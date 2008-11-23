@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -154,7 +154,7 @@ int do_admin(User * u)
 			notice_lang(s_OperServ, u, READ_ONLY_MODE);
 	} else if (!stricmp(cmd, "LIST")) {
 		int sent_header = 0;
-		
+
 		if (servadmins.count == 0) {
 			notice_lang(s_OperServ, u, OPER_ADMIN_LIST_EMPTY);
 			return MOD_CONT;
@@ -176,11 +176,11 @@ int do_admin(User * u)
 
 			for (i = 0; i < servadmins.count; i++)
 				if (!stricmp
-					(nick, ((NickCore *) servadmins.list[i])->display)
+					(nick, (static_cast<NickCore *>(servadmins.list[i]))->display)
 					|| match_wild_nocase(nick,
-										 ((NickCore *) servadmins.
-										  list[i])->display))
-					admin_list(i + 1, (NickCore *)servadmins.list[i], u, &sent_header);
+										 (static_cast<NickCore *>(servadmins.
+										  list[i]))->display))
+					admin_list(i + 1, static_cast<NickCore *>(servadmins.list[i]), u, &sent_header);
 
 			if (!sent_header)
 				notice_lang(s_OperServ, u, OPER_ADMIN_NO_MATCH);
@@ -213,7 +213,7 @@ int admin_list_callback(SList * slist, int number, void *item,
 	User *u = va_arg(args, User *);
 	int *sent_header = va_arg(args, int *);
 
-	return admin_list(number, (NickCore *)item, u, sent_header);
+	return admin_list(number, static_cast<NickCore *>(item), u, sent_header);
 }
 
 int admin_list(int number, NickCore * nc, User * u, int *sent_header)

@@ -167,7 +167,7 @@ void common_unban(ChannelInfo * ci, char *nick)
 		ircdproto->SendBanDel(ci->name, nick);
 	} else {
 		if (ircdcap->tsmode) {
-			snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+			snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 			av[0] = ci->name;
 			av[1] = buf;
 			av[2] = "-b";

@@ -418,7 +418,7 @@ void sighandler(int signum)
 		   !(quitmsg = new char[BUFSIZE])) {
 		quitmsg = "Out of memory!";
 	} else {
-		snprintf((char *)quitmsg, BUFSIZE, "Services terminating on signal %d", signum);
+		snprintf(const_cast<char *>(quitmsg), BUFSIZE, "Services terminating on signal %d", signum);
 	}
 
 	if (signum == SIGSEGV) {
@@ -554,7 +554,7 @@ int main(int ac, char **av, char **envp)
 		waiting = 1;
 		/* this is a nasty nasty typecast. we need to rewrite the
 		   socket stuff -Certus */
-		i = (int) (long) sgets2(inbuf, sizeof(inbuf), servsock);
+		i = static_cast<int>(reinterpret_cast<long>(sgets2(inbuf, sizeof(inbuf), servsock)));
 		waiting = 0;
 		if ((i > 0) || (i < (-1))) {
 			process();
@@ -563,7 +563,7 @@ int main(int ac, char **av, char **envp)
 			quitmsg = new char[BUFSIZE];
 			if (quitmsg) {
 		// Naughty, but oh well. :)
-				snprintf((char *)quitmsg, BUFSIZE,
+				snprintf(const_cast<char *>(quitmsg), BUFSIZE,
 						 "Read error from server: %s (error num: %d)",
 						 strerror(errno_save), errno_save);
 			} else {

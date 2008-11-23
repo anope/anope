@@ -133,14 +133,14 @@ int do_register(User * u)
 				return MOD_CONT;
 			}
 		}
-		for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]); i++) {
+		for (i = 0; i < servadmins.count && (nc = static_cast<NickCore *>(servadmins.list[i])); i++) {
 			if (stristr(u->nick, nc->display) && !is_oper(u)) {
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
 							u->nick);
 				return MOD_CONT;
 			}
 		}
-		for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]); i++) {
+		for (i = 0; i < servopers.count && (nc = static_cast<NickCore *>(servopers.list[i])); i++) {
 			if (stristr(u->nick, nc->display) && !is_oper(u)) {
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
 							u->nick);
@@ -180,7 +180,7 @@ int do_register(User * u)
 		for (idx = 0; idx < 9; idx++) {
 			passcode[idx] =
 				chars[(1 +
-					   (int) (((float) (max - min)) * getrandom16() /
+					   static_cast<int>((static_cast<float>(max - min)) * getrandom16() /
 							  (65535 + 1.0)) + min)];
 		} passcode[idx] = '\0';
 		nr = makerequest(u->nick);
@@ -301,7 +301,7 @@ int do_confirm(User * u)
 		char tmp_pass[PASSMAX];
 
 		memcpy(na->nc->pass, nr->password, PASSMAX);
-		na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
+		na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
 /*		na->nc->flags |= NI_ENCRYPTEDPW; */
 
 		na->nc->flags |= NSDefFlags;
@@ -326,7 +326,7 @@ int do_confirm(User * u)
 		na->time_registered = na->last_seen = time(NULL);
 		if (NSAddAccessOnReg) {
 			na->nc->accesscount = 1;
-			na->nc->access = (char **)scalloc(sizeof(char *), 1);
+			na->nc->access = static_cast<char **>(scalloc(sizeof(char *), 1));
 			na->nc->access[0] = create_mask(u);
 		} else {
 			na->nc->accesscount = 0;
@@ -365,7 +365,7 @@ int do_confirm(User * u)
 
 				if (ircd->tsonmode) {
 					snprintf(tsbuf, sizeof(tsbuf), "%lu",
-							 (unsigned long int) u->timestamp);
+							 static_cast<unsigned long>(u->timestamp));
 					common_svsmode(u, modes, tsbuf);
 				} else {
 					common_svsmode(u, modes, NULL);

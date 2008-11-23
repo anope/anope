@@ -91,7 +91,7 @@ int displayEventHook(EvtHook * evh)
 	int i = 0;
 	alog("Displaying message list for %s", evh->name);
 	for (msg = evh; msg; msg = msg->next) {
-		alog("%d: 0x%p", ++i, (void *) msg);
+		alog("%d: 0x%p", ++i, static_cast<void *>(msg));
 	}
 	alog("end");
 	return 0;
@@ -199,7 +199,7 @@ int addEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
 			current->evh = evh;
 			if (debug)
 				alog("debug: existing msg: (0x%p), new msg (0x%p)",
-					 (void *) evh->next, (void *) evh);
+					 static_cast<void *>(evh->next), static_cast<void *>(evh));
 			return MOD_ERR_OK;
 		}
 		lastHash = current;

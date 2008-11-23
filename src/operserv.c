@@ -284,7 +284,7 @@ void save_os_dbase(void)
 
 	SAFE(write_int16(akills.count, f));
 	for (i = 0; i < akills.count; i++) {
-		ak = (Akill *)akills.list[i];
+		ak = static_cast<Akill *>(akills.list[i]);
 
 		SAFE(write_string(ak->user, f));
 		SAFE(write_string(ak->host, f));
@@ -296,7 +296,7 @@ void save_os_dbase(void)
 
 	SAFE(write_int16(sglines.count, f));
 	for (i = 0; i < sglines.count; i++) {
-		sx = (SXLine *)sglines.list[i];
+		sx = static_cast<SXLine *>(sglines.list[i]);
 
 		SAFE(write_string(sx->mask, f));
 		SAFE(write_string(sx->by, f));
@@ -307,7 +307,7 @@ void save_os_dbase(void)
 
 	SAFE(write_int16(sqlines.count, f));
 	for (i = 0; i < sqlines.count; i++) {
-		sx = (SXLine *)sqlines.list[i];
+		sx = static_cast<SXLine *>(sqlines.list[i]);
 
 		SAFE(write_string(sx->mask, f));
 		SAFE(write_string(sx->by, f));
@@ -318,7 +318,7 @@ void save_os_dbase(void)
 
 	SAFE(write_int16(szlines.count, f));
 	for (i = 0; i < szlines.count; i++) {
-		sx = (SXLine *)szlines.list[i];
+		sx = static_cast<SXLine *>(szlines.list[i]);
 
 		SAFE(write_string(sx->mask, f));
 		SAFE(write_string(sx->by, f));
@@ -516,7 +516,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
 		for (i = akills.count - 1; i >= 0; i--) {
 			char amask[BUFSIZE];
 
-			entry = (Akill *)akills.list[i];
+			entry = static_cast<Akill *>(akills.list[i]);
 
 			if (!entry)
 				continue;
@@ -626,7 +626,7 @@ int check_akill(const char *nick, const char *username, const char *host,
 		return 0;
 
 	for (i = 0; i < akills.count; i++) {
-		ak = (Akill *)akills.list[i];
+		ak = static_cast<Akill *>(akills.list[i]);
 		if (!ak)
 			continue;
 		if (match_wild_nocase(ak->user, username)
@@ -670,7 +670,7 @@ void expire_akills(void)
 	Akill *ak;
 
 	for (i = akills.count - 1; i >= 0; i--) {
-		ak = (Akill *)akills.list[i];
+		ak = static_cast<Akill *>(akills.list[i]);
 
 		if (!ak->expires || ak->expires > now)
 			continue;
@@ -684,7 +684,7 @@ void expire_akills(void)
 
 static void free_akill_entry(SList * slist, void *item)
 {
-	Akill *ak = (Akill *)item;
+	Akill *ak = static_cast<Akill *>(item);
 
 	/* Remove the AKILLs from all the servers */
 	ircdproto->SendAkillDel(ak->user, ak->host);
@@ -702,8 +702,8 @@ static void free_akill_entry(SList * slist, void *item)
 
 static int is_akill_entry_equal(SList * slist, void *item1, void *item2)
 {
-	char *ak1 = (char *)item1, buf[BUFSIZE];
-	Akill *ak2 = (Akill *)item2;
+	char *ak1 = static_cast<char *>(item1), buf[BUFSIZE];
+	Akill *ak2 = static_cast<Akill *>(item2);
 
 	if (!ak1 || !ak2)
 		return 0;
@@ -747,7 +747,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 	if (sglines.count > 0) {
 
 		for (i = sglines.count - 1; i >= 0; i--) {
-			entry = (SXLine *)sglines.list[i];
+			entry = static_cast<SXLine *>(sglines.list[i]);
 
 			if (!entry)
 				continue;
@@ -834,7 +834,7 @@ int check_sgline(const char *nick, const char *realname)
 		return 0;
 
 	for (i = 0; i < sglines.count; i++) {
-		sx = (SXLine *)sglines.list[i];
+		sx = static_cast<SXLine *>(sglines.list[i]);
 		if (!sx)
 			continue;
 
@@ -858,7 +858,7 @@ void expire_sglines(void)
 	SXLine *sx;
 
 	for (i = sglines.count - 1; i >= 0; i--) {
-		sx = (SXLine *)sglines.list[i];
+		sx = static_cast<SXLine *>(sglines.list[i]);
 
 		if (!sx->expires || sx->expires > now)
 			continue;
@@ -872,7 +872,7 @@ void expire_sglines(void)
 
 static void free_sgline_entry(SList * slist, void *item)
 {
-	SXLine *sx = (SXLine *)item;
+	SXLine *sx = static_cast<SXLine *>(item);
 
 	/* Remove the SGLINE from all the servers */
 	ircdproto->SendSGLineDel(sx->mask);
@@ -888,8 +888,8 @@ static void free_sgline_entry(SList * slist, void *item)
 
 static int is_sgline_entry_equal(SList * slist, void *item1, void *item2)
 {
-	char *sx1 = (char *)item1;
-	SXLine *sx2 = (SXLine *)item2;
+	char *sx1 = static_cast<char *>(item1);
+	SXLine *sx2 = static_cast<SXLine *>(item2);
 
 	if (!sx1 || !sx2)
 		return 0;
@@ -930,7 +930,7 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
 	if (sqlines.count > 0) {
 
 		for (i = sqlines.count - 1; i >= 0; i--) {
-			entry = (SXLine *)sqlines.list[i];
+			entry = static_cast<SXLine *>(sqlines.list[i]);
 
 			if (!entry)
 				continue;
@@ -1023,7 +1023,7 @@ int check_sqline(const char *nick, int nick_change)
 		return 0;
 
 	for (i = 0; i < sqlines.count; i++) {
-		sx = (SXLine *)sqlines.list[i];
+		sx = static_cast<SXLine *>(sqlines.list[i]);
 		if (!sx)
 			continue;
 
@@ -1053,7 +1053,7 @@ int check_chan_sqline(const char *chan)
 		return 0;
 
 	for (i = 0; i < sqlines.count; i++) {
-		sx = (SXLine *)sqlines.list[i];
+		sx = static_cast<SXLine *>(sqlines.list[i]);
 		if (!sx)
 			continue;
 
@@ -1078,7 +1078,7 @@ void expire_sqlines(void)
 	SXLine *sx;
 
 	for (i = sqlines.count - 1; i >= 0; i--) {
-		sx = (SXLine *)sqlines.list[i];
+		sx = static_cast<SXLine *>(sqlines.list[i]);
 
 		if (!sx->expires || sx->expires > now)
 			continue;
@@ -1093,7 +1093,7 @@ void expire_sqlines(void)
 
 static void free_sqline_entry(SList * slist, void *item)
 {
-	SXLine *sx = (SXLine *)item;
+	SXLine *sx = static_cast<SXLine *>(item);
 
 	/* Remove the SQLINE from all the servers */
 	ircdproto->SendSQLineDel(sx->mask);
@@ -1109,8 +1109,8 @@ static void free_sqline_entry(SList * slist, void *item)
 
 static int is_sqline_entry_equal(SList * slist, void *item1, void *item2)
 {
-	char *sx1 = (char *)item1;
-	SXLine *sx2 = (SXLine *)item2;
+	char *sx1 = static_cast<char *>(item1);
+	SXLine *sx2 = static_cast<SXLine *>(item2);
 
 	if (!sx1 || !sx2)
 		return 0;
@@ -1148,7 +1148,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
 	if (szlines.count > 0) {
 
 		for (i = szlines.count - 1; i >= 0; i--) {
-			entry = (SXLine *)szlines.list[i];
+			entry = static_cast<SXLine *>(szlines.list[i]);
 
 			if (!entry)
 				continue;
@@ -1223,7 +1223,7 @@ int check_szline(const char *nick, char *ip)
 	}
 
 	for (i = 0; i < szlines.count; i++) {
-		sx = (SXLine *)szlines.list[i];
+		sx = static_cast<SXLine *>(szlines.list[i]);
 		if (!sx) {
 			continue;
 		}
@@ -1247,7 +1247,7 @@ void expire_szlines(void)
 	SXLine *sx;
 
 	for (i = szlines.count - 1; i >= 0; i--) {
-		sx = (SXLine *)szlines.list[i];
+		sx = static_cast<SXLine *>(szlines.list[i]);
 
 		if (!sx->expires || sx->expires > now)
 			continue;
@@ -1261,7 +1261,7 @@ void expire_szlines(void)
 
 static void free_szline_entry(SList * slist, void *item)
 {
-	SXLine *sx = (SXLine *)item;
+	SXLine *sx = static_cast<SXLine *>(item);
 
 	/* Remove the SZLINE from all the servers */
 	ircdproto->SendSZLineDel(sx->mask);
@@ -1278,8 +1278,8 @@ static void free_szline_entry(SList * slist, void *item)
 
 static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 {
-	char *sx1 = (char *)item1;
-	SXLine *sx2 = (SXLine *)item2;
+	char *sx1 = static_cast<char *>(item1);
+	SXLine *sx2 = static_cast<SXLine *>(item2);
 
 	if (!sx1 || !sx2)
 		return 0;
@@ -1297,7 +1297,7 @@ static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 static int compare_adminlist_entries(SList * slist, void *item1,
 									 void *item2)
 {
-	NickCore *nc1 = (NickCore *)item1, *nc2 = (NickCore *)item2;
+	NickCore *nc1 = static_cast<NickCore *>(item1), *nc2 = static_cast<NickCore *>(item2);
 	if (!nc1 || !nc2)
 		return -1;			  /* To tell to continue */
 	return stricmp(nc1->display, nc2->display);
@@ -1307,7 +1307,7 @@ static int compare_adminlist_entries(SList * slist, void *item1,
 
 static void free_adminlist_entry(SList * slist, void *item)
 {
-	NickCore *nc = (NickCore *)item;
+	NickCore *nc = static_cast<NickCore *>(item);
 	nc->flags &= ~NI_SERVICES_ADMIN;
 }
 
@@ -1318,7 +1318,7 @@ static void free_adminlist_entry(SList * slist, void *item)
 static int compare_operlist_entries(SList * slist, void *item1,
 									void *item2)
 {
-	NickCore *nc1 = (NickCore *)item1, *nc2 = (NickCore *)item2;
+	NickCore *nc1 = static_cast<NickCore *>(item1), *nc2 = static_cast<NickCore *>(item2);
 	if (!nc1 || !nc2)
 		return -1;			  /* To tell to continue */
 	return stricmp(nc1->display, nc2->display);
@@ -1328,7 +1328,7 @@ static int compare_operlist_entries(SList * slist, void *item1,
 
 static void free_operlist_entry(SList * slist, void *item)
 {
-	NickCore *nc = (NickCore *)item;
+	NickCore *nc = static_cast<NickCore *>(item);
 	nc->flags &= ~NI_SERVICES_OPER;
 }
 
@@ -1465,7 +1465,7 @@ int defconParseModeString(const char *str)
 				continue;
 		}
 
-		if ((int) mode < 128 && (cbm = &cbmodes[(int) mode])->flag != 0) {
+		if (static_cast<int>(mode) < 128 && (cbm = &cbmodes[static_cast<int>(mode)])->flag != 0) {
 			if (cbm->flags & CBM_NO_MLOCK) {
 				alog("DefConChanModes mode character '%c' cannot be locked", mode);
 				delete [] str_copy;

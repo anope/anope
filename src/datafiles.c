@@ -466,7 +466,7 @@ int read_ptr(void **ret, dbFILE * f)
 	c = fgetc(f->fp);
 	if (c == EOF)
 		return -1;
-	*ret = (c ? (void *) 1 : (void *) 0);
+	*ret = (c ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0));
 	return 0;
 }
 
@@ -533,7 +533,7 @@ int write_string(const char *s, dbFILE * f)
 	len = strlen(s);
 	if (len > 65534)
 		len = 65534;
-	if (write_int16((uint16) (len + 1), f) < 0)
+	if (write_int16(static_cast<uint16>(len + 1), f) < 0)
 		return -1;
 	if (len > 0 && fwrite(s, 1, len, f->fp) != len)
 		return -1;

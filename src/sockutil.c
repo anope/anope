@@ -180,7 +180,7 @@ static int buffered_read_one(ano_socket_t fd)
 	total_read++;
 	if (debug >= 4)
 		alog("debug: buffered_read_one(%d) returning %d", fd, c);
-	return (int) c & 0xFF;
+	return static_cast<int>(c) & 0xFF;
 }
 
 /*************************************************************************/
@@ -429,7 +429,7 @@ char *sgets(char *buf, int len, ano_socket_t s)
 		flush_write_buffer(0);
 	}
 	if (read_buffer_len() == 0 && c == 0)
-		return (char *) -1;
+		return reinterpret_cast<char *>(-1);
 	c = sgetc(s);
 	while (--len && (*ptr++ = c) != '\n' && (c = sgetc(s)) >= 0);
 	if (c < 0)
@@ -452,7 +452,7 @@ char *sgets2(char *buf, int len, ano_socket_t s)
 {
 	char *str = sgets(buf, len, s);
 
-	if (!str || str == (char *) -1)
+	if (!str || str == reinterpret_cast<char *>(-1))
 		return str;
 	str = buf + strlen(buf) - 1;
 	if (*str == '\n')
@@ -565,11 +565,11 @@ int conn(const char *host, int port, const char *lhost, int lport)
 	if (lhost) {
 #if HAVE_GETHOSTBYNAME
 		if ((hp = gethostbyname(lhost)) != NULL) {
-			memcpy((char *) &lsa.sin_addr, hp->h_addr, hp->h_length);
+			memcpy(&lsa.sin_addr, hp->h_addr, hp->h_length);
 			lsa.sin_family = hp->h_addrtype;
 #else
 		if (addr = pack_ip(lhost)) {
-			memcpy((char *) &lsa.sin_addr, addr, 4);
+			memcpy(&lsa.sin_addr, addr, 4);
 			lsa.sin_family = AF_INET;
 #endif
 		} else {
@@ -577,13 +577,13 @@ int conn(const char *host, int port, const char *lhost, int lport)
 		}
 	}
 	if (lport)
-		lsa.sin_port = htons((unsigned short) lport);
+		lsa.sin_port = htons(static_cast<unsigned short>(lport));
 
 	memset(&sa, 0, sizeof(sa));
 #if HAVE_GETHOSTBYNAME
 	if (!(hp = gethostbyname(host)))
 		return -1;
-	memcpy((char *) &sa.sin_addr, hp->h_addr, hp->h_length);
+	memcpy(&sa.sin_addr, hp->h_addr, hp->h_length);
 	sa.sin_family = hp->h_addrtype;
 #else
 	if (!(addr = pack_ip(host))) {
@@ -591,28 +591,28 @@ int conn(const char *host, int port, const char *lhost, int lport)
 		ano_sockseterr(SOCKERR_EINVAL);
 		return -1;
 	}
-	memcpy((char *) &sa.sin_addr, addr, 4);
+	memcpy(&sa.sin_addr, addr, 4);
 	sa.sin_family = AF_INET;
 #endif
-	sa.sin_port = htons((unsigned short) port);
+	sa.sin_port = htons(static_cast<unsigned short>(port));
 
 	if ((sock = socket(sa.sin_family, SOCK_STREAM, 0)) < 0)
 		return -1;
 
 	if (setsockopt
-		(sock, SOL_SOCKET, SO_REUSEADDR, (char *) &sockopt,
+		(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&sockopt),
 		 sizeof(int)) < 0)
 		alog("debug: couldn't set SO_REUSEADDR on socket");
 
 	if ((lhost || lport)
-		&& bind(sock, (struct sockaddr *) &lsa, sizeof(lsa)) < 0) {
+		&& bind(sock, reinterpret_cast<struct sockaddr *>(&lsa), sizeof(lsa)) < 0) {
 		int errno_save = ano_sockgeterr();
 		ano_sockclose(sock);
 		ano_sockseterr(errno_save);
 		return -1;
 	}
 
-	if (connect(sock, (struct sockaddr *) &sa, sizeof(sa)) < 0) {
+	if (connect(sock, reinterpret_cast<struct sockaddr *>(&sa), sizeof(sa)) < 0) {
 		int errno_save = ano_sockgeterr();
 		ano_sockclose(sock);
 		ano_sockseterr(errno_save);

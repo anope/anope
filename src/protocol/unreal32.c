@@ -475,7 +475,7 @@ void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
 
 void unreal_cmd_netinfo(int ac, const char **av)
 {
-	send_cmd(NULL, "AO %ld %ld %d %s 0 0 0 :%s", (long int) maxusercnt, (long int) time(NULL), atoi(av[2]), av[3], av[7]);
+	send_cmd(NULL, "AO %ld %ld %d %s 0 0 0 :%s", static_cast<long>(maxusercnt), static_cast<long>(time(NULL)), atoi(av[2]), av[3], av[7]);
 }
 /* PROTOCTL */
 /*
@@ -1335,7 +1335,7 @@ int anope_event_sdesc(const char *source, int ac, const char **av)
 	s = findserver(servlist, source);
 
 	if (s) {
-		s->desc = (char *)av[0]; // XXX Unsafe cast -- CyberBotX
+		s->desc = const_cast<char *>(av[0]); // XXX Unsafe cast -- CyberBotX
 	}
 
 	return MOD_CONT;

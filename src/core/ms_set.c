@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -38,7 +38,7 @@ class MSSet : public Module
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 
 		c = createCommand("SET LIMIT", NULL, NULL, -1, MEMO_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT);
-		c->help_param1 = (char *) (long) MSMaxMemos;
+		c->help_param1 = reinterpret_cast<char *>(static_cast<long>(MSMaxMemos));
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 
 		moduleSetMemoHelp(myMemoServHelp);

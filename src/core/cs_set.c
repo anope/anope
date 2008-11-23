@@ -56,7 +56,7 @@ class CSSet : public Module
 		c = createCommand("SET FOUNDER", NULL, NULL, CHAN_HELP_SET_FOUNDER, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 		c = createCommand("SET SUCCESSOR", NULL, NULL, CHAN_HELP_SET_SUCCESSOR, -1, -1, -1, -1);
-		c->help_param1 = (char *) (long) CSMaxReg;
+		c->help_param1 = reinterpret_cast<char *>(static_cast<long>(CSMaxReg));
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 		c = createCommand("SET PASSWORD", NULL, NULL, CHAN_HELP_SET_PASSWORD, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
@@ -470,7 +470,7 @@ int do_set_mlock(User * u, ChannelInfo * ci, char *param)
 				continue;
 		}
 
-		if ((int) mode < 128 && (cbm = &cbmodes[(int) mode])->flag != 0) {
+		if (static_cast<int>(mode) < 128 && (cbm = &cbmodes[static_cast<int>(mode)])->flag != 0) {
 			if ((cbm->flags & CBM_NO_MLOCK)
 				|| ((cbm->flags & CBM_NO_USER_MLOCK) && !is_oper(u))) {
 				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR,

@@ -105,7 +105,7 @@ int do_identify(User * u)
 		na->status |= NS_IDENTIFIED;
 		na->last_seen = time(NULL);
 		snprintf(tsbuf, sizeof(tsbuf), "%lu",
-				 (unsigned long int) u->timestamp);
+				 static_cast<unsigned long>(u->timestamp));
 
 		if (ircd->modeonreg) {
 			len = strlen(ircd->modeonreg);

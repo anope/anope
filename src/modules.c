@@ -53,7 +53,7 @@ char *ModuleGetErrStr(int status)
 		"Module Error, No Service found for request",				/* MOD_ERR_NOSERVICE */
 		"Module Error, No module name for request"				/* MOD_ERR_NO_MOD_NAME */
 	};
-	return (char *) module_err_str[status];
+	return const_cast<char *>(module_err_str[status]);
 }
 
 
@@ -310,7 +310,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 				current->c = c;
 				if (debug)
 					alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
-						 (void *) c->next, (void *) c);
+						 static_cast<void *>(c->next), static_cast<void *>(c));
 				return MOD_ERR_OK;
 			} else if (pos == 2) {
 
@@ -319,7 +319,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 					tail = tail->next;
 				if (debug)
 					alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
-						 (void *) tail, (void *) c);
+						 static_cast<void *>(tail), static_cast<void *>(c));
 				tail->next = c;
 				c->next = NULL;
 
@@ -616,7 +616,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
 				current->m = m;
 				if (debug)
 					alog("debug: existing msg: (0x%p), new msg (0x%p)",
-						 (void *) m->next, (void *) m);
+						 static_cast<void *>(m->next), static_cast<void *>(m));
 				return MOD_ERR_OK;
 			} else if (pos == 2) {
 				tail = current->m;
@@ -624,7 +624,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
 					tail = tail->next;
 				if (debug)
 					alog("debug: existing msg: (0x%p), new msg (0x%p)",
-						 (void *) tail, (void *) m);
+						 static_cast<void *>(tail), static_cast<void *>(m));
 				tail->next = m;
 				m->next = NULL;
 				return MOD_ERR_OK;
@@ -792,7 +792,7 @@ int Module::AddCallback(const char *name, time_t when,
 	}
 	if (debug)
 		alog("debug: added module CallBack: [%s] due to execute at %ld",
-			 newcb->name ? newcb->name : "?", (long int) newcb->when);
+			 newcb->name ? newcb->name : "?", static_cast<long>(newcb->when));
 	return MOD_ERR_OK;
 }
 

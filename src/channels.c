@@ -182,7 +182,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 			alog("debug: Removing instead of setting due to DEOPPED flag");
 
 		/* Swap adding and removing of the modes */
-		for (s = (char *)av[0]; *s; s++) { // XXX Unsafe cast, this needs reviewing -- CyberBotX
+		for (s = const_cast<char *>(av[0]); *s; s++) { // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			if (*s == '+')
 				*s = '-';
 			else if (*s == '-')
@@ -208,13 +208,13 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 			continue;
 		}
 
-		if (((int) mode) < 0) {
+		if (static_cast<int>(mode) < 0) {
 			if (debug)
 				alog("Debug: Malformed mode detected on %s.", chan->name);
 			continue;
 		}
 
-		if ((cum = &cumodes[(int) mode])->status != 0) {
+		if ((cum = &cumodes[static_cast<int>(mode)])->status != 0) {
 			if (ac == 0) {
 				alog("channel: mode %c%c with no parameter (?) for channel %s", add ? '+' : '-', mode, chan->name);
 				continue;
@@ -262,7 +262,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 				chan_remove_user_status(chan, user, cum->status);
 			}
 
-		} else if ((cbm = &cbmodes[(int) mode])->flag != 0) {
+		} else if ((cbm = &cbmodes[static_cast<int>(mode)])->flag != 0) {
 			if (check >= 0) {
 				if (add)
 					chan->mode |= cbm->flag;
@@ -288,7 +288,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 				else
 					chan->mode &= ~cbm->flag;
 			}
-		} else if ((cmm = &cmmodes[(int) mode])->addmask) {
+		} else if ((cmm = &cmmodes[static_cast<int>(mode)])->addmask) {
 			if (ac == 0) {
 				alog("channel: mode %c%c with no parameter (?) for channel %s", add ? '+' : '-', mode, chan->name);
 				continue;
@@ -374,13 +374,13 @@ Channel *findchan(const char *chan)
 	while (c) {
 		if (stricmp(c->name, chan) == 0) {
 			if (debug >= 3)
-				alog("debug: findchan(%s) -> %p", chan, (void *) c);
+				alog("debug: findchan(%s) -> %p", chan, static_cast<void *>(c));
 			return c;
 		}
 		c = c->next;
 	}
 	if (debug >= 3)
-		alog("debug: findchan(%s) -> %p", chan, (void *) c);
+		alog("debug: findchan(%s) -> %p", chan, static_cast<void *>(c));
 	return NULL;
 }
 
@@ -539,7 +539,7 @@ void do_join(const char *source, int ac, const char **av)
 		return;
 	}
 
-	t = (char *)av[0]; // XXX Unsafe cast, this needs reviewing -- CyberBotX
+	t = const_cast<char *>(av[0]); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 	while (*(s = t)) {
 		t = s + strcspn(s, ",");
 		if (*t)
@@ -576,7 +576,7 @@ void do_join(const char *source, int ac, const char **av)
 		if (ac == 2) {
 			if (debug) {
 				alog("debug: recieved a new TS for JOIN: %ld",
-					 (long int) ts);
+					 static_cast<long>(ts));
 			}
 			ts = strtoul(av[1], NULL, 10);
 		}
@@ -605,7 +605,7 @@ void do_kick(const char *source, int ac, const char **av)
 	char *s, *t;
 	struct u_chanlist *c;
 
-	t = (char *)av[1]; // XXX unsafe cast, this needs reviewing -- w00t
+	t = const_cast<char *>(av[1]); // XXX unsafe cast, this needs reviewing -- w00t
 	while (*(s = t)) {
 		t = s + strcspn(s, ",");
 		if (*t)
@@ -682,7 +682,7 @@ void do_part(const char *source, int ac, const char **av)
 		}
 		return;
 	}
-	t = (char *)av[0]; // XXX Unsafe cast, this needs reviewing -- CyberBotX
+	t = const_cast<char *>(av[0]); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 	while (*(s = t)) {
 		t = s + strcspn(s, ",");
 		if (*t)
@@ -850,8 +850,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 				}
 			}
 
-			while (csmodes[(int) *s] != 0)
-				*end2++ = csmodes[(int) *s++];
+			while (csmodes[static_cast<int>(*s)] != 0)
+				*end2++ = csmodes[static_cast<int>(*s++)];
 			*end2 = 0;
 
 
@@ -936,8 +936,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 			end2 = cubuf + 1;
 
-			while (csmodes[(int) *s] != 0)
-				*end2++ = csmodes[(int) *s++];
+			while (csmodes[static_cast<int>(*s)] != 0)
+				*end2++ = csmodes[static_cast<int>(*s++)];
 			*end2 = 0;
 
 			if (ircd->ts6) {
@@ -1011,8 +1011,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 			end2 = cubuf + 1;
 
-			while (csmodes[(int) *s] != 0)
-				*end2++ = csmodes[(int) *s++];
+			while (csmodes[static_cast<int>(*s)] != 0)
+				*end2++ = csmodes[static_cast<int>(*s++)];
 			*end2 = 0;
 
 			if (ircd->ts6) {
@@ -1788,7 +1788,7 @@ char *get_limit(Channel * chan)
 	if (chan->limit == 0)
 		return NULL;
 
-	snprintf(limit, sizeof(limit), "%lu", (unsigned long int) chan->limit);
+	snprintf(limit, sizeof(limit), "%lu", static_cast<unsigned long>(chan->limit));
 	return limit;
 }
 

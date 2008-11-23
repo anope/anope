@@ -224,10 +224,10 @@ int do_sqline(User * u)
 			char *amask;
 
 			for (i = 0; i < sqlines.count; i++) {
-				amask = ((SXLine *) sqlines.list[i])->mask;
+				amask = (static_cast<SXLine *>(sqlines.list[i]))->mask;
 				if (!stricmp(mask, amask)
 					|| match_wild_nocase(mask, amask))
-					sqline_list(i + 1, (SXLine *)sqlines.list[i], u, &sent_header);
+					sqline_list(i + 1, static_cast<SXLine *>(sqlines.list[i]), u, &sent_header);
 			}
 
 			if (!sent_header)
@@ -261,10 +261,10 @@ int do_sqline(User * u)
 			char *amask;
 
 			for (i = 0; i < sqlines.count; i++) {
-				amask = ((SXLine *) sqlines.list[i])->mask;
+				amask = (static_cast<SXLine *>(sqlines.list[i]))->mask;
 				if (!stricmp(mask, amask)
 					|| match_wild_nocase(mask, amask))
-					sqline_view(i + 1, (SXLine *)sqlines.list[i], u, &sent_header);
+					sqline_view(i + 1, static_cast<SXLine *>(sqlines.list[i]), u, &sent_header);
 			}
 
 			if (!sent_header)
@@ -310,7 +310,7 @@ int sqline_view_callback(SList * slist, int number, void *item,
 	User *u = va_arg(args, User *);
 	int *sent_header = va_arg(args, int *);
 
-	return sqline_view(number, (SXLine *)item, u, sent_header);
+	return sqline_view(number, static_cast<SXLine *>(item), u, sent_header);
 }
 
 /* Lists an SQLINE entry, prefixing it with the header if needed */
@@ -339,7 +339,7 @@ int sqline_list_callback(SList * slist, int number, void *item,
 	User *u = va_arg(args, User *);
 	int *sent_header = va_arg(args, int *);
 
-	return sqline_list(number, (SXLine *)item, u, sent_header);
+	return sqline_list(number, static_cast<SXLine *>(item), u, sent_header);
 }
 
 MODULE_INIT("os_sqline", OSSQLine)

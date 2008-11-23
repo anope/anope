@@ -694,7 +694,7 @@ void bot_join(ChannelInfo * ci)
 			int ac;
 
 			if (ircdcap->tsmode) {
-				snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+				snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 				av[0] = ci->c->name;
 				av[1] = buf;
 				av[2] = "-b";
@@ -723,7 +723,7 @@ void bot_join(ChannelInfo * ci)
 
 		/* Should we be invited? */
 		if ((ci->c->mode & anope_get_invite_mode())
-			|| (ci->c->limit && (unsigned int)ci->c->usercount >= ci->c->limit))
+			|| (ci->c->limit && ci->c->usercount >= ci->c->limit))
 			ircdproto->SendNoticeChanops(NULL, ci->c->name,
 								 "%s invited %s into the channel.",
 								 ci->bi->nick, ci->bi->nick);
@@ -757,7 +757,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
 		get_idealban(ci, u, mask, sizeof(mask));
 
 		if (ircdcap->tsmode) {
-			snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+			snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 			av[0] = ci->name;
 			av[1] = buf;
 			av[2] = "+b";
@@ -845,7 +845,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	get_idealban(ci, u, mask, sizeof(mask));
 
 	if (ircdcap->tsmode) {
-		snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+		snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 		av[0] = ci->name;
 		av[1] = buf;
 		av[2] = "+b";
@@ -868,7 +868,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 		kav[2] = ci->bi->nick;
 	} else {
 		if (strlen(reason) > 200)
-			*((char **)&reason[200]) = '\0'; // Unsafe cast -- will review later -- CyberBotX
+			(*const_cast<char **>(&reason))[200] = '\0'; // Unsafe cast -- will review later -- CyberBotX
 		kav[2] = reason;
 	}
 
@@ -917,7 +917,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 		av[2] = ci->bi->nick;
 	} else {
 		if (strlen(reason) > 200)
-			*((char **)&reason[200]) = '\0'; // Unsafe cast -- will review later -- CyberBotX
+			(*const_cast<char **>(&reason))[200] = '\0'; // Unsafe cast -- will review later -- CyberBotX
 		av[2] = reason;
 	}
 
@@ -950,7 +950,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 	if (!u || !is_on_chan(ci->c, u))
 		return;
 
-	snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 
 	if (ircd->protectedumode) {
 		if (is_protected(u) && *mode == '-' && (requester != u)) {

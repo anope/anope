@@ -133,7 +133,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 		if (s_BotServ && (ci = cs_findchan(receiver))) {
 			/* Some paranoia checks */
 			if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi) {
-				botchanmsgs(u, ci, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				botchanmsgs(u, ci, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
 		}
 	} else {
@@ -173,25 +173,25 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 									 s_OperServ, u->nick, u->username,
 									 u->host);
 			} else {
-				operserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
 		} else if (!stricmp(receiver, s_NickServ)) {
-			nickserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			nickserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (!stricmp(receiver, s_ChanServ)) {
 			if (!is_oper(u) && CSOpersOnly)
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			else
-				chanserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				chanserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (!stricmp(receiver, s_MemoServ)) {
-			memoserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			memoserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_HostServ && !stricmp(receiver, s_HostServ)) {
-			hostserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			hostserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_HelpServ && !stricmp(receiver, s_HelpServ)) {
-			helpserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			helpserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_BotServ && !stricmp(receiver, s_BotServ)) {
-			botserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			botserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_BotServ && (bi = findbot(receiver))) {
-			botmsgs(u, bi, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			botmsgs(u, bi, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		}
 
 		/* Add to ignore list if the command took a significant amount of time. */
@@ -237,10 +237,10 @@ int m_stats(const char *source, int ac, const char **av)
 		} else {
 			for (i = 0; i < RootNumber; i++)
 				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Root 0", ServicesRoots[i]);
-			for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]);
+			for (i = 0; i < servadmins.count && (nc = static_cast<NickCore *>(servadmins.list[i]));
 				 i++)
 				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Admin 0", nc->display);
-			for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]);
+			for (i = 0; i < servopers.count && (nc = static_cast<NickCore *>(servopers.list[i]));
 				 i++)
 				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Oper 0", nc->display);
 

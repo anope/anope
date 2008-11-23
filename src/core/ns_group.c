@@ -104,14 +104,14 @@ int do_group(User * u)
 				return MOD_CONT;
 			}
 		}
-		for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]); i++) {
+		for (i = 0; i < servadmins.count && (nc = static_cast<NickCore *>(servadmins.list[i])); i++) {
 			if (stristr(u->nick, nc->display) && !is_oper(u)) {
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
 							u->nick);
 				return MOD_CONT;
 			}
 		}
-		for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]); i++) {
+		for (i = 0; i < servopers.count && (nc = static_cast<NickCore *>(servopers.list[i])); i++) {
 			if (stristr(u->nick, nc->display) && !is_oper(u)) {
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
 							u->nick);
@@ -182,7 +182,7 @@ int do_group(User * u)
 					common_get_vhost(u));
 			na->last_realname = sstrdup(u->realname);
 			na->time_registered = na->last_seen = time(NULL);
-			na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
+			na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
 
 			if (!(na->nc->flags & NI_SERVICES_ROOT)) {
 				for (i = 0; i < RootNumber; i++) {
@@ -202,7 +202,7 @@ int do_group(User * u)
 
 			u->lastnickreg = time(NULL);
 			snprintf(tsbuf, sizeof(tsbuf), "%lu",
-					 (unsigned long int) u->timestamp);
+					 static_cast<unsigned long>(u->timestamp));
 			if (ircd->modeonreg) {
 				len = strlen(ircd->modeonreg);
 				strncpy(modes,ircd->modeonreg,512);
@@ -282,7 +282,7 @@ int do_glist(User * u)
 					nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER,
 					na->nc->display);
 		for (i = 0; i < na->nc->aliases.count; i++) {
-			na2 = (NickAlias *)na->nc->aliases.list[i];
+			na2 = static_cast<NickAlias *>(na->nc->aliases.list[i]);
 			if (na2->nc == na->nc) {
 				if (!(wont_expire = na2->status & NS_NO_EXPIRE)) {
 					expt = na2->last_seen + NSExpire;

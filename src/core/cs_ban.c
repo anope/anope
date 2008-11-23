@@ -68,7 +68,7 @@ int do_ban(User * u)
 	int is_same;
 
 	if (!reason) {
-		reason = (char *)"Requested"; // XXX unsafe cast -- w00t
+		reason = const_cast<char *>("Requested"); // XXX unsafe cast -- w00t
 	} else {
 		if (strlen(reason) > 200)
 			reason[200] = '\0';

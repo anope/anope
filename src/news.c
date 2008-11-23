@@ -172,7 +172,7 @@ void load_news()
 			news_size = 32767;
 		else
 			news_size = 2 * nnews;
-		news = (NewsItem *)scalloc(sizeof(*news) * news_size, 1);
+		news = static_cast<NewsItem *>(scalloc(sizeof(*news) * news_size, 1));
 		if (!nnews) {
 			close_db(f);
 			return;
@@ -440,7 +440,7 @@ static int add_newsitem(User * u, const char *text, short type)
 			news_size = 8;
 		else
 			news_size *= 2;
-		news = (NewsItem *)srealloc(news, sizeof(*news) * news_size);
+		news = static_cast<NewsItem *>(srealloc(news, sizeof(*news) * news_size));
 	}
 	num = 0;
 	for (i = nnews - 1; i >= 0; i--) {

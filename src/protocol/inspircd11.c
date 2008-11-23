@@ -428,7 +428,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 int anope_event_idle(const char *source, int ac, const char **av)
 {
 	if (ac == 1) {
-		send_cmd(av[0], "IDLE %s %ld 0", source, (long int) time(NULL));
+		send_cmd(av[0], "IDLE %s %ld 0", source, static_cast<long>(time(NULL)));
 	}
 	return MOD_CONT;
 }
@@ -1071,7 +1071,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 {
 	User *user;
 	struct in_addr addy;
-	uint32 *ad = (uint32 *) & addy;
+	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 
 	if (ac != 1) {
 		if (ac == 8) {

@@ -57,7 +57,7 @@ void myHostServHelp(User * u)
  **/
 int do_setall(User * u)
 {
-	char *nick = (char *)strtok(NULL, " ");
+	char *nick = strtok(NULL, " ");
 	char *rawhostmask = strtok(NULL, " ");
 	char *hostmask = new char[HOSTMAX];
 

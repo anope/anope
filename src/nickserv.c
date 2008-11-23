@@ -263,19 +263,19 @@ void load_ns_dbase(void)
 			SAFE(read_int16(&nc->accesscount, f));
 			if (nc->accesscount) {
 				char **access;
-				access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
+				access = static_cast<char **>(scalloc(sizeof(char *) * nc->accesscount, 1));
 				nc->access = access;
 				for (j = 0; j < nc->accesscount; j++, access++)
 					SAFE(read_string(access, f));
 			}
 
 			SAFE(read_int16(&tmp16, f));
-			nc->memos.memocount = (int16) tmp16;
+			nc->memos.memocount = static_cast<int16>(tmp16);
 			SAFE(read_int16(&tmp16, f));
-			nc->memos.memomax = (int16) tmp16;
+			nc->memos.memomax = static_cast<int16>(tmp16);
 			if (nc->memos.memocount) {
 				Memo *memos;
-				memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
+				memos = static_cast<Memo *>(scalloc(sizeof(Memo) * nc->memos.memocount, 1));
 				nc->memos.memos = memos;
 				for (j = 0; j < nc->memos.memocount; j++, memos++) {
 					SAFE(read_int32(&memos->number, f));
@@ -914,7 +914,7 @@ void change_core_display(NickCore * nc, char *newdisplay)
 		if (nc->aliases.count <= 0)
 			return;
 
-		na = (NickAlias *)nc->aliases.list[0];
+		na = static_cast<NickAlias *>(nc->aliases.list[0]);
 		newdisplay = na->nick;
 	}
 
@@ -1172,7 +1172,7 @@ static void rem_ns_timeout(NickAlias * na, int type)
 
 static void timeout_collide(Timeout * t)
 {
-	NickAlias *na = (NickAlias *)t->data;
+	NickAlias *na = static_cast<NickAlias *>(t->data);
 
 	rem_ns_timeout(na, TO_COLLIDE);
 	/* If they identified or don't exist anymore, don't kill them. */
@@ -1191,7 +1191,7 @@ static void timeout_collide(Timeout * t)
 
 static void timeout_release(Timeout * t)
 {
-	NickAlias *na = (NickAlias *)t->data;
+	NickAlias *na = static_cast<NickAlias *>(t->data);
 
 	rem_ns_timeout(na, TO_RELEASE);
 	release(na, 1);
@@ -1213,7 +1213,7 @@ static void add_ns_timeout(NickAlias * na, int type, time_t delay)
 		timeout_routine = timeout_release;
 	else {
 		alog("NickServ: unknown timeout type %d! na=0x%p (%s), delay=%ld",
-			 type, (void *) na, na->nick, (long int) delay);
+			 type, static_cast<void *>(na), na->nick, static_cast<long>(delay));
 		return;
 	}
 

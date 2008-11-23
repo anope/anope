@@ -185,7 +185,7 @@ int do_clear(User * u)
 						ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
 
 				if (ircdcap->tsmode) {
-					snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+					snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 					av[1] = buf;
 					av[2] = tmp;
 					/* We have to give as much nicks as modes.. - Viper */
@@ -221,7 +221,7 @@ int do_clear(User * u)
 						(isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
 
 				if (ircdcap->tsmode) {
-					snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+					snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 					av[1] = buf;
 					av[2] = tmp;
 					/* We have to give as much nicks as modes.. - Viper */
@@ -256,7 +256,7 @@ int do_clear(User * u)
 				continue;
 
 			if (ircdcap->tsmode) {
-				snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+				snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 				av[0] = chan;
 				av[1] = buf;
 				av[2] = "-h";
@@ -300,7 +300,7 @@ int do_clear(User * u)
 				continue;
 
 			if (ircdcap->tsmode) {
-				snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+				snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long int>(time(NULL)));
 				av[0] = chan;
 				av[1] = buf;
 				av[2] = "-v";

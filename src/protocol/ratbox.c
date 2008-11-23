@@ -420,7 +420,7 @@ CUMode myCumodes[128] = {
  */
 void ratbox_cmd_svinfo()
 {
-	send_cmd(NULL, "SVINFO 6 3 0 :%ld", (long int) time(NULL));
+	send_cmd(NULL, "SVINFO 6 3 0 :%ld", static_cast<long>(time(NULL)));
 }
 
 void ratbox_cmd_svsinfo()
@@ -1029,12 +1029,12 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	/* We get the params as one arg, we should split it for capab_parse */
-	argv = (const char **)scalloc(argvsize, sizeof(const char *));
+	argv = static_cast<const char **>(scalloc(argvsize, sizeof(const char *)));
 	argc = 0;
 	while ((str = myStrGetToken(av[0], ' ', argc))) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			argv = (const char **)srealloc(argv, argvsize * sizeof(const char *));
+			argv = static_cast<const char **>(srealloc(argv, argvsize * sizeof(const char *)));
 		}
 		argv[argc] = str;
 		argc++;
@@ -1046,7 +1046,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 	for (argvsize = 0; argvsize < argc; argvsize++) {
 		delete [] argv[argvsize];
 	}
-	free((char **)argv);
+	free(const_cast<char **>(argv));
 
 	return MOD_CONT;
 }

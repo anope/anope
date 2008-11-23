@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -63,7 +63,7 @@ int slist_add(SList * slist, void *item)
 
 /**
  * Clears the list. If free is 1, the freeitem function will be called
- * for each item before clearing. 
+ * for each item before clearing.
  * @param slist Slist Struct
  * @param mustfree What is being freed
  * @return void
@@ -89,7 +89,7 @@ void slist_clear(SList * slist, int mustfree)
 /*************************************************************************/
 
 /**
- * Deletes an item from the list, by index. Returns 1 if successful, 
+ * Deletes an item from the list, by index. Returns 1 if successful,
  * 0 otherwise.
  * @param slist Slist Struct
  * @param index beign deleted
@@ -136,14 +136,14 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
 	va_start(args, cb);
 
 	for (;;) {
-		n1 = n2 = strtol(range, (char **) &range, 10);
+		n1 = n2 = strtol(range, &range, 10);
 		range += strcspn(range, "0123456789,-");
 
 		if (*range == '-') {
 			range++;
 			range += strcspn(range, "0123456789,");
 			if (isdigit(*range)) {
-				n2 = strtol(range, (char **) &range, 10);
+				n2 = strtol(range, &range, 10);
 				range += strcspn(range, "0123456789,-");
 			}
 		}
@@ -234,13 +234,13 @@ int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
 
 		for (;;) {
 			res = 0;
-			n1 = n2 = strtol(range, (char **) &range, 10);
+			n1 = n2 = strtol(range, &range, 10);
 			range += strcspn(range, "0123456789,-");
 			if (*range == '-') {
 				range++;
 				range += strcspn(range, "0123456789,");
 				if (isdigit(*range)) {
-					n2 = strtol(range, (char **) &range, 10);
+					n2 = strtol(range, &range, 10);
 					range += strcspn(range, "0123456789,-");
 				}
 			}
@@ -338,7 +338,7 @@ int slist_indexof(SList * slist, void *item)
 /*************************************************************************/
 
 /**
- * Removes all NULL pointers from the list. 
+ * Removes all NULL pointers from the list.
  * @param slist Slist Struct
  * @return void
  */
@@ -384,7 +384,7 @@ int slist_setcapacity(SList * slist, int16 capacity)
 	slist->capacity = capacity;
 	if (slist->capacity)
 		slist->list =
-			(void **)srealloc(slist->list, sizeof(void *) * slist->capacity);
+			static_cast<void **>(srealloc(slist->list, sizeof(void *) * slist->capacity));
 	else {
 		free(slist->list);
 		slist->list = NULL;

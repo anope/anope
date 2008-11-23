@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -75,7 +75,7 @@ int do_staff(User * u)
 						ServicesRoots[idx]);
 		} else if ((nc = findcore(ServicesRoots[idx]))) {
 			for (i = 0; i < nc->aliases.count; i++) {   /* check all aliases */
-				na = (NickAlias *)nc->aliases.list[i];
+				na = static_cast<NickAlias *>(nc->aliases.list[i]);
 				if ((au = finduser(na->nick))) {		/* see if user is online */
 					found = 1;
 					notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT,
@@ -102,7 +102,7 @@ int opers_list_callback(SList * slist, int number, void *item,
 	User *u = va_arg(args, User *);
 	char *level = va_arg(args, char *);
 
-	return opers_list(number, (NickCore *)item, u, level);
+	return opers_list(number, static_cast<NickCore *>(item), u, level);
 }
 
 
@@ -126,7 +126,7 @@ int opers_list(int number, NickCore * nc, User * u, char *level)
 					nc->display);
 	} else {
 		for (i = 0; i < nc->aliases.count; i++) {	   /* check all aliases */
-			na = (NickAlias *)nc->aliases.list[i];
+			na = static_cast<NickAlias *>(nc->aliases.list[i]);
 			if ((au = finduser(na->nick))) {	/* see if user is online */
 				found = 1;
 				notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT, '*', level,

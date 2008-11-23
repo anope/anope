@@ -299,7 +299,7 @@ int do_akick(User * u)
 		}
 		ci->akickcount++;
 		ci->akick =
-			(AutoKick *)srealloc(ci->akick, sizeof(AutoKick) * ci->akickcount);
+			static_cast<AutoKick *>(srealloc(ci->akick, sizeof(AutoKick) * ci->akickcount));
 		akick = &ci->akick[i];
 		akick->flags = AK_USED;
 		if (nc) {
@@ -518,7 +518,7 @@ int do_akick(User * u)
 				ci->akickcount--;
 			}
 			ci->akick =
-				(AutoKick *)srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount);
+				static_cast<AutoKick *>(srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount));
 		}
 	} else if (stricmp(cmd, "LIST") == 0) {
 		int sent_header = 0;

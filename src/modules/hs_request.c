@@ -557,11 +557,11 @@ void req_send_memos(User * u, char *vHost)
 
 	if (HSRequestMemoOper == 1) {
 		for (i = 0; i < servopers.count; i++) {
-			my_memo_lang(u, (((NickCore *) servopers.list[i])->display), z,
+			my_memo_lang(u, ((static_cast<NickCore *>(servopers.list[i]))->display), z,
 						 LNG_REQUEST_MEMO, vHost);
 		}
 		for (i = 0; i < servadmins.count; i++) {
-			my_memo_lang(u, (((NickCore *) servadmins.list[i])->display),
+			my_memo_lang(u, ((static_cast<NickCore *>(servadmins.list[i]))->display),
 						 z, LNG_REQUEST_MEMO, vHost);
 		}
 		for (i = 0; i < RootNumber; i++) {
@@ -860,7 +860,7 @@ void hsreq_load_db(void)
 			vhost = myStrGetToken(buf, ':', 2);
 			tmp = myStrGetToken(buf, ':', 3);
 			if (tmp) {
-				tmp_time = strtol(tmp, (char **) NULL, 16);
+				tmp_time = strtol(tmp, NULL, 16);
 				delete [] tmp;
 			} else {
 				tmp_time = 0;
@@ -913,7 +913,7 @@ void hsreq_save_db(void)
 	while (current) {
 		vident = (current->vIdent ? current->vIdent : "(null)");
 		fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident,
-				current->vHost, (uint32) current->time, current->creator);
+				current->vHost, static_cast<uint32>(current->time), current->creator);
 		current = current->next;
 	}
 

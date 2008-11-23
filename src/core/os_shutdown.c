@@ -59,7 +59,7 @@ int do_shutdown(User * u)
 	if (!quitmsg)
 		quitmsg = "SHUTDOWN command received, but out of memory!";
 	else
-		sprintf((char *)quitmsg, /* XXX */ "SHUTDOWN command received from %s", u->nick);
+		sprintf(const_cast<char *>(quitmsg), /* XXX */ "SHUTDOWN command received from %s", u->nick);
 
 	if (GlobalOnCycle) {
 		oper_global(NULL, "%s", GlobalOnCycleMessage);

@@ -345,7 +345,7 @@ void expire_exceptions(void)
 		nexceptions--;
 		memmove(exceptions + i, exceptions + i + 1,
 				sizeof(Exception) * (nexceptions - i));
-		exceptions = (Exception *)srealloc(exceptions, sizeof(Exception) * nexceptions);
+		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 		i--;
 	}
 }
@@ -411,7 +411,7 @@ void load_exceptions()
 	case 7:
 		SAFE(read_int16(&n, f));
 		nexceptions = n;
-		exceptions = (Exception *)scalloc(sizeof(Exception) * nexceptions, 1);
+		exceptions = static_cast<Exception *>(scalloc(sizeof(Exception) * nexceptions, 1));
 		if (!nexceptions) {
 			close_db(f);
 			return;
@@ -505,7 +505,7 @@ int exception_add(User * u, const char *mask, const int limit,
 	}
 
 	nexceptions++;
-	exceptions = (Exception *)srealloc(exceptions, sizeof(Exception) * nexceptions);
+	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 
 	exceptions[nexceptions - 1].mask = sstrdup(mask);
 	exceptions[nexceptions - 1].limit = limit;
@@ -530,7 +530,7 @@ static int exception_del(const int index)
 	nexceptions--;
 	memmove(exceptions + index, exceptions + index + 1,
 			sizeof(Exception) * (nexceptions - index));
-	exceptions = (Exception *)srealloc(exceptions, sizeof(Exception) * nexceptions);
+	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 
 	return 1;
 }
@@ -775,7 +775,7 @@ int do_exception(User * u)
 
 		if ((n1 >= 0 && n1 < nexceptions) && (n2 >= 0 && n2 < nexceptions)
 			&& (n1 != n2)) {
-			exception = (Exception *)smalloc(sizeof(Exception));
+			exception = static_cast<Exception *>(smalloc(sizeof(Exception)));
 			memcpy(exception, &exceptions[n1], sizeof(Exception));
 
 			if (n1 < n2) {

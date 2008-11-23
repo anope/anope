@@ -134,7 +134,7 @@ char *log_gettimestamp(void)
 		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S", &tm);
 		s = tbuf + strlen(tbuf);
 		s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d",
-					  (int) tv.tv_usec);
+					  static_cast<int>(tv.tv_usec));
 		strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
 	} else {
 #endif

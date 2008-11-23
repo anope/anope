@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -154,7 +154,7 @@ int do_oper(User * u)
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
-		
+
 		if (servopers.count == 0) {
 			notice_lang(s_OperServ, u, OPER_OPER_LIST_EMPTY);
 			return MOD_CONT;
@@ -176,11 +176,11 @@ int do_oper(User * u)
 
 			for (i = 0; i < servopers.count; i++)
 				if (!stricmp
-					(nick, ((NickCore *) servopers.list[i])->display)
+					(nick, (static_cast<NickCore *>(servopers.list[i]))->display)
 					|| match_wild_nocase(nick,
-										 ((NickCore *) servopers.list[i])->
+										 (static_cast<NickCore *>(servopers.list[i]))->
 										 display))
-					oper_list(i + 1, (NickCore *)servopers.list[i], u, &sent_header);
+					oper_list(i + 1, static_cast<NickCore *>(servopers.list[i]), u, &sent_header);
 
 			if (!sent_header)
 				notice_lang(s_OperServ, u, OPER_OPER_NO_MATCH);
@@ -230,7 +230,7 @@ int oper_list_callback(SList * slist, int number, void *item, va_list args)
 	User *u = va_arg(args, User *);
 	int *sent_header = va_arg(args, int *);
 
-	return oper_list(number, (NickCore *)item, u, sent_header);
+	return oper_list(number, static_cast<NickCore *>(item), u, sent_header);
 }
 
 MODULE_INIT("os_oper", OSOper)

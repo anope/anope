@@ -384,7 +384,7 @@ User *finduser(const char *nick)
 	while (user && stricmp(user->nick, nick) != 0)
 		user = user->next;
 	if (debug >= 3)
-		alog("debug: finduser(%s) -> 0x%p", nick, (void *) user);
+		alog("debug: finduser(%s) -> 0x%p", nick, static_cast<void *>(user));
 	return user;
 }
 
@@ -748,7 +748,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 					common_get_vident(user), common_get_vhost(user));
 
 			snprintf(tsbuf, sizeof(tsbuf), "%lu",
-					 (unsigned long int) user->timestamp);
+					 static_cast<unsigned long>(user->timestamp));
 			ircdproto->SendSVID2(user, tsbuf);
 
 			alog("%s: %s!%s@%s automatically identified for nick %s",
@@ -762,7 +762,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (nick_identified(user)) {
 			char tsbuf[16];
 			snprintf(tsbuf, sizeof(tsbuf), "%lu",
-					 (unsigned long int) user->timestamp);
+					 static_cast<unsigned long>(user->timestamp));
 			ircdproto->SendSVID3(user, tsbuf);
 		}
 	}

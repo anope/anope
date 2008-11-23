@@ -320,7 +320,7 @@ class Extensible
 		 * the return value is a std::pair of an iterator to the
 		 * element, and a bool saying if it was actually inserted.
 		 */
-		return this->Extension_Items.insert(std::make_pair(key, (char*)p)).second;
+		return this->Extension_Items.insert(std::make_pair(key, static_cast<char *>(p))).second;
 	}
 
 	/** Extend an Extensible class.
@@ -340,7 +340,7 @@ class Extensible
 		 * the return value is a std::pair of an iterator to the
 		 * element, and a bool saying if it was actually inserted.
 		 */
-		return this->Extension_Items.insert(std::make_pair(key, (char*)NULL)).second;
+		return this->Extension_Items.insert(std::make_pair(key, static_cast<char *>(NULL))).second;
 	}
 
 	/** Shrink an Extensible class.
@@ -364,7 +364,7 @@ class Extensible
 		std::map<std::string, void *>::iterator iter = this->Extension_Items.find(key); /* Find the item */
 		if(iter != this->Extension_Items.end())
 		{
-			p = (T*)iter->second;	/* Item found */
+			p = static_cast<T *>(iter->second);	/* Item found */
 			return true;
 		}
 		else

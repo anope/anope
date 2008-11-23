@@ -427,7 +427,7 @@ int anope_event_idle(const char *source, int ac, const char **av)
 	if (!bi)
 		return MOD_CONT;
 
-	send_cmd(bi->uid, "IDLE %s %ld 0", source, (long int) time(NULL));
+	send_cmd(bi->uid, "IDLE %s %ld 0", source, static_cast<long>(time(NULL)));
 	return MOD_CONT;
 }
 
@@ -629,7 +629,7 @@ class InspIRCdProto : public IRCDProto
 	void SendSVSHold(const char *nick)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi->uid, "SVSHOLD %s %ud :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
+		send_cmd(bi->uid, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
@@ -701,7 +701,7 @@ class InspIRCdProto : public IRCDProto
 				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "SNONOTICE A :%s", buf);
 		}
 	}
-	
+
 	int IsNickValid(const char *nick)
 	{
 		/* InspIRCd, like TS6, uses UIDs on collision, so... */
@@ -1104,7 +1104,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	User *user;
 	struct in_addr addy;
 	Server *s = findserver_uid(servlist, source);
-	uint32 *ad = (uint32 *) &addy;
+	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 	int svid = 0;
 	int ts = strtoul(av[1], NULL, 10);
 

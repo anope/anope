@@ -154,7 +154,7 @@ int do_set_display(User * u, NickCore * nc, char *param)
 
 	/* First check whether param is a valid nick of the group */
 	for (i = 0; i < nc->aliases.count; i++) {
-		na = (NickAlias *)nc->aliases.list[i];
+		na = static_cast<NickAlias *>(nc->aliases.list[i]);
 		if (!stricmp(na->nick, param)) {
 			param = na->nick;   /* Because case may differ */
 			break;

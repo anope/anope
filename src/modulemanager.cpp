@@ -51,7 +51,7 @@ static int moduleCopyFile(const char *name, const char *output)
 	strncat(input, MODULE_EXT, 4095 - len);
 
 #ifndef _WIN32
-	if ((srcfp = mkstemp((char *)output)) == -1)
+	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)
 		return MOD_ERR_FILE_IO;
 #else
 	if (!mktemp(output))
@@ -160,7 +160,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 
 	ano_modclearerr();
-	func = (Module *(*)(const std::string &))ano_modsym(handle, "init_module");
+	func = reinterpret_cast<Module *(*)(const std::string &)>(ano_modsym(handle, "init_module"));
 	if (func == NULL && (err = ano_moderr()) != NULL)
 	{
 		alog("No magical init function found, not an Anope module");
@@ -263,7 +263,7 @@ void ModuleManager::DeleteModule(Module *m)
 	handle = m->handle;
 
 	ano_modclearerr();
-	destroy_func = (void(*)(Module *m))ano_modsym(m->handle, "destroy_module");
+	destroy_func = reinterpret_cast<void (*)(Module *)>(ano_modsym(m->handle, "destroy_module"));
 	if (destroy_func == NULL && (err = ano_moderr()) != NULL)
 	{
 		alog("No magical destroy function found, chancing delete...");

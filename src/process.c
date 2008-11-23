@@ -253,12 +253,12 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 	int argc;
 	char *s;
 
-	*argv = (const char **)scalloc(sizeof(const char *) * argvsize, 1);
+	*argv = static_cast<const char **>(scalloc(sizeof(const char *) * argvsize, 1));
 	argc = 0;
 	while (*buf) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			*argv = (const char **)srealloc(*argv, sizeof(const char *) * argvsize);
+			*argv = static_cast<const char **>(srealloc(*argv, sizeof(const char *) * argvsize));
 		}
 		if (*buf == ':') {
 			(*argv)[argc++] = buf + 1;
@@ -310,7 +310,7 @@ void process()
 	 * crash - in that case, we want to know what we crashed on. */
 	strscpy(buf, inbuf, sizeof(buf));
 
-	doCleanBuffer((char *) buf);
+	doCleanBuffer(buf);
 
 	/* Split the buffer into pieces. */
 	if (*buf == ':') {

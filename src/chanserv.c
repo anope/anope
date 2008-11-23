@@ -387,17 +387,17 @@ void load_cs_dbase(void)
 			for (j = 0; j < n_levels; j++) {
 				SAFE(read_int16(&tmp16, f));
 				if (j < CA_SIZE)
-					ci->levels[j] = (int16) tmp16;
+					ci->levels[j] = static_cast<int16>(tmp16);
 			}
 
 			SAFE(read_int16(&ci->accesscount, f));
 			if (ci->accesscount) {
-				ci->access = (ChanAccess *)scalloc(ci->accesscount, sizeof(ChanAccess));
+				ci->access = static_cast<ChanAccess *>(scalloc(ci->accesscount, sizeof(ChanAccess)));
 				for (j = 0; j < ci->accesscount; j++) {
 					SAFE(read_int16(&ci->access[j].in_use, f));
 					if (ci->access[j].in_use) {
 						SAFE(read_int16(&tmp16, f));
-						ci->access[j].level = (int16) tmp16;
+						ci->access[j].level = static_cast<int16>(tmp16);
 						SAFE(read_string(&s, f));
 						if (s) {
 							ci->access[j].nc = findcore(s);
@@ -415,7 +415,7 @@ void load_cs_dbase(void)
 
 			SAFE(read_int16(&ci->akickcount, f));
 			if (ci->akickcount) {
-				ci->akick = (AutoKick *)scalloc(ci->akickcount, sizeof(AutoKick));
+				ci->akick = static_cast<AutoKick *>(scalloc(ci->akickcount, sizeof(AutoKick)));
 				for (j = 0; j < ci->akickcount; j++) {
 					SAFE(read_int16(&ci->akick[j].flags, f));
 					if (ci->akick[j].flags & AK_USED) {
@@ -468,12 +468,12 @@ void load_cs_dbase(void)
 			}
 
 			SAFE(read_int16(&tmp16, f));
-			ci->memos.memocount = (int16) tmp16;
+			ci->memos.memocount = static_cast<int16>(tmp16);
 			SAFE(read_int16(&tmp16, f));
-			ci->memos.memomax = (int16) tmp16;
+			ci->memos.memomax = static_cast<int16>(tmp16);
 			if (ci->memos.memocount) {
 				Memo *memos;
-				memos = (Memo *)scalloc(sizeof(Memo) * ci->memos.memocount, 1);
+				memos = static_cast<Memo *>(scalloc(sizeof(Memo) * ci->memos.memocount, 1));
 				ci->memos.memos = memos;
 				for (j = 0; j < ci->memos.memocount; j++, memos++) {
 					SAFE(read_int32(&memos->number, f));
@@ -507,7 +507,7 @@ void load_cs_dbase(void)
 			for (j = 0; j < n_ttb; j++) {
 				SAFE(read_int16(&tmp16, f));
 				if (j < TTB_SIZE)
-					ci->ttb[j] = (int16) tmp16;
+					ci->ttb[j] = static_cast<int16>(tmp16);
 			}
 			for (j = n_ttb; j < TTB_SIZE; j++)
 				ci->ttb[j] = 0;
@@ -524,7 +524,7 @@ void load_cs_dbase(void)
 
 			SAFE(read_int16(&ci->bwcount, f));
 			if (ci->bwcount) {
-				ci->badwords = (BadWord *)scalloc(ci->bwcount, sizeof(BadWord));
+				ci->badwords = static_cast<BadWord *>(scalloc(ci->bwcount, sizeof(BadWord)));
 				for (j = 0; j < ci->bwcount; j++) {
 					SAFE(read_int16(&ci->badwords[j].in_use, f));
 					if (ci->badwords[j].in_use) {
@@ -791,7 +791,7 @@ void check_modes(Channel * c)
 				else
 					value = cbmi->csgetvalue(ci);
 
-				cbm = &cbmodes[(int) cbmi->mode];
+				cbm = &cbmodes[static_cast<int>(cbmi->mode)];
 				cbm->setvalue(c, value);
 
 				if (value) {
@@ -817,7 +817,7 @@ void check_modes(Channel * c)
 			if (value && csvalue && strcmp(value, csvalue)) {
 				*end++ = cbmi->mode;
 
-				cbm = &cbmodes[(int) cbmi->mode];
+				cbm = &cbmodes[static_cast<int>(cbmi->mode)];
 				cbm->setvalue(c, csvalue);
 
 				*end2++ = ' ';
@@ -845,7 +845,7 @@ void check_modes(Channel * c)
 
 				/* Add the eventual parameter and clean up the Channel structure */
 				if (cbmi->getvalue) {
-					cbm = &cbmodes[(int) cbmi->mode];
+					cbm = &cbmodes[static_cast<int>(cbmi->mode)];
 
 					if (!(cbm->flags & CBM_MINUS_NO_ARG)) {
 						char *value = cbmi->getvalue(c);
@@ -1102,14 +1102,14 @@ int check_should_protect(User * user, char *chan)
 
 static void timeout_leave(Timeout * to)
 {
-	const char *chan = (const char *)to->data;
+	const char *chan = static_cast<const char *>(to->data);
 	ChannelInfo *ci = cs_findchan(chan);
 
 	if (ci)					 /* Check cos the channel may be dropped in the meantime */
 		ci->flags &= ~CI_INHABIT;
 
 	ircdproto->SendPart(findbot(s_ChanServ), chan, NULL);
-	delete [] (const char *)to->data;
+	delete [] static_cast<const char *>(to->data);
 }
 
 
@@ -1228,7 +1228,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 
 	if (c) {
 		if (ircdcap->tsmode) {
-			snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+			snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 			av[0] = chan;
 			av[1] = buf;
 			av[2] = "+b";
@@ -1507,7 +1507,7 @@ ChannelInfo *cs_findchan(const char *chan)
 		return NULL;
 	}
 
-	for (ci = chanlists[(unsigned char) tolower(chan[1])]; ci;
+	for (ci = chanlists[static_cast<unsigned char>(tolower(chan[1]))]; ci;
 		 ci = ci->next) {
 		if (stricmp(ci->name, chan) == 0)
 			return ci;
@@ -1572,13 +1572,13 @@ void alpha_insert_chan(ChannelInfo * ci)
 
 	chan = ci->name;
 
-	for (prev = NULL, ptr = chanlists[(unsigned char) tolower(chan[1])];
+	for (prev = NULL, ptr = chanlists[static_cast<unsigned char>(tolower(chan[1]))];
 		 ptr != NULL && stricmp(ptr->name, chan) < 0;
 		 prev = ptr, ptr = ptr->next);
 	ci->prev = prev;
 	ci->next = ptr;
 	if (!prev)
-		chanlists[(unsigned char) tolower(chan[1])] = ci;
+		chanlists[static_cast<unsigned char>(tolower(chan[1]))] = ci;
 	else
 		prev->next = ci;
 	if (ptr)
@@ -1682,7 +1682,7 @@ int delchan(ChannelInfo * ci)
 	if (ci->prev)
 		ci->prev->next = ci->next;
 	else
-		chanlists[(unsigned char) tolower(ci->name[1])] = ci->next;
+		chanlists[static_cast<unsigned char>(tolower(ci->name[1]))] = ci->next;
 	if (ci->desc)
 		delete [] ci->desc;
 	if (ci->url)
@@ -1994,7 +1994,7 @@ char *cs_get_limit(ChannelInfo * ci)
 		return NULL;
 
 	snprintf(limit, sizeof(limit), "%lu",
-			 (unsigned long int) ci->mlock_limit);
+			 static_cast<unsigned long>(ci->mlock_limit));
 	return limit;
 }
 

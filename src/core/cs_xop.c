@@ -301,8 +301,8 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 			if (i < CSAccessMax) {
 				ci->accesscount++;
 				ci->access =
-					(ChanAccess *)srealloc(ci->access,
-							 sizeof(ChanAccess) * ci->accesscount);
+					static_cast<ChanAccess *>(srealloc(ci->access,
+							 sizeof(ChanAccess) * ci->accesscount));
 			} else {
 				notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT,
 							CSAccessMax);
@@ -434,7 +434,7 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 				ci->accesscount--;
 			}
 			ci->access =
-				(ChanAccess *)srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
+				static_cast<ChanAccess *>(srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount));
 		}
 	} else if (stricmp(cmd, "LIST") == 0) {
 		int sent_header = 0;

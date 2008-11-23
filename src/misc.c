@@ -37,9 +37,9 @@ struct arc4_stream {
 int toupper(char c)
 {
 	if (islower(c)) {
-		return (unsigned char) c - ('a' - 'A');
+		return static_cast<int>(c) - ('a' - 'A');
 	} else {
-		return (unsigned char) c;
+		return static_cast<int>(c);
 	}
 }
 
@@ -54,9 +54,9 @@ int toupper(char c)
 int tolower(char c)
 {
 	if (isupper(c)) {
-		return (unsigned char) c + ('a' - 'A');
+		return static_cast<int>(c) + ('a' - 'A');
 	} else {
-		return (unsigned char) c;
+		return static_cast<int>(c);
 	}
 }
 
@@ -326,13 +326,13 @@ int process_numlist(const char *numstr, int *count_ret,
 	 * end of a valid number or range to the next comma or null.
 	 */
 	for (;;) {
-		n1 = n2 = strtol(numstr, (char **) &numstr, 10);
+		n1 = n2 = strtol(numstr, const_cast<char **>(&numstr), 10);
 		numstr += strcspn(numstr, "0123456789,-");
 		if (*numstr == '-') {
 			numstr++;
 			numstr += strcspn(numstr, "0123456789,");
 			if (isdigit(*numstr)) {
-				n2 = strtol(numstr, (char **) &numstr, 10);
+				n2 = strtol(numstr, const_cast<char **>(&numstr), 10);
 				numstr += strcspn(numstr, "0123456789,-");
 			}
 		}
@@ -387,7 +387,7 @@ int dotime(const char *s)
 		return -1;
 	}
 
-	amount = strtol(s, (char **) &s, 10);
+	amount = strtol(s, const_cast<char **>(&s), 10);
 	if (*s) {
 		switch (*s) {
 		case 's':
@@ -937,7 +937,7 @@ static void arc4_addrandom(void *dat, int datlen)
 	for (n = 0; n < 256; n++) {
 		rs.i = (rs.i + 1);
 		si = rs.s[rs.i];
-		rs.j = (rs.j + si + ((unsigned char *) dat)[n % datlen]);
+		rs.j = (rs.j + si + (static_cast<unsigned char *>(dat))[n % datlen]);
 		rs.s[rs.i] = rs.s[rs.j];
 		rs.s[rs.j] = si;
 	}
@@ -1130,9 +1130,9 @@ char *str_signed(unsigned char *str)
 {
 	char *nstr;
 
-	nstr = (char *) str;
+	nstr = reinterpret_cast<char *>(str);
 	while (*str) {
-		*nstr = (char) *str;
+		*nstr = static_cast<char>(*str);
 		str++;
 		nstr++;
 	}
@@ -1157,7 +1157,7 @@ char *stripModePrefix(const char *str)
 
 void ntoa(struct in_addr addr, char *ipaddr, int len)
 {
-	unsigned char *bytes = (unsigned char *) &addr.s_addr;
+	unsigned char *bytes = reinterpret_cast<unsigned char *>(&addr.s_addr);
 	snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2],
 			 bytes[3]);
 }
@@ -1176,7 +1176,7 @@ char **buildStringList(const std::string &src, int *number)
 
 	while (tokens.GetToken(token)) {
 		i++;
-		list = (char **)realloc(list, sizeof(char *) * i);
+		list = static_cast<char **>(realloc(list, sizeof(char *) * i));
 		list[i - 1] = sstrdup(token.c_str());
 	}
 	*number = i;				/* always zero it, even if we have no setters */

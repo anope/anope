@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -95,7 +95,7 @@ int do_kickcmd(User * u)
 			if (!stricmp(value, "ON")) {
 				if (ttb) {
 					ci->ttb[TTB_BADWORDS] =
-						strtol(ttb, (char **) NULL, 10);
+						strtol(ttb, NULL, 10);
 					/* Only error if errno returns ERANGE or EINVAL or we are less then 0 - TSL */
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_BADWORDS] < 0) {
@@ -124,7 +124,7 @@ int do_kickcmd(User * u)
 		} else if (!stricmp(option, "BOLDS")) {
 			if (!stricmp(value, "ON")) {
 				if (ttb) {
-					ci->ttb[TTB_BOLDS] = strtol(ttb, (char **) NULL, 10);
+					ci->ttb[TTB_BOLDS] = strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_BOLDS] < 0) {
 						if (debug) {
@@ -152,7 +152,7 @@ int do_kickcmd(User * u)
 				char *percent = strtok(NULL, " ");
 
 				if (ttb) {
-					ci->ttb[TTB_CAPS] = strtol(ttb, (char **) NULL, 10);
+					ci->ttb[TTB_CAPS] = strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_CAPS] < 0) {
 						if (debug) {
@@ -194,7 +194,7 @@ int do_kickcmd(User * u)
 		} else if (!stricmp(option, "COLORS")) {
 			if (!stricmp(value, "ON")) {
 				if (ttb) {
-					ci->ttb[TTB_COLORS] = strtol(ttb, (char **) NULL, 10);
+					ci->ttb[TTB_COLORS] = strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_COLORS] < 0) {
 						if (debug) {
@@ -222,7 +222,7 @@ int do_kickcmd(User * u)
 				char *secs = strtok(NULL, " ");
 
 				if (ttb) {
-					ci->ttb[TTB_FLOOD] = strtol(ttb, (char **) NULL, 10);
+					ci->ttb[TTB_FLOOD] = strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_FLOOD] < 0) {
 						if (debug) {
@@ -266,7 +266,7 @@ int do_kickcmd(User * u)
 				char *times = strtok(NULL, " ");
 
 				if (ttb) {
-					ci->ttb[TTB_REPEAT] = strtol(ttb, (char **) NULL, 10);
+					ci->ttb[TTB_REPEAT] = strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_REPEAT] < 0) {
 						if (debug) {
@@ -301,7 +301,7 @@ int do_kickcmd(User * u)
 			if (!stricmp(value, "ON")) {
 				if (ttb) {
 					ci->ttb[TTB_REVERSES] =
-						strtol(ttb, (char **) NULL, 10);
+						strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_REVERSES] < 0) {
 						if (debug) {
@@ -327,7 +327,7 @@ int do_kickcmd(User * u)
 			if (!stricmp(value, "ON")) {
 				if (ttb) {
 					ci->ttb[TTB_UNDERLINES] =
-						strtol(ttb, (char **) NULL, 10);
+						strtol(ttb, NULL, 10);
 					if (errno == ERANGE || errno == EINVAL
 						|| ci->ttb[TTB_UNDERLINES] < 0) {
 						if (debug) {

@@ -469,7 +469,7 @@ int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
 	NickAlias *na;
 
 	for (i = 0; i < nc->aliases.count; i++) {
-		na = (NickAlias *)nc->aliases.list[i];
+		na = static_cast<NickAlias *>(nc->aliases.list[i]);
 		addHostCore(na->nick, vIdent, hostmask, creator, time);
 	}
 	return MOD_CONT;
@@ -517,7 +517,7 @@ int is_host_setter(User * u)
 
 	/* Look through all user's aliases (0000412) */
 	for (i = 0; i < u->na->nc->aliases.count; i++) {
-		na = (NickAlias *)u->na->nc->aliases.list[i];
+		na = static_cast<NickAlias *>(u->na->nc->aliases.list[i]);
 		for (j = 0; j < HostNumber; j++) {
 			if (stricmp(HostSetters[j], na->nick) == 0) {
 				return 1;

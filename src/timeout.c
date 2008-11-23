@@ -27,7 +27,7 @@ void check_timeouts(void)
 	time_t t = time(NULL);
 
 	if (debug >= 2)
-		alog("debug: Checking timeouts at %ld", (long int) t);
+		alog("debug: Checking timeouts at %ld", static_cast<long>(t));
 
 	to = timeouts;
 	while (to) {
@@ -37,7 +37,7 @@ void check_timeouts(void)
 		}
 		if (debug >= 4) {
 			alog("debug: Running timeout 0x%p (code=0x%p repeat=%d)",
-				 (void *) to, (void *) to->code, to->repeat);
+				 static_cast<void *>(to), reinterpret_cast<void *>(to->code), to->repeat);
 		}
 		to->code(to);
 		if (to->repeat) {

@@ -118,7 +118,7 @@ int do_badwords(User * u)
 			if (i < BSBadWordsMax) {
 				ci->bwcount++;
 				ci->badwords =
-					(BadWord *)srealloc(ci->badwords, sizeof(BadWord) * ci->bwcount);
+					static_cast<BadWord *>(srealloc(ci->badwords, sizeof(BadWord) * ci->bwcount));
 			} else {
 				notice_lang(s_BotServ, u, BOT_BADWORDS_REACHED_LIMIT,
 							BSBadWordsMax);
@@ -211,7 +211,7 @@ int do_badwords(User * u)
 				ci->bwcount--;
 			}
 			ci->badwords =
-				(BadWord *)srealloc(ci->badwords,sizeof(BadWord) * ci->bwcount);
+				static_cast<BadWord *>(srealloc(ci->badwords,sizeof(BadWord) * ci->bwcount));
 		}
 
 	} else if (stricmp(cmd, "LIST") == 0) {

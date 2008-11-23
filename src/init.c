@@ -317,7 +317,7 @@ static void write_pidfile(void)
 
 	pidfile = fopen(PIDFilename, "w");
 	if (pidfile) {
-		fprintf(pidfile, "%d\n", (int) getpid());
+		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
 		fclose(pidfile);
 		atexit(remove_pidfile);
 	} else {

@@ -217,7 +217,7 @@ void load_ignore_db(void) {
  				if (!ign) {
 					/* Create a fresh entry.. */
 					ign = new IgnoreData;
-					ign->mask = (char *)sstrdup(mask);
+					ign->mask = sstrdup(mask);
 					ign->time = expiry_time;
 					ign->prev = NULL;
 					ign->next = ignore;
@@ -254,7 +254,7 @@ void load_ignore_db(void) {
 				expiry_time = atoi(value);
 
 			} else if (!stricmp(key, "IGNORE_DB_VERSION")) {
-				if ((int)atoi(value) != IGNOREDBVERSION) {
+				if (atoi(value) != IGNOREDBVERSION) {
 					alog("[\002os_ignore_db\002] Database version does not match any database versions supported by this module.");
 					alog("[\002os_ignore_db\002] Continuing with clean database...");
 					break;

@@ -125,7 +125,7 @@ int do_access(User * u)
 
 		na->nc->accesscount++;
 		na->nc->access =
-			(char **)srealloc(na->nc->access, sizeof(char *) * na->nc->accesscount);
+			static_cast<char **>(srealloc(na->nc->access, sizeof(char *) * na->nc->accesscount));
 		na->nc->access[na->nc->accesscount - 1] = sstrdup(mask);
 		notice_lang(s_NickServ, u, NICK_ACCESS_ADDED, mask);
 
@@ -149,8 +149,8 @@ int do_access(User * u)
 					(na->nc->accesscount - i) * sizeof(char *));
 		if (na->nc->accesscount)		/* if there are any entries left... */
 			na->nc->access =
-				(char **)srealloc(na->nc->access,
-						 na->nc->accesscount * sizeof(char *));
+				static_cast<char **>(srealloc(na->nc->access,
+						 na->nc->accesscount * sizeof(char *)));
 		else {
 			free(na->nc->access);
 			na->nc->access = NULL;

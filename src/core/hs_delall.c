@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -72,7 +72,7 @@ int do_delall(User * u)
 		}
 		nc = na->nc;
 		for (i = 0; i < nc->aliases.count; i++) {
-			na = (NickAlias *)nc->aliases.list[i];
+			na = static_cast<NickAlias *>(nc->aliases.list[i]);
 			delHostCore(na->nick);
 		}
 		alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);

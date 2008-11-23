@@ -1627,7 +1627,7 @@ int read_config(int reload)
 			if (s) {
 				RootNumber++;
 				ServicesRoots =
-					(char **)realloc(ServicesRoots, sizeof(char *) * RootNumber);
+					static_cast<char **>(realloc(ServicesRoots, sizeof(char *) * RootNumber));
 				ServicesRoots[RootNumber - 1] = sstrdup(s);
 			}
 		} while ((s = strtok(NULL, " ")));
@@ -1647,7 +1647,7 @@ int read_config(int reload)
 		do {
 			if (s) {
 				NumUlines++;
-				Ulines = (char **)realloc(Ulines, sizeof(char *) * NumUlines);
+				Ulines = static_cast<char **>(realloc(Ulines, sizeof(char *) * NumUlines));
 				Ulines[NumUlines - 1] = sstrdup(s);
 			}
 		} while ((s = strtok(NULL, " ")));

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -382,7 +382,7 @@ void get_operserv_stats(long *nrec, long *memuse)
 	mem += akills.count * sizeof(Akill);
 
 	for (i = 0; i < akills.count; i++) {
-		ak = (Akill *)akills.list[i];
+		ak = static_cast<Akill *>(akills.list[i]);
 		mem += strlen(ak->user) + 1;
 		mem += strlen(ak->host) + 1;
 		mem += strlen(ak->by) + 1;
@@ -395,7 +395,7 @@ void get_operserv_stats(long *nrec, long *memuse)
 		mem += sglines.count * sizeof(SXLine);
 
 		for (i = 0; i < sglines.count; i++) {
-			sx = (SXLine *)sglines.list[i];
+			sx = static_cast<SXLine *>(sglines.list[i]);
 			mem += strlen(sx->mask) + 1;
 			mem += strlen(sx->by) + 1;
 			mem += strlen(sx->reason) + 1;
@@ -407,7 +407,7 @@ void get_operserv_stats(long *nrec, long *memuse)
 		mem += sqlines.count * sizeof(SXLine);
 
 		for (i = 0; i < sqlines.count; i++) {
-			sx = (SXLine *)sqlines.list[i];
+			sx = static_cast<SXLine *>(sqlines.list[i]);
 			mem += strlen(sx->mask) + 1;
 			mem += strlen(sx->by) + 1;
 			mem += strlen(sx->reason) + 1;
@@ -419,7 +419,7 @@ void get_operserv_stats(long *nrec, long *memuse)
 		mem += szlines.count * sizeof(SXLine);
 
 		for (i = 0; i < szlines.count; i++) {
-			sx = (SXLine *)szlines.list[i];
+			sx = static_cast<SXLine *>(szlines.list[i]);
 			mem += strlen(sx->mask) + 1;
 			mem += strlen(sx->by) + 1;
 			mem += strlen(sx->reason) + 1;

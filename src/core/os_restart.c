@@ -64,7 +64,7 @@ int do_restart(User * u)
 	if (!quitmsg)
 		quitmsg = "RESTART command received, but out of memory!";
 	else
-		sprintf((char *)quitmsg, /* XXX */ "RESTART command received from %s", u->nick);
+		sprintf(const_cast<char *>(quitmsg), /* XXX */ "RESTART command received from %s", u->nick);
 
 	if (GlobalOnCycle) {
 		oper_global(NULL, "%s", GlobalOnCycleMessage);

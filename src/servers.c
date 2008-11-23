@@ -291,7 +291,7 @@ Server *findserver(Server * s, const char *name)
 	}
 
 	if (debug)
-		alog("debug: findserver(%s) -> %p", name, (void *) s);
+		alog("debug: findserver(%s) -> %p", name, static_cast<void *>(s));
 	return s;
 }
 
@@ -337,7 +337,7 @@ Server *findserver_uid(Server * s, const char *name)
 	}
 
 	if (debug)
-		alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
+		alog("debug: findserver_uid(%s) -> %p", name, static_cast<void *>(s));
 	return s;
 }
 

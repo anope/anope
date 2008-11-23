@@ -61,7 +61,7 @@ int do_reload(User * u)
 			quitmsg =
 				"Error during the reload of the configuration file, but out of memory!";
 		else
-			sprintf((char *)quitmsg, /* XXX */
+			sprintf(const_cast<char *>(quitmsg), /* XXX */
 					"Error during the reload of the configuration file!");
 		quitting = 1;
 	}

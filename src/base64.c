@@ -184,7 +184,7 @@ int b64_decode(const char *src, char *target, size_t targsize)
 		switch (state) {
 		case 0:
 			if (target) {
-				if ((size_t) tarindex >= targsize)
+				if (static_cast<size_t>(tarindex) >= targsize)
 					return (-1);
 				target[tarindex] = (pos - Base64) << 2;
 			}
@@ -192,7 +192,7 @@ int b64_decode(const char *src, char *target, size_t targsize)
 			break;
 		case 1:
 			if (target) {
-				if ((size_t) tarindex + 1 >= targsize)
+				if (static_cast<size_t>(tarindex) + 1 >= targsize)
 					return (-1);
 				target[tarindex] |= (pos - Base64) >> 4;
 				target[tarindex + 1] = ((pos - Base64) & 0x0f)
@@ -203,7 +203,7 @@ int b64_decode(const char *src, char *target, size_t targsize)
 			break;
 		case 2:
 			if (target) {
-				if ((size_t) tarindex + 1 >= targsize)
+				if (static_cast<size_t>(tarindex) + 1 >= targsize)
 					return (-1);
 				target[tarindex] |= (pos - Base64) >> 2;
 				target[tarindex + 1] = ((pos - Base64) & 0x03)
@@ -214,7 +214,7 @@ int b64_decode(const char *src, char *target, size_t targsize)
 			break;
 		case 3:
 			if (target) {
-				if ((size_t) tarindex >= targsize)
+				if (static_cast<size_t>(tarindex) >= targsize)
 					return (-1);
 				target[tarindex] |= (pos - Base64);
 			}
@@ -290,13 +290,13 @@ const char* encode_ip(unsigned char *ip)
 	if (!ip)
 		return "*";
 
-	if (strchr((char *) ip, ':')) {
+	if (strchr(reinterpret_cast<char *>(ip), ':')) {
 		return NULL;
 	} else {
 		s_ip = str_signed(ip);
 		ia.s_addr = inet_addr(s_ip);
-		cp = (unsigned char *) ia.s_addr;
-		b64_encode((char *) &cp, sizeof(struct in_addr), buf, 25);
+		cp = reinterpret_cast<unsigned char *>(ia.s_addr);
+		b64_encode(reinterpret_cast<char *>(&cp), sizeof(struct in_addr), buf, 25);
 	}
 	return buf;
 }
@@ -308,7 +308,7 @@ int decode_ip(const char *buf)
 	struct in_addr ia;
 
 	b64_decode(buf, targ, 25);
-	ia = *(struct in_addr *) targ;
+	ia = *reinterpret_cast<struct in_addr *>(targ);
 	if (len == 24) {			/* IPv6 */
 		return 0;
 	} else if (len == 8)		/* IPv4 */
@@ -378,14 +378,14 @@ static char *int_to_base64(long val)
 
 static long base64_to_int(char *b64)
 {
-	int v = base64_to_int6_map[(unsigned char) *b64++];
+	int v = base64_to_int6_map[static_cast<unsigned char>(*b64++)];
 
 	if (!b64)
 		return 0;
 
 	while (*b64) {
 		v <<= 6;
-		v += base64_to_int6_map[(unsigned char) *b64++];
+		v += base64_to_int6_map[static_cast<unsigned char>(*b64++)];
 	}
 
 	return v;

@@ -59,7 +59,7 @@ int do_os_quit(User * u)
 	if (!quitmsg)
 		quitmsg = "QUIT command received, but out of memory!";
 	else
-		sprintf((char *)quitmsg, "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
+		sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
 
 	if (GlobalOnCycle) {
 		oper_global(NULL, "%s", GlobalOnCycleMessage);

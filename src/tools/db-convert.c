@@ -202,7 +202,7 @@ struct botinfo_ {
 struct badword_ {
 	uint16 in_use;
 	char *word;
-	uint16 type;	
+	uint16 type;
 };
 
 struct hostcore_ {
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 	std::string hashm;
 
 	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.x database converter"C_NONE"\n\n");
-	
+
 	hashm = "plain"; // XXX
 	/*
 	while (hashm != "md5" && hashm != "sha1" && hashm != "oldmd5" && hashm != "plain")
@@ -337,16 +337,16 @@ int main(int argc, char *argv[])
 		std::cin >> hashm;
 	}
 	*/
-	
+
 	std::cout << "You selected " << hashm << std::endl;
 
 	fs.open("anope.db");
 	if (!fs.is_open())
 	{
 		printf("\n"C_LBLUE"Could not open anope.db for write"C_NONE"\n\n");
-		exit(1);	
+		exit(1);
 	}
-	
+
 	// VERSHUN ONE
 	fs << "VER 1" << std::endl;
 
@@ -452,26 +452,26 @@ int main(int argc, char *argv[])
 				na->nc = findcore(s, 0);
 				na->nc->aliascount++;
 				free(s);
-				
+
 				if (!na->nc->last_quit && quit)
 					na->nc->last_quit = strdup(quit);
 				if (!na->nc->last_realname && real)
 					na->nc->last_realname = strdup(real);
 				if (!na->nc->last_usermask && mask)
 					na->nc->last_usermask = strdup(mask);
-				
-				// Convert nick NOEXPIRE to group NOEXPIRE	
+
+				// Convert nick NOEXPIRE to group NOEXPIRE
 				if (na->status & 0x0004)
 				{
 					na->nc->flags |= 0x00100000;
 				}
-				
+
 				// Convert nick VERBOTEN to group FORBIDDEN
 				if (na->status & 0x0002)
 				{
-					na->nc->flags |= 0x80000000;	
+					na->nc->flags |= 0x80000000;
 				}
-				
+
 				free(mask);
 				free(real);
 				free(quit);
@@ -493,7 +493,7 @@ int main(int argc, char *argv[])
 		for (NickCore *nc = nclists[i]; nc; nc = ncnext) {
 			ncnext = nc->next;
 			if (nc->aliascount < 1) {
-				printf("Deleting core %s (%s).\n", nc->display, nc->email); 
+				printf("Deleting core %s (%s).\n", nc->display, nc->email);
 				delcore(nc);
 			}
 		}
@@ -515,32 +515,32 @@ int main(int argc, char *argv[])
 				std::cout << "Skipping core with 0 or less aliases (wtf?)" << std::endl;
 				continue;
 			}
-			
+
 			if (nc->flags & 0x80000000)
 			{
 				std::cout << "Skipping forbidden nick " << nc->display << std::endl;
-				continue;	
+				continue;
 			}
-			
+
 			// Enc pass
 			b64_encode(nc->pass, hashm == "plain" ? strlen(nc->pass) : 32, (char *)cpass, 5000);
 
 			// Get language identifier
 			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " ";
 			fs << nc->email << " " << nc->flags << " " << GetLanguageID(nc->language) << std::endl;
-			
+
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
-			
+
 			if (nc->greet)
 				fs << "MD NC " << nc->display << " greet :" << nc->greet << std::endl;
 			if (nc->icq)
 				fs << "MD NC " << nc->display << " icq :" << nc->icq << std::endl;
 			if (nc->url)
-				fs << "MD NC " << nc->display << " url :" << nc->url << std::endl; 
+				fs << "MD NC " << nc->display << " url :" << nc->url << std::endl;
 
 			if (nc->accesscount)
 			{
-				fs << "MD NC " << nc->display << " obsolete_accesscount :" << nc->accesscount << std::endl; 
+				fs << "MD NC " << nc->display << " obsolete_accesscount :" << nc->accesscount << std::endl;
 				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
 					fs << "MD NC " << nc->display << " ns_access " << *access << std::endl;
 			}
@@ -550,7 +550,7 @@ int main(int argc, char *argv[])
 			if (nc->memos.memocount)
 			{
 				memos = nc->memos.memos;
-				fs << "MD NC " << nc->display << " obsolete_memocount :" << nc->memos.memocount << std::endl; 
+				fs << "MD NC " << nc->display << " obsolete_memocount :" << nc->memos.memocount << std::endl;
 				for (j = 0; j < nc->memos.memocount; j++, memos++)
 					fs << "ME " << nc->display << " " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
 			}
@@ -576,7 +576,7 @@ int main(int argc, char *argv[])
 
 
 					fs <<  "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << std::endl;
-					
+
 /*				SAFE(write_int8(1, f));
 				SAFE(write_string(na->nick, f));
 				SAFE(write_string(na->last_usermask, f)); // core
@@ -597,7 +597,7 @@ int main(int argc, char *argv[])
 
 
 	/* Section II: Chans */
-	// IIa: First database 
+	// IIa: First database
 	if ((f = open_db_read("ChanServ", "chan.db", 16)))
 	{
 		ChannelInfo *ci, **last, *prev;
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
 
 			last = &chanlists[i];
 			prev = NULL;
-		
+
 			while ((c = getc_db(f)) == 1)
 			{
 				std::cout << "got a channel" << std::endl;
@@ -814,9 +814,9 @@ int main(int argc, char *argv[])
 			*last = NULL;
 		}
 	}
-	
+
 	close_db(f);
-	
+
 
 	ChannelInfo *ci;
 	Memo *memos;
@@ -826,14 +826,14 @@ int main(int argc, char *argv[])
 		for (ci = chanlists[i]; ci; ci = ci->next)
 		{
 			int j;
-			
+
 		/*	if (!ci->founder)
 			{
 				std::cout << "Skipping channel with no founder (wtf?)" << std::endl;
 				continue;
 			}*/
-			
-			fs << "CH " << ci->name << " " << ci->founder << " " << ci->successor << " " << ci->time_registered << " " << ci->last_used << " " << ci->flags << std::endl;
+
+			fs << "CH " << ci->name << " " << ci->founder << " " << (ci->successor ? ci->successor : " ") << " " << ci->time_registered << " " << ci->last_used << " " << ci->flags << std::endl;
 
 			for (j = 0; j < 36; j++)
 			{
@@ -842,8 +842,8 @@ int main(int argc, char *argv[])
 
 			fs << "MD CH " << ci->name << " founderpass " << ci->founderpass << std::endl;
 			fs << "MD CH " << ci->name << " desc " << ci->desc << std::endl;
-			fs << "MD CH " << ci->name << " url " << ci->url << std::endl;
-			fs << "MD CH " << ci->name << " email " << ci->email << std::endl; 
+			fs << "MD CH " << ci->name << " url " << (ci->url ? ci->url : "") << std::endl;
+			fs << "MD CH " << ci->name << " email " << (ci->email ? ci->email : "") << std::endl;
 
 /*
 			SAFE(write_string(ci->last_topic, f));
@@ -1002,7 +1002,7 @@ int main(int argc, char *argv[])
 			firsthc = hc;
 		}
 	}
-	
+
 	if ((f = open_db_write("HostServ", HOST_DB_NEW, 3))) {
 		HostCore *hcptr;
 		for (hcptr = firsthc; hcptr; hcptr = hcptr->next) {

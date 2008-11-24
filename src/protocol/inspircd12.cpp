@@ -841,7 +841,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 	*nicklist = '\0';
 	*prefixandnick = '\0';
 
-	if (ac <= 4)
+	if (ac <= 3)
 		return MOD_CONT;
 
 	curnick = myStrGetToken(av[ac - 1], ' ', curtoken);

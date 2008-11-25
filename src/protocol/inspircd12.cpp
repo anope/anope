@@ -847,6 +847,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 	curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
 	while (curnick != NULL)
 	{
+		char *curnick_real = curnick;
 		for (; *curnick; curnick++)
 		{
 			/* XXX: bleagh! -- w00t */
@@ -882,6 +883,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 endnick:
 		strncat(nicklist, prefixandnick, 513);
 		strncat(nicklist, " ", 513);
+		delete [] curnick_real;
 		curtoken++;
 		curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
 		nlen = 0;

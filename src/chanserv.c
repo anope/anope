@@ -233,10 +233,10 @@ void get_chanserv_stats(long *nrec, long *memuse)
 				mem += strlen(ci->forbidreason) + 1;
 			if (ci->levels)
 				mem += sizeof(*ci->levels) * CA_SIZE;
-			mem += ci->memos.memocount * sizeof(Memo);
-			for (j = 0; j < ci->memos.memocount; j++) {
-				if (ci->memos.memos[j].text)
-					mem += strlen(ci->memos.memos[j].text) + 1;
+			mem += ci->memos.memos.size() * sizeof(Memo);
+			for (j = 0; j < ci->memos.memos.size(); j++) {
+				if (ci->memos.memos[j]->text)
+					mem += strlen(ci->memos.memos[j]->text) + 1;
 			}
 			if (ci->ttb)
 				mem += sizeof(*ci->ttb) * TTB_SIZE;
@@ -468,20 +468,19 @@ void load_cs_dbase(void)
 			}
 
 			SAFE(read_int16(&tmp16, f));
-			ci->memos.memocount = static_cast<int16>(tmp16);
+			if (tmp16) ci->memos.memos.resize(tmp16);
 			SAFE(read_int16(&tmp16, f));
 			ci->memos.memomax = static_cast<int16>(tmp16);
-			if (ci->memos.memocount) {
-				Memo *memos;
-				memos = static_cast<Memo *>(scalloc(sizeof(Memo) * ci->memos.memocount, 1));
-				ci->memos.memos = memos;
-				for (j = 0; j < ci->memos.memocount; j++, memos++) {
-					SAFE(read_int32(&memos->number, f));
-					SAFE(read_int16(&memos->flags, f));
+			if (!ci->memos.memos.empty()) {
+				for (j = 0; j < ci->memos.memos.size(); j++) {
+					ci->memos.memos[j] = new Memo;
+					Memo *memo = ci->memos.memos[j];
+					SAFE(read_int32(&memo->number, f));
+					SAFE(read_int16(&memo->flags, f));
 					SAFE(read_int32(&tmp32, f));
-					memos->time = tmp32;
-					SAFE(read = read_buffer(memos->sender, f));
-					SAFE(read_string(&memos->text, f));
+					memo->time = tmp32;
+					SAFE(read = read_buffer(memo->sender, f));
+					SAFE(read_string(&memo->text, f));
 				}
 			}
 
@@ -581,7 +580,6 @@ void save_cs_dbase(void)
 	dbFILE *f;
 	int i, j;
 	ChannelInfo *ci;
-	Memo *memos;
 	static time_t lastwarn = 0;
 
 	if (!(f = open_db(s_ChanServ, ChanDBName, "w", CHAN_VERSION)))
@@ -659,15 +657,15 @@ void save_cs_dbase(void)
 			} else {
 				SAFE(write_string(NULL, f));
 			}
-			SAFE(write_int16(ci->memos.memocount, f));
+			SAFE(write_int16(ci->memos.memos.size(), f));
 			SAFE(write_int16(ci->memos.memomax, f));
-			memos = ci->memos.memos;
-			for (j = 0; j < ci->memos.memocount; j++, memos++) {
-				SAFE(write_int32(memos->number, f));
-				SAFE(write_int16(memos->flags, f));
-				SAFE(write_int32(memos->time, f));
-				SAFE(written = write_buffer(memos->sender, f));
-				SAFE(write_string(memos->text, f));
+			for (j = 0; j < ci->memos.memos.size(); j++) {
+				Memo *memo = ci->memos.memos[j];
+				SAFE(write_int32(memo->number, f));
+				SAFE(write_int16(memo->flags, f));
+				SAFE(write_int32(memo->time, f));
+				SAFE(written = write_buffer(memo->sender, f));
+				SAFE(write_string(memo->text, f));
 			}
 
 			SAFE(write_string(ci->entry_message, f));
@@ -1731,12 +1729,13 @@ int delchan(ChannelInfo * ci)
 	if (debug >= 2) {
 		alog("debug: delchan() top of the memo list");
 	}
-	if (ci->memos.memos) {
-		for (i = 0; i < ci->memos.memocount; i++) {
-			if (ci->memos.memos[i].text)
-				delete [] ci->memos.memos[i].text;
+	if (!ci->memos.memos.empty()) {
+		for (i = 0; i < ci->memos.memos.size(); ++i) {
+			if (ci->memos.memos[i]->text)
+				delete [] ci->memos.memos[i]->text;
+			delete ci->memos.memos[i];
 		}
-		free(ci->memos.memos);
+		ci->memos.memos.clear();
 	}
 	if (debug >= 2) {
 		alog("debug: delchan() done with the memo list");

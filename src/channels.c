@@ -1538,13 +1538,13 @@ void chan_adduser2(User * user, Channel * c)
 
 	if (get_ignore(user->nick) == NULL) {
 		if (c->ci && (check_access(user, c->ci, CA_MEMO))
-			&& (c->ci->memos.memocount > 0)) {
-			if (c->ci->memos.memocount == 1) {
+			&& (c->ci->memos.memos.size() > 0)) {
+			if (c->ci->memos.memos.size() == 1) {
 				notice_lang(s_MemoServ, user, MEMO_X_ONE_NOTICE,
-							c->ci->memos.memocount, c->ci->name);
+							c->ci->memos.memos.size(), c->ci->name);
 			} else {
 				notice_lang(s_MemoServ, user, MEMO_X_MANY_NOTICE,
-							c->ci->memos.memocount, c->ci->name);
+							c->ci->memos.memos.size(), c->ci->name);
 			}
 		}
 		/* Added channelname to entrymsg - 30.03.2004, Certus */

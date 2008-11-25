@@ -102,10 +102,10 @@ void get_core_stats(long *nrec, long *memuse)
 					mem += strlen(*accptr) + 1;
 			}
 
-			mem += nc->memos.memocount * sizeof(Memo);
-			for (j = 0; j < nc->memos.memocount; j++) {
-				if (nc->memos.memos[j].text)
-					mem += strlen(nc->memos.memos[j].text) + 1;
+			mem += nc->memos.memos.size() * sizeof(Memo);
+			for (j = 0; j < nc->memos.memos.size(); j++) {
+				if (nc->memos.memos[j]->text)
+					mem += strlen(nc->memos.memos[j]->text) + 1;
 			}
 
 			mem += sizeof(void *) * nc->aliases.count;
@@ -270,20 +270,19 @@ void load_ns_dbase(void)
 			}
 
 			SAFE(read_int16(&tmp16, f));
-			nc->memos.memocount = static_cast<int16>(tmp16);
+			if (tmp16) nc->memos.memos.resize(tmp16);
 			SAFE(read_int16(&tmp16, f));
 			nc->memos.memomax = static_cast<int16>(tmp16);
-			if (nc->memos.memocount) {
-				Memo *memos;
-				memos = static_cast<Memo *>(scalloc(sizeof(Memo) * nc->memos.memocount, 1));
-				nc->memos.memos = memos;
-				for (j = 0; j < nc->memos.memocount; j++, memos++) {
-					SAFE(read_int32(&memos->number, f));
-					SAFE(read_int16(&memos->flags, f));
+			if (!nc->memos.memos.empty()) {
+				for (j = 0; j < nc->memos.memos.size(); j++) {
+					nc->memos.memos[j] = new Memo;
+					Memo *memo = nc->memos.memos[j];
+					SAFE(read_int32(&memo->number, f));
+					SAFE(read_int16(&memo->flags, f));
 					SAFE(read_int32(&tmp32, f));
-					memos->time = tmp32;
-					SAFE(read_buffer(memos->sender, f));
-					SAFE(read_string(&memos->text, f));
+					memo->time = tmp32;
+					SAFE(read_buffer(memo->sender, f));
+					SAFE(read_string(&memo->text, f));
 				}
 			}
 
@@ -388,7 +387,6 @@ void save_ns_dbase(void)
 	NickAlias *na;
 	NickCore *nc;
 	char **access;
-	Memo *memos;
 	static time_t lastwarn = 0;
 
 	if (!(f = open_db(s_NickServ, NickDBName, "w", NICK_VERSION)))
@@ -414,15 +412,15 @@ void save_ns_dbase(void)
 				 j++, access++)
 				SAFE(write_string(*access, f));
 
-			SAFE(write_int16(nc->memos.memocount, f));
+			SAFE(write_int16(nc->memos.memos.size(), f));
 			SAFE(write_int16(nc->memos.memomax, f));
-			memos = nc->memos.memos;
-			for (j = 0; j < nc->memos.memocount; j++, memos++) {
-				SAFE(write_int32(memos->number, f));
-				SAFE(write_int16(memos->flags, f));
-				SAFE(write_int32(memos->time, f));
-				SAFE(write_buffer(memos->sender, f));
-				SAFE(write_string(memos->text, f));
+			for (j = 0; j < nc->memos.memos.size(); j++) {
+				Memo *memo = nc->memos.memos[j];
+				SAFE(write_int32(memo->number, f));
+				SAFE(write_int16(memo->flags, f));
+				SAFE(write_int32(memo->time, f));
+				SAFE(write_buffer(memo->sender, f));
+				SAFE(write_string(memo->text, f));
 			}
 
 			SAFE(write_int16(nc->channelcount, f));
@@ -979,12 +977,13 @@ static int delcore(NickCore * nc)
 		free(nc->access);
 	}
 
-	if (nc->memos.memos) {
-		for (i = 0; i < nc->memos.memocount; i++) {
-			if (nc->memos.memos[i].text)
-				delete [] nc->memos.memos[i].text;
+	if (!nc->memos.memos.empty()) {
+		for (i = 0; i < nc->memos.memos.size(); ++i) {
+			if (nc->memos.memos[i]->text)
+				delete [] nc->memos.memos[i]->text;
+			delete nc->memos.memos[i];
 		}
-		free(nc->memos.memos);
+		nc->memos.memos.clear();
 	}
 
 	delete nc;

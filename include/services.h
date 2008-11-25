@@ -230,6 +230,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include <map>
 #include <exception>
 #include <list>
+#include <vector>
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
@@ -570,8 +571,8 @@ struct memo_ {
 };
 
 typedef struct {
-	int16 memocount, memomax;
-	Memo *memos;
+	int16 memomax;
+	std::vector<Memo *> memos;
 } MemoInfo;
 
 

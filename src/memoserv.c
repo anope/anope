@@ -99,29 +99,29 @@ void check_memos(User * u)
 		return;
 	}
 
-	for (i = 0; i < nc->memos.memocount; i++) {
-		if (nc->memos.memos[i].flags & MF_UNREAD)
+	for (i = 0; i < nc->memos.memos.size(); i++) {
+		if (nc->memos.memos[i]->flags & MF_UNREAD)
 			newcnt++;
 	}
 	if (newcnt > 0) {
 		notice_lang(s_MemoServ, u,
 					newcnt == 1 ? MEMO_HAVE_NEW_MEMO : MEMO_HAVE_NEW_MEMOS,
 					newcnt);
-		if (newcnt == 1 && (nc->memos.memos[i - 1].flags & MF_UNREAD)) {
+		if (newcnt == 1 && (nc->memos.memos[i - 1]->flags & MF_UNREAD)) {
 			notice_lang(s_MemoServ, u, MEMO_TYPE_READ_LAST, s_MemoServ);
 		} else if (newcnt == 1) {
-			for (i = 0; i < nc->memos.memocount; i++) {
-				if (nc->memos.memos[i].flags & MF_UNREAD)
+			for (i = 0; i < nc->memos.memos.size(); i++) {
+				if (nc->memos.memos[i]->flags & MF_UNREAD)
 					break;
 			}
 			notice_lang(s_MemoServ, u, MEMO_TYPE_READ_NUM, s_MemoServ,
-						nc->memos.memos[i].number);
+						nc->memos.memos[i]->number);
 		} else {
 			notice_lang(s_MemoServ, u, MEMO_TYPE_LIST_NEW, s_MemoServ);
 		}
 	}
-	if (nc->memos.memomax > 0 && nc->memos.memocount >= nc->memos.memomax) {
-		if (nc->memos.memocount > nc->memos.memomax)
+	if (nc->memos.memomax > 0 && nc->memos.memos.size() >= nc->memos.memomax) {
+		if (nc->memos.memos.size() > nc->memos.memomax)
 			notice_lang(s_MemoServ, u, MEMO_OVER_LIMIT, nc->memos.memomax);
 		else
 			notice_lang(s_MemoServ, u, MEMO_AT_LIMIT, nc->memos.memomax);
@@ -245,23 +245,22 @@ void memo_send(User * u, char *name, char *text, int z)
 		if (z == 0 || z == 3)
 			notice_lang(s_MemoServ, u, MEMO_X_GETS_NO_MEMOS, name);
 
-	} else if (mi->memomax > 0 && mi->memocount >= mi->memomax
+	} else if (mi->memomax > 0 && mi->memos.size() >= mi->memomax
 			   && !is_servoper) {
 		if (z == 0 || z == 3)
 			notice_lang(s_MemoServ, u, MEMO_X_HAS_TOO_MANY_MEMOS, name);
 
 	} else {
 		u->lastmemosend = now;
-		mi->memocount++;
-		mi->memos = static_cast<Memo *>(srealloc(mi->memos, sizeof(Memo) * mi->memocount));
-		m = &mi->memos[mi->memocount - 1];
+		m = new Memo;
+		mi->memos.push_back(m);
 		strscpy(m->sender, source, NICKMAX);
-		if (mi->memocount > 1) {
-			m->number = m[-1].number + 1;
+		if (mi->memos.size() > 1) {
+			m->number = mi->memos[mi->memos.size() - 2]->number + 1;
 			if (m->number < 1) {
 				int i;
-				for (i = 0; i < mi->memocount; i++) {
-					mi->memos[i].number = i + 1;
+				for (i = 0; i < mi->memos.size(); i++) {
+					mi->memos[i]->number = i + 1;
 				}
 			}
 		} else {
@@ -339,21 +338,16 @@ void memo_send(User * u, char *name, char *text, int z)
 int delmemo(MemoInfo * mi, int num)
 {
 	int i;
+	if (mi->memos.empty()) return 0;
 
-	for (i = 0; i < mi->memocount; i++) {
-		if (mi->memos[i].number == num)
+	for (i = 0; i < mi->memos.size(); i++) {
+		if (mi->memos[i]->number == num)
 			break;
 	}
-	if (i < mi->memocount) {
-		delete [] mi->memos[i].text;		/* Deallocate memo text memory */
-		mi->memocount--;		/* One less memo now */
-		if (i < mi->memocount)  /* Move remaining memos down a slot */
-			memmove(mi->memos + i, mi->memos + i + 1,
-					sizeof(Memo) * (mi->memocount - i));
-		if (mi->memocount == 0) {	   /* If no more memos, free array */
-			free(mi->memos);
-			mi->memos = NULL;
-		}
+	if (i < mi->memos.size()) {
+		delete [] mi->memos[i]->text;		/* Deallocate memo text memory */
+		delete mi->memos[i];	/* Deallocate the memo itself */
+		mi->memos.erase(mi->memos.begin() + i);	/* Remove the memo pointer from the vector */
 		return 1;
 	} else {
 		return 0;

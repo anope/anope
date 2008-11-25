@@ -84,7 +84,10 @@ void User::SetNewNick(const std::string &newnick)
 		throw "User::SetNewNick() got a bad argument";
 	}
 
-	is_same = (!stricmp(this->nick, nick) ? 1 : 0);
+	if (debug)
+		alog("debug: %s changed nick to %s", this->nick, newnick.c_str());
+
+	is_same = (!stricmp(this->nick, newnick.c_str()) ? 1 : 0);
 
 	if (this->prev)
 		this->prev->next = this->next;
@@ -94,7 +97,7 @@ void User::SetNewNick(const std::string &newnick)
 	if (this->next)
 		this->next->prev = this->prev;
 
-	strscpy(this->nick, nick, NICKMAX);
+	strscpy(this->nick, newnick.c_str(), NICKMAX);
 	list = &userlist[HASH(this->nick)];
 	this->next = *list;
 	this->prev = NULL;
@@ -108,13 +111,11 @@ void User::SetNewNick(const std::string &newnick)
 	{
 		if (this->na)
 			this->na->u = NULL;
-		this->na = findnick(nick);
+		this->na = findnick(this->nick);
 		if (this->na)
 			this->na->u = this;
 	}
 
-	if (debug)
-		alog("debug: %s changed nick to %s", this->nick, newnick.c_str());
 }
 
 void User::SetDisplayedHost(const std::string &shost)

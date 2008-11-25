@@ -640,7 +640,7 @@ int main(int argc, char *argv[])
 				READ(read_string(&ci->desc, f));
 				if (!ci->desc)
 					ci->desc = strdup("");
-				std::cout << "Read " << ci->name << " founder " << ci->founder << std::endl;
+				std::cout << "Read " << ci->name << " founder " << (ci->founder ? ci->founder : "N/A") << std::endl;
 				READ(read_string(&ci->url, f));
 				READ(read_string(&ci->email, f));
 				READ(read_int32(&tmp32, f));
@@ -833,7 +833,7 @@ int main(int argc, char *argv[])
 				continue;
 			}*/
 
-			fs << "CH " << ci->name << " " << ci->founder << " " << (ci->successor ? ci->successor : " ") << " " << ci->time_registered << " " << ci->last_used << " " << ci->flags << std::endl;
+			fs << "CH " << ci->name << " " << (ci->founder ? ci->founder : "") << " " << (ci->successor ? ci->successor : " ") << " " << ci->time_registered << " " << ci->last_used << " " << ci->flags << std::endl;
 
 			for (j = 0; j < 36; j++)
 			{

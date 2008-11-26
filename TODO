@@ -32,6 +32,7 @@ Legend:
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
 [x] Remove old (prior to 1.8.0) db compat
+[ ] add StatServ module for Hal9000 to play with :)
 
 1.9.1
 -----

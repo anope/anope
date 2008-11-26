@@ -1,16 +1,13 @@
 #include "version.h"
 
-#ifndef _WIN32
-#define E extern
-#define I extern
+#ifdef _WIN32
+# ifdef MODULE_COMPILE
+#  define E extern __declspec(dllexport)
+# else
+#  define E extern __declspec(dllimport)
+# endif
 #else
-#ifndef MODULE_COMPILE
-#define E extern __declspec(dllexport)
-#define I extern __declspec(dllimport)
-#else
-#define E extern __declspec(dllimport)
-#define I extern __declspec(dllexport)
-#endif
+# define E extern
 #endif
 
 extern "C"

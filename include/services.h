@@ -305,7 +305,7 @@ class CoreExport ModuleException : public CoreException
 /** Class with the ability to be extended with key:value pairs.
  * Thanks to InspIRCd for this.
  */
-class Extensible
+class CoreExport Extensible
 {
  private:
 	std::map<std::string, void *> Extension_Items;
@@ -360,7 +360,14 @@ class Extensible
 	 * you provide a nonexistent key (case is important) then the function will return false.
 	 * @return Returns true on success.
 	 */
-	bool Shrink(const std::string &key);
+	bool Shrink(const std::string &key)
+	{
+		/* map::size_type map::erase( const key_type& key );
+		 * returns the number of elements removed, std::map
+		 * is single-associative so this should only be 0 or 1
+		 */
+		return this->Extension_Items.erase(key);
+	}
 
 	/** Get an extension item.
 	 *

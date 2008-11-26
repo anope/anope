@@ -22,13 +22,13 @@ OBJS =  actions.obj base64.obj bots.obj botserv.obj channels.obj chanserv.obj co
         init.obj ircd.obj language.obj log.obj mail.obj main.obj memory.obj \
         memoserv.obj messages.obj misc.obj modules.obj mod_version.obj news.obj nickserv.obj operserv.obj \
         process.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
-        timeout.obj users.obj module.obj modulemanager.obj hashcomp.obj
+        timeout.obj users.obj module.obj modulemanager.obj hashcomp.obj configreader.obj
 
 SRCS =  actions.c base64.c botserv.c bots.cpp channels.c chanserv.c commands.c compat.c \
         config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c \
         language.c log.c mail.c main.c memory.c memoserv.c messages.c misc.c \
         modules.c mod_version.c news.c nickserv.c operserv.c process.c send.c servers.obj sessions.c \
-        slist.c sockutil.c timeout.c users.c module.cpp modulemanager.cpp hashcomp.cpp
+        slist.c sockutil.c timeout.c users.c module.cpp modulemanager.cpp hashcomp.cpp configreader.cpp
 
 ###########################################################################
 
@@ -42,7 +42,7 @@ SRCS =  actions.c base64.c botserv.c bots.cpp channels.c chanserv.c commands.c c
 all: $(PROGRAM)
 
 $(PROGRAM): $(OBJS) win32.res
-        $(CC) $(OBJS) win32.res /link /out:$(PROGRAM) /implib:anope.lib $(LIBS) $(LFLAGS) $(MLIBS) $(ELIBS)
+        $(CC) $(OBJS) win32.res /link /debug /out:$(PROGRAM) /implib:anope.lib $(LIBS) $(LFLAGS) $(MLIBS) $(ELIBS)
 
 spotless:
         -@erase *.obj *.exe *.exp *.lib tools\*.exe *.res win32.rc *.manifest

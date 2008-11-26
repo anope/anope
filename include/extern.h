@@ -15,18 +15,8 @@
 #ifndef EXTERN_H
 #define EXTERN_H
 
-#ifndef _WIN32
-#define E extern
-#define EI extern
-#else
-#ifndef MODULE_COMPILE
-#define E extern __declspec(dllexport)
-#define EI extern __declspec(dllimport)
-#else
-#define E extern __declspec(dllimport)
-#define EI extern __declspec(dllexport)
-#endif
-#endif
+#define E extern CoreExport
+#define EI extern DllExport
 
 #include "slist.h"
 

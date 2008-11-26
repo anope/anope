@@ -88,7 +88,7 @@ int do_read(User * u)
 			&& num <= 0)) {
 		syntax_error(s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 
-	} else if (mi->memocount == 0) {
+	} else if (mi->memos.empty()) {
 		if (chan)
 			notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
 		else
@@ -99,8 +99,8 @@ int do_read(User * u)
 
 		if (stricmp(numstr, "NEW") == 0) {
 			int readcount = 0;
-			for (i = 0; i < mi->memocount; i++) {
-				if (mi->memos[i].flags & MF_UNREAD) {
+			for (i = 0; i < mi->memos.size(); i++) {
+				if (mi->memos[i]->flags & MF_UNREAD) {
 					read_memo(u, i, mi, chan);
 					readcount++;
 				}
@@ -113,7 +113,7 @@ int do_read(User * u)
 					notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 			}
 		} else if (stricmp(numstr, "LAST") == 0) {
-			for (i = 0; i < mi->memocount - 1; i++);
+			for (i = 0; i < mi->memos.size() - 1; i++);
 			read_memo(u, i, mi, chan);
 		} else {				/* number[s] */
 			if (!process_numlist(numstr, &count, read_memo_callback, u,
@@ -143,8 +143,8 @@ int read_memo_callback(User * u, int num, va_list args)
 	const char *chan = va_arg(args, const char *);
 	int i;
 
-	for (i = 0; i < mi->memocount; i++) {
-		if (mi->memos[i].number == num)
+	for (i = 0; i < mi->memos.size(); i++) {
+		if (mi->memos[i]->number == num)
 			break;
 	}
 	/* Range check done in read_memo */
@@ -165,9 +165,9 @@ int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
 	char timebuf[64];
 	struct tm tm;
 
-	if (index < 0 || index >= mi->memocount)
+	if (index < 0 || index >= mi->memos.size())
 		return 0;
-	m = &mi->memos[index];
+	m = mi->memos[index];
 	tm = *localtime(&m->time);
 	strftime_lang(timebuf, sizeof(timebuf),
 				  u, STRFTIME_DATE_TIME_FORMAT, &tm);

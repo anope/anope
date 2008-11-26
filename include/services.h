@@ -178,10 +178,18 @@ extern int strncasecmp(const char *, const char *, size_t);
 	#define MARK_DEPRECATED
 #endif
 
-/** XXX: we need to grab these from inspircd -- w00t
- */
-#define DllExport
-#define CoreExport
+#ifdef _WIN32
+# ifdef MODULE_COMPILE
+#  define CoreExport __declspec(dllimport)
+#  define DllExport __declspec(dllexport)
+# else
+#  define CoreExport __declspec(dllexport)
+#  define DllExport __declspec(dllimport)
+# endif
+#else
+# define DllExport
+# define CoreExport
+#endif
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
@@ -203,7 +211,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 			} \
 			return TRUE; \
 		} \
-		extern "C" DllExport void *destroy_module(y *m) \
+		extern "C" DllExport void destroy_module(y *m) \
 		{ \
 		    delete m; \
 		}

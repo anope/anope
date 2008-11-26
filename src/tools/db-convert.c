@@ -27,6 +27,7 @@
 #else
 #include "sysconf.h"
 #include <windows.h>
+#include <io.h>
 #endif
 
 #include <string>
@@ -1079,7 +1080,7 @@ dbFILE *open_db_write(const char *service, const char *filename, int version)
 #ifndef _WIN32
 	fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0666);
 #else
-	fd = open(filename, O_WRONLY | O_CREAT | O_EXCL | _O_BINARY, 0666);
+	fd = _open(filename, O_WRONLY | O_CREAT | O_EXCL | _O_BINARY, 0666);
 #endif
 	f->fp = fdopen(fd, "wb");   /* will fail and return NULL if fd < 0 */
 	if (!f->fp || !write_file_version(f, version)) {

@@ -54,7 +54,7 @@ static int moduleCopyFile(const char *name, const char *output)
 	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)
 		return MOD_ERR_FILE_IO;
 #else
-	if (!mktemp(output))
+	if (!mktemp(const_cast<char *>(output)))
 		return MOD_ERR_FILE_IO;
 #endif
 
@@ -152,7 +152,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	ano_modclearerr();
 
-	void *handle = ano_modopen(pbuf.c_str());
+	ano_module_t handle = ano_modopen(pbuf.c_str());
 	if (handle == NULL && (err = ano_moderr()) != NULL)
 	{
 		alog("%s", err);
@@ -253,7 +253,7 @@ void ModuleManager::DeleteModule(Module *m)
 {
 	const char *err;
 	void (*destroy_func)(Module *m);
-	void *handle;
+	ano_module_t handle;
 
 	if (!m || !m->handle) /* check m is least possibly valid */
 	{

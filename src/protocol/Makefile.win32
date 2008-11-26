@@ -2,10 +2,10 @@ include ../../Makefile.inc.win32
 
 SRCS=bahamut.c inspircd11.c inspircd12.cpp \
      ratbox.c unreal32.c
+OBJECTS=bahamut.dll inspircd11.dll inspircd12.dll ratbox.dll unreal32.dll
 
-OBJECTS= $(SRCS:.c=.dll)
 CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
-LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /VERSION:$(VERSION)
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:init_module /export:destroy_module /VERSION:$(VERSION)
 
 all: $(OBJECTS)
 

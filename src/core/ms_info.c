@@ -98,31 +98,31 @@ int do_info(User * u)
 
 	if (name && (ci || na->nc != u->na->nc)) {
 
-		if (!mi->memocount) {
+		if (mi->memos.empty()) {
 			notice_lang(s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
-		} else if (mi->memocount == 1) {
-			if (mi->memos[0].flags & MF_UNREAD)
+		} else if (mi->memos.size() == 1) {
+			if (mi->memos[0]->flags & MF_UNREAD)
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMO_UNREAD, name);
 			else
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMO, name);
 		} else {
 			int count = 0, i;
-			for (i = 0; i < mi->memocount; i++) {
-				if (mi->memos[i].flags & MF_UNREAD)
+			for (i = 0; i < mi->memos.size(); i++) {
+				if (mi->memos[i]->flags & MF_UNREAD)
 					count++;
 			}
-			if (count == mi->memocount)
+			if (count == mi->memos.size())
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_ALL_UNREAD,
 							name, count);
 			else if (count == 0)
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS, name,
-							mi->memocount);
+							mi->memos.size());
 			else if (count == 1)
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_ONE_UNREAD,
-							name, mi->memocount);
+							name, mi->memos.size());
 			else
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD,
-							name, mi->memocount, count);
+							name, mi->memos.size(), count);
 		}
 		if (mi->memomax == 0) {
 			if (hardmax)
@@ -161,30 +161,30 @@ int do_info(User * u)
 
 	} else {					/* !name || (!ci || na->nc == u->na->nc) */
 
-		if (!mi->memocount) {
+		if (mi->memos.empty()) {
 			notice_lang(s_MemoServ, u, MEMO_INFO_NO_MEMOS);
-		} else if (mi->memocount == 1) {
-			if (mi->memos[0].flags & MF_UNREAD)
+		} else if (mi->memos.size() == 1) {
+			if (mi->memos[0]->flags & MF_UNREAD)
 				notice_lang(s_MemoServ, u, MEMO_INFO_MEMO_UNREAD);
 			else
 				notice_lang(s_MemoServ, u, MEMO_INFO_MEMO);
 		} else {
 			int count = 0, i;
-			for (i = 0; i < mi->memocount; i++) {
-				if (mi->memos[i].flags & MF_UNREAD)
+			for (i = 0; i < mi->memos.size(); i++) {
+				if (mi->memos[i]->flags & MF_UNREAD)
 					count++;
 			}
-			if (count == mi->memocount)
+			if (count == mi->memos.size())
 				notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS_ALL_UNREAD,
 							count);
 			else if (count == 0)
-				notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS, mi->memocount);
+				notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS, mi->memos.size());
 			else if (count == 1)
 				notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS_ONE_UNREAD,
-							mi->memocount);
+							mi->memos.size());
 			else
 				notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS_SOME_UNREAD,
-							mi->memocount, count);
+							mi->memos.size(), count);
 		}
 
 		if (mi->memomax == 0) {

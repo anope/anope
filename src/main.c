@@ -48,6 +48,8 @@ int protocoldebug = 0;		  /* -protocoldebug */
 
 #ifdef _WIN32
 char *binary_dir;			   /* Used to store base path for win32 restart */
+#include <process.h>
+#define execve _execve
 #endif
 
 /* Set to 1 if we are to quit */

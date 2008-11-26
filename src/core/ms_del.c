@@ -88,7 +88,7 @@ int do_del(User * u)
 		|| (!isdigit(*numstr) && stricmp(numstr, "ALL") != 0
 			&& stricmp(numstr, "LAST") != 0)) {
 		syntax_error(s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
-	} else if (mi->memocount == 0) {
+	} else if (mi->memos.size() == 0) {
 		if (chan)
 			notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
 		else
@@ -128,18 +128,17 @@ int do_del(User * u)
 			}
 		} else if (stricmp(numstr, "LAST") == 0) {
 			/* Delete last memo. */
-			for (i = 0; i < mi->memocount; i++)
-				last = mi->memos[i].number;
+			for (i = 0; i < mi->memos.size(); i++)
+				last = mi->memos[i]->number;
 			delmemo(mi, last);
 			notice_lang(s_MemoServ, u, MEMO_DELETED_ONE, last);
 		} else {
 			/* Delete all memos. */
-			for (i = 0; i < mi->memocount; i++) {
-				delete [] mi->memos[i].text;
+			for (i = 0; i < mi->memos.size(); i++) {
+				delete [] mi->memos[i]->text;
+				delete mi->memos[i];
 			}
-			free(mi->memos);
-			mi->memos = NULL;
-			mi->memocount = 0;
+			mi->memos.clear();
 			if (chan)
 				notice_lang(s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan);
 			else
@@ -147,8 +146,8 @@ int do_del(User * u)
 		}
 
 		/* Reset the order */
-		for (i = 0; i < mi->memocount; i++)
-			mi->memos[i].number = i + 1;
+		for (i = 0; i < mi->memos.size(); i++)
+			mi->memos[i]->number = i + 1;
 	}
 	return MOD_CONT;
 }

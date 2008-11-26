@@ -56,24 +56,24 @@ var installerQuestions = [
                                                                                                 f.WriteLine("MYSQL_INC_PATH=/I $(MYSQL_INC)");
                                                                                                 f.WriteLine("BASE_CFLAGS=/D $(BASE_CFLAGS)");
                                                                                                 f.WriteLine("MYPASQL_BUILD=$(CC) /LD $(MYSQL_INC_PATH) src\\mypasql.c /link $(MYSQL_LIB_PATH) $(LFLAGS) /DEF:src\mypasql.def libmysql.lib zlib.lib ws2_32.lib advapi32.lib /NODEFAULTLIB:LIBCMTD.lib");
-                                                                                                f.WriteLine("LIBS=$(LIBS) libmysql.lib zlib.lib");                                                                             
+                                                                                                f.WriteLine("LIBS=$(LIBS) libmysql.lib zlib.lib");
                                                                                         }
                                                                                         else {
                                                                                                 f.WriteLine("USE_MYSQL=0");
                                                                                         }
-                                                        }                                                                                                                                        
+                                                        }
                                                 },
-                                               
+
                                        ];
 
 var buildPackages = [
                                         {
                                                         'name' : 'Microsoft Visual Studio 2008 (New PSDK)',
-                                                        'libpaths' : [                                                                               
+                                                        'libpaths' : [
                                                                      'Program Files\\Microsoft Visual Studio 9.0\\VC\\Lib',
                                                                      'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
                                                                      ],
-                                                        'incpaths' : [                                                                               
+                                                        'incpaths' : [
                                                                      'Program Files\\Microsoft Visual Studio 9.0\\VC\\Include',
                                                                      'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Include'
                                                                      ],
@@ -99,7 +99,7 @@ var buildPackages = [
                                                         'additional_switches' : [ '/w' ],
                                                         'installedDrive' : 'C'
                                         },
- 
+
                                         {
                                                         'name' : 'Microsoft Visual Studio 2005 (New PSDK)',
                                                         'libpaths' : [
@@ -119,7 +119,7 @@ var buildPackages = [
                                                                       	],
 							'installedDrive' : 'C'
                                         },
-                                        {                                        
+                                        {
                                                         'name' : 'Microsoft Visual Studio 2005 (Old PSDK)',
                                                         'libpaths' : [
                                                                                 'Program Files\\Microsoft Visual Studio 8\\VC\\Lib',
@@ -138,7 +138,7 @@ var buildPackages = [
                                                                		],
 							'installedDrive' : 'C'
                                         },
-                                        
+
                                         {
                                                         'name' : 'Microsoft Visual Studio .NET 2003',
                                                         'libpaths' : [
@@ -152,7 +152,7 @@ var buildPackages = [
                                                         'nmake' : [
                                                                                 'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Bin',
                                                                                 ''
-                                                                        ],                                                                    
+                                                                        ],
                                                         'additional_switches' : false,
 							'installedDrive' : 'C'
                                         },
@@ -174,10 +174,10 @@ var buildPackages = [
                                                                     	],
 							'installedDrive' : 'C'
                                         }
-                                        
-                                ];                  
-                                                              
-                                
+
+                                ];
+
+
         var mysqlVersions = [
 						{
 							'name' : 'MySQL 5.1',
@@ -199,10 +199,10 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 5.0\\Include'
                                                                         ],
-                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.0\\Bin\\libmysql.dll', 
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.0\\Bin\\libmysql.dll',
 							'installedDrive' : 'C'
                                                 },
-                                                
+
                                                 {
                                                         'name' : 'MySQL 4.1',
                                                         'libpaths' : [
@@ -211,10 +211,10 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 4.1\\Include'
                                                                         ],
-                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.1\\Bin\\libmysql.dll', 
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.1\\Bin\\libmysql.dll',
                                                 	'installedDrive' : 'C'
-						},        
-                                                
+						},
+
                                                 {
                                                         'name' : 'MySQL 4.0',
                                                         'libpaths' : [
@@ -225,8 +225,8 @@ var buildPackages = [
                                                                         ],
                                                         'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.0\\Bin\\libmysql.dll',
 							'installedDrive' : 'C'
-                                                },                                                                                                                                                                           
-                                                        
+                                                },
+
                                                 {
                                                         'name' : 'MySQL 3.23 or older (or other default path)',
                                                         'libpaths' : [
@@ -236,11 +236,11 @@ var buildPackages = [
                                                                                 'mysql\\include'
                                                                         ],
                                                         'dllfile' : 'mysql\\Bin\\libmysql.dll',
-							'installedDrive' : 'C'                               
+							'installedDrive' : 'C'
                                                 }
 
-                                ];                  
-                                
+                                ];
+
         var bannerReplacements = [
                                                                 {
                                                                         'findtext' : /CURVER/g,
@@ -250,32 +250,32 @@ var buildPackages = [
                                                                         'findtext' : / For more options type .\/Config --help/g,
                                                                         'replacement' : function() { return ''; }
                                                                  }
-                                                ];                                                                       
-                                                                        
-                                                                        
-        var fso = WScript.CreateObject("Scripting.FileSystemObject"); 
+                                                ];
+
+
+        var fso = WScript.CreateObject("Scripting.FileSystemObject");
         var x, y, z;
-        
+
         if (fso.FileExists('.BANNER')) {
                 var bannerStream = fso.OpenTextFile(".BANNER");
-                var bannerText = bannerStream.ReadAll();              
+                var bannerText = bannerStream.ReadAll();
                 bannerStream.close();
-                
+
                 for (x in bannerReplacements) {
                         var thisReplacement = bannerReplacements[x];
                         bannerText = bannerText.replace(thisReplacement['findtext'], thisReplacement['replacement']);
                 }
-                
+
                 WScript.Echo(bannerText+"\n");
-        }    
+        }
         else {
                 WScript.Echo("ERROR: Cannot find banner file!\n");
         }
-        
+
         WScript.Echo("Press Enter to Begin...");
-        InstallerInput();        
+        InstallerInput();
         WScript.Echo("");
-      
+
         for (x in installerQuestions) {
                 var thisQuestion = installerQuestions[x];
                 var validResponse = false;
@@ -305,10 +305,10 @@ var buildPackages = [
                         else if (thisQuestion.store_answer(inputValue)) {
                                 validResponse = true;
                         }
-                }                
+                }
                 WScript.Echo("");
         }
-        
+
         if (!findCompiler()) {
                 WScript.Echo("\nERROR: No suitable build tools were found!");
                 WScript.Echo("Please ensure you have downloaded and installed a version of Visual C++ and/or PlatformSDK.\n");
@@ -320,7 +320,7 @@ var buildPackages = [
                 for (x in installerResponses) {
                         var thisResponse = installerResponses[x];
                         WScript.Echo("\t"+x+":\t\t["+thisResponse.toUpperCase()+"]");
-                }        
+                }
                 for (x in softwareVersions) {
                         var thisVer = softwareVersions[x];
                         if (!thisVer) {
@@ -328,12 +328,12 @@ var buildPackages = [
                         }
                         else {
                                 WScript.Echo("\t"+x+" Version:\t\t"+thisVer.name);
-                        }        
+                        }
                 }
 		    WScript.Echo("\tAnope Version:\t\t\t"+anopeVersion);
                 WScript.Echo("\nTo continue, please press Enter...");
-                InstallerInput();    
-       
+                InstallerInput();
+
                 var f = fso.OpenTextFile("Makefile.inc.win32", 2);
                 f.WriteLine("#");
                 f.WriteLine("# Generated by install.js");
@@ -364,47 +364,47 @@ var buildPackages = [
                 f.WriteLine("CC=cl");
                 f.WriteLine("RC=rc");
                 f.WriteLine("MAKE=nmake -f Makefile.win32");
-                f.WriteLine("BASE_CFLAGS=$(VC6) /O2 /MD /TP /EHsc $(INCFLAGS)");
+                f.WriteLine("BASE_CFLAGS=$(VC6) /O2 /MD /TP /GR /EHsc $(INCFLAGS)");
                 f.WriteLine("RC_FLAGS="+path_line_rc);
                 f.WriteLine("LIBS=wsock32.lib advapi32.lib /NODEFAULTLIB:libcmtd.lib");
-                f.WriteLine("LFLAGS=$(LIBPATH)");               
-                   
+                f.WriteLine("LFLAGS=$(LIBPATH)");
+
                 for (x in installerQuestions) {
                         var thisQuestion = installerQuestions[x];
                         thisQuestion.commit_config();
-                } 
-                        
+                }
+
                 f.WriteLine("MORE_CFLAGS = /I\"../include\"");
                 f.WriteLine("CFLAGS = /nologo $(CDEFS) $(BASE_CFLAGS) $(MORE_CFLAGS)");
                 f.close();
-                
+
                 generateRC();
-                
+
                 WScript.Echo("\nConfiguration Complete!");
                 WScript.Echo("-----------------------\n");
                 WScript.Echo("Anope has been configured to your system. To compile, simply type:");
                 WScript.Echo("nmake -f Makefile.win32\n");
 		    WScript.Echo("If you update Anope, you should run this script again to ensure\nall available options are set.\n");
-          
-        }                        
+
+        }
         // Fin.
-        
+
         // -----------------------------------------------------------------
-        
+
         // Functions
-        
+
         function FindAnopeVersion() {
                 if (!fso.FileExists('version.log')) {
                         anopeVersion = 'Unknown';
                         return;
-                }                               
-                
+                }
+
                 var versionLog = fso.OpenTextFile("version.log");
                 while (!versionLog.atEndOfStream) {
                         var versionLine = versionLog.readline();
                         var thisMatch = versionLine.replace('\n', '');
 			while (thisMatch.match(/\"/g)) {
-				thisMatch = thisMatch.replace('"', '');	
+				thisMatch = thisMatch.replace('"', '');
 			}
 			versionLine = thisMatch;
                         if (versionLine.match(/VERSION_MAJOR=/g)) {
@@ -414,30 +414,30 @@ var buildPackages = [
                         if (versionLine.match(/VERSION_MINOR=/g)) {
                                 vMin = versionLine.replace('VERSION_MINOR=', '');
                                 continue;
-                        } 
+                        }
                         if (versionLine.match(/VERSION_PATCH=/g)) {
                                 vPat = versionLine.replace('VERSION_PATCH=', '');
                                 continue;
-                        }       
+                        }
                         if (versionLine.match(/VERSION_EXTRA=/g)) {
                                 vExtra = versionLine.replace('VERSION_EXTRA=', '');
                                 continue;
-                        }                
+                        }
                         if (versionLine.match(/VERSION_BUILD=/g)) {
                                 vBuild = versionLine.replace('VERSION_BUILD=', '');
                                 continue;
-                        }                                                                                                
+                        }
                 }
                 versionLog.close();
                 anopeVersion = vMaj+"."+vMin+"."+vPat+"."+vBuild+vExtra;
                 return;
         }
-        
+
         function InstallerInput() {
                 var input = WScript.StdIn.Readline();
-                return input;          
+                return input;
         }
-        
+
         function findMySQL() {
                 WScript.Echo("\nLooking for MySQL...\n");
 		var installedDrive = "";
@@ -459,11 +459,11 @@ var buildPackages = [
                 }
                 return false;
         }
-        
+
         function findCompiler() {
                 WScript.Echo("\nLooking for a suitable compiler...\n");
                 var noPSDK = false;
-		var installedDrive = "";                
+		var installedDrive = "";
                 for (x in buildPackages) {
                         var thisPack = buildPackages[x];
                         WScript.Echo("Looking for: "+thisPack.name+"...");
@@ -478,7 +478,7 @@ var buildPackages = [
                         }
                         if (!findFile("advapi32.lib", thisPack.libpaths)) {
                                 WScript.Echo("ERROR: Cannot find advapi32.lib - Probably missing PlatformSDK...\n");
-                                noPSDK = true;                                
+                                noPSDK = true;
                                 continue;
                         }
                         if (!findFile("stdio.h", thisPack.incpaths)) {
@@ -487,7 +487,7 @@ var buildPackages = [
                         }
                         if (!findFile("windows.h", thisPack.incpaths)) {
                                 WScript.Echo("ERROR: Cannot find windows.h - Probably missing PlatformSDK headers...\n");
-                                noPSDK = true;                                
+                                noPSDK = true;
                                 continue;
                         }
                         if (!findFile("nmake.exe", thisPack.nmake)) {
@@ -497,7 +497,7 @@ var buildPackages = [
                                 WScript.Echo("nmake.exe is also available in the PlatformSDK which can be freely downloaded from Microsoft.\n");
                                 WScript.Echo("nmake.exe:\nhttp://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe\n");
                                 break;
-                        }                                
+                        }
                         WScript.Echo("SUCCESS: "+thisPack.name+" was found, and is complete!");
 			thisPack.installedDrive = installedDrive;
                         softwareVersions.Compiler = thisPack;
@@ -507,11 +507,11 @@ var buildPackages = [
                         WScript.Echo("Some of the build tools were detected on your computer, but the essential PlatformSDK components were missing.");
                         WScript.Echo("You will need to download the PlatformSDK from the URL below, ensuring that the Core Windows files, and Debugging Tools are installed.");
                         WScript.Echo("For more details on installing the PlatformSDK, visit http://windows.anope.org\n");
-                        WScript.Echo("PSDK: http://download.microsoft.com/download/a/5/f/a5f0d781-e201-4ab6-8c6a-9bb4efed1e1a/PSDK-x86.exe\n");                        
+                        WScript.Echo("PSDK: http://download.microsoft.com/download/a/5/f/a5f0d781-e201-4ab6-8c6a-9bb4efed1e1a/PSDK-x86.exe\n");
                 }
                 return false;
         }
-        
+
         function findFile(fileName, arrayOfPaths) {
                 for (z in arrayOfPaths) {
                         var thisPath = arrayOfPaths[z];
@@ -522,27 +522,27 @@ var buildPackages = [
                 	        }
                 	}
 		}
-                return false;                                
+                return false;
         }
-        
+
         function generateRC() {
                 var version_matches = [
                                                                 {
                                                                         'find' : /VERSION_COMMA/g,
                                                                         'replacement' : vMaj+","+vMin+","+vPat+","+vBuild
                                                                 },
-                                                                
+
                                                                 {
                                                                         'find' : /VERSION_FULL/g,
                                                                         'replacement' : anopeVersion
                                                                 },
-                                                                
+
                                                                 {
                                                                         'find' : /VERSION_DOTTED/g,
                                                                         'replacement' : vMaj+"."+vMin+"."+vPat+"."+vBuild
                                                                 }
                                                         ];
-                                                        
+
                 var template = fso.OpenTextFile("src/win32.rc.template", 1);
                 var output = fso.OpenTextFile("src/win32.rc", 2, true);
                 if (!template) {
@@ -553,15 +553,15 @@ var buildPackages = [
                 }
                 var templateText = template.ReadAll();
                 template.close();
-                
+
                 for (x in version_matches) {
                         var thisVerStr = version_matches[x];
                         while (templateText.match(thisVerStr.find)) {
                                 templateText = templateText.replace(thisVerStr.find, thisVerStr.replacement);
                         }
                 }
-                
+
                 output.WriteLine(templateText);
                 output.close();
         }
-                                                                                                                                                                
+

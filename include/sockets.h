@@ -22,6 +22,7 @@ typedef SOCKET				ano_socket_t;
 #define ano_sockgeterr()		WSAGetLastError()
 #define ano_sockseterr(err)		WSASetLastError(err)
 /* ano_sockstrerror in sockutil.c */
+extern char *ano_sockstrerror(int);
 /* ano_socksetnonb in sockutil.c */
 #define ano_sockerrnonb(err)		(err == WSAEINPROGRESS || err == WSAEWOULDBLOCK)
 #define SOCKERR_EBADF			WSAENOTSOCK

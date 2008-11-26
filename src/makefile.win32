@@ -6,9 +6,9 @@
 # Please read COPYING and README for further details.
 #
 # Based on the original code of Epona by Lara.
-# Based on the original code of Services by Andy Church. 
-# 
-# $Id:$ 
+# Based on the original code of Services by Andy Church.
+#
+# $Id:$
 #
 
 # Source Makefile
@@ -19,19 +19,19 @@ include ../Makefile.inc.win32
 
 OBJS =  actions.obj base64.obj bots.obj botserv.obj channels.obj chanserv.obj commands.obj compat.obj \
         config.obj datafiles.obj encrypt.obj events.obj helpserv.obj hostserv.obj \
-        init.obj ircd.obj language.obj list.obj log.obj mail.obj main.obj memory.obj \
+        init.obj ircd.obj language.obj log.obj mail.obj main.obj memory.obj \
         memoserv.obj messages.obj misc.obj modules.obj mod_version.obj news.obj nickserv.obj operserv.obj \
         process.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
-        timeout.obj users.obj module.obj modulemanager.obj
-        
+        timeout.obj users.obj module.obj modulemanager.obj hashcomp.obj
+
 SRCS =  actions.c base64.c botserv.c bots.cpp channels.c chanserv.c commands.c compat.c \
         config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c \
-        language.c list.c log.c mail.c main.c memory.c memoserv.c messages.c misc.c \
+        language.c log.c mail.c main.c memory.c memoserv.c messages.c misc.c \
         modules.c mod_version.c news.c nickserv.c operserv.c process.c send.c servers.obj sessions.c \
-        slist.c sockutil.c timeout.c users.c module.cpp modulemanager.cpp
+        slist.c sockutil.c timeout.c users.c module.cpp modulemanager.cpp hashcomp.cpp
 
 ###########################################################################
-        
+
 .c.obj:
         $(CC) $(CFLAGS) -c $<
 
@@ -46,9 +46,9 @@ $(PROGRAM): $(OBJS) win32.res
 
 spotless:
         -@erase *.obj *.exe *.exp *.lib tools\*.exe *.res win32.rc *.manifest
-        
+
 install:
-        -@copy anope.exe ..\anope.exe        
+        -@copy anope.exe ..\anope.exe
         -@mkdir ..\$(DATDEST)\bin
         -@copy  bin\* ..\$(DATDEST)\bin
         -@copy anope.exe.manifest ..\anope.exe.manifest
@@ -56,9 +56,9 @@ install:
 win32.res: win32.rc
         $(RC) /l 0x409 $(RC_FLAGS) /fowin32.res win32.rc
 
-      
+
 ###########################################################################
-        
+
 # Catch any changes in compilation options at the top of this file
 $(OBJS):
 
@@ -76,6 +76,7 @@ encrypt.obj:        encrypt.c        ..\include\encrypt.h ..\include\sysconf.h
 events.obj:                         events.c                 ..\include\modules.h ..\include\language.h ..\include\version.h
 init.obj:                init.c                ..\include\services.h
 ircd.obj:        ircd.c                ..\include\services.h
+hashcomp.obj:     hashcomp.cpp    ..\include\services.h ..\include\hashcomp.h
 hostserv.obj:     hostserv.c      ..\include\services.h ..\include\pseudo.h
 language.obj:        language.c        ..\include\services.h ..\include\language.h
 list.obj:                list.c                ..\include\services.h
@@ -110,7 +111,7 @@ vsnprintf.obj:        vsnprintf.c
 ..\include\extern.h: ..\include\slist.h
 
 ..\include\pseudo.h: ..\include\commands.h ..\include\language.h ..\include\timeout.h ..\include\encrypt.h ..\include\datafiles.h ..\include\slist.h
-        
+
 ###########################################################################
 
 FRC:

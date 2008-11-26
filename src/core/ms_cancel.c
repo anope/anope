@@ -76,11 +76,11 @@ int do_cancel(User * u)
 	} else {
 		int i;
 
-		for (i = mi->memocount - 1; i >= 0; i--) {
-			if ((mi->memos[i].flags & MF_UNREAD)
-				&& !stricmp(mi->memos[i].sender, u->na->nc->display)
-				&& (!(mi->memos[i].flags & MF_NOTIFYS))) {
-				delmemo(mi, mi->memos[i].number);
+		for (i = mi->memos.size() - 1; i >= 0; i--) {
+			if ((mi->memos[i]->flags & MF_UNREAD)
+				&& !stricmp(mi->memos[i]->sender, u->na->nc->display)
+				&& (!(mi->memos[i]->flags & MF_NOTIFYS))) {
+				delmemo(mi, mi->memos[i]->number);
 				notice_lang(s_MemoServ, u, MEMO_CANCELLED, name);
 				return MOD_CONT;
 			}

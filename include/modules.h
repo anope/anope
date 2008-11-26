@@ -150,7 +150,7 @@ struct ModuleLang_ {
 
 /** Every module in Anope is actually a class.
  */
-CoreExport class Module
+class CoreExport Module
 {
  private:
 	bool permanent;
@@ -163,7 +163,7 @@ CoreExport class Module
 	 */
 	std::string filename;
 
-	void *handle;
+	ano_module_t handle;
 	time_t created;
 	std::string version;
 	std::string author;
@@ -285,7 +285,7 @@ CoreExport class Module
 
 /** Used to manage modules.
  */
-CoreExport class ModuleManager
+class CoreExport ModuleManager
 {
  public:
 	/** Load up a list of modules.

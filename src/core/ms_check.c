@@ -80,15 +80,15 @@ int do_memocheck(User * u)
 /* Okay, I know this looks strange but we wanna get the LAST memo, so we
 	have to loop backwards */
 
-	for (i = (mi->memocount - 1); i >= 0; i--) {
-		if (!stricmp(mi->memos[i].sender, u->na->nc->display)) {
+	for (i = (mi->memos.size() - 1); i >= 0; i--) {
+		if (!stricmp(mi->memos[i]->sender, u->na->nc->display)) {
 			found = 1;		  /* Yes, we've found the memo */
 
-			tm = localtime(&mi->memos[i].time);
+			tm = localtime(&mi->memos[i]->time);
 			strftime_lang(timebuf, sizeof(timebuf), u,
 						  STRFTIME_DATE_TIME_FORMAT, tm);
 
-			if (mi->memos[i].flags & MF_UNREAD)
+			if (mi->memos[i]->flags & MF_UNREAD)
 				notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick,
 							timebuf);
 			else

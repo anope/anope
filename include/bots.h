@@ -15,7 +15,7 @@
  *	--lara
  */
 
-class BotInfo
+class CoreExport BotInfo
 {
  public:
 	BotInfo *next, *prev;

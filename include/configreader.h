@@ -420,7 +420,7 @@ class ConfigException : public std::exception
  * Constructing the class using one parameter allows you to specify a path to your own configuration
  * file, otherwise, inspircd.conf is read.
  */
-class ConfigReader
+class CoreExport ConfigReader
 {
 	protected:
 		/** The contents of the configuration file

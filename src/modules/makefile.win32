@@ -3,7 +3,7 @@ include ./Makefile.inc.win32
 
 OBJECTS= $(SRCS:.c=.dll)
 CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
-LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:init_module /export:destroy_module
 
 all: $(OBJECTS) subs
 
@@ -11,7 +11,7 @@ distclean: clean spotless
 
 .c.dll:
         $(CC) $(CFLAGS) $(IRCTYPE) $< ..\mod_version.c $(LFLAGS)
-        
+
 subs:
         @for %i in ( $(SUBS) ); do \
         	@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) && cd ..
@@ -29,7 +29,7 @@ spotless: clean subs-spotless
 subs-spotless:
 	@for %i in ( $(SUBS) ); do \
 		@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) spotless && cd ..
-        
+
 install:
         -@mkdir ..\..\$(DATDEST)\modules
         -@mkdir ..\..\$(DATDEST)\modules\runtime

@@ -57,6 +57,8 @@
 #else
 #include "sysconf.h"
 #include <windows.h>
+#include <io.h>
+#define open _open
 #endif
 
 /* Some SUN fixs */

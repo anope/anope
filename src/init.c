@@ -317,7 +317,11 @@ static void write_pidfile(void)
 
 	pidfile = fopen(PIDFilename, "w");
 	if (pidfile) {
+#ifdef _WIN32
+		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
+#else
 		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
+#endif
 		fclose(pidfile);
 		atexit(remove_pidfile);
 	} else {

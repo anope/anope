@@ -1336,8 +1336,10 @@ char *GetWindowsVersion(void)
 				extra = sstrdup("Datacenter Edition");
 			} else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
 				extra = sstrdup("Enterprise Edition");
+#ifdef VER_SUITE_COMPUTE_SERVER
 			} else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER) {
 				extra = sstrdup("Compute Cluster Edition");
+#endif
 			} else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
 				extra = sstrdup("Web Edition");
 			} else {

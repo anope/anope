@@ -83,7 +83,7 @@ int do_list(User * u)
 	}
 	if (param && !isdigit(*param) && stricmp(param, "NEW") != 0) {
 		syntax_error(s_MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
-	} else if (mi->memocount == 0) {
+	} else if (mi->memos.size() == 0) {
 		if (chan)
 			notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
 		else
@@ -95,11 +95,11 @@ int do_list(User * u)
 							mi, &sent_header, chan);
 		} else {
 			if (param) {
-				for (i = 0, m = mi->memos; i < mi->memocount; i++, m++) {
-					if (m->flags & MF_UNREAD)
+				for (i = 0; i < mi->memos.size(); i++) {
+					if (mi->memos[i]->flags & MF_UNREAD)
 						break;
 				}
-				if (i == mi->memocount) {
+				if (i == mi->memos.size()) {
 					if (chan)
 						notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS,
 									chan);
@@ -108,8 +108,8 @@ int do_list(User * u)
 					return MOD_CONT;
 				}
 			}
-			for (i = 0, m = mi->memos; i < mi->memocount; i++, m++) {
-				if (param && !(m->flags & MF_UNREAD))
+			for (i = 0; i < mi->memos.size(); i++) {
+				if (param && !(mi->memos[i]->flags & MF_UNREAD))
 					continue;
 				list_memo(u, i, mi, &sent_header, param != NULL, chan);
 			}
@@ -132,8 +132,8 @@ int list_memo_callback(User * u, int num, va_list args)
 	const char *chan = va_arg(args, const char *);
 	int i;
 
-	for (i = 0; i < mi->memocount; i++) {
-		if (mi->memos[i].number == num)
+	for (i = 0; i < mi->memos.size(); i++) {
+		if (mi->memos[i]->number == num)
 			break;
 	}
 	/* Range checking done by list_memo() */
@@ -156,7 +156,7 @@ int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, co
 	char timebuf[64];
 	struct tm tm;
 
-	if (index < 0 || index >= mi->memocount)
+	if (index < 0 || index >= mi->memos.size())
 		return 0;
 	if (!*sent_header) {
 		if (chan) {
@@ -171,7 +171,7 @@ int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, co
 		notice_lang(s_MemoServ, u, MEMO_LIST_HEADER);
 		*sent_header = 1;
 	}
-	m = &mi->memos[index];
+	m = mi->memos[index];
 	tm = *localtime(&m->time);
 	strftime_lang(timebuf, sizeof(timebuf),
 				  u, STRFTIME_DATE_TIME_FORMAT, &tm);

@@ -136,13 +136,8 @@ void modules_unload_all(bool fini, bool unload_proto)
 		mh = MODULE_HASH[idx];
 		while (mh) {
 			next = mh->next;
-			if (unload_proto || (mh->m->type != PROTOCOL)) {
-				mod_current_module = mh->m;
-				mod_current_module_name = mh->m->name.c_str();
-				mod_current_module_name = NULL;
-
-				delete mh->m;
-			}
+			if (unload_proto || (mh->m->type != PROTOCOL))
+				ModuleManager::UnloadModule(mh->m, NULL);
 	   		mh = next;
 		}
 	}
@@ -1266,36 +1261,27 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
 	}
 }
 
-/**
- * Get the text of the given lanugage string in the corrent language, or
- * in english.
- * @param u The user to send the message to
- * @param number The message number
- **/
-const char *moduleGetLangString(User * u, int number)
+const char *Module::GetLangString(User * u, int number)
 {
 	int lang = NSDefLanguage;
-
-	if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name))
-		mod_current_module = findModule(mod_current_module_name);
 
 	/* Find the users lang, and use it if we can */
 	if (u && u->na && u->na->nc)
 		lang = u->na->nc->language;
 
 	/* If the users lang isnt supported, drop back to English */
-	if (mod_current_module->lang[lang].argc == 0)
+	if (this->lang[lang].argc == 0)
 		lang = LANG_EN_US;
 
 	/* If the requested lang string exists for the language */
-	if (mod_current_module->lang[lang].argc > number) {
-		return mod_current_module->lang[lang].argv[number];
+	if (this->lang[lang].argc > number) {
+		return this->lang[lang].argv[number];
 	/* Return an empty string otherwise, because we might be used without
 	 * the return value being checked. If we would return NULL, bad things
 	 * would happen!
 	 */
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
+		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), lang, number);
 		return "";
 	}
 }

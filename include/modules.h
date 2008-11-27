@@ -233,6 +233,14 @@ class CoreExport Module
 	 **/
 	void DeleteLanguage(int langNumber);
 
+	/**
+	 * Get the text of the given lanugage string in the corrent language, or
+	 * in english.
+	 * @param u The user to send the message to
+	 * @param number The message number
+	 **/
+	const char *GetLangString(User *u, int number);
+
 	/** Add a module message to the IRCD message hash
 	 * @param m the Message to add
 	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE

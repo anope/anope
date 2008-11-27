@@ -51,6 +51,7 @@ Legend:
   [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
+[ ] Add support for +k, +q, etc type umodes
 
 1.9.2
 -----

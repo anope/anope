@@ -227,6 +227,12 @@ class CoreExport Module
 	 **/
 	void InsertLanguage(int langNumber, int ac, const char **av);
 
+	/**
+	 * Delete a language from a module
+	 * @param langNumber the language Number to delete
+	 **/
+	void DeleteLanguage(int langNumber);
+
 	/** Add a module message to the IRCD message hash
 	 * @param m the Message to add
 	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
@@ -458,7 +464,6 @@ int destroyEventHook(EvtHook * evh);
 MDE void moduleInsertLanguage(int langNumber, int ac, const char **av);
 MDE void moduleNoticeLang(char *source, User *u, int number, ...);
 MDE const char *moduleGetLangString(User * u, int number);
-MDE void moduleDeleteLanguage(int langNumber);
 
 /*************************************************************************/
 

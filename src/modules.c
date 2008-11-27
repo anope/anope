@@ -156,7 +156,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 		alog("debug: %s Adding %d texts for language %d", this->name.c_str(), ac, langNumber);
 
 	if (this->lang[langNumber].argc > 0) {
-		moduleDeleteLanguage(langNumber);
+		this->DeleteLanguage(langNumber);
 	}
 
 	this->lang[langNumber].argc = ac;
@@ -1300,20 +1300,15 @@ const char *moduleGetLangString(User * u, int number)
 	}
 }
 
-/**
- * Delete a language from a module
- * @param langNumber the language Number to delete
- **/
-void moduleDeleteLanguage(int langNumber)
+void Module::DeleteLanguage(int langNumber)
 {
-	int idx = 0;
-	if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name)) {
-		mod_current_module = findModule(mod_current_module_name);
+	if (this->lang[langNumber].argc)
+	{
+		for (int idx = 0; idx > this->lang[langNumber].argc; idx++)
+			delete [] this->lang[langNumber].argv[idx];
+		delete [] this->lang[langNumber].argv;
+		this->lang[langNumber].argc = 0;
 	}
-	for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {
-		delete [] mod_current_module->lang[langNumber].argv[idx];
-	}
-	mod_current_module->lang[langNumber].argc = 0;
 }
 
 void ModuleRunTimeDirCleanUp(void)

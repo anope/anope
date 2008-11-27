@@ -65,7 +65,7 @@ Module::~Module()
 	mod_current_module = this;
 
 	for (i = 0; i < NUM_LANGS; i++)
-		moduleDeleteLanguage(i);
+		this->DeleteLanguage(i);
 
 	remove(this->filename.c_str());
 

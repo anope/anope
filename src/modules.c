@@ -29,7 +29,6 @@ MessageHash *IRCD[MAX_CMD_HASH];
 ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 
 Module *mod_current_module;
-const char *mod_current_module_name = NULL;
 char *mod_current_buffer = NULL;
 ModuleCallBack *moduleCallBackHead = NULL;
 
@@ -1319,7 +1318,6 @@ void ModuleManager::RunCallbacks()
 		if (debug)
 			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
 		if (tmp->func) {
-			mod_current_module_name = tmp->owner_name;
 			tmp->func(tmp->argc, tmp->argv);
 			mod_current_module = NULL;
 			moduleCallBackDeleteEntry(NULL);

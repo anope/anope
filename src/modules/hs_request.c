@@ -512,23 +512,18 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
 	char *s, *t, *buf;
 	User *u2;
 
-	if ((mod_current_module_name)
-		&& (!mod_current_module
-			|| mod_current_module_name != mod_current_module->name))
-		mod_current_module = findModule(mod_current_module_name);
-
 	u2 = finduser(name);
 	/* Find the users lang, and use it if we cant */
 	if (u2 && u2->na && u2->na->nc)
 		lang = u2->na->nc->language;
 
 	/* If the users lang isnt supported, drop back to enlgish */
-	if (mod_current_module->lang[lang].argc == 0)
+	if (me->lang[lang].argc == 0)
 		lang = LANG_EN_US;
 
 	/* If the requested lang string exists for the language */
-	if (mod_current_module->lang[lang].argc > number) {
-		fmt = mod_current_module->lang[lang].argv[number];
+	if (me->lang[lang].argc > number) {
+		fmt = me->lang[lang].argv[number];
 
 		buf = sstrdup(fmt);
 		s = buf;
@@ -546,7 +541,7 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
 		}
 		delete [] buf;
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
+		alog("%s: INVALID language string call, language: [%d], String [%d]", me->name.c_str(), lang, number);
 	}
 }
 

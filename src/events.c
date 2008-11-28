@@ -63,15 +63,11 @@ void event_process_hook(const char *name, int argc, char **argv)
 	evh = find_eventhook(name);
 	if (evh) {
 		if (evh->func) {
-			mod_current_module_name = evh->mod_name;
 			retVal = evh->func(argc, argv);
-			mod_current_module_name = NULL;
 			if (retVal == MOD_CONT) {
 				current = evh->next;
 				while (current && current->func && retVal == MOD_CONT) {
-					mod_current_module_name = current->mod_name;
 					retVal = current->func(argc, argv);
-					mod_current_module_name = NULL;
 					current = current->next;
 				}
 			}

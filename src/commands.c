@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -62,18 +62,14 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
 				notice_lang(service, u, OPER_DEFCON_DENIED);
 			}
 		} else {
-			mod_current_module_name = c->mod_name;
 			mod_current_module = NULL;
 			if ((c->has_priv == NULL) || c->has_priv(u)) {
 				retVal = c->routine(u);
-				mod_current_module_name = NULL;
 				if (retVal == MOD_CONT) {
 					current = c->next;
 					while (current && retVal == MOD_CONT) {
-						mod_current_module_name = current->mod_name;
 						mod_current_module = NULL;
 						retVal = current->routine(u);
-						mod_current_module_name = NULL;
 						current = current->next;
 					}
 				}
@@ -82,7 +78,6 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
 				alog("Access denied for %s with service %s and command %s",
 					 u->nick, service, cmd);
 			}
-			mod_current_module_name = NULL;
 		}
 	} else {
 		if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u)) {
@@ -135,16 +130,9 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 	int cont = MOD_CONT;
 	const char *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL;
 	Module *calling_module = mod_current_module;
-	const char *calling_module_name = mod_current_module_name;
 
 	for (current = c; (current) && (cont == MOD_CONT);
 		 current = current->next) {
-		mod_current_module_name = current->mod_name;
-		if (mod_current_module_name)
-			mod_current_module = findModule(mod_current_module_name);
-		else
-			mod_current_module = NULL;
-
 		p1 = current->help_param1;
 		p2 = current->help_param2;
 		p3 = current->help_param3;
@@ -201,7 +189,6 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 	}
 
 	mod_current_module = calling_module;
-	mod_current_module_name = calling_module_name;
 }
 
 /*************************************************************************/

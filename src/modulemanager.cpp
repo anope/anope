@@ -172,8 +172,6 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
 	}
 
-	mod_current_module_name = modname.c_str();
-
 	/* Create module. */
 	std::string nick;
 	if (u)
@@ -209,8 +207,6 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		alog("You cannot load two encryption modules");
 		return MOD_STOP;
 	}
-
-	mod_current_module_name = NULL;
 
 	if (u)
 	{

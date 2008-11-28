@@ -492,8 +492,6 @@ MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
 extern MDE Module *mod_current_module;
 extern MDE const char *mod_current_module_name;
 extern MDE char *mod_current_buffer;
-extern MDE int mod_current_op;
-extern MDE User *mod_current_user;
 
 /*************************************************************************/
 /*************************************************************************/

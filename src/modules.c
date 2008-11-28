@@ -31,7 +31,6 @@ ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 Module *mod_current_module;
 const char *mod_current_module_name = NULL;
 char *mod_current_buffer = NULL;
-User *mod_current_user;
 ModuleCallBack *moduleCallBackHead = NULL;
 
 

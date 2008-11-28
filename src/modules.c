@@ -28,7 +28,6 @@ CommandHash *OPERSERV[MAX_CMD_HASH];
 MessageHash *IRCD[MAX_CMD_HASH];
 ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 
-Module *mod_current_module;
 char *mod_current_buffer = NULL;
 ModuleCallBack *moduleCallBackHead = NULL;
 
@@ -67,7 +66,6 @@ int encryption_module_init(void) {
 	ret = ModuleManager::LoadModule(EncModule, NULL);
 	if (ret == MOD_ERR_OK)
 		findModule(EncModule)->SetType(ENCRYPTION);
-	mod_current_module = NULL;
 	return ret;
 }
 
@@ -102,7 +100,6 @@ int protocol_module_init(void)
 		}
 	}
 
-	mod_current_module = NULL;
 	return ret;
 }
 
@@ -1319,7 +1316,6 @@ void ModuleManager::RunCallbacks()
 			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
 		if (tmp->func) {
 			tmp->func(tmp->argc, tmp->argv);
-			mod_current_module = NULL;
 			moduleCallBackDeleteEntry(NULL);
 		}
 	}

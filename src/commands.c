@@ -62,13 +62,11 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
 				notice_lang(service, u, OPER_DEFCON_DENIED);
 			}
 		} else {
-			mod_current_module = NULL;
 			if ((c->has_priv == NULL) || c->has_priv(u)) {
 				retVal = c->routine(u);
 				if (retVal == MOD_CONT) {
 					current = c->next;
 					while (current && retVal == MOD_CONT) {
-						mod_current_module = NULL;
 						retVal = current->routine(u);
 						current = current->next;
 					}
@@ -129,7 +127,6 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 	int has_had_help = 0;
 	int cont = MOD_CONT;
 	const char *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL;
-	Module *calling_module = mod_current_module;
 
 	for (current = c; (current) && (cont == MOD_CONT);
 		 current = current->next) {
@@ -187,8 +184,6 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 	} else {
 		do_help_limited(service, u, c);
 	}
-
-	mod_current_module = calling_module;
 }
 
 /*************************************************************************/

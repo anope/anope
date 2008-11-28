@@ -62,7 +62,6 @@ Module::Module(const std::string &mname, const std::string &creator)
 Module::~Module()
 {
 	int i = 0;
-	mod_current_module = this;
 
 	for (i = 0; i < NUM_LANGS; i++)
 		this->DeleteLanguage(i);

@@ -489,8 +489,6 @@ MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
-extern MDE Module *mod_current_module;
-extern MDE const char *mod_current_module_name;
 extern MDE char *mod_current_buffer;
 
 /*************************************************************************/

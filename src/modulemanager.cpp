@@ -21,7 +21,6 @@ void ModuleManager::LoadModuleList(int total_modules, char **module_list)
 		m = findModule(module_list[idx]);
 		if (!m) {
 			status = ModuleManager::LoadModule(module_list[idx], NULL);
-			mod_current_module = NULL;
 		}
 	}
 }
@@ -191,7 +190,6 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		return MOD_STOP;
 	}
 
-	mod_current_module = m;
 	m->filename = pbuf;
 	m->handle = handle;
 

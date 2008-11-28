@@ -1035,14 +1035,9 @@ void moduleDisplayHelp(int service, User * u)
 {
 	int idx;
 	ModuleHash *current = NULL;
-	Module *calling_module = mod_current_module;
-	const char *calling_module_name = mod_current_module_name;
 
 	for (idx = 0; idx != MAX_CMD_HASH; idx++) {
 		for (current = MODULE_HASH[idx]; current; current = current->next) {
-			mod_current_module_name = current->name;
-			mod_current_module = current->m;
-
 			if ((service == 1) && current->m->nickHelp) {
 				current->m->nickHelp(u);
 			} else if ((service == 2) && current->m->chanHelp) {
@@ -1060,9 +1055,6 @@ void moduleDisplayHelp(int service, User * u)
 			}
 		}
 	}
-
-	mod_current_module = calling_module;
-	mod_current_module_name = calling_module_name;
 }
 
 /**

@@ -16,23 +16,22 @@ Legend:
     [x] Mark os_modunload permanent.
   [x] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
   [ ] Remove modules_unload_all fini + hack that goes with it
+    [ ] signal handling cleanup
   [+] Remove mod_current_* crap (involves passing Module * around a lot)
     [x] events.c
-    [ ] modules.c
+    [x] modules.c
     [x] commands.c
   [x] Redo moduleAdd|Get|Remove data to use class Extensible, etc.
 [x] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
-[ ] burn automake with fire (1.9.1?)
-[+] Clean up protocol
+[x] Clean up protocol
   [x] Fix anope_cmd_* stuff to just use IRCdProto methods directly
-  [ ] Fix command parsing (TBD)
   [x] SendClientIntroduction should take a UID param, rather than generating one(?)
   [x] Fix permanent channels (+P) stuff.
   [x] Remove UnRestrictSAdmin, UseTS6, UseSVSHOLD
-[?] Immediate protection enforcement
-[+] InspIRCd 1.2 support
+[x] InspIRCd 1.2 support
 [x] Remove old (prior to 1.8.0) db compat
-[ ] add StatServ module for Hal9000 to play with :)
+[ ] Establish a proper base for services pseudoclients
+  [ ] add ss_main StatServ Hal9000 to play with :)
 
 1.9.1
 -----
@@ -52,6 +51,7 @@ Legend:
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 [ ] Add support for +k, +q, etc type umodes
+[ ] burn automake with fire (1.9.1?)
 
 1.9.2
 -----

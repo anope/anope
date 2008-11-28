@@ -675,8 +675,7 @@ int hs_do_activate(User * u)
 			me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
 		}
 	} else {
-		/* Should be "User Not Found" instead */
-		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		notice_lang(s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
 	}
 
 	delete [] nick;

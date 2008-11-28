@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -33,14 +33,6 @@ class BSFantasy : public Module
 };
 
 /**
- * Unload the module
- **/
-void AnopeFini()
-{
-
-}
-
-/**
  * Handle all csmodeutils fantasy commands.
  * @param argc Argument count
  * @param argv Argument list
@@ -60,7 +52,7 @@ int do_fantasy(int argc, char **argv)
 		if (stricmp(argv[0], util->bsname) == 0) {
 			/* This could have been moved to its own module
 			   however it would require more coding to handle the pass holders
-			   similar to how PROTECT is done 
+			   similar to how PROTECT is done
 			*/
 			if (!ircd->halfop) {
 				if (!stricmp(argv[0], "halfop") || !stricmp(argv[0], "dehalfop")) {

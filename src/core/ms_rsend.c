@@ -38,14 +38,6 @@ class MSRSend : public Module
 };
 
 /**
- * Unload the module
- **/
-void AnopeFini()
-{
-
-}
-
-/**
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/

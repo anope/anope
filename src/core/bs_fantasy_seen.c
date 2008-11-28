@@ -34,14 +34,6 @@ class BSFantasySeen : public Module
 };
 
 /**
- * Unload the module
- **/
-void AnopeFini()
-{
-
-}
-
-/**
  * Handle seen fantasy command.
  * @param argc Argument count
  * @param argv Argument list

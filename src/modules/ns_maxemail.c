@@ -30,6 +30,8 @@ int NSEmailMax = 0;
 #define LNG_NSEMAILMAX_REACHED		0
 #define LNG_NSEMAILMAX_REACHED_ONE	1
 
+static Module *me;
+
 class NSMaxEmail : public Module
 {
  public:
@@ -38,6 +40,8 @@ class NSMaxEmail : public Module
 		Command *c;
 		EvtHook *evt;
 		int status;
+
+		me = this;
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
@@ -134,9 +138,9 @@ int check_email_limit_reached(char *email, User * u)
 		return MOD_CONT;
 
 	if (NSEmailMax == 1)
-		moduleNoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
+		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
 	else
-		moduleNoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED,
+		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED,
 						 NSEmailMax);
 
 	return MOD_STOP;

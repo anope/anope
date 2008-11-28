@@ -53,12 +53,16 @@ void my_cs_help(User * u);
 int my_cs_help_appendtopic(User * u);
 void my_add_languages(void);
 
+static Module *me;
+
 class CSAppendTopic : public Module
 {
  public:
 	CSAppendTopic(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
+
+		me = this;
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
@@ -153,14 +157,14 @@ class CSAppendTopic : public Module
 
 void my_cs_help(User * u)
 {
-	moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
 }
 
 int my_cs_help_appendtopic(User * u)
 {
-	moduleNoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+	me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-	moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
+	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
 	return MOD_STOP;
 }
 
@@ -178,7 +182,7 @@ int my_cs_appendtopic(User * u)
 	newtopic = myStrGetTokenRemainder(cur_buffer, ' ', 1);
 
 	if (!chan || !newtopic) {
-		moduleNoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	} else if (!(c = findchan(chan))) {
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 	} else if (!(ci = c->ci)) {

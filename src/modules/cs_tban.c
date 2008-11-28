@@ -122,25 +122,25 @@ class CSTBan : public Module
 
 void myHelp(User * u)
 {
-	moduleNoticeLang(s_ChanServ, u, TBAN_HELP);
+	me->NoticeLang(s_ChanServ, u, TBAN_HELP);
 }
 
 void myFullHelpSyntax(User * u)
 {
-	moduleNoticeLang(s_ChanServ, u, TBAN_SYNTAX);
+	me->NoticeLang(s_ChanServ, u, TBAN_SYNTAX);
 }
 
 int myFullHelp(User * u)
 {
 	myFullHelpSyntax(u);
 	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-	moduleNoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
+	me->NoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
 	return MOD_CONT;
 }
 
 void mySendResponse(User * u, char *channel, char *mask, char *time)
 {
-	moduleNoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
+	me->NoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
 int do_tban(User * u)

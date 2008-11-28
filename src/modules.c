@@ -1209,14 +1209,7 @@ void updateProtectDetails(const char *level_info_protect_word,
 	}
 }
 
-/**
- * Send a notice to the user in the correct language, or english.
- * @param source Who sends the notice
- * @param u The user to send the message to
- * @param number The message number
- * @param ... The argument list
- **/
-void moduleNoticeLang(char *source, User * u, int number, ...)
+void Module::NoticeLang(char *source, User * u, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -1224,23 +1217,19 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
 	int lang = NSDefLanguage;
 	char *s, *t, *buf;
 
-	if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name)) {
-		mod_current_module = findModule(mod_current_module_name);
-	}
-
 	/* Find the users lang, and use it if we can */
 	if (u && u->na && u->na->nc) {
 		lang = u->na->nc->language;
 	}
 
 	/* If the users lang isnt supported, drop back to English */
-	if (mod_current_module->lang[lang].argc == 0) {
+	if (this->lang[lang].argc == 0) {
 		lang = LANG_EN_US;
 	}
 
 	/* If the requested lang string exists for the language */
-	if (mod_current_module->lang[lang].argc > number) {
-		fmt = mod_current_module->lang[lang].argv[number];
+	if (this->lang[lang].argc > number) {
+		fmt = this->lang[lang].argv[number];
 
 		buf = sstrdup(fmt);
 		va_start(va, number);
@@ -1257,7 +1246,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
 		}
 		delete [] buf;
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
+		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), lang, number);
 	}
 }
 

@@ -241,6 +241,15 @@ class CoreExport Module
 	 **/
 	const char *GetLangString(User *u, int number);
 
+	/**
+	 * Send a notice to the user in the correct language, or english.
+	 * @param source Who sends the notice
+	 * @param u The user to send the message to
+	 * @param number The message number
+	 * @param ... The argument list
+	 **/
+	void NoticeLang(char *source, User * u, int number, ...);
+
 	/** Add a module message to the IRCD message hash
 	 * @param m the Message to add
 	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
@@ -470,7 +479,6 @@ int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, const char *mod_na
 int destroyEventHook(EvtHook * evh);
 
 MDE void moduleInsertLanguage(int langNumber, int ac, const char **av);
-MDE void moduleNoticeLang(char *source, User *u, int number, ...);
 MDE const char *moduleGetLangString(User * u, int number);
 
 /*************************************************************************/

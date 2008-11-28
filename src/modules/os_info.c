@@ -59,6 +59,8 @@ int mBackupData(int argc, char **argv);
 int mLoadConfig();
 int mEventReload(int argc, char **argv);
 
+static Module *me;
+
 /*************************************************************************/
 
 class OSInfo : public Module
@@ -70,6 +72,8 @@ class OSInfo : public Module
 		EvtHook *hook = NULL;
 
 		int status;
+
+		me = this;
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
@@ -383,7 +387,7 @@ int myAddNickInfo(User * u)
 					if ((na = findnick(nick))) {
 						/* Add the module data to the user */
 						na->nc->Extend("os_info", sstrdup(info));
-						moduleNoticeLang(s_NickServ, u, OINFO_ADD_SUCCESS, nick);
+						me->NoticeLang(s_NickServ, u, OINFO_ADD_SUCCESS, nick);
 						/* NickCore not found! */
 					} else {
 						notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED,
@@ -402,7 +406,7 @@ int myAddNickInfo(User * u)
 						na->nc->Shrink("os_info");
 					}
 
-					moduleNoticeLang(s_NickServ, u, OINFO_DEL_SUCCESS, nick);
+					me->NoticeLang(s_NickServ, u, OINFO_DEL_SUCCESS, nick);
 					/* NickCore not found! */
 				} else {
 					notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED,
@@ -410,17 +414,17 @@ int myAddNickInfo(User * u)
 				}
 				/* another syntax error! */
 			} else {
-				moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
+				me->NoticeLang(s_NickServ, u, OINFO_SYNTAX);
 			}
 			delete [] cmd;
 			delete [] nick;
 			/* Syntax error */
 		} else if (cmd) {
-			moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
+			me->NoticeLang(s_NickServ, u, OINFO_SYNTAX);
 			delete [] cmd;
 			/* Syntax error */
 		} else {
-			moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
+			me->NoticeLang(s_NickServ, u, OINFO_SYNTAX);
 		}
 	}
 	return MOD_CONT;
@@ -456,7 +460,7 @@ int myAddChanInfo(User * u)
 					if ((ci = cs_findchan(chan))) {
 						/* Add the module data to the channel */
 						ci->Extend("os_info", sstrdup(info));
-						moduleNoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
+						me->NoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
 						/* ChanInfo */
 					} else {
 						notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED,
@@ -473,7 +477,7 @@ int myAddChanInfo(User * u)
 						delete [] c;
 						ci->Shrink("os_info");
 					}
-					moduleNoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
+					me->NoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
 					/* ChanInfo */
 				} else {
 					notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED,
@@ -481,17 +485,17 @@ int myAddChanInfo(User * u)
 				}
 				/* another syntax error! */
 			} else {
-				moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
+				me->NoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
 			}
 			delete [] cmd;
 			delete [] chan;
 			/* Syntax error */
 		} else if (cmd) {
-			moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
+			me->NoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
 			delete [] cmd;
 			/* Syntax error */
 		} else {
-			moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
+			me->NoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
 		}
 	}
 	return MOD_CONT;
@@ -735,7 +739,7 @@ int mEventReload(int argc, char **argv)
 int mNickHelp(User * u)
 {
 	if (is_oper(u)) {
-		moduleNoticeLang(s_NickServ, u, OINFO_HELP);
+		me->NoticeLang(s_NickServ, u, OINFO_HELP);
 	} else {
 		notice_lang(s_NickServ, u, NO_HELP_AVAILABLE, "OINFO");
 	}
@@ -745,7 +749,7 @@ int mNickHelp(User * u)
 int mChanHelp(User * u)
 {
 	if (is_oper(u)) {
-		moduleNoticeLang(s_ChanServ, u, OCINFO_HELP);
+		me->NoticeLang(s_ChanServ, u, OCINFO_HELP);
 	} else {
 		notice_lang(s_ChanServ, u, NO_HELP_AVAILABLE, "OINFO");
 	}
@@ -756,7 +760,7 @@ int mChanHelp(User * u)
 void mMainNickHelp(User * u)
 {
 	if (is_oper(u)) {
-		moduleNoticeLang(s_NickServ, u, OINFO_HELP_CMD);
+		me->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
 	}
 }
 
@@ -764,7 +768,7 @@ void mMainNickHelp(User * u)
 void mMainChanHelp(User * u)
 {
 	if (is_oper(u)) {
-		moduleNoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
+		me->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
 	}
 }
 

@@ -83,6 +83,8 @@ void my_add_languages(void);
 
 HostCore *hs_request_head;
 
+static Module *me;
+
 class HSRequest : public Module
 {
  public:
@@ -90,6 +92,8 @@ class HSRequest : public Module
 	{
 		Command *c;
 		EvtHook *hook;
+
+		me = this;
 
 		c = createCommand("request", hs_do_request, nick_identified, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, hs_help_request);
@@ -417,7 +421,7 @@ int hs_do_request(User * u)
 	if (!nick || !rawhostmask) {
 		if (rawhostmask)
 			delete [] rawhostmask;
-		moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -425,7 +429,7 @@ int hs_do_request(User * u)
 	if (vIdent) {
 		rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);	  /* get the remaining string */
 		if (!rawhostmask) {
-			moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+			me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
 			delete [] vIdent;
 			return MOD_CONT;
 		}
@@ -474,7 +478,7 @@ int hs_do_request(User * u)
 		if (HSRequestMemoOper || HSRequestMemoSetters) {
 			if (MSSendDelay > 0 && u
 				&& u->lastmemosend + MSSendDelay > now) {
-				moduleNoticeLang(s_HostServ, u, LNG_REQUEST_WAIT,
+				me->NoticeLang(s_HostServ, u, LNG_REQUEST_WAIT,
 								 MSSendDelay);
 				u->lastmemosend = now;
 				if (vIdent)
@@ -485,7 +489,7 @@ int hs_do_request(User * u)
 		}
 		my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
 
-		moduleNoticeLang(s_HostServ, u, LNG_REQUESTED);
+		me->NoticeLang(s_HostServ, u, LNG_REQUESTED);
 		req_send_memos(u, hostmask);
 		alog("New vHost Requested by %s", nick);
 	} else {
@@ -603,7 +607,7 @@ int hs_do_reject(User * u)
 	reason = myStrGetTokenRemainder(cur_buffer, ' ', 1);
 
 	if (!nick) {
-		moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
 		if (reason)
 			delete [] reason;
 		return MOD_CONT;
@@ -625,11 +629,11 @@ int hs_do_reject(User * u)
 		}
 
 		hs_request_head = deleteHostCore(hs_request_head, tmp);
-		moduleNoticeLang(s_HostServ, u, LNG_REJECTED, nick);
+		me->NoticeLang(s_HostServ, u, LNG_REJECTED, nick);
 		alog("Host Request for %s rejected by %s (%s)", nick, u->nick,
 			 reason ? reason : "");
 	} else {
-		moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+		me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
 	}
 
 	delete [] nick;
@@ -651,7 +655,7 @@ int hs_do_activate(User * u)
 	nick = myStrGetToken(cur_buffer, ' ', 0);
 
 	if (!nick) {
-		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -670,14 +674,14 @@ int hs_do_activate(User * u)
 				my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
 
 			hs_request_head = deleteHostCore(hs_request_head, tmp);
-			moduleNoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
+			me->NoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
 			alog("Host Request for %s activated by %s", nick, u->nick);
 		} else {
-			moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+			me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
 		}
 	} else {
 		/* Should be "User Not Found" instead */
-		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 	}
 
 	delete [] nick;
@@ -775,9 +779,9 @@ void show_list(User * u)
 
 int hs_help_request(User * u)
 {
-	moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+	me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
 	ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-	moduleNoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
+	me->NoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
 
 	return MOD_CONT;
 }
@@ -785,11 +789,11 @@ int hs_help_request(User * u)
 int hs_help_activate(User * u)
 {
 	if (is_host_setter(u)) {
-		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
+		me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
 		if (HSRequestMemoUser)
-			moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
+			me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
 	} else {
 		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "ACTIVATE");
 	}
@@ -800,11 +804,11 @@ int hs_help_activate(User * u)
 int hs_help_reject(User * u)
 {
 	if (is_host_setter(u)) {
-		moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT);
+		me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT);
 		if (HSRequestMemoUser)
-			moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
+			me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
 	} else {
 		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "REJECT");
 	}
@@ -815,9 +819,9 @@ int hs_help_reject(User * u)
 int hs_help_waiting(User * u)
 {
 	if (is_host_setter(u)) {
-		moduleNoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
+		me->NoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		moduleNoticeLang(s_HostServ, u, LNG_HELP_WAITING);
+		me->NoticeLang(s_HostServ, u, LNG_HELP_WAITING);
 	} else {
 		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "WAITING");
 	}
@@ -827,9 +831,9 @@ int hs_help_waiting(User * u)
 
 void hs_help(User * u)
 {
-	moduleNoticeLang(s_HostServ, u, LNG_HELP);
+	me->NoticeLang(s_HostServ, u, LNG_HELP);
 	if (is_host_setter(u))
-		moduleNoticeLang(s_HostServ, u, LNG_HELP_SETTER);
+		me->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
 void hsreq_load_db(void)
 {

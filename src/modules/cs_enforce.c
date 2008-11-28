@@ -32,12 +32,16 @@ void my_add_languages(void);
 #define LNG_CHAN_HELP_ENFORCE_R_DISABLED		4
 #define LNG_CHAN_RESPONSE					   5
 
+static Module *me;
+
 class CSEnforce : public Module
 {
  public:
 	CSEnforce(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
+
+		me = this;
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
@@ -409,7 +413,7 @@ int my_cs_enforce(User * u)
 	chan = myStrGetToken(cur_buffer, ' ', 0);
 
 	if (!chan) {
-		moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+		me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	} else if (!(c = findchan(chan))) {
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 	} else if (!(ci = c->ci)) {
@@ -422,21 +426,21 @@ int my_cs_enforce(User * u)
 		what = myStrGetToken(cur_buffer, ' ', 1);
 		if (!what || (stricmp(what, "SET") == 0)) {
 			do_enforce_set(c);
-			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+			me->NoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
 		} else if (stricmp(what, "MODES") == 0) {
 			do_enforce_modes(c);
-			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+			me->NoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
 		} else if (stricmp(what, "SECUREOPS") == 0) {
 			do_enforce_secureops(c);
-			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+			me->NoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
 		} else if (stricmp(what, "RESTRICTED") == 0) {
 			do_enforce_restricted(c);
-			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+			me->NoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
 		} else if (stricmp(what, "+R") == 0) {
 			do_enforce_cmode_R(c);
-			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+			me->NoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
 		} else {
-			moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+			me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 		}
 	}
 
@@ -449,19 +453,19 @@ int my_cs_enforce(User * u)
 /* Language and response stuff */
 void my_cs_help(User * u)
 {
-	moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
 }
 
 int my_cs_help_enforce(User * u)
 {
-	moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+	me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-	moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
+	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
 	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
 	if (cbmodes['R'].flag != 0)
-		moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
+		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
 	else
-		moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
+		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
 
 	return MOD_STOP;
 }

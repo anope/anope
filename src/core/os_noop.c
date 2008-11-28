@@ -32,7 +32,7 @@ class OSNOOP : public Module
 		c = createCommand("NOOP", do_noop, is_services_admin, OPER_HELP_NOOP, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

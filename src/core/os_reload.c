@@ -32,7 +32,7 @@ class OSReload : public Module
 		c = createCommand("RELOAD", do_reload, is_services_root, OPER_HELP_RELOAD, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

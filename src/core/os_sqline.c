@@ -40,7 +40,7 @@ class OSSQLine : public Module
 		OPER_HELP_SQLINE, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 		if (!ircd->sqline)
 			throw ModuleException("Your IRCd does not support QLines.");
 	}

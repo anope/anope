@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -31,7 +31,7 @@ class MSList : public Module
 		this->SetType(CORE);
 		c = createCommand("LIST", do_list, NULL, MEMO_HELP_LIST, -1, -1, -1, -1);
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
-		moduleSetMemoHelp(myMemoServHelp);
+		this->SetMemoHelp(myMemoServHelp);
 	}
 };
 

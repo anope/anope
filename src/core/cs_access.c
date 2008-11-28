@@ -39,7 +39,7 @@ class CSAccess : public Module
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 		c = createCommand("LEVELS", do_levels, NULL, CHAN_HELP_LEVELS, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

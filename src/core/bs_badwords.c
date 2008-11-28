@@ -35,7 +35,7 @@ class BSBadwords : public Module
 		c = createCommand("BADWORDS", do_badwords, NULL, BOT_HELP_BADWORDS, -1, -1, -1, -1);
 		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-		moduleSetBotHelp(myBotServHelp);
+		this->SetBotHelp(myBotServHelp);
 	}
 };
 

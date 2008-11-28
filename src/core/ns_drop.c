@@ -35,7 +35,7 @@ class NSDrop : public Module
 		c = createCommand("UNLINK", do_unlink, NULL, -1, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

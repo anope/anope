@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -33,7 +33,7 @@ class NSSendPass : public Module
 		c = createCommand("SENDPASS", do_sendpass, NULL, NICK_HELP_SENDPASS, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 		if (!UseMail)
 		{
 			throw ModuleException("Not using mail, whut.");

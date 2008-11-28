@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -32,7 +32,7 @@ class NSStatus : public Module
 		c = createCommand("STATUS", do_status, NULL, NICK_HELP_STATUS, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

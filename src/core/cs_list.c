@@ -33,7 +33,7 @@ class CSList : public Module
 
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

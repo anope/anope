@@ -75,7 +75,7 @@ class NSSASet : public Module
 		c = createCommand("SASET LANGUAGE", NULL, is_services_oper, -1, -1, -1, -1, NICK_HELP_SASET_LANGUAGE);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

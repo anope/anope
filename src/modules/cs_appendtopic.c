@@ -71,12 +71,12 @@ class CSAppendTopic : public Module
 		c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_HEAD);
 		moduleAddHelp(c, my_cs_help_appendtopic);
-		moduleSetChanHelp(my_cs_help);
+		this->SetChanHelp(my_cs_help);
 
 		/* English (US) */
 		const char* langtable_en_us[] = {
 		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Add text to a channels topic",
+		"   APPENDTOPIC Add text to a channels topic",
 		/* LNG_CHAN_HELP_APPENDTOPIC */
 		"This command allows users to append text to a currently set\n"
 		"channel topic. When TOPICLOCK is on, the topic is updated and\n"
@@ -88,7 +88,7 @@ class CSAppendTopic : public Module
 		/* Dutch (NL) */
 		const char* langtable_nl[] = {
 		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Voeg tekst aan een kanaal onderwerp toe",
+		"   APPENDTOPIC Voeg tekst aan een kanaal onderwerp toe",
 		/* LNG_CHAN_HELP_APPENDTOPIC */
 		"Dit command stelt gebruikers in staat om text toe te voegen\n"
 		"achter het huidige onderwerp van een kanaal. Als TOPICLOCK aan\n"
@@ -101,7 +101,7 @@ class CSAppendTopic : public Module
 		/* German (DE) */
 		const char* langtable_de[] = {
 		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Fьgt einen Text zu einem Channel-Topic hinzu.",
+		"   APPENDTOPIC Fьgt einen Text zu einem Channel-Topic hinzu.",
 		/* LNG_CHAN_HELP_APPENDTOPIC */
 		"Dieser Befehl erlaubt Benutzern, einen Text zu dem vorhandenen Channel-Topic\n"
 		"hinzuzufьgen. Wenn TOPICLOCK gesetzt ist, wird das Topic aktualisiert\n"
@@ -113,7 +113,7 @@ class CSAppendTopic : public Module
 		/* Portuguese (PT) */
 		const char* langtable_pt[] = {
 		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Adiciona texto ao tуpico de um canal",
+		"   APPENDTOPIC Adiciona texto ao tуpico de um canal",
 		/* LNG_CHAN_HELP_APPENDTOPIC */
 		"Este comando permite aos usuбrios anexar texto a um tуpico de canal\n"
 		"jб definido. Quando TOPICLOCK estб ativado, o tуpico й atualizado e\n"
@@ -125,7 +125,7 @@ class CSAppendTopic : public Module
 		/* Russian (RU) */
 		const char* langtable_ru[] = {
 		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Добавляет текст к топику канала",
+		"   APPENDTOPIC Добавляет текст к топику канала",
 		/* LNG_CHAN_HELP_APPENDTOPIC */
 		"Данная команда позволяет добавить текст к топику, который установлен на указанном\n"
 		"канале. Если активирован режим TOPICLOCK, топик будет обновлен и заблокирован.\n"
@@ -137,7 +137,7 @@ class CSAppendTopic : public Module
 		/* Italian (IT) */
 		const char* langtable_it[] = {
 		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Aggiunge del testo al topic di un canale",
+		"   APPENDTOPIC Aggiunge del testo al topic di un canale",
 		/* LNG_CHAN_HELP_APPENDTOPIC */
 		"Questo comando permette agli utenti di aggiungere del testo ad un topic di un canale\n"
 		"giа impostato. Se TOPICLOCK и attivato, il topic viene aggiornato e il nuovo topic\n"

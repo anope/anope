@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -32,7 +32,7 @@ class HSDel : public Module
 		c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1, -1, -1, -1);
 		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
-		moduleSetHostHelp(myHostServHelp);
+		this->SetHostHelp(myHostServHelp);
 	}
 };
 

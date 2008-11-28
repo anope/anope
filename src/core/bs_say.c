@@ -31,7 +31,7 @@ class BSSay : public Module
 		c = createCommand("SAY", do_say, NULL, BOT_HELP_SAY, -1, -1, -1, -1);
 		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-		moduleSetBotHelp(myBotServHelp);
+		this->SetBotHelp(myBotServHelp);
 	}
 };
 

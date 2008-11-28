@@ -39,7 +39,7 @@ class OSSZLine : public Module
 		OPER_HELP_SZLINE, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 		if (!ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");
 	}

@@ -31,7 +31,7 @@ class BSAct : public Module
 		c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
 		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-		moduleSetBotHelp(myBotServHelp);
+		this->SetBotHelp(myBotServHelp);
 	}
 };
 

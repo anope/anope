@@ -991,88 +991,39 @@ int moduleAddHelp(Command * c, int (*func) (User * u))
 	return MOD_CONT;
 }
 
-/**
-  * Add output to nickserv help.
-  * when doing a /msg nickserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetNickHelp(void (*func) (User * u))
+void Module::SetNickHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->nickHelp = func;
-	}
+	this->nickHelp = func;
 }
 
-/**
-  * Add output to chanserv help.
-  * when doing a /msg chanserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetChanHelp(void (*func) (User * u))
+void Module::SetChanHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->chanHelp = func;
-	}
+	this->chanHelp = func;
 }
 
-/**
-  * Add output to memoserv help.
-  * when doing a /msg memoserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetMemoHelp(void (*func) (User * u))
+void Module::SetMemoHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->memoHelp = func;
-	}
+	this->memoHelp = func;
 }
 
-/**
-  * Add output to botserv help.
-  * when doing a /msg botserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetBotHelp(void (*func) (User * u))
+void Module::SetBotHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->botHelp = func;
-	}
+	this->botHelp = func;
 }
 
-/**
-  * Add output to operserv help.
-  * when doing a /msg operserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetOperHelp(void (*func) (User * u))
+void Module::SetOperHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->operHelp = func;
-	}
+	this->operHelp = func;
 }
 
-/**
-  * Add output to hostserv help.
-  * when doing a /msg hostserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetHostHelp(void (*func) (User * u))
+void Module::SetHostHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->hostHelp = func;
-	}
+	this->hostHelp = func;
 }
 
-/**
-  * Add output to helpserv help.
-  * when doing a /msg helpserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-  * @param func a pointer to the function which will display the code
-  **/
-void moduleSetHelpHelp(void (*func) (User * u))
+void Module::SetHelpHelp(void (*func)(User *))
 {
-	if (mod_current_module) {
-		mod_current_module->helpHelp = func;
-	}
+	this->helpHelp = func;
 }
 
 /**

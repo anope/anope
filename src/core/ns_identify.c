@@ -41,7 +41,7 @@ class NSIdentify : public Module
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

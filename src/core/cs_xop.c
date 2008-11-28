@@ -105,7 +105,7 @@ class CSXOP : public Module
 		c = createCommand("VOP", do_vop, NULL, CHAN_HELP_VOP, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

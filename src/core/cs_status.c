@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -32,7 +32,7 @@ class CSStatus : public Module
 		c = createCommand("STATUS", do_status, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_STATUS, CHAN_SERVADMIN_HELP_STATUS);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

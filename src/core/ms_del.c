@@ -31,7 +31,7 @@ class MSDel : public Module
 		this->SetType(CORE);
 		c = createCommand("DEL", do_del, NULL, MEMO_HELP_DEL, -1, -1, -1, -1);
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
-		moduleSetMemoHelp(myMemoServHelp);
+		this->SetMemoHelp(myMemoServHelp);
 	}
 };
 

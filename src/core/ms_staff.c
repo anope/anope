@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -30,7 +30,7 @@ class MSStaff : public Module
 		this->SetType(CORE);
 		c = createCommand("STAFF", do_staff, is_services_oper, -1, -1, MEMO_HELP_STAFF, MEMO_HELP_STAFF, MEMO_HELP_STAFF);
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
-		moduleSetMemoHelp(myMemoServHelp);
+		this->SetMemoHelp(myMemoServHelp);
 	}
 };
 

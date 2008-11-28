@@ -33,7 +33,7 @@ class OSClearModes : public Module
 		c = createCommand("CLEARMODES", do_clearmodes, is_services_oper, OPER_HELP_CLEARMODES, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

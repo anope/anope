@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -31,7 +31,7 @@ class BSBotList : public Module
 		c = createCommand("BOTLIST", do_botlist, NULL, BOT_HELP_BOTLIST, -1, -1, -1, -1);
 		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-		moduleSetBotHelp(myBotServHelp);
+		this->SetBotHelp(myBotServHelp);
 	}
 };
 

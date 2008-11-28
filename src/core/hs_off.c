@@ -32,7 +32,7 @@ class HSOff : public Module
 		c = createCommand("OFF", do_off, NULL, HOST_HELP_OFF, -1, -1, -1, -1);
 		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
-		moduleSetHostHelp(myHostServHelp);
+		this->SetHostHelp(myHostServHelp);
 	}
 };
 

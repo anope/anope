@@ -32,7 +32,7 @@ class OSGlobal : public Module
 		c = createCommand("GLOBAL", do_global, is_services_admin, OPER_HELP_GLOBAL, -1, -1, -1, -1);
 		c->help_param1 = s_GlobalNoticer;
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

@@ -34,7 +34,7 @@ class OSModUnLoad : public Module
 		c = createCommand("MODUNLOAD", do_modunload, is_services_root, -1, -1, -1, -1, OPER_HELP_MODUNLOAD);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

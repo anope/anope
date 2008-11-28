@@ -33,7 +33,7 @@ class OSSVSNick : public Module
 		OPER_HELP_SVSNICK, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 	}

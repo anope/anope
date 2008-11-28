@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -35,7 +35,7 @@ class NSLogout : public Module
 		c = createCommand("LOGOUT", do_logout, NULL, -1, NICK_HELP_LOGOUT, -1, NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 
@@ -106,7 +106,7 @@ int do_logout(User * u)
 		if (u->na->nc->flags & NI_KILLPROTECT) {
 			del_ns_timeout(u->na, TO_COLLIDE);
 		}
-		
+
 		/* Send out an event */
 		send_event(EVENT_NICK_LOGOUT, 1, u2->nick);
 	}

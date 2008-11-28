@@ -34,7 +34,7 @@ class CSAKick : public Module
 		c = createCommand("AKICK", do_akick, NULL, CHAN_HELP_AKICK, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

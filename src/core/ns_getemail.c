@@ -6,13 +6,13 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
+ * Based on the original code of Services by Andy Church.
  *
  *
- * A simple call to check for all emails that a user may have registered 
- * with. It returns the nicks that match the email you provide. Wild	 
- * Cards are not excepted. Must use user@email-host.					 
- * 
+ * A simple call to check for all emails that a user may have registered
+ * with. It returns the nicks that match the email you provide. Wild
+ * Cards are not excepted. Must use user@email-host.
+ *
  * $Id$
  *
  */
@@ -37,7 +37,7 @@ class NSGetEMail : public Module
 		c = createCommand("GETEMAIL", do_getemail, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_GETEMAIL, NICK_SERVADMIN_HELP_GETEMAIL);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

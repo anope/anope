@@ -220,6 +220,55 @@ class CoreExport Module
 	void SetAuthor(const std::string &author);
 
 	/**
+	 * Add output to nickserv help.
+	 * when doing a /msg nickserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetNickHelp(void (*func)(User *));
+
+	/**
+	 * Add output to chanserv help.
+	 * when doing a /msg chanserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetChanHelp(void (*func)(User *));
+
+	/**
+	 * Add output to memoserv help.
+	 * when doing a /msg memoserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetMemoHelp(void (*func)(User *));
+
+	/**
+	 * Add output to botserv help.
+	 * when doing a /msg botserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetBotHelp(void (*func)(User *));
+
+	/**
+	 * Add output to operserv help.
+	 * when doing a /msg operserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetOperHelp(void (*func)(User *));
+
+	/**
+	 * Add output to hostserv help.
+	 * when doing a /msg hostserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetHostHelp(void (*func)(User *));
+
+	/**
+	 * Add output to helpserv help.
+	 * when doing a /msg helpserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+	 * @param func a pointer to the function which will display the code
+	 **/
+	void SetHelpHelp(void (*func)(User *));
+
+	/**
 	 * Allow a module to add a set of language strings to anope
 	 * @param langNumber the language number for the strings
 	 * @param ac The language count for the strings
@@ -434,14 +483,7 @@ int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
 MDE char *moduleGetLastBuffer(void);
-MDE void moduleSetHelpHelp(void (*func) (User * u));
 MDE void moduleDisplayHelp(int service, User *u);
-MDE void moduleSetHostHelp(void (*func) (User * u));
-MDE void moduleSetOperHelp(void (*func) (User * u));
-MDE void moduleSetBotHelp(void (*func) (User * u));
-MDE void moduleSetMemoHelp(void (*func) (User * u));
-MDE void moduleSetChanHelp(void (*func) (User * u));
-MDE void moduleSetNickHelp(void (*func) (User * u));
 MDE int moduleAddHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));

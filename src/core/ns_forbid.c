@@ -33,7 +33,7 @@ class NSForbid : public Module
 		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

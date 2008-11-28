@@ -32,7 +32,7 @@ class CSTopic : public Module
 		c = createCommand("TOPIC", do_cs_topic, NULL, CHAN_HELP_TOPIC, -1, -1,-1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

@@ -32,7 +32,7 @@ class OSQuit : public Module
 		c = createCommand("QUIT", do_os_quit, is_services_root, OPER_HELP_QUIT, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

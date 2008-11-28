@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -30,7 +30,7 @@ class MSSend : public Module
 		this->SetType(CORE);
 		c = createCommand("SEND", do_send, NULL, MEMO_HELP_SEND, -1, -1, -1, -1);
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
-		moduleSetMemoHelp(myMemoServHelp);
+		this->SetMemoHelp(myMemoServHelp);
 	}
 };
 

@@ -32,7 +32,7 @@ class OSUMode : public Module
 		c = createCommand("UMODE", do_operumodes, is_services_root, OPER_HELP_UMODE, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -33,7 +33,7 @@ class NSInfo : public Module
 		c = createCommand("INFO", do_info, NULL, NICK_HELP_INFO, -1, NICK_HELP_INFO, NICK_SERVADMIN_HELP_INFO, NICK_SERVADMIN_HELP_INFO);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

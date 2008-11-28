@@ -37,7 +37,7 @@ class OSAKill : public Module
 		c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

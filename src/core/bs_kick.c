@@ -48,7 +48,7 @@ class BSKick : public Module
 		c = createCommand("KICK UNDERLINES", NULL, NULL, BOT_HELP_KICK_UNDERLINES, -1, -1, -1, -1);
 		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-		moduleSetBotHelp(myBotServHelp);
+		this->SetBotHelp(myBotServHelp);
 	}
 };
 

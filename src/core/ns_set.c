@@ -70,7 +70,7 @@ class NSSet : public Module
 		c = createCommand("SET AUTOOP", NULL, NULL, NICK_HELP_SET_AUTOOP, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

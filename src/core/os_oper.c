@@ -35,7 +35,7 @@ class OSOper : public Module
 		c->help_param1 = s_NickServ;
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

@@ -51,12 +51,12 @@ class CSEnforce : public Module
 		this->AddCommand(CHANSERV, c, MOD_HEAD);
 
 		moduleAddHelp(c, my_cs_help_enforce);
-		moduleSetChanHelp(my_cs_help);
+		this->SetChanHelp(my_cs_help);
 
 		/* English (US) */
 		const char* langtable_en_us[] = {
 		/* LNG_CHAN_HELP */
-		"	ENFORCE	Enforce various channel modes and set options",
+		"    ENFORCE    Enforce various channel modes and set options",
 		/* LNG_ENFORCE_SYNTAX */
 		"Syntax: \002ENFORCE \037channel\037 [\037what\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -90,7 +90,7 @@ class CSEnforce : public Module
 		/* Dutch (NL) */
 		const char* langtable_nl[] = {
 		/* LNG_CHAN_HELP */
-		"	ENFORCE	Forceer enkele kanaalmodes en set-opties",
+		"    ENFORCE    Forceer enkele kanaalmodes en set-opties",
 		/* LNG_ENFORCE_SYNTAX */
 		"Syntax: \002ENFORCE \037kanaal\037 [\037wat\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -126,7 +126,7 @@ class CSEnforce : public Module
 		/* German (DE) */
 		const char* langtable_de[] = {
 		/* LNG_CHAN_HELP */
-		"	ENFORCE   Erzwingt verschieden Modes und SET Optionen",
+		"    ENFORCE    Erzwingt verschieden Modes und SET Optionen",
 		/* LNG_ENFORCE_SYNTAX */
 		"Syntax: \002ENFORCE \037Channel\037 [\037was\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -159,7 +159,7 @@ class CSEnforce : public Module
 		/* Portuguese (PT) */
 		const char* langtable_pt[] = {
 		/* LNG_CHAN_HELP */
-		"	ENFORCE	Verifica o cumprimento de vбrios modos de canal e opзхes ajustadas",
+		"    ENFORCE    Verifica o cumprimento de vбrios modos de canal e opзхes ajustadas",
 		/* LNG_ENFORCE_SYNTAX */
 		"Sintaxe: \002ENFORCE \037canal\037 [\037opзгo\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -192,7 +192,7 @@ class CSEnforce : public Module
 		/* Russian (RU) */
 		const char* langtable_ru[] = {
 		/* LNG_CHAN_HELP */
-		"	ENFORCE	Перепроверка и установка различных режимов и опций канала",
+		"    ENFORCE    Перепроверка и установка различных режимов и опций канала",
 		/* LNG_ENFORCE_SYNTAX */
 		"Синтаксис: \002ENFORCE \037#канал\037 \037параметр\037\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -224,7 +224,7 @@ class CSEnforce : public Module
 		/* Italian (IT) */
 		const char* langtable_it[] = {
 		/* LNG_CHAN_HELP */
-		"	ENFORCE	Forza diversi modi di canale ed opzioni SET",
+		"    ENFORCE    Forza diversi modi di canale ed opzioni SET",
 		/* LNG_ENFORCE_SYNTAX */
 		"Sintassi: \002ENFORCE \037canale\037 [\037cosa\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */

@@ -32,7 +32,7 @@ class CSDrop : public Module
 		c = createCommand("DROP", do_drop, NULL, -1, CHAN_HELP_DROP, -1, CHAN_SERVADMIN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

@@ -32,7 +32,7 @@ class CSGetPass : public Module
 		c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_GETPASS, CHAN_SERVADMIN_HELP_GETPASS);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

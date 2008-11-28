@@ -32,7 +32,7 @@ class OSChanKill : public Module
 		c = createCommand("CHANKILL", do_chankill, is_services_admin, OPER_HELP_CHANKILL, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

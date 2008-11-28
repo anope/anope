@@ -31,7 +31,7 @@ class HSList : public Module
 
 		c = createCommand("LIST", listOut, is_services_oper, -1, -1, HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);
 		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
-		moduleSetHostHelp(myHostServHelp);
+		this->SetHostHelp(myHostServHelp);
 	}
 };
 

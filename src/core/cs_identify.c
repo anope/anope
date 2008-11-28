@@ -35,7 +35,7 @@ class CSIdentify : public Module
 		c = createCommand("ID", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

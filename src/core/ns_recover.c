@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -34,7 +34,7 @@ class NSRecover : public Module
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		moduleAddHelp(c, myHelpResonse);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 
@@ -58,7 +58,7 @@ int myHelpResonse(User * u)
 
 	/* Convert NSReleaseTimeout seconds to string format */
 	duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
-	
+
 	notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
 	do_help_limited(s_NickServ, u, c);
 

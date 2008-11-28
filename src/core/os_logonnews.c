@@ -43,7 +43,7 @@ class OSLogonNews : public Module
 		c->help_param1 = sstrdup(buf);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 
 		hook = createEventHook(EVENT_RELOAD, reload_config);
 		if (this->AddEventHook(hook) != MOD_ERR_OK)

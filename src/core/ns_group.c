@@ -48,7 +48,7 @@ class NSGroup : public Module
 		c = createCommand("LISTLINKS", do_listlinks, NULL, -1, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

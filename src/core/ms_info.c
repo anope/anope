@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -30,7 +30,7 @@ class MSInfo : public Module
 		this->SetType(CORE);
 		c = createCommand("INFO", do_info, NULL, -1, MEMO_HELP_INFO, -1, MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO);
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
-		moduleSetMemoHelp(myMemoServHelp);
+		this->SetMemoHelp(myMemoServHelp);
 	}
 };
 

@@ -35,7 +35,7 @@ class OSStaff : public Module
 		c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

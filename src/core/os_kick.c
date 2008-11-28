@@ -32,7 +32,7 @@ class OSKick : public Module
 		c = createCommand("KICK", do_os_kick, is_services_oper, OPER_HELP_KICK, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

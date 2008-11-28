@@ -33,7 +33,7 @@ class CSRegister : public Module
 		c->help_param1 = s_NickServ;
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

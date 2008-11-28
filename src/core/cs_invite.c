@@ -32,7 +32,7 @@ class CSInvite : public Module
 		c = createCommand("INVITE", do_invite, NULL, CHAN_HELP_INVITE, -1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

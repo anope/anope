@@ -98,7 +98,7 @@ class CSSet : public Module
 		c = createCommand("SET NOEXPIRE", NULL, NULL, -1, -1, -1, CHAN_SERVADMIN_HELP_SET_NOEXPIRE, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

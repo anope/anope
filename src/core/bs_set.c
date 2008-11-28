@@ -49,7 +49,7 @@ class BSSet : public Module
 		BOT_SERVADMIN_HELP_SET_PRIVATE);
 		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-		moduleSetBotHelp(myBotServHelp);
+		this->SetBotHelp(myBotServHelp);
 	}
 };
 

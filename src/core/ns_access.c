@@ -32,7 +32,7 @@ class NSAccess : public Module
 		c = createCommand("ACCESS", do_access, NULL, NICK_HELP_ACCESS, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

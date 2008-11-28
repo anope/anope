@@ -32,7 +32,7 @@ class OSShutdown : public Module
 		c = createCommand("SHUTDOWN", do_shutdown, is_services_root, OPER_HELP_SHUTDOWN, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

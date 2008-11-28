@@ -32,7 +32,7 @@ class OSOLine : public Module
 		c = createCommand("OLINE", do_operoline, is_services_root, OPER_HELP_OLINE, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");

@@ -123,7 +123,7 @@ class HSRequest : public Module
 		hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
 		this->AddEventHook(hook);
 
-		moduleSetHostHelp(hs_help);
+		this->SetHostHelp(hs_help);
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
@@ -159,11 +159,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"No request for nick %s found.",
 		/* LNG_HELP */
-		"	REQUEST	 Request a vHost for your nick",
+		"    REQUEST     Request a vHost for your nick",
 		/* LNG_HELP_SETTER */
-		"	ACTIVATE	Approve the requested vHost of a user\n"
-		"	REJECT	  Reject the requested vHost of a user\n"
-		"	WAITING	 Convenience command for LIST +req",
+		"    ACTIVATE    Approve the requested vHost of a user\n"
+		"    REJECT      Reject the requested vHost of a user\n"
+		"    WAITING     Convenience command for LIST +req",
 		/* LNG_HELP_REQUEST */
 		"Request the given vHost to be actived for your nick by the\n"
 		"network administrators. Please be patient while your request\n"
@@ -209,11 +209,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Geen aanvraag voor nick %s gevonden.",
 		/* LNG_HELP */
-		"	REQUEST	 Vraag een vHost aan voor je nick",
+		"    REQUEST     Vraag een vHost aan voor je nick",
 		/* LNG_HELP_SETTER */
-		"	ACTIVATE	Activeer de aangevraagde vHost voor een gebruiker\n"
-		"	REJECT	  Keur de aangevraagde vHost voor een gebruiker af\n"
-		"	WAITING	 Snelkoppeling naar LIST +req",
+		"    ACTIVATE    Activeer de aangevraagde vHost voor een gebruiker\n"
+		"    REJECT      Keur de aangevraagde vHost voor een gebruiker af\n"
+		"    WAITING     Snelkoppeling naar LIST +req",
 		/* LNG_HELP_REQUEST */
 		"Verzoek de gegeven vHost te activeren voor jouw nick bij de\n"
 		"netwerk beheerders. Het kan even duren voordat je aanvraag\n"
@@ -259,11 +259,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Nenhum pedido encontrado para o nick %s.",
 		/* LNG_HELP */
-		"	REQUEST	 Request a vHost for your nick",
+		"    REQUEST     Request a vHost for your nick",
 		/* LNG_HELP_SETTER */
-		"	ACTIVATE	Aprova o pedido de vHost de um usuбrio\n"
-		"	REJECT	  Recusa o pedido de vHost de um usuбrio\n"
-		"	WAITING	 Comando para LISTAR +req",
+		"    ACTIVATE    Aprova o pedido de vHost de um usuбrio\n"
+		"    REJECT      Recusa o pedido de vHost de um usuбrio\n"
+		"    WAITING     Comando para LISTAR +req",
 		/* LNG_HELP_REQUEST */
 		"Solicita a ativaзгo do vHost fornecido em seu nick pelos\n"
 		"administradores da rede. Por favor, tenha paciкncia\n"
@@ -309,11 +309,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Запрос на vHost для ника %s не найден.",
 		/* LNG_HELP */
-		"	REQUEST	 Запрос на vHost для вашего текущего ника",
+		"    REQUEST     Запрос на vHost для вашего текущего ника",
 		/* LNG_HELP_SETTER */
-		"	ACTIVATE	Утвердить запрашиваемый пользователем  vHost\n"
-		"	REJECT	  Отклонить запрашиваемый пользователем  vHost\n"
-		"	WAITING	 Список запросов ожидающих обработки (аналог LIST +req)",
+		"    ACTIVATE    Утвердить запрашиваемый пользователем  vHost\n"
+		"    REJECT      Отклонить запрашиваемый пользователем  vHost\n"
+		"    WAITING     Список запросов ожидающих обработки (аналог LIST +req)",
 		/* LNG_HELP_REQUEST */
 		"Отправляет запрос на активацию vHost, который будет рассмотрен одним из\n"
 		"администраторов сети. Просьба проявить терпение, пока запрос\n"
@@ -359,11 +359,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Nessuna richiesta trovata per il nick %s.",
 		/* LNG_HELP */
-		"	REQUEST	 Richiede un vHost per il tuo nick",
+		"    REQUEST     Richiede un vHost per il tuo nick",
 		/* LNG_HELP_SETTER */
-		"	ACTIVATE	Approva il vHost richiesto di un utente\n"
-		"	REJECT	  Rifiuta il vHost richiesto di un utente\n"
-		"	WAITING	 Comando per LIST +req",
+		"    ACTIVATE    Approva il vHost richiesto di un utente\n"
+		"    REJECT      Rifiuta il vHost richiesto di un utente\n"
+		"    WAITING     Comando per LIST +req",
 		/* LNG_HELP_REQUEST */
 		"Richiede l'attivazione del vHost specificato per il tuo nick da parte\n"
 		"degli amministratori di rete. Sei pregato di pazientare finchи la tua\n"

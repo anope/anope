@@ -32,7 +32,7 @@ class NSUpdate : public Module
 		c = createCommand("UPDATE", do_nickupdate, NULL, NICK_HELP_UPDATE, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

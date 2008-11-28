@@ -41,7 +41,7 @@ class MSSet : public Module
 		c->help_param1 = reinterpret_cast<char *>(static_cast<long>(MSMaxMemos));
 		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 
-		moduleSetMemoHelp(myMemoServHelp);
+		this->SetMemoHelp(myMemoServHelp);
 	}
 };
 

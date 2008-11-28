@@ -35,7 +35,7 @@ class NSSuspend : public Module
 		c = createCommand("UNSUSPEND", do_unsuspend, is_services_oper, -1, -1, -1, NICK_SERVADMIN_HELP_UNSUSPEND, NICK_SERVADMIN_HELP_UNSUSPEND);
 		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
-		moduleSetNickHelp(myNickServHelp);
+		this->SetNickHelp(myNickServHelp);
 	}
 };
 

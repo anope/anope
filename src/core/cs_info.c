@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -32,7 +32,7 @@ class CSInfo : public Module
 		c = createCommand("INFO", do_info, NULL, CHAN_HELP_INFO, -1, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 	}
 };
 

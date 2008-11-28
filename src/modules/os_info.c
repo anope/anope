@@ -105,8 +105,8 @@ class OSInfo : public Module
 		hook = createEventHook(EVENT_RELOAD, mEventReload);
 		status = this->AddEventHook(hook);
 
-		moduleSetNickHelp(mMainNickHelp);
-		moduleSetChanHelp(mMainChanHelp);
+		this->SetNickHelp(mMainNickHelp);
+		this->SetChanHelp(mMainChanHelp);
 
 		mLoadData();
 
@@ -134,9 +134,9 @@ class OSInfo : public Module
 		"This will show up when any oper /cs info's the channel.\n"
 		"and can be used for 'tagging' channels etc....",
 		/* OINFO_HELP_CMD */
-		"	OINFO		 Add / Del an OperInfo line to a nick",
+		"    OINFO      Add / Del an OperInfo line to a nick",
 		/* OCINFO_HELP_CMD */
-		"	OINFO		 Add / Del an OperInfo line to a channel"
+		"    OINFO      Add / Del an OperInfo line to a channel"
 		};
 
 		const char* langtable_es[] = {
@@ -163,9 +163,9 @@ class OSInfo : public Module
 		"Esto se mostrara cuando cualquier operador haga /cs info canal\n"
 		"y puede ser usado para 'marcado' de canales, etc....",
 		/* OINFO_HELP_CMD */
-		"	OINFO		 Agrega / Elimina una linea OperInfo al nick",
+		"    OINFO      Agrega / Elimina una linea OperInfo al nick",
 		/* OCINFO_HELP_CMD */
-		"	OINFO		 Agrega / Elimina una linea OperInfo al canal"
+		"    OINFO      Agrega / Elimina una linea OperInfo al canal"
 		};
 
 		const char* langtable_nl[] = {
@@ -194,9 +194,9 @@ class OSInfo : public Module
 		"een oper /cs info kanaal doet voor dit kanaal, en kan worden\n"
 		"gebruikt om een kanaal te 'markeren' etc...",
 		/* OINFO_HELP_CMD */
-		"	OINFO		 Voeg een OperInfo regel toe aan een nick of verwijder deze",
+		"    OINFO      Voeg een OperInfo regel toe aan een nick of verwijder deze",
 		/* OCINFO_HELP_CMD */
-		"	OINFO		 Voeg een OperInfo regel toe aan een kanaal of verwijder deze"
+		"    OINFO         Voeg een OperInfo regel toe aan een kanaal of verwijder deze"
 		};
 
 		const char* langtable_de[] = {
@@ -223,9 +223,9 @@ class OSInfo : public Module
 		"Channel.Sie wird angezeigt wenn ein Oper mit /cs info sich\n"
 		"ьber den Channel informiert.",
 		/* OINFO_HELP_CMD */
-		"	OINFO		 Addiert / Lцscht eine OperInfo Linie zu / von einen Nicknamen",
+		"    OINFO      Addiert / Lцscht eine OperInfo Linie zu / von einen Nicknamen",
 		/* OCINFO_HELP_CMD */
-		"	OINFO		 Addiert / Lцscht eine OperInfo Linie zu / von einen Channel"
+		"    OINFO      Addiert / Lцscht eine OperInfo Linie zu / von einen Channel"
 		};
 
 		const char* langtable_pt[] = {
@@ -252,9 +252,9 @@ class OSInfo : public Module
 		"Isto serб mostrado quando qualquer Operador usar /cs info canal\n"
 		"e pode ser usado para 'etiquetar' canais etc...",
 		/* OINFO_HELP_CMD */
-		"	OINFO	  Adiciona ou Apaga a linha OperInfo para um nick",
+		"    OINFO      Adiciona ou Apaga a linha OperInfo para um nick",
 		/* OCINFO_HELP_CMD */
-		"	OINFO	  Adiciona ou Apaga a linha OperInfo para um canal"
+		"    OINFO      Adiciona ou Apaga a linha OperInfo para um canal"
 		};
 
 		const char* langtable_ru[] = {
@@ -281,9 +281,9 @@ class OSInfo : public Module
 		"которая будет показана любому оператору, запрашивающему INFO канала.\n"
 		"Может быть использована для 'пометки' каналов и т. д...",
 		/* OINFO_HELP_CMD */
-		"	OINFO	  Добавляет/Удаляет опер-инфо для ника",
+		"    OINFO      Добавляет/Удаляет опер-инфо для ника",
 		/* OCINFO_HELP_CMD */
-		"	OINFO	  Добавляет/Удаляет опер-инфо для канала"
+		"    OINFO      Добавляет/Удаляет опер-инфо для канала"
 		};
 
 		const char* langtable_it[] = {
@@ -310,9 +310,9 @@ class OSInfo : public Module
 		"Queste vengono mostrate quando un oper esegue il comando /cs info <canale>\n"
 		"e possono essere utilizzate per 'marchiare' i canali ecc...",
 		/* OINFO_HELP_CMD */
-		"	OINFO		 Aggiunge/Rimuove una linea OperInfo ad/da un nick",
+		"    OINFO      Aggiunge/Rimuove una linea OperInfo ad/da un nick",
 		/* OCINFO_HELP_CMD */
-		"	OINFO		 Aggiunge/Rimuove una linea OperInfo ad/da un canale"
+		"    OINFO      Aggiunge/Rimuove una linea OperInfo ad/da un canale"
 		};
 
 		this->InsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);

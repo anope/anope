@@ -46,7 +46,7 @@ class OSSet : public Module
 		c = createCommand("SET SUPERADMIN", NULL, NULL, OPER_HELP_SET_SUPERADMIN, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 	}
 };
 

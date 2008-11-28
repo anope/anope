@@ -40,7 +40,7 @@ class OSSGLine : public Module
 		OPER_HELP_SGLINE, -1, -1, -1, -1);
 		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
-		moduleSetOperHelp(myOperServHelp);
+		this->SetOperHelp(myOperServHelp);
 
 		if (!ircd->sgline)
 			throw ModuleException("Your IRCd does not support SGLine");

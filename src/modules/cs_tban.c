@@ -50,7 +50,7 @@ class CSTBan : public Module
 
 		me = this;
 
-		moduleSetChanHelp(myHelp);
+		this->SetChanHelp(myHelp);
 		c = createCommand("TBAN", do_tban, NULL, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, myFullHelp);
 		this->AddCommand(CHANSERV, c, MOD_HEAD);
@@ -60,7 +60,7 @@ class CSTBan : public Module
 		this->SetType(SUPPORTED);
 
 		const char* langtable_en_us[] = {
-		"	TBAN	   Bans the user for a given length of time",
+		"    TBAN       Bans the user for a given length of time",
 		"Syntax: TBAN channel nick time",
 		"Bans the given user from a channel for a specified length of\n"
 		"time. If the ban is removed before by hand, it will NOT be replaced.",
@@ -68,7 +68,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_nl[] = {
-		"	TBAN	   Verban een gebruiker voor een bepaalde tijd",
+		"    TBAN       Verban een gebruiker voor een bepaalde tijd",
 		"Syntax: TBAN kanaal nick tijd",
 		"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
 		"gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
@@ -77,7 +77,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_de[] = {
-		"	TBAN	   Bant ein User fьr eine bestimmte Zeit aus ein Channel",
+		"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
 		"Syntax: TBAN Channel Nickname Zeit",
 		"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
 		"Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
@@ -85,7 +85,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_pt[] = {
-		"	TBAN	   Bane o usuбrio por um determinado perнodo de tempo",
+		"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
 		"Sintaxe: TBAN canal nick tempo",
 		"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
 		"tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
@@ -93,7 +93,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_ru[] = {
-		"	TBAN	   Банит пользователя на указанный промежуток времени",
+		"    TBAN       Банит пользователя на указанный промежуток времени",
 		"Синтаксис: TBAN #канал ник время",
 		"Банит пользователя на указанный промежуток времени в секундах\n"
 		"Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
@@ -102,7 +102,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_it[] = {
-		"	TBAN	   Banna l'utente per un periodo di tempo specificato",
+		"    TBAN       Banna l'utente per un periodo di tempo specificato",
 		"Sintassi: TBAN canale nick tempo",
 		"Banna l'utente specificato da un canale per un periodo di tempo\n"
 		"specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",

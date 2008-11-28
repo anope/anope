@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -34,7 +34,7 @@ class CSSendPass : public Module
 		-1, -1, -1, -1);
 		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
-		moduleSetChanHelp(myChanServHelp);
+		this->SetChanHelp(myChanServHelp);
 
 		if (!UseMail)
 		{
@@ -101,7 +101,7 @@ int do_sendpass(User * u)
 			fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_5),
 					NetworkName);
 			fprintf(mail->pipe, "\n.\n");
- 
+
 			MailEnd(mail);
 
 			alog("%s: %s!%s@%s used SENDPASS on %s", s_ChanServ, u->nick,

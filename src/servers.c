@@ -597,7 +597,7 @@ static int ts6_uid_initted = 0;
 static char ts6_new_uid[10];	/* allow for \0 */
 static unsigned int ts6_uid_index = 9;  /* last slot in uid buf */
 
-void ts6_uid_init(void)
+void ts6_uid_init()
 {
 	snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);
 	ts6_uid_initted = 1;
@@ -622,7 +622,7 @@ void ts6_uid_increment(unsigned int slot)
 	}
 }
 
-const char *ts6_uid_retrieve(void)
+const char *ts6_uid_retrieve()
 {
 	if (ircd->ts6 == 0)
 	{

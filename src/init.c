@@ -16,8 +16,8 @@
 #include "pseudo.h"
 Uplink *uplink_server;
 
-extern void moduleAddMsgs(void);
-extern void moduleAddIRCDMsgs(void);
+extern void moduleAddMsgs();
+extern void moduleAddIRCDMsgs();
 
 /*************************************************************************/
 
@@ -53,7 +53,7 @@ void introduce_user(const char *user)
  * defined), else print an error message to logfile and return -1.
  */
 
-static int set_group(void)
+static int set_group()
 {
 #if defined(RUNGROUP) && defined(HAVE_SETGRENT)
 	struct group *gr;
@@ -302,7 +302,7 @@ static int parse_options(int ac, char **av)
 
 /* Remove our PID file.  Done at exit. */
 
-static void remove_pidfile(void)
+static void remove_pidfile()
 {
 	remove(PIDFilename);
 }
@@ -311,7 +311,7 @@ static void remove_pidfile(void)
 
 /* Create our PID file and write the PID to it. */
 
-static void write_pidfile(void)
+static void write_pidfile()
 {
 	FILE *pidfile;
 

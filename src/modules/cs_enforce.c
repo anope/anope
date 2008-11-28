@@ -21,7 +21,7 @@
 int my_cs_enforce(User * u);
 void my_cs_help(User * u);
 int my_cs_help_enforce(User * u);
-void my_add_languages(void);
+void my_add_languages();
 
 #define LNG_NUM_STRINGS	6
 

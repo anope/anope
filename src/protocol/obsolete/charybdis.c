@@ -1254,7 +1254,7 @@ int charybdis_send_deaccount(int argc, char **argv)
 }
 
 /* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void)
+void moduleAddIRCDMsgs()
 {
 	Message *m;
 

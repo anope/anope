@@ -680,7 +680,7 @@ anope_event_436 (const char *source, int ac, const char **av)
 
 
 void
-moduleAddIRCDMsgs (void)
+moduleAddIRCDMsgs ()
 {
   Message *m;
 

@@ -55,7 +55,7 @@ ChannelInfo DefConModesCI;	  /* ChannelInfo containg params for locked modes
 								 */
 
 
-void moduleAddOperServCmds(void);
+void moduleAddOperServCmds();
 /*************************************************************************/
 
 /* Options for the lists */
@@ -73,7 +73,7 @@ SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
 
 /*************************************************************************/
 /* *INDENT-OFF* */
-void moduleAddOperServCmds(void) {
+void moduleAddOperServCmds() {
 	ModuleManager::LoadModuleList(OperServCoreNumber, OperServCoreModules);
 }
 
@@ -83,7 +83,7 @@ void moduleAddOperServCmds(void) {
 
 /* OperServ initialization. */
 
-void os_init(void)
+void os_init()
 {
 	moduleAddOperServCmds();
 
@@ -149,7 +149,7 @@ void operserv(User * u, char *buf)
 	}							\
 } while (0)
 
-void load_os_dbase(void)
+void load_os_dbase()
 {
 	dbFILE *f;
 	int16 i, ver;
@@ -269,7 +269,7 @@ void load_os_dbase(void)
 	}								\
 } while (0)
 
-void save_os_dbase(void)
+void save_os_dbase()
 {
 	int i;
 	dbFILE *f;
@@ -663,7 +663,7 @@ int check_akill(const char *nick, const char *username, const char *host,
 
 /* Delete any expired autokills. */
 
-void expire_akills(void)
+void expire_akills()
 {
 	int i;
 	time_t now = time(NULL);
@@ -851,7 +851,7 @@ int check_sgline(const char *nick, const char *realname)
 
 /* Delete any expired SGLINEs. */
 
-void expire_sglines(void)
+void expire_sglines()
 {
 	int i;
 	time_t now = time(NULL);
@@ -1071,7 +1071,7 @@ int check_chan_sqline(const char *chan)
 
 /* Delete any expired SQLINEs. */
 
-void expire_sqlines(void)
+void expire_sqlines()
 {
 	int i;
 	time_t now = time(NULL);
@@ -1240,7 +1240,7 @@ int check_szline(const char *nick, char *ip)
 
 /* Delete any expired SZLINEs. */
 
-void expire_szlines(void)
+void expire_szlines()
 {
 	int i;
 	time_t now = time(NULL);
@@ -1377,7 +1377,7 @@ void resetDefCon(int level)
 /**
  * Run DefCon level specific Functions.
  **/
-void runDefCon(void)
+void runDefCon()
 {
 	char *newmodes;
 	if (checkDefCon(DEFCON_FORCE_CHAN_MODES)) {

@@ -537,7 +537,7 @@ int anope_event_436(const char *source, int ac, const char **av)
 }
 
 
-void moduleAddIRCDMsgs(void)
+void moduleAddIRCDMsgs()
 {
 	Message *m;
 

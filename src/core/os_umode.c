@@ -42,7 +42,7 @@ class OSUMode : public Module
 /**
  * Unload the module
  **/
-void AnopeFini(void)
+void AnopeFini()
 {
 
 }

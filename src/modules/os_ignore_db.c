@@ -69,9 +69,9 @@ void fill_db_ptr(DBFile *dbptr, int version, int core_version, char service[256]
 
 int save_ignoredb(int argc, char **argv);
 int backup_ignoredb(int argc, char **argv);
-void load_ignore_db(void);
-void save_ignore_db(void);
-void load_config(void);
+void load_ignore_db();
+void save_ignore_db();
+void load_config();
 int reload_config(int argc, char **argv);
 
 /* ------------------------------------------------------------------------------- */
@@ -120,7 +120,7 @@ class OSIgnoreDB : public Module
 
 /* ------------------------------------------------------------------------------- */
 
-void load_config(void) {
+void load_config() {
 	ConfigReader config;
 	std::string tmp = config.ReadValue("os_ignore", "database", DefIgnoreDB, 0);
 
@@ -173,7 +173,7 @@ int backup_ignoredb(int argc, char **argv) {
  *				DataBase Handling
  **************************************************************************/
 
-void load_ignore_db(void) {
+void load_ignore_db() {
 	DBFile *dbptr = new DBFile;
 	char *key, *value, *mask = NULL;
 	int retval = 0;
@@ -267,7 +267,7 @@ void load_ignore_db(void) {
 }
 
 
-void save_ignore_db(void) {
+void save_ignore_db() {
 	DBFile *dbptr = new DBFile;
 	time_t now;
 	IgnoreData *ign, *next;

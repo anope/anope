@@ -328,7 +328,7 @@ void del_session(const char *host)
 /********************** Internal Exception Functions *********************/
 /*************************************************************************/
 
-void expire_exceptions(void)
+void expire_exceptions()
 {
 	int i;
 	time_t now = time(NULL);

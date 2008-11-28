@@ -73,13 +73,13 @@ void show_list(User * u);
 int hs_do_waiting(User * u);
 int ns_do_drop(User * u);
 
-void hsreq_save_db(void);
-void hsreq_load_db(void);
+void hsreq_save_db();
+void hsreq_load_db();
 int hsreqevt_db_saving(int argc, char **argv);
 int hsreqevt_db_backup(int argc, char **argv);
 
-void my_load_config(void);
-void my_add_languages(void);
+void my_load_config();
+void my_add_languages();
 
 HostCore *hs_request_head;
 
@@ -830,7 +830,7 @@ void hs_help(User * u)
 	if (is_host_setter(u))
 		me->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
-void hsreq_load_db(void)
+void hsreq_load_db()
 {
 	FILE *fp;
 	const char *filename;
@@ -889,7 +889,7 @@ void hsreq_load_db(void)
 		alog("[hs_request] Succesfully loaded database");
 }
 
-void hsreq_save_db(void)
+void hsreq_save_db()
 {
 	FILE *fp;
 	const char *filename;
@@ -942,7 +942,7 @@ int hsreqevt_db_backup(int argc, char **argv)
 	return MOD_CONT;
 }
 
-void my_load_config(void)
+void my_load_config()
 {
 	ConfigReader config;
 	HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);

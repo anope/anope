@@ -25,11 +25,11 @@ HostCore *head = NULL;		  /* head of the HostCore list */
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
 				 char *creator, time_t time);
 
-E void moduleAddHostServCmds(void);
+E void moduleAddHostServCmds();
 
 /*************************************************************************/
 
-void moduleAddHostServCmds(void)
+void moduleAddHostServCmds()
 {
 	ModuleManager::LoadModuleList(HostServCoreNumber, HostServCoreModules);
 }
@@ -69,7 +69,7 @@ void get_hostserv_stats(long *nrec, long *memuse)
  * HostServ initialization.
  * @return void
  */
-void hostserv_init(void)
+void hostserv_init()
 {
 	if (s_HostServ) {
 		moduleAddHostServCmds();
@@ -365,7 +365,7 @@ void delHostCore(char *nick)
 	}							\
 } while (0)
 
-void load_hs_dbase(void)
+void load_hs_dbase()
 {
 	dbFILE *f;
 	int ver;
@@ -429,7 +429,7 @@ void load_hs_dbase(dbFILE * f)
 	}								\
 } while (0)
 
-void save_hs_dbase(void)
+void save_hs_dbase()
 {
 	dbFILE *f;
 	static time_t lastwarn = 0;

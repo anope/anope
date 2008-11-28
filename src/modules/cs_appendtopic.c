@@ -51,7 +51,7 @@
 int my_cs_appendtopic(User * u);
 void my_cs_help(User * u);
 int my_cs_help_appendtopic(User * u);
-void my_add_languages(void);
+void my_add_languages();
 
 static Module *me;
 

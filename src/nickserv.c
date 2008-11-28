@@ -35,7 +35,7 @@ static void add_ns_timeout(NickAlias * na, int type, time_t delay);
 
 /*************************************************************************/
 /* *INDENT-OFF* */
-void moduleAddNickServCmds(void) {
+void moduleAddNickServCmds() {
 	ModuleManager::LoadModuleList(NickServCoreNumber, NickServCoreModules);
 }
 /* *INDENT-ON* */
@@ -120,7 +120,7 @@ void get_core_stats(long *nrec, long *memuse)
 
 /* NickServ initialization. */
 
-void ns_init(void)
+void ns_init()
 {
 	moduleAddNickServCmds();
 	guestnum = time(NULL);
@@ -165,7 +165,7 @@ void nickserv(User * u, char *buf)
 	}							\
 } while (0)
 
-void load_ns_req_db(void)
+void load_ns_req_db()
 {
 	dbFILE *f;
 	int i, c, ver;
@@ -201,7 +201,7 @@ void load_ns_req_db(void)
 	close_db(f);
 }
 
-void load_ns_dbase(void)
+void load_ns_dbase()
 {
 	dbFILE *f;
 	int ver, i, j, c;
@@ -380,7 +380,7 @@ void load_ns_dbase(void)
 
 
 
-void save_ns_dbase(void)
+void save_ns_dbase()
 {
 	dbFILE *f;
 	int i, j;
@@ -457,7 +457,7 @@ void save_ns_dbase(void)
 
 }
 
-void save_ns_req_dbase(void)
+void save_ns_req_dbase()
 {
 	dbFILE *f;
 	int i;

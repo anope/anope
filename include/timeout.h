@@ -30,7 +30,7 @@ struct timeout_ {
 
 
 /* Check the timeout list for any pending actions. */
-extern void check_timeouts(void);
+extern void check_timeouts();
 
 /* Add a timeout to the list to be triggered in `delay' seconds.  Any
  * timeout added from within a timeout routine will not be checked during

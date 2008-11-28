@@ -35,7 +35,7 @@ class BSFantasy : public Module
 /**
  * Unload the module
  **/
-void AnopeFini(void)
+void AnopeFini()
 {
 
 }

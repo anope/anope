@@ -113,7 +113,7 @@ typedef void *	ano_module_t;
 		#define RTLD_LOCAL 0
 	#endif
 #else
-	const char *ano_moderr(void);
+	const char *ano_moderr();
 #endif
 
 typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION } MODType;
@@ -478,11 +478,11 @@ struct EvtHookHash_ {
 /* Module Managment Functions */
 MDE Module *findModule(const char *name);				/* Find a module */
 
-int encryption_module_init(void); /* Load the encryption module */
-int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
+int encryption_module_init(); /* Load the encryption module */
+int protocol_module_init();	/* Load the IRCD Protocol Module up*/
 void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
-MDE char *moduleGetLastBuffer(void);
+MDE char *moduleGetLastBuffer();
 MDE void moduleDisplayHelp(int service, User *u);
 MDE int moduleAddHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));

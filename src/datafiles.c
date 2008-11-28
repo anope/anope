@@ -571,7 +571,7 @@ static void rename_database(const char *name, char *ext)
  *
  * @return void
  */
-static void remove_backups(void)
+static void remove_backups()
 {
 
 	char ext[9];
@@ -649,7 +649,7 @@ static void remove_backups(void)
  *
  * @return void
  */
-void backup_databases(void)
+void backup_databases()
 {
 
 	time_t t;

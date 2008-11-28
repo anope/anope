@@ -118,7 +118,7 @@ CSModeUtil csmodeutils[] = {
 
 /*************************************************************************/
 
-void moduleAddChanServCmds(void) {
+void moduleAddChanServCmds() {
 	ModuleManager::LoadModuleList(ChanServCoreNumber, ChanServCoreModules);
 }
 
@@ -255,7 +255,7 @@ void get_chanserv_stats(long *nrec, long *memuse)
 
 /* ChanServ initialization. */
 
-void cs_init(void)
+void cs_init()
 {
 	moduleAddChanServCmds();
 }
@@ -296,7 +296,7 @@ void chanserv(User * u, char *buf)
 	}							\
 } while (0)
 
-void load_cs_dbase(void)
+void load_cs_dbase()
 {
 	dbFILE *f;
 	int ver, i, j, c;
@@ -575,7 +575,7 @@ void load_cs_dbase(void)
 	}								\
 } while (0)
 
-void save_cs_dbase(void)
+void save_cs_dbase()
 {
 	dbFILE *f;
 	int i, j;

@@ -51,9 +51,9 @@ int mNickHelp(User * u);
 int mChanHelp(User * u);
 void mMainChanHelp(User * u);
 void mMainNickHelp(User * u);
-void m_AddLanguages(void);
+void m_AddLanguages();
 
-int mLoadData(void);
+int mLoadData();
 int mSaveData(int argc, char **argv);
 int mBackupData(int argc, char **argv);
 int mLoadConfig();
@@ -576,7 +576,7 @@ int myChanInfo(User * u)
  * Load data from the db file, and populate our OperInfo lines
  * @return 0 for success
  **/
-int mLoadData(void)
+int mLoadData()
 {
 	int ret = 0;
 	FILE *in;
@@ -697,7 +697,7 @@ int mBackupData(int argc, char **argv)
  * Load the configuration directives from Services configuration file.
  * @return 0 for success
  **/
-int mLoadConfig(void)
+int mLoadConfig()
 {
 	ConfigReader config;
 	std::string tmp = config.ReadValue("os_info", "database", DEFAULT_DB_NAME, 0);

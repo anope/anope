@@ -1100,7 +1100,7 @@ int anope_event_error(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-void moduleAddIRCDMsgs(void)
+void moduleAddIRCDMsgs()
 {
 	Message *m;
 

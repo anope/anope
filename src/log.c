@@ -42,7 +42,7 @@ static int get_logname(char *name, int count, struct tm *tm)
 
 /*************************************************************************/
 
-static void remove_log(void)
+static void remove_log()
 {
 	time_t t;
 	struct tm tm;
@@ -67,7 +67,7 @@ static void remove_log(void)
 
 /*************************************************************************/
 
-static void checkday(void)
+static void checkday()
 {
 	time_t t;
 	struct tm tm;
@@ -87,7 +87,7 @@ static void checkday(void)
 /* Open the log file.  Return -1 if the log file could not be opened, else
  * return 0. */
 
-int open_log(void)
+int open_log()
 {
 	char name[PATH_MAX];
 
@@ -107,7 +107,7 @@ int open_log(void)
 
 /* Close the log file. */
 
-void close_log(void)
+void close_log()
 {
 	if (!logfile)
 		return;
@@ -118,7 +118,7 @@ void close_log(void)
 /*************************************************************************/
 
 /* added cause this is used over and over in the code */
-char *log_gettimestamp(void)
+char *log_gettimestamp()
 {
 	time_t t;
 	struct tm tm;

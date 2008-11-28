@@ -1295,7 +1295,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-void moduleAddIRCDMsgs(void) {
+void moduleAddIRCDMsgs() {
 	Message *m;
 
 	updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");

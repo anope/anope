@@ -397,7 +397,7 @@ User *finduser(const char *nick)
 static User *current;
 static int next_index;
 
-User *firstuser(void)
+User *firstuser()
 {
 	next_index = 0;
 	current = NULL;
@@ -409,7 +409,7 @@ User *firstuser(void)
 	return current;
 }
 
-User *nextuser(void)
+User *nextuser()
 {
 	if (current)
 		current = current->next;
@@ -443,7 +443,7 @@ User *find_byuid(const char *uid)
 static User *current_uid;
 static int next_index_uid;
 
-User *first_uid(void)
+User *first_uid()
 {
 	next_index_uid = 0;
 	current_uid = NULL;
@@ -458,7 +458,7 @@ User *first_uid(void)
 	return current_uid;
 }
 
-User *next_uid(void)
+User *next_uid()
 {
 	if (current_uid)
 		current_uid = current_uid->next;

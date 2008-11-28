@@ -31,7 +31,7 @@ void addBan(Channel * c, time_t timeout, char *banmask);
 int delBan(int argc, char **argv);
 int canBanUser(Channel * c, User * u, User * u2);
 
-void mAddLanguages(void);
+void mAddLanguages();
 
 static Module *me = NULL;
 

@@ -17,7 +17,7 @@
 
 #ifdef _WIN32
 extern MDE time_t DefContimer;
-extern MDE void runDefCon(void);
+extern MDE void runDefCon();
 #endif
 int do_defcon(User * u);
 void defcon_sendlvls(User * u);

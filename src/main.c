@@ -98,7 +98,7 @@ static int started = 0;
 
 /* Run expiration routines */
 
-extern void expire_all(void)
+extern void expire_all()
 {
 	waiting = -30;
 	send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
@@ -133,7 +133,7 @@ extern void expire_all(void)
 
 /*************************************************************************/
 
-void save_databases(void)
+void save_databases()
 {
 	waiting = -19;
 	send_event(EVENT_DB_SAVING, 1, EVENT_START);
@@ -172,7 +172,7 @@ void save_databases(void)
 
 /* Restarts services */
 
-static void services_restart(void)
+static void services_restart()
 {
 	alog("Restarting");
 	send_event(EVENT_RESTART, 1, EVENT_START);
@@ -203,7 +203,7 @@ static void services_restart(void)
  * Added to allow do_restart from operserv access to the static functions without making them
  * fair game to every other function - not exactly ideal :|
  **/
-void do_restart_services(void)
+void do_restart_services()
 {
 	if (!readonly) {
 		expire_all();
@@ -217,7 +217,7 @@ void do_restart_services(void)
 
 /* Terminates services */
 
-static void services_shutdown(void)
+static void services_shutdown()
 {
 	User *u, *next;
 

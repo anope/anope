@@ -29,11 +29,11 @@ static UserData *get_user_data(Channel * c, User * u);
 static void check_ban(ChannelInfo * ci, User * u, int ttbtype);
 static void bot_kick(ChannelInfo * ci, User * u, int message, ...);
 
-E void moduleAddBotServCmds(void);
+E void moduleAddBotServCmds();
 
 /*************************************************************************/
 /* *INDENT-OFF* */
-void moduleAddBotServCmds(void) {
+void moduleAddBotServCmds() {
 	ModuleManager::LoadModuleList(BotServCoreNumber, BotServCoreModules);
 }
 /* *INDENT-ON* */
@@ -68,7 +68,7 @@ void get_botserv_stats(long *nrec, long *memuse)
 
 /* BotServ initialization. */
 
-void bs_init(void)
+void bs_init()
 {
 	if (s_BotServ) {
 		moduleAddBotServCmds();
@@ -442,7 +442,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 	}							\
 } while (0)
 
-void load_bs_dbase(void)
+void load_bs_dbase()
 {
 	dbFILE *f;
 	int c, ver;
@@ -498,7 +498,7 @@ void load_bs_dbase(void)
 	}								\
 } while (0)
 
-void save_bs_dbase(void)
+void save_bs_dbase()
 {
 	dbFILE *f;
 	BotInfo *bi;

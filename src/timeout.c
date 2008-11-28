@@ -21,7 +21,7 @@ static Timeout *timeouts = NULL;
 
 /* Check the timeout list for any pending actions. */
 
-void check_timeouts(void)
+void check_timeouts()
 {
 	Timeout *to, *to2;
 	time_t t = time(NULL);

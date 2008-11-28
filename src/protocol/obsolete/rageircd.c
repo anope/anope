@@ -498,7 +498,7 @@ int anope_event_436(const char *source, int ac, const char **av)
 
 
 /* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) {
+void moduleAddIRCDMsgs() {
 	Message *m;
 
 	updateProtectDetails("ADMIN","ADMINME","admin","deadmin","AUTOADMIN","+a","-a");

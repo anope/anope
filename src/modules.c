@@ -59,7 +59,7 @@ char *ModuleGetErrStr(int status)
 /**
  *
  **/
-int encryption_module_init(void) {
+int encryption_module_init() {
 	int ret = 0;
 
 	alog("Loading Encryption Module: [%s]", EncModule);
@@ -72,7 +72,7 @@ int encryption_module_init(void) {
 /**
  * Load the ircd protocol module up
  **/
-int protocol_module_init(void)
+int protocol_module_init()
 {
 	int ret = 0;
 
@@ -901,7 +901,7 @@ void moduleCallBackPrepForUnload(const char *mod_name)
  * This is needed for modules who cant trust the strtok() buffer, as we dont know who will have already messed about with it.
  * @reutrn a pointer to a copy of the last buffer - DONT mess with this, copy if first if you must do things to it.
  **/
-char *moduleGetLastBuffer(void)
+char *moduleGetLastBuffer()
 {
 	char *tmp = NULL;
 	if (mod_current_buffer) {
@@ -1095,7 +1095,7 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 }
 
 #ifdef _WIN32
-const char *ano_moderr(void)
+const char *ano_moderr()
 {
 	static char errbuf[513];
 	DWORD err = GetLastError();
@@ -1224,7 +1224,7 @@ void Module::DeleteLanguage(int langNumber)
 	}
 }
 
-void ModuleRunTimeDirCleanUp(void)
+void ModuleRunTimeDirCleanUp()
 {
 #ifndef _WIN32
 	DIR *dirp;

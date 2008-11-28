@@ -18,7 +18,7 @@
 Command *c;
 
 void myOperServHelp(User * u);
-int load_config(void);
+int load_config();
 int reload_config(int argc, char **argv);
 
 class OSLogonNews : public Module

@@ -18,8 +18,8 @@
 #define AUTHOR "Anope"
 #define VERSION "$Id$"
 
-void my_load_config(void);
-void my_add_languages(void);
+void my_load_config();
+void my_add_languages();
 int my_ns_register(User * u);
 int my_ns_set(User * u);
 int my_event_reload(int argc, char **argv);
@@ -200,7 +200,7 @@ int my_event_reload(int argc, char **argv)
 	return MOD_CONT;
 }
 
-void my_load_config(void)
+void my_load_config()
 {
 	ConfigReader config;
 	NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);

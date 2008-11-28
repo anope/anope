@@ -16,7 +16,7 @@
 #include "services.h"
 #include "pseudo.h"
 
-void moduleAddHelpServCmds(void);
+void moduleAddHelpServCmds();
 
 /*************************************************************************/
 
@@ -24,7 +24,7 @@ void moduleAddHelpServCmds(void);
  * Setup the commands for HelpServ
  * @return void
  */
-void moduleAddHelpServCmds(void)
+void moduleAddHelpServCmds()
 {
 	ModuleManager::LoadModuleList(HelpServCoreNumber, HelpServCoreModules);
 }
@@ -35,7 +35,7 @@ void moduleAddHelpServCmds(void)
  * HelpServ initialization.
  * @return void
  */
-void helpserv_init(void)
+void helpserv_init()
 {
 	moduleAddHelpServCmds();
 }

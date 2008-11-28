@@ -16,7 +16,7 @@
 #include "modules.h"
 
 extern Message messages[];
-extern void moduleAddMsgs(void);
+extern void moduleAddMsgs();
 extern Message *find_message(const char *name);
 
 

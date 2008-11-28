@@ -20,7 +20,7 @@
 
 #include "slist.h"
 
-E void ModuleRunTimeDirCleanUp(void);
+E void ModuleRunTimeDirCleanUp();
 
 
 E char *uplink;
@@ -54,12 +54,12 @@ E void common_svsmode(User * u, const char *modes, const char *arg);
 E BotInfo *botlists[256];
 E int nbots;
 E void get_botserv_stats(long *nrec, long *memuse);
-E void bs_init(void);
+E void bs_init();
 E void botserv(User *u, char *buf);
 E void botmsgs(User *u, BotInfo *bi, char *buf);
 E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
-E void load_bs_dbase(void);
-E void save_bs_dbase(void);
+E void load_bs_dbase();
+E void save_bs_dbase();
 E BotInfo *findbot(const char *nick);
 
 /** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
@@ -102,8 +102,8 @@ E void set_redirect(Channel * chan, const char *value);
 
 E void get_channel_stats(long *nrec, long *memuse);
 E Channel *findchan(const char *chan);
-E Channel *firstchan(void);
-E Channel *nextchan(void);
+E Channel *firstchan();
+E Channel *nextchan();
 
 E void chan_deluser(User * user, Channel * c);
 
@@ -131,7 +131,7 @@ E void do_topic(const char *source, int ac, const char **av);
 E void do_mass_mode(char *modes);
 
 E void chan_set_correct_modes(User * user, Channel * c, int give_modes);
-E void restore_unsynced_topics(void);
+E void restore_unsynced_topics();
 
 E Entry *entry_create(char *mask);
 E Entry *entry_add(EList *list, const char *mask);
@@ -159,11 +159,11 @@ E void get_chanserv_stats(long *nrec, long *memuse);
 E int delchan(ChannelInfo * ci);
 E void alpha_insert_chan(ChannelInfo * ci);
 E void reset_levels(ChannelInfo * ci);
-E void cs_init(void);
+E void cs_init();
 E void chanserv(User * u, char *buf);
-E void load_cs_dbase(void);
-E void save_cs_dbase(void);
-E void expire_chans(void);
+E void load_cs_dbase();
+E void save_cs_dbase();
+E void expire_chans();
 E void cs_remove_nick(const NickCore * nc);
 
 E int is_real_founder(User * user, ChannelInfo * ci);
@@ -251,8 +251,8 @@ E char *desc_GlobalNoticer;
 E char *HostDBName;
 E char *desc_HostServ;
 E char *s_HostServ;
-E void load_hs_dbase(void);
-E void save_hs_dbase(void);
+E void load_hs_dbase();
+E void save_hs_dbase();
 E int do_on_id(User * u);
 E void delHostCore(char *nick);
 E void hostserv(User * u, char *buf);
@@ -455,7 +455,7 @@ E long unsigned int UserKey2;
 E long unsigned int UserKey3;
 /**** converter.c ****/
 
-E int convert_ircservices_44(void);
+E int convert_ircservices_44();
 
 /**** encrypt.c ****/
 E char *EncModule;
@@ -473,11 +473,11 @@ E void encmodule_check_password(int (*func)(const char *plaintext, const char *p
 
 /**** helpserv.c  ****/
 E void helpserv(User * u, char *buf);
-E void helpserv_init(void);
+E void helpserv_init();
 
 /**** hostserv.c  ****/
 E void get_hostserv_stats(long *nrec, long *memuse);
-E void hostserv_init(void);
+E void hostserv_init();
 E void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
 E char *getvIdent(char *nick);
 E char *getvHost(char *nick);
@@ -532,7 +532,7 @@ E char **langtexts[NUM_LANGS];
 E char *langnames[NUM_LANGS];
 E int langlist[NUM_LANGS];
 
-E void lang_init(void);
+E void lang_init();
 #define getstring(na,index) \
 	(langtexts[((na) && (static_cast<NickAlias *>(na))->nc && !((static_cast<NickAlias *>(na))->status & NS_VERBOTEN) ? (static_cast<NickAlias *>(na))->nc->language : NSDefLanguage)][(index)])
 #define getstring2(nc,index) \
@@ -545,8 +545,8 @@ E void syntax_error(char *service, User * u, const char *command,
 
 /**** log.c ****/
 
-E int open_log(void);
-E void close_log(void);
+E int open_log();
+E void close_log();
 E void alog(const char *fmt, ...)		FORMAT(printf,1,2);
 E void log_perror(const char *fmt, ...)		FORMAT(printf,1,2);
 E void fatal(const char *fmt, ...)		FORMAT(printf,1,2);
@@ -590,11 +590,11 @@ E int   save_data;
 E int   got_alarm;
 E time_t start_time;
 
-E void save_databases(void);
-E void expire_all(void);
+E void save_databases();
+E void expire_all();
 E void do_backtrace(int show_segheader);
 E void sighandler(int signum);
-E void do_restart_services(void);
+E void do_restart_services();
 
 /**** memory.c ****/
 
@@ -606,7 +606,7 @@ E char *sstrdup(const char *s);
 
 /**** memoserv.c ****/
 
-E void ms_init(void);
+E void ms_init();
 E void memoserv(User * u, char *buf);
 E void check_memos(User * u);
 E MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid);
@@ -667,11 +667,11 @@ E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(const char *nick, const char *killer);
 E int nickIsServices(const char *nick, int bot);
 
-E void add_entropy_userkeys(void);
-E void rand_init(void);
-E unsigned char getrandom8(void);
-E u_int16_t getrandom16(void);
-E u_int32_t getrandom32(void);
+E void add_entropy_userkeys();
+E void rand_init();
+E unsigned char getrandom8();
+E u_int16_t getrandom16();
+E u_int32_t getrandom32();
 
 E char *str_signed(unsigned char *str);
 
@@ -700,8 +700,8 @@ E void ModuleRemoveBackups(const char *dbname);
 E int32 nnews, news_size;
 E NewsItem *news;
 E void get_news_stats(long *nrec, long *memuse);
-E void load_news(void);
-E void save_news(void);
+E void load_news();
+E void save_news();
 E void display_news(User * u, int16 type);
 E int do_logonnews(User * u);
 E int do_opernews(User * u);
@@ -727,18 +727,18 @@ E void release(NickAlias * na, int from_timeout);
 E int do_setmodes(User * u);
 E int should_mode_change(int16 status, int16 mode);
 
-E void ns_init(void);
+E void ns_init();
 E void nickserv(User * u, char *buf);
-E void load_ns_dbase(void);
-E void load_ns_req_db(void);
-E void save_ns_dbase(void);
-E void save_ns_req_dbase(void);
+E void load_ns_dbase();
+E void load_ns_req_db();
+E void save_ns_dbase();
+E void save_ns_req_dbase();
 E int validate_user(User * u);
 E void cancel_user(User * u);
 E int nick_identified(User * u);
 E int nick_recognized(User * u);
-E void expire_nicks(void);
-E void expire_requests(void);
+E void expire_nicks();
+E void expire_requests();
 EI int ns_do_register(User * u);
 E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
@@ -764,9 +764,9 @@ E uint32 DefConModesOff;
 E ChannelInfo DefConModesCI;
 
 E void operserv(User *u, char *buf);
-E void os_init(void);
-E void load_os_dbase(void);
-E void save_os_dbase(void);
+E void os_init();
+E void load_os_dbase();
+E void save_os_dbase();
 
 E void os_remove_nick(NickCore *nc);
 E int is_services_root(User *u);
@@ -778,28 +778,28 @@ E int nick_is_services_oper(NickCore *nc);
 
 E int add_akill(User *u, char *mask, const char *by, const time_t expires, const char *reason);
 E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
-E void expire_akills(void);
+E void expire_akills();
 E void oper_global(char *nick, const char *fmt, ...);
 
 E int add_sgline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
 E int check_sgline(const char *nick, const char *realname);
-E void expire_sglines(void);
+E void expire_sglines();
 
 E int add_sqline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
 E int check_sqline(const char *nick, int nick_change);
-E void expire_sqlines(void);
+E void expire_sqlines();
 E int check_chan_sqline(const char *chan);
 
 E int add_szline(User * u, char *mask, const char *by,
 				 const time_t expires, const char *reason);
-E void expire_szlines(void);
+E void expire_szlines();
 E int check_szline(const char *nick, char *ip);
 
 E Server *server_global(Server * s, char *msg);
 
 E bool OSOpersOnly;
 E time_t DefContimer;
-E void runDefCon(void);
+E void runDefCon();
 E int defconParseModeString(const char *str);
 
 /**** process.c ****/
@@ -813,7 +813,7 @@ E int delete_ignore(const char *nick);
 E int clear_ignores();
 
 E int split_buf(char *buf, const char ***argv, int colon_special);
-E void process(void);
+E void process();
 
 /**** send.c ****/
 
@@ -856,9 +856,9 @@ E int anope_check_sync(const char *name);
 
 E void finish_sync(Server *serv, int sync_links);
 
-E void ts6_uid_init(void);
+E void ts6_uid_init();
 E void ts6_uid_increment(unsigned int slot);
-E const char *ts6_uid_retrieve(void);
+E const char *ts6_uid_retrieve();
 
 /**** sessions.c ****/
 
@@ -875,10 +875,10 @@ E int do_session(User *u);
 E int add_session(const char *nick, const char *host, char *hostip);
 E void del_session(const char *host);
 
-E void load_exceptions(void);
-E void save_exceptions(void);
+E void load_exceptions();
+E void save_exceptions();
 E int do_exception(User *u);
-E void expire_exceptions(void);
+E void expire_exceptions();
 
 E Session *findsession(const char *host);
 
@@ -904,8 +904,8 @@ E int slist_setcapacity(SList *slist, int16 capacity);
 /**** sockutil.c ****/
 
 E int32 total_read, total_written;
-E int32 read_buffer_len(void);
-E int32 write_buffer_len(void);
+E int32 read_buffer_len();
+E int32 write_buffer_len();
 
 E int sgetc(ano_socket_t s);
 E char *sgets(char *buf, int len, ano_socket_t s);
@@ -926,12 +926,12 @@ E time_t maxusertime;
 
 E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
-E User *firstuser(void);
-E User *nextuser(void);
+E User *firstuser();
+E User *nextuser();
 
 E User *find_byuid(const char *uid);
-E User *first_uid(void);
-E User *next_uid(void);
+E User *first_uid();
+E User *next_uid();
 E Server *findserver_uid(Server * s, const char *name);
 E char *TS6SID;
 E char *TS6UPLINK;
@@ -983,15 +983,15 @@ E int db_mysql_save_news(NewsItem * ni);
 E int db_mysql_save_exceptions(Exception * e);
 E int db_mysql_save_hs_core(HostCore * hc);
 E int db_mysql_save_bs_core(BotInfo * bi);
-E int db_mysql_load_bs_dbase(void);
-E int db_mysql_load_hs_dbase(void);
-E int db_mysql_load_ns_dbase(void);
-E int db_mysql_load_ns_req_dbase(void);
-E int db_mysql_load_cs_dbase(void);
-E int db_mysql_load_os_dbase(void);
-E int db_mysql_load_exceptions(void);
-E int db_mysql_load_news(void);
-E unsigned int mysql_rand(void);
+E int db_mysql_load_bs_dbase();
+E int db_mysql_load_hs_dbase();
+E int db_mysql_load_ns_dbase();
+E int db_mysql_load_ns_req_dbase();
+E int db_mysql_load_cs_dbase();
+E int db_mysql_load_os_dbase();
+E int db_mysql_load_exceptions();
+E int db_mysql_load_news();
+E unsigned int mysql_rand();
 #endif
 
 /******************************************************************************/
@@ -1012,8 +1012,8 @@ E void event_process_hook(const char *name, int argc, char **argv);
 E void send_event(const char *name, int argc, ...);
 
 #ifdef _WIN32
-E char *GetWindowsVersion(void) ;
-E int SupportedWindowsVersion(void);
+E char *GetWindowsVersion() ;
+E int SupportedWindowsVersion();
 #endif
 
 #endif	/* EXTERN_H */

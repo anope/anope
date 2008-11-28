@@ -331,7 +331,7 @@ int m_whois(const char *source, const char *who)
 }
 
 /* *INDENT-OFF* */
-void moduleAddMsgs(void) {
+void moduleAddMsgs() {
 	Message *m;
 	m = createMessage("STATS",	 m_stats); addCoreMessage(IRCD,m);
 	m = createMessage("TIME",	  m_time); addCoreMessage(IRCD,m);

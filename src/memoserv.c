@@ -18,13 +18,13 @@
 /*************************************************************************/
 /* *INDENT-OFF* */
 
-E void moduleAddMemoServCmds(void);
+E void moduleAddMemoServCmds();
 static void new_memo_mail(NickCore *nc, Memo *m);
 E void rsend_notify(User *u, Memo *m, const char *chan);
 
 /*************************************************************************/
 
-void moduleAddMemoServCmds(void) {
+void moduleAddMemoServCmds() {
 	ModuleManager::LoadModuleList(MemoServCoreNumber, MemoServCoreModules);
 }
 
@@ -36,7 +36,7 @@ void moduleAddMemoServCmds(void) {
  * MemoServ initialization.
  * @return void
  */
-void ms_init(void)
+void ms_init()
 {
 	moduleAddMemoServCmds();
 }

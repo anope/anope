@@ -393,7 +393,7 @@ Channel *findchan(const char *chan)
 static Channel *current;
 static int next_index;
 
-Channel *firstchan(void)
+Channel *firstchan()
 {
 	next_index = 0;
 	while (next_index < 1024 && current == NULL)
@@ -404,7 +404,7 @@ Channel *firstchan(void)
 	return current;
 }
 
-Channel *nextchan(void)
+Channel *nextchan()
 {
 	if (current)
 		current = current->next;
@@ -1908,7 +1908,7 @@ void do_mass_mode(char *modes)
 
 /*************************************************************************/
 
-void restore_unsynced_topics(void)
+void restore_unsynced_topics()
 {
 	Channel *c;
 

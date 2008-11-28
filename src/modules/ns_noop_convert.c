@@ -51,11 +51,11 @@ int mEventJoin(int argc, char **argv);
 int setAutoOp(User * u);
 int UnsetAutoOp(User * u);
 
-int mLoadData(void);
+int mLoadData();
 int mSaveData(int argc, char **argv);
 int mLoadConfig(int argc, char **argv);
 
-void m_AddLanguages(void);
+void m_AddLanguages();
 
 /*************************************************************************/
 
@@ -92,7 +92,7 @@ class NSNOOPConvert : public Module
  * Load data from the db file, and populate the autoop setting
  * @return 0 for success
  **/
-int mLoadData(void)
+int mLoadData()
 {
 	int ret = 0;
 	int len = 0;

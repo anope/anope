@@ -994,7 +994,7 @@ int anope_event_burst(const char *source, int ac, const char **av)
 
 
 /* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) {
+void moduleAddIRCDMsgs() {
 	Message *m;
 
 

@@ -911,7 +911,7 @@ int nickIsServices(const char *tempnick, int bot)
  * arc4 init
  * @return void
  */
-static void arc4_init(void)
+static void arc4_init()
 {
 	int n;
 	for (n = 0; n < 256; n++)
@@ -949,7 +949,7 @@ static void arc4_addrandom(void *dat, int datlen)
  * random init
  * @return void
  */
-void rand_init(void)
+void rand_init()
 {
 	int n;
 #ifndef _WIN32
@@ -1001,7 +1001,7 @@ void rand_init(void)
  * Setup the random numbers
  * @return void
  */
-void add_entropy_userkeys(void)
+void add_entropy_userkeys()
 {
 	arc4_addrandom(&UserKey1, sizeof(UserKey1));
 	arc4_addrandom(&UserKey2, sizeof(UserKey2));
@@ -1015,7 +1015,7 @@ void add_entropy_userkeys(void)
  * Get the random numbers 8 byte deep
  * @return char
  */
-unsigned char getrandom8(void)
+unsigned char getrandom8()
 {
 	unsigned char si, sj;
 
@@ -1034,7 +1034,7 @@ unsigned char getrandom8(void)
  * Get the random numbers 16 byte deep
  * @return char
  */
-u_int16_t getrandom16(void)
+u_int16_t getrandom16()
 {
 	u_int16_t val;
 
@@ -1049,7 +1049,7 @@ u_int16_t getrandom16(void)
  * Get the random numbers 32 byte deep
  * @return char
  */
-u_int32_t getrandom32(void)
+u_int32_t getrandom32()
 {
 	u_int32_t val;
 
@@ -1275,7 +1275,7 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 
 
 #ifdef _WIN32
-char *GetWindowsVersion(void)
+char *GetWindowsVersion()
 {
 	OSVERSIONINFOEX osvi;
 	BOOL bOsVersionInfoEx;
@@ -1413,7 +1413,7 @@ char *GetWindowsVersion(void)
 	return sstrdup(buf);
 }
 
-int SupportedWindowsVersion(void)
+int SupportedWindowsVersion()
 {
 	OSVERSIONINFOEX osvi;
 	BOOL bOsVersionInfoEx;

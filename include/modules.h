@@ -520,9 +520,6 @@ int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
 int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, const char *mod_name);
 int destroyEventHook(EvtHook * evh);
 
-MDE void moduleInsertLanguage(int langNumber, int ac, const char **av);
-MDE const char *moduleGetLangString(User * u, int number);
-
 /*************************************************************************/
 
 MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */

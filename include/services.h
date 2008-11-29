@@ -1240,7 +1240,7 @@ struct capabinfo_ {
 
 /*************************************************************************/
 
-class CoreExport Services : public BotInfo
+class CoreExport Service : public BotInfo
 {
 	public:
 		/** Create a new Services pseudo-client
@@ -1249,10 +1249,10 @@ class CoreExport Services : public BotInfo
 		 * @param host The hostname to assign to the pseudo-client.
 		 * @param real The realname to assign to the pseudo-client.
 		 */
-		Services(const char *nick, const char *user, const char *host, const char *real);
+		Service(const char *nick, const char *user, const char *host, const char *real);
 		/** Destroy a pseudo-client, cleaning up appropriately.
 		 */
-		virtual ~Services();
+		virtual ~Service();
 };
 
 /*************************************************************************/

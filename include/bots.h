@@ -46,7 +46,7 @@ class CoreExport BotInfo
 
 	/** Destroy a bot, clearing up appropriately.
 	 */
-	~BotInfo();
+	virtual ~BotInfo();
 
 	/** Change the nickname set on a bot.
 	 * @param newnick The nick to change to

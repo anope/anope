@@ -18,6 +18,7 @@ BotInfo::BotInfo(const char *nnick)
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
 	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
+	this->cmdTable = NULL;
 }
 
 BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const char *nreal)
@@ -30,6 +31,7 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
 	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
+	this->cmdTable = NULL;
 }
 
 BotInfo::~BotInfo()

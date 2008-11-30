@@ -15,6 +15,8 @@
  *	--lara
  */
 
+struct CommandHash;
+
 class CoreExport BotInfo
 {
  public:
@@ -30,6 +32,7 @@ class CoreExport BotInfo
 	int16 chancount;		/* Number of channels that use the bot. */
 	/* Dynamic data */
 	time_t lastmsg;			/* Last time we said something */
+	CommandHash **cmdTable;
 
 	/** Create a new bot.
 	 * XXX: Note - this constructor is considered obsolete. Use the four parameter form.

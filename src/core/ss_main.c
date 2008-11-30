@@ -14,31 +14,57 @@
 
 #include "module.h"
 
-class StatServ : public Service
-{
- public:
-	StatServ() : Service("StatServ", ServiceUser, ServiceHost, "Stats Service")
-	{
-	}
-} *statserv = NULL;
+BotInfo *statserv = NULL;
+CommandHash *cmdTable[MAX_CMD_HASH];
 
 int statserv_create(int argc, char **argv);
+int do_help(User *u);
 
 class SSMain : public Module
 {
  public:
 	SSMain(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		Command *c;
 		EvtHook *hook;
+
+		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
+		this->AddCommand(cmdTable, c, MOD_HEAD);
 
 		hook = createEventHook(EVENT_SERVER_CONNECT, statserv_create);
 		this->AddEventHook(hook);
+	}
+	~SSMain()
+	{
+		CommandHash *current;
+		Command *c;
+		for (int i = 0; i < MAX_CMD_HASH; i++) {
+			for (current = cmdTable[i]; current; current = current->next) {
+				for (c = current->c; c; c = c->next)
+					this->DelCommand(cmdTable, c->name);
+			}
+		}
+		if (statserv) {
+			ircdproto->SendQuit(statserv, "Quit due to module unload.");
+			delete statserv;
+		}
 	}
 };
 
 int statserv_create(int argc, char **argv)
 {
-	statserv = new StatServ();
+	statserv = findbot("StatServ");
+	if (!statserv) {
+		statserv = new BotInfo("StatServ", ServiceUser, ServiceHost, "Stats Service");
+		ircdproto->SendClientIntroduction("StatServ", ServiceUser, ServiceHost, "Stats Service", ircd->pseudoclient_mode, statserv->uid.c_str());
+	}
+	statserv->cmdTable = cmdTable;
+	return MOD_CONT;
+}
+
+int do_help(User *u)
+{
+	ircdproto->SendMessage(statserv, u->nick, "This is a test of the emergency StatServ system.");
 	return MOD_CONT;
 }
 

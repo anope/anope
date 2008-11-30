@@ -123,7 +123,7 @@ typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
 /* Structure for information about a *Serv command. */
 
 typedef struct Command_ Command;
-typedef struct CommandHash_ CommandHash;
+struct CommandHash;
 typedef struct ModuleLang_ ModuleLang;
 typedef struct ModuleHash_ ModuleHash;
 typedef struct Message_ Message;
@@ -430,7 +430,7 @@ struct Command_ {
 	Command *next;	/* Next command responsible for the same command */
 };
 
-struct CommandHash_ {
+struct CommandHash {
 		char *name;	/* Name of the command */
 		Command *c;	/* Actual command */
 		CommandHash *next; /* Next command */

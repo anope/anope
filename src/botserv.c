@@ -116,6 +116,10 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
 		}
 		ircdproto->SendCTCP(bi, u->nick, "PING %s", s);
 	}
+	else if (cmd && bi->cmdTable)
+	{
+		mod_run_cmd(bi->nick, u, bi->cmdTable, cmd);
+	}
 }
 
 /*************************************************************************/

@@ -22,15 +22,13 @@ OBJS =  actions.obj base64.obj bots.obj botserv.obj channels.obj chanserv.obj co
         init.obj ircd.obj language.obj log.obj mail.obj main.obj memory.obj \
         memoserv.obj messages.obj misc.obj modules.obj mod_version.obj news.obj nickserv.obj operserv.obj \
         process.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
-        timeout.obj users.obj module.obj modulemanager.obj hashcomp.obj configreader.obj \
-	services.obj
+        timeout.obj users.obj module.obj modulemanager.obj hashcomp.obj configreader.obj
 
 SRCS =  actions.c base64.c botserv.c bots.cpp channels.c chanserv.c commands.c compat.c \
         config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c \
         language.c log.c mail.c main.c memory.c memoserv.c messages.c misc.c \
         modules.c mod_version.c news.c nickserv.c operserv.c process.c send.c servers.obj sessions.c \
-        slist.c sockutil.c timeout.c users.c module.cpp modulemanager.cpp hashcomp.cpp configreader.cpp \
-	services.cpp
+        slist.c sockutil.c timeout.c users.c module.cpp modulemanager.cpp hashcomp.cpp configreader.cpp
 
 ###########################################################################
 
@@ -99,7 +97,6 @@ operserv.obj:        operserv.c        ..\include\services.h ..\include\pseudo.h
 process.obj:        process.c        ..\include\services.h ..\include\messages.h
 send.obj:                send.c                ..\include\services.h
 servers.obj:     servers.c      ..\include\services.h
-services.obj:     services.cpp      ..\include\services.h
 sessions.obj:     sessions.c      ..\include\services.h ..\include\pseudo.h
 slist.obj:        slist.c                ..\include\services.h ..\include\slist.h
 sockutil.obj:        sockutil.c        ..\include\services.h

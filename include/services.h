@@ -1240,23 +1240,6 @@ struct capabinfo_ {
 
 /*************************************************************************/
 
-class CoreExport Service : public BotInfo
-{
-	public:
-		/** Create a new Services pseudo-client
-		 * @param nick The nickname to assign to the pseudo-client.
-		 * @param user The ident to assign to the pseudo-client.
-		 * @param host The hostname to assign to the pseudo-client.
-		 * @param real The realname to assign to the pseudo-client.
-		 */
-		Service(const char *nick, const char *user, const char *host, const char *real);
-		/** Destroy a pseudo-client, cleaning up appropriately.
-		 */
-		virtual ~Service();
-};
-
-/*************************************************************************/
-
 /*
  * Forward declaration reqired, because the base IRCDProto class uses some crap from in here.
  */

@@ -27,6 +27,11 @@ class SSMain : public Module
 	{
 		Command *c;
 
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		this->SetPermanent(true);
+
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
 		this->AddCommand(cmdTable, c, MOD_HEAD);
 

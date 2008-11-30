@@ -26,13 +26,18 @@ class SSMain : public Module
 	SSMain(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
-		EvtHook *hook;
 
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
 		this->AddCommand(cmdTable, c, MOD_HEAD);
 
-		hook = createEventHook(EVENT_SERVER_CONNECT, statserv_create);
-		this->AddEventHook(hook);
+		if (servsock == -1) {
+			EvtHook *hook;
+
+			hook = createEventHook(EVENT_SERVER_CONNECT, statserv_create);
+			this->AddEventHook(hook);
+		}
+		else
+			statserv_create(0, NULL);
 	}
 	~SSMain()
 	{

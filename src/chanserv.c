@@ -1124,6 +1124,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	Channel *c;
 	AutoKick *akick;
 	int i;
+	bool set_modes = false;
 	NickCore *nc;
 	const char *av[4];
 	int ac;
@@ -1138,19 +1139,11 @@ int check_kick(User * user, const char *chan, time_t chants)
 	if (user->isSuperAdmin == 1)
 		return 0;
 
-	if (ci->flags & CI_VERBOTEN) {
+	if (ci->flags & CI_SUSPENDED || ci->flags & CI_VERBOTEN)
+	{
 		get_idealban(ci, user, mask, sizeof(mask));
-		reason =
-			ci->forbidreason ? ci->forbidreason : getstring(user->na,
-															CHAN_MAY_NOT_BE_USED);
-		goto kick;
-	}
-
-	if (ci->flags & CI_SUSPENDED) {
-		get_idealban(ci, user, mask, sizeof(mask));
-		reason =
-			ci->forbidreason ? ci->forbidreason : getstring(user->na,
-															CHAN_MAY_NOT_BE_USED);
+		reason = ci->forbidreason ? ci->forbidreason : getstring(user->na, CHAN_MAY_NOT_BE_USED);
+		set_modes = true;
 		goto kick;
 	}
 
@@ -1212,13 +1205,16 @@ int check_kick(User * user, const char *chan, time_t chants)
 	 * JOIN would not). */
 	/* Don't check for CI_INHABIT before for the Channel record cos else
 	 * c may be NULL even if it exists */
-	if ((!(c = findchan(chan)) || c->usercount == 0)
-		&& !(ci->flags & CI_INHABIT)) {
+	if ((!(c = findchan(chan)) || c->usercount == 0) && !(ci->flags & CI_INHABIT))
+	{
 		ircdproto->SendJoin(findbot(s_ChanServ), chan, (c ? c->creation_time : chants));
-		/* Lets hide the channel from /list just incase someone does /list
-		 * while we are here. - katsklaw
+		/*
+		 * If channel was forbidden, etc, set it +si to prevent rejoin
 		 */
-		ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
+		if (send_modes)
+		{
+			ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
+		}
 		t = add_timeout(CSInhabit, timeout_leave, 0);
 		t->data = sstrdup(chan);
 		ci->flags |= CI_INHABIT;

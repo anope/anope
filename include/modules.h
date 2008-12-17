@@ -34,7 +34,7 @@ typedef void *	ano_module_t;
 
 #define ano_modopen(file) 		dlopen(file, RTLD_LAZY)
 #define ano_moderr()			dlerror()
-#define ano_modsym(file, symbol)	dlsym(file, DL_PREFIX symbol)
+#define ano_modsym(file, symbol)	dlsym(file, symbol)
 #define ano_modclose(file)		dlclose(file)
 /* We call dlerror() here because it clears the module error after being
  * called. This previously read 'errno = 0', but that didn't work on

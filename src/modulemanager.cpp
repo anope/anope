@@ -44,7 +44,9 @@ static int moduleCopyFile(const char *name, const char *output)
 	char input[4096];
 	int len;
 
-	strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
+	strncpy(input, services_dir.c_str(), 4095);
+	len = strlen(input);
+	strncat(input, "/modules/", 4095 - len);  /* Get full path with module extension */
 	len = strlen(input);
 	strncat(input, name, 4095 - len);
 	len = strlen(output);
@@ -146,7 +148,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	/* Generate the filename for the temporary copy of the module */
 	std::string pbuf;
-	pbuf = MODULE_PATH;
+	pbuf = services_dir + "/modules/";
 #ifndef _WIN32
 	pbuf += "runtime/";
 #else

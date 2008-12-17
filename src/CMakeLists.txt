@@ -1,196 +1,69 @@
-#if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
-#else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-#  file(RELATIVE_PATH DIR ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${DIR})
-#endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-
-set(SRC_SRCS actions.c base64.c bots.cpp botserv.c channels.c chanserv.c
-  commands.c compat.c config.c configreader.cpp datafiles.c encrypt.c events.c
-  hashcomp.cpp helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c
-  main.c memory.c memoserv.c messages.c misc.c module.cpp modulemanager.cpp
-  modules.c news.c nickserv.c operserv.c process.c send.c servers.c sessions.c
-  slist.c sockutil.c timeout.c users.c)
-if(WIN32 AND MSVC)
-  set(SRC_SRCS ${SRC_SRCS} win32_memory.cpp)
-endif(WIN32 AND MSVC)
+# Find all the *.c and *.cpp files within the current source directory, and sort the list
+file(GLOB SRC_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
+file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
+set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
+# If not using Visual Studio, don't include win32_memory.cpp, it's only required by Visual Studio to override it's override of the new/delete operators
+if(NOT MSVC)
+  list(REMOVE_ITEM SRC_SRCS win32_memory.cpp)
+endif(NOT MSVC)
 list(SORT SRC_SRCS)
 
+# Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
 
-#add_custom_target(src_srcs DEPENDS ${SRC_SRCS})
-
-set(actions.c_HEADERS services.h)
-set(base64.c_HEADERS services.h)
-set(bots.cpp_HEADERS services.h)
-set(botserv.c_HEADERS services.h pseudo.h)
-set(channels.c_HEADERS services.h ${Anope_BINARY_DIR}/lang/language.h)
-set(chanserv.c_HEADERS services.h pseudo.h)
-set(commands.c_HEADERS services.h commands.h ${Anope_BINARY_DIR}/lang/language.h)
-set(compat.c_HEADERS services.h)
-set(config.c_HEADERS services.h configreader.h hashcomp.h)
-set(configreader.cpp_HEADERS services.h)
-set(datafiles.c_HEADERS services.h datafiles.h)
-set(encrypt.c_HEADERS services.h encrypt.h)
-set(events.c_HEADERS modules.h ${Anope_BINARY_DIR}/lang/language.h ${Anope_BINARY_DIR}/include/version.h)
-set(hashcomp.c_HEADERS hashcomp.h)
-set(helpserv.c_HEADERS services.h pseudo.h)
-set(hostserv.c_HEADERS services.h pseudo.h)
-set(init.c_HEADERS services.h pseudo.h)
-set(ircd.c_HEADERS services.h extern.h)
-set(language.c_HEADERS services.h ${Anope_BINARY_DIR}/lang/language.h)
-set(log.c_HEADERS services.h pseudo.h)
-set(mail.c_HEADERS services.h ${Anope_BINARY_DIR}/lang/language.h)
-set(main.c_HEADERS services.h timeout.h ${Anope_BINARY_DIR}/include/version.h datafiles.h modules.h)
-set(memory.c_HEADERS services.h)
-set(memoserv.c_HEADERS services.h pseudo.h)
-set(messages.c_HEADERS services.h messages.h ${Anope_BINARY_DIR}/lang/language.h)
-set(misc.c_HEADERS services.h ${Anope_BINARY_DIR}/lang/language.h hashcomp.h)
-set(module.cpp_HEADERS modules.h ${Anope_BINARY_DIR}/lang/language.h ${Anope_BINARY_DIR}/include/version.h)
-set(modulemanager.cpp_HEADERS modules.h ${Anope_BINARY_DIR}/lang/language.h ${Anope_BINARY_DIR}/include/version.h)
-set(modules.c_HEADERS modules.h ${Anope_BINARY_DIR}/lang/language.h ${Anope_BINARY_DIR}/include/version.h)
-set(news.c_HEADERS services.h pseudo.h)
-set(nickserv.c_HEADERS services.h pseudo.h)
-set(operserv.c_HEADERS services.h pseudo.h)
-set(process.c_HEADERS services.h messages.h modules.h)
-set(send.c_HEADERS services.h)
-set(servers.c_HEADERS services.h)
-set(sessions.c_HEADERS services.h pseudo.h)
-set(slist.c_HEADERS services.h slist.h)
-set(sockutil.c_HEADERS services.h)
-set(timeout.c_HEADERS services.h pseudo.h)
-set(users.c_HEADERS services.h)
-
-set(${PROGRAM_NAME}_HEADERS)
-
+# Iterate through all the source files
 foreach(SRC ${SRC_SRCS})
-  #string(REGEX REPLACE "\\." "_" SRC_TARGET ${SRC})
-  #string(REGEX REPLACE "\\.cpp$" ".x" SRC_X ${SRC})
-  #string(REGEX REPLACE "\\.c$" ".o" SRC_O ${SRC_X})
-  #string(REGEX REPLACE "\\.x$" ".o" OBJ ${SRC_O})
-  #string(REGEX REPLACE "\\." "_" OBJ_TARGET ${OBJ})
-  #set(SRC_SRCS_FULL ${SRC_SRCS_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-  #set(SRC_OBJS ${SRC_OBJS} ${BUILD_DIR}/${OBJ})
-  #add_custom_command(OUTPUT ${BUILD_DIR}/${OBJ}
-  #  COMMAND ${MY_COMPILER} ${MY_COMP_ARG} ${CMAKE_CXX_CFLAGS} -I${Anope_SOURCE_DIR}/include -c ${SRC} -o ${BUILD_DIR}/${OBJ}
-  #  MAIN_DEPENDENCY ${SRC}
-  #)
-  #add_custom_target(src_${OBJ_TARGET} DEPENDS ${BUILD_DIR}/${OBJ})
-  #add_custom_target(src_${SRC_TARGET} DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-  #add_dependencies(src_srcs src_${SRC_TARGET})
-  #set(HEADERS)
-  #if(${SRC}_HEADERS)
-  #  foreach(HEADER ${${SRC}_HEADERS})
-  #    string(SUBSTRING ${HEADER} 0 1 FIRST_CHAR)
-  #    string(SUBSTRING ${HEADER} 1 1 SECOND_CHAR)
-  #    if(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #      set(HEADERS ${HEADERS} ${HEADER})
-  #    else(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #      set(HEADERS ${HEADERS} ${Anope_SOURCE_DIR}/include/${HEADER})
-  #    endif(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #  endforeach(HEADER)
-  #endif(${SRC}_HEADERS)
-
-  #file(STRINGS ${SRC} INCLUDES REGEX "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$")
-  ##message(STATUS "${SRC}'s includes: ${INCLUDES}")
-  ##get_filename_component(HEADER_FILENAME ${HEADER} NAME)
-  #set(HEADERS)
-  #foreach(INCLUDE ${INCLUDES})
-  #  string(STRIP ${INCLUDE} INCLUDE)
-  #  string(REGEX MATCH "\".*\"$" FILENAME ${INCLUDE})
-  #  string(LENGTH ${FILENAME} FILENAME_LEN)
-  #  math(EXPR FILENAME_LEN "${FILENAME_LEN} - 2")
-  #  string(SUBSTRING ${FILENAME} 1 ${FILENAME_LEN} FILENAME)
-  #  #message(STATUS "INCLUDE FILENAME: ${FILENAME}")
-  #  #list(APPEND ${HEADER_FILENAME}_HEADERS ${FILENAME})
-  #  list(APPEND HEADERS ${FILENAME})
-  #endforeach(INCLUDE)
-  ##message(STATUS "${SRC}'s HEADERS: ${HEADERS}")
-  #set(NEW_HEADERS)
-  #foreach(HEADER ${HEADERS})
-  #  #message(STATUS "HEADER: ${HEADER} - ${HEADERS}_HEADERS: ${${HEADERS}_HEADERS}")
-  #  if(${HEADER}_HEADERS)
-  #    list(APPEND NEW_HEADERS ${${HEADER}_HEADERS})
-  #  endif(${HEADER}_HEADERS)
-  #endforeach(HEADER)
-  #if(NEW_HEADERS)
-  #  list(APPEND HEADERS ${NEW_HEADERS})
-  #endif(NEW_HEADERS)
-  #list(REMOVE_DUPLICATES HEADERS)
-  #list(SORT HEADERS)
-  #if(HEADERS)
-  #  #message(STATUS "${SRC}'s HEADERS after NEW_HEADERS: ${HEADERS}")
-  #  set(HEADERS_FULL)
-  #  foreach(HEADER ${HEADERS})
-  #    get_filename_component(HEADER_FILENAME ${HEADER} NAME)
-  #    list(APPEND HEADERS_FULL ${${HEADER_FILENAME}_FULLPATH})
-  #  endforeach(HEADER)
-  #  #message(STATUS "${SRC}'s HEADERS_FULL: ${HEADERS_FULL}")
-  #  set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS_FULL}")
-  #  list(APPEND ${PROGRAM_NAME}_HEADERS ${HEADERS_FULL})
-  #endif(HEADERS)
+  # Calculate the header file dependencies for the given source file
   calculate_depends(${SRC})
-  get_source_file_property(HEADERS ${SRC} OBJECT_DEPENDS)
-  message(STATUS "${SRC}'s OBJECT_DEPENDS: ${HEADERS}")
-
 endforeach(SRC)
 
-#add_custom_target(src_srcs DEPENDS ${SRC_SRCS_FULL})
-
-#add_custom_command(OUTPUT ${BUILD_DIR}/services
-#  COMMAND ${MY_COMPILER} ${MY_COMP_ARG} ${CMAKE_CXX_CFLAGS} ${SRC_OBJS} -o ${BUILD_DIR}/services
-#  DEPENDS ${SRC_OBJS}
-#)
-#add_custom_target(src_services ALL DEPENDS ${BUILD_DIR}/services)
-#add_custom_target(src_services DEPENDS ${BUILD_DIR}/services)
-#add_custom_target(build ALL)
-#add_dependencies(build language headers src_services)
+# Under Windows, we also include a resource file to the build
 if(WIN32)
+  # Make sure that the resource file is seen as an RC file to be compiled with a resource compiler, not a C++ compiler
   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc LANGUAGE RC)
-  set(SRC_SRCS ${SRC_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/win32.rc)
+  # Add the resource file to the list of sources
+  list(APPEND SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32.rc)
+  # For MinGW, we have to change the compile flags
   if(MINGW)
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "-DMINGW -Ocoff -I${Anope_SOURCE_DIR}/include")
-    #add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/win32.obj
-    #  COMMAND ${CMAKE_RC_COMPILER} -DMINGW -I${Anope_SOURCE_DIR}/include -o ${CMAKE_CURRENT_BINARY_DIR}/win32.obj ${CMAKE_CURRENT_BINARY_DIR}/win32.rc
-    #  MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/win32.rc
-    #)
-    #set(SRC_SRCS ${SRC_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/win32.obj)
+    set(RC_CFLAGS "-DMINGW -Ocoff -I${Anope_SOURCE_DIR}/include")
+    # If any sort of debugging is being enabled, add a _DEBUG define to the flags for the resource compiler
+    if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+      set(RC_CFLAGS "${RC_CFLAGS} -D_DEBUG")
+    endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "${RC_CFLAGS}")
+  # For anything else, assumingly Visual Studio at this point, use a different set of compile flags
   else(MINGW)
-    #set(SRC_SRCS ${SRC_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/win32.rc)
-    #set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc LANGUAGE RC)
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "/i${Anope_SOURCE_DIR}/include")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
   endif(MINGW)
-  message(STATUS "CMAKE_RC_OUTPUT_EXTENSION: ${CMAKE_RC_OUTPUT_EXTENSION}")
 endif(WIN32)
+
+# Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
-set(SERVICES_LDFLAGS "${LDFLAGS}")
-if(WIN32 AND MSVC)
-  set(SERVICES_LDFLAGS "${SERVICES_LDFLAGS} /FIXED:NO")
-endif(WIN32 AND MSVC)
-set_target_properties(${PROGRAM_NAME} PROPERTIES LINK_FLAGS "${SERVICES_LDFLAGS}")
-  set_target_properties(${PROGRAM_NAME} PROPERTIES ENABLE_EXPORTS ON)
+set_target_properties(${PROGRAM_NAME} PROPERTIES LINK_FLAGS "${LDFLAGS}" ENABLE_EXPORTS ON)
+# On Windows, also link Anope to the wsock32 library, as well as set the version
 if(WIN32)
   target_link_libraries(${PROGRAM_NAME} wsock32)
+  set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 endif(WIN32)
-#set_target_properties(services PROPERTIES COMPILE_FLAGS ${CXXFLAGS})
+# Building the Anope executable requires the language files to be compiled first as well as the version.h header to be generated
 add_dependencies(${PROGRAM_NAME} language headers)
 
+# Get the filename of the Anope executable as it is in on this system
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
-file(RELATIVE_PATH SERVICES_BINARY ${CMAKE_CURRENT_BINARY_DIR} ${SERVICES_BINARY})
-  set(SERVICES_BIN "${BINDIR}/${SERVICES_BINARY}")
-message("[in src] SERVICES_BIN: ${SERVICES_BIN}")
+get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
+set(SERVICES_BIN "${SERVICES_BINARY}")
 
+# Generate sysconf.h from the earlier configuration
 configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/include/sysconf.h)
-if(NOT WIN32)
-  configure_file(${Anope_SOURCE_DIR}/src/bin/anoperc.cmake ${Anope_BINARY_DIR}/src/bin/anoperc)
-endif(NOT WIN32)
 
+# Go into the following directories and run their CMakeLists.txt as well
 add_subdirectory(bin)
 add_subdirectory(core)
 add_subdirectory(modules)
 add_subdirectory(protocol)
 add_subdirectory(tools)
 
+# Set Anope to be installed to the bin directory
 install(TARGETS ${PROGRAM_NAME}
-  DESTINATION "${BINDIR}"
+  DESTINATION "${INSTDIR}"
 )

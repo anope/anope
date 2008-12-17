@@ -1239,12 +1239,7 @@ void ModuleRunTimeDirCleanUp()
 	char dirbuf[BUFSIZE];
 	char filebuf[BUFSIZE];
 
-
-#ifndef _WIN32
-	snprintf(dirbuf, BUFSIZE, "%s/modules/runtime", services_dir);
-#else
-	snprintf(dirbuf, BUFSIZE, "\\%s", "modules/runtime");
-#endif
+	snprintf(dirbuf, BUFSIZE, "%s/modules/runtime", services_dir.c_str());
 
 	if (debug) {
 		alog("debug: Cleaning out Module run time directory (%s) - this may take a moment please wait", dirbuf);

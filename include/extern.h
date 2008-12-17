@@ -569,7 +569,7 @@ E const char version_build[];
 E char *version_protocol;
 E const char version_flags[];
 
-E const char *services_dir;
+E std::string services_dir;
 E const char *log_filename;
 E int   debug;
 E int   readonly;

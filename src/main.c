@@ -35,7 +35,7 @@
 /******** Global variables! ********/
 
 /* Command-line options: (note that configuration variables are in config.c) */
-const char *services_dir = SERVICES_DIR;	  /* -dir dirname */
+std::string services_dir;	  /* -dir dirname */
 const char *log_filename = LOG_FILENAME;	  /* -log filename */
 int debug = 0;				  /* -debug */
 int readonly = 0;			   /* -readonly */
@@ -46,8 +46,8 @@ int nothird = 0;				/* -nothrid */
 int noexpire = 0;			   /* -noexpire */
 int protocoldebug = 0;		  /* -protocoldebug */
 
+std::string binary_dir; /* Used to store base path for Anope */
 #ifdef _WIN32
-char *binary_dir;			   /* Used to store base path for win32 restart */
 #include <process.h>
 #define execve _execve
 #endif
@@ -184,12 +184,7 @@ static void services_restart()
 	/* First don't unload protocol module, then do so */
 	modules_unload_all(true, false);
 	modules_unload_all(true, true);
-#ifdef _WIN32
-	/* This fixes bug #589 - change to binary directory for restart */
-	/*  -- heinz */
-	if (binary_dir)
-		chdir(binary_dir);
-#endif
+	chdir(binary_dir.c_str());
 	execve(SERVICES_BIN, my_av, my_envp);
 	if (!readonly) {
 		open_log();
@@ -445,6 +440,45 @@ void sighandler(int signum)
 
 /*************************************************************************/
 
+/** The following comes from InspIRCd to get the full path of the Anope executable
+ */
+std::string GetFullProgDir(char *argv0)
+{
+	char buffer[PATH_MAX];
+#ifdef _WIN32
+	/* Windows has specific API calls to get the EXE path that never fail.
+	 * For once, Windows has something of use, compared to the POSIX code
+	 * for this, this is positively neato.
+	 */
+	if (GetModuleFileName(NULL, buffer, PATH_MAX))
+	{
+		std::string fullpath = buffer;
+		std::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
+		return std::string(fullpath, 0, n);
+	}
+#else
+	// Get the current working directory
+	if (getcwd(buffer, PATH_MAX))
+	{
+		std::string remainder = argv0;
+
+		/* Does argv[0] start with /? If so, it's a full path, use it */
+		if (remainder[0] == '/')
+		{
+			std::string::size_type n = remainder.rfind("/" SERVICES_BIN);
+			return std::string(remainder, 0, n);
+		}
+
+		std::string fullpath = static_cast<std::string>(buffer) + "/" + remainder;
+		std::string::size_type n = fullpath.rfind("/" SERVICES_BIN);
+		return std::string(fullpath, 0, n);
+	}
+#endif
+	return "/";
+}
+
+/*************************************************************************/
+
 /* Main routine.  (What does it look like? :-) ) */
 
 int main(int ac, char **av, char **envp)
@@ -469,19 +503,10 @@ int main(int ac, char **av, char **envp)
 				"	require root privileges to run, and it is discouraged that you run Anope\n");
 		fprintf(stderr, "	as the root superuser.\n");
 	}
-#else
-	/*
-	 * We need to know which directory we're in for when restart is called.
-	 * This only affects Windows as a full path is not specified in services_dir.
-	 * This fixes bug #589.
-	 * -- heinz
-	 */
-	binary_dir = new char[MAX_PATH];
-	if (!getcwd(binary_dir, MAX_PATH)) {
-		fprintf(stderr, "error: getcwd() error\n");
-		return -1;
-	}
 #endif
+
+	binary_dir = GetFullProgDir(av[0]);
+	services_dir = binary_dir + "/data";
 
 	/* General initialization first */
 	if ((i = init_primary(ac, av)) != 0)
@@ -590,12 +615,7 @@ int main(int ac, char **av, char **envp)
 		ircdproto->SendSquit(ServerName, quitmsg);
 		disconn(servsock);
 		close_log();
-#ifdef _WIN32
-		/* This fixes bug #589 - change to binary directory for restart */
-		/*  -- heinz */
-		if (binary_dir)
-			chdir(binary_dir);
-#endif
+		chdir(binary_dir.c_str());
 		execve(SERVICES_BIN, av, envp);
 		if (!readonly) {
 			open_log();
@@ -611,11 +631,6 @@ int main(int ac, char **av, char **envp)
 
 	/* Disconnect and exit */
 	services_shutdown();
-
-#ifdef _WIN32
-	if (binary_dir)
-		delete [] binary_dir;
-#endif
 
 	return 0;
 }

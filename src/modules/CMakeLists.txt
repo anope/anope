@@ -1,69 +1,32 @@
-#if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
-#else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-#  file(RELATIVE_PATH DIR ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${DIR})
-#endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-
+# Find all the *.c and *.cpp files within the current source directory, and sort the list
 file(GLOB MODULES_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
 file(GLOB MODULES_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(MODULES_SRCS ${MODULES_SRCS_C} ${MODULES_SRCS_CPP})
 list(SORT MODULES_SRCS)
 
-#add_custom_target(modules ALL)
-#add_custom_target(modules)
-#add_dependencies(modules build)
-
+# Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${MODULES_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${MODULE_CXXFLAGS}")
 
+# Iterate through all the source files
 foreach(SRC ${MODULES_SRCS})
-  string(REGEX REPLACE "\\.cpp$" ".x" SRC_X ${SRC})
-  string(REGEX REPLACE "\\.c$" ".o" SRC_O ${SRC_X})
-  string(REGEX REPLACE "\\.x$" ".o" OBJ ${SRC_O})
-  #string(REGEX REPLACE "\\." "_" OBJ_TARGET ${OBJ})
-  string(REGEX REPLACE "\\.o" ".so" SO ${OBJ})
-  #string(REGEX REPLACE "\\.o" "" SO ${OBJ})
-  #string(REGEX REPLACE "\\." "_" SO_TARGET ${SO})
-  #add_custom_command(OUTPUT ${BUILD_DIR}/${OBJ}
-  #  COMMAND ${MY_COMPILER} ${MY_COMP_ARG} ${CMAKE_CXX_CFLAGS} -I${Anope_SOURCE_DIR}/include -c ${SRC} -o ${BUILD_DIR}/${OBJ}
-  #  MAIN_DEPENDENCY ${SRC}
-  #)
-  #add_custom_target(modules_${OBJ_TARGET} DEPENDS ${BUILD_DIR}/${OBJ})
-  #add_custom_command(OUTPUT ${BUILD_DIR}/${SO}
-  #  COMMAND ${MY_COMPILER} ${MY_COMP_ARG} ${CMAKE_CXX_CFLAGS} ${CMAKE_SHARED_LIBRARY_CXX_FLAGS} ${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} ${BUILD_DIR}/${OBJ} -o ${BUILD_DIR}/${SO}
-  #  MAIN_DEPENDENCY ${BUILD_DIR}/${OBJ}
-  #)
-  #add_custom_target(modules_${SO_TARGET} DEPENDS ${BUILD_DIR}/${SO})
-  #add_dependencies(modules modules_${SO_TARGET})
-  #set(HEADERS ${Anope_SOURCE_DIR}/include/module.h)
-  #if(${SRC}_HEADERS)
-  #  foreach(HEADER ${${SRC}_HEADERS})
-  #    string(SUBSTRING ${HEADER} 0 1 FIRST_CHAR)
-  #    string(SUBSTRING ${HEADER} 1 1 SECOND_CHAR)
-  #    if(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #      set(HEADERS ${HEADERS} ${HEADER})
-  #    else(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #      set(HEADERS ${HEADERS} ${Anope_SOURCE_DIR}/include/${HEADER})
-  #    endif(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #  endforeach(HEADER)
-  #endif(${SRC}_HEADERS)
-  #if(HEADERS)
-  #  set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS}")
-  #endif(HEADERS)
+  # Convert the source file extension to have a .so extension
+  string(REGEX REPLACE "\\.(c|cpp)$" ".so" SO ${SRC})
+  # Calculate the header file dependencies for the given source file
   calculate_depends(${SRC})
-  get_source_file_property(HEADERS ${SRC} OBJECT_DEPENDS)
-  message(STATUS "${SRC}'s OBJECT_DEPENDS: ${HEADERS}")
-  if(WIN32 AND MSVC)
-    set(SRC ${SRC} ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
-  endif(WIN32 AND MSVC)
+  # For Visual Studio only, include win32_memory.cpp to the list of sources, required to override Visual Studio's overrides of the new/delete operators
+  if(MSVC)
+    list(APPEND SRC ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
+  endif(MSVC)
+  # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} MODULE ${SRC})
-  add_dependencies(${SO} ${PROGRAM_NAME})
-  #set_target_properties(${SO} PROPERTIES PREFIX "" SUFFIX "" COMPILE_FLAGS ${CXXFLAGS})
   set_target_properties(${SO} PROPERTIES PREFIX "" SUFFIX "" LINK_FLAGS "${LDFLAGS}")
+  add_dependencies(${SO} ${PROGRAM_NAME})
+  # For Windows only, have the module link to the export library of Anope as well as the wsock32 library (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
   if(WIN32)
     target_link_libraries(${SO} ${PROGRAM_NAME} wsock32)
+    set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
   endif(WIN32)
-  #set_target_properties(${SO} PROPERTIES PREFIX "" SUFFIX "")
+  # Set the module to be installed to the module directory under the data directory
   install(TARGETS ${SO}
     DESTINATION "${DATADIR}/modules"
   )

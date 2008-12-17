@@ -256,7 +256,7 @@ static int parse_options(int ac, char **av)
 						version_flags, version_build);
 				fprintf(stdout,
 						"Anope IRC Services (http://www.anope.org)\n");
-				fprintf(stdout, "Usage ./services [options] ...\n");
+				fprintf(stdout, "Usage ./" SERVICES_BIN " [options] ...\n");
 				fprintf(stdout,
 						"-remote		-remote hostname[:port]\n");
 				fprintf(stdout, "-local		 -local hostname[:port]\n");
@@ -352,8 +352,8 @@ int init_primary(int ac, char **av)
 	parse_options(ac, av);
 
 	/* Chdir to Services data directory. */
-	if (chdir(services_dir) < 0) {
-		fprintf(stderr, "chdir(%s): %s\n", services_dir, strerror(errno));
+	if (chdir(services_dir.c_str()) < 0) {
+		fprintf(stderr, "chdir(%s): %s\n", services_dir.c_str(), strerror(errno));
 		return -1;
 	}
 

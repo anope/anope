@@ -1,68 +1,34 @@
-#if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
-#else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-#  file(RELATIVE_PATH DIR ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${DIR})
-#endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-
-set(TOOLS_SRCS anopesmtp.c db-convert.c db-merger.c)
+# Find all the *.c and *.cpp files within the current source directory, and sort the list
+file(GLOB TOOLS_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
+file(GLOB TOOLS_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
+set(TOOLS_SRCS ${TOOLS_SRCS_C} ${TOOLS_SRCS_CPP})
 list(SORT TOOLS_SRCS)
 
+# Set all the files to use C++ as well as set their compile flags
 set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
 
-set(anopesmtp.c_HEADERS ${Anope_BINARY_DIR}/include/sysconf.h ${CMAKE_CURRENT_SOURCE_DIR}/smtp.h)
-set(db-convert.c_HEADERS ${Anope_BINARY_DIR}/include/sysconf.h)
-set(db-merger.c_HEADERS ${Anope_BINARY_DIR}/include/sysconf.h)
-
+# Iterate through all the source files
 foreach(SRC ${TOOLS_SRCS})
-  #string(REGEX REPLACE "\\." "_" SRC_TARGET ${SRC})
-  string(REGEX REPLACE "\\.cpp$" ".x" SRC_X ${SRC})
-  string(REGEX REPLACE "\\.c$" ".o" SRC_O ${SRC_X})
-  string(REGEX REPLACE "\\.x$" ".o" OBJ ${SRC_O})
-  string(REGEX REPLACE "\\.o$" "" EXE ${OBJ})
-  #string(REGEX REPLACE "\\." "_" OBJ_TARGET ${OBJ})
-  #set(SRC_OBJS ${SRC_OBJS} ${BUILD_DIR}/${OBJ})
-  set(TOOLS ${TOOLS} ${EXE})
-  #add_custom_command(OUTPUT ${BUILD_DIR}/${OBJ}
-  #  COMMAND ${MY_COMPILER} ${MY_COMP_ARG} ${CMAKE_CXX_CFLAGS} -I${Anope_SOURCE_DIR}/include -c ${SRC} -o ${BUILD_DIR}/${OBJ}
-  #  MAIN_DEPENDENCY ${SRC}
-  #)
-  #add_custom_target(src_${OBJ_TARGET} DEPENDS ${BUILD_DIR}/${OBJ})
-  #add_custom_target(src_${SRC_TARGET} DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-  #add_dependencies(src_srcs src_${SRC_TARGET})
-  #set(HEADERS)
-  #if(${SRC}_HEADERS)
-  #  foreach(HEADER ${${SRC}_HEADERS})
-  #    string(SUBSTRING ${HEADER} 0 1 FIRST_CHAR)
-  #    string(SUBSTRING ${HEADER} 1 1 SECOND_CHAR)
-  #    if(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #      set(HEADERS ${HEADERS} ${HEADER})
-  #    else(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #      set(HEADERS ${HEADERS} ${Anope_SOURCE_DIR}/include/${HEADER})
-  #    endif(FIRST_CHAR STREQUAL "/" OR SECOND_CHAR STREQUAL ":")
-  #  endforeach(HEADER)
-  #endif(${SRC}_HEADERS)
-  #if(HEADERS)
-  #  set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS}")
-  #endif(HEADERS)
+  # Convert the source file extension to have no extension
+  string(REGEX REPLACE "\\.(c|cpp)$" "" EXE ${SRC})
+  # Calculate the header file dependencies for the given source file
   calculate_depends(${SRC})
-  get_source_file_property(HEADERS ${SRC} OBJECT_DEPENDS)
-  message(STATUS "${SRC}'s OBJECT_DEPENDS: ${HEADERS}")
+  # Generate the executable and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_executable(${EXE} ${SRC})
   set_target_properties(${EXE} PROPERTIES LINK_FLAGS "${LDFLAGS}")
   add_dependencies(${EXE} ${PROGRAM_NAME})
-  #set_target_properties(${EXE} PROPERTIES COMPILE_FLAGS ${CXXFLAGS})
+  # Set the executable to be installed to the tools directory under the bin directory
   install(TARGETS ${EXE}
-    DESTINATION "${BINDIR}/tools"
+    DESTINATION "${INSTDIR}/tools"
   )
 endforeach(SRC)
 
+# Only for Windows, set anopesmtp to require the wsock32 library
 if(WIN32)
   target_link_libraries(anopesmtp wsock32)
 endif(WIN32)
 
-if(NOT WIN32)
-  if(RUNGROUP)
-    install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"${BINDIR}/tools\")")
-  endif(RUNGROUP)
-endif(NOT WIN32)
+# On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
+if(NOT WIN32 AND RUNGROUP)
+  install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"${INSTDIR}/tools\")")
+endif(NOT WIN32 AND RUNGROUP)

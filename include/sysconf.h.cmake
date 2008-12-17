@@ -17,14 +17,8 @@
 #cmakedefine HAVE_SYS_SELECT_H 1
 #cmakedefine HAVE_UMASK 1
 #cmakedefine HAVE_VA_LIST_AS_ARRAY 1
-// Temporary, change elsewhere to be SERVICES_DIR/modules/
-#define MODULE_PATH "@SERVICES_DIR@/modules/"
 #cmakedefine RUNGROUP "@RUNGROUP@"
 #cmakedefine SERVICES_BIN "@SERVICES_BIN@"
-#cmakedefine SERVICES_DIR "@SERVICES_DIR@"
-
-// Temporary, remove from here later as well as elsewhere in the code
-#define DL_PREFIX ""
 
 #cmakedefine HAVE_UINT8_T 1
 #cmakedefine HAVE_U_INT8_T 1

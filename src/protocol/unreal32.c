@@ -555,7 +555,15 @@ class UnrealIRCdProto : public IRCDProto
 					if (ac <= 0) break;
 					--ac;
 					++av;
-					if (av) user->svid = strtoul(*av, NULL, 0);
+					if (av)
+						user->svid = strtoul(*av, NULL, 0);
+
+					/* Unreal annoyingly uses +d for deaf as well as svid, so if a svid was set, unset +d (this actually means that
+					 * in practice, we could lose someone's svid if they set +d after identifying, so this fix is crap)
+					 * XXX: fix it better
+					 */
+					if (user->svid)
+						user->mode &= ~UMODE_d;
 					break;
 				case 'o':
 					if (add) {

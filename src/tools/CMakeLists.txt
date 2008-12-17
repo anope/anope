@@ -47,7 +47,7 @@ foreach(SRC ${TOOLS_SRCS})
   endif(HEADERS)
   add_executable(${EXE} ${SRC})
   set_target_properties(${EXE} PROPERTIES LINK_FLAGS "${LDFLAGS}")
-  add_dependencies(${EXE} services)
+  add_dependencies(${EXE} ${PROGRAM_NAME})
   #set_target_properties(${EXE} PROPERTIES COMPILE_FLAGS ${CXXFLAGS})
   install(TARGETS ${EXE}
     DESTINATION "${BINDIR}/tools"

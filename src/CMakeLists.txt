@@ -11,6 +11,9 @@ set(SRC_SRCS actions.c base64.c bots.cpp botserv.c channels.c chanserv.c
   main.c memory.c memoserv.c messages.c misc.c module.cpp modulemanager.cpp
   modules.c news.c nickserv.c operserv.c process.c send.c servers.c sessions.c
   slist.c sockutil.c timeout.c users.c)
+if(WIN32 AND MSVC)
+  set(SRC_SRCS ${SRC_SRCS} win32_memory.cpp)
+endif(WIN32 AND MSVC)
 list(SORT SRC_SRCS)
 
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
@@ -118,7 +121,11 @@ if(WIN32)
   message(STATUS "CMAKE_RC_OUTPUT_EXTENSION: ${CMAKE_RC_OUTPUT_EXTENSION}")
 endif(WIN32)
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
-set_target_properties(${PROGRAM_NAME} PROPERTIES LINK_FLAGS "${LDFLAGS}")
+set(SERVICES_LDFLAGS "${LDFLAGS}")
+if(WIN32 AND MSVC)
+  set(SERVICES_LDFLAGS "${SERVICES_LDFLAGS} /FIXED:NO")
+endif(WIN32 AND MSVC)
+set_target_properties(${PROGRAM_NAME} PROPERTIES LINK_FLAGS "${SERVICES_LDFLAGS}")
   set_target_properties(${PROGRAM_NAME} PROPERTIES ENABLE_EXPORTS ON)
 if(WIN32)
   target_link_libraries(${PROGRAM_NAME} wsock32)

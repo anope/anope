@@ -8,15 +8,13 @@ Legend:
 [x] additional field where users' masked host can be stored so both masked IP and vhost are available instead of just one.
 [x] no struct Uid bollocks. that's insane, and now, unnecessary that we store UID in BotInfo.
 [x] prevent deletion of core services via /bs bot
-[ ] Module subsystem cleanup ('modules' branch)
+[x] Module subsystem cleanup ('modules' branch)
   [x] Move modules to use classes somewhat (AnopeInit, AnopeFini)
   [x] Change MODULE_INIT to return a pointer
   [x] Remove duplicate module creation.. have loadModule return a pointer rather than creating one
   [x] Remove buffered loading/unloading, this makes os_modunload perm, but who cares
     [x] Mark os_modunload permanent.
   [x] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
-  [ ] Remove modules_unload_all fini + hack that goes with it
-    [ ] signal handling cleanup
   [+] Remove mod_current_* crap (involves passing Module * around a lot)
     [x] events.c
     [x] modules.c
@@ -30,11 +28,13 @@ Legend:
   [x] Remove UnRestrictSAdmin, UseTS6, UseSVSHOLD
 [x] InspIRCd 1.2 support
 [x] Remove old (prior to 1.8.0) db compat
-[ ] Establish a proper base for services pseudoclients
-  [ ] add ss_main StatServ Hal9000 to play with :)
+[x] Establish a proper base for services pseudoclients
+  [x] add ss_main StatServ Hal9000 to play with :)
 
 1.9.1
 -----
+[ ] Remove modules_unload_all fini + hack that goes with it
+  [ ] signal handling cleanup
 [ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
 [ ] Redo database insanity.
   [ ] Move database load/save to a module

@@ -153,9 +153,8 @@ void load_os_dbase()
 {
 	dbFILE *f;
 	int16 i, ver;
-	uint16 tmp16, n;
+	uint16 tmp16;
 	uint32 tmp32;
-	char *s;
 	int failed = 0;
 
 	if (!(f = open_db(s_OperServ, OperDBName, "r", OPER_VERSION)))

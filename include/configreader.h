@@ -282,9 +282,6 @@ class ServerConfig
 		 * recursively included.
 		 */
 		std::vector<std::string> include_stack;
-		/** Process an include directive
-		 */
-		bool DoInclude(ConfigDataHash &, const std::string &, std::ostringstream &);
 		/** Check that there is only one of each configuration item
 		 */
 		bool CheckOnce(const char *);
@@ -381,31 +378,20 @@ class ServerConfig
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class ConfigException : public std::exception
+class ConfigException : public CoreException
 {
-	protected:
-		/** Holds the error message to be displayed
-		 */
-		const std::string err;
 	public:
 		/** Default constructor, just uses the error mesage 'Config threw an exception'.
 		 */
-		ConfigException() : err("Config threw an exception") { }
+		ConfigException() : CoreException("Config threw an exception", "Config Parser") {}
 		/** This constructor can be used to specify an error message before throwing.
 		 */
-		ConfigException(const std::string &message) : err(message) {}
+		ConfigException(const std::string &message) : CoreException(message, "Config Parser") {}
 		/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
 		 * Actually no, it does nothing. Never mind.
 		 * @throws Nothing!
 		 */
 		virtual ~ConfigException() throw() { };
-		/** Returns the reason for the exception.
-		 * The module should probably put something informative here as the user will see this upon failure.
-		 */
-		virtual const char *GetReason()
-		{
-			return err.c_str();
-		}
 };
 
 #define CONF_NO_ERROR 0x000000

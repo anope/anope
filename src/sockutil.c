@@ -431,7 +431,7 @@ char *sgets(char *buf, int len, ano_socket_t s)
 	if (read_buffer_len() == 0 && c == 0)
 		return reinterpret_cast<char *>(-1);
 	c = sgetc(s);
-	while (--len && (*ptr++ = c) != '\n' && (c = sgetc(s)) >= 0);
+	while (--len && (*ptr++ = static_cast<char>(c)) != '\n' && (c = sgetc(s)) >= 0);
 	if (c < 0)
 		return NULL;
 	*ptr = 0;
@@ -532,7 +532,7 @@ static char *pack_ip(const char *ipaddr)
 	for (i = 0; i < 4; i++) {
 		if (tmp[i] < 0 || tmp[i] > 255)
 			return NULL;
-		ipbuf[i] = tmp[i];
+		ipbuf[i] = static_cast<char>(tmp[i]);
 	}
 	return ipbuf;
 }

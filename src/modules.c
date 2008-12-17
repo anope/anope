@@ -1233,7 +1233,6 @@ void ModuleRunTimeDirCleanUp()
 	BOOL fFinished;
 	HANDLE hList;
 	TCHAR szDir[MAX_PATH + 1];
-	TCHAR szSubDir[MAX_PATH + 1];
 	WIN32_FIND_DATA FileData;
 	char buffer[_MAX_PATH];
 #endif
@@ -1294,7 +1293,7 @@ void ModuleRunTimeDirCleanUp()
 		}
 	} else {
 		if (debug) {
-			alog("debug: Invalid File Handle. GetLastError reports %d\n", GetLastError());
+			alog("debug: Invalid File Handle. GetLastError reports %d\n", static_cast<int>(GetLastError()));
 		}
 	}
 	FindClose(hList);

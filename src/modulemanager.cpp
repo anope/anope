@@ -38,7 +38,9 @@ static int moduleCopyFile(const char *name, const char *output)
 {
 	int ch;
 	FILE *source, *target;
+#ifndef _WIN32
 	int srcfp;
+#endif
 	char input[4096];
 	int len;
 

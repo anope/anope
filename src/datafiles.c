@@ -186,7 +186,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #ifdef _WIN32
 		if (debug) {
 			if (errno == ENOENT) {
-				alog("debug: Error %d (ENOENT) : the file or directory does not exist", errno, filename);
+				alog("debug: Error %d (ENOENT) : the file or directory does not exist", errno);
 			} else if (errno == EACCES) {
 				alog("debug: Error %d (EACCES) : error while attempting to access file", errno);
 			} else {

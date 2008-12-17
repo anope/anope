@@ -198,11 +198,11 @@ extern int strncasecmp(const char *, const char *, size_t);
 #ifdef _WIN32
 	#define MODULE_INIT(x, y) \
 		extern "C" DllExport Module *init_module(const std::string &, const std::string &); \
-		extern "C" Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" Module *init_module(const std::string &, const std::string &creator) \
 		{ \
 			return new y(x, creator); \
 		} \
-		BOOLEAN WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved) \
+		BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
 		{ \
 			switch ( nReason ) \
 			{ \
@@ -220,7 +220,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 
 #else
 	#define MODULE_INIT(x, y) \
-		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" DllExport Module *init_module(const std::string &, const std::string &creator) \
 		{ \
 			return new y(x, creator); \
 		} \
@@ -253,10 +253,10 @@ class CoreExport CoreException : public std::exception
  protected:
 	/** Holds the error message to be displayed
 	 */
-	const std::string err;
+	std::string err;
 	/** Source of the exception
 	 */
-	const std::string source;
+	std::string source;
  public:
 	/** Default constructor, just uses the error mesage 'Core threw an exception'.
 	 */
@@ -272,16 +272,16 @@ class CoreExport CoreException : public std::exception
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~CoreException() throw() {};
+	virtual ~CoreException() throw() {}
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
-	virtual const char* GetReason()
+	virtual const char* GetReason() const
 	{
 		return err.c_str();
 	}
 
-	virtual const char* GetSource()
+	virtual const char* GetSource() const
 	{
 		return source.c_str();
 	}
@@ -301,7 +301,7 @@ class CoreExport ModuleException : public CoreException
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ModuleException() throw() {};
+	virtual ~ModuleException() throw() {}
 };
 
 /** Class with the ability to be extended with key:value pairs.
@@ -1405,7 +1405,7 @@ private:
 		 * Thanks.
 		 * -- w00t
 		 */
-		virtual void SendQuit(const char *nick, const char *buf) MARK_DEPRECATED
+		virtual void SendQuit(const char *nick, const char *) MARK_DEPRECATED
 		{
 			send_cmd(nick, "QUIT");
 		}

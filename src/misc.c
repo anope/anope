@@ -951,9 +951,8 @@ static void arc4_addrandom(void *dat, int datlen)
  */
 void rand_init()
 {
-	int n;
 #ifndef _WIN32
-	int fd;
+	int n, fd;
 #endif
 	struct {
 #ifdef USE_MYSQL

@@ -387,8 +387,10 @@ int init_primary(int ac, char **av)
 
 int init_secondary(int ac, char **av)
 {
+#ifndef _WIN32
 	int i;
 	int started_from_term = isatty(0) && isatty(1) && isatty(2);
+#endif
 
 	/* Add Core MSG handles */
 	moduleAddMsgs();

@@ -465,7 +465,7 @@ void save_exceptions()
 	SAFE(write_int16(nexceptions, f));
 	for (i = 0; i < nexceptions; i++) {
 		SAFE(write_string(exceptions[i].mask, f));
-		SAFE(write_int16(exceptions[i].limit, f));
+		SAFE(write_int16(static_cast<uint16>(exceptions[i].limit), f));
 		SAFE(write_buffer(exceptions[i].who, f));
 		SAFE(write_string(exceptions[i].reason, f));
 		SAFE(write_int32(exceptions[i].time, f));

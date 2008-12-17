@@ -499,7 +499,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		inspircd_cmd_chghost(u->nick, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
+		inspircd_cmd_chghost(u->nick, (u->mode & umodes[static_cast<int>('x')]) ? u->chost.c_str() : u->host);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
@@ -629,7 +629,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout, "Being held for registered user");
+		send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, static_cast<int>(NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
@@ -1231,10 +1231,10 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				cbmi->getvalue = get_flood;
 				cbmi->csgetvalue = cs_get_flood;
 
-				myCbmodes['f'].flag = CMODE_f;
-				myCbmodes['f'].flags = 0;
-				myCbmodes['f'].setvalue = set_flood;
-				myCbmodes['f'].cssetvalue = cs_set_flood;
+				myCbmodes[static_cast<int>('f')].flag = CMODE_f;
+				myCbmodes[static_cast<int>('f')].flags = 0;
+				myCbmodes[static_cast<int>('f')].setvalue = set_flood;
+				myCbmodes[static_cast<int>('f')].cssetvalue = cs_set_flood;
 
 				pmodule_ircd_cbmodeinfos(myCbmodeinfos);
 				pmodule_ircd_cbmodes(myCbmodes);
@@ -1249,13 +1249,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 		}
 		if (has_banexceptionmod) {
-			myCmmodes['e'].addmask = add_exception;
-			myCmmodes['e'].delmask = del_exception;
+			myCmmodes[static_cast<int>('e')].addmask = add_exception;
+			myCmmodes[static_cast<int>('e')].delmask = del_exception;
 			ircd->except = 1;
 		}
 		if (has_inviteexceptionmod) {
-			myCmmodes['I'].addmask = add_invite;
-			myCmmodes['I'].delmask = del_invite;
+			myCmmodes[static_cast<int>('I')].addmask = add_invite;
+			myCmmodes[static_cast<int>('I')].delmask = del_invite;
 			ircd->invitemode = 1;
 		}
 		ircd->svshold = has_svsholdmod;

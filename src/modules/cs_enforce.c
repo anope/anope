@@ -363,7 +363,7 @@ void do_enforce_cmode_R(Channel * c)
 		if (!nick_identified(u)) {
 			get_idealban(ci, u, mask, sizeof(mask));
 			reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
-			if (((cbm = &cbmodes['R'])->flag == 0)
+			if (((cbm = &cbmodes[static_cast<int>('R')])->flag == 0)
 				|| !(c->mode & cbm->flag))
 				ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
 							   time(NULL));
@@ -395,7 +395,7 @@ void do_enforce_modes(Channel * c)
 {
 	CBMode *cbm;
 
-	if (((cbm = &cbmodes['R'])->flag != 0) && (c->mode & cbm->flag))
+	if (((cbm = &cbmodes[static_cast<int>('R')])->flag != 0) && (c->mode & cbm->flag))
 		do_enforce_cmode_R(c);
 }
 
@@ -462,7 +462,7 @@ int my_cs_help_enforce(User * u)
 	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
 	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
 	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-	if (cbmodes['R'].flag != 0)
+	if (cbmodes[static_cast<int>('R')].flag != 0)
 		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
 	else
 		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);

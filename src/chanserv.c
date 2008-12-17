@@ -1211,7 +1211,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 		/*
 		 * If channel was forbidden, etc, set it +si to prevent rejoin
 		 */
-		if (send_modes)
+		if (set_modes)
 		{
 			ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
 		}

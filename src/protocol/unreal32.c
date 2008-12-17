@@ -540,11 +540,8 @@ class UnrealIRCdProto : public IRCDProto
 		if (!user || !modes) return; /* Prevent NULLs from doing bad things */
 		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
 		while (*modes) {
-			/* This looks better, much better than "add ? (do_add) : (do_remove)".
-			 * At least this is readable without paying much attention :) -GD */
-			if (add) user->mode |= umodes[static_cast<int>(*modes)];
-			else user->mode &= ~umodes[static_cast<int>(*modes)];
-			switch (*modes++) {
+			switch (*modes++)
+			{
 				case '+':
 					add = 1;
 					break;
@@ -552,18 +549,13 @@ class UnrealIRCdProto : public IRCDProto
 					add = 0;
 					break;
 				case 'd':
-					if (ac <= 0) break;
-					--ac;
-					++av;
-					if (av)
-						user->svid = strtoul(*av, NULL, 0);
-
-					/* Unreal annoyingly uses +d for deaf as well as svid, so if a svid was set, unset +d (this actually means that
-					 * in practice, we could lose someone's svid if they set +d after identifying, so this fix is crap)
-					 * XXX: fix it better
-					 */
-					if (user->svid)
-						user->mode &= ~UMODE_d;
+					if (ac <= 0)
+						break;
+					if (isdigit(*av[1]))
+					{
+						user->svid = strtoul(av[1], NULL, 0);
+						continue; // +d was setting a service stamp, ignore the usermode +-d.
+					}
 					break;
 				case 'o':
 					if (add) {
@@ -581,6 +573,14 @@ class UnrealIRCdProto : public IRCDProto
 					break;
 				case 'x':
 					update_host(user);
+					break;
+				default:
+					/* This looks better, much better than "add ? (do_add) : (do_remove)".
+					 * At least this is readable without paying much attention :) -GD */
+					if (add)
+						user->mode |= umodes[static_cast<int>(*modes)];
+					else
+						user->mode &= ~umodes[static_cast<int>(*modes)];
 			}
 		}
 	}

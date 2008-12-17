@@ -26,6 +26,8 @@
 // Temporary, remove from here later as well as elsewhere in the code
 #define DL_PREFIX ""
 
+#cmakedefine HAVE_UINT8_T 1
+#cmakedefine HAVE_U_INT8_T 1
 #cmakedefine HAVE_INT16_T 1
 #cmakedefine HAVE_UINT16_T 1
 #cmakedefine HAVE_U_INT16_T 1
@@ -43,10 +45,28 @@
 # include <stddef.h>
 #endif
 
+#ifdef HAVE_UINT8_T
+typedef uint8_t uint8;
+#else
+# ifdef HAVE_U_INT8_T
+typedef u_int8_t uint8;
+# else
+#  ifdef _WIN32
+typedef unsigned __int8 uint8;
+#  else
+typedef unsigned short uint8;
+#  endif
+# endif
+#endif
+
 #ifdef HAVE_INT16_T
 typedef int16_t int16;
 #else
-typedef short int16;
+# ifdef _WIN32
+typedef signed __int16 int16;
+# else
+typedef int int16;
+# endif
 #endif
 
 #ifdef HAVE_UINT16_T
@@ -55,14 +75,22 @@ typedef uint16_t uint16;
 # ifdef HAVE_U_INT16_T
 typedef u_int16_t uint16;
 # else
-typedef unsigned short uint16;
+#  ifdef _WIN32
+typedef unsigned __int16 uint16;
+#  else
+typedef unsigned int uint16;
+#  endif
 # endif
 #endif
 
 #ifdef HAVE_INT32_T
 typedef int32_t int32;
 #else
+# ifdef _WIN32
+typedef signed __int32 int32;
+# else
 typedef long int32;
+# endif
 #endif
 
 #ifdef HAVE_UINT32_T
@@ -71,8 +99,30 @@ typedef uint32_t uint32;
 # ifdef HAVE_U_INT32_T
 typedef u_int32_t uint32;
 # else
+#  ifdef _WIN32
+typedef unsigned __int32 uint32;
+#  else
 typedef unsigned long uint32;
+#  endif
 # endif
+#endif
+
+#ifdef _WIN32
+# ifdef MSVCPP
+#  define snprintf _snprintf
+# endif
+# define popen _popen
+# define pclose _pclose
+# define ftruncate _chsize
+# ifdef MSVCPP
+#  define PATH_MAX MAX_PATH
+# endif
+# define MAXPATHLEN MAX_PATH
+# define bzero(buf, size) memset(buf, 0, size)
+# ifdef MSVCPP
+#  define strcasecmp stricmp
+# endif
+# define sleep(x) Sleep(x * 1000)
 #endif
 
 #endif

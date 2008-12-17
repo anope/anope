@@ -100,7 +100,7 @@ DATDEST=$HOME/services
 RUNGROUP=
 UMASK=
 DEBUG="no"
-RUN_CC_PL="no"
+USE_RUN_CC_PL="no"
 CAN_QUICK="no"
 
 ###########################################################################
@@ -302,7 +302,7 @@ echo ""
 ####
 
 TEMP_YN="n"
-if [ "$RUN_CC_PL" = "yes" ] ; then
+if [ "$USE_RUN_CC_PL" = "yes" ] ; then
 	TEMP_YN="y"
 fi
 echo "You can optionally have the build run through run-cc.pl, which will"
@@ -314,9 +314,9 @@ echo2 "[$TEMP_YN] "
 read YN
 if [ "$YN" ] ; then
 	if [ "$YN" = "y" ] ; then
-		RUN_CC_PL="yes"
+		USE_RUN_CC_PL="yes"
 	else
-		RUN_CC_PL="no"
+		USE_RUN_CC_PL="no"
 	fi
 fi
 echo ""
@@ -335,7 +335,7 @@ DATDEST="$DATDEST"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
-RUN_CC_PL="$RUN_CC_PL"
+USE_RUN_CC_PL="$USE_RUN_CC_PL"
 EOT
 echo "done."
 

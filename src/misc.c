@@ -21,9 +21,9 @@
 #define issp(c) ((c) == 32)
 
 struct arc4_stream {
-	u_int8_t i;
-	u_int8_t j;
-	u_int8_t s[256];
+	uint8 i;
+	uint8 j;
+	uint8 s[256];
 } rs;
 
 /*************************************************************************/
@@ -931,7 +931,7 @@ static void arc4_init()
 static void arc4_addrandom(void *dat, int datlen)
 {
 	int n;
-	u_int8_t si;
+	uint8 si;
 
 	rs.i--;
 	for (n = 0; n < 256; n++) {
@@ -1034,9 +1034,9 @@ unsigned char getrandom8()
  * Get the random numbers 16 byte deep
  * @return char
  */
-u_int16_t getrandom16()
+uint16 getrandom16()
 {
-	u_int16_t val;
+	uint16 val;
 
 	val = getrandom8() << 8;
 	val |= getrandom8();
@@ -1049,9 +1049,9 @@ u_int16_t getrandom16()
  * Get the random numbers 32 byte deep
  * @return char
  */
-u_int32_t getrandom32()
+uint32 getrandom32()
 {
-	u_int32_t val;
+	uint32 val;
 
 	val = getrandom8() << 24;
 	val |= getrandom8() << 16;

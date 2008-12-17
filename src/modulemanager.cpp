@@ -111,10 +111,26 @@ static bool IsOneOfModuleTypeLoaded(MODType mt)
 	return false;
 }
 
+/* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
+ *
+ * This function will take a pointer from either dlsym or GetProcAddress and cast it in
+ * a way that won't cause C++ warnings/errors to come up.
+ */
+template <class TYPE>
+TYPE function_cast(ano_module_t symbol)
+{
+	union {
+		ano_module_t symbol;
+		TYPE function;
+	} cast;
+	cast.symbol = symbol;
+	return cast.function;
+}
+
 int ModuleManager::LoadModule(const std::string &modname, User * u)
 {
 	const char *err;
-	Module * (*func) (const std::string &);
+	Module *(*func)(const std::string &);
 	int ret = 0;
 
 	if (modname.empty())
@@ -158,7 +174,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 
 	ano_modclearerr();
-	func = reinterpret_cast<Module *(*)(const std::string &)>(ano_modsym(handle, "init_module"));
+	func = function_cast<Module *(*)(const std::string &)>(ano_modsym(handle, "init_module"));
 	if (func == NULL && (err = ano_moderr()) != NULL)
 	{
 		alog("No magical init function found, not an Anope module");
@@ -255,11 +271,11 @@ void ModuleManager::DeleteModule(Module *m)
 	handle = m->handle;
 
 	ano_modclearerr();
-	destroy_func = reinterpret_cast<void (*)(Module *)>(ano_modsym(m->handle, "destroy_module"));
+	destroy_func = function_cast<void (*)(Module *)>(ano_modsym(m->handle, "destroy_module"));
 	if (destroy_func == NULL && (err = ano_moderr()) != NULL)
 	{
 		alog("No magical destroy function found, chancing delete...");
-		delete m; /* we just have to change they haven't overwrote the delete operator then... */
+		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
 	}
 	else
 	{

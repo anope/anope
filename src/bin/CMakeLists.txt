@@ -1,8 +1,9 @@
-install(PROGRAMS anoperc
-  DESTINATION "${BINDIR}"
-)
-install(PROGRAMS mydbgen
-  DESTINATION "${DATADIR}"
-)
-
+if(NOT WIN32)
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
+    DESTINATION "${BINDIR}"
+  )
+  install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/mydbgen
+    DESTINATION "${DATADIR}"
+  )
+endif(NOT WIN32)
 

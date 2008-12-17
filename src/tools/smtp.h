@@ -14,6 +14,8 @@
 #ifndef SMTP_H
 #define SMTP_H
 
+#include "sysconf.h"
+
 /*************************************************************************/
 
 /* Some Linux boxes (or maybe glibc includes) require this for the
@@ -82,10 +84,10 @@ extern int connect(int, struct sockaddr *, int);
 #endif
 
 
-#ifdef _WIN32
+/*#ifdef _WIN32
 #define PATH_MAX 		MAX_PATH
 #define snprintf _snprintf
-#endif
+#endif*/
 
 
 /*************************************************************************/

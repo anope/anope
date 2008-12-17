@@ -19,8 +19,6 @@
 #include <cstdlib>
 #include <cctype>
 
-#define CTRL "version.log"
-
 long version_major, version_minor, version_patch, version_build, build;
 char *version_extra = NULL;
 char version[1024];
@@ -32,16 +30,20 @@ long get_value(char *);
 char *get_value_str(char *);
 char *strip(char *);
 void parse_version(FILE *);
-void write_version(FILE *);
+void write_version(FILE *, const char *);
 void parse_line(FILE *, char *);
 
-int main()
+int main(int argc, char *argv[])
 {
-	FILE *fd = fopen(CTRL, "r");
+	if (argc < 4) {
+		fprintf(stderr, "Syntax: %s <version.log> <version.sh> <version.h>\n", argv[0]);
+		exit(1);
+	}
+	FILE *fd = fopen(argv[1], "r");
 
 
 	if (!fd) {
-		fprintf(stderr, "Error: Unable to find control file: " CTRL "\n");
+		fprintf(stderr, "Error: Unable to find control file: %s\n", argv[1]);
 		exit(0);
 	}
 
@@ -54,7 +56,7 @@ int main()
 	_snprintf(version_dotted, 1024, "%ld.%ld.%ld%s.%ld", version_major, version_minor,
 			  version_patch, (version_extra ? version_extra : ""), version_build);
 
-	fd = fopen("version.h", "r");
+	fd = fopen(argv[3], "r");
 
 	if (fd) {
 		parse_version(fd);
@@ -63,10 +65,10 @@ int main()
 		build = 1;
 
 
-	fd = fopen("version.h", "w");
-	write_version(fd);
+	fd = fopen(argv[3], "w");
+	write_version(fd, argv[2]);
 	fclose(fd);
-	
+
 	if (version_extra)
 		free(version_extra);
 }
@@ -109,7 +111,7 @@ char *strip(char *str)
 long get_value(char *string)
 {
 	// XXX : if the fields in version.log are empty strtok returns a double quote, dont try to atol it then
-	if (*string != '"')
+	if (string[1] != '"')
 		return atol(get_value_str(string));
 	else
 		return 0;
@@ -118,6 +120,7 @@ long get_value(char *string)
 char *get_value_str(char *string)
 {
 	int len;
+	char *newstr;
 
 	if (*string == '"')
 		string++;
@@ -128,7 +131,10 @@ char *get_value_str(char *string)
 		string[len - 1] = 0;
 	if (!*string)
 		return NULL;
-	return strdup(string);
+	newstr = (char *)malloc(len + 1);
+	strcpy(newstr, string);
+	return newstr;
+	//return strdup(string);
 }
 
 void parse_version(FILE * fd)
@@ -161,9 +167,9 @@ void parse_version(FILE * fd)
 	build = 1;
 }
 
-void write_version(FILE * fd)
+void write_version(FILE * fd, const char *input)
 {
-	FILE *fdin = fopen("include\\version.sh", "r");
+	FILE *fdin = fopen(input, "r");
 	char buf[1024];
 	short until_eof = 0;
 
@@ -178,7 +184,7 @@ void write_version(FILE * fd)
 				parse_line(fd, buf);
 		}
 
-		if (!strcmp(buf, "cat >version.h <<EOF"))
+		if (!strcmp(buf, "cat >$VERSIONH <<EOF"))
 			until_eof = 1;
 	}
 
@@ -221,7 +227,7 @@ void parse_line(FILE * fd, char *line)
 					fprintf(fd, "%s", version);
 				else if (!strcmp(varbegin, "VERSIONDOTTED"))
 					fprintf(fd, "%s", version_dotted);
-				fputc(tmp, fd);
+				if (tmp) fputc(tmp, fd);
 			}
 			c = var;
 		} else

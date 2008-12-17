@@ -24,10 +24,10 @@ typedef HMODULE ano_module_t;
 
 #define ano_modopen(file)		LoadLibrary(file)
 /* ano_moderr in modules.c */
-#define ano_modsym(file, symbol)	(void *)GetProcAddress(file, symbol)
+#define ano_modsym(file, symbol)	(HMODULE)GetProcAddress(file, symbol)
 #define ano_modclose(file)		FreeLibrary(file) ? 0 : 1
 #define ano_modclearerr()		SetLastError(0)
-#define MODULE_EXT			".dll"
+#define MODULE_EXT			".so"
 
 #else
 typedef void *	ano_module_t;

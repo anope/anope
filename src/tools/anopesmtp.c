@@ -20,7 +20,7 @@ static int curday = 0;
 
 /*************************************************************************/
 
-#ifdef _WIN32
+/*#ifdef _WIN32
 int strcasecmp(const char *s1, const char *s2)
 {
 	register int c;
@@ -35,7 +35,7 @@ int strcasecmp(const char *s1, const char *s2)
 		return -1;
 	return 1;
 }
-#endif
+#endif*/
 
 static int get_logname(char *name, int count, struct tm *tm)
 {

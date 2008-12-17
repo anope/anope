@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * Written by Dominick Meglio <codemastr@unrealircd.com>
  *
  */
@@ -29,14 +29,14 @@ char *strip(char *str)
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2)
+	if (argc < 4)
 		exit(1);
 
 	/* Build the index file */
 	if (!strcmp(argv[1], "index"))
 	{
-		FILE *fd = fopen("en_us.l", "rb");
-		FILE *fdout = fopen("index", "wb");
+		FILE *fd = fopen(argv[2], "rb");
+		FILE *fdout = fopen(argv[3], "wb");
 		char buf[1024];
 		if (!fd || !fdout)
 			exit(2);
@@ -52,10 +52,10 @@ int main(int argc, char *argv[])
 	/* Build the language.h file */
 	else if (!strcmp(argv[1], "language.h"))
 	{
-		FILE *fd = fopen("index", "r");
-		FILE *fdout = fopen("language.h", "w");
+		FILE *fd = fopen(argv[2], "r");
+		FILE *fdout = fopen(argv[3], "w");
 		char buf[1024];
-		int i = 0;		
+		int i = 0;
 
 		if (!fd || !fdout)
 			exit(2);
@@ -72,5 +72,5 @@ int main(int argc, char *argv[])
 		fclose(fdout);
 	}
 	return 0;
-			
+
 }

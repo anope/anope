@@ -55,11 +55,11 @@
 #ifndef _WIN32
 #include <unistd.h>
 #else
-#include "sysconf.h"
 #include <windows.h>
 #include <io.h>
 #define open _open
 #endif
+#include "sysconf.h"
 
 /* Some SUN fixs */
 #ifdef __sun
@@ -131,10 +131,6 @@
 	} \
 } while (0)
 
-typedef int16_t int16;
-typedef u_int16_t uint16;
-typedef int32_t int32;
-typedef u_int32_t uint32;
 typedef struct memo_ Memo;
 typedef struct dbFILE_ dbFILE;
 typedef struct nickalias_ NickAlias;
@@ -270,7 +266,7 @@ struct botinfo_ {
 struct badword_ {
 	uint16 in_use;
 	char *word;
-	uint16 type;	
+	uint16 type;
 };
 
 struct hostcore_ {
@@ -575,7 +571,7 @@ int main(int argc, char *argv[])
 								scanf("%s", input);
 							}
 							if (input[0] == '1') { /* get alias #2 out of the list, then free() it, then add #1 to the list */
-								printf("Deleting nick alias %s (#2).\n", naptr->nick); 
+								printf("Deleting nick alias %s (#2).\n", naptr->nick);
 								naptr->nc->aliascount--; /* tell the core it has one alias less */
 								delnick(naptr, 0); /* removes the alias from the list and free()s it */
 								na->nc = ncptr;
@@ -620,7 +616,7 @@ int main(int argc, char *argv[])
 					free(s);
 				} /* getc_db() */
 			} /* for() loop */
-			close_db(f); /* End of section Ib */   
+			close_db(f); /* End of section Ib */
 		} else
 			nonick = 1;
 	}
@@ -632,7 +628,7 @@ int main(int argc, char *argv[])
 		for (NickCore *nc = nclists[i]; nc; nc = ncnext) {
 			ncnext = nc->next;
 			if (nc->aliascount < 1) {
-				printf("Deleting core %s (%s).\n", nc->display, nc->email); 
+				printf("Deleting core %s (%s).\n", nc->display, nc->email);
 				delcore(nc);
 			}
 		}
@@ -718,7 +714,7 @@ int main(int argc, char *argv[])
 
 			last = &chanlists[i];
 			prev = NULL;
-		
+
 			while ((c = getc_db(f)) == 1) {
 				int j;
 

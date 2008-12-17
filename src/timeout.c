@@ -17,6 +17,8 @@
 
 static Timeout *timeouts = NULL;
 
+typedef void (*voidF)();
+
 /*************************************************************************/
 
 /* Check the timeout list for any pending actions. */
@@ -37,7 +39,7 @@ void check_timeouts()
 		}
 		if (debug >= 4) {
 			alog("debug: Running timeout 0x%p (code=0x%p repeat=%d)",
-				 static_cast<void *>(to), reinterpret_cast<void *>(to->code), to->repeat);
+				 static_cast<void *>(to), reinterpret_cast<voidF>(to->code), to->repeat);
 		}
 		to->code(to);
 		if (to->repeat) {

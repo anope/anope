@@ -25,10 +25,10 @@
 #ifndef _WIN32
 #include <unistd.h>
 #else
-#include "sysconf.h"
 #include <windows.h>
 #include <io.h>
 #endif
+#include "sysconf.h"
 
 #include <string>
 #include <iostream>
@@ -63,10 +63,6 @@
 	} \
 } while (0)
 
-typedef int16_t int16;
-typedef u_int16_t uint16;
-typedef int32_t int32;
-typedef u_int32_t uint32;
 typedef struct memo_ Memo;
 typedef struct dbFILE_ dbFILE;
 typedef struct nickalias_ NickAlias;

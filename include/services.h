@@ -81,7 +81,7 @@
 #include <sys/stat.h>	/* for umask() on some systems */
 #include <sys/types.h>
 
-#ifndef _WIN32
+#ifdef HAVE_GETTIMEOFDAY
 #include <sys/time.h>
 #endif
 
@@ -197,7 +197,8 @@ extern int strncasecmp(const char *, const char *, size_t);
  */
 #ifdef _WIN32
 	#define MODULE_INIT(x, y) \
-		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" DllExport Module *init_module(const std::string &, const std::string &); \
+		extern "C" Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
 			return new y(x, creator); \
 		} \
@@ -211,9 +212,10 @@ extern int strncasecmp(const char *, const char *, size_t);
 			} \
 			return TRUE; \
 		} \
-		extern "C" DllExport void destroy_module(y *m) \
+		extern "C" DllExport void destroy_module(y *); \
+		extern "C" void destroy_module(y *m) \
 		{ \
-		    delete m; \
+			delete m; \
 		}
 
 #else

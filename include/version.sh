@@ -3,8 +3,8 @@
 # Build version string and increment Services build number.
 #
 
-if [ $# -lt 1 ] ; then
-	echo "Syntax: $0 <version.log>"
+if [ $# -lt 2 ] ; then
+	echo "Syntax: $0 <version.log> <version.h>"
 	exit 1
 fi
 # Grab version information from the version control file.
@@ -19,8 +19,9 @@ fi
 VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA} (${VERSION_BUILD})"
 VERSIONDOTTED="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA}.${VERSION_BUILD}"
 
-if [ -f version.h ] ; then
-	BUILD=`fgrep '#define BUILD' version.h | cut -f2 -d\"`
+VERSIONH="$2"
+if [ -f $VERSIONH ] ; then
+	BUILD=`fgrep '#define BUILD' $VERSIONH | cut -f2 -d\"`
 	BUILD=`expr $BUILD + 1 2>/dev/null`
 else
 	BUILD=1
@@ -28,7 +29,7 @@ fi
 if [ ! "$BUILD" ] ; then
 	BUILD=1
 fi
-cat >version.h <<EOF
+cat >$VERSIONH <<EOF
 /* Version information for Services.
  *
  * (C) 2003-2008 Anope Team

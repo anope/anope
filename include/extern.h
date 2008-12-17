@@ -670,8 +670,8 @@ E int nickIsServices(const char *nick, int bot);
 E void add_entropy_userkeys();
 E void rand_init();
 E unsigned char getrandom8();
-E u_int16_t getrandom16();
-E u_int32_t getrandom32();
+E uint16 getrandom16();
+E uint32 getrandom32();
 
 E char *str_signed(unsigned char *str);
 

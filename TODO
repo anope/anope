@@ -30,6 +30,7 @@ Legend:
 [x] Remove old (prior to 1.8.0) db compat
 [x] Establish a proper base for services pseudoclients
   [x] add ss_main StatServ Hal9000 to play with :)
+[x] burn automake with fire (CBX)
 
 1.9.1
 -----
@@ -51,7 +52,6 @@ Legend:
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 [ ] Add support for +k, +q, etc type umodes
-[ ] burn automake with fire (1.9.1?)
 
 1.9.2
 -----
@@ -63,6 +63,7 @@ Legend:
 [ ] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
 [?] Remote identification (1.9.1? will this break stuff?)
   [ ] Requires a rejig of how Alias vs Core works
+[ ] Language charset stuff, including collation (1.9.1? phoenix?)
 
 Future
 ------

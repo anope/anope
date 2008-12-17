@@ -1167,6 +1167,10 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
 {
 	User *u = find_byuid(source);
 	BotInfo *bi = findbot(av[0]);
+
+	if (!u)
+		return; // likely a message from a server, which can happen.
+
 	m_privmsg(u->nick, bi ? bi->nick: av[0], av[1]);
 	return MOD_CONT;
 }

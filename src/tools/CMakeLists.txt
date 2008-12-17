@@ -1,0 +1,57 @@
+#if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+#else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+#  file(RELATIVE_PATH DIR ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+#  set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${DIR})
+#endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+
+set(TOOLS_SRCS anopesmtp.c db-convert.c db-merger.c)
+list(SORT TOOLS_SRCS)
+
+set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+
+set(anopesmtp.c_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/smtp.h)
+set(db-convert.c_HEADERS sysconf.h)
+set(db-merger.c_HEADERS sysconf.h)
+
+foreach(SRC ${TOOLS_SRCS})
+  #string(REGEX REPLACE "\\." "_" SRC_TARGET ${SRC})
+  string(REGEX REPLACE "\\.cpp$" ".x" SRC_X ${SRC})
+  string(REGEX REPLACE "\\.c$" ".o" SRC_O ${SRC_X})
+  string(REGEX REPLACE "\\.x$" ".o" OBJ ${SRC_O})
+  string(REGEX REPLACE "\\.o$" "" EXE ${OBJ})
+  #string(REGEX REPLACE "\\." "_" OBJ_TARGET ${OBJ})
+  #set(SRC_OBJS ${SRC_OBJS} ${BUILD_DIR}/${OBJ})
+  set(TOOLS ${TOOLS} ${EXE})
+  #add_custom_command(OUTPUT ${BUILD_DIR}/${OBJ}
+  #  COMMAND ${MY_COMPILER} ${MY_COMP_ARG} ${CMAKE_CXX_CFLAGS} -I${Anope_SOURCE_DIR}/include -c ${SRC} -o ${BUILD_DIR}/${OBJ}
+  #  MAIN_DEPENDENCY ${SRC}
+  #)
+  #add_custom_target(src_${OBJ_TARGET} DEPENDS ${BUILD_DIR}/${OBJ})
+  #add_custom_target(src_${SRC_TARGET} DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
+  #add_dependencies(src_srcs src_${SRC_TARGET})
+  set(HEADERS)
+  if(${SRC}_HEADERS)
+    foreach(HEADER ${${SRC}_HEADERS})
+      string(SUBSTRING ${HEADER} 0 1 FIRST_CHAR)
+      if(FIRST_CHAR STREQUAL "/")
+        set(HEADERS ${HEADERS} ${HEADER})
+      else(FIRST_CHAR STREQUAL "/")
+        set(HEADERS ${HEADERS} ${Anope_SOURCE_DIR}/include/${HEADER})
+      endif(FIRST_CHAR STREQUAL "/")
+    endforeach(HEADER)
+  endif(${SRC}_HEADERS)
+  if(HEADERS)
+    set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS}")
+  endif(HEADERS)
+  add_executable(${EXE} ${SRC})
+  add_dependencies(${EXE} services)
+  #set_target_properties(${EXE} PROPERTIES COMPILE_FLAGS ${CXXFLAGS})
+  install(TARGETS ${EXE}
+    DESTINATION "${BINDIR}/tools"
+  )
+endforeach(SRC)
+
+if(RUNGROUP)
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"${BINDIR}/tools\")")
+endif(RUNGROUP)

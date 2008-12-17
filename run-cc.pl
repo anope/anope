@@ -151,8 +151,6 @@ die "Cannot fork to start $cc! $!\n" unless defined($pid);
 
 if ($pid) {
 
-	printf "\t\e[1;32m%-20s\e[0m%s\n", $action . ":", $name unless $name eq "";
-
 	my $fail = 0;
 	# Parent - Close child-side pipes.
 	close $w_stderr;

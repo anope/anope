@@ -3,8 +3,12 @@
 # Build version string and increment Services build number.
 #
 
+if [ $# -lt 1 ] ; then
+	echo "Syntax: $0 <version.log>"
+	exit 1
+fi
 # Grab version information from the version control file.
-CTRL="../version.log"
+CTRL="$1"
 if [ -f $CTRL ] ; then
 	. $CTRL
 else
@@ -16,7 +20,7 @@ VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA} (${V
 VERSIONDOTTED="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA}.${VERSION_BUILD}"
 
 if [ -f version.h ] ; then
-	BUILD=`fgrep '#define BUILD' version.h | sed 's/^#define BUILD.*\([0-9]*\).*$/\1/'`
+	BUILD=`fgrep '#define BUILD' version.h | cut -f2 -d\"`
 	BUILD=`expr $BUILD + 1 2>/dev/null`
 else
 	BUILD=1

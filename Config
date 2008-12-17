@@ -14,73 +14,80 @@
 ###########################################################################
 
 echo2 () {
-    $ECHO2 "$*$ECHO2SUF"    # these are defined later
+	$ECHO2 "$*$ECHO2SUF" # these are defined later
 }
 
-exists () {                     # because some shells don't have test -e
-    if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
-        return 0
-    else
-        return 1
-    fi
+exists () { # because some shells don't have test -e
+	if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 Load_Cache () {
-    if [ -f config.cache -a -r config.cache -a ! "$IGNORE_CACHE" ] ; then
-        echo "Using defaults from config.cache. To ignore, ./Config -nocache"
-        echo ""
-        . config.cache
-        CAN_QUICK="yes"
-    else
-        CAN_QUICK="no"
-    fi
+	if [ -f config.cache -a -r config.cache -a ! "$IGNORE_CACHE" ] ; then
+		echo "Using defaults from config.cache. To ignore, ./Config -nocache"
+		echo ""
+		. config.cache
+		CAN_QUICK="yes"
+	else
+		CAN_QUICK="no"
+	fi
 }
 
-Run_Configure () {
-WITH_BIN=""
-WITH_DATA=""
-WITH_ENC=""
-WITH_RUN=""
-WITH_PERM=""
-WITH_MYSQL=""
+Run_CMake () {
+	WITH_BIN=""
+	WITH_DATA=""
+	WITH_RUN=""
+	WITH_PERM=""
+	BUILD_TYPE=""
+	RUN_CC_PL=""
 
-if [ "$BINDEST" != "" ] ; then
-    WITH_BIN=" --with-bindir=$BINDEST"
-    WITH_DATA=" --with-datadir=$DATDEST"
-fi
+	if [ "$BINDEST" != "" ] ; then
+		WITH_BIN="-DBINDIR:STRING=$BINDEST"
+		WITH_DATA="-DDATADIR:STRING=$DATDEST"
+	fi
 
-if [ "$DATDEST" != "" ] ; then
-    WITH_DATA=" --with-datadir=$DATDEST"
-fi
+	if [ "$DATDEST" != "" ] ; then
+		WITH_DATA="-DDATADIR:STRING=$DATDEST"
+	fi
 
-if [ "$RUNGROUP" != "" ] ; then
-    WITH_RUN="  --with-rungroup=$RUNGROUP"
-fi
+	if [ "$RUNGROUP" != "" ] ; then
+		WITH_RUN="-DRUNGROUP:STRING=$RUNGROUP"
+	fi
 
-if [ "$UMASK" != "" ] ; then
-    WITH_PERM=" --with-permissions=$UMASK"
-fi
+	if [ "$UMASK" != "" ] ; then
+		WITH_PERM="-DDEFUMASK:STRING=$UMASK"
+	fi
 
-if [ "$MYSQL" != "yes" ] ; then
-    WITH_MYSQL=" --without-mysql"
-fi
+	if [ "$DEBUG" = "yes" ] ; then
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
+	else
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
+	fi
 
+	if [ "$USE_RUN_CC_PL" = "yes" ] ; then
+		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
+	else
+		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
+	fi
 
-echo "./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_RUN $WITH_PERM $WITH_MYSQL --with-debugsym"
+	echo "cmake $WITH_BIN $WITH_DATA $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL ."
 
-./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_RUN $WITH_PERM $WITH_MYSQL
+	cmake $WITH_BIN $WITH_DATA $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL .
 }
 
 ECHO2SUF=''
 if [ "`echo -n a ; echo -n b`" = "ab" ] ; then
 	ECHO2='echo -n'
 elif [ "`echo 'a\c' ; echo 'b\c'`" = "ab" ] ; then
-        ECHO2='echo' ; ECHO2SUF='\c'
+		ECHO2='echo' ; ECHO2SUF='\c'
 elif [ "`printf 'a' 2>&1 ; printf 'b' 2>&1`" = "ab" ] ; then
-        ECHO2='printf "%s"'
+		ECHO2='printf "%s"'
 else
-        # oh well...
-        ECHO2='echo'
+		# oh well...
+		ECHO2='echo'
 fi
 export ECHO2 ECHO2SUF
 
@@ -92,46 +99,49 @@ BINDEST=$HOME/services
 DATDEST=$HOME/services
 RUNGROUP=
 UMASK=
-IRCTYPE="no default"
+DEBUG="no"
+RUN_CC_PL="no"
 CAN_QUICK="no"
 
 ###########################################################################
 # Check out the options
 ###########################################################################
+
 while [ $# -ge 1 ] ; do
-        if [ $1 = "--help" ] ; then
-                echo "Config utility for Anope"
-                echo "------------------------"
-                echo "Syntax: ./Config [options]"
-                echo "-nocache     Ignore settings saved in config.cache"
-                echo "-nointro     Skip intro (disclaimer, etc)"
-                echo "-quick       Skip questions, go straight to configure"
-                exit 0
-        elif [ $1 = "-nocache" ] ; then
-                IGNORE_CACHE="1"
-        elif [ $1 = "-nointro" ] ; then
-                NO_INTRO="1"
-        elif [ $1 = "-quick" -o $1 = "-q" ] ; then
-                Load_Cache
-                if [ $CAN_QUICK = "yes" ] ; then
-                    Run_Configure
-                else
-                    echo ""
-                    echo "Can't find cache file (config.cache), aborting..."
-                fi
-                exit 0
-        fi
-        shift 1
+		if [ $1 = "--help" ] ; then
+				echo "Config utility for Anope"
+				echo "------------------------"
+				echo "Syntax: ./Config [options]"
+				echo "-nocache     Ignore settings saved in config.cache"
+				echo "-nointro     Skip intro (disclaimer, etc)"
+				echo "-quick       Skip questions, go straight to cmake"
+				exit 0
+		elif [ $1 = "-nocache" ] ; then
+				IGNORE_CACHE="1"
+		elif [ $1 = "-nointro" ] ; then
+				NO_INTRO="1"
+		elif [ $1 = "-quick" -o $1 = "-q" ] ; then
+				Load_Cache
+				if [ "$CAN_QUICK" = "yes" ] ; then
+					Run_CMake
+				else
+					echo ""
+					echo "Can't find cache file (config.cache), aborting..."
+				fi
+				exit 0
+		fi
+		shift 1
 done
 
 ###########################################################################
+
 if [ ! "$NO_INTRO" ] ; then
-        clear
+		clear
 		. ./version.log
-        cat .BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | more
-        echo ""
+		cat .BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | more
+		echo ""
 else
-        echo ""
+		echo ""
 fi
 
 echo "Beginning Services configuration."
@@ -140,8 +150,9 @@ echo ""
 ###########################################################################
 # Load the cache
 ###########################################################################
+
 if [ ! "$IGNORE_CACHE" ] ; then
-        Load_Cache
+		Load_Cache
 fi
 
 # Ask the user anything we need to know ahead of time.
@@ -188,29 +199,29 @@ echo ""
 ok=0
 echo "Where do you want the data files to be installed?"
 while [ $ok -eq 0 ] ; do
-        echo2 "[$DATDEST] "
-        if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-        if [ ! "$INPUT" ] ; then
-                INPUT=$DATDEST
-        fi
-        if [ ! -d "$INPUT" ] ; then
-                if exists "$INPUT" ; then
-                        echo "$INPUT exists, but is not a directory!"
-                else
-                        echo "$INPUT does not exist.  Create it?"
-                        echo2 "[y] "
-                        read YN
-                        if [ "$YN" != "n" ] ; then
-                                if mkdir -p $INPUT ; then
-                                        ok=1
-                                fi
-                        fi
-                fi
-        elif exists "$INPUT/include/services.h" ; then
-                echo "You cannot use the Services source directory as a target directory."
-        else
-                ok=1
-        fi
+		echo2 "[$DATDEST] "
+		if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+		if [ ! "$INPUT" ] ; then
+				INPUT=$DATDEST
+		fi
+		if [ ! -d "$INPUT" ] ; then
+				if exists "$INPUT" ; then
+						echo "$INPUT exists, but is not a directory!"
+				else
+						echo "$INPUT does not exist.  Create it?"
+						echo2 "[y] "
+						read YN
+						if [ "$YN" != "n" ] ; then
+								if mkdir -p $INPUT ; then
+										ok=1
+								fi
+						fi
+				fi
+		elif exists "$INPUT/include/services.h" ; then
+				echo "You cannot use the Services source directory as a target directory."
+		else
+				ok=1
+		fi
 done
 DATDEST=$INPUT
 echo ""
@@ -220,91 +231,102 @@ echo ""
 
 OLD_RUNGROUP="$RUNGROUP"
 if [ "$RUNGROUP" ] ; then
-  echo "Which group should all Services data files be owned by?  (If Services"
-  echo "should not force files to be owned by a particular group, type "\"none\"
-  echo "(without the quotes) and press Return.)"
+	echo "Which group should all Services data files be owned by?  (If Services"
+	echo "should not force files to be owned by a particular group, type \"none\""
+	echo "(without the quotes) and press Return.)"
 else
-  echo "Which group should all Services data files be owned by?  (If Services"
-  echo "should not force files to be owned by a particular group, just press"
-  echo "Return.)"
+	echo "Which group should all Services data files be owned by?  (If Services"
+	echo "should not force files to be owned by a particular group, just press"
+	echo "Return.)"
 fi
 echo2 "[$RUNGROUP] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
-        if [ "$INPUT" = "none" ] ; then
-                RUNGROUP=""
-        else
-                RUNGROUP="$INPUT"
-        fi
+		if [ "$INPUT" = "none" ] ; then
+				RUNGROUP=""
+		else
+				RUNGROUP="$INPUT"
+		fi
 fi
 echo ""
 
 ####
 
 if [ ! "$UMASK" -o "$RUNGROUP" != "$OLD_RUNGROUP" ] ; then
-        if [ "$RUNGROUP" ] ; then
-                UMASK=007
-        else
-                UMASK=077
-        fi
+		if [ "$RUNGROUP" ] ; then
+				UMASK=007
+		else
+				UMASK=077
+		fi
 fi
 
 ok=0
 echo "What should the default umask for data files be (in octal)?"
 echo "(077 = only accessible by owner; 007 = accessible by owner and group)"
 while [ $ok -eq 0 ] ; do
-        echo2 "[$UMASK] "
-        if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-        if [ ! "$INPUT" ] ; then
-                INPUT=$UMASK
-        fi
-        if [ `echo "$INPUT" | grep -c '[^0-7]'` -gt 0 ] ; then
-                echo "$UMASK is not a valid octal number!"
-        else
-                if [ "`echo $INPUT | cut -c1`" != "0" ] ; then
-                        INPUT=0$INPUT
-                fi
-                ok=1
-        fi
+		echo2 "[$UMASK] "
+		if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+		if [ ! "$INPUT" ] ; then
+				INPUT=$UMASK
+		fi
+		if [ `echo "$INPUT" | grep -c '[^0-7]'` -gt 0 ] ; then
+				echo "$UMASK is not a valid octal number!"
+		else
+				if [ "`echo $INPUT | cut -c1`" != "0" ] ; then
+						INPUT=0$INPUT
+				fi
+				ok=1
+		fi
 done
 UMASK=$INPUT
 echo ""
 
 ####
 
-ok=0
-DEF=yes
-echo "Allow anope to automatically check for mysql libaries?"
-echo "unless you get errors with make, there is no need to"
-echo "change this setting."
-while [ $ok -eq 0 ] ; do
-        echo2 "[$DEF] "
-        if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-        if [ ! "$INPUT" ] ; then
-                INPUT=$DEF
-        fi
-        case $INPUT in
-                n*|N*)
-			MYSQL=
-			ok=1
-			;;
-                y*|Y*)
-			MYSQL="yes"
-			ok=1
-			;;
-                *)
-                        echo "Please enter 'yes' or 'no'."
-                        ;;
-        esac
-done
+TEMP_YN="n"
+if [ "$DEBUG" = "yes" ] ; then
+	TEMP_YN="y"
+fi
+echo "Would you like to build a debug version of Anope?"
+echo2 "[$TEMP_YN] "
+read YN
+if [ "$YN" ] ; then
+	if [ "$YN" = "y" ] ; then
+		DEBUG="yes"
+	else
+		DEBUG="no"
+	fi
+fi
 echo ""
 
 ####
 
+TEMP_YN="n"
+if [ "$RUN_CC_PL" = "yes" ] ; then
+	TEMP_YN="y"
+fi
+echo "You can optionally have the build run through run-cc.pl, which will"
+echo "cause warnings and errors (if any) to be colored yellow and run,"
+echo "respectively. This relies on Perl being installed, so if you say yes"
+echo "to this without Perl, the option will be ignored."
+echo "Would you like to utilize run-cc.pl?"
+echo2 "[$TEMP_YN] "
+read YN
+if [ "$YN" ] ; then
+	if [ "$YN" = "y" ] ; then
+		RUN_CC_PL="yes"
+	else
+		RUN_CC_PL="no"
+	fi
+fi
+echo ""
+
+####
 
 ################################################################################
 # Store values
 ################################################################################
+
 echo2 "Saving configuration results in config.cache... "
 
 cat <<EOT >config.cache
@@ -312,9 +334,8 @@ BINDEST="$BINDEST"
 DATDEST="$DATDEST"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
-IRCTYPE="$IRCTYPE"
-IRCTYPE_DEF="$IRCTYPE_DEF"
-MYSQL="$MYSQL"
+DEBUG="$DEBUG"
+RUN_CC_PL="$RUN_CC_PL"
 EOT
 echo "done."
 
@@ -322,4 +343,5 @@ echo "done."
 ################################################################################
 # Build the configure string
 ################################################################################
-Run_Configure
+
+Run_CMake

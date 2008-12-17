@@ -7,7 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- * 
+ *
  * $Id$
  *
  */
@@ -165,8 +165,8 @@ char *anopeStrDup(const char *src) {
 /*************************************************************************/
 int main(int ac, char **av)
 {
-	char *filename = NULL, *s;
-	char langname[254], outfile[256];
+	char *filename = NULL, *s, *outfile;
+	//char langname[254], outfile[256];
 	FILE *in, *out;
 	int warn = 0;
 	int retval = 0;
@@ -175,24 +175,25 @@ int main(int ac, char **av)
 	int pos;
 	int maxerr = 50;	/* Max errors before we bail out */
 
-	if (ac >= 2 && strcmp(av[1], "-w") == 0) {
+	if (ac >= 3 && strcmp(av[2], "-w") == 0) {
 	warn = 1;
-	av[1] = av[2];
+	av[2] = av[3];
 	ac--;
 	}
-	if (ac != 2) {
-	fprintf(stderr, "Usage: %s [-w] <lang-file>\n", av[0]);
+	if (ac != 3) {
+	fprintf(stderr, "Usage: %s [-w] <lang-file> <out-file>\n", av[0]);
 	return 1;
 	}
 	filename = av[1];
-	s = strrchr(filename, '.');
+	/*s = strrchr(filename, '.');
 	if (!s)
 	s = filename + strlen(filename);
 	if (s-filename > (int)sizeof(langname)-3)
 	s = filename + sizeof(langname)-1;
 	strncpy(langname, filename, s-filename);
 	langname[s-filename] = '\0';
-	snprintf(outfile, sizeof(outfile), "%s", langname);
+	snprintf(outfile, sizeof(outfile), "%s", langname);*/
+	outfile = av[2];
 
 	if (read_index_file() < 0)
 	return 1;
@@ -243,7 +244,7 @@ int main(int ac, char **av)
 
 		if (maxerr == 0)
 		fprintf(stderr, "%s:%d: Too many errors!\n", filename, linenum);
-		
+
 	}
 	}
 

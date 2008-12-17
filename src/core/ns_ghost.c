@@ -75,11 +75,7 @@ int do_ghost(User * u)
 		int res = enc_check_password(pass, na->nc->pass);
 		if (res == 1) {
 			char buf[NICKMAX + 32];
-			snprintf(buf, sizeof(buf), "GHOST command used by %s",
-					 u->nick);
-			if (LimitSessions) {
-				del_session(u2->host);
-			}
+			snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);
 			kill_user(s_NickServ, nick, buf);
 			notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
 		} else {
@@ -94,11 +90,7 @@ int do_ghost(User * u)
 		if (group_identified(u, na->nc)
 			|| (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
 			char buf[NICKMAX + 32];
-			snprintf(buf, sizeof(buf), "GHOST command used by %s",
-					 u->nick);
-			if (LimitSessions) {
-				del_session(u2->host);
-			}
+			snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);
 			kill_user(s_NickServ, nick, buf);
 			notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
 		} else {

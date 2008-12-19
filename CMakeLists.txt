@@ -2,15 +2,11 @@
 cmake_minimum_required(VERSION 2.4.4 FATAL_ERROR)
 
 # Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
-if(CMAKE_MAJOR_VERSION GREATER 2)
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER TRUE)
-else(CMAKE_MAJOR_VERSION GREATER 2)
-  if(CMAKE_MINOR_VERSION GREATER 5)
-    set(CMAKE26_OR_BETTER TRUE)
-  else(CMAKE_MINOR_VERSION GREATER 5)
-    set(CMAKE26_OR_BETTER FALSE)
-  endif(CMAKE_MINOR_VERSION GREATER 5)
-endif(CMAKE_MAJOR_VERSION GREATER 2)
+else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+  set(CMAKE26_OR_BETTER FALSE)
+endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
@@ -193,6 +189,28 @@ macro(read_from_file FILE REGEX STRINGS)
   set(${STRINGS} ${RESULT})
 endmacro(read_from_file)
 
+# A macro to handle searching within a list
+macro(find_in_list LIST ITEM_TO_FIND FOUND)
+  if(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+    # For CMake 2.6.x or better (as well as CMake 2.4.8 or better), we can use the FIND sub-command of list()
+    list(FIND ${LIST} ${ITEM_TO_FIND} ITEM_FOUND)
+  else(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+    # For CMake 2.4.x before 2.4.8, we have to do this ourselves (NOTE: This is very slow due to a lack of break() as well), firstly we set that we a temporary boolean
+    set(ITEM_FOUND -1)
+    set(POS 0)
+    # Iterate through the list
+    foreach(ITEM ${${LIST}})
+      # If the item we are looking at is the item we are trying to find, set that we've found the item
+      if(${ITEM} STREQUAL ${ITEM_TO_FIND})
+        set(ITEM_FOUND ${POS})
+      endif(${ITEM} STREQUAL ${ITEM_TO_FIND})
+      math(EXPR POS "${POS} + 1")
+    endforeach(ITEM)
+  endif(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+  # Set the given FOUND variable to the result
+  set(${FOUND} ${ITEM_FOUND})
+endmacro(find_in_list)
+
 # A macro to handle removing duplicates from a list
 macro(remove_list_duplicates LIST)
   if(CMAKE26_OR_BETTER)
@@ -204,7 +222,7 @@ macro(remove_list_duplicates LIST)
     # Iterate through the old list
     foreach(ITEM ${${LIST}})
       # Check if the item is in the new list
-      list(FIND NEW_LIST ${ITEM} FOUND_ITEM)
+      find_in_list(NEW_LIST ${ITEM} FOUND_ITEM)
       if(FOUND_ITEM EQUAL -1)
         # If the item was not found, append it to the list
         list(APPEND NEW_LIST ${ITEM})

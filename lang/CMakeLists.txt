@@ -13,19 +13,19 @@ if(NOT GREP OR NOT PERL)
   set_target_properties(langtool PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
 endif(NOT GREP OR NOT PERL)
 
-# If grep exists, use it to generate the index file
-if(GREP)
+# If grep exists (and we aren't using Visual Studio, it hates this), use it to generate the index file
+if(NOT MSVC AND GREP)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/index
     COMMAND ${GREP} '^[A-Z]' ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l > ${CMAKE_CURRENT_BINARY_DIR}/index
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l
   )
 # Otherwise, use langtool to generate the index file
-else(GREP)
+else(NOT MSVC AND GREP)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/index
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/langtool index ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l ${CMAKE_CURRENT_BINARY_DIR}/index
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l DEPENDS langtool
   )
-endif(GREP)
+endif(NOT MSVC AND GREP)
 
 # Find all the *.l files within the current source directory, and sort the list
 file(GLOB LANG_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.l")

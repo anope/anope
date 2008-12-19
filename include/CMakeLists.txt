@@ -4,7 +4,7 @@ if(MSVC OR NOT SH)
   set_source_files_properties(version.sh.c PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
   # Generate version_sh executable to create version.h from the contents of version.sh, setting it's linker flags as well
   add_executable(version_sh version.sh.c)
-  set_target_properties(version_sh PROPERTIES LINK_FLAGS "${LDFLAGS}")
+  set_target_properties(version_sh PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
   # Generate version.h from the above executable and the version.log file from the main source directory, with dependencies to the given headers and all source files in the main Anope build
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
     COMMAND version_sh ${Anope_SOURCE_DIR}/version.log ${CMAKE_CURRENT_SOURCE_DIR}/version.sh ${CMAKE_CURRENT_BINARY_DIR}/version.h

@@ -39,7 +39,7 @@ endif(WIN32)
 
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
-set_target_properties(${PROGRAM_NAME} PROPERTIES LINK_FLAGS "${LDFLAGS}" ENABLE_EXPORTS ON)
+set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}" ENABLE_EXPORTS ON)
 # On Windows, also link Anope to the wsock32 library, as well as set the version
 if(WIN32)
   target_link_libraries(${PROGRAM_NAME} wsock32)

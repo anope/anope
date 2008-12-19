@@ -1,5 +1,16 @@
-# This usage of CMake requires at least version 2.6 (I don't know if it'll work with earlier versions)
-cmake_minimum_required(VERSION 2.6)
+# This usage of CMake requires at least version 2.4.4 (earlier versions lack the CheckCXXCompilerFlag module)
+cmake_minimum_required(VERSION 2.4.4 FATAL_ERROR)
+
+# Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
+if(CMAKE_MAJOR_VERSION GREATER 2)
+  set(CMAKE26_OR_BETTER TRUE)
+else(CMAKE_MAJOR_VERSION GREATER 2)
+  if(CMAKE_MINOR_VERSION GREATER 5)
+    set(CMAKE26_OR_BETTER TRUE)
+  else(CMAKE_MINOR_VERSION GREATER 5)
+    set(CMAKE26_OR_BETTER FALSE)
+  endif(CMAKE_MINOR_VERSION GREATER 5)
+endif(CMAKE_MAJOR_VERSION GREATER 2)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
@@ -144,14 +155,65 @@ check_type_size(int32_t INT32_T)
 check_type_size(uint32_t UINT32_T)
 check_type_size(u_int32_t U_INT32_T)
 
-# Strip the leading and trailing spaces from the compile flags
-if(CXXFLAGS)
-  string(STRIP ${CXXFLAGS} CXXFLAGS)
-endif(CXXFLAGS)
-# Strip the leading and trailing spaces from the linker flags
-if(LDFLAGS)
-  string(STRIP ${LDFLAGS} LDFLAGS)
-endif(LDFLAGS)
+# Only CMake 2.6.x and later contain the STRIP sub-command for string()
+if(CMAKE26_OR_BETTER)
+  # Strip the leading and trailing spaces from the compile flags
+  if(CXXFLAGS)
+    string(STRIP ${CXXFLAGS} CXXFLAGS)
+  endif(CXXFLAGS)
+  # Strip the leading and trailing spaces from the linker flags
+  if(LDFLAGS)
+    string(STRIP ${LDFLAGS} LDFLAGS)
+  endif(LDFLAGS)
+endif(CMAKE26_OR_BETTER)
+
+# A macro to handle reading specific lines from a file
+macro(read_from_file FILE REGEX STRINGS)
+  if(CMAKE26_OR_BETTER)
+    # For CMake 2.6.x or better, we can just use this function to get the lines that match the given regular expression
+    file(STRINGS ${FILE} RESULT REGEX ${REGEX})
+  else(CMAKE26_OR_BETTER)
+    # For CMake 2.4.x, we need to do this manually, firsly we read the file in
+    file(READ ${FILE} ALL_STRINGS)
+    # Next we replace all newlines with semicolons
+    string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
+    # Clear the result list
+    set(RESULT)
+    # Iterate through all the lines of the file
+    foreach(STRING ${ALL_STRINGS})
+      # Check for a match against the given regular expression
+      string(REGEX MATCH ${REGEX} STRING_MATCH ${STRING})
+      # If we had a match, append the match to the list
+      if(STRING_MATCH)
+        list(APPEND RESULT ${STRING})
+      endif(STRING_MATCH)
+    endforeach(STRING)
+  endif(CMAKE26_OR_BETTER)
+  # Set the given STRINGS variable to the result
+  set(${STRINGS} ${RESULT})
+endmacro(read_from_file)
+
+# A macro to handle removing duplicates from a list
+macro(remove_list_duplicates LIST)
+  if(CMAKE26_OR_BETTER)
+    # For CMake 2.6.x or better, this can be done automatically
+    list(REMOVE_DUPLICATES ${LIST})
+  else(CMAKE26_OR_BETTER)
+    # For CMake 2.4.x, we have to do this ourselves, firstly we'll clear a temporary list
+    set(NEW_LIST)
+    # Iterate through the old list
+    foreach(ITEM ${${LIST}})
+      # Check if the item is in the new list
+      list(FIND NEW_LIST ${ITEM} FOUND_ITEM)
+      if(FOUND_ITEM EQUAL -1)
+        # If the item was not found, append it to the list
+        list(APPEND NEW_LIST ${ITEM})
+      endif(FOUND_ITEM EQUAL -1)
+    endforeach(ITEM)
+    # replace the old list with the new list
+    set(${LIST} ${NEW_LIST})
+  endif(CMAKE26_OR_BETTER)
+endmacro(remove_list_duplicates)
 
 # Search for the following programs
 find_program(GREP grep)
@@ -178,7 +240,7 @@ set(DATADIR "${INSTDIR}/data")
 # Only process Anope's version on Windows, it's needed for win32.rc as well as version branding at link time
 if(WIN32)
   # Find all lines in version.log that start with VERSION_
-  file(STRINGS ${Anope_SOURCE_DIR}/version.log VERSIONS REGEX "^VERSION_")
+  read_from_file(${Anope_SOURCE_DIR}/version.log "^VERSION_" VERSIONS)
   # Iterate through the strings found
   foreach(VERSION_STR ${VERSIONS})
     # Get the length of the string
@@ -222,9 +284,19 @@ set(ALL_HEADERS ${TMP_HEADERS})
 list(SORT ALL_HEADERS)
 
 # This function will take a #include line and extract the filename minus the quotes
-function(extract_include_filename INCLUDE FILENAME)
-  # Strip away leading and trailing whitespace from the line
-  string(STRIP ${INCLUDE} INCLUDE_STRIPPED)
+macro(extract_include_filename INCLUDE FILENAME)
+  # Detect if there is any trailing whitespace (basically see if the last character is a space or a tab)
+  string(LENGTH ${INCLUDE} INCLUDE_LEN)
+  math(EXPR LAST_CHAR_POS "${INCLUDE_LEN} - 1")
+  string(SUBSTRING ${INCLUDE} ${LAST_CHAR_POS} 1 LAST_CHAR)
+  # Only strip if the last character was a space or a tab
+  if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+    # Strip away trailing whitespace from the line
+    string(REGEX REPLACE "[ \t]*$" "" INCLUDE_STRIPPED ${INCLUDE})
+  else(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+    # Just copy INCLUDE to INCLUDE_STRIPPED so the below code doesn't complain about a lack of INCLUDE_STRIPPED
+    set(INCLUDE_STRIPPED ${INCLUDE})
+  endif(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
   # Find the filename including the quotes, it should be at the end of the line after whitespace was stripped
   string(REGEX MATCH "\".*\"$" FILE ${INCLUDE_STRIPPED})
   # Get the length of the filename with quotes
@@ -234,14 +306,14 @@ function(extract_include_filename INCLUDE FILENAME)
   # Overwrite the filename with a version sans quotes
   string(SUBSTRING ${FILE} 1 ${FILENAME_LEN} FILE)
   # Set the filename to the the given variable
-  set(${FILENAME} "${FILE}" PARENT_SCOPE)
-endfunction(extract_include_filename)
+  set(${FILENAME} "${FILE}")
+endmacro(extract_include_filename)
 
 # Preparse step 1: get filenames sans paths
 # Iterate through the headers
 foreach(HEADER ${ALL_HEADERS})
   # Find all the lines in the current header that have any form of #include on them, regardless of whitespace
-  file(STRINGS ${HEADER} INCLUDES REGEX "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$")
+  read_from_file(${HEADER} "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$" INCLUDES)
   # Get the filename only of the header we just checked
   get_filename_component(HEADER_FILENAME ${HEADER} NAME)
   # Iterate through the strings containing #include (if any)
@@ -283,7 +355,7 @@ foreach(HEADER ${ALL_HEADERS})
       set(NEW_HEADERS)
     endwhile(HEADERS)
     # OLD_HEADERS will now contain all headers that the current header relies on, remove duplicate headers from the list and sort the list
-    list(REMOVE_DUPLICATES OLD_HEADERS)
+    remove_list_duplicates(OLD_HEADERS)
     list(SORT OLD_HEADERS)
     # Set the current header's list of headers to the cleaned up list from above
     set(${HEADER_FILENAME}_HEADERS ${OLD_HEADERS})
@@ -297,9 +369,9 @@ set(sysconf.h_FULLPATH ${Anope_BINARY_DIR}/include/sysconf.h)
 set(version.h_FULLPATH ${Anope_BINARY_DIR}/include/version.h)
 
 # This function is used in most of the src (sub)directories to calculate the header file dependencies for the given source file
-function(calculate_depends SRC)
+macro(calculate_depends SRC)
   # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace
-  file(STRINGS ${SRC} INCLUDES REGEX "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$")
+  read_from_file(${SRC} "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$" INCLUDES)
   # Reset the list of headers to empty
   set(HEADERS)
   # Iterate through the strings containing #include (if any)
@@ -325,7 +397,7 @@ function(calculate_depends SRC)
   # If after all the above there is a list of header, we'll process them, converting them to full paths
   if(HEADERS)
     # Remove duplicate headers from the list and sort the list
-    list(REMOVE_DUPLICATES HEADERS)
+    remove_list_duplicates(HEADERS)
     list(SORT HEADERS)
     # Set the list of full path headers to empty
     set(HEADERS_FULL)
@@ -337,7 +409,7 @@ function(calculate_depends SRC)
     # Set the given source file to depend on the headers given
     set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS_FULL}")
   endif(HEADERS)
-endfunction(calculate_depends)
+endmacro(calculate_depends)
 
 # Go into the following directories and run their CMakeLists.txt as well
 add_subdirectory(data)

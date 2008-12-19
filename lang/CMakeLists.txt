@@ -2,7 +2,7 @@
 set_source_files_properties(langcomp.c PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
 # Generate langcomp and set it's linker flags
 add_executable(langcomp langcomp.c)
-set_target_properties(langcomp PROPERTIES LINK_FLAGS "${LDFLAGS}")
+set_target_properties(langcomp PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
 
 # If grep or perl don't exist on the system, build langtool to generate index and language.h
 if(NOT GREP OR NOT PERL)
@@ -10,7 +10,7 @@ if(NOT GREP OR NOT PERL)
   set_source_files_properties(langtool.c PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
   # Generate langtool and set it's linker flags
   add_executable(langtool langtool.c)
-  set_target_properties(langtool PROPERTIES LINK_FLAGS "${LDFLAGS}")
+  set_target_properties(langtool PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
 endif(NOT GREP OR NOT PERL)
 
 # If grep exists, use it to generate the index file
@@ -22,7 +22,7 @@ if(GREP)
 # Otherwise, use langtool to generate the index file
 else(GREP)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/index
-    COMMAND langtool index ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l ${CMAKE_CURRENT_BINARY_DIR}/index
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/langtool index ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l ${CMAKE_CURRENT_BINARY_DIR}/index
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l DEPENDS langtool
   )
 endif(GREP)
@@ -39,7 +39,7 @@ foreach(LANG_L ${LANG_SRCS})
   list(APPEND LANGS ${CMAKE_CURRENT_BINARY_DIR}/${LANG})
   # Generate a compiled language file using langcomp, as well as having a dependency on the index file being generated
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${LANG}
-    COMMAND langcomp ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_L} ${CMAKE_CURRENT_BINARY_DIR}/${LANG}
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/langcomp ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_L} ${CMAKE_CURRENT_BINARY_DIR}/${LANG}
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_L} DEPENDS langcomp ${CMAKE_CURRENT_BINARY_DIR}/index
   )
 endforeach(LANG_L)
@@ -53,7 +53,7 @@ if(NOT MSVC AND PERL)
 # Otherwise, use langtool to generate language.h
 else(NOT MSVC AND PERL)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/language.h
-    COMMAND langtool language.h ${CMAKE_CURRENT_BINARY_DIR}/index ${CMAKE_CURRENT_BINARY_DIR}/language.h
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/langtool language.h ${CMAKE_CURRENT_BINARY_DIR}/index ${CMAKE_CURRENT_BINARY_DIR}/language.h
     MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/index DEPENDS langtool
   )
 endif(NOT MSVC AND PERL)

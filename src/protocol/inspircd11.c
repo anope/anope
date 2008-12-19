@@ -61,7 +61,7 @@
 #endif
 
 #ifdef _WIN32
-#include "winsock.h"
+#include <winsock.h>
 int inet_aton(const char *name, struct in_addr *addr)
 {
 	uint32 a = inet_addr(name);

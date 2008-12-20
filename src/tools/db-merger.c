@@ -1952,8 +1952,6 @@ int delcore(NickCore *nc)
 		nclists[HASH(nc->display)] = nc->next;
 
 	free(nc->display);
-	if (nc->pass)
-		free(nc->pass);
 	if (nc->email)
 		free(nc->email);
 	if (nc->greet)

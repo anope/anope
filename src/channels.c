@@ -574,11 +574,11 @@ void do_join(const char *source, int ac, const char **av)
 			continue;
 
 		if (ac == 2) {
+			ts = strtoul(av[1], NULL, 10);
 			if (debug) {
 				alog("debug: recieved a new TS for JOIN: %ld",
 					 static_cast<long>(ts));
 			}
-			ts = strtoul(av[1], NULL, 10);
 		}
 
 		chan = findchan(s);

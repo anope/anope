@@ -29,14 +29,16 @@ endif(NOT MSVC AND GREP)
 
 # Find all the *.l files within the current source directory, and sort the list
 file(GLOB LANG_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.l")
-list(SORT LANG_SRCS)
+if(CMAKE244_OR_BETTER)
+  list(SORT LANG_SRCS)
+endif(CMAKE244_OR_BETTER)
 
 # Iterate through the language files
 foreach(LANG_L ${LANG_SRCS})
   # Convert the language file's extension to have no extension
   STRING(REGEX REPLACE "\\.l$" "" LANG ${LANG_L})
   # Add the language file to the list of compiled language files
-  list(APPEND LANGS ${CMAKE_CURRENT_BINARY_DIR}/${LANG})
+  append_to_list(LANGS ${CMAKE_CURRENT_BINARY_DIR}/${LANG})
   # Generate a compiled language file using langcomp, as well as having a dependency on the index file being generated
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${LANG}
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/langcomp ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_L} ${CMAKE_CURRENT_BINARY_DIR}/${LANG}

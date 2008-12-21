@@ -2,7 +2,9 @@
 file(GLOB PROTOCOL_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
 file(GLOB PROTOCOL_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(PROTOCOL_SRCS ${PROTOCOL_SRCS_C} ${PROTOCOL_SRCS_CPP})
-list(SORT PROTOCOL_SRCS)
+if(CMAKE244_OR_BETTER)
+  list(SORT PROTOCOL_SRCS)
+endif(CMAKE244_OR_BETTER)
 
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${PROTOCOL_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${MODULE_CXXFLAGS}")
@@ -15,7 +17,8 @@ foreach(SRC ${PROTOCOL_SRCS})
   calculate_depends(${SRC})
   # For Visual Studio only, include win32_memory.cpp to the list of sources, required to override Visual Studio's overrides of the new/delete operators
   if(MSVC)
-    list(APPEND SRC ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
+    append_to_list(APPEND SRC ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
+    set_source_files_properties(${Anope_SOURCE_DIR}/src/win32_memory.cpp LANGUAGE CXX COMPILE_FLAGS "${MODULE_CXXFLAGS}")
   endif(MSVC)
   # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} MODULE ${SRC})

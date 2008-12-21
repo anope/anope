@@ -6,7 +6,9 @@ set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
 if(NOT MSVC)
   list(REMOVE_ITEM SRC_SRCS win32_memory.cpp)
 endif(NOT MSVC)
-list(SORT SRC_SRCS)
+if(CMAKE244_OR_BETTER)
+  list(SORT SRC_SRCS)
+endif(CMAKE244_OR_BETTER)
 
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
@@ -22,7 +24,7 @@ if(WIN32)
   # Make sure that the resource file is seen as an RC file to be compiled with a resource compiler, not a C++ compiler
   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc LANGUAGE RC)
   # Add the resource file to the list of sources
-  list(APPEND SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32.rc)
+  append_to_list(SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32.rc)
   # For MinGW, we have to change the compile flags
   if(MINGW)
     set(RC_CFLAGS "-DMINGW -Ocoff -I${Anope_SOURCE_DIR}/include")

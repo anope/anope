@@ -1,11 +1,23 @@
-# This usage of CMake requires at least version 2.4.4 (earlier versions lack the CheckCXXCompilerFlag module)
-cmake_minimum_required(VERSION 2.4.4 FATAL_ERROR)
+# This usage of CMake requires at least version 2.4 (checks are made to determine what to use when certain versions lack functions)
+cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
 
 # Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER TRUE)
 else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER FALSE)
+  # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module is non-existant in earlier versions
+  if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+    set(CMAKE244_OR_BETTER TRUE)
+  else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+    set(CMAKE244_OR_BETTER FALSE)
+    # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
+    if(CMAKE_PATCH_VERSION GREATER 1)
+      set(CMAKE242_OR_BETTER TRUE)
+    else(CMAKE_PATCH_VERSION GREATER 1)
+      set(CMAKE242_OR_BETTER FALSE)
+    endif(CMAKE_PATCH_VERSION GREATER 1)
+  endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
 endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
@@ -35,8 +47,10 @@ endif(MINGW)
 include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckTypeSize)
-include(CheckCXXCompilerFlag)
 include(CheckLibraryExists)
+if(CMAKE244_OR_BETTER)
+  include(CheckCXXCompilerFlag)
+endif(CMAKE244_OR_BETTER)
 
 # Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
 option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
@@ -74,7 +88,7 @@ endif(MSVC)
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
-  set(LDFLAGS "${LDFLAGS} ${CMAKE_DL_LIBS}")
+  set(LDFLAGS "${LDFLAGS} -l${CMAKE_DL_LIBS}")
 endif(CMAKE_DL_LIBS)
 
 # Under MinGW, the -shared flag isn't properly set in the module-specific linker flags, add it from the C flags for shared libraries
@@ -92,11 +106,14 @@ endif(WIN32)
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
-  # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
-  check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
-  if(HAVE_PIPE_FLAG)
-    set(CXXFLAGS "${CXXFLAGS} -pipe")
-  endif(HAVE_PIPE_FLAG)
+  # The following check can only be done on CMake 2.4.4 or better
+  if(CMAKE244_OR_BETTER)
+    # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
+    check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
+    if(HAVE_PIPE_FLAG)
+      set(CXXFLAGS "${CXXFLAGS} -pipe")
+    endif(HAVE_PIPE_FLAG)
+  endif(CMAKE244_OR_BETTER)
 
   # The following are additional library checks, they are not required for Windows
   if(NOT WIN32)
@@ -163,6 +180,17 @@ if(CMAKE26_OR_BETTER)
   endif(LDFLAGS)
 endif(CMAKE26_OR_BETTER)
 
+# A macro to handle appending to lists
+macro(append_to_list LIST)
+  if(CMAKE242_OR_BETTER)
+    # For CMake 2.4.2 or better, we can just use the APPEND sub-command of list()
+    list(APPEND ${LIST} ${ARGN})
+  else(CMAKE242_OR_BETTER)
+    # For CMake 2.4.x before 2.4.2, we have to do this manually use set() instead
+    set(${LIST} ${${LIST}} ${ARGN})
+  endif(CMAKE242_OR_BETTER)
+endmacro(append_to_list)
+
 # A macro to handle reading specific lines from a file
 macro(read_from_file FILE REGEX STRINGS)
   if(CMAKE26_OR_BETTER)
@@ -181,7 +209,7 @@ macro(read_from_file FILE REGEX STRINGS)
       string(REGEX MATCH ${REGEX} STRING_MATCH ${STRING})
       # If we had a match, append the match to the list
       if(STRING_MATCH)
-        list(APPEND RESULT ${STRING})
+        append_to_list(RESULT ${STRING})
       endif(STRING_MATCH)
     endforeach(STRING)
   endif(CMAKE26_OR_BETTER)
@@ -225,7 +253,7 @@ macro(remove_list_duplicates LIST)
       find_in_list(NEW_LIST ${ITEM} FOUND_ITEM)
       if(FOUND_ITEM EQUAL -1)
         # If the item was not found, append it to the list
-        list(APPEND NEW_LIST ${ITEM})
+        append_to_list(NEW_LIST ${ITEM})
       endif(FOUND_ITEM EQUAL -1)
     endforeach(ITEM)
     # replace the old list with the new list
@@ -291,7 +319,7 @@ file(GLOB_RECURSE ALL_HEADERS "*.h")
 foreach(HEADER ${ALL_HEADERS})
   # Don't process the file if it's in an obsolete directory
   if(NOT HEADER MATCHES ".*obsolete.*")
-    list(APPEND TMP_HEADERS ${HEADER})
+    append_to_list(TMP_HEADERS ${HEADER})
     # In addition, also set up a variable to store the fullpath of the header, in a variable prefixed with just the header's filename for easy access later
     get_filename_component(HEADER_FILENAME ${HEADER} NAME)
     set(${HEADER_FILENAME}_FULLPATH ${HEADER})
@@ -299,7 +327,9 @@ foreach(HEADER ${ALL_HEADERS})
 endforeach(HEADER)
 # Set the list of headers to be all the non-obsolete ones, then sort the list
 set(ALL_HEADERS ${TMP_HEADERS})
-list(SORT ALL_HEADERS)
+if(CMAKE244_OR_BETTER)
+  list(SORT ALL_HEADERS)
+endif(CMAKE244_OR_BETTER)
 
 # This function will take a #include line and extract the filename minus the quotes
 macro(extract_include_filename INCLUDE FILENAME)
@@ -339,7 +369,7 @@ foreach(HEADER ${ALL_HEADERS})
     # Extract the filename from the #include line
     extract_include_filename(${INCLUDE} FILENAME)
     # Append this filename to the list of headers for the header we are checking
-    list(APPEND ${HEADER_FILENAME}_HEADERS ${FILENAME})
+    append_to_list(${HEADER_FILENAME}_HEADERS ${FILENAME})
   endforeach(INCLUDE)
 endforeach(HEADER)
 
@@ -361,12 +391,12 @@ foreach(HEADER ${ALL_HEADERS})
         # If that header has headers it relies on, we'll add them to the list of new headers
         if(${CURR_HEADER}_HEADERS)
           foreach(CURR_HEADERS_HEADER ${${CURR_HEADER}_HEADERS})
-            list(APPEND NEW_HEADERS ${CURR_HEADERS_HEADER})
+            append_to_list(NEW_HEADERS ${CURR_HEADERS_HEADER})
           endforeach(CURR_HEADERS_HEADER)
         endif(${CURR_HEADER}_HEADERS)
       endforeach(CURR_HEADER)
       # Append the headers we checked to the old headers
-      list(APPEND OLD_HEADERS ${HEADERS})
+      append_to_list(OLD_HEADERS ${HEADERS})
       # Set the headers to check to the new headers (it may be empty and that'll exit the loop)
       set(HEADERS ${NEW_HEADERS})
       # Erase the new headers
@@ -374,14 +404,16 @@ foreach(HEADER ${ALL_HEADERS})
     endwhile(HEADERS)
     # OLD_HEADERS will now contain all headers that the current header relies on, remove duplicate headers from the list and sort the list
     remove_list_duplicates(OLD_HEADERS)
-    list(SORT OLD_HEADERS)
+    if(CMAKE244_OR_BETTER)
+      list(SORT OLD_HEADERS)
+    endif(CMAKE244_OR_BETTER)
     # Set the current header's list of headers to the cleaned up list from above
     set(${HEADER_FILENAME}_HEADERS ${OLD_HEADERS})
   endif(${HEADER_FILENAME}_HEADERS)
 endforeach(HEADER)
 
 # The following headers are generated from CMake rules and won't be found with the above
-list(APPEND ALL_HEADERS ${Anope_BINARY_DIR}/lang/language.h ${Anope_BINARY_DIR}/include/sysconf.h ${Anope_BINARY_DIR}/include/version.h)
+append_to_list(ALL_HEADERS ${Anope_BINARY_DIR}/lang/language.h ${Anope_BINARY_DIR}/include/sysconf.h ${Anope_BINARY_DIR}/include/version.h)
 set(language.h_FULLPATH ${Anope_BINARY_DIR}/lang/language.h)
 set(sysconf.h_FULLPATH ${Anope_BINARY_DIR}/include/sysconf.h)
 set(version.h_FULLPATH ${Anope_BINARY_DIR}/include/version.h)
@@ -397,7 +429,7 @@ macro(calculate_depends SRC)
     # Extract the filename from the #include line
     extract_include_filename(${INCLUDE} FILENAME)
     # Append the filename to the list of headers
-    list(APPEND HEADERS ${FILENAME})
+    append_to_list(HEADERS ${FILENAME})
   endforeach(INCLUDE)
   # Set the list of new headers to empty (this will store all the headers that the above list depends on)
   set(NEW_HEADERS)
@@ -405,24 +437,26 @@ macro(calculate_depends SRC)
   foreach(HEADER ${HEADERS})
     # If the current header has it's own headers to depend on, append those to the list of new headers
     if(${HEADER}_HEADERS)
-      list(APPEND NEW_HEADERS ${${HEADER}_HEADERS})
+      append_to_list(NEW_HEADERS ${${HEADER}_HEADERS})
     endif(${HEADER}_HEADERS)
   endforeach(HEADER)
   # If there were new headers, append them to the list of headers
   if(NEW_HEADERS)
-    list(APPEND HEADERS ${NEW_HEADERS})
+    append_to_list(HEADERS ${NEW_HEADERS})
   endif(NEW_HEADERS)
   # If after all the above there is a list of header, we'll process them, converting them to full paths
   if(HEADERS)
     # Remove duplicate headers from the list and sort the list
     remove_list_duplicates(HEADERS)
-    list(SORT HEADERS)
+    if(CMAKE244_OR_BETTER)
+      list(SORT HEADERS)
+    endif(CMAKE244_OR_BETTER)
     # Set the list of full path headers to empty
     set(HEADERS_FULL)
     # Iterate through the list of headers
     foreach(HEADER ${HEADERS})
       # Append the full path of the header to the full path headers list
-      list(APPEND HEADERS_FULL ${${HEADER}_FULLPATH})
+      append_to_list(HEADERS_FULL ${${HEADER}_FULLPATH})
     endforeach(HEADER)
     # Set the given source file to depend on the headers given
     set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS_FULL}")

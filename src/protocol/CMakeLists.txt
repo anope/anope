@@ -31,6 +31,6 @@ foreach(SRC ${PROTOCOL_SRCS})
   endif(WIN32)
   # Set the module to be installed to the module directory under the data directory
   install(TARGETS ${SO}
-    DESTINATION "${DATADIR}/modules"
+    DESTINATION data/modules
   )
 endforeach(SRC)

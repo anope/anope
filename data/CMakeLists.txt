@@ -2,5 +2,5 @@
 # NOTE: I would've had this just find all files in the directory, but that would include files not needed (like this file)
 set(DATA example.chk example.conf)
 install(FILES ${DATA}
-  DESTINATION "${DATADIR}"
+  DESTINATION data
 )

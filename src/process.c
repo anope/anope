@@ -46,9 +46,9 @@ void add_ignore(const char *nick, time_t delta)
 		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
 		mask = sstrdup(tmp);
 	/* Determine whether we get a nick or a mask. */
-	} else if ((host = strchr(nick, '@'))) {
+	} else if ((host = const_cast<char *>(strchr(nick, '@')))) {
 		/* Check whether we have a nick too.. */
-			if ((user = strchr(nick, '!'))) {
+			if ((user = const_cast<char *>(strchr(nick, '!')))) {
 			/* this should never happen */
 			if (user > host)
 				return;
@@ -121,8 +121,8 @@ IgnoreData *get_ignore(const char *nick)
 				break;
 		} else {
 		/* We didn't get a user.. generate a valid mask. */
-			if ((host = strchr(nick, '@'))) {
-				if ((user = strchr(nick, '!'))) {
+			if ((host = const_cast<char *>(strchr(nick, '@')))) {
+				if ((user = const_cast<char *>(strchr(nick, '!')))) {
 				/* this should never happen */
 				if (user > host)
 					return NULL;
@@ -177,9 +177,9 @@ int delete_ignore(const char *nick)
 	if ((u = finduser(nick))) {
 		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
 	/* Determine whether we get a nick or a mask. */
-	} else if ((host = strchr(nick, '@'))) {
+	} else if ((host = const_cast<char *>(strchr(nick, '@')))) {
 		/* Check whether we have a nick too.. */
-		if ((user = strchr(nick, '!'))) {
+		if ((user = const_cast<char *>(strchr(nick, '!')))) {
 			/* this should never happen */
 			if (user > host)
 				return 0;

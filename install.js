@@ -99,6 +99,26 @@ var installerQuestions = [
 			else return '-DCMAKE_BUILD_TYPE:STRING=RELEASE';
 		}
 	},
+	{
+		'question' : [
+			'Are you using Visual Studio 2008?  If you are, you need to answer yes',
+			'to this question, otherwise CMake will not function properly.'
+		],
+		'short' : 'Using Visual Studio 2008?',
+		'options' : [
+			'yes',
+			'no'
+		],
+		'default_answer' : 'no',
+		'store_answer' : function(answer) {
+			installerResponses['Visual Studio 2008'] = answer;
+			return true;
+		},
+		'cmake_argument' : function() {
+			if (installerResponses['Visual Studio 2008'] == 'yes') return '-G"Visual Studio 9 2008"';
+			else return '';
+		}
+	},
 ];
 
 var bannerReplacements = [
@@ -143,6 +163,10 @@ for (x in installerQuestions) {
 	var validOpts = new Array();
 	if (thisQuestion.short == 'Build debug?' && installerResponses['Use NMake'] == 'no') {
 		installerResponses['Debug'] = 'msvc';
+		continue;
+	}
+	if (thisQuestion.short == 'Using Visual Studio 2008?' && installerResponses['Debug'] != 'msvc') {
+		installerResponses['Visual Studio 2008'] = 'no';
 		continue;
 	}
 	while (!validResponse) {

@@ -148,7 +148,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
 		/* If a server is specified (nick@server format), make sure it matches
 		 * us, and strip it off. */
-		s = strchr(receiver, '@');
+		s = const_cast<char *>(strchr(receiver, '@'));
 		if (s) {
 			*s++ = 0;
 			if (stricmp(s, ServerName) != 0)

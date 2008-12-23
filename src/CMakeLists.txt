@@ -37,6 +37,10 @@ if(WIN32)
   else(MINGW)
     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
   endif(MINGW)
+  if(IN_SOURCE)
+    # Add the resource file to the list of files for CPack to ignore
+    add_to_cpack_ignored_files("win32.rc$" TRUE)
+  endif(IN_SOURCE)
 endif(WIN32)
 
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
@@ -54,6 +58,10 @@ add_dependencies(${PROGRAM_NAME} language headers)
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 set(SERVICES_BIN "${SERVICES_BINARY}")
+if(IN_SOURCE)
+  # Add the Anope executable to the list of files for CPack to ignore
+  add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)
+endif(IN_SOURCE)
 
 # Generate sysconf.h from the earlier configuration
 configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/include/sysconf.h)
@@ -67,5 +75,5 @@ add_subdirectory(tools)
 
 # Set Anope to be installed to the bin directory
 install(TARGETS ${PROGRAM_NAME}
-  DESTINATION "${INSTDIR}"
+  DESTINATION .
 )

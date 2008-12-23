@@ -1,14 +1,20 @@
 # This usage of CMake requires at least version 2.4 (checks are made to determine what to use when certain versions lack functions)
 cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 # Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER TRUE)
+  set(CMAKE244_OR_BETTER TRUE)
+  set(CMAKE242_OR_BETTER TRUE)
 else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER FALSE)
   # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module is non-existant in earlier versions
   if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
     set(CMAKE244_OR_BETTER TRUE)
+    set(CMAKE242_OR_BETTER TRUE)
   else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
     set(CMAKE244_OR_BETTER FALSE)
     # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
@@ -62,7 +68,7 @@ if(MSVC)
   string(REPLACE "/GX " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines, and the include directories
-  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4251 /wd4706 /wd4800 /EHs /D_WIN32 /DMSVCPP /I\"${Anope_SOURCE_DIR}/include\" /I\"${Anope_BINARY_DIR}/include\" /I\"${Anope_BINARY_DIR}/lang\"")
+  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4251 /wd4706 /wd4800 /wd4996 /EHs /D_WIN32 /DMSVCPP /D_CRT_SECURE_NO_WARNINGS /I\"${Anope_SOURCE_DIR}/include\" /I\"${Anope_BINARY_DIR}/include\" /I\"${Anope_BINARY_DIR}/lang\"")
   # Set the module-specific compile flags to include a define for module compiling
   set(MODULE_CXXFLAGS "${CXXFLAGS} /DMODULE_COMPILE")
 # Otherwise, we're not using Visual Studio
@@ -275,37 +281,39 @@ if(PERL AND USE_RUN_CC_PL)
   set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl ${CMAKE_CXX_CREATE_SHARED_MODULE}")
 endif(PERL AND USE_RUN_CC_PL)
 
-# If a INSTDIR wasn't passed in to CMake, set the default to the services directory under the user's home directory
-if(NOT INSTDIR)
-  set(INSTDIR "$ENV{HOME}/services")
-endif(NOT INSTDIR)
+# If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
+if(INSTDIR)
+  set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
+else(INSTDIR)
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/services")
+endif(INSTDIR)
 
-# Set Anope's data install location to be the data directory under the install directory
-set(DATADIR "${INSTDIR}/data")
+# Version number processing
+# Find all lines in version.log that start with VERSION_
+read_from_file(${Anope_SOURCE_DIR}/version.log "^VERSION_" VERSIONS)
+# Iterate through the strings found
+foreach(VERSION_STR ${VERSIONS})
+  # Get the length of the string
+  string(LENGTH ${VERSION_STR} VERSION_LEN)
+  # Subtract 16 from the string's length (8 for VERSION_, 5 more for the type, 2 for the space and leading quote, 1 for the trailing quote)
+  math(EXPR VERSION_NUM_LEN "${VERSION_LEN} - 16")
+  # Extract the type from the string
+  string(SUBSTRING ${VERSION_STR} 8 5 VERSION_TYPE)
+  # Extract the actual value from the string
+  string(SUBSTRING ${VERSION_STR} 15 ${VERSION_NUM_LEN} VERSION)
+  # Set the version type to the value extract from above
+  set(VERSION_${VERSION_TYPE} ${VERSION})
+endforeach(VERSION_STR ${VERSIONS})
 
-# Only process Anope's version on Windows, it's needed for win32.rc as well as version branding at link time
+# Set the version variables based on what was found above
+set(VERSION_COMMA "${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH},${VERSION_BUILD}")
+set(VERSION_DOTTED_NOBUILD "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+set(VERSION_DOTTED "${VERSION_DOTTED_NOBUILD}.${VERSION_BUILD}")
+set(VERSION_FULL "${VERSION_DOTTED}${VERSION_EXTRA}")
+set(VERSION_FULL_NOBUILD "${VERSION_DOTTED_NOBUILD}${VERSION_EXTRA}")
+
+# Only do the following for Windows
 if(WIN32)
-  # Find all lines in version.log that start with VERSION_
-  read_from_file(${Anope_SOURCE_DIR}/version.log "^VERSION_" VERSIONS)
-  # Iterate through the strings found
-  foreach(VERSION_STR ${VERSIONS})
-    # Get the length of the string
-    string(LENGTH ${VERSION_STR} VERSION_LEN)
-    # Subtract 16 from the string's length (8 for VERSION_, 5 more for the type, 2 for the space and leading quote, 1 for the trailing quote)
-    math(EXPR VERSION_NUM_LEN "${VERSION_LEN} - 16")
-    # Extract the type from the string
-    string(SUBSTRING ${VERSION_STR} 8 5 VERSION_TYPE)
-    # Extract the actual value from the string
-    string(SUBSTRING ${VERSION_STR} 15 ${VERSION_NUM_LEN} VERSION)
-    # Set the version type to the value extract from above
-    set(VERSION_${VERSION_TYPE} ${VERSION})
-  endforeach(VERSION_STR ${VERSIONS})
-
-  # Set the version variables based on what was found above
-  set(VERSION_COMMA "${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH},${VERSION_BUILD}")
-  set(VERSION_DOTTED "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD}")
-  set(VERSION_FULL "${VERSION_DOTTED}${VERSION_EXTRA}")
-
   # Generate the win32.rc file using the above variables
   configure_file(${Anope_SOURCE_DIR}/src/win32.rc.cmake ${Anope_BINARY_DIR}/src/win32.rc)
 endif(WIN32)
@@ -463,20 +471,110 @@ macro(calculate_depends SRC)
   endif(HEADERS)
 endmacro(calculate_depends)
 
+# A macro to update the environment variable CPACK_IGNORED_FILES which contains a list of files for CPack to ignore
+macro(add_to_cpack_ignored_files ITEM)
+  # Temporary copy of the orignal item
+  set(REAL_ITEM "${ITEM}")
+  # If we have 2+ arguments, assume that the second one was something like TRUE (doesn't matter really) and convert periods so they will be \\. for CPack
+  if(${ARGC} GREATER 1)
+    string(REPLACE "." "\\\\." REAL_ITEM ${REAL_ITEM})
+  endif(${ARGC} GREATER 1)
+  # If the environment variable is already defined, just tack the item to the end
+  if(DEFINED ENV{CPACK_IGNORED_FILES})
+    set(ENV{CPACK_IGNORED_FILES} "$ENV{CPACK_IGNORED_FILES};${REAL_ITEM}")
+  # Otherwise set the environment variable to the item
+  else(DEFINED ENV{CPACK_IGNORED_FILES})
+    set(ENV{CPACK_IGNORED_FILES} "${REAL_ITEM}")
+  endif(DEFINED ENV{CPACK_IGNORED_FILES})
+endmacro(add_to_cpack_ignored_files)
+
+# Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
+add_to_cpack_ignored_files(".git\;config.cache\;.svn\;CMakeFiles" TRUE)
+# If the two directories are the same, we are building in-source, thus we need to ignore more files from the build
+if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
+  # This variable is used in the sub-directories to determine if we are building in-source
+  set(IN_SOURCE TRUE)
+  # Add the files that need their periods converted
+  add_to_cpack_ignored_files("Makefile\;cmake_install.cmake\;sysconf.h$\;CMakeCache.txt\;install_manifest.txt" TRUE)
+  # Add the files we don't want the periods converted for
+  add_to_cpack_ignored_files(".\\\\\\\\.so$;CPack.;anope-${VERSION_FULL_NOBUILD}-source\\\\\\\\..")
+  # If using Visual Studio, add these files as well
+  if(MSVC)
+    add_to_cpack_ignored_files(".vcproj$\;.sln$\;.ncb$\;.suo$\;.dir$\;.ilk$\;.exp$\;.pdb$\;.lib$\;/debug$;/release$;/relwithdebinfo$;/minsizerel$" TRUE)
+  endif(MSVC)
+# Otherwise, the two directories are different and we are building out-of-source
+else(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
+  set(IN_SOURCE FALSE)
+endif(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
+
 # Go into the following directories and run their CMakeLists.txt as well
 add_subdirectory(data)
+add_subdirectory(docs)
 add_subdirectory(lang)
 add_subdirectory(src)
 add_subdirectory(include)
 
+# Get the filename of the Anope binary, to use later
+get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
+
 # At install time, create the following additional directories
-install(CODE "file(MAKE_DIRECTORY \"${DATADIR}/backups\")")
-install(CODE "file(MAKE_DIRECTORY \"${DATADIR}/logs\")")
-install(CODE "file(MAKE_DIRECTORY \"${DATADIR}/modules/runtime\")")
+install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/data/backups\")")
+install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/data/logs\")")
+install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/data/modules/runtime\")")
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"${DATADIR}/backups\")")
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"${DATADIR}/logs\")")
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"${DATADIR}/modules/runtime\")")
-  install(CODE "execute_process(COMMAND ${CHGRP} -R ${RUNGROUP} \"${DATADIR}\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\${CMAKE_INSTALL_PREFIX}/data/backups\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\${CMAKE_INSTALL_PREFIX}/data/logs\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\${CMAKE_INSTALL_PREFIX}/data/modules/runtime\")")
+  install(CODE "execute_process(COMMAND ${CHGRP} -R ${RUNGROUP} \"\${CMAKE_INSTALL_PREFIX}\")")
 endif(NOT WIN32 AND RUNGROUP)
+# On Windows platforms, install extra files
+if(WIN32)
+  install(FILES ${Anope_SOURCE_DIR}/anope.bat
+    ${Anope_SOURCE_DIR}/Changes
+    ${Anope_SOURCE_DIR}/Changes.conf
+    ${Anope_SOURCE_DIR}/Changes.lang
+    DESTINATION .
+  )
+endif(WIN32)
+
+# Only process the CPack section if we have CPack
+if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+  # Override the module include path to include our directory, as we are using our own version of the NSIS template
+  set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR})
+  # Various options for CPack
+  set(CPACK_PACKAGE_NAME "Anope IRC Services")
+  set(CPACK_PACKAGE_VENDOR "Anope Team")
+  set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+  set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+  set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}${VERSION_EXTRA}")
+  set(CPACK_PACKAGE_FILE_NAME "anope-${VERSION_FULL_NOBUILD}")
+  set(CPACK_RESOURCE_FILE_LICENSE "${Anope_SOURCE_DIR}/docs/COPYING")
+  # The following doesn't actually do anything. :(
+  #set(CPACK_RESOURCE_FILE_README "${Anope_SOURCE_DIR}/docs/README")
+  # The following is primarily for NSIS
+  if(WIN32)
+    set(CPACK_GENERATOR "NSIS")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Anope")
+    set(CPACK_PACKAGE_EXECUTABLES "")
+    set(CPACK_NSIS_MENU_LINKS
+      "${SERVICES_BINARY}" "Anope IRC Services"
+      "anope.bat\\\" \\\"-debug -nofork" "Anope IRC Services (Debug and Window Logging)"
+      "anope.bat\\\" \\\"-nofork" "Anope IRC Services (Window Logging)"
+      "anope.bat\\\" \\\"-nothird" "Anope IRC Services (No Third Party Modules)"
+      "http://www.anope.org" "Anope Web Site"
+    )
+    # The following doesn't work, but a bug report has been filed about it
+    #set(CPACK_CREATE_DESKTOP_LINK_${SERVICES_BINARY} TRUE)
+    set(CPACK_NSIS_MUI_ICON "${Anope_SOURCE_DIR}/src\\\\anope-icon.ico")
+    set(CPACK_NSIS_MUI_UNIICON "${Anope_SOURCE_DIR}/src\\\\anope-icon.ico")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "${SERVICES_BINARY}")
+    set(CPACK_NSIS_URL_INFO_ABOUT "http://www.anope.org")
+    set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")
+  endif(WIN32)
+  set(CPACK_SOURCE_PACKAGE_FILE_NAME "anope-${VERSION_FULL_NOBUILD}-source")
+  set(CPACK_SOURCE_IGNORE_FILES "$ENV{CPACK_IGNORED_FILES}")
+  set(CPACK_MONOLITHIC_INSTALL TRUE)
+  include(CPack)
+endif(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")

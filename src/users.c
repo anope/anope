@@ -521,10 +521,10 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	 * Ugly swap routine for Flop's bug :)
  	 **/
 			if (realname) {
-				tmp = strchr(realname, '%');
+				tmp = const_cast<char *>(strchr(realname, '%'));
 				while (tmp) {
 					*tmp = '-';
-					tmp = strchr(realname, '%');
+					tmp = const_cast<char *>(strchr(realname, '%'));
 				}
 			}
 			logrealname = normalizeBuffer(realname);

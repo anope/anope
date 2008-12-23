@@ -10,6 +10,12 @@ if(MSVC OR NOT SH)
     COMMAND version_sh ${Anope_SOURCE_DIR}/version.log ${CMAKE_CURRENT_SOURCE_DIR}/version.sh ${CMAKE_CURRENT_BINARY_DIR}/version.h
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/version.sh DEPENDS version_sh ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${CMAKE_CURRENT_SOURCE_DIR}/pseudo.h ${CMAKE_CURRENT_SOURCE_DIR}/messages.h ${SRC_SRCS}
   )
+  if(IN_SOURCE)
+    # Add version_sh to list of files for CPack to ignore
+    get_target_property(version_sh_BINARY version_sh LOCATION)
+    get_filename_component(version_sh_BINARY ${version_sh_BINARY} NAME)
+    add_to_cpack_ignored_files("${version_sh_BINARY}$" TRUE)
+  endif(IN_SOURCE)
 # For any non-Visual Studio platforms that do have sh, we will run version.h through the version.h shell script
 else(MSVC OR NOT SH)
   # Generate version.h from version.sh and the version.log file from the main source directory, with dependencies to the given headers and all source files in the main Anope build
@@ -18,6 +24,11 @@ else(MSVC OR NOT SH)
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/version.sh DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${CMAKE_CURRENT_SOURCE_DIR}/pseudo.h ${CMAKE_CURRENT_SOURCE_DIR}/messages.h ${SRC_SRCS}
   )
 endif(MSVC OR NOT SH)
+
+if(IN_SOURCE)
+  # Add version.h to the list of files for CPack to ignore
+  add_to_cpack_ignored_files("version.h$" TRUE)
+endif(IN_SOURCE)
 
 # Add a custom target to the above file
 add_custom_target(headers DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/version.h)

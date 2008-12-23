@@ -177,7 +177,7 @@ int b64_decode(const char *src, char *target, size_t targsize)
 		if (ch == Pad64)
 			break;
 
-		pos = strchr(Base64, ch);
+		pos = const_cast<char *>(strchr(Base64, ch));
 		if (pos == 0)		   /* A non-base64 character. */
 			return (-1);
 

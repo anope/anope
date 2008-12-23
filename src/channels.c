@@ -813,7 +813,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 		s = av[ac - 1];		 /* Users are always the last element */
 
 		while (*s) {
-			end = strchr(s, ' ');
+			end = const_cast<char *>(strchr(s, ' '));
 			if (end)
 				*end = 0;
 
@@ -930,7 +930,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 		s = av[2];			  /* Users are always the last element */
 
 		while (*s) {
-			end = strchr(s, ' ');
+			end = const_cast<char *>(strchr(s, ' '));
 			if (end)
 				*end = 0;
 
@@ -1005,7 +1005,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 		s = sstrdup(source);	/* Users are always the last element */
 
 		while (*s) {
-			end = strchr(s, ' ');
+			end = const_cast<char *>(strchr(s, ' '));
 			if (end)
 				*end = 0;
 

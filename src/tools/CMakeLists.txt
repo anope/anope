@@ -21,8 +21,14 @@ foreach(SRC ${TOOLS_SRCS})
   add_dependencies(${EXE} ${PROGRAM_NAME})
   # Set the executable to be installed to the tools directory under the bin directory
   install(TARGETS ${EXE}
-    DESTINATION "${INSTDIR}/tools"
+    DESTINATION tools
   )
+  if(IN_SOURCE)
+    # Add the executable to the list of files for CPack to ignore
+    get_target_property(EXE_BINARY ${EXE} LOCATION)
+    get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
+    add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
+  endif(IN_SOURCE)
 endforeach(SRC)
 
 # Only for Windows, set anopesmtp to require the wsock32 library
@@ -32,5 +38,5 @@ endif(WIN32)
 
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
 if(NOT WIN32 AND RUNGROUP)
-  install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"${INSTDIR}/tools\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"\${CMAKE_INSTALL_PREFIX}/tools\")")
 endif(NOT WIN32 AND RUNGROUP)

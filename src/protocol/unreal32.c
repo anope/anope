@@ -534,12 +534,22 @@ class UnrealIRCdProto : public IRCDProto
 {
 	void ProcessUsermodes(User *user, int ac, const char **av)
 	{
-		int add = 1; /* 1 if adding modes, 0 if deleting */
+		int backup, add = 1; /* 1 if adding modes, 0 if deleting */
 		const char *modes = av[0];
 		--ac;
 		if (!user || !modes) return; /* Prevent NULLs from doing bad things */
 		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+		
 		while (*modes) {
+			uint32 backup = user->mode;
+			
+			/* This looks better, much better than "add ? (do_add) : (do_remove)".
+			 * At least this is readable without paying much attention :) -GD */
+			if (add)
+				user->mode |= umodes[static_cast<int>(*modes)];
+			else
+				user->mode &= ~umodes[static_cast<int>(*modes)];
+			
 			switch (*modes++)
 			{
 				case '+':
@@ -554,6 +564,7 @@ class UnrealIRCdProto : public IRCDProto
 					if (isdigit(*av[1]))
 					{
 						user->svid = strtoul(av[1], NULL, 0);
+						user->mode = backup;  /* Ugly fix, but should do the job ~ Viper */
 						continue; // +d was setting a service stamp, ignore the usermode +-d.
 					}
 					break;
@@ -575,12 +586,7 @@ class UnrealIRCdProto : public IRCDProto
 					update_host(user);
 					break;
 				default:
-					/* This looks better, much better than "add ? (do_add) : (do_remove)".
-					 * At least this is readable without paying much attention :) -GD */
-					if (add)
-						user->mode |= umodes[static_cast<int>(*modes)];
-					else
-						user->mode &= ~umodes[static_cast<int>(*modes)];
+					break;
 			}
 		}
 	}

@@ -56,6 +56,8 @@ include(CheckTypeSize)
 include(CheckLibraryExists)
 if(CMAKE244_OR_BETTER)
   include(CheckCXXCompilerFlag)
+else(CMAKE244_OR_BETTER)
+  include(TestCXXAcceptsFlag)
 endif(CMAKE244_OR_BETTER)
 
 # Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
@@ -112,14 +114,18 @@ endif(WIN32)
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
-  # The following check can only be done on CMake 2.4.4 or better
+  # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
   if(CMAKE244_OR_BETTER)
-    # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
+    # If using CMake 2.4.4 or better, we can use check_cxx_compiler_flag
     check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
-    if(HAVE_PIPE_FLAG)
-      set(CXXFLAGS "${CXXFLAGS} -pipe")
-    endif(HAVE_PIPE_FLAG)
+  else(CMAKE244_OR_BETTER)
+    # If using CMake 2.4.3 or older, we will use check_cxx_accepts_flags instead
+    check_cxx_accepts_flag(-pipe HAVE_PIPE_FLAG)
   endif(CMAKE244_OR_BETTER)
+  # If the flag was accepted, add it to the list of flags
+  if(HAVE_PIPE_FLAG)
+    set(CXXFLAGS "${CXXFLAGS} -pipe")
+  endif(HAVE_PIPE_FLAG)
 
   # The following are additional library checks, they are not required for Windows
   if(NOT WIN32)
@@ -555,6 +561,8 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   #set(CPACK_RESOURCE_FILE_README "${Anope_SOURCE_DIR}/docs/README")
   # The following is primarily for NSIS
   if(WIN32)
+    # Also for Windows, include installing the MSVCRT library
+    include(InstallRequiredSystemLibraries)
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "Anope")
     set(CPACK_PACKAGE_EXECUTABLES "")

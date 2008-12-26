@@ -63,34 +63,38 @@ endif(CMAKE244_OR_BETTER)
 # Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
 option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 
+# Use the following directories as includes
+include_directories(${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/include ${Anope_BINARY_DIR}/lang)
+
+# If using Windows, always add the _WIN32 define
+if(WIN32)
+  add_definitions(-D_WIN32)
+endif(WIN32)
+
 # If using Visual Studio, set the C++ flags accordingly
 if(MSVC)
   # Remove the default exception handling flags, also remove default warning level flag
   string(REPLACE "/EHsc " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string(REPLACE "/GX " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-  # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines, and the include directories
-  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4251 /wd4706 /wd4800 /wd4996 /EHs /D_WIN32 /DMSVCPP /D_CRT_SECURE_NO_WARNINGS /I\"${Anope_SOURCE_DIR}/include\" /I\"${Anope_BINARY_DIR}/include\" /I\"${Anope_BINARY_DIR}/lang\"")
-  # Set the module-specific compile flags to include a define for module compiling
-  set(MODULE_CXXFLAGS "${CXXFLAGS} /DMODULE_COMPILE")
+  # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines
+  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4251 /wd4706 /wd4800 /wd4996 /EHs")
+  add_definitions(-DMSVCPP -D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
 else(MSVC)
-  # Set the compile flags to have all warnings on (including shadowed variables) and the include directories
-  set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow -I${Anope_SOURCE_DIR}/include -I${Anope_BINARY_DIR}/include -I${Anope_BINARY_DIR}/lang")
+  # Set the compile flags to have all warnings on (including shadowed variables)
+  set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow")
   # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols
   if(UNIX)
     set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic -fno-leading-underscore")
     # Set the module-specific compile flags to the same setting as the compile flags
     set(MODULE_CXXFLAGS "${CXXFLAGS}")
-  # If we aren't on a *nix system, set the compile flags to include a define for Windows
+  # If we aren't on a *nix system, we are using MinGW
   else(UNIX)
-    set(CXXFLAGS "${CXXFLAGS} -D_WIN32")
     # Also, if we are building under MinGW, add another define for MinGW
     if(MINGW)
-      set(CXXFLAGS "${CXXFLAGS} -DMINGW")
+      add_definitions(-DMINGW)
     endif(MINGW)
-    # Set the module-specific compile flags to include a define for module compiling
-    set(MODULE_CXXFLAGS "${CXXFLAGS} -DMODULE_COMPILE")
   endif(UNIX)
 endif(MSVC)
 

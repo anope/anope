@@ -160,7 +160,6 @@ endif(NOT DEFUMASK)
 
 # Check for the existance of the following include files
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
-check_include_file(execinfo.h HAVE_BACKTRACE)
 check_include_file(strings.h HAVE_STRINGS_H)
 check_include_file(sys/select.h HAVE_SYS_SELECT_H)
 
@@ -173,6 +172,7 @@ check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(strlcat HAVE_STRLCAT)
 check_function_exists(strlcpy HAVE_STRLCPY)
 check_function_exists(umask HAVE_UMASK)
+check_function_exists(backtrace HAVE_BACKTRACE)
 
 # Check for the existance of the following types
 check_type_size(uint8_t UINT8_T)

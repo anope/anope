@@ -2052,8 +2052,6 @@ Entry *entry_add(EList * list, const char *mask)
 	list->entries = e;
 	list->count++;
 
-	delete [] hostmask;
-
 	return e;
 }
 

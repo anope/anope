@@ -2039,10 +2039,7 @@ Entry *entry_add(EList * list, const char *mask)
 	e = entry_create(hostmask);
 
 	if (!e)
-	{
-		delete [] hostmask;
 		return NULL;
-	}
 
 	e->next = list->entries;
 	e->prev = NULL;

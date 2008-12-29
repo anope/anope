@@ -5,27 +5,25 @@ CFLAGS=@CFLAGS@ -Wall -ansi -pedantic -Wshadow
 PROFILE=-pg
 LDPROFILE=
 SHELL=/bin/sh
-BINDEST=@BINDEST@
+INSTDIR=@INSTDIR@
 MAKEBIN=@MAKEBIN@
-DATDEST=@DATDEST@
 INSTALL=@INSTALL@
 RM=@RM@
 CP=@CP@
 TOUCH=@TOUCH@
-MODULE_PATH=@MODULE_PATH@
 LDFLAGS=@LDFLAGS@
 RUNGROUP=@RUNGROUP@
 SHARED=@SHARED@
 MODULEFLAGS=@MODULEFLAGS@
 
-all:   language headers build core protocols tools modules 
+all:   language headers build core protocols tools modules
 profile: language headers profile_build profile_core profile_protocols profile_tools profile_modules
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
-	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+	   'LDFLAGS=${LDFLAGS}' 'INSTDIR=${INSTDIR}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
-      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-  	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
+      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' \
+  	   'RUNGROUP=${RUNGROUP}' \
 	   'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}' \
 	   'MAKEBIN=${MAKEBIN}'
 
@@ -56,11 +54,11 @@ profile_protocols: build
 	@src/protocol/configure src/protocol
 	@${MAKE} -C src/protocol ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' all
 
-core: build 
+core: build
 	@echo "*** Building Core modules";
 	 @${MAKE} -C src ${MAKEARGS} core
 
-profile_core: build 
+profile_core: build
 	@echo "*** Building Core modules";
 	@${MAKE} -C src ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' core
 
@@ -88,7 +86,7 @@ clean:
 	${MAKE} -C include ${MAKEARGS} clean
 	${MAKE} -C src ${MAKEARGS} clean
 	${MAKE} -C src/tools ${MAKEARGS} clean
-                
+
 distclean: clean
 	${MAKE} -C lang ${MAKEARGS} distclean
 	${MAKE} -C include ${MAKEARGS} distclean

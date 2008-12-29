@@ -1,9 +1,9 @@
 # Makefile for language module
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
-	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+	   'LDFLAGS=${LDFLAGS}' 'INSTDIR=${INSTDIR}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
-     	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
+     	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' \
    	   'RUNGROUP=${RUNGROUP}' 'MAKEBIN=${MAKEBIN}'
 
 LANGOBJS = cat de en_us es fr gr hun it nl pl pt ru tr
@@ -18,24 +18,24 @@ all: $(LANGOBJS)
 distclean: clean spotless
 
 install: all
-	test -d $(DATDEST)/languages || mkdir $(DATDEST)/languages
+	test -d $(INSTDIR)/data/languages || mkdir $(INSTDIR)/data/languages
 	@if [ "$(RUNGROUP)" ] ; then \
-		echo chgrp -R $(RUNGROUP) $(DATDEST)/languages ; \
-		chgrp -R $(RUNGROUP) $(DATDEST)/languages ; \
-		echo chmod -R g+rw $(DATDEST)/languages ; \
-		chmod -R g+rw $(DATDEST)/languages ; \
-		$(CP) $(LANGOBJS) $(DATDEST)/languages ; \
-		echo chgrp -R $(RUNGROUP) $(DATDEST)/languages ; \
-		chgrp -R $(RUNGROUP) $(DATDEST)/languages/* ; \
-		echo chmod -R g+rw $(DATDEST)/languages/* ; \
-		chmod -R g+rw $(DATDEST)/languages/* ; \
+		echo chgrp -R $(RUNGROUP) $(INSTDIR)/data/languages ; \
+		chgrp -R $(RUNGROUP) $(INSTDIR)/data/languages ; \
+		echo chmod -R g+rw $(INSTDIR)/data/languages ; \
+		chmod -R g+rw $(INSTDIR)/data/languages ; \
+		$(CP) $(LANGOBJS) $(INSTDIR)/data/languages ; \
+		echo chgrp -R $(RUNGROUP) $(INSTDIR)/data/languages ; \
+		chgrp -R $(RUNGROUP) $(INSTDIR)/data/languages/* ; \
+		echo chmod -R g+rw $(INSTDIR)/data/languages/* ; \
+		chmod -R g+rw $(INSTDIR)/data/languages/* ; \
 	fi
 	@if [ ! "$(RUNGROUP)" ] ; then \
-		chmod 700 $(DATDEST)/languages/ ; \
-		$(CP) $(LANGOBJS) $(DATDEST)/languages ; \
-		chmod 600 $(DATDEST)/languages/* ; \
+		chmod 700 $(INSTDIR)/data/languages/ ; \
+		$(CP) $(LANGOBJS) $(INSTDIR)/data/languages ; \
+		chmod 600 $(INSTDIR)/data/languages/* ; \
 	fi
-	
+
 clean:
 	rm -f $(LANGOBJS) langcomp language.h
 

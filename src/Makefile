@@ -14,10 +14,10 @@ INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/modules.h ../include/slist.h ../include/hashcomp.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
-	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+	   'LDFLAGS=${LDFLAGS}' 'INSTDIR=${INSTDIR}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
-     	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
+     	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' \
+   	   'RUNGROUP=${RUNGROUP}' \
 	   'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}' \
 	   'MAKEBIN=${MAKEBIN}'
 
@@ -112,28 +112,28 @@ spotless:
 	@${MAKE} -C core distclean
 
 install: services
-	test -d ${BINDEST} || mkdir ${BINDEST}
-	$(INSTALL) services $(BINDEST)/services
-	$(INSTALL) bin/anoperc $(BINDEST)/anoperc
+	test -d ${INSTDIR} || mkdir ${INSTDIR}
+	$(INSTALL) services $(INSTDIR)/services
+	$(INSTALL) bin/anoperc $(INSTDIR)/anoperc
 	(cd ../lang ; $(MAKE) install)
-	$(CP) ../data/* $(DATDEST)
-	$(INSTALL) bin/mydbgen $(DATDEST)/mydbgen
-	test -d $(DATDEST)/backups || mkdir $(DATDEST)/backups
-	test -d $(DATDEST)/logs || mkdir $(DATDEST)/logs
-	@if [ "$(MODULE_PATH)" ] ; then \
-		test -d ${MODULE_PATH} || mkdir ${MODULE_PATH} ; \
-		test -d ${MODULE_PATH}/runtime || mkdir ${MODULE_PATH}/runtime ; \
+	$(CP) ../data/* $(INSTDIR)/data
+	$(INSTALL) bin/mydbgen $(INSTDIR)/data/mydbgen
+	test -d $(INSTDIR)/data/backups || mkdir $(INSTDIR)/data/backups
+	test -d $(INSTDIR)/data/logs || mkdir $(INSTDIR)/data/logs
+	@if [ "$(INSTDIR)/data/modules" ] ; then \
+		test -d ${INSTDIR}/data/modules || mkdir ${INSTDIR}/data/modules ; \
+		test -d ${INSTDIR}/data/modules/runtime || mkdir ${INSTDIR}/data/modules/runtime ; \
 		(cd modules ; $(MAKE) install) ; \
 		(cd protocol ; ${MAKE} install) ; \
 		(cd core ; ${MAKE} install) ; \
 	fi
 	@if [ "$(RUNGROUP)" ] ; then \
-		echo chgrp -R $(RUNGROUP) $(DATDEST) ; \
-		chgrp -R $(RUNGROUP) $(DATDEST) ; \
-		echo chmod -R g+rw $(DATDEST) ; \
-		chmod -R g+rw $(DATDEST) ; \
-		echo find $(DATDEST) -type d -exec chmod g+xs \'\{\}\' \\\; ; \
-		find $(DATDEST) -type d -exec chmod g+xs '{}' \; ; \
+		echo chgrp -R $(RUNGROUP) $(INSTDIR)/data ; \
+		chgrp -R $(RUNGROUP) $(INSTDIR)/data ; \
+		echo chmod -R g+rw $(INSTDIR)/data ; \
+		chmod -R g+rw $(INSTDIR)/data ; \
+		echo find $(INSTDIR)/data -type d -exec chmod g+xs \'\{\}\' \\\; ; \
+		find $(INSTDIR)/data -type d -exec chmod g+xs '{}' \; ; \
 	fi
 
 DUMMY:

@@ -28,7 +28,6 @@ typedef unsigned __int8 u_int8_t;
 
 /* Enable Module support */
 #define USE_MODULES
-#define MODULE_PATH ".\\modules\\"
 
 /* Windows/MSVC likes to name things differently */
 #define snprintf		_snprintf

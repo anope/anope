@@ -1,10 +1,10 @@
 include ./Makefile.inc
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
-	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+	   'LDFLAGS=${LDFLAGS}' 'INSTDIR=${INSTDIR}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
-      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
+      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' \
+   	   'RUNGROUP=${RUNGROUP}' \
 	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'\
 	   'MAKEBIN=${MAKEBIN}'
 
@@ -16,8 +16,8 @@ all: modules subs
 
 modules: $(OBJECTS) $(SO_FILES)
 
-install: 
-	$(CP) ./*.so $(MODULE_PATH) 
+install:
+	$(CP) ./*.so $(INSTDIR)/data/modules
 	@for i in $(SUBS); do \
 	echo "make install in $$i..."; \
 	(cd $$i; $(MAKE) $(MAKEARGS) install);done

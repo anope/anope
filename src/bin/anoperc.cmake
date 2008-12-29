@@ -15,9 +15,9 @@
 
 
 
-ANOPEPID="@DATADIR@/services.pid"
-ANOPROG="@BINDIR@/services"
-LOG="@DATADIR@/logs/"
+ANOPEPID="@INSTDIR@/data/services.pid"
+ANOPROG="@INSTDIR@/services"
+LOG="@INSTDIR@/data/logs/"
 ARCVERSION="1.2"
 
 isAnopeRunning () {
@@ -134,7 +134,7 @@ elif [ "$1" = "help" ] ; then
 		echo "folder or make use of our extensive online support at"
 		echo "http://www.anope.org/"
 	fi
-	
+
 else
 	echo "Anope Remote Control ($ARCVERSION)"
 	echo "Usage: $0 [start|stop|status|restart|rehash|version|help]"

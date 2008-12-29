@@ -75,9 +75,6 @@
 /* va_list as array */
 #undef HAVE_VA_LIST_AS_ARRAY
 
-/* "Module dir" */
-#undef MODULE_PATH
-
 /* "Has mysql/mysql.h" */
 #undef MYSQL_HEADER_PREFIX
 

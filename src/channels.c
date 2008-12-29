@@ -1930,7 +1930,6 @@ Entry *entry_create(char *mask)
 {
 	Entry *entry;
 	char *nick = NULL, *user, *host, *cidrhost;
-	int do_free = 0;
 	uint32 ip, cidr;
 
 	entry = new Entry;
@@ -1997,7 +1996,6 @@ Entry *entry_create(char *mask)
 			entry->cidr_mask = cidr;
 			entry->type |= ENTRYTYPE_CIDR4;
 			host = cidrhost;
-			do_free = 1;
 		} else if (ircd->cidrchanbei && strchr(host, '/')) {
 			/* Most IRCd's don't enforce sane bans therefore it is not
 			 * so unlikely we will encounter this.
@@ -2017,8 +2015,6 @@ Entry *entry_create(char *mask)
 		}
 	}
 	delete [] mask;
-	if (do_free)
-		delete [] host;
 
 	return entry;
 }

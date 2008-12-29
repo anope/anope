@@ -504,11 +504,11 @@ macro(add_to_cpack_ignored_files ITEM)
 endmacro(add_to_cpack_ignored_files)
 
 # Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
-add_to_cpack_ignored_files(".git\;config.cache\;.svn\;CMakeFiles" TRUE)
+add_to_cpack_ignored_files(".git\;config.cache\;.svn\;CMakeFiles\;sysconf.h$\;Makefile.inc$\;config.log\;config.status" TRUE)
+# Add the files we don't want the periods converted for
+add_to_cpack_ignored_files(".\\\\\\\\.so$;.\\\\\\\\.o$;.\\\\\\\\.s$;${Anope_SOURCE_DIR}/Makefile$")
 # If the two directories are the same, we are building in-source, thus we need to ignore more files from the build
 if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
-  # This variable is used in the sub-directories to determine if we are building in-source
-  set(IN_SOURCE TRUE)
   # Add the files that need their periods converted
   add_to_cpack_ignored_files("Makefile\;cmake_install.cmake\;sysconf.h$\;CMakeCache.txt\;install_manifest.txt" TRUE)
   # Add the files we don't want the periods converted for
@@ -517,9 +517,6 @@ if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
   if(MSVC)
     add_to_cpack_ignored_files(".vcproj$\;.sln$\;.ncb$\;.suo$\;.dir$\;.ilk$\;.exp$\;.pdb$\;.lib$\;/debug$;/release$;/relwithdebinfo$;/minsizerel$" TRUE)
   endif(MSVC)
-# Otherwise, the two directories are different and we are building out-of-source
-else(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
-  set(IN_SOURCE FALSE)
 endif(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
 
 # Go into the following directories and run their CMakeLists.txt as well

@@ -5,11 +5,9 @@ add_executable(langcomp langcomp.c)
 set_target_properties(langcomp PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
 # Get the location of the binary to use later
 get_target_property(langcomp_BINARY langcomp LOCATION)
-if(IN_SOURCE)
-  # Add the executable to the list of files for CPack to ignore
-  file(RELATIVE_PATH langcomp_BINARY_RELATIVE ${Anope_BINARY_DIR} ${langcomp_BINARY})
-  add_to_cpack_ignored_files("${langcomp_BINARY_RELATIVE}$" TRUE)
-endif(IN_SOURCE)
+# Add the executable to the list of files for CPack to ignore
+file(RELATIVE_PATH langcomp_BINARY_RELATIVE ${Anope_BINARY_DIR} ${langcomp_BINARY})
+add_to_cpack_ignored_files("${langcomp_BINARY_RELATIVE}$" TRUE)
 
 # Determine if langtool should be built
 if(MSVC)
@@ -31,11 +29,9 @@ if(BUILD_LANGTOOL)
   set_target_properties(langtool PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
   # Get the location of the binary to use later)
   get_target_property(langtool_BINARY langtool LOCATION)
-  if(IN_SOURCE)
-    # Add the executable to the list of files for CPack to ignore
-    file(RELATIVE_PATH langtool_BINARY_RELATIVE ${Anope_BINARY_DIR} ${langtool_BINARY})
-    add_to_cpack_ignored_files("${langtool_BINARY_RELATIVE}$" TRUE)
-  endif(IN_SOURCE)
+  # Add the executable to the list of files for CPack to ignore
+  file(RELATIVE_PATH langtool_BINARY_RELATIVE ${Anope_BINARY_DIR} ${langtool_BINARY})
+  add_to_cpack_ignored_files("${langtool_BINARY_RELATIVE}$" TRUE)
 endif(BUILD_LANGTOOL)
 
 # If grep exists (and we aren't using Visual Studio, it hates this), use it to generate the index file
@@ -51,11 +47,9 @@ else(NOT MSVC AND GREP)
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/en_us.l DEPENDS langtool
   )
 endif(NOT MSVC AND GREP)
-if(IN_SOURCE)
-  # Add the index file to the list of files for CPack to ignore
-  file(RELATIVE_PATH index_RELATIVE ${Anope_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/index)
-  add_to_cpack_ignored_files("${index_RELATIVE}$")
-endif(IN_SOURCE)
+# Add the index file to the list of files for CPack to ignore
+file(RELATIVE_PATH index_RELATIVE ${Anope_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/index)
+add_to_cpack_ignored_files("${index_RELATIVE}$")
 
 # Find all the *.l files within the current source directory, and sort the list
 file(GLOB LANG_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.l")
@@ -74,11 +68,9 @@ foreach(LANG_L ${LANG_SRCS})
     COMMAND ${langcomp_BINARY} ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_L} ${CMAKE_CURRENT_BINARY_DIR}/${LANG}
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_L} DEPENDS langcomp ${CMAKE_CURRENT_BINARY_DIR}/index
   )
-  if(IN_SOURCE)
-    # Add the language file to the list of files for CPack to ignore
-    file(RELATIVE_PATH LANG_RELATIVE ${Anope_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${LANG})
-    add_to_cpack_ignored_files("${LANG_RELATIVE}$")
-  endif(IN_SOURCE)
+  # Add the language file to the list of files for CPack to ignore
+  file(RELATIVE_PATH LANG_RELATIVE ${Anope_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${LANG})
+  add_to_cpack_ignored_files("${LANG_RELATIVE}$")
 endforeach(LANG_L)
 
 # If perl exists (and we aren't using Visual Studio, it hates this), use it to generate language.h
@@ -94,10 +86,8 @@ else(NOT MSVC AND PERL)
     MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/index DEPENDS langtool
   )
 endif(NOT MSVC AND PERL)
-if(IN_SOURCE)
-  # Add language.h to the list of files for CPack to ignore
-  add_to_cpack_ignored_files("language.h$" TRUE)
-endif(IN_SOURCE)
+# Add language.h to the list of files for CPack to ignore
+add_to_cpack_ignored_files("language.h$" TRUE)
 
 # Add a custom target to depend on the language files and language.h
 add_custom_target(language DEPENDS ${LANGS} ${CMAKE_CURRENT_BINARY_DIR}/language.h)

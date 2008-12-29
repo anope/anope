@@ -4,10 +4,8 @@ if(NOT WIN32)
   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
     DESTINATION .
   )
-  if(IN_SOURCE)
-    # Add anoperc to list of files for CPack to ignore
-    add_to_cpack_ignored_files("anoperc$")
-  endif(IN_SOURCE)
+  # Add anoperc to list of files for CPack to ignore
+  add_to_cpack_ignored_files("anoperc$")
   install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/mydbgen
     DESTINATION data
   )

@@ -23,12 +23,10 @@ foreach(SRC ${TOOLS_SRCS})
   install(TARGETS ${EXE}
     DESTINATION tools
   )
-  if(IN_SOURCE)
-    # Add the executable to the list of files for CPack to ignore
-    get_target_property(EXE_BINARY ${EXE} LOCATION)
-    get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
-    add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
-  endif(IN_SOURCE)
+  # Add the executable to the list of files for CPack to ignore
+  get_target_property(EXE_BINARY ${EXE} LOCATION)
+  get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
+  add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
 endforeach(SRC)
 
 # Only for Windows, set anopesmtp to require the wsock32 library

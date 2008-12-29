@@ -1,0 +1,290 @@
+dnl autoconf.in for Services.
+dnl
+dnl Anope (c) 2003-2008 Anope team
+dnl Contact us at dev@anope.org
+
+dnl This program is free but copyrighted software; see the file COPYING for
+dnl details.
+
+dnl Based heavily on the Unreal configure.in script, and extra thanks to
+dnl codemastr from UnrealIRCD.
+
+AC_INIT
+
+# Clear out any CFLAGS (cept -g) the os is using, usually -g -O2
+CFLAGS="-g"
+
+# If no bindir, we tell him to run ./Config.
+if test "${with_instdir+set}" != set; then
+  echo "You might want to run ./Config or provide some parameters to this script."
+  echo "./configure --help for information about this script"
+  exit 0
+fi
+
+AC_CONFIG_SRCDIR([src/actions.c])
+AC_CONFIG_HEADER(include/sysconf.h)
+AC_PROG_CC
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+#    CFLAGS="$CFLAGS -funsigned-char"
+    AC_CACHE_CHECK(if gcc has a working -pipe, ac_cv_pipe, [
+    save_cflags="$CFLAGS"
+    CFLAGS="$CFLAGS -pipe"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_pipe="yes"],[ac_cv_pipe="no"])
+    CFLAGS="$save_cflags"
+    ])
+    if test "$ac_cv_pipe" = "yes"; then
+        CFLAGS="-pipe $CFLAGS"
+    fi
+fi
+
+dnl CFLAGS="$CFLAGS -W -Wall"
+
+AC_PATH_PROG(RM,rm)
+AC_PATH_PROG(CP,cp)
+AC_PATH_PROG(TOUCH,touch)
+AC_PATH_PROG(INSTALL,install)
+AC_CHECK_LIB(nsl,inet_ntoa,ANOPELIBS="$ANOPELIBS-lnsl ")
+AC_CHECK_LIB(socket, socket,ANOPELIBS="$ANOPELIBS-lsocket ")
+AC_CHECK_LIB(resolv, res_query,ANOPELIBS="$ANOPELIBS-lresolv ")
+AC_CHECK_LIB(bsd, revoke,ANOPELIBS="$ANOPELIBS-lbsd ")
+
+dnl Does this platform require array notation to assign to a va_list?
+dnl If cross-compiling, we assume va_list is "normal".  If this breaks
+dnl you, set ac_cv_valistisarray=true and maybe define HAVE_VA_LIST_AS_ARRAY
+dnl also just to be sure.
+
+dnl NOTE: this autoconf test is taken from mozilla: www.mozilla.org.
+
+AC_MSG_CHECKING(whether va_list assignments need array notation)
+AC_CACHE_VAL(ac_cv_valistisarray,
+        [AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <stdlib.h>
+		     #include <stdarg.h>
+		     void foo(int i, ...) {
+			va_list ap1, ap2;
+			va_start(ap1, i);
+			ap2 = ap1;
+			if (va_arg(ap2, int) != 123 || va_arg(ap1, int) != 123) { exit(1); }
+			va_end(ap1); va_end(ap2);
+		     }
+		     int main()
+		     { foo(0, 123); return(0); }]])],[ac_cv_valistisarray=false],[ac_cv_valistisarray=true],[ac_cv_valistisarray=false])])
+
+if test "$ac_cv_valistisarray" = true ; then
+	AC_DEFINE(HAVE_VA_LIST_AS_ARRAY,[1],[va_list as array])
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+
+DIS_MYSQL="  MySQL: No"
+AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to find it],,[
+	AC_ARG_WITH(mysqlconfig-path, [  --with-mysqlconfig-path=PATH Complete path to the mysql_config executable],
+	mysql_config_path="$withval", mysql_config_path="")
+	MYSQLCONF=""
+	if test "$mysql_config_path" != ""; then
+		if test -x "$mysql_config_path"; then
+			MYSQLCONF="$mysql_config_path"
+			echo "checking for mysql_config... $MYSQLCONF" >&6
+		fi
+	fi
+	if test "$MYSQLCONF" = ""; then
+		AC_PATH_PROG(MYSQLCONF,mysql_config, "")
+	fi
+	if test "$MYSQLCONF" != ""; then
+		hold_cflags="$CFLAGS"
+		hold_ldflags="$LDFLAGS"
+		if test "$MYSQL_CFLAGS" = ""; then
+			MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
+		fi
+		if test "$MYSQL_LDFLAGS" = ""; then
+			MYSQL_LDFLAGS="`$MYSQLCONF --libs`"
+		fi
+		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
+		LDFLAGS="$LDFLAGS $MYSQL_LDFLAGS"
+		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
+		AC_TRY_RUN([
+#include <mysql.h>
+
+int main()
+{
+	MYSQL *mysql = mysql_init(0);
+
+	return 0;
+}
+		], ac_cv_mysql_valid=yes, ac_cv_mysql_valid=no)
+		echo $ac_cv_mysql_valid >&6
+		if test "$ac_cv_mysql_valid" = "yes"; then
+			 DIS_MYSQL="  MySQL: Yes"
+		else
+			CFLAGS="$hold_cflags"
+			LDFLAGS="$hold_ldflags"
+		fi
+	fi
+])
+
+AC_MSG_CHECKING(whether this is a bit or little endian system)
+AC_TRY_RUN([
+int main()
+{
+	short s = 1;
+	short* ptr = &s;
+	unsigned char c = *((char*)ptr);
+	return c;
+}
+]
+, AC_DEFINE(BIG_ENDIAN)
+  AC_MSG_RESULT(big)
+, AC_DEFINE(LITTLE_ENDIAN)
+  AC_MSG_RESULT(little)
+)
+
+AC_SUBST(ANOPELIBS)
+AC_SUBST(LDFLAGS)
+
+AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
+dnl module checking based on Unreal's module checking code
+AC_DEFUN(AC_ENABLE_DYN,
+[
+AC_CHECK_FUNC(dlopen,, AC_CHECK_LIB(dl,dlopen,[
+  ANOPELIBS="$ANOPELIBS -ldl"
+],
+[
+  AC_ERROR("dlopen() is required for Anope to be compiled and used. Sorry.")
+]))
+
+hold_cflags=$CFLAGS
+CFLAGS="$CFLAGS -export-dynamic"
+AC_CACHE_CHECK(if we need the -export-dynamic flag, ac_cv_export_dynamic, [
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int i;]])],[ac_cv_export_dynamic=yes],[ac_cv_export_dynamic=no])])
+if test "$ac_cv_export_dynamic" = "no"; then
+CFLAGS=$hold_cflags
+fi
+
+AC_CACHE_CHECK(for compiler option to produce PIC,ac_cv_pic,[
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+        ac_cv_pic="-fPIC -DPIC -shared"
+	case `uname -s` in
+		Darwin*[)]
+		ac_cv_pic="-bundle -flat_namespace -undefined suppress"
+		;;
+		HP-UX*[)]
+		ac_cv_pic="-fPIC"
+		;;
+	esac
+else
+case `uname -s` in
+    SunOS*[)]
+       ac_cv_pic="-KPIC -DPIC -G"
+    ;;
+esac
+
+fi
+
+])
+
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+	case `uname -s` in
+		Darwin*[)]
+		SHARED="-bundle -flat_namespace -undefined suppress"
+		AC_SUBST(SHARED)
+		;;
+		*[)]
+		SHARED="-shared"
+		AC_SUBST(SHARED)
+		;;
+	esac
+fi
+
+AC_CACHE_CHECK(if your system prepends an underscore on symbols,ac_cv_underscore,[
+cat >uscore.c << __EOF__
+int main() {
+return 0;
+}
+__EOF__
+$CC -o uscore $CFLAGS uscore.c 1>&5
+if test -z "`strings -a uscore |grep '^_main$'`"; then
+    ac_cv_underscore=no
+else
+    ac_cv_underscore=yes
+fi
+
+rm -f uscore uscore.c
+])
+if test "$ac_cv_underscore" = "yes"; then
+AC_DEFINE(DL_PREFIX,"_","Underscore needed for dlopen")
+else
+AC_DEFINE(DL_PREFIX,"","No prefix needed for dlopen")
+fi
+
+MODULEFLAGS=$ac_cv_pic
+AC_SUBST(MODULEFLAGS)
+])
+
+AC_ENABLE_DYN
+anope_CHECK_TYPE_SIZES
+
+AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H,1,""))
+AC_CHECK_HEADER(sys/select.h,AC_DEFINE(HAVE_SYS_SELECT_H,1,""))
+
+AC_CHECK_FUNCS(backtrace,AC_DEFINE(HAVE_BACKTRACE,1))
+AC_CHECK_FUNCS(stricmp,AC_DEFINE(HAVE_STRICMP,1))
+AC_CHECK_FUNCS(strcasecmp,AC_DEFINE(HAVE_STRCASECMP,1))
+AC_CHECK_FUNCS(gettimeofday,AC_DEFINE(HAVE_GETTIMEOFDAY,1))
+AC_CHECK_FUNCS(setgrent,AC_DEFINE(HAVE_SETGRENT,1))
+AC_CHECK_FUNCS(umask,AC_DEFINE(HAVE_UMASK,1))
+AC_CHECK_FUNCS(fork,AC_DEFINE(HAVE_FORK,1))
+AC_CHECK_FUNCS(gethostbyname,AC_DEFINE(HAVE_GETHOSTBYNAME,1))
+AC_CHECK_FUNCS(gethostbyname_r,AC_DEFINE(HAVE_GETHOSTBYNAME_R,1))
+AC_CHECK_FUNCS(strlcpy,AC_DEFINE(HAVE_STRLCPY,1))
+AC_CHECK_FUNCS(strlcat,AC_DEFINE(HAVE_STRLCAT,1))
+
+AC_ARG_WITH(rungroup, [ --with-rungroup=group     Specify the rungroup for anope], [
+    AC_DEFINE_UNQUOTED(RUNGROUP,"$withval","Run group")
+    RUNGROUP=$withval
+])
+
+AC_SUBST(RUNGROUP)
+
+dnl AC_DEFINE_UNQUOTED(MYOSNAME,"`uname -a`","uname")
+
+AC_ARG_WITH(permissions, [ --with-permissions=permissions     Specify the default permissions for anope], AC_DEFINE_UNQUOTED(DEFUMASK,$withval,"Default umask permissions"), AC_DEFINE(DEFUMASK, 007,"Default umask Permissions"))
+
+AC_ARG_WITH(instdir, [ --with-instdir=instdir   Specify the default install dir for anope], [
+    INSTDIR=$withval
+])
+
+MAKEBIN=`pwd`/run-cc.pl
+
+AC_ARG_WITH(makebin, [--with-makebin=run-cc.pl     Specify the default make binary to use],[MAKEBIN=$withval])
+
+AC_SUBST(INSTDIR)
+AC_SUBST(MAKEBIN)
+
+AC_ARG_WITH(optimization, [ --with-optimization=1|2|3|4|5   Specify the optimization level], [
+    CFLAGS="$CFLAGS -O$withval"
+])
+
+AC_ARG_WITH(debugsym, [ --with-debugsym    Include debugging symbols], [
+    CFLAGS="$CFLAGS -g"
+])
+
+
+AC_CONFIG_FILES(		\
+	Makefile		\
+	src/bin/anoperc	\
+)
+
+AC_OUTPUT
+
+cat <<EOT
+
+$DIS_MODULES
+$DIS_MYSQL
+
+
+
+All done!  Now run "make" (or possibly "gmake") to compile Anope.
+See the INSTALL, README and FAQ files if you have any problems.
+EOT
+

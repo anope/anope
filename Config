@@ -36,7 +36,7 @@ Load_Cache () {
 	fi
 }
 
-Run_CMake () {
+Run_Build_System () {
 	WITH_INST=""
 	WITH_RUN=""
 	WITH_PERM=""
@@ -44,42 +44,77 @@ Run_CMake () {
 	RUN_CC_PL=""
 	GEN_TYPE=""
 
-	if [ "$INSTDEST" != "" ] ; then
-		WITH_INST="-DINSTDIR:STRING=$INSTDEST"
+	if [ "$INSTDIR" != "" ] ; then
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			WITH_INST="-DINSTDIR:STRING=$INSTDIR"
+		else
+			WITH_INST="--with-instdir=$INSTDIR"
+		fi
 	fi
 
 	if [ "$RUNGROUP" != "" ] ; then
-		WITH_RUN="-DRUNGROUP:STRING=$RUNGROUP"
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			WITH_RUN="-DRUNGROUP:STRING=$RUNGROUP"
+		else
+			WITH_RUN="--with-rungroup=$RUNGROUP"
+		fi
 	fi
 
 	if [ "$UMASK" != "" ] ; then
-		WITH_PERM="-DDEFUMASK:STRING=$UMASK"
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			WITH_PERM="-DDEFUMASK:STRING=$UMASK"
+		else
+			WITH_PERM="--with-permissions=$UMASK"
+		fi
 	fi
 
 	if [ "$DEBUG" = "yes" ] ; then
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
+		else
+			BUILD_TYPE="--with-debugsym"
+		fi
 	else
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
+		fi
 	fi
 
 	if [ "$USE_RUN_CC_PL" = "yes" ] ; then
-		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
+		else
+			pwdsave=`pwd`
+			cd "`dirname $SOURCE_DIR/run-cc.pl`"
+			RUN_CC_PL="--with-makebin=`pwd`/run-cc.pl"
+			cd "$pwdsave"
+		fi
 	else
-		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
+		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
+		else
+			RUN_CC_PL="--with-makebin="
+		fi
 	fi
 
-	case `uname -s` in
-		MINGW*)
-			GEN_TYPE="-G\"MSYS Makefiles\""
-			;;
-	esac
+	if [ "$BUILD_SYSTEM" = "cmake" ] ; then
+		case `uname -s` in
+			MINGW*)
+				GEN_TYPE="-G\"MSYS Makefiles\""
+				;;
+		esac
 
-	echo "cmake $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $SOURCE_DIR"
+		echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $SOURCE_DIR"
 
-	cmake $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $SOURCE_DIR
+		cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $SOURCE_DIR
 
-	echo ""
-	echo "Now run make to build Anope."
+		echo ""
+		echo "Now run make to build Anope."
+	else
+		echo "./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL"
+
+		./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL
+	fi
 }
 
 ECHO2SUF=''
@@ -99,10 +134,11 @@ export ECHO2 ECHO2SUF
 # Init values
 ###########################################################################
 
-INSTDEST=$HOME/services
+BUILD_SYSTEM="cmake"
+INSTDIR=$HOME/services
 RUNGROUP=
 UMASK=
-DEBUG="no"
+DEBUG="yes"
 USE_RUN_CC_PL="no"
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
@@ -127,7 +163,7 @@ while [ $# -ge 1 ] ; do
 	elif [ $1 = "-quick" -o $1 = "-q" ] ; then
 		Load_Cache
 		if [ "$CAN_QUICK" = "yes" ] ; then
-			Run_CMake
+			Run_Build_System
 		else
 			echo ""
 			echo "Can't find cache file (config.cache), aborting..."
@@ -175,12 +211,36 @@ export ok INPUT
 
 ok=0
 echo "Note: press Return for the default, or enter a new value."
-echo "In what directory do you want the binaries to be installed?"
+echo "Are you using configure or cmake?"
 while [ $ok -eq 0 ] ; do
-	echo2 "[$INSTDEST] "
+	echo2 "[$BUILD_SYSTEM] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
-		INPUT=$INSTDEST
+		INPUT=$BUILD_SYSTEM
+	fi
+	case $INPUT in
+		cmake)
+			ok=1
+			;;
+		configure)
+			ok=1
+			;;
+		*)
+			echo "That is not a valid choice!"
+			ok=0
+			;;
+	esac
+done
+BUILD_SYSTEM=$INPUT
+echo ""
+
+ok=0
+echo "In what directory do you want the binaries to be installed?"
+while [ $ok -eq 0 ] ; do
+	echo2 "[$INSTDIR] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$INSTDIR
 	fi
 	if [ ! -d "$INPUT" ] ; then
 		if exists "$INPUT" ; then
@@ -201,7 +261,7 @@ while [ $ok -eq 0 ] ; do
 		ok=1
 	fi
 done
-INSTDEST=$INPUT
+INSTDIR=$INPUT
 echo ""
 
 
@@ -310,7 +370,8 @@ echo ""
 echo2 "Saving configuration results in config.cache... "
 
 cat <<EOT >$SOURCE_DIR/config.cache
-INSTDEST="$INSTDEST"
+BUILD_SYSTEM="$BUILD_SYSTEM"
+INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
@@ -320,7 +381,7 @@ echo "done."
 
 
 ################################################################################
-# Build the CMake string
+# Build the build system string
 ################################################################################
 
-Run_CMake
+Run_Build_System

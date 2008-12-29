@@ -1,0 +1,75 @@
+# Makefile for language module
+
+include ../Makefile.inc.win32
+
+
+LANGOBJS = cat de en_us es fr hun gr nl pl pt tr it ru
+LANGSRCS = cat de en_us.l es fr.l hun.l gr.l nl.l pl.l pt.l tr.l it.l ru.l
+
+LANGCOMP = ./langcomp
+#LANGCOMP = ./langcomp -w
+
+
+all: $(LANGOBJS)
+
+
+install: all
+        -copy cat ..\$(DATDEST)\languages
+        -copy en_us ..\$(DATDEST)\languages
+        -copy de ..\$(DATDEST)\languages
+        -copy es ..\$(DATDEST)\languages
+        -copy fr ..\$(DATDEST)\languages
+        -copy hun ..\$(DATDEST)\languages
+        -copy gr ..\$(DATDEST)\languages
+        -copy nl ..\$(DATDEST)\languages
+        -copy pl ..\$(DATDEST)\languages
+        -copy pt ..\$(DATDEST)\languages
+        -copy tr ..\$(DATDEST)\languages
+        -copy it ..\$(DATDEST)\languages
+        -copy ru ..\$(DATDEST)\languages
+
+clean:
+        -@erase $(LANGOBJS) langcomp.exe langtool.exe *.obj index
+
+spotless: clean
+        -@erase language.h
+
+
+cat:       cat.l     langtool.exe langcomp.exe index
+        langcomp $@.l
+de:       de.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+en_us:    en_us.l    langtool.exe langcomp.exe index
+        langcomp $@.l
+es:       es.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+fr:       fr.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+hun:       hun.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+gr:       gr.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+nl:       nl.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+pl:       pl.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+pt:       pt.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+tr:       tr.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+it:       it.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+ru:       ru.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+
+langtool.exe: langtool.c
+        $(CC) $(CFLAGS) langtool.c -o $@ /link $(LFLAGS)
+
+langcomp.exe: langcomp.c
+        $(CC) $(CFLAGS) langcomp.c -o $@ /link $(LFLAGS)
+
+language.h: langtool.exe index
+        langtool language.h
+
+index: langtool.exe en_us.l
+        langtool index

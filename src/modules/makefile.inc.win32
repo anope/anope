@@ -1,0 +1,2 @@
+SRCS=cs_appendtopic.c cs_enforce.c cs_tban.c ns_maxemail.c hs_request.c os_info.c bs_fantasy_unban.c
+SUBS=test

@@ -6,7 +6,7 @@ Anope Installation Instructions
 3) Setting up the IRCd
 4) Starting Anope
 5) Setting up a crontab
-  
+
 Note: You should also read the README and FAQ files!
 
 1) Installing Anope
@@ -21,15 +21,35 @@ Note: You should also read the README and FAQ files!
 
         http://www.anope.org/
 
+    Anope can be built one of two ways. The recommended way is to use CMake.
+    You can check if CMake is already installed on your system using the
+    command:
+
+        cmake --version
+
+    If it's installed, you will get a line that says something similar to
+    "cmake version 2.6-patch 1". If the version is less than 2.4 or you get
+    an error saying the command was not found, you will not be able to use
+    CMake unless you install it yourself into your home directory. CMake
+    can be downloaded from:
+
+        http://www.cmake.org/cmake/resources/software.html
+
+    If you are unable to install CMake yourself (either due to lack of space
+    or restrictions by your hosting provider), you still have the alternative
+    to use the provided configure script. This option is not recommended and
+    will eventually be phased out, but is provided for compatibility for those
+    lacking CMake.
+
     Next, unpack the package in your home directory, and go into the created
     directory.
 
     Now type ./Config to start the configuration script. It will ask you a
     few questions, and figure out how to compile Anope on your system. If
-    you are unsure about the answer to a question, use the default value. 
-
-    NOTE: although you may specify different binary and data paths, it is
-          RECOMMENDED that you use the same value for both.
+    you are unsure about the answer to a question, use the default value.
+    The question to using configure or cmake depends on your decision from
+    above. If you have CMake and wish to use it, answer with cmake, otherwise
+    answer with configure.
 
     You can now type make to compile Anope. If there are errors in the
     Makefile, *try to use gmake* instead. If it still doesn't work, you (or
@@ -44,10 +64,10 @@ Note: You should also read the README and FAQ files!
     the memos of any user.
 
     If you see errors during this process, please mail us with the *complete*
-    error output, and don't forget to mention your OS, compiler and C library
-    versions. 
+    error output, and don't forget to mention your OS, compiler and C++ library
+    versions.
 
-    Now go into the data directory (by default, ~/services). Copy the example
+    Now go into the data directory (by default, ~/services/data). Copy the example
     configuration file (example.conf) to services.conf, and open the latter
     with your favorite text editor. It contains all the configuration
     directives Anope will use at startup. Read the instructions contained in
@@ -146,7 +166,7 @@ Note: You should also read the README and FAQ files!
 
     If there are syntax errors in the configuration file they will be
     displayed on the screen. Correct them until there are no errors anymore.
-    A successful startup won't generate any message. 
+    A successful startup won't generate any message.
 
     Give Services at least one minute to link to your network, as certain
     IRCds on some OSes may be really slow for the link process. If nothing

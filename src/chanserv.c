@@ -1465,8 +1465,7 @@ void cs_remove_nick(const NickCore * nc)
 				}
 			}
 
-			for (akick = ci->akick, j = ci->akickcount; j > 0;
-				 akick++, j--) {
+			for (akick = ci->akick, j = 0; j < ci->akickcount; akick++, j++) {
 				if ((akick->flags & AK_USED) && (akick->flags & AK_ISNICK)
 					&& akick->u.nc == nc) {
 					if (akick->creator) {
@@ -1478,9 +1477,53 @@ void cs_remove_nick(const NickCore * nc)
 						akick->reason = NULL;
 					}
 					akick->flags = 0;
+					akick->addtime = 0;
 					akick->u.nc = NULL;
+					
+					/* Only one occurance can exist in every akick list.. ~ Viper */
+					break;
 				}
 			}
+
+			/* Are there any akicks behind us? 
+			 * If so, move all following akicks.. ~ Viper */
+			if (j < ci->akickcount - 1) {
+				for (k = j + 1; k < ci->akickcount; j++, k++) {
+					if (ci->akick[k].flags & AK_USED) {
+						/* Move the akick one place ahead and clear the original */
+						if (ci->akick[k].flags & AK_ISNICK) {
+							ci->akick[j].u.nc = ci->akick[k].u.nc;
+							ci->akick[k].u.nc = NULL;
+						} else {
+							ci->akick[j].u.mask = sstrdup(ci->akick[k].u.mask);
+							delete [] ci->akick[k].u.mask;
+							ci->akick[k].u.mask = NULL;
+						}
+
+						if (ci->akick[k].reason) {
+							ci->akick[j].reason = sstrdup(ci->akick[k].reason);
+							delete [] ci->akick[k].reason;
+							ci->akick[k].reason = NULL;
+						} else
+							ci->akick[j].reason = NULL;
+
+						ci->akick[j].creator = sstrdup(ci->akick[k].creator);
+						delete [] ci->akick[k].creator;
+						ci->akick[k].creator = NULL;
+
+						ci->akick[j].flags = ci->akick[k].flags;
+						ci->akick[k].flags = 0;
+
+						ci->akick[j].addtime = ci->akick[k].addtime;
+						ci->akick[k].addtime = 0;
+					}
+				}
+			}
+
+			/* After moving only the last entry should still be empty.
+			 * Free the place no longer in use... ~ Viper */
+			ci->akickcount = j;
+			ci->akick = static_cast<AutoKick *>(srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount));
 		}
 	}
 }

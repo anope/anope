@@ -20,116 +20,82 @@ Anope for Windows
         * Current Anope source:
             http://sourceforge.net/project/showfiles.php?group_id=94081
 
-        * CMake:
-            http://www.cmake.org/cmake/resources/software.html
-
-        (NOTE: When installing, tell CMake to add itself to the PATH.)
-
-        If you have Visual C++ 6, 7 (.NET 2002/2003), 8 (2005), or 9 (2008) skip ahead to step 2, else you
+        If you have Visual C++ 6, 7 (.NET 2002/2003) or 8 (2005) skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once
         downloaded, install these packages.
 
-        * Microsoft Visual C++ 2008 Express Edition:
-            http://www.microsoft.com/express/vc/
+		* Microsoft Visual C++ 2008 Express Edition:
+			http://www.microsoft.com/express/vc/
 
-        or
+		or
 
         * Microsoft Visual C++ 2005 Express Edition:
-            http://www.microsoft.com/downloads/details.aspx?FamilyId=7B0B0339-613A-46E6-AB4D-080D4D4A8C4E&displaylang=en
+            http://msdn.microsoft.com/vstudio/express/visualc/download/
+            
+		then download and install:
 
-        then download and install:
+        * Microsoft Windows PlatformSDK: (Requires WGA validation)
+	    http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
 
-        * Microsoft Windows 2008 SDK:
-            http://www.microsoft.com/downloads/details.aspx?FamilyId=E6E1C3DF-A74F-4207-8586-711EBE331CDC&displaylang=en
+	    (NOTE: Although this says for Windows Server 2003, it does infact work on all supported
+	    versions of Windows. When installing, you should select the Custom option, and ensure
+	    that only the top selection, and the bottom selection are checked. This will cut down
+	    install time dramatically)
 
-        or (if you prefer a smaller download)
+        * MySQL for Windows (only needed if building with MySQL enabled):
+            http://dev.mysql.com/
 
-        * Microsoft Windows 2003 Platform SDK: (Requires WGA validation)
-            http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
+	    (NOTE: Anope can be compiled against MySQL Version 3.23 and above)
 
-        (NOTE: Although they say for Windows Server 2003 or 2008, they do infact work on all supported
-        versions of Windows. When installing the 2003 SDK, you should select the Custom option, and only select
-        to have the Microsoft Windows Core SDK installed. When installing the 2008 SDK, you should select the
-        Custom option, and only select to have the Developer Tools installed, but also expand that and deselect
-        the Visual C++ Compilers as well as the Mobile Tools. Doing this will decrease the install time as well
-        as the space used by the SDK.)
-
-        If you chose to download the 2003 SDK, it will not work out-of-the-box on either Visual C++ 2005 Express or
-        Visual C++ 2008 Express. The 2008 SDK will work out-of-the-box with Visual C++ 2008 Express but not with
-        Visual C++ 2005 Express.
 
     2) Unpack the Anope tarball with your favorite uncompression program
        (WinZip or WinRAR, etc).
 
-    3) (Note before this step: If you fall under one of the situations at the end of Step 1 where it says that the
-       SDK will not work out of the box, do not bring up the Visual C++ Command Prompt by using the link in
-       the Windows Start Menu. Instead, edit vsvars32.bat in the directory where you unpacked the source code
-       in step 2, so the first line that says "@SET VSINSTALLDIR=<whatever>" has the directory where you installed
-       Visual C++ Express to, if different from the default. Save the file and then run it instead.)
-
-       Bring up the Visual C++ Command Prompt; This will launch a
+    3) Bring up the Visual C++ Command Prompt; This will launch a
        DOS Command Prompt like window, which will set the environment
        properties needed to make Anope.
 
-       Create a new directory, which will be used to hold the build files. You can make it
-       be a directory under the source directory unpacked in step 2, or somewhere else entirely.
+       Change directories to where you unpacked the source code in step 2, by typing:
 
-       Change directories to this new folder, by typing:
+	cd <path to extracted source>
+	
+	e.g.
 
-          cd <path to build directory>
-
-          e.g.
-
-          cd c:\anope-build
-
+	cd c:\anope-trunk
+       
     4) You now need to configure Anope to your requirements. At the prompt type:
-
-        <path to source directory>\Config.bat
+    
+        Config.bat
 
        NOTE: If you run an Anti-Virus program such as McAfee or Norton, you may
        be unable to run this command due to the protection in place. Some Anti-
        Virus programs may detect the Anope Configuration Tool as a worm, however
-       this is not the case. If you are prompted to allow or deny execution of
+       this is not the case. If you are prompted to allow or deny execution of 
        the script, you should choose allow. If the script fails to run, and no
        notice is displayed, please check your Anti-Virus settings before seeking
        assistance.
-
+        
        An interactive configuration program should guide you through the install
-       options. You will be given a choice to use NMake or not. NMake will compile
-       inside the command prompt window you are in. If you want to build within
-       the Visual C++ IDE, say no to that option, and it'll create a Solution for
-       you to open up.
+       options, and then detect your Microsoft Visual C++ Library files. If it
+       fails to detect them, you should check you have everything installed.
 
        If you cannot find whats causing the error, please visit our forums or
        our IRC Support channel for assistance.
+ 
+    5) You are now ready to compile. At the prompt type:
 
-    5) You are now ready to compile. If you said you wanted to use NMake in step 4,
-       at the prompt type:
-
-        nmake
+        nmake -f Makefile.win32
 
        Once you are back at the command prompt again, if there have been no
-       errors, you are ready to go.
-
-       If instead you decided to use the Visual C++ IDE, open up the Anope.sln
-       file. After the IDE has fully loaded, hit F7 to build everything.
+       errors, you are ready to go. 
 
        Should you encounter errors with the installation process, check the
        messages displayed for advice on resolving them. If you are unable to
        resolve the issues yourself, seek assistance on our forums or in our
        IRC Support channel.
 
-    6) Finally you will need to install Anope. If you said you wanted to use NMake
-       in step 4, at the prompt type:
-
-        nmake install
-
-       Otherwise, if you decided to use the Visual C++ IDE, find the project called
-       INSTALL within the Solution Explorer. Right-click on INSTALL and choose Build.
-
-       When you have done this, all the files will be installed to where they belong.
-       The only thing you need to do is rename "data/example.conf" to be "data/services.conf",
-       and then follow the steps to set up Anope.
+    6) Anope will install the files where they belong. The only thing you need
+       to do is rename "data/example.conf" to be "data/services.conf".
 
     You have now completed the building phase of Anope for Windows. You can
     now move on to the next section, which is related to setting up Anope.
@@ -180,32 +146,52 @@ Anope for Windows
        file to the end of the line. So if you have two files:
 
         SRCS=file.c file2.c
-
+        
        If you are compiling a folder of module components, such as the example
        "catserv", you will need to add/change the "SUBS=" line. If you were
        compiling the "catserv" example, the line would look like this:
-
+       
         SUBS=catserv
 
     B) When you've done this, use the same command prompt you set up in part
        1, change directories to the src\modules folder, and type:
 
         nmake -f Makefile.win32
-
+        
        followed afterwards, by:
 
         nmake -f Makefile.win32 install
-
+        
     C) You should now be able to load your modules on IRC via OperServ, or via
        the services.conf file.
 
 
 4) Other compile options
 
-    A) If you have trouble recompiling Anope, you should delete all files and folders
-       within the build folder you created in step 3 of section 1. Afterwards, follow
-       the directions from step 4 of section 1 down.
-
+	A) If you have trouble recompiling Anope, you should try:
+	
+		nmake -f Makefile.win32 distclean
+		
+		This will clean up the source directory and allow for chages to be applied
+		to previously compiled files.
+		
+	B) A list of valid options are:
+	
+		install
+		distclean
+		clean
+		spotless
+		all
+		core
+		protocols
+		mypasql
+		languages
+		modules
+		
+		The syntax for these options is:
+		
+		nmake -f Makefile.win32 [option]
+	
 5) Credits
 
     Anope is based on Epona and IRCServices. See CREDITS for more credits and
@@ -216,8 +202,8 @@ Anope for Windows
         * Dominick Meglio       <codemastr@unrealircd.com>
         * Trystan Scott Lee     <trystan@nomadirc.net>
         * Chris Hogben          <heinz@anope.org>
-
+        
     Anope's Windows Installer was made using:
-
+    
         * NSIS 2.20          <http://nsis.sourceforge.net>
-
+        

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 ### THIS IS DESIGNED TO BE RUN BY MAKE! DO NOT RUN FROM THE SHELL (because it MIGHT sigterm the shell)! ###
 
@@ -16,16 +16,7 @@ use POSIX ();
 
 # The subs are passed the message, and anything the regex captured.
 
-my $flag = shift(@ARGV);
-my $quiet = 0;
-my $cc;
-if ($flag eq "-q") {
-	$quiet = 1;
-	$cc = shift(@ARGV);
-}
-else {
-	$cc = $flag;
-}
+my $cc = shift(@ARGV);
 
 my $showncmdline = 0;
 
@@ -159,10 +150,6 @@ $pid = fork;
 die "Cannot fork to start $cc! $!\n" unless defined($pid);
 
 if ($pid) {
-
-	if ($quiet == 0) {
-		printf "\t\e[1;32m%-20s\e[0m%s\n", $action . ":", $name unless $name eq "";
-	}
 
 	my $fail = 0;
 	# Parent - Close child-side pipes.

@@ -1930,7 +1930,7 @@ Entry *entry_create(char *mask)
 {
 	Entry *entry;
 	char *nick = NULL, *user, *host, *cidrhost;
-	int do_free;
+	int do_free = 0;
 	uint32 ip, cidr;
 
 	entry = new Entry;

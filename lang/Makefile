@@ -44,31 +44,31 @@ spotless: clean
 
 
 cat:      cat.l      langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 de:       de.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 en_us:    en_us.l    langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 es:       es.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 fr:       fr.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 gr:       gr.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 hun:      hun.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 it:       it.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 nl:       nl.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 pl:       pl.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 pt:       pt.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 ru:       ru.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 tr:       tr.l       langcomp index
-	@./langcomp $@.l
+	@./langcomp $@.l $@
 
 langcomp: langcomp.c
 	@$(MAKEBIN) $(CC) $(CFLAGS) langcomp.c -o $@

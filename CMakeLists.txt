@@ -4,6 +4,11 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+# If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)
+if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
+  message(FATAL_ERROR "You can not use CMake to build Anope from the root of it's source tree! Remove the CMakeCache.txt file from this directory, then create a separate directory (either below this directory or elsewhere), and then re-run CMake from there.")
+endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
+
 # Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER TRUE)
@@ -286,9 +291,9 @@ find_program(PERL perl)
 
 # If perl is included on the system and the user wants to use run-cc.pl, change the commands for compiling and linking
 if(PERL AND USE_RUN_CC_PL)
-  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl ${CMAKE_CXX_COMPILE_OBJECT}")
-  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl ${CMAKE_CXX_LINK_EXECUTABLE}")
-  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl ${CMAKE_CXX_CREATE_SHARED_MODULE}")
+  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_COMPILE_OBJECT}")
+  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_LINK_EXECUTABLE}")
+  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_CREATE_SHARED_MODULE}")
 endif(PERL AND USE_RUN_CC_PL)
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory

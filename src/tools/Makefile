@@ -10,7 +10,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
    	   'RUNGROUP=${RUNGROUP}' 'MAKEBIN=${MAKEBIN}'
 
 .c.o:
-	@$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
+	@$(MAKEBIN) $(CC) $(CFLAGS) -I../../include/ -c $<
 
 all: ${OBJS}
 

@@ -2,7 +2,7 @@
 all: services.h extern.h pseudo.h version.h
 
 version.h: Makefile version.sh services.h pseudo.h messages.h $(SRCS)
-	sh version.sh
+	sh version.sh ../version.log $@
 
 services.h: sysconf.h config.h extern.h
 	touch $@
@@ -13,7 +13,7 @@ extern.h: slist.h
 pseudo.h: commands.h timeout.h encrypt.h datafiles.h slist.h
 	touch $@
 
-clean: 
+clean:
 	(rm -f language.h)
 
 distclean: clean

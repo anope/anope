@@ -1,6 +1,6 @@
 dnl autoconf.in for Services.
 dnl
-dnl Anope (c) 2003-2007 Anope team
+dnl Anope (c) 2003-2008 Anope team
 dnl Contact us at dev@anope.org
 
 dnl This program is free but copyrighted software; see the file COPYING for
@@ -226,8 +226,8 @@ anope_CHECK_TYPE_SIZES
 
 AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H,1,""))
 AC_CHECK_HEADER(sys/select.h,AC_DEFINE(HAVE_SYS_SELECT_H,1,""))
-AC_CHECK_HEADER(execinfo.h,AC_DEFINE(HAVE_BACKTRACE,1,""))
 
+AC_CHECK_FUNCS(backtrace,AC_DEFINE(HAVE_BACKTRACE,1))
 AC_CHECK_FUNCS(stricmp,AC_DEFINE(HAVE_STRICMP,1))
 AC_CHECK_FUNCS(strcasecmp,AC_DEFINE(HAVE_STRCASECMP,1))
 AC_CHECK_FUNCS(gettimeofday,AC_DEFINE(HAVE_GETTIMEOFDAY,1))

@@ -44,9 +44,9 @@ Run_Build_System () {
 	RUN_CC_PL=""
 	GEN_TYPE=""
 
-	if [ "$INSTDEST" != "" ] ; then
+	if [ "$INSTDIR" != "" ] ; then
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			WITH_INST="-DINSTDIR:STRING=$INSTDEST"
+			WITH_INST="-DINSTDIR:STRING=$INSTDIR"
 		else
 			WITH_INST="--with-instdir=$INSTDIR"
 		fi
@@ -84,7 +84,10 @@ Run_Build_System () {
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
 		else
-			RUN_CC_PL="--with-makebin=run-cc.pl"
+			pwdsave=`pwd`
+			cd "`dirname $SOURCE_DIR/run-cc.pl`"
+			RUN_CC_PL="--with-makebin=`pwd`/run-cc.pl"
+			cd "$pwdsave"
 		fi
 	else
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
@@ -132,10 +135,10 @@ export ECHO2 ECHO2SUF
 ###########################################################################
 
 BUILD_SYSTEM="cmake"
-INSTDEST=$HOME/services
+INSTDIR=$HOME/services
 RUNGROUP=
 UMASK=
-DEBUG="no"
+DEBUG="yes"
 USE_RUN_CC_PL="no"
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
@@ -209,7 +212,7 @@ export ok INPUT
 ok=0
 echo "Note: press Return for the default, or enter a new value."
 echo "Are you using configure or cmake?"
-while [ $ok -qe 0 ] ; do
+while [ $ok -eq 0 ] ; do
 	echo2 "[$BUILD_SYSTEM] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
@@ -228,14 +231,16 @@ while [ $ok -qe 0 ] ; do
 			;;
 	esac
 done
+BUILD_SYSTEM=$INPUT
+echo ""
 
 ok=0
 echo "In what directory do you want the binaries to be installed?"
 while [ $ok -eq 0 ] ; do
-	echo2 "[$INSTDEST] "
+	echo2 "[$INSTDIR] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 	if [ ! "$INPUT" ] ; then
-		INPUT=$INSTDEST
+		INPUT=$INSTDIR
 	fi
 	if [ ! -d "$INPUT" ] ; then
 		if exists "$INPUT" ; then
@@ -256,7 +261,7 @@ while [ $ok -eq 0 ] ; do
 		ok=1
 	fi
 done
-INSTDEST=$INPUT
+INSTDIR=$INPUT
 echo ""
 
 
@@ -366,7 +371,7 @@ echo2 "Saving configuration results in config.cache... "
 
 cat <<EOT >$SOURCE_DIR/config.cache
 BUILD_SYSTEM="$BUILD_SYSTEM"
-INSTDEST="$INSTDEST"
+INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"

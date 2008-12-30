@@ -1419,7 +1419,7 @@ void expire_chans()
 
 void cs_remove_nick(const NickCore * nc)
 {
-	int i, j;
+	int i, j, k;
 	ChannelInfo *ci, *next;
 	ChanAccess *ca;
 	AutoKick *akick;
@@ -1479,13 +1479,13 @@ void cs_remove_nick(const NickCore * nc)
 					akick->flags = 0;
 					akick->addtime = 0;
 					akick->u.nc = NULL;
-					
+
 					/* Only one occurance can exist in every akick list.. ~ Viper */
 					break;
 				}
 			}
 
-			/* Are there any akicks behind us? 
+			/* Are there any akicks behind us?
 			 * If so, move all following akicks.. ~ Viper */
 			if (j < ci->akickcount - 1) {
 				for (k = j + 1; k < ci->akickcount; j++, k++) {

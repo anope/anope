@@ -104,12 +104,26 @@ Run_Build_System () {
 				;;
 		esac
 
-		echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $SOURCE_DIR"
+		if [ "$SOURCE_DIR" = "." ] ; then
+			pwdsave=`pwd`
+			test -d build || mkdir build
+			cd "build"
+			REAL_SOURCE_DIR=".."
+		else
+			REAL_SOURCE_DIR="$SOURCE_DIR"
+		fi
 
-		cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $SOURCE_DIR
+		echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $REAL_SOURCE_DIR"
+
+		cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $REAL_SOURCE_DIR
 
 		echo ""
-		echo "Now run make to build Anope."
+		if [ "$SOURCE_DIR" = "." ] ; then
+			echo "Now cd build, then run make to build Anope."
+			cd "$pwdsave"
+		else
+			echo "Now run make to build Anope."
+		fi
 	else
 		echo "./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL"
 

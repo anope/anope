@@ -16,8 +16,12 @@ all: ${OBJS}
 
 distclean: spotless
 
-anopesmpt:  $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
+anopesmtp: anopesmtp.o
+	$(CC) $(CFLAGS) anopesmtp.o $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
+db-merger: db-merger.o
+	$(CC) $(CFLAGS) db-merger.o $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
+db-convert: db-convert.o
+	$(CC) $(CFLAGS) db-convert.o $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
 anopesmtp.o:    anopesmtp.c $(INCLUDES)

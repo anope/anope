@@ -922,6 +922,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
 	time_t topic_time = time(NULL);
+	User *u = find_byuid(source);
 
 	if (!c) {
 		if (debug) {
@@ -941,7 +942,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 	if (ac > 1 && *av[1])
 		c->topic = sstrdup(av[1]);
 
-	strscpy(c->topic_setter, source, sizeof(c->topic_setter));
+	strscpy(c->topic_setter, u ? u->nick : source, sizeof(c->topic_setter));
 	c->topic_time = topic_time;
 
 	record_topic(av[0]);

@@ -144,14 +144,6 @@ if(NOT MSVC)
       set(LDFLAGS "${LDFLAGS} -lsocket")
     endif(HAVE_SOCKET_LIB)
   endif(NOT WIN32)
-
-  # Check if va_list can be copied as an array, and if it can, set the flag for it
-  try_run(RUN_VA_LIST_AS_ARRAY COMPILE_VA_LIST_AS_ARRAY
-    ${Anope_SOURCE_DIR} ${Anope_SOURCE_DIR}/va_list_check.c
-  )
-  if(COMPILE_VA_LIST_AS_ARRAY AND NOT RUN_VA_LIST_AS_ARRAY)
-    set(HAVE_VA_LIST_AS_ARRAY 1)
-  endif(COMPILE_VA_LIST_AS_ARRAY AND NOT RUN_VA_LIST_AS_ARRAY)
 endif(NOT MSVC)
 
 # If DEFUMASK wasn't passed to CMake, set a default depending on if RUNGROUP was passed in or not

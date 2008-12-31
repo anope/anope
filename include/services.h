@@ -125,11 +125,7 @@
 #  define VA_COPY(DEST, SRC) memcpy ((&DEST), (&SRC), sizeof(va_list))
 # endif
 #else
-# ifdef HAVE_VA_LIST_AS_ARRAY
-#   define VA_COPY(DEST,SRC) (*(DEST) = *(SRC))
-# else
-#   define VA_COPY(DEST, SRC) va_copy(DEST, SRC)
-# endif
+# define VA_COPY(DEST, SRC) va_copy(DEST, SRC)
 #endif
 
 #ifdef _AIX

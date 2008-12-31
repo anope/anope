@@ -16,7 +16,6 @@
 #undef HAVE_STRLCPY
 #undef HAVE_SYS_SELECT_H
 #undef HAVE_UMASK
-#undef HAVE_VA_LIST_AS_ARRAY
 #undef RUNGROUP
 #define SERVICES_BIN "services"
 

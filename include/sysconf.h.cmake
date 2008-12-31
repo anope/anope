@@ -16,7 +16,6 @@
 #cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_SYS_SELECT_H 1
 #cmakedefine HAVE_UMASK 1
-#cmakedefine HAVE_VA_LIST_AS_ARRAY 1
 #cmakedefine RUNGROUP "@RUNGROUP@"
 #cmakedefine SERVICES_BIN "@SERVICES_BIN@"
 

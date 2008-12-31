@@ -804,6 +804,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 
 	curnick = myStrGetToken(av[2], ' ', curtoken);
 	while (curnick != NULL) {
+		char *curnick_real = curnick;
 		for (; *curnick; curnick++) {
 			/* I bet theres a better way to do this... */
 			if ((*curnick == '&') ||
@@ -824,7 +825,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		}
 		strncat(nicklist, prefixandnick, 513);
 		strncat(nicklist, " ", 513);
-		delete [] curnick;
+		delete [] curnick_real;
 		curtoken++;
 		curnick = myStrGetToken(av[2], ' ', curtoken);
 		nlen = 0;

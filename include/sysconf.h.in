@@ -1,0 +1,227 @@
+/* include/sysconf.h.in.  Generated from configure.in by autoheader.  */
+
+/* "Default umask Permissions" */
+#undef DEFUMASK
+
+/* "No prefix needed for dlopen" */
+#undef DL_PREFIX
+
+/* "Has sys/types.h" */
+#undef HAS_SYS_TYPES_H
+
+/* "" */
+#undef HAVE_BACKTRACE
+
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
+/* Define to 1 if you have the `gethostbyname' function. */
+#undef HAVE_GETHOSTBYNAME
+
+/* Define to 1 if you have the `gethostbyname_r' function. */
+#undef HAVE_GETHOSTBYNAME_R
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `setgrent' function. */
+#undef HAVE_SETGRENT
+
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the `stricmp' function. */
+#undef HAVE_STRICMP
+
+/* "" */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strlcat' function. */
+#undef HAVE_STRLCAT
+
+/* Define to 1 if you have the `strlcpy' function. */
+#undef HAVE_STRLCPY
+
+/* Define to 1 if you have the `strsignal' function. */
+#undef HAVE_STRSIGNAL
+
+/* Define to 1 if you have the `strspn' function. */
+#undef HAVE_STRSPN
+
+/* Define to 1 if you have the `sys_errlist' function. */
+#undef HAVE_SYS_ERRLIST
+
+/* "" */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the `umask' function. */
+#undef HAVE_UMASK
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* va_list as array */
+#undef HAVE_VA_LIST_AS_ARRAY
+
+/* "Module dir" */
+#undef MODULE_PATH
+
+/* "Has mysql/mysql.h" */
+#undef MYSQL_HEADER_PREFIX
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* "Run group" */
+#undef RUNGROUP
+
+/* "Binary Dir" */
+#undef SERVICES_BIN
+
+/* "services bin dir" */
+#undef SERVICES_DIR
+
+/* The size of a `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of a `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* "modules not available" */
+#undef STATIC_LINKING
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* "Modules available" */
+#undef USE_MODULES
+
+/* "Use Mysql" */
+#undef USE_MYSQL
+
+/* "Use RDB" */
+#undef USE_RDB
+
+/* Define to `short' if <sys/types.h> does not define. */
+#undef int16_t
+
+/* Define to `long' if <sys/types.h> does not define. */
+#undef int32_t
+
+/* Define to `unsigned short' if <sys/types.h> does not define. */
+#undef u_int16_t
+
+/* Define to `unsigned long' if <sys/types.h> does not define. */
+#undef u_int32_t
+
+/* Static config, copy from here to below before running autoheader! */
+
+#ifndef BIG_ENDIAN
+
+/* Big Endian system */
+#undef BIG_ENDIAN
+
+#endif
+
+#ifndef LITTLE_ENDIAN
+
+/* Little Endian system */
+#undef LITTLE_ENDIAN
+
+#endif
+
+/**
+ * NOTE: BIG_ENDIAN and LITTLE_ENDIAN defines should not be left in
+ * by autoheader as they may be defined or may not be, as such we check
+ * if there defined before messing with them!
+ **/
+
+#ifdef HAS_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef __STRICT_ANSI__
+#include <stdarg.h>
+#include <stdio.h>
+
+/* We KNOW these are not ansi, we are defining them here to suppress the warning
+ *  * s messages on a "make strict" compile */
+#ifndef snprintf
+int snprintf(char *str, size_t size, const char *format, ...);
+#endif
+#ifndef vprintf
+int vprintf(const char *format, va_list ap);
+#endif
+#ifndef vfprintf
+int vfprintf(FILE *stream, const char *format, va_list ap);
+#endif
+#ifndef vsprintf
+int vsprintf(char *str, const char *format, va_list ap);
+#endif
+#ifndef vsnprintf
+int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+#endif
+
+FILE *popen(const char *command, const char *type);
+int pclose(FILE *stream);
+FILE *fdopen(int fildes, const char *mode);
+
+int ftruncate(int fd, off_t length);
+
+#ifdef HAVE_STRSIGNAL
+char *strsignal(int sig);
+#endif
+
+#endif
+
+
+typedef int16_t int16;
+typedef u_int16_t uint16;
+typedef int32_t int32;
+typedef u_int32_t uint32;
+

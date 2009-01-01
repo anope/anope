@@ -1,0 +1,58 @@
+#!/bin/sh
+
+echo2 () {
+    $ECHO2 "$*$ECHO2SUF"    # these are defined later
+}
+
+ECHO2SUF=''
+if [ "`echo -n a ; echo -n b`" = "ab" ] ; then
+        ECHO2='echo -n'
+elif [ "`echo 'a\c' ; echo 'b\c'`" = "ab" ] ; then
+        ECHO2='echo' ; ECHO2SUF='\c'
+elif [ "`printf 'a' 2>&1 ; printf 'b' 2>&1`" = "ab" ] ; then
+        ECHO2='printf "%s"'
+else
+        # oh well...
+        ECHO2='echo'
+fi
+export ECHO2 ECHO2SUF
+
+
+echo2 "SRCS=" > ./Makefile.inc
+FIRST=1
+for oldfile in *.c
+do
+	if [ "$FIRST" = 1 ] ; then
+		echo2 " "$oldfile >> ./Makefile.inc
+	else
+		echo "\\" >> ./Makefile.inc
+		echo2 "     " $oldfile >> ./Makefile.inc
+	fi
+	FIRST=0
+done
+echo "" >> ./Makefile.inc
+
+echo2 "SUBS=" >> ./Makefile.inc
+FIRST=1
+for dir in *
+do
+        if [ -d $dir ] ; then
+	        if [ -f $dir/configure ] ; then
+			cd $dir
+			./configure
+			cd ..
+		fi
+		if [ -f $dir/Makefile ] ; then
+			if [ "$FIRST" = 1 ] ; then
+				echo2 " "$dir >> ./Makefile.inc
+		        else
+				echo "\\" >> ./Makefile.inc
+				echo2 "     " $dir >> ./Makefile.inc
+			fi
+			FIRST=0
+		fi
+	fi
+done
+
+exit 0
+

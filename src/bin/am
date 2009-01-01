@@ -1,0 +1,499 @@
+#!/usr/bin/env perl
+
+# ====================================================================
+# anomgr: Anope Manager. Used to manage anope revision on SubVersion.
+#
+# For usage, see the usage subroutine or run the script with no
+# command line arguments.
+#
+# $Id$
+#    
+# ====================================================================
+require 5.6.0;
+use strict;
+use Getopt::Std;
+use Net::FTP;
+use Cwd;
+
+######################################################################
+# Configuration section.
+my $myver="1.0";
+my $svnrev="http://www.zero.org/anosvn.php";
+my $fhint="version.log";
+
+# Default values, change or use environment variables instead.
+my $copy="anope";
+my $svnuser="evil_closet_monkey";
+my $svnpath="/usr/bin";
+my $svnroot="svn://svn.anope.org/$copy";
+my $editor="/usr/bin/mcedit";
+
+# Environment variables SVNBINDIR and SVNROOT override the above 
+# hardcoded values.
+$svnuser="$ENV{SVNUSER}"   if ($ENV{SVNUSER});
+$svnpath="$ENV{SVNBINDIR}" if ($ENV{SVNBINDIR});
+$svnroot="$ENV{SVNROOT}"   if ($ENV{SVNROOT});
+$editor="$ENV{EDITOR}"     if ($ENV{EDITOR});
+
+# Svnlook path.
+my $svnlook = "$svnpath/svnlook";
+
+# Svn path.
+my $svn = "$svnpath/svn";
+
+# wget path. Need to change to a perl module instead...
+my $wget = "$svnpath/wget";
+
+my (
+    $rev,
+    $branch,
+    $proto,
+    $tag,
+    $ftp,
+    $dst,
+    $ver_major,
+    $ver_minor,
+    $ver_patch,
+    $ver_build,
+    $ver_revision,
+    $ver_comment,
+    $svn_comment,
+    $cver,
+    $nver,
+    $ctrlfile,
+    $tmpfile,
+    @source,
+    %opt
+);
+
+{
+  my $ok = 1;
+  foreach my $program ($svnlook, $svn, $editor)
+    {
+      if (-e $program)
+        {
+          unless (-x $program)
+            {
+              warn "$0: required program `$program' is not executable, ",
+                   "edit $0.\n";
+              $ok = 0;
+            }
+        }
+      else
+        {
+          warn "$0: required program `$program' does not exist, edit $0.\n";
+          $ok = 0;
+        }
+    }
+  exit 1 unless $ok;
+}
+
+sub usage()
+{
+    # More features to add:
+    # --diff N:M to produce a diff between revisions
+    # --bugs CLI method to add bug number to the commit message
+    # --mesg CLI methos to add the commit message
+    # --create-branch to create a branch
+    # --create-tag to create a tag
+    # --switch to switch between branches/tags
+	print "Usage: $0 <-g | -p | -f | -l> [-r revision | -b branch | -t tag | -P proto] <destination>\n";
+	print " Operations:\n";
+	print "   -g           Get Operation\n";
+	print "   -p           Put Operation\n";
+	print "   -f[tar|diff] FTP Operation, retrieve latest tar or diff\n";
+	print "   -l           List Operation, for valid selector options\n";
+	print " Selector:\n";
+	print "   -r revision  Retrieve by revision number\n";
+	print "   -b branch    Retrieve by branch name\n";
+	print "   -t tag       Retrieve by tag name\n";
+	print "   -P proto     Retrieve by prototype name\n";
+	print " Destination:\n";
+	print "   The working copy to perform the operation in or to. The script will \n";
+	print "   try to guess where that is, unless you provide a specific path.\n";
+	exit;
+}
+
+sub banner() {
+
+    print "Anope Source Managemnt Utility - Version $myver\n\n";
+
+}
+
+sub getans {
+    my $ans;
+    while (! (($ans =~ /y/) || ($ans =~ /n/))) {
+        print "*** Ready to continue? (y/n): ";
+        $ans = <STDIN>;
+        chomp($ans);
+        $ans = lc($ans);
+        # $ans = &getans();
+    }
+
+    # return $ans;
+    return ($ans eq "y") ? 1 : 0
+}
+
+sub find_conflict() {
+
+    my $filename=shift;
+    my $retval=0;
+    open (IN2, "$filename") || die "Can't open $filename\n";
+    while (<IN2>) {
+        if (/^<<<<<<</) {
+            $retval=1;
+        }
+    }
+    close(IN2);
+
+    return $retval;
+}
+
+sub do_lst() {
+    my $out;
+    print "*** BRANCHES:\n";
+    print "trunk (DEFAULT)\n";
+    open (IN, "$svn list $svnroot/branches|");
+    while (<IN>) {
+        if (! /proto/) {
+	    $out="$_";
+	    $out =~ s/\/$//;
+            print "$out";
+        }
+    }
+    close(IN);
+
+    print "\n*** PROTOTYPES:\n";
+    open (IN, "$svn list $svnroot/branches/proto|");
+    while (<IN>) {
+	    $out="$_";
+	    $out =~ s/\/$//;
+	    chomp($out);
+        if (/bahamut18/) {
+		$out .= "\t(OBSOLETE)";
+	} elsif (/capab/) {
+		$out .= "\t(OBSOLETE)";
+	}
+            print "$out\n";
+    }
+    close(IN);
+
+    print "\n*** TAGS:\n";
+    open (IN, "$svn list $svnroot/tags|");
+    while (<IN>) {
+	    $out="$_";
+	    $out =~ s/\/$//;
+            print "$out";
+    }
+    close(IN);
+    print "\n";
+
+}
+
+sub do_ftp() {
+
+    my $ftpc;
+    $ftpc = Net::FTP->new("ftp.zero.org");
+    $ftpc->login("ftp","-anonymou@");
+    $ftpc->cwd("/incoming");
+
+    if ( lc($ftp) eq "tar" ) {
+        print "Retrieving latest tar ball...\n";
+        $ftpc->get("anope.tgz");
+    } elsif ( lc($ftp) eq "diff" ) {
+        print "Retrieving latest patch file...\n";
+        $ftpc->get("anope.diff");
+    } else {
+        print "Unknown type $ftp, aborting...\n";
+    }
+    $ftpc->quit();
+}
+
+sub do_get() {
+
+    my $options  = "" ; # Options to be passed to the svn command
+    my $selector = "" ; # Selector to be passed to the svn command
+
+    if ($rev) {
+        $options .= "-r $rev";
+        $selector = "trunk";
+        $copy     = $copy . "-$rev";
+    } elsif ($tag) {
+        $selector = "tags/$tag";
+        $copy     = "$tag";
+    } elsif ($branch) {
+        $selector = "branches/$branch";
+        $copy     = $copy . "-$branch";
+    } elsif ($proto) {
+        $selector = "branches/proto/$proto";
+        $copy     = "$proto";
+    } else {
+        $selector = "trunk";
+    }
+    
+    if ($dst eq undef) {
+        my $cwd = &Cwd::cwd();
+        if (-f "$cwd/$fhint") {
+            system("$svn update $options $cwd");
+        } elsif (-f "$cwd/$copy/$fhint") {
+            system("$svn update $options $cwd/$copy");
+        } else {
+            system("$svn checkout $svnroot/$selector $options $cwd/$copy");
+        }
+    } else {
+        $dst = &Cwd::cwd() if ($dst eq "\.") ;
+        if (-f "$dst/$fhint") {
+            system("$svn update $options $dst");
+        } else {
+            system("$svn checkout $svnroot/$selector $options $dst");
+        }
+    }
+}
+
+sub do_put() {
+
+    if ($dst eq undef) {
+        my $cwd = &Cwd::cwd();
+        if (-f "$cwd/$fhint") {
+            $dst = "$cwd";
+        } elsif (-f "$cwd/$copy/$fhint") {
+            $dst .= "$cwd/$copy";
+        } else {
+            print "Error: Unable to determine your working copy location.\n";
+            exit;
+        }
+    } else {
+        $dst = &Cwd::cwd() if ($dst eq "\.") ;
+        if (! -f "$dst/$fhint") {
+            print "Error: Unable to determine your working copy location.\n";
+            exit;
+        }
+    }
+
+    # Check to see if we need to update our working copy first.
+    my $nupdate;
+    open (IN, "$svn status --show-updates --verbose $dst|");
+    while (<IN>) {
+        if (/\*/) {
+            $nupdate .= "$_";
+        }
+    }
+    close(IN);
+
+    if ($nupdate ne undef) {
+            print "*** Warning: There are files modified in the repository that need\n";
+            print "*** to be merged back to your working copy before the commit can\n";
+            print "*** take place. These files are:\n";
+            print $nupdate;
+            print "Please use: $0 -g $dst\n";
+            exit;
+    }
+
+    # Get a prelim diff of the changes...
+    my $dcount=0;
+    my $conflict;
+    # open (IN, "$svn diff $dst|");
+    open (IN, "$svn status $dst|");
+    while (<IN>) {
+        if (!/^\?/) {
+            $dcount++;
+        }
+
+        if (/^C/) {
+            $_ =~ s/^C\s+//;
+            chomp($_);
+            # I don't want to use grep. But my find_conflict sub
+            # does not seem to work :( Too bad
+            if (`grep "^<<<<<<<" $_`) {
+                $conflict .= "$_\n" ;
+            } else {
+                system("$svn resolved $_");
+            }
+        }
+    }
+    close(IN);
+
+    if ($dcount == 0) {
+            print "*** Warning: There are no modified files to be commited. Are you\n";
+            print "*** sure you are in the right working copy? Verify changes with:\n";
+            print "*** $svn diff $dst\n";
+            exit;
+    }
+
+    if ($conflict ne undef) {
+            print "*** Warning: There are merge conflicts to be resolved! Please take\n";
+            print "*** a look at the following files and resolve them manually:\n\n";
+            print "$conflict\n";
+            exit;
+    }
+
+    $ctrlfile = "$dst/$fhint";
+    # Grab the current revision number. Clunky way, I know!
+#    $ver_revision=`$wget -qO - $svnrev`;
+    $ver_revision=`svnversion . | sed "s/.*:\\\(.*\\\)/\\1/" | cut -d 'M' -f 1 | cut -d 'S' -f 1`;
+    chomp($ver_revision);
+
+        unless ($ver_revision =~ /^\d+/ and $ver_revision > 0)
+        {
+            print "*** Error: Got bogus result $ver_revision from $svnrev.\n";
+            exit;
+        }
+
+    $ver_revision++;
+    open (REV, "$ctrlfile") || die "Can't open $ctrlfile\n";
+    while (<REV>) {
+        push (@source, $_);
+        $ver_major = $_ if (/VERSION_MAJOR/);
+        $ver_minor = $_ if (/VERSION_MINOR/);
+        $ver_patch = $_ if (/VERSION_PATCH/);
+        $ver_build = $_ if (/VERSION_BUILD/);
+    }
+    close(REV);
+
+    my $junk;
+    ($junk, $ver_major) = split('"', $ver_major);
+    ($junk, $ver_minor) = split('"', $ver_minor);
+    ($junk, $ver_patch) = split('"', $ver_patch);
+    ($junk, $ver_build) = split('"', $ver_build);
+
+    $cver = "$ver_major.$ver_minor.$ver_patch ($ver_build)";
+    $nver = "$ver_major.$ver_minor.$ver_patch ($ver_revision)";
+
+    # Greet the developer
+    banner();
+
+    
+    # Check to see if we need to update our working copy first.
+    my $svnrepo;
+    open (IN, "$svn info|");
+    while (<IN>) {
+        if (/URL/) {
+            $svnrepo = "$_";
+            $svnrepo =~ s/URL: //;
+        }
+    }
+    close(IN);
+
+    print "*** Repository   : $svnroot \n";
+    print "*** Working copy : $dst \n" ;
+    print "*** Current ver. : $cver \n";
+    print "*** Updated ver. : $nver \n";
+    print "*** Files Changed: $dcount (before indent and version change)\n";
+    die ("Aborting...\n") unless &getans();
+
+    # Need to add a clause for -c "comment" and -b "buglist"
+
+    # Get developers input for commit
+    $tmpfile=".commit";
+    open (OUT, ">$tmpfile") or die ("*** Error! Unable to open $tmpfile file\n");
+    print OUT "# Anope commit utility. Please use this template for your commits. 
+# Add Bugzilla bugs separated by spaces. The note part is free form.
+BUILD : $nver
+BUGS  : 
+NOTES : ";
+    close(OUT);
+
+    system("$editor $tmpfile");
+
+    my $tmp_comment="";
+    $ver_comment="#\n";
+    $svn_comment="";
+    open (IN, "$tmpfile") or die ("*** Error! Unable to open $tmpfile file\n");
+    while (<IN>) {
+        if ( !/^#/) {
+            $tmp_comment.="$_";
+            chomp($_);
+            $_ =~ s/\t/        /g;
+            $ver_comment.="# $_\n";
+            $svn_comment.="$_ ";
+        }
+    }
+    close(IN);
+
+    $svn_comment =~ s/\s\s+/ /g;
+    # Confirm the commit one last time...
+    print "*** Ready to commit, please verify:\n";
+    print "\n$tmp_comment\n";
+
+    die ("Aborting...\n") unless &getans();
+
+    print "*** Running Indent...\n";
+    my $prefix=".";
+    if (-d "src") {
+	    $prefix="src";
+    }
+    system("indent -kr -nut $prefix/*.c");
+    system("rm -f $prefix/*~");
+#    if (-d "src/core") {
+#        system("indent -kr -nut src/core/*.c");
+#        system("rm -f src/core/*~");
+#    }
+#    if (-d "src/protocol") {
+#        system("indent -kr -nut src/protocol/*.c");
+#        system("rm -f src/protocol/*~");
+#    }
+
+    print "*** Bumping the revision number...\n";
+    # Re-write the control file
+    open(OUT, ">$ctrlfile") or die ("*** Error! Unable to open $ctrlfile ... aborting");
+    foreach (@source) {
+        if (/^VERSION_BUILD/) {
+            $_ =~ s/\"\d+\"/\"$ver_revision\"/;
+        } elsif (/# \$Log\$/) {
+            $_ .= "$ver_comment";
+        }
+        print OUT $_;
+    }
+    close(OUT);
+
+    print "*** Starting the upload...\n\n";
+    my $rval=system("$svn commit $dst --username='$svnuser' --message '$svn_comment'");
+    if ( $rval ) {
+            print "*** Error: Unable to complete commit. Rolling back....\n\n";
+            system("$svn revert $ctrlfile");
+    }
+
+}
+
+{
+    usage() if (! @ARGV);
+
+    my $opt = 'hgplf:r:b:t:P:';
+    getopts ("$opt", \%opt) or usage();
+    usage() if $opt{h};
+
+    usage() if ($opt{g} && $opt{p});
+    usage() if ($opt{g} && $opt{f});
+    usage() if ($opt{g} && $opt{l});
+    usage() if ($opt{p} && $opt{f});
+    usage() if ($opt{p} && $opt{l});
+    usage() if ($opt{f} && $opt{l});
+    usage() if ($opt{r} && $opt{b});
+    usage() if ($opt{r} && $opt{t});
+    usage() if ($opt{b} && $opt{t});
+    usage() if ($opt{b} && $opt{P});
+
+    $rev    = $opt{r} ;
+    $branch = $opt{b} ;
+    $tag    = $opt{t} ;
+    $ftp    = $opt{f} ;
+    $proto  = $opt{P} ;
+    $dst    = shift;
+
+    if ($rev ne undef) {
+        unless ($rev =~ /^\d+/ and $rev > 0)
+        {
+            print "*** Error: Revision number '$rev' must be an integer > 0.\n";
+            exit;
+        }
+    }
+
+    do_lst() if $opt{l};
+    do_ftp() if $opt{f};
+    do_get() if $opt{g};
+    do_put() if $opt{p};
+    print "*** Done!\n";
+
+}
+
+

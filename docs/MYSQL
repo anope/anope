@@ -1,0 +1,109 @@
+Anope MySQL Support
+-------------------
+
+1) Introduction
+
+    Anope 1.6 onwards supports MySQL databases. On Anope 1.6.0 only PHASE 1 
+    has been implemented. Since the next phases require major changes in the 
+    core, we decided to save it for 2.0. However, having your db's easily 
+    accessible on your website is still a great feature.
+
+    PHASE 1:Anope will be able to save all it's databases to MySQL. It will 
+    happen in conjunction with the current FFF databases. This first step is 
+    nothing more than a MySQL dump of the databases (i.e. read-only), since 
+    Anope will not (for now) read from Mysql. (COMPLETED)
+
+    PHASE 2:The next step is load the databases from MySQL, being able to 
+    replace the FFF completely as an archive method (since all changes to 
+    the MySQL db would be lost on the next Services save). All, while keeping 
+    FFF intact. This is still not the final goal, but it's a milestone.
+    (COMPLETED)
+    
+    UPDATE: Anope 1.7.0 (Revision 11 and above) finally supports phase 2!
+            A new config directive called 'UseRDB' has been added.
+            If you enable this, anope will automatically try to load its
+            data from MySQL (if configured and compiled with).
+
+    PHASE 3:The next step, and most convoluted of all (since we'll need to 
+    modify pretty much all the source) is to load/save (SELECT/INSERT) data 
+    in realtime. That way the MySQL db could be modified externally (web?).  
+    Again, the FFF will be kept intact.
+
+2) Requirements
+
+    1. MySQL server version 3.23.32 or greater
+    2. MySQL libs and development files (usually called mysql-dev).
+    3. A MySQL user account
+    4. A MySQL database
+
+3) Installation
+
+    1. The ./Config script automatically detects if your system is capable
+       of running Anope with MySQL support. There is no need anymore to
+       answer yes when asked.
+
+       Note: You might need to run "make distclean" prior to running ./Config
+
+    2. Compile Anope as usual. The (g)make process will now compile MySQL
+       support into Anope.
+
+    3. Install Anope as usual. 
+
+4) Configuration
+
+    1. Go to your "services bin directory" (eg: /home/someuser/services/) and run mydbgen 
+       to help on the schema creation and adjustments.
+
+    2. Edit services.conf and add your MySQL data to the MySQL configuration
+       block. 
+
+    3. Start or restart services to make use of the new Anope executable.
+
+5) Security
+
+    To add a layer of security you have the option of encrypting or encoding
+    all passwords for nicks and chans. Use the "MysqlSecure" directive on your
+    services.conf file to enable it. The available storage methods are:
+
+        #MysqlSecure ""
+
+    or
+
+        MysqlSecure ""
+
+    Disables security. All passwords will be saved on the MySQL database
+    as clear text, with no encryption or encoding. FASTEST
+
+        MysqlSecure "des"
+
+    Encrypts all passwords using a UNIX DES encryption. This is a one way
+    encryption algorithm. You can only validate it against another DES
+    encrypted string, using the same "salt" (the first two characters of
+    the encrypted string). FAST
+
+        MysqlSecure "md5"
+
+    Calculates an MD5 128-bit checksum for the password. The value is 
+    returned as a 32-digit hex number that may be used as a hash key.
+    This is a one way encryption algorithm. SLOW
+
+        MysqlSecure "sha"
+
+    Calculates an SHA 160-bit checksum for the password. The value is 
+    returned as a 40-digit hex number. This is a one way encryption 
+    algorithm. SLOWEST
+
+        MysqlSecure "mykey"
+
+    Encodes the passwords using "mykey" as the encryption password. It
+    produces a binary string and can be decoded using the MySQL built in
+    function DECODE(crypt_str,mykey). VARIABLE
+
+    Caveat: Keep in mind that this if you use any method other than clear
+    text, services will need to encrypt/encode every single password on
+    every database save. On large networks, it may impact responsiveness
+    during the saves.
+
+    Caveat: If you enable MysqlSecure you can not longer use the UseRDB directive
+    as all the password types are encrypted with a one way encryption method for
+    older MySQL servers.

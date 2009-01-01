@@ -1,0 +1,29 @@
+include ../../Makefile.inc.win32
+
+SRCS=anopesmtp.c epona2anope.c db-merger.c
+OBJECTS= $(SRCS:.c=.exe)
+CFLAGS=$(CFLAGS) /I"../../include"
+LFLAGS=/link wsock32.lib $(LIBS) $(LFLAGS)
+
+all: $(OBJECTS)
+
+distclean: clean spotless
+
+.c.exe:
+        $(CC) $(CFLAGS) $< $(LFLAGS)
+
+clean:
+        -@del *.obj
+
+spotless: clean
+        -@del *.exe *.lib *.exp
+
+install: exe_install manifest_install
+
+exe_install: FRC
+        -@copy *.exe ..\..\$(DATDEST)\
+
+manifest_install: FRC
+        -@copy *.manifest ..\..\$(DATDEST)\
+
+FRC:

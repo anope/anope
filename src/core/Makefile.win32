@@ -1,0 +1,24 @@
+include ../../Makefile.inc.win32
+
+SRCS=bs_act.c bs_assign.c bs_badwords.c bs_bot.c bs_botlist.c bs_fantasy.c bs_fantasy_kick.c bs_fantasy_kickban.c bs_fantasy_owner.c bs_fantasy_seen.c bs_help.c bs_info.c bs_kick.c bs_say.c bs_set.c bs_unassign.c cs_access.c cs_akick.c cs_ban.c cs_clear.c cs_drop.c cs_forbid.c cs_getkey.c cs_getpass.c cs_help.c cs_identify.c cs_info.c cs_invite.c cs_kick.c cs_list.c cs_logout.c cs_modes.c cs_register.c cs_sendpass.c cs_set.c cs_status.c cs_suspend.c cs_topic.c cs_xop.c enc_none.c enc_md5.c enc_old.c enc_sha1.c he_help.c hs_del.c hs_delall.c hs_group.c hs_help.c hs_list.c hs_off.c hs_on.c hs_set.c hs_setall.c ms_cancel.c ms_check.c ms_del.c ms_help.c ms_info.c ms_list.c ms_read.c ms_rsend.c ms_send.c ms_sendall.c ms_set.c ms_staff.c ns_access.c ns_alist.c ns_drop.c ns_forbid.c ns_getemail.c ns_getpass.c ns_ghost.c ns_group.c ns_help.c ns_identify.c ns_info.c ns_list.c ns_logout.c ns_recover.c ns_register.c ns_release.c ns_sendpass.c ns_set.c ns_saset.c ns_status.c ns_suspend.c ns_update.c os_admin.c os_akill.c os_chankill.c os_chanlist.c os_clearmodes.c os_defcon.c os_global.c os_help.c os_ignore.c os_jupe.c os_kick.c os_logonnews.c os_mode.c os_modinfo.c os_modlist.c os_modload.c os_modunload.c os_noop.c os_oline.c os_oper.c os_opernews.c os_quit.c os_randomnews.c os_raw.c os_reload.c os_restart.c os_session.c os_set.c os_sgline.c os_shutdown.c os_sqline.c os_staff.c os_stats.c os_svsnick.c os_szline.c os_umode.c os_update.c os_userlist.c
+OBJECTS= $(SRCS:.c=.dll)
+CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini /VERSION:$(VERSION)
+
+all: $(OBJECTS)
+
+distclean: clean spotless
+
+.c.dll:
+        $(CC) $(CFLAGS) $< ..\mod_version.c $(LFLAGS)
+
+clean:
+        -@del *.obj
+
+spotless: clean
+        -@del *.dll *.lib *.exp *.manifest
+
+install:
+        -@mkdir ..\..\$(DATDEST)\modules
+        -@mkdir ..\..\$(DATDEST)\modules\runtime
+        -@copy *.dll ..\..\$(DATDEST)\modules

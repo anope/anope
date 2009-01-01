@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Crontab script for Anope
+# 
+# To know how to install the crontab, read the INSTALL file.
+
+###############################################################
+# CONFIGURATION
+###############################################################
+
+# Anope binary directory
+ANOPATH=/home/ircd/services/
+
+# Name of the pid file
+ANOPIDF=services.pid
+
+# Name of the executable
+ANOPROG=services
+
+# Parameters to pass to the executable
+ANOARGS=""
+#ANOARGS="-debug"
+
+###############################################################
+#                 DON'T EDIT ANYTHING BELOW                   #
+###############################################################
+
+PATH=/bin:/usr/bin:/usr/local/bin
+
+ANOPID=
+
+cd $ANOPATH
+
+if [ -f $ANOPIDF ]
+then
+	ANOPID=`cat $ANOPIDF`
+	if [ `ps auwx | grep $ANOPROG | grep $ANOPID | grep -v -c grep` = 1 ]
+	then
+		exit	
+	fi
+	rm -f $ANOPIDF
+fi
+
+./$ANOPROG $ANOARGS

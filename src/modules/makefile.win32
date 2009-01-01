@@ -1,0 +1,41 @@
+include ../../Makefile.inc.win32
+include ./Makefile.inc.win32
+
+OBJECTS= $(SRCS:.c=.dll)
+CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini
+
+all: $(OBJECTS) subs
+
+distclean: clean spotless
+
+.c.dll:
+        $(CC) $(CFLAGS) $(IRCTYPE) $< ..\mod_version.c $(LFLAGS)
+        
+subs:
+        @for %i in ( $(SUBS) ); do \
+        	@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) && cd ..
+
+clean: subs-clean
+        -@del *.obj
+
+subs-clean:
+	@for %i in ( $(SUBS) ); do \
+		@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) clean && cd ..
+
+spotless: clean subs-spotless
+        -@del *.dll *.lib *.exp *.manifest
+
+subs-spotless:
+	@for %i in ( $(SUBS) ); do \
+		@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) spotless && cd ..
+        
+install:
+        -@mkdir ..\..\$(DATDEST)\modules
+        -@mkdir ..\..\$(DATDEST)\modules\runtime
+        -@copy *.dll ..\..\$(DATDEST)\modules
+
+subs-install: install
+	@for %i in ( $(SUBS) ); do \
+		@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) install && cd ..
+

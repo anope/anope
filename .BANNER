@@ -1,0 +1,18 @@
+   ___
+  / _ \  http://www.anope.org
+ | /_\ | _ __  _ _  _ _   ___
+ |  _  || '_ \/ _ \/ _ \ / _ \
+ | | | || | |  |_|  |_| |  __/
+ |_| |_||_| |_\___/|  _/ \___|
+                   | |
+                   |_| IRC Services
+                             CURVER
+This program will help you to compile your Services, and ask you
+questions regarding the compile-time settings of it during the
+process. For more options type ./Config --help
+
+Anope is a set of Services for IRC networks that allows users to
+manage their nicks and channels in a secure and efficient way,
+and administrators to manage their network with powerful tools.
+
+For all your Anope needs please visit our portal at www.anope.org

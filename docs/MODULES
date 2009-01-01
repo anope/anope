@@ -1,0 +1,124 @@
+Anope Modules
+-------------
+
+1) Introduction
+2) Installation
+3) Usage
+4) Usage Example
+5) More Modules
+6) Support
+7) Information for Developers
+8) Modules Repository
+
+1) Introduction
+
+    Anope 1.6 onwards supports external modules. External modules are pieces
+    of code that can be attached to a running Anope process dynamically. These
+    modules can serve several purposes, and perform all kind of operations to
+    enhance your network.
+
+2) Installation
+
+    1. If modules are supported by your system, they will be configured
+       automatically when you run ./Config. The modules will be installed
+       to the modules directory in your data path (by default this will
+       be ~/services/modules).
+
+       Note: you might need to run "make distclean" prior to running ./Config
+
+    2. Compile Anope as usual. The (g)make process will now compile module
+       support into Anope, and compile the default sample modules, and/or
+       any other module located on the modules folder ("src/modules/").
+
+    3. Install Anope as usual. The install process will place the compiled
+       modules in their runtime location, making them available for loading.
+
+    4. Start or restart services to make use of the new Anope executable.
+       Note that you do not need to restart to load new or changed modules,
+       only to make use of a new Anope executable.
+
+3) Usage
+
+    All module manipulation commands are done through OperServ. These are:
+
+       MODLOAD     Load a module
+       MODUNLOAD   Un-Load a module
+       MODLIST     List loaded modules
+       MODINFO     Info about a loaded module
+
+    These commands available to Service Roots only.
+
+    You can also load (and pre-load) Modules automatically by loading them
+    on startup. To do so, edit your services.conf file and change the values
+    of "ModuleAutoload" and "ModuleDelayedAutoload" to include the modules
+    you want to load every time Anope starts.
+
+4) Usage Example
+
+    /msg OperServ modload hs_moo
+    *** Global -- from OperServ: dengel loaded module hs_moo
+    -OperServ- Module hs_moo loaded
+
+    /msg OperServ modinfo hs_moo
+    -OperServ- Module: hs_moo Version: 1.1 Author: Anope loaded: Mar 21 10:54:37 2004 CLT
+    -OperServ- Providing command: /msg HostServ moo
+
+    /msg HostServ moo
+    -HostServ- MOO! - This command was loaded via a module!
+
+    /msg OperServ modunload hs_moo
+    *** Global -- from OperServ: dengel unloaded module hs_moo
+    -OperServ- Module hs_moo unloaded
+
+    /msg HostServ moo
+    -HostServ- Unknown command moo. "/msg HostServ HELP" for help.
+
+    * Note that the name of the module file is "hs_moo.c", yet we load
+      and reference the module as "hs_moo" only. By naming convention
+      modules have an abbreviated service name they attach to (hs_ for
+      HostServ, cs_ for ChanServ, etc) followed by a descriptive keyword.
+
+5) More Modules
+
+    Anope ships with three sample modules that only illustrates some of the
+    implemented module capabilities. They don't really do much or anything
+    useful.
+
+    You can download more useful modules from http://modules.anope.org/. Just
+    grab the module file (usually with a .c extension). Place the module
+    file in your modules (src/modules) folder; the same folder that contains
+    both hs_moo.c and catserv.c module files.
+
+    The new modules need to be compiled and installed before you can make
+    use of them:
+    
+    1. Make sure you're in the main source directory. (usually anope-1.X.XX/)
+    2. Run `make modules` to compile any new or changed modules.
+    3. Run `make install` to install the modules.
+
+    You can now use /msg OperServ MODLOAD to load the new modules.
+
+6) Support
+
+    The Anope team is not responsible or liable for any unofficial module
+    (i.e. anything other than what was released with the Anope package).
+
+    Use modules at your own risk, and make sure you get them from a
+    reputable source. You might get module support by contacting the module
+    author, posting on our online forum, or maybe on our #anope channel
+    at /server irc.anope.org.
+
+7) Information for Developers
+
+    There are a number of useful documents on the Anope Wiki. The Anope Wiki
+    can be reached at:
+    
+    * http://wiki.anope.org/
+
+
+8) Modules Repository
+
+    You can find modules at http://modules.anope.org
+
+    These modules are 3rd party and as such are not supported by the Anope Team.
+    Contact the Module Author directly with problems, not the Anope Team.

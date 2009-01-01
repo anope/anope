@@ -1,0 +1,209 @@
+Anope for Windows
+-----------------
+
+1) Building the Source
+2) Installation
+3) Compiling Modules
+4) Other compile options
+5) Credits
+
+1) Building the Source
+
+    NOTE: If you have downloaded one of the pre-compiled installers, you do
+          NOT need to complete this step, and you can proceed to step 2.
+
+    If you want to build Anope from source on a Win32 system, you will need
+    to follow this instructions:
+
+    1) Download the required files:
+
+        * Current Anope source:
+            http://sourceforge.net/project/showfiles.php?group_id=94081
+
+        If you have Visual C++ 6, 7 (.NET 2002/2003) or 8 (2005) skip ahead to step 2, else you
+        need to download the following free components from Microsoft. Once
+        downloaded, install these packages.
+
+		* Microsoft Visual C++ 2008 Express Edition:
+			http://www.microsoft.com/express/vc/
+
+		or
+
+        * Microsoft Visual C++ 2005 Express Edition:
+            http://msdn.microsoft.com/vstudio/express/visualc/download/
+            
+		then download and install:
+
+        * Microsoft Windows PlatformSDK: (Requires WGA validation)
+	    http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
+
+	    (NOTE: Although this says for Windows Server 2003, it does infact work on all supported
+	    versions of Windows. When installing, you should select the Custom option, and ensure
+	    that only the top selection, and the bottom selection are checked. This will cut down
+	    install time dramatically)
+
+        * MySQL for Windows (only needed if building with MySQL enabled):
+            http://dev.mysql.com/
+
+	    (NOTE: Anope can be compiled against MySQL Version 3.23 and above)
+
+
+    2) Unpack the Anope tarball with your favorite uncompression program
+       (WinZip or WinRAR, etc).
+
+    3) Bring up the Visual C++ Command Prompt; This will launch a
+       DOS Command Prompt like window, which will set the environment
+       properties needed to make Anope.
+
+       Change directories to where you unpacked the source code in step 2, by typing:
+
+	cd <path to extracted source>
+	
+	e.g.
+
+	cd c:\anope-trunk
+       
+    4) You now need to configure Anope to your requirements. At the prompt type:
+    
+        Config.bat
+
+       NOTE: If you run an Anti-Virus program such as McAfee or Norton, you may
+       be unable to run this command due to the protection in place. Some Anti-
+       Virus programs may detect the Anope Configuration Tool as a worm, however
+       this is not the case. If you are prompted to allow or deny execution of 
+       the script, you should choose allow. If the script fails to run, and no
+       notice is displayed, please check your Anti-Virus settings before seeking
+       assistance.
+        
+       An interactive configuration program should guide you through the install
+       options, and then detect your Microsoft Visual C++ Library files. If it
+       fails to detect them, you should check you have everything installed.
+
+       If you cannot find whats causing the error, please visit our forums or
+       our IRC Support channel for assistance.
+ 
+    5) You are now ready to compile. At the prompt type:
+
+        nmake -f Makefile.win32
+
+       Once you are back at the command prompt again, if there have been no
+       errors, you are ready to go. 
+
+       Should you encounter errors with the installation process, check the
+       messages displayed for advice on resolving them. If you are unable to
+       resolve the issues yourself, seek assistance on our forums or in our
+       IRC Support channel.
+
+    6) Anope will install the files where they belong. The only thing you need
+       to do is rename "data/example.conf" to be "data/services.conf".
+
+    You have now completed the building phase of Anope for Windows. You can
+    now move on to the next section, which is related to setting up Anope.
+
+2) Installation
+
+    Since Anope for Windows does not use a visual interface, you must do the
+    configuration with a text editor before proceeding with running Anope
+    itself.
+
+    NOTE: You may need to open the configuration file with Wordpad, or a text
+    editor which supports UNIX line endings. Opening the configuration file in
+    Notepad will cause strange characters to appear, and you may not be able to
+    edit the file correctly.
+
+    Open services.conf, and read through it carefully and adjust the settings
+    you think you need to adjust. Pay special attention to these settings:
+
+    A) IRCDModule:   This is the name of an IRCd Module that Anope will use
+                     to communicate with your server. Anope supports 15 IRCds,
+                     so ensure you set the right value here.
+    B) RemoteServer: This is the address to your ircd, along with the port
+                     and password. You should consult your ircd
+                     documentation on how to link ircds.
+    C) ServicesRoot: Remove the # and change the names to your nick so you
+                     can take control of services once they are online.
+    D) UserKey1/2/3: Remove the # infront of the three UserKey settings, and
+                     change the parameters to numbers; around 6-7 digits will
+                     do.
+
+    If you are unsure of the settings, you can go to the dos command prompt
+    and run "anope.exe -nofork -debug" and watch the information as it
+    attempts to connect.
+
+    You can launch services in two ways. If you are sure that the entered
+    configuration information is correct, simply double clicking the Anope
+    executable will cause it to start; no window will pop up. If you'd rather
+    have a more textual output, you can start at the dos prompt and type in
+    "anope.exe". If services are successfully started up the dos prompt will
+    seem to hang; at this point you can safely close the dos window.
+
+3) Compiling Modules
+
+    If you want to build other modules than the ones shipped by default, you
+    will need to modify the Makefile.inc.win32 file, in the src\modules folder.
+
+    A) Add modules; find the line stating "SRCS=" and add the name of the
+       file to the end of the line. So if you have two files:
+
+        SRCS=file.c file2.c
+        
+       If you are compiling a folder of module components, such as the example
+       "catserv", you will need to add/change the "SUBS=" line. If you were
+       compiling the "catserv" example, the line would look like this:
+       
+        SUBS=catserv
+
+    B) When you've done this, use the same command prompt you set up in part
+       1, change directories to the src\modules folder, and type:
+
+        nmake -f Makefile.win32
+        
+       followed afterwards, by:
+
+        nmake -f Makefile.win32 install
+        
+    C) You should now be able to load your modules on IRC via OperServ, or via
+       the services.conf file.
+
+
+4) Other compile options
+
+	A) If you have trouble recompiling Anope, you should try:
+	
+		nmake -f Makefile.win32 distclean
+		
+		This will clean up the source directory and allow for chages to be applied
+		to previously compiled files.
+		
+	B) A list of valid options are:
+	
+		install
+		distclean
+		clean
+		spotless
+		all
+		core
+		protocols
+		mypasql
+		languages
+		modules
+		
+		The syntax for these options is:
+		
+		nmake -f Makefile.win32 [option]
+	
+5) Credits
+
+    Anope is based on Epona and IRCServices. See CREDITS for more credits and
+    a complete list of all developers.
+
+    Anope's Windows-specific code is provided by:
+
+        * Dominick Meglio       <codemastr@unrealircd.com>
+        * Trystan Scott Lee     <trystan@nomadirc.net>
+        * Chris Hogben          <heinz@anope.org>
+        
+    Anope's Windows Installer was made using:
+    
+        * NSIS 2.20          <http://nsis.sourceforge.net>
+        

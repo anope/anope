@@ -1,0 +1,118 @@
+Anope DefCon 
+------------
+
+1) Introduction
+2) Installation
+3) Configuration
+4) Usage
+5) Usage Example
+6) Support
+
+1) Introduction
+
+    Anope 1.6 onwards supports a unique protection mechanism based on the
+    military "Defense Readiness Condition" (DefCon) system. It is based on 
+    5 levels of defense readiness defined as:
+
+    DEFCON5 Normal peacetime readiness
+    DEFCON4 Increased intelligence and security readiness
+    DEFCON3 Increase in force readiness
+    DEFCON2 Further increase in force readiness
+    DEFCON1 Maximum force readiness.
+
+    These are configurable levels that mandates what actions Anope should
+    take in case of emergency and change in readiness status.
+
+    It is used to prevent abuse to both Services, and the ircd on which they 
+    are running. Also to protect the users, primarily in the event of Clones
+    and/or FloodBOT attacks. 
+
+2) Installation
+
+    The DefCon system is part of Anope's core,
+
+    The DefCon system has to be configured on your services.conf file to
+    be enabled. All directives are optional unless they depend on what
+    options you enable for each level. Look for the "DefCon configuration"
+    section on your services.conf file for more information.
+
+    Make sure you restart Anope after changing the DefCon configuration
+    directives.
+
+3) Configuration
+
+    Pre-defined DefCon actions:
+
+    No new channel registrations                       1 
+    No New Nick Registrations                          2 
+    No MLOCK changes                                   4 
+    Force Chan Mode                                    8 
+    Use Reduced Session Limit                         16 
+    KILL any new clients trying to connect            32 
+    Services will ignore everyone but opers           64 
+    Services will silently ignore everyone but opers 128 
+    AKILL all new clients trying to connect          256 
+    No new memos sent to block MemoServ attacks      512
+
+    These are the values used to determine each defcon setting, are set via: 
+
+    DefCon1 XX 
+    DefCon2 XX 
+    DefCon3 XX 
+    DefCon4 XX 
+
+    To set the desired value, you simply add the value of the numbers together 
+    and place that as your DefCon# setting. For instance:
+
+    Say you wish to set: 
+
+    No Channel Registrations, No Nickname Registrations and Services Ignoring 
+    everyone except for Operators. You would do this by: 
+
+    1 + 2 + 128 (Each value listed above is added together) 
+    Giving: 131 
+
+    You would then place this as which ever Defcon setting you want: 
+    
+    DefCon1 131 
+
+    The recommended default values are safe to use on any network.
+
+4) Usage
+
+    Anope starts up in DEFCON5 (normal readiness). To change the Defcon level 
+    in action use: 
+    
+    /msg OperServ DEFCON 1|2|3|4|5 
+
+5) Usage Example
+
+    Place the network on DEFCON4:
+
+    /msg OperServ DEFCON 4
+
+    *** Global -- from OperServ: dengel Changed the DEFCON level to 4
+
+    -OperServ- Services are now at DEFCON 4
+    -OperServ- * No new channel registrations
+    -OperServ- * No new nick registrations
+    -OperServ- * No MLOCK changes
+    -OperServ- * Use the reduced session limit of 5
+
+    -Global- The Defcon Level is now at Level: 4
+
+    Restore normal readiness:
+
+    /msg OperServ DEFCON 5
+
+    *** Global -- from OperServ: dengel Changed the DEFCON level to 5
+
+    -OperServ- Services are now at DEFCON 5
+
+    -Global- Services are now back to normal, sorry for any inconvenience
+
+6) Support
+
+    You might get DefCon support by posting on our online forum, or maybe on 
+    our #anope channel at /server irc.anope.org.
+

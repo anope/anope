@@ -1,0 +1,26 @@
+include ../../Makefile.inc.win32
+
+SRCS=bahamut.c charybdis.c dreamforge.c hybrid.c inspircd10.c inspircd11.c plexus2.c plexus3.c ptlink.c rageircd.c \
+     ratbox.c shadowircd.c solidircd.c ultimate2.c ultimate3.c unreal31.c unreal32.c viagra.c
+
+OBJECTS= $(SRCS:.c=.dll)
+CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /VERSION:$(VERSION)
+
+all: $(OBJECTS)
+
+distclean: clean spotless
+
+.c.dll:
+        $(CC) $(CFLAGS) $< ..\mod_version.c $(LFLAGS)
+
+clean:
+        -@del *.obj
+
+spotless: clean
+        -@del *.dll *.lib *.exp *.manifest
+
+install:
+        -@mkdir ..\..\$(DATDEST)\modules
+        -@mkdir ..\..\$(DATDEST)\modules\runtime
+        -@copy *.dll ..\..\$(DATDEST)\modules

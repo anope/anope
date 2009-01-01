@@ -1,0 +1,50 @@
+
+#define SERVICES_DIR "data"
+#define SERVICES_BIN "anope.exe"
+
+typedef   signed __int16  int16;
+typedef   signed __int16  int16_t;
+typedef unsigned __int16 uint16;
+typedef unsigned __int16 u_int16_t;
+typedef   signed __int32  int32;
+typedef   signed __int32  int32_t;
+typedef unsigned __int32 uint32;
+typedef unsigned __int32 u_int32_t;
+typedef unsigned __int8 u_int8_t;
+
+#define HAVE_STRINGS_H		0
+#define HAVE_SYS_SELECT_H	0
+#define HAVE_SYS_SYSPROTO_H	0
+
+#define HAVE_STRERROR		1
+#define HAVE_SYS_ERRLIST	0
+#define HAVE_SNPRINTF		1
+#define BAD_SNPRINTF		0
+#define HAVE_STRICMP		1
+#define HAVE_STRCASECMP		0
+#define HAVE_STRDUP		1
+#define HAVE_STRSPN		1
+#define HAVE_STRSIGNAL		0
+#define HAVE_GETTIMEOFDAY	0
+#define HAVE_SETGRENT		0
+#define HAVE_UMASK		0
+#define HAVE_FORK		0
+#define HAVE_GETHOSTBYNAME	1
+#define HAVE_BACKTRACE 0
+
+/* Enable Module support */
+#define USE_MODULES
+#define MODULE_PATH ".\\modules\\"
+
+/* Windows/MSVC likes to name things differently */
+#define snprintf		_snprintf
+#define popen			_popen
+#define pclose			_pclose
+#define ftruncate		_chsize
+#define PATH_MAX 		MAX_PATH
+#define MAXPATHLEN 		MAX_PATH
+#define bzero(buf, size)	memset(buf, 0, size)
+#define strcasecmp		stricmp
+#define sleep(x)		Sleep(x*1000)
+
+

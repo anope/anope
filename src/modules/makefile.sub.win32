@@ -1,0 +1,19 @@
+include ../../../Makefile.inc.win32
+
+OBJECTS= $(SRCS:.c=.obj)
+CFLAGS=/nologo /LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../../include" /I "../"
+LFLAGS=/nologo ../../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini /OUT:$(TARGET)
+
+all: 
+    $(CC) $(SRCS) $(CFLAGS) ..\..\mod_version.c /link $(LFLAGS)
+
+distclean: clean spotless
+
+clean:
+        -@del *.obj
+
+spotless: clean
+        -@del *.dll *.lib *.exp *.manifest
+        
+install:
+        -@copy *.dll ..\..\..\$(DATDEST)\modules

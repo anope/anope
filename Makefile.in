@@ -1,0 +1,131 @@
+CC=@CC@
+INCLUDEDIR=../include
+ANOPELIBS=@ANOPELIBS@
+CFLAGS=@CFLAGS@
+STRICT=-Wall -ansi -pedantic
+PROFILE=-pg
+LDPROFILE=
+SHELL=/bin/sh
+SUBDIRS=src
+BINDEST=@BINDEST@
+DATDEST=@DATDEST@
+INSTALL=@INSTALL@
+RM=@RM@
+CP=@CP@
+TOUCH=@TOUCH@
+MODULE_PATH=@MODULE_PATH@
+MYSQL=@MYSQL@
+RDB=@RDB@
+LDFLAGS=@LDFLAGS@
+RUNGROUP=@RUNGROUP@
+SHARED=@SHARED@
+MODULEFLAGS=@MODULEFLAGS@
+
+all:   language headers build core protocols tools modules 
+strict: language headers strict_build strict_core strict_protocols strict_tools strict_modules
+profile: language headers profile_build profile_core profile_protocols profile_tools profile_modules
+
+MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
+	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+           'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
+      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
+  	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'RDB=${RDB}'\
+	   'MYSQL=${MYSQL}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
+
+build: language headers
+	@for i in $(SUBDIRS); do \
+            echo "*** Building $$i";\
+            ( cd $$i; ${MAKE} ${MAKEARGS} all; ) \
+        done
+
+strict_build:  
+	@for i in $(SUBDIRS); do \
+            echo "*** Strict Building $$i";\
+            ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' all; ) \
+        done
+
+profile_build:
+	@for i in $(SUBDIRS); do \
+            echo "*** Strict Building $$i";\
+            ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(PROFILE)' 'LDFLAGS=${LDFLAGS} ${PROFILE}' all; ) \
+        done
+
+modules: build
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules";
+
+clean_modules:
+	(cd src ; ${MAKE} ${MAKEARGS} clean_modules )
+
+distclean_modules:
+	(cd src ; ${MAKE} ${MAKEARGS} distclean_modules )
+
+protocols: build
+	@echo "*** Building protocol support";
+	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} all; )
+
+strict_protocols: build
+	@echo "*** Building protocol support";
+	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' all; )
+
+profile_protocols: build
+	@echo "*** Building protocol support";
+	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' all; )
+
+core: build 
+	@echo "*** Building Core modules";
+	(cd src/ ; ${MAKE} ${MAKEARGS} core; )
+
+strict_core: build 
+	@echo "*** Building Core modules";
+	(cd src/ ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' core; )
+
+profile_core: build 
+	@echo "*** Building Core modules";
+	(cd src/ ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' core; )
+
+tools: build
+	(cd src/tools ; ${MAKE} ${MAKEARGS} all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules/Tools";
+
+strict_tools: strict_build
+	(cd src/tools ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules/Tools";
+
+profile_tools: profile_build
+	(cd src/tools ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(PROFILE)' all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules/Tools";
+
+strict_modules: strict_build
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=$(CFLAGS) $(STRICT)' all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules";
+
+profile_modules: profile_build
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules";
+
+language:
+	(cd lang ; $(MAKE) ${MAKEARGS} all language.h ; )
+
+headers:
+	(cd include ; ${MAKE} ${MAKEARGS} )
+
+clean:
+	(cd lang ; ${MAKE} ${MAKEARGS} clean )
+	(cd include ; ${MAKE} ${MAKEARGS} clean )
+	(cd src ; ${MAKE} ${MAKEARGS} clean )
+	(cd src/tools ; ${MAKE} ${MAKEARGS} clean )
+
+distclean: clean
+	(cd lang ; ${MAKE} distclean )
+	(cd include ; ${MAKE} distclean )
+	(cd src ; ${MAKE} distclean )
+	(cd src/tools ; ${MAKE} distclean )
+	rm -f config.log config.status config.cache Makefile src/bin/anoperc
+
+install: DUMMY
+	(cd src ; ${MAKE} ${MAKEARGS} install)
+	(cd src/tools ; ${MAKE} ${MAKEARGS} install)
+	@echo "*** All done, Anope is now installed. Please read docs/INSTALL for details on what to do now.";
+
+DUMMY:

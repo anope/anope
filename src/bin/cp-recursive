@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ $1 = "-t" ] ; then
+	shift
+fi
+if [ ! "$2" ] ; then
+	echo >&2 Usage: $0 '<sourcedir> <targetdir>'
+	exit 1
+fi
+if [ -d "$1" ] ; then
+	dir="$1"
+else
+	dir="`echo $1 | sed 's#\(.*\)/.*#\1#'`"
+fi
+while [ "$2" ] ; do
+	shift
+done
+if [ ! -d $1 ] ; then
+	mkdir -p $1 || exit 1
+fi
+/bin/tar -Ccf $dir - . | /bin/tar -Cxf $1 -

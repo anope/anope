@@ -1,0 +1,25 @@
+# Make file for Win32
+#
+# (C) 2003-2008 Anope Team
+# Contact us at info@anope.org
+#
+# Please read COPYING and README for further details.
+#
+# Based on the original code of Epona by Lara.
+# Based on the original code of Services by Andy Church. 
+# 
+# $Id$ 
+#
+
+###########################################################################
+
+clean: 
+	-@erase language.h
+
+spotless: clean
+	-@erase sysconf.h version.h
+
+distclean: spotless
+
+
+FRC:

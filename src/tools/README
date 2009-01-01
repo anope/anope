@@ -1,0 +1,58 @@
+Anope Bundled Tools
+-------------------
+
+1) Anope SMTP Client
+2) Anope Database Merger
+3) Epona to Anope Database Converter
+
+1) Anope SMTP Client
+
+    Provided with Anope is a simple SMTP client which can be used instead of
+    programs like SendMail in some cases.
+
+    The SMTP client can be used instead of sendmail for use with Anope's mail
+    options. To use the SMTP client instead of sendmail, find the line in your
+    services configuration file (services.conf) that defines SendMailPath. On
+    that line, change the path to your services installation directory, then
+    followed by "tools/anopesmtp" and the IP address of a valid SMTP server. It
+    should look like this:
+
+        SendMailPath "/home/anope/services/tools/anopesmtp 127.0.0.1"
+
+    If the SMTP client doesn't send mail, or if there's an other problem with
+    it, you can compile it in debug mode. To do this, open smtp.h, and look
+    for "smtp_debug" near the bottom. Change this from 0 to 1 and recompile
+    the code. This should generate a log file of what happened when it tried
+    to connect to the SMTP server.
+
+        Credits:
+    Originally written by  Dominick Meglio    <codemastr@unrealircd.com>
+    Ported to *nix by      Trystan Scott Lee  <trystan@nomadirc.net>
+
+2) Anope Database Merger
+
+    This program tries to merge two standard Anope database sets (ChanServ,
+    NickServ, BotServ, and MemoServ).
+
+    To merge two database sets, put them both in the folder where the merger
+    is located. The first database set must be named <name>1.db (nick1.db,
+    chan1.db, etc); the second database set must be named <name>2.db (nick2.db,
+    chan2.db, etc). If you execute the merger now the databases will be merged
+    into databases named <name>.db.
+
+        Credits:
+    Written by  Florian Schulze  <certus@anope.org>
+
+3) Epona to Anope Database Converter
+
+    This program tries to convert databases made by epona .4.15 and up to
+    standard anope databases. Currently, only the ChanServ database needs to
+    be converted.
+
+    Put your Epona (ChanServ) database in the folder where the epona2anope
+    executable file is located. Rename this ChanServ database file to
+    chan1.db and then run the converter (epona2anope). A new database called
+    chan.db will be created; this file is Anope-compatible.
+
+        Credits:
+    Written by  Florian Schulze  <certus@anope.org>

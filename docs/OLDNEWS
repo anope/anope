@@ -1,0 +1,139 @@
+Highlighted News in Anope 1.7 (and soon 1.8)
+============================================
+  * Added a new and improved ./Config script.
+  * Added MySQL phase 2 implementation (see docs/MYSQL).
+  * Added NickServ registration delays.
+  * Added read receipts for memos.
+  * Added a way for modules to store data with internal structures.
+  * Added nick tracking support.
+  * Added support for SVSHOLD.
+  * Added support for U:Lined servers.
+  * Added support for TS6 IRCd's.
+  * Added support for Windows.
+  * Added internal events for modules.
+  * Added a way to suspend nicks.
+  * Added support for module configuration directives.
+  * Added translation support for modules.
+  * Added a module pack with handy modules.
+  * Added IRCd protocol modules.
+  * Added support for new IRCd's. Currently supported:
+    - Bahamut 1.4.27 or later (including 1.8)
+    - Charybdis 1.0 or later
+    - DreamForge 4.6.7
+    - Hybrid 7 or later
+    - InspIRCd 1.0 or later (including 1.1)
+    - Plexus 2.0 or later (including 3.0)
+    - PTLink 6.15 or later
+    - RageIRCd 2.0 or later
+    - Ratbox 2.0.6 or later
+    - ShadowIRCd 4.0 beta 7 or later
+    - Solid IRCd 3.4.6 or later
+    - UltimateIRCd 2.8.2 or later (including 3.0)
+    - UnrealIRCd 3.1.1 or later (including 3.2)
+    - ViagraIRCd 1.3 or later
+  * Added new languages. Currently included:
+      Catalan, German, English, Spanish, French, Greek,
+      Hungarian, Italian, Dutch, Polish, Portugese,
+      Russian, Turkish
+  * Added support for CIDR channel lists.
+  * Converted the core to be completely modular.
+  * Improved random number algorithm.
+  * Removed proxy detector (see docs/PROXY).
+  * Fixed various exploits and vulnerabilities.
+  * Fixed various language typos and inconsistencies.
+  * Fixed a bug in the database system causing nickserv passwords
+      to be saved incorrectly. Note that this breaks backwards
+      compatibility on nick.db !!!
+
+Highlighted News in Anope 1.6
+=============================
+  * Fixed various exploits and vulnerabilities.
+  * Fixed various language typos and inconsistencies.
+  * Improved ignore system.
+  * Improved ./configure script.
+  * Removed all compile warning fixed.
+  * Converted HelpServ into a proper service.
+  * Added external module support.
+  * Added Defense Condition (DEFCON) System.
+  * Added MySQL support for mirroring databases.
+  * Added multi-server configuration.
+  * Added multi-domain /OS GLOBAL support.
+  * Added combined +oq +oa +ha +va on net-joins.
+  * Added support for ircd changes and upgrades.
+  * Added HostSetters configuration directive.
+  * Added /OS STAFF command.
+  * Added /OS SVSNICK command.
+  * Added /OS CHANKILL command.
+  * Added /MS STAFF command.
+  * Added /NS UPDATE command.
+  * Added /MS SENDALL command.
+  * Added /NS GETMAIL command.
+  * Added /HS DELALL command.
+  * Added /HS LIST command with pattern matching.
+  * New support scripts and tools.
+  * New ircd support, complete list: DreamForge 4.6.7, Bahamut 1.4.27,
+                                     UnrealIRCd 3.1.1, UltimateIRCd 2.8.2,
+                                     UltimateIRCd 3.0.0, Hybrid IRCd 7.0
+                                     ViagraIRCd 1.3.x, PTlink 6.15.0
+  * New Language files, complete list: cat.l, de.l, en_us.l, es.l, fr.l,
+                                       gr.l, it.l, nl.l, pt.l, ru.l, tr.l
+
+Highlighted News in Anope 1.4
+=============================
+
+After the change from Epona to Anope
+------------------------------------
+  * New Italian Language file
+  * Added support for UltimateIRCd 3.0 and later
+  * Services realtime logging to a channel
+  * SuperAdmin directive for access to "super" commands.
+  * Ban system is now exception aware.
+  * HostServ for hostname masquerading.
+  * Smarter XOP System.
+  * Email verification/handshake upon registration.
+  * Services can now /ignore users.
+  * Smarter memo notification for channels.
+  * Channel can be SUSPENDed instead of FORBIDen.
+
+Before the change from Epona to Anope
+-------------------------------------
+  * HostServ for networks that support them.
+  * UnrealIRCd support has been rewritten, it is now fully 
+    working (hopefully) and officially supported again.
+  * Added support for UltimateIRCd 2.8.2 and later. 
+  * A multi-threaded proxy detector that can scan Wingates, 
+    SOCKS 4/5 and HTTP proxies on ports 3128 and 8080. Don't use
+    it if you have not been authorized to use it by your system
+    administrator!
+  * The ChanServ AOP/SOP/VOP commands, and, on networks that
+    support halfops, the HOP command, have been added. They
+    allow a more user-friendly control of channel privileges.
+  * Use of services IDs that allow an user to be automatically
+    identified after a split (if he was identified before the split)
+    in a secure way. This also saves lots of bandwidth.
+  * Services' default language can now be set in services.conf.
+  * The OperServ RANDOMNEWS command provides an easy way to show
+    network news in a random manner without flooding your users
+    with them (one news per connection).
+  * The BotServ SET PRIVATE option allows services admins to 
+    make the bot usable by IRC operators only.
+  * The OperServ SQLINE command allows you to forbid nick masks
+    and even channel masks with the latest Bahamut.
+  * The ChanServ AKICK STICK command allows akicks to be permanently
+    kept on channel.
+  * The ChanServ SET TOPIC command has been renamed to TOPIC, and
+    a new BAN command has been added. They both have their own
+    associated levels.
+  * A SET PEACE command has been added to ChanServ. It prevents
+    users to use pejorative services commands (DEOP, KICK, ...)
+    on users with greater or equal levels.
+
+Networks using Bahamut must upgrade to Bahamut 1.4.27 or later, 
+while networks using UnrealIRCd must upgrade to Unreal 3.1.1.
+
+For the full changes, see the Changes file.
+
+For announcements and discussions about Anope, please visit our
+web site http://www.anope.org
+
+

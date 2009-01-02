@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008 Robin Burchell <w00t@inspircd.org>
- * Copyright (C) 2008 Anope Team <info@anope.org>
+ * Copyright (C) 2008-2009 Robin Burchell <w00t@inspircd.org>
+ * Copyright (C) 2008-2009 Anope Team <info@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -9,11 +9,6 @@
  *
  */
 
-
-/* Bot info structures. Note that since there won't be many bots,
- * they're not in a hash list.
- *	--lara
- */
 
 struct CommandHash;
 

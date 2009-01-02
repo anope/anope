@@ -1,6 +1,6 @@
 /* cs_appendtopic.c - Add text to a channels topic
  *
- * (C) 2003-2008 Anope Team
+ * (C) 2003-2009 Anope Team
  * Contact us at info@anope.org
  *
  * Based on the original module by SGR <Alex_SGR@ntlworld.com>

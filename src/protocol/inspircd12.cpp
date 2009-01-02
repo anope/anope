@@ -1,6 +1,6 @@
 /* inspircd 1.2 functions
  *
- * (C) 2003-2008 Anope Team
+ * (C) 2003-2009 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
@@ -814,7 +814,7 @@ int anope_event_fmode(const char *source, int ac, const char **av)
 }
 
 /*
- * [Nov 03 22:31:57.695076 2008] debug: Received: :964 FJOIN #test 1223763723 +BPSnt :,964AAAAAB ,964AAAAAC ,966AAAAAA
+ * [Nov 03 22:31:57.695076 2009] debug: Received: :964 FJOIN #test 1223763723 +BPSnt :,964AAAAAB ,964AAAAAC ,966AAAAAA
  *
  * 0: name
  * 1: channel ts (when it was created, see protocol docs for more info)
@@ -1088,7 +1088,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 
 
 /*
- * [Nov 03 22:09:58.176252 2008] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
+ * [Nov 03 22:09:58.176252 2009] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
  * 0: uid
  * 1: ts
  * 2: nick
@@ -1146,7 +1146,7 @@ int anope_event_chghost(const char *source, int ac, const char **av)
 }
 
 /*
- * [Nov 04 00:08:46.308435 2008] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
+ * [Nov 04 00:08:46.308435 2009] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
  * 0: name
  * 1: pass
  * 2: hops

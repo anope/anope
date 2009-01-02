@@ -1,7 +1,7 @@
 
 /* Miscellaneous routines.
  *
- * (C) 2003-2008 Anope Team
+ * (C) 2003-2009 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
@@ -1324,7 +1324,7 @@ char *GetWindowsVersion()
 				snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s%s",
 						 cputype, extra);
 		} else {
-				snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s",
+				snprintf(buf, sizeof(buf), "Microsoft Windows Server 2009 %s%s",
 						 cputype, extra);
 		}
 			delete [] extra;

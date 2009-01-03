@@ -2,7 +2,7 @@
 /* News functions.
  *
  * (C) 2003-2009 Anope Team
- * Contact us at info@anope.org
+ * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  *

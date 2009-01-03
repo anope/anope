@@ -1,7 +1,7 @@
 # Hungarian (magyar) language file.
 #
 # (C) 2003-2008 Anope Team
-# Contact us at info@anope.org
+# Contact us at team@anope.org
 #    
 # Translated by:                                      
 # ==============                                      
@@ -20,7 +20,7 @@
 # English messages do.  (Obviously, this doesn't hold for the strftime()
 # format lines immediately below.)  If you can't get a natural translation
 # of a message without changing the order of the parameters, let us know
-# (dev@anope.org) which message is causing a problem and I'll see
+# (team@anope.org) which message is causing a problem and I'll see
 # what I can do.
 #
 # In help messages, "%S" (capital S, not lowercase) refers to the name of

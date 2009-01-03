@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2003-2009 Anope Team <info@anope.org>
+ *   Copyright (C) 2003-2009 Anope Team <team@anope.org>
  *   Copyright (C) 2005-2006 Florian Schulze <certus@anope.org>
  *   Copyright (C) 2008-2009 Robin Burchell <w00t@inspircd.org>
  *

@@ -318,7 +318,7 @@ Anope Version 1.7.17
 
 Anope Version 1.7.16
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2006
+Provided by Anope Dev. <team@anope.org> - 2006
 09/10 A Added SASET AUTOOP to NickServ to match SET AUTOOP.               [#588]
 09/11 A Added detection in install.js for the latest PlatformSDK.         [#596]
 09/29 A Ability for modules to backup their databases.                    [#604]
@@ -355,7 +355,7 @@ Provided by ThaPrince <jon@vile.com> - 2006
 
 Anope Version 1.7.15
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2006
+Provided by Anope Dev. <team@anope.org> - 2006
 06/14 A Indication in the version string if we're running on win32.       [ #00]
 06/20 A Added support for Visual Studio 2005.                             [#408]
 06/22 A Ability for ircd modules to set extra modes on id.                [ #00]
@@ -435,7 +435,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 
 Anope Version 1.7.14
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2006
+Provided by Anope Dev. <team@anope.org> - 2006
 02/04 A Events for channel kicks and NickServ logout.                     [ #00]
 03/02 A Added support for TS6 Save (FNC) on ratbox, shadow and charybdis. [#424]
 03/07 F Counting issue in /os stats uplink.                               [#468]
@@ -515,7 +515,7 @@ Provided by Monk <monk@mindforge.org> - 2006
 
 Anope Version 1.7.13
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <team@anope.org> - 2005
 12/26 F Generating language.h failed on certain setups.                   [ #00]
 12/11 F First user on HelpChannel always got +h, even without access.     [#405]
 12/02 F Missing quitmessage when catching unknown signals.                [ #00]
@@ -538,7 +538,7 @@ Provided by Brain <brain@inspircd.org> - 2005
 
 Anope Version 1.7.12
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <team@anope.org> - 2005
 10/01 A Information on uplink server can be displayed via OperServ STATS. [ #00]
 09/29 A Configuration option to change fantasy command prefix character.  [ #00]
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
@@ -566,7 +566,7 @@ Provided by Cloud <cloud@shortcut.game-host.org> - 2005
 
 Anope Version  1.7.11
 ---------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <team@anope.org> - 2005
 09/01 A Function to retrieve a module language string.                    [ #00]
 08/21 A NickServ SASET to set options on other nicks (split from SET).    [ #00]
 08/10 A New Windows installation files.                                   [ #00]
@@ -648,7 +648,7 @@ Provided by Certus <> - 2005
 
 Anope Version 1.7.10
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <team@anope.org> - 2005
 05/23 F Updated install.vbs to detect SDK paths.                          [ #00]
 05/22 F Removed trailing space for whois output.                          [ #00]
 05/17 F Compiling on solaris and amd64 systems.                           [ #00]
@@ -679,7 +679,7 @@ Provided by Sascha Just <bugs.anope@nmg.own-hero.de> - 2005
 
 Anope Version 1.7.9
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <team@anope.org> - 2005
 05/03 A Dutch translation for all modulepack modules, where needed.       [ #00]
 04/30 A Modulepack with a few useful modules which are loaded by default. [ #00]
 04/30 A Modularized all BotServ fantasy commands.                         [ #00]
@@ -826,7 +826,7 @@ Provided by nenolod <nenolod@gmail.com> - 2005
 
 Anope Version 1.7.8
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <team@anope.org> - 2005
 01/23 A Support for Ratbox IRCD (With and Without TS6).                   [ #00]
 01/23 A Support for TS6 protocol.                                         [ #00]
 01/19 A Add simple smtp client, read the README in src/tools for info.    [ #00]
@@ -859,7 +859,7 @@ Provided by Ricardo <ricardoltdb@gmail.com> - 2005
 
 Anope Version 1.7.7
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2004/2005
+Provided by Anope Dev. <team@anope.org> - 2004/2005
 01/12 A Added make profile to allow for gprof profileing of anope.        [ #00]
 12/30 A Warnings for NULL values with sstrdup/moduleData.                 [#261]
 12/26 A Services can enforce SGLINE/SQLINE by killing the user on set.    [#245]
@@ -970,7 +970,7 @@ Provided by ThaPrince <jon@vile.com> - 2004/2005
 
 Anope Version 1.7.6
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2004
+Provided by Anope Dev. <team@anope.org> - 2004
 10/13 A Added argv[0] as nick for AnopeInit.                              [ #00]
 09/20 A Added RestrictOperNicks as new feature in services.conf.          [ #00]
 09/08 A Removed rand() and ported bsd's arc4random() to fit our needs.    [ #00]
@@ -1072,7 +1072,7 @@ Provided by Miles Nordin <carton@Ivy.NET> - 2004
 
 Anope Version 1.7.5
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2004
+Provided by Anope Dev. <team@anope.org> - 2004
 07/17 A Switched to autoconf for configure script.                        [ #00]
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
@@ -1114,7 +1114,7 @@ Provided by Mateusz Szczyrzyca <annihilator@ircnet.pl> - 2004
 
 Anope Version 1.7.4
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2004
+Provided by Anope Dev. <team@anope.org> - 2004
 06/16 A More verbose error messages for services.conf checking.           [ #00]
 06/10 A Improved handling of /NS INFO for pseudo-clients.                 [ #98]
 06/07 A Added register script in /bin/ for users to register anope.       [ #00]
@@ -1153,7 +1153,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 
 Anope Version 1.7.3
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2004
+Provided by Anope Dev. <team@anope.org> - 2004
 05/16 A make install will now move anoperc to bin, fixed anoperc bug
 05/15 A New standard Changes file format.
 05/15 A BSCaseSensitive directive for a cAsE sEnSiTiVe badword kicker.
@@ -1181,7 +1181,7 @@ Provided by Rage IRCD. <rageircd@users.sourceforge.net> - 2004
 
 Anope Version 1.7.2
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2004/04/17 Fixed table.sql usage on mydbgen script (Bug #10)
 2004/04/17 Fixed bug where anope_ns_req was being referenced
 2004/04/17 Added SIGUSR2 signal to Rehash Config and Save DBs
@@ -1189,7 +1189,7 @@ Provided by Anope Dev. <dev@anope.org>
 
 Anope Version 1.7.1
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2004/04/12 Fixed quoted MD5 password for MySQL use (Bug #11)
 2004/04/11 Fixed table.sql detection on mydbgen script (Bug #10)
 2004/04/09 Fixed segfault due to coreless nicks in MySQL db (Bug #8)
@@ -1210,7 +1210,7 @@ Provided by Anope Dev. <dev@anope.org>
 
 Anope Version 1.6.0
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2004/03/22  Added and updated several documents on "docs" folder.
 2004/03/22  Added bin/dbgen to help MySQL db schema.
 2004/03/21  Fixed module makefile to use -Wall for new modules
@@ -1220,7 +1220,7 @@ Provided by Anope Dev.  <dev@anope.org>
 
 Anope Version 1.5.15
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2004/03/14  Fixed LogBot and LogChan issue                            (0000437)
 2004/03/14  Fixed tiny bug in french lang file                        (0000465)
 2004/03/14  Fixed chanmode +r not being removed.		      (0000462)
@@ -1236,7 +1236,7 @@ Provided by Anope Dev.  <dev@anope.org>
 
 Anope Version 1.5.14
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2004/02/17  Disabled modules on OpenBSD for the time being            (0000408)
 2004/02/15  Added Viagra's VS command to handle vHosts properly       (0000404)
 2004/02/15  Fixed HostSetters to cover all aliases in the group       (0000412)
@@ -1253,7 +1253,7 @@ Provided by Anope Dev.  <dev@anope.org>
 
 Anope Version 1.5.13
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2004/01/30  Fixed malformed buffer bug                                (0000398)
 2004/01/31  Fixed OperServ news system reordering.                    (0000396)
 2004/01/19  Fixed minor typos on en_us.l                    (0000380) (0000381)
@@ -1262,7 +1262,7 @@ Provided by Anope Dev.  <dev@anope.org>
 
 Anope Version 1.5.12
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2004/01/12  Added optimized language parser
 2004/01/11  Added moduleSetHelpHelp to modules.h
 2004/01/11  Added updated documentation 
@@ -1284,7 +1284,7 @@ Provided by GeniousDex
 
 Anope Version 1.5.11
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2003/12/12  Fixed all printf parameters on all language files
 2003/12/08  Fixed HOST_HELP string for all languages (0000340)
 2003/12/08  ChanServ and NickServ LIST's now accept #X-Y for seaching
@@ -1304,7 +1304,7 @@ Provided by Stuff <the.stuff@gmx.de>
 
 Anope Version 1.5.10
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2003/11/24  New version of putanope to make more robust
 2003/11/24  New #defines for version tokens (see built version.h)
 2003/11/24  New version schema: major.minor.patch.build
@@ -1323,7 +1323,7 @@ Provided by Anope Dev.  <dev@anope.org>
 
 Anope Version 1.5.9
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2003/11/03  Added optional MysqlSecure password security directive
 2003/11/03  Fixed case insensitive password fields on MySQL           (0000196)
 2003/11/03  Fixed /OS STAFF bug not showing online aliases            (0000124)
@@ -1342,7 +1342,7 @@ Provided by GeniusDex <geniusdex@twistification.net>
 
 Anope Version 1.5.8
 --------------------
-Provided by Anope Dev.  <dev@anope.org>
+Provided by Anope Dev.  <team@anope.org>
 2003/10/08  Fixed compile errors on PTLink and Ultimate3 as nither have vIdents
 2003/10/17  Fixed double TAB on language files (0000283)
 2003/10/14  Added a check on nicksserv logout so you can't logout services admins
@@ -1353,7 +1353,7 @@ Provided by ShadowMaster <ShadowMaster@Shadow-Realm.org>
 
 Anope Version 1.5.7
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/10/05  Added /ns update to replace further identifies, /ns identify will now only work once
 2003/10/03  Added check_unload function to modules. (like on-error unloading)
 2003/10/03  Added directive MysqlPort
@@ -1385,7 +1385,7 @@ Provided by DrStein
 
 Anope Version 1.5.6
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/07/16  Reimplemented +oa and +oq on net-joins and ModeOnId (less intrusive)
 2003/07/16  Added bin directory with misc tools
 2003/07/12  Fixed chankill no expire
@@ -1398,7 +1398,7 @@ Provided by Anope Dev. <dev@anope.org>
 
 Anope Version 1.5.5
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/06/24  Added the ability to autoload modules at services startup
 2003/06/23  Now MySQL functionality is optional even when compiled with MySQL support
 2003/06/23  Combined +oq +oa +ha +va on net-joins.
@@ -1412,7 +1412,7 @@ Provided by GeniusDex <geniusdex@twistification.net>
 
 Anope Version 1.5.4
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/06/11  Added RemoteServer2 and RemoteServer3 to the conf. If one server is down, the services will try the next one.
 2003/06/06  Added /MS SENDALL to send a massmemo to all registered users
 2003/06/03  Renamed function log() to alog() to prevent gcc3.3 warnings
@@ -1424,7 +1424,7 @@ Provided by Anope Dev. <dev@anope.org>
 
 Anope Version 1.5.3
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/05/31  Removed TitanIRCd support. Difference willnot allow joint support
 2003/05/25  Custom GlobalOnCycle message
 2003/05/25  Defcon reject all new connections Kill message.
@@ -1447,7 +1447,7 @@ Provided by openglx <openglx@brasnerd.com.br>
 
 Anope Version 1.5.2
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/05/20  Added GlobalOnDefcon to global current Defcon Level when set
 2003/05/20  Added GlobalOnDefconMore to allow admin to attach a msg to users
 2003/05/15  Added No New Memos to Defcon
@@ -1457,7 +1457,7 @@ Provided by Anope Dev. <dev@anope.org>
 
 Anope Version 1.5.1
 --------------------
-Provided by Anope Dev. <dev@anope.org> :)
+Provided by Anope Dev. <team@anope.org> :)
 2003/04/27  Added Forbid/Suspend reason on akick if defined (0000023)
 2003/04/27  Added /OS CHANKILL command to deal with botnet channels (0000066)
 2003/04/26  Added DEFCON framework, along with basic settings
@@ -1473,7 +1473,7 @@ Provided by Anope Dev. <dev@anope.org> :)
 
 Anope Version 1.4.23
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/05/18  Fixed /ns list display error with no-expire
 2003/05/15  Fixed Exception move bug
 2003/05/15  Fixed /msg Operserv noop issue
@@ -1481,7 +1481,7 @@ Provided by Anope Dev. <dev@anope.org>
 
 Anope Version 1.4.22
 --------------------
-Provided by Anope Dev. <dev@anope.org>
+Provided by Anope Dev. <team@anope.org>
 2003/04/27  Fixed unsuspend crash when the # sign was left out
 2003/04/27  Fixed JOIN modes not set correctly internaly (e.g. for /cs clear ops)
 2003/04/26  Fixed OperServ jupe will only attempt to Jupe valid server masks
@@ -1494,7 +1494,7 @@ Provided by James <slowking50@aol.com>
 
 Anope Version 1.4.21
 --------------------
-Provided by Anope Dev. <dev@anope.org> (thanks goto PopCorn)
+Provided by Anope Dev. <team@anope.org> (thanks goto PopCorn)
 2003/04/20  Fixed BotServ nick/host/ident checking
 2003/04/20  Fixed HostServ valid host/ident checking
 
@@ -1505,13 +1505,13 @@ Provided by PopCorn
 
 Anope Version 1.4.19
 --------------------
-Provided by Anope Dev. <dev@anope.org> :)
+Provided by Anope Dev. <team@anope.org> :)
 2003/04/12  Fixed MSNofityAll bug that crashed Services.
 2003/04/12  Fixed MD5 compilation error.
 
 Anope Version 1.4.18
 --------------------
-Provided by Anope Dev. <dev@anope.org> :)
+Provided by Anope Dev. <team@anope.org> :)
 2003/03/27  SUSPENDed Channels can't be DROPed by Founder anymore
 2003/03/27  Fixed a couple of log'ing errors to tidy logfiels up a bit
 2003/03/20  Fixed a minor epona bug with !unban (BotServ will now

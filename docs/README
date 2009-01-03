@@ -1,7 +1,7 @@
 Anope -- a set of IRC services for IRC networks
 -----------------------------------------------
 
-Anope is          2003-2008 Anope Team    <info@anope.org>.
+Anope is          2003-2008 Anope Team    <team@anope.org>.
 Based on Epona    2000-2002 PegSoft       <epona@pegsoft.net>.
 Based on Services 1996-1999 Andrew Church <achurch@achurch.org>.
 
@@ -351,7 +351,7 @@ Table of Contents
     were added, modified or deleted.
 
     If you did a language file translation, and want to let others use it,
-    please send it to dev@anope.org (don't forget to mention clearly your
+    please send it to team@anope.org (don't forget to mention clearly your
     (nick)name, your e-mail and the language name). You'll of course get full
     credit for it, and will even get future final major releases before
     anyone else to complete the translation!... ;)

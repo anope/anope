@@ -2,7 +2,7 @@
  *
  * Modified for Anope.
  * (C) 2003-2009 Anope Team
- * Contact us at dev@anope.org
+ * Contact us at team@anope.org
  *
  * Taken from IRC Services and is copyright (c) 1996-2002 Andrew Church.
  *     E-mail: <achurch@achurch.org>

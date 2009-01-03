@@ -1,5 +1,5 @@
-# (C) 2003-2008 Anope 
-# Contact us at info@anope.org
+# (C) 2003-2009 Anope Team
+# Contact us at team@anope.org
 #
 # Please read COPYING and README for further details.
 #
@@ -9,7 +9,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1901"
+VERSION_BUILD="1913"
 
 # $Log$
 #

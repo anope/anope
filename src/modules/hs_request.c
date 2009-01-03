@@ -1,8 +1,8 @@
 /* hs_request.c - Add request and activate functionality to HostServ,
  *                along with adding +req as optional param to HostServ list.
  *
- * (C) 2003-2008 Anope Team
- * Contact us at info@anope.org
+ * (C) 2003-2009 Anope Team
+ * Contact us at team@anope.org
  *
  * Based on the original module by Rob <rob@anope.org>
  * Included in the Anope module pack since Anope 1.7.11

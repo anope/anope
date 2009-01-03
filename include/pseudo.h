@@ -1,7 +1,7 @@
 /* Include extra includes needed by most/all pseudo-clients.
  *
- * (C) 2003-2008 Anope Team
- * Contact us at info@anope.org
+ * (C) 2003-2009 Anope Team
+ * Contact us at team@anope.org
  *
  * Please read COPYING and README for furhter details.
  *

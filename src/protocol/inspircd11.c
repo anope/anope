@@ -1,8 +1,8 @@
 /* inspircd 1.1 beta 6+ functions
  *
  * (C) 2005-2007 Craig Edwards <brain@inspircd.org>
- * (C) 2003-2008 Anope Team
- * Contact us at info@anope.org
+ * (C) 2003-2009 Anope Team
+ * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
  *

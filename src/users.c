@@ -297,11 +297,11 @@ void User::SendMessage(const char *source, const std::string &msg)
 	if (UsePrivmsg &&
 		((!this->na && NSDefFlags & NI_MSG) || (this->na && this->na->nc->flags & NI_MSG)))
 	{
-		ircdproto->SendPrivmsg(findbot(source), this->nick, msg.c_str());
+		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
 	}
 	else
 	{
-		ircdproto->SendNotice(findbot(source), this->nick, msg.c_str());
+		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
 	}
 }
 

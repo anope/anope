@@ -127,7 +127,7 @@ void notice_user(char *source, User * u, const char *fmt, ...)
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-		u->SendMessage(source, buf);
+		u->SendMessage(source, "%s", buf);
 
 		va_end(args);
 	}
@@ -151,7 +151,7 @@ void notice_list(char *source, char *dest, char **text)
 		 * with a single space.
 		 */
 		if (**text) {
-			u->SendMessage(source, *text);
+			u->SendMessage(source, "%s", *text);
 		} else {
 			u->SendMessage(source, " ");
 		}
@@ -193,7 +193,7 @@ void notice_lang(const char *source, User * dest, int message, ...)
 		if (*s)
 			*s++ = 0;
 
-	dest->SendMessage(source, *t ? t : " ");
+		dest->SendMessage(source, "%s", *t ? t : " ");
 	}
 	va_end(args);
 }
@@ -239,7 +239,7 @@ void notice_help(const char *source, User * dest, int message, ...)
 		strscpy(outbuf, t, sizeof(outbuf));
 		strnrepl(outbuf, sizeof(outbuf), "\1\1", source);
 
-	dest->SendMessage(source, *outbuf ? outbuf : " ");
+		dest->SendMessage(source, "%s", *outbuf ? outbuf : " ");
 	}
 	va_end(args);
 }

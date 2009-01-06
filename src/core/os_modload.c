@@ -74,7 +74,7 @@ int do_modload(User * u)
 	int status = ModuleManager::LoadModule(name, u);
 	if (status != MOD_ERR_OK)
 	{
-		notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name.c_str());
+		notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
 	}
 
 	return MOD_CONT;

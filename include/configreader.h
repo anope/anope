@@ -224,10 +224,10 @@ typedef std::deque<ValueItem> ValueList;
 typedef bool (*Validator)(ServerConfig *, const char *, const char *, ValueItem &);
 /** A callback for validating multiple value entries
  */
-typedef bool (*MultiValidator)(ServerConfig *, const char *, const char **, ValueList &, int *);
+typedef bool (*MultiValidator)(ServerConfig *, const char *, const char **, ValueList &, int *, bool);
 /** A callback indicating the end of a group of entries
  */
-typedef bool (*MultiNotify)(ServerConfig *, const char *);
+typedef bool (*MultiNotify)(ServerConfig *, const char *, bool);
 
 /** Holds a core configuration item and its callbacks
  */

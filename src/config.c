@@ -542,8 +542,10 @@ void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 	}
 }
 
-bool InitUplinks(ServerConfig *, const char *)
+bool InitUplinks(ServerConfig *, const char *, bool bail)
 {
+	// If bail is false, we were reloading, don't clear anything
+	if (!bail) return true;
 	if (!Uplinks.empty()) {
 		std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
 		for (; curr_uplink != end_uplink; ++curr_uplink) delete *curr_uplink;
@@ -552,8 +554,10 @@ bool InitUplinks(ServerConfig *, const char *)
 	return true;
 }
 
-bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values, int *)
+bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values, int *, bool bail)
 {
+	// If bail is false, we were reloading, don't even try to add another uplink
+	if (!bail) return true;
 	// Validation variables
 	const char *host = values[0].GetString(), *password = values[2].GetString();
 	int port = values[1].GetInteger();
@@ -572,19 +576,21 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 	return true;
 }
 
-bool DoneUplinks(ServerConfig *, const char *)
+bool DoneUplinks(ServerConfig *, const char *, bool bail)
 {
+	// If bail is false, we were reloading, ignore this check
+	if (!bail) return true;
 	if (Uplinks.empty()) throw ConfigException("You must define at least one uplink block!");
 	return true;
 }
 
-bool InitModules(ServerConfig *, const char *)
+bool InitModules(ServerConfig *, const char *, bool)
 {
 	Modules.clear();
 	return true;
 }
 
-bool DoModule(ServerConfig *conf, const char *, const char **, ValueList &values, int *)
+bool DoModule(ServerConfig *conf, const char *, const char **, ValueList &values, int *, bool)
 {
 	// First we validate that there was a name in the module block
 	const char *module = values[0].GetString();
@@ -598,7 +604,7 @@ bool DoModule(ServerConfig *conf, const char *, const char **, ValueList &values
 	return true;
 }
 
-bool DoneModules(ServerConfig *, const char *)
+bool DoneModules(ServerConfig *, const char *, bool)
 {
 	return true;
 }
@@ -953,10 +959,11 @@ int ServerConfig::Read(bool bail)
 		 * and call the callbacks associated with them. We have three
 		 * callbacks for these, a 'start', 'item' and 'end' callback. */
 		for (int Index = 0; MultiValues[Index].tag; ++Index) {
-			MultiValues[Index].init_function(this, MultiValues[Index].tag);
+			MultiValues[Index].init_function(this, MultiValues[Index].tag, bail);
 			int number_of_tags = ConfValueEnum(config_data, MultiValues[Index].tag);
 			for (int tagnum = 0; tagnum < number_of_tags; ++tagnum) {
 				ValueList vl;
+				vl.clear();
 				for (int valuenum = 0; MultiValues[Index].items[valuenum]; ++valuenum) {
 					int dt = MultiValues[Index].datatype[valuenum];
 					bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
@@ -1044,9 +1051,9 @@ int ServerConfig::Read(bool bail)
 					}
 				}
 				MultiValues[Index].validation_function(this, MultiValues[Index].tag, static_cast<const char **>(MultiValues[Index].items), vl,
-					MultiValues[Index].datatype);
+					MultiValues[Index].datatype, bail);
 			}
-			MultiValues[Index].finish_function(this, MultiValues[Index].tag);
+			MultiValues[Index].finish_function(this, MultiValues[Index].tag, bail);
 		}
 	}
 	catch (ConfigException &ce) {

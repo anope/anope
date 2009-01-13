@@ -205,8 +205,8 @@ int do_badwords(User * u)
 			}
 			/* After reordering only the entries at the end could still be empty.
 			 * We ll free the places no longer in use... - Viper */
-			for (i = ci->bwcount - 1; i >= 0; i--) {
-				if (ci->badwords[i].in_use)
+			for (int j = ci->bwcount - 1; j >= 0; j--) {
+				if (ci->badwords[j].in_use)
 					break;
 				ci->bwcount--;
 			}

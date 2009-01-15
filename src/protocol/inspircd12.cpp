@@ -548,9 +548,9 @@ class InspIRCdProto : public IRCDProto
 	{
 		User *u = finduser(user);
 		if (buf)
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u->uid, buf);
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u ? u->uid : user, buf);
 		else
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u->uid, user);
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u ? u->uid : user, user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)

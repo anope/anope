@@ -240,50 +240,49 @@ int db_mysql_try(const char *fmt, ...)
  * Returns a string (buffer) to insert into a SQL query.
  * The string will, once evaluated by MySQL, result in the given pass
  * encoded in the encryption type selected for MysqlSecure
+ * The result of this function is an allocated MySQL safe string.
  *
- * This should be removed since Rob properly did encryption modules... -GD
- *
- * @param dest Destination buffer to store the password/ encryption string in. Needs to be at least size+14.
  * @param pass The buffer containing the password to secure.
- * @param bufsize The size of the destination buffer.
  * @param size The size of the password-to-secure buffer.
- * @return Returns -1 on failure, 1 if the result needs to be made MySQL safe (hash), 0 if it s ready.
+ * @return Returns a MySQL safe string containing the password, hash or SQL instruction to encrypt the password. Needs to be free'd.
  **/
-int db_mysql_secure(char *dest, char *pass, int bufsize, int size)
+char *db_mysql_secure(char *pass, int size)
 {
     char tmp_pass[PASSMAX];
-
-    if (bufsize < size+14)
-        return -1;
+    char *str, *tmp;
 
     /* Initialize the buffer. Bug #86 */
     memset(tmp_pass, 0, PASSMAX);
-    memset(dest, 0, bufsize);
 
     /* Return all zeros if no pass is set. */
     if (!pass)
-    	return 1;
+        return NULL;
 
-    /* We couldnt decrypt the pass... */
+    str = scalloc(2 * PASSMAX + 15, sizeof(char));
     if (enc_decrypt(pass, tmp_pass, PASSMAX - 1) != 1) {
-        memcpy(dest, pass, size);
-        return 1;
+        /* We couldnt decrypt the pass... */
+        /* Make sure the hash is MySQL safe.. */
+        tmp = db_mysql_quote_buffer(pass, size);
+        snprintf(str, 2 * PASSMAX + 15, "'%s'", tmp);
+        free(tmp);
     } else {                    /* if we could decrypt the pass */
+        /* Make sure the pass itself pass is MySQL safe.. */
+        tmp = db_mysql_quote_buffer(tmp_pass, strlen(tmp_pass));
         if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
-            snprintf(dest, bufsize, "'%s'", tmp_pass);
+            snprintf(str, 2 * PASSMAX + 15, "'%s'", tmp);
         } else if (strcmp(MysqlSecure, "des") == 0) {
-            snprintf(dest, bufsize, "ENCRYPT('%s')", tmp_pass);
+            snprintf(str, 2 * PASSMAX + 15, "ENCRYPT('%s')", tmp);
         } else if (strcmp(MysqlSecure, "md5") == 0) {
-            snprintf(dest, bufsize, "MD5('%s')", tmp_pass);
+            snprintf(str, 2 * PASSMAX + 15, "MD5('%s')", tmp);
         } else if (strcmp(MysqlSecure, "sha") == 0) {
-            snprintf(dest, bufsize, "SHA('%s')", tmp_pass);
+            snprintf(str, 2 * PASSMAX + 15, "SHA('%s')", tmp);
         } else {
-            snprintf(dest, bufsize, "ENCODE('%s','%s')", tmp_pass,
-                     MysqlSecure);
+            snprintf(str, 2 * PASSMAX + 15, "ENCODE('%s','%s')", tmp, MysqlSecure);
         }
+        free(tmp);
     }
 
-    return 0;
+    return str;
 }
 
 /*************************************************************************/
@@ -316,12 +315,12 @@ int db_mysql_save_ns_req(NickRequest * nr)
                        q_nick);
 
     if (ret && (mysql_affected_rows(mysql) == 0)) {
-    	ret = db_mysql_try("INSERT DELAYED INTO anope_ns_request "
-    	                   "(nick, passcode, password, email, requested, active) "
+        ret = db_mysql_try("INSERT DELAYED INTO anope_ns_request "
+                           "(nick, passcode, password, email, requested, active) "
                            "VALUES ('%s', '%s', '%s', '%s', %d, 1)",
                            q_nick, q_passcode, q_password, q_email,
                            (int) nr->requested);
-	}
+    }
 
     free(q_nick);
     free(q_passcode);
@@ -344,10 +343,9 @@ int db_mysql_save_ns_req(NickRequest * nr)
  */
 int db_mysql_save_ns_core(NickCore * nc)
 {
-    int ret, res;
+    int ret;
     int i;
-    char epass[PASSMAX+15];
-    char *q_display, *q_pass = NULL, *q_email, *q_greet, *q_url,
+    char *q_display, *q_pass, *q_email, *q_greet, *q_url,
         *q_access, *q_sender, *q_text;
 
     q_display = db_mysql_quote(nc->display);
@@ -356,58 +354,30 @@ int db_mysql_save_ns_core(NickCore * nc)
     q_url = db_mysql_quote(nc->url);
 
     /* First secure the pass, then make it MySQL safe.. - Viper */
-    res = db_mysql_secure(epass, nc->pass, PASSMAX+15, PASSMAX);
-    if (res < 0)
+    q_pass = db_mysql_secure(nc->pass, PASSMAX);
+    if (!q_pass)
         fatal("Unable to encrypt password for MySQL");
-    else if (res)
-        q_pass = db_mysql_quote_buffer(epass, PASSMAX+15);
-    else {
-        q_pass = scalloc(PASSMAX+15,sizeof(char));
-        memcpy(q_pass, epass, PASSMAX+15);
-    }
 
-    /* If it has been made MySQL safe, it still needs the 's.
-     * I know it s an ugly solution, but it works without breaking anything.. - Viper */
     /* Let's take care of the core itself */
     /* Update the existing records */
-    if (res)
-        ret = db_mysql_try("UPDATE anope_ns_core "
-                       "SET pass = '%s', email = '%s', greet = '%s', icq = %d, url = '%s', flags = %d, language = %d, accesscount = %d, memocount = %d, "
-                       "    memomax = %d, channelcount = %d, channelmax = %d, active = 1 "
-                       "WHERE display = '%s'",
-                       q_pass, q_email, q_greet, nc->icq, q_url, nc->flags,
-                       nc->language, nc->accesscount, nc->memos.memocount,
-                       nc->memos.memomax, nc->channelcount, nc->channelmax,
-                       q_display);
-    else
-        ret = db_mysql_try("UPDATE anope_ns_core "
-                       "SET pass = %s, email = '%s', greet = '%s', icq = %d, url = '%s', flags = %d, language = %d, accesscount = %d, memocount = %d, "
-                       "    memomax = %d, channelcount = %d, channelmax = %d, active = 1 "
-                       "WHERE display = '%s'",
-                       q_pass, q_email, q_greet, nc->icq, q_url, nc->flags,
-                       nc->language, nc->accesscount, nc->memos.memocount,
-                       nc->memos.memomax, nc->channelcount, nc->channelmax,
-                       q_display);
+    ret = db_mysql_try("UPDATE anope_ns_core "
+                "SET pass = %s, email = '%s', greet = '%s', icq = %d, url = '%s', flags = %d, language = %d, "
+                "accesscount = %d, memocount = %d, memomax = %d, channelcount = %d, channelmax = %d, active = 1 "
+                "WHERE display = '%s'",
+                q_pass, q_email, q_greet, nc->icq, q_url, nc->flags,
+                nc->language, nc->accesscount, nc->memos.memocount,
+                nc->memos.memomax, nc->channelcount, nc->channelmax,
+                q_display);
 
     /* Our previous UPDATE affected no rows, therefore this is a new record */
-    if (ret && (mysql_affected_rows(mysql) == 0)) {
-        if (res)
-            ret = db_mysql_try("INSERT DELAYED INTO anope_ns_core "
-                           "(display, pass, email, greet, icq, url, flags, language, accesscount, memocount, memomax, channelcount, channelmax, active) "
-                           "VALUES ('%s', '%s', '%s', '%s', %d, '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
-                           q_display, q_pass, q_email, q_greet, nc->icq, q_url,
-                           nc->flags, nc->language, nc->accesscount,
-                           nc->memos.memocount, nc->memos.memomax,
-                           nc->channelcount, nc->channelmax);
-        else
-            ret = db_mysql_try("INSERT DELAYED INTO anope_ns_core "
-                           "(display, pass, email, greet, icq, url, flags, language, accesscount, memocount, memomax, channelcount, channelmax, active) "
-                           "VALUES ('%s', %s, '%s', '%s', %d, '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
-                           q_display, q_pass, q_email, q_greet, nc->icq, q_url,
-                           nc->flags, nc->language, nc->accesscount,
-                           nc->memos.memocount, nc->memos.memomax,
-                           nc->channelcount, nc->channelmax);
-    }
+    if (ret && (mysql_affected_rows(mysql) == 0))
+        ret = db_mysql_try("INSERT DELAYED INTO anope_ns_core "
+                    "(display, pass, email, greet, icq, url, flags, language, accesscount, memocount, memomax, channelcount, channelmax, active) "
+                    "VALUES ('%s', %s, '%s', '%s', %d, '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
+                    q_display, q_pass, q_email, q_greet, nc->icq, q_url,
+                    nc->flags, nc->language, nc->accesscount,
+                    nc->memos.memocount, nc->memos.memomax,
+                    nc->channelcount, nc->channelmax);
 
     /* Now let's do the access */
     for (i = 0; ret && (i < nc->accesscount); i++) {
@@ -544,12 +514,11 @@ int db_mysql_save_ns_alias(NickAlias * na)
  */
 int db_mysql_save_cs_info(ChannelInfo * ci)
 {
-    int ret, res, i;
-    char epass[PASSMAX+15];
+    int ret, i;
     char *q_name;
     char *q_founder;
     char *q_successor;
-    char *q_pass = NULL;
+    char *q_pass;
     char *q_desc;
     char *q_url;
     char *q_email;
@@ -599,107 +568,54 @@ int db_mysql_save_cs_info(ChannelInfo * ci)
     }
 
     /* First secure the pass, then make it MySQL safe.. - Viper */
-    res = db_mysql_secure(epass, ci->founderpass, PASSMAX+15, PASSMAX);
-    if (res < 0)
+    q_pass = db_mysql_secure(ci->founderpass, PASSMAX);
+    if (!q_pass)
         fatal("Unable to encrypt password for MySQL");
-    else if (res)
-        q_pass = db_mysql_quote_buffer(epass, PASSMAX+15);
-    else {
-        q_pass = scalloc(PASSMAX+15,sizeof(char));
-        memcpy(q_pass, epass, PASSMAX+15);
-    }
 
-    /* If it has been made MySQL safe, it still needs the 's.
-     * I know it s an ugly solution, but it works without breaking anything.. - Viper */
     /* Let's take care of the core itself */
-    if (res)
-        ret = db_mysql_try("UPDATE anope_cs_info "
-                       "SET founder = '%s', successor = '%s', founderpass = '%s', descr = '%s', url = '%s', email = '%s', time_registered = %d, "
-                       "    last_used = %d, last_topic = '%s', last_topic_setter = '%s', last_topic_time = %d, flags = %d, forbidby = '%s', "
-                       "    forbidreason = '%s', bantype = %d, accesscount = %d, akickcount = %d, mlock_on = %d,  mlock_off = %d, mlock_limit = %d, "
-                       "    mlock_key = '%s', mlock_flood = '%s', mlock_redirect = '%s', entry_message = '%s', memomax = %d, botnick = '%s', botflags = %d, "
-                       "    bwcount = %d, capsmin = %d, capspercent = %d, floodlines = %d, floodsecs = %d, repeattimes = %d, active = 1 "
-                       "WHERE name = '%s'",
-                       q_founder, q_successor, q_pass, q_desc, q_url, q_email,
-                       (int) ci->time_registered, (int) ci->last_used,
-                       q_lasttopic, q_lasttopicsetter,
-                       (int) ci->last_topic_time, (int) ci->flags, q_forbidby,
-                       q_forbidreason, (int) ci->bantype,
-                       (int) ci->accesscount, (int) ci->akickcount,
-                       (int) ci->mlock_on, (int) ci->mlock_off,
-                       (int) ci->mlock_limit, q_mlock_key, q_mlock_flood,
-                       q_mlock_redirect, q_entrymsg, (int) ci->memos.memomax,
-                       q_botnick, (int) ci->botflags, (int) ci->bwcount,
-                       (int) ci->capsmin, (int) ci->capspercent,
-                       (int) ci->floodlines, (int) ci->floodsecs,
-                       (int) ci->repeattimes, q_name);
-    else
-        ret = db_mysql_try("UPDATE anope_cs_info "
-                       "SET founder = '%s', successor = '%s', founderpass = %s, descr = '%s', url = '%s', email = '%s', time_registered = %d, "
-                       "    last_used = %d, last_topic = '%s', last_topic_setter = '%s', last_topic_time = %d, flags = %d, forbidby = '%s', "
-                       "    forbidreason = '%s', bantype = %d, accesscount = %d, akickcount = %d, mlock_on = %d,  mlock_off = %d, mlock_limit = %d, "
-                       "    mlock_key = '%s', mlock_flood = '%s', mlock_redirect = '%s', entry_message = '%s', memomax = %d, botnick = '%s', botflags = %d, "
-                       "    bwcount = %d, capsmin = %d, capspercent = %d, floodlines = %d, floodsecs = %d, repeattimes = %d, active = 1 "
-                       "WHERE name = '%s'",
-                       q_founder, q_successor, q_pass, q_desc, q_url, q_email,
-                       (int) ci->time_registered, (int) ci->last_used,
-                       q_lasttopic, q_lasttopicsetter,
-                       (int) ci->last_topic_time, (int) ci->flags, q_forbidby,
-                       q_forbidreason, (int) ci->bantype,
-                       (int) ci->accesscount, (int) ci->akickcount,
-                       (int) ci->mlock_on, (int) ci->mlock_off,
-                       (int) ci->mlock_limit, q_mlock_key, q_mlock_flood,
-                       q_mlock_redirect, q_entrymsg, (int) ci->memos.memomax,
-                       q_botnick, (int) ci->botflags, (int) ci->bwcount,
-                       (int) ci->capsmin, (int) ci->capspercent,
-                       (int) ci->floodlines, (int) ci->floodsecs,
-                       (int) ci->repeattimes, q_name);
+    ret = db_mysql_try("UPDATE anope_cs_info "
+                "SET founder = '%s', successor = '%s', founderpass = %s, descr = '%s', url = '%s', email = '%s', time_registered = %d, "
+                "    last_used = %d, last_topic = '%s', last_topic_setter = '%s', last_topic_time = %d, flags = %d, forbidby = '%s', "
+                "    forbidreason = '%s', bantype = %d, accesscount = %d, akickcount = %d, mlock_on = %d,  mlock_off = %d, mlock_limit = %d, "
+                "    mlock_key = '%s', mlock_flood = '%s', mlock_redirect = '%s', entry_message = '%s', memomax = %d, botnick = '%s', botflags = %d, "
+                "    bwcount = %d, capsmin = %d, capspercent = %d, floodlines = %d, floodsecs = %d, repeattimes = %d, active = 1 "
+                "WHERE name = '%s'",
+                q_founder, q_successor, q_pass, q_desc, q_url, q_email,
+                (int) ci->time_registered, (int) ci->last_used,
+                q_lasttopic, q_lasttopicsetter,
+                (int) ci->last_topic_time, (int) ci->flags, q_forbidby,
+                q_forbidreason, (int) ci->bantype,
+                (int) ci->accesscount, (int) ci->akickcount,
+                (int) ci->mlock_on, (int) ci->mlock_off,
+                (int) ci->mlock_limit, q_mlock_key, q_mlock_flood,
+                q_mlock_redirect, q_entrymsg, (int) ci->memos.memomax,
+                q_botnick, (int) ci->botflags, (int) ci->bwcount,
+                (int) ci->capsmin, (int) ci->capspercent,
+                (int) ci->floodlines, (int) ci->floodsecs,
+                (int) ci->repeattimes, q_name);
 
     /* Our previous UPDATE affected no rows, therefore this is a new record */
-    if (ret && (mysql_affected_rows(mysql) == 0)) {
-        if (res)
-            ret = db_mysql_try("INSERT DELAYED INTO anope_cs_info "
-                           "(name, founder, successor, founderpass, descr, url, email, time_registered, last_used,  last_topic, last_topic_setter, "
-                           "    last_topic_time, flags, forbidby, forbidreason, bantype, accesscount, akickcount, mlock_on, mlock_off, mlock_limit, "
-                           "    mlock_key, mlock_flood, mlock_redirect, entry_message, botnick, botflags, bwcount, capsmin, capspercent, floodlines, "
-                           "    floodsecs, repeattimes, active) "
-                           "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', %d, %d, '%s', '%s', %d, %d, %d, %d, %d, %d, '%s', '%s', "
-                           "        '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
-                           q_name, q_founder, q_successor, q_pass, q_desc,
-                           q_url, q_email, (int) ci->time_registered,
-                           (int) ci->last_used, q_lasttopic,
-                           q_lasttopicsetter, (int) ci->last_topic_time,
-                           (int) ci->flags, q_forbidby, q_forbidreason,
-                           (int) ci->bantype, (int) ci->accesscount,
-                           (int) ci->akickcount, (int) ci->mlock_on,
-                           (int) ci->mlock_off, (int) ci->mlock_limit,
-                           q_mlock_key, q_mlock_flood, q_mlock_redirect,
-                           q_entrymsg, q_botnick, (int) ci->botflags,
-                           (int) ci->bwcount, (int) ci->capsmin,
-                           (int) ci->capspercent, (int) ci->floodlines,
-                           (int) ci->floodsecs, (int) ci->repeattimes);
-        else
-            ret = db_mysql_try("INSERT DELAYED INTO anope_cs_info "
-                           "(name, founder, successor, founderpass, descr, url, email, time_registered, last_used,  last_topic, last_topic_setter, "
-                           "    last_topic_time, flags, forbidby, forbidreason, bantype, accesscount, akickcount, mlock_on, mlock_off, mlock_limit, "
-                           "    mlock_key, mlock_flood, mlock_redirect, entry_message, botnick, botflags, bwcount, capsmin, capspercent, floodlines, "
-                           "    floodsecs, repeattimes, active) "
-                           "VALUES ('%s', '%s', '%s', %s, '%s', '%s', '%s', %d, %d, '%s', '%s', %d, %d, '%s', '%s', %d, %d, %d, %d, %d, %d, '%s', '%s', "
-                           "        '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
-                           q_name, q_founder, q_successor, q_pass, q_desc,
-                           q_url, q_email, (int) ci->time_registered,
-                           (int) ci->last_used, q_lasttopic,
-                           q_lasttopicsetter, (int) ci->last_topic_time,
-                           (int) ci->flags, q_forbidby, q_forbidreason,
-                           (int) ci->bantype, (int) ci->accesscount,
-                           (int) ci->akickcount, (int) ci->mlock_on,
-                           (int) ci->mlock_off, (int) ci->mlock_limit,
-                           q_mlock_key, q_mlock_flood, q_mlock_redirect,
-                           q_entrymsg, q_botnick, (int) ci->botflags,
-                           (int) ci->bwcount, (int) ci->capsmin,
-                           (int) ci->capspercent, (int) ci->floodlines,
-                           (int) ci->floodsecs, (int) ci->repeattimes);
-    }
+    if (ret && (mysql_affected_rows(mysql) == 0))
+        ret = db_mysql_try("INSERT DELAYED INTO anope_cs_info "
+                    "(name, founder, successor, founderpass, descr, url, email, time_registered, last_used,  last_topic, last_topic_setter, "
+                    "    last_topic_time, flags, forbidby, forbidreason, bantype, accesscount, akickcount, mlock_on, mlock_off, mlock_limit, "
+                    "    mlock_key, mlock_flood, mlock_redirect, entry_message, botnick, botflags, bwcount, capsmin, capspercent, floodlines, "
+                    "    floodsecs, repeattimes, active) "
+                    "VALUES ('%s', '%s', '%s', %s, '%s', '%s', '%s', %d, %d, '%s', '%s', %d, %d, '%s', '%s', %d, %d, %d, %d, %d, %d, '%s', '%s', "
+                    "        '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
+                    q_name, q_founder, q_successor, q_pass, q_desc,
+                    q_url, q_email, (int) ci->time_registered,
+                    (int) ci->last_used, q_lasttopic,
+                    q_lasttopicsetter, (int) ci->last_topic_time,
+                    (int) ci->flags, q_forbidby, q_forbidreason,
+                    (int) ci->bantype, (int) ci->accesscount,
+                    (int) ci->akickcount, (int) ci->mlock_on,
+                    (int) ci->mlock_off, (int) ci->mlock_limit,
+                    q_mlock_key, q_mlock_flood, q_mlock_redirect,
+                    q_entrymsg, q_botnick, (int) ci->botflags,
+                    (int) ci->bwcount, (int) ci->capsmin,
+                    (int) ci->capspercent, (int) ci->floodlines,
+                    (int) ci->floodsecs, (int) ci->repeattimes);
 
     /* Memos */
     for (i = 0; ret && (i < ci->memos.memocount); i++) {

@@ -1,3 +1,9 @@
+Anope Version 1.8 SVN
+-------------------
+Provided by Anope Dev. <team@anope.org> - 2009
+01/03 F Updated install.js url for windows build help.                    [ #00]
+01/17 F Fixed MySQL DB saving failing due to unsafe queries.              [#994]
+
 Anope Version 1.8.0
 -------------------
 10/19 F Updated Anope Credits                                             [ #00]

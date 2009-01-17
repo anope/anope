@@ -1,3 +1,7 @@
+Anope Version 1.8 SVN
+-------------------
+- NONE
+
 Anope Version 1.8.0
 -------------------
 ALTER TABLE `anope_ns_access` DROP INDEX display;

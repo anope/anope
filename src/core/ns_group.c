@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -108,6 +108,11 @@ int do_group(User * u)
     }
     if (checkDefCon(DEFCON_NO_NEW_NICKS)) {
         notice_lang(s_NickServ, u, OPER_DEFCON_DENIED);
+        return MOD_CONT;
+    }
+
+    if (!anope_valid_nick(u->nick)) {
+        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
         return MOD_CONT;
     }
 
@@ -233,7 +238,7 @@ int do_group(User * u)
             if (ircd->modeonreg) {
                 len = strlen(ircd->modeonreg);
                 strncpy(modes,ircd->modeonreg,512);
-	       if(ircd->rootmodeonid && is_services_root(u)) { 
+	       if(ircd->rootmodeonid && is_services_root(u)) {
                     strncat(modes,ircd->rootmodeonid,512-len);
 	        } else if(ircd->adminmodeonid && is_services_admin(u)) {
                     strncat(modes,ircd->adminmodeonid,512-len);

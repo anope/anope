@@ -102,7 +102,7 @@ IRCDVar myIrcd[] = {
 	 0,						 /* Protected Umode	  */
 	 0,						 /* Has Admin			*/
 	 0,						 /* Chan SQlines		 */
-	 0,						 /* Quit on Kill		 */
+	 1,						 /* Quit on Kill		 */
 	 0,						 /* SVSMODE unban		*/
 	 1,						 /* Has Protect		  */
 	 1,						 /* Reverse			  */

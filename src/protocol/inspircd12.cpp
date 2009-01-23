@@ -892,7 +892,9 @@ endnick:
 	newav[0] = av[1];		   /* timestamp */
 	newav[1] = av[0];		   /* channel name */
 
-	for (int i = 2; i != ac; i++)
+	int i ;
+
+	for (i = 2; i != ac; i++)
 	{
 		newav[i] = av[i];
 	}

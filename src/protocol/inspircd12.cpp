@@ -823,7 +823,7 @@ int anope_event_fmode(const char *source, int ac, const char **av)
  */
 int anope_event_fjoin(const char *source, int ac, const char **av)
 {
-	const char *newav[10];
+	const char *newav[30]; // hopefully 30 will do until the stupid ac/av stuff goes away.
 
 	/* value used for myStrGetToken */
 	int curtoken = 0;
@@ -891,9 +891,17 @@ endnick:
 
 	newav[0] = av[1];		   /* timestamp */
 	newav[1] = av[0];		   /* channel name */
-	newav[2] = av[2];			 /* channel modes */ // XXX: this is incorrect, it doesn't take into account +L etc, modes which require params.. call FMODE instead? -- w00t
+
+	int newac = 2;
+
+	for (int i = 2; i != ac; i++)
+	{
+		newav[i] = av[i];
+		newac++;
+	}
+
 	newav[3] = nicklist;
-	do_sjoin(source, 4, newav);
+	do_sjoin(source, newac, newav);
 
 	return MOD_CONT;
 }

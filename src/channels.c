@@ -1114,6 +1114,14 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 /* Handle a channel MODE command. */
 
+/*
+ * av[0]: channel
+ * av[1]: (tsmode) channel TS (this should be moved to a protocol module)
+ * av[2-]: (tsmode) modes and parameters
+ *
+ * av[1-]: modes and parameters.
+ *
+ */
 void do_cmode(const char *source, int ac, const char **av)
 {
 	Channel *chan;

@@ -892,16 +892,15 @@ endnick:
 	newav[0] = av[1];		   /* timestamp */
 	newav[1] = av[0];		   /* channel name */
 
-	int newac = 2;
-
 	for (int i = 2; i != ac; i++)
 	{
 		newav[i] = av[i];
-		newac++;
 	}
 
-	newav[3] = nicklist;
-	do_sjoin(source, newac, newav);
+	newav[i] = nicklist;
+	i++;
+
+	do_sjoin(source, i, newav);
 
 	return MOD_CONT;
 }

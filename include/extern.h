@@ -920,8 +920,8 @@ E void disconn(ano_socket_t s);
 
 E User *userlist[1024];
 
-E int32 usercnt, opcnt;
-E uint32 maxusercnt;
+E int32 opcnt;
+E uint32 maxusercnt, usercnt;
 E time_t maxusertime;
 
 E void get_user_stats(long *nusers, long *memuse);

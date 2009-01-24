@@ -403,12 +403,23 @@ void load_hs_dbase(dbFILE * f)
 			SAFE(read_string(&vHost, f));
 			SAFE(read_string(&creator, f));
 			SAFE(read_int32(&time, f));
+
+			// Older Anope could save an empty vident when importing from MySQL, so trap that here.
+			if (!strcmp(vIdent, ""))
+			{
+				delete [] vIdent;
+				vIdent = NULL;
+			}
+
 			addHostCore(nick, vIdent, vHost, creator, time);	/* could get a speed increase by not searching the list */
 			delete [] nick;		 /* as we know the db is in alphabetical order... */
 			delete [] vHost;
 			delete [] creator;
-			delete [] vIdent;
-		} else {
+			if (vIdent)
+				delete [] vIdent;
+		}
+		else
+		{
 			fatal("Invalid format in %s %d", HostDBName, c);
 		}
 	}

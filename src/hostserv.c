@@ -405,7 +405,7 @@ void load_hs_dbase(dbFILE * f)
 			SAFE(read_int32(&time, f));
 
 			// Older Anope could save an empty vident when importing from MySQL, so trap that here.
-			if (!strcmp(vIdent, ""))
+			if (vIdent && !strcmp(vIdent, ""))
 			{
 				delete [] vIdent;
 				vIdent = NULL;

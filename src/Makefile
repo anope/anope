@@ -109,8 +109,9 @@ spotless:
 
 install: services
 	test -d ${INSTDIR} || mkdir ${INSTDIR}
-	$(INSTALL) services $(INSTDIR)/services
-	$(INSTALL) bin/anoperc $(INSTDIR)/anoperc
+	test -d ${INSTDIR}/bin || mkdir ${INSTDIR}/bin
+	$(INSTALL) services $(INSTDIR)/bin/services
+	$(INSTALL) bin/anoperc $(INSTDIR)/bin/anoperc
 	test -d ${INSTDIR}/data || mkdir ${INSTDIR}/data
 	(cd ../lang ; $(MAKE) install)
 	$(CP) ../data/* $(INSTDIR)/data

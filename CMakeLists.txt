@@ -536,9 +536,9 @@ endif(NOT WIN32 AND RUNGROUP)
 # On Windows platforms, install extra files
 if(WIN32)
   install(FILES ${Anope_SOURCE_DIR}/anope.bat
-    ${Anope_SOURCE_DIR}/Changes
-    ${Anope_SOURCE_DIR}/Changes.conf
-    ${Anope_SOURCE_DIR}/Changes.lang
+    DESTINATION bin
+  )
+  install(FILES ${Anope_SOURCE_DIR}/Changes ${Anope_SOURCE_DIR}/Changes.conf ${Anope_SOURCE_DIR}/Changes.lang
     DESTINATION .
   )
 endif(WIN32)
@@ -565,10 +565,10 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "Anope")
     set(CPACK_PACKAGE_EXECUTABLES "")
     set(CPACK_NSIS_MENU_LINKS
-      "${SERVICES_BINARY}" "Anope IRC Services"
-      "anope.bat\\\" \\\"-debug -nofork" "Anope IRC Services (Debug and Window Logging)"
-      "anope.bat\\\" \\\"-nofork" "Anope IRC Services (Window Logging)"
-      "anope.bat\\\" \\\"-nothird" "Anope IRC Services (No Third Party Modules)"
+      "bin\\\\${SERVICES_BINARY}" "Anope IRC Services"
+      "bin\\\\anope.bat\\\" \\\"-debug -nofork" "Anope IRC Services (Debug and Window Logging)"
+      "bin\\\\anope.bat\\\" \\\"-nofork" "Anope IRC Services (Window Logging)"
+      "bin\\\\anope.bat\\\" \\\"-nothird" "Anope IRC Services (No Third Party Modules)"
       "http://www.anope.org" "Anope Web Site"
     )
     # The following doesn't work, but a bug report has been filed about it

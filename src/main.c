@@ -512,7 +512,7 @@ int main(int ac, char **av, char **envp)
 #endif
 
 	binary_dir = GetFullProgDir(av[0]);
-	services_dir = binary_dir + "/data";
+	services_dir = binary_dir + "/../data";
 
 	/* General initialization first */
 	if ((i = init_primary(ac, av)) != 0)

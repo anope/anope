@@ -73,5 +73,5 @@ add_subdirectory(tools)
 
 # Set Anope to be installed to the bin directory
 install(TARGETS ${PROGRAM_NAME}
-  DESTINATION .
+  DESTINATION bin
 )

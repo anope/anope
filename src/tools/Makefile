@@ -35,9 +35,9 @@ spotless: clean
 
 install: anopesmtp db-merger db-convert
 	test -d ${INSTDIR} || mkdir ${INSTDIR}
-	test -d $(INSTDIR)/tools || mkdir $(INSTDIR)/tools
-	$(INSTALL) anopesmtp $(INSTDIR)/tools/anopesmtp
-	$(INSTALL) db-merger $(INSTDIR)/tools/db-merger
-	$(INSTALL) db-convert $(INSTDIR)/tools/db-convert
+	test -d $(INSTDIR)/bin || mkdir $(INSTDIR)/bin
+	$(INSTALL) anopesmtp $(INSTDIR)/bin/anopesmtp
+	$(INSTALL) db-merger $(INSTDIR)/bin/db-merger
+	$(INSTALL) db-convert $(INSTDIR)/bin/db-convert
 
 DUMMY:

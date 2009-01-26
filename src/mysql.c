@@ -1147,29 +1147,37 @@ int db_mysql_load_bs_dbase(void)
 int db_mysql_load_hs_dbase(void)
 {
 	int ret;
-    int32 time;
+	char *vident = NULL;
+	int32 time;
 
-    if (!do_mysql)
-        return 0;
+	if (!do_mysql)
+		return 0;
 
-    ret = db_mysql_try("SELECT nick, vident, vhost, creator, `time` "
-                       "FROM anope_hs_core "
-                       "WHERE active = 1");
+	ret = db_mysql_try("SELECT nick, vident, vhost, creator, `time` "
+			"FROM anope_hs_core "
+			"WHERE active = 1");
 
-    if (!ret)
-        return 0;
+	if (!ret)
+		return 0;
 
-    mysql_res = mysql_use_result(mysql);
+	mysql_res = mysql_use_result(mysql);
 
-    while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        time = strtol(mysql_row[4], (char **) NULL, 10);
-        addHostCore(mysql_row[0], mysql_row[1], mysql_row[2], mysql_row[3],
-                    time);
-    }
+	while ((mysql_row = mysql_fetch_row(mysql_res)))
+	{
+		/* FIX: we can never allow an empty vident, it must *always* be NULL. */
+		vident = mysql_row[1];
+		if (!strcmp(vident, ""))
+		{
+			vident = NULL;
+		}
 
-    mysql_free_result(mysql_res);
+		time = strtol(mysql_row[4], (char **) NULL, 10);
+		addHostCore(mysql_row[0], NULL, mysql_row[2], mysql_row[3], time);
+	}
 
-    return 1;
+	mysql_free_result(mysql_res);
+
+	return 1;
 }
 
 int db_mysql_load_news(void)

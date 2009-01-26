@@ -102,6 +102,12 @@ static int started = 0;
 
 extern void expire_all(void)
 {
+    if (noexpire || readonly)
+    {
+        /* don't allow expiry here or bad things will happen. */
+        return;
+    }
+
     waiting = -30;
     send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
     waiting = -3;
@@ -613,8 +619,7 @@ int main(int ac, char **av, char **envp)
         if (debug >= 2)
             alog("debug: Top of main loop");
 
-        if (!noexpire && !readonly
-            && (save_data || t - last_expire >= ExpireTimeout)) {
+        if (save_data || t - last_expire >= ExpireTimeout) {
             expire_all();
             last_expire = t;
         }

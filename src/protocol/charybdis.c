@@ -36,7 +36,7 @@ IRCDVar myIrcd[] = {
      "+oiS",                     /* Global alias mode   */
      "+oiS",                     /* Used by BotServ Bots */
      2,                         /* Chan Max Symbols     */
-     "-cilmnpstrgzQF",          /* Modes to Remove */
+     "-cijlmnpstrgzQF",         /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -105,6 +105,8 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      0,                         /* reports sync state */
      1,                         /* CIDR channelbans */
+     0,                         /* +j */
+     0,                         /* +j Mode */
      }
     ,
     {NULL}

@@ -39,7 +39,7 @@ IRCDVar myIrcd[] = {
      "+ioS",                    /* Global alias mode   */
      "+qS",                     /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
-     "-cilmnpstuzACGHKMNOQRSTV",        /* Modes to Remove */
+     "-cijlmnpstuzACGKMNOQRSTV",     /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -108,6 +108,8 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      1,                         /* reports sync state */
      0,                         /* CIDR channelbans */
+     1,                         /* +j */
+     CMODE_j,                   /* +j Mode */
      }
     ,
     {NULL}
@@ -316,7 +318,7 @@ CBMode myCbmodes[128] = {
     {0},                        /* g */
     {0},                        /* h */
     {CMODE_i, 0, NULL, NULL},
-    {0},                        /* j */
+    {CMODE_j, CBM_MINUS_NO_ARG | CBM_NO_MLOCK, chan_set_throttle, cs_set_throttle}, /* j */
     {CMODE_k, 0, chan_set_key, cs_set_key},
     {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
     {CMODE_m, 0, NULL, NULL},
@@ -340,6 +342,7 @@ CBModeInfo myCbmodeinfos[] = {
     {'c', CMODE_c, 0, NULL, NULL},
     {'f', CMODE_f, 0, get_flood, cs_get_flood},
     {'i', CMODE_i, 0, NULL, NULL},
+    {'j', CMODE_j, 0, get_throttle, cs_get_throttle},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
     {'m', CMODE_m, 0, NULL, NULL},
@@ -1854,6 +1857,26 @@ void unreal_cmd_ctcp(char *source, char *dest, char *buf)
     free(s);
 }
 
+int unreal_jointhrottle_mode_check(char *value)
+{
+    char *tempValue, *one, *two;
+    int param1, param2;
+
+    if (!value)
+        return 0;
+
+    tempValue = sstrdup(value);
+    one = strtok(tempValue, ":");
+    two = strtok(NULL, "");
+    if (one && two) {
+        param1 = atoi(one);
+        param2 = atoi(two);
+    }
+    if ((param1 >= 1) && (param1 <= 255) && (param2 >= 1) && (param2 <= 999))
+        return 1;
+    return 0;
+}
+
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
@@ -2192,6 +2215,7 @@ void moduleAddAnopeCmds()
     pmodule_valid_chan(unreal_valid_chan);
     pmodule_cmd_ctcp(unreal_cmd_ctcp);
     pmodule_set_umode(unreal_set_umode);
+    pmodule_jointhrottle_mode_check(unreal_jointhrottle_mode_check);
 }
 
 /** 

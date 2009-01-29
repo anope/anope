@@ -92,6 +92,7 @@ E void chan_adduser2(User * user, Channel * c);
 E void add_invite(Channel * chan, char *mask);
 E void chan_delete(Channel * c);
 E void del_ban(Channel * chan, char *mask);
+E void chan_set_throttle(Channel * chan, char *value);
 E void chan_set_key(Channel * chan, char *value);
 E void set_limit(Channel * chan, char *value);
 E void del_invite(Channel * chan, char *mask);
@@ -104,6 +105,8 @@ E void add_exception(Channel * chan, char *mask);
 E void del_exception(Channel * chan, char *mask);
 E char *get_flood(Channel * chan);
 E void set_flood(Channel * chan, char *value);
+E char *get_throttle(Channel * chan);
+E void set_throttle(Channel * chan, char *value);
 E char *get_redirect(Channel * chan);
 E void set_redirect(Channel * chan, char *value);
 
@@ -204,6 +207,8 @@ E void stick_mask(ChannelInfo * ci, AutoKick * akick);
 E void stick_all(ChannelInfo * ci);
 E char *cs_get_flood(ChannelInfo * ci);
 E void cs_set_flood(ChannelInfo * ci, char *value);
+E char *cs_get_throttle(ChannelInfo * ci);
+E void cs_set_throttle(ChannelInfo * ci, char *value);
 E char *cs_get_key(ChannelInfo * ci);
 E void cs_set_key(ChannelInfo * ci, char *value);
 E char *cs_get_limit(ChannelInfo * ci);
@@ -702,6 +707,7 @@ E void pmodule_secret_cmode(int mode);
 E void pmodule_private_cmode(int mode);
 E void pmodule_key_mode(int mode);
 E void pmodule_limit_mode(int mode);
+E void pmodule_jointhrottle_mode_check(int (*func) (char *value));
 
 E int anope_get_secret_mode();
 E int anope_get_invite_mode();
@@ -1369,6 +1375,7 @@ E void anope_cmd_svid_umode2(User *u, char *ts);
 E void anope_cmd_svid_umode3(User *u, char *ts);
 E void anope_cmd_nc_change(User *u);
 E int anope_flood_mode_check(char *value);
+E int anope_jointhrottle_mode_check(char *value);
 
 E void anope_cmd_jupe(char *jserver, char *who, char *reason);
 

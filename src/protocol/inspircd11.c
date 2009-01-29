@@ -56,7 +56,7 @@ IRCDVar myIrcd[] = {
      "+ioI",                    /* Global alias mode   */
      "+sI",                     /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
-     "-cilmnpstuzACGHKNOQRSV",  /* Modes to Remove */
+     "-cijlmnpstuzACGHKNOQRSV", /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -125,6 +125,8 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      0,                         /* reports sync state */
      1,                         /* CIDR channelbans */
+     1,                         /* +j */
+     CMODE_j,                   /* +j Mode */
      }
     ,
     {NULL}
@@ -284,7 +286,7 @@ CBMode myCbmodes[128] = {
     {0},                        /* g */
     {0},                        /* h */
     {CMODE_i, 0, NULL, NULL},
-    {0},                        /* j */
+    {CMODE_j, CBM_MINUS_NO_ARG | CBM_NO_MLOCK, chan_set_throttle, cs_set_throttle}, /* j */
     {CMODE_k, 0, chan_set_key, cs_set_key},
     {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
     {CMODE_m, 0, NULL, NULL},
@@ -308,6 +310,7 @@ CBModeInfo myCbmodeinfos[] = {
     {'f', CMODE_f, 0, NULL, NULL},
     {'c', CMODE_c, 0, NULL, NULL},
     {'i', CMODE_i, 0, NULL, NULL},
+    {'j', CMODE_j, 0, get_throttle, cs_get_throttle},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
     {'m', CMODE_m, 0, NULL, NULL},
@@ -1806,6 +1809,27 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
 }
 
 
+int inspircd_jointhrottle_mode_check(char *value)
+{
+    char *tempValue, *one, *two;
+    int param1, param2;
+
+    if (!value)
+        return 0;
+
+    tempValue = sstrdup(value);
+    one = strtok(tempValue, ":");
+    two = strtok(NULL, "");
+    if (one && two) {
+        param1 = atoi(one);
+        param2 = atoi(two);
+    }
+    if ((param1 >= 1) && (param1 <= 255) && (param2 >= 1) && (param2 <= 999))
+        return 1;
+    return 0;
+}
+
+
 /**
  * Tell anope which function we want to perform each task inside of anope.
  * These prototypes must match what anope expects.
@@ -1886,6 +1910,7 @@ void moduleAddAnopeCmds()
     pmodule_valid_chan(inspircd_valid_chan);
     pmodule_cmd_ctcp(inspircd_cmd_ctcp);
     pmodule_set_umode(inspircd_set_umode);
+    pmodule_jointhrottle_mode_check(inspircd_jointhrottle_mode_check);
 }
 
 /** 

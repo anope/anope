@@ -74,6 +74,7 @@
 #define CMODE_N 0x01000000
 #define CMODE_T 0x02000000
 #define CMODE_M 0x04000000
+#define CMODE_j 0x08000000
 
 
 /* Default Modes with MLOCK */
@@ -150,4 +151,5 @@ int unreal_flood_mode_check(char *value);
 void unreal_cmd_jupe(char *jserver, char *who, char *reason);
 int unreal_valid_nick(char *nick);
 void unreal_cmd_ctcp(char *source, char *dest, char *buf);
+int unreal_jointhrottle_mode_check(char *value);
 

@@ -48,6 +48,7 @@
 #define CMODE_N 0x01000000
 #define CMODE_R 0x00000100		/* Only identified users can join */
 #define CMODE_r 0x00000200		/* Set for all registered channels */
+#define CMODE_j 0x02000000
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
@@ -121,6 +122,8 @@ int inspircd_flood_mode_check(char *value);
 void inspircd_cmd_jupe(char *jserver, char *who, char *reason);
 int inspircd_valid_nick(char *nick);
 void inspircd_cmd_ctcp(char *source, char *dest, char *buf);
+int inspircd_jointhrottle_mode_check(char *value);
+
 int anope_event_fjoin(char *source, int ac, char **av);
 int anope_event_fmode(char *source, int ac, char **av);
 int anope_event_ftopic(char *source, int ac, char **av);

@@ -106,6 +106,8 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      0,                         /* reports sync state */
      0,                         /* CIDR channelbans */
+     0,                         /* +j */
+     0,                         /* +j mode */
      }
     ,
     {NULL}

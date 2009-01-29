@@ -445,6 +445,10 @@ void get_channel_stats(long *nrec, long *memuse)
                 if (chan->redirect)
                     mem += strlen(chan->redirect) + 1;
             }
+            if (ircd->jmode) {
+                if (chan->throttle)
+                    mem += strlen(chan->throttle) + 1;
+            }
             mem += get_memuse(chan->bans);
             if (ircd->except) {
                 mem += get_memuse(chan->excepts);
@@ -1648,6 +1652,10 @@ void chan_delete(Channel * c)
         if (c->redirect)
             free(c->redirect);
     }
+    if (ircd->jmode) {
+        if (c->throttle)
+            free (c->throttle);
+    }
 
     if (c->bans && c->bans->count) {
         while (c->bans->entries) {
@@ -1759,6 +1767,13 @@ char *get_flood(Channel * chan)
 
 /*************************************************************************/
 
+char *get_throttle(Channel * chan)
+{
+    return chan->throttle;
+}
+
+/*************************************************************************/
+
 char *get_key(Channel * chan)
 {
     return chan->key;
@@ -1821,6 +1836,19 @@ void set_flood(Channel * chan, char *value)
     if (debug)
         alog("debug: Flood mode for channel %s set to %s", chan->name,
              chan->flood ? chan->flood : "no flood settings");
+}
+
+/*************************************************************************/
+
+void chan_set_throttle(Channel * chan, char *value)
+{
+    if (chan->throttle)
+        free(chan->throttle);
+    chan->throttle = value ? sstrdup(value) : NULL;
+
+    if (debug)
+        alog("debug: Throttle mode for channel %s set to %s", chan->name,
+            chan->throttle ? chan->throttle : "none");
 }
 
 /*************************************************************************/

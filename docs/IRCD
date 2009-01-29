@@ -446,6 +446,11 @@ How To Add IRCd Support
                       Contact the anope Dev Team if this is the case.
                       Set to 0 if CIDR's are not supported by your IRCd.
 
+    88) Throttle Mode: The IRCd has a channelmode for throttling joins per-user. 
+                       Use 1 for yes, 0 for no.
+
+    89) CMode j: CMODE_ that defines throttle mode. Use 0 for no support.
+
     So we've had this long list. Now there's a second struct to fill. This
     struct isn't as long as the previous one though, so we'll handle it quite
     quick compared to the previous one.

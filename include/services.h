@@ -361,6 +361,8 @@ struct ircdvars_ {
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
 							 * 0 for no support, 1 for strict cidr support, anything else
 							 * for ircd specific support (nefarious only cares about first /mask) */
+	int jmode;				/* +j join throttle */
+	uint32 chan_jmode;		/* Mode */
 };
 
 struct ircdcapab_ {
@@ -668,6 +670,7 @@ struct chaninfo_ {
     char *mlock_key;			/* NULL if no key */
     char *mlock_flood;			/* NULL if no +f */
     char *mlock_redirect;		/* NULL if no +L */
+    char *mlock_throttle;		/* NULL if no +j */
 
     char *entry_message;		/* Notice sent on entering channel */
 
@@ -990,6 +993,7 @@ struct channel_ {
     char *key;				/* NULL if none */
     char *redirect;			/* +L; NULL if none */
     char *flood;			/* +f; NULL if none */
+    char *throttle;			/* +j: NULL if none */
     EList *bans;
     EList *excepts;
     EList *invites;
@@ -1208,6 +1212,7 @@ typedef struct ircd_proto_ {
     int (*ircd_valid_nick)(char *nick);
     int (*ircd_valid_chan)(char *chan);
     int (*ircd_flood_mode_check)(char *value);
+    int (*ircd_jointhrottle_mode_check)(char *value);
 } IRCDProto;
 
 typedef struct ircd_modes_ {

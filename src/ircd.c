@@ -113,6 +113,7 @@ void initIrcdProto()
     ircdproto.ircd_valid_nick = NULL;
     ircdproto.ircd_valid_chan = NULL;
     ircdproto.ircd_cmd_ctcp = NULL;
+    ircdproto.ircd_jointhrottle_mode_check = NULL;
 }
 
 /* Special function, returns 1 if executed, 0 if not */
@@ -639,6 +640,13 @@ int anope_flood_mode_check(char *value)
     return ircdproto.ircd_flood_mode_check(value);
 }
 
+int anope_jointhrottle_mode_check(char *value)
+{
+    if (ircd->jmode)
+        return ircdproto.ircd_jointhrottle_mode_check(value);
+    return 0;
+}
+
 void anope_cmd_jupe(char *jserver, char *who, char *reason)
 {
     ircdproto.ircd_cmd_jupe(jserver, who, reason);
@@ -1135,6 +1143,11 @@ void pmodule_ircd_csmodes(char mode[128])
     for (i = 0; i < 128; i++) {
         csmodes[i] = mode[i];
     }
+}
+
+void pmodule_jointhrottle_mode_check(int (*func) (char *value))
+{
+    ircdproto.ircd_jointhrottle_mode_check = func;
 }
 
 void pmodule_ircd_useTSMode(int use)

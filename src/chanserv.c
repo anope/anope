@@ -342,6 +342,10 @@ void get_chanserv_stats(long *nrec, long *memuse)
                 if (ci->mlock_redirect)
                     mem += strlen(ci->mlock_redirect) + 1;
             }
+            if (ircd->jmode) {
+                if (ci->mlock_throttle)
+                    mem += strlen(ci->mlock_throttle) + 1;
+            }
             if (ci->last_topic)
                 mem += strlen(ci->last_topic) + 1;
             if (ci->entry_message)
@@ -675,6 +679,16 @@ void load_cs_dbase(void)
                     if (s)
                         free(s);
                 }
+                /* We added support for channelmode +j tracking,
+                 * however unless for some other reason we need to
+                 * change the DB format, it is being saved to DB. ~ Viper
+                if (ircd->jmode) {
+                    SAFE(read_string(&ci->mlock_throttle, f));
+                } else {
+                    SAFE(read_string(&s, f));
+                    if (s)
+                        free(s);
+                }*/
             }
 
             SAFE(read_int16(&tmp16, f));
@@ -934,6 +948,13 @@ void save_cs_dbase(void)
             } else {
                 SAFE(write_string(NULL, f));
             }
+            /* Current DB format does not hold +j yet..  ~ Viper
+            if (ircd->jmode) {
+                SAFE(write_string(ci->mlock_throttle, f));
+            } else {
+                SAFE(write_string(NULL, f));
+            }
+            */
             SAFE(write_int16(ci->memos.memocount, f));
             SAFE(write_int16(ci->memos.memomax, f));
             memos = ci->memos.memos;
@@ -2139,6 +2160,10 @@ int delchan(ChannelInfo * ci)
         if (ci->mlock_redirect)
             free(ci->mlock_redirect);
     }
+    if (ircd->jmode) {
+        if (ci->mlock_throttle)
+            free(ci->mlock_throttle);
+    }
     if (ci->last_topic)
         free(ci->last_topic);
     if (ci->forbidby)
@@ -2410,6 +2435,17 @@ char *cs_get_flood(ChannelInfo * ci)
 
 /*************************************************************************/
 
+char *cs_get_throttle(ChannelInfo * ci)
+{
+    if (!ci) {
+        return NULL;
+    } else {
+        return ci->mlock_throttle;
+    }
+}
+
+/*************************************************************************/
+
 char *cs_get_key(ChannelInfo * ci)
 {
     if (!ci) {
@@ -2465,6 +2501,24 @@ void cs_set_flood(ChannelInfo * ci, char *value)
     } else {
         ci->mlock_on &= ~ircd->chan_fmode;
         ci->mlock_flood = NULL;
+    }
+}
+
+/*************************************************************************/
+
+void cs_set_throttle(ChannelInfo * ci, char *value)
+{
+    if (!ci)
+        return;
+
+    if (ci->mlock_throttle)
+        free(ci->mlock_throttle);
+
+    if (anope_jointhrottle_mode_check(value)) {
+        ci->mlock_throttle = sstrdup(value);
+    } else {
+        ci->mlock_on &= ~ircd->chan_jmode;
+        ci->mlock_throttle = NULL;
     }
 }
 

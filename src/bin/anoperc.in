@@ -16,9 +16,9 @@
 
 
 ANOPEPID="@INSTDIR@/data/services.pid"
-ANOPROG="@INSTDIR@/services"
+ANOPROG="@INSTDIR@/bin/services"
 LOG="@INSTDIR@/data/logs/"
-ARCVERSION="1.2"
+ARCVERSION="1.3"
 
 isAnopeRunning () {
 if [ ! -f $ANOPEPID ] ; then

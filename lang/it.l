@@ -6602,6 +6602,8 @@ HOST_DEL
 	Il vhost di %s è stato rimosso.
 HOST_DEL_SYNTAX
 	Sintassi: %R%s del <nick>.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Il tuo vhost è stato rimosso. Per riattivare il mascheramento standard del tuo host o IP, digita /mode %s +%s
 HOST_NO_VIDENT

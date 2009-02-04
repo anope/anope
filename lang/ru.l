@@ -6665,6 +6665,8 @@ HOST_DEL
 	Виртуальный хост для %s удален.
 HOST_DEL_SYNTAX
 	Синтаксис: %R%s del <ник>.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Ваш виртуальный хост деактивирован. Для ре-активации используйте: /MODE %s +%s
 HOST_NO_VIDENT

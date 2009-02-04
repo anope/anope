@@ -534,12 +534,16 @@ void unreal_cmd_vhost_off(User * u)
     if (UseSVS2MODE) {
         send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"),
                  u->nick);
+        send_cmd(s_HostServ, "%s %s +x", send_token("SVS2MODE", "v"),
+                 u->nick);
     } else {
         send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"),
                  u->nick);
-    }
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick,
-                myIrcd->vhostchar);
+        send_cmd(s_HostServ, "%s %s +x", send_token("SVSMODE", "n"),
+                 u->nick);
+
+  }
+    notice_lang(s_HostServ, u, HOST_OFF);
 }
 
 void unreal_cmd_akill(char *user, char *host, char *who, time_t when,

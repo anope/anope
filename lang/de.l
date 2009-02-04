@@ -6746,6 +6746,8 @@ HOST_DEL
 	vHost für %s wurde gelöscht.
 HOST_DEL_SYNTAX
 	Syntax: %R%s DEL Nickname.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Dein vHost wurde gelöscht. Um die normale Host-Verschlüsselung zu reaktivieren, tippe /mode %s +%s
 HOST_NO_VIDENT

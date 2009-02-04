@@ -1,12 +1,15 @@
 Anope Version 1.8 SVN
 -------------------
 Provided by Anope Dev. <team@anope.org> - 2009
-01/03 F Updated install.js url for windows build help.                    [  #00]
-01/17 F Fixed MySQL DB saving failing due to unsafe queries.              [ #994]
-01/18 F Fixed check for backtrace() in configure.                         [  #00]
-01/22 F Do not allow invalied nicks to be grouped.                        [#1000]
-01/26 F Do not allow empty vIdent when loading from MySQL.                [  #00]
-01/26 F Readonly/noexpire are now checked before saving on shutdown.      [  #00]
+01/03 F Updated install.js url for windows build help.                   [  #00]
+01/17 F Fixed MySQL DB saving failing due to unsafe queries.             [ #994]
+01/18 F Fixed check for backtrace() in configure.                        [  #00]
+01/22 F Do not allow invalied nicks to be grouped.                       [#1000]
+01/26 F Do not allow empty vIdent when loading from MySQL.               [  #00]
+01/26 F Readonly/noexpire are now checked before saving on shutdown.     [  #00]
+
+Provided by mooncup <mooncup@anonnet.org> - 2009
+02/04 F Automatically reapply vhost on hs off for unreal32.		 [  #00]
 
 Provided by Adam <Adam@SubZeroIRC.net> - 2009
 01/28 F Added internal support for +j channelmodes.                       [#1001]

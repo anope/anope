@@ -6378,6 +6378,8 @@ HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
 	Syntax: %R%s del <nick>.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Your vhost was removed. To re-enable the standard host cloaking, type /mode %s +%s
 HOST_NO_VIDENT

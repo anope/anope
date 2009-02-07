@@ -6804,6 +6804,8 @@ HOST_DEL_SYNTAX
 # HostServ Help messages
 #
 ###########################################################################
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Votre vhost a été enlevée. Pour réactiver la protection de votre IP, tapez /mode %s +%s
 HOST_NO_VIDENT

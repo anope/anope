@@ -6563,6 +6563,8 @@ HOST_DEL
 	vhost voor %s verwijderd.
 HOST_DEL_SYNTAX
 	Gebruik: %R%s del <nick>.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Je vhost is verwijderd. Om standaard host verberging weer aan te schakelen, type je /mode %s +%s
 HOST_NO_VIDENT

@@ -6527,6 +6527,8 @@ HOST_DEL
 	vhost para %s removido.
 HOST_DEL_SYNTAX
 	Sintaxe: %R%s del <nick>.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Seu vhost foi removido. Para reabilitar a encriptação padrão de host, digite /mode %s +%s
 HOST_NO_VIDENT

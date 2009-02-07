@@ -6752,6 +6752,8 @@ HOST_DEL_SYNTAX
 # HostServ Help messages
 #
 ###########################################################################
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Your vhost was removed. To re-enable the standard host cloaking, type /mode %s +%s
 HOST_NO_VIDENT

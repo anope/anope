@@ -7,3 +7,6 @@ Anope Version 1.9.0
 11/01 F Move modules into a class
 11/15 F Fixed ns resending of passcode issue
 11/15 F Modules now delete themselves
+
+Provided by mooncup <mooncup@anonnet.org> - 2009
+02/04 F Automatically reapply vhost on hs off for unreal32.              [  #00]

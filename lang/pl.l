@@ -7624,7 +7624,8 @@ HOST_DEL
 
 HOST_DEL_SYNTAX
 	Sk³adnia: %R%s DEL <nick>.
-
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	Twój vhost zosta³ usuniêty. Aby w³±czyæ standardowe ukrywanie hosta wpisz /mode %s +%s
 

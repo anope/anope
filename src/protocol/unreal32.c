@@ -611,7 +611,8 @@ class UnrealIRCdProto : public IRCDProto
 	void SendVhostDel(User *u)
 	{
 		send_cmd(s_HostServ, "v %s -xt", u->nick);
-		notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
+		send_cmd(s_HostServ, "v %s +x", u->nick);
+		notice_lang(s_HostServ, u, HOST_OFF);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)

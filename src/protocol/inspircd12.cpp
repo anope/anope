@@ -499,6 +499,7 @@ class InspIRCdProto : public IRCDProto
 	void SendVhostDel(User *u)
 	{
 		inspircd_cmd_chghost(u->uid, (u->mode & umodes[static_cast<int>('x')]) ? u->chost.c_str() : u->host);
+		notice_lang(s_HostServ, u, HOST_OFF);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)

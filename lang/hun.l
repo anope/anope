@@ -6538,6 +6538,8 @@ HOST_DEL
 	%s vhosztja törölve lett.
 HOST_DEL_SYNTAX
 	Szintaktika: %R%s del <nick>.
+HOST_OFF
+	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL
 	A vhostod kikapcsolva. Hogy újra használd az alap
 	hosztrejtést írd be /mode %s +%s

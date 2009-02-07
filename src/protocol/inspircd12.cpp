@@ -702,6 +702,17 @@ class InspIRCdProto : public IRCDProto
 		}
 	}
 
+	void SendAccountLogin(User *u,  NickCore *account)
+	{
+		send_cmd(TS6SID, "METADATA %s accountname :%s", u->uid, account->display);
+
+	}
+
+	void SendAccountLogout(User *u,  NickCore *account)
+	{
+		send_cmd(TS6SID, "METADATA %s accountname :", u->uid);
+	}
+
 	int IsNickValid(const char *nick)
 	{
 		/* InspIRCd, like TS6, uses UIDs on collision, so... */

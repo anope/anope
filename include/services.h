@@ -1500,6 +1500,18 @@ private:
 			va_end(args);
 			SendNumericInternal(source, numeric, dest, *buf ? buf : NULL);
 		}
+
+		/** Sends a message logging a user into an account, where ircds support such a feature.
+		 * @param u The user logging in
+		 * @param account The account the user is logging into
+		 */
+		virtual void SendAccountLogin(User *u, NickCore *account) { }
+
+		/** Sends a message logging a user out of an account, where ircds support such a feature.
+		 * @param u The user logging out
+		 * @param account The account the user is logging out of
+		 */
+		virtual void SendAccountLogout(User *u, NickCore *account) { }
 };
 
 class IRCDTS6Proto : public IRCDProto

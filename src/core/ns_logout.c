@@ -107,6 +107,8 @@ int do_logout(User * u)
 			del_ns_timeout(u->na, TO_COLLIDE);
 		}
 
+		ircdproto->SendAccountLogout(u2, u2->na->nc);
+
 		/* Send out an event */
 		send_event(EVENT_NICK_LOGOUT, 1, u2->nick);
 	}

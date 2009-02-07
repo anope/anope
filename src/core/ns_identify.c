@@ -123,6 +123,7 @@ int do_identify(User * u)
 				common_svsmode(u, modes, "");
 			}
 		}
+		ircdproto->SendAccountLogin(u, na->nc);
 		send_event(EVENT_NICK_IDENTIFY, 1, u->nick);
 		alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
 			 u->username, u->host, u->nick);

@@ -305,15 +305,19 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     if (check > 0) {
         check_modes(chan);
 
-        if (check < 2) {
+        if ((check < 2) || (check == 3)) {
             /* Walk through all users we've set modes for and see if they are
              * valid. Invalid modes (like +o with SECUREOPS on) will be removed
              */
             real_ac--;
             real_av++;
             for (i = 0; i < real_ac; i++) {
-                if ((user = finduser(*real_av)) && is_on_chan(chan, user))
-                    chan_set_correct_modes(user, chan, 0);
+				if ((user = finduser(*real_av)) && is_on_chan(chan, user)) {
+					if (check < 2)
+						chan_set_correct_modes(user, chan, 0);
+					else if ((chan->ci->flags) && (chan->ci->flags & CI_SECUREOPS))
+						chan_set_correct_modes(user, chan, 0);
+				}
                 real_av++;
             }
         }

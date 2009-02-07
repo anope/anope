@@ -382,7 +382,7 @@ int do_util(User * u, CSModeUtil * util)
 
         av[0] = util->mode;
         av[1] = u2->nick;
-        chan_set_modes(s_ChanServ, c, 2, av, 2);
+        chan_set_modes(s_ChanServ, c, 2, av, 3);
 
         if (util->notice && ci->flags & util->notice)
             notice(whosends(ci), c->name, "%s command used for %s by %s",

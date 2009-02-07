@@ -223,7 +223,7 @@ int do_bot(User * u)
 
 		if (nickIsServices(nick, 0))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST);
+			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;
 		}
 

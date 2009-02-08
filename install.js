@@ -214,7 +214,7 @@ for (x in installerQuestions) {
 	var thisQuestion = installerQuestions[x];
 	cmake += ' ' + thisQuestion.cmake_argument();
 }
-cmake += ' ' + ScriptPath;
+cmake += ' "' + ScriptPath + '"';
 WScript.Echo(cmake + "\n");
 
 var shell = WScript.CreateObject('WScript.Shell');

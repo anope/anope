@@ -9,6 +9,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'MAKEBIN=${MAKEBIN}'
 
 OBJECTS= $(SRCS:.c=.o)
+OBJECTS+= $(SRCS:.cpp=.o)
 SO_FILES=$(OBJECTS:.o=.s)
 CDEFS= -rdynamic -Wall
 
@@ -25,6 +26,9 @@ install:
 distclean: spotless
 
 .c.o:
+	@$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
+
+.cpp.o:
 	@$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .o.s:

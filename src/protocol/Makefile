@@ -29,7 +29,7 @@ distclean: clean spotless
 	@$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .o.s:
-	@$(MAKEBIN) $(CC) ${SHARED} ../mod_version.o  $< -o $*.so ${PROFILE}
+	@$(MAKEBIN) $(CC) ${SHARED} ../mod_version.o $< -o $*.so ${PROFILE}
 	@$(TOUCH) $*.s
 
 subs:

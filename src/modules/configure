@@ -26,7 +26,7 @@ export ECHO2 ECHO2SUF
 
 echo2 "SRCS=" > ./Makefile.inc
 FIRST=1
-for oldfile in *.c
+for oldfile in `ls -1 *.c *.cpp`
 do
 	if [ "$FIRST" = 1 ] ; then
 		echo2 " "$oldfile >> ./Makefile.inc

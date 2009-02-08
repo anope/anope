@@ -105,6 +105,14 @@ static int parse_dir_options(int ac, char **av)
 					return -1;
 				}
 				log_filename = av[i];
+			} else if (strcmp(s, "debug") == 0) {
+				++debug;
+			} else if (strcmp(s, "nofork") == 0) {
+				nofork = 1;
+			} else if (strcmp(s, "support") == 0) {
+				nofork = 1;
+				++debug;
+				nothird = 1;
 			} else if (strcmp(s, "version") == 0) {
 				fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
 						version_flags, version_build);
@@ -226,11 +234,11 @@ static int parse_options(int ac, char **av)
 				} else
 					ExpireTimeout = atol(s);
 			} else if (strcmp(s, "debug") == 0) {
-				debug++;
+				/* Handled by parse_dir_options() */
 			} else if (strcmp(s, "readonly") == 0) {
 				readonly = 1;
 			} else if (strcmp(s, "nofork") == 0) {
-				nofork = 1;
+				/* Handled by parse_dir_options() */
 			} else if (strcmp(s, "logchan") == 0) {
 				if (!LogChannel) {
 					fprintf(stderr,
@@ -246,9 +254,7 @@ static int parse_options(int ac, char **av)
 			} else if (strcmp(s, "protocoldebug") == 0) {
 				protocoldebug = 1;
 			} else if (strcmp(s, "support") == 0) {
-				nofork = 1;
-				debug++;
-				nothird = 1;
+				/* Handled by parse_dir_options() */
 			} else if (!strcmp(s, "noexpire")) {
 				noexpire = 1;
 			} else if (!strcmp(s, "help")) {
@@ -348,8 +354,6 @@ int init_primary(int ac, char **av)
 
 	/* Parse command line for -dir and -version options. */
 	parse_dir_options(ac, av);
-	/* Parse all remaining command-line options. */
-	parse_options(ac, av);
 
 	/* Chdir to Services data directory. */
 	if (chdir(services_dir.c_str()) < 0) {
@@ -394,6 +398,9 @@ int init_secondary(int ac, char **av)
 
 	/* Add Core MSG handles */
 	moduleAddMsgs();
+
+	/* Parse all remaining command-line options. */
+	parse_options(ac, av);
 
 	/* Parse the defcon mode string if needed */
 	if (DefConLevel) {

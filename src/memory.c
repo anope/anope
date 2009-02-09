@@ -101,8 +101,7 @@ char *sstrdup(const char *src)
 		strcpy(ret, src);
 	} else {
 		alog("sstrdup() called with NULL-arg");
-		if (debug)
-			do_backtrace(0);
+		abort();
 	}
 
 	return ret;

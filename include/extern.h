@@ -592,7 +592,6 @@ E time_t start_time;
 
 E void save_databases();
 E void expire_all();
-E void do_backtrace(int show_segheader);
 E void sighandler(int signum);
 E void do_restart_services();
 

@@ -407,9 +407,7 @@ class XOPBase : public Command
 
 		ChannelInfo *ci;
 
-		if (!cmd)
-			this->OnSyntaxError(u);
-		else if (!(ci = cs_findchan(chan)))
+		if (!(ci = cs_findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (ci->flags & CI_VERBOTEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);

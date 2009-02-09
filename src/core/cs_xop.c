@@ -15,17 +15,37 @@
 
 #include "module.h"
 
-int do_xop(User * u, const char *xname, int xlev, int *xmsgs);
-int do_aop(User * u);
-int do_hop(User * u);
-int do_sop(User * u);
-int do_vop(User * u);
+void myChanServHelp(User *u);
 
-void myChanServHelp(User * u);
+enum
+{
+	XOP_AOP,
+	XOP_SOP,
+	XOP_VOP,
+	XOP_HOP,
+	XOP_TYPES
+};
 
-int xop_msgs[4][14] = {
-	{CHAN_AOP_SYNTAX,
-	 CHAN_AOP_DISABLED,
+enum
+{
+	XOP_DISABLED,
+	XOP_NICKS_ONLY,
+	XOP_ADDED,
+	XOP_MOVED,
+	XOP_NO_SUCH_ENTRY,
+	XOP_NOT_FOUND,
+	XOP_NO_MATCH,
+	XOP_DELETED,
+	XOP_DELETED_ONE,
+	XOP_DELETED_SEVERAL,
+	XOP_LIST_EMPTY,
+	XOP_LIST_HEADER,
+	XOP_CLEAR,
+	XOP_MESSAGES
+};
+
+int xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
+	{CHAN_AOP_DISABLED,
 	 CHAN_AOP_NICKS_ONLY,
 	 CHAN_AOP_ADDED,
 	 CHAN_AOP_MOVED,
@@ -38,8 +58,7 @@ int xop_msgs[4][14] = {
 	 CHAN_AOP_LIST_EMPTY,
 	 CHAN_AOP_LIST_HEADER,
 	 CHAN_AOP_CLEAR},
-	{CHAN_SOP_SYNTAX,
-	 CHAN_SOP_DISABLED,
+	{CHAN_SOP_DISABLED,
 	 CHAN_SOP_NICKS_ONLY,
 	 CHAN_SOP_ADDED,
 	 CHAN_SOP_MOVED,
@@ -52,8 +71,7 @@ int xop_msgs[4][14] = {
 	 CHAN_SOP_LIST_EMPTY,
 	 CHAN_SOP_LIST_HEADER,
 	 CHAN_SOP_CLEAR},
-	{CHAN_VOP_SYNTAX,
-	 CHAN_VOP_DISABLED,
+	{CHAN_VOP_DISABLED,
 	 CHAN_VOP_NICKS_ONLY,
 	 CHAN_VOP_ADDED,
 	 CHAN_VOP_MOVED,
@@ -66,8 +84,7 @@ int xop_msgs[4][14] = {
 	 CHAN_VOP_LIST_EMPTY,
 	 CHAN_VOP_LIST_HEADER,
 	 CHAN_VOP_CLEAR},
-	{CHAN_HOP_SYNTAX,
-	 CHAN_HOP_DISABLED,
+	{CHAN_HOP_DISABLED,
 	 CHAN_HOP_NICKS_ONLY,
 	 CHAN_HOP_ADDED,
 	 CHAN_HOP_MOVED,
@@ -82,230 +99,76 @@ int xop_msgs[4][14] = {
 	 CHAN_HOP_CLEAR}
 };
 
-class CSXOP : public Module
+class XOPBase : public Command
 {
- public:
-	CSXOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
+ private:
+	CommandResult DoAdd(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
-		Command *c;
+		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		ChanAccess *access;
+		int change = 0;
+		char event_access[BUFSIZE];
 
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
-
-		c = createCommand("AOP", do_aop, NULL, CHAN_HELP_AOP, -1, -1, -1, -1);
-		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-		if (ircd->halfop)
+		if (!nick)
 		{
-			c = createCommand("HOP", do_hop, NULL, CHAN_HELP_HOP, -1, -1, -1, -1);
-			this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-		}
-		c = createCommand("SOP", do_sop, NULL, CHAN_HELP_SOP, -1, -1, -1, -1);
-		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-		c = createCommand("VOP", do_vop, NULL, CHAN_HELP_VOP, -1, -1, -1, -1);
-		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
-	}
-};
-
-
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
-	if (ircd->halfop) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HOP);
-	}
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOP);
-}
-
-/**
- * The /cs xop command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_aop(User * u)
-{
-	return do_xop(u, "AOP", ACCESS_AOP, xop_msgs[0]);
-}
-
-/*************************************************************************/
-
-int do_hop(User * u)
-{
-	return do_xop(u, "HOP", ACCESS_HOP, xop_msgs[3]);
-}
-
-/*************************************************************************/
-
-int do_sop(User * u)
-{
-	return do_xop(u, "SOP", ACCESS_SOP, xop_msgs[1]);
-}
-
-/*************************************************************************/
-
-int do_vop(User * u)
-{
-	return do_xop(u, "VOP", ACCESS_VOP, xop_msgs[2]);
-}
-
-/* `last' is set to the last index this routine was called with
- * `perm' is incremented whenever a permission-denied error occurs
- */
-
-int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc, int xlev)
-{
-	char *nick = access->nc->display;
-	if (!access->in_use || access->level != xlev)
-		return 0;
-	if (!is_services_admin(u) && uacc <= access->level) {
-		(*perm)++;
-		return 0;
-	}
-	access->nc = NULL;
-	access->in_use = 0;
-	send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);
-	return 1;
-}
-
-int xop_del_callback(User * u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *last = va_arg(args, int *);
-	int *perm = va_arg(args, int *);
-	int uacc = va_arg(args, int);
-	int xlev = va_arg(args, int);
-
-	if (num < 1 || num > ci->accesscount)
-		return 0;
-	*last = num;
-
-	return xop_del(u, ci, &ci->access[num - 1], perm, uacc, xlev);
-}
-
-
-int xop_list(User * u, int index, ChannelInfo * ci,
-			 int *sent_header, int xlev, int xmsg)
-{
-	ChanAccess *access = &ci->access[index];
-
-	if (!access->in_use || access->level != xlev)
-		return 0;
-
-	if (!*sent_header) {
-		notice_lang(s_ChanServ, u, xmsg, ci->name);
-		*sent_header = 1;
-	}
-
-	notice_lang(s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index + 1,
-				access->nc->display);
-	return 1;
-}
-
-int xop_list_callback(User * u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *sent_header = va_arg(args, int *);
-	int xlev = va_arg(args, int);
-	int xmsg = va_arg(args, int);
-
-	if (num < 1 || num > ci->accesscount)
-		return 0;
-
-	return xop_list(u, num - 1, ci, sent_header, xlev, xmsg);
-}
-
-
-int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
-{
-	char *chan = strtok(NULL, " ");
-	char *cmd = strtok(NULL, " ");
-	char *nick = strtok(NULL, " ");
-	char event_access[BUFSIZE];
-
-	ChannelInfo *ci;
-	NickAlias *na;
-	NickCore *nc;
-
-	unsigned i;
-	int change = 0;
-	short ulev;
-	int is_list = (cmd && stricmp(cmd, "LIST") == 0);
-	int is_servadmin = is_services_admin(u);
-	ChanAccess *access;
-
-	/* If CLEAR, we don't need any parameters.
-	 * If LIST, we don't *require* any parameters, but we can take any.
-	 * If DEL or ADD we require a nick. */
-	if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 : !nick)) {
-		syntax_error(s_ChanServ, u, xname, xmsgs[0]);
-	} else if (!(ci = cs_findchan(chan))) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-	} else if (ci->flags & CI_VERBOTEN) {
-		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-	} else if (!(ci->flags & CI_XOP)) {
-		notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
-	} else if (stricmp(cmd, "ADD") == 0) {
-		if (readonly) {
-			notice_lang(s_ChanServ, u, xmsgs[1]);
+			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		ulev = get_access(u, ci);
+		if (readonly)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_DISABLED]);
+			return MOD_CONT;
+		}
 
-		if ((xlev >= ulev || ulev < ACCESS_AOP) && !is_servadmin) {
+		short ulev = get_access(u, ci);
+
+		if ((level >= ulev || ulev < ACCESS_AOP) && !is_services_admin(u))
+		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		na = findnick(nick);
-		if (!na) {
-			notice_lang(s_ChanServ, u, xmsgs[2]);
+		NickAlias *na = findnick(nick);
+		if (!na)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_NICKS_ONLY]);
 			return MOD_CONT;
-		} else if (na->status & NS_VERBOTEN) {
+		}
+		else if (na->status & NS_VERBOTEN)
+		{
 			notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
 		}
 
-		nc = na->nc;
-		for (access = ci->access, i = 0; i < ci->accesscount;
-			 access++, i++) {
-			if (access->nc == nc) {
+		NickCore *nc = na->nc;
+		for (access = ci->access, i = 0; i < ci->accesscount; ++access, ++i)
+		{
+			if (access->nc == nc)
+			{
 				/**
 				 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
 				 **/
-				if ((access->level >= ulev) && (!is_servadmin)) {
+				if (access->level >= ulev && !is_services_admin(u))
+				{
 					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 					return MOD_CONT;
 				}
-				change++;
+				++change;
 				break;
 			}
 		}
 
-		if (!change) {
-			/* All entries should be in use so we no longer need
-			 * to go over the entire list..
-			for (i = 0; i < ci->accesscount; i++)
-				if (!ci->access[i].in_use)
-					break;
-			 */
-
-			if (i < CSAccessMax) {
-				ci->accesscount++;
-				ci->access =
-					static_cast<ChanAccess *>(srealloc(ci->access,
-							 sizeof(ChanAccess) * ci->accesscount));
-			} else {
-				notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT,
-							CSAccessMax);
+		if (!change)
+		{
+			if (i < CSAccessMax)
+			{
+				++ci->accesscount;
+				ci->access = static_cast<ChanAccess *>(srealloc(ci->access, sizeof(ChanAccess) * ci->accesscount));
+			}
+			else
+			{
+				notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT, CSAccessMax);
 				return MOD_CONT;
 			}
 
@@ -321,100 +184,126 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 
 		snprintf(event_access, BUFSIZE, "%d", access->level);
 
-		if (!change) {
-			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick,
-					   event_access);
-			notice_lang(s_ChanServ, u, xmsgs[3], access->nc->display,
-						ci->name);
-		} else {
-			send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick,
-					   event_access);
-			notice_lang(s_ChanServ, u, xmsgs[4], access->nc->display,
-						ci->name);
+		if (!change)
+		{
+			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
+			notice_lang(s_ChanServ, u, messages[XOP_ADDED], access->nc->display, ci->name);
+		}
+		else
+		{
+			send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
+			notice_lang(s_ChanServ, u, messages[XOP_MOVED], access->nc->display, ci->name);
 		}
 
-	} else if (stricmp(cmd, "DEL") == 0) {
+		return MOD_CONT;
+	}
+
+	CommandResult DoDel(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	{
+		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		ChanAccess *access;
+
 		int deleted, a, b;
-		if (readonly) {
-			notice_lang(s_ChanServ, u, xmsgs[1]);
+
+		if (!nick)
+		{
+			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (ci->accesscount == 0) {
-			notice_lang(s_ChanServ, u, xmsgs[11], chan);
+		if (readonly)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
-		ulev = get_access(u, ci);
+		if (!ci->accesscount)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
+			return MOD_CONT;
+		}
 
-		if ((xlev >= ulev || ulev < ACCESS_AOP) && !is_servadmin) {
+		short ulev = get_access(u, ci);
+
+		if ((level >= ulev || ulev < ACCESS_AOP) && !is_services_admin(u))
+		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
-		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
+		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
+		{
 			int count, last = -1, perm = 0;
-			deleted =
-				process_numlist(nick, &count, xop_del_callback, u, ci,
-								&last, &perm, ulev, xlev);
-			if (!deleted) {
-				if (perm) {
+			deleted = process_numlist(nick, &count, xop_del_callback, u, ci, &last, &perm, ulev, level);
+			if (!deleted)
+			{
+				if (perm)
 					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-				} else if (count == 1) {
-					notice_lang(s_ChanServ, u, xmsgs[5], last, ci->name);
-				} else {
-					notice_lang(s_ChanServ, u, xmsgs[7], ci->name);
-				}
-			} else if (deleted == 1) {
-				notice_lang(s_ChanServ, u, xmsgs[9], ci->name);
-			} else {
-				notice_lang(s_ChanServ, u, xmsgs[10], deleted, ci->name);
+				else if (count == 1)
+					notice_lang(s_ChanServ, u, messages[XOP_NO_SUCH_ENTRY], last, ci->name);
+				else
+					notice_lang(s_ChanServ, u, messages[XOP_NO_MATCH], ci->name);
 			}
-		} else {
-			na = findnick(nick);
-			if (!na) {
+			else if (deleted == 1)
+				notice_lang(s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name);
+			else
+				notice_lang(s_ChanServ, u, messages[XOP_DELETED_SEVERAL], deleted, ci->name);
+		}
+		else
+		{
+			NickAlias *na = findnick(nick);
+			if (!na)
+			{
 				notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
 				return MOD_CONT;
 			}
 			nc = na->nc;
 
-			for (i = 0; i < ci->accesscount; i++)
-				if (ci->access[i].nc == nc && ci->access[i].level == xlev)
+			int i;
+
+			for (i = 0; i < ci->accesscount; ++i)
+				if (ci->access[i].nc == nc && ci->access[i].level == level)
 					break;
 
-			if (i == ci->accesscount) {
-				notice_lang(s_ChanServ, u, xmsgs[6], nick, chan);
+			if (i == ci->accesscount)
+			{
+				notice_lang(s_ChanServ, u, messages[XOP_NOT_FOUND], nick, chan);
 				return MOD_CONT;
 			}
 
 			access = &ci->access[i];
-			if (!is_servadmin && ulev <= access->level) {
+			if (!is_services_admin(u) && ulev <= access->level)
+			{
 				deleted = 0;
 				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-			} else {
-				notice_lang(s_ChanServ, u, xmsgs[8], access->nc->display,
-							ci->name);
+			}
+			else
+			{
+				notice_lang(s_ChanServ, u, messages[XOP_DELETED], access->nc->display, ci->name);
 				access->nc = NULL;
 				access->in_use = 0;
-				send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick,
-						   na->nick);
+				send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
 				deleted = 1;
 			}
 		}
-		if (deleted) {
+		if (deleted)
+		{
 			/* Reordering - DrStein */
-			for (b = 0; b < ci->accesscount; b++) {
-				if (ci->access[b].in_use) {
-					for (a = 0; a < ci->accesscount; a++) {
+			for (b = 0; b < ci->accesscount; ++b)
+			{
+				if (ci->access[b].in_use)
+				{
+					for (a = 0; a < ci->accesscount; ++a)
+					{
 						if (a > b)
 							break;
-						if (!ci->access[a].in_use) {
+						if (!ci->access[a].in_use)
+						{
 							ci->access[a].in_use = 1;
 							ci->access[a].level = ci->access[b].level;
 							ci->access[a].nc = ci->access[b].nc;
-							ci->access[a].last_seen =
-								ci->access[b].last_seen;
+							ci->access[a].last_seen = ci->access[b].last_seen;
 							ci->access[b].nc = NULL;
 							ci->access[b].in_use = 0;
 							break;
@@ -427,61 +316,79 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 			 * before sending the events! */
 			/* After reordering only the entries at the end could still be empty.
 			 * We ll free the places no longer in use... */
-			for (i = ci->accesscount - 1; i >= 0; i--) {
+			for (i = ci->accesscount - 1; i >= 0; --i)
+			{
 				if (ci->access[i].in_use == 1)
 					break;
 
-				ci->accesscount--;
+				--ci->accesscount;
 			}
-			ci->access =
-				static_cast<ChanAccess *>(srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount));
+			ci->access = static_cast<ChanAccess *>(srealloc(ci->access, sizeof(ChanAccess) * ci->accesscount));
 		}
-	} else if (stricmp(cmd, "LIST") == 0) {
+
+		return MOD_CONT;
+	}
+
+	CommandResult DoList(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	{
 		int sent_header = 0;
+		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 
-		ulev = get_access(u, ci);
+		short ulev = get_access(u, ci);
 
-		if (!is_servadmin && ulev < ACCESS_AOP) {
+		if (!is_services_admin(u) && level < ACCESS_AOP)
+		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
-		if (ci->accesscount == 0) {
-			notice_lang(s_ChanServ, u, xmsgs[11], ci->name);
+		if (!ci->accesscount)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
 			return MOD_CONT;
 		}
 
-		if (nick && strspn(nick, "1234567890,-") == strlen(nick)) {
-			process_numlist(nick, NULL, xop_list_callback, u, ci,
-							&sent_header, xlev, xmsgs[12]);
-		} else {
-			for (i = 0; i < ci->accesscount; i++) {
-				if (nick && ci->access[i].nc
-					&& !match_wild_nocase(nick, ci->access[i].nc->display))
+		if (nick && strspn(nick, "1234567890,-") == strlen(nick))
+			process_numlist(nick, NULL, xop_list_callback, u, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
+		else
+		{
+			for (int i = 0; i < ci->accesscount; ++i)
+			{
+				if (nick && ci->access[i].nc && !match_wild_nocase(nick, ci->access[i].nc->display))
 					continue;
-				xop_list(u, i, ci, &sent_header, xlev, xmsgs[12]);
+				xop_list(u, i, ci, &sent_header, level, message[XOP_LIST_HEADER]);
 			}
 		}
 		if (!sent_header)
-			notice_lang(s_ChanServ, u, xmsgs[7], chan);
-	} else if (stricmp(cmd, "CLEAR") == 0) {
-		if (readonly) {
-			notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
+			notice_lang(s_ChanServ, u, messages[XOP_NO_MATCH], ci->name);
+
+		return MOD_CONT;
+	}
+
+	CommandResult DoClear(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	{
+		if (readonly)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
-		if (ci->accesscount == 0) {
-			notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
+		if (!ci->accesscount)
+		{
+			notice_lang(s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
 			return MOD_CONT;
 		}
 
-		if (!is_servadmin && !is_founder(u, ci)) {
+		if (!is_services_admin(u) && !is_founder(u, ci))
+		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		for (i = 0; i < ci->accesscount; i++) {
-			if (ci->access[i].in_use && ci->access[i].level == xlev) {
+		for (int i = 0; i < ci->accesscount; ++i)
+		{
+			if (ci->access[i].in_use && ci->access[i].level == level)
+			{
 				ci->access[i].nc = NULL;
 				ci->access[i].in_use = 0;
 			}
@@ -489,11 +396,244 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 
 		send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
 
-		notice_lang(s_ChanServ, u, xmsgs[13], ci->name);
-	} else {
-		syntax_error(s_ChanServ, u, xname, xmsgs[0]);
+		notice_lang(s_ChanServ, u, messages[XOP_CLEAR], ci->name);
+
+		return MOD_CONT;
 	}
-	return MOD_CONT;
+	CommandResult DoXop(User *u, std::vector<std::string> &params, int level, int *messages)
+	{
+		const char *chan = params[0].c_str();
+		const char *cmd = params[1].c_str();
+
+		ChannelInfo *ci;
+
+		if (!cmd)
+			this->OnSyntaxError(u);
+		else if (!(ci = cs_findchan(chan)))
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+		else if (ci->flags & CI_VERBOTEN)
+			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+		else if (!(ci->flags & CI_XOP))
+			notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
+		else if (!stricmp(cmd, "ADD"))
+			return this->DoAdd(u, params, ci, level, messages);
+		else if (!stricmp(cmd, "DEL"))
+			return this->DoDel(u, params, ci, level, messages);
+		else if (!stricmp(cmd, "LIST"))
+			return this->DoList(u, params, ci, level, messages);
+		else if (!stricmp(cmd, "CLEAR"))
+			return this->DoClear(u, params, ci, level, messages);
+		else
+			this->OnSyntaxError(u);
+		return MOD_CONT;
+	}
+ public:
+	XOPBase(const std::string &command) : Command(command, 2, 3)
+	{
+	}
+
+	virtual ~XOPBase()
+	{
+	}
+
+	virtual CommandResult Execute(User *u, std::vector<std::string> &params) = 0;
+
+	virtual bool OnHelp(User *u, const std::string &subcommand) = 0;
+
+	virtual void OnSyntaxError(User *u) = 0;
+};
+
+class CommandCSAOP : public XOPBase
+{
+ public:
+	CommandCSAOP() : XOPBase("AOP")
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		return this->DoXop(u, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_land(s_ChanServ, u, CHAN_HELP_AOP);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
+	}
+};
+
+class CommandCSHOP : public XOPBase
+{
+ public:
+	CommandCSHOP() : XOPBase("HOP")
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		return this->DoXop(u, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_land(s_ChanServ, u, CHAN_HELP_HOP);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
+	}
+};
+
+class CommandCSSOP : public XOPBase
+{
+ public:
+	CommandCSSOP() : XOPBase("SOP")
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		return this->DoXop(u, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_land(s_ChanServ, u, CHAN_HELP_SOP);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
+	}
+};
+
+class CommandCSVOP : public XOPBase
+{
+ public:
+	CommandCSVOP() : XOPBase("VOP")
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		return this->DoXop(u, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_land(s_ChanServ, u, CHAN_HELP_VOP);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
+	}
+};
+
+class CSXOP : public Module
+{
+ public:
+	CSXOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+
+		this->AddCommand(CHANSERV, new CommandCSAOP(), MOD_UNIQUE);
+		if (ircd->halfop)
+			this->AddCommand(CHANSERV, new CommandCSHOP(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSSOP(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSVOP(), MOD_UNIQUE);
+
+		this->SetChanHelp(myChanServHelp);
+	}
+};
+
+/**
+ * Add the help response to anopes /cs help output.
+ * @param u The user who is requesting help
+ **/
+void myChanServHelp(User *u)
+{
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
+	if (ircd->halfop)
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HOP);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOP);
+}
+
+/* `last' is set to the last index this routine was called with
+ * `perm' is incremented whenever a permission-denied error occurs
+ */
+int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, int xlev)
+{
+	char *nick = access->nc->display;
+	if (!access->in_use || access->level != xlev)
+		return 0;
+	if (!is_services_admin(u) && uacc <= access->level)
+	{
+		++(*perm);
+		return 0;
+	}
+	access->nc = NULL;
+	access->in_use = 0;
+	send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);
+	return 1;
+}
+
+int xop_del_callback(User *u, int num, va_list args)
+{
+	ChannelInfo *ci = va_arg(args, ChannelInfo *);
+	int *last = va_arg(args, int *);
+	int *perm = va_arg(args, int *);
+	int uacc = va_arg(args, int);
+	int xlev = va_arg(args, int);
+
+	if (num < 1 || num > ci->accesscount)
+		return 0;
+	*last = num;
+
+	return xop_del(u, ci, &ci->access[num - 1], perm, uacc, xlev);
+}
+
+
+int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, int xmsg)
+{
+	ChanAccess *access = &ci->access[index];
+
+	if (!access->in_use || access->level != xlev)
+		return 0;
+
+	if (!*sent_header)
+	{
+		notice_lang(s_ChanServ, u, xmsg, ci->name);
+		*sent_header = 1;
+	}
+
+	notice_lang(s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index + 1, access->nc->display);
+	return 1;
+}
+
+int xop_list_callback(User *u, int num, va_list args)
+{
+	ChannelInfo *ci = va_arg(args, ChannelInfo *);
+	int *sent_header = va_arg(args, int *);
+	int xlev = va_arg(args, int);
+	int xmsg = va_arg(args, int);
+
+	if (num < 1 || num > ci->accesscount)
+		return 0;
+
+	return xop_list(u, num - 1, ci, sent_header, xlev, xmsg);
 }
 
 MODULE_INIT("cs_xop", CSXOP)

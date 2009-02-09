@@ -5592,8 +5592,6 @@ OPER_HELP_STATS
 	A RESET beállítás nullázza az aktuális felhasználók max.
 	számát átírja a jelenlegi felhasználó számra	
 	
-	UPTIME, a STATS helyett használható.
-	
 OPER_HELP_OPER
 	Syntax:	OPER ADD nick
 			OPER DEL {nick | sorszám | lista}

@@ -15,91 +15,95 @@
 
 #include "module.h"
 
-int do_chanlist(User * u);
-void myOperServHelp(User * u);
-#ifdef _WIN32
-extern MDE int anope_get_private_mode();
-#endif
+void myOperServHelp(User *u);
+
+class CommandOSChanList : public Command
+{
+ public:
+	CommandOSChanList() : Command("CHANLIST", 0, 2)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
+		char *opt = params.size() > 1 ? params[1].c_str() : NULL;
+
+		int modes = 0;
+		User *u2;
+
+		if (opt && !stricmp(opt, "SECRET"))
+			modes |= (anope_get_secret_mode() | anope_get_private_mode());
+
+		if (pattern && (u2 = finduser(pattern)))
+		{
+			struct u_chanlist *uc;
+
+			notice_lang(s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick);
+
+			for (uc = u2->chans; uc; uc = uc->next)
+			{
+				if (modes && !(uc->chan->mode & modes))
+					continue;
+				notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, uc->chan->name, uc->chan->usercount, chan_get_modes(uc->chan, 1, 1), uc->chan->topic ? uc->chan->topic : "");
+			}
+		}
+		else
+		{
+			int i;
+			Channel *c;
+
+			notice_lang(s_OperServ, u, OPER_CHANLIST_HEADER);
+
+			for (i = 0; i < 1024; ++i)
+			{
+				for (c = chanlist[i]; c; c = c->next)
+				{
+					if (pattern && !match_wild_nocase(pattern, c->name))
+						continue;
+					if (modes && !(c->mode & modes))
+						continue;
+					notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, c->name, c->usercount, chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
+				}
+			}
+		}
+
+		notice_lang(s_OperServ, u, OPER_CHANLIST_END);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_oper(u))
+			return false;
+
+		notice_lang(s_OperServ, u, OPER_HELP_CHAN_LIST);
+		return true;
+	}
+};
 
 class OSChanList : public Module
 {
  public:
 	OSChanList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("CHANLIST", do_chanlist, is_services_oper, OPER_HELP_CHANLIST, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSChanList(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
 };
 
-
-
 /**
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
 	notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANLIST);
-}
-
-/**
- * The /os chanlist command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_chanlist(User * u)
-{
-	char *pattern = strtok(NULL, " ");
-	char *opt = strtok(NULL, " ");
-
-	int modes = 0;
-	User *u2;
-
-	if (opt && !stricmp(opt, "SECRET"))
-		modes |= (anope_get_secret_mode() | anope_get_private_mode());
-
-	if (pattern && (u2 = finduser(pattern))) {
-		struct u_chanlist *uc;
-
-		notice_lang(s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick);
-
-		for (uc = u2->chans; uc; uc = uc->next) {
-			if (modes && !(uc->chan->mode & modes))
-				continue;
-			notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD,
-						uc->chan->name, uc->chan->usercount,
-						chan_get_modes(uc->chan, 1, 1),
-						(uc->chan->topic ? uc->chan->topic : ""));
-		}
-	} else {
-		int i;
-		Channel *c;
-
-		notice_lang(s_OperServ, u, OPER_CHANLIST_HEADER);
-
-		for (i = 0; i < 1024; i++) {
-			for (c = chanlist[i]; c; c = c->next) {
-				if (pattern && !match_wild_nocase(pattern, c->name))
-					continue;
-				if (modes && !(c->mode & modes))
-					continue;
-				notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, c->name,
-							c->usercount, chan_get_modes(c, 1, 1),
-							(c->topic ? c->topic : ""));
-			}
-		}
-	}
-
-	notice_lang(s_OperServ, u, OPER_CHANLIST_END);
-	return MOD_CONT;
 }
 
 MODULE_INIT("os_chanlist", OSChanList)

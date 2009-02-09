@@ -15,108 +15,119 @@
 
 #include "module.h"
 
-int do_forbid(User * u);
-void myNickServHelp(User * u);
+void myNickServHelp(User *u);
 NickAlias *makenick(const char *nick);
+
+class CommandNSForbid : public Command
+{
+ public:
+	CommandNSForbid() : Command("FORBID", 1, 2)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		NickAlias *na;
+		const char *nick = params[0].c_str();
+		const char *reason = params.size() > 1 ? params[1].c_str();
+
+		/* Assumes that permission checking has already been done. */
+		if (ForceForbidReason && !reason) {
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
+
+		if (readonly)
+			notice_lang(s_NickServ, u, READ_ONLY_MODE);
+		if (!ircdproto->IsNickValid(nick))
+		{
+			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
+			return MOD_CONT;
+		}
+		if ((na = findnick(nick)))
+		{
+			if (NSSecureAdmins && nick_is_services_admin(na->nc) && !is_services_root(u))
+			{
+				notice_lang(s_NickServ, u, PERMISSION_DENIED);
+				return MOD_CONT;
+			}
+			delnick(na);
+		}
+		na = makenick(nick);
+		if (na)
+		{
+			na->status |= NS_VERBOTEN;
+			na->last_usermask = sstrdup(u->nick);
+			if (reason)
+				na->last_realname = sstrdup(reason);
+
+			na->u = finduser(na->nick);
+			if (na->u)
+				na->u->na = na;
+
+			if (na->u)
+			{
+				notice_lang(s_NickServ, na->u, FORCENICKCHANGE_NOW);
+				collide(na, 0);
+			}
+
+
+			if (ircd->sqline)
+				ircdproto->SendSQLine(na->nick, reason ? reason : "Forbidden");
+
+			if (WallForbid)
+				ircdproto->SendGlobops(s_NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick, nick);
+
+			alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);
+			notice_lang(s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
+			send_event(EVENT_NICK_FORBIDDEN, 1, nick);
+		}
+		else
+		{
+			alog("%s: Valid FORBID for %s by %s failed", s_NickServ, nick, u->nick);
+			notice_lang(s_NickServ, u, NICK_FORBID_FAILED, nick);
+		}
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_admin(u))
+			return false;
+
+		notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_NickServ, u, "FORBID", ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
+	}
+};
 
 class NSForbid : public Module
 {
  public:
 	NSForbid(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID);
-		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSForbid(), MOD_UNIQUE);
 
 		this->SetNickHelp(myNickServHelp);
 	}
 };
 
-
-
 /**
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+void myNickServHelp(User *u)
 {
-	if (is_services_admin(u)) {
+	if (is_services_admin(u))
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
-	}
-}
-
-/**
- * The /ns forbid command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_forbid(User * u)
-{
-	NickAlias *na;
-	char *nick = strtok(NULL, " ");
-	char *reason = strtok(NULL, "");
-
-	/* Assumes that permission checking has already been done. */
-	if (!nick || (ForceForbidReason && !reason)) {
-		syntax_error(s_NickServ, u, "FORBID",
-					 (ForceForbidReason ? NICK_FORBID_SYNTAX_REASON :
-					  NICK_FORBID_SYNTAX));
-		return MOD_CONT;
-	}
-
-	if (readonly)
-		notice_lang(s_NickServ, u, READ_ONLY_MODE);
-	if (!ircdproto->IsNickValid(nick)) {
-		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
-		return MOD_CONT;
-	}
-	if ((na = findnick(nick)) != NULL) {
-		if (NSSecureAdmins && nick_is_services_admin(na->nc)
-			&& !is_services_root(u)) {
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
-		delnick(na);
-	}
-	na = makenick(nick);
-	if (na) {
-		na->status |= NS_VERBOTEN;
-		na->last_usermask = sstrdup(u->nick);
-		if (reason)
-			na->last_realname = sstrdup(reason);
-
-		na->u = finduser(na->nick);
-		if (na->u)
-			na->u->na = na;
-
-		if (na->u) {
-			notice_lang(s_NickServ, na->u, FORCENICKCHANGE_NOW);
-			collide(na, 0);
-		}
-
-
-		if (ircd->sqline) {
-			ircdproto->SendSQLine(na->nick, ((reason) ? reason : "Forbidden"));
-		}
-
-		if (WallForbid)
-			ircdproto->SendGlobops(s_NickServ, "\2%s\2 used FORBID on \2%s\2",
-							 u->nick, nick);
-
-		alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);
-		notice_lang(s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
-		send_event(EVENT_NICK_FORBIDDEN, 1, nick);
-	} else {
-		alog("%s: Valid FORBID for %s by %s failed", s_NickServ, nick,
-			 u->nick);
-		notice_lang(s_NickServ, u, NICK_FORBID_FAILED, nick);
-	}
-	return MOD_CONT;
 }
 
 NickAlias *makenick(const char *nick)

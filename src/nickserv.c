@@ -529,9 +529,9 @@ int validate_user(User * u)
 		na->last_seen = time(NULL);
 		if (na->last_usermask)
 			delete [] na->last_usermask;
-		na->last_usermask = new char[strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2];
-		sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
-				common_get_vhost(u));
+		na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
+		sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(),
+				u->GetDisplayedHost().c_str());
 		if (na->last_realname)
 			delete [] na->last_realname;
 		na->last_realname = sstrdup(u->realname);
@@ -795,12 +795,12 @@ int is_on_access(User * u, NickCore * nc)
 	if (nc->accesscount == 0)
 		return 0;
 
-	buf = new char[strlen(u->username) + strlen(u->host) + 2];
-	sprintf(buf, "%s@%s", u->username, u->host);
+	buf = new char[u->GetIdent().length() + strlen(u->host) + 2];
+	sprintf(buf, "%s@%s", u->GetIdent().c_str(), u->host);
 	if (ircd->vhost) {
 		if (u->vhost) {
-			buf2 = new char[strlen(u->username) + strlen(u->vhost) + 2];
-			sprintf(buf2, "%s@%s", u->username, u->vhost);
+			buf2 = new char[u->GetIdent().length() + strlen(u->vhost) + 2];
+			sprintf(buf2, "%s@%s", u->GetIdent().c_str(), u->vhost);
 		}
 	}
 

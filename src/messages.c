@@ -169,7 +169,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 				if (WallBadOS)
 					ircdproto->SendGlobops(s_OperServ,
 									 "Denied access to %s from %s!%s@%s (non-oper)",
-									 s_OperServ, u->nick, u->username,
+									 s_OperServ, u->nick, u->GetIdent().c_str(),
 									 u->host);
 			} else {
 				operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX

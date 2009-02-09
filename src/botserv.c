@@ -421,14 +421,22 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 			/* Strip off the fantasy character */
 			cmd++;
 
-			if (check_access(u, ci, CA_FANTASIA))
+			if (check_access(u, ci, CA_FANTASIA))              
+			{
+				std::string bbuf = std::string(cmd) + " " + ci->name;
+				if (params)
+				{
+					bbuf += " ";
+					bbuf += params;
+				}
+				chanserv(u, const_cast<char *>(bbuf.c_str())); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 				event_name = EVENT_BOT_FANTASY;
+			}
 
 			if (params)
 				send_event(event_name, 4, cmd, u->nick, ci->name, params);
 			else
-				send_event(event_name, 3, cmd, u->nick, ci->name);
-		}
+				send_event(event_name, 3, cmd, u->nick, ci->name);}
 	}
 }
 
@@ -596,8 +604,8 @@ static BanData *get_ban_data(Channel * c, User * u)
 	if (!c || !u)
 		return NULL;
 
-	snprintf(mask, sizeof(mask), "%s@%s", u->username,
-			 common_get_vhost(u));
+	snprintf(mask, sizeof(mask), "%s@%s", u->GetIdent().c_str(),
+			 u->GetDisplayedHost().c_str());
 
 	for (bd = c->bd; bd; bd = next) {
 		if (now - bd->last_use > BSKeepData) {

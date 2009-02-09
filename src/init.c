@@ -477,54 +477,9 @@ int init_secondary(int ac, char **av)
 	/* Set signal handlers.  Catch certain signals to let us do things or
 	 * panic as necessary, and ignore all others.
 	 */
-
-#ifndef _WIN32
-#if defined(NSIG)
-	for (i = 1; i <= NSIG - 1; i++) {
-#else
-	for (i = 1; i <= 31; i++) {
-#endif
-		signal(i, SIG_IGN);
-	}
-#else
-	/* work around to bug #527 */
-	signal(SIGILL, SIG_IGN);
-	signal(SIGBREAK, SIG_IGN);
-	signal(SIGABRT, SIG_IGN);
-#endif
-
-	signal(SIGINT, sighandler);
-	signal(SIGTERM, sighandler);
-#ifndef _WIN32
-	signal(SIGQUIT, sighandler);
-#endif
-	if (!DumpCore) {
-		signal(SIGSEGV, sighandler);
-#ifndef _WIN32
-		signal(SIGBUS, sighandler);
-		signal(SIGTRAP, sighandler);
-#endif
-	} else {
-		signal(SIGSEGV, SIG_DFL);
-#ifndef _WIN32
-		signal(SIGBUS, sighandler);
-		signal(SIGTRAP, sighandler);
-#endif
-	}
-#ifndef _WIN32
-	signal(SIGQUIT, sighandler);
 	signal(SIGHUP, sighandler);
-	signal(SIGUSR2, sighandler);
-#endif
-
-#ifdef SIGIOT
-	signal(SIGIOT, sighandler);
-#endif
-	signal(SIGFPE, sighandler);
-
-#ifndef _WIN32
-	signal(SIGUSR1, sighandler);		/* This is our "out-of-memory" panic switch */
-#endif
+	signal(SIGTERM, sighandler);
+	signal(SIGINT, sighandler)'
 
 	/* Initialize multi-language support */
 	lang_init();

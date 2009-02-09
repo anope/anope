@@ -15,41 +15,39 @@
 
 #include "module.h"
 
-int do_help(User * u);
+class CommandBSHelp : public Command
+{
+ public:
+	CommandBSHelp() : Command("HELP", 1, 1)
+	{
+	}
+	
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		mod_help_cmd(s_BotServ, u, BOTSERV, params[0].c_str());
+		return MOD_CONT;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		notice_help(s_BotServ, u, BOT_HELP);
+		moduleDisplayHelp(4, u);
+		notice_help(s_BotServ, u, BOT_HELP_FOOTER, BSMinUsers);
+	}
+};
 
 class BSHelp : public Module
 {
  public:
 	BSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSHelp(), MOD_UNIQUE);
 	}
 };
 
 
-/**
- * The /bs help command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_help(User * u)
-{
-	char *cmd = strtok(NULL, "");
-
-	if (!cmd) {
-		notice_help(s_BotServ, u, BOT_HELP);
-		moduleDisplayHelp(4, u);
-		notice_help(s_BotServ, u, BOT_HELP_FOOTER, BSMinUsers);
-	} else {
-		mod_help_cmd(s_BotServ, u, BOTSERV, cmd);
-	}
-	return MOD_CONT;
-}
 
 MODULE_INIT("bs_help", BSHelp)

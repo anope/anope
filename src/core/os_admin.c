@@ -15,90 +15,64 @@
 
 #include "module.h"
 
-int do_admin(User * u);
-int admin_list_callback(SList * slist, int number, void *item,
-						va_list args);
-int admin_list(int number, NickCore * nc, User * u, int *sent_header);
-void myOperServHelp(User * u);
+int admin_list_callback(SList *slist, int number, void *item, va_list args);
+int admin_list(int number, NickCore *nc, User *u, int *sent_header);
+void myOperServHelp(User *u);
 
-class OSAdmin : public Module
+class CommandOSAdmin : public Command
 {
- public:
-	OSAdmin(const std::string &modname, const std::string &creator) : Module(modname, creator)
+ private:
+	CommandResult DoAdd(User *u, std::vector<std::string> &params)
 	{
-		Command *c;
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		int res = 0;
 
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
+		if (!nick)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
 
-		c = createCommand("ADMIN", do_admin, NULL, OPER_HELP_ADMIN, -1, -1, -1, -1);
-		c->help_param1 = s_NickServ;
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
-	}
-};
-
-
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User * u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
-}
-
-/**
- * The /os admin command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_admin(User * u)
-{
-	char *cmd = strtok(NULL, " ");
-	char *nick = strtok(NULL, " ");
-	NickAlias *na;
-	int res = 0;
-
-	if (!cmd || (!nick && stricmp(cmd, "LIST") && stricmp(cmd, "CLEAR"))) {
-		syntax_error(s_OperServ, u, "ADMIN", OPER_ADMIN_SYNTAX);
-	} else if (!stricmp(cmd, "ADD")) {
-		if (!is_services_root(u)) {
+		if (!is_services_root(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (!(na = findnick(nick))) {
+		if (!(na = findnick(nick)))
+		{
 			notice_lang(s_OperServ, u, NICK_X_NOT_REGISTERED, nick);
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_VERBOTEN) {
+		if (na->status & NS_VERBOTEN)
+		{
 			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, nick);
 			return MOD_CONT;
 		}
 
-		if (na->nc->flags & NI_SERVICES_ADMIN
-			|| slist_indexof(&servadmins, na->nc) != -1) {
+		if (na->nc->flags & NI_SERVICES_ADMIN || slist_indexof(&servadmins, na->nc) != -1)
+		{
 			notice_lang(s_OperServ, u, OPER_ADMIN_EXISTS, nick);
 			return MOD_CONT;
 		}
 
 		res = slist_add(&servadmins, na->nc);
-		if (res == -2) {
+		if (res == -2)
+		{
 			notice_lang(s_OperServ, u, OPER_ADMIN_REACHED_LIMIT, nick);
 			return MOD_CONT;
-		} else {
-			if (na->nc->flags & NI_SERVICES_OPER
-				&& (res = slist_indexof(&servopers, na->nc)) != -1) {
+		}
+		else
+		{
+			if (na->nc->flags & NI_SERVICES_OPER && (res = slist_indexof(&servopers, na->nc)) != -1)
+			{
 				slist_delete(&servopers, res);
 				na->nc->flags |= NI_SERVICES_ADMIN;
 				notice_lang(s_OperServ, u, OPER_ADMIN_MOVED, nick);
-			} else {
+			}
+			else
+			{
 				na->nc->flags |= NI_SERVICES_ADMIN;
 				notice_lang(s_OperServ, u, OPER_ADMIN_ADDED, nick);
 			}
@@ -106,42 +80,63 @@ int do_admin(User * u)
 
 		if (readonly)
 			notice_lang(s_OperServ, u, READ_ONLY_MODE);
-	} else if (!stricmp(cmd, "DEL")) {
-		if (!is_services_root(u)) {
+
+		return MOD_CONT;
+	}
+
+	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	{
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		int res = 0;
+
+		if (!nick)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
+
+		if (!is_services_root(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (servadmins.count == 0) {
+		if (!servadmins.count)
+		{
 			notice_lang(s_OperServ, u, OPER_ADMIN_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
+		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
+		{
 			/* Deleting a range */
 			res = slist_delete_range(&servadmins, nick, NULL);
-			if (res == 0) {
+			if (!res)
+			{
 				notice_lang(s_OperServ, u, OPER_ADMIN_NO_MATCH);
 				return MOD_CONT;
-			} else if (res == 1) {
-				notice_lang(s_OperServ, u, OPER_ADMIN_DELETED_ONE);
-			} else {
-				notice_lang(s_OperServ, u, OPER_ADMIN_DELETED_SEVERAL,
-							res);
 			}
-		} else {
-			if (!(na = findnick(nick))) {
+			else if (res == 1)
+				notice_lang(s_OperServ, u, OPER_ADMIN_DELETED_ONE);
+			else
+				notice_lang(s_OperServ, u, OPER_ADMIN_DELETED_SEVERAL, res);
+		}
+		else
+		{
+			if (!(na = findnick(nick)))
+			{
 				notice_lang(s_OperServ, u, NICK_X_NOT_REGISTERED, nick);
 				return MOD_CONT;
 			}
 
-			if (na->status & NS_VERBOTEN) {
+			if (na->status & NS_VERBOTEN)
+			{
 				notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
 
-			if (!(na->nc->flags & NI_SERVICES_ADMIN)
-				|| (res = slist_indexof(&servadmins, na->nc)) == -1) {
+			if (!(na->nc->flags & NI_SERVICES_ADMIN) || (res = slist_indexof(&servadmins, na->nc)) == -1)
+			{
 				notice_lang(s_OperServ, u, OPER_ADMIN_NOT_FOUND, nick);
 				return MOD_CONT;
 			}
@@ -152,63 +147,118 @@ int do_admin(User * u)
 
 		if (readonly)
 			notice_lang(s_OperServ, u, READ_ONLY_MODE);
-	} else if (!stricmp(cmd, "LIST")) {
-		int sent_header = 0;
 
-		if (servadmins.count == 0) {
+		return MOD_CONT;
+	}
+
+	CommandResult DoList(User *u, std::vector<std::string> &params)
+	{
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		int sent_header = 0, res = 0;
+
+		if (!servadmins.count)
+		{
 			notice_lang(s_OperServ, u, OPER_ADMIN_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		if (!nick || (isdigit(*nick)
-					  && strspn(nick, "1234567890,-") == strlen(nick))) {
-			res =
-				slist_enum(&servadmins, nick, &admin_list_callback, u,
-						   &sent_header);
-			if (res == 0) {
+		if (!nick || (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)))
+		{
+			res = slist_enum(&servadmins, nick, &admin_list_callback, u, &sent_header);
+			if (!res)
+			{
 				notice_lang(s_OperServ, u, OPER_ADMIN_NO_MATCH);
 				return MOD_CONT;
-			} else {
-				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Admin");
 			}
-		} else {
+			else
+				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Admin");
+		}
+		else
+		{
 			int i;
 
-			for (i = 0; i < servadmins.count; i++)
-				if (!stricmp
-					(nick, (static_cast<NickCore *>(servadmins.list[i]))->display)
-					|| match_wild_nocase(nick,
-										 (static_cast<NickCore *>(servadmins.
-										  list[i]))->display))
+			for (i = 0; i < servadmins.count; ++i) {
+				if (!stricmp(nick, (static_cast<NickCore *>(servadmins.list[i]))->display) || match_wild_nocase(nick, (static_cast<NickCore *>(servadmins.list[i]))->display))
 					admin_list(i + 1, static_cast<NickCore *>(servadmins.list[i]), u, &sent_header);
+			}
 
 			if (!sent_header)
 				notice_lang(s_OperServ, u, OPER_ADMIN_NO_MATCH);
-			else {
+			else
 				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Admin");
-			}
 		}
-	} else if (!stricmp(cmd, "CLEAR")) {
-		if (!is_services_root(u)) {
+
+		return MOD_CONT;
+	}
+
+	CommandResult DoClear(User *u, std::vector<std::string> &params)
+	{
+		if (!is_services_root(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (servadmins.count == 0) {
+		if (!servadmins.count)
+		{
 			notice_lang(s_OperServ, u, OPER_ADMIN_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
 		slist_clear(&servadmins, 1);
 		notice_lang(s_OperServ, u, OPER_ADMIN_CLEAR);
-	} else {
-		syntax_error(s_OperServ, u, "ADMIN", OPER_ADMIN_SYNTAX);
+
+		return MOD_CONT;
 	}
-	return MOD_CONT;
+ public:
+	CommandOSAdmin() : Command("ADMIN", 1, 2)
+	{
+		this->help_param1 = s_NickServ;
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *cmd = params[0].c_str();
+
+		if (!stricmp(cmd, "ADD"))
+			return this->DoAdd(u, params);
+		else if (!stricmp(cmd, "DEL"))
+			return this->DoDel(u, params);
+		else if (!stricmp(cmd, "LIST"))
+			return this->DoList(u, params);
+		else if (!stricmp(cmd, "CLEAR"))
+			return this->DoClear(u, params);
+		else
+			this->OnSyntaxError(u);
+		return MOD_CONT;
+	}
+};
+
+class OSAdmin : public Module
+{
+ public:
+	OSAdmin(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+
+		this->AddCommand(OPERSERV, new CommandOSAdmin(), MOD_UNIQUE);
+
+		this->SetOperHelp(myOperServHelp);
+	}
+};
+
+/**
+ * Add the help response to anopes /os help output.
+ * @param u The user who is requesting help
+ **/
+void myOperServHelp(User *u)
+{
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
 }
 
-int admin_list_callback(SList * slist, int number, void *item,
-						va_list args)
+int admin_list_callback(SList *slist, int number, void *item, va_list args)
 {
 	User *u = va_arg(args, User *);
 	int *sent_header = va_arg(args, int *);
@@ -216,18 +266,18 @@ int admin_list_callback(SList * slist, int number, void *item,
 	return admin_list(number, static_cast<NickCore *>(item), u, sent_header);
 }
 
-int admin_list(int number, NickCore * nc, User * u, int *sent_header)
+int admin_list(int number, NickCore *nc, User *u, int *sent_header)
 {
 	if (!nc)
 		return 0;
 
-	if (!*sent_header) {
+	if (!*sent_header)
+	{
 		notice_lang(s_OperServ, u, OPER_ADMIN_LIST_HEADER);
 		*sent_header = 1;
 	}
 
-	notice_lang(s_OperServ, u, OPER_ADMIN_LIST_FORMAT, number,
-				nc->display);
+	notice_lang(s_OperServ, u, OPER_ADMIN_LIST_FORMAT, number, nc->display);
 	return 1;
 }
 

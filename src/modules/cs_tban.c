@@ -21,15 +21,12 @@
 #define AUTHOR "Rob"
 #define VERSION "$Id$"
 
-void myHelp(User * u);
-void myFullHelpSyntax(User * u);
-int myFullHelp(User * u);
-void mySendResponse(User * u, char *channel, char *mask, char *time);
+void myHelp(User *u);
+void mySendResponse(User *u, char *channel, char *mask, char *time);
 
-int do_tban(User * u);
-void addBan(Channel * c, time_t timeout, char *banmask);
+void addBan(Channel *c, time_t timeout, char *banmask);
 int delBan(int argc, char **argv);
-int canBanUser(Channel * c, User * u, User * u2);
+int canBanUser(Channel *c, User *u, User *u2);
 
 void mAddLanguages();
 
@@ -41,72 +38,117 @@ static Module *me = NULL;
 #define TBAN_HELP_DETAIL	2
 #define TBAN_RESPONSE	   3
 
+class CommandCSTBan : public Command
+{
+ public:
+	CommandCSTBan() : Command("TBAN", 3, 3)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		char mask[BUFSIZE];
+		Channel *c;
+		User *u2 = NULL;
+
+		char *chan = params[0].c_str();
+		char *nick = params[1].c_str();
+		char *time = params[2].c_str();
+
+		if (!(c = findchan(chan)))
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+		else if (!(u2 = finduser(nick)))
+			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+		else
+		{
+			if (canBanUser(c, u, u2))
+			{
+				get_idealban(c->ci, u2, mask, sizeof(mask));
+				addBan(c, dotime(time), mask);
+				mySendResponse(u, chan, mask, time);
+			}
+		}
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		this->OnSyntaxError(u);
+		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
+		me->NoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
+
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		me->NoticeLang(s_ChanServ, u, TBAN_SYNTAX);
+	}
+};
+
 class CSTBan : public Module
 {
  public:
 	CSTBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		me = this;
 
 		this->SetChanHelp(myHelp);
-		c = createCommand("TBAN", do_tban, NULL, -1, -1, -1, -1, -1);
-		moduleAddHelp(c, myFullHelp);
-		this->AddCommand(CHANSERV, c, MOD_HEAD);
+		this->AddCommand(CHANSERV, new CommandCSTBan(), MOD_HEAD);
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		const char* langtable_en_us[] = {
-		"    TBAN       Bans the user for a given length of time",
-		"Syntax: TBAN channel nick time",
-		"Bans the given user from a channel for a specified length of\n"
-		"time. If the ban is removed before by hand, it will NOT be replaced.",
-		"%s banned from %s, will auto-expire in %s"
+			"    TBAN       Bans the user for a given length of time",
+			"Syntax: TBAN channel nick time",
+			"Bans the given user from a channel for a specified length of\n"
+			"time. If the ban is removed before by hand, it will NOT be replaced.",
+			"%s banned from %s, will auto-expire in %s"
 		};
 
 		const char* langtable_nl[] = {
-		"    TBAN       Verban een gebruiker voor een bepaalde tijd",
-		"Syntax: TBAN kanaal nick tijd",
-		"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
-		"gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
-		"zal deze NIET worden vervangen.",
-		"%s verbannen van %s, zal verlopen in %s"
+			"    TBAN       Verban een gebruiker voor een bepaalde tijd",
+			"Syntax: TBAN kanaal nick tijd",
+			"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
+			"gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
+			"zal deze NIET worden vervangen.",
+			"%s verbannen van %s, zal verlopen in %s"
 		};
 
 		const char* langtable_de[] = {
-		"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
-		"Syntax: TBAN Channel Nickname Zeit",
-		"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
-		"Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
-		"%s gebannt von %s, wird auto-auslaufen in %s"
+			"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
+			"Syntax: TBAN Channel Nickname Zeit",
+			"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
+			"Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
+			"%s gebannt von %s, wird auto-auslaufen in %s"
 		};
 
 		const char* langtable_pt[] = {
-		"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
-		"Sintaxe: TBAN canal nick tempo",
-		"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
-		"tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
-		"%s foi banido do %s, irб auto-expirar em %s"
+			"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
+			"Sintaxe: TBAN canal nick tempo",
+			"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
+			"tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
+			"%s foi banido do %s, irб auto-expirar em %s"
 		};
 
 		const char* langtable_ru[] = {
-		"    TBAN       Банит пользователя на указанный промежуток времени",
-		"Синтаксис: TBAN #канал ник время",
-		"Банит пользователя на указанный промежуток времени в секундах\n"
-		"Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
-		"переустановлен сервисами автоматически!",
-		"Установленный бан %s на канале %s истечет через %s секунд"
+			"    TBAN       Банит пользователя на указанный промежуток времени",
+			"Синтаксис: TBAN #канал ник время",
+			"Банит пользователя на указанный промежуток времени в секундах\n"
+			"Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
+			"переустановлен сервисами автоматически!",
+			"Установленный бан %s на канале %s истечет через %s секунд"
 		};
 
 		const char* langtable_it[] = {
-		"    TBAN       Banna l'utente per un periodo di tempo specificato",
-		"Sintassi: TBAN canale nick tempo",
-		"Banna l'utente specificato da un canale per un periodo di tempo\n"
-		"specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",
-		"%s bannato da %s, scadrа automaticamente tra %s"
+			"    TBAN       Banna l'utente per un periodo di tempo specificato",
+			"Sintassi: TBAN canale nick tempo",
+			"Banna l'utente specificato da un canale per un periodo di tempo\n"
+			"specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",
+			"%s bannato da %s, scadrа automaticamente tra %s"
 		};
 
 		this->InsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
@@ -118,73 +160,17 @@ class CSTBan : public Module
 	}
 };
 
-
-
-void myHelp(User * u)
+void myHelp(User *u)
 {
 	me->NoticeLang(s_ChanServ, u, TBAN_HELP);
 }
 
-void myFullHelpSyntax(User * u)
-{
-	me->NoticeLang(s_ChanServ, u, TBAN_SYNTAX);
-}
-
-int myFullHelp(User * u)
-{
-	myFullHelpSyntax(u);
-	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-	me->NoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
-	return MOD_CONT;
-}
-
-void mySendResponse(User * u, char *channel, char *mask, char *time)
+void mySendResponse(User *u, char *channel, char *mask, char *time)
 {
 	me->NoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
-int do_tban(User * u)
-{
-	char mask[BUFSIZE];
-	Channel *c;
-	User *u2 = NULL;
-
-	char *buffer = moduleGetLastBuffer();
-	char *chan;
-	char *nick;
-	char *time;
-
-	chan = myStrGetToken(buffer, ' ', 0);
-	nick = myStrGetToken(buffer, ' ', 1);
-	time = myStrGetToken(buffer, ' ', 2);
-
-	if (time && chan && nick) {
-
-		if (!(c = findchan(chan))) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!(u2 = finduser(nick))) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-		} else {
-			if (canBanUser(c, u, u2)) {
-				get_idealban(c->ci, u2, mask, sizeof(mask));
-				addBan(c, dotime(time), mask);
-				mySendResponse(u, chan, mask, time);
-			}
-		}
-	} else {
-		myFullHelpSyntax(u);
-	}
-	if (time)
-		delete [] time;
-	if (nick)
-		delete [] nick;
-	if (chan)
-		delete [] chan;
-
-	return MOD_CONT;
-}
-
-void addBan(Channel * c, time_t timeout, char *banmask)
+void addBan(Channel *c, time_t timeout, char *banmask)
 {
 	const char *av[3];
 	char *cb[2];
@@ -209,7 +195,8 @@ int delBan(int argc, char **argv)
 	av[0] = "-b";
 	av[1] = argv[1];
 
-	if ((c = findchan(argv[0])) && c->ci) {
+	if ((c = findchan(argv[0])) && c->ci)
+	{
 		ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
 		chan_set_modes(s_ChanServ, c, 2, av, 1);
 	}
@@ -221,23 +208,20 @@ int canBanUser(Channel * c, User * u, User * u2)
 {
 	ChannelInfo *ci;
 	int ok = 0;
-	if (!(ci = c->ci)) {
+	if (!(ci = c->ci))
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-	} else if (ci->flags & CI_VERBOTEN) {
+	else if (ci->flags & CI_VERBOTEN)
 		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, c->name);
-	} else if (!check_access(u, ci, CA_BAN)) {
+	else if (!check_access(u, ci, CA_BAN))
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
-	} else if (ircd->except && is_excepted(ci, u2)) {
+	else if (ircd->except && is_excepted(ci, u2))
 		notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
-	} else if (ircd->protectedumode && is_protected(u2)) {
+	else if (ircd->protectedumode && is_protected(u2))
 		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-	} else {
+	else
 		ok = 1;
-	}
 
 	return ok;
 }
-
-
 
 MODULE_INIT("cs_tban", CSTBan)

@@ -15,93 +15,101 @@
 
 #include "module.h"
 
-int do_memocheck(User * u);
-void myMemoServHelp(User * u);
+void myMemoServHelp(User *u);
+
+class CommandMSCheck : public Command
+{
+ public:
+	CommandMSCheck() : Command("CHECK", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		NickAlias *na = NULL;
+		MemoInfo *mi = NULL;
+		int i, found = 0;
+		const char *recipient = params[0].c_str();
+		struct tm *tm;
+		char timebuf[64];
+
+		if (!nick_recognized(u))
+		{
+			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+			return MOD_CONT;
+		}
+		else if (!(na = findnick(recipient)))
+		{
+			notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
+			return MOD_CONT;
+		}
+
+		if ((na->status & NS_VERBOTEN))
+		{
+			notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
+			return MOD_CONT;
+		}
+
+		mi = &na->nc->memos;
+
+		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
+			have to loop backwards */
+
+		for (i = mi->memos.size() - 1; i >= 0; --i)
+		{
+			if (!stricmp(mi->memos[i]->sender, u->na->nc->display))
+			{
+				found = 1; /* Yes, we've found the memo */
+
+				tm = localtime(&mi->memos[i]->time);
+				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
+
+				if (mi->memos[i]->flags & MF_UNREAD)
+					notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick, timebuf);
+				else
+					notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick, timebuf);
+				break;
+			}
+		}
+
+		if (!found)
+			notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CHECK);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+	}
+};
 
 class MSCheck : public Module
 {
  public:
 	MSCheck(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		c = createCommand("CHECK", do_memocheck, NULL, MEMO_HELP_CHECK, -1, -1, -1, -1);
-		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSCheck(), MOD_UNIQUE);
 		this->SetMemoHelp(myMemoServHelp);
 	}
 };
-
-
 
 /**
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+void myMemoServHelp(User *u)
 {
 	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CHECK);
-}
-
-/**
- * The /ms check command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_memocheck(User * u)
-{
-	NickAlias *na = NULL;
-	MemoInfo *mi = NULL;
-	int i, found = 0;
-	char *recipient = strtok(NULL, "");
-	struct tm *tm;
-	char timebuf[64];
-
-	if (!recipient) {
-		syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
-		return MOD_CONT;
-	} else if (!nick_recognized(u)) {
-		notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-		return MOD_CONT;
-	} else if (!(na = findnick(recipient))) {
-		notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
-		return MOD_CONT;
-	}
-
-	if ((na->status & NS_VERBOTEN)) {
-		notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
-		return MOD_CONT;
-	}
-
-	mi = &na->nc->memos;
-
-/* Okay, I know this looks strange but we wanna get the LAST memo, so we
-	have to loop backwards */
-
-	for (i = (mi->memos.size() - 1); i >= 0; i--) {
-		if (!stricmp(mi->memos[i]->sender, u->na->nc->display)) {
-			found = 1;		  /* Yes, we've found the memo */
-
-			tm = localtime(&mi->memos[i]->time);
-			strftime_lang(timebuf, sizeof(timebuf), u,
-						  STRFTIME_DATE_TIME_FORMAT, tm);
-
-			if (mi->memos[i]->flags & MF_UNREAD)
-				notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick,
-							timebuf);
-			else
-				notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick,
-							timebuf);
-			break;
-		}
-	}
-
-	if (!found)
-		notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
-
-	return MOD_CONT;
 }
 
 MODULE_INIT("ms_check", MSCheck)

@@ -53,25 +53,12 @@ char *HSRequestDBName = NULL;
 #define LNG_WAITING_SYNTAX		19
 #define LNG_HELP_WAITING		20
 
-int hs_do_request(User * u);
-int hs_do_activate(User * u);
-int hs_do_reject(User * u);
-int hs_do_list_out(User * u);
+void hs_help(User *u);
 
-int hs_help_request(User * u);
-int hs_help_activate(User * u);
-int hs_help_reject(User * u);
-int hs_help_waiting(User * u);
-void hs_help(User * u);
-
-void my_add_host_request(char *nick, char *vIdent, char *vhost,
-						 char *creator, int32 tmp_time);
+void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 int my_isvalidchar(const char c);
-void my_memo_lang(User * u, char *name, int z, int number, ...);
-void req_send_memos(User * u, char *vHost);
-void show_list(User * u);
-int hs_do_waiting(User * u);
-int ns_do_drop(User * u);
+void my_memo_lang(User *u, char *name, int z, int number, ...);
+void req_send_memos(User *u, char *vHost);
 
 void hsreq_save_db();
 void hsreq_load_db();
@@ -85,37 +72,377 @@ HostCore *hs_request_head;
 
 static Module *me;
 
+class CommandHSRequest : public Command
+{
+ public:
+	CommandHSRequest() : Command("REQUEST", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		char *nick;
+		const char *rawhostmask = params[1].c_str();
+		char hostmask[HOSTMAX];
+		NickAlias *na;
+		int32 tmp_time;
+		char *s;
+		char *vIdent = NULL;
+		time_t now = time(NULL);
+
+		nick = u->nick;
+
+		vIdent = myStrGetOnlyToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
+		if (vIdent)
+		{
+			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
+			if (!rawhostmask)
+			{
+				me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+				delete [] vIdent;
+				return MOD_CONT;
+			}
+			if (strlen(vIdent) > USERMAX - 1)
+			{
+				notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+				delete [] vIdent;
+				delete [] rawhostmask;
+				return MOD_CONT;
+			}
+			else
+			{
+				for (s = vIdent; *s; ++s)
+				{
+					if (!my_isvalidchar(*s))
+					{
+						notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
+						delete [] vIdent;
+						delete [] rawhostmask;
+						return MOD_CONT;
+					}
+				}
+			}
+			if (!ircd->vident)
+			{
+				notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+				delete [] vIdent;
+				delete [] rawhostmask;
+				return MOD_CONT;
+			}
+		}
+		if (strlen(rawhostmask) < HOSTMAX - 1)
+			snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
+		else
+		{
+			notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+			if (vIdent)
+			{
+				delete [] vIdent;
+				delete [] rawhostmask;
+			}
+			return MOD_CONT;
+		}
+
+		if (!isValidHost(hostmask, 3))
+		{
+			notice_lang(s_HostServ, u, HOST_SET_ERROR);
+			if (vIdent)
+			{
+				delete [] vIdent;
+				delete [] rawhostmask;
+			}
+			return MOD_CONT;
+		}
+
+		tmp_time = time(NULL);
+		if ((na = findnick(nick)))
+		{
+			if (HSRequestMemoOper || HSRequestMemoSetters)
+			{
+				if (MSSendDelay > 0 && u && u->lastmemosend + MSSendDelay > now)
+				{
+					me->NoticeLang(s_HostServ, u, LNG_REQUEST_WAIT, MSSendDelay);
+					u->lastmemosend = now;
+					if (vIdent)
+					{
+						delete [] vIdent;
+						delete [] rawhostmask;
+					}
+					return MOD_CONT;
+				}
+			}
+			my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
+
+			me->NoticeLang(s_HostServ, u, LNG_REQUESTED);
+			req_send_memos(u, hostmask);
+			alog("New vHost Requested by %s", nick);
+		}
+		else
+			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+
+		if (vIdent)
+		{
+			delete [] vIdent;
+			delete [] rawhostmask;
+		}
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		me->NoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
+
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+	}
+};
+
+class CommandHSActivate : public Command
+{
+ public:
+	CommandHSActivate() : Command("ACTIVATE", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *nick = params[0].c_str();
+		NickAlias *na;
+		HostCore *tmp, *hc;
+		bool found = false;
+
+		if ((na = findnick(nick)))
+		{
+			tmp = findHostCore(hs_request_head, nick, &found);
+			if (found)
+			{
+				if (!tmp)
+					hc = hs_request_head;
+				else
+					hc = tmp->next;
+
+				addHostCore(hc->nick, hc->vIdent, hc->vHost, u->nick, time(NULL));
+
+				if (HSRequestMemoUser)
+					my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
+
+				hs_request_head = deleteHostCore(hs_request_head, tmp);
+				me->NoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
+				alog("Host Request for %s activated by %s", nick, u->nick);
+			}
+			else
+				me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+		}
+		else
+			notice_lang(s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_host_setter(u))
+			return false;
+
+		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
+		if (HSRequestMemoUser)
+			me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
+
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+	}
+};
+
+class CommandHSReject : public Command
+{
+ public:
+	CommandHSReject() : Command("REJECT", 1, 2)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *nick = params[0].c_str();
+		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		HostCore *tmp, *hc;
+		bool found = false;
+
+		tmp = findHostCore(hs_request_head, nick, &found);
+		if (found)
+		{
+			if (!tmp)
+				hc = hs_request_head;
+			else
+				hc = tmp->next;
+
+			if (HSRequestMemoUser)
+			{
+				if (reason)
+					my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO_REASON, reason);
+				else
+					my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO);
+			}
+
+			hs_request_head = deleteHostCore(hs_request_head, tmp);
+			me->NoticeLang(s_HostServ, u, LNG_REJECTED, nick);
+			alog("Host Request for %s rejected by %s (%s)", nick, u->nick, reason ? reason : "");
+		}
+		else
+			me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_host_setter(u))
+			return false;
+
+		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT);
+		if (HSRequestMemoUser)
+			me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
+
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+	}
+};
+
+class CommandHSList : public Command
+{
+ private:
+	CommandResult DoList(User *u, std::vector<std::string> &params)
+	{
+		struct tm *tm;
+		char buf[BUFSIZE];
+		int counter = 1;
+		int from = 0, to = 0;
+		int display_counter = 0;
+		HostCore *current;
+
+		current = hs_request_head;
+		while (current)
+		{
+			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < NSListMax)
+			{
+				++display_counter;
+				tm = localtime(&current->time);
+				strftime(buf, sizeof(buf), getstring(NULL, STRFTIME_DATE_TIME_FORMAT), tm);
+				if (current->vIdent)
+					notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+				else
+					notice_lang(s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+			}
+			++counter;
+			current = current->next;
+		}
+		notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
+
+		return MOD_CONT;
+	}
+ public:
+	CommandHSList() : Command("LIST", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *key = params[0].c_str();
+
+		if (stricmp(key, "+req"))
+			return MOD_CONT;
+
+		return this->DoList(u, params);
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		// no-op
+	}
+};
+
+class CommandHSWaiting : public CommandHSList
+{
+ public:
+	CommandHSWaiting() : Command("WAITING", 0, 0)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		return this->DoList(u, params);
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_host_setter(u))
+			return false;
+
+		me->NoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		me->NoticeLang(s_HostServ, u, LNG_HELP_WAITING);
+
+		return true;
+	}
+};
+
+class CommandNSDrop : public Command
+{
+ public:
+	CommandNSDrop() : Command("DROP", 0, 0)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		HostCore *tmp;
+		bool found = false;
+		NickAlias *na;
+
+		na = findnick(u->nick);
+		tmp = findHostCore(hs_request_head, u->nick, &found);
+
+		if (found && na)
+			hs_request_head = deleteHostCore(hs_request_head, tmp);
+
+		return MOD_CONT;
+	}
+};
+
 class HSRequest : public Module
 {
  public:
 	HSRequest(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
 		EvtHook *hook;
 
 		me = this;
 
-		c = createCommand("request", hs_do_request, nick_identified, -1, -1, -1, -1, -1);
-		moduleAddHelp(c, hs_help_request);
-		this->AddCommand(HOSTSERV, c, MOD_HEAD);
+		this->AddCommand(HOSTSERV, new CommandHSRequest(), MOD_HEAD);
+		this->AddCommand(HOSTSERV, new CommandHSActivate(), MOD_HEAD);
+		this->AddCommand(HOSTSERV, new CommandHSReject(), MOD_HEAD);
+		this->AddCommand(HOSTSERV, new CommandHSWaiting(), MOD_HEAD);
+		this->AddCommand(HOSTSERV, new CommandHSList(), MOD_HEAD);
 
-		c = createCommand("activate", hs_do_activate, is_host_setter, -1, -1, -1, -1, -1);
-		moduleAddHelp(c, hs_help_activate);
-		this->AddCommand(HOSTSERV, c, MOD_HEAD);
-
-		c = createCommand("reject", hs_do_reject, is_host_setter, -1, -1, -1, -1, -1);
-		moduleAddHelp(c, hs_help_reject);
-		this->AddCommand(HOSTSERV, c, MOD_HEAD);
-
-		c = createCommand("waiting", hs_do_waiting, is_host_setter, -1, -1, -1, -1, -1);
-		moduleAddHelp(c, hs_help_waiting);
-		this->AddCommand(HOSTSERV, c, MOD_HEAD);
-
-		c = createCommand("list", hs_do_list_out, is_services_oper, -1, -1, -1, -1, -1);
-		this->AddCommand(HOSTSERV, c, MOD_HEAD);
-
-		c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1);
-		this->AddCommand(NICKSERV, c, MOD_HEAD);
+		this->AddCommand(NICKSERV, new CommandNSDrop(), MOD_HEAD);
 
 		hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
 		this->AddEventHook(hook);
@@ -134,254 +461,255 @@ class HSRequest : public Module
 		hsreq_load_db();
 
 		const char* langtable_en_us[] = {
-		/* LNG_REQUEST_SYNTAX */
-		"Syntax: \002REQUEST \037vhost\037\002",
-		/* LNG_REQUESTED */
-		"Your vHost has been requested",
-		/* LNG_REQUEST_WAIT */
-		"Please wait %d seconds before requesting a new vHost",
-		/* LNG_REQUEST_MEMO */
-		"[auto memo] vHost \002%s\002 has been requested.",
-		/* LNG_ACTIVATE_SYNTAX */
-		"Syntax: \002ACTIVATE \037nick\037\002",
-		/* LNG_ACTIVATED */
-		"vHost for %s has been activated",
-		/* LNG_ACTIVATE_MEMO */
-		"[auto memo] Your requested vHost has been approved.",
-		/* LNG_REJECT_SYNTAX */
-		"Syntax: \002REJECT \037nick\037\002",
-		/* LNG_REJECTED */
-		"vHost for %s has been rejected",
-		/* LNG_REJECT_MEMO */
-		"[auto memo] Your requested vHost has been rejected.",
-		/* LNG_REJECT_MEMO_REASON */
-		"[auto memo] Your requested vHost has been rejected. Reason: %s",
-		/* LNG_NO_REQUEST */
-		"No request for nick %s found.",
-		/* LNG_HELP */
-		"    REQUEST     Request a vHost for your nick",
-		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Approve the requested vHost of a user\n"
-		"    REJECT      Reject the requested vHost of a user\n"
-		"    WAITING     Convenience command for LIST +req",
-		/* LNG_HELP_REQUEST */
-		"Request the given vHost to be actived for your nick by the\n"
-		"network administrators. Please be patient while your request\n"
-		"is being considered.",
-		/* LNG_HELP_ACTIVATE */
-		"Activate the requested vHost for the given nick.",
-		/* LNG_HELP_ACTIVATE_MEMO */
-		"A memo informing the user will also be sent.",
-		/* LNG_HELP_REJECT */
-		"Reject the requested vHost for the given nick.",
-		/* LNG_HELP_REJECT_MEMO */
-		"A memo informing the user will also be sent.",
-		/* LNG_WAITING_SYNTAX */
-		"Syntax: \002WAITING\002",
-		/* LNG_HELP_WAITING */
-		"This command is provided for convenience. It is essentially\n"
-		"the same as performing a LIST +req ."
+			/* LNG_REQUEST_SYNTAX */
+			"Syntax: \002REQUEST \037vhost\037\002",
+			/* LNG_REQUESTED */
+			"Your vHost has been requested",
+			/* LNG_REQUEST_WAIT */
+			"Please wait %d seconds before requesting a new vHost",
+			/* LNG_REQUEST_MEMO */
+			"[auto memo] vHost \002%s\002 has been requested.",
+			/* LNG_ACTIVATE_SYNTAX */
+			"Syntax: \002ACTIVATE \037nick\037\002",
+			/* LNG_ACTIVATED */
+			"vHost for %s has been activated",
+			/* LNG_ACTIVATE_MEMO */
+			"[auto memo] Your requested vHost has been approved.",
+			/* LNG_REJECT_SYNTAX */
+			"Syntax: \002REJECT \037nick\037\002",
+			/* LNG_REJECTED */
+			"vHost for %s has been rejected",
+			/* LNG_REJECT_MEMO */
+			"[auto memo] Your requested vHost has been rejected.",
+			/* LNG_REJECT_MEMO_REASON */
+			"[auto memo] Your requested vHost has been rejected. Reason: %s",
+			/* LNG_NO_REQUEST */
+			"No request for nick %s found.",
+			/* LNG_HELP */
+			"    REQUEST     Request a vHost for your nick",
+			/* LNG_HELP_SETTER */
+			"    ACTIVATE    Approve the requested vHost of a user\n"
+			"    REJECT      Reject the requested vHost of a user\n"
+			"    WAITING     Convenience command for LIST +req",
+			/* LNG_HELP_REQUEST */
+			"Request the given vHost to be actived for your nick by the\n"
+			"network administrators. Please be patient while your request\n"
+			"is being considered.",
+			/* LNG_HELP_ACTIVATE */
+			"Activate the requested vHost for the given nick.",
+			/* LNG_HELP_ACTIVATE_MEMO */
+			"A memo informing the user will also be sent.",
+			/* LNG_HELP_REJECT */
+			"Reject the requested vHost for the given nick.",
+			/* LNG_HELP_REJECT_MEMO */
+			"A memo informing the user will also be sent.",
+			/* LNG_WAITING_SYNTAX */
+			"Syntax: \002WAITING\002",
+			/* LNG_HELP_WAITING */
+			"This command is provided for convenience. It is essentially\n"
+			"the same as performing a LIST +req ."
 		};
 
 		const char* langtable_nl[] = {
-		/* LNG_REQUEST_SYNTAX */
-		"Gebruik: \002REQUEST \037vhost\037\002",
-		/* LNG_REQUESTED */
-		"Je vHost is aangevraagd",
-		/* LNG_REQUEST_WAIT */
-		"Wacht %d seconden voor je een nieuwe vHost aanvraagt",
-		/* LNG_REQUEST_MEMO */
-		"[auto memo] vHost \002%s\002 is aangevraagd.",
-		/* LNG_ACTIVATE_SYNTAX */
-		"Gebruik: \002ACTIVATE \037nick\037\002",
-		/* LNG_ACTIVATED */
-		"vHost voor %s is geactiveerd",
-		/* LNG_ACTIVATE_MEMO */
-		"[auto memo] Je aangevraagde vHost is geaccepteerd.",
-		/* LNG_REJECT_SYNTAX */
-		"Gebruik: \002REJECT \037nick\037\002",
-		/* LNG_REJECTED */
-		"vHost voor %s is afgekeurd",
-		/* LNG_REJECT_MEMO */
-		"[auto memo] Je aangevraagde vHost is afgekeurd.",
-		/* LNG_REJECT_MEMO_REASON */
-		"[auto memo] Je aangevraagde vHost is afgekeurd. Reden: %s",
-		/* LNG_NO_REQUEST */
-		"Geen aanvraag voor nick %s gevonden.",
-		/* LNG_HELP */
-		"    REQUEST     Vraag een vHost aan voor je nick",
-		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Activeer de aangevraagde vHost voor een gebruiker\n"
-		"    REJECT      Keur de aangevraagde vHost voor een gebruiker af\n"
-		"    WAITING     Snelkoppeling naar LIST +req",
-		/* LNG_HELP_REQUEST */
-		"Verzoek de gegeven vHost te activeren voor jouw nick bij de\n"
-		"netwerk beheerders. Het kan even duren voordat je aanvraag\n"
-		"afgehandeld wordt.",
-		/* LNG_HELP_ACTIVATE */
-		"Activeer de aangevraagde vHost voor de gegeven nick.",
-		/* LNG_HELP_ACTIVATE_MEMO */
-		"Een memo die de gebruiker op de hoogste stelt zal ook worden verstuurd.",
-		/* LNG_HELP_REJECT */
-		"Keur de aangevraagde vHost voor de gegeven nick af.",
-		/* LNG_HELP_REJECT_MEMO */
-		"Een memo die de gebruiker op de hoogste stelt zal ook worden verstuurd.",
-		/* LNG_WAITING_SYNTAX */
-		"Gebruik: \002WAITING\002",
-		/* LNG_HELP_WAITING */
-		"Dit commando is beschikbaar als handigheid. Het is simpelweg\n"
-		"hetzelfde als LIST +req ."
+			/* LNG_REQUEST_SYNTAX */
+			"Gebruik: \002REQUEST \037vhost\037\002",
+			/* LNG_REQUESTED */
+			"Je vHost is aangevraagd",
+			/* LNG_REQUEST_WAIT */
+			"Wacht %d seconden voor je een nieuwe vHost aanvraagt",
+			/* LNG_REQUEST_MEMO */
+			"[auto memo] vHost \002%s\002 is aangevraagd.",
+			/* LNG_ACTIVATE_SYNTAX */
+			"Gebruik: \002ACTIVATE \037nick\037\002",
+			/* LNG_ACTIVATED */
+			"vHost voor %s is geactiveerd",
+			/* LNG_ACTIVATE_MEMO */
+			"[auto memo] Je aangevraagde vHost is geaccepteerd.",
+			/* LNG_REJECT_SYNTAX */
+			"Gebruik: \002REJECT \037nick\037\002",
+			/* LNG_REJECTED */
+			"vHost voor %s is afgekeurd",
+			/* LNG_REJECT_MEMO */
+			"[auto memo] Je aangevraagde vHost is afgekeurd.",
+			/* LNG_REJECT_MEMO_REASON */
+			"[auto memo] Je aangevraagde vHost is afgekeurd. Reden: %s",
+			/* LNG_NO_REQUEST */
+			"Geen aanvraag voor nick %s gevonden.",
+			/* LNG_HELP */
+			"    REQUEST     Vraag een vHost aan voor je nick",
+			/* LNG_HELP_SETTER */
+			"    ACTIVATE    Activeer de aangevraagde vHost voor een gebruiker\n"
+			"    REJECT      Keur de aangevraagde vHost voor een gebruiker af\n"
+			"    WAITING     Snelkoppeling naar LIST +req",
+			/* LNG_HELP_REQUEST */
+			"Verzoek de gegeven vHost te activeren voor jouw nick bij de\n"
+			"netwerk beheerders. Het kan even duren voordat je aanvraag\n"
+			"afgehandeld wordt.",
+			/* LNG_HELP_ACTIVATE */
+			"Activeer de aangevraagde vHost voor de gegeven nick.",
+			/* LNG_HELP_ACTIVATE_MEMO */
+			"Een memo die de gebruiker op de hoogste stelt zal ook worden verstuurd.",
+			/* LNG_HELP_REJECT */
+			"Keur de aangevraagde vHost voor de gegeven nick af.",
+			/* LNG_HELP_REJECT_MEMO */
+			"Een memo die de gebruiker op de hoogste stelt zal ook worden verstuurd.",
+			/* LNG_WAITING_SYNTAX */
+			"Gebruik: \002WAITING\002",
+			/* LNG_HELP_WAITING */
+			"Dit commando is beschikbaar als handigheid. Het is simpelweg\n"
+			"hetzelfde als LIST +req ."
 		};
 
 		const char* langtable_pt[] = {
-		/* LNG_REQUEST_SYNTAX */
-		"Sintaxe: \002REQUEST \037vhost\037\002",
-		/* LNG_REQUESTED */
-		"Seu pedido de vHost foi encaminhado",
-		/* LNG_REQUEST_WAIT */
-		"Por favor, espere %d segundos antes de fazer um novo pedido de vHost",
-		/* LNG_REQUEST_MEMO */
-		"[Auto Memo] O vHost \002%s\002 foi solicitado.",
-		/* LNG_ACTIVATE_SYNTAX */
-		"Sintaxe: \002ACTIVATE \037nick\037\002",
-		/* LNG_ACTIVATED */
-		"O vHost para %s foi ativado",
-		/* LNG_ACTIVATE_MEMO */
-		"[Auto Memo] Seu pedido de vHost foi aprovado.",
-		/* LNG_REJECT_SYNTAX */
-		"Sintaxe: \002REJECT \037nick\037\002",
-		/* LNG_REJECTED */
-		"O vHost de %s foi recusado",
-		/* LNG_REJECT_MEMO */
-		"[Auto Memo] Seu pedido de vHost foi recusado.",
-		/* LNG_REJECT_MEMO_REASON */
-		"[Auto Memo] Seu pedido de vHost foi recusado. Motivo: %s",
-		/* LNG_NO_REQUEST */
-		"Nenhum pedido encontrado para o nick %s.",
-		/* LNG_HELP */
-		"    REQUEST     Request a vHost for your nick",
-		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Aprova o pedido de vHost de um usuбrio\n"
-		"    REJECT      Recusa o pedido de vHost de um usuбrio\n"
-		"    WAITING     Comando para LISTAR +req",
-		/* LNG_HELP_REQUEST */
-		"Solicita a ativaзгo do vHost fornecido em seu nick pelos\n"
-		"administradores da rede. Por favor, tenha paciкncia\n"
-		"enquanto seu pedido й analisado.",
-		/* LNG_HELP_ACTIVATE */
-		"Ativa o vHost solicitado para o nick fornecido.",
-		/* LNG_HELP_ACTIVATE_MEMO */
-		"Um memo informando o usuбrio tambйm serб enviado.",
-		/* LNG_HELP_REJECT */
-		"Recusa o pedido de vHost para o nick fornecido.",
-		/* LNG_HELP_REJECT_MEMO */
-		"Um memo informando o usuбrio tambйm serб enviado.",
-		/* LNG_WAITING_SYNTAX */
-		"Sintaxe: \002WAITING\002",
-		/* LNG_HELP_WAITING */
-		"Este comando й usado por conveniкncia. Й essencialmente\n"
-		"o mesmo que fazer um LIST +req"
+			/* LNG_REQUEST_SYNTAX */
+			"Sintaxe: \002REQUEST \037vhost\037\002",
+			/* LNG_REQUESTED */
+			"Seu pedido de vHost foi encaminhado",
+			/* LNG_REQUEST_WAIT */
+			"Por favor, espere %d segundos antes de fazer um novo pedido de vHost",
+			/* LNG_REQUEST_MEMO */
+			"[Auto Memo] O vHost \002%s\002 foi solicitado.",
+			/* LNG_ACTIVATE_SYNTAX */
+			"Sintaxe: \002ACTIVATE \037nick\037\002",
+			/* LNG_ACTIVATED */
+			"O vHost para %s foi ativado",
+			/* LNG_ACTIVATE_MEMO */
+			"[Auto Memo] Seu pedido de vHost foi aprovado.",
+			/* LNG_REJECT_SYNTAX */
+			"Sintaxe: \002REJECT \037nick\037\002",
+			/* LNG_REJECTED */
+			"O vHost de %s foi recusado",
+			/* LNG_REJECT_MEMO */
+			"[Auto Memo] Seu pedido de vHost foi recusado.",
+			/* LNG_REJECT_MEMO_REASON */
+			"[Auto Memo] Seu pedido de vHost foi recusado. Motivo: %s",
+			/* LNG_NO_REQUEST */
+			"Nenhum pedido encontrado para o nick %s.",
+			/* LNG_HELP */
+			"    REQUEST     Request a vHost for your nick",
+			/* LNG_HELP_SETTER */
+			"    ACTIVATE    Aprova o pedido de vHost de um usuбrio\n"
+			"    REJECT      Recusa o pedido de vHost de um usuбrio\n"
+			"    WAITING     Comando para LISTAR +req",
+			/* LNG_HELP_REQUEST */
+			"Solicita a ativaзгo do vHost fornecido em seu nick pelos\n"
+			"administradores da rede. Por favor, tenha paciкncia\n"
+			"enquanto seu pedido й analisado.",
+			/* LNG_HELP_ACTIVATE */
+			"Ativa o vHost solicitado para o nick fornecido.",
+			/* LNG_HELP_ACTIVATE_MEMO */
+			"Um memo informando o usuбrio tambйm serб enviado.",
+			/* LNG_HELP_REJECT */
+			"Recusa o pedido de vHost para o nick fornecido.",
+			/* LNG_HELP_REJECT_MEMO */
+			"Um memo informando o usuбrio tambйm serб enviado.",
+			/* LNG_WAITING_SYNTAX */
+			"Sintaxe: \002WAITING\002",
+			/* LNG_HELP_WAITING */
+			"Este comando й usado por conveniкncia. Й essencialmente\n"
+			"o mesmo que fazer um LIST +req"
 		};
 
 		const char* langtable_ru[] = {
-		/* LNG_REQUEST_SYNTAX */
-		"Синтаксис: \002REQUEST \037vHost\037\002",
-		/* LNG_REQUESTED */
-		"Ваш запрос на vHost отправлен.",
-		/* LNG_REQUEST_WAIT */
-		"Пожалуйста, подождите %d секунд, прежде чем запрашивать новый vHost",
-		/* LNG_REQUEST_MEMO */
-		"[авто-сообщение] Был запрошен vHost \002%s\002",
-		/* LNG_ACTIVATE_SYNTAX */
-		"Синтаксис: \002ACTIVATE \037ник\037\002",
-		/* LNG_ACTIVATED */
-		"vHost для %s успешно активирован",
-		/* LNG_ACTIVATE_MEMO */
-		"[авто-сообщение] Запрашиваемый вами vHost утвержден и активирован.",
-		/* LNG_REJECT_SYNTAX */
-		"Синтаксис: \002REJECT \037ник\037\002",
-		/* LNG_REJECTED */
-		"vHost для %s отклонен.",
-		/* LNG_REJECT_MEMO */
-		"[авто-сообщение] Запрашиваемый вами vHost отклонен.",
-		/* LNG_REJECT_MEMO_REASON */
-		"[авто-сообщение] Запрашиваемый вами vHost отклонен. Причина: %s",
-		/* LNG_NO_REQUEST */
-		"Запрос на vHost для ника %s не найден.",
-		/* LNG_HELP */
-		"    REQUEST     Запрос на vHost для вашего текущего ника",
-		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Утвердить запрашиваемый пользователем  vHost\n"
-		"    REJECT      Отклонить запрашиваемый пользователем  vHost\n"
-		"    WAITING     Список запросов ожидающих обработки (аналог LIST +req)",
-		/* LNG_HELP_REQUEST */
-		"Отправляет запрос на активацию vHost, который будет рассмотрен одним из\n"
-		"администраторов сети. Просьба проявить терпение, пока запрос\n"
-		"рассматривается администрацией.",
-		/* LNG_HELP_ACTIVATE */
-		"Утвердить запрашиваемый vHost для указанного ника.",
-		/* LNG_HELP_ACTIVATE_MEMO */
-		"Пользователю будет послано авто-уведомление об активации его запроса.",
-		/* LNG_HELP_REJECT */
-		"Отклонить запрашиваемый vHost для указанного ника.",
-		/* LNG_HELP_REJECT_MEMO */
-		"Пользователю будет послано авто-уведомление об отклонении его запроса.",
-		/* LNG_WAITING_SYNTAX */
-		"Синтаксис: \002WAITING\002",
-		/* LNG_HELP_WAITING */
-		"Данная команда создана для удобства использования и выводит список запросов,\n"
-		"ожидающих обработки. Аналогичная команда: LIST +req ."
+			/* LNG_REQUEST_SYNTAX */
+			"Синтаксис: \002REQUEST \037vHost\037\002",
+			/* LNG_REQUESTED */
+			"Ваш запрос на vHost отправлен.",
+			/* LNG_REQUEST_WAIT */
+			"Пожалуйста, подождите %d секунд, прежде чем запрашивать новый vHost",
+			/* LNG_REQUEST_MEMO */
+			"[авто-сообщение] Был запрошен vHost \002%s\002",
+			/* LNG_ACTIVATE_SYNTAX */
+			"Синтаксис: \002ACTIVATE \037ник\037\002",
+			/* LNG_ACTIVATED */
+			"vHost для %s успешно активирован",
+			/* LNG_ACTIVATE_MEMO */
+			"[авто-сообщение] Запрашиваемый вами vHost утвержден и активирован.",
+			/* LNG_REJECT_SYNTAX */
+			"Синтаксис: \002REJECT \037ник\037\002",
+			/* LNG_REJECTED */
+			"vHost для %s отклонен.",
+			/* LNG_REJECT_MEMO */
+			"[авто-сообщение] Запрашиваемый вами vHost отклонен.",
+			/* LNG_REJECT_MEMO_REASON */
+			"[авто-сообщение] Запрашиваемый вами vHost отклонен. Причина: %s",
+			/* LNG_NO_REQUEST */
+			"Запрос на vHost для ника %s не найден.",
+			/* LNG_HELP */
+			"    REQUEST     Запрос на vHost для вашего текущего ника",
+			/* LNG_HELP_SETTER */
+			"    ACTIVATE    Утвердить запрашиваемый пользователем  vHost\n"
+			"    REJECT      Отклонить запрашиваемый пользователем  vHost\n"
+			"    WAITING     Список запросов ожидающих обработки (аналог LIST +req)",
+			/* LNG_HELP_REQUEST */
+			"Отправляет запрос на активацию vHost, который будет рассмотрен одним из\n"
+			"администраторов сети. Просьба проявить терпение, пока запрос\n"
+			"рассматривается администрацией.",
+			/* LNG_HELP_ACTIVATE */
+			"Утвердить запрашиваемый vHost для указанного ника.",
+			/* LNG_HELP_ACTIVATE_MEMO */
+			"Пользователю будет послано авто-уведомление об активации его запроса.",
+			/* LNG_HELP_REJECT */
+			"Отклонить запрашиваемый vHost для указанного ника.",
+			/* LNG_HELP_REJECT_MEMO */
+			"Пользователю будет послано авто-уведомление об отклонении его запроса.",
+			/* LNG_WAITING_SYNTAX */
+			"Синтаксис: \002WAITING\002",
+			/* LNG_HELP_WAITING */
+			"Данная команда создана для удобства использования и выводит список запросов,\n"
+			"ожидающих обработки. Аналогичная команда: LIST +req ."
 		};
 
 		const char* langtable_it[] = {
-		/* LNG_REQUEST_SYNTAX */
-		"Sintassi: \002REQUEST \037vhost\037\002",
-		/* LNG_REQUESTED */
-		"Il tuo vHost и stato richiesto",
-		/* LNG_REQUEST_WAIT */
-		"Prego attendere %d secondi prima di richiedere un nuovo vHost",
-		/* LNG_REQUEST_MEMO */
-		"[auto memo] и stato richiesto il vHost \002%s\002.",
-		/* LNG_ACTIVATE_SYNTAX */
-		"Sintassi: \002ACTIVATE \037nick\037\002",
-		/* LNG_ACTIVATED */
-		"Il vHost per %s и stato attivato",
-		/* LNG_ACTIVATE_MEMO */
-		"[auto memo] Il vHost da te richiesto и stato approvato.",
-		/* LNG_REJECT_SYNTAX */
-		"Sintassi: \002REJECT \037nick\037\002",
-		/* LNG_REJECTED */
-		"Il vHost per %s и stato rifiutato",
-		/* LNG_REJECT_MEMO */
-		"[auto memo] Il vHost da te richiesto и stato rifiutato.",
-		/* LNG_REJECT_MEMO_REASON */
-		"[auto memo] Il vHost da te richiesto и stato rifiutato. Motivo: %s",
-		/* LNG_NO_REQUEST */
-		"Nessuna richiesta trovata per il nick %s.",
-		/* LNG_HELP */
-		"    REQUEST     Richiede un vHost per il tuo nick",
-		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Approva il vHost richiesto di un utente\n"
-		"    REJECT      Rifiuta il vHost richiesto di un utente\n"
-		"    WAITING     Comando per LIST +req",
-		/* LNG_HELP_REQUEST */
-		"Richiede l'attivazione del vHost specificato per il tuo nick da parte\n"
-		"degli amministratori di rete. Sei pregato di pazientare finchи la tua\n"
-		"richiesta viene elaborata.",
-		/* LNG_HELP_ACTIVATE */
-		"Attiva il vHost richiesto per il nick specificato.",
-		/* LNG_HELP_ACTIVATE_MEMO */
-		"Viene inviato un memo per informare l'utente.",
-		/* LNG_HELP_REJECT */
-		"Rifiuta il vHost richiesto per il nick specificato.",
-		/* LNG_HELP_REJECT_MEMO */
-		"Viene inviato un memo per informare l'utente.",
-		/* LNG_WAITING_SYNTAX */
-		"Sintassi: \002WAITING\002",
-		/* LNG_HELP_WAITING */
-		"Questo comando и per comoditа. Praticamente и la stessa cosa che\n"
-		"eseguire un LIST +req ."
+			/* LNG_REQUEST_SYNTAX */
+			"Sintassi: \002REQUEST \037vhost\037\002",
+			/* LNG_REQUESTED */
+			"Il tuo vHost и stato richiesto",
+			/* LNG_REQUEST_WAIT */
+			"Prego attendere %d secondi prima di richiedere un nuovo vHost",
+			/* LNG_REQUEST_MEMO */
+			"[auto memo] и stato richiesto il vHost \002%s\002.",
+			/* LNG_ACTIVATE_SYNTAX */
+			"Sintassi: \002ACTIVATE \037nick\037\002",
+			/* LNG_ACTIVATED */
+			"Il vHost per %s и stato attivato",
+			/* LNG_ACTIVATE_MEMO */
+			"[auto memo] Il vHost da te richiesto и stato approvato.",
+			/* LNG_REJECT_SYNTAX */
+			"Sintassi: \002REJECT \037nick\037\002",
+			/* LNG_REJECTED */
+			"Il vHost per %s и stato rifiutato",
+			/* LNG_REJECT_MEMO */
+			"[auto memo] Il vHost da te richiesto и stato rifiutato.",
+			/* LNG_REJECT_MEMO_REASON */
+			"[auto memo] Il vHost da te richiesto и stato rifiutato. Motivo: %s",
+			/* LNG_NO_REQUEST */
+			"Nessuna richiesta trovata per il nick %s.",
+			/* LNG_HELP */
+			"    REQUEST     Richiede un vHost per il tuo nick",
+			/* LNG_HELP_SETTER */
+			"    ACTIVATE    Approva il vHost richiesto di un utente\n"
+			"    REJECT      Rifiuta il vHost richiesto di un utente\n"
+			"    WAITING     Comando per LIST +req",
+			/* LNG_HELP_REQUEST */
+			"Richiede l'attivazione del vHost specificato per il tuo nick da parte\n"
+			"degli amministratori di rete. Sei pregato di pazientare finchи la tua\n"
+			"richiesta viene elaborata.",
+			/* LNG_HELP_ACTIVATE */
+			"Attiva il vHost richiesto per il nick specificato.",
+			/* LNG_HELP_ACTIVATE_MEMO */
+			"Viene inviato un memo per informare l'utente.",
+			/* LNG_HELP_REJECT */
+			"Rifiuta il vHost richiesto per il nick specificato.",
+			/* LNG_HELP_REJECT_MEMO */
+			"Viene inviato un memo per informare l'utente.",
+			/* LNG_WAITING_SYNTAX */
+			"Sintassi: \002WAITING\002",
+			/* LNG_HELP_WAITING */
+			"Questo comando и per comoditа. Praticamente и la stessa cosa che\n"
+			"eseguire un LIST +req ."
 		};
+
 		this->InsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
 		this->InsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
 		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
@@ -401,109 +729,7 @@ class HSRequest : public Module
 	}
 };
 
-
-int hs_do_request(User * u)
-{
-	char *cur_buffer;
-	char *nick;
-	char *rawhostmask;
-	char hostmask[HOSTMAX];
-	NickAlias *na;
-	int32 tmp_time;
-	char *s;
-	char *vIdent = NULL;
-	time_t now = time(NULL);
-
-	cur_buffer = moduleGetLastBuffer();
-	nick = u->nick;
-	rawhostmask = myStrGetToken(cur_buffer, ' ', 0);
-
-	if (!nick || !rawhostmask) {
-		if (rawhostmask)
-			delete [] rawhostmask;
-		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-		return MOD_CONT;
-	}
-
-	vIdent = myStrGetOnlyToken(rawhostmask, '@', 0);	/* Get the first substring, @ as delimiter */
-	if (vIdent) {
-		rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);	  /* get the remaining string */
-		if (!rawhostmask) {
-			me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-			delete [] vIdent;
-			return MOD_CONT;
-		}
-		if (strlen(vIdent) > USERMAX - 1) {
-			notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
-			delete [] vIdent;
-			delete [] rawhostmask;
-			return MOD_CONT;
-		} else {
-			for (s = vIdent; *s; s++) {
-				if (!my_isvalidchar(*s)) {
-					notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
-					delete [] vIdent;
-					delete [] rawhostmask;
-					return MOD_CONT;
-				}
-			}
-		}
-		if (!ircd->vident) {
-			notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-			delete [] vIdent;
-			delete [] rawhostmask;
-			return MOD_CONT;
-		}
-	}
-	if (strlen(rawhostmask) < HOSTMAX - 1) {
-		snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
-	} else {
-		notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
-		if (vIdent)
-			delete [] vIdent;
-		delete [] rawhostmask;
-		return MOD_CONT;
-	}
-
-	if (!isValidHost(hostmask, 3)) {
-		notice_lang(s_HostServ, u, HOST_SET_ERROR);
-		if (vIdent)
-			delete [] vIdent;
-		delete [] rawhostmask;
-		return MOD_CONT;
-	}
-
-	tmp_time = time(NULL);
-	if ((na = findnick(nick))) {
-		if (HSRequestMemoOper || HSRequestMemoSetters) {
-			if (MSSendDelay > 0 && u
-				&& u->lastmemosend + MSSendDelay > now) {
-				me->NoticeLang(s_HostServ, u, LNG_REQUEST_WAIT,
-								 MSSendDelay);
-				u->lastmemosend = now;
-				if (vIdent)
-					delete [] vIdent;
-				delete [] rawhostmask;
-				return MOD_CONT;
-			}
-		}
-		my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
-
-		me->NoticeLang(s_HostServ, u, LNG_REQUESTED);
-		req_send_memos(u, hostmask);
-		alog("New vHost Requested by %s", nick);
-	} else {
-		notice_lang(s_HostServ, u, HOST_NOREG, nick);
-	}
-
-	if (vIdent)
-		delete [] vIdent;
-	delete [] rawhostmask;
-
-	return MOD_CONT;
-}
-
-void my_memo_lang(User * u, char *name, int z, int number, ...)
+void my_memo_lang(User *u, char *name, int z, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -518,16 +744,18 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
 		lang = u2->na->nc->language;
 
 	/* If the users lang isnt supported, drop back to enlgish */
-	if (me->lang[lang].argc == 0)
+	if (!me->lang[lang].argc)
 		lang = LANG_EN_US;
 
 	/* If the requested lang string exists for the language */
-	if (me->lang[lang].argc > number) {
+	if (me->lang[lang].argc > number)
+	{
 		fmt = me->lang[lang].argv[number];
 
 		buf = sstrdup(fmt);
 		s = buf;
-		while (*s) {
+		while (*s)
+		{
 			t = s;
 			s += strcspn(s, "\n");
 			if (*s)
@@ -540,13 +768,12 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
 			memo_send(u, name, buffer, z);
 		}
 		delete [] buf;
-	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", me->name.c_str(), lang, number);
 	}
+	else
+		alog("%s: INVALID language string call, language: [%d], String [%d]", me->name.c_str(), lang, number);
 }
 
-
-void req_send_memos(User * u, char *vHost)
+void req_send_memos(User *u, char *vHost)
 {
 	int i;
 	int z = 2;
@@ -554,273 +781,47 @@ void req_send_memos(User * u, char *vHost)
 	if (checkDefCon(DEFCON_NO_NEW_MEMOS))
 		return;
 
-	if (HSRequestMemoOper == 1) {
-		for (i = 0; i < servopers.count; i++) {
-			my_memo_lang(u, ((static_cast<NickCore *>(servopers.list[i]))->display), z,
-						 LNG_REQUEST_MEMO, vHost);
-		}
-		for (i = 0; i < servadmins.count; i++) {
-			my_memo_lang(u, ((static_cast<NickCore *>(servadmins.list[i]))->display),
-						 z, LNG_REQUEST_MEMO, vHost);
-		}
-		for (i = 0; i < RootNumber; i++) {
+	if (HSRequestMemoOper == 1)
+	{
+		for (i = 0; i < servopers.count; ++i)
+			my_memo_lang(u, (static_cast<NickCore *>(servopers.list[i]))->display, z, LNG_REQUEST_MEMO, vHost);
+		for (i = 0; i < servadmins.count; ++i)
+			my_memo_lang(u, (static_cast<NickCore *>(servadmins.list[i]))->display, z, LNG_REQUEST_MEMO, vHost);
+		for (i = 0; i < RootNumber; ++i)
 			my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, vHost);
-		}
 	}
-	if (HSRequestMemoSetters == 1) {
-		for (i = 0; i < HostNumber; i++) {
+	if (HSRequestMemoSetters == 1)
+	{
+		for (i = 0; i < HostNumber; ++i)
 			my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, vHost);
-		}
 	}
 }
 
-int ns_do_drop(User * u)
+void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time)
 {
 	HostCore *tmp;
 	bool found = false;
-	NickAlias *na;
 
-	na = findnick(u->nick);
-	tmp = findHostCore(hs_request_head, u->nick, &found);
-
-	if (found && na)
-		hs_request_head = deleteHostCore(hs_request_head, tmp);
-
-	return MOD_CONT;
-}
-
-int hs_do_reject(User * u)
-{
-	char *cur_buffer;
-	char *nick;
-	char *reason;
-	HostCore *tmp, *hc;
-	bool found = false;
-
-	cur_buffer = moduleGetLastBuffer();
-	nick = myStrGetToken(cur_buffer, ' ', 0);
-	reason = myStrGetTokenRemainder(cur_buffer, ' ', 1);
-
-	if (!nick) {
-		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-		if (reason)
-			delete [] reason;
-		return MOD_CONT;
-	}
-
-	tmp = findHostCore(hs_request_head, nick, &found);
-	if (found) {
-		if (!tmp)
-			hc = hs_request_head;
+	if (!hs_request_head)
+		hs_request_head = createHostCorelist(hs_request_head, nick, vIdent, vhost, creator, tmp_time);
+	else {
+		tmp = findHostCore(hs_request_head, nick, &found);
+		if (!found)
+			hs_request_head = insertHostCore(hs_request_head, tmp, nick, vIdent, vhost, creator, tmp_time);
 		else
-			hc = tmp->next;
-
-		if (HSRequestMemoUser) {
-			if (reason)
-				my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO_REASON,
-							 reason);
-			else
-				my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO);
-		}
-
-		hs_request_head = deleteHostCore(hs_request_head, tmp);
-		me->NoticeLang(s_HostServ, u, LNG_REJECTED, nick);
-		alog("Host Request for %s rejected by %s (%s)", nick, u->nick,
-			 reason ? reason : "");
-	} else {
-		me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
-	}
-
-	delete [] nick;
-	if (reason)
-		delete [] reason;
-
-	return MOD_CONT;
-}
-
-int hs_do_activate(User * u)
-{
-	char *cur_buffer;
-	char *nick;
-	NickAlias *na;
-	HostCore *tmp, *hc;
-	bool found = false;
-
-	cur_buffer = moduleGetLastBuffer();
-	nick = myStrGetToken(cur_buffer, ' ', 0);
-
-	if (!nick) {
-		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-		return MOD_CONT;
-	}
-
-	if ((na = findnick(nick))) {
-		tmp = findHostCore(hs_request_head, nick, &found);
-		if (found) {
-			if (!tmp)
-				hc = hs_request_head;
-			else
-				hc = tmp->next;
-
-			addHostCore(hc->nick, hc->vIdent, hc->vHost, u->nick,
-						time(NULL));
-
-			if (HSRequestMemoUser)
-				my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
-
-			hs_request_head = deleteHostCore(hs_request_head, tmp);
-			me->NoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
-			alog("Host Request for %s activated by %s", nick, u->nick);
-		} else {
-			me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
-		}
-	} else {
-		notice_lang(s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
-	}
-
-	delete [] nick;
-	return MOD_CONT;
-}
-
-
-void my_add_host_request(char *nick, char *vIdent, char *vhost,
-						 char *creator, int32 tmp_time)
-{
-	HostCore *tmp;
-	bool found = false;
-
-	if (!hs_request_head) {
-		hs_request_head =
-			createHostCorelist(hs_request_head, nick, vIdent, vhost,
-							   creator, tmp_time);
-	} else {
-		tmp = findHostCore(hs_request_head, nick, &found);
-		if (!found) {
-			hs_request_head =
-				insertHostCore(hs_request_head, tmp, nick, vIdent, vhost,
-							   creator, tmp_time);
-		} else {
-			hs_request_head = deleteHostCore(hs_request_head, tmp);	 /* delete the old entry */
-			my_add_host_request(nick, vIdent, vhost, creator, tmp_time);		/* recursive call to add new entry */
+		{
+			hs_request_head = deleteHostCore(hs_request_head, tmp); /* delete the old entry */
+			my_add_host_request(nick, vIdent, vhost, creator, tmp_time); /* recursive call to add new entry */
 		}
 	}
 }
 
 int my_isvalidchar(const char c)
 {
-	if (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))
-		|| ((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
 		return 1;
 	else
 		return 0;
-}
-
-int hs_do_list_out(User * u)
-{
-	char *key;
-
-	key = moduleGetLastBuffer();
-	if (!key)
-		return MOD_CONT;
-
-	if (stricmp(key, "+req") != 0)
-		return MOD_CONT;
-
-	show_list(u);
-
-	return MOD_CONT;
-}
-
-int hs_do_waiting(User * u)
-{
-	show_list(u);
-
-	return MOD_CONT;
-}
-
-void show_list(User * u)
-{
-	struct tm *tm;
-	char buf[BUFSIZE];
-	int counter = 1;
-	int from = 0, to = 0;
-	int display_counter = 0;
-	HostCore *current;
-
-	current = hs_request_head;
-	while (current) {
-		if ((((counter >= from) && (counter <= to))
-			 || ((from == 0) && (to == 0)))
-			&& (display_counter < NSListMax)) {
-			display_counter++;
-			tm = localtime(&current->time);
-			strftime(buf, sizeof(buf),
-					 getstring(NULL, STRFTIME_DATE_TIME_FORMAT), tm);
-			if (current->vIdent)
-				notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter,
-							current->nick, current->vIdent, current->vHost,
-							current->creator, buf);
-			else
-				notice_lang(s_HostServ, u, HOST_ENTRY, counter,
-							current->nick, current->vHost,
-							current->creator, buf);
-		}
-		counter++;
-		current = current->next;
-	}
-	notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
-}
-
-int hs_help_request(User * u)
-{
-	me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-	ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-	me->NoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
-
-	return MOD_CONT;
-}
-
-int hs_help_activate(User * u)
-{
-	if (is_host_setter(u)) {
-		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
-		if (HSRequestMemoUser)
-			me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
-	} else {
-		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "ACTIVATE");
-	}
-
-	return MOD_CONT;
-}
-
-int hs_help_reject(User * u)
-{
-	if (is_host_setter(u)) {
-		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT);
-		if (HSRequestMemoUser)
-			me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
-	} else {
-		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "REJECT");
-	}
-
-	return MOD_CONT;
-}
-
-int hs_help_waiting(User * u)
-{
-	if (is_host_setter(u)) {
-		me->NoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_WAITING);
-	} else {
-		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "WAITING");
-	}
-
-	return MOD_CONT;
 }
 
 void hs_help(User * u)
@@ -829,6 +830,7 @@ void hs_help(User * u)
 	if (is_host_setter(u))
 		me->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
+
 void hsreq_load_db()
 {
 	FILE *fp;
@@ -844,31 +846,36 @@ void hsreq_load_db()
 		filename = HSREQ_DEFAULT_DBNAME;
 
 	fp = fopen(filename, "r");
-	if (!fp) {
-		alog("[hs_request] Unable to open database ('%s') for reading",
-			 filename);
+	if (!fp)
+	{
+		alog("[hs_request] Unable to open database ('%s') for reading", filename);
 		return;
 	}
 
-	while (fgets(readbuf, 1024, fp)) {
+	while (fgets(readbuf, 1024, fp))
+	{
 		buf = normalizeBuffer(readbuf);
-		if (buf || *buf) {
+		if (buf || *buf)
+		{
 			nick = myStrGetToken(buf, ':', 0);
 			vident = myStrGetToken(buf, ':', 1);
 			vhost = myStrGetToken(buf, ':', 2);
 			tmp = myStrGetToken(buf, ':', 3);
-			if (tmp) {
+			if (tmp)
+			{
 				tmp_time = strtol(tmp, NULL, 16);
 				delete [] tmp;
-			} else {
-				tmp_time = 0;
 			}
+			else
+				tmp_time = 0;
 			creator = myStrGetToken(buf, ':', 4);
-			if (!nick || !vident || !vhost || !creator) {
+			if (!nick || !vident || !vhost || !creator)
+			{
 				alog("[hs_request] Error while reading database, skipping record");
 				continue;
 			}
-			if (stricmp(vident, "(null)") == 0) {
+			if (!stricmp(vident, "(null)"))
+			{
 				delete [] vident;
 				vident = NULL;
 			}
@@ -901,17 +908,17 @@ void hsreq_save_db()
 		filename = HSREQ_DEFAULT_DBNAME;
 
 	fp = fopen(filename, "w");
-	if (!fp) {
-		alog("[hs_request] Unable to open database ('%s') for writing",
-			 filename);
+	if (!fp)
+	{
+		alog("[hs_request] Unable to open database ('%s') for writing", filename);
 		return;
 	}
 
 	current = hs_request_head;
-	while (current) {
-		vident = (current->vIdent ? current->vIdent : "(null)");
-		fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident,
-				current->vHost, static_cast<uint32>(current->time), current->creator);
+	while (current)
+	{
+		vident = current->vIdent ? current->vIdent : "(null)";
+		fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident, current->vHost, static_cast<uint32>(current->time), current->creator);
 		current = current->next;
 	}
 
@@ -923,7 +930,7 @@ void hsreq_save_db()
 
 int hsreqevt_db_saving(int argc, char **argv)
 {
-	if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
+	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
 		hsreq_save_db();
 
 	return MOD_CONT;
@@ -931,7 +938,8 @@ int hsreqevt_db_saving(int argc, char **argv)
 
 int hsreqevt_db_backup(int argc, char **argv)
 {
-	if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0)) {
+	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
+	{
 		if (HSRequestDBName)
 			ModuleDatabaseBackup(HSRequestDBName);
 		else

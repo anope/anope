@@ -15,91 +15,70 @@
 
 #include "module.h"
 
-int do_oper(User * u);
-int oper_list_callback(SList * slist, int number, void *item,
-					   va_list args);
-int oper_list(int number, NickCore * nc, User * u, int *sent_header);
-void myOperServHelp(User * u);
+int oper_list_callback(SList *slist, int number, void *item, va_list args);
+int oper_list(int number, NickCore *nc, User *u, int *sent_header);
+void myOperServHelp(User *u);
 
-class OSOper : public Module
+class CommandOSOper : public Command
 {
- public:
-	OSOper(const std::string &modname, const std::string &creator) : Module(modname, creator)
+ private:
+	CommandResult DoAdd(User *u, std::vector<std::string> &params)
 	{
-		Command *c;
+		const char *nick = param.size() > 1 ? params[1].c_str() : NULL;
+		NickAlias *na;
+		int res = 0;
 
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
-		c = createCommand("OPER", do_oper, NULL, OPER_HELP_OPER, -1, -1, -1, -1);
-		c->help_param1 = s_NickServ;
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		if (!nick)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
 
-		this->SetOperHelp(myOperServHelp);
-	}
-};
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User * u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_OPER);
-}
-
-/**
- * The /os oper command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_oper(User * u)
-{
-	char *cmd = strtok(NULL, " ");
-	char *nick = strtok(NULL, " ");
-	NickAlias *na;
-	int res = 0;
-
-	if (!cmd || (!nick && stricmp(cmd, "LIST") && stricmp(cmd, "CLEAR"))) {
-		syntax_error(s_OperServ, u, "OPER", OPER_OPER_SYNTAX);
-	} else if (!stricmp(cmd, "ADD")) {
-		if (!is_services_root(u)) {
+		if (!is_services_root(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (!(na = findnick(nick))) {
+		if (!(na = findnick(nick)))
+		{
 			notice_lang(s_OperServ, u, NICK_X_NOT_REGISTERED, nick);
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_VERBOTEN) {
+		if (na->status & NS_VERBOTEN)
+		{
 			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, nick);
 			return MOD_CONT;
 		}
 
-		if (na->nc->flags & NI_SERVICES_OPER
-			|| slist_indexof(&servopers, na->nc) != -1) {
+		if (na->nc->flags & NI_SERVICES_OPER || slist_indexof(&servopers, na->nc) != -1)
+		{
 			notice_lang(s_OperServ, u, OPER_OPER_EXISTS, nick);
 			return MOD_CONT;
 		}
 
 		res = slist_add(&servopers, na->nc);
-		if (res == -2) {
+		if (res == -2)
+		{
 			notice_lang(s_OperServ, u, OPER_OPER_REACHED_LIMIT, nick);
 			return MOD_CONT;
-		} else {
-			if (na->nc->flags & NI_SERVICES_ADMIN
-				&& (res = slist_indexof(&servadmins, na->nc)) != -1) {
-				if (!is_services_root(u)) {
+		}
+		else
+		{
+			if (na->nc->flags & NI_SERVICES_ADMIN && (res = slist_indexof(&servadmins, na->nc)) != -1)
+			{
+				if (!is_services_root(u))
+				{
 					notice_lang(s_OperServ, u, PERMISSION_DENIED);
 					return MOD_CONT;
 				}
 				slist_delete(&servadmins, res);
 				na->nc->flags |= NI_SERVICES_OPER;
 				notice_lang(s_OperServ, u, OPER_OPER_MOVED, nick);
-			} else {
+			}
+			else
+			{
 				na->nc->flags |= NI_SERVICES_OPER;
 				notice_lang(s_OperServ, u, OPER_OPER_ADDED, nick);
 			}
@@ -107,36 +86,58 @@ int do_oper(User * u)
 
 		if (readonly)
 			notice_lang(s_OperServ, u, READ_ONLY_MODE);
-	} else if (!stricmp(cmd, "DEL")) {
-		if (!is_services_root(u)) {
+
+		return MOD_CONT;
+	}
+
+	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	{
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		NickAlias *na;
+		int res = 0;
+
+		if (!nick)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
+
+		if (!is_services_root(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
+		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
+		{
 			/* Deleting a range */
 			res = slist_delete_range(&servopers, nick, NULL);
-			if (res == 0) {
+			if (res == 0)
+			{
 				notice_lang(s_OperServ, u, OPER_OPER_NO_MATCH);
 				return MOD_CONT;
-			} else if (res == 1) {
-				notice_lang(s_OperServ, u, OPER_OPER_DELETED_ONE);
-			} else {
-				notice_lang(s_OperServ, u, OPER_OPER_DELETED_SEVERAL, res);
 			}
-		} else {
-			if (!(na = findnick(nick))) {
+			else if (res == 1)
+				notice_lang(s_OperServ, u, OPER_OPER_DELETED_ONE);
+			else
+				notice_lang(s_OperServ, u, OPER_OPER_DELETED_SEVERAL, res);
+		}
+		else
+		{
+			if (!(na = findnick(nick)))
+			{
 				notice_lang(s_OperServ, u, NICK_X_NOT_REGISTERED, nick);
 				return MOD_CONT;
 			}
 
-			if (na->status & NS_VERBOTEN) {
+			if (na->status & NS_VERBOTEN)
+			{
 				notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
 
-			if (!(na->nc->flags & NI_SERVICES_OPER)
-				|| (res = slist_indexof(&servopers, na->nc)) == -1) {
+			if (!(na->nc->flags & NI_SERVICES_OPER) || (res = slist_indexof(&servopers, na->nc)) == -1)
+			{
 				notice_lang(s_OperServ, u, OPER_OPER_NOT_FOUND, nick);
 				return MOD_CONT;
 			}
@@ -147,74 +148,143 @@ int do_oper(User * u)
 
 		if (readonly)
 			notice_lang(s_OperServ, u, READ_ONLY_MODE);
-	} else if (!stricmp(cmd, "LIST")) {
-		int sent_header = 0;
 
-		if (!is_oper(u)) {
+		return MOD_CONT;
+	}
+
+	CommandResult DoList(User *u, std::vector<std::string> &params)
+	{
+		int sent_header = 0;
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+
+		if (!is_oper(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (servopers.count == 0) {
+		if (!servopers.count)
+		{
 			notice_lang(s_OperServ, u, OPER_OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		if (!nick || (isdigit(*nick)
-					  && strspn(nick, "1234567890,-") == strlen(nick))) {
-			res =
-				slist_enum(&servopers, nick, &oper_list_callback, u,
-						   &sent_header);
-			if (res == 0) {
+		if (!nick || (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)))
+		{
+			res = slist_enum(&servopers, nick, &oper_list_callback, u, &sent_header);
+			if (!res)
+			{
 				notice_lang(s_OperServ, u, OPER_OPER_NO_MATCH);
 				return MOD_CONT;
-			} else {
-				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Oper");
 			}
-		} else {
+			else
+				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Oper");
+		}
+		else
+		{
 			int i;
 
-			for (i = 0; i < servopers.count; i++)
-				if (!stricmp
-					(nick, (static_cast<NickCore *>(servopers.list[i]))->display)
-					|| match_wild_nocase(nick,
-										 (static_cast<NickCore *>(servopers.list[i]))->
-										 display))
+			for (i = 0; i < servopers.count; ++i)
+			{
+				if (!stricmp(nick, (static_cast<NickCore *>(servopers.list[i]))->display) || match_wild_nocase(nick, (static_cast<NickCore *>(servopers.list[i]))->display))
 					oper_list(i + 1, static_cast<NickCore *>(servopers.list[i]), u, &sent_header);
+			}
 
 			if (!sent_header)
 				notice_lang(s_OperServ, u, OPER_OPER_NO_MATCH);
-			else {
+			else
 				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Oper");
-			}
 		}
-	} else if (!stricmp(cmd, "CLEAR")) {
-		if (!is_services_root(u)) {
+
+		return MOD_CONT;
+	}
+
+	CommandResult DoClear(User *u, std::vector<std::string> &params)
+	{
+		if (!is_services_root(u))
+		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
-		if (servopers.count == 0) {
+		if (!servopers.count)
+		{
 			notice_lang(s_OperServ, u, OPER_OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
 		slist_clear(&servopers, 1);
 		notice_lang(s_OperServ, u, OPER_OPER_CLEAR);
-	} else {
+
+		return MOD_CONT;
+	}
+ public:
+	CommandOSOper() : Command("OPER", 1, 2)
+	{
+		this->help_param1 = s_NickServ;
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *cmd = params[0].c_str();
+
+		if (!stricmp(cmd, "ADD"))
+			return this->DoAdd(u, params);
+		else if (!stricmp(cmd, "DEL"))
+			return this->DoDel(u, params);
+		else if (!stricmp(cmd, "LIST"))
+			return this->DoList(u, params);
+		else if (!stricmp(cmd, "CLEAR"))
+			return this->DoClear(u, params);
+		else
+			this->OnSyntaxError(u);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_OPER);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
 		syntax_error(s_OperServ, u, "OPER", OPER_OPER_SYNTAX);
 	}
-	return MOD_CONT;
+};
+
+class OSOper : public Module
+{
+ public:
+	OSOper(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		this->AddCommand(OPERSERV, new CommandOSOper(), MOD_UNIQUE);
+
+		this->SetOperHelp(myOperServHelp);
+	}
+};
+
+
+/**
+ * Add the help response to anopes /os help output.
+ * @param u The user who is requesting help
+ **/
+void myOperServHelp(User *u)
+{
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_OPER);
 }
 
 /* Lists an oper entry, prefixing it with the header if needed */
-
-int oper_list(int number, NickCore * nc, User * u, int *sent_header)
+int oper_list(int number, NickCore *nc, User *u, int *sent_header)
 {
 	if (!nc)
 		return 0;
 
-	if (!*sent_header) {
+	if (!*sent_header)
+	{
 		notice_lang(s_OperServ, u, OPER_OPER_LIST_HEADER);
 		*sent_header = 1;
 	}
@@ -224,8 +294,7 @@ int oper_list(int number, NickCore * nc, User * u, int *sent_header)
 }
 
 /* Callback for enumeration purposes */
-
-int oper_list_callback(SList * slist, int number, void *item, va_list args)
+int oper_list_callback(SList *slist, int number, void *item, va_list args)
 {
 	User *u = va_arg(args, User *);
 	int *sent_header = va_arg(args, int *);

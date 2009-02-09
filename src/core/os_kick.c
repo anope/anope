@@ -15,75 +15,82 @@
 
 #include "module.h"
 
-int do_os_kick(User * u);
-void myOperServHelp(User * u);
+void myOperServHelp(User *u);
+
+class CommandOSKick : public Command
+{
+ public:
+	CommandOSKick() : Command("KICK", 3, 3)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *argv[3];
+		const char *chan = params[0].c_str(), *nick = params[1].c_str(), *s = params[2].c_str();
+		Channel *c;
+
+		if (!(c = findchan(chan)))
+		{
+			notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+			return MOD_CONT;
+		}
+		else if (c->bouncy_modes)
+		{
+			notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			return MOD_CONT;
+		}
+		ircdproto->SendKick(findbot(s_OperServ), chan, nick, "%s (%s)", u->nick, s);
+		if (WallOSKick)
+			ircdproto->SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick, nick, chan);
+		argv[0] = sstrdup(chan);
+		argv[1] = sstrdup(nick);
+		argv[2] = sstrdup(s);
+		do_kick(s_OperServ, 3, argv);
+		delete [] argv[2];
+		delete [] argv[1];
+		delete [] argv[0];
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_oper(u))
+			return false;
+
+		notice_lang(s_OperServ, u, OPER_HELP_KICK);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
+	}
+};
 
 class OSKick : public Module
 {
  public:
 	OSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("KICK", do_os_kick, is_services_oper, OPER_HELP_KICK, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSKick(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
 };
 
-
 /**
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
-	if (is_services_oper(u)) {
+	if (is_services_oper(u))
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_KICK);
-	}
-}
-
-/**
- * The /os kick command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_os_kick(User * u)
-{
-	const char *argv[3];
-	char *chan, *nick, *s;
-	Channel *c;
-
-	chan = strtok(NULL, " ");
-	nick = strtok(NULL, " ");
-	s = strtok(NULL, "");
-	if (!chan || !nick || !s) {
-		syntax_error(s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
-		return MOD_CONT;
-	}
-	if (!(c = findchan(chan))) {
-		notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
-	} else if (c->bouncy_modes) {
-		notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
-		return MOD_CONT;
-	}
-	ircdproto->SendKick(findbot(s_OperServ), chan, nick, "%s (%s)", u->nick, s);
-	if (WallOSKick)
-		ircdproto->SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick,
-						 nick, chan);
-	argv[0] = sstrdup(chan);
-	argv[1] = sstrdup(nick);
-	argv[2] = sstrdup(s);
-	do_kick(s_OperServ, 3, argv);
-	delete [] argv[2];
-	delete [] argv[1];
-	delete [] argv[0];
-	return MOD_CONT;
 }
 
 MODULE_INIT("os_kick", OSKick)

@@ -86,7 +86,7 @@ Module::~Module()
 		for (current = HS_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(HOSTSERV, c->name);
+					this->DelCommand(HOSTSERV, c->name.c_str());
 				}
 			}
 		}
@@ -94,7 +94,7 @@ Module::~Module()
 		for (current = BS_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(BOTSERV, c->name);
+					this->DelCommand(BOTSERV, c->name.c_str());
 				}
 			}
 		}
@@ -102,7 +102,7 @@ Module::~Module()
 		for (current = MS_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(MEMOSERV, c->name);
+					this->DelCommand(MEMOSERV, c->name.c_str());
 				}
 			}
 		}
@@ -110,7 +110,7 @@ Module::~Module()
 		for (current = NS_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(NICKSERV, c->name);
+					this->DelCommand(NICKSERV, c->name.c_str());
 				}
 			}
 		}
@@ -118,7 +118,7 @@ Module::~Module()
 		for (current = CS_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(CHANSERV, c->name);
+					this->DelCommand(CHANSERV, c->name.c_str());
 				}
 			}
 		}
@@ -126,7 +126,7 @@ Module::~Module()
 		for (current = HE_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(HELPSERV, c->name);
+					this->DelCommand(HELPSERV, c->name.c_str());
 				}
 			}
 		}
@@ -134,7 +134,7 @@ Module::~Module()
 		for (current = OS_cmdTable[idx]; current; current = current->next) {
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (stricmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(OPERSERV, c->name);
+					this->DelCommand(OPERSERV, c->name.c_str());
 				}
 			}
 		}

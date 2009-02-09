@@ -1197,7 +1197,7 @@ int check_kick(User * user, const char *chan, time_t chants)
   kick:
 	if (debug)
 		alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick,
-			 user->username, user->host, chan);
+			 user->GetIdent().c_str(), user->host, chan);
 
 	/* Remember that the user has not been added to our channel user list
 	 * yet, so we check whether the channel does not exist OR has no user
@@ -1968,22 +1968,24 @@ int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen)
 	if (!ci || !u || !ret || retlen == 0)
 		return 0;
 
+	std::string vident = u->GetIdent();
+	
 	switch (ci->bantype) {
 	case 0:
-		snprintf(ret, retlen, "*!%s@%s", common_get_vident(u),
-				 common_get_vhost(u));
+		snprintf(ret, retlen, "*!%s@%s", vident.c_str(),
+				 u->GetDisplayedHost().c_str());
 		return 1;
 	case 1:
-		snprintf(ret, retlen, "*!%s%s@%s",
-				 (strlen(common_get_vident(u)) <
-				  (*(common_get_vident(u)) ==
-				   '~' ? USERMAX + 1 : USERMAX) ? "*" : ""),
-				 (*(common_get_vident(u)) ==
-				  '~' ? common_get_vident(u) + 1 : common_get_vident(u)),
-				 common_get_vhost(u));
+		if (vident[0] == '~')
+			snprintf(ret, retlen, "*!*%s@%s",
+				vident.c_str(), u->GetDisplayedHost().c_str());
+		else
+			snprintf(ret, retlen, "*!%s@%s",
+				vident.c_str(), u->GetDisplayedHost().c_str());
+
 		return 1;
 	case 2:
-		snprintf(ret, retlen, "*!*@%s", common_get_vhost(u));
+		snprintf(ret, retlen, "*!*@%s", u->GetDisplayedHost().c_str());
 		return 1;
 	case 3:
 		mask = create_mask(u);

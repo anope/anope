@@ -15,67 +15,73 @@
 
 #include "module.h"
 
-int do_del(User * u);
-void myHostServHelp(User * u);
+void myHostServHelp(User *u);
+
+class CommandHSDel : public Command
+{
+ public:
+	CommandHSDel() : Command("DEL", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		NickAlias *na;
+		const char *nick = params[0].c_str();
+		if ((na = findnick(nick)))
+		{
+			if (na->status & NS_VERBOTEN)
+			{
+				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+				return MOD_CONT;
+			}
+			alog("vHost for user \002%s\002 deleted by oper \002%s\002", nick, u->nick);
+			delHostCore(nick);
+			notice_lang(s_HostServ, u, HOST_DEL, nick);
+		}
+		else
+			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_host_remover(u))
+			return false;
+
+		notice_lang(s_HostServ, u, HOST_HELP_DEL);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_HostServ, u, "DEL", HOST_DEL_SYNTAX, s_HostServ);
+	}
+};
 
 class HSDel : public Module
 {
  public:
 	HSDel(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1, -1, -1, -1);
-		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSDel(), MOD_UNIQUE);
 
 		this->SetHostHelp(myHostServHelp);
 	}
 };
 
-
-
-
 /**
  * Add the help response to anopes /hs help output.
  * @param u The user who is requesting help
  **/
-void myHostServHelp(User * u)
+void myHostServHelp(User *u)
 {
-	if (is_host_remover(u)) {
+	if (is_host_remover(u))
 		notice_lang(s_HostServ, u, HOST_HELP_CMD_DEL);
-	}
-}
-
-/**
- * The /hs del command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_del(User * u)
-{
-	NickAlias *na;
-	char *nick = strtok(NULL, " ");
-	if (nick) {
-		if ((na = findnick(nick))) {
-			if (na->status & NS_VERBOTEN) {
-				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-				return MOD_CONT;
-			}
-			alog("vHost for user \002%s\002 deleted by oper \002%s\002",
-				 nick, u->nick);
-			delHostCore(nick);
-			notice_lang(s_HostServ, u, HOST_DEL, nick);
-		} else {
-			notice_lang(s_HostServ, u, HOST_NOREG, nick);
-		}
-	} else {
-		notice_lang(s_HostServ, u, HOST_DEL_SYNTAX, s_HostServ);
-	}
-	return MOD_CONT;
 }
 
 MODULE_INIT("hs_del", HSDel)

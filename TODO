@@ -35,26 +35,37 @@ Legend:
 1.9.1
 -----
 [ ] Remove modules_unload_all fini + hack that goes with it
-  [ ] signal handling cleanup
+  [x] signal handling cleanup
 [ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
+[ ] burn do_sjoin with fire
+[x] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
+  Remaining issues:
+    ? [ ] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
+    [ ] (think on this carefully): some commands (e.g. !help) need to strip the pre-provided channelname from them.
+    [ ] (will require wider re-work): allow replies/notifications to fantasy commands to go to the channel via notice
+[ ] HelpServ must die (1.9.1?)
+[-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
+[ ] Fix permanent channels support properly. This will require removing do_sjoin().
+[ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
+[x] Add support for +k, +q, etc type umodes
+  Remaining issues:
+   ? [ ] Also deny kills with usermode +q at Unreal, bearing in mind that AKILL on yourself is prevented that way.
+   ? [ ] Add a force parameter to SendSVSKill/SendKick.
+    [ ] No check at modechange yet, maybe it's better to define in what circumstances it shall block, first.
+    [ ] Check whether there is a similar usermode in other IRCds and add them to the refering protocol.
+    [ ] Check for blocked KICK in e.g /cs kick.
+[x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
+
+1.9.2
+-----
 [ ] Redo database insanity.
   [ ] Move database load/save to a module
-    [ ] realtime SQL/whatever module using events
+    [ ] realtime SQL/whatever module using events (possibly ongoing)
     [ ] flatfile save on a periodic timer
     [ ] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
     [ ] Salted SHA256 (contact Special for this)
   [ ] New database format (text, not binary - works very well for merging and so on)
-[ ] burn do_sjoin with fire
-[ ] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
-[ ] HelpServ must die (1.9.1?)
-[ ] Command parser cleanup
-  [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
-[ ] Fix permanent channels support properly. This will require removing do_sjoin().
-[ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
-[ ] Add support for +k, +q, etc type umodes
-
-1.9.2
------
+[ ] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
 [ ] Socket subsystem needs some serious loving
   [ ] Multiple sockets
   [ ] Asynchronous, using select() (multiple engines? not really needed..)

@@ -37,11 +37,7 @@ void *smalloc(long size)
 	}
 	buf = malloc(size);
 	if (!buf)
-#ifndef _WIN32
-		raise(SIGUSR1);
-#else
 		abort();
-#endif
 	return buf;
 }
 
@@ -62,11 +58,7 @@ void *scalloc(long elsize, long els)
 	}
 	buf = calloc(elsize, els);
 	if (!buf)
-#ifndef _WIN32
-		raise(SIGUSR1);
-#else
 		abort();
-#endif
 	return buf;
 }
 
@@ -87,11 +79,7 @@ void *srealloc(void *oldptr, long newsize)
 	}
 	buf = realloc(oldptr, newsize);
 	if (!buf)
-#ifndef _WIN32
-		raise(SIGUSR1);
-#else
 		abort();
-#endif
 	return buf;
 }
 
@@ -109,11 +97,7 @@ char *sstrdup(const char *src)
 	if (src) {
 		ret = new char[strlen(src) + 1];
 		if (!ret)
-#ifndef _WIN32
-			raise(SIGUSR1);
-#else
 			abort();
-#endif
 		strcpy(ret, src);
 	} else {
 		alog("sstrdup() called with NULL-arg");

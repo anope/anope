@@ -174,7 +174,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 0,						 /* VHOST		*/
 	 CAPAB_SSJ3,				/* SSJ3		 */
 	 CAPAB_NICK2,			   /* NICK2		*/
-	 0,						 /* UMODE2	   */
 	 CAPAB_VL,				  /* VL		   */
 	 CAPAB_TLKEXT,			  /* TLKEXT	   */
 	 0,						 /* DODKEY	   */

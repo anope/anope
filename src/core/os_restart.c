@@ -15,66 +15,66 @@
 
 #include "module.h"
 
-#ifdef _WIN32
-/* OperServ restart needs access to this if were gonna avoid sending ourself a signal */
-extern MDE void do_restart_services();
-#endif
+void myOperServHelp(User *u);
 
-int do_restart(User * u);
-void myOperServHelp(User * u);
+class CommandOSRestart : public Command
+{
+ public:
+	CommandOSRestart() : Command("RESTART", 0, 0)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+#ifdef SERVICES_BIN
+		quitmsg = new char[31 + strlen(u->nick)];
+		if (!quitmsg)
+			quitmsg = "RESTART command received, but out of memory!";
+		else
+			sprintf(const_cast<char *>(quitmsg), /* XXX */ "RESTART command received from %s", u->nick);
+
+		if (GlobalOnCycle)
+			oper_global(NULL, "%s", GlobalOnCycleMessage);
+		/*	raise(SIGHUP); */
+		do_restart_services();
+#else
+		notice_lang(s_OperServ, u, OPER_CANNOT_RESTART);
+#endif
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_root(u))
+			return false;
+
+		notice_lang(s_OperServ, u, OPER_HELP_RESTART);
+		return true;
+	}
+};
 
 class OSRestart : public Module
 {
  public:
 	OSRestart(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		c = createCommand("RESTART", do_restart, is_services_root, OPER_HELP_RESTART, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSRestart(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
 };
 
-
 /**
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
-	if (is_services_root(u)) {
+	if (is_services_root(u))
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_RESTART);
-	}
-}
-
-/**
- * The /os restart command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_restart(User * u)
-{
-#ifdef SERVICES_BIN
-	quitmsg = new char[31 + strlen(u->nick)];
-	if (!quitmsg)
-		quitmsg = "RESTART command received, but out of memory!";
-	else
-		sprintf(const_cast<char *>(quitmsg), /* XXX */ "RESTART command received from %s", u->nick);
-
-	if (GlobalOnCycle) {
-		oper_global(NULL, "%s", GlobalOnCycleMessage);
-	}
-	/*	raise(SIGHUP); */
-	do_restart_services();
-#else
-	notice_lang(s_OperServ, u, OPER_CANNOT_RESTART);
-#endif
-	return MOD_CONT;
 }
 
 MODULE_INIT("os_restart", OSRestart)

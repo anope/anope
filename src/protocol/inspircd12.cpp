@@ -23,6 +23,7 @@
 #define UMODE_r 0x00000010
 #define UMODE_w 0x00000020
 #define UMODE_A 0x00000040
+#define UMODE_k 0x00000080
 #define UMODE_g 0x80000000
 #define UMODE_x 0x40000000
 
@@ -174,7 +175,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 0,						 /* VHOST		*/
 	 CAPAB_SSJ3,				/* SSJ3		 */
 	 CAPAB_NICK2,			   /* NICK2		*/
-	 0,						 /* UMODE2	   */
 	 CAPAB_VL,				  /* VL		   */
 	 CAPAB_TLKEXT,			  /* TLKEXT	   */
 	 0,						 /* DODKEY	   */
@@ -197,7 +197,7 @@ unsigned long umodes[128] = {
 	0, 0, 0, 0, 0,
 	0, UMODE_a, 0, 0, 0, 0, 0,
 	UMODE_g,
-	UMODE_h, UMODE_i, 0, 0, 0, 0, 0, UMODE_o,
+	UMODE_h, UMODE_i, 0, UMODE_k, 0, 0, 0, UMODE_o,
 	0,
 	0, UMODE_r, 0, 0, 0, 0, UMODE_w,
 	UMODE_x,
@@ -498,8 +498,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		inspircd_cmd_chghost(u->uid, (u->mode & umodes[static_cast<int>('x')]) ? u->chost.c_str() : u->host);
-		notice_lang(s_HostServ, u, HOST_OFF);
+		inspircd_cmd_chghost(u->GetUID().c_str(), (u->mode & umodes[static_cast<int>('x')]) ? u->chost.c_str() : u->host);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
@@ -511,17 +510,22 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long int>(when), static_cast<long int>(timeleft), reason);
 	}
 
+	void CanSVSKill(const char *source,  const char *user,  const char *buf)
+	{
+		return !user->mode & UMODE_k;
+	}
+
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
 	{
 		BotInfo *bi = findbot(source);
 		User *u = finduser(user);
-		send_cmd(bi ? bi->uid : TS6SID, "KILL %s :%s", u ? u->uid : user, buf);
+		send_cmd(bi ? bi->uid : TS6SID, "KILL %s :%s", u ? u->GetUID().c_str(): user, buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
 		BotInfo *bi = findbot(s_NickServ);
-		send_cmd(bi->uid, "MODE %s %s", u->uid, merge_args(ac, av));
+		send_cmd(bi->uid, "MODE %s %s", u->GetUID().c_str(), merge_args(ac, av));
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -545,13 +549,20 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(ServerName, "UID %s %ld %s %s %s %s 0.0.0.0 %ld +%s :%s", uid, static_cast<long>(time(NULL)), nick, host, host, user, static_cast<long>(time(NULL)), modes, real);
 	}
 
+	bool CanKick(BotInfo *source,  const char *chan,  const char *user,  const char *buf)
+	{
+		return !user->mode & UMODE_k;
+	}
+
 	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 	{
 		User *u = finduser(user);
 		if (buf)
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u ? u->uid : user, buf);
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str()
+, buf);
 		else
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u ? u->uid : user, user);
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str()
+, user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
@@ -669,14 +680,14 @@ class InspIRCdProto : public IRCDProto
 	{
 		User *u = finduser(nick);
 		BotInfo *bi = findbot(source);
-		send_cmd(bi->uid, "SVSJOIN %s %s", u->uid, chan);
+		send_cmd(bi->uid, "SVSJOIN %s %s", u->GetUID().c_str(), chan);
 	}
 
 	void SendSVSPart(const char *source, const char *nick, const char *chan)
 	{
 		User *u = finduser(nick);
 		BotInfo *bi = findbot(source);
-		send_cmd(bi->uid, "SVSPART %s %s", u->uid, chan);
+		send_cmd(bi->uid, "SVSPART %s %s", u->GetUID().c_str(), chan);
 	}
 
 	void SendEOB()

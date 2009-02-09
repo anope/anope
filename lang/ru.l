@@ -5630,8 +5630,6 @@ OPER_HELP_STATS
 	
 	Параметр ALL выведет общую статистику в комбинации с данными из
 	MEMORY и UPLINK.
-	
-	Команда UPTIME является алиасом команды STATS.
 
 OPER_HELP_OPER
 	Синтаксис: OPER ADD ник

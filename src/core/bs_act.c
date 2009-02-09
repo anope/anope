@@ -15,21 +15,78 @@
 
 #include "module.h"
 
-int do_act(User * u);
 void myBotServHelp(User * u);
+
+class CommandBSAct : public Command
+{
+ public:
+	CommandBSAct() : Command("ACT", 2, 2)
+	{
+
+	}
+
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		ChannelInfo *ci;
+
+		if (!(ci = cs_findchan(params[0].c_str())))
+		{
+			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return MOD_CONT;
+		}
+
+		if (ci->flags & CI_VERBOTEN)
+		{
+			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, ci->name);
+			return MOD_CONT;
+		}
+
+		if (!ci->bi)
+		{
+			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
+			return MOD_CONT;
+		}
+
+		if (!ci->c || ci->c->usercount < BSMinUsers)
+		{
+			notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
+			return MOD_CONT;
+		}
+
+		if (!check_access(u, ci, CA_SAY))
+		{
+			notice_lang(s_BotServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
+		size_t i = 0;
+		while ((i = params[1].find_first_of("\001"), i) && i != std::string::npos)
+		{
+			params[1].erase(i, 1);
+		}
+		
+		ircdproto->SendAction(ci->bi, ci->name, "%s", params[1].c_str());
+		ci->bi->lastmsg = time(NULL);
+		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
+			ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s", u->nick, ci->name, params[1].c_str());
+		return MOD_CONT;
+	}
+
+	void OnBadSyntax(User *u)
+	{
+		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
+	}
+};
 
 class BSAct : public Module
 {
  public:
 	BSAct(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
-		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSAct(), MOD_UNIQUE);
 
 		this->SetBotHelp(myBotServHelp);
 	}
@@ -43,41 +100,6 @@ class BSAct : public Module
 void myBotServHelp(User * u)
 {
 	notice_lang(s_BotServ, u, BOT_HELP_CMD_ACT);
-}
-
-/**
- * The /bs act command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_act(User * u)
-{
-	ChannelInfo *ci;
-
-	char *chan = strtok(NULL, " ");
-	char *text = strtok(NULL, "");
-
-	if (!chan || !text)
-		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
-	else if (!(ci = cs_findchan(chan)))
-		notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-	else if (ci->flags & CI_VERBOTEN)
-		notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-	else if (!ci->bi)
-		notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
-	else if (!ci->c || ci->c->usercount < BSMinUsers)
-		notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
-	else if (!check_access(u, ci, CA_SAY))
-		notice_lang(s_BotServ, u, ACCESS_DENIED);
-	else {
-		strnrepl(text, BUFSIZE, "\001", "");
-		ircdproto->SendAction(ci->bi, ci->name, "%s", text);
-		ci->bi->lastmsg = time(NULL);
-		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s",
-							  u->nick, ci->name, text);
-	}
-	return MOD_CONT;
 }
 
 MODULE_INIT("bs_act", BSAct)

@@ -88,9 +88,6 @@ extern char *mod_current_buffer;
 
 /******** Local variables! ********/
 
-/* Set to 1 if we are waiting for input */
-static int waiting = 0;
-
 /* Set to 1 after we've set everything up */
 static int started = 0;
 
@@ -106,34 +103,23 @@ extern void expire_all()
 		return;
 	}
 
-	waiting = -30;
 	send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
-	waiting = -3;
 	if (debug)
 		alog("debug: Running expire routines");
-	waiting = -21;
 	expire_nicks();
-	waiting = -22;
 	expire_chans();
-	waiting = -23;
 	expire_requests();
-	waiting = -25;
 	expire_akills();
 	if (ircd->sgline) {
-		waiting = -26;
 		expire_sglines();
 	}
 	if (ircd->sqline) {
-		waiting = -28;
 		expire_sqlines();
 	}
 	if (ircd->szline) {
-		waiting = -27;
 		expire_szlines();
 	}
-	waiting = -29;
 	expire_exceptions();
-	waiting = -31;
 	send_event(EVENT_DB_EXPIRE, 1, EVENT_STOP);
 }
 
@@ -141,36 +127,24 @@ extern void expire_all()
 
 void save_databases()
 {
-	waiting = -19;
 	send_event(EVENT_DB_SAVING, 1, EVENT_START);
-	waiting = -2;
 	if (debug)
 		alog("debug: Saving FFF databases");
-	waiting = -10;
 	backup_databases();
-	waiting = -11;
 	save_ns_dbase();
-	waiting = -12;
 	if (PreNickDBName) {
 		save_ns_req_dbase();
-		waiting = -13;
 	}
 	save_cs_dbase();
 	if (s_BotServ) {
-		waiting = -14;
 		save_bs_dbase();
 	}
 	if (s_HostServ) {
-		waiting = -15;
 		save_hs_dbase();
 	}
-	waiting = -16;
 	save_os_dbase();
-	waiting = -17;
 	save_news();
-	waiting = -18;
 	save_exceptions();
-	waiting = -20;
 	send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
 }
 
@@ -262,46 +236,31 @@ void sighandler(int signum)
 	 * always set when we need it. It seems some signals slip through to the
 	 * QUIT code without having a valid quitmsg. -GD
 	 */
-	quitmsg = sstrdup("Signal Received");
-	if (started) {
+	snprintf(const_cast<char *>(quitmsg), BUFSIZE, "Services terminating on signal %d", signum);
+
+	if (started)
+	{
 #ifndef _WIN32
-		if (signum == SIGHUP) { /* SIGHUP = save databases and restart */
-			signal(SIGHUP, SIG_IGN);
-			signal(SIGUSR2, SIG_IGN);
-			alog("Received SIGHUP, restarting.");
+		if (signum == SIGHUP)
+		{
+			alog("Received SIGHUP: Saving Databases & Rehash Configuration");
 
 			expire_all();
 			save_databases();
 
-			if (!quitmsg)
-				quitmsg = "Restarting on SIGHUP";
-
-#ifdef SERVICES_BIN
-			services_restart();
-			exit(1);
-#else
-			quitmsg =
-				"Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
-#endif
-		} else if (signum == SIGQUIT) {
-			/* had to move it to here to make win32 happy */
-		} else if (signum == SIGUSR2) {
-
-			alog("Received SIGUSR2: Saving Databases & Rehash Configuration");
-
-			expire_all();
-			save_databases();
-
-			if (!read_config(1)) {
-				quitmsg = "Error Reading Configuration File (Received SIGUSR2)";
+			if (!read_config(1))
+			{
+				quitmsg = "Error Reading Configuration File (Received SIGHUP)";
 				quitting = 1;
 			}
+
 			send_event(EVENT_RELOAD, 1, EVENT_START);
 			return;
 
 		} else
 #endif
-		if (signum == SIGTERM) {
+		if (signum == SIGTERM)
+		{
 			signal(SIGTERM, SIG_IGN);
 #ifndef _WIN32
 			signal(SIGHUP, SIG_IGN);
@@ -314,8 +273,11 @@ void sighandler(int signum)
 			quitmsg = "Shutting down on SIGTERM";
 			services_shutdown();
 			exit(0);
-		} else if (signum == SIGINT) {
-			if (nofork) {
+		}
+		else if (signum == SIGINT)
+		{
+			if (nofork)
+			{
 				signal(SIGINT, SIG_IGN);
 				alog("Received SIGINT, exiting.");
 				expire_all();
@@ -324,122 +286,29 @@ void sighandler(int signum)
 				services_shutdown();
 				exit(0);
 			}
-		} else if (!waiting) {
-			alog("PANIC! buffer = %s", inbuf);
-			/* Cut off if this would make IRC command >510 characters. */
-			if (strlen(inbuf) > 448) {
-				inbuf[446] = '>';
-				inbuf[447] = '>';
-				inbuf[448] = 0;
-			}
-			ircdproto->SendGlobops(NULL, "PANIC! buffer = %s\r\n", inbuf);
-			modules_unload_all(false, true);
-		} else if (waiting < 0) {
-			/* This is static on the off-chance we run low on stack */
-			static char buf[BUFSIZE];
-			switch (waiting) {
-			case -1:
-				snprintf(buf, sizeof(buf), "in timed_update");
-				break;
-			case -10:
-				snprintf(buf, sizeof(buf), "backing up databases");
-				break;
-			case -11:
-				snprintf(buf, sizeof(buf), "saving %s", NickDBName);
-				break;
-			case -12:
-				snprintf(buf, sizeof(buf), "saving %s", ChanDBName);
-				break;
-			case -13:
-				snprintf(buf, sizeof(buf), "saving %s", PreNickDBName);
-				break;
-			case -14:
-				snprintf(buf, sizeof(buf), "saving %s", BotDBName);
-				break;
-			case -15:
-				snprintf(buf, sizeof(buf), "saving %s", HostDBName);
-				break;
-			case -16:
-				snprintf(buf, sizeof(buf), "saving %s", OperDBName);
-				break;
-			case -17:
-				snprintf(buf, sizeof(buf), "saving %s", NewsDBName);
-				break;
-			case -18:
-				snprintf(buf, sizeof(buf), "saving %s", ExceptionDBName);
-				break;
-			case -19:
-				snprintf(buf, sizeof(buf), "Sending event %s %s",
-						 EVENT_DB_SAVING, EVENT_START);
-				break;
-			case -20:
-				snprintf(buf, sizeof(buf), "Sending event %s %s",
-						 EVENT_DB_SAVING, EVENT_STOP);
-				break;
-			case -21:
-				snprintf(buf, sizeof(buf), "expiring nicknames");
-				break;
-			case -22:
-				snprintf(buf, sizeof(buf), "expiring channels");
-				break;
-			case -25:
-				snprintf(buf, sizeof(buf), "expiring autokills");
-				break;
-			case -26:
-				snprintf(buf, sizeof(buf), "expiring SGLINEs");
-				break;
-			case -27:
-				snprintf(buf, sizeof(buf), "expiring SZLINEs");
-				break;
-			case -28:
-				snprintf(buf, sizeof(buf), "expiring SQLINEs");
-				break;
-			case -29:
-				snprintf(buf, sizeof(buf), "expiring Exceptions");
-				break;
-			case -30:
-				snprintf(buf, sizeof(buf), "Sending event %s %s",
-						 EVENT_DB_EXPIRE, EVENT_START);
-				break;
-			case -31:
-				snprintf(buf, sizeof(buf), "Sending event %s %s",
-						 EVENT_DB_EXPIRE, EVENT_STOP);
-				break;
-			default:
-				snprintf(buf, sizeof(buf), "waiting=%d", waiting);
-			}
-			ircdproto->SendGlobops(NULL, "PANIC! %s (caught signal %d)", buf, signum);
-			alog("PANIC! %s (caught signal %d)", buf, signum);
-			modules_unload_all(false, true);
 		}
 	}
 
-	if (
-#ifndef _WIN32
-		   signum == SIGUSR1 ||
-#endif
-		   !(quitmsg = new char[BUFSIZE])) {
-		quitmsg = "Out of memory!";
-	} else {
-		snprintf(const_cast<char *>(quitmsg), BUFSIZE, "Services terminating on signal %d", signum);
-	}
 
-	if (signum == SIGSEGV) {
-		do_backtrace(1);
-		modules_unload_all(false, true);		/* probably cant do this, but might as well try, we have nothing left to loose */
-	}
 	/* Should we send the signum here as well? -GD */
 	send_event(EVENT_SIGNAL, 1, quitmsg);
 
-	if (started) {
+	if (started)
+	{
 		services_shutdown();
 		exit(0);
-	} else {
-		if (isatty(2)) {
+	}
+	else
+	{
+		if (isatty(2))
+		{
 			fprintf(stderr, "%s\n", quitmsg);
-		} else {
+		}
+		else
+		{
 			alog("%s", quitmsg);
 		}
+
 		exit(1);
 	}
 }
@@ -642,38 +511,3 @@ int main(int ac, char **av, char **envp)
 	return 0;
 }
 
-/*************************************************************************/
-
-void do_backtrace(int show_segheader)
-{
-#ifndef _WIN32
-#ifdef HAVE_BACKTRACE
-	void *array[50];
-	size_t size;
-	char **strings;
-	int i;
-
-	if (show_segheader) {
-		alog("Backtrace: Segmentation fault detected");
-		alog("Backtrace: report the following lines");
-	}
-	alog("Backtrace: Anope version %s %s %s", version_number,
-		 version_build, version_flags);
-	size = backtrace(array, 10);
-	strings = backtrace_symbols(array, size);
-	for (i = 0; i < size; i++) {
-		alog("Backtrace(%d): %s", i, strings[i]);
-	}
-	free(strings);
-	alog("Backtrace: complete");
-#else
-	alog("Backtrace: not available on this platform");
-#endif
-#else
-	char *winver;
-	winver = GetWindowsVersion();
-	alog("Backtrace: not available on Windows");
-	alog("Running %s", winver);
-	delete [] winver;
-#endif
-}

@@ -5564,8 +5564,6 @@ OPER_HELP_STATS
 	
 	A opção RESET reinicia a contagem do máximo de usuários
 	para o número de usuários atualmente conectados na rede.
-	
-	UPTIME pode ser usado como um sinônimo para STATS.
 
 OPER_HELP_OPER
 	Sintaxe: OPER ADD nick

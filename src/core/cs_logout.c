@@ -80,7 +80,7 @@ int do_logout(User * u)
 			make_unidentified(u2, ci);
 			notice_lang(s_ChanServ, u, CHAN_LOGOUT_SUCCEEDED, nick, chan);
 			alog("%s: User %s!%s@%s has been logged out of channel %s.",
-				 s_ChanServ, u2->nick, u2->username, u2->host, chan);
+				 s_ChanServ, u2->nick, u2->GetIdent().c_str(), u2->host, chan);
 		} else {
 			int i;
 			for (i = 0; i < 1024; i++)

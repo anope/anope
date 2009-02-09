@@ -15,27 +15,7 @@
 
 #include "module.h"
 
-int do_forbid(User * u);
 void myChanServHelp(User * u);
-
-class CSForbid : public Module
-{
- public:
-	CSForbid(const std::string &modname, const std::string &creator) : Module(modname, creator)
-	{
-		Command *c;
-
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
-
-		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_FORBID, CHAN_SERVADMIN_HELP_FORBID);
-		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
-	}
-};
-
 
 /**
  * Add the help response to anopes /cs help output.
@@ -48,50 +28,71 @@ void myChanServHelp(User * u)
 	}
 }
 
-/**
- * The /cs forbid command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_forbid(User * u)
+class CommandCSForbid : public Command
 {
-	ChannelInfo *ci;
-	char *chan = strtok(NULL, " ");
-	char *reason = strtok(NULL, "");
+ public:
+	CommandCSForbid() : Command("FORBID", 1, 2)
+	{
 
-	Channel *c;
+	}
 
-	/* Assumes that permission checking has already been done. */
-	if (!chan || (ForceForbidReason && !reason)) {
-		syntax_error(s_ChanServ, u, "FORBID",
-					 (ForceForbidReason ? CHAN_FORBID_SYNTAX_REASON :
-					  CHAN_FORBID_SYNTAX));
-		return MOD_CONT;
-	}
-	if (*chan != '#') {
-		notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
-		return MOD_CONT;
-	} else if (!ircdproto->IsChannelValid(chan)) {
-		notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
-		return MOD_CONT;
-	}
-	if (readonly)
-		notice_lang(s_ChanServ, u, READ_ONLY_MODE);
-	if ((ci = cs_findchan(chan)) != NULL)
-		delchan(ci);
-	ci = makechan(chan);
-	if (ci) {
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		ChannelInfo *ci;
+		const char *chan = params[0].c_str();
+		const char *reason = params[1].c_str();
+
+		Channel *c;
+
+		if (ForceForbidReason && !reason)
+		{
+			syntax_error(s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
+			return MOD_CONT;
+		}
+
+		if (*chan != '#')
+		{
+			notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+			return MOD_CONT;
+		}
+
+		if (!ircdproto->IsChannelValid(chan))
+		{
+			notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
+			return MOD_CONT;
+		}
+
+		if (readonly)
+		{
+			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
+			return MOD_CONT;
+
+		}
+
+		if ((ci = cs_findchan(chan)) != NULL)
+			delchan(ci);
+
+		ci = makechan(chan);
+		if (!ci)
+		{
+			alog("%s: Valid FORBID for %s by %s failed", s_ChanServ, ci->name, u->nick);
+			notice_lang(s_ChanServ, u, CHAN_FORBID_FAILED, chan);
+			return MOD_CONT;
+		}
+
 		ci->flags |= CI_VERBOTEN;
 		ci->forbidby = sstrdup(u->nick);
 		if (reason)
 			ci->forbidreason = sstrdup(reason);
 
-		if ((c = findchan(ci->name))) {
-			struct c_userlist *cu, *next;
+		if ((c = findchan(ci->name)))
+		{
+			struct c_userlist *cu, *nextu;
 			const char *av[3];
 
-			for (cu = c->users; cu; cu = next) {
-				next = cu->next;
+			for (cu = c->users; cu; cu = nextu)
+			{
+				nextu = cu->next;
 
 				if (is_oper(cu->user))
 					continue;
@@ -105,24 +106,44 @@ int do_forbid(User * u)
 		}
 
 		if (WallForbid)
-			ircdproto->SendGlobops(s_ChanServ,
-							 "\2%s\2 used FORBID on channel \2%s\2",
-							 u->nick, ci->name);
+			ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick, ci->name);
 
-		if (ircd->chansqline) {
+		if (ircd->chansqline)
+		{
 			ircdproto->SendSQLine(ci->name, ((reason) ? reason : "Forbidden"));
 		}
 
-		alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick,
-			 ci->name);
+		alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick, ci->name);
 		notice_lang(s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
 		send_event(EVENT_CHAN_FORBIDDEN, 1, chan);
-	} else {
-		alog("%s: Valid FORBID for %s by %s failed", s_ChanServ, ci->name,
-			 u->nick);
-		notice_lang(s_ChanServ, u, CHAN_FORBID_FAILED, chan);
+		return MOD_CONT;
 	}
-	return MOD_CONT;
-}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
+	}
+};
+
+class CSForbid : public Module
+{
+ public:
+	CSForbid(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		this->AddCommand(CHANSERV, new CommandCSForbid(), MOD_UNIQUE);
+
+		this->SetChanHelp(myChanServHelp);
+	}
+};
+
 
 MODULE_INIT("cs_forbid", CSForbid)

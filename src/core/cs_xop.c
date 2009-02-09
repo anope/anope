@@ -317,7 +317,7 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 		access->level = xlev;
 		access->last_seen = 0;
 
-		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
+		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
 
 		snprintf(event_access, BUFSIZE, "%d", access->level);
 

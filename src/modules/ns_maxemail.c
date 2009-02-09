@@ -20,8 +20,6 @@
 
 void my_load_config();
 void my_add_languages();
-int my_ns_register(User * u);
-int my_ns_set(User * u);
 int my_event_reload(int argc, char **argv);
 
 int NSEmailMax = 0;
@@ -32,12 +30,53 @@ int NSEmailMax = 0;
 
 static Module *me;
 
+class CommandNSRegister : public Command
+{
+ public:
+	CommandNSRegister() : Command("REGISTER", 2, 2)
+	{
+	}
+
+	CommandResult(User *u, std::vector<std::string> &params)
+	{
+		return check_email_limit_reached(params[1].c_str(), u);
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		// no-op
+	}
+};
+
+class CommandNSSet : public Command
+{
+ public:
+	CommandNSSet() : Command("SET", 2, 2)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *set = params[0].c_str();
+		const char *email = params[1].c_str();
+
+		if (!stricmp(set, "email"))
+			return MOD_CONT;
+
+		return check_email_limit_reached(email, u);
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		// no-op
+	}
+};
+
 class NSMaxEmail : public Module
 {
  public:
 	NSMaxEmail(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
 		EvtHook *evt;
 		int status;
 
@@ -47,57 +86,55 @@ class NSMaxEmail : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1, -1);
-		this->AddCommand(NICKSERV, c, MOD_HEAD);
-		c = createCommand("SET", my_ns_set, NULL, -1, -1, -1, -1, -1);
-		this->AddCommand(NICKSERV, c, MOD_HEAD);
+		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_HEAD);
+		this->AddCommand(NICKSERV, new CommandNSSet(), MOD_HEAD);
 
 		evt = createEventHook(EVENT_RELOAD, my_event_reload);
 		if ((status = this->AddEventHook(evt)))
-		throw ModuleException("ns_maxemail: Unable to hook to EVENT_RELOAD");
+			throw ModuleException("ns_maxemail: Unable to hook to EVENT_RELOAD");
 
 		my_load_config();
 
 		const char *langtable_en_us[] = {
-		/* LNG_NSEMAILMAX_REACHED */
-		"The given email address has reached it's usage limit of %d users.",
-		/* LNG_NSEMAILMAX_REACHED_ONE */
-		"The given email address has reached it's usage limit of 1 user."
+			/* LNG_NSEMAILMAX_REACHED */
+			"The given email address has reached it's usage limit of %d users.",
+			/* LNG_NSEMAILMAX_REACHED_ONE */
+			"The given email address has reached it's usage limit of 1 user."
 		};
 
 		const char *langtable_nl[] = {
-		/* LNG_NSEMAILMAX_REACHED */
-		"Het gegeven email adres heeft de limiet van %d gebruikers bereikt.",
-		/* LNG_NSEMAILMAX_REACHED_ONE */
-		"Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
+			/* LNG_NSEMAILMAX_REACHED */
+			"Het gegeven email adres heeft de limiet van %d gebruikers bereikt.",
+			/* LNG_NSEMAILMAX_REACHED_ONE */
+			"Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
 		};
 
 		const char *langtable_de[] = {
-		/* LNG_NSEMAILMAX_REACHED */
-		"Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
-		/* LNG_NSEMAILMAX_REACHED_ONE */
-		"Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
+			/* LNG_NSEMAILMAX_REACHED */
+			"Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
+			/* LNG_NSEMAILMAX_REACHED_ONE */
+			"Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
 		};
 
 		const char *langtable_pt[] = {
-		/* LNG_NSEMAILMAX_REACHED */
-		"O endereço de email fornecido alcançou seu limite de uso de %d usuários.",
-		/* LNG_NSEMAILMAX_REACHED_ONE */
-		"O endereço de email fornecido alcançou seu limite de uso de 1 usuário."
+			/* LNG_NSEMAILMAX_REACHED */
+			"O endereço de email fornecido alcançou seu limite de uso de %d usuários.",
+			/* LNG_NSEMAILMAX_REACHED_ONE */
+			"O endereço de email fornecido alcançou seu limite de uso de 1 usuário."
 		};
 
 		const char *langtable_ru[] = {
-		/* LNG_NSEMAILMAX_REACHED */
-		"Óêàçàííûé âàìè email-àäðåñ èñïîëüçóåòñÿ ìàêñèìàëüíî äîïóñòèìîå êîë-âî ðàç: %d",
-		/* LNG_NSEMAILMAX_REACHED_ONE */
-		"Óêàçàííûé âàìè email-àäðåñ óæå êåì-òî èñïîëüçóåòñÿ."
+			/* LNG_NSEMAILMAX_REACHED */
+			"Óêàçàííûé âàìè email-àäðåñ èñïîëüçóåòñÿ ìàêñèìàëüíî äîïóñòèìîå êîë-âî ðàç: %d",
+			/* LNG_NSEMAILMAX_REACHED_ONE */
+			"Óêàçàííûé âàìè email-àäðåñ óæå êåì-òî èñïîëüçóåòñÿ."
 		};
 
 		const char *langtable_it[] = {
-		/* LNG_NSEMAILMAX_REACHED */
-		"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
-		/* LNG_NSEMAILMAX_REACHED_ONE */
-		"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di 1 utente."
+			/* LNG_NSEMAILMAX_REACHED */
+			"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
+			/* LNG_NSEMAILMAX_REACHED_ONE */
+			"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di 1 utente."
 		};
 
 		this->InsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
@@ -119,10 +156,12 @@ int count_email_in_use(char *email, User * u)
 	if (!email)
 		return 0;
 
-	for (i = 0; i < 1024; i++) {
-		for (nc = nclists[i]; nc; nc = nc->next) {
-			if (!(u->na && u->na->nc && (u->na->nc == nc)) && nc->email && (stricmp(nc->email, email) == 0))
-				count++;
+	for (i = 0; i < 1024; ++i)
+	{
+		for (nc = nclists[i]; nc; nc = nc->next)
+		{
+			if (!(u->na && u->na->nc && u->na->nc == nc) && nc->email && !stricmp(nc->email, email))
+				++count;
 		}
 	}
 
@@ -131,7 +170,7 @@ int count_email_in_use(char *email, User * u)
 
 int check_email_limit_reached(char *email, User * u)
 {
-	if ((NSEmailMax < 1) || !email || is_services_admin(u))
+	if (NSEmailMax < 1 || !email || is_services_admin(u))
 		return MOD_CONT;
 
 	if (count_email_in_use(email, u) < NSEmailMax)
@@ -140,61 +179,14 @@ int check_email_limit_reached(char *email, User * u)
 	if (NSEmailMax == 1)
 		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
 	else
-		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED,
-						 NSEmailMax);
+		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
 
 	return MOD_STOP;
 }
 
-int my_ns_register(User * u)
-{
-	char *cur_buffer;
-	char *email;
-	int ret;
-
-	cur_buffer = moduleGetLastBuffer();
-	email = myStrGetToken(cur_buffer, ' ', 1);
-	if (!email)
-		return MOD_CONT;
-
-	ret = check_email_limit_reached(email, u);
-	delete [] email;
-
-	return ret;
-}
-
-int my_ns_set(User * u)
-{
-	char *cur_buffer;
-	char *set;
-	char *email;
-	int ret;
-
-	cur_buffer = moduleGetLastBuffer();
-	set = myStrGetToken(cur_buffer, ' ', 0);
-
-	if (!set)
-		return MOD_CONT;
-
-	if (stricmp(set, "email") != 0) {
-		delete [] set;
-		return MOD_CONT;
-	}
-
-	delete [] set;
-	email = myStrGetToken(cur_buffer, ' ', 1);
-	if (!email)
-		return MOD_CONT;
-
-	ret = check_email_limit_reached(email, u);
-	delete [] email;
-
-	return ret;
-}
-
 int my_event_reload(int argc, char **argv)
 {
-	if ((argc > 0) && (stricmp(argv[0], EVENT_START) == 0))
+	if (argc > 0 && !stricmp(argv[0], EVENT_START))
 		my_load_config();
 
 	return MOD_CONT;
@@ -208,7 +200,5 @@ void my_load_config()
 	if (debug)
 		alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);
 }
-
-
 
 MODULE_INIT("ns_maxemail", NSMaxEmail)

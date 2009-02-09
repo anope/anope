@@ -15,24 +15,63 @@
 
 #include "module.h"
 
-int do_modunload(User * u);
+void myOperServHelp(User *u);
 
-void myOperServHelp(User * u);
+class CommandOSModUnLoad : public Command
+{
+ public:
+	CommandOSModUnLoad() : Command("MODUNLOAD", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *name = params[0].c_str();
+		int status;
+
+		Module *m = findModule(name);
+		if (!m)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
+
+		alog("Trying to unload module [%s]", name);
+
+		status = ModuleManager::UnloadModule(m, u);
+
+		if (status != MOD_ERR_OK)
+			notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_root(u))
+			return false;
+
+		notice_lang(s_OperServ, u, OPER_HELP_MODUNLOAD);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
+	}
+};
 
 class OSModUnLoad : public Module
 {
  public:
 	OSModUnLoad(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		c = createCommand("MODUNLOAD", do_modunload, is_services_root, -1, -1, -1, -1, OPER_HELP_MODUNLOAD);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSModUnLoad(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
@@ -43,47 +82,10 @@ class OSModUnLoad : public Module
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
-	if (is_services_root(u)) {
+	if (is_services_root(u))
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
-	}
-}
-
-/**
- * The /os modunload command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_modunload(User *u)
-{
-	char *name;
-	int status;
-
-	name = strtok(NULL, "");
-	if (!name)
-	{
-		syntax_error(s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
-		return MOD_CONT;
-	}
-
-	Module *m = findModule(name);
-	if (!m)
-	{
-		syntax_error(s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
-		return MOD_CONT;
-	}
-
-	alog("Trying to unload module [%s]", name);
-
-	status = ModuleManager::UnloadModule(m, u);
-
-	if (status != MOD_ERR_OK)
-	{
-		notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
-	}
-
-	return MOD_CONT;
 }
 
 MODULE_INIT("os_modunload", OSModUnLoad)

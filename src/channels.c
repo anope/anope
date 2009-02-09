@@ -174,27 +174,6 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 		alog("debug: Changing modes for %s to %s", chan->name,
 			 merge_args(ac, av));
 
-	u = finduser(source);
-	if (u && (chan_get_user_status(chan, u) & CUS_DEOPPED)) {
-		char *s;
-
-		if (debug)
-			alog("debug: Removing instead of setting due to DEOPPED flag");
-
-		/* Swap adding and removing of the modes */
-		for (s = const_cast<char *>(av[0]); *s; s++) { // XXX Unsafe cast, this needs reviewing -- CyberBotX
-			if (*s == '+')
-				*s = '-';
-			else if (*s == '-')
-				*s = '+';
-		}
-
-		/* Set the resulting mode buffer */
-		ircdproto->SendMode(whosends(chan->ci), chan->name, merge_args(ac, av));
-
-		return;
-	}
-
 	ac--;
 
 	while ((mode = *modes++)) {
@@ -256,8 +235,6 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 			if (add) {
 				chan_set_user_status(chan, user, cum->status);
 				/* If this does +o, remove any DEOPPED flag */
-				if (cum->status & CUS_OP)
-					chan_remove_user_status(chan, user, CUS_DEOPPED);
 			} else {
 				chan_remove_user_status(chan, user, cum->status);
 			}
@@ -1471,7 +1448,6 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 			strcat(modebuf, "o");
 			strcat(userbuf, " ");
 			strcat(userbuf, user->nick);
-			rem_modes |= CUS_DEOPPED;
 		} else {
 			add_modes &= ~CUS_OP;
 		}
@@ -1510,7 +1486,6 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 			strcat(modebuf, "o");
 			strcat(userbuf, " ");
 			strcat(userbuf, user->nick);
-			add_modes |= CUS_DEOPPED;
 		}
 		if (rem_modes & CUS_HALFOP) {
 			strcat(modebuf, "h");
@@ -2122,7 +2097,7 @@ EList *list_create()
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match(Entry * e, char *nick, char *user, char *host, uint32 ip)
+int entry_match(Entry * e, const char *nick, const char *user, const char *host, uint32 ip)
 {
 	/* If we don't get an entry, or it s an invalid one, no match ~ Viper */
 	if (!e || e->type == ENTRYTYPE_NONE)
@@ -2160,7 +2135,7 @@ int entry_match(Entry * e, char *nick, char *user, char *host, uint32 ip)
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match_mask(Entry * e, char *mask, uint32 ip)
+int entry_match_mask(Entry * e, const char *mask, uint32 ip)
 {
 	char *hostmask, *nick, *user, *host;
 	int res;
@@ -2201,7 +2176,7 @@ int entry_match_mask(Entry * e, char *mask, uint32 ip)
  * @param ip The ip to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match(EList * list, char *nick, char *user, char *host,
+Entry *elist_match(EList * list, const char *nick, const char *user, const char *host,
 				   uint32 ip)
 {
 	Entry *e;
@@ -2225,7 +2200,7 @@ Entry *elist_match(EList * list, char *nick, char *user, char *host,
  * @param ip The ip to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match_mask(EList * list, char *mask, uint32 ip)
+Entry *elist_match_mask(EList * list, const char *mask, uint32 ip)
 {
 	char *hostmask, *nick, *user, *host;
 	Entry *res;
@@ -2291,9 +2266,9 @@ Entry *elist_match_user(EList * list, User * u)
 		ip = str_is_ip(host);
 
 	/* Match what we ve got against the lists.. */
-	res = elist_match(list, u->nick, u->username, u->host, ip);
+	res = elist_match(list, u->nick, u->GetIdent().c_str(), u->host, ip);
 	if (!res)
-		elist_match(list, u->nick, u->username, u->vhost, ip);
+		elist_match(list, u->nick, u->GetIdent().c_str(), u->vhost, ip);
 
 	if (host)
 		delete [] host;

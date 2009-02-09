@@ -26,7 +26,7 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-User::User(const std::string &snick)
+User::User(const std::string &snick, const std::string &suid)
 {
 	User **list;
 	// XXX: we could do well to steal CoreException from insp
@@ -38,7 +38,7 @@ User::User(const std::string &snick)
 	/* we used to do this by calloc, no more. */
 	this->next = NULL;
 	this->prev = NULL;
-	username = host = hostip = vhost = vident = realname = nickTrack = uid = NULL;
+	host = hostip = vhost = realname = nickTrack = NULL;
 	server = NULL;
 	na = NULL;
 	chans = NULL;
@@ -46,6 +46,7 @@ User::User(const std::string &snick)
 	invalid_pw_count = timestamp = my_signon = svid = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 
 	strscpy(this->nick, snick.c_str(), NICKMAX);
+	this->uid = suid;
 	list = &userlist[HASH(this->nick)];
 	this->next = *list;
 
@@ -133,20 +134,67 @@ void User::SetDisplayedHost(const std::string &shost)
 	update_host(this);
 }
 
-void User::SetIdent(const std::string &ident)
-{
-	if (ident.empty())
-		throw "empty ident in SetIdent";
 
-	if (this->vident)
-		delete [] this->vident;
-	this->vident = sstrdup(ident.c_str());
+const std::string User::GetDisplayedHost() const
+{
+	if (ircd->vhostmode && (this->mode & ircd->vhostmode))
+		return this->vhost;
+	else if (ircd->vhost && this->vhost)
+		return this->vhost;
+	else
+		return this->host;
+}
+
+
+
+
+const std::string &User::GetUID() const
+{
+ return this->uid;
+}
+
+
+
+
+
+void User::SetVIdent(const std::string &sident)
+{
+	this->vident = sident;
 
 	if (debug)
-		alog("debug: %s changed ident to %s", this->nick, username);
+		alog("debug: %s changed ident to %s", this->nick, sident.c_str());
 
 	update_host(this);
 }
+
+const std::string &User::GetVIdent() const            
+{
+	if (ircd->vhostmode && (this->mode & ircd->vhostmode))
+		return this->vident;
+	else if (ircd->vident && !this->vident.empty())
+		return this->vident;
+	else
+		return this->ident;
+}
+
+void User::SetIdent(const std::string &sident)
+{
+	this->ident = sident;
+
+	if (debug)
+		alog("debug: %s changed real ident to %s", this->nick, sident.c_str());
+
+	update_host(this);
+}
+
+const std::string &User::GetIdent() const
+{
+	return this->ident;
+}
+
+
+
+
 
 void User::SetRealname(const std::string &srealname)
 {
@@ -182,13 +230,13 @@ User::~User()
 		if (ircd->vhost)
 		{
 			alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
-				this->nick, this->username, this->host,
+				this->nick, this->GetIdent().c_str(), this->host,
 				(this->vhost ? this->vhost : "(none)"), srealname, this->server->name);
 		}
 		else
 		{
 			alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
-				this->nick, this->username, this->host,
+				this->nick, this->GetIdent().c_str(), this->host,
 				srealname, this->server->name);
 		}
 
@@ -208,15 +256,10 @@ User::~User()
 	if (debug >= 2)
 		alog("debug: User::~User(): free user data");
 
-	delete [] this->username;
 	delete [] this->host;
 
 	if (this->vhost)
 		delete [] this->vhost;
-	if (this->vident)
-		delete [] this->vident;
-	if (this->uid)
-		delete [] this->uid;
 
 	if (this->realname)
 		delete [] this->realname;
@@ -321,9 +364,9 @@ void update_host(User * user)
 		if (user->na->last_usermask)
 			delete [] user->na->last_usermask;
 
-		user->na->last_usermask = new char[strlen(common_get_vident(user)) + strlen(common_get_vhost(user)) + 2];
-		sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
-				common_get_vhost(user));
+		user->na->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
+		sprintf(user->na->last_usermask, "%s@%s", user->GetIdent().c_str(),
+				user->GetDisplayedHost().c_str());
 	}
 }
 
@@ -345,8 +388,6 @@ void get_user_stats(long *nusers, long *memuse)
 		for (user = userlist[i]; user; user = user->next) {
 			count++;
 			mem += sizeof(*user);
-			if (user->username)
-				mem += strlen(user->username) + 1;
 			if (user->host)
 				mem += strlen(user->host) + 1;
 			if (ircd->vhost) {
@@ -430,10 +471,8 @@ User *find_byuid(const char *uid)
 	u = first_uid();
 	while (u) {
 		next = next_uid();
-		if (u->uid) {
-			if (!stricmp(uid, u->uid)) {
-				return u;
-			}
+		if (u->GetUID() == uid) {
+			return u;
 		}
 		u = next;
 	}
@@ -453,7 +492,7 @@ User *first_uid()
 	if (debug >= 2) {
 		alog("debug: first_uid() returning %s %s",
 			 current_uid ? current_uid->nick : "NULL (end of list)",
-			 current_uid ? current_uid->uid : "");
+			 current_uid ? current_uid->GetUID().c_str() : "");
 	}
 	return current_uid;
 }
@@ -469,7 +508,7 @@ User *next_uid()
 	if (debug >= 2) {
 		alog("debug: next_uid() returning %s %s",
 			 current_uid ? current_uid->nick : "NULL (end of list)",
-			 current_uid ? current_uid->uid : "");
+			 current_uid ? current_uid->GetUID().c_str() : "");
 	}
 	return current_uid;
 }
@@ -562,18 +601,14 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		 * as such, create a user_struct, and if the client is removed, we'll delete it again when the QUIT notice
 		 * comes in from the ircd.
 		 **/
-		if (check_akill(nick, username, host, vhost, ipbuf)) {
-/*			return NULL; */
-		}
+		check_akill(nick, username, host, vhost, ipbuf);
 
-/**
- * DefCon AKILL system, if we want to akill all connecting user's here's where to do it
- * then force check_akill again on them...
- **/
-		/* don't akill on netmerges -Certus */
-		/* don't akill clients introduced by ulines. -Viper */
-		if (is_sync(findserver(servlist, server))
-			&& checkDefCon(DEFCON_AKILL_NEW_CLIENTS) && !is_ulined(server)) {
+		/**
+		 * DefCon AKILL system, if we want to akill all connecting user's here's where to do it
+		 * then force check_akill again on them...
+		 */
+		if (is_sync(findserver(servlist, server)) && checkDefCon(DEFCON_AKILL_NEW_CLIENTS) && !is_ulined(server))
+		{
 			strncpy(mask, "*@", 3);
 			strncat(mask, host, HOSTMAX);
 			alog("DEFCON: adding akill for %s", mask);
@@ -581,48 +616,35 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 					  time(NULL) + DefConAKILL,
 					  DefConAkillReason ? DefConAkillReason :
 					  "DEFCON AKILL");
-			if (check_akill(nick, username, host, vhost, ipbuf)) {
-/*			return NULL; */
-			}
+			check_akill(nick, username, host, vhost, ipbuf);
 		}
+    
+		/* As with akill checks earlier, we can't not add the user record, as the user may be exempt from bans.
+		 * Instead, we'll just wait for the IRCd to tell us they are gone.
+		 */
+		if (ircd->sgline)
+			check_sgline(nick, realname);
 
-		/* SGLINE */
-		if (ircd->sgline) {
-			if (check_sgline(nick, realname))
-				return NULL;
-		}
+		if (ircd->sqline)
+			check_sqline(nick, 0);
 
-		/* SQLINE */
-		if (ircd->sqline) {
-			if (check_sqline(nick, 0))
-				return NULL;
-		}
+		if (ircd->szline && ircd->nickip)
+			check_szline(nick, ipbuf);
 
-		/* SZLINE */
-		if (ircd->szline && ircd->nickip) {
-			if (check_szline(nick, ipbuf))
-				return NULL;
-		}
 		/* Now check for session limits */
-		if (LimitSessions && !is_ulined(server)
-			&& !add_session(nick, host, ipbuf))
-			return NULL;
+		if (LimitSessions && !is_ulined(server))
+			add_session(nick, host, ipbuf);
 
 		/* Allocate User structure and fill it in. */
-		user = new User(nick);
-		user->username = sstrdup(username);
+		user = new User(nick, uid ? uid : "");
+		user->SetIdent(username);
 		user->host = sstrdup(host);
 		user->server = findserver(servlist, server);
 		user->realname = sstrdup(realname);
 		user->timestamp = ts;
 		user->my_signon = time(NULL);
 		user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
-		if (uid) {
-			user->uid = sstrdup(uid);   /* p10/ts6 stuff */
-		} else {
-			user->uid = NULL;
-		}
-		user->vident = sstrdup(username);
+		user->SetVIdent(username);
 		/* We now store the user's ip in the user_ struct,
 		 * because we will use it in serveral places -- DrStein */
 		if (ircd->nickip) {
@@ -677,10 +699,10 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (LogUsers) {
 			logrealname = normalizeBuffer(user->realname);
 			if (ircd->vhost) {
-				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), logrealname, nick, user->server->name);
+				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick, user->GetIdent().c_str(), user->host, (user->vhost ? user->vhost : "(none)"), logrealname, nick, user->server->name);
 			} else {
 				alog("LOGUSERS: %s (%s@%s) (%s) changed nick to %s (%s).",
-					 user->nick, user->username, user->host, logrealname,
+					 user->nick, user->GetIdent().c_str(), user->host, logrealname,
 					 nick, user->server->name);
 			}
 			if (logrealname) {
@@ -744,16 +766,16 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 			if (user->na->last_usermask)
 				delete [] user->na->last_usermask;
-			user->na->last_usermask = new char[strlen(common_get_vident(user)) + strlen(common_get_vhost(user)) + 2];
+			user->na->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
 			sprintf(user->na->last_usermask, "%s@%s",
-					common_get_vident(user), common_get_vhost(user));
+					user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
 
 			snprintf(tsbuf, sizeof(tsbuf), "%lu",
 					 static_cast<unsigned long>(user->timestamp));
 			ircdproto->SendSVID2(user, tsbuf);
 
 			alog("%s: %s!%s@%s automatically identified for nick %s",
-				 s_NickServ, user->nick, user->username,
+				 s_NickServ, user->nick, user->GetIdent().c_str(),
 				 user->host, user->nick);
 		}
 	}
@@ -790,24 +812,6 @@ void do_umode(const char *source, int ac, const char **av)
 	}
 
 	ircdproto->ProcessUsermodes(user, ac - 1, &av[1]);
-}
-
-/* Handle a UMODE2 command for a user.
- *	av[0] = modes
- */
-
-void do_umode2(const char *source, int ac, const char **av)
-{
-	User *user;
-
-	user = finduser(source);
-	if (!user) {
-		alog("user: MODE %s for nonexistent nick %s: %s", av[0], source,
-			 merge_args(ac, av));
-		return;
-	}
-
-	ircdproto->ProcessUsermodes(user, ac, &av[0]);
 }
 
 /*************************************************************************/
@@ -926,7 +930,7 @@ int is_excepted(ChannelInfo * ci, User * user)
 /*************************************************************************/
 
 /* Is the given MASK ban-excepted? */
-int is_excepted_mask(ChannelInfo * ci, char *mask)
+int is_excepted_mask(ChannelInfo * ci, const char *mask)
 {
 	if (!ci->c || !ircd->except)
 		return 0;
@@ -971,57 +975,12 @@ int match_usermask(const char *mask, User * user)
 
 	if (nick) {
 		result = match_wild_nocase(nick, user->nick)
-			&& match_wild_nocase(username, user->username)
+			&& match_wild_nocase(username, user->GetIdent().c_str())
 			&& (match_wild_nocase(host, user->host)
 				|| match_wild_nocase(host, user->vhost));
 	} else {
-		result = match_wild_nocase(username, user->username)
+		result = match_wild_nocase(username, user->GetIdent().c_str())
 			&& (match_wild_nocase(host, user->host)
-				|| match_wild_nocase(host, user->vhost));
-	}
-
-	delete [] mask2;
-	return result;
-}
-
-
-/*************************************************************************/
-
-/* simlar to match_usermask, except here we pass the host as the IP */
-
-int match_userip(const char *mask, User * user, char *iphost)
-{
-	char *mask2;
-	char *nick, *username, *host;
-	int result;
-
-	if (!mask || !*mask) {
-		return 0;
-	}
-
-	mask2 = sstrdup(mask);
-
-	if (strchr(mask2, '!')) {
-		nick = strtok(mask2, "!");
-		username = strtok(NULL, "@");
-	} else {
-		nick = NULL;
-		username = strtok(mask2, "@");
-	}
-	host = strtok(NULL, "");
-	if (!username || !host) {
-		delete [] mask2;
-		return 0;
-	}
-
-	if (nick) {
-		result = match_wild_nocase(nick, user->nick)
-			&& match_wild_nocase(username, user->username)
-			&& (match_wild_nocase(host, iphost)
-				|| match_wild_nocase(host, user->vhost));
-	} else {
-		result = match_wild_nocase(username, user->username)
-			&& (match_wild_nocase(host, iphost)
 				|| match_wild_nocase(host, user->vhost));
 	}
 
@@ -1076,40 +1035,42 @@ void split_usermask(const char *mask, char **nick, char **user,
 char *create_mask(User * u)
 {
 	char *mask, *s, *end;
-	int ulen = strlen(common_get_vident(u));
+	std::string mident = u->GetIdent();
+	std::string mhost = u->GetDisplayedHost();
+	int ulen = mident.length();
 
 	/* Get us a buffer the size of the username plus hostname.  The result
 	 * will never be longer than this (and will often be shorter), thus we
 	 * can use strcpy() and sprintf() safely.
 	 */
-	end = mask = new char[ulen + strlen(common_get_vhost(u)) + 3];
-	end += sprintf(end, "%s%s@",
-				   (ulen <
-					(*(common_get_vident(u)) ==
-					 '~' ? USERMAX + 1 : USERMAX) ? "*" : ""),
-				   (*(common_get_vident(u)) ==
-					'~' ? common_get_vident(u) +
-					1 : common_get_vident(u)));
+	end = mask = new char[ulen + mhost.length() + 3];
+	if (mident[0] == '~')
+		end += sprintf(end, "*%s@", mident.c_str());
+	else
+		end += sprintf(end, "%s@", mident.c_str());
 
-	if (strspn(common_get_vhost(u), "0123456789.") ==
-		strlen(common_get_vhost(u))
-		&& (s = strchr(common_get_vhost(u), '.'))
+	// XXX: someone needs to rewrite this godawful kitten murdering pile of crap.
+	if (strspn(mhost.c_str(), "0123456789.") == mhost.length()
+		&& (s = strchr(mhost.c_str(), '.'))
 		&& (s = strchr(s + 1, '.'))
 		&& (s = strchr(s + 1, '.'))
-		&& (!strchr(s + 1, '.'))) {	 /* IP addr */
-		s = sstrdup(common_get_vhost(u));
+		&& (!strchr(s + 1, '.')))
+	{	 /* IP addr */
+		s = sstrdup(mhost.c_str());
 		*strrchr(s, '.') = 0;
 
 		sprintf(end, "%s.*", s);
 		delete [] s;
-	} else {
-		if ((s = strchr(common_get_vhost(u), '.')) && strchr(s + 1, '.')) {
-			s = sstrdup(strchr(common_get_vhost(u), '.') - 1);
+	}
+	else
+	{
+		if ((s = strchr(mhost.c_str(), '.')) && strchr(s + 1, '.')) {
+			s = sstrdup(strchr(mhost.c_str(), '.') - 1);
 			*s = '*';
 			strcpy(end, s);
 			delete [] s;
 		} else {
-			strcpy(end, common_get_vhost(u));
+			strcpy(end, mhost.c_str());
 		}
 	}
 	return mask;

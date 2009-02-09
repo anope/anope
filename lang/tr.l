@@ -5635,8 +5635,6 @@ OPER_HELP_STATS
 	
 	RESET parametresi önceki maksimum kullanýcý sayýsýný o anda
 	networkte bulunan kullanýcý sayýsýyla deðiþtirir.
-	
-	UPTIME komutu STATS komutunun alternatifi olarak kullanýlabilir.
 
 OPER_HELP_OPER
 	Kullanýmý: OPER ADD nick

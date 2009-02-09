@@ -506,7 +506,7 @@ int do_on_id(User * u)
 		}
 		if (ircd->vident) {
 			if (vIdent)
-				u->vident = sstrdup(vIdent);
+				u->SetVIdent(vIdent);
 		}
 		set_lastmask(u);
 	}
@@ -552,8 +552,7 @@ void set_lastmask(User * u)
 	if (u->na->last_usermask)
 		delete [] u->na->last_usermask;
 
-	u->na->last_usermask = new char[strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2];
-	sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u),
-			common_get_vhost(u));
+	u->na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
+	sprintf(u->na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
 
 }

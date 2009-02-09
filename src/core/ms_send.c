@@ -15,48 +15,56 @@
 
 #include "module.h"
 
-int do_send(User * u);
-void myMemoServHelp(User * u);
+void myMemoServHelp(User *u);
+
+class CommandMSSend : public Command
+{
+ public:
+	CommandMSSend() : Command("SEND", 2, 2)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *name = params[0].c_str();
+		const char *text = params[1].c_str();
+		int z = 0;
+		memo_send(u, name, text, z);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_SEND);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+	}
+};
 
 class MSSend : public Module
 {
  public:
 	MSSend(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		c = createCommand("SEND", do_send, NULL, MEMO_HELP_SEND, -1, -1, -1, -1);
-		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSSend(), MOD_UNIQUE);
 		this->SetMemoHelp(myMemoServHelp);
 	}
 };
-
-
 
 /**
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+void myMemoServHelp(User *u)
 {
 	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SEND);
-}
-
-/**
- * The /ms send command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_send(User * u)
-{
-	char *name = strtok(NULL, " ");
-	char *text = strtok(NULL, "");
-	int z = 0;
-	memo_send(u, name, text, z);
-	return MOD_CONT;
 }
 
 MODULE_INIT("ms_send", MSSend)

@@ -165,7 +165,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 0,						 /* VHOST		*/
 	 0,						 /* SSJ3		 */
 	 0,						 /* NICK2		*/
-	 0,						 /* UMODE2	   */
 	 0,						 /* VL		   */
 	 0,						 /* TLKEXT	   */
 	 0,						 /* DODKEY	   */

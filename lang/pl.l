@@ -6746,8 +6746,6 @@ OPER_HELP_STATS
 	którego serwisy s± bezpo¶rednio pod³±czone.
 	
 	Parametr ALL wy¶wietla wszystkie dostêpne informacje.
-	
-	UPTIME mo¿e byæ u¿ywane jako synonim STATS.
 
 OPER_HELP_OPER
 	Sk³adnia: OPER ADD nick

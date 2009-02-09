@@ -180,8 +180,8 @@ void common_unban(ChannelInfo * ci, char *nick)
 
 		for (ban = ci->c->bans->entries; ban; ban = next) {
 			next = ban->next;
-			if (entry_match(ban, u->nick, u->username, u->host, ip) ||
-				entry_match(ban, u->nick, u->username, u->vhost, ip)) {
+			if (entry_match(ban, u->nick, u->GetIdent().c_str(), u->host, ip) ||
+				entry_match(ban, u->nick, u->GetIdent().c_str(), u->vhost, ip)) {
 				ircdproto->SendMode(whosends(ci), ci->name, "-b %s", ban->mask);
 				if (ircdcap->tsmode)
 					av[3] = ban->mask;
@@ -224,42 +224,3 @@ void common_svsmode(User * u, const char *modes, const char *arg)
 
 /*************************************************************************/
 
-/**
- * Get the vhost for the user, if set else return the host, on ircds without
- * vhost this returns the host
- * @param u user to get the vhost for
- * @return vhost
- */
-char *common_get_vhost(User * u)
-{
-	if (!u)
-		return NULL;
-
-	if (ircd->vhostmode && (u->mode & ircd->vhostmode))
-		return u->vhost;
-	else if (ircd->vhost && u->vhost)
-		return u->vhost;
-	else
-		return u->host;
-}
-
-/*************************************************************************/
-
-/**
- * Get the vident for the user, if set else return the ident, on ircds without
- * vident this returns the ident
- * @param u user to get info the vident for
- * @return vident
- */
-char *common_get_vident(User * u)
-{
-	if (!u)
-		return NULL;
-
-	if (ircd->vhostmode && (u->mode & ircd->vhostmode))
-		return u->vident;
-	else if (ircd->vident && u->vident)
-		return u->vident;
-	else
-		return u->username;
-}

@@ -137,10 +137,10 @@ E Entry *entry_create(char *mask);
 E Entry *entry_add(EList *list, const char *mask);
 E void entry_delete(EList *list, Entry *e);
 E EList *list_create();
-E int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip);
-E int entry_match_mask(Entry *e, char *mask, uint32 ip);
-E Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip);
-E Entry *elist_match_mask(EList *list, char *mask, uint32 ip);
+E int entry_match(Entry *e, const char *nick, const char *user, const char *host, uint32 ip);
+E int entry_match_mask(Entry *e, const char *mask, uint32 ip);
+E Entry *elist_match(EList *list, const char *nick, const char *user, const char *host, uint32 ip);
+E Entry *elist_match_mask(EList *list, const char *mask, uint32 ip);
 E Entry *elist_match_user(EList *list, User *u);
 E Entry *elist_find_mask(EList *list, const char *mask);
 E long get_memuse(EList *list);
@@ -942,7 +942,6 @@ E User *do_nick(const char *source, const char *nick, const char *username, cons
 			  const char *server, const char *realname, time_t ts, uint32 svid, uint32 ip, const char *vhost, const char *uid);
 
 E void do_umode(const char *source, int ac, const char **av);
-E void do_umode2(const char *source, int ac, const char **av);
 E void do_quit(const char *source, int ac, const char **av);
 E void do_kill(const char *source, const char *reason);
 
@@ -950,54 +949,16 @@ E int is_oper(User * user);
 E int is_protected(User * user);
 
 E int is_excepted(ChannelInfo * ci, User * user);
-E int is_excepted_mask(ChannelInfo * ci, char *mask);
+E int is_excepted_mask(ChannelInfo * ci, const char *mask);
 
 E int match_usermask(const char *mask, User * user);
-E int match_userip(const char *mask, User * user, char *host);
 E void split_usermask(const char *mask, char **nick, char **user,
 					  char **host);
 E char *create_mask(User * u);
 
-#ifdef USE_MYSQL
-/**** mysql.c ****/
-E MYSQL	   *mysql;
-E MYSQL_RES   *mysql_res;
-E MYSQL_FIELD *mysql_fields;
-E MYSQL_ROW   mysql_row;
-
-E int db_mysql_init();
-E int db_mysql_open();
-E int db_mysql_close();
-E int db_mysql_query(char *sql);
-E char *db_mysql_quote(char *sql);
-E char *db_mysql_quote_buffer(char *sql, int size);
-E int db_mysql_try(const char *fmt, ...);
-E int db_mysql_save_ns_core(NickCore * nc);
-E int db_mysql_save_ns_alias(NickAlias * na);
-E int db_mysql_save_ns_req(NickRequest * nr);
-E int db_mysql_save_cs_info(ChannelInfo * ci);
-E int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-						   SList * ak, SList * sgl, SList * sql,
-						   SList * szl);
-E int db_mysql_save_news(NewsItem * ni);
-E int db_mysql_save_exceptions(Exception * e);
-E int db_mysql_save_hs_core(HostCore * hc);
-E int db_mysql_save_bs_core(BotInfo * bi);
-E int db_mysql_load_bs_dbase();
-E int db_mysql_load_hs_dbase();
-E int db_mysql_load_ns_dbase();
-E int db_mysql_load_ns_req_dbase();
-E int db_mysql_load_cs_dbase();
-E int db_mysql_load_os_dbase();
-E int db_mysql_load_exceptions();
-E int db_mysql_load_news();
-E unsigned int mysql_rand();
-#endif
 
 /******************************************************************************/
 
-E char *common_get_vident(User *u);
-E char *common_get_vhost(User *u);
 E const char* base64enc(long i);
 E long base64dec(char *b64);
 E long base64dects(const char *ts);

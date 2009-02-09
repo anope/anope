@@ -20,22 +20,69 @@
 
 #include "module.h"
 
-int do_getemail(User * u);
-void myNickServHelp(User * u);
+void myNickServHelp(User *u);
+
+class CommandNSGetEMail : public Command
+{
+ public:
+	CommandNSGetEMail() : Command("GETEMAIL", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *email = params[0].c_str();
+		int i, j = 0;
+		NickCore *nc;
+
+		alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, email);
+		for (i = 0; i < 1024; ++i)
+		{
+			for (nc = nclists[i]; nc; nc = nc->next)
+			{
+				if (nc->email)
+				{
+					if (!stricmp(nc->email, email))
+					{
+						++j;
+						notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email);
+					}
+				}
+			}
+		}
+		if (j <= 0)
+		{
+			notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email);
+			return MOD_CONT;
+		}
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_admin(u))
+			return false;
+
+		notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
+	}
+};
 
 class NSGetEMail : public Module
 {
  public:
 	NSGetEMail(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("GETEMAIL", do_getemail, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_GETEMAIL, NICK_SERVADMIN_HELP_GETEMAIL);
-		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSGetEMail(), MOD_UNIQUE);
 
 		this->SetNickHelp(myNickServHelp);
 	}
@@ -45,46 +92,10 @@ class NSGetEMail : public Module
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+void myNickServHelp(User *u)
 {
-	if (is_services_admin(u)) {
+	if (is_services_admin(u))
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
-	}
-}
-
-/**
- * The /ns getemail command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_getemail(User * u)
-{
-	char *email = strtok(NULL, " ");
-	int i, j = 0;
-	NickCore *nc;
-
-	if (!email) {
-		syntax_error(s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
-		return MOD_CONT;
-	}
-	alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick,
-		 u->username, u->host, email);
-	for (i = 0; i < 1024; i++) {
-		for (nc = nclists[i]; nc; nc = nc->next) {
-			if (nc->email) {
-				if (stricmp(nc->email, email) == 0) {
-					j++;
-					notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE,
-								nc->display, email);
-				}
-			}
-		}
-	}
-	if (j <= 0) {
-		notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email);
-		return MOD_CONT;
-	}
-	return MOD_CONT;
 }
 
 MODULE_INIT("ns_getemail", NSGetEMail)

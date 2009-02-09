@@ -150,7 +150,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 0,						 /* VHOST		*/
 	 0,						 /* SSJ3		 */
 	 0,						 /* NICK2		*/
-	 0,						 /* UMODE2	   */
 	 0,						 /* VL		   */
 	 0,						 /* TLKEXT	   */
 	 0,						 /* DODKEY	   */
@@ -577,7 +576,7 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		BotInfo *bi = findbot(source);
 		User *u = find_byuid(user);
-		send_cmd(bi ? bi->uid : source, "KILL %s :%s", u ? u->uid : user, buf);
+		send_cmd(bi ? bi->uid : source, "KILL %s :%s", u ? u->GetUID().c_str(): user, buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -635,8 +634,10 @@ class RatboxProto : public IRCDTS6Proto
 	void SendKickInternal(BotInfo *bi, const char *chan, const char *user, const char *buf)
 	{
 		User *u = finduser(user);
-		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan, u ? u->uid : user, buf);
-		else send_cmd(bi->uid, "KICK %s %s", chan, u ? u->uid : user);
+		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan, u ? u->GetUID().c_str()
+: user, buf);
+		else send_cmd(bi->uid, "KICK %s %s", chan, u ? u->GetUID().c_str()
+: user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
@@ -667,7 +668,7 @@ class RatboxProto : public IRCDTS6Proto
 	void SendInvite(BotInfo *source, const char *chan, const char *nick)
 	{
 		User *u = finduser(nick);
-		send_cmd(source->uid, "INVITE %s %s", u ? u->uid : nick, chan);
+		send_cmd(source->uid, "INVITE %s %s", u ? u->GetUID().c_str(): nick, chan);
 	}
 
 	int IsNickValid(const char *nick)

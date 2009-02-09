@@ -15,22 +15,67 @@
 
 #include "module.h"
 
-int do_modinfo(User * u);
-void myOperServHelp(User * u);
-int showModuleCmdLoaded(CommandHash * cmdList, const char *mod_name, User * u);
+void myOperServHelp(User *u);
+int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u);
+
+class CommandOSModInfo : public Command
+{
+ public:
+	CommandOSModInfo() : Command("MODINFO", 1, 1)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *file = params[0].c_str();
+		struct tm tm;
+		char timebuf[64];
+		Module *m;
+		int idx = 0;
+
+		m = findModule(file);
+		if (m)
+		{
+			tm = *localtime(&m->created);
+			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
+			notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", timebuf);
+			for (idx = 0; idx < MAX_CMD_HASH; ++idx)
+			{
+				showModuleCmdLoaded(HOSTSERV[idx], m->name.c_str(), u);
+				showModuleCmdLoaded(OPERSERV[idx], m->name.c_str(), u);
+				showModuleCmdLoaded(NICKSERV[idx], m->name.c_str(), u);
+				showModuleCmdLoaded(CHANSERV[idx], m->name.c_str(), u);
+				showModuleCmdLoaded(BOTSERV[idx], m->name.c_str(), u);
+				showModuleCmdLoaded(MEMOSERV[idx], m->name.c_str(), u);
+				showModuleCmdLoaded(HELPSERV[idx], m->name.c_str(), u);
+			}
+		}
+		else
+			notice_lang(s_OperServ, u, OPER_MODULE_NO_INFO, file);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_MODINFO);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_OperServ, u, "MODINFO", OPER_MODULE_INFO_SYNTAX);
+	}
+};
 
 class OSModInfo : public Module
 {
  public:
 	OSModInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1, OPER_HELP_MODINFO);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSModInfo(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
@@ -41,64 +86,25 @@ class OSModInfo : public Module
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
 	notice_lang(s_OperServ, u, OPER_HELP_CMD_MODINFO);
 }
 
-/**
- * The /os command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_modinfo(User * u)
-{
-	char *file;
-	struct tm tm;
-	char timebuf[64];
-	Module *m;
-	int idx = 0;
-
-	file = strtok(NULL, "");
-	if (!file) {
-		syntax_error(s_OperServ, u, "MODINFO", OPER_MODULE_INFO_SYNTAX);
-		return MOD_CONT;
-	}
-	m = findModule(file);
-	if (m) {
-		tm = *localtime(&m->created);
-		strftime_lang(timebuf, sizeof(timebuf), u,
-					  STRFTIME_DATE_TIME_FORMAT, &tm);
-		notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(),
-					!m->version.empty() ? m->version.c_str() : "?",
-					!m->author.empty() ? m->author.c_str() : "?", timebuf);
-		for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-			showModuleCmdLoaded(HOSTSERV[idx], m->name.c_str(), u);
-			showModuleCmdLoaded(OPERSERV[idx], m->name.c_str(), u);
-			showModuleCmdLoaded(NICKSERV[idx], m->name.c_str(), u);
-			showModuleCmdLoaded(CHANSERV[idx], m->name.c_str(), u);
-			showModuleCmdLoaded(BOTSERV[idx], m->name.c_str(), u);
-			showModuleCmdLoaded(MEMOSERV[idx], m->name.c_str(), u);
-			showModuleCmdLoaded(HELPSERV[idx], m->name.c_str(), u);
-		}
-	} else {
-		notice_lang(s_OperServ, u, OPER_MODULE_NO_INFO, file);
-	}
-	return MOD_CONT;
-}
-
-int showModuleCmdLoaded(CommandHash * cmdList, const char *mod_name, User * u)
+int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u)
 {
 	Command *c;
 	CommandHash *current;
 	int display = 0;
 
-	for (current = cmdList; current; current = current->next) {
-		for (c = current->c; c; c = c->next) {
-			if ((c->mod_name) && (stricmp(c->mod_name, mod_name) == 0)) {
-				notice_lang(s_OperServ, u, OPER_MODULE_CMD_LIST,
-							c->service, c->name);
-				display++;
+	for (current = cmdList; current; current = current->next)
+	{
+		for (c = current->c; c; c = c->next)
+		{
+			if (c->mod_name && !stricmp(c->mod_name, mod_name))
+			{
+				notice_lang(s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name);
+				++display;
 			}
 		}
 	}

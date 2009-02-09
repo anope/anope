@@ -105,7 +105,7 @@ int do_sendpass(User * u)
 			MailEnd(mail);
 
 			alog("%s: %s!%s@%s used SENDPASS on %s", s_ChanServ, u->nick,
-				 u->username, u->host, chan);
+				 u->GetIdent().c_str(), u->host, chan);
 			notice_lang(s_ChanServ, u, CHAN_SENDPASS_OK, chan);
 		} else {
 			notice_lang(s_ChanServ, u, CHAN_SENDPASS_UNAVAILABLE);

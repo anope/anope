@@ -88,7 +88,7 @@ int do_cs_topic(User * u)
 
 		if (is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
 			alog("%s: %s!%s@%s changed topic of %s as services admin.",
-				 s_ChanServ, u->nick, u->username, u->host, c->name);
+				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, c->name);
 		if (ircd->join2set) {
 			if (whosends(ci) == findbot(s_ChanServ)) {
 				ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);

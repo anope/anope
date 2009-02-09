@@ -182,88 +182,6 @@ Module *findModule(const char *name)
 /*******************************************************************************
  * Command Functions
  *******************************************************************************/
-/**
- * Create a Command struct ready for use in anope.
- * @param name the name of the command
- * @param func pointer to the function to execute when command is given
- * @param has_priv pointer to function to check user priv's
- * @param help_all help file index for all users
- * @param help_reg help file index for all regustered users
- * @param help_oper help file index for all opers
- * @param help_admin help file index for all admins
- * @param help_root help file indenx for all services roots
- * @return a "ready to use" Command struct will be returned
- */
-Command *createCommand(const char *name, int (*func) (User * u),
-					   int (*has_priv) (User * u), int help_all,
-					   int help_reg, int help_oper, int help_admin,
-					   int help_root)
-{
-	Command *c;
-	if (!name || !*name) {
-		return NULL;
-	}
-
-	if (!(c = new Command)) {
-		fatal("Out of memory!");
-	}
-	c->name = sstrdup(name);
-	c->routine = func;
-	c->has_priv = has_priv;
-	c->helpmsg_all = help_all;
-	c->helpmsg_reg = help_reg;
-	c->helpmsg_oper = help_oper;
-	c->helpmsg_admin = help_admin;
-	c->helpmsg_root = help_root;
-	c->help_param1 = NULL;
-	c->help_param2 = NULL;
-	c->help_param3 = NULL;
-	c->help_param4 = NULL;
-	c->core = 0;
-	c->next = NULL;
-	c->mod_name = NULL;
-	c->service = NULL;
-	c->all_help = NULL;
-	c->regular_help = NULL;
-	c->oper_help = NULL;
-	c->admin_help = NULL;
-	c->root_help = NULL;
-	return c;
-}
-
-/**
- * Destroy a command struct freeing any memory.
- * @param c Command to destroy
- * @return MOD_ERR_OK on success, anything else on fail
- */
-int destroyCommand(Command * c)
-{
-	if (!c) {
-		return MOD_ERR_PARAMS;
-	}
-	if (c->core == 1) {
-		return MOD_ERR_UNKNOWN;
-	}
-	if (c->name) {
-		delete [] c->name;
-	}
-	c->routine = NULL;
-	c->has_priv = NULL;
-	c->helpmsg_all = -1;
-	c->helpmsg_reg = -1;
-	c->helpmsg_oper = -1;
-	c->helpmsg_admin = -1;
-	c->helpmsg_root = -1;
-	if (c->mod_name) {
-		delete [] c->mod_name;
-	}
-	if (c->service) {
-		delete [] c->service;
-	}
-	c->next = NULL;
-	delete c;
-	return MOD_ERR_OK;
-}
 
 /** Add a command to a command table. Only for internal use.
  * only add if were unique, pos = 0;
@@ -294,7 +212,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 			&& (!strcmp(c->service, current->c->service) == 0)) {
 			continue;
 		}
-		if ((stricmp(c->name, current->name) == 0)) {   /* the cmd exist's we are a addHead */
+		if ((stricmp(c->name.c_str(), current->name) == 0)) {   /* the cmd exist's we are a addHead */
 			if (pos == 1) {
 				c->next = current->c;
 				current->c = c;
@@ -324,7 +242,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 		fatal("Out of memory");
 	}
 	newHash->next = NULL;
-	newHash->name = sstrdup(c->name);
+	newHash->name = sstrdup(c->name.c_str());
 	newHash->c = c;
 
 	if (lastHash == NULL)
@@ -421,7 +339,7 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
 
 	index = CMD_HASH(c->name);
 	for (current = cmdTable[index]; current; current = current->next) {
-		if (stricmp(c->name, current->name) == 0) {
+		if (stricmp(c->name.c_str(), current->name) == 0) {
 			if (!lastHash) {
 				tail = current->c;
 				if (tail->next) {
@@ -1093,20 +1011,6 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	}
 	return ret;
 }
-
-#ifdef _WIN32
-const char *ano_moderr()
-{
-	static char errbuf[513];
-	DWORD err = GetLastError();
-	if (err == 0)
-		return NULL;
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-				  FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512,
-				  NULL);
-	return errbuf;
-}
-#endif
 
 /**
  * Allow ircd protocol files to update the protect level info tables.

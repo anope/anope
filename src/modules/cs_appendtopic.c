@@ -48,102 +48,176 @@
 #define LNG_CHAN_HELP_APPENDTOPIC	1
 #define LNG_APPENDTOPIC_SYNTAX		2
 
-int my_cs_appendtopic(User * u);
-void my_cs_help(User * u);
-int my_cs_help_appendtopic(User * u);
-void my_add_languages();
+void my_cs_help(User *u);
 
 static Module *me;
+
+class CommandCSAppendTopic : public Command
+{
+ public:
+	CommandCSAppendTopic() : Command("APPENDTOPIC", 2, 2)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *chan = params[0].c_str();
+		const char *newtopic = params[1].c_str();
+		char topic[1024];
+		Channel *c;
+		ChannelInfo *ci;
+
+		if (!(c = findchan(chan)))
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+		else if (!(ci = c->ci))
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
+		else if (ci->flags & CI_VERBOTEN)
+			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
+		else if (!is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
+			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+		else
+		{
+			if (ci->last_topic)
+			{
+				snprintf(topic, sizeof(topic), "%s %s", ci->last_topic, newtopic);
+				delete [] ci->last_topic;
+			}
+			else
+				strscpy(topic, newtopic, sizeof(topic));
+
+			ci->last_topic = *topic ? sstrdup(topic) : NULL;
+			strscpy(ci->last_topic_setter, u->nick, NICKMAX);
+			ci->last_topic_time = time(NULL);
+
+			if (c->topic)
+				delete [] c->topic;
+			c->topic = *topic ? sstrdup(topic) : NULL;
+			strscpy(c->topic_setter, u->nick, NICKMAX);
+			if (ircd->topictsbackward)
+				c->topic_time = c->topic_time - 1;
+			else
+				c->topic_time = ci->last_topic_time;
+
+			if (is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
+				alog("%s: %s!%s@%s changed topic of %s as services admin.", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, c->name);
+			if (ircd->join2set)
+			{
+				if (whosends(ci) == findbot(s_ChanServ))
+				{
+					ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
+					ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
+				}
+			}
+			ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic, c->topic_time);
+			if (ircd->join2set)
+			{
+				if (whosends(ci) == findbot(s_ChanServ))
+					ircdproto->SendPart(findbot(s_ChanServ), c->name, NULL);
+			}
+		}
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
+		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
+
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+	}
+};
 
 class CSAppendTopic : public Module
 {
  public:
 	CSAppendTopic(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		me = this;
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1, -1, -1);
-		this->AddCommand(CHANSERV, c, MOD_HEAD);
-		moduleAddHelp(c, my_cs_help_appendtopic);
+		this->AddCommand(CHANSERV, new CommandCSAppendTopic(), MOD_HEAD);
 		this->SetChanHelp(my_cs_help);
 
 		/* English (US) */
 		const char* langtable_en_us[] = {
-		/* LNG_CHAN_HELP */
-		"   APPENDTOPIC Add text to a channels topic",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"This command allows users to append text to a currently set\n"
-		"channel topic. When TOPICLOCK is on, the topic is updated and\n"
-		"the new, updated topic is locked.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Syntax: APPENDTOPIC channel text\n"
+			/* LNG_CHAN_HELP */
+			"   APPENDTOPIC Add text to a channels topic",
+			/* LNG_CHAN_HELP_APPENDTOPIC */
+			"This command allows users to append text to a currently set\n"
+			"channel topic. When TOPICLOCK is on, the topic is updated and\n"
+			"the new, updated topic is locked.",
+			/* LNG_APPENDTOPIC_SYNTAX */
+			"Syntax: APPENDTOPIC channel text\n"
 		};
 
 		/* Dutch (NL) */
 		const char* langtable_nl[] = {
-		/* LNG_CHAN_HELP */
-		"   APPENDTOPIC Voeg tekst aan een kanaal onderwerp toe",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Dit command stelt gebruikers in staat om text toe te voegen\n"
-		"achter het huidige onderwerp van een kanaal. Als TOPICLOCK aan\n"
-		"staat, zal het onderwerp worden bijgewerkt en zal het nieuwe,\n"
-		"bijgewerkte topic worden geforceerd.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Gebruik: APPENDTOPIC kanaal tekst\n"
+			/* LNG_CHAN_HELP */
+			"   APPENDTOPIC Voeg tekst aan een kanaal onderwerp toe",
+			/* LNG_CHAN_HELP_APPENDTOPIC */
+			"Dit command stelt gebruikers in staat om text toe te voegen\n"
+			"achter het huidige onderwerp van een kanaal. Als TOPICLOCK aan\n"
+			"staat, zal het onderwerp worden bijgewerkt en zal het nieuwe,\n"
+			"bijgewerkte topic worden geforceerd.",
+			/* LNG_APPENDTOPIC_SYNTAX */
+			"Gebruik: APPENDTOPIC kanaal tekst\n"
 		};
 
 		/* German (DE) */
 		const char* langtable_de[] = {
-		/* LNG_CHAN_HELP */
-		"   APPENDTOPIC Fьgt einen Text zu einem Channel-Topic hinzu.",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Dieser Befehl erlaubt Benutzern, einen Text zu dem vorhandenen Channel-Topic\n"
-		"hinzuzufьgen. Wenn TOPICLOCK gesetzt ist, wird das Topic aktualisiert\n"
-		"und das neue, aktualisierte Topic wird gesperrt.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Syntax: APPENDTOPIC Channel Text\n"
+			/* LNG_CHAN_HELP */
+			"   APPENDTOPIC Fьgt einen Text zu einem Channel-Topic hinzu.",
+			/* LNG_CHAN_HELP_APPENDTOPIC */
+			"Dieser Befehl erlaubt Benutzern, einen Text zu dem vorhandenen Channel-Topic\n"
+			"hinzuzufьgen. Wenn TOPICLOCK gesetzt ist, wird das Topic aktualisiert\n"
+			"und das neue, aktualisierte Topic wird gesperrt.",
+			/* LNG_APPENDTOPIC_SYNTAX */
+			"Syntax: APPENDTOPIC Channel Text\n"
 		};
 
 		/* Portuguese (PT) */
 		const char* langtable_pt[] = {
-		/* LNG_CHAN_HELP */
-		"   APPENDTOPIC Adiciona texto ao tуpico de um canal",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Este comando permite aos usuбrios anexar texto a um tуpico de canal\n"
-		"jб definido. Quando TOPICLOCK estб ativado, o tуpico й atualizado e\n"
-		"o novo tуpico й travado.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Sintaxe: APPENDTOPIC canal texto\n"
+			/* LNG_CHAN_HELP */
+			"   APPENDTOPIC Adiciona texto ao tуpico de um canal",
+			/* LNG_CHAN_HELP_APPENDTOPIC */
+			"Este comando permite aos usuбrios anexar texto a um tуpico de canal\n"
+			"jб definido. Quando TOPICLOCK estб ativado, o tуpico й atualizado e\n"
+			"o novo tуpico й travado.",
+			/* LNG_APPENDTOPIC_SYNTAX */
+			"Sintaxe: APPENDTOPIC canal texto\n"
 		};
 
 		/* Russian (RU) */
 		const char* langtable_ru[] = {
-		/* LNG_CHAN_HELP */
-		"   APPENDTOPIC Добавляет текст к топику канала",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Данная команда позволяет добавить текст к топику, который установлен на указанном\n"
-		"канале. Если активирован режим TOPICLOCK, топик будет обновлен и заблокирован.\n"
-		"Примечание: текст будет ДОБАВЛЕН к топику, то есть старый топик удален НЕ БУДЕТ.\n",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Синтаксис: APPENDTOPIC #канал текст\n"
+			/* LNG_CHAN_HELP */
+			"   APPENDTOPIC Добавляет текст к топику канала",
+			/* LNG_CHAN_HELP_APPENDTOPIC */
+			"Данная команда позволяет добавить текст к топику, который установлен на указанном\n"
+			"канале. Если активирован режим TOPICLOCK, топик будет обновлен и заблокирован.\n"
+			"Примечание: текст будет ДОБАВЛЕН к топику, то есть старый топик удален НЕ БУДЕТ.\n",
+			/* LNG_APPENDTOPIC_SYNTAX */
+			"Синтаксис: APPENDTOPIC #канал текст\n"
 		};
 
 		/* Italian (IT) */
 		const char* langtable_it[] = {
-		/* LNG_CHAN_HELP */
-		"   APPENDTOPIC Aggiunge del testo al topic di un canale",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Questo comando permette agli utenti di aggiungere del testo ad un topic di un canale\n"
-		"giа impostato. Se TOPICLOCK и attivato, il topic viene aggiornato e il nuovo topic\n"
-		"viene bloccato.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Sintassi: APPENDTOPIC canale testo\n"
+			/* LNG_CHAN_HELP */
+			"   APPENDTOPIC Aggiunge del testo al topic di un canale",
+			/* LNG_CHAN_HELP_APPENDTOPIC */
+			"Questo comando permette agli utenti di aggiungere del testo ad un topic di un canale\n"
+			"giа impostato. Se TOPICLOCK и attivato, il topic viene aggiornato e il nuovo topic\n"
+			"viene bloccato.",
+			/* LNG_APPENDTOPIC_SYNTAX */
+			"Sintassi: APPENDTOPIC canale testo\n"
 		};
 
 		this->InsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
@@ -155,83 +229,9 @@ class CSAppendTopic : public Module
 	}
 };
 
-void my_cs_help(User * u)
+void my_cs_help(User *u)
 {
 	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
-}
-
-int my_cs_help_appendtopic(User * u)
-{
-	me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
-	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
-	return MOD_STOP;
-}
-
-int my_cs_appendtopic(User * u)
-{
-	char *cur_buffer;
-	char *chan;
-	char *newtopic;
-	char topic[1024];
-	Channel *c;
-	ChannelInfo *ci;
-
-	cur_buffer = moduleGetLastBuffer();
-	chan = myStrGetToken(cur_buffer, ' ', 0);
-	newtopic = myStrGetTokenRemainder(cur_buffer, ' ', 1);
-
-	if (!chan || !newtopic) {
-		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
-	} else if (!(c = findchan(chan))) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-	} else if (!(ci = c->ci)) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-	} else if (ci->flags & CI_VERBOTEN) {
-		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-	} else if (!is_services_admin(u) && !check_access(u, ci, CA_TOPIC)) {
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-	} else {
-		if (ci->last_topic) {
-			snprintf(topic, sizeof(topic), "%s %s", ci->last_topic,
-					 newtopic);
-			delete [] ci->last_topic;
-		} else {
-			strscpy(topic, newtopic, sizeof(topic));
-		}
-
-		ci->last_topic = *topic ? sstrdup(topic) : NULL;
-		strscpy(ci->last_topic_setter, u->nick, NICKMAX);
-		ci->last_topic_time = time(NULL);
-
-		if (c->topic)
-			delete [] c->topic;
-		c->topic = *topic ? sstrdup(topic) : NULL;
-		strscpy(c->topic_setter, u->nick, NICKMAX);
-		if (ircd->topictsbackward)
-			c->topic_time = c->topic_time - 1;
-		else
-			c->topic_time = ci->last_topic_time;
-
-		if (is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
-			alog("%s: %s!%s@%s changed topic of %s as services admin.",
-				 s_ChanServ, u->nick, u->username, u->host, c->name);
-		if (ircd->join2set) {
-			if (whosends(ci) == findbot(s_ChanServ)) {
-				ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
-				ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
-			}
-		}
-		ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic, c->topic_time);
-		if (ircd->join2set) {
-			if (whosends(ci) == findbot(s_ChanServ)) {
-				ircdproto->SendPart(findbot(s_ChanServ), c->name, NULL);
-			}
-		}
-	}
-	if (newtopic) delete [] newtopic;
-	if (chan) delete [] chan;
-	return MOD_CONT;
 }
 
 MODULE_INIT("cs_appendtopic", CSAppendTopic)

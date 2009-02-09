@@ -356,13 +356,7 @@ void process()
 	}
 
 	if (ac >= 1) {
-		if (nickIsServices(av[0], 1)) {
-			mod_current_buffer =
-				(ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-		} else {
-			mod_current_buffer =
-				(ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-		}
+			mod_current_buffer = (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
 	} else {
 		mod_current_buffer = NULL;
 	}

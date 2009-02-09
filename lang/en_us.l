@@ -5466,8 +5466,6 @@ OPER_HELP_STATS
 	
 	The ALL displays the user and uptime statistics, and
 	everything you'd see with MEMORY and UPLINK options.
-	
-	UPTIME may be used as a synonym for STATS.
 
 OPER_HELP_OPER
 	Syntax: OPER ADD nick

@@ -15,28 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User * u);
-int do_invite(User * u);
-
-class CSInvite : public Module
-{
- public:
-	CSInvite(const std::string &modname, const std::string &creator) : Module(modname, creator)
-	{
-		Command *c;
-
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
-
-		c = createCommand("INVITE", do_invite, NULL, CHAN_HELP_INVITE, -1, -1, -1, -1);
-		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
-	}
-};
-
-
 
 /**
  * Add the help response to anopes /cs help output.
@@ -47,33 +25,78 @@ void myChanServHelp(User * u)
 	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INVITE);
 }
 
-/**
- * The /cs invite command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_invite(User * u)
+class CommandCSInvite : public Command
 {
-	char *chan = strtok(NULL, " ");
-	Channel *c;
-	ChannelInfo *ci;
+ public:
+	CommandCSInvite() : Command("INVITE", 1, 1)
+	{
 
-	if (!chan) {
-		syntax_error(s_ChanServ, u, "INVITE", CHAN_INVITE_SYNTAX);
-	} else if (!(c = findchan(chan))) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-	} else if (!(ci = c->ci)) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-	} else if (ci->flags & CI_VERBOTEN) {
-		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-	} else if (ci->flags & CI_SUSPENDED) {
-		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-	} else if (!u || !check_access(u, ci, CA_INVITE)) {
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-	} else {
-		ircdproto->SendInvite(whosends(ci), chan, u->nick);
 	}
-	return MOD_CONT;
-}
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *chan = params[0].c_str();
+		Channel *c;
+		ChannelInfo *ci;
+
+		if (!(c = findchan(chan)))
+		{
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			return MOD_CONT;
+		}
+		else if (!(ci = c->ci))
+		{
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+			return MOD_CONT;
+		}
+		else if (ci->flags & CI_VERBOTEN)
+		{
+			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+			return MOD_CONT;
+		}
+		else if (ci->flags & CI_SUSPENDED)
+		{
+			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+			return MOD_CONT;
+		}
+		else if (!u || !check_access(u, ci, CA_INVITE))
+		{
+			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
+
+		ircdproto->SendInvite(whosends(ci), chan, u->nick);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_INVITE);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "INVITE", CHAN_INVITE_SYNTAX);
+	}
+};
+
+
+
+
+class CSInvite : public Module
+{
+ public:
+	CSInvite(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		this->AddCommand(CHANSERV, new CommandCSInvite(), MOD_UNIQUE);
+
+		this->SetChanHelp(myChanServHelp);
+	}
+};
+
+
 
 MODULE_INIT("cs_invite", CSInvite)

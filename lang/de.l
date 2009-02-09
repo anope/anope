@@ -5764,8 +5764,6 @@ OPER_HELP_STATS
 	Durch RESET werden einige Werte der Statistik zurück-
 	gesetzt, unter anderem die max. Anzahl gleichzeitig
 	verbundenen User.
-	
-	UPTIME kann als Synonym für STATS verwendet werden.
 
 OPER_HELP_OPER
 	Syntax: OPER ADD Nickname

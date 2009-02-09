@@ -170,19 +170,19 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	ano_modclearerr();
 
-	ano_module_t handle = ano_modopen(pbuf.c_str());
-	if (handle == NULL && (err = ano_moderr()) != NULL)
+	ano_module_t handle = dlopen(pbuf.c_str(), RTLD_LAZY);
+	if (handle == NULL && (err = dlerror()) != NULL)
 	{
 		alog("%s", err);
 		return MOD_ERR_NOLOAD;
 	}
 
 	ano_modclearerr();
-	func = function_cast<Module *(*)(const std::string &)>(ano_modsym(handle, "init_module"));
-	if (func == NULL && (err = ano_moderr()) != NULL)
+	func = function_cast<Module *(*)(const std::string &)>(dlsym(handle, "init_module"));
+	if (func == NULL && (err = dlerror()) != NULL)
 	{
 		alog("No magical init function found, not an Anope module");
-		ano_modclose(handle);
+		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
 
@@ -275,8 +275,8 @@ void ModuleManager::DeleteModule(Module *m)
 	handle = m->handle;
 
 	ano_modclearerr();
-	destroy_func = function_cast<void (*)(Module *)>(ano_modsym(m->handle, "destroy_module"));
-	if (destroy_func == NULL && (err = ano_moderr()) != NULL)
+	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "destroy_module"));
+	if (destroy_func == NULL && (err = dlerror()) != NULL)
 	{
 		alog("No magical destroy function found, chancing delete...");
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
@@ -288,7 +288,7 @@ void ModuleManager::DeleteModule(Module *m)
 
 	if (handle)
 	{
-		if ((ano_modclose(handle)) != 0)
-			alog("%s", ano_moderr());
+		if ((dlclose(handle)) != 0)
+			alog("%s", dlerror());
 	}
 }

@@ -15,72 +15,23 @@
 
 #include "module.h"
 
-int do_bot(User * u);
 void myBotServHelp(User * u);
 
-class BSBot : public Module
+class CommandBSBot : public Command
 {
- public:
-	BSBot(const std::string &modname, const std::string &creator) : Module(modname, creator)
+ private:
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		Command *c;
-
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
-
-		c = createCommand("BOT", do_bot, is_services_admin, -1, -1, -1,	BOT_SERVADMIN_HELP_BOT, BOT_SERVADMIN_HELP_BOT);
-		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
-
-		this->SetBotHelp(myBotServHelp);
-	}
-};
-
-
-/**
- * Add the help response to Anopes /bs help output.
- * @param u The user who is requesting help
- **/
-void myBotServHelp(User * u)
-{
-	if (is_services_admin(u)) {
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
-	}
-}
-
-/**
- * The /bs bot command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_bot(User * u)
-{
-	BotInfo *bi;
-	char *cmd = strtok(NULL, " ");
-	char *ch = NULL;
-
-	if (!cmd)
-	{
-			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
-		return MOD_CONT;
-	}
-
-	if (readonly)
-	{
-		notice_lang(s_BotServ, u, BOT_BOT_READONLY);
-		return MOD_CONT;
-	}
-
-	if (!stricmp(cmd, "ADD"))
-	{
-		char *nick = strtok(NULL, " ");
-		char *user = strtok(NULL, " ");
-		char *host = strtok(NULL, " ");
-		char *real = strtok(NULL, "");
+		const char *nick = params[1].c_str();
+		const char *user = params[2].c_str();
+		const char *host = params[3].c_str();
+		const char *real = params[4].c_str();
+		const char *ch = NULL;
+		BotInfo *bi;
 
 		if (!nick || !user || !host || !real)
 		{
-			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
@@ -182,18 +133,22 @@ int do_bot(User * u)
 			bi->host, bi->real);
 
 		send_event(EVENT_BOT_CREATE, 1, bi->nick);
+		return MOD_CONT;
 	}
-	else if (!stricmp(cmd, "CHANGE"))
+
+	CommandReturn DoChange(User *u, std::vector<std::string> &params)
 	{
-		char *oldnick = strtok(NULL, " ");
-		char *nick = strtok(NULL, " ");
-		char *user = strtok(NULL, " ");
-		char *host = strtok(NULL, " ");
-		char *real = strtok(NULL, "");
+		const char *oldnick = params[1].c_str();
+		const char *nick = params[2].c_str();
+		const char *user = params[3].c_str();
+		const char *host = params[4].c_str();
+		const char *real = params[5].c_str();
+		const char *ch = NULL;
+		BotInfo *bi;
 
 		if (!oldnick || !nick)
 		{
-			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
@@ -351,14 +306,17 @@ int do_bot(User * u)
 			oldnick, bi->nick, bi->user, bi->host, bi->real);
 
 		send_event(EVENT_BOT_CHANGE, 1, bi->nick);
+		return MOD_CONT;
 	}
-	else if (!stricmp(cmd, "DEL"))
-	{
-		char *nick = strtok(NULL, " ");
+
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
+	{ 
+		const char *nick = params[1].c_str();
+		BotInfo *bi;
 
 		if (!nick)
 		{
-			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
@@ -379,12 +337,88 @@ int do_bot(User * u)
 		ircdproto->SendSQLineDel(bi->nick);
 		delete bi;
 		notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
+		return MOD_CONT;
 	}
-	else
-		syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+ public:
+	CommandBSBot() : Command("BOT", 1, 5)
+	{
+	}
 
-	return MOD_CONT;
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *cmd = strtok(NULL, " ");
+
+		if (!cmd)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
+
+		if (readonly)
+		{
+			notice_lang(s_BotServ, u, BOT_BOT_READONLY);
+			return MOD_CONT;
+		}
+
+		if (!stricmp(cmd, "ADD"))
+		{
+			return this->DoAdd(u, params);
+		}
+		else if (!stricmp(cmd, "CHANGE"))
+		{
+			return this->DoChange(u, params);
+		}
+		else if (!stricmp(cmd, "DEL"))
+		{
+			return this->DoDel(u, params);
+		}
+		else
+			this->OnSyntaxError(u);
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_admin(u) && !is_services_root(u))
+			return false;
+	
+		notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+	}
+};
+
+class BSBot : public Module
+{
+ public:
+	BSBot(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		this->AddCommand(BOTSERV, new CommandBSBot(), MOD_UNIQUE);
+
+		this->SetBotHelp(myBotServHelp);
+	}
+};
+
+
+/**
+ * Add the help response to Anopes /bs help output.
+ * @param u The user who is requesting help
+ **/
+void myBotServHelp(User * u)
+{
+	if (is_services_admin(u)) {
+		notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
+	}
 }
+
 
 
 MODULE_INIT("bs_bot", BSBot)

@@ -187,7 +187,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 0,						 /* VHOST		*/
 	 CAPAB_SSJ3,				/* SSJ3		 */
 	 CAPAB_NICK2,			   /* NICK2		*/
-	 CAPAB_UMODE2,			  /* UMODE2	   */
 	 CAPAB_VL,				  /* VL		   */
 	 CAPAB_TLKEXT,			  /* TLKEXT	   */
 	 0,						 /* DODKEY	   */
@@ -664,6 +663,11 @@ class UnrealIRCdProto : public IRCDProto
 		SendSQLine(nick, "Reserved for services");
 	}
 
+	bool CanKick(BotInfo *source,  const char *chan,  const char *user,  const char *buf)
+	{
+		return !user->mode & MODE_q;
+	}
+
 	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 	{
 		if (buf) send_cmd(source->nick, "H %s %s :%s", chan, user, buf);
@@ -1059,7 +1063,10 @@ int anope_event_umode2(const char *source, int ac, const char **av)
 	if (ac < 1)
 		return MOD_CONT;
 
-	do_umode2(source, ac, av);
+	const char *newav[4];
+	newav[0] = source;
+	newav[1] = av[0];
+	do_umode(source, ac, av);
 	return MOD_CONT;
 }
 

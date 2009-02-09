@@ -15,27 +15,85 @@
 
 #include "module.h"
 
-#ifdef _WIN32
-extern MDE int anope_get_invite_mode();
-extern MDE int anope_get_invis_mode();
-#endif
+void myOperServHelp(User *u);
 
-int do_userlist(User * u);
-void myOperServHelp(User * u);
+class CommandOSUserList : public Command
+{
+ public:
+	CommandOSUserList() : Command("USERLIST", 0, 2)
+	{
+	}
+
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
+		const char *opt = params.size() > 1 ? params[1].c_str() : NULL;
+
+		Channel *c;
+		int modes = 0;
+
+		if (opt && !stricmp(opt, "INVISIBLE"))
+			modes |= anope_get_invis_mode();
+
+		if (pattern && (c = findchan(pattern)))
+		{
+			struct c_userlist *cu;
+
+			notice_lang(s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
+
+			for (cu = c->users; cu; cu = cu->next)
+			{
+				if (modes && !(cu->user->mode & mode))
+					continue;
+				notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick, cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
+			}
+		}
+		else
+		{
+			char mask[BUFSIZE];
+			int i;
+			User *u2;
+
+			notice_lang(s_OperServ, u, OPER_USERLIST_HEADER);
+
+			for (i = 0; i < 1024; ++i)
+			{
+				for (u2 = userlist[i]; u2; u2 = u2->next)
+				{
+					if (pattern)
+					{
+						snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+						if (!match_wild_nocase(pattern, mask))
+							continue;
+						if (modes && !(u2->mode & modes))
+							continue;
+					}
+					notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+				}
+			}
+		}
+
+		notice_lang(s_OperServ, u, OPER_USERLIST_END);
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_USERLIST);
+		return true;
+	}
+};
 
 class OSUserList : public Module
 {
  public:
 	OSUserList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("USERLIST", do_userlist, NULL, OPER_HELP_USERLIST, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSUserList(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
@@ -46,65 +104,9 @@ class OSUserList : public Module
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
 	notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
-}
-
-/**
- * The /os userlist command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-
-int do_userlist(User * u)
-{
-	char *pattern = strtok(NULL, " ");
-	char *opt = strtok(NULL, " ");
-
-	Channel *c;
-	int modes = 0;
-
-	if (opt && !stricmp(opt, "INVISIBLE"))
-		modes |= anope_get_invis_mode();
-
-	if (pattern && (c = findchan(pattern))) {
-		struct c_userlist *cu;
-
-		notice_lang(s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
-
-		for (cu = c->users; cu; cu = cu->next) {
-			if (modes && !(cu->user->mode & modes))
-				continue;
-			notice_lang(s_OperServ, u, OPER_USERLIST_RECORD,
-						cu->user->nick, common_get_vident(cu->user),
-						common_get_vhost(cu->user));
-		}
-	} else {
-		char mask[BUFSIZE];
-		int i;
-		User *u2;
-
-		notice_lang(s_OperServ, u, OPER_USERLIST_HEADER);
-
-		for (i = 0; i < 1024; i++) {
-			for (u2 = userlist[i]; u2; u2 = u2->next) {
-				if (pattern) {
-					snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick,
-							 common_get_vident(u2), common_get_vhost(u2));
-					if (!match_wild_nocase(pattern, mask))
-						continue;
-					if (modes && !(u2->mode & modes))
-						continue;
-				}
-				notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick,
-							common_get_vident(u2), common_get_vhost(u2));
-			}
-		}
-	}
-
-	notice_lang(s_OperServ, u, OPER_USERLIST_END);
-	return MOD_CONT;
 }
 
 MODULE_INIT("os_userlist", OSUserList)

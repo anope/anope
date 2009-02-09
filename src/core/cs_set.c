@@ -269,7 +269,7 @@ int do_set_founder(User * u, ChannelInfo * ci, char *param)
 
 	alog("%s: Changing founder of %s from %s to %s by %s!%s@%s",
 		 s_ChanServ, ci->name, ci->founder->display, nc->display, u->nick,
-		 u->username, u->host);
+		 u->GetIdent().c_str(), u->host);
 
 	/* Founder and successor must not be the same group */
 	if (nc == ci->successor)
@@ -315,7 +315,7 @@ int do_set_successor(User * u, ChannelInfo * ci, char *param)
 	alog("%s: Changing successor of %s from %s to %s by %s!%s@%s",
 		 s_ChanServ, ci->name,
 		 (ci->successor ? ci->successor->display : "none"),
-		 (nc ? nc->display : "none"), u->nick, u->username, u->host);
+		 (nc ? nc->display : "none"), u->nick, u->GetIdent().c_str(), u->host);
 
 	ci->successor = nc;
 
@@ -356,14 +356,14 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
 
 	if (get_access(u, ci) < ACCESS_FOUNDER) {
 		alog("%s: %s!%s@%s set password as Services admin for %s",
-			 s_ChanServ, u->nick, u->username, u->host, ci->name);
+			 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ci->name);
 		if (WallSetpass)
 			ircdproto->SendGlobops(s_ChanServ,
 							 "\2%s\2 set password as Services admin for channel \2%s\2",
 							 u->nick, ci->name);
 	} else {
 		alog("%s: %s!%s@%s changed password of %s (founder: %s)",
-			 s_ChanServ, u->nick, u->username, u->host,
+			 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
 			 ci->name, ci->founder->display);
 	}
 	return MOD_CONT;
@@ -748,13 +748,13 @@ int do_set_xop(User * u, ChannelInfo * ci, char *param)
 		}
 
 		alog("%s: %s!%s@%s enabled XOP for %s", s_ChanServ, u->nick,
-			 u->username, u->host, ci->name);
+			 u->GetIdent().c_str(), u->host, ci->name);
 		notice_lang(s_ChanServ, u, CHAN_SET_XOP_ON, ci->name);
 	} else if (stricmp(param, "OFF") == 0) {
 		ci->flags &= ~CI_XOP;
 
 		alog("%s: %s!%s@%s disabled XOP for %s", s_ChanServ, u->nick,
-			 u->username, u->host, ci->name);
+			 u->GetIdent().c_str(), u->host, ci->name);
 		notice_lang(s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name);
 	} else {
 		syntax_error(s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);

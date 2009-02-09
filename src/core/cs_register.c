@@ -93,7 +93,7 @@ int do_register(User * u)
 		notice_lang(s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
 	} else if ((ci = cs_findchan(chan)) != NULL) {
 		if (ci->flags & CI_VERBOTEN) {
-			alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->username, u->host);
+			alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->GetIdent().c_str(), u->host);
 			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 		} else {
 			notice_lang(s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
@@ -146,7 +146,7 @@ int do_register(User * u)
 		ci->botflags = BSDefFlags;
 		ci->founder->channelcount++;
 		alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan,
-			 u->nick, u->username, u->host);
+			 u->nick, u->GetIdent().c_str(), u->host);
 		notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
 
 		if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX - 1) == 1) {

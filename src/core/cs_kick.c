@@ -15,27 +15,6 @@
 
 #include "module.h"
 
-int do_cs_kick(User * u);
-void myChanServHelp(User * u);
-
-class CSKick : public Module
-{
- public:
-	CSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
-	{
-		Command *c;
-
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(CORE);
-
-		c = createCommand("KICK", do_cs_kick, NULL, CHAN_HELP_KICK, -1, -1, -1, -1);
-		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
-	}
-};
-
 /**
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
@@ -45,97 +24,91 @@ void myChanServHelp(User * u)
 	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_KICK);
 }
 
-/**
- * The /cs kick command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_cs_kick(User * u)
+class CommandCSKick : public Command
 {
-	char *chan = strtok(NULL, " ");
-	char *params = strtok(NULL, " ");
-	char *reason = strtok(NULL, "");
+ public:
+	CommandCSKick() : Command("KICK", 1, 3)
+	{
 
-	Channel *c;
-	ChannelInfo *ci;
-	User *u2;
-
-	int is_same;
-
-	if (!reason) {
-		reason = "Requested";
-	} else {
-		if (strlen(reason) > 200)
-			reason[200] = '\0';
 	}
 
-	if (!chan) {
-		struct u_chanlist *uc, *next;
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	{
+		const char *chan = params[0].c_str();
+		const char *target = params[1].c_str();
+		params[2].resize(200);
+		const char *reason = params[2].c_str();
+		Channel *c;
+		ChannelInfo *ci;
+		User *u2;
 
-		/* Kicks the user on every channels he is on. */
+		int is_same;
 
-		for (uc = u->chans; uc; uc = next) {
-			next = uc->next;
-			if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
-				&& check_access(u, ci, CA_KICKME)) {
-				const char *av[3];
-
-				if ((ci->flags & CI_SIGNKICK)
-					|| ((ci->flags & CI_SIGNKICK_LEVEL)
-						&& !check_access(u, ci, CA_SIGNKICK)))
-					ircdproto->SendKick(whosends(ci), ci->name, u->nick,
-								   "%s (%s)", reason, u->nick);
-				else
-					ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s",
-								   reason);
-				av[0] = ci->name;
-				av[1] = u->nick;
-				av[2] = reason;
-				do_kick(s_ChanServ, 3, av);
-			}
+		if (!reason) {
+			reason = "Requested";
 		}
 
+		if (!target) {
+			target = u->nick;
+		}
+
+		is_same = (target == u->nick) ? 1 : (stricmp(target, u->nick) == 0);
+
+		if (!(c = findchan(chan))) {
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+		} else if (!(ci = c->ci)) {
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+		} else if (ci->flags & CI_VERBOTEN) {
+			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
+			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, target);
+		} else if (!is_on_chan(c, u2)) {
+			notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
+		} else if (!is_same ? !check_access(u, ci, CA_KICK) :
+					 !check_access(u, ci, CA_KICKME)) {
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+		} else if (!is_same && (ci->flags & CI_PEACE)
+					 && (get_access(u2, ci) >= get_access(u, ci))) {
+			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+		} else if (is_protected(u2)) {
+			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+		} else {
+			const char *av[3];
+
+			if ((ci->flags & CI_SIGNKICK)
+				|| ((ci->flags & CI_SIGNKICK_LEVEL)
+					&& !check_access(u, ci, CA_SIGNKICK)))
+				ircdproto->SendKick(whosends(ci), ci->name, target, "%s (%s)",
+								 reason, u->nick);
+			else
+				ircdproto->SendKick(whosends(ci), ci->name, target, "%s", reason);
+			av[0] = ci->name;
+			av[1] = target;
+			av[2] = reason;
+			do_kick(s_ChanServ, 3, av);
+		}
 		return MOD_CONT;
-	} else if (!params) {
-		params = u->nick;
 	}
 
-	is_same = (params == u->nick) ? 1 : (stricmp(params, u->nick) == 0);
-
-	if (!(c = findchan(chan))) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-	} else if (!(ci = c->ci)) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-	} else if (ci->flags & CI_VERBOTEN) {
-		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-	} else if (is_same ? !(u2 = u) : !(u2 = finduser(params))) {
-		notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, params);
-	} else if (!is_on_chan(c, u2)) {
-		notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
-	} else if (!is_same ? !check_access(u, ci, CA_KICK) :
-			   !check_access(u, ci, CA_KICKME)) {
-		notice_lang(s_ChanServ, u, ACCESS_DENIED);
-	} else if (!is_same && (ci->flags & CI_PEACE)
-			   && (get_access(u2, ci) >= get_access(u, ci))) {
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-	} else if (is_protected(u2)) {
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-	} else {
-		const char *av[3];
-
-		if ((ci->flags & CI_SIGNKICK)
-			|| ((ci->flags & CI_SIGNKICK_LEVEL)
-				&& !check_access(u, ci, CA_SIGNKICK)))
-			ircdproto->SendKick(whosends(ci), ci->name, params, "%s (%s)",
-						   reason, u->nick);
-		else
-			ircdproto->SendKick(whosends(ci), ci->name, params, "%s", reason);
-		av[0] = ci->name;
-		av[1] = params;
-		av[2] = reason;
-		do_kick(s_ChanServ, 3, av);
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+    notice_lang(s_ChanServ, u, CHAN_HELP_KICK);
+		return true;
 	}
-	return MOD_CONT;
-}
+};
+
+class CSKick : public Module
+{
+ public:
+	CSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		this->AddCommand(CHANSERV, new CommandCSKick(), MOD_UNIQUE);
+
+		this->SetChanHelp(myChanServHelp);
+	}
+};
 
 MODULE_INIT("cs_kick", CSKick)

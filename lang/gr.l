@@ -5676,8 +5676,6 @@ OPER_HELP_STATS
 	
 	The RESET option currently resets the maximum user count
 	to the number of users currently present on the network.
-	
-	UPTIME may be used as a synonym for STATS.
 
 OPER_HELP_OPER
 	Σύνταξη: OPER ADD ψευδώνυμο

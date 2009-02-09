@@ -835,7 +835,7 @@ void EnforceQlinedNick(const char *nick, const char *killer)
 	User *u2;
 
 	if ((u2 = finduser(nick))) {
-		alog("Killed Q-lined nick: %s!%s@%s", u2->nick, u2->username,
+		alog("Killed Q-lined nick: %s!%s@%s", u2->nick, u2->GetIdent().c_str(),
 			 u2->host);
 		kill_user(killer, u2->nick,
 				  "This nick is reserved for Services. Please use a non Q-Lined nick.");

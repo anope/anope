@@ -5801,8 +5801,6 @@ OPER_HELP_STATS
 		
 	L'option UPLINK affiche les informations sur le serveur qui est
 	utilisé pour linker Anope au réseau.
-	
-	UPTIME est l'équivalent de STATS.
 
 OPER_HELP_OPER
 	Syntaxe: OPER ADD pseudo

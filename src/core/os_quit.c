@@ -15,22 +15,49 @@
 
 #include "module.h"
 
-int do_os_quit(User * u);
-void myOperServHelp(User * u);
+void myOperServHelp(User *u);
+
+class CommandOSQuit : public Command
+{
+ public:
+	CommandOSQuit() : Command("QUIT", 0, 0)
+	{
+	}
+
+	CommandResult Execute(User *u, std::vector<std::string> &params)
+	{
+		quitmsg = new char[28 + strlen(u->nick)];
+		if (!quitmsg)
+			quitmsg = "QUIT command received, but out of memory!";
+		else
+			sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
+
+		if (GlobalOnCycle)
+			oper_global(NULL, "%s", GlobalOnCycleMessage);
+		quitting = 1;
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_root(u))
+			return false;
+
+		notice_lang(s_OperServ, u, OPER_HELP_QUIT);
+		return true;
+	}
+};
 
 class OSQuit : public Module
 {
  public:
 	OSQuit(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("QUIT", do_os_quit, is_services_root, OPER_HELP_QUIT, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSQuit(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 	}
@@ -41,31 +68,10 @@ class OSQuit : public Module
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+void myOperServHelp(User *u)
 {
-	if (is_services_root(u)) {
+	if (is_services_root(u))
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_QUIT);
-	}
-}
-
-/**
- * The /os quit command.
- * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- **/
-int do_os_quit(User * u)
-{
-	quitmsg = new char[28 + strlen(u->nick)];
-	if (!quitmsg)
-		quitmsg = "QUIT command received, but out of memory!";
-	else
-		sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
-
-	if (GlobalOnCycle) {
-		oper_global(NULL, "%s", GlobalOnCycleMessage);
-	}
-	quitting = 1;
-	return MOD_CONT;
 }
 
 MODULE_INIT("os_quit", OSQuit)

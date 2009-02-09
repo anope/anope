@@ -5634,8 +5634,6 @@ OPER_HELP_STATS
 	
 	De ALL optie stelt momenteel het maximum aantal gebruikers in
 	op het aantal gebruikers dat momenteel aanwezig is op het netwerk.
-	
-	UPTIME kan als een synoniem voor STATS gebruikt worden.
 
 OPER_HELP_OPER
 	Gebruik: OPER ADD nick

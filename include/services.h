@@ -542,7 +542,6 @@ struct ircdcapab_ {
   uint32 vhost;
   uint32 ssj3;
   uint32 nick2;
-  uint32 umode2;
   uint32 vl;
   uint32 tlkext;
   uint32 dodkey;
@@ -1173,7 +1172,7 @@ typedef struct ircd_modes_ {
 #define CUS_HALFOP		0x0004		/* Halfop (+h) */
 #define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
 #define CUS_PROTECT		0x0010		/* Protected users (+a) */
-#define CUS_DEOPPED		0x0080		/* User has been specifically deopped */
+/* #define CUS_DEOPPED		0x0080	*/	/* Removed due to IRCd checking it */
 
 #define MUT_DEOP   		0
 #define MUT_OP			1
@@ -1218,12 +1217,11 @@ struct capabinfo_ {
 #define CAPAB_TOKEN	 0x00400000
 #define CAPAB_SSJ3	  0x00800000
 #define CAPAB_NICK2	 0x01000000
-#define CAPAB_UMODE2	0x02000000
-#define CAPAB_VL		0x04000000
-#define CAPAB_TLKEXT	0x08000000
-#define CAPAB_CHANMODE  0x10000000
-#define CAPAB_SJB64	 0x20000000
-#define CAPAB_NICKCHARS 0x40000000
+#define CAPAB_VL		0x02000000
+#define CAPAB_TLKEXT	0x04000000
+#define CAPAB_CHANMODE  0x08000000
+#define CAPAB_SJB64	 0x10000000
+#define CAPAB_NICKCHARS 0x20000000
 
 /*************************************************************************/
 
@@ -1311,14 +1309,24 @@ private:
 		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
 		virtual void SendVhostDel(User *) { }
 		virtual void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual void SendSVSKill(const char *source, const char *user, const char *fmt, ...)
+		virtual bool CanSVSKill(const char *source,  const char *user,  const char *buf)
+		{
+			return true;
+		}
+		virtual bool SendSVSKill(const char *source, const char *user, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
 			va_start(args, fmt);
 			vsnprintf(buf, BUFSIZE - 1, fmt, args);
 			va_end(args);
-			SendSVSKillInternal(source, user, buf);
+
+			if (CanSVSKill(source, user, buf))
+			{
+				SendSVSKillInternal(source, user, buf);
+			}
+
+			return false;
 		}
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
@@ -1331,14 +1339,25 @@ private:
 			SendModeInternal(bi, dest, buf);
 		}
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid) = 0;
-		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
+		virtual bool CanKick(BotInfo *bi,  const char *chan,  const char *user,  const char *buf)
+		{
+			return true;
+		}
+		virtual bool SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
 			va_start(args, fmt);
 			vsnprintf(buf, BUFSIZE - 1, fmt, args);
 			va_end(args);
-			SendKickInternal(bi, chan, user, buf);
+
+			if (CanKick(bi, chan, user, buf))
+			{
+				SendKickInternal(bi, chan, user, buf);
+				return true;
+			}
+
+			return false;
 		}
 		virtual void SendNoticeChanops(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{

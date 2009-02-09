@@ -479,7 +479,7 @@ int init_secondary(int ac, char **av)
 	 */
 	signal(SIGHUP, sighandler);
 	signal(SIGTERM, sighandler);
-	signal(SIGINT, sighandler)'
+	signal(SIGINT, sighandler);
 
 	/* Initialize multi-language support */
 	lang_init();

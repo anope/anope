@@ -152,7 +152,7 @@ class CommandHSSet : public Command
 
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_HostServ, u, "SET", HOST_SET_SYNTAX, s_HostServ);
+		syntax_error(s_HostServ, u, "SET", HOST_SET_SYNTAX);
 	}
 };
 

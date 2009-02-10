@@ -125,7 +125,7 @@ HostCore *hostCoreListHead()
  * @param time Time the vhost was Set
  * @return HostCore
  */
-HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
+HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 							 char *vHost, const char *creator, int32 tmp_time)
 {
 
@@ -174,7 +174,7 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
  * @param found If found
  * @return HostCore
  */
-HostCore *findHostCore(HostCore * phead, char *nick, bool* found)
+HostCore *findHostCore(HostCore * phead, const char *nick, bool* found)
 {
 	HostCore *previous, *current;
 
@@ -206,7 +206,7 @@ HostCore *findHostCore(HostCore * phead, char *nick, bool* found)
 }
 
 /*************************************************************************/
-HostCore *insertHostCore(HostCore * phead, HostCore * prev, char *nick,
+HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 						 char *vIdent, char *vHost, const char *creator,
 						 int32 tmp_time)
 {
@@ -285,7 +285,7 @@ HostCore *deleteHostCore(HostCore * phead, HostCore * prev)
 }
 
 /*************************************************************************/
-void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator,
+void addHostCore(const char *nick, char *vIdent, char *vhost, const char *creator,
 				 int32 tmp_time)
 {
 	HostCore *tmp;
@@ -339,7 +339,7 @@ char *getvIdent(char *nick)
 }
 
 /*************************************************************************/
-void delHostCore(char *nick)
+void delHostCore(const char *nick)
 {
 	HostCore *tmp;
 	bool found = false;

@@ -254,7 +254,7 @@ E char *s_HostServ;
 E void load_hs_dbase();
 E void save_hs_dbase();
 E int do_on_id(User * u);
-E void delHostCore(char *nick);
+E void delHostCore(const char *nick);
 E void hostserv(User * u, char *buf);
 
 E char *PIDFilename;
@@ -478,15 +478,15 @@ E void helpserv_init();
 /**** hostserv.c  ****/
 E void get_hostserv_stats(long *nrec, long *memuse);
 E void hostserv_init();
-E void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
+E void addHostCore(const char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
 E char *getvIdent(char *nick);
 E char *getvHost(char *nick);
 E int is_host_remover(User * u);
 E int is_host_setter(User *u);
 E HostCore *hostCoreListHead();
-E HostCore *findHostCore(HostCore * head, char *nick, bool *found);
-E HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
-E HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
+E HostCore *findHostCore(HostCore * head, const char *nick, bool *found);
+E HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
+E HostCore *insertHostCore(HostCore * head, HostCore * prev, const char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
 E HostCore *deleteHostCore(HostCore * head, HostCore * prev);
 E void set_lastmask(User * u);
 

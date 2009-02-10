@@ -56,13 +56,13 @@ class CommandHSDelAll : public Command
 		if (!is_host_remover(u))
 			return false;
 
-		notice_lang(s_HostServ, u, HOST_HELP_ALL);
+		notice_lang(s_HostServ, u, HOST_HELP_DELALL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX, s_HostServ);
+		syntax_error(s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
 	}
 };
 

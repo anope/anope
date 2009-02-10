@@ -152,7 +152,7 @@ class CommandHSSetAll : public Command
 
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX, s_HostServ);
+		syntax_error(s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
 	}
 };
 

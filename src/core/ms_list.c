@@ -37,7 +37,7 @@ class CommandMSList : public Command
 		if (param && *param == '#')
 		{
 			chan = param;
-			param = params.size() > 1 ? params[1].c)_str() : NULL;
+			param = params.size() > 1 ? params[1].c_str() : NULL;
 			if (!(ci = cs_findchan(chan)))
 			{
 				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);

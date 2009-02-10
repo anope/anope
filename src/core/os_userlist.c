@@ -43,7 +43,7 @@ class CommandOSUserList : public Command
 
 			for (cu = c->users; cu; cu = cu->next)
 			{
-				if (modes && !(cu->user->mode & mode))
+				if (modes && !(cu->user->mode & modes))
 					continue;
 				notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick, cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
 			}

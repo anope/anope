@@ -781,7 +781,7 @@ E int check_akill(const char *nick, const char *username, const char *host, cons
 E void expire_akills();
 E void oper_global(char *nick, const char *fmt, ...);
 
-E int add_sgline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
+E int add_sgline(User *u, const char *mask, const char *by, time_t expires, const char *reason);
 E int check_sgline(const char *nick, const char *realname);
 E void expire_sglines();
 

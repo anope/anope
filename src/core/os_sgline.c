@@ -14,6 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hashcomp.h"
 
 void myOperServHelp(User *u);
 int sgline_view_callback(SList *slist, int number, void *item, va_list args);
@@ -26,8 +27,9 @@ class CommandOSSGLine : public Command
  private:
 	CommandReturn OnAdd(User *u, std::vector<std::string> &params)
 	{
-		int deleted = 0, last_param = 2;
-		const char *param;
+		int deleted = 0;
+		unsigned last_param = 2;
+		const char *param, *expiry;
 		char rest[BUFSIZE];
 		time_t expires;
 
@@ -61,7 +63,7 @@ class CommandOSSGLine : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(rest, sizeof(rest), "%s%s%s", param, params.size() > last_param ? " " : "", params.size() > last_param ? param[last_param].c_str() : "");
+		snprintf(rest, sizeof(rest), "%s%s%s", param, params.size() > last_param ? " " : "", params.size() > last_param ? params[last_param].c_str() : "");
 
 		sepstream sep(rest, ':');
 		std::string mask;
@@ -76,7 +78,7 @@ class CommandOSSGLine : public Command
 			if (mask[masklen - 1] == ' ')
 				mask.erase(masklen - 1);
 
-			const char cmask = mask.c_str();
+			const char *cmask = mask.c_str();
 
 			/* We first do some sanity check on the proposed mask. */
 
@@ -101,7 +103,7 @@ class CommandOSSGLine : public Command
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					char *s = NULL;
+					const char *s = NULL;
 
 					if (wall_expiry >= 86400)
 					{
@@ -169,7 +171,7 @@ class CommandOSSGLine : public Command
 				notice_lang(s_OperServ, u, OPER_SGLINE_DELETED_SEVERAL, res);
 		}
 		else {
-			if ((res = slist_indexof(&sglines, mask)) == -1)
+			if ((res = slist_indexof(&sglines, const_cast<char *>(mask))) == -1)
 			{
 				notice_lang(s_OperServ, u, OPER_SGLINE_NOT_FOUND, mask);
 				return MOD_CONT;
@@ -272,6 +274,8 @@ class CommandOSSGLine : public Command
 	{
 		slist_clear(&sglines, 1);
 		notice_lang(s_OperServ, u, OPER_SGLINE_CLEAR);
+
+		return MOD_CONT;
 	}
  public:
 	CommandOSSGLine() : Command("SGLINE", 1, 3)

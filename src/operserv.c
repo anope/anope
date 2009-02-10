@@ -723,7 +723,7 @@ static int is_akill_entry_equal(SList * slist, void *item1, void *item2)
  * The success result is the number of SGLINEs that were deleted to successfully add one.
  */
 
-int add_sgline(User * u, char *mask, const char *by, const time_t expires,
+int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 			   const char *reason)
 {
 	int deleted = 0, i;

@@ -692,6 +692,10 @@ E void ModuleRemoveBackups(const char *dbname);
 
 /**** news.c ****/
 
+/* Add news items. */
+E int add_newsitem(User * u, const char *text, int16 type);
+/* Delete news items. */
+E int del_newsitem(int num, int16 type);
 E int32 nnews, news_size;
 E NewsItem *news;
 E void get_news_stats(long *nrec, long *memuse);

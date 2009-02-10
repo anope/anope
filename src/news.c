@@ -16,6 +16,7 @@
 #include "services.h"
 #include "pseudo.h"
 
+#define MSG_MAX		11
 /*************************************************************************/
 
 int32 nnews = 0;
@@ -24,103 +25,7 @@ NewsItem *news = NULL;
 
 /*************************************************************************/
 
-/* List of messages for each news type.  This simplifies message sending. */
 
-#define MSG_SYNTAX	0
-#define MSG_LIST_HEADER	1
-#define MSG_LIST_ENTRY	2
-#define MSG_LIST_NONE	3
-#define MSG_ADD_SYNTAX	4
-#define MSG_ADD_FULL	5
-#define MSG_ADDED	6
-#define MSG_DEL_SYNTAX	7
-#define MSG_DEL_NOT_FOUND 8
-#define MSG_DELETED	9
-#define MSG_DEL_NONE	10
-#define MSG_DELETED_ALL	11
-#define MSG_MAX		11
-
-struct newsmsgs {
-	int16 type;
-	const char *name;
-	int msgs[MSG_MAX + 1];
-};
-
-struct newsmsgs msgarray[] = {
-	{NEWS_LOGON, "LOGON",
-	 {NEWS_LOGON_SYNTAX,
-	  NEWS_LOGON_LIST_HEADER,
-	  NEWS_LOGON_LIST_ENTRY,
-	  NEWS_LOGON_LIST_NONE,
-	  NEWS_LOGON_ADD_SYNTAX,
-	  NEWS_LOGON_ADD_FULL,
-	  NEWS_LOGON_ADDED,
-	  NEWS_LOGON_DEL_SYNTAX,
-	  NEWS_LOGON_DEL_NOT_FOUND,
-	  NEWS_LOGON_DELETED,
-	  NEWS_LOGON_DEL_NONE,
-	  NEWS_LOGON_DELETED_ALL}
-	 },
-	{NEWS_OPER, "OPER",
-	 {NEWS_OPER_SYNTAX,
-	  NEWS_OPER_LIST_HEADER,
-	  NEWS_OPER_LIST_ENTRY,
-	  NEWS_OPER_LIST_NONE,
-	  NEWS_OPER_ADD_SYNTAX,
-	  NEWS_OPER_ADD_FULL,
-	  NEWS_OPER_ADDED,
-	  NEWS_OPER_DEL_SYNTAX,
-	  NEWS_OPER_DEL_NOT_FOUND,
-	  NEWS_OPER_DELETED,
-	  NEWS_OPER_DEL_NONE,
-	  NEWS_OPER_DELETED_ALL}
-	 },
-	{NEWS_RANDOM, "RANDOM",
-	 {NEWS_RANDOM_SYNTAX,
-	  NEWS_RANDOM_LIST_HEADER,
-	  NEWS_RANDOM_LIST_ENTRY,
-	  NEWS_RANDOM_LIST_NONE,
-	  NEWS_RANDOM_ADD_SYNTAX,
-	  NEWS_RANDOM_ADD_FULL,
-	  NEWS_RANDOM_ADDED,
-	  NEWS_RANDOM_DEL_SYNTAX,
-	  NEWS_RANDOM_DEL_NOT_FOUND,
-	  NEWS_RANDOM_DELETED,
-	  NEWS_RANDOM_DEL_NONE,
-	  NEWS_RANDOM_DELETED_ALL}
-	 }
-};
-
-static int *findmsgs(int16 type, const char **type_name)
-{
-	int i;
-	for (i = 0; i < lenof(msgarray); i++) {
-		if (msgarray[i].type == type) {
-			if (type_name)
-				*type_name = msgarray[i].name;
-			return msgarray[i].msgs;
-		}
-	}
-	return NULL;
-}
-
-/*************************************************************************/
-
-/* Called by the main OperServ routine in response to a NEWS command. */
-static void do_news(User * u, int16 type);
-
-/* Lists all a certain type of news. */
-static void do_news_list(User * u, int16 type, int *msgs);
-
-/* Add news items. */
-static void do_news_add(User * u, int16 type, int *msgs,
-						const char *type_name);
-static int add_newsitem(User * u, const char *text, int16 type);
-
-/* Delete news items. */
-static void do_news_del(User * u, int16 type, int *msgs,
-						const char *type_name);
-static int del_newsitem(int num, int16 type);
 
 /*************************************************************************/
 /****************************** Statistics *******************************/
@@ -308,7 +213,7 @@ void display_news(User * u, int16 type)
  * if the news list is full (32767 items).
  */
 
-static int add_newsitem(User * u, const char *text, short type)
+int add_newsitem(User * u, const char *text, short type)
 {
 	int i, num;
 
@@ -344,7 +249,7 @@ static int add_newsitem(User * u, const char *text, short type)
  * the given type.  Returns the number of items deleted.
  */
 
-static int del_newsitem(int num, short type)
+int del_newsitem(int num, short type)
 {
 	int i;
 	int count = 0;

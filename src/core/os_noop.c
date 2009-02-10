@@ -74,7 +74,7 @@ class CommandOSNOOP : public Command
 	{
 		syntax_error(s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
 	}
-}
+};
 
 class OSNOOP : public Module
 {

@@ -15,6 +15,9 @@
 
 #include "module.h"
 
+int xop_del_callback(User *u, int num, va_list args);
+int xop_list_callback(User *u, int num, va_list args);
+int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, int xmsg);
 void myChanServHelp(User *u);
 
 enum
@@ -106,7 +109,7 @@ class XOPBase : public Command
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
-		int change = 0;
+		int change = 0, i;
 		char event_access[BUFSIZE];
 
 		if (!nick)
@@ -177,7 +180,7 @@ class XOPBase : public Command
 		}
 
 		access->in_use = 1;
-		access->level = xlev;
+		access->level = level;
 		access->last_seen = 0;
 
 		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
@@ -202,6 +205,7 @@ class XOPBase : public Command
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
+		int i;
 
 		int deleted, a, b;
 
@@ -258,9 +262,7 @@ class XOPBase : public Command
 				notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
 				return MOD_CONT;
 			}
-			nc = na->nc;
-
-			int i;
+			NickCore *nc = na->nc;
 
 			for (i = 0; i < ci->accesscount; ++i)
 				if (ci->access[i].nc == nc && ci->access[i].level == level)
@@ -268,7 +270,7 @@ class XOPBase : public Command
 
 			if (i == ci->accesscount)
 			{
-				notice_lang(s_ChanServ, u, messages[XOP_NOT_FOUND], nick, chan);
+				notice_lang(s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name);
 				return MOD_CONT;
 			}
 
@@ -334,8 +336,6 @@ class XOPBase : public Command
 		int sent_header = 0;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 
-		short ulev = get_access(u, ci);
-
 		if (!is_services_admin(u) && level < ACCESS_AOP)
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -356,7 +356,7 @@ class XOPBase : public Command
 			{
 				if (nick && ci->access[i].nc && !match_wild_nocase(nick, ci->access[i].nc->display))
 					continue;
-				xop_list(u, i, ci, &sent_header, level, message[XOP_LIST_HEADER]);
+				xop_list(u, i, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
 			}
 		}
 		if (!sent_header)
@@ -400,6 +400,7 @@ class XOPBase : public Command
 
 		return MOD_CONT;
 	}
+ protected:
 	CommandReturn DoXop(User *u, std::vector<std::string> &params, int level, int *messages)
 	{
 		const char *chan = params[0].c_str();
@@ -455,7 +456,7 @@ class CommandCSAOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_land(s_ChanServ, u, CHAN_HELP_AOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_AOP);
 		return true;
 	}
 
@@ -479,7 +480,7 @@ class CommandCSHOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_land(s_ChanServ, u, CHAN_HELP_HOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_HOP);
 		return true;
 	}
 
@@ -503,7 +504,7 @@ class CommandCSSOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_land(s_ChanServ, u, CHAN_HELP_SOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_SOP);
 		return true;
 	}
 
@@ -527,7 +528,7 @@ class CommandCSVOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_land(s_ChanServ, u, CHAN_HELP_VOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_VOP);
 		return true;
 	}
 

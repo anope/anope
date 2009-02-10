@@ -28,9 +28,9 @@ class CommandOSDEFCON : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *lvl = params[0].c_str();
+		const char *lvl = params[0].c_str();
 		int newLevel = 0;
-		char *langglobal = getstring(NULL, DEFCON_GLOBAL);
+		const char *langglobal = getstring(NULL, DEFCON_GLOBAL);
 
 		if (!DefConLevel) /* If we dont have a .conf setting! */
 		{

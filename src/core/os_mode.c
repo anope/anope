@@ -28,7 +28,7 @@ class CommandOSMode : public Command
 	{
 		int ac;
 		const char **av;
-		char *chan = params[0].c_str(), *modes = params[1].c_str();
+		const char *chan = params[0].c_str(), *modes = params[1].c_str();
 		Channel *c;
 
 		if (!(c = findchan(chan)))
@@ -41,7 +41,7 @@ class CommandOSMode : public Command
 		{
 			ircdproto->SendMode(findbot(s_OperServ), chan, "%s", modes);
 
-			ac = split_buf(modes, &av, 1);
+			ac = split_buf((char *)modes, &av, 1);
 			chan_set_modes(s_OperServ, c, ac, av, -1);
 			free(av);
 

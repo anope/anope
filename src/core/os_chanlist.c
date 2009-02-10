@@ -26,8 +26,8 @@ class CommandOSChanList : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
-		char *opt = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
+		const char *opt = params.size() > 1 ? params[1].c_str() : NULL;
 
 		int modes = 0;
 		User *u2;
@@ -77,7 +77,7 @@ class CommandOSChanList : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_OperServ, u, OPER_HELP_CHAN_LIST);
+		notice_lang(s_OperServ, u, OPER_HELP_CHANLIST);
 		return true;
 	}
 };

@@ -22,8 +22,8 @@ class CommandOSIgnore : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		char *time = params.size() > 1 ? params[1].c_str() : NULL;
-		char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		const char *time = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		int t;
 
 		if (!time || !nick)
@@ -74,7 +74,7 @@ class CommandOSIgnore : public Command
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
-		char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		if (!nick)
 			this->OnSyntaxError(u);
 		else
@@ -105,7 +105,6 @@ class CommandOSIgnore : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-		int t;
 
 		if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params);
@@ -114,7 +113,7 @@ class CommandOSIgnore : public Command
 		else if (!stricmp(cmd, "DEL"))
 			return this->DoDel(u, params);
 		else if (!stricmp(cmd, "CLEAR"))
-			return this->DoCelar(u, params);
+			return this->DoClear(u, params);
 		else
 			this->OnSyntaxError(u);
 

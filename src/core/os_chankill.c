@@ -29,7 +29,6 @@ class CommandOSChanKill : public Command
 		const char *expiry, *channel;
 		char reason[BUFSIZE];
 		time_t expires;
-		char breason[BUFSIZE];
 		char mask[USERMAX + HOSTMAX + 2];
 		struct c_userlist *cu, *next;
 		int last_param = 1;
@@ -61,7 +60,7 @@ class CommandOSChanKill : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 1 ? " " : "", last_param == 1 ? param[2].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 1 ? " " : "", last_param == 1 ? params[2].c_str() : "");
 		if (*reason)
 		{
 
@@ -87,6 +86,11 @@ class CommandOSChanKill : public Command
 				notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
 		}
 		return MOD_CONT;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_OperServ,  u,  "CHANKILL",  OPER_CHANKILL_SYNTAX);
 	}
 };
 

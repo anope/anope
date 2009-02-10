@@ -26,7 +26,8 @@ class CommandOSSQLine : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		int deleted = 0, last_param = 2;
+		int deleted = 0;
+		unsigned last_param = 2;
 		const char *expiry, *mask;
 		char reason[BUFSIZE];
 		time_t expires;
@@ -61,7 +62,7 @@ class CommandOSSQLine : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? param[3].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? params[3].c_str() : "");
 		if (mask && *reason)
 		{
 			/* We first do some sanity check on the proposed mask. */
@@ -94,7 +95,7 @@ class CommandOSSQLine : public Command
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					char *s = NULL;
+					const char *s = NULL;
 
 					if (wall_expiry >= 86400)
 					{
@@ -162,7 +163,7 @@ class CommandOSSQLine : public Command
 				notice_lang(s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, res);
 		}
 		else {
-			if ((res = slist_indexof(&sqlines, mask)) == -1)
+			if ((res = slist_indexof(&sqlines, const_cast<char *>(mask))) == -1)
 			{
 				notice_lang(s_OperServ, u, OPER_SQLINE_NOT_FOUND, mask);
 				return MOD_CONT;
@@ -313,15 +314,11 @@ class OSSQLine : public Module
  public:
 	OSSQLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		c = createCommand("SQLINE", do_sqline, is_services_oper,
-		OPER_HELP_SQLINE, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSSQLine(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
 		if (!ircd->sqline)

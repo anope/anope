@@ -785,7 +785,7 @@ E int add_sgline(User *u, const char *mask, const char *by, time_t expires, cons
 E int check_sgline(const char *nick, const char *realname);
 E void expire_sglines();
 
-E int add_sqline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
+E int add_sqline(User *u, const char *mask, const char *by, time_t expires, const char *reason);
 E int check_sqline(const char *nick, int nick_change);
 E void expire_sqlines();
 E int check_chan_sqline(const char *chan);

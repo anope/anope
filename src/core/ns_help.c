@@ -24,7 +24,7 @@ class CommandNSHelp : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *cmd = params[0].c_str()
+		const char *cmd = params[0].c_str();
 		if (!stricmp(cmd, "SET LANGUAGE"))
 		{
 			int i;
@@ -34,6 +34,8 @@ class CommandNSHelp : public Command
 		}
 		else
 			mod_help_cmd(s_NickServ, u, NICKSERV, cmd);
+
+		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u)

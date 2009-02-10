@@ -23,17 +23,120 @@ int do_sendregmail(User *u, NickRequest *nr);
 
 class CommandNSConfirm : public Command
 {
- private:
+ protected:
+	CommandReturn ActuallyConfirmNick(User *u, NickRequest *nr, bool force)
+	{
+		NickAlias *na;
+		na = makenick(nr->nick);
+
+		if (!na)
+		{
+			alog("%s: makenick(%s) failed", s_NickServ, u->nick);
+			notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
+			return MOD_CONT;
+		}
+
+		int i, len;
+		char tsbuf[16];
+		char tmp_pass[PASSMAX];
+		char modes[512];
+
+		memcpy(na->nc->pass, nr->password, PASSMAX);
+		na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
+
+		na->nc->flags |= NSDefFlags;
+		for (i = 0; i < RootNumber; ++i)
+		{
+			if (!stricmp(ServicesRoots[i], nr->nick))
+			{
+				na->nc->flags |= NI_SERVICES_ROOT;
+				break;
+			}
+		}
+
+		na->nc->memos.memomax = MSMaxMemos;
+
+		if (force)
+		{
+			na->last_usermask = sstrdup("*@*");
+			na->last_realname = sstrdup("unknown");
+		}
+		else
+		{
+			na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
+			sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
+			na->last_realname = sstrdup(u->realname);
+		}
+
+		na->time_registered = na->last_seen = time(NULL);
+
+		if (NSAddAccessOnReg)
+		{
+			na->nc->accesscount = 1;
+			na->nc->access = static_cast<char **>(scalloc(sizeof(char *), 1));
+			na->nc->access[0] = create_mask(u);
+		}
+		else
+		{
+			na->nc->accesscount = 0;
+			na->nc->access = NULL;
+		}
+
+		na->nc->language = NSDefLanguage;
+		if (nr->email)
+			na->nc->email = sstrdup(nr->email);
+
+		if (!force)
+		{
+			u->na = na;
+			na->u = u;
+			alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
+			if (NSAddAccessOnReg)
+				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->access[0]);
+			else
+				notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
+			send_event(EVENT_NICK_REGISTERED, 1, u->nick);
+
+			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)
+				notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
+
+			u->lastnickreg = time(NULL);
+			if (ircd->modeonreg)
+			{
+				len = strlen(ircd->modeonreg);
+				strncpy(modes, ircd->modeonreg, 512);
+				if (ircd->rootmodeonid && is_services_root(u))
+					strncat(modes, ircd->rootmodeonid, 512 - len);
+				else if (ircd->adminmodeonid && is_services_admin(u))
+					strncat(modes, ircd->adminmodeonid, 512 - len);
+				else if (ircd->opermodeonid && is_services_oper(u))
+					strncat(modes, ircd->opermodeonid, 512 - len);
+
+				if (ircd->tsonmode)
+				{
+					snprintf(tsbuf, sizeof(tsbuf), "%lu", static_cast<unsigned long>(u->timestamp));
+					common_svsmode(u, modes, tsbuf);
+				}
+				else
+					common_svsmode(u, modes, NULL);
+			}
+		}
+		else
+			notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
+		delnickrequest(nr); /* remove the nick request */
+
+		/* Enable nick tracking if enabled */
+		if (NSNickTracking)
+			nsStartNickTracking(u);
+
+		return MOD_CONT;
+
+	}
+
 	CommandReturn DoConfirm(User *u, std::vector<std::string> &params)
 	{
 		NickRequest *nr = NULL;
-		NickAlias *na = NULL;
-		char *passcode = params.size() ? params[0].c_str() : NULL;
-		char *email = NULL;
-		int forced = 0;
-		User *utmp = NULL;
-		char modes[512];
-		int len;
+		const char *passcode = params.size() ? params[0].c_str() : NULL;
 
 		nr = findrequestnick(u->nick);
 
@@ -54,19 +157,17 @@ class CommandNSConfirm : public Command
 					nr = findrequestnick(passcode);
 					if (nr)
 					{
-						utmp = finduser(passcode);
+						User *utmp = finduser(passcode);
 						if (utmp)
 						{
-							sprintf(passcode, "FORCE_ACTIVATION_DUE_TO_OPER_CONFIRM %s", nr->passcode);
-							passcode = strtok(passcode, " ");
+							ActuallyConfirmNick(u, nr, false);
 							notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
-							do_confirm(utmp);
 							return MOD_CONT;
 						}
 						else
 						{
-							passcode = sstrdup(nr->passcode);
-							forced = 1;
+							passcode = nr->passcode;
+							ActuallyConfirmNick(u, nr, true);
 						}
 					}
 					else
@@ -85,8 +186,6 @@ class CommandNSConfirm : public Command
 			if (stricmp(nr->passcode, passcode))
 			{
 				notice_lang(s_NickServ, u, NICK_CONFIRM_INVALID);
-				if (forced)
-					delete [] passcode;
 				return MOD_CONT;
 			}
 		}
@@ -94,121 +193,14 @@ class CommandNSConfirm : public Command
 		if (!nr)
 		{
 			notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
-			if (forced)
-				delete [] passcode;
 			return MOD_CONT;
 		}
 
-		if (nr->email)
-			email = sstrdup(nr->email);
-		na = makenick(nr->nick);
-
-		if (na)
-		{
-			int i;
-			char tsbuf[16];
-			char tmp_pass[PASSMAX];
-
-			memcpy(na->nc->pass, nr->password, PASSMAX);
-			na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
-			/* na->nc->flags |= NI_ENCRYPTEDPW; */
-
-			na->nc->flags |= NSDefFlags;
-			for (i = 0; i < RootNumber; ++i)
-			{
-				if (!stricmp(ServicesRoots[i], nr->nick))
-				{
-					na->nc->flags |= NI_SERVICES_ROOT;
-					break;
-				}
-			}
-
-			na->nc->memos.memomax = MSMaxMemos;
-
-			if (forced == 1)
-			{
-				na->last_usermask = sstrdup("*@*");
-				na->last_realname = sstrdup("unknown");
-			}
-			else
-			{
-				na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-				sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
-				na->last_realname = sstrdup(u->realname);
-			}
-			na->time_registered = na->last_seen = time(NULL);
-			if (NSAddAccessOnReg)
-			{
-				na->nc->accesscount = 1;
-				na->nc->access = static_cast<char **>(scalloc(sizeof(char *), 1));
-				na->nc->access[0] = create_mask(u);
-			}
-			else
-			{
-				na->nc->accesscount = 0;
-				na->nc->access = NULL;
-			}
-			na->nc->language = NSDefLanguage;
-			if (email)
-				na->nc->email = sstrdup(email);
-			if (forced != 1)
-			{
-				u->na = na;
-				na->u = u;
-				alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, email ? email : "none");
-				if (NSAddAccessOnReg)
-					notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->access[0]);
-				else
-					notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
-				send_event(EVENT_NICK_REGISTERED, 1, u->nick);
-
-				if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)
-					notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
-
-				u->lastnickreg = time(NULL);
-				if (ircd->modeonreg)
-				{
-					len = strlen(ircd->modeonreg);
-					strncpy(modes, ircd->modeonreg, 512);
-					if (ircd->rootmodeonid && is_services_root(u))
-						strncat(modes, ircd->rootmodeonid, 512 - len);
-					else if (ircd->adminmodeonid && is_services_admin(u))
-						strncat(modes, ircd->adminmodeonid, 512 - len);
-					else if (ircd->opermodeonid && is_services_oper(u))
-						strncat(modes, ircd->opermodeonid, 512 - len);
-
-					if (ircd->tsonmode)
-					{
-						snprintf(tsbuf, sizeof(tsbuf), "%lu", static_cast<unsigned long>(u->timestamp));
-						common_svsmode(u, modes, tsbuf);
-					}
-					else
-						common_svsmode(u, modes, NULL);
-				}
-			}
-			else
-				notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
-			delnickrequest(nr); /* remove the nick request */
-		}
-		else
-		{
-			alog("%s: makenick(%s) failed", s_NickServ, u->nick);
-			notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
-		}
-
-		/* Enable nick tracking if enabled */
-		if (NSNickTracking)
-			nsStartNickTracking(u);
-
-		if (forced)
-			delete [] passcode;
-		if (email)
-			delete [] email;
-
+		ActuallyConfirmNick(u, nr, false);
 		return MOD_CONT;
 	}
  public:
-	CommandNSConfirm() : Command("CONFIRM", 0, 1)
+	CommandNSConfirm(const std::string &cmdn, int min, int max) : Command("CONFIRM", min, max)
 	{
 	}
 
@@ -227,7 +219,7 @@ class CommandNSConfirm : public Command
 class CommandNSRegister : public CommandNSConfirm
 {
  public:
-	CommandNSRegister() : Command("REGISTER", 1, 2)
+	CommandNSRegister() : CommandNSConfirm("REGISTER", 1, 2)
 	{
 	}
 
@@ -237,8 +229,8 @@ class CommandNSRegister : public CommandNSConfirm
 		NickCore *nc = NULL;
 		int prefixlen = strlen(NSGuestNickPrefix);
 		int nicklen = strlen(u->nick);
-		char *pass = params[0].c_str();
-		char *email = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *pass = params[0].c_str();
+		const char *email = params.size() > 1 ? params[1].c_str() : NULL;
 		char passcode[11];
 		int idx, min = 1, max = 62, i = 0;
 		int chars[] =
@@ -346,9 +338,6 @@ class CommandNSRegister : public CommandNSConfirm
 			nr = makerequest(u->nick);
 			nr->passcode = sstrdup(passcode);
 			strscpy(nr->password, pass, PASSMAX);
-			memset(pass, 0, strlen(pass));
-			/* We are paranoid about keeping a plain text pass in memory, yet we would write
-			 * it to a database.. - Viper */
 			enc_encrypt_in_place(nr->password, PASSMAX);
 			if (email)
 				nr->email = sstrdup(email);
@@ -445,7 +434,7 @@ class NSRegister : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_UNIQUE);
-		this->AddCommand(NICKSERV, new CommandNSConfirm(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 0, 1), MOD_UNIQUE);
 		this->AddCommand(NICKSERV, new CommandNSResend(), MOD_UNIQUE);
 
 		this->SetNickHelp(myNickServHelp);

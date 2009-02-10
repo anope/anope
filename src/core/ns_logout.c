@@ -29,8 +29,8 @@ class CommandNSLogout : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *nick = params.size() ? params[0].c_str() : NULL;
-		char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *nick = params.size() ? params[0].c_str() : NULL;
+		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 		User *u2;
 
 		if (!is_services_admin(u) && nick)

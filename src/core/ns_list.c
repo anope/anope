@@ -14,6 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hashcomp.h"
 
 void myNickServHelp(User *u);
 
@@ -39,7 +40,7 @@ class CommandNSList : public Command
 		 *
 		 * UPDATE: SUSPENDED keyword is now accepted as well.
 		 */
-		char *pattern = params[0].c_str();
+		const char *pattern = params[0].c_str();
 		NickAlias *na;
 		NickCore *mync;
 		unsigned nnicks, i;
@@ -106,7 +107,7 @@ class CommandNSList : public Command
 		{
 			std::string keyword;
 			spacesepstream keywords(params[1]);
-			while (keywords.GetString(keyword))
+			while (keywords.GetToken(keyword))
 			{
 				if (!stricmp(keyword.c_str(), "FORBIDDEN"))
 					matchflags |= NS_FORBIDDEN;
@@ -197,6 +198,8 @@ class CommandNSList : public Command
 			notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_LIST);
 		else
 			notice_lang(s_NickServ, u, NICK_HELP_LIST);
+
+		return true;
 	}
 
 	void OnSyntaxError(User *u)

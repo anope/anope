@@ -45,8 +45,8 @@ class CommandNSInfo : public Command
 		 * Syntax: INFO <nick> {ALL}
 		 * -TheShadow (13 Mar 1999)
 		 */
-		char *nick = params[0].c_str();
-		char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *nick = params[0].c_str();
+		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
 		NickAlias *na;
 		NickRequest *nr = NULL;
@@ -81,9 +81,7 @@ class CommandNSInfo : public Command
 		else
 		{
 			struct tm *tm;
-			char buf[BUFSIZE], *end;
-			const char *commastr = getstring(u->na, COMMA_SPACE);
-			int need_comma = 0;
+			char buf[BUFSIZE];
 			int nick_online = 0;
 			int show_hidden = 0;
 			time_t expt;

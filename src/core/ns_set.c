@@ -132,7 +132,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetUrl(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetUrl(User *u, std::vector<std::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -152,7 +152,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetEmail(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetEmail(User *u, std::vector<std::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -530,6 +530,8 @@ class CommandNSSet : public Command
 			notice_lang(s_NickServ, u, NICK_HELP_SET_AUTOOP);
 		else
 			notice_lang(s_NickServ, u, NICK_HELP_SET);
+
+		return true;
 	}
 
 	void OnSyntaxError(User *u)

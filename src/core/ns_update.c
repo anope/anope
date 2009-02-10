@@ -46,7 +46,7 @@ class CommandNSUpdate : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u)
+	bool OnHelp(User *u, const std::string &)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_UPDATE);
 		return true;

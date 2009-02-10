@@ -27,8 +27,8 @@ class CommandCSSuspend : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		ChannelInfo *ci;
-		char *chan = params[0].c_str();
-		char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		const char *chan = params[0].c_str();
+		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		Channel *c;
 
@@ -71,12 +71,12 @@ class CommandCSSuspend : public Command
 
 			if ((c = findchan(ci->name)))
 			{
-				struct c_userlist *cu, *next;
+				struct c_userlist *cu, *nextu;
 				const char *av[3];
 
-				for (cu = c->users; cu; cu = next)
+				for (cu = c->users; cu; cu = nextu)
 				{
-					next = cu->next;
+					nextu = cu->next;
 
 					if (is_oper(cu->user))
 						continue;

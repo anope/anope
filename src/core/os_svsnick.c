@@ -30,7 +30,7 @@ class CommandOSSVSNick : public Command
 		const char *newnick = params[1].c_str();
 
 		NickAlias *na;
-		char *c;
+		const char *c;
 
 		/* Only allow this if SuperAdmin is enabled */
 		if (!u->isSuperAdmin)
@@ -43,7 +43,8 @@ class CommandOSSVSNick : public Command
 		if (strlen(newnick) > NICKMAX - 2)
 		{
 			notice_lang(s_OperServ, u, NICK_X_TRUNCATED, newnick, NICKMAX - 2, newnick);
-			newnick[NICKMAX - 2] = '\0';
+			params[1] = params[1].substr(0, NICKMAX - 2);
+			newnick = params[1].c_str();
 		}
 
 		/* Check for valid characters */

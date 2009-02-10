@@ -62,7 +62,7 @@ class SSMain : public Module
 			for (current = cmdTable[i]; current; current = current->next)
 			{
 				for (c = current->c; c; c = c->next)
-					this->DelCommand(cmdTable, c->name);
+					this->DelCommand(cmdTable, c->name.c_str());
 			}
 		}
 		if (statserv)

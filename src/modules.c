@@ -657,7 +657,7 @@ int destroyMessage(Message * m)
  * Module Callback Functions
  *******************************************************************************/
 
-int Module::AddCallback(const char *name, time_t when,
+int Module::AddCallback(const char *nname, time_t when,
 					  int (*func) (int argc, char *argv[]), int argc,
 					  char **argv)
 {
@@ -667,8 +667,8 @@ int Module::AddCallback(const char *name, time_t when,
 	if (!newcb)
 		return MOD_ERR_MEMORY;
 
-	if (name)
-		newcb->name = sstrdup(name);
+	if (nname)
+		newcb->name = sstrdup(nname);
 	else
 		newcb->name = NULL;
 	newcb->when = when;
@@ -761,22 +761,20 @@ static ModuleCallBack *moduleCallBackFindEntry(const char *mod_name, bool * foun
 	}
 }
 
-void Module::DelCallback(const char *name)
+void Module::DelCallback(const char *nname)
 {
 	ModuleCallBack *current = NULL;
 	ModuleCallBack *prev = NULL, *tmp = NULL;
 	int del = 0;
-	if (!name) {
-		return;
-	}
+
 	current = moduleCallBackHead;
+
 	while (current) {
 		if ((current->owner_name) && (current->name)) {
 			if ((strcmp(this->name.c_str(), current->owner_name) == 0)
-				&& (strcmp(current->name, name) == 0)) {
+				&& (strcmp(current->name, nname) == 0)) {
 				if (debug) {
-					alog("debug: removing CallBack %s for module %s", name,
-						 this->name.c_str());
+					alog("debug: removing CallBack %s for module %s", nname, this->name.c_str());
 				}
 				tmp = current->next;	/* get a pointer to the next record, as once we delete this record, we'll lose it :) */
 				moduleCallBackDeleteEntry(prev);		/* delete this record */
@@ -1056,22 +1054,22 @@ void Module::NoticeLang(char *source, User * u, int number, ...)
 	va_list va;
 	char buffer[4096], outbuf[4096];
 	char *fmt = NULL;
-	int lang = NSDefLanguage;
+	int mlang = NSDefLanguage;
 	char *s, *t, *buf;
 
 	/* Find the users lang, and use it if we can */
 	if (u && u->na && u->na->nc) {
-		lang = u->na->nc->language;
+		mlang = u->na->nc->language;
 	}
 
 	/* If the users lang isnt supported, drop back to English */
-	if (this->lang[lang].argc == 0) {
-		lang = LANG_EN_US;
+	if (this->lang[mlang].argc == 0) {
+		mlang = LANG_EN_US;
 	}
 
 	/* If the requested lang string exists for the language */
-	if (this->lang[lang].argc > number) {
-		fmt = this->lang[lang].argv[number];
+	if (this->lang[mlang].argc > number) {
+		fmt = this->lang[mlang].argv[number];
 
 		buf = sstrdup(fmt);
 		va_start(va, number);
@@ -1088,31 +1086,31 @@ void Module::NoticeLang(char *source, User * u, int number, ...)
 		}
 		delete [] buf;
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), lang, number);
+		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), mlang, number);
 	}
 }
 
 const char *Module::GetLangString(User * u, int number)
 {
-	int lang = NSDefLanguage;
+	int mlang = NSDefLanguage;
 
 	/* Find the users lang, and use it if we can */
 	if (u && u->na && u->na->nc)
-		lang = u->na->nc->language;
+		mlang = u->na->nc->language;
 
 	/* If the users lang isnt supported, drop back to English */
-	if (this->lang[lang].argc == 0)
-		lang = LANG_EN_US;
+	if (this->lang[mlang].argc == 0)
+		mlang = LANG_EN_US;
 
 	/* If the requested lang string exists for the language */
-	if (this->lang[lang].argc > number) {
-		return this->lang[lang].argv[number];
+	if (this->lang[mlang].argc > number) {
+		return this->lang[mlang].argv[number];
 	/* Return an empty string otherwise, because we might be used without
 	 * the return value being checked. If we would return NULL, bad things
 	 * would happen!
 	 */
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), lang, number);
+		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), mlang, number);
 		return "";
 	}
 }

@@ -262,7 +262,7 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 		}
 		if (*buf == ':') {
 			(*argv)[argc++] = buf + 1;
-			buf = "";
+			buf = (char *)""; // XXX: unsafe cast.
 		} else {
 			s = strpbrk(buf, " ");
 			if (s) {

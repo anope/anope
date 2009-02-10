@@ -166,7 +166,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 	CUMode *cum;
 	unsigned char botmode = 0;
 	BotInfo *bi;
-	User *u, *user;
+	User *user;
 	int i, real_ac = ac;
 	const char **real_av = av;
 

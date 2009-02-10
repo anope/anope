@@ -37,10 +37,6 @@ void check_timeouts()
 			to = to->next;
 			continue;
 		}
-		if (debug >= 4) {
-			alog("debug: Running timeout 0x%p (code=0x%p repeat=%d)",
-				 static_cast<void *>(to), reinterpret_cast<voidF>(to->code), to->repeat);
-		}
 		to->code(to);
 		if (to->repeat) {
 			to = to->next;

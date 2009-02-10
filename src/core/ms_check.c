@@ -44,7 +44,7 @@ class CommandMSCheck : public Command
 			return MOD_CONT;
 		}
 
-		if ((na->status & NS_VERBOTEN))
+		if ((na->status & NS_FORBIDDEN))
 		{
 			notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
 			return MOD_CONT;

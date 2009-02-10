@@ -126,7 +126,7 @@ class CommandCSAccess : public Command
 			syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_VERBOTEN) {
+		} else if (ci->flags & CI_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			/* We still allow LIST in xOP mode, but not others */
 		} else if ((ci->flags & CI_XOP) && !is_list) {
@@ -166,7 +166,7 @@ class CommandCSAccess : public Command
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
 				return MOD_CONT;
 			}
-			if (na->status & NS_VERBOTEN) {
+			if (na->status & NS_FORBIDDEN) {
 				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
@@ -411,7 +411,7 @@ class CommandCSLevels : public Command
 			syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_VERBOTEN) {
+		} else if (ci->flags & CI_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (ci->flags & CI_XOP) {
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);

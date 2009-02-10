@@ -63,7 +63,7 @@ class CommandCSRegister : public Command
 			notice_lang(s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
 		else if ((ci = cs_findchan(chan)))
 		{
-			if (ci->flags & CI_VERBOTEN)
+			if (ci->flags & CI_FORBIDDEN)
 			{
 				alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->GetIdent().c_str(), u->host);
 				notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);

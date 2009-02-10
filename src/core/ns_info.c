@@ -71,7 +71,7 @@ class CommandNSInfo : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		}
-		else if (na->status & NS_VERBOTEN)
+		else if (na->status & NS_FORBIDDEN)
 		{
 			if (is_oper(u) && na->last_usermask)
 				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u->na, NO_REASON));

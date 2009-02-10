@@ -548,7 +548,7 @@ void load_cs_dbase()
 		ChannelInfo *next;
 		for (ci = chanlists[i]; ci; ci = next) {
 			next = ci->next;
-			if (!(ci->flags & CI_VERBOTEN) && !ci->founder) {
+			if (!(ci->flags & CI_FORBIDDEN) && !ci->founder) {
 				alog("%s: database load: Deleting founderless channel %s",
 					 s_ChanServ, ci->name);
 				delchan(ci);
@@ -883,7 +883,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 	}
 
 	/* They will be kicked; no need to deop, no need to update our internal struct too */
-	if (chan->ci->flags & CI_VERBOTEN)
+	if (chan->ci->flags & CI_FORBIDDEN)
 		return 0;
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
@@ -915,7 +915,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 		return 1;
 
 	/* They will be kicked; no need to deop, no need to update our internal struct too */
-	if (chan->ci->flags & CI_VERBOTEN)
+	if (chan->ci->flags & CI_FORBIDDEN)
 		return 0;
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOOP)) {
@@ -997,7 +997,7 @@ int check_should_op(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
+	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if ((ci->flags & CI_SECURE) && !nick_identified(user))
@@ -1020,7 +1020,7 @@ int check_should_voice(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
+	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if ((ci->flags & CI_SECURE) && !nick_identified(user))
@@ -1040,7 +1040,7 @@ int check_should_halfop(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
+	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOHALFOP)) {
@@ -1058,7 +1058,7 @@ int check_should_owner(User * user, char *chan)
 	char *tmp;
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
+	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
@@ -1080,7 +1080,7 @@ int check_should_protect(User * user, char *chan)
 	char *tmp;
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
+	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOPROTECT)) {
@@ -1139,7 +1139,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	if (user->isSuperAdmin == 1)
 		return 0;
 
-	if (ci->flags & CI_SUSPENDED || ci->flags & CI_VERBOTEN)
+	if (ci->flags & CI_SUSPENDED || ci->flags & CI_FORBIDDEN)
 	{
 		get_idealban(ci, user, mask, sizeof(mask));
 		reason = ci->forbidreason ? ci->forbidreason : getstring(user->na, CHAN_MAY_NOT_BE_USED);
@@ -1402,7 +1402,7 @@ void expire_chans()
 			next = ci->next;
 			if (!ci->c && now - ci->last_used >= CSExpire
 				&& !(ci->
-					 flags & (CI_VERBOTEN | CI_NO_EXPIRE | CI_SUSPENDED)))
+					 flags & (CI_FORBIDDEN | CI_NO_EXPIRE | CI_SUSPENDED)))
 			{
 				send_event(EVENT_CHAN_EXPIRE, 1, ci->name);
 				alog("Expiring channel %s (founder: %s)", ci->name,

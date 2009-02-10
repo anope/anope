@@ -43,7 +43,7 @@ class CommandNSGetPass : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		}
-		else if (na->status & NS_VERBOTEN)
+		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (NSSecureAdmins && nick_is_services_admin(na->nc) && !is_services_root(u))
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);

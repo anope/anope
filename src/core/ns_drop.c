@@ -76,7 +76,7 @@ class CommandNSDrop : public Command
 			if (readonly)
 				notice_lang(s_NickServ, u, READ_ONLY_MODE);
 
-			if (ircd->sqline && (na->status & NS_VERBOTEN))
+			if (ircd->sqline && (na->status & NS_FORBIDDEN))
 				ircdproto->SendSQLineDel(na->nick);
 
 			alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, na->nick, na->nc->display, na->nc->email ? na->nc->email : "none");

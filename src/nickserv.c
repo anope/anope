@@ -320,7 +320,7 @@ void load_ns_dbase()
 
 			slist_add(&na->nc->aliases, na);
 
-			if (!(na->status & NS_VERBOTEN)) {
+			if (!(na->status & NS_FORBIDDEN)) {
 				if (!na->last_usermask)
 					na->last_usermask = sstrdup("");
 				if (!na->last_realname)
@@ -508,7 +508,7 @@ int validate_user(User * u)
 	if (!(na = u->na))
 		return 0;
 
-	if (na->status & NS_VERBOTEN) {
+	if (na->status & NS_FORBIDDEN) {
 		notice_lang(s_NickServ, u, NICK_MAY_NOT_BE_USED);
 		collide(na, 0);
 		return 0;
@@ -676,7 +676,7 @@ void expire_nicks()
 			}
 
 			if (NSExpire && now - na->last_seen >= NSExpire
-				&& !(na->status & (NS_VERBOTEN | NS_NO_EXPIRE))
+				&& !(na->status & (NS_FORBIDDEN | NS_NO_EXPIRE))
 				&& !(na->nc->flags & (NI_SUSPENDED))) {
 				alog("Expiring nickname %s (group: %s) (e-mail: %s)",
 					 na->nick, na->nc->display,
@@ -1418,7 +1418,7 @@ int nsCheckNickTracking(User * u)
 	}
 
 	/* nick is forbidden best return 0 */
-	if (na->status & NS_VERBOTEN) {
+	if (na->status & NS_FORBIDDEN) {
 		return 0;
 	}
 

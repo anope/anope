@@ -502,7 +502,7 @@ class CommandNSSASet : public Command
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_VERBOTEN)
+		if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->flags & NI_SUSPENDED)
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);

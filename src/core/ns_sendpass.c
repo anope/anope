@@ -33,7 +33,7 @@ class CommandNSSendPass : public Command
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 		else if (!(na = findnick(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_VERBOTEN)
+		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else
 		{

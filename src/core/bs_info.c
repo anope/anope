@@ -86,7 +86,7 @@ class CommandBSInfo : public Command
 				notice_lang(s_BotServ, u, PERMISSION_DENIED);
 				return MOD_CONT;
 			}
-			if (ci->flags & CI_VERBOTEN) {
+			if (ci->flags & CI_FORBIDDEN) {
 				notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, query);
 				return MOD_CONT;
 			}

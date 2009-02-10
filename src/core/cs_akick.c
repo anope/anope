@@ -182,7 +182,7 @@ class CommandCSAKick : public Command
 			syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci-> flags & CI_VERBOTEN) {
+		} else if (ci-> flags & CI_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (!check_access(u, ci, CA_AKICK) && !is_services_admin(u)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -207,7 +207,7 @@ class CommandCSAKick : public Command
 				delete [] user;
 				delete [] host;
 			} else {
-				if (na->status & NS_VERBOTEN) {
+				if (na->status & NS_FORBIDDEN) {
 					notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, mask);
 					return MOD_CONT;
 				}
@@ -253,7 +253,7 @@ class CommandCSAKick : public Command
 				 * or higher access. - Viper */
 				for (i = 0; i < 1024; i++) {
 					for (na2 = nalists[i]; na2; na2 = na2->next) {
-						if (na2->status & NS_VERBOTEN)
+						if (na2->status & NS_FORBIDDEN)
 							continue;
 
 						if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci)

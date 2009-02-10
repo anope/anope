@@ -92,7 +92,7 @@ class CommandNSGroup : public Command
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, NSRegDelay);
-		else if (u->na && (u->na->status & NS_VERBOTEN))
+		else if (u->na && (u->na->status & NS_FORBIDDEN))
 		{
 			alog("%s: %s@%s tried to use GROUP from FORBIDden nick %s", s_NickServ, u->GetIdent().c_str(), u->host, u->nick);
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
@@ -111,7 +111,7 @@ class CommandNSGroup : public Command
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
-		else if (target->status & NS_VERBOTEN)
+		else if (target->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
 		else if (u->na && target->nc == u->na->nc)
 			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
@@ -231,7 +231,7 @@ class CommandNSGList : public Command
 			notice_lang(s_NickServ, u, nick_ided ? ACCESS_DENIED : NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!nick ? !(na = u->na) : !(na = findnick(nick)))
 			notice_lang(s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_VERBOTEN)
+		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else
 		{

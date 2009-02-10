@@ -131,7 +131,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 	if (*receiver == '#') {
 		if (s_BotServ && (ci = cs_findchan(receiver))) {
 			/* Some paranoia checks */
-			if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi) {
+			if (!(ci->flags & CI_FORBIDDEN) && ci->c && ci->bi) {
 				botchanmsgs(u, ci, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
 		}

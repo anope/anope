@@ -63,7 +63,7 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 		/* Sets the mode to the user on every channels he is on. */
 
 		for (uc = u->chans; uc; uc = uc->next) {
-			if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
+			if ((ci = uc->chan->ci) && !(ci->flags & CI_FORBIDDEN)
 				&& check_access(u, ci, util->levelself)) {
 				ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
 							   util->mode, u->nick);
@@ -87,7 +87,7 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 	} else if (!(ci = c->ci)) {
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-	} else if (ci->flags & CI_VERBOTEN) {
+	} else if (ci->flags & CI_FORBIDDEN) {
 		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 	} else if (is_same ? !(u2 = u) : !(u2 = finduser(nick))) {
 		notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
@@ -334,7 +334,7 @@ class CommandCSOwner : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!(ci = c->ci)) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-		} else if (ci->flags & CI_VERBOTEN) {
+		} else if (ci->flags & CI_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 		} else if (!(u2 = finduser(nick))) {
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
@@ -388,7 +388,7 @@ class CommandCSDeOwner : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!(ci = c->ci)) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-		} else if (ci->flags & CI_VERBOTEN) {
+		} else if (ci->flags & CI_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 		} else if (!(u2 = finduser(nick))) {
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);

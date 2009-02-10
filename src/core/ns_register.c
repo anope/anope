@@ -324,7 +324,7 @@ class CommandNSRegister : public CommandNSConfirm
 			notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, NSRegDelay);
 		else if (u->na) /* i.e. there's already such a nick regged */
 		{
-			if (u->na->status & NS_VERBOTEN)
+			if (u->na->status & NS_FORBIDDEN)
 			{
 				alog("%s: %s@%s tried to register FORBIDden nick %s", s_NickServ, u->GetIdent().c_str(), u->host, u->nick);
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);

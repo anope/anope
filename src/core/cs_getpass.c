@@ -45,7 +45,7 @@ class CommandCSGetPass : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 			return MOD_CONT;
 		}
-		if (ci->flags & CI_VERBOTEN)
+		if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;

@@ -76,7 +76,7 @@ class CommandCSLogout : public Command
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		}
-		else if (!is_servadmin && (ci->flags & CI_VERBOTEN))
+		else if (!is_servadmin && (ci->flags & CI_FORBIDDEN))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		}

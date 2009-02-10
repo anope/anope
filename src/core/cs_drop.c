@@ -52,7 +52,7 @@ class CommandCSDrop : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_servadmin && (ci->flags & CI_VERBOTEN))
+		if (!is_servadmin && (ci->flags & CI_FORBIDDEN))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
@@ -81,7 +81,7 @@ class CommandCSDrop : public Command
 			}
 		}
 
-		if (ircd->chansqline && (ci->flags & CI_VERBOTEN))
+		if (ircd->chansqline && (ci->flags & CI_FORBIDDEN))
 		{
 			ircdproto->SendSQLineDel(ci->name);
 		}

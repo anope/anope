@@ -53,7 +53,7 @@ class CommandCSSuspend : public Command
 		}
 
 		/* You should not SUSPEND a FORBIDEN channel */
-		if (ci->flags & CI_VERBOTEN)
+		if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 			return MOD_CONT;

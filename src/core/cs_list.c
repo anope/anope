@@ -107,7 +107,7 @@ public:
 			while (keywords.GetToken(keyword))
 			{
 				if (stricmp(keyword.c_str(), "FORBIDDEN") == 0)
-					matchflags |= CI_VERBOTEN;
+					matchflags |= CI_FORBIDDEN;
 				if (stricmp(keyword.c_str(), "SUSPENDED") == 0)
 					matchflags |= CI_SUSPENDED;
 				if (stricmp(keyword.c_str(), "NOEXPIRE") == 0)
@@ -126,7 +126,7 @@ public:
 				for (ci = chanlists[i]; ci; ci = ci->next)
 				{
 					if (!is_servadmin && ((ci->flags & CI_PRIVATE)
-					                      || (ci->flags & CI_VERBOTEN)))
+					                      || (ci->flags & CI_FORBIDDEN)))
 						continue;
 					if ((matchflags != 0) && !(ci->flags & matchflags))
 						continue;
@@ -144,7 +144,7 @@ public:
 							if (is_servadmin && (ci->flags & CI_NO_EXPIRE))
 								noexpire_char = '!';
 
-							if (ci->flags & CI_VERBOTEN)
+							if (ci->flags & CI_FORBIDDEN)
 							{
 								snprintf(buf, sizeof(buf),
 								         "%-20s  [Forbidden]", ci->name);

@@ -155,7 +155,7 @@ int do_set(User * u)
 		syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	} else if (!(ci = cs_findchan(chan))) {
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-	} else if (ci->flags & CI_VERBOTEN) {
+	} else if (ci->flags & CI_FORBIDDEN) {
 		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 	} else if (!is_servadmin && !check_access(u, ci, CA_SET)) {
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -256,7 +256,7 @@ int do_set_founder(User * u, ChannelInfo * ci, char *param)
 	if (!na) {
 		notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, param);
 		return MOD_CONT;
-	} else if (na->status & NS_VERBOTEN) {
+	} else if (na->status & NS_FORBIDDEN) {
 		notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, param);
 		return MOD_CONT;
 	}
@@ -297,7 +297,7 @@ int do_set_successor(User * u, ChannelInfo * ci, char *param)
 			notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, param);
 			return MOD_CONT;
 		}
-		if (na->status & NS_VERBOTEN) {
+		if (na->status & NS_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, param);
 			return MOD_CONT;
 		}

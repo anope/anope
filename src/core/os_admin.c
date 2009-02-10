@@ -45,7 +45,7 @@ class CommandOSAdmin : public Command
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_VERBOTEN)
+		if (na->status & NS_FORBIDDEN)
 		{
 			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, nick);
 			return MOD_CONT;
@@ -129,7 +129,7 @@ class CommandOSAdmin : public Command
 				return MOD_CONT;
 			}
 
-			if (na->status & NS_VERBOTEN)
+			if (na->status & NS_FORBIDDEN)
 			{
 				notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;

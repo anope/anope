@@ -210,7 +210,7 @@ int canBanUser(Channel * c, User * u, User * u2)
 	int ok = 0;
 	if (!(ci = c->ci))
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-	else if (ci->flags & CI_VERBOTEN)
+	else if (ci->flags & CI_FORBIDDEN)
 		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, c->name);
 	else if (!check_access(u, ci, CA_BAN))
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);

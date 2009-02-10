@@ -44,7 +44,7 @@ class CommandNSLogout : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
 		}
-		else if (u2->na->status & NS_VERBOTEN)
+		else if (u2->na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u2->na->nick);
 		else if (!nick && !nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);

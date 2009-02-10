@@ -834,7 +834,7 @@ void do_quit(const char *source, int ac, const char **av)
 	if (debug) {
 		alog("debug: %s quits", source);
 	}
-	if ((na = user->na) && (!(na->status & NS_VERBOTEN))
+	if ((na = user->na) && (!(na->status & NS_FORBIDDEN))
 		&& (!(na->nc->flags & NI_SUSPENDED))
 		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 		na->last_seen = time(NULL);
@@ -870,7 +870,7 @@ void do_kill(const char *nick, const char *msg)
 	if (debug) {
 		alog("debug: %s killed", nick);
 	}
-	if ((na = user->na) && (!(na->status & NS_VERBOTEN))
+	if ((na = user->na) && (!(na->status & NS_FORBIDDEN))
 		&& (!(na->nc->flags & NI_SUSPENDED))
 		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 		na->last_seen = time(NULL);

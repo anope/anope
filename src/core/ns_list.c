@@ -26,7 +26,7 @@ class CommandNSList : public Command
 
 	CommandResult Execute(User *u, std::vector<std::string> &params)
 	{
-		/* SADMINS can search for nicks based on their NS_VERBOTEN and NS_NO_EXPIRE
+		/* SADMINS can search for nicks based on their NS_FORBIDDEN and NS_NO_EXPIRE
 		 * status. The keywords FORBIDDEN and NOEXPIRE represent these two states
 		 * respectively. These keywords should be included after the search pattern.
 		 * Multiple keywords are accepted and should be separated by spaces. Only one
@@ -109,7 +109,7 @@ class CommandNSList : public Command
 			while (keywords.GetString(keyword))
 			{
 				if (!stricmp(keyword.c_str(), "FORBIDDEN"))
-					matchflags |= NS_VERBOTEN;
+					matchflags |= NS_FORBIDDEN;
 				if (!stricmp(keyword.c_str(), "NOEXPIRE"))
 					matchflags |= NS_NO_EXPIRE;
 				if (!stricmp(keyword.c_str(), "SUSPENDED"))
@@ -129,7 +129,7 @@ class CommandNSList : public Command
 				for (na = nalists[i]; na; na = na->next)
 				{
 					/* Don't show private and forbidden nicks to non-services admins. */
-					if ((na->status & NS_VERBOTEN) && !is_servadmin)
+					if ((na->status & NS_FORBIDDEN) && !is_servadmin)
 						continue;
 					if ((na->nc->flags & NI_PRIVATE) && !is_servadmin && na->nc != mync)
 						continue;
@@ -141,7 +141,7 @@ class CommandNSList : public Command
 					/* We no longer compare the pattern against the output buffer.
 					 * Instead we build a nice nick!user@host buffer to compare.
 					 * The output is then generated separately. -TheShadow */
-					snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->status & NS_VERBOTEN) ? na->last_usermask : "*@*");
+					snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->status & NS_FORBIDDEN) ? na->last_usermask : "*@*");
 					if (!stricmp(pattern, na->nick) || match_wild_nocase(pattern, buf))
 					{
 						if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= NSListMax)
@@ -152,7 +152,7 @@ class CommandNSList : public Command
 								noexpire_char = ' ';
 							if ((na->nc->flags & NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
 								snprintf(buf, sizeof(buf), "%-20s  [Hostname Hidden]", na->nick);
-							else if (na->status & NS_VERBOTEN)
+							else if (na->status & NS_FORBIDDEN)
 								snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", na->nick);
 							else if (na->nc->flags & NI_SUSPENDED)
 								snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick);

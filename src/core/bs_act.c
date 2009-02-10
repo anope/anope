@@ -35,7 +35,7 @@ class CommandBSAct : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->flags & CI_VERBOTEN)
+		if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, ci->name);
 			return MOD_CONT;

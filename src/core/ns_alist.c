@@ -87,7 +87,7 @@ class CommandNSAList : public Command
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (is_servadmin && nick && !na)
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_VERBOTEN)
+		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
 			notice_lang(s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);

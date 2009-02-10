@@ -66,7 +66,7 @@ class CommandOSSVSNick : public Command
 			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (finduser(newnick))
 			notice_lang(s_OperServ, u, NICK_X_IN_USE, newnick);
-		else if ((na = findnick(newnick)) && (na->status & NS_VERBOTEN))
+		else if ((na = findnick(newnick)) && (na->status & NS_FORBIDDEN))
 			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick);
 		else
 		{

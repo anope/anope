@@ -30,7 +30,7 @@ class CommandHSDel : public Command
 		const char *nick = params[0].c_str();
 		if ((na = findnick(nick)))
 		{
-			if (na->status & NS_VERBOTEN)
+			if (na->status & NS_FORBIDDEN)
 			{
 				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;

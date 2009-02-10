@@ -1149,7 +1149,7 @@ void do_cmode(const char *source, int ac, const char **av)
 	if (!chan) {
 		if (debug) {
 			ci = cs_findchan(av[0]);
-			if (!(ci && (ci->flags & CI_VERBOTEN)))
+			if (!(ci && (ci->flags & CI_FORBIDDEN)))
 				alog("debug: MODE %s for nonexistent channel %s",
 					 merge_args(ac - 1, av + 1), av[0]);
 		}
@@ -1363,7 +1363,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!c || !(ci = c->ci))
 		return;
 
-	if ((ci->flags & CI_VERBOTEN) || (*(c->name) == '+'))
+	if ((ci->flags & CI_FORBIDDEN) || (*(c->name) == '+'))
 		return;
 
 	status = chan_get_user_status(c, user);

@@ -148,7 +148,7 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 			*ischan = 1;
 		ci = cs_findchan(name);
 		if (ci) {
-			if (!(ci->flags & CI_VERBOTEN)) {
+			if (!(ci->flags & CI_FORBIDDEN)) {
 				*isforbid = 0;
 				return &ci->memos;
 			} else {
@@ -165,7 +165,7 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 			*ischan = 0;
 		na = findnick(name);
 		if (na) {
-			if (!(na->status & NS_VERBOTEN)) {
+			if (!(na->status & NS_FORBIDDEN)) {
 				*isforbid = 0;
 				return &na->nc->memos;
 			} else {

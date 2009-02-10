@@ -64,7 +64,7 @@ class CommandCSBan : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!(ci = c->ci)) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_VERBOTEN) {
+		} else if (ci->flags & CI_FORBIDDEN) {
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, target);
@@ -149,7 +149,7 @@ class CommandCSUnban : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->flags & CI_VERBOTEN)
+		if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;

@@ -34,7 +34,7 @@ class CommandCSSendPass : public Command
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 		else if (!(ci = cs_findchan(chan)) || !(founder = ci->founder))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (ci->flags & CI_VERBOTEN)
+		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		else
 		{

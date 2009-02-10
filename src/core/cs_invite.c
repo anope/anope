@@ -48,7 +48,7 @@ class CommandCSInvite : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 			return MOD_CONT;
 		}
-		else if (ci->flags & CI_VERBOTEN)
+		else if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;

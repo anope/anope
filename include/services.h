@@ -678,7 +678,7 @@ struct badword_ {
 /* Don't allow any privileges unless a user is IDENTIFY'd with NickServ */
 #define CI_SECURE	0x00000040
 /* Don't allow the channel to be registered or used */
-#define CI_VERBOTEN	0x00000080
+#define CI_FORBIDDEN	0x00000080
 /* Channel password is encrypted */
 #define CI_ENCRYPTEDPW	0x00000100
 /* Channel does not expire */
@@ -1092,7 +1092,7 @@ typedef struct ircd_modes_ {
 #define MF_NOTIFYS	  0x0004  /* Memo is a notification of receitp */
 
 /* Nickname status flags: */
-#define NS_VERBOTEN	0x0002	  /* Nick may not be registered or used */
+#define NS_FORBIDDEN	0x0002	  /* Nick may not be registered or used */
 #define NS_NO_EXPIRE	0x0004	  /* Nick never expires */
 #define NS_IDENTIFIED	0x8000	  /* User has IDENTIFY'd */
 #define NS_RECOGNIZED	0x4000	  /* ON_ACCESS true && SECURE flag not set */
@@ -1134,7 +1134,7 @@ typedef struct ircd_modes_ {
 #define NI_AUTOOP		0x00080000  /* Autoop nickname in channels */
 #define NI_NOEXPIRE		0x00100000 /* nicks in this group won't expire */
 
-// Old NS_VERBOTEN, very fucking temporary.
+// Old NS_FORBIDDEN, very fucking temporary.
 #define NI_FORBIDDEN	0x80000000
 
 /* Languages.  Never insert anything in the middle of this list, or

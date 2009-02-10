@@ -34,7 +34,7 @@ class CommandBSUnassign : public Command
 			notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
 		else if (!(ci = cs_findchan(chan)))
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (ci->flags & CI_VERBOTEN)
+		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
 		else if (!is_services_admin(u) && !check_access(u, ci, CA_ASSIGN))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);

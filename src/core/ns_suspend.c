@@ -43,7 +43,7 @@ class CommandNSSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_VERBOTEN)
+		if (na->status & NS_FORBIDDEN)
 		{
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
@@ -125,7 +125,7 @@ class CommandNSUnSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_VERBOTEN)
+		if (na->status & NS_FORBIDDEN)
 		{
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;

@@ -463,7 +463,7 @@ int main(int argc, char *argv[])
 					na->nc->flags |= 0x00100000;
 				}
 
-				// Convert nick VERBOTEN to group FORBIDDEN
+				// Convert nick FORBIDDEN to group FORBIDDEN
 				if (na->status & 0x0002)
 				{
 					na->nc->flags |= 0x80000000;

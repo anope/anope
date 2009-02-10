@@ -23,7 +23,7 @@ class CommandOSSession : public Command
 	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		Session *session;
-		int mincount;
+		int mincount, i;
 		const char *param = params[1].c_str();
 
 		if ((mincount = atoi(param)) <= 1)
@@ -75,9 +75,9 @@ class CommandOSSession : public Command
 		}
 
 		if (!stricmp(cmd, "LIST"))
-			return this->DoList(u);
+			return this->DoList(u, params);
 		else if (!stricmp(cmd, "VIEW"))
-			return this->DoView(u);
+			return this->DoView(u, params);
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;
@@ -98,6 +98,91 @@ class CommandOSSession : public Command
 	}
 };
 
+static int exception_del(const int index)
+{
+	if (index < 0 || index >= nexceptions)
+		return 0;
+
+	delete [] exceptions[index].mask;
+	delete [] exceptions[index].reason;
+	--nexceptions;
+	memmove(exceptions + index, exceptions + index + 1, sizeof(Exception) * (nexceptions - index));
+	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
+
+	return 1;
+}
+
+/* We use the "num" property to keep track of the position of each exception
+ * when deleting using ranges. This is because an exception's position changes
+ * as others are deleted. The positions will be recalculated once the process
+ * is complete. -TheShadow
+ */
+
+static int exception_del_callback(User *u, int num, va_list args)
+{
+	int i;
+	int *last = va_arg(args, int *);
+
+	*last = num;
+	for (i = 0; i < nexceptions; ++i)
+		if (num - 1 == exceptions[i].num)
+			break;
+
+	if (i < nexceptions)
+		return exception_del(i);
+	else
+		return 0;
+}
+
+static int exception_list(User *u, const int index, int *sent_header)
+{
+	if (index < 0 || index >= nexceptions)
+		return 0;
+	if (!*sent_header) {
+		notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+		notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
+		*sent_header = 1;
+	}
+	notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index].limit, exceptions[index].mask);
+	return 1;
+}
+
+static int exception_list_callback(User *u, int num, va_list args)
+{
+	int *sent_header = va_arg(args, int *);
+
+	return exception_list(u, num - 1, sent_header);
+}
+
+static int exception_view(User *u, const int index, int *sent_header)
+{
+	char timebuf[32], expirebuf[256];
+	struct tm tm;
+	time_t t = time(NULL);
+
+	if (index < 0 || index >= nexceptions)
+		return 0;
+	if (!*sent_header) {
+		notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+		*sent_header = 1;
+	}
+
+	tm = *localtime(exceptions[index].time ? &exceptions[index].time : &t);
+	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
+
+	expire_left(u->na, expirebuf, sizeof(expirebuf), exceptions[index].expires);
+
+	notice_lang(s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, *exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
+	return 1;
+}
+
+static int exception_view_callback(User *u, int num, va_list args)
+{
+	int *sent_header = va_arg(args, int *);
+
+	return exception_view(u, num - 1, sent_header);
+}
+
 class CommandOSException : public Command
 {
  private:
@@ -105,7 +190,8 @@ class CommandOSException : public Command
 	{
 		const char *mask, *expiry, *limitstr;
 		char reason[BUFSIZE];
-		int last_param = 3, x;
+		unsigned last_param = 3;
+		int x;
 
 		if (nexceptions >= 32767)
 		{
@@ -130,7 +216,7 @@ class CommandOSException : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 3 ? " " : "", last_param == 3 ? param[4].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 3 ? " " : "", last_param == 3 ? params[4].c_str() : "");
 
 		if (!*reason)
 		{
@@ -138,7 +224,7 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		expires = expiry ? dotime(expiry) : ExceptionExpiry;
+		int expires = expiry ? dotime(expiry) : ExceptionExpiry;
 		if (expires < 0)
 		{
 			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);
@@ -147,7 +233,7 @@ class CommandOSException : public Command
 		else if (expires > 0)
 			expires += time(NULL);
 
-		limit = limitstr && isdigit(*limitstr) ? atoi(limitstr) : -1;
+		int limit = limitstr && isdigit(*limitstr) ? atoi(limitstr) : -1;
 
 		if (limit < 0 || limit > MaxSessionLimit)
 		{
@@ -238,7 +324,7 @@ class CommandOSException : public Command
 		Exception *exception;
 		const char *n1str = params.size() > 1 ? params[1].c_str() : NULL; /* From position */
 		const char *n2str = params.size() > 2 ? params[2].c_str() : NULL; /* To position */
-		int n1, n2;
+		int n1, n2, i;
 
 		if (!n2str)
 		{
@@ -286,7 +372,7 @@ class CommandOSException : public Command
 
 	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
-		int sent_header = 0;
+		int sent_header = 0, i;
 		expire_exceptions();
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -308,7 +394,7 @@ class CommandOSException : public Command
 
 	CommandReturn DoView(User *u, std::vector<std::string> &params)
 	{
-		int sent_header = 0;
+		int sent_header = 0, i;
 		expire_exceptions();
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -336,10 +422,6 @@ class CommandOSException : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-		char *mask, *reason, *expiry, *limitstr;
-		int limit, expires;
-		int i;
-		int x;
 
 		if (!LimitSessions)
 		{

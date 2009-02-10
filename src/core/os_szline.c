@@ -26,7 +26,8 @@ class CommandOSSZLine : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		int deleted = 0, last_param = 2;
+		int deleted = 0;
+		unsigned last_param = 2;
 		const char *expiry, *mask;
 		char reason[BUFSIZE];
 		time_t expires;
@@ -61,7 +62,7 @@ class CommandOSSZLine : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? param[3].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? params[3].c_str() : "");
 		if (mask && *reason)
 		{
 			/* We first do some sanity check on the proposed mask. */
@@ -94,7 +95,7 @@ class CommandOSSZLine : public Command
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					char *s = NULL;
+					const char *s = NULL;
 
 					if (wall_expiry >= 86400)
 					{
@@ -130,7 +131,7 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
-		char *mask;
+		const char *mask;
 		int res = 0;
 
 		mask = params.size() > 1 ? params[1].c_str() : NULL;
@@ -163,7 +164,7 @@ class CommandOSSZLine : public Command
 		}
 		else
 		{
-			if ((res = slist_indexof(&szlines, mask)) == -1)
+			if ((res = slist_indexof(&szlines, const_cast<char *>(mask))) == -1)
 			{
 				notice_lang(s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask);
 				return MOD_CONT;
@@ -181,7 +182,7 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
-		char *mask;
+		const char *mask;
 		int res, sent_header = 0;
 
 		if (!szlines.count)
@@ -190,7 +191,7 @@ class CommandOSSZLine : public Command
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 : params[1].c_str() : NULL;
+		mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
 		{
@@ -222,7 +223,7 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoView(User *u, std::vector<std::string> &params)
 	{
-		char *mask;
+		const char *mask;
 		int res, sent_header = 0;
 
 		if (!szlines.count)

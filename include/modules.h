@@ -178,7 +178,7 @@ class Command
 		this->root_help = NULL;
 	}
 
-	~Command()
+	virtual ~Command()
 	{
 		this->has_priv = NULL;
 		if (this->mod_name) {

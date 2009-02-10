@@ -24,7 +24,7 @@ class CommandOSOper : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		const char *nick = param.size() > 1 ? params[1].c_str() : NULL;
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
 		int res = 0;
 
@@ -156,6 +156,7 @@ class CommandOSOper : public Command
 	{
 		int sent_header = 0;
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		int res = 0;
 
 		if (!is_oper(u))
 		{

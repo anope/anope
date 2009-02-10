@@ -14,6 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hashcomp.h"
 
 class CommandOSRaw : public Command
 {
@@ -30,7 +31,7 @@ class CommandOSRaw : public Command
 		{
 			std::string kw;
 			spacesepstream textsep(text);
-			while (textsep.GetString(kw) && kw[0] == ':');
+			while (textsep.GetToken(kw) && kw[0] == ':');
 			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used RAW command for \2%s\2", u->nick, !kw.empty() ? kw.c_str() : "\2non RFC compliant message\2");
 		}
 		alog("%s used RAW command for %s", u->nick, text);
@@ -63,8 +64,7 @@ class OSRaw : public Module
 		this->SetVersion("$Id$");
 		this->SetType(THIRD);
 
-		c = createCommand("RAW", do_raw, is_services_root, OPER_HELP_RAW, -1, -1, -1, -1);
-		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSRaw(), MOD_UNIQUE);
 
 		if (DisableRaw)
 			throw ModuleException("os_raw: Not loading because you probably shouldn't be loading me");

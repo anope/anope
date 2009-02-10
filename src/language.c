@@ -306,4 +306,29 @@ void syntax_error(char *service, User * u, const char *command, int msgnum)
 	notice_lang(service, u, MORE_INFO, service, command);
 }
 
+const char *getstring(NickAlias *na, int index)
+{
+	// Default to config
+	int langidx = NSDefLanguage;
+
+	// If they are registered (na->nc), and NOT forbidden
+	if (na->nc && !na->status & NS_FORBIDDEN)
+		langidx = na->nc->language; // set language to their nickcore's language
+
+	return langtexts[langidx][index];
+}
+
+const char *getstring2(NickCore *nc, int index)
+{
+	// Default to config
+	int langidx = NSDefLanguage;
+
+	if (nc)
+	{
+		langidx = nc->language;
+	}
+
+	return langtexts[langidx][index];
+}
+
 /*************************************************************************/

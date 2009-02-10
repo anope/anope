@@ -533,14 +533,10 @@ E char *langnames[NUM_LANGS];
 E int langlist[NUM_LANGS];
 
 E void lang_init();
-#define getstring(na,index) \
-	(langtexts[((na) && (static_cast<NickAlias *>(na))->nc && !((static_cast<NickAlias *>(na))->status & NS_FORBIDDEN) ? (static_cast<NickAlias *>(na))->nc->language : NSDefLanguage)][(index)])
-#define getstring2(nc,index) \
-	(langtexts[((nc) ? (static_cast<NickCore *>(nc))->language : NSDefLanguage)][(index)])
-E int strftime_lang(char *buf, int size, User * u, int format,
-					struct tm *tm);
-E void syntax_error(char *service, User * u, const char *command,
-					int msgnum);
+E int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm);
+E void syntax_error(char *service, User * u, const char *command, int msgnum);
+E const char *getstring(NickAlias *na, int index);
+E const char *getstring2(NickCore *nc, int index);
 
 
 /**** log.c ****/

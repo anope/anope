@@ -423,7 +423,7 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 	int need_comma = 0;
 
 	char buf2[64], *end;
-	char *comma = getstring(na, COMMA_SPACE);
+	const char *comma = getstring(na, COMMA_SPACE);
 
 	/* We first calculate everything */
 	days = seconds / 86400;

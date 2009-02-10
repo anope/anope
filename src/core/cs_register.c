@@ -22,6 +22,7 @@ class CommandCSRegister : public Command
  public:
 	CommandCSRegister() : Command("REGISTER", 3, 3)
 	{
+
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

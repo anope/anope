@@ -20,7 +20,7 @@ void myNickServHelp(User *u);
 
 class CommandNSSASet : public Command
 {
- private:
+private:
 	CommandReturn DoSetDisplay(User *u, std::vector<std::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
@@ -180,7 +180,7 @@ class CommandNSSASet : public Command
 			{
 				nc->icq = tmp;
 				notice_lang(s_NickServ, u, NICK_SASET_ICQ_CHANGED, nc->display,
-							param);
+				            param);
 			}
 		}
 		else
@@ -479,7 +479,7 @@ class CommandNSSASet : public Command
 
 		return MOD_CONT;
 	}
- public:
+public:
 	CommandNSSASet() : Command("SASET", 2, 4)
 	{
 	}
@@ -532,7 +532,7 @@ class CommandNSSASet : public Command
 			return this->DoSetNoExpire(u, params, na);
 		else if (!stricmp(cmd, "AUTOOP"))
 			return this->DoSetAutoOP(u, params, na->nc);
-		else if (!stricmp(cmd, "LANGUAGE")) {
+		else if (!stricmp(cmd, "LANGUAGE"))
 			return this->DoSetLanguage(u, params, na->nc);
 		else
 			notice_lang(s_NickServ, u, NICK_SASET_UNKNOWN_OPTION, cmd);
@@ -572,7 +572,7 @@ class CommandNSSASet : public Command
 
 class NSSASet : public Module
 {
- public:
+public:
 	NSSASet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");

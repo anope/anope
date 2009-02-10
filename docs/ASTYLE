@@ -1,0 +1,1 @@
+astyle --style=java --indent=tab --brackets=break-closing --indent-switches --indent-cases --brackets=break

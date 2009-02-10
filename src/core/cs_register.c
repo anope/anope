@@ -24,7 +24,7 @@ class CommandCSRegister : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *pass = params[1].c_str();
@@ -104,7 +104,6 @@ class CommandCSRegister : public Command
 			ci->last_used = ci->time_registered;
 			ci->founder = nc;
 
-			memset(pass, 0, strlen(pass));
 			memcpy(ci->founderpass, founderpass, PASSMAX);
 			ci->desc = sstrdup(desc);
 			if (c->topic)

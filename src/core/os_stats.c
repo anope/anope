@@ -18,6 +18,26 @@
 void get_operserv_stats(long *nrec, long *memuse);
 void myOperServHelp(User *u);
 
+/**
+ * Count servers connected to server s
+ * @param s The server to start counting from
+ * @return Amount of servers connected to server s
+ **/
+int stats_count_servers(Server *s)
+{
+	int count = 0;
+
+	while (s)
+	{
+		++count;
+		if (s->links)
+			count += stats_count_servers(s->links);
+		s = s->next;
+	}
+
+	return count;
+}
+
 class CommandOSStats : public Command
 {
  private:
@@ -118,8 +138,11 @@ class CommandOSStats : public Command
 
 	CommandReturn DoStatsUptime(User *u, std::vector<std::string> &params)
 	{
+		char timebuf[64];
+		time_t uptime = time(NULL) - start_time;
+		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
 		notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
-		tm = localtime(&maxusertime);
+		struct tm *tm = localtime(&maxusertime);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 		notice_lang(s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt, timebuf);
 		if (days > 1)
@@ -179,10 +202,14 @@ class CommandOSStats : public Command
 				}
 			}
 		}
+
+		return MOD_CONT;
 	}
 
 	CommandReturn DoStatsUplink(User *u, std::vector<std::string> &params)
 	{
+		char buf[512];
+		int buflen, i;
 		buf[0] = '\0';
 		buflen = 511; /* How confusing, this is the amount of space left! */
 		for (i = 0; capab_info[i].token; ++i)
@@ -250,6 +277,8 @@ class CommandOSStats : public Command
 		notice_lang(s_OperServ, u, OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
 		get_session_stats(&count, &mem);
 		notice_lang(s_OperServ, u, OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
+
+		return MOD_CONT;
 	}
  public:
 	CommandOSStats() : Command("STATS", 0, 1)
@@ -258,14 +287,7 @@ class CommandOSStats : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		time_t uptime = time(NULL) - start_time;
 		const char *extra = params.size() ? params[0].c_str() : NULL;
-		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
-		struct tm *tm;
-		char timebuf[64];
-		char buf[512];
-		int buflen;
-		int i;
 
 		if (extra && stricmp(extra, "ALL"))
 		{
@@ -319,26 +341,6 @@ class OSStats : public Module
 void myOperServHelp(User *u)
 {
 	notice_lang(s_OperServ, u, OPER_HELP_CMD_STATS);
-}
-
-/**
- * Count servers connected to server s
- * @param s The server to start counting from
- * @return Amount of servers connected to server s
- **/
-int stats_count_servers(Server *s)
-{
-	int count = 0;
-
-	while (s)
-	{
-		++count;
-		if (s->links)
-			count += stats_count_servers(s->links);
-		s = s->next;
-	}
-
-	return count;
 }
 
 void get_operserv_stats(long *nrec, long *memuse)

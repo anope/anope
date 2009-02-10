@@ -241,10 +241,7 @@ class CommandOSSet : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *option = params[0].c_str();
-		char *setting = strtok(NULL, " ");
-		int index;
-		Channel *c;
+		const char *option = params[0].c_str();
 
 		if (!stricmp(option, "LIST"))
 			return this->DoList(u, params);
@@ -270,15 +267,22 @@ class CommandOSSet : public Command
 		if (!is_services_root(u))
 			return false;
 
-		// This needs to change XXX
-		notice_lang(s_OperServ, u, OPER_HELP_SET);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_LIST);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_READONLY);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_LOGCHAN);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_DEBUG);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_NOEXPIRE);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_IGNORE);
-		notice_lang(s_OperServ, u, OPER_HELP_SET_SUPERADMIN);
+		if (subcommand.empty())
+			notice_lang(s_OperServ, u, OPER_HELP_SET);
+		else if (subcommand == "LIST")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_LIST);
+		else if (subcommand == "READONLY")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_READONLY);
+		else if (subcommand == "LOGCHAN")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_LOGCHAN);
+		else if (subcommand == "DEBUG")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_DEBUG);
+		else if (subcommand == "NOEXPIRE")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_NOEXPIRE);
+		else if (subcommand == "IGNORE")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_IGNORE);
+		else if (subcommand == "SUPERADMIN")
+			notice_lang(s_OperServ, u, OPER_HELP_SET_SUPERADMIN);
 
 		return true;
 	}

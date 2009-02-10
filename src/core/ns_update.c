@@ -46,9 +46,10 @@ class CommandNSUpdate : public Command
 		return MOD_CONT;
 	}
 
-	bool Help(User *u)
+	bool OnHelp(User *u)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_UPDATE);
+		return true;
 	}
 };
 

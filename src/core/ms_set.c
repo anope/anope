@@ -20,9 +20,9 @@ void myMemoServHelp(User *u);
 class CommandMSSet : public Command
 {
  private:
-	CommandReturn DoNotify(User *u, std::vector<std::string> &params, MemoInfo &mi)
+	CommandReturn DoNotify(User *u, std::vector<std::string> &params, MemoInfo *mi)
 	{
-		const char *params = params[1].c_str();
+		const char *param = params[1].c_str();
 
 		if (!stricmp(param, "ON"))
 		{
@@ -66,7 +66,7 @@ class CommandMSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoLimit(User *u, std::vector<std::string> &params)
+	CommandReturn DoLimit(User *u, std::vector<std::string> &params, MemoInfo *mi)
 	{
 		const char *p1 = params[1].c_str();
 		const char *p2 = params.size() > 2 ? params[2].c_str() : NULL;
@@ -236,13 +236,17 @@ class CommandMSSet : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		// This needs to change XXX
-		notice_lang(s_MemoServ, u, MEMO_HELP_SET);
-		notice_lang(s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
-		notice_lang(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);
-
-		if (is_services_oper(u))
-			notice_lang(s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, MSMaxMemos);
+		if (subcommand.empty())
+			notice_lang(s_MemoServ, u, MEMO_HELP_SET);
+		else if (subcommand == "NOTIFY")
+			notice_lang(s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
+		else if (subcommand == "LIMIT")
+		{
+			if (is_services_oper(u))
+				notice_lang(s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, MSMaxMemos);
+			else
+				notice_lang(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);
+		}
 
 		return true;
 	}

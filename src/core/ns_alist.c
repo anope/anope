@@ -138,6 +138,8 @@ class CommandNSAList : public Command
 			notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
 		else
 			notice_lang(s_NickServ, u, NICK_HELP_ALIST);
+
+		return true;
 	}
 };
 

@@ -20,7 +20,7 @@ void myNickServHelp(User *u);
 class CommandNSAccess : public Command
 {
  private:
-	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params)
+	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params, NickAlias *na)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
 		char **access;
@@ -55,7 +55,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params, const char *mask)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params, NickAlias *na, const char *mask)
 	{
 		char **access;
 		int i;
@@ -89,7 +89,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params, const char *mask)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params, NickAlias *na, const char *mask)
 	{
 		char **access;
 		int i;
@@ -127,7 +127,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<std::string> *params, const char *mask)
+	CommandReturn DoList(User *u, std::vector<std::string> &params, NickAlias *na, const char *mask)
 	{
 		char **access;
 		int i;
@@ -177,11 +177,11 @@ class CommandNSAccess : public Command
 		else if (!nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!stricmp(cmd, "ADD"))
-			return this->DoAdd(u, params, mask);
+			return this->DoAdd(u, params, na, mask);
 		else if (!stricmp(cmd, "DEL"))
-			return this->DoDel(u, params, mask);
+			return this->DoDel(u, params, na, mask);
 		else if (!stricmp(cmd, "LIST"))
-			return thus->DoList(u, params, mask);
+			return this->DoList(u, params, na, mask);
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;

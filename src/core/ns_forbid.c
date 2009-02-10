@@ -29,7 +29,7 @@ class CommandNSForbid : public Command
 	{
 		NickAlias *na;
 		const char *nick = params[0].c_str();
-		const char *reason = params.size() > 1 ? params[1].c_str();
+		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		/* Assumes that permission checking has already been done. */
 		if (ForceForbidReason && !reason) {

@@ -24,7 +24,7 @@ class CommandMSStaff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vecyor<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickCore *nc;
 		int i, z = 0;

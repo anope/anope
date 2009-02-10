@@ -26,7 +26,7 @@ class CommandSSHelp : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		ircdproto->SendMessage(statserv, u->nick, "This is a test of the emergency StatServ system.");
 		return MOD_CONT;

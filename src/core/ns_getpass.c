@@ -24,7 +24,7 @@ class CommandNSGetPass : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		char tmp_pass[PASSMAX];

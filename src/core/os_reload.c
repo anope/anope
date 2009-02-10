@@ -24,7 +24,7 @@ class CommandOSReload : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		if (!read_config(1))
 		{

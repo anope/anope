@@ -24,7 +24,7 @@ class CommandOSRestart : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 #ifdef SERVICES_BIN
 		quitmsg = new char[31 + strlen(u->nick)];

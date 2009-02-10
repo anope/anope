@@ -24,7 +24,7 @@ class CommandMSSend : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *name = params[0].c_str();
 		const char *text = params[1].c_str();

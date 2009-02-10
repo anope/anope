@@ -20,7 +20,7 @@ void myOperServHelp(User *u);
 class CommandOSSet : public Command
 {
  private:
-	CommandResult DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		int index;
 
@@ -38,7 +38,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoSetIgnore(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetIgnore(User *u, std::vector<std::string> &params)
 	{
 		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -64,7 +64,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoSetReadOnly(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetReadOnly(User *u, std::vector<std::string> &params)
 	{
 		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -94,7 +94,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoSetLogChan(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetLogChan(User *u, std::vector<std::string> &params)
 	{
 		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
 		Channel *c;
@@ -136,7 +136,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoSetSuperAdmin(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetSuperAdmin(User *u, std::vector<std::string> &params)
 	{
 		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -173,7 +173,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoSetDebug(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetDebug(User *u, std::vector<std::string> &params)
 	{
 		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -207,7 +207,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoSetNoExpire(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetNoExpire(User *u, std::vector<std::string> &params)
 	{
 		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -239,7 +239,7 @@ class CommandOSSet : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *option = params[0].c_str();
 		char *setting = strtok(NULL, " ");

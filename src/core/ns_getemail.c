@@ -29,7 +29,7 @@ class CommandNSGetEMail : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *email = params[0].c_str();
 		int i, j = 0;

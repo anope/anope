@@ -24,7 +24,7 @@ class CommandHSOff : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickAlias *na;
 		char *vhost;

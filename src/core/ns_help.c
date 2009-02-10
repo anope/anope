@@ -22,7 +22,7 @@ class CommandNSHelp : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str()
 		if (!stricmp(cmd, "SET LANGUAGE"))

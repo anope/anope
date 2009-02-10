@@ -37,7 +37,7 @@ class CommandNSInfo : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		/* Show hidden info to nick owners and sadmins when the "ALL" parameter is
 		 * supplied. If a nick is online, the "Last seen address" changes to "Is

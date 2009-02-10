@@ -24,7 +24,7 @@ class CommandNSStatus : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		User *u2;
 		NickAlias *na = NULL;

@@ -24,7 +24,7 @@ int sqline_list(int number, SXLine *sx, User *u, int *sent_header);
 class CommandOSSQLine : public Command
 {
  private:
-	CommandResult DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		int deleted = 0, last_param = 2;
 		const char *expiry, *mask;
@@ -128,7 +128,7 @@ class CommandOSSQLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		const char *mask;
 		int res = 0;
@@ -178,7 +178,7 @@ class CommandOSSQLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -221,7 +221,7 @@ class CommandOSSQLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoView(User *u, std::vector<std::string> &params)
+	CommandReturn DoView(User *u, std::vector<std::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -262,7 +262,7 @@ class CommandOSSQLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoClear(User *u, std::vector<std::string> &params)
+	CommandReturn DoClear(User *u, std::vector<std::string> &params)
 	{
 		slist_clear(&sqlines, 1);
 		notice_lang(s_OperServ, u, OPER_SQLINE_CLEAR);
@@ -274,7 +274,7 @@ class CommandOSSQLine : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 

@@ -24,7 +24,7 @@ class CommandCSSuspend : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		ChannelInfo *ci;
 		char *chan = params[0].c_str();
@@ -126,7 +126,7 @@ class CommandCSUnSuspend : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		ChannelInfo *ci;
 		const char *chan = params[0].c_str();

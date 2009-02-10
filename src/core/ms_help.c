@@ -22,7 +22,7 @@ class CommandMSHelp : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		mod_help_cmd(s_MemoServ, u, MEMOSERV, params[0].c_str());
 		return MOD_CONT;

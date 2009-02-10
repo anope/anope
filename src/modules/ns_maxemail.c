@@ -37,7 +37,7 @@ class CommandNSRegister : public Command
 	{
 	}
 
-	CommandResult(User *u, std::vector<std::string> &params)
+	CommandReturn(User *u, std::vector<std::string> &params)
 	{
 		return check_email_limit_reached(params[1].c_str(), u);
 	}
@@ -55,7 +55,7 @@ class CommandNSSet : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *set = params[0].c_str();
 		const char *email = params[1].c_str();

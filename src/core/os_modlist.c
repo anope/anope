@@ -24,7 +24,7 @@ class CommandOSModList : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		int idx;
 		int count = 0;

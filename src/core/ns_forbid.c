@@ -25,7 +25,7 @@ class CommandNSForbid : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickAlias *na;
 		const char *nick = params[0].c_str();

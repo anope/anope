@@ -25,7 +25,7 @@ class CommandOSModInfo : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *file = params[0].c_str();
 		struct tm tm;

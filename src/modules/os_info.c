@@ -58,7 +58,7 @@ static Module *me;
 class CommandNSOInfo : public Command
 {
  private:
-	CommandResult DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
@@ -83,7 +83,7 @@ class CommandNSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		NickAlias *na = NULL;
@@ -110,7 +110,7 @@ class CommandNSOInfo : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 
@@ -145,7 +145,7 @@ class CommandNSInfo : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		NickAlias *na = NULL;
@@ -174,7 +174,7 @@ class CommandNSInfo : public Command
 class CommandCSOInfo : public Command
 {
  private:
-	CommandResult DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
@@ -198,7 +198,7 @@ class CommandCSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[1].c_str();
 		ChannelInfo *ci = NULL;
@@ -224,7 +224,7 @@ class CommandCSOInfo : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 
@@ -259,7 +259,7 @@ class CommandCSInfo : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *chan = params[0].c_str();
 		ChannelInfo *ci = NULL;

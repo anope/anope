@@ -20,7 +20,7 @@ void myNickServHelp(User *u);
 class CommandNSAccess : public Command
 {
  private:
-	CommandResult DoServAdminList(User *u, std::vector<std::string> &params)
+	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
 		char **access;
@@ -55,7 +55,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoAdd(User *u, std::vector<std::string> &params, const char *mask)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params, const char *mask)
 	{
 		char **access;
 		int i;
@@ -89,7 +89,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params, const char *mask)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params, const char *mask)
 	{
 		char **access;
 		int i;
@@ -127,7 +127,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoList(User *u, std::vector<std::string> *params, const char *mask)
+	CommandReturn DoList(User *u, std::vector<std::string> *params, const char *mask)
 	{
 		char **access;
 		int i;
@@ -153,7 +153,7 @@ class CommandNSAccess : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;

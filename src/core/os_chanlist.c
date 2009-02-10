@@ -24,7 +24,7 @@ class CommandOSChanList : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
 		char *opt = params.size() > 1 ? params[1].c_str() : NULL;

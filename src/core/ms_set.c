@@ -20,7 +20,7 @@ void myMemoServHelp(User *u);
 class CommandMSSet : public Command
 {
  private:
-	CommandResult DoNotify(User *u, std::vector<std::string> &params, MemoInfo &mi)
+	CommandReturn DoNotify(User *u, std::vector<std::string> &params, MemoInfo &mi)
 	{
 		const char *params = params[1].c_str();
 
@@ -66,7 +66,7 @@ class CommandMSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoLimit(User *u, std::vector<std::string> &params)
+	CommandReturn DoLimit(User *u, std::vector<std::string> &params)
 	{
 		const char *p1 = params[1].c_str();
 		const char *p2 = params.size() > 2 ? params[2].c_str() : NULL;
@@ -209,7 +209,7 @@ class CommandMSSet : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 		MemoInfo *mi = &u->na->nc->memos;

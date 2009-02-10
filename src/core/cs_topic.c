@@ -24,7 +24,7 @@ class CommandCSTopic : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *chan = params[0].c_str();
 		char *topic = params.size() > 1 ? params[1].c_str() : NULL;

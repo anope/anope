@@ -22,7 +22,7 @@ void myOperServHelp(User *u);
 class CommandOSOper : public Command
 {
  private:
-	CommandResult DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = param.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
@@ -90,7 +90,7 @@ class CommandOSOper : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
@@ -152,7 +152,7 @@ class CommandOSOper : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		int sent_header = 0;
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
@@ -199,7 +199,7 @@ class CommandOSOper : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoClear(User *u, std::vector<std::string> &params)
+	CommandReturn DoClear(User *u, std::vector<std::string> &params)
 	{
 		if (!is_services_root(u))
 		{
@@ -224,7 +224,7 @@ class CommandOSOper : public Command
 		this->help_param1 = s_NickServ;
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 

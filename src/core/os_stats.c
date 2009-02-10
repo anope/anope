@@ -21,7 +21,7 @@ void myOperServHelp(User *u);
 class CommandOSStats : public Command
 {
  private:
-	CommandResult DoStatsAkill(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsAkill(User *u, std::vector<std::string> &params)
 	{
 		int timeout;
 		/* AKILLs */
@@ -104,7 +104,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoStatsReset(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsReset(User *u, std::vector<std::string> &params)
 	{
 		if (is_services_admin(u))
 		{
@@ -116,7 +116,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoStatsUptime(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsUptime(User *u, std::vector<std::string> &params)
 	{
 		notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
 		tm = localtime(&maxusertime);
@@ -181,7 +181,7 @@ class CommandOSStats : public Command
 		}
 	}
 
-	CommandResult DoStatsUplink(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsUplink(User *u, std::vector<std::string> &params)
 	{
 		buf[0] = '\0';
 		buflen = 511; /* How confusing, this is the amount of space left! */
@@ -219,7 +219,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoStatsMemory(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsMemory(User *u, std::vector<std::string> &params)
 	{
 		long count, mem;
 
@@ -256,7 +256,7 @@ class CommandOSStats : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		time_t uptime = time(NULL) - start_time;
 		const char *extra = params.size() ? params[0].c_str() : NULL;

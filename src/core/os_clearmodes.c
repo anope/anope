@@ -24,7 +24,7 @@ class CommandOSClearModes : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *s;
 		const char *argv[2];

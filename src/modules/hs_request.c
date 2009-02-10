@@ -79,7 +79,7 @@ class CommandHSRequest : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *nick;
 		const char *rawhostmask = params[1].c_str();
@@ -211,7 +211,7 @@ class CommandHSActivate : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		NickAlias *na;
@@ -273,7 +273,7 @@ class CommandHSReject : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
@@ -329,7 +329,7 @@ class CommandHSReject : public Command
 class CommandHSList : public Command
 {
  private:
-	CommandResult DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		struct tm *tm;
 		char buf[BUFSIZE];
@@ -363,7 +363,7 @@ class CommandHSList : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *key = params[0].c_str();
 
@@ -386,7 +386,7 @@ class CommandHSWaiting : public CommandHSList
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		return this->DoList(u, params);
 	}
@@ -411,7 +411,7 @@ class CommandNSDrop : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		HostCore *tmp;
 		bool found = false;

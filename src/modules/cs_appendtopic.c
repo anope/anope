@@ -59,7 +59,7 @@ class CommandCSAppendTopic : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *newtopic = params[1].c_str();

@@ -24,7 +24,7 @@ class CommandOSNOOP : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 		const char *server = params[1].c_str();

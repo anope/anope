@@ -24,7 +24,7 @@ int sgline_list(int number, SXLine *sx, User *u, int *sent_header);
 class CommandOSSGLine : public Command
 {
  private:
-	CommandResult OnAdd(User *u, std::vector<std::string> &params)
+	CommandReturn OnAdd(User *u, std::vector<std::string> &params)
 	{
 		int deleted = 0, last_param = 2;
 		const char *param;
@@ -135,7 +135,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult OnDel(User *u, std::vector<std::string> &params)
+	CommandReturn OnDel(User *u, std::vector<std::string> &params)
 	{
 		const char *mask;
 		int res = 0;
@@ -185,7 +185,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult OnList(User *u, std::vector<std::string> &params)
+	CommandReturn OnList(User *u, std::vector<std::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -227,7 +227,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult OnView(User *u, std::vector<std::string> &params)
+	CommandReturn OnView(User *u, std::vector<std::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -268,7 +268,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult OnClear(User *u, std::vector<std::string> &params)
+	CommandReturn OnClear(User *u, std::vector<std::string> &params)
 	{
 		slist_clear(&sglines, 1);
 		notice_lang(s_OperServ, u, OPER_SGLINE_CLEAR);
@@ -278,7 +278,7 @@ class CommandOSSGLine : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 

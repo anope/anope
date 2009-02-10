@@ -20,7 +20,7 @@ void myOperServHelp(User *u);
 class CommandOSIgnore : public Command
 {
  private:
-	CommandResult DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		char *time = params.size() > 1 ? params[1].c_str() : NULL;
 		char *nick = params.size() > 2 ? params[2].c_str() : NULL;
@@ -55,7 +55,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		IgnoreData *id;
 
@@ -72,7 +72,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		if (!nick)
@@ -90,7 +90,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoClear(User *u, std::vector<std::string> &params)
+	CommandReturn DoClear(User *u, std::vector<std::string> &params)
 	{
 		clear_ignores();
 		notice_lang(s_OperServ, u, OPER_IGNORE_LIST_CLEARED);
@@ -102,7 +102,7 @@ class CommandOSIgnore : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 		int t;

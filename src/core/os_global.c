@@ -25,7 +25,7 @@ class CommandOSGlobal : public Command
 		this->help_param1 = s_GlobalNoticer;
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *msg = params[1].c_str();
 

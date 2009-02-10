@@ -24,7 +24,7 @@ class CommandOSJupe : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *jserver = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;

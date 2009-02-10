@@ -25,7 +25,7 @@ class CommandMSDel : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		MemoInfo *mi;
 		ChannelInfo *ci;

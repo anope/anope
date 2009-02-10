@@ -24,7 +24,7 @@ class CommandOSQuit : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		quitmsg = new char[28 + strlen(u->nick)];
 		if (!quitmsg)

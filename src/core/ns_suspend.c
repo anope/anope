@@ -24,7 +24,7 @@ class CommandNSSuspend : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickAlias *na, *na2;
 		const char *nick = params[0].c_str();
@@ -108,7 +108,7 @@ class CommandNSUnSuspend : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickAlias *na;
 		const char *nick = params[0].c_str();

@@ -27,7 +27,7 @@ class CommandNSIdentify : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *pass = params[0].c_str();
 		NickAlias *na;

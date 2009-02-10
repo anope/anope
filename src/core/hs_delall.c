@@ -24,7 +24,7 @@ class CommandHSDelAll : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		int i;
 		const char *nick = params[0].c_str();

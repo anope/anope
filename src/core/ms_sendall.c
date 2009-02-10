@@ -24,7 +24,7 @@ class CommandMSSendAll : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		int i, z = 1;
 		NickCore *nc;

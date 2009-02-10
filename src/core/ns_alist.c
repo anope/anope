@@ -24,7 +24,7 @@ class CommandNSAList : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		/*
 		 * List the channels that the given nickname has access on

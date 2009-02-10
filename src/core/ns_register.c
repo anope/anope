@@ -24,7 +24,7 @@ int do_sendregmail(User *u, NickRequest *nr);
 class CommandNSConfirm : public Command
 {
  private:
-	CommandResult DoConfirm(User *u, std::vector<std::string> &params)
+	CommandReturn DoConfirm(User *u, std::vector<std::string> &params)
 	{
 		NickRequest *nr = NULL;
 		NickAlias *na = NULL;
@@ -212,7 +212,7 @@ class CommandNSConfirm : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		return this->DoConfirm(u, params);
 	}
@@ -231,7 +231,7 @@ class CommandNSRegister : public CommandNSConfirm
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickRequest *nr = NULL, *anr = NULL;
 		NickCore *nc = NULL;
@@ -400,7 +400,7 @@ class CommandNSResend : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickRequest *nr = NULL;
 		if (NSEmailReg)

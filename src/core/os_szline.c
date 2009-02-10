@@ -24,7 +24,7 @@ int szline_list(int number, SXLine *sx, User *u, int *sent_header);
 class CommandOSSZLine : public Command
 {
  private:
-	CommandResult DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		int deleted = 0, last_param = 2;
 		const char *expiry, *mask;
@@ -128,7 +128,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		char *mask;
 		int res = 0;
@@ -179,7 +179,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		char *mask;
 		int res, sent_header = 0;
@@ -220,7 +220,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoView(User *u, std::vector<std::string> &params)
+	CommandReturn DoView(User *u, std::vector<std::string> &params)
 	{
 		char *mask;
 		int res, sent_header = 0;
@@ -261,7 +261,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandResult DoClear(User *u, std::vector<std::string> &params)
+	CommandReturn DoClear(User *u, std::vector<std::string> &params)
 	{
 		slist_clear(&szlines, 1);
 		notice_lang(s_OperServ, u, OPER_SZLINE_CLEAR);
@@ -273,7 +273,7 @@ class CommandOSSZLine : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
 

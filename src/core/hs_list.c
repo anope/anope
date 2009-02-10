@@ -24,7 +24,7 @@ class CommandHSList : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *key = params.size() ? params[0].c_str() : NULL;
 		struct tm *tm;

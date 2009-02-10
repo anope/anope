@@ -24,7 +24,7 @@ class CommandOSKick : public Command
 	{
 	}
 
-	CommandResult Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *argv[3];
 		const char *chan = params[0].c_str(), *nick = params[1].c_str(), *s = params[2].c_str();

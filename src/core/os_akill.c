@@ -61,7 +61,7 @@ class CommandOSAKill : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? param[3].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? params[3].c_str() : "");
 		if (mask && *reason) {
 			/* We first do some sanity check on the proposed mask. */
 			if (strchr(mask, '!'))
@@ -106,7 +106,7 @@ class CommandOSAKill : public Command
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					char *s = NULL;
+					const char *s = NULL;
 
 					if (wall_expiry >= 86400)
 					{
@@ -144,7 +144,7 @@ class CommandOSAKill : public Command
 		const char *mask;
 		int res = 0;
 
-		mask = params.size() > 1 ? params[1].c_str();
+		mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (!mask)
 		{
@@ -174,7 +174,7 @@ class CommandOSAKill : public Command
 		}
 		else
 		{
-			if ((res = slist_indexof(&akills, mask)) == -1)
+			if ((res = slist_indexof(&akills, (void *)mask)) == -1)
 			{
 				notice_lang(s_OperServ, u, OPER_AKILL_NOT_FOUND, mask);
 				return MOD_CONT;
@@ -291,7 +291,6 @@ class CommandOSAKill : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-		char breason[BUFSIZE];
 
 		if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params);

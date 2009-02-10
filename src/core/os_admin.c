@@ -24,6 +24,7 @@ class CommandOSAdmin : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
+		NickAlias *na;
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		int res = 0;
 
@@ -87,6 +88,7 @@ class CommandOSAdmin : public Command
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
+		NickAlias *na;
 		int res = 0;
 
 		if (!nick)
@@ -231,6 +233,11 @@ class CommandOSAdmin : public Command
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_OperServ,  u,  "ADMIN",  OPER_ADMIN_SYNTAX);
 	}
 };
 

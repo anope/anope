@@ -490,7 +490,7 @@ void oper_global(char *nick, const char *fmt, ...)
  * The success result is the number of AKILLs that were deleted to successfully add one.
  */
 
-int add_akill(User * u, char *mask, const char *by, const time_t expires,
+int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 			  const char *reason)
 {
 	int deleted = 0, i;

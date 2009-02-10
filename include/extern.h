@@ -772,7 +772,7 @@ E int nick_is_services_root(NickCore * nc);
 E int nick_is_services_admin(NickCore *nc);
 E int nick_is_services_oper(NickCore *nc);
 
-E int add_akill(User *u, char *mask, const char *by, const time_t expires, const char *reason);
+E int add_akill(User *u, const char *mask, const char *by, const time_t expires, const char *reason);
 E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
 E void expire_akills();
 E void oper_global(char *nick, const char *fmt, ...);
@@ -888,8 +888,8 @@ E int exception_add(User * u, const char *mask, const int limit,
 E int slist_add(SList *slist, void *item);
 E void slist_clear(SList *slist, int free);
 E int slist_delete(SList *slist, int index);
-E int slist_delete_range(SList *slist, char *range, slist_delcheckcb_t cb, ...);
-E int slist_enum(SList *slist, char *range, slist_enumcb_t cb, ...);
+E int slist_delete_range(SList *slist, const char *range, slist_delcheckcb_t cb, ...);
+E int slist_enum(SList *slist, const char *range, slist_enumcb_t cb, ...);
 E int slist_full(SList *slist);
 E int slist_indexof(SList *slist, void *item);
 E void slist_init(SList *slist);

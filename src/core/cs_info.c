@@ -48,8 +48,8 @@ class CommandCSInfo : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *chan = strtok(NULL, " ");
-		char *param = strtok(NULL, " ");
+		const char *chan = params[0].c_str();
+		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;

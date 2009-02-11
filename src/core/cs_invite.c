@@ -65,6 +65,7 @@ class CommandCSInvite : public Command
 		}
 
 		ircdproto->SendInvite(whosends(ci), chan, u->nick);
+		// XXX: maybe send a message about it succeeding.
 		return MOD_CONT;
 	}
 

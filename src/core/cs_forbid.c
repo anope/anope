@@ -40,7 +40,7 @@ class CommandCSForbid : public Command
 	{
 		ChannelInfo *ci;
 		const char *chan = params[0].c_str();
-		const char *reason = params[1].c_str();
+		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		Channel *c;
 

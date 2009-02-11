@@ -46,9 +46,6 @@ Legend:
 [ ] HelpServ must die (1.9.1?)
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 	These all need reviewing, remove them from the list _AS YOU GO_. Talk t0 w00t or CBX if you don't know what this is for:
-		src/core/cs_forbid.c
-		src/core/cs_getkey.c
-		src/core/cs_getpass.c
 		src/core/cs_help.c
 		src/core/cs_identify.c
 		src/core/cs_info.c

@@ -280,6 +280,11 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 		}
 	}
 
+	// Don't bounce modes from u:lined clients or servers, bug #1004
+	user = finduser(source);
+	if ((user && is_ulined(user->server->name)) || is_ulined(source))
+		return;
+
 	if (check > 0)
 	{
 		check_modes(chan);

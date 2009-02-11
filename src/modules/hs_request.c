@@ -326,9 +326,9 @@ class CommandHSReject : public Command
 	}
 };
 
-class CommandHSList : public Command
+class HSListBase : public Command
 {
- private:
+ protected:
 	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
 		struct tm *tm;
@@ -359,7 +359,20 @@ class CommandHSList : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandHSList() : Command("LIST", 1, 1)
+	HSListBase(const std::string &cmd, int min, int max) : Command("LIST", 1, 1)
+	{
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		// no-op
+	}
+};
+
+class CommandHSList : public HSListBase
+{
+ public:
+	CommandHSList() : HSListBase("LIST", 1, 1)
 	{
 	}
 
@@ -372,17 +385,12 @@ class CommandHSList : public Command
 
 		return this->DoList(u, params);
 	}
-
-	void OnSyntaxError(User *u)
-	{
-		// no-op
-	}
 };
 
-class CommandHSWaiting : public CommandHSList
+class CommandHSWaiting : public HSListBase
 {
  public:
-	CommandHSWaiting() : Command("WAITING", 0, 0)
+	CommandHSWaiting() : HSListBase("WAITING", 0, 0)
 	{
 	}
 

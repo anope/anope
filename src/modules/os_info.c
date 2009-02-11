@@ -220,7 +220,7 @@ class CommandCSOInfo : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandCSOInfo : Command("OINFO", 2, 3)
+	CommandCSOInfo() : Command("OINFO", 2, 3)
 	{
 	}
 
@@ -261,7 +261,7 @@ class CommandCSInfo : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *chan = params[0].c_str();
+		const char *chan = params[0].c_str();
 		ChannelInfo *ci = NULL;
 
 		if (is_oper(u)) /* Only show our goodies to opers */

@@ -94,7 +94,7 @@ class CommandCSEnforce : public Command
 		ChannelInfo *ci;
 		int16 old_nojoin_level;
 		char mask[BUFSIZE];
-		char *reason;
+		const char *reason;
 		const char *av[3];
 		User *u;
 
@@ -136,7 +136,7 @@ class CommandCSEnforce : public Command
 		struct c_userlist *next;
 		ChannelInfo *ci;
 		char mask[BUFSIZE];
-		char *reason;
+		const char *reason;
 		const char *av[3];
 		User *u;
 		CBMode *cbm;

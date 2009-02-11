@@ -21,6 +21,7 @@
 void my_load_config();
 void my_add_languages();
 int my_event_reload(int argc, char **argv);
+CommandReturn check_email_limit_reached(const char *email, User * u);
 
 int NSEmailMax = 0;
 
@@ -37,7 +38,7 @@ class CommandNSRegister : public Command
 	{
 	}
 
-	CommandReturn(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		return check_email_limit_reached(params[1].c_str(), u);
 	}
@@ -147,7 +148,7 @@ class NSMaxEmail : public Module
 };
 
 
-int count_email_in_use(char *email, User * u)
+int count_email_in_use(const char *email, User * u)
 {
 	NickCore *nc;
 	int i;
@@ -168,7 +169,7 @@ int count_email_in_use(char *email, User * u)
 	return count;
 }
 
-int check_email_limit_reached(char *email, User * u)
+CommandReturn check_email_limit_reached(const char *email, User * u)
 {
 	if (NSEmailMax < 1 || !email || is_services_admin(u))
 		return MOD_CONT;

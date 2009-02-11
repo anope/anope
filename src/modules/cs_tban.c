@@ -22,7 +22,7 @@
 #define VERSION "$Id$"
 
 void myHelp(User *u);
-void mySendResponse(User *u, char *channel, char *mask, char *time);
+void mySendResponse(User *u, const char *channel, char *mask, const char *time);
 
 void addBan(Channel *c, time_t timeout, char *banmask);
 int delBan(int argc, char **argv);
@@ -51,9 +51,9 @@ class CommandCSTBan : public Command
 		Channel *c;
 		User *u2 = NULL;
 
-		char *chan = params[0].c_str();
-		char *nick = params[1].c_str();
-		char *time = params[2].c_str();
+		const char *chan = params[0].c_str();
+		const char *nick = params[1].c_str();
+		const char *time = params[2].c_str();
 
 		if (!(c = findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
@@ -165,7 +165,7 @@ void myHelp(User *u)
 	me->NoticeLang(s_ChanServ, u, TBAN_HELP);
 }
 
-void mySendResponse(User *u, char *channel, char *mask, char *time)
+void mySendResponse(User *u, const char *channel, char *mask, const char *time)
 {
 	me->NoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }

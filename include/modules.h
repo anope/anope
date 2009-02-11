@@ -205,7 +205,7 @@ class Command
 	/** Requested when the user provides bad syntax to this command (not enough params, etc).
 	 * @param u The user executing the command.
 	 */
-	virtual void OnBadSyntax(User *u) { }
+	virtual void OnSyntaxError(User *u) { }
 
 	int (*has_priv)(User *u);	/* Returns 1 if user may use command, else 0 */
 

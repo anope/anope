@@ -53,7 +53,7 @@ class CommandBSUnassign : public Command
 		return true;
 	}
 
-	void OnBadSyntax(User *u)
+	void OnSyntaxError(User *u)
 	{
 		syntax_error(s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
 	}

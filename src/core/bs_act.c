@@ -72,7 +72,7 @@ class CommandBSAct : public Command
 		return MOD_CONT;
 	}
 
-	void OnBadSyntax(User *u)
+	void OnSyntaxError(User *u)
 	{
 		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
 	}

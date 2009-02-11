@@ -30,7 +30,7 @@ class CommandBSKick : public Command
 		const char *chan = params[0].c_str();
 		const char *option = params[1].c_str();
 		const char *value = params[2].c_str();
-		const char *ttb = params[3].c_str();
+		const char *ttb = params.size() > 3 ? params[3].c_str() : NULL;
 
 		ChannelInfo *ci;
 
@@ -315,16 +315,24 @@ class CommandBSKick : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		// XXX: This is not a good way to handle it, we need to accept params for HELP.
-		notice_help(s_BotServ, u, BOT_HELP_KICK);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_BADWORDS);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_BOLDS);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_CAPS);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_COLORS);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_FLOOD);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_REPEAT);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_REVERSES);
-		notice_help(s_BotServ, u, BOT_HELP_KICK_UNDERLINES);
+		if (subcommand == "BADWORDS")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_BADWORDS);
+		else if (subcommand == "BOLDS")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_BOLDS);
+		else if (subcommand == "CAPS")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_CAPS);
+		else if (subcommand == "COLORS")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_COLORS);
+		else if (subcommand == "FLOOD")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_FLOOD);
+		else if (subcommand == "REPEAT")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_REPEAT);
+		else if (subcommand == "REVERSES")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_REVERSES);
+		else if (subcommand == "UNDERLINES")
+			notice_help(s_BotServ, u, BOT_HELP_KICK_UNDERLINES);
+		else
+			notice_help(s_BotServ, u, BOT_HELP_KICK);
 		return true;
 	}
 

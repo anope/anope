@@ -57,7 +57,7 @@ class CommandBSInfo : public Command
 	{
 		BotInfo *bi;
 		ChannelInfo *ci;
-		char *query = strtok(NULL, " ");
+		const char *query = params[0].c_str();
 
 		int need_comma = 0, is_servadmin = is_services_admin(u);
 		char buf[BUFSIZE], *end;

@@ -239,10 +239,9 @@ class CommandBSBadwords : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
-		const char *word = params[2].c_str();
+		const char *word = params.size() > 2 ? params[2].c_str() : NULL;
 		ChannelInfo *ci;
-		int need_args = (cmd
-						 && (!stricmp(cmd, "LIST") || !stricmp(cmd, "CLEAR")));
+		int need_args = (cmd && (!stricmp(cmd, "LIST") || !stricmp(cmd, "CLEAR")));
 
 		if (!cmd || (need_args ? 0 : !word))
 		{

@@ -22,10 +22,10 @@ class CommandBSBot : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		const char *nick = params[1].c_str();
-		const char *user = params[2].c_str();
-		const char *host = params[3].c_str();
-		const char *real = params[4].c_str();
+		const char *nick = params[0].c_str();
+		const char *user = params[1].c_str();
+		const char *host = params[2].c_str();
+		const char *real = params[3].c_str();
 		const char *ch = NULL;
 		BotInfo *bi;
 
@@ -138,11 +138,11 @@ class CommandBSBot : public Command
 
 	CommandReturn DoChange(User *u, std::vector<std::string> &params)
 	{
-		const char *oldnick = params[1].c_str();
-		const char *nick = params[2].c_str();
-		const char *user = params[3].c_str();
-		const char *host = params[4].c_str();
-		const char *real = params[5].c_str();
+		const char *oldnick = params[0].c_str();
+		const char *nick = params[1].c_str();
+		const char *user = params[2].c_str();
+		const char *host = params[3].c_str();
+		const char *real = params[4].c_str();
 		const char *ch = NULL;
 		BotInfo *bi;
 
@@ -311,7 +311,7 @@ class CommandBSBot : public Command
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{ 
-		const char *nick = params[1].c_str();
+		const char *nick = params[0].c_str();
 		BotInfo *bi;
 
 		if (!nick)
@@ -340,19 +340,13 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandBSBot() : Command("BOT", 1, 5)
+	CommandBSBot() : Command("BOT", 1, 6)
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *cmd = strtok(NULL, " ");
-
-		if (!cmd)
-		{
-			this->OnSyntaxError(u);
-			return MOD_CONT;
-		}
+		const char *cmd = params[0].c_str();
 
 		if (readonly)
 		{
@@ -362,14 +356,39 @@ class CommandBSBot : public Command
 
 		if (!stricmp(cmd, "ADD"))
 		{
+			// ADD nick user host real - 5
+			if (params.size() < 5)
+			{
+				this->OnSyntaxError(u);
+				return MOD_CONT;
+			}
+			
+			// ADD takes less params than CHANGE, so we need to take 6 if given and append it with a space to 5.
+			if (params.size() >= 6)
+				params[5] = params[5] + " " + params[6];
+
 			return this->DoAdd(u, params);
 		}
 		else if (!stricmp(cmd, "CHANGE"))
 		{
+			// CHANGE oldn newn user host real - 6
+			if (params.size() < 6)
+			{
+				this->OnSyntaxError(u);
+				return MOD_CONT;
+			}
+
 			return this->DoChange(u, params);
 		}
 		else if (!stricmp(cmd, "DEL"))
 		{
+			// DEL nick
+			if (params.size() < 1)
+			{
+				this->OnSyntaxError(u);
+				return MOD_CONT;
+			}
+
 			return this->DoDel(u, params);
 		}
 		else

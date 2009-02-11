@@ -18,7 +18,7 @@
 class CommandNSHelp : public Command
 {
  public:
-	CommandNSHelp() : Command("HELP", 1, 1)
+	CommandNSHelp() : Command("HELP", 0, 1)
 	{
 	}
 

@@ -1309,24 +1309,14 @@ private:
 		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
 		virtual void SendVhostDel(User *) { }
 		virtual void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual bool CanSVSKill(const char *source,  const char *user,  const char *buf)
-		{
-			return true;
-		}
-		virtual bool SendSVSKill(const char *source, const char *user, const char *fmt, ...)
+		virtual void SendSVSKill(const char *source, const char *user, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
 			va_start(args, fmt);
 			vsnprintf(buf, BUFSIZE - 1, fmt, args);
 			va_end(args);
-
-			if (CanSVSKill(source, user, buf))
-			{
-				SendSVSKillInternal(source, user, buf);
-			}
-
-			return false;
+			SendSVSKillInternal(source, user, buf);
 		}
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
@@ -1339,25 +1329,14 @@ private:
 			SendModeInternal(bi, dest, buf);
 		}
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid) = 0;
-		virtual bool CanKick(BotInfo *bi,  const char *chan,  const char *user,  const char *buf)
-		{
-			return true;
-		}
-		virtual bool SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
+		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
 			va_start(args, fmt);
 			vsnprintf(buf, BUFSIZE - 1, fmt, args);
 			va_end(args);
-
-			if (CanKick(bi, chan, user, buf))
-			{
-				SendKickInternal(bi, chan, user, buf);
-				return true;
-			}
-
-			return false;
+			SendKickInternal(bi, chan, user, buf);
 		}
 		virtual void SendNoticeChanops(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{

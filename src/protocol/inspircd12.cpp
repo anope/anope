@@ -23,7 +23,6 @@
 #define UMODE_r 0x00000010
 #define UMODE_w 0x00000020
 #define UMODE_A 0x00000040
-#define UMODE_k 0x00000080
 #define UMODE_g 0x80000000
 #define UMODE_x 0x40000000
 
@@ -197,7 +196,7 @@ unsigned long umodes[128] = {
 	0, 0, 0, 0, 0,
 	0, UMODE_a, 0, 0, 0, 0, 0,
 	UMODE_g,
-	UMODE_h, UMODE_i, 0, UMODE_k, 0, 0, 0, UMODE_o,
+	UMODE_h, UMODE_i, 0, 0, 0, 0, 0, UMODE_o,
 	0,
 	0, UMODE_r, 0, 0, 0, 0, UMODE_w,
 	UMODE_x,
@@ -510,11 +509,6 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long int>(when), static_cast<long int>(timeleft), reason);
 	}
 
-	void CanSVSKill(const char *source,  const char *user,  const char *buf)
-	{
-		return !user->mode & UMODE_k;
-	}
-
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
 	{
 		BotInfo *bi = findbot(source);
@@ -547,11 +541,6 @@ class InspIRCdProto : public IRCDProto
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		send_cmd(ServerName, "UID %s %ld %s %s %s %s 0.0.0.0 %ld +%s :%s", uid, static_cast<long>(time(NULL)), nick, host, host, user, static_cast<long>(time(NULL)), modes, real);
-	}
-
-	bool CanKick(BotInfo *source,  const char *chan,  const char *user,  const char *buf)
-	{
-		return !user->mode & UMODE_k;
 	}
 
 	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)

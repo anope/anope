@@ -47,13 +47,7 @@ Legend:
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
-[x] Add support for +k, +q, etc type umodes
-  Remaining issues:
-   ? [ ] Also deny kills with usermode +q at Unreal, bearing in mind that AKILL on yourself is prevented that way.
-   ? [ ] Add a force parameter to SendSVSKill/SendKick.
-    [ ] No check at modechange yet, maybe it's better to define in what circumstances it shall block, first.
-    [ ] Check whether there is a similar usermode in other IRCds and add them to the refering protocol.
-    [ ] Check for blocked KICK in e.g /cs kick.
+[ ] Add support for +k, +q, etc type umodes
 [x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
 
 1.9.2

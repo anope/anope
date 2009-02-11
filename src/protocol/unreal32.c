@@ -663,11 +663,6 @@ class UnrealIRCdProto : public IRCDProto
 		SendSQLine(nick, "Reserved for services");
 	}
 
-	bool CanKick(BotInfo *source,  const char *chan,  const char *user,  const char *buf)
-	{
-		return !user->mode & MODE_q;
-	}
-
 	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 	{
 		if (buf) send_cmd(source->nick, "H %s %s :%s", chan, user, buf);

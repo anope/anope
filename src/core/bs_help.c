@@ -24,7 +24,7 @@ class CommandBSHelp : public Command
 	
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		mod_help_cmd(s_BotServ, u, BOTSERV, params[0].c_str());
+		mod_help_cmd(s_BotServ, u, BOTSERV, params.size() > 0 ? params[0].c_str() : NULL);
 		return MOD_CONT;
 	}
 

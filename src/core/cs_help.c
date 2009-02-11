@@ -25,8 +25,7 @@ class CommandCSHelp : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *cmd = params[0].c_str();
-		const char *subcmd = params[1].c_str();
+		const char *cmd = params.size() > 0 ? params[0].c_str() : NULL;
 
 		if (!cmd)
 		{

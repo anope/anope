@@ -24,7 +24,7 @@ class CommandMSHelp : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		mod_help_cmd(s_MemoServ, u, MEMOSERV, params[0].c_str());
+		mod_help_cmd(s_MemoServ, u, MEMOSERV, params.size() > 0 ? params[0].c_str() : NULL);
 		return MOD_CONT;
 	}
 

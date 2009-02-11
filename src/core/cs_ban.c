@@ -31,7 +31,7 @@ void myChanServHelp(User * u)
 class CommandCSBan : public Command
 {
  public:
-	CommandCSBan() : Command("BAN", 1, 3)
+	CommandCSBan() : Command("BAN", 2, 3)
 	{
 
 	}
@@ -40,23 +40,23 @@ class CommandCSBan : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *target = params[1].c_str();
-		params[2].resize(200);
-		const char *reason = params[2].c_str();
+		const char *reason = NULL;
+		
+		if (params.size() > 2)
+		{
+			params[2].resize(200);
+			reason = params[2].c_str();
+
+		}
 
 		Channel *c;
 		ChannelInfo *ci;
 		User *u2;
 
-		if (!chan)
-			return MOD_CONT;
-
 		int is_same;
 
 		if (!reason)
 			reason = "Requested";
-
-		if (!target)
-			target = u->nick;
 
 		is_same = (stricmp(target, u->nick) == 0);
 
@@ -119,6 +119,12 @@ class CommandCSBan : public Command
 		notice_lang(s_ChanServ, u, CHAN_HELP_BAN);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		// XXX: temporary, this can be tackled when the language system isn't so goddamn hairy.
+		syntax_error(s_ChanServ, u, "BAN", CHAN_UNBAN_SYNTAX);
+	}
 };
 
 
@@ -133,7 +139,7 @@ class CommandCSUnban : public Command
 
 	CommandReturn Execute(User *u,  std::vector<std::string> &params)
 	{
-		char *chan = strtok(NULL, " ");
+		const char *chan = params[0].c_str();
 		Channel *c;
 		ChannelInfo *ci;
 

@@ -41,9 +41,7 @@ class CommandCSClear : public Command
 		Channel *c;
 		ChannelInfo *ci;
 
-		if (!what) {
-			syntax_error(s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
-		} else if (!(c = findchan(chan))) {
+		if (!(c = findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!(ci = c->ci)) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);

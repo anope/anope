@@ -36,7 +36,7 @@ class CommandCSDrop : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *chan = strtok(NULL, " ");
+		const char *chan = params[0].c_str();
 		ChannelInfo *ci;
 		int is_servadmin = is_services_admin(u);
 

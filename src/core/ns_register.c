@@ -200,7 +200,7 @@ class CommandNSConfirm : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandNSConfirm(const std::string &cmdn, int min, int max) : Command("CONFIRM", min, max)
+	CommandNSConfirm(const std::string &cmdn, int min, int max) : Command(cmdn, min, max)
 	{
 	}
 

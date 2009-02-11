@@ -20,14 +20,14 @@ void myBotServHelp(User * u);
 class CommandBSAssign : public Command
 {
  public:
-	CommandBSAssign() : Command("ASSIGN", 1, 1)
+	CommandBSAssign() : Command("ASSIGN", 2, 2)
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *chan = strtok(NULL, " ");
-		char *nick = strtok(NULL, " ");
+		const char *chan = params[0].c_str();
+		const char *nick = params[1].c_str();
 		BotInfo *bi;
 		ChannelInfo *ci;
 

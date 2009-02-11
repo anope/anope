@@ -84,14 +84,26 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	char *s = NULL;
 	while ((s = strtok(NULL, " ")))
 	{
-		if (params.size() < c->MaxParams)
-			params.push_back(s);
-		else
+		// - 1 because params[0] corresponds with a maxparam of 1.
+		if (params.size() >= (c->MaxParams - 1))
+		{
 			curparam += s;
+			curparam += " ";
+		}
+		else
+		{
+			params.push_back(s);
+		}
 	}
 
 	if (!curparam.empty())
+	{
+		// Remove trailing space
+		curparam.erase(curparam.size() - 1, curparam.size());
+
+		// Add it
 		params.push_back(curparam);
+	}
 
 	if (params.size() < c->MinParams)
 	{

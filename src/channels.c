@@ -298,7 +298,15 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 					if (check < 2)
 						chan_set_correct_modes(user, chan, 0);
 					else if ((chan->ci->flags) && (chan->ci->flags & CI_SECUREOPS))
+					{
+						/* Fixing bug #1006 oringinally caused by fixing #922
+						 * we must check for secureops here, not in chan_set_correct_modes
+						 * because chan_set_corret_modes will also check for usercount == 1
+						 * where it will deop the user, this way we know the channel was not
+						 * just created. (check == 3 from /cs (half)op) - Adam
+						 */
 						chan_set_correct_modes(user, chan, 0);
+					}
 				}
 
 				real_av++;

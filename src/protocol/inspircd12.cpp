@@ -705,13 +705,13 @@ class InspIRCdProto : public IRCDProto
 
 	void SendAccountLogin(User *u,  NickCore *account)
 	{
-		send_cmd(TS6SID, "METADATA %s accountname :%s", u->uid, account->display);
+		send_cmd(TS6SID, "METADATA %s accountname :%s", u->GetUID().c_str(), account->display);
 
 	}
 
 	void SendAccountLogout(User *u,  NickCore *account)
 	{
-		send_cmd(TS6SID, "METADATA %s accountname :", u->uid);
+		send_cmd(TS6SID, "METADATA %s accountname :", u->GetUID().c_str());
 	}
 
 	int IsNickValid(const char *nick)

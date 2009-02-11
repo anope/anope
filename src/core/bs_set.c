@@ -22,6 +22,7 @@ class CommandBSSet : public Command
  public:
 	CommandBSSet() : Command("SET", 3, 3)
 	{
+		this->help_param1 = s_ChanServ;
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -179,13 +180,10 @@ class BSSet : public Module
  public:
 	BSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Command *c;
-
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(BOTSERV, new CommandBSSet(), MOD_UNIQUE);
-		c->help_param1 = s_ChanServ;
 
 		this->SetBotHelp(myBotServHelp);
 	}

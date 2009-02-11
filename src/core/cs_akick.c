@@ -161,10 +161,15 @@ class CommandCSAKick : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
-		const char *mask = params[2].c_str();
-		if (params[5].length() > 200)
-			params[5].resize(200); // XXX: is this right?
-		const char *reason = params[5].c_str();
+		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
+		const char *reason = NULL;
+
+		if (params.size() > 3)
+		{
+			params[3].resize(200); // XXX: is this right?
+			reason = params[3].c_str();
+		}
+
 		ChannelInfo *ci;
 		AutoKick *akick;
 		int i;

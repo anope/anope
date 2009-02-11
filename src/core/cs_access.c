@@ -96,7 +96,7 @@ static int access_list_callback(User * u, int num, va_list args)
 class CommandCSAccess : public Command
 {
  public:
-	CommandCSAccess() : Command("ACCESS", 0, 4)
+	CommandCSAccess() : Command("ACCESS", 2, 4)
 	{
 	}
 
@@ -104,8 +104,8 @@ class CommandCSAccess : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
-		const char *nick = params[2].c_str();
-		const char *s = params[3].c_str();
+		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 		char event_access[BUFSIZE];
 
 		ChannelInfo *ci;
@@ -394,8 +394,8 @@ class CommandCSLevels : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
-		const char *what = params[2].c_str();
-		const char *s = params[3].c_str();
+		const char *what = params.size() > 2 ? params[2].c_str() : NULL;
+		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 		char *error;
 
 		ChannelInfo *ci;

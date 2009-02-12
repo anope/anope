@@ -1808,25 +1808,52 @@ char *get_redirect(Channel * chan)
 Channel *join_user_update(User * user, Channel * chan, char *name,
                           time_t chants)
 {
-    struct u_chanlist *c;
+	struct u_chanlist *c;
 
-    /* If it's a new channel, so we need to create it first. */
-    if (!chan)
-        chan = chan_create(name, chants);
+	/* If it's a new channel, so we need to create it first. */
+	if (!chan)
+		chan = chan_create(name, chants);
+	else
+	{
+		// Check chants against 0, as not every ircd sends JOIN with a TS.
+		if (chan->creation_time > chants && chants != 0)
+		{
+			struct c_userlist *cu;
+			const char *modes[6];
 
-    if (debug)
-        alog("debug: %s joins %s", user->nick, chan->name);
+			chan->creation_time = chants;
+			for (cu = chan->users; cu; cu = cu->next)
+			{
+				/* XXX */
+				modes[0] = "-ov";
+				modes[1] = cu->user->nick;
+				modes[2] = cu->user->nick;
+				chan_set_modes(s_OperServ, chan, 3, modes, 2);
+			}
+			if (chan->ci && chan->ci->bi)
+			{
+				/* This is ugly, but it always works */
+				ircdproto->SendPart(chan->ci->bi, chan->name, "TS reop");
+				bot_join(chan->ci);
+			}
+			/* XXX simple modes and bans */
+		}
 
-    c = scalloc(sizeof(*c), 1);
-    c->next = user->chans;
-    if (user->chans)
-        user->chans->prev = c;
-    user->chans = c;
-    c->chan = chan;
+	}
 
-    chan_adduser2(user, chan);
+	if (debug)
+		alog("debug: %s joins %s", user->nick, chan->name);
 
-    return chan;
+	c = scalloc(sizeof(*c), 1);
+	c->next = user->chans;
+	if (user->chans)
+		user->chans->prev = c;
+	user->chans = c;
+	c->chan = chan;
+
+	chan_adduser2(user, chan);
+
+	return chan;
 }
 
 /*************************************************************************/

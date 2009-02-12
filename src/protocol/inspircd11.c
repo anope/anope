@@ -892,7 +892,7 @@ void inspircd_cmd_pong(char *servname, char *who)
 /* JOIN */
 void inspircd_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(user, "JOIN %s", channel);
+    send_cmd(user, "JOIN %s %ld", channel, (unsigned int)chantime);
 }
 
 /* UNSQLINE */

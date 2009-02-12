@@ -60,7 +60,7 @@ class CommandCSLogout : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *nick = params[1].c_str();
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		ChannelInfo *ci;
 		User *u2 = NULL;
 		int is_servadmin = is_services_admin(u);

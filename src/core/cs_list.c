@@ -32,7 +32,9 @@ void myChanServHelp(User * u)
 class CommandCSList : public Command
 {
 public:
-	CommandCSList() : Command("LIST",1,2) { }
+	CommandCSList() : Command("LIST",1,2)
+	{
+	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
@@ -114,63 +116,63 @@ public:
 					matchflags |= CI_NO_EXPIRE;
 
 			}
+		}
 
-			spattern_size = (strlen(pattern) + 2) * sizeof(char);
-			spattern = new char[spattern_size];
-			snprintf(spattern, spattern_size, "#%s", pattern);
+		spattern_size = (strlen(pattern) + 2) * sizeof(char);
+		spattern = new char[spattern_size];
+		snprintf(spattern, spattern_size, "#%s", pattern);
 
 
-			notice_lang(s_ChanServ, u, CHAN_LIST_HEADER, pattern);
-			for (i = 0; i < 256; i++)
+		notice_lang(s_ChanServ, u, CHAN_LIST_HEADER, pattern);
+		for (i = 0; i < 256; i++)
+		{
+			for (ci = chanlists[i]; ci; ci = ci->next)
 			{
-				for (ci = chanlists[i]; ci; ci = ci->next)
+				if (!is_servadmin && ((ci->flags & CI_PRIVATE)
+							    || (ci->flags & CI_FORBIDDEN)))
+					continue;
+				if ((matchflags != 0) && !(ci->flags & matchflags))
+					continue;
+
+				if ((stricmp(pattern, ci->name) == 0)
+					  || (stricmp(spattern, ci->name) == 0)
+					  || match_wild_nocase(pattern, ci->name)
+					  || match_wild_nocase(spattern, ci->name))
 				{
-					if (!is_servadmin && ((ci->flags & CI_PRIVATE)
-					                      || (ci->flags & CI_FORBIDDEN)))
-						continue;
-					if ((matchflags != 0) && !(ci->flags & matchflags))
-						continue;
-
-					if ((stricmp(pattern, ci->name) == 0)
-					        || (stricmp(spattern, ci->name) == 0)
-					        || match_wild_nocase(pattern, ci->name)
-					        || match_wild_nocase(spattern, ci->name))
+					if ((((count + 1 >= from) && (count + 1 <= to))
+						  || ((from == 0) && (to == 0)))
+						  && (++nchans <= CSListMax))
 					{
-						if ((((count + 1 >= from) && (count + 1 <= to))
-						        || ((from == 0) && (to == 0)))
-						        && (++nchans <= CSListMax))
+						char noexpire_char = ' ';
+						if (is_servadmin && (ci->flags & CI_NO_EXPIRE))
+							noexpire_char = '!';
+
+						if (ci->flags & CI_FORBIDDEN)
 						{
-							char noexpire_char = ' ';
-							if (is_servadmin && (ci->flags & CI_NO_EXPIRE))
-								noexpire_char = '!';
-
-							if (ci->flags & CI_FORBIDDEN)
-							{
-								snprintf(buf, sizeof(buf),
-								         "%-20s  [Forbidden]", ci->name);
-							}
-							else if (ci->flags & CI_SUSPENDED)
-							{
-								snprintf(buf, sizeof(buf),
-								         "%-20s  [Suspended]", ci->name);
-							}
-							else
-							{
-								snprintf(buf, sizeof(buf), "%-20s  %s",
-								         ci->name, ci->desc ? ci->desc : "");
-							}
-
-							notice_user(s_ChanServ, u, "  %c%s",
-							            noexpire_char, buf);
+							snprintf(buf, sizeof(buf),
+								   "%-20s  [Forbidden]", ci->name);
 						}
-						count++;
+						else if (ci->flags & CI_SUSPENDED)
+						{
+							snprintf(buf, sizeof(buf),
+								   "%-20s  [Suspended]", ci->name);
+						}
+						else
+						{
+							snprintf(buf, sizeof(buf), "%-20s  %s",
+								   ci->name, ci->desc ? ci->desc : "");
+						}
+
+						notice_user(s_ChanServ, u, "  %c%s",
+								noexpire_char, buf);
 					}
+					count++;
 				}
 			}
-			notice_lang(s_ChanServ, u, CHAN_LIST_END,
-			            nchans > CSListMax ? CSListMax : nchans, nchans);
-			delete [] spattern;
 		}
+		notice_lang(s_ChanServ, u, CHAN_LIST_END,
+				nchans > CSListMax ? CSListMax : nchans, nchans);
+		delete [] spattern;
 		if (tofree)
 			delete [] pattern;
 		return MOD_CONT;

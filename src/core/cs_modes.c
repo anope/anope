@@ -116,6 +116,7 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 	return MOD_CONT;
 }
 
+// XXX: Future enhancement. Default these to the sender, with an optional target arg.
 
 class CommandCSOp : public Command
 {

@@ -27,7 +27,7 @@ void myChanServHelp(User * u)
 class CommandCSKick : public Command
 {
  public:
-	CommandCSKick() : Command("KICK", 1, 3)
+	CommandCSKick() : Command("KICK", 2, 3)
 	{
 
 	}
@@ -36,8 +36,14 @@ class CommandCSKick : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *target = params[1].c_str();
-		params[2].resize(200);
-		const char *reason = params[2].c_str();
+		const char *reason = NULL;
+
+		if (params.size() > 2)
+		{
+			params[2].resize(200);
+			reason = params[2].c_str();
+		}
+
 		Channel *c;
 		ChannelInfo *ci;
 		User *u2;
@@ -46,10 +52,6 @@ class CommandCSKick : public Command
 
 		if (!reason) {
 			reason = "Requested";
-		}
-
-		if (!target) {
-			target = u->nick;
 		}
 
 		is_same = (target == u->nick) ? 1 : (stricmp(target, u->nick) == 0);
@@ -92,8 +94,14 @@ class CommandCSKick : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-    notice_lang(s_ChanServ, u, CHAN_HELP_KICK);
+		notice_lang(s_ChanServ, u, CHAN_HELP_KICK);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		// XXX: best I can do for now, fixme
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, "");
 	}
 };
 

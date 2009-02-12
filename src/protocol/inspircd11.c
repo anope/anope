@@ -570,7 +570,7 @@ class InspIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(user->nick, "JOIN %s", channel);
+		send_cmd(user->nick, "JOIN %s %ld", channel, (unsigned int)chantime);
 	}
 
 	/* UNSQLINE */

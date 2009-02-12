@@ -46,10 +46,6 @@ Legend:
 [ ] HelpServ must die (1.9.1?)
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 	These all need reviewing, remove them from the list _AS YOU GO_. Talk t0 w00t or CBX if you don't know what this is for:
-		src/core/enc_md5.c
-		src/core/enc_none.c
-		src/core/enc_old.c
-		src/core/enc_sha1.c
 		src/core/he_help.c
 		src/core/hs_delall.c
 		src/core/hs_del.c

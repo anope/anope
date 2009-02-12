@@ -1368,7 +1368,8 @@ class ProtoInspIRCd : public Module
 		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
-		TS6SID = sstrdup(Numeric);
+		if (Numeric)
+			TS6SID = sstrdup(Numeric);
 
 		pmodule_ircd_version("InspIRCd 1.2");
 		pmodule_ircd_cap(myIrcdcap);

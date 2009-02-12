@@ -539,7 +539,7 @@ class CommandCSSet : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
-		const char *param = params[2].c_str();
+		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
 		ChannelInfo *ci;
 		int is_servadmin = is_services_admin(u);
 

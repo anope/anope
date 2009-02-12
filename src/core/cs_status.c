@@ -28,11 +28,10 @@ class CommandCSStatus : public Command
 	{
 		ChannelInfo *ci;
 		User *u2;
-		const char *nick, *chan;
+		const char *chan = params[0].c_str();
+		const char *nick = params[1].c_str();
 		const char *temp = NULL;
 
-		chan = params[0].c_str();
-		nick = params[1].c_str();
 		if (!(ci = cs_findchan(chan)))
 		{
 			temp = chan;

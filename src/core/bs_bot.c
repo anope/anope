@@ -22,10 +22,10 @@ class CommandBSBot : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		const char *user = params[1].c_str();
-		const char *host = params[2].c_str();
-		const char *real = params[3].c_str();
+		const char *nick = params[1].c_str();
+		const char *user = params[2].c_str();
+		const char *host = params[3].c_str();
+		const char *real = params[4].c_str();
 		const char *ch = NULL;
 		BotInfo *bi;
 
@@ -138,11 +138,11 @@ class CommandBSBot : public Command
 
 	CommandReturn DoChange(User *u, std::vector<std::string> &params)
 	{
-		const char *oldnick = params[0].c_str();
-		const char *nick = params[1].c_str();
-		const char *user = params[2].c_str();
-		const char *host = params[3].c_str();
-		const char *real = params[4].c_str();
+		const char *oldnick = params[1].c_str();
+		const char *nick = params[2].c_str();
+		const char *user = params[3].c_str();
+		const char *host = params[4].c_str();
+		const char *real = params[5].c_str();
 		const char *ch = NULL;
 		BotInfo *bi;
 
@@ -153,6 +153,12 @@ class CommandBSBot : public Command
 		}
 
 		if (!(bi = findbot(oldnick)))
+		{
+			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			return MOD_CONT;
+		}
+
+		if (nickIsServices(oldnick, 0))
 		{
 			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;
@@ -311,7 +317,7 @@ class CommandBSBot : public Command
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{ 
-		const char *nick = params[0].c_str();
+		const char *nick = params[1].c_str();
 		BotInfo *bi;
 
 		if (!nick)
@@ -328,7 +334,7 @@ class CommandBSBot : public Command
 
 		if (nickIsServices(nick, 0))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST);
+			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
 			return MOD_CONT;
 		}
 

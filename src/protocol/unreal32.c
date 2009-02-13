@@ -1061,7 +1061,7 @@ int anope_event_umode2(const char *source, int ac, const char **av)
 	const char *newav[4];
 	newav[0] = source;
 	newav[1] = av[0];
-	do_umode(source, ac, av);
+	do_umode(source, ac, newav);
 	return MOD_CONT;
 }
 

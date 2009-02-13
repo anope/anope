@@ -1,12 +1,28 @@
 Anope Version 1.9.0
 --------------------
-09/27 F Modified compile to use g++
-10/01 F Improve protocol modules support (classes, virtual methods, etc)
-10/11 F Move core services to use BotInfo
-10/12 F Move BotInfo and related methods into a class
-11/01 F Move modules into a class
-11/15 F Fixed ns resending of passcode issue
-11/15 F Modules now delete themselves
+F Modified compile to use g++
+F Improve protocol modules support (classes, virtual methods, etc)
+F Move core services to use BotInfo
+F Move BotInfo and related methods into a class
+F Move modules into a class
+F Fixed ns resending of passcode issue
+F Modules now delete themselves
+F additional field where users' masked host can be stored so both masked IP and vhost are available instead of just one.
+F No struct Uid, ugly, and, unnecessary that we store UID in BotInfo.
+F Prevent deletion of core services via /bs bot
+F Module subsystem cleanup ('modules' branch)
+F Move modules to use classes somewhat (AnopeInit, AnopeFini)
+F Change MODULE_INIT to return a pointer
+F Remove duplicate module creation.. have loadModule return a pointer rather than creating one
+F Remove buffered loading/unloading, this makes os_modunload perm, but who cares
+F Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
+A Remove old config, replace with insp-inspired (albeit bind format) config (CBX)
+F Clean up protocol modules a bit
+A InspIRCd 1.2 support
+F Remove old (prior to 1.8.0) db compat
+F Establish a proper base for services pseudoclients
+F Add ss_main StatServ Hal9000 to play with :)
+F Burn automake with fire (CBX)
 
 Provided by mooncup <mooncup@anonnet.org> - 2009
-02/04 F Automatically reapply vhost on hs off for unreal32.              [  #00]
+F Automatically reapply vhost on hs off for unreal.

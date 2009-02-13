@@ -193,7 +193,7 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
  *	3 - reply to user and request read receipt
  * @return void
  */
-void memo_send(User * u, char *name, char *text, int z)
+void memo_send(User * u, const char *name, const char *text, int z)
 {
 	int ischan;
 	int isforbid;

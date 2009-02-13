@@ -46,28 +46,6 @@ Legend:
 [ ] HelpServ must die (1.9.1?)
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 	These all need reviewing, remove them from the list _AS YOU GO_. Talk t0 w00t or CBX if you don't know what this is for:
-		src/core/ns_access.c
-		src/core/ns_alist.c
-		src/core/ns_drop.c
-		src/core/ns_forbid.c
-		src/core/ns_getemail.c
-		src/core/ns_getpass.c
-		src/core/ns_ghost.c
-		src/core/ns_group.c
-		src/core/ns_help.c
-		src/core/ns_identify.c
-		src/core/ns_info.c
-		src/core/ns_list.c
-		src/core/ns_logout.c
-		src/core/ns_recover.c
-		src/core/ns_register.c
-		src/core/ns_release.c
-		src/core/ns_saset.c
-		src/core/ns_sendpass.c
-		src/core/ns_set.c
-		src/core/ns_status.c
-		src/core/ns_suspend.c
-		src/core/ns_update.c
 		src/core/os_admin.c
 		src/core/os_akill.c
 		src/core/os_chankill.c

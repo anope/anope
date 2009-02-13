@@ -18,14 +18,14 @@
 class CommandNSHelp : public Command
 {
  public:
-	CommandNSHelp() : Command("HELP", 0, 1)
+	CommandNSHelp() : Command("HELP", 1, 1)
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *cmd = params.size() > 0 ? params[0].c_str() : NULL;
-		if (cmd && !stricmp(cmd, "SET LANGUAGE"))
+		const char *cmd = params[0].c_str();
+		if (!stricmp(cmd, "SET LANGUAGE"))
 		{
 			int i;
 			notice_help(s_NickServ, u, NICK_HELP_SET_LANGUAGE);

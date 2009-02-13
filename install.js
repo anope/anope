@@ -52,7 +52,7 @@ var installerQuestions = [
 			return true;
 		},
 		'cmake_argument' : function() {
-			return '-DINSTDIR:STRING=' + installerResponses['Install Directory'];
+			return '-DINSTDIR:STRING="' + installerResponses['Install Directory'] + '"';
 		}
 	},
 	{

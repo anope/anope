@@ -23,9 +23,9 @@ class CommandBSBot : public Command
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[1].c_str();
-		const char *user = params[2].c_str();
-		const char *host = params[3].c_str();
-		const char *real = params[4].c_str();
+		const char *user = params.size() > 2 ? params[2].c_str() : NULL;
+		const char *host = params.size() > 3 ? params[3].c_str() : NULL;
+		const char *real = params.size() > 4 ? params[4].c_str() : NULL;
 		const char *ch = NULL;
 		BotInfo *bi;
 
@@ -139,10 +139,10 @@ class CommandBSBot : public Command
 	CommandReturn DoChange(User *u, std::vector<std::string> &params)
 	{
 		const char *oldnick = params[1].c_str();
-		const char *nick = params[2].c_str();
-		const char *user = params[3].c_str();
-		const char *host = params[4].c_str();
-		const char *real = params[5].c_str();
+		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		const char *user = params.size() > 3 ? params[3].c_str() : NULL;
+		const char *host = params.size() > 4 ? params[4].c_str() : NULL;
+		const char *real = params.size() > 5 ? params[5].c_str() : NULL;
 		const char *ch = NULL;
 		BotInfo *bi;
 
@@ -272,6 +272,13 @@ class CommandBSBot : public Command
 			EnforceQlinedNick(nick, s_BotServ);
 		}
 
+		if (user)
+			ircdproto->SendQuit(bi, "Quit: Be right back");
+		else {
+			ircdproto->SendChangeBotNick(bi, nick);
+			ircdproto->SendSQLine(bi->nick, "Reserved for services");
+		}
+
 		if (strcmp(nick, bi->nick))
 			bi->ChangeNick(nick);
 
@@ -291,20 +298,9 @@ class CommandBSBot : public Command
 			bi->real = sstrdup(real);
 		}
 
-		/* If only the nick changes, we just make the bot change his nick,
-		 * else we must make it quit and rejoin. We must not forget to set
-		 * the Q:Line either (it's otherwise set in SendClientIntroduction)
-		 */
-		if (!user)
+		if (user)
 		{
-			ircdproto->SendChangeBotNick(bi, bi->nick);
-			ircdproto->SendSQLine(bi->nick, "Reserved for services");
-		}
-		else
-		{
-			ircdproto->SendQuit(bi, "Quit: Be right back");
-			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
-					ircd->pseudoclient_mode, bi->uid.c_str());
+			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid.c_str());
 			bi->RejoinAll();
 		}
 
@@ -316,7 +312,7 @@ class CommandBSBot : public Command
 	}
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
-	{ 
+	{
 		const char *nick = params[1].c_str();
 		BotInfo *bi;
 
@@ -339,8 +335,10 @@ class CommandBSBot : public Command
 		}
 
 		send_event(EVENT_BOT_DEL, 1, bi->nick);
+
 		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick);
 		ircdproto->SendSQLineDel(bi->nick);
+
 		delete bi;
 		notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
 		return MOD_CONT;
@@ -368,7 +366,7 @@ class CommandBSBot : public Command
 				this->OnSyntaxError(u);
 				return MOD_CONT;
 			}
-			
+
 			// ADD takes less params than CHANGE, so we need to take 6 if given and append it with a space to 5.
 			if (params.size() >= 6)
 				params[5] = params[5] + " " + params[6];
@@ -378,7 +376,8 @@ class CommandBSBot : public Command
 		else if (!stricmp(cmd, "CHANGE"))
 		{
 			// CHANGE oldn newn user host real - 6
-			if (params.size() < 6)
+			// but only oldn and newn are required - Adam
+			if (params.size() < 3)
 			{
 				this->OnSyntaxError(u);
 				return MOD_CONT;
@@ -407,7 +406,7 @@ class CommandBSBot : public Command
 	{
 		if (!is_services_admin(u) && !is_services_root(u))
 			return false;
-	
+
 		notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
 		return true;
 	}

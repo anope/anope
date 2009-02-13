@@ -300,13 +300,13 @@ class CommandOSStats : public Command
 		}
 
 		if (!extra || (stricmp(extra, "MEMORY") && stricmp(extra, "UPLINK")))
-			return this->DoStatsUptime(u, params);
+			this->DoStatsUptime(u, params);
 
 		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "UPLINK")) && is_services_admin(u))
-			return this->DoStatsUplink(u, params);
+			this->DoStatsUplink(u, params);
 
 		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "MEMORY")) && is_services_admin(u))
-			return this->DoStatsMemory(u, params);
+			this->DoStatsMemory(u, params);
 
 		return MOD_CONT;
 	}

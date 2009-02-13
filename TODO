@@ -94,8 +94,6 @@ Legend:
 		src/core/os_mode.c
 		src/core/os_modinfo.c
 		src/core/os_modlist.c
-		src/core/os_modload.c
-		src/core/os_modunload.c
 		src/core/os_news.c
 		src/core/os_noop.c
 		src/core/os_oline.c
@@ -106,11 +104,8 @@ Legend:
 		src/core/os_session.c
 		src/core/os_set.c
 		src/core/os_sgline.c
-		src/core/os_shutdown.c
 		src/core/os_sqline.c
 		src/core/os_staff.c
-		src/core/os_stats.c
-		src/core/os_svsnick.c
 		src/core/os_szline.c
 		src/modules/cs_appendtopic.c
 		src/modules/cs_enforce.c

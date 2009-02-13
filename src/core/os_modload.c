@@ -26,14 +26,7 @@ class CommandOSModLoad : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		char *name;
-
-		name = strtok(NULL, "");
-		if (!name)
-		{
-			syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
-			return MOD_CONT;
-		}
+		const char *name = params[0].c_str();
 
 		Module *m = findModule(name);
 		if (m)

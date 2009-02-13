@@ -312,7 +312,7 @@ const char *getstring(NickAlias *na, int index)
 	int langidx = NSDefLanguage;
 
 	// If they are registered (na->nc), and NOT forbidden
-	if (na->nc && !(na->status & NS_FORBIDDEN))
+	if (na && na->nc && !(na->status & NS_FORBIDDEN))
 		langidx = na->nc->language; // set language to their nickcore's language
 
 	return langtexts[langidx][index];

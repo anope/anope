@@ -127,11 +127,11 @@ int slist_delete(SList * slist, int index)
  * @param ... various args
  * @return int
  */
-int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
-					   ...)
+int slist_delete_range(SList * slist, const char *crange, slist_delcheckcb_t cb, ...)
 {
 	int count = 0, i, n1, n2;
 	va_list args, preserve;
+	char *range = (char *)crange;
 
 	va_start(args, cb);
 
@@ -201,10 +201,11 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
  * @param ... various args
  * @return int
  */
-int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
+int slist_enum(SList * slist, const char *crange, slist_enumcb_t cb, ...)
 {
 	int count = 0, i, res;
 	va_list args, preserve;
+	char *range = (char *)crange;
 
 	va_start(args, cb);
 

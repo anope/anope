@@ -152,19 +152,26 @@ class CommandBSSet : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		// This needs to change XXX
-		notice_lang(s_BotServ, u, BOT_HELP_SET);
+		if (subcommand == "DONTKICKOPS")
 		notice_lang(s_BotServ, u, BOT_HELP_SET_DONTKICKOPS);
+		else if (subcommand == "DONTKICKVOICES")
 		notice_lang(s_BotServ, u, BOT_HELP_SET_DONTKICKVOICES);
+		else if (subcommand == "FANTASY")
 		notice_lang(s_BotServ, u, BOT_HELP_SET_FANTASY);
+		else if (subcommand == "GREET")
 		notice_lang(s_BotServ, u, BOT_HELP_SET_GREET);
+		else if (subcommand == "SYMBIOSIS")
 		notice_lang(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS);
-
-		if (is_services_admin(u) || is_services_root(u))
-		{
-			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
+		else if (subcommand == "NOBOT" && (is_services_admin(u) || is_services_root(u)))
 			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
+		else if (subcommand == "PRIVATE" && (is_services_admin(u) || is_services_root(u)))
 			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_PRIVATE);
+		else if (subcommand.empty())
+		{
+			if (is_services_admin(u) || is_services_root(u))
+				notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
+			else
+				notice_lang(s_BotServ, u, BOT_HELP_SET);
 		}
 
 		return true;

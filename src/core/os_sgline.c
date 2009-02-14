@@ -65,6 +65,12 @@ class CommandOSSGLine : public Command
 		}
 		snprintf(rest, sizeof(rest), "%s%s%s", param, params.size() > last_param ? " " : "", params.size() > last_param ? params[last_param].c_str() : "");
 
+		if (static_cast<std::string>(rest).find(':') == std::string::npos)
+		{
+			this->OnSyntaxError(u);
+			return MOD_CONT;
+		}
+
 		sepstream sep(rest, ':');
 		std::string mask;
 		sep.GetToken(mask);

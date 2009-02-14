@@ -57,12 +57,12 @@ class CommandOSSZLine : public Command
 		else if (expires > 0)
 			expires += time(NULL);
 
-		if (params.size() < last_param)
+		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? params[3].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
 		if (mask && *reason)
 		{
 			/* We first do some sanity check on the proposed mask. */

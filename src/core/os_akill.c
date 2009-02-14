@@ -26,9 +26,10 @@ class CommandOSAKill : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		int deleted = 0, last_param = 2;
+		int deleted = 0;
+		unsigned last_param = 2;
 		const char *expiry, *mask;
-		char reason[BUFSIZE];
+		char reason[BUFSIZE], realreason[BUFSIZE];
 		time_t expires;
 
 		mask = params.size() > 1 ? params[1].c_str() : NULL;
@@ -56,12 +57,12 @@ class CommandOSAKill : public Command
 		else if (expires > 0)
 			expires += time(NULL);
 
-		if (params.size() < last_param)
+		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 ? " " : "", last_param == 2 ? params[3].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
 		if (mask && *reason) {
 			/* We first do some sanity check on the proposed mask. */
 			if (strchr(mask, '!'))
@@ -88,9 +89,11 @@ class CommandOSAKill : public Command
 			 * -Rob
 			 **/
 			if (AddAkiller)
-				snprintf(reason, sizeof(reason), "[%s] %s", u->nick, reason);
+				snprintf(realreason, sizeof(realreason), "[%s] %s", u->nick, reason);
+			else
+				snprintf(realreason, sizeof(realreason), "%s", reason);
 
-			deleted = add_akill(u, mask, u->nick, expires, reason);
+			deleted = add_akill(u, mask, u->nick, expires, realreason);
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
@@ -127,7 +130,7 @@ class CommandOSAKill : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(s_OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick, mask, reason, buf);
+				ircdproto->SendGlobops(s_OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick, mask, realreason, buf);
 			}
 
 			if (readonly)

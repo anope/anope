@@ -18,7 +18,6 @@ Legend:
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 	These all need reviewing, remove them from the list _AS YOU GO_. Talk t0 w00t or CBX if you don't know what this is for:
 		src/core/os_admin.c
-		src/core/os_akill.c
 		src/core/os_chankill.c
 		src/core/os_chanlist.c
 		src/core/os_clearmodes.c
@@ -39,11 +38,6 @@ Legend:
 		src/core/os_raw.c
 		src/core/os_restart.c
 		src/core/os_session.c
-		src/core/os_set.c
-		src/core/os_sgline.c
-		src/core/os_sqline.c
-		src/core/os_staff.c
-		src/core/os_szline.c
 		src/modules/cs_appendtopic.c
 		src/modules/cs_enforce.c
 		src/modules/cs_tban.c

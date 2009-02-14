@@ -35,7 +35,6 @@ Legend:
 		src/core/os_quit.c
 		src/core/os_raw.c
 		src/core/os_restart.c
-		src/core/os_session.c
 		src/modules/cs_appendtopic.c
 		src/modules/cs_enforce.c
 		src/modules/cs_tban.c

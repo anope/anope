@@ -211,12 +211,12 @@ class CommandOSException : public Command
 
 		limitstr = params.size() > last_param - 1 ? params[last_param - 1].c_str() : NULL;
 
-		if (params.size() < last_param)
+		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 3 ? " " : "", last_param == 3 ? params[4].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 3 && params.size() > 4 ? " " : "", last_param == 3 && params.size() > 4 ? params[4].c_str() : "");
 
 		if (!*reason)
 		{
@@ -235,7 +235,7 @@ class CommandOSException : public Command
 
 		int limit = limitstr && isdigit(*limitstr) ? atoi(limitstr) : -1;
 
-		if (limit < 0 || limit > MaxSessionLimit)
+		if (limit < 0 || limit > static_cast<int>(MaxSessionLimit))
 		{
 			notice_lang(s_OperServ, u, OPER_EXCEPTION_INVALID_LIMIT, MaxSessionLimit);
 			return MOD_CONT;
@@ -399,8 +399,7 @@ class CommandOSException : public Command
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
-			process_numlist(mask, NULL, exception_view_callback, u,
-							&sent_header);
+			process_numlist(mask, NULL, exception_view_callback, u, &sent_header);
 		else
 		{
 			for (i = 0; i < nexceptions; ++i)

@@ -88,9 +88,18 @@ class CommandOSChanKill : public Command
 		return MOD_CONT;
 	}
 
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		if (!is_services_admin(u))
+			return false;
+
+		notice_lang(s_OperServ, u, OPER_HELP_CHANKILL);
+		return true;
+	}
+
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_OperServ,  u,  "CHANKILL",  OPER_CHANKILL_SYNTAX);
+		syntax_error(s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
 	}
 };
 

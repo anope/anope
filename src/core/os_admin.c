@@ -235,9 +235,15 @@ class CommandOSAdmin : public Command
 		return MOD_CONT;
 	}
 
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_ADMIN);
+		return true;
+	}
+
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_OperServ,  u,  "ADMIN",  OPER_ADMIN_SYNTAX);
+		syntax_error(s_OperServ, u, "ADMIN", OPER_ADMIN_SYNTAX);
 	}
 };
 

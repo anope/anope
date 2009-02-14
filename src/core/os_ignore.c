@@ -98,7 +98,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSIgnore() : Command("IGNORE", 1, 4)
+	CommandOSIgnore() : Command("IGNORE", 1, 3)
 	{
 	}
 

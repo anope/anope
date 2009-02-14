@@ -121,14 +121,14 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 class CommandCSOp : public Command
 {
  public:
-	CommandCSOp() : Command("OP", 2, 2)
+	CommandCSOp() : Command("OP", 0, 2)
 	{
 
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		return do_util(u, &csmodeutils[MUT_OP], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_OP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -142,14 +142,14 @@ class CommandCSOp : public Command
 class CommandCSDeOp : public Command
 {
  public:
-	CommandCSDeOp() : Command("DEOP", 2, 2)
+	CommandCSDeOp() : Command("DEOP", 0, 2)
 	{
 
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		return do_util(u, &csmodeutils[MUT_DEOP], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_DEOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -163,14 +163,14 @@ class CommandCSDeOp : public Command
 class CommandCSVoice : public Command
 {
  public:
-	CommandCSVoice() : Command("VOICE", 2, 2)
+	CommandCSVoice() : Command("VOICE", 0, 2)
 	{
 
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		return do_util(u, &csmodeutils[MUT_VOICE], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_VOICE], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -184,14 +184,14 @@ class CommandCSVoice : public Command
 class CommandCSDeVoice : public Command
 {
  public:
-	CommandCSDeVoice() : Command("DEVOICE", 2, 2)
+	CommandCSDeVoice() : Command("DEVOICE", 0, 2)
 	{
 
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		return do_util(u, &csmodeutils[MUT_DEVOICE], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_DEVOICE], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -205,7 +205,7 @@ class CommandCSDeVoice : public Command
 class CommandCSHalfOp : public Command
 {
  public:
-	CommandCSHalfOp() : Command("HALFOP", 2, 2)
+	CommandCSHalfOp() : Command("HALFOP", 0, 2)
 	{
 
 	}
@@ -218,7 +218,7 @@ class CommandCSHalfOp : public Command
 
 		}
 
-		return do_util(u, &csmodeutils[MUT_HALFOP], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_HALFOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -232,7 +232,7 @@ class CommandCSHalfOp : public Command
 class CommandCSDeHalfOp : public Command
 {
  public:
-	CommandCSDeHalfOp() : Command("DEHALFOP", 2, 2)
+	CommandCSDeHalfOp() : Command("DEHALFOP", 0, 2)
 	{
 
 	}
@@ -244,7 +244,7 @@ class CommandCSDeHalfOp : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, &csmodeutils[MUT_DEHALFOP], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_DEHALFOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -258,7 +258,7 @@ class CommandCSDeHalfOp : public Command
 class CommandCSProtect : public Command
 {
  public:
-	CommandCSProtect() : Command("PROTECT", 2, 2)
+	CommandCSProtect() : Command("PROTECT", 0, 2)
 	{
 
 	}
@@ -270,7 +270,7 @@ class CommandCSProtect : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, &csmodeutils[MUT_PROTECT], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_PROTECT], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -285,7 +285,7 @@ class CommandCSProtect : public Command
 class CommandCSDeProtect : public Command
 {
  public:
-	CommandCSDeProtect() : Command("DEPROTECT", 2, 2)
+	CommandCSDeProtect() : Command("DEPROTECT", 0, 2)
 	{
 
 	}
@@ -297,7 +297,7 @@ class CommandCSDeProtect : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, &csmodeutils[MUT_DEPROTECT], params[0].c_str(), params[1].c_str());
+		return do_util(u, &csmodeutils[MUT_DEPROTECT], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)

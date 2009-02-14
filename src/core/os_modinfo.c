@@ -103,7 +103,7 @@ int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u)
 		{
 			if (c->mod_name && !stricmp(c->mod_name, mod_name))
 			{
-				notice_lang(s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name);
+				notice_lang(s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
 				++display;
 			}
 		}

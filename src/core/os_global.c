@@ -27,7 +27,7 @@ class CommandOSGlobal : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *msg = params[1].c_str();
+		const char *msg = params[0].c_str();
 
 		if (WallOSGlobal)
 			ircdproto->SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);

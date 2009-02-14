@@ -22,13 +22,11 @@ Legend:
 		src/core/os_chanlist.c
 		src/core/os_clearmodes.c
 		src/core/os_defcon.c
-		src/core/os_global.c
 		src/core/os_help.c
 		src/core/os_ignore.c
 		src/core/os_jupe.c
 		src/core/os_kick.c
 		src/core/os_mode.c
-		src/core/os_modinfo.c
 		src/core/os_modlist.c
 		src/core/os_news.c
 		src/core/os_noop.c

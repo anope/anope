@@ -178,8 +178,6 @@ ACCESS_DENIED
 	accés denegat.
 PERMISSION_DENIED
 	Permis denegat.
-RAW_DISABLED
-	The RAW option has been disabled. If you must use it, enable the DisableRaw directive in Services configuration.
 
 MORE_OBSCURE_PASSWORD
 	Per favor intenti novamente amb una clau mes oculta. Les claus han de ser de com a mínim 5 caràcters, no han de ser fàcils d'encertar (ex. Nom real o Nick), i no poden contenir el caràcter d'espai o tabulació.

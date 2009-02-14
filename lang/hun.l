@@ -186,9 +186,6 @@ ACCESS_DENIED
 	Hozzáférés megtagadva.
 PERMISSION_DENIED
 	Engedély megtagadva.
-RAW_DISABLED
-	A RAW opcó nem használható. Ha  használnod kell, állitsd
-	akkor be a DisableRaw beállitást  a Szerviz beállításnál.
 MORE_OBSCURE_PASSWORD
 	Próbálj nehezebb jelszót használni .Jelszavad  min. öt
 	karakter legyen,	és nem kitalálható legyen, (ne a

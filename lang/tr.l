@@ -181,8 +181,6 @@ ACCESS_DENIED
 	Bu komuta eriþiminiz yok.
 PERMISSION_DENIED
 	Bu komutu kullanma izniniz yok.
-RAW_DISABLED
-	The RAW option has been disabled. If you must use it, enable the DisableRaw directive in Services configuration.
 
 MORE_OBSCURE_PASSWORD
 	Lütfen daha zor bir þifre deneyin.  Þifreler en az 5 karakter uzunlukta, kolayca tahmin edilemeyecek birþey olmalýdýr(ör: gerçek isminiz, nickiniz v.b. olmamalýdýr), ve boþlukla tab kullanýlmamalýdýr.

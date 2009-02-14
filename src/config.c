@@ -188,7 +188,6 @@ bool WallOSSQLine;
 bool WallOSSZLine;
 bool WallOSNoOp;
 bool WallOSJupe;
-bool WallOSRaw;
 bool WallAkillExpire;
 bool WallSGLineExpire;
 bool WallSQLineExpire;
@@ -805,7 +804,6 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsgline", "no", new ValueContainerBool(&KillonSGline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&KillonSQline), DT_BOOLEAN, NoValidation},
-		{"operserv", "disableraw", "no", new ValueContainerBool(&DisableRaw), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&DefSessionLimit), DT_UINTEGER, NoValidation},
@@ -1593,7 +1591,7 @@ int read_config(int reload)
 	}
 
 	WallOper = WallBadOS = WallOSGlobal = WallOSMode = WallOSClearmodes = WallOSKick = WallOSAkill = WallOSSGLine = WallOSSQLine = WallOSSZLine = WallOSNoOp =
-		WallOSJupe = WallOSRaw = WallAkillExpire = WallSGLineExpire = WallSQLineExpire = WallSZLineExpire = WallExceptionExpire = WallGetpass = WallSetpass =
+		WallOSJupe = WallAkillExpire = WallSGLineExpire = WallSQLineExpire = WallSZLineExpire = WallExceptionExpire = WallGetpass = WallSetpass =
 		WallForbid = WallDrop = false;
 	if (!OSNotifications.empty()) {
 		spacesepstream notifications(OSNotifications);
@@ -1611,7 +1609,6 @@ int read_config(int reload)
 			else if (notice == "osszline") WallOSSZLine = true;
 			else if (notice == "osnoop") WallOSNoOp = true;
 			else if (notice == "osjupe") WallOSJupe = true;
-			else if (notice == "osraw") WallOSRaw = true;
 			else if (notice == "akillexpire") WallAkillExpire = true;
 			else if (notice == "sglineexpire") WallSGLineExpire = true;
 			else if (notice == "sqlineexpire") WallSQLineExpire = true;

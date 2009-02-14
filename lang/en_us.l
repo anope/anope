@@ -177,8 +177,6 @@ ACCESS_DENIED
 	Access denied.
 PERMISSION_DENIED
 	Permission denied.
-RAW_DISABLED
-	The RAW option has been disabled. If you must use it, configure the DisableRaw directive in Services configuration.
 
 MORE_OBSCURE_PASSWORD
 	Please try again with a more obscure password.  Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters.

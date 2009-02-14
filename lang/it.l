@@ -179,8 +179,6 @@ ACCESS_DENIED
 	Accesso negato.
 PERMISSION_DENIED
 	Permesso negato.
-RAW_DISABLED
-	L'opzione RAW è stata disabilitata. Se devi usarla, attiva la direttiva DisableRaw nella configurazione dei Services.
 
 MORE_OBSCURE_PASSWORD
 	Per favore, prova di nuovo con una password più oscura. Le password devono essere lunghe almeno 5 caratteri, non devono essere indovinate facilmente (ad es. il proprio nome o nick), e non possono contenere i caratteri di spazio e di tabulazione.

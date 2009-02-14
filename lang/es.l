@@ -177,10 +177,6 @@ ACCESS_DENIED
 	Acceso denegado.
 PERMISSION_DENIED
 	Permiso denegado.
-RAW_DISABLED
-	La opcion RAW ha sido deshabilitada. Si necesitas usarla 
-	debes habilitar la directiva DisableRaw en la configuracion
-	de los Servicios.
 
 MORE_OBSCURE_PASSWORD
 	Por favor intente nuevamente con una clave mas oscura.

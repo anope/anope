@@ -177,8 +177,6 @@ ACCESS_DENIED
 	Δεν έχεις την επιτρεπόμενη άδεια.
 PERMISSION_DENIED
 	Δεν έχεις άδεια.
-RAW_DISABLED
-	The RAW option has been disabled. If you must use it, enable the DisableRaw directive in Services configuration.
 
 MORE_OBSCURE_PASSWORD
 	Παρακαλώ προσπάθησε ξανά με έναν πιο πολύπλοκο κωδικό. Οι κωδικοί πρέπει να είναι τουλάχιστον έως πέντε χαρακτήρες, να μην είναι εύκολοι να μαντευτούν (π.χ. το πραγματικό ονομά σου ή το ψευδώνυμο σου), και να μην περιέχει κενό ή διάφοπους άλλους χαρακτήρες.

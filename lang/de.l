@@ -196,8 +196,6 @@ ACCESS_DENIED
 	Zugriff verweigert.
 PERMISSION_DENIED
 	Berechtigung nicht ausreichend.
-RAW_DISABLED
-	RAW wurde deaktiviert. Um RAW nutzen zu können, muss DisableRaw in der Services Config Datei deaktiviert werden.
 
 MORE_OBSCURE_PASSWORD
 	Bitte versuche es nochmal mit einem besseren Passwort. 

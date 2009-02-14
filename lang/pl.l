@@ -201,10 +201,6 @@ ACCESS_DENIED
 PERMISSION_DENIED
 	Brak uprawnieñ.
 
-RAW_DISABLED
-	Polecenie RAW zosta³o wy³±czone. Je¶li chcesz go u¿ywaæ,
-	ustaw odpowiednio DisableRaw w konfiguracji serwisów.
-
 MORE_OBSCURE_PASSWORD
 	Proszê spróbowaæ ponownie z trudniejszym has³em.
 	Has³o powinno mieæ minimum 5 znaków oraz powinno

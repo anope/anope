@@ -187,8 +187,6 @@ ACCESS_DENIED
 	Acesso negado.
 PERMISSION_DENIED
 	Permissão negada.
-RAW_DISABLED
-	A opção RAW está desabilitada. Se realmente precisar, deve desabilitar a opção DisableRaw na configuração dos Services.
 
 MORE_OBSCURE_PASSWORD
 	Por favor tente novamente com uma senha mais difícil. Não use TAB ou espaços.

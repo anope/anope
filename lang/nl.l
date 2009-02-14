@@ -179,9 +179,6 @@ ACCESS_DENIED
 	Toegang geweigerd.
 PERMISSION_DENIED
 	Toestemming geweigerd.
-RAW_DISABLED
-	De RAW optie is uitgeschakeld. Als je deze moet gebruiken, stel dan de DisableRaw optie in de Services configuratie in.
-
 
 MORE_OBSCURE_PASSWORD
 	Probeer aub opnieuw met een onduidelijker wachtwoord.  Wachtwoorden moeten tenminste 5 tekens lang zijn, niet iets makkelijk raadbaars (bijv. je echte naam of je nick), en kan geen tab of spatie bevatten.

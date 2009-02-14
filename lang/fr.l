@@ -183,8 +183,6 @@ ACCESS_DENIED
 	Accès refusé.
 PERMISSION_DENIED
 	Permission refusée.
-RAW_DISABLED
-	L'option RAW n'est pas active. Si vous voulez l'utiliser, desactiver l'option DisableRaw dans la configuration des services.
 
 MORE_OBSCURE_PASSWORD
 	Veuillez réessayer avec un mot de passe plus difficile à trouver.  Les mots de passe doivent contenir au moins cinq caractères, ne doivent pas être trop facilement devinables (par exemple votre vrai nom ou votre pseudo), et ne doit pas contenir d'espaces ou de tabulations.

@@ -33,7 +33,6 @@ Legend:
 		src/core/os_oline.c
 		src/core/os_oper.c
 		src/core/os_quit.c
-		src/core/os_raw.c
 		src/core/os_restart.c
 		src/modules/cs_appendtopic.c
 		src/modules/cs_enforce.c

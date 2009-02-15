@@ -54,16 +54,7 @@ class NickAlias
 class NickCore : public Extensible
 {
  public:
-	NickCore()
-	{
-		next = prev = NULL;
-		display = email = greet = url = NULL;
-		ot = NULL;
-		pass[0] = '\0';
-		icq = flags = 0;
-		language = accesscount = channelcount = 0;
-		lastmail = 0;
-	}
+	NickCore();
 
 	NickCore *next, *prev;
 
@@ -85,5 +76,17 @@ class NickCore : public Extensible
 	/* Unsaved data */
 	time_t lastmail;			/* Last time this nick record got a mail */
 	SList aliases;				/* List of aliases */
+
+	/** Check whether this opertype has access to run the given command string.
+	  * @param cmdstr The string to check, e.g. botserv/set/private.
+	  * @return True if this opertype may run the specified command, false otherwise.
+	  */
+	bool HasCommand(const std::string &cmdstr);
+
+	/** Check whether this opertype has access to the given special permission.
+	  * @param privstr The priv to check for, e.g. users/auspex.
+	  * @return True if this opertype has the specified priv, false otherwise.
+	  */
+	bool HasPriv(const std::string &privstr);
 };
 

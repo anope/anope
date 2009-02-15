@@ -1,4 +1,4 @@
-OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
+OBJS =  account.cpp actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
 		config.o datafiles.o encrypt.o events.o hashcomp.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o timeout.o users.o module.o modulemanager.o configreader.o \
@@ -33,6 +33,7 @@ services:  $(OBJS) mod_version
 	@$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
+account.o:      account.cpp $(INCLUDES)
 actions.o:      actions.c   $(INCLUDES)
 base64.o:       base64.c    $(INCLUDES)
 bots.o:         bots.cpp    $(INCLUDES)

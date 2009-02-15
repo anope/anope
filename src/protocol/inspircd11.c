@@ -570,7 +570,7 @@ class InspIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(user->nick, "JOIN %s %ld", channel, (unsigned int)chantime);
+		send_cmd(user->nick, "JOIN %s %ld", channel, static_cast<long>(chantime));
 	}
 
 	/* UNSQLINE */
@@ -1164,9 +1164,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		/* reset CAPAB */
 		has_servicesmod = 0;
 		has_globopsmod = 0;
-	has_svsholdmod = 0;
-	has_chghostmod = 0;
-	has_chgidentmod = 0;
+		has_svsholdmod = 0;
+		has_chghostmod = 0;
+		has_chgidentmod = 0;
 
 	} else if (strcasecmp(av[0], "MODULES") == 0) {
 		if (strstr(av[1], "m_globops.so")) {
@@ -1175,13 +1175,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		if (strstr(av[1], "m_services.so")) {
 			has_servicesmod = 1;
 		}
-	if (strstr(av[1], "m_svshold.so")) {
+		if (strstr(av[1], "m_svshold.so")) {
 			has_svsholdmod = 1;
 		}
-	if (strstr(av[1], "m_chghost.so")) {
+		if (strstr(av[1], "m_chghost.so")) {
 			has_chghostmod = 1;
 		}
-	if (strstr(av[1], "m_chgident.so")) {
+		if (strstr(av[1], "m_chgident.so")) {
 			has_chgidentmod = 1;
 		}
 		if (strstr(av[1], "m_messageflood.so")) {

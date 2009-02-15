@@ -634,10 +634,8 @@ class RatboxProto : public IRCDTS6Proto
 	void SendKickInternal(BotInfo *bi, const char *chan, const char *user, const char *buf)
 	{
 		User *u = finduser(user);
-		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan, u ? u->GetUID().c_str()
-: user, buf);
-		else send_cmd(bi->uid, "KICK %s %s", chan, u ? u->GetUID().c_str()
-: user);
+		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan, u ? u->GetUID().c_str() : user, buf);
+		else send_cmd(bi->uid, "KICK %s %s", chan, u ? u->GetUID().c_str() : user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)

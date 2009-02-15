@@ -89,13 +89,13 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* Mode on ID for Opers */
 	 "-r",					  /* Mode on UnReg		*/
 	 "-r",					  /* Mode on Nick Change  */
-	 1,						 /* Supports SGlines	 */
+	 0,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
 	 1,						 /* Supports Halfop +h   */
 	 4,						 /* Number of server args */
 	 0,						 /* Join 2 Set		   */
-	 1,						 /* Join 2 Message	   */
+	 0,						 /* Join 2 Message	   */
 	 0,						 /* Has exceptions +e	*/
 	 1,						 /* TS Topic Forward	 */
 	 0,						 /* TS Topci Backward	*/
@@ -112,7 +112,7 @@ IRCDVar myIrcd[] = {
 	 1,						 /* svshold			  */
 	 0,						 /* time stamp on mode   */
 	 0,						 /* NICKIP			   */
-	 1,						 /* O:LINE			   */
+	 0,						 /* O:LINE			   */
 	 1,						 /* UMODE			   */
 	 1,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
@@ -547,11 +547,9 @@ class InspIRCdProto : public IRCDProto
 	{
 		User *u = finduser(user);
 		if (buf)
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str()
-, buf);
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str(), buf);
 		else
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str()
-, user);
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str(), user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)

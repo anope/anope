@@ -547,6 +547,38 @@ int init_secondary(int ac, char **av)
 	}
 	alog("Databases loaded");
 
+	// XXX: this is duplicated in type loading.
+	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+	{
+		std::string nick = it->first;
+		std::string type = it->second;
+
+		NickAlias *na = findnick(nick);
+		if (!na)
+		{
+			// Nonexistant nick
+			alog("Oper nick %s is not registered", nick.c_str());
+			continue;
+		}
+
+		if (!na->nc)
+		{
+			// Nick with no core (wtf?)
+			abort();
+		}
+
+		for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); tit++)
+		{
+			OperType *ot = *tit;
+			if (ot->GetName() == type)
+			{
+				alog("Tied oper %s to type %s", na->nc->display, type.c_str());
+				na->nc->ot = ot;
+			}
+		}
+	}
+	// END DUPLICATION
+
 
 	/* this is only used on the first run of Anope. */
 	BotInfo *bi = findbot("NickServ");

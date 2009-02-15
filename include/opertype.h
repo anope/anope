@@ -40,13 +40,13 @@ class OperType
 	  * @param cmdstr The string to check, e.g. botserv/set/private.
 	  * @return True if this opertype may run the specified command, false otherwise.
 	  */
-	bool HasCommand(const std::string &cmdstr);
+	bool HasCommand(const std::string &cmdstr) const;
 
 	/** Check whether this opertype has access to the given special permission.
 	  * @param privstr The priv to check for, e.g. users/auspex.
 	  * @return True if this opertype has the specified priv, false otherwise.
 	  */
-	bool HasPriv(const std::string &privstr);
+	bool HasPriv(const std::string &privstr) const;
 
 	/** Add the specified command to this opertype.
 	  * @param cmdstr The command mask to grant this opertype access to, e.g: nickserv/ *, chanserv/set/ *, botserv/set/private.
@@ -57,4 +57,8 @@ class OperType
 	  * @param privstr The specified mask of privs to grant this opertype access to,  e.g. users/auspex, users/ *, etc.
 	  */
 	void AddPriv(const std::string &privstr);
+
+	/** Returns the name of this opertype.
+	 */
+	const std::string &GetName() const;
 };

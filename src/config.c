@@ -271,11 +271,11 @@ static char *UlineServers;
 char **Ulines;
 int NumUlines;
 
-static std::list<OperType *> MyOperTypes;
+std::list<OperType *> MyOperTypes;
 /* Pair of nick/opertype lookup. It's stored like this currently, because config is parsed before db load.
  * XXX: It would be nice to not need this.
  */
-static std::list<std::pair<std::string, std::string> > svsopers_in_config;
+std::list<std::pair<std::string, std::string> > svsopers_in_config;
 
 /*************************************************************************/
 
@@ -672,6 +672,35 @@ static bool DoOper(ServerConfig *conf, const char *, const char **, ValueList &v
 
 static bool DoneOpers(ServerConfig *, const char *, bool)
 {
+	// XXX: this is duplicated in config.c
+	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+	{
+		std::string nick = it->first;
+		std::string type = it->second;
+
+		NickAlias *na = findnick(nick);
+		if (!na)
+		{
+			// Nonexistant nick
+			continue;
+		}
+
+		if (!na->nc)
+		{
+			// Nick with no core (wtf?)
+			abort();
+		}
+
+		for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); tit++)
+		{
+			OperType *ot = *tit;
+			if (ot->GetName() == type)
+			{
+				alog("Tied oper %s to type %s", na->nc->display, type.c_str());
+				na->nc->ot = ot;
+			}
+		}
+	}
 	return true;
 }
 

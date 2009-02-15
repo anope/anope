@@ -15,12 +15,12 @@ OperType::OperType(const std::string &nname) : name(nname)
 {
 }
 
-bool OperType::HasCommand(const std::string &cmdstr)
+bool OperType::HasCommand(const std::string &cmdstr) const
 {
 
 }
 
-bool OperType::HasPriv(const std::string &privstr)
+bool OperType::HasPriv(const std::string &privstr) const
 {
 
 }
@@ -33,5 +33,10 @@ void OperType::AddCommand(const std::string &cmdstr)
 void OperType::AddPriv(const std::string &privstr)
 {
 	this->privs.push_back(privstr);
+}
+
+const std::string &OperType::GetName() const
+{
+	return this->name;
 }
 

@@ -3409,39 +3409,6 @@ NEWS_HELP_RANDOM
 
 ###########################################################################
 #
-# HelpServ help message  ## 20.10.2004 ##
-#
-###########################################################################
-
-HELP_HELP
-	%S dient dazu, Hilfe und weitere Informationen zu den Services
-	auszugeben. Eine Themenübersicht bekommt man mit Hilfe des 
-	HELP Befehls der anderen Services:
-	
-	%R%s HELP
-	     für Informationen zum Registrieren der Nicknames
-	
-	%R%s HELP
-	     für Informationen zum Registrieren und Kontrollieren der
-	     Channels
-	
-	%R%s HELP
-	     für Informationen zum Senden von Memos an User, die im
-	     Moment nicht online sind
-
-HELP_HELP_BOT
-
-	%R%s HELP
-	     für Informationen wie man einen Bot in einem Channel
-	     einrichtet
-
-HELP_HELP_HOST
-
-	%R%s HELP
-	     für Informationen über vHosts Einstellungen
-
-###########################################################################
-#
 # NickServ help messages
 #
 ###########################################################################

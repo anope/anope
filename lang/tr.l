@@ -3450,36 +3450,6 @@ NEWS_HELP_RANDOM
 
 ###########################################################################
 #
-# HelpServ help message
-#
-###########################################################################
-
-HELP_HELP
-	%S servisler hakkýnda bilgi vermek için tasarlanmýþtýr.
-	Yardým konularýna diðer servislerin HELP komutuyla ulaþýlýr.
-	
-	%R%s HELP
-	     nick kayýt hakkýnda bilgiler içerir.
-	
-	%R%s HELP
-	     kanal kayýdý ve kontrolü hakkýnda bilgi içerir.
-	
-	%R%s HELP
-	     kullanýcýlara internette olmasalar bile mesaj göndermek
-	     için gerekli bilgileri içerir.
-
-HELP_HELP_BOT
-
-	%R%s HELP
-	     kanallara bot sokulmasý ve ayarlarý hakkýnda bilgi içerir.
-
-HELP_HELP_HOST
-
-	%R%s HELP
-	     for information on setting up nick vHosts
-
-###########################################################################
-#
 # NickServ help messages
 #
 ###########################################################################

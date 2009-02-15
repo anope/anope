@@ -3455,38 +3455,6 @@ NEWS_HELP_RANDOM
 
 ###########################################################################
 #
-# HelpServ help message
-#
-###########################################################################
-
-HELP_HELP
-	%S es un servei designat per donar informació sobre
-	serveis. Tòpics d'ajuda estan disponibles via les
-	comandes HELP dels altres clients de serveis:
-
-	%R%s HELP
-	     per mes informació sobre registrar nicknames
-
-	%R%s HELP
-	     per mes informació sobre registrar i controlar
-	     canals
-
-	%R%s HELP
-	     per més informació sobre enviar missatges a usuaris no
-	     en linea.
-
-HELP_HELP_BOT
-
-	%R%s HELP
-	     per més informació sobre establir un bot en el teu canal
-
-HELP_HELP_HOST
-
-	%R%s HELP
-	     for information on setting up nick vHosts
-
-###########################################################################
-#
 # NickServ help messages
 #
 ###########################################################################

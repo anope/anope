@@ -3413,37 +3413,6 @@ NEWS_HELP_RANDOM
 
 ###########################################################################
 #
-# HelpServ help message
-#
-###########################################################################
-
-HELP_HELP
-	%S is een service die informatie over Services geeft.
-	Help onderwerpen zijn toegankelijk via de HELP commando's
-	of de andere Service clients:
-	
-	%R%s HELP
-	     voor informatie over nickname registratie
-
-	%R%s HELP
-	     voor informatie over kanaal instellingen en registratie
-	     
-	%R%s HELP
-	     voor informatie over berichten naar offline gebruikers
-	     sturen
-
-HELP_HELP_BOT
-
-	%R%s HELP
-	     voor informatie over een bot in je kanaal instellen
-
-HELP_HELP_HOST
-
-	%R%s HELP
-	     for information on setting up nick vHosts
-
-###########################################################################
-#
 # NickServ help messages
 #
 ###########################################################################

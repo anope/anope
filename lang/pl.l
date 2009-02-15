@@ -4420,33 +4420,6 @@ NEWS_HELP_RANDOM
 
 ###########################################################################
 #
-# HelpServ help message
-#
-###########################################################################
-HELP_HELP
-	%S jest serwisem udzielaj±cym informacji
-	na temat innych serwisów. Dostêpne tematy pomocy:
-	
-	
-	%R%s HELP
-	     rejestracja i zarz±dzanie nickami
-	
-	%R%s HELP
-	     rejestracja i zarz±dzanie kana³ami
-	
-	%R%s HELP
-	     wysy³anie wiadomo¶ci do u¿ytkowników off-line
-
-HELP_HELP_BOT
-	%R%s HELP
-	     stawianie serwisowego bota na kanale
-
-HELP_HELP_HOST
-	%R%s HELP
-	     ustawianie vhostów
-
-###########################################################################
-#
 # NickServ help messages
 #
 ###########################################################################

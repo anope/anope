@@ -3341,39 +3341,6 @@ NEWS_HELP_RANDOM
 
 ###########################################################################
 #
-# HelpServ help message
-#
-###########################################################################
-
-HELP_HELP
-	%S è un servizio pensato per fornire informazioni sui
-	Services. Gli argomenti di aiuto sono accessibili con il
-	comando HELP degli altri Services:
-	
-	%R%s HELP
-	     per informazioni sulla registrazione dei nick
-	
-	%R%s HELP
-	     per informazioni sulla registrazione e il controllo
-	     dei canali
-	
-	%R%s HELP
-	     per informazioni sull'invio dei messaggi ad utenti
-	     non connessi
-
-HELP_HELP_BOT
-
-	%R%s HELP
-	     per informazioni sulla configurazione di un bot
-	     per il proprio canale
-
-HELP_HELP_HOST
-
-	%R%s HELP
-	     per informazioni su come impostare vHosts sui nick
-
-###########################################################################
-#
 # NickServ help messages
 #
 ###########################################################################

@@ -3380,37 +3380,6 @@ NEWS_HELP_RANDOM
 	
 ###########################################################
 #
-# HelpSzerv segítség üzenetei
-#
-###########################################################
-
-HELP_HELP
-	%S egy szolgáltatás melynek a feladata, hogy eligazítást
-	adjon a Szervízzel kapcsolatos információkban.
-	A következõ témakörök érhetõk el más Services kliensekrõl:
-
-	%R%s HELP
-	     A nicknév regisztrációval kapcsolatos információkról.
-
-	%R%s HELP
-	     A szoba regisztrációval és karbantartással 
-	     kapcsolatos információkról
-
-	%R%s HELP
-	     Üzenetek küldése offline (regisztrált) usereknek.
-
-HELP_HELP_BOT
-
-	%R%s HELP
-	     Szervíz bot felállításához a csatornádra.
-
-HELP_HELP_HOST
-
-	%R%s HELP
-	     Vhost igénylésrõl bõvebb információkért.
-	
-###########################################################
-#
 # NickServ segítség üzenetei
 #
 ###########################################################

@@ -163,8 +163,7 @@ public:
 								   ci->name, ci->desc ? ci->desc : "");
 						}
 
-						notice_user(s_ChanServ, u, "  %c%s",
-								noexpire_char, buf);
+						u->SendMessage(s_ChanServ, "  %c%s", noexpire_char, buf);
 					}
 					count++;
 				}

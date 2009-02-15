@@ -67,7 +67,7 @@ class CommandOSIgnore : public Command
 
 		notice_lang(s_OperServ, u, OPER_IGNORE_LIST);
 		for (id = ignore; id; id = id->next)
-			notice_user(s_OperServ, u, "%s", id->mask);
+			u->SendMessage(s_OperServ, "%s", id->mask);
 
 		return MOD_CONT;
 	}

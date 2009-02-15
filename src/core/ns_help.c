@@ -31,7 +31,7 @@ class CommandNSHelp : public Command
 			int i;
 			notice_help(s_NickServ, u, NICK_HELP_SET_LANGUAGE);
 			for (i = 0; i < NUM_LANGS && langlist[i] >= 0; ++i)
-				notice_user(s_NickServ, u, "    %2d) %s", i + 1, langnames[langlist[i]]);
+				u->SendMessage(s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
 		}
 		else
 			mod_help_cmd(s_NickServ, u, NICKSERV, cmd);

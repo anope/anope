@@ -157,9 +157,7 @@ class CommandNSInfo : public Command
 				/* If we have any info on this user */
 				char *c;
 				if (na->nc->GetExt("os_info", c))
-				{
-					notice_user(s_NickServ, u, " OperInfo: %s", c);
-				}
+					u->SendMessage(s_NickServ, " OperInfo: %s", c);
 			}
 		}
 		return MOD_CONT;
@@ -271,7 +269,7 @@ class CommandCSInfo : public Command
 				/* If we have any info on this channel */
 				char *c;
 				if (ci->GetExt("os_info", c))
-					notice_user(s_ChanServ, u, " OperInfo: %s", c);
+					u->SendMessage(s_ChanServ, " OperInfo: %s", c);
 			}
 		}
 		return MOD_CONT;

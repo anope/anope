@@ -1069,7 +1069,7 @@ void Module::NoticeLang(char *source, User * u, int number, ...)
 			if (*s)
 				*s++ = '\0';
 			strscpy(outbuf, t, sizeof(outbuf));
-			notice_user(source, u, "%s", outbuf);
+			u->SendMessage(source, "%s", outbuf);
 		}
 		delete [] buf;
 	} else {

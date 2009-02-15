@@ -809,8 +809,6 @@ E void send_cmd(const std::string &source, const char *fmt, ...) FORMAT(printf,2
 
 E void notice_server(char *source, Server * s, const char *fmt, ...)
 	FORMAT(printf,3,4);
-E void notice_user(char *source, User *u, const char *fmt, ...)
-	FORMAT(printf,3,4);
 
 E void notice_list(const char *source, const char *dest, char **text); // MARK_DEPRECATED;
 E void notice_lang(const char *source, User *dest, int message, ...); // MARK_DEPRECATED;

@@ -40,8 +40,7 @@ class CommandBSBotList : public Command
 					if (!count)
 						notice_lang(s_BotServ, u, BOT_BOTLIST_HEADER);
 					count++;
-					notice_user(s_BotServ, u, "   %-15s  (%s@%s)", bi->nick,
-								bi->user, bi->host);
+					u->SendMessage(s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
 				}
 			}
 		}
@@ -52,8 +51,7 @@ class CommandBSBotList : public Command
 			for (i = 0; i < 256; i++) {
 				for (bi = botlists[i]; bi; bi = bi->next) {
 					if (bi->flags & BI_PRIVATE) {
-						notice_user(s_BotServ, u, "   %-15s  (%s@%s)",
-									bi->nick, bi->user, bi->host);
+						u->SendMessage(s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
 						count++;
 					}
 				}

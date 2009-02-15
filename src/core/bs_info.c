@@ -33,7 +33,7 @@ class CommandBSInfo : public Command
 			for (ci = chanlists[i]; ci; ci = ci->next) {
 				if (ci->bi == bi) {
 					if (strlen(buf) + strlen(ci->name) > 300) {
-						notice_user(s_BotServ, u, "%s", buf);
+						u->SendMessage(s_BotServ, "%s", buf);
 						*buf = 0;
 						end = buf;
 					}
@@ -45,7 +45,7 @@ class CommandBSInfo : public Command
 		}
 
 		if (*buf)
-			notice_user(s_BotServ, u, "%s", buf);
+			u->SendMessage(s_BotServ, "%s", buf);
 		return;
 	}
  public:

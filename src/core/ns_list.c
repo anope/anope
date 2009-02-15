@@ -159,7 +159,7 @@ class CommandNSList : public Command
 								snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick);
 							else
 								snprintf(buf, sizeof(buf), "%-20s  %s", na->nick, na->last_usermask);
-							notice_user(s_NickServ, u, "   %c%s", noexpire_char, buf);
+							u->SendMessage(s_NickServ, "   %c%s", noexpire_char, buf);
 						}
 						++count;
 					}
@@ -180,7 +180,7 @@ class CommandNSList : public Command
 						if (++nnicks <= NSListMax)
 						{
 							snprintf(buf, sizeof(buf), "%-20s  [UNCONFIRMED]", nr->nick);
-							notice_user(s_NickServ, u, "   %c%s", noexpire_char, buf);
+							u->SendMessage(s_NickServ, "   %c%s", noexpire_char, buf);
 						}
 					}
 				}

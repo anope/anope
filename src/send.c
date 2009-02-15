@@ -110,32 +110,6 @@ void notice_server(char *source, Server * s, const char *fmt, ...)
 /*************************************************************************/
 
 /**
- * Send a notice to a user
- * @param source Orgin of the Message
- * @param u User Struct
- * @param fmt Format of the Message
- * @param ... any number of parameters
- * @return void
- */
-void notice_user(char *source, User * u, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE];
-	*buf = '\0';
-
-	if (fmt) {
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-
-		u->SendMessage(source, "%s", buf);
-
-		va_end(args);
-	}
-}
-
-/*************************************************************************/
-
-/**
  * Send a NULL-terminated array of text as NOTICEs.
  * @param source Orgin of the Message
  * @param dest Destination of the Notice

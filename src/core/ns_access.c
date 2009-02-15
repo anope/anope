@@ -51,7 +51,7 @@ class CommandNSAccess : public Command
 		{
 			if (mask && !match_wild(mask, *access))
 				continue;
-			notice_user(s_NickServ, u, "    %s", *access);
+			u->SendMessage(s_NickServ, "    %s", *access);
 		}
 
 		return MOD_CONT;
@@ -145,7 +145,7 @@ class CommandNSAccess : public Command
 		{
 			if (mask && !match_wild(mask, *access))
 				continue;
-			notice_user(s_NickServ, u, "    %s", *access);
+			u->SendMessage(s_NickServ, "    %s", *access);
 		}
 
 		return MOD_CONT;

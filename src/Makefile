@@ -1,7 +1,7 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
 		config.o datafiles.o encrypt.o events.o hashcomp.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
-		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o timeout.o users.o module.o modulemanager.o configreader.o
+		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o svsopers.o timeout.o users.o module.o modulemanager.o configreader.o
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
@@ -69,6 +69,7 @@ servers.o:      servers.c   $(INCLUDES)
 sessions.o:     sessions.c  $(INCLUDES)
 slist.o:        slist.c     $(INCLUDES)
 sockutil.o:     sockutil.c  $(INCLUDES)
+svsopers.o:     svsopers.cpp  $(INCLUDES)
 timeout.o:      timeout.c   $(INCLUDES)
 users.o:        users.c     $(INCLUDES)
 vsnprintf.o:    vsnprintf.c $(INCLUDES)

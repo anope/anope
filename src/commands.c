@@ -75,7 +75,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED))
 	{
 		// Command requires registered users only
-		if (!u->na || !u->na->nc)
+		if (!nick_identified(u))
 		{
 			// XXX: we should have a new string for this
 			notice_lang(service, u, ACCESS_DENIED);

@@ -58,6 +58,7 @@ class NickCore : public Extensible
 	{
 		next = prev = NULL;
 		display = email = greet = url = NULL;
+		ot = NULL;
 		pass[0] = '\0';
 		icq = flags = 0;
 		language = accesscount = channelcount = 0;
@@ -78,6 +79,8 @@ class NickCore : public Extensible
 	char **access;				/* Array of strings */
 	MemoInfo memos;
 	uint16 channelcount;			/* Number of channels currently registered */
+
+	OperType *ot;
 
 	/* Unsaved data */
 	time_t lastmail;			/* Last time this nick record got a mail */

@@ -11,22 +11,26 @@
  
  #include "services.h"
 
-bool SVSOper::HasCommand(const std::string &cmdstr)
+OperType::OperType(const std::string &nname) : name(nname)
+{
+}
+
+bool OperType::HasCommand(const std::string &cmdstr)
 {
 
 }
 
-bool SVSOper::HasPriv(const std::string &privstr)
+bool OperType::HasPriv(const std::string &privstr)
 {
 
 }
 
-void SVSOper::AddCommand(const std::string &cmdstr)
+void OperType::AddCommand(const std::string &cmdstr)
 {
 	this->commands.push_back(cmdstr);
 }
 
-void SVSOper::AddPriv(const std::string &privstr)
+void OperType::AddPriv(const std::string &privstr)
 {
 	this->privs.push_back(privstr);
 }

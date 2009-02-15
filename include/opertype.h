@@ -9,7 +9,7 @@
  *
  */
 
-class SVSOper
+class OperType
 {
  private:
 	/** The name of this opertype, e.g. "sra".
@@ -31,6 +31,10 @@ class SVSOper
 	  */
 	std::list<std::string> commands;
  public:
+	/** Create a new opertype of the given name.
+	 * @param nname The opertype name, e.g. "sra".
+	 */
+	OperType(const std::string &nname);
 
 	/** Check whether this opertype has access to run the given command string.
 	  * @param cmdstr The string to check, e.g. botserv/set/private.

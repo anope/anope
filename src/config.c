@@ -271,6 +271,12 @@ static char *UlineServers;
 char **Ulines;
 int NumUlines;
 
+static std::list<OperType *> MyOperTypes;
+/* Pair of nick/opertype lookup. It's stored like this currently, because config is parsed before db load.
+ * XXX: It would be nice to not need this.
+ */
+static std::list<std::pair<std::string, std::string> > svsopers_in_config;
+
 /*************************************************************************/
 
 ServerConfig::ServerConfig() : include_stack(), errstr(""), newconfig(), config_data()
@@ -563,13 +569,13 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 	ValueItem vi_host(host), vi_port(port), vi_password(password);
 	// Validate the host to make sure it is not empty
 	if (!ValidateNotEmpty(conf, "uplink", "host", vi_host))
-		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// Validate the port to make sure it is a valid port
 	if (!ValidatePort(conf, "uplink", "port", vi_port))
-		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// Validate the password to make sure it is not empty
 	if (!ValidateNotEmpty(conf, "uplink", "password", vi_password))
-		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// If we get here, all the values are valid, we'll add it to the Uplinks list
 	Uplinks.push_back(new Uplink(host, port, password));
 	return true;
@@ -583,6 +589,94 @@ bool DoneUplinks(ServerConfig *, const char *, bool bail)
 	return true;
 }
 
+static bool InitOperTypes(ServerConfig *, const char *, bool)
+{
+	for (std::list<OperType *>::iterator it = MyOperTypes.begin(); it != MyOperTypes.end(); it++)
+	{
+		delete *(it);
+	}
+
+	MyOperTypes.clear();
+	return true;
+}
+
+static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueList &values, int *, bool)
+{
+	const char *name = values[0].GetString();
+	const char *commands = values[1].GetString();
+	const char *privs = values[2].GetString();
+
+	ValueItem vi(name);
+	if (!ValidateNotEmpty(conf, "opertype", "name", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	OperType *ot = new OperType(name);
+
+	std::string tok;
+	spacesepstream cmdstr(commands);
+	while (cmdstr.GetToken(tok))
+	{
+		ot->AddCommand(tok);
+	}
+
+	spacesepstream privstr(privs);
+	while (privstr.GetToken(tok))
+	{
+		ot->AddPriv(tok);
+	}
+
+	MyOperTypes.push_back(ot);
+	return true;
+}
+
+static bool DoneOperTypes(ServerConfig *, const char *, bool)
+{
+	return true;
+}
+
+
+/*************************************************************************/
+
+static bool InitOpers(ServerConfig *, const char *, bool)
+{
+	int i;
+	NickCore *nc;
+
+	for (i = 0; i < 1024; i++)
+	{
+		for (nc = nclists[i]; nc; nc = nc->next)
+		{
+			nc->ot = NULL;
+		}
+	}
+
+	return true;
+}
+
+static bool DoOper(ServerConfig *conf, const char *, const char **, ValueList &values, int *, bool)
+{
+	const char *name = values[0].GetString();
+	const char *type = values[1].GetString();
+
+	ValueItem vi(name);
+	if (!ValidateNotEmpty(conf, "oper", "name", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	ValueItem vi2(type);
+	if (!ValidateNotEmpty(conf, "oper", "type", vi2))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	svsopers_in_config.push_back(std::make_pair(name, type));
+	return true;
+}
+
+static bool DoneOpers(ServerConfig *, const char *, bool)
+{
+	return true;
+}
+
+/*************************************************************************/
+
 bool InitModules(ServerConfig *, const char *, bool)
 {
 	Modules.clear();
@@ -595,7 +689,7 @@ bool DoModule(ServerConfig *conf, const char *, const char **, ValueList &values
 	const char *module = values[0].GetString();
 	ValueItem vi(module);
 	if (!ValidateNotEmpty(conf, "module", "name", vi))
-		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// If the string isn't empty, add a space before we add the module name
 	if (!Modules.empty()) Modules += " ";
 	// Add the module name to the string
@@ -831,6 +925,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "akillreason", "", new ValueContainerChar(&DefConAkillReason), DT_CHARPTR, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
+
 	/* These tags can occur multiple times, and therefore they have special code to read them
 	 * which is different to the code for reading the singular tags listed above. */
 	MultiConfig MultiValues[] = {
@@ -844,12 +939,23 @@ int ServerConfig::Read(bool bail)
 			{"", NULL},
 			{DT_CHARPTR},
 			InitModules, DoModule, DoneModules},
+		{"opertype",
+			{"name", "commands", "privs", NULL},
+			{"", "", "", NULL},
+			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
+			InitOperTypes, DoOperType, DoneOperTypes},
+		{"oper",
+			{"name", "type", NULL},
+			{"", "", NULL},
+			{DT_CHARPTR, DT_CHARPTR},
+			InitOpers, DoOper, DoneOpers},
 		{NULL,
 			{NULL},
 			{NULL},
 			{0},
 			NULL, NULL, NULL}
 	};
+
 	// Load and parse the config file, if there are any errors then explode
 	// Make a copy here so if it fails then we can carry on running with an unaffected config
 	newconfig.clear();

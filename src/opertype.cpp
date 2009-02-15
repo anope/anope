@@ -17,12 +17,28 @@ OperType::OperType(const std::string &nname) : name(nname)
 
 bool OperType::HasCommand(const std::string &cmdstr) const
 {
+	for (std::list<std::string>::const_iterator it = this->commands.begin(); it != this->commands.end(); it++)
+	{
+		if (Anope::Match(cmdstr, *it))
+		{
+			return true;
+		}
+	}
 
+	return false;
 }
 
 bool OperType::HasPriv(const std::string &privstr) const
 {
+	for (std::list<std::string>::const_iterator it = this->privs.begin(); it != this->privs.end(); it++)
+	{
+		if (Anope::Match(privstr, *it))
+		{
+			return true;
+		}
+	}
 
+	return false;
 }
 
 void OperType::AddCommand(const std::string &cmdstr)

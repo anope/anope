@@ -43,7 +43,7 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if (bi->flags & BI_PRIVATE && !is_oper(u))
+		if (bi->flags & BI_PRIVATE && !u->na->nc->HasCommand("botserv/assign/private"))
 		{
 			notice_lang(s_BotServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -66,8 +66,13 @@ class CommandBSAssign : public Command
 			notice_lang(s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
 			return MOD_CONT;
 		}
+<<<<<<< HEAD:src/core/bs_assign.c
 
 		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !is_services_admin(u)))
+=======
+		
+		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->na->nc->HasCommand("botserv/administration")))
+>>>>>>> Set required command string for botserv modules.:src/core/bs_assign.c
 		{
 			notice_lang(s_BotServ, u, PERMISSION_DENIED);
 			return MOD_CONT;

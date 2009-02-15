@@ -46,7 +46,7 @@ class CommandBSBotList : public Command
 			}
 		}
 
-		if (is_oper(u) && count < nbots) {
+		if (u->na->nc->HasCommand("botserv/botlist") && count < nbots) {
 			notice_lang(s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
 			for (i = 0; i < 256; i++) {

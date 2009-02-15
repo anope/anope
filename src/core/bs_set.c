@@ -29,7 +29,6 @@ class CommandBSSet : public Command
 		const char *chan = params[0].c_str();
 		const char *option = params[1].c_str();
 		const char *value = params[2].c_str();
-		int is_servadmin = is_services_admin(u);
 		ChannelInfo *ci;
 
 		if (readonly)
@@ -38,7 +37,7 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (is_servadmin && !stricmp(option, "PRIVATE"))
+		if (u->na->nc->HasCommand("botserv/set/private") && !stricmp(option, "PRIVATE"))
 		{
 			BotInfo *bi;
 
@@ -67,7 +66,7 @@ class CommandBSSet : public Command
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-		else if (!is_servadmin && !check_access(u, ci, CA_SET))
+		else if (!u->na->nc->HasCommand("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else {
 			if (!stricmp(option, "DONTKICKOPS")) {
@@ -118,7 +117,7 @@ class CommandBSSet : public Command
 					syntax_error(s_BotServ, u, "SET GREET",
 								 BOT_SET_GREET_SYNTAX);
 				}
-			} else if (is_servadmin && !stricmp(option, "NOBOT")) {
+			} else if (u->na->nc->HasCommand("botserv/set/nobot") && !stricmp(option, "NOBOT")) {
 				if (!stricmp(value, "ON")) {
 					ci->botflags |= BS_NOBOT;
 					if (ci->bi)
@@ -160,11 +159,11 @@ class CommandBSSet : public Command
 		else if (subcommand == "GREET")
 			notice_help(s_BotServ, u, BOT_HELP_SET_GREET);
 		else if (subcommand == "SYMBIOSIS")
-			notice_help(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS, s_ChanServ);
-		else if (subcommand == "NOBOT" && (is_services_admin(u) || is_services_root(u)))
-			notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
-		else if (subcommand == "PRIVATE" && (is_services_admin(u) || is_services_root(u)))
-			notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET_PRIVATE);
+		notice_lang(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS);
+		else if (subcommand == "NOBOT")
+			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
+		else if (subcommand == "PRIVATE")
+			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_PRIVATE);
 		else if (subcommand.empty())
 		{
 			notice_help(s_BotServ, u, BOT_HELP_SET);

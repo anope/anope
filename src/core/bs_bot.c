@@ -361,6 +361,12 @@ class CommandBSBot : public Command
 		if (!stricmp(cmd, "ADD"))
 		{
 			// ADD nick user host real - 5
+			if (!u->na->nc->HasCommand("botserv/bot/add"))
+			{
+				notice_lang(s_BotServ, u, PERMISSION_DENIED);
+				return MOD_CONT;
+			}
+
 			if (params.size() < 5)
 			{
 				this->OnSyntaxError(u);
@@ -376,7 +382,13 @@ class CommandBSBot : public Command
 		else if (!stricmp(cmd, "CHANGE"))
 		{
 			// CHANGE oldn newn user host real - 6
-			// but only oldn and newn are required - Adam
+			// but only oldn and newn are required
+			if (!u->na->nc->HasCommand("botserv/bot/change"))
+			{
+				notice_lang(s_BotServ, u, PERMISSION_DENIED);
+				return MOD_CONT;
+			}
+
 			if (params.size() < 3)
 			{
 				this->OnSyntaxError(u);
@@ -388,6 +400,12 @@ class CommandBSBot : public Command
 		else if (!stricmp(cmd, "DEL"))
 		{
 			// DEL nick
+			if (!u->na->nc->HasCommand("botserv/bot/del"))
+			{
+				notice_lang(s_BotServ, u, PERMISSION_DENIED);
+				return MOD_CONT;
+			}
+
 			if (params.size() < 1)
 			{
 				this->OnSyntaxError(u);
@@ -404,10 +422,7 @@ class CommandBSBot : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u) && !is_services_root(u))
-			return false;
-
-		notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
+		notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
 		return true;
 	}
 
@@ -438,9 +453,7 @@ class BSBot : public Module
  **/
 void myBotServHelp(User * u)
 {
-	if (is_services_admin(u)) {
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
-	}
+	notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
 }
 
 

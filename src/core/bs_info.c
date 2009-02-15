@@ -59,11 +59,12 @@ class CommandBSInfo : public Command
 		ChannelInfo *ci;
 		const char *query = params[0].c_str();
 
-		int need_comma = 0, is_servadmin = is_services_admin(u);
+		int need_comma = 0;
 		char buf[BUFSIZE], *end;
 		const char *commastr = getstring(u->na, COMMA_SPACE);
 
-		if ((bi = findbot(query))) {
+		if ((bi = findbot(query)))
+		{
 			struct tm *tm;
 
 			notice_lang(s_BotServ, u, BOT_INFO_BOT_HEADER, bi->nick);
@@ -79,10 +80,13 @@ class CommandBSInfo : public Command
 									BOT_INFO_OPT_NONE));
 			notice_lang(s_BotServ, u, BOT_INFO_BOT_USAGE, bi->chancount);
 
-			if (is_services_admin(u))
+			if (u->na->nc->HasCommand("botserv/administration"))
 				this->send_bot_channels(u, bi);
-		} else if ((ci = cs_findchan(query))) {
-			if (!is_servadmin && !is_founder(u, ci)) {
+		}
+		else if ((ci = cs_findchan(query)))
+		{
+			if (!is_founder(u, ci) && !u->na->nc->HasCommand("botserv/administration"))
+			{
 				notice_lang(s_BotServ, u, PERMISSION_DENIED);
 				return MOD_CONT;
 			}

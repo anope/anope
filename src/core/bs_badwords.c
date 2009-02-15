@@ -261,7 +261,7 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !is_services_admin(u)))
+		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->na->nc->HasCommand("botserv/administration")))
 		{
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;

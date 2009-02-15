@@ -1,4 +1,4 @@
-OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
+OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
 		config.o datafiles.o encrypt.o events.o hashcomp.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o timeout.o users.o module.o modulemanager.o configreader.o \
@@ -40,6 +40,7 @@ bots.o:         bots.cpp    $(INCLUDES)
 botserv.o:      botserv.c   $(INCLUDES)
 channels.o:     channels.c  $(INCLUDES)
 chanserv.o:     chanserv.c  $(INCLUDES)
+command.o:     command.cpp  $(INCLUDES)
 commands.o:     commands.c  $(INCLUDES)
 compat.o:       compat.c    $(INCLUDES)
 config.o:       config.c    $(INCLUDES)

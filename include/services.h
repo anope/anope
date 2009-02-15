@@ -1372,7 +1372,7 @@ class Anope
 	 * @param str The string to check against the pattern (e.g. foobar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
-	CoreExport static bool Anope::Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
+	CoreExport static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
 };
 
 /*************************************************************************/

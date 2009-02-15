@@ -172,7 +172,7 @@ class CommandOSOper : public Command
 
 		if (!nick || (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)))
 		{
-			res = slist_enum(&servopers, nick, &oper_list_callback, u, &sent_header);
+			int res = slist_enum(&servopers, nick, &oper_list_callback, u, &sent_header);
 			if (!res)
 			{
 				notice_lang(s_OperServ, u, OPER_OPER_NO_MATCH);

@@ -89,6 +89,7 @@ class CommandNSConfirm : public Command
 		if (!force)
 		{
 			u->na = na;
+			u->nc = na->nc;
 			na->u = u;
 			alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
 			if (NSAddAccessOnReg)

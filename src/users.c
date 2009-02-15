@@ -41,6 +41,7 @@ User::User(const std::string &snick, const std::string &suid)
 	host = hostip = vhost = realname = nickTrack = NULL;
 	server = NULL;
 	na = NULL;
+	nc = NULL;
 	chans = NULL;
 	founder_chans = NULL;
 	invalid_pw_count = timestamp = my_signon = svid = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
@@ -57,8 +58,10 @@ User::User(const std::string &snick, const std::string &suid)
 
 	this->na = findnick(snick);
 
-	if (this->na)
+	if (this->na) {
 		this->na->u = this;
+		this->nc = this->na->nc;
+	}
 
 	usercnt++;
 
@@ -113,8 +116,10 @@ void User::SetNewNick(const std::string &newnick)
 		if (this->na)
 			this->na->u = NULL;
 		this->na = findnick(this->nick);
-		if (this->na)
+		if (this->na) {
 			this->na->u = this;
+			this->nc = this->na->nc;
+		}
 	}
 
 }

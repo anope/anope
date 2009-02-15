@@ -164,6 +164,7 @@ class CommandNSGroup : public Command
 				}
 
 				u->na = na;
+				u->nc = na->nc;
 				na->u = u;
 
 				send_event(EVENT_GROUP, 1, u->nick);

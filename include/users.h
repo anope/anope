@@ -43,6 +43,7 @@ public: // XXX: exposing a tiny bit too much
 	time_t svid;		/* Services ID 			*/
 	uint32 mode;		/* See below 			*/
 
+	NickCore *nc;
 	NickAlias *na;
 
 	int isSuperAdmin;	/* is SuperAdmin on or off? */

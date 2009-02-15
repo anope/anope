@@ -1126,6 +1126,7 @@ int delnickrequest(NickRequest * nr)
 
 int delnick(NickAlias * na)
 {
+	User *u = NULL;
 	/* First thing to do: remove any timeout belonging to the nick we're deleting */
 	clean_ns_timeouts(na);
 
@@ -1134,6 +1135,7 @@ int delnick(NickAlias * na)
 
 	if (na->u)
 	{
+		u = na->u;
 		na->u->na = NULL;
 
 		if (ircd->modeonunreg)
@@ -1153,6 +1155,7 @@ int delnick(NickAlias * na)
 			if (!delcore(na->nc))
 				return 0;
 			na->nc = NULL;
+			u->nc = NULL;
 		}
 		else
 		{

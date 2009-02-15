@@ -82,7 +82,7 @@ class CommandHSRequest : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		char *nick;
-		const char *rawhostmask = params[1].c_str();
+		const char *rawhostmask = params[0].c_str();
 		char hostmask[HOSTMAX];
 		NickAlias *na;
 		int32 tmp_time;
@@ -359,7 +359,7 @@ class HSListBase : public Command
 		return MOD_CONT;
 	}
  public:
-	HSListBase(const std::string &cmd, int min, int max) : Command("LIST", 1, 1)
+	HSListBase(const std::string &cmd, int min, int max) : Command(cmd, min, max)
 	{
 	}
 
@@ -372,13 +372,16 @@ class HSListBase : public Command
 class CommandHSList : public HSListBase
 {
  public:
-	CommandHSList() : HSListBase("LIST", 1, 1)
+	CommandHSList() : HSListBase("LIST", 0, 1)
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *key = params[0].c_str();
+		const char *key = params.size() ? params[0].c_str() : NULL;
+
+		if (!key)
+			return MOD_CONT;
 
 		if (stricmp(key, "+req"))
 			return MOD_CONT;

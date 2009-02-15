@@ -18,14 +18,6 @@ Legend:
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 	These all need reviewing, remove them from the list _AS YOU GO_. Talk t0 w00t or CBX if you don't know what this is for:
 		src/core/os_restart.c
-		src/modules/cs_appendtopic.c
-		src/modules/cs_enforce.c
-		src/modules/cs_tban.c
-		src/modules/hs_request.c
-		src/modules/ns_maxemail.c
-		src/modules/ns_noop_convert.c
-		src/modules/os_ignore_db.c
-		src/modules/os_info.c
 
 
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().

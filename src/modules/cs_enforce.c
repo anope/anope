@@ -192,7 +192,7 @@ class CommandCSEnforce : public Command
 			if (!what || !stricmp(what, "SET"))
 			{
 				this->DoSet(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what);
+				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what ? what : "SET");
 			}
 			else if (!stricmp(what, "MODES"))
 			{

@@ -16,10 +16,6 @@ Legend:
     [ ] (will require wider re-work): allow replies/notifications to fantasy commands to go to the channel via notice
 [ ] HelpServ must die (1.9.1?)
 [-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
-	These all need reviewing, remove them from the list _AS YOU GO_. Talk t0 w00t or CBX if you don't know what this is for:
-		src/core/os_restart.c
-
-
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 [ ] Add support for +k, +q, etc type umodes

@@ -211,68 +211,15 @@ const char *merge_args(int argc, char **argv)
 /*************************************************************************/
 
 /**
- * do_match_wild:  Attempt to match a string to a pattern which might contain
- *			  '*' or '?' wildcards.  Return 1 if the string matches the
- *			  pattern, 0 if not.
- * @param pattern To be matched
- * @param str String in which the pattern is to be matched
- * @param docase Case In/Senstive
- * @return 1 if the string matches the pattern, 0 if not.
- */
-static int do_match_wild(const char *pattern, const char *str, int docase)
-{
-	char c;
-	const char *s;
-
-	if (!str || !*str || !pattern || !*pattern) {
-		return 0;
-	}
-
-	/* This WILL eventually terminate: either by *pattern == 0, or by a
-	 * trailing '*'. */
-
-	for (;;) {
-		switch (c = *pattern++) {
-		case 0:
-			if (!*str)
-				return 1;
-			return 0;
-		case '?':
-			if (!*str)
-				return 0;
-			str++;
-			break;
-		case '*':
-			if (!*pattern)
-				return 1;	   /* trailing '*' matches everything else */
-			s = str;
-			while (*s) {
-				if ((docase ? (*s == *pattern)
-					 : (tolower(*s) == tolower(*pattern)))
-					&& do_match_wild(pattern, s, docase))
-					return 1;
-				s++;
-			}
-			break;
-		default:
-			if (docase ? (*str++ != c) : (tolower(*str++) != tolower(c)))
-				return 0;
-			break;
-		}					   /* switch */
-	}
-}
-
-/*************************************************************************/
-
-/**
  * match_wild:  Case Senstive wild card search
  * @param pattern To be matched
  * @param str String in which the pattern is to be matched
  * @return 1 if the string matches the pattern, 0 if not.
+ * NOTE: Deprecated by Anope::Match().
  */
 int match_wild(const char *pattern, const char *str)
 {
-	return do_match_wild(pattern, str, 1);
+	return Anope::Match(str, pattern, true);
 }
 
 /*************************************************************************/
@@ -282,10 +229,11 @@ int match_wild(const char *pattern, const char *str)
  * @param pattern To be matched
  * @param str String in which the pattern is to be matched
  * @return 1 if the string matches the pattern, 0 if not.
+ * NOTE: Deprecated by Anope::Match().
  */
 int match_wild_nocase(const char *pattern, const char *str)
 {
-	return do_match_wild(pattern, str, 0);
+	return Anope::Match(pattern, str, false);
 }
 
 /*************************************************************************/

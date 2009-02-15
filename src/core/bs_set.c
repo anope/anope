@@ -37,7 +37,7 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (u->na->nc->HasCommand("botserv/set/private") && !stricmp(option, "PRIVATE"))
+		if (u->nc->HasCommand("botserv/set/private") && !stricmp(option, "PRIVATE"))
 		{
 			BotInfo *bi;
 
@@ -66,7 +66,7 @@ class CommandBSSet : public Command
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-		else if (!u->na->nc->HasCommand("botserv/administration") && !check_access(u, ci, CA_SET))
+		else if (!u->nc->HasCommand("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else {
 			if (!stricmp(option, "DONTKICKOPS")) {
@@ -117,7 +117,7 @@ class CommandBSSet : public Command
 					syntax_error(s_BotServ, u, "SET GREET",
 								 BOT_SET_GREET_SYNTAX);
 				}
-			} else if (u->na->nc->HasCommand("botserv/set/nobot") && !stricmp(option, "NOBOT")) {
+			} else if (u->nc->HasCommand("botserv/set/nobot") && !stricmp(option, "NOBOT")) {
 				if (!stricmp(value, "ON")) {
 					ci->botflags |= BS_NOBOT;
 					if (ci->bi)

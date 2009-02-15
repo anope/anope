@@ -72,13 +72,28 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		}
 	}
 
+	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED))
+	{
+		// Command requires registered users only
+		if (!u->na || !u->na->nc)
+		{
+			// XXX: we should have a new string for this
+			notice_lang(service, u, ACCESS_DENIED);
+			alog("Access denied for unregistered user %s with service %s and command %s", u->nick, service, cmd);
+			return;
+		}
+	}
+
+/*
+XXX: priv checking
 	if (c->has_priv != NULL && !c->has_priv(u))
 	{
 		notice_lang(service, u, ACCESS_DENIED);
 		alog("Access denied for %s with service %s and command %s", u->nick, service, cmd);
 		return;
 	}
-   
+  */
+  
 	std::vector<std::string> params;
 	std::string curparam;
 	char *s = NULL;
@@ -131,7 +146,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
  * @param u User Struct
  * @param c Command Struct
  * @return void
- */
+ *
 void do_help_limited(char *service, User * u, Command * c)
 {
 	if (c->has_priv == is_services_oper)
@@ -147,6 +162,7 @@ void do_help_limited(char *service, User * u, Command * c)
 	else if (c->has_priv == is_host_remover)
 		notice_lang(service, u, HELP_LIMIT_HOST_REMOVER);
 }
+*/
 
 /*************************************************************************/
 
@@ -177,9 +193,10 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 	}
 	if (has_had_help == false) {
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
-	} else {
-		do_help_limited(service, u, c);
 	}
+	//else {
+	//	do_help_limited(service, u, c);
+	//}
 }
 
 /*************************************************************************/

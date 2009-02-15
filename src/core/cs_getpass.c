@@ -31,7 +31,6 @@ class CommandCSGetPass : public Command
  public:
 	CommandCSGetPass() : Command("GETPASS", 1, 1)
 	{
-		this->has_priv = is_services_admin;
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

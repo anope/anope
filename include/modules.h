@@ -146,10 +146,16 @@ struct ModuleLang_ {
 	char **argv;
 };
 
+enum CommandFlags
+{
+	CFLAG_ALLOW_UNREGISTERED
+};
+
 /** Every services command is a class, inheriting from Command.
  */
 class Command
 {
+	int flags;
  public:
 	size_t MaxParams;
 	size_t MinParams;
@@ -181,7 +187,21 @@ class Command
 	 */
 	virtual void OnSyntaxError(User *u);
 
-	int (*has_priv)(User *u);	/* Returns 1 if user may use command, else 0 */
+	/** Set a certain flag on this command.
+	 * @param flag The CommandFlag to set on this command.
+	 */
+	void SetFlag(CommandFlags flag);
+
+	/** Remove a certain flag from this command.
+	 * @param flag The CommandFlag to unset.
+	 */
+	void UnsetFlag(CommandFlags flag);
+
+	/** Check whether a certain flag is set on this command.
+	 * @param flag The CommandFlag to check.
+	 * @return bool True if the flag is set, false else.
+	 */
+	bool HasFlag(CommandFlags flag) const;
 
 	char *help_param1;
 	char *help_param2;

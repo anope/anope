@@ -81,12 +81,12 @@ class NickCore : public Extensible
 	  * @param cmdstr The string to check, e.g. botserv/set/private.
 	  * @return True if this opertype may run the specified command, false otherwise.
 	  */
-	bool HasCommand(const std::string &cmdstr);
+	bool HasCommand(const std::string &cmdstr) const;
 
 	/** Check whether this opertype has access to the given special permission.
 	  * @param privstr The priv to check for, e.g. users/auspex.
 	  * @return True if this opertype has the specified priv, false otherwise.
 	  */
-	bool HasPriv(const std::string &privstr);
+	bool HasPriv(const std::string &privstr) const;
 };
 

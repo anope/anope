@@ -3,7 +3,7 @@
 
 Command::Command(const std::string &sname, size_t min_params, size_t max_params) : MaxParams(max_params), MinParams(min_params), name(sname)
 {
-	this->has_priv = NULL;
+	this->flags = 0;
 	this->help_param1 = NULL;
 	this->help_param2 = NULL;
 	this->help_param3 = NULL;
@@ -21,7 +21,6 @@ Command::Command(const std::string &sname, size_t min_params, size_t max_params)
 
 Command::~Command()
 {
-	this->has_priv = NULL;
 	if (this->mod_name) {
 		delete [] this->mod_name;
 	}
@@ -47,3 +46,28 @@ bool Command::OnHelp(User *u, const std::string &subcommand) { return false; }
  * @param u The user executing the command.
  */
 void Command::OnSyntaxError(User *u) { }
+
+/** Set a certain flag on this command.
+ * @param flag The CommandFlag to set on this command.
+ */
+void Command::SetFlag(CommandFlags flag)
+{
+	this->flags |= flag;
+}
+
+/** Remove a certain flag from this command.
+ * @param flag The CommandFlag to unset.
+ */
+void Command::UnsetFlag(CommandFlags flag)
+{
+	this->flags &= ~flag;
+}
+
+/** Check whether a certain flag is set on this command.
+ * @param flag The CommandFlag to check.
+ * @return bool True if the flag is set, false else.
+ */
+bool Command::HasFlag(CommandFlags flag) const
+{
+	return this->flags & flag;
+}

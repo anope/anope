@@ -23,7 +23,6 @@ CommandHash *BOTSERV[MAX_CMD_HASH];
 CommandHash *MEMOSERV[MAX_CMD_HASH];
 CommandHash *NICKSERV[MAX_CMD_HASH];
 CommandHash *CHANSERV[MAX_CMD_HASH];
-CommandHash *HELPSERV[MAX_CMD_HASH];
 CommandHash *OPERSERV[MAX_CMD_HASH];
 MessageHash *IRCD[MAX_CMD_HASH];
 ModuleHash *MODULE_HASH[MAX_CMD_HASH];
@@ -293,12 +292,6 @@ int Module::AddCommand(CommandHash * cmdTable[], Command * c, int pos)
 	} else if (cmdTable == NICKSERV) {
 		if (s_NickServ) {
 			c->service = sstrdup(s_NickServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else if (cmdTable == HELPSERV) {
-		if (s_HelpServ) {
-			c->service = sstrdup(s_HelpServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
@@ -932,11 +925,6 @@ void Module::SetHostHelp(void (*func)(User *))
 	this->hostHelp = func;
 }
 
-void Module::SetHelpHelp(void (*func)(User *))
-{
-	this->helpHelp = func;
-}
-
 /**
  * Display any extra module help for the given service.
  * @param services which services is help being dispalyed for?
@@ -961,8 +949,6 @@ void moduleDisplayHelp(int service, User * u)
 				current->m->operHelp(u);
 			} else if ((service == 6) && current->m->hostHelp) {
 				current->m->hostHelp(u);
-			} else if ((service == 7) && current->m->helpHelp) {
-				current->m->helpHelp(u);
 			}
 		}
 	}

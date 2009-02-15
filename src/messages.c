@@ -185,8 +185,6 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 			memoserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_HostServ && !stricmp(receiver, s_HostServ)) {
 			hostserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-		} else if (s_HelpServ && !stricmp(receiver, s_HelpServ)) {
-			helpserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_BotServ && !stricmp(receiver, s_BotServ)) {
 			botserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 		} else if (s_BotServ && (bi = findbot(receiver))) {
@@ -293,8 +291,6 @@ int m_whois(const char *source, const char *who)
 			clientdesc = desc_BotServ;
 		else if (s_HostServ && stricmp(who, s_HostServ) == 0)
 			clientdesc = desc_HostServ;
-		else if (stricmp(who, s_HelpServ) == 0)
-			clientdesc = desc_HelpServ;
 		else if (stricmp(who, s_OperServ) == 0)
 			clientdesc = desc_OperServ;
 		else if (stricmp(who, s_GlobalNoticer) == 0)

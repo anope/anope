@@ -237,14 +237,12 @@ E char *s_NickServ;
 E char *s_ChanServ;
 E char *s_MemoServ;
 E char *s_BotServ;
-E char *s_HelpServ;
 E char *s_OperServ;
 E char *s_GlobalNoticer;
 E char *desc_NickServ;
 E char *desc_ChanServ;
 E char *desc_MemoServ;
 E char *desc_BotServ;
-E char *desc_HelpServ;
 E char *desc_OperServ;
 E char *desc_GlobalNoticer;
 
@@ -401,9 +399,6 @@ E int ModulesDelayedNumber;
 E char **HostServCoreModules;
 E int HostServCoreNumber;
 
-E char **HelpServCoreModules;
-E int HelpServCoreNumber;
-
 E char **MemoServCoreModules;
 E int MemoServCoreNumber;
 
@@ -468,10 +463,6 @@ E void encmodule_encrypt_in_place(int (*func)(char *buf, int size));
 E void encmodule_encrypt_check_len(int (*func)(int passlen, int bufsize));
 E void encmodule_decrypt(int (*func)(const char *src, char *dest, int size));
 E void encmodule_check_password(int (*func)(const char *plaintext, const char *password));
-
-/**** helpserv.c  ****/
-E void helpserv(User * u, char *buf);
-E void helpserv_init();
 
 /**** hostserv.c  ****/
 E void get_hostserv_stats(long *nrec, long *memuse);

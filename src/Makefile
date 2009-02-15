@@ -1,5 +1,5 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
-		config.o datafiles.o encrypt.o events.o hashcomp.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
+		config.o datafiles.o encrypt.o events.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o timeout.o users.o module.o modulemanager.o configreader.o \
 		wildcard.o nickcore.o
@@ -49,7 +49,6 @@ encrypt.o:      encrypt.c   $(INCLUDES)
 events.o:       events.c    $(INCLUDES)
 init.o:         init.c      $(INCLUDES)
 ircd.o:         ircd.c      $(INCLUDES)
-helpserv.o:     helpserv.c  $(INCLUDES)
 hostserv.o:     hostserv.c  $(INCLUDES)
 language.o:     language.c  $(INCLUDES)
 log.o:          log.c       $(INCLUDES)

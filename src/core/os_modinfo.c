@@ -47,7 +47,6 @@ class CommandOSModInfo : public Command
 				showModuleCmdLoaded(CHANSERV[idx], m->name.c_str(), u);
 				showModuleCmdLoaded(BOTSERV[idx], m->name.c_str(), u);
 				showModuleCmdLoaded(MEMOSERV[idx], m->name.c_str(), u);
-				showModuleCmdLoaded(HELPSERV[idx], m->name.c_str(), u);
 			}
 		}
 		else

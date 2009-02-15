@@ -219,7 +219,7 @@ const char *merge_args(int argc, char **argv)
  */
 int match_wild(const char *pattern, const char *str)
 {
-	return Anope::Match(str, pattern, true);
+	return Anope::Match(pattern, str, true);
 }
 
 /*************************************************************************/
@@ -827,8 +827,6 @@ int nickIsServices(const char *tempnick, int bot)
 	else if (s_MemoServ && (stricmp(nick, s_MemoServ) == 0))
 		found++;
 	else if (s_BotServ && (stricmp(nick, s_BotServ) == 0))
-		found++;
-	else if (s_HelpServ && (stricmp(nick, s_HelpServ) == 0))
 		found++;
 	else if (s_OperServ && (stricmp(nick, s_OperServ) == 0))
 		found++;

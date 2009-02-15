@@ -44,14 +44,12 @@ char *s_NickServ;
 char *s_ChanServ;
 char *s_MemoServ;
 char *s_BotServ;
-char *s_HelpServ;
 char *s_OperServ;
 char *s_GlobalNoticer;
 char *desc_NickServ;
 char *desc_ChanServ;
 char *desc_MemoServ;
 char *desc_BotServ;
-char *desc_HelpServ;
 char *desc_OperServ;
 char *desc_GlobalNoticer;
 
@@ -225,10 +223,6 @@ int HostServCoreNumber;
 static char *MemoCoreModules;
 char **MemoServCoreModules;
 int MemoServCoreNumber;
-
-static char *HelpCoreModules;
-char **HelpServCoreModules;
-int HelpServCoreNumber;
 
 static char *BotCoreModules;
 char **BotServCoreModules;
@@ -735,7 +729,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"serverinfo", "networkinfo", "options", "nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
+	static const char *Once[] = {"serverinfo", "networkinfo", "options", "nickserv", "chanserv", "memoserv", "operserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -905,9 +899,6 @@ int ServerConfig::Read(bool bail)
 		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
 		{"hostserv", "modules", "", new ValueContainerChar(&HostCoreModules), DT_CHARPTR, NoValidation},
 		{"hostserv", "hostsetters", "", new ValueContainerChar(&HostSetter), DT_CHARPTR, NoValidation},
-		{"helpserv", "nick", "HelpServ", new ValueContainerChar(&s_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"helpserv", "description", "Help Service", new ValueContainerChar(&desc_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"helpserv", "modules", "", new ValueContainerChar(&HelpCoreModules), DT_CHARPTR, NoValidation},
 		{"operserv", "nick", "OperServ", new ValueContainerChar(&s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -1801,8 +1792,6 @@ int read_config(int reload)
 		buildStringList(HostCoreModules ? HostCoreModules : "", &HostServCoreNumber);
 	MemoServCoreModules =
 		buildStringList(MemoCoreModules ? MemoCoreModules : "", &MemoServCoreNumber);
-	HelpServCoreModules =
-		buildStringList(HelpCoreModules ? HelpCoreModules : "", &HelpServCoreNumber);
 
 	BotServCoreModules =
 		buildStringList(BotCoreModules ? BotCoreModules : "", &BotServCoreNumber);

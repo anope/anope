@@ -58,7 +58,6 @@ enum CommandReturn
 #define MEMOSERV MS_cmdTable
 #define NICKSERV NS_cmdTable
 #define CHANSERV CS_cmdTable
-#define HELPSERV HE_cmdTable
 #define OPERSERV OS_cmdTable
 #define IRCD IRCD_cmdTable
 #define MODULE_HASH Module_table
@@ -135,7 +134,6 @@ extern MDE CommandHash  *BOTSERV[MAX_CMD_HASH];
 extern MDE CommandHash *MEMOSERV[MAX_CMD_HASH];
 extern MDE CommandHash *NICKSERV[MAX_CMD_HASH];
 extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
-extern MDE CommandHash *HELPSERV[MAX_CMD_HASH];
 extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
 extern MDE MessageHash *IRCD[MAX_CMD_HASH];
 extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
@@ -248,7 +246,6 @@ class CoreExport Module
 	void (*botHelp)(User *u); /* 4 */
 	void (*operHelp)(User *u); /* 5 */
 	void (*hostHelp)(User *u); /* 6 */
-	void (*helpHelp)(User *u); /* 7 */
 
 	MessageHash *msgList[MAX_CMD_HASH];
 	ModuleLang lang[NUM_LANGS];
@@ -332,13 +329,6 @@ class CoreExport Module
 	 * @param func a pointer to the function which will display the code
 	 **/
 	void SetHostHelp(void (*func)(User *));
-
-	/**
-	 * Add output to helpserv help.
-	 * when doing a /msg helpserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetHelpHelp(void (*func)(User *));
 
 	/**
 	 * Allow a module to add a set of language strings to anope

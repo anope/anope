@@ -21,7 +21,6 @@ Module::Module(const std::string &mname, const std::string &creator)
 	this->botHelp = NULL;
 	this->operHelp = NULL;
 	this->hostHelp = NULL;
-	this->helpHelp = NULL;
 	this->type = THIRD;
 	this->handle = NULL;
 
@@ -119,14 +118,6 @@ Module::~Module()
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
 					this->DelCommand(CHANSERV, c->name.c_str());
-				}
-			}
-		}
-
-		for (current = HE_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(HELPSERV, c->name.c_str());
 				}
 			}
 		}

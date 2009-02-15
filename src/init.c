@@ -494,7 +494,6 @@ int init_secondary(int ac, char **av)
 	bs_init();
 	os_init();
 	hostserv_init();
-	helpserv_init();
 
 	/* load any custom modules */
 	ModuleManager::LoadModuleList(ModulesNumber, ModulesAutoload);
@@ -596,8 +595,6 @@ int init_secondary(int ac, char **av)
 			bi = new BotInfo(s_MemoServ, ServiceUser, ServiceHost, desc_MemoServ);
 		if (s_BotServ)
 			bi = new BotInfo(s_BotServ, ServiceUser, ServiceHost, desc_BotServ);
-		if (s_HelpServ)
-			bi = new BotInfo(s_HelpServ, ServiceUser, ServiceHost, desc_HelpServ);
 		if (s_GlobalNoticer)
 			bi = new BotInfo(s_GlobalNoticer, ServiceUser, ServiceHost, desc_GlobalNoticer);
 	}

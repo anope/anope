@@ -25,6 +25,7 @@ class CommandNSIdentify : public Command
  public:
 	CommandNSIdentify(const std::string &cname) : Command(cname, 1, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

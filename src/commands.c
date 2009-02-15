@@ -83,6 +83,10 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 			return;
 		}
 	}
+	else
+	{
+		// Check whether or not access string is empty
+	}
 
 /*
 XXX: priv checking

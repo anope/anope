@@ -20,6 +20,7 @@ class CommandNSHelp : public Command
  public:
 	CommandNSHelp() : Command("HELP", 1, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

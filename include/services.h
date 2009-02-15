@@ -433,6 +433,7 @@ typedef struct csmodeutil_ CSModeUtil;
 typedef struct session_ Session;
 
 #include "bots.h"
+#include "svsoper.h"
 
 /*************************************************************************/
 

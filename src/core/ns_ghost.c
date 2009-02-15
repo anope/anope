@@ -28,12 +28,11 @@ class CommandNSGhost : public Command
 	{
 		const char *nick = params[0].c_str();
 		const char *pass = params.size() > 1 ? params[1].c_str() : NULL;
-		NickAlias *na;
-		User *u2;
+		NickAlias *na = findnick(nick);
 
-		if (!(u2 = finduser(nick)))
+		if (!finduser(nick))
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (!(na = u2->na))
+		else if (!na)
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
@@ -63,7 +62,7 @@ class CommandNSGhost : public Command
 		}
 		else
 		{
-			if (group_identified(u, na->nc) || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->nc == na->nc || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				char buf[NICKMAX + 32];
 				snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);

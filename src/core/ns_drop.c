@@ -39,7 +39,7 @@ class CommandNSDrop : public Command
 			return MOD_CONT;
 		}
 
-		if (!(na = (nick ? findnick(nick) : u->na)))
+		if (!(na = (nick ? findnick(nick) : findnick(u->nick))))
 		{
 			if (nick)
 			{
@@ -61,7 +61,7 @@ class CommandNSDrop : public Command
 			return MOD_CONT;
 		}
 
-		is_mine = u->na && u->na->nc == na->nc;
+		is_mine = u->nc && u->nc == na->nc;
 		if (is_mine && !nick)
 			my_nick = sstrdup(na->nick);
 

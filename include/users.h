@@ -37,14 +37,11 @@ public: // XXX: exposing a tiny bit too much
 	std::string chost;	/* User's cloaked hostname */
 	char *realname;		/* Realname 			*/
 	Server *server;		/* Server user is connected to  */
-	char *nickTrack;	/* Nick Tracking 		*/
 	time_t timestamp;	/* Timestamp of the nick 	*/
 	time_t my_signon;	/* When did _we_ see the user?  */
-	time_t svid;		/* Services ID 			*/
 	uint32 mode;		/* See below 			*/
 
 	NickCore *nc;
-	NickAlias *na;
 
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 

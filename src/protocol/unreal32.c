@@ -562,7 +562,7 @@ class UnrealIRCdProto : public IRCDProto
 						break;
 					if (isdigit(*av[1]))
 					{
-						user->svid = strtoul(av[1], NULL, 0);
+						//user->svid = strtoul(av[1], NULL, 0);
 						user->mode = backup;  /* Ugly fix, but should do the job ~ Viper */
 						continue; // +d was setting a service stamp, ignore the usermode +-d.
 					}
@@ -817,29 +817,6 @@ class UnrealIRCdProto : public IRCDProto
 		if (nick) send_cmd(ServerName, "n %s %s %s", name, mode, nick);
 		else send_cmd(ServerName, "n %s %s", name, mode);
 	}
-
-
-	/* SVSMODE +d */
-	/* sent if svid is something weird */
-	void SendSVID(const char *nick, time_t ts)
-	{
-		send_cmd(ServerName, "v %s +d 1", nick);
-	}
-
-	/* SVSMODE +d */
-	/* nc_change was = 1, and there is no na->status */
-	void SendUnregisteredNick(User *u)
-	{
-		common_svsmode(u, "-r+d", "1");
-	}
-
-	/* SVSMODE +r */
-	void SendSVID2(User *u, const char *ts)
-	{
-		if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
-		else common_svsmode(u, "+r", NULL);
-	}
-
 
 	/* svsjoin
 		parv[0] - sender
@@ -1223,7 +1200,7 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 */
 /*
  do_nick(const char *source, char *nick, char *username, char *host,
-			  char *server, char *realname, time_t ts, uint32 svid,
+			  char *server, char *realname, time_t ts, 
 			  uint32 ip, char *vhost, char *uid)
 */
 int anope_event_nick(const char *source, int ac, const char **av)
@@ -1239,28 +1216,25 @@ int anope_event_nick(const char *source, int ac, const char **av)
 			   - so we have to leave it around for now -TSL
 			 */
 			do_nick(source, av[0], av[3], av[4], av[5], av[6],
-					strtoul(av[2], NULL, 10), 0, 0, "*", NULL);
+					strtoul(av[2], NULL, 10), 0, "*", NULL);
 
 		} else if (ac == 11) {
 			user = do_nick(source, av[0], av[3], av[4], av[5], av[10],
-						   strtoul(av[2], NULL, 10), strtoul(av[6], NULL,
-															 0),
-						   ntohl(decode_ip(av[9])), av[8], NULL);
+						   strtoul(av[2], NULL, 10), ntohl(decode_ip(av[9])), av[8], NULL);
 			if (user)
 				ircdproto->ProcessUsermodes(user, 1, &av[7]);
 
 		} else {
 			/* NON NICKIP */
 			user = do_nick(source, av[0], av[3], av[4], av[5], av[9],
-						   strtoul(av[2], NULL, 10), strtoul(av[6], NULL,
-															 0), 0, av[8],
+						   strtoul(av[2], NULL, 10), 0, av[8],
 						   NULL);
 			if (user)
 				ircdproto->ProcessUsermodes(user, 1, &av[7]);
 		}
 	} else {
 		do_nick(source, av[0], NULL, NULL, NULL, NULL,
-				strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+				strtoul(av[1], NULL, 10), 0, NULL, NULL);
 	}
 	return MOD_CONT;
 }

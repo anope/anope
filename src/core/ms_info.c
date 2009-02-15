@@ -82,11 +82,11 @@ class CommandMSInfo : public Command
 				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 				return MOD_CONT;
 			}
-			mi = &u->na->nc->memos;
-			hardmax = u->na->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;
+			mi = &u->nc->memos;
+			hardmax = u->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;
 		}
 
-		if (name && (ci || na->nc != u->na->nc))
+		if (name && (ci || na->nc != u->nc))
 		{
 			if (mi->memos.empty())
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
@@ -145,7 +145,7 @@ class CommandMSInfo : public Command
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name);
 			}
 		}
-		else /* !name || (!ci || na->nc == u->na->nc) */
+		else /* !name || (!ci || na->nc == u->nc) */
 		{
 			if (mi->memos.empty())
 				notice_lang(s_MemoServ, u, MEMO_INFO_NO_MEMOS);
@@ -192,11 +192,11 @@ class CommandMSInfo : public Command
 				notice_lang(s_MemoServ, u, MEMO_INFO_NO_LIMIT);
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
-			if ((u->na->nc->flags & NI_MEMO_RECEIVE) && (u->na->nc->flags & NI_MEMO_SIGNON))
+			if ((u->nc->flags & NI_MEMO_RECEIVE) && (u->nc->flags & NI_MEMO_SIGNON))
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_ON);
-			else if (u->na->nc->flags & NI_MEMO_RECEIVE)
+			else if (u->nc->flags & NI_MEMO_RECEIVE)
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_RECEIVE);
-			else if (u->na->nc->flags & NI_MEMO_SIGNON)
+			else if (u->nc->flags & NI_MEMO_SIGNON)
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_SIGNON);
 			else
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_OFF);

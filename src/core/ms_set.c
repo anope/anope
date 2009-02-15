@@ -26,26 +26,26 @@ class CommandMSSet : public Command
 
 		if (!stricmp(param, "ON"))
 		{
-			u->na->nc->flags |= NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
+			u->nc->flags |= NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_ON, s_MemoServ);
 		}
 		else if (!stricmp(param, "LOGON"))
 		{
-			u->na->nc->flags |= NI_MEMO_SIGNON;
-			u->na->nc->flags &= ~NI_MEMO_RECEIVE;
+			u->nc->flags |= NI_MEMO_SIGNON;
+			u->nc->flags &= ~NI_MEMO_RECEIVE;
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, s_MemoServ);
 		}
 		else if (!stricmp(param, "NEW"))
 		{
-			u->na->nc->flags &= ~NI_MEMO_SIGNON;
-			u->na->nc->flags |= NI_MEMO_RECEIVE;
+			u->nc->flags &= ~NI_MEMO_SIGNON;
+			u->nc->flags |= NI_MEMO_RECEIVE;
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NEW, s_MemoServ);
 		}
 		else if (!stricmp(param, "MAIL"))
 		{
-			if (u->na->nc->email)
+			if (u->nc->email)
 			{
-				u->na->nc->flags |= NI_MEMO_MAIL;
+				u->nc->flags |= NI_MEMO_MAIL;
 				notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
 			}
 			else
@@ -53,12 +53,12 @@ class CommandMSSet : public Command
 		}
 		else if (!stricmp(param, "NOMAIL"))
 		{
-			u->na->nc->flags &= ~NI_MEMO_MAIL;
+			u->nc->flags &= ~NI_MEMO_MAIL;
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
 		}
 		else if (!stricmp(param, "OFF"))
 		{
-			u->na->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE);
+			u->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
 		}
 		else
@@ -73,7 +73,7 @@ class CommandMSSet : public Command
 		const char *p3 = params.size() > 3 ? params[3].c_str() : NULL;
 		const char *user = NULL, *chan = NULL;
 		int32 limit;
-		NickAlias *na = u->na;
+		NickCore *nc = u->nc;
 		ChannelInfo *ci = NULL;
 		int is_servadmin = is_services_admin(u);
 
@@ -104,6 +104,7 @@ class CommandMSSet : public Command
 		{
 			if (p2 && stricmp(p2, "HARD") && !chan)
 			{
+				NickAlias *na;
 				if (!(na = findnick(p1)))
 				{
 					notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, p1);
@@ -111,6 +112,7 @@ class CommandMSSet : public Command
 				}
 				user = p1;
 				mi = &na->nc->memos;
+				nc = na->nc;
 				p1 = p2;
 				p2 = p3;
 			}
@@ -134,9 +136,9 @@ class CommandMSSet : public Command
 			else
 			{
 				if (p2)
-					na->nc->flags |= NI_MEMO_HARDMAX;
+					nc->flags |= NI_MEMO_HARDMAX;
 				else
-					na->nc->flags &= ~NI_MEMO_HARDMAX;
+					nc->flags &= ~NI_MEMO_HARDMAX;
 			}
 			limit = atoi(p1);
 			if (limit < 0 || limit > 32767)
@@ -158,7 +160,7 @@ class CommandMSSet : public Command
 				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_FORBIDDEN, chan);
 				return MOD_CONT;
 			}
-			else if (!chan && (na->nc->flags & NI_MEMO_HARDMAX)) {
+			else if (!chan && (nc->flags & NI_MEMO_HARDMAX)) {
 				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
 				return MOD_CONT;
 			}
@@ -182,21 +184,21 @@ class CommandMSSet : public Command
 		mi->memomax = limit;
 		if (limit > 0)
 		{
-			if (!chan && na->nc == u->na->nc)
+			if (!chan && nc == u->nc)
 				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT, limit);
 			else
 				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT, chan ? chan : user, limit);
 		}
 		else if (!limit)
 		{
-			if (!chan && na->nc == u->na->nc)
+			if (!chan && nc == u->nc)
 				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_ZERO);
 			else
 				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_ZERO, chan ? chan : user);
 		}
 		else
 		{
-			if (!chan && na->nc == u->na->nc)
+			if (!chan && nc == u->nc)
 				notice_lang(s_MemoServ, u, MEMO_UNSET_YOUR_LIMIT);
 			else
 				notice_lang(s_MemoServ, u, MEMO_UNSET_LIMIT,
@@ -212,7 +214,7 @@ class CommandMSSet : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-		MemoInfo *mi = &u->na->nc->memos;
+		MemoInfo *mi = &u->nc->memos;
 
 		if (readonly)
 		{

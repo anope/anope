@@ -21,11 +21,11 @@ class CommandNSInfo : public Command
 {
  private:
 	// cannot be const, as it is modified
-	void CheckOptStr(std::string &buf, int opt, const std::string &str, NickCore *nc, NickAlias *na, bool reverse_logic = false)
+	void CheckOptStr(std::string &buf, int opt, const std::string &str, NickCore *nc, bool reverse_logic = false)
 	{
 		if (reverse_logic ? !(nc->flags & opt) : (nc->flags & opt))
 		{
-			const char *commastr = getstring(na, COMMA_SPACE);
+			const char *commastr = getstring(nc, COMMA_SPACE);
 			if (!buf.empty())
 				buf += commastr;
 
@@ -75,7 +75,7 @@ class CommandNSInfo : public Command
 		else if (na->status & NS_FORBIDDEN)
 		{
 			if (is_oper(u) && na->last_usermask)
-				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u->na, NO_REASON));
+				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u, NO_REASON));
 			else
 				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
 		}
@@ -93,12 +93,12 @@ class CommandNSInfo : public Command
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL
 			 * parameter is used. -TheShadow */
-			if (param && !stricmp(param, "ALL") && u->na && ((nick_identified(u) && na->nc == u->na->nc) || is_servadmin))
+			if (param && !stricmp(param, "ALL") && u->nc && (na->nc == u->nc || is_servadmin))
 				show_hidden = 1;
 
 			notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
 
-			if ((nick_identified(u) && na->nc == u->na->nc) || is_servadmin)
+			if (show_hidden)
 			{
 				if (nick_is_services_root(na->nc))
 					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ROOT, na->nick);
@@ -169,13 +169,13 @@ class CommandNSInfo : public Command
 
 				std::string optbuf;
 
-				CheckOptStr(optbuf, NI_KILLPROTECT, getstring(u->na, NICK_INFO_OPT_KILL), na->nc, u->na);
-				CheckOptStr(optbuf, NI_SECURE, getstring(u->na, NICK_INFO_OPT_SECURE), na->nc, u->na);
-				CheckOptStr(optbuf, NI_PRIVATE, getstring(u->na, NICK_INFO_OPT_PRIVATE), na->nc, u->na);
-				CheckOptStr(optbuf, NI_MSG, getstring(u->na, NICK_INFO_OPT_MSG), na->nc, u->na);
-				CheckOptStr(optbuf, NI_AUTOOP, getstring(u->na, NICK_INFO_OPT_AUTOOP), na->nc, u->na, true);
+				CheckOptStr(optbuf, NI_KILLPROTECT, getstring(u, NICK_INFO_OPT_KILL), na->nc);
+				CheckOptStr(optbuf, NI_SECURE, getstring(u, NICK_INFO_OPT_SECURE), na->nc);
+				CheckOptStr(optbuf, NI_PRIVATE, getstring(u, NICK_INFO_OPT_PRIVATE), na->nc);
+				CheckOptStr(optbuf, NI_MSG, getstring(u, NICK_INFO_OPT_MSG), na->nc);
+				CheckOptStr(optbuf, NI_AUTOOP, getstring(u, NICK_INFO_OPT_AUTOOP), na->nc, true);
 
-				notice_lang(s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u->na, NICK_INFO_OPT_NONE) : optbuf.c_str());
+				notice_lang(s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u, NICK_INFO_OPT_NONE) : optbuf.c_str());
 
 				if (na->nc->flags & NI_SUSPENDED)
 				{
@@ -193,14 +193,13 @@ class CommandNSInfo : public Command
 					{
 						expt = na->last_seen + NSExpire;
 						tm = localtime(&expt);
-						strftime_lang(buf, sizeof(buf), na->u, STRFTIME_DATE_TIME_FORMAT, tm);
+						strftime_lang(buf, sizeof(buf), finduser(na->nick), STRFTIME_DATE_TIME_FORMAT, tm);
 						notice_lang(s_NickServ, u, NICK_INFO_EXPIRE, buf);
 					}
 				}
 			}
 
-			if (!show_hidden && ((u->na && (na->nc == u->na->nc) && nick_identified(u)) || is_servadmin))
-				notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, na->nick);
+			notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, na->nick);
 		}
 		return MOD_CONT;
 	}

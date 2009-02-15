@@ -34,13 +34,10 @@ class CommandMSRSend : public Command
 		/* prevent user from rsend to themselves */
 		if ((na = findnick(name)))
 		{
-			if (u->na)
+			if (na->nc == u->nc)
 			{
-				if (!stricmp(na->nc->display, u->na->nc->display))
-				{
-					notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
-					return MOD_CONT;
-				}
+				notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
+				return MOD_CONT;
 			}
 			else
 			{

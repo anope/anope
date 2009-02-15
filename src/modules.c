@@ -1044,12 +1044,13 @@ void Module::NoticeLang(char *source, User * u, int number, ...)
 	char *s, *t, *buf;
 
 	/* Find the users lang, and use it if we can */
-	if (u && u->na && u->na->nc) {
-		mlang = u->na->nc->language;
+	if (u && u->nc) {
+		mlang = u->nc->language;
 	}
 
 	/* If the users lang isnt supported, drop back to English */
-	if (this->lang[mlang].argc == 0) {
+	if (this->lang[mlang].argc == 0)
+	{
 		mlang = LANG_EN_US;
 	}
 
@@ -1081,8 +1082,8 @@ const char *Module::GetLangString(User * u, int number)
 	int mlang = NSDefLanguage;
 
 	/* Find the users lang, and use it if we can */
-	if (u && u->na && u->na->nc)
-		mlang = u->na->nc->language;
+	if (u && u->nc)
+		mlang = u->nc->language;
 
 	/* If the users lang isnt supported, drop back to English */
 	if (this->lang[mlang].argc == 0)

@@ -52,7 +52,7 @@ class CommandCSHelp : public Command
 			{
 				notice_help(s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT,
 							levelinfo_maxwidth, levelinfo[i].name,
-							getstring(u->na, levelinfo[i].desc));
+							getstring(u, levelinfo[i].desc));
 			}
 		}
 		else

@@ -62,7 +62,7 @@ class CommandMSList : public Command
 				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 				return MOD_CONT;
 			}
-			mi = &u->na->nc->memos;
+			mi = &u->nc->memos;
 		}
 		if (param && !isdigit(*param) && stricmp(param, "NEW"))
 			this->OnSyntaxError(u);

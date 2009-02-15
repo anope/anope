@@ -120,7 +120,7 @@ class CommandNSList : public Command
 			}
 		}
 
-		mync = nick_identified(u) ? u->na->nc : NULL;
+		mync = u->nc;
 
 		notice_lang(s_NickServ, u, NICK_LIST_HEADER, pattern);
 		if (!nronly)

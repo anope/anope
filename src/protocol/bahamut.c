@@ -494,7 +494,6 @@ class BahamutIRCdProto : public IRCDProto
 					}
 					--ac;
 					++av;
-					user->svid = strtoul(*av, NULL, 0);
 					break;
 				case 'o':
 					if (add) {
@@ -685,23 +684,10 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSMODE +d */
-	/* sent if svid is something weird */
-	void SendSVID(const char *nick, time_t ts)
-	{
-		send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick, static_cast<unsigned long>(ts));
-	}
-
-	/* SVSMODE +d */
 	/* nc_change was = 1, and there is no na->status */
 	void SendUnregisteredNick(User *u)
 	{
 		common_svsmode(u, "+d", "1");
-	}
-
-	void SendSVID3(User *u, const char *ts)
-	{
-		if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
-		else common_svsmode(u, "+r", NULL);
 	}
 
 	int IsFloodModeParamValid(const char *value)
@@ -761,13 +747,13 @@ int anope_event_nick(const char *source, int ac, const char **av)
 	if (ac != 2) {
 		user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
 					   strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
-					   strtoul(av[8], NULL, 0), NULL, NULL);
+					   NULL, NULL);
 		if (user) {
 			ircdproto->ProcessUsermodes(user, 1, &av[3]);
 		}
 	} else {
 		do_nick(source, av[0], NULL, NULL, NULL, NULL,
-				strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+				strtoul(av[1], NULL, 10), 0, NULL, NULL);
 	}
 	return MOD_CONT;
 }

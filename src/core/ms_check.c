@@ -57,7 +57,7 @@ class CommandMSCheck : public Command
 
 		for (i = mi->memos.size() - 1; i >= 0; --i)
 		{
-			if (!stricmp(mi->memos[i]->sender, u->na->nc->display))
+			if (!stricmp(mi->memos[i]->sender, u->nc->display))
 			{
 				found = 1; /* Yes, we've found the memo */
 

@@ -20,32 +20,34 @@ void myNickServHelp(User *u);
 class CommandNSAccess : public Command
 {
  private:
-	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params, NickAlias *na)
+	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params, NickCore *nc)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
 		char **access;
 		int i;
 
-		if (!na->nc->accesscount)
+		if (!nc->accesscount)
 		{
-			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, na->nick);
+			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display);
 			return MOD_CONT;
 		}
 
+/* reinstate when forbidden is moved to a group flag
 		if (na->status & NS_FORBIDDEN)
 		{
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
 		}
+*/
 
-		if (na->nc->flags & NI_SUSPENDED)
+		if (nc->flags & NI_SUSPENDED)
 		{
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, nc->display);
 			return MOD_CONT;
 		}
 
 		notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
-		for (access = na->nc->access, i = 0; i < na->nc->accesscount; ++access, ++i)
+		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
 		{
 			if (mask && !match_wild(mask, *access))
 				continue;
@@ -55,7 +57,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params, NickAlias *na, const char *mask)
+	CommandReturn DoAdd(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
 	{
 		char **access;
 		int i;
@@ -66,13 +68,13 @@ class CommandNSAccess : public Command
 			return MOD_CONT;
 		}
 
-		if (na->nc->accesscount >= NSAccessMax)
+		if (nc->accesscount >= NSAccessMax)
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_REACHED_LIMIT, NSAccessMax);
 			return MOD_CONT;
 		}
 
-		for (access = na->nc->access, i = 0; i < na->nc->accesscount; ++access, ++i)
+		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
 		{
 			if (!strcmp(*access, mask))
 			{
@@ -81,15 +83,15 @@ class CommandNSAccess : public Command
 			}
 		}
 
-		++na->nc->accesscount;
-		na->nc->access = static_cast<char **>(srealloc(na->nc->access, sizeof(char *) * na->nc->accesscount));
-		na->nc->access[na->nc->accesscount - 1] = sstrdup(mask);
+		++nc->accesscount;
+		nc->access = static_cast<char **>(srealloc(nc->access, sizeof(char *) * nc->accesscount));
+		nc->access[nc->accesscount - 1] = sstrdup(mask);
 		notice_lang(s_NickServ, u, NICK_ACCESS_ADDED, mask);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params, NickAlias *na, const char *mask)
+	CommandReturn DoDel(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
 	{
 		char **access;
 		int i;
@@ -100,12 +102,12 @@ class CommandNSAccess : public Command
 			return MOD_CONT;
 		}
 
-		for (access = na->nc->access, i = 0; i < na->nc->accesscount; ++access, ++i)
+		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
 		{
 			if (!stricmp(*access, mask))
 				break;
 		}
-		if (i == na->nc->accesscount)
+		if (i == nc->accesscount)
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask);
 			return MOD_CONT;
@@ -113,33 +115,33 @@ class CommandNSAccess : public Command
 
 		notice_lang(s_NickServ, u, NICK_ACCESS_DELETED, *access);
 		delete [] *access;
-		--na->nc->accesscount;
-		if (i < na->nc->accesscount) /* if it wasn't the last entry... */
-			memmove(access, access + 1, (na->nc->accesscount - i) * sizeof(char *));
-		if (na->nc->accesscount) /* if there are any entries left... */
-			na->nc->access = static_cast<char **>(srealloc(na->nc->access, na->nc->accesscount * sizeof(char *)));
+		--nc->accesscount;
+		if (i < nc->accesscount) /* if it wasn't the last entry... */
+			memmove(access, access + 1, (nc->accesscount - i) * sizeof(char *));
+		if (nc->accesscount) /* if there are any entries left... */
+			nc->access = static_cast<char **>(srealloc(nc->access, nc->accesscount * sizeof(char *)));
 		else
 		{
-			free(na->nc->access);
-			na->nc->access = NULL;
+			free(nc->access);
+			nc->access = NULL;
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<std::string> &params, NickAlias *na, const char *mask)
+	CommandReturn DoList(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
 	{
 		char **access;
 		int i;
 
-		if (!na->nc->accesscount)
+		if (!nc->accesscount)
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick);
 			return MOD_CONT;
 		}
 
 		notice_lang(s_NickServ, u, NICK_ACCESS_LIST);
-		for (access = na->nc->access, i = 0; i < na->nc->accesscount; ++access, ++i)
+		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
 		{
 			if (mask && !match_wild(mask, *access))
 				continue;
@@ -160,7 +162,7 @@ class CommandNSAccess : public Command
 		NickAlias *na;
 
 		if (!stricmp(cmd, "LIST") && is_services_admin(u) && mask && (na = findnick(params[1].c_str())))
-			return this->DoServAdminList(u, params, na);
+			return this->DoServAdminList(u, params, na->nc);
 
 		if (mask && !strchr(mask, '@'))
 		{
@@ -168,20 +170,18 @@ class CommandNSAccess : public Command
 			notice_lang(s_NickServ, u, MORE_INFO, s_NickServ, "ACCESS");
 
 		}
-		else if (!(na = u->na))
-			notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
+		/*
 		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (na->nc->flags & NI_SUSPENDED)
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!nick_identified(u))
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+			*/
+		else if (u->nc->flags & NI_SUSPENDED)
+			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
 		else if (!stricmp(cmd, "ADD"))
-			return this->DoAdd(u, params, na, mask);
+			return this->DoAdd(u, params, u->nc, mask);
 		else if (!stricmp(cmd, "DEL"))
-			return this->DoDel(u, params, na, mask);
+			return this->DoDel(u, params, u->nc, mask);
 		else if (!stricmp(cmd, "LIST"))
-			return this->DoList(u, params, na, mask);
+			return this->DoList(u, params, u->nc, mask);
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;

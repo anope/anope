@@ -240,7 +240,7 @@ void lang_init()
 
 int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
 {
-	int language = u && u->na ? u->na->nc->language : NSDefLanguage;
+	int language = u && u->nc ? u->nc->language : NSDefLanguage;
 	char tmpbuf[BUFSIZE], buf2[BUFSIZE];
 	char *s;
 	int i, ret;
@@ -301,7 +301,7 @@ void syntax_error(char *service, User * u, const char *command, int msgnum)
 		return;
 	}
 
-	str = getstring(u->na, msgnum);
+	str = getstring(u, msgnum);
 	notice_lang(service, u, SYNTAX_ERROR, str);
 	notice_lang(service, u, MORE_INFO, service, command);
 }
@@ -318,7 +318,7 @@ const char *getstring(NickAlias *na, int index)
 	return langtexts[langidx][index];
 }
 
-const char *getstring2(NickCore *nc, int index)
+const char *getstring(NickCore *nc, int index)
 {
 	// Default to config
 	int langidx = NSDefLanguage;
@@ -327,6 +327,19 @@ const char *getstring2(NickCore *nc, int index)
 	{
 		langidx = nc->language;
 	}
+
+	return langtexts[langidx][index];
+}
+
+const char *getstring(User *u, int index)
+{
+	return getstring(u->nc, index);
+}
+
+const char *getstring(int index)
+{
+	// Default to config
+	int langidx = NSDefLanguage;
 
 	return langtexts[langidx][index];
 }

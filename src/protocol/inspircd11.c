@@ -471,7 +471,6 @@ class InspIRCdProto : public IRCDProto
 					else --opcnt;
 					break;
 				case 'r':
-					user->svid = add ? user->timestamp : 0;
 					if (add && !nick_identified(user)) {
 						common_svsmode(user, "-r", NULL);
 						user->mode &= ~UMODE_r;
@@ -654,12 +653,6 @@ class InspIRCdProto : public IRCDProto
 	void SendUnregisteredNick(User *u)
 	{
 		common_svsmode(u, "-r", NULL);
-	}
-
-	/* SVSMODE +r */
-	void SendSVID2(User *u, const char *ts)
-	{
-		common_svsmode(u, "+r", NULL);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -1075,11 +1068,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 
 	if (ac != 1) {
 		if (ac == 8) {
-			int svid = 0;
 			int ts = strtoul(av[0], NULL, 10);
-
-			if (strchr(av[5], 'r') != NULL)
-				svid = ts;
 
 			inet_aton(av[6], &addy);
 			user = do_nick("", av[1],   /* nick */
@@ -1087,15 +1076,14 @@ int anope_event_nick(const char *source, int ac, const char **av)
 						   av[2],   /* realhost */
 						   source,  /* server */
 						   av[7],   /* realname */
-						   ts, svid, htonl(*ad), av[3], NULL);
+						   ts, htonl(*ad), av[3], NULL);
 			if (user) {
 				ircdproto->ProcessUsermodes(user, 1, &av[5]);
 				user->chost = av[3];
 			}
 		}
 	} else {
-		do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, 0, NULL,
-				NULL);
+		do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, NULL, NULL);
 	}
 	return MOD_CONT;
 }

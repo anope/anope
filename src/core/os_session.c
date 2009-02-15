@@ -170,7 +170,7 @@ static int exception_view(User *u, const int index, int *sent_header)
 	tm = *localtime(exceptions[index].time ? &exceptions[index].time : &t);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 
-	expire_left(u->na, expirebuf, sizeof(expirebuf), exceptions[index].expires);
+	expire_left(u->nc, expirebuf, sizeof(expirebuf), exceptions[index].expires);
 
 	notice_lang(s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, *exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
 	return 1;

@@ -161,7 +161,7 @@ int count_email_in_use(const char *email, User * u)
 	{
 		for (nc = nclists[i]; nc; nc = nc->next)
 		{
-			if (!(u->na && u->na->nc && u->na->nc == nc) && nc->email && !stricmp(nc->email, email))
+			if (!(u->nc && u->nc == nc) && nc->email && !stricmp(nc->email, email))
 				++count;
 		}
 	}

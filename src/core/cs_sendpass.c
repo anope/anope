@@ -44,24 +44,24 @@ class CommandCSSendPass : public Command
 			{
 				MailInfo *mail;
 
-				snprintf(buf, sizeof(buf), getstring2(founder, CHAN_SENDPASS_SUBJECT), ci->name);
+				snprintf(buf, sizeof(buf), getstring(founder, CHAN_SENDPASS_SUBJECT), ci->name);
 				mail = MailBegin(u, founder, buf, s_ChanServ);
 				if (!mail)
 					return MOD_CONT;
 
-				fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_HEAD));
+				fprintf(mail->pipe, getstring(founder, CHAN_SENDPASS_HEAD));
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_1),
+				fprintf(mail->pipe, getstring(founder, CHAN_SENDPASS_LINE_1),
 						ci->name);
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_2),
+				fprintf(mail->pipe, getstring(founder, CHAN_SENDPASS_LINE_2),
 						tmp_pass);
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_3));
+				fprintf(mail->pipe, getstring(founder, CHAN_SENDPASS_LINE_3));
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_4));
+				fprintf(mail->pipe, getstring(founder, CHAN_SENDPASS_LINE_4));
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_5),
+				fprintf(mail->pipe, getstring(founder, CHAN_SENDPASS_LINE_5),
 						NetworkName);
 				fprintf(mail->pipe, "\n.\n");
 

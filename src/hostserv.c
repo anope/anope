@@ -527,8 +527,8 @@ int is_host_setter(User * u)
 	}
 
 	/* Look through all user's aliases (0000412) */
-	for (i = 0; i < u->na->nc->aliases.count; i++) {
-		na = static_cast<NickAlias *>(u->na->nc->aliases.list[i]);
+	for (i = 0; i < u->nc->aliases.count; i++) {
+		na = static_cast<NickAlias *>(u->nc->aliases.list[i]);
 		for (j = 0; j < HostNumber; j++) {
 			if (stricmp(HostSetters[j], na->nick) == 0) {
 				return 1;
@@ -549,10 +549,10 @@ int is_host_remover(User * u)
  */
 void set_lastmask(User * u)
 {
-	if (u->na->last_usermask)
-		delete [] u->na->last_usermask;
+	NickAlias *na = findnick(u->nick);
+	if (na->last_usermask)
+		delete [] na->last_usermask;
 
-	u->na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-	sprintf(u->na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
-
+	na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
+	sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
 }

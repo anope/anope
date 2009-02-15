@@ -158,14 +158,14 @@ class CommandOSSet : public Command
 			u->isSuperAdmin = 1;
 			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ON);
 			alog("%s: %s is a SuperAdmin ", s_OperServ, u->nick);
-			ircdproto->SendGlobops(s_OperServ, getstring2(NULL, OPER_SUPER_ADMIN_WALL_ON), u->nick);
+			ircdproto->SendGlobops(s_OperServ, getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick);
 		}
 		else if (!stricmp(setting, "OFF"))
 		{
 			u->isSuperAdmin = 0;
 			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_OFF);
 			alog("%s: %s is no longer a SuperAdmin", s_OperServ, u->nick);
-			ircdproto->SendGlobops(s_OperServ, getstring2(NULL, OPER_SUPER_ADMIN_WALL_OFF), u->nick);
+			ircdproto->SendGlobops(s_OperServ, getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick);
 		}
 		else
 			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_SYNTAX);

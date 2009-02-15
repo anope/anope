@@ -365,13 +365,13 @@ int dotime(const char *s)
  * @param seconds time in seconds
  * @return buffer
  */
-char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
+const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds)
 {
 	int days = 0, hours = 0, minutes = 0;
 	int need_comma = 0;
 
 	char buf2[64], *end;
-	const char *comma = getstring(na, COMMA_SPACE);
+	const char *comma = getstring(nc, COMMA_SPACE);
 
 	/* We first calculate everything */
 	days = seconds / 86400;
@@ -382,7 +382,7 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 
 	if (!days && !hours && !minutes) {
 		snprintf(buf, bufsize,
-				 getstring(na,
+				 getstring(nc,
 						   (seconds <=
 							1 ? DURATION_SECOND : DURATION_SECONDS)),
 				 seconds);
@@ -390,7 +390,7 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 		end = buf;
 		if (days) {
 			snprintf(buf2, sizeof(buf2),
-					 getstring(na,
+					 getstring(nc,
 							   (days == 1 ? DURATION_DAY : DURATION_DAYS)),
 					 days);
 			end += snprintf(end, bufsize - (end - buf), "%s", buf2);
@@ -398,7 +398,7 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 		}
 		if (hours) {
 			snprintf(buf2, sizeof(buf2),
-					 getstring(na,
+					 getstring(nc,
 							   (hours ==
 								1 ? DURATION_HOUR : DURATION_HOURS)),
 					 hours);
@@ -409,7 +409,7 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 		}
 		if (minutes) {
 			snprintf(buf2, sizeof(buf2),
-					 getstring(na,
+					 getstring(nc,
 							   (minutes ==
 								1 ? DURATION_MINUTE : DURATION_MINUTES)),
 					 minutes);
@@ -433,27 +433,27 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
  * @param seconds time in seconds
  * @return buffer
  */
-char *expire_left(NickAlias * na, char *buf, int len, time_t expires)
+const char *expire_left(NickCore *nc, char *buf, int len, time_t expires)
 {
 	time_t now = time(NULL);
 
 	if (!expires) {
-		strncpy(buf, getstring(na, NO_EXPIRE), len);
+		strncpy(buf, getstring(nc, NO_EXPIRE), len);
 	} else if (expires <= now) {
-		strncpy(buf, getstring(na, EXPIRES_SOON), len);
+		strncpy(buf, getstring(nc, EXPIRES_SOON), len);
 	} else {
 		time_t diff = expires - now + 59;
 
 		if (diff >= 86400) {
 			int days = diff / 86400;
 			snprintf(buf, len,
-					 getstring(na, (days == 1) ? EXPIRES_1D : EXPIRES_D),
+					 getstring(nc, (days == 1) ? EXPIRES_1D : EXPIRES_D),
 					 days);
 		} else {
 			if (diff <= 3600) {
 				int minutes = diff / 60;
 				snprintf(buf, len,
-						 getstring(na,
+						 getstring(nc,
 								   (minutes ==
 									1) ? EXPIRES_1M : EXPIRES_M), minutes);
 			} else {
@@ -461,7 +461,7 @@ char *expire_left(NickAlias * na, char *buf, int len, time_t expires)
 				diff -= (hours * 3600);
 				minutes = diff / 60;
 				snprintf(buf, len,
-						 getstring(na,
+						 getstring(nc,
 								   ((hours == 1
 									 && minutes ==
 									 1) ? EXPIRES_1H1M : ((hours == 1

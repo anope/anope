@@ -62,7 +62,7 @@ class CommandMSRead : public Command
 				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 				return MOD_CONT;
 			}
-			mi = &u->na->nc->memos;
+			mi = &u->nc->memos;
 		}
 		num = numstr ? atoi(numstr) : -1;
 		if (!numstr || (stricmp(numstr, "LAST") && stricmp(numstr, "NEW") && num <= 0))

@@ -542,7 +542,7 @@ int validate_user(User * u)
 		notice_lang(s_NickServ, u, NICK_IS_PREREG);
 	}
 
-	if (!(na = u->na))
+	if (!(na = findnick(u->nick)))
 		return 0;
 
 	if (na->status & NS_FORBIDDEN)
@@ -615,7 +615,7 @@ int validate_user(User * u)
 
 void cancel_user(User * u)
 {
-	NickAlias *na = u->na;
+	NickAlias *na = findnick(u->nick);
 
 	if (na)
 	{
@@ -652,24 +652,11 @@ void cancel_user(User * u)
 
 int nick_identified(User * u)
 {
-	if (u)
+	if (u->nc)
 	{
-		if (u->na)
-		{
-			if (u->na->status)
-			{
-				return (u->na->status & NS_IDENTIFIED);
-			}
-			else
-			{
-				return 0;
-			}
-		}
-		else
-		{
-			return 0;
-		}
+		return 1;
 	}
+
 	return 0;
 }
 
@@ -681,11 +668,12 @@ int nick_recognized(User * u)
 {
 	if (u)
 	{
-		if (u->na)
+		NickAlias *na = findnick(u->nick);
+		if (na)
 		{
-			if (u->na->status)
+			if (na->status)
 			{
-				return (u->na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
+				return (na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
 			}
 			else
 			{
@@ -698,15 +686,6 @@ int nick_recognized(User * u)
 		}
 	}
 	return 0;
-}
-
-/*************************************************************************/
-
-/* Returns whether a user is identified AND in the group nc */
-
-int group_identified(User * u, NickCore * nc)
-{
-	return nick_identified(u) && u->na->nc == nc;
 }
 
 /*************************************************************************/
@@ -728,9 +707,9 @@ void expire_nicks()
 		{
 			next = na->next;
 
-			if (na->u
-			        && ((na->nc->flags & NI_SECURE) ? nick_identified(na->u) :
-			            nick_recognized(na->u)))
+			User *u = finduser(na->nick);
+			if (u
+			        && ((na->nc->flags & NI_SECURE) ? nick_identified(u) : nick_recognized(u)))
 			{
 				if (debug >= 2)
 					alog("debug: NickServ: updating last seen time for %s",
@@ -1132,15 +1111,10 @@ int delnick(NickAlias * na)
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */
-
-	if (na->u)
+	if (finduser(na->nick))
 	{
-		u = na->u;
-		na->u->na = NULL;
-
 		if (ircd->modeonunreg)
-			common_svsmode(na->u, ircd->modeonunreg, "1");
-
+			common_svsmode(finduser(na->nick), ircd->modeonunreg, "1");
 	}
 
 	delHostCore(na->nick);	  /* delete any vHost's for this nick */
@@ -1221,8 +1195,7 @@ void collide(NickAlias * na, int from_timeout)
 			         NSGuestNickPrefix, getrandom16());
 		}
 		while (finduser(guestnick));
-		notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
-		            guestnick);
+		notice_lang(s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick);
 		ircdproto->SendForceNickChange(na->nick, guestnick, time(NULL));
 		na->status |= NS_GUESTED;
 	}
@@ -1302,8 +1275,8 @@ static void timeout_collide(Timeout * t)
 
 	rem_ns_timeout(na, TO_COLLIDE);
 	/* If they identified or don't exist anymore, don't kill them. */
-	if ((na->status & NS_IDENTIFIED) || !na->u
-	        || na->u->my_signon > t->settime)
+	if ((na->status & NS_IDENTIFIED) || !finduser(na->nick)
+	        || finduser(na->nick)->my_signon > t->settime)
 		return;
 	/* The RELEASE timeout will always add to the beginning of the
 	 * list, so we won't see it.  Which is fine because it can't be
@@ -1507,79 +1480,3 @@ int do_setmodes(User * u)
 	return MOD_CONT;
 }
 
-/*************************************************************************/
-/*
- * Nick tracking
- */
-
-/**
- * Start Nick tracking and store the nick core display under the user struct.
- * @param u The user to track nicks for
- **/
-void nsStartNickTracking(User * u)
-{
-	NickCore *nc;
-
-	/* We only track identified users */
-	if (nick_identified(u))
-	{
-		nc = u->na->nc;
-
-		/* Release memory if needed */
-		if (u->nickTrack)
-			delete [] u->nickTrack;
-
-		/* Copy the nick core displayed nick to
-		   the user structure for further checks */
-		u->nickTrack = sstrdup(nc->display);
-	}
-}
-
-/**
- * Stop Nick tracking and remove the nick core display under the user struct.
- * @param u The user to stop tracking for
- **/
-void nsStopNickTracking(User * u)
-{
-	/* Simple enough. If its there, release it */
-	if (u->nickTrack)
-	{
-		delete [] u->nickTrack;
-		u->nickTrack = NULL;
-	}
-}
-
-/**
- * Boolean function to check if the user requesting a nick has the tracking
- * signature of that core in its structure.
- * @param u The user whom to check tracking for
- **/
-int nsCheckNickTracking(User * u)
-{
-	NickCore *nc;
-	NickAlias *na;
-	char *nick;
-
-	/* No nick alias or nick return false by default */
-	if ((!(na = u->na)) || (!(nick = na->nick)))
-	{
-		return 0;
-	}
-
-	/* nick is forbidden best return 0 */
-	if (na->status & NS_FORBIDDEN)
-	{
-		return 0;
-	}
-
-	/* Get the core for the requested nick */
-	nc = na->nc;
-
-	/* If the core and the tracking displayed nick are there,
-	 * and they match, return true
-	 */
-	if (nc && u->nickTrack && (strcmp(nc->display, u->nickTrack) == 0))
-		return 1;
-	else
-		return 0;
-}

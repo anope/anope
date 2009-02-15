@@ -28,11 +28,11 @@ void myChanServHelp(User * u)
 
 class CommandCSInfo : public Command
 {                  // cannot be const, as it is modified.
-	void CheckOptStr(std::string &buf, int opt, const std::string &str, ChannelInfo *ci, NickAlias *na)
+	void CheckOptStr(std::string &buf, int opt, const std::string &str, ChannelInfo *ci, NickCore *nc)
 	{
 		if (ci->flags & opt)
 		{
-			const char *commastr = getstring(na, COMMA_SPACE);
+			const char *commastr = getstring(nc, COMMA_SPACE);
 			if (!buf.empty())
 				buf += commastr;
 
@@ -69,7 +69,7 @@ class CommandCSInfo : public Command
 				notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN_OPER, chan,
 							ci->forbidby,
 							(ci->forbidreason ? ci->
-							 forbidreason : getstring(u->na, NO_REASON)));
+							 forbidreason : getstring(u, NO_REASON)));
 			else
 				notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 
@@ -115,19 +115,19 @@ class CommandCSInfo : public Command
 			notice_lang(s_ChanServ, u, CHAN_INFO_BANTYPE, ci->bantype);
 			std::string optbuf;
 
-			CheckOptStr(optbuf, CI_KEEPTOPIC,											getstring(u->na,  CHAN_INFO_OPT_KEEPTOPIC),			ci, u->na);
-			CheckOptStr(optbuf, CI_OPNOTICE,											getstring(u->na,  CHAN_INFO_OPT_OPNOTICE),			ci, u->na);
-			CheckOptStr(optbuf, CI_PEACE,													getstring(u->na,  CHAN_INFO_OPT_PEACE),					ci, u->na);
-			CheckOptStr(optbuf, CI_PRIVATE,												getstring(u->na,  CHAN_INFO_OPT_PRIVATE),				ci, u->na);
-			CheckOptStr(optbuf, CI_RESTRICTED,										getstring(u->na,  CHAN_INFO_OPT_RESTRICTED),		ci, u->na);
-			CheckOptStr(optbuf, CI_SECURE,												getstring(u->na,  CHAN_INFO_OPT_SECURE),				ci, u->na);
-			CheckOptStr(optbuf, CI_SECUREFOUNDER,									getstring(u->na,  CHAN_INFO_OPT_SECUREFOUNDER),	ci, u->na);
-			CheckOptStr(optbuf, CI_SECUREOPS,											getstring(u->na,  CHAN_INFO_OPT_SECUREOPS),			ci, u->na);
-			CheckOptStr(optbuf, CI_SIGNKICK | CI_SIGNKICK_LEVEL,	getstring(u->na,  CHAN_INFO_OPT_SIGNKICK),			ci, u->na);
-			CheckOptStr(optbuf, CI_TOPICLOCK,											getstring(u->na,	CHAN_INFO_OPT_TOPICLOCK),			ci, u->na);
-			CheckOptStr(optbuf, CI_XOP,														getstring(u->na,  CHAN_INFO_OPT_XOP),						ci, u->na);
+			CheckOptStr(optbuf, CI_KEEPTOPIC,											getstring(u,  CHAN_INFO_OPT_KEEPTOPIC),			ci, u->nc);
+			CheckOptStr(optbuf, CI_OPNOTICE,											getstring(u,  CHAN_INFO_OPT_OPNOTICE),			ci, u->nc);
+			CheckOptStr(optbuf, CI_PEACE,													getstring(u,  CHAN_INFO_OPT_PEACE),					ci, u->nc);
+			CheckOptStr(optbuf, CI_PRIVATE,												getstring(u,  CHAN_INFO_OPT_PRIVATE),				ci, u->nc);
+			CheckOptStr(optbuf, CI_RESTRICTED,										getstring(u,  CHAN_INFO_OPT_RESTRICTED),		ci, u->nc);
+			CheckOptStr(optbuf, CI_SECURE,												getstring(u,  CHAN_INFO_OPT_SECURE),				ci, u->nc);
+			CheckOptStr(optbuf, CI_SECUREFOUNDER,									getstring(u,  CHAN_INFO_OPT_SECUREFOUNDER),	ci, u->nc);
+			CheckOptStr(optbuf, CI_SECUREOPS,											getstring(u,  CHAN_INFO_OPT_SECUREOPS),			ci, u->nc);
+			CheckOptStr(optbuf, CI_SIGNKICK | CI_SIGNKICK_LEVEL,	getstring(u,  CHAN_INFO_OPT_SIGNKICK),			ci, u->nc);
+			CheckOptStr(optbuf, CI_TOPICLOCK,											getstring(u,	CHAN_INFO_OPT_TOPICLOCK),			ci, u->nc);
+			CheckOptStr(optbuf, CI_XOP,														getstring(u,  CHAN_INFO_OPT_XOP),						ci, u->nc);
 
-			notice_lang(s_ChanServ, u, CHAN_INFO_OPTIONS,	optbuf.empty() ? getstring(u->na, CHAN_INFO_OPT_NONE) : optbuf.c_str());
+			notice_lang(s_ChanServ, u, CHAN_INFO_OPTIONS,	optbuf.empty() ? getstring(u, CHAN_INFO_OPT_NONE) : optbuf.c_str());
 			notice_lang(s_ChanServ, u, CHAN_INFO_MODE_LOCK,	get_mlock_modes(ci, 1));
 
 			// XXX: we could just as easily (and tidily) merge this in with the flags display above.
@@ -148,7 +148,7 @@ class CommandCSInfo : public Command
 		}
 		if (ci->flags & CI_SUSPENDED)
 		{
-			notice_lang(s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u->na, NO_REASON)));
+			notice_lang(s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON)));
 		}
 
 		if (!show_all && (check_access(u, ci, CA_INFO) || is_servadmin))

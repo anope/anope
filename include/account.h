@@ -34,7 +34,6 @@ class NickAlias
 		time_registered = last_seen = 0;
 		status = 0;
 		nc = NULL;
-		u = NULL;
 	}
 
 	NickAlias *next, *prev;
@@ -46,9 +45,6 @@ class NickAlias
 	time_t last_seen;			/* When it was seen online for the last time */
 	uint16 status;				/* See NS_* below */
 	NickCore *nc;				/* I'm an alias of this */
-
-	/* Not saved */
-	User *u;				/* Current online user that has me */
 };
 
 class NickCore : public Extensible

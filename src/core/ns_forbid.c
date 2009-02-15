@@ -61,13 +61,11 @@ class CommandNSForbid : public Command
 			if (reason)
 				na->last_realname = sstrdup(reason);
 
-			na->u = finduser(na->nick);
-			if (na->u)
-				na->u->na = na;
+			User *curr = finduser(na->nick);
 
-			if (na->u)
+			if (curr)
 			{
-				notice_lang(s_NickServ, na->u, FORCENICKCHANGE_NOW);
+				notice_lang(s_NickServ, curr, FORCENICKCHANGE_NOW);
 				collide(na, 0);
 			}
 

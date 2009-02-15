@@ -38,13 +38,12 @@ User::User(const std::string &snick, const std::string &suid)
 	/* we used to do this by calloc, no more. */
 	this->next = NULL;
 	this->prev = NULL;
-	host = hostip = vhost = realname = nickTrack = NULL;
+	host = hostip = vhost = realname = NULL;
 	server = NULL;
-	na = NULL;
 	nc = NULL;
 	chans = NULL;
 	founder_chans = NULL;
-	invalid_pw_count = timestamp = my_signon = svid = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
+	invalid_pw_count = timestamp = my_signon = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 
 	strscpy(this->nick, snick.c_str(), NICKMAX);
 	this->uid = suid;
@@ -56,12 +55,7 @@ User::User(const std::string &snick, const std::string &suid)
 
 	*list = this;
 
-	this->na = findnick(snick);
-
-	if (this->na) {
-		this->na->u = this;
-		this->nc = this->na->nc;
-	}
+	this->nc = NULL;
 
 	usercnt++;
 
@@ -74,13 +68,11 @@ User::User(const std::string &snick, const std::string &suid)
 	}
 
 	this->isSuperAdmin = 0;	 /* always set SuperAdmin to 0 for new users */
-	this->nickTrack = NULL;	 /* ensure no default tracking nick */
 }
 
 void User::SetNewNick(const std::string &newnick)
 {
 	User **list;
-	int is_same;
 
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
@@ -90,8 +82,6 @@ void User::SetNewNick(const std::string &newnick)
 
 	if (debug)
 		alog("debug: %s changed nick to %s", this->nick, newnick.c_str());
-
-	is_same = (!stricmp(this->nick, newnick.c_str()) ? 1 : 0);
 
 	if (this->prev)
 		this->prev->next = this->next;
@@ -109,19 +99,6 @@ void User::SetNewNick(const std::string &newnick)
 	if (*list)
 		(*list)->prev = this;
 	*list = this;
-
-	/* Only if old and new nick aren't the same; no need to waste time */
-	if (!is_same)
-	{
-		if (this->na)
-			this->na->u = NULL;
-		this->na = findnick(this->nick);
-		if (this->na) {
-			this->na->u = this;
-			this->nc = this->na->nc;
-		}
-	}
-
 }
 
 void User::SetDisplayedHost(const std::string &shost)
@@ -209,13 +186,14 @@ void User::SetRealname(const std::string &srealname)
 	if (this->realname)
 		delete [] this->realname;
 	this->realname = sstrdup(srealname.c_str());
+	NickAlias *na = findnick(this->nick);
 
-	if (this->na && (nick_identified(this) ||
-			(!(this->na->nc->flags & NI_SECURE) && nick_recognized(this))))
+	if (na && (nick_identified(this) ||
+			(!(this->nc->flags & NI_SECURE) && nick_recognized(this))))
 	{
-		if (this->na->last_realname)
-			delete [] this->na->last_realname;
-		this->na->last_realname = sstrdup(srealname.c_str());
+		if (na->last_realname)
+			delete [] na->last_realname;
+		na->last_realname = sstrdup(srealname.c_str());
 	}
 
 	if (debug)
@@ -287,9 +265,6 @@ User::~User()
 	/* Cancel pending nickname enforcers, etc */
 	cancel_user(this);
 
-	if (this->na)
-		this->na->u = NULL;
-
 	if (debug >= 2)
 		alog("debug: User::~User(): free founder data");
 	ci = this->founder_chans;
@@ -299,9 +274,6 @@ User::~User()
 		delete ci;
 		ci = ci2;
 	}
-
-	if (this->nickTrack)
-		delete [] this->nickTrack;
 
 	if (debug >= 2)
 		alog("debug: User::~User(): delete from list");
@@ -343,7 +315,7 @@ void User::SendMessage(const char *source, const std::string &msg)
 	* - The user is registered and has set /ns set msg on
 	*/
 	if (UsePrivmsg &&
-		((!this->na && NSDefFlags & NI_MSG) || (this->na && this->na->nc->flags & NI_MSG)))
+		((!this->nc && NSDefFlags & NI_MSG) || (this->nc && this->nc->flags & NI_MSG)))
 	{
 		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
 	}
@@ -363,14 +335,16 @@ void User::SendMessage(const char *source, const std::string &msg)
  */
 void update_host(User * user)
 {
-	if (user->na && (nick_identified(user)
-					 || (!(user->na->nc->flags & NI_SECURE)
-						 && nick_recognized(user)))) {
-		if (user->na->last_usermask)
-			delete [] user->na->last_usermask;
+	NickCore *nc = findcore(user->nick);
+	if (nick_identified(user) || (nc && !(nc->flags & NI_SECURE) && nick_recognized(user)))
+	{
+		NickAlias *na = findnick(user->nick);
 
-		user->na->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
-		sprintf(user->na->last_usermask, "%s@%s", user->GetIdent().c_str(),
+		if (na->last_usermask)
+			delete [] na->last_usermask;
+
+		na->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
+		sprintf(na->last_usermask, "%s@%s", user->GetIdent().c_str(),
 				user->GetDisplayedHost().c_str());
 	}
 }
@@ -524,7 +498,7 @@ User *next_uid()
 /* Handle a server NICK command. */
 
 User *do_nick(const char *source, const char *nick, const char *username, const char *host,
-			  const char *server, const char *realname, time_t ts, uint32 svid,
+			  const char *server, const char *realname, time_t ts,
 			  uint32 ip, const char *vhost, const char *uid)
 {
 	User *user = NULL;
@@ -658,33 +632,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user->hostip = NULL;
 		}
 
-		if (svid == 0) {
-			display_news(user, NEWS_LOGON);
-			display_news(user, NEWS_RANDOM);
-		}
-
-		if (svid == ts && user->na) {
-			/* Timestamp and svid match, and nick is registered; automagically identify the nick */
-			user->svid = svid;
-			user->na->status |= NS_IDENTIFIED;
-			check_memos(user);
-			nc_changed = 0;
-
-			/* Start nick tracking if available */
-			if (NSNickTracking)
-				nsStartNickTracking(user);
-
-		} else if (svid != 1) {
-			/* Resets the svid because it doesn't match */
-			user->svid = 1;
-
-			ircdproto->SendSVID(user->nick, user->timestamp);
-
-		} else {
-			user->svid = 1;
-		}
+		display_news(user, NEWS_LOGON);
+		display_news(user, NEWS_RANDOM);
 		send_event(EVENT_NEWNICK, 1, nick);
-
 	} else {
 		/* An old user changing nicks. */
 		if (ircd->ts6)
@@ -725,10 +675,10 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			/* Update this only if nicks aren't the same */
 			user->my_signon = time(NULL);
 
-			old_na = user->na;
+			old_na = findnick(user->nick);
 			if (old_na) {
 				if (nick_recognized(user))
-					user->na->last_seen = time(NULL);
+					old_na->last_seen = time(NULL);
 				status = old_na->status & NS_TRANSGROUP;
 				cancel_user(user);
 			}
@@ -736,62 +686,61 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user->SetNewNick(nick);
 			send_event(EVENT_CHANGE_NICK, 1, nick);
 
-			if ((old_na ? old_na->nc : NULL) ==
-				(user->na ? user->na->nc : NULL))
+			if ((old_na ? old_na->nc : NULL) == user->nc)
 				nc_changed = 0;
 
-			if (!nc_changed && (user->na))
-				user->na->status |= status;
-			else {
+			if (!nc_changed)
+			{
+				NickAlias *tmp = findnick(user->nick);
+				if (tmp)
+					tmp->status |= status;
+			}
+			else
+			{
 				ircdproto->SendUnregisteredNick(user);
 			}
 		}
 
-		if (ircd->sqline) {
+		if (ircd->sqline)
+		{
 			if (!is_oper(user) && check_sqline(user->nick, 1))
 				return NULL;
 		}
 
 	}						   /* if (!*source) */
 
-	/* Check for nick tracking to bypass identification */
-	if (NSNickTracking && nsCheckNickTracking(user)) {
-		user->na->status |= NS_IDENTIFIED;
+	NickAlias *ntmp = findnick(user->nick);
+	if (ntmp && user->nc == ntmp->nc)
+	{
+		ntmp->status |= NS_IDENTIFIED;
 		nc_changed = 0;
 	}
 
-	if (nc_changed || !nick_recognized(user)) {
+	if (nc_changed || !nick_recognized(user))
+	{
 		if (validate_user(user))
 			check_memos(user);
+	}
+	else
+	{
+		char tsbuf[16];
+		ntmp->last_seen = time(NULL);
 
-	} else {
-		if (nick_identified(user)) {
-			char tsbuf[16];
-			user->na->last_seen = time(NULL);
+		if (ntmp->last_usermask)
+			delete [] ntmp->last_usermask;
+		ntmp->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
+		sprintf(ntmp->last_usermask, "%s@%s",
+				user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
 
-			if (user->na->last_usermask)
-				delete [] user->na->last_usermask;
-			user->na->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
-			sprintf(user->na->last_usermask, "%s@%s",
-					user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
-
-			snprintf(tsbuf, sizeof(tsbuf), "%lu",
-					 static_cast<unsigned long>(user->timestamp));
-			ircdproto->SendSVID2(user, tsbuf);
-
-			alog("%s: %s!%s@%s automatically identified for nick %s",
-				 s_NickServ, user->nick, user->GetIdent().c_str(),
-				 user->host, user->nick);
-		}
+		alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
 	}
 
 	/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
-	if (ircd->check_nick_id) {
-		if (nick_identified(user)) {
-			char tsbuf[16];
-			snprintf(tsbuf, sizeof(tsbuf), "%lu",
-					 static_cast<unsigned long>(user->timestamp));
-			ircdproto->SendSVID3(user, tsbuf);
+	if (ircd->check_nick_id)
+	{
+		if (nick_identified(user))
+		{
+			// XXX: I assume we need to reset +r on here.
 		}
 	}
 
@@ -839,7 +788,7 @@ void do_quit(const char *source, int ac, const char **av)
 	if (debug) {
 		alog("debug: %s quits", source);
 	}
-	if ((na = user->na) && (!(na->status & NS_FORBIDDEN))
+	if ((na = findnick(user->nick)) && (!(na->status & NS_FORBIDDEN))
 		&& (!(na->nc->flags & NI_SUSPENDED))
 		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 		na->last_seen = time(NULL);
@@ -875,7 +824,7 @@ void do_kill(const char *nick, const char *msg)
 	if (debug) {
 		alog("debug: %s killed", nick);
 	}
-	if ((na = user->na) && (!(na->status & NS_FORBIDDEN))
+	if ((na = findnick(user->nick)) && (!(na->status & NS_FORBIDDEN))
 		&& (!(na->nc->flags & NI_SUSPENDED))
 		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 		na->last_seen = time(NULL);

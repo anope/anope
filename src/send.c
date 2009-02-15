@@ -180,7 +180,7 @@ void notice_lang(const char *source, User * dest, int message, ...)
 		return;
 	}
 	va_start(args, message);
-	fmt = getstring(dest->na, message);
+	fmt = getstring(dest, message);
 
 	if (!fmt)
 		return;
@@ -221,7 +221,7 @@ void notice_help(const char *source, User * dest, int message, ...)
 		return;
 	}
 	va_start(args, message);
-	fmt = getstring(dest->na, message);
+	fmt = getstring(dest, message);
 	if (!fmt)
 		return;
 	/* Some sprintf()'s eat %S or turn it into just S, so change all %S's

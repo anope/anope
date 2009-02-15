@@ -499,7 +499,7 @@ User *nc_on_chan(Channel * c, NickCore * nc)
 		return NULL;
 
 	for (u = c->users; u; u = u->next) {
-		if (u->user->na && u->user->na->nc == nc
+		if (u->user->nc == nc
 			&& nick_recognized(u->user))
 			return u->user;
 	}
@@ -1390,7 +1390,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	 * to receive modes. I wonder who added that... *looks at Rob* ;) -GD
 	 */
 	if (give_modes && (get_ignore(user->nick) == NULL)
-		&& (!user->na || !(user->na->nc->flags & NI_AUTOOP))) {
+		&& (!user->nc || !(user->nc->flags & NI_AUTOOP))) {
 		if (ircd->owner && is_founder(user, ci))
 			add_modes |= CUS_OWNER;
 		else if ((ircd->protect || ircd->admin)
@@ -1569,7 +1569,7 @@ void chan_adduser2(User * user, Channel * c)
 		if (c->usercount == BSMinUsers)
 			bot_join(c->ci);
 		if (c->usercount >= BSMinUsers && (c->ci->botflags & BS_GREET)
-			&& user->na && user->na->nc->greet
+			&& user->nc && user->nc->greet
 			&& check_access(user, c->ci, CA_GREET)) {
 			/* Only display the greet if the main uplink we're connected
 			 * to has synced, or we'll get greet-floods when the net
@@ -1577,7 +1577,7 @@ void chan_adduser2(User * user, Channel * c)
 			 */
 			if (is_sync(user->server)) {
 				ircdproto->SendPrivmsg(c->ci->bi, c->name, "[%s] %s",
-								  user->na->nick, user->na->nc->greet);
+								  user->nc->display, user->nc->greet);
 				c->ci->bi->lastmsg = time(NULL);
 			}
 		}

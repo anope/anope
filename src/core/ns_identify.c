@@ -38,7 +38,7 @@ class CommandNSIdentify : public Command
 		char modes[512];
 		int len;
 
-		if (!(na = u->na))
+		if (!(na = findnick(u->nick)))
 		{
 			if ((nr = findrequestnick(u->nick)))
 				notice_lang(s_NickServ, u, NICK_IS_PREREG);
@@ -74,6 +74,8 @@ class CommandNSIdentify : public Command
 
 			na->status |= NS_IDENTIFIED;
 			na->last_seen = time(NULL);
+			u->nc = na->nc;
+
 			snprintf(tsbuf, sizeof(tsbuf), "%lu", static_cast<unsigned long>(u->timestamp));
 
 			if (ircd->modeonreg)
@@ -99,7 +101,7 @@ class CommandNSIdentify : public Command
 			if (NSModeOnID)
 				do_setmodes(u);
 
-			if (NSForceEmail && u->na && !u->na->nc->email)
+			if (NSForceEmail && u->nc && !u->nc->email)
 			{
 				notice_lang(s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
 				notice_help(s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
@@ -107,10 +109,6 @@ class CommandNSIdentify : public Command
 
 			if (!(na->status & NS_RECOGNIZED))
 				check_memos(u);
-
-			/* Enable nick tracking if enabled */
-			if (NSNickTracking)
-				nsStartNickTracking(u);
 
 			/* Clear any timers */
 			if (na->nc->flags & NI_KILLPROTECT)

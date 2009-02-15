@@ -52,11 +52,6 @@ private:
 
 		change_core_display(nc, param);
 		notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_CHANGED, nc->display);
-
-		/* Enable nick tracking if enabled */
-		if (NSNickTracking)
-			nsStartNickTracking(u);
-
 		return MOD_CONT;
 	}
 
@@ -73,7 +68,7 @@ private:
 		int len = strlen(param);
 		char tmp_pass[PASSMAX];
 
-		if (NSSecureAdmins && u->na->nc != nc && nick_is_services_admin(nc) && !is_services_root(u))
+		if (NSSecureAdmins && u->nc != nc && nick_is_services_admin(nc) && !is_services_root(u))
 		{
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -138,7 +133,7 @@ private:
 			notice_lang(s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
-		else if (NSSecureAdmins && u->na->nc != nc && nick_is_services_admin(nc) && !is_services_root(u))
+		else if (NSSecureAdmins && u->nc != nc && nick_is_services_admin(nc) && !is_services_root(u))
 		{
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 			return MOD_CONT;

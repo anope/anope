@@ -30,7 +30,7 @@ class CommandOSDEFCON : public Command
 	{
 		const char *lvl = params[0].c_str();
 		int newLevel = 0;
-		const char *langglobal = getstring(NULL, DEFCON_GLOBAL);
+		const char *langglobal = getstring(DEFCON_GLOBAL);
 
 		if (!DefConLevel) /* If we dont have a .conf setting! */
 		{
@@ -56,7 +56,7 @@ class CommandOSDEFCON : public Command
 		notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
 		defcon_sendlvls(u);
 		alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
-		ircdproto->SendGlobops(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL), u->nick, newLevel);
+		ircdproto->SendGlobops(s_OperServ, getstring(OPER_DEFCON_WALL), u->nick, newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (GlobalOnDefcon)

@@ -46,7 +46,7 @@ class CommandNSAList : public Command
 
 		if (!is_servadmin)
 			/* Non service admins can only see their own levels */
-			na = u->na;
+			na = findnick(u->nick);
 		else
 		{
 			/* Services admins can request ALIST on nicks.
@@ -61,7 +61,7 @@ class CommandNSAList : public Command
 			if (nick)
 				na = findnick(nick);
 			else
-				na = u->na;
+				na = findnick(u->nick);
 		}
 
 		/* If available, get level from arguments */

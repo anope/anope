@@ -803,7 +803,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 		return;
 
 	va_start(args, message);
-	fmt = getstring(u->na, message);
+	fmt = getstring(u, message);
 	if (!fmt)
 		return;
 	vsnprintf(buf, sizeof(buf), fmt, args);
@@ -837,7 +837,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	if (ircd->protectedumode) {
 		if (is_protected(u) && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring2(NULL, PERMISSION_DENIED));
+							  getstring(PERMISSION_DENIED));
 			return;
 		}
 	}
@@ -849,7 +849,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	if (ircd->except) {
 		if (is_excepted(ci, u) == 1) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring2(NULL, BOT_EXCEPT));
+							  getstring(BOT_EXCEPT));
 			return;
 		}
 	}
@@ -913,7 +913,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	if (ircd->protectedumode) {
 		if (is_protected(u) && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring2(NULL, PERMISSION_DENIED));
+							  getstring(PERMISSION_DENIED));
 			return;
 		}
 	}
@@ -967,7 +967,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 	if (ircd->protectedumode) {
 		if (is_protected(u) && *mode == '-' && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring2(NULL, PERMISSION_DENIED));
+							  getstring(PERMISSION_DENIED));
 			return;
 		}
 	}

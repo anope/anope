@@ -352,7 +352,7 @@ int is_services_root(User * u)
 	if ((NSStrictPrivileges && !is_oper(u))
 		|| (!nick_identified(u)))
 		return 0;
-	if ((u->na->nc->flags & NI_SERVICES_ROOT))
+	if ((u->nc->flags & NI_SERVICES_ROOT))
 		return 1;
 	return 0;
 }
@@ -366,7 +366,7 @@ int is_services_admin(User * u)
 	if ((NSStrictPrivileges && !is_oper(u))
 		|| (!nick_identified(u)))
 		return 0;
-	if ((u->na->nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT)))
+	if ((u->nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT)))
 		return 1;
 	return 0;
 }
@@ -380,7 +380,7 @@ int is_services_oper(User * u)
 	if ((NSStrictPrivileges && !is_oper(u))
 		|| (!nick_identified(u)))
 		return 0;
-	if ((u->na->nc->
+	if ((u->nc->
 			flags & (NI_SERVICES_OPER | NI_SERVICES_ADMIN |
 					 NI_SERVICES_ROOT)))
 		return 1;
@@ -1355,13 +1355,13 @@ void resetDefCon(int level)
 			send_event(EVENT_DEFCON_LEVEL, 1, strLevel);
 			alog("Defcon level timeout, returning to lvl %d", level);
 			ircdproto->SendGlobops(s_OperServ,
-							 getstring2(NULL, OPER_DEFCON_WALL),
+							 getstring(OPER_DEFCON_WALL),
 							 s_OperServ, level);
 			if (GlobalOnDefcon) {
 				if (DefConOffMessage) {
 					oper_global(NULL, "%s", DefConOffMessage);
 				} else {
-					oper_global(NULL, getstring(NULL, DEFCON_GLOBAL),
+					oper_global(NULL, getstring(DEFCON_GLOBAL),
 								DefConLevel);
 				}
 			}

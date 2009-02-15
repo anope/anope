@@ -26,20 +26,22 @@ class CommandNSUpdate : public Command
 
 	CommandReturn Process(User *u, std::vector<std::string> &params)
 	{
-		if (!nick_identified(u))
+		NickAlias *na = findnick(u->nick);
+
+		if (!na)
 		{
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 			return MOD_CONT;
 		}
 
 		if (NSModeOnID)
 			do_setmodes(u);
 		check_memos(u);
-		if (u->na->last_realname)
-			delete [] u->na->last_realname;
-		u->na->last_realname = sstrdup(u->realname);
-		u->na->status |= NS_IDENTIFIED;
-		u->na->last_seen = time(NULL);
+
+		if (na->last_realname)
+			delete [] na->last_realname;
+		na->last_realname = sstrdup(u->realname);
+		na->status |= NS_IDENTIFIED;
+		na->last_seen = time(NULL);
 		if (ircd->vhost)
 			do_on_id(u);
 		notice_lang(s_NickServ, u, NICK_UPDATE_SUCCESS, s_NickServ);

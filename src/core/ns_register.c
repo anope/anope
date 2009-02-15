@@ -88,9 +88,7 @@ class CommandNSConfirm : public Command
 
 		if (!force)
 		{
-			u->na = na;
 			u->nc = na->nc;
-			na->u = u;
 			alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
 			if (NSAddAccessOnReg)
 				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->access[0]);
@@ -125,10 +123,6 @@ class CommandNSConfirm : public Command
 		else
 			notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
 		delnickrequest(nr); /* remove the nick request */
-
-		/* Enable nick tracking if enabled */
-		if (NSNickTracking)
-			nsStartNickTracking(u);
 
 		return MOD_CONT;
 
@@ -228,6 +222,7 @@ class CommandNSRegister : public CommandNSConfirm
 	{
 		NickRequest *nr = NULL, *anr = NULL;
 		NickCore *nc = NULL;
+		NickAlias *na;
 		int prefixlen = strlen(NSGuestNickPrefix);
 		int nicklen = strlen(u->nick);
 		const char *pass = params[0].c_str();
@@ -315,9 +310,10 @@ class CommandNSRegister : public CommandNSConfirm
 			this->OnSyntaxError(u);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, NSRegDelay);
-		else if (u->na) /* i.e. there's already such a nick regged */
+		else if ((na = findnick(u->nick))) 
 		{
-			if (u->na->status & NS_FORBIDDEN)
+			/* i.e. there's already such a nick regged */
+			if (na->status & NS_FORBIDDEN)
 			{
 				alog("%s: %s@%s tried to register FORBIDden nick %s", s_NickServ, u->GetIdent().c_str(), u->host, u->nick);
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
@@ -498,21 +494,21 @@ int do_sendregmail(User *u, NickRequest *nr)
 
 	if (!nr && !u)
 		return -1;
-	snprintf(buf, sizeof(buf), getstring2(NULL, NICK_REG_MAIL_SUBJECT), nr->nick);
+	snprintf(buf, sizeof(buf), getstring(NICK_REG_MAIL_SUBJECT), nr->nick);
 	mail = MailRegBegin(u, nr, buf, s_NickServ);
 	if (!mail)
 		return -1;
-	fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_HEAD));
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_HEAD));
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_1), nr->nick);
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_1), nr->nick);
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_2), s_NickServ, nr->passcode);
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_2), s_NickServ, nr->passcode);
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_3));
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_3));
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_4));
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_4));
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_5), NetworkName);
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_5), NetworkName);
 	fprintf(mail->pipe, "\n.\n");
 	MailEnd(mail);
 	return 0;

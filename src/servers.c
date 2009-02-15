@@ -204,8 +204,9 @@ static void delete_server(Server * serv, const char *quitreason)
 			u = firstuser();
 			while (u) {
 				unext = nextuser();
-				if (u->server == serv) {
-					if ((na = u->na) && !(na->status & NS_FORBIDDEN)
+				if (u->server == serv)
+				{
+					if ((na = findnick(u->nick)) && !(na->status & NS_FORBIDDEN)
 						&& (!(na->nc->flags & NI_SUSPENDED))
 						&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 						na->last_seen = time(NULL);
@@ -214,6 +215,7 @@ static void delete_server(Server * serv, const char *quitreason)
 						na->last_quit =
 							(quitreason ? sstrdup(quitreason) : NULL);
 					}
+
 					if (LimitSessions) {
 						del_session(u->host);
 					}

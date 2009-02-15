@@ -317,7 +317,6 @@ E bool  NSStrictPrivileges;
 E bool  NSEmailReg;
 E bool  NSModeOnID;
 E bool  NSRestrictGetPass;
-E bool  NSNickTracking;
 E bool  NSAddAccessOnReg;
 
 E int   CSDefFlags;
@@ -525,7 +524,9 @@ E void lang_init();
 E int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm);
 E void syntax_error(char *service, User * u, const char *command, int msgnum);
 E const char *getstring(NickAlias *na, int index);
-E const char *getstring2(NickCore *nc, int index);
+E const char *getstring(NickCore *nc, int index);
+E const char *getstring(User *nc, int index);
+E const char *getstring(int index);
 
 
 /**** log.c ****/
@@ -630,8 +631,8 @@ E const char *merge_args(int argc, const char **argv);
 E int match_wild(const char *pattern, const char *str) MARK_DEPRECATED;
 E int match_wild_nocase(const char *pattern, const char *str) MARK_DEPRECATED;
 E int dotime(const char *s);
-E char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds);
-E char *expire_left(NickAlias * na, char *buf, int len, time_t expires);
+E const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds);
+E const char *expire_left(NickCore *nc, char *buf, int len, time_t expires);
 E int doValidHost(const char *host, int type);
 
 typedef int (*range_callback_t) (User * u, int num, va_list args);
@@ -736,11 +737,6 @@ E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
 E NickCore  *findcore(const char *nick);
 E void clean_ns_timeouts(NickAlias * na);
-E void nsStartNickTracking(User * u);
-E void nsStopNickTracking(User * u);
-E int nsCheckNickTracking(User *u);
-
-E int group_identified(User * u, NickCore * nc);
 E int is_on_access(User * u, NickCore * nc);
 
 /**** operserv.c  ****/
@@ -930,7 +926,7 @@ E char *TS6UPLINK;
 E void update_host(User * user);
 
 E User *do_nick(const char *source, const char *nick, const char *username, const char *host,
-			  const char *server, const char *realname, time_t ts, uint32 svid, uint32 ip, const char *vhost, const char *uid);
+			  const char *server, const char *realname, time_t ts, uint32 ip, const char *vhost, const char *uid);
 
 E void do_umode(const char *source, int ac, const char **av);
 E void do_quit(const char *source, int ac, const char **av);

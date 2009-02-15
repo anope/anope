@@ -1312,10 +1312,7 @@ class IRCDProto
 		virtual void SendSGLine(const char *, const char *) { }
 		virtual void SendBanDel(const char *, const char *) { }
 		virtual void SendSVSModeChan(const char *, const char *, const char *) { }
-		virtual void SendSVID(const char *, time_t) { }
 		virtual void SendUnregisteredNick(User *) { }
-		virtual void SendSVID2(User *, const char *) { }
-		virtual void SendSVID3(User *, const char *) { }
 		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
 		virtual void SendSVSPart(const char *, const char *, const char *) { }

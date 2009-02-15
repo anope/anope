@@ -56,10 +56,6 @@ class CommandCSRegister : public Command
 			notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
 			notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
-		else if (!u->na || !(nc = u->na->nc))
-			notice_lang(s_ChanServ, u, CHAN_MUST_REGISTER_NICK, s_NickServ);
-		else if (!nick_recognized(u))
-			notice_lang(s_ChanServ, u, CHAN_MUST_IDENTIFY_NICK, s_NickServ, s_NickServ);
 		else if (!(c = findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
 		else if ((ci = cs_findchan(chan)))

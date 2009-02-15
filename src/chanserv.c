@@ -1142,13 +1142,13 @@ int check_kick(User * user, const char *chan, time_t chants)
 	if (ci->flags & CI_SUSPENDED || ci->flags & CI_FORBIDDEN)
 	{
 		get_idealban(ci, user, mask, sizeof(mask));
-		reason = ci->forbidreason ? ci->forbidreason : getstring(user->na, CHAN_MAY_NOT_BE_USED);
+		reason = ci->forbidreason ? ci->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
 		set_modes = true;
 		goto kick;
 	}
 
 	if (nick_recognized(user))
-		nc = user->na->nc;
+		nc = user->nc;
 	else
 		nc = NULL;
 
@@ -1188,7 +1188,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 
 	if (check_access(user, ci, CA_NOJOIN)) {
 		get_idealban(ci, user, mask, sizeof(mask));
-		reason = getstring(user->na, CHAN_NOT_ALLOWED_TO_JOIN);
+		reason = getstring(user, CHAN_NOT_ALLOWED_TO_JOIN);
 		goto kick;
 	}
 
@@ -1846,7 +1846,7 @@ int is_founder(User * user, ChannelInfo * ci)
 		return 1;
 	}
 
-	if (user->na && user->na->nc == ci->founder) {
+	if (user->nc && user->nc == ci->founder) {
 		if ((nick_identified(user)
 			 || (nick_recognized(user) && !(ci->flags & CI_SECURE))))
 			return 1;
@@ -1864,7 +1864,7 @@ int is_real_founder(User * user, ChannelInfo * ci)
 		return 1;
 	}
 
-	if (user->na && user->na->nc == ci->founder) {
+	if (user->nc && user->nc == ci->founder) {
 		if ((nick_identified(user)
 			 || (nick_recognized(user) && !(ci->flags & CI_SECURE))))
 			return 1;
@@ -1927,12 +1927,12 @@ int get_access(User * user, ChannelInfo * ci)
 	if (is_founder(user, ci))
 		return ACCESS_FOUNDER;
 
-	if (!user->na)
+	if (!user->nc)
 		return 0;
 
 	if (nick_identified(user)
 		|| (nick_recognized(user) && !(ci->flags & CI_SECURE)))
-		if ((access = get_access_entry(user->na->nc, ci)))
+		if ((access = get_access_entry(user->nc, ci)))
 			return access->level;
 
 	if (nick_identified(user))
@@ -1947,12 +1947,12 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 {
 	ChanAccess *access;
 
-	if (!ci || !user || !user->na)
+	if (!ci || !user || !user->nc)
 		return;
 
 	if (is_founder(user, ci) || nick_identified(user)
 		|| (nick_recognized(user) && !(ci->flags & CI_SECURE)))
-		if ((access = get_access_entry(user->na->nc, ci)))
+		if ((access = get_access_entry(user->nc, ci)))
 			access->last_seen = time(NULL);
 }
 

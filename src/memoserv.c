@@ -65,7 +65,7 @@ void memoserv(User * u, char *buf)
 		}
 		ircdproto->SendCTCP(findbot(s_MemoServ), u->nick, "PING %s", s);
 	} else {
-		if (!u->na && stricmp(cmd, "HELP") != 0)
+		if (!u->nc && stricmp(cmd, "HELP") != 0)
 			notice_lang(s_MemoServ, u, NICK_NOT_REGISTERED_HELP,
 						s_NickServ);
 		else
@@ -94,7 +94,7 @@ void check_memos(User * u)
 		return;
 	}
 
-	if (!(nc = (u->na ? u->na->nc : NULL)) || !nick_recognized(u) ||
+	if (!(nc = u->nc) || !nick_recognized(u) ||
 		!(nc->flags & NI_MEMO_SIGNON)) {
 		return;
 	}
@@ -200,7 +200,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 	Memo *m;
 	MemoInfo *mi;
 	time_t now = time(NULL);
-	char *source = u->na->nc->display;
+	char *source = u->nc->display;
 	int is_servoper = is_services_oper(u);
 
 	if (readonly) {
@@ -289,8 +289,8 @@ void memo_send(User * u, const char *name, const char *text, int z)
 
 					for (i = 0; i < nc->aliases.count; i++) {
 						na = static_cast<NickAlias *>(nc->aliases.list[i]);
-						if (na->u && nick_identified(na->u))
-							notice_lang(s_MemoServ, na->u,
+						if (finduser(na->nick) && nick_identified(finduser(na->nick)))
+							notice_lang(s_MemoServ, finduser(na->nick),
 										MEMO_NEW_MEMO_ARRIVED, source,
 										s_MemoServ, m->number);
 					}
@@ -313,8 +313,8 @@ void memo_send(User * u, const char *name, const char *text, int z)
 				for (cu = c->users; cu; cu = next) {
 					next = cu->next;
 					if (check_access(cu->user, c->ci, CA_MEMO)) {
-						if (cu->user->na
-							&& (cu->user->na->nc->flags & NI_MEMO_RECEIVE)
+						if (cu->user->nc
+							&& (cu->user->nc->flags & NI_MEMO_RECEIVE)
 							&& get_ignore(cu->user->nick) == NULL) {
 							notice_lang(s_MemoServ, cu->user,
 										MEMO_NEW_X_MEMO_ARRIVED,
@@ -367,12 +367,12 @@ static void new_memo_mail(NickCore * nc, Memo * m)
 	if (!mail) {
 		return;
 	}
-	fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT1), nc->display);
+	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT1), nc->display);
 	fprintf(mail->pipe, "\n");
-	fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT2), m->sender,
+	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT2), m->sender,
 			m->number);
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, "%s", getstring2(NULL, MEMO_MAIL_TEXT3));
+	fprintf(mail->pipe, "%s", getstring(MEMO_MAIL_TEXT3));
 	fprintf(mail->pipe, "\n\n");
 	fprintf(mail->pipe, "%s", m->text);
 	fprintf(mail->pipe, "\n");

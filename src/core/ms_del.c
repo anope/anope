@@ -67,7 +67,7 @@ class CommandMSDel : public Command
 				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 				return MOD_CONT;
 			}
-			mi = &u->na->nc->memos;
+			mi = &u->nc->memos;
 		}
 		if (!numstr || (!isdigit(*numstr) && stricmp(numstr, "ALL") && stricmp(numstr, "LAST")))
 			this->OnSyntaxError(u);

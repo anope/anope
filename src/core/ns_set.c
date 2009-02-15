@@ -53,11 +53,6 @@ class CommandNSSet : public Command
 
 		change_core_display(nc, param);
 		notice_lang(s_NickServ, u, NICK_SET_DISPLAY_CHANGED, nc->display);
-
-		/* Enable nick tracking if enabled */
-		if (NSNickTracking)
-			nsStartNickTracking(u);
-
 		return MOD_CONT;
 	}
 
@@ -455,7 +450,6 @@ class CommandNSSet : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-		NickAlias *na = u->na;
 
 		if (readonly)
 		{
@@ -463,40 +457,40 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (!na)
-			notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
-		else if (na->status & NS_FORBIDDEN)
+/*
+		if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (na->nc->flags & NI_SUSPENDED)
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+*/
+		if (u->nc->flags & NI_SUSPENDED)
+			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
 		else if (!nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!stricmp(cmd, "DISPLAY"))
-			return this->DoSetDisplay(u, params, na->nc);
+			return this->DoSetDisplay(u, params, u->nc);
 		else if (!stricmp(cmd, "PASSWORD"))
-			return this->DoSetPassword(u, params, na->nc);
+			return this->DoSetPassword(u, params, u->nc);
 		else if (!stricmp(cmd, "LANGUAGE"))
-			return this->DoSetLanguage(u, params, na->nc);
+			return this->DoSetLanguage(u, params, u->nc);
 		else if (!stricmp(cmd, "URL"))
-			return this->DoSetUrl(u, params, na->nc);
+			return this->DoSetUrl(u, params, u->nc);
 		else if (!stricmp(cmd, "EMAIL"))
-			return this->DoSetEmail(u, params, na->nc);
+			return this->DoSetEmail(u, params, u->nc);
 		else if (!stricmp(cmd, "ICQ"))
-			return this->DoSetICQ(u, params, na->nc);
+			return this->DoSetICQ(u, params, u->nc);
 		else if (!stricmp(cmd, "GREET"))
-			return this->DoSetGreet(u, params, na->nc);
+			return this->DoSetGreet(u, params, u->nc);
 		else if (!stricmp(cmd, "KILL"))
-			return this->DoSetKill(u, params, na->nc);
+			return this->DoSetKill(u, params, u->nc);
 		else if (!stricmp(cmd, "SECURE"))
-			return this->DoSetSecure(u, params, na->nc);
+			return this->DoSetSecure(u, params, u->nc);
 		else if (!stricmp(cmd, "PRIVATE"))
-			return this->DoSetPrivate(u, params, na->nc);
+			return this->DoSetPrivate(u, params, u->nc);
 		else if (!stricmp(cmd, "MSG"))
-			return this->DoSetMsg(u, params, na->nc);
+			return this->DoSetMsg(u, params, u->nc);
 		else if (!stricmp(cmd, "HIDE"))
-			return this->DoSetHide(u, params, na->nc);
+			return this->DoSetHide(u, params, u->nc);
 		else if (!stricmp(cmd, "AUTOOP"))
-			return this->DoSetAutoOP(u, params, na->nc);
+			return this->DoSetAutoOP(u, params, u->nc);
 		else
 			notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd);
 		return MOD_CONT;

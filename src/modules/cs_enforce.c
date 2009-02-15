@@ -116,7 +116,7 @@ class CommandCSEnforce : public Command
 			if (check_access(u, c->ci, CA_NOJOIN))
 			{
 				get_idealban(ci, u, mask, sizeof(mask));
-				reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
+				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask, time(NULL));
 				ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
 				av[0] = ci->name;
@@ -155,7 +155,7 @@ class CommandCSEnforce : public Command
 			if (!nick_identified(u))
 			{
 				get_idealban(ci, u, mask, sizeof(mask));
-				reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
+				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				if (!(cbm = &cbmodes[static_cast<int>('R')])->flag || !(c->mode & cbm->flag))
 					ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask, time(NULL));
 				ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);

@@ -469,7 +469,6 @@ class InspIRCdProto : public IRCDProto
 					else --opcnt;
 					break;
 				case 'r':
-					user->svid = add ? user->timestamp : 0;
 					if (add && !nick_identified(user)) {
 						common_svsmode(user, "-r", NULL);
 						user->mode &= ~UMODE_r;
@@ -655,12 +654,6 @@ class InspIRCdProto : public IRCDProto
 	void SendUnregisteredNick(User *u)
 	{
 		common_svsmode(u, "-r", NULL);
-	}
-
-	/* SVSMODE +r */
-	void SendSVID2(User *u, const char *ts)
-	{
-		common_svsmode(u, "+r", NULL);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -1101,7 +1094,7 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 
 int anope_event_nick(const char *source, int ac, const char **av)
 {
-	do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+	do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, NULL, NULL);
 	return MOD_CONT;
 }
 
@@ -1126,11 +1119,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	struct in_addr addy;
 	Server *s = findserver_uid(servlist, source);
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
-	int svid = 0;
 	int ts = strtoul(av[1], NULL, 10);
-
-	if (strchr(av[8], 'r') != NULL)
-		svid = ts;
 
 	inet_aton(av[6], &addy);
 	user = do_nick("", av[2],   /* nick */
@@ -1138,7 +1127,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 			av[3],   /* realhost */
 			s->name,  /* server */
 			av[ac - 1],   /* realname */
-			ts, svid, htonl(*ad), av[4], av[0]);
+			ts, htonl(*ad), av[4], av[0]);
 	if (user)
 	{
 		ircdproto->ProcessUsermodes(user, 1, &av[8]);

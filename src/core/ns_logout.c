@@ -32,20 +32,19 @@ class CommandNSLogout : public Command
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 		User *u2;
+		NickAlias *na;
 
 		if (!is_services_admin(u) && nick)
 			this->OnSyntaxError(u);
 		else if (!(u2 = (nick ? finduser(nick) : u)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (!u2->na)
+		else if (!(na = findnick(u2->nick)))
 		{
 			if (nick)
 				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 			else
 				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
 		}
-		else if (u2->na->status & NS_FORBIDDEN)
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u2->na->nick);
 		else if (!nick && !nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (nick && is_services_admin(u2))
@@ -58,7 +57,9 @@ class CommandNSLogout : public Command
 				validate_user(u2);
 			}
 			else
-				u2->na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+			{
+				na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+			}
 
 			if (ircd->modeonreg)
 				common_svsmode(u2, ircd->modeonunreg, "1");
@@ -71,13 +72,11 @@ class CommandNSLogout : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
-			/* Stop nick tracking if enabled */
-			if (NSNickTracking)
-				nsStopNickTracking(u2);
-
 			/* Clear any timers again */
-			if (u->na->nc->flags & NI_KILLPROTECT)
-				del_ns_timeout(u->na, TO_COLLIDE);
+			if (u->nc->flags & NI_KILLPROTECT)
+				del_ns_timeout(na, TO_COLLIDE);
+
+			u2->nc = NULL;
 
 			/* Send out an event */
 			send_event(EVENT_NICK_LOGOUT, 1, u2->nick);

@@ -161,7 +161,7 @@ MailInfo *MailMemoBegin(NickCore * nc)
 					nc->email);
 		}
 		fprintf(mail->pipe, "Subject: %s\n",
-				getstring2(NULL, MEMO_MAIL_SUBJECT));
+				getstring(MEMO_MAIL_SUBJECT));
 		return mail;
 	}
 	return NULL;

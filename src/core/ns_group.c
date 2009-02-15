@@ -92,19 +92,12 @@ class CommandNSGroup : public Command
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, NSRegDelay);
-		else if (u->na && (u->na->status & NS_FORBIDDEN))
-		{
-			alog("%s: %s@%s tried to use GROUP from FORBIDden nick %s", s_NickServ, u->GetIdent().c_str(), u->host, u->nick);
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
-		}
-		else if (u->na && (u->na->nc->flags & NI_SUSPENDED))
+		else if (u->nc->flags & NI_SUSPENDED)
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		}
-		else if (u->na && NSNoGroupChange)
-			notice_lang(s_NickServ, u, NICK_GROUP_CHANGE_DISABLED, s_NickServ);
-		else if (u->na && !nick_identified(u))
+		else if (!nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (target && (target->nc->flags & NI_SUSPENDED))
 		{
@@ -113,7 +106,7 @@ class CommandNSGroup : public Command
 		}
 		else if (target->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
-		else if (u->na && target->nc == u->na->nc)
+		else if (target->nc == u->nc)
 			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
 		else if (NSMaxAliases && (target->nc->aliases.count >= NSMaxAliases) && !nick_is_services_admin(target->nc))
 			notice_lang(s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, s_NickServ, s_NickServ);
@@ -128,8 +121,8 @@ class CommandNSGroup : public Command
 			/* If the nick is already registered, drop it.
 			 * If not, check that it is valid.
 			 */
-			if (u->na)
-				delnick(u->na);
+			if (findnick(u->nick))
+				delnick(findnick(u->nick));
 			else
 			{
 				int prefixlen = strlen(NSGuestNickPrefix);
@@ -163,9 +156,7 @@ class CommandNSGroup : public Command
 					}
 				}
 
-				u->na = na;
 				u->nc = na->nc;
-				na->u = u;
 
 				send_event(EVENT_GROUP, 1, u->nick);
 				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
@@ -223,17 +214,17 @@ class CommandNSGList : public Command
 	{
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 
-		NickAlias *na, *na2;
+		NickCore *nc = u->nc;
 		int is_servadmin = is_services_admin(u);
 		int nick_ided = nick_identified(u);
 		int i;
 
 		if (nick ? (stricmp(nick, u->nick) ? !is_servadmin : !nick_ided) : !nick_ided)
 			notice_lang(s_NickServ, u, nick_ided ? ACCESS_DENIED : NICK_IDENTIFY_REQUIRED, s_NickServ);
-		else if (!nick ? !(na = u->na) : !(na = findnick(nick)))
+		else if (nick && (!findnick(nick) || !(nc = findnick(nick)->nc)))
 			notice_lang(s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_FORBIDDEN)
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+/*		else if (na->status & NS_FORBIDDEN)
+			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);*/
 		else
 		{
 			time_t expt;
@@ -241,22 +232,22 @@ class CommandNSGList : public Command
 			char buf[BUFSIZE];
 			int wont_expire;
 
-			notice_lang(s_NickServ, u, nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, na->nc->display);
-			for (i = 0; i < na->nc->aliases.count; ++i)
+			notice_lang(s_NickServ, u, nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display);
+			for (i = 0; i < nc->aliases.count; ++i)
 			{
-				na2 = static_cast<NickAlias *>(na->nc->aliases.list[i]);
-				if (na2->nc == na->nc)
+				NickAlias *na2 = static_cast<NickAlias *>(nc->aliases.list[i]);
+				if (na2->nc == nc)
 				{
 					if (!(wont_expire = na2->status & NS_NO_EXPIRE))
 					{
 						expt = na2->last_seen + NSExpire;
 						tm = localtime(&expt);
-						strftime_lang(buf, sizeof(buf), na2->u, STRFTIME_DATE_TIME_FORMAT, tm);
+						strftime_lang(buf, sizeof(buf), finduser(na2->nick), STRFTIME_DATE_TIME_FORMAT, tm);
 					}
 					notice_lang(s_NickServ, u, is_services_admin(u) && !wont_expire ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY, wont_expire ? '!' : ' ', na2->nick, buf);
 				}
 			}
-			notice_lang(s_NickServ, u, NICK_GLIST_FOOTER, na->nc->aliases.count);
+			notice_lang(s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.count);
 		}
 		return MOD_CONT;
 	}

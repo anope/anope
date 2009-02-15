@@ -33,7 +33,7 @@ class CommandNSRecover : public Command
 
 		if (!(u2 = finduser(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (!(na = u2->na))
+		else if (!(na = findnick(u2->nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
@@ -53,7 +53,7 @@ class CommandNSRecover : public Command
 				collide(na, 0);
 
 				/* Convert NSReleaseTimeout seconds to string format */
-				duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
+				duration(na->nc, relstr, sizeof(relstr), NSReleaseTimeout);
 
 				notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
 			}
@@ -69,7 +69,7 @@ class CommandNSRecover : public Command
 		}
 		else
 		{
-			if (group_identified(u, na->nc) || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->nc == na->nc || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
 				collide(na, 0);
@@ -86,7 +86,7 @@ class CommandNSRecover : public Command
 		char relstr[192];
 
 		/* Convert NSReleaseTimeout seconds to string format */
-		duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
+		duration(u->nc, relstr, sizeof(relstr), NSReleaseTimeout);
 
 		notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
 		do_help_limited(s_NickServ, u, this);

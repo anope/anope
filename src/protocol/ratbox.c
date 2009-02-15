@@ -725,7 +725,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 		s = findserver_uid(servlist, source);
 		/* Source is always the server */
 		user = do_nick("", av[0], av[4], av[5], s->name, av[8],
-					   strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
+					   strtoul(av[2], NULL, 10), 0, "*", av[7]);
 		if (user)
 		{
 			ircdproto->ProcessUsermodes(user, 1, &av[3]);
@@ -734,7 +734,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 		if (ac == 2)
 		{
 			do_nick(source, av[0], NULL, NULL, NULL, NULL,
-					strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+					strtoul(av[1], NULL, 10), 0, NULL, NULL);
 		}
 	}
 	return MOD_CONT;

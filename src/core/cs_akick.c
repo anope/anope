@@ -82,7 +82,7 @@ int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 				((akick->flags & AK_ISNICK) ? akick->u.nc->
 				 display : akick->u.mask),
 				(akick->reason ? akick->
-				 reason : getstring(u->na, NO_REASON)));
+				 reason : getstring(u, NO_REASON)));
 	return 1;
 }
 
@@ -113,7 +113,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 		strftime_lang(timebuf, sizeof(timebuf), u,
 					  STRFTIME_SHORT_DATE_FORMAT, &tm);
 	} else {
-		snprintf(timebuf, sizeof(timebuf), "%s", getstring(u->na, UNKNOWN));
+		snprintf(timebuf, sizeof(timebuf), "%s", getstring(u, UNKNOWN));
 	}
 
 	notice_lang(s_ChanServ, u,
@@ -122,11 +122,11 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 				 CHAN_AKICK_VIEW_FORMAT), index + 1,
 				((akick->flags & AK_ISNICK) ? akick->u.nc->
 				 display : akick->u.mask),
-				akick->creator ? akick->creator : getstring(u->na,
+				akick->creator ? akick->creator : getstring(u,
 															UNKNOWN),
 				timebuf,
 				(akick->reason ? akick->
-				 reason : getstring(u->na, NO_REASON)));
+				 reason : getstring(u, NO_REASON)));
 	return 1;
 }
 

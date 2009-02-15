@@ -58,7 +58,7 @@ class CommandNSRelease : public Command
 		}
 		else
 		{
-			if (group_identified(u, na->nc) || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->nc == na->nc || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				release(na, 0);
 				notice_lang(s_NickServ, u, NICK_RELEASED);
@@ -74,7 +74,7 @@ class CommandNSRelease : public Command
 		char relstr[192];
 
 		/* Convert NSReleaseTimeout seconds to string format */
-		duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
+		duration(u->nc, relstr, sizeof(relstr), NSReleaseTimeout);
 
 		notice_help(s_NickServ, u, NICK_HELP_RELEASE, relstr);
 		do_help_limited(s_NickServ, u, this);

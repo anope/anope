@@ -61,7 +61,7 @@ class CommandBSInfo : public Command
 
 		int need_comma = 0;
 		char buf[BUFSIZE], *end;
-		const char *commastr = getstring(u->na, COMMA_SPACE);
+		const char *commastr = getstring(u, COMMA_SPACE);
 
 		if ((bi = findbot(query)))
 		{
@@ -74,7 +74,7 @@ class CommandBSInfo : public Command
 			strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 			notice_lang(s_BotServ, u, BOT_INFO_BOT_CREATED, buf);
 			notice_lang(s_BotServ, u, BOT_INFO_BOT_OPTIONS,
-						getstring(u->na,
+						getstring(u,
 									(bi->
 									 flags & BI_PRIVATE) ? BOT_INFO_OPT_PRIVATE :
 									BOT_INFO_OPT_NONE));
@@ -104,137 +104,137 @@ class CommandBSInfo : public Command
 			if (ci->botflags & BS_KICK_BADWORDS) {
 				if (ci->ttb[TTB_BADWORDS])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_BADWORDS]);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS,
-								getstring(u->na, BOT_INFO_ACTIVE));
+								getstring(u, BOT_INFO_ACTIVE));
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_BOLDS) {
 				if (ci->ttb[TTB_BOLDS])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_BOLDS]);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS,
-								getstring(u->na, BOT_INFO_ACTIVE));
+								getstring(u, BOT_INFO_ACTIVE));
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_CAPS) {
 				if (ci->ttb[TTB_CAPS])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_CAPS], ci->capsmin,
 								ci->capspercent);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_ON,
-								getstring(u->na, BOT_INFO_ACTIVE), ci->capsmin,
+								getstring(u, BOT_INFO_ACTIVE), ci->capsmin,
 								ci->capspercent);
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_OFF,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_COLORS) {
 				if (ci->ttb[TTB_COLORS])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_COLORS]);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS,
-								getstring(u->na, BOT_INFO_ACTIVE));
+								getstring(u, BOT_INFO_ACTIVE));
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_FLOOD) {
 				if (ci->ttb[TTB_FLOOD])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_FLOOD], ci->floodlines,
 								ci->floodsecs);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_ON,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->floodlines, ci->floodsecs);
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_OFF,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_REPEAT) {
 				if (ci->ttb[TTB_REPEAT])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_REPEAT], ci->repeattimes);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_ON,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->repeattimes);
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_OFF,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_REVERSES) {
 				if (ci->ttb[TTB_REVERSES])
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_REVERSES]);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES,
-								getstring(u->na, BOT_INFO_ACTIVE));
+								getstring(u, BOT_INFO_ACTIVE));
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 			if (ci->botflags & BS_KICK_UNDERLINES) {
 				if (ci->ttb[TTB_UNDERLINES])
 					notice_lang(s_BotServ, u,
 								BOT_INFO_CHAN_KICK_UNDERLINES_BAN,
-								getstring(u->na, BOT_INFO_ACTIVE),
+								getstring(u, BOT_INFO_ACTIVE),
 								ci->ttb[TTB_UNDERLINES]);
 				else
 					notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES,
-								getstring(u->na, BOT_INFO_ACTIVE));
+								getstring(u, BOT_INFO_ACTIVE));
 			} else
 				notice_lang(s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES,
-							getstring(u->na, BOT_INFO_INACTIVE));
+							getstring(u, BOT_INFO_INACTIVE));
 
 			end = buf;
 			*end = 0;
 			if (ci->botflags & BS_DONTKICKOPS) {
 				end += snprintf(end, sizeof(buf) - (end - buf), "%s",
-								getstring(u->na, BOT_INFO_OPT_DONTKICKOPS));
+								getstring(u, BOT_INFO_OPT_DONTKICKOPS));
 				need_comma = 1;
 			}
 			if (ci->botflags & BS_DONTKICKVOICES) {
 				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
 								need_comma ? commastr : "",
-								getstring(u->na, BOT_INFO_OPT_DONTKICKVOICES));
+								getstring(u, BOT_INFO_OPT_DONTKICKVOICES));
 				need_comma = 1;
 			}
 			if (ci->botflags & BS_FANTASY) {
 				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
 								need_comma ? commastr : "",
-								getstring(u->na, BOT_INFO_OPT_FANTASY));
+								getstring(u, BOT_INFO_OPT_FANTASY));
 				need_comma = 1;
 			}
 			if (ci->botflags & BS_GREET) {
 				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
 								need_comma ? commastr : "",
-								getstring(u->na, BOT_INFO_OPT_GREET));
+								getstring(u, BOT_INFO_OPT_GREET));
 				need_comma = 1;
 			}
 			if (ci->botflags & BS_NOBOT) {
 				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
 								need_comma ? commastr : "",
-								getstring(u->na, BOT_INFO_OPT_NOBOT));
+								getstring(u, BOT_INFO_OPT_NOBOT));
 				need_comma = 1;
 			}
 			if (ci->botflags & BS_SYMBIOSIS) {
 				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
 								need_comma ? commastr : "",
-								getstring(u->na, BOT_INFO_OPT_SYMBIOSIS));
+								getstring(u, BOT_INFO_OPT_SYMBIOSIS));
 				need_comma = 1;
 			}
 			notice_lang(s_BotServ, u, BOT_INFO_CHAN_OPTIONS,
-						*buf ? buf : getstring(u->na, BOT_INFO_OPT_NONE));
+						*buf ? buf : getstring(u, BOT_INFO_OPT_NONE));
 
 		} else
 			notice_lang(s_BotServ, u, BOT_INFO_NOT_FOUND, query);

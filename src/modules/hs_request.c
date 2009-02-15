@@ -345,7 +345,7 @@ class HSListBase : public Command
 			{
 				++display_counter;
 				tm = localtime(&current->time);
-				strftime(buf, sizeof(buf), getstring(NULL, STRFTIME_DATE_TIME_FORMAT), tm);
+				strftime(buf, sizeof(buf), getstring(u, STRFTIME_DATE_TIME_FORMAT), tm);
 				if (current->vIdent)
 					notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
 				else
@@ -751,8 +751,8 @@ void my_memo_lang(User *u, char *name, int z, int number, ...)
 
 	u2 = finduser(name);
 	/* Find the users lang, and use it if we cant */
-	if (u2 && u2->na && u2->na->nc)
-		lang = u2->na->nc->language;
+	if (u2 && u2->nc)
+		lang = u2->nc->language;
 
 	/* If the users lang isnt supported, drop back to enlgish */
 	if (!me->lang[lang].argc)

@@ -22,7 +22,6 @@ class CommandOSGlobal : public Command
  public:
 	CommandOSGlobal() : Command("GLOBAL", 1, 1)
 	{
-		this->help_param1 = s_GlobalNoticer;
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -40,7 +39,7 @@ class CommandOSGlobal : public Command
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_OperServ, u, OPER_HELP_GLOBAL);
+		notice_help(s_OperServ, u, OPER_HELP_GLOBAL, s_GlobalNoticer);
 		return true;
 	}
 

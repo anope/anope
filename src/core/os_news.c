@@ -271,7 +271,7 @@ class CommandOSLogonNews : public NewsBase
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_OperServ, u, NEWS_HELP_LOGON);
+		notice_help(s_OperServ, u, NEWS_HELP_LOGON, this->help_param1);
 		return true;
 	}
 
@@ -317,7 +317,7 @@ class CommandOSOperNews : public NewsBase
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_OperServ, u, NEWS_HELP_OPER);
+		notice_help(s_OperServ, u, NEWS_HELP_OPER, this->help_param1);
 		return true;
 	}
 
@@ -355,7 +355,7 @@ class CommandOSRandomNews : public NewsBase
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_OperServ, u, NEWS_HELP_RANDOM);
+		notice_help(s_OperServ, u, NEWS_HELP_RANDOM);
 		return true;
 	}
 

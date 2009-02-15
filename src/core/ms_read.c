@@ -117,7 +117,7 @@ class CommandMSRead : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_READ);
+		notice_help(s_MemoServ, u, MEMO_HELP_READ);
 		return true;
 	}
 

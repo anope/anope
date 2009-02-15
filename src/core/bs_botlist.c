@@ -69,7 +69,7 @@ class CommandBSBotList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_BOTLIST);
+		notice_help(s_BotServ, u, BOT_HELP_BOTLIST);
 		return true;
 	}
 };

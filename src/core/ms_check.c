@@ -80,7 +80,7 @@ class CommandMSCheck : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CHECK);
+		notice_help(s_MemoServ, u, MEMO_HELP_CHECK);
 		return true;
 	}
 

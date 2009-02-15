@@ -407,7 +407,7 @@ class CommandBSBot : public Command
 		if (!is_services_admin(u) && !is_services_root(u))
 			return false;
 
-		notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
+		notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
 		return true;
 	}
 

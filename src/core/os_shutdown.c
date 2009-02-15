@@ -44,7 +44,7 @@ class CommandOSShutdown : public Command
 		if (!is_services_root(u))
 			return false;
 
-		notice_lang(s_OperServ, u, OPER_HELP_SHUTDOWN);
+		notice_help(s_OperServ, u, OPER_HELP_SHUTDOWN);
 		return true;
 	}
 };

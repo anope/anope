@@ -222,7 +222,6 @@ class CommandOSOper : public Command
  public:
 	CommandOSOper() : Command("OPER", 1, 2)
 	{
-		this->help_param1 = s_NickServ;
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -244,7 +243,7 @@ class CommandOSOper : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_OPER);
+		notice_help(s_OperServ, u, OPER_HELP_OPER, s_NickServ);
 		return true;
 	}
 

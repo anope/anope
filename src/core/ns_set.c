@@ -505,31 +505,31 @@ class CommandNSSet : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (subcommand == "DISPLAY")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_DISPLAY);
+			notice_help(s_NickServ, u, NICK_HELP_SET_DISPLAY);
 		else if (subcommand == "PASSWORD")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_PASSWORD);
+			notice_help(s_NickServ, u, NICK_HELP_SET_PASSWORD);
 		else if (subcommand == "URL")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_URL);
+			notice_help(s_NickServ, u, NICK_HELP_SET_URL);
 		else if (subcommand == "EMAIL")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_EMAIL);
+			notice_help(s_NickServ, u, NICK_HELP_SET_EMAIL);
 		else if (subcommand == "ICQ")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_ICQ);
+			notice_help(s_NickServ, u, NICK_HELP_SET_ICQ);
 		else if (subcommand == "GREET")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_GREET);
+			notice_help(s_NickServ, u, NICK_HELP_SET_GREET);
 		else if (subcommand == "KILL")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_KILL);
+			notice_help(s_NickServ, u, NICK_HELP_SET_KILL);
 		else if (subcommand == "SECURE")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_SECURE);
+			notice_help(s_NickServ, u, NICK_HELP_SET_SECURE);
 		else if (subcommand == "PRIVATE")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_PRIVATE);
+			notice_help(s_NickServ, u, NICK_HELP_SET_PRIVATE);
 		else if (subcommand == "MSG")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_MSG);
+			notice_help(s_NickServ, u, NICK_HELP_SET_MSG);
 		else if (subcommand == "HIDE")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_HIDE);
+			notice_help(s_NickServ, u, NICK_HELP_SET_HIDE);
 		else if (subcommand == "AUTOOP")
-			notice_lang(s_NickServ, u, NICK_HELP_SET_AUTOOP);
+			notice_help(s_NickServ, u, NICK_HELP_SET_AUTOOP);
 		else
-			notice_lang(s_NickServ, u, NICK_HELP_SET);
+			notice_help(s_NickServ, u, NICK_HELP_SET);
 
 		return true;
 	}

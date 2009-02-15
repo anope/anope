@@ -79,7 +79,7 @@ class CommandHSGroup : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_GROUP);
+		notice_help(s_HostServ, u, HOST_HELP_GROUP);
 		return true;
 	}
 };

@@ -201,7 +201,7 @@ class CommandNSGroup : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_GROUP);
+		notice_help(s_NickServ, u, NICK_HELP_GROUP);
 		return true;
 	}
 
@@ -264,9 +264,9 @@ class CommandNSGList : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (is_services_admin(u))
-			notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_GLIST);
+			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_GLIST);
 		else
-			notice_lang(s_NickServ, u, NICK_HELP_GLIST);
+			notice_help(s_NickServ, u, NICK_HELP_GLIST);
 
 		return true;
 	}

@@ -59,7 +59,7 @@ class CommandMSSendAll : public Command
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_MemoServ, u, MEMO_HELP_SENDALL);
+		notice_help(s_MemoServ, u, MEMO_HELP_SENDALL);
 		return true;
 	}
 

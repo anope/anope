@@ -54,7 +54,7 @@ class CommandBSBadwords : public Command
 
 		return MOD_CONT;
 	}
-	
+
 	CommandReturn DoAdd(User *u, ChannelInfo *ci, const char *word)
 	{
 		char *opt, *pos;
@@ -165,7 +165,7 @@ class CommandBSBadwords : public Command
 				if (!ci->badwords[i].in_use)
 					break;
 			}
-			
+
 			if (i == ci->bwcount)
 			{
 				notice_lang(s_BotServ, u, BOT_BADWORDS_NOT_FOUND, word, ci->name);
@@ -298,7 +298,7 @@ class CommandBSBadwords : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_BADWORDS);
+		notice_help(s_BotServ, u, BOT_HELP_BADWORDS);
 		return true;
 	}
 

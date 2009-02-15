@@ -56,7 +56,7 @@ class CommandHSDelAll : public Command
 		if (!is_host_remover(u))
 			return false;
 
-		notice_lang(s_HostServ, u, HOST_HELP_DELALL);
+		notice_help(s_HostServ, u, HOST_HELP_DELALL);
 		return true;
 	}
 

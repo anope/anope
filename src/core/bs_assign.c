@@ -36,43 +36,43 @@ class CommandBSAssign : public Command
 			notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
 			return MOD_CONT;
 		}
-		
+
 		if (!(bi = findbot(nick)))
 		{
 			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
 			return MOD_CONT;
 		}
-		
+
 		if (bi->flags & BI_PRIVATE && !is_oper(u))
 		{
 			notice_lang(s_BotServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
-		
+
 		if (!(ci = cs_findchan(chan)))
 		{
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 			return MOD_CONT;
 		}
-		
+
 		if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
-		
+
 		if ((ci->bi) && (stricmp(ci->bi->nick, nick) == 0))
 		{
 			notice_lang(s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
 			return MOD_CONT;
 		}
-		
+
 		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !is_services_admin(u)))
 		{
 			notice_lang(s_BotServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
-		
+
 		bi->Assign(u, ci);
 		notice_lang(s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
 		return MOD_CONT;
@@ -80,7 +80,7 @@ class CommandBSAssign : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_ASSIGN);
+		notice_help(s_BotServ, u, BOT_HELP_ASSIGN);
 		return true;
 	}
 

@@ -95,7 +95,7 @@ class CommandNSForbid : public Command
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
+		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 

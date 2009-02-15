@@ -120,7 +120,7 @@ class CommandNSIdentify : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_IDENTIFY);
+		notice_help(s_NickServ, u, NICK_HELP_IDENTIFY);
 		return true;
 	}
 

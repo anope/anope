@@ -41,7 +41,7 @@ class CommandCSBan : public Command
 		const char *chan = params[0].c_str();
 		const char *target = params[1].c_str();
 		const char *reason = NULL;
-		
+
 		if (params.size() > 2)
 		{
 			params[2].resize(200);
@@ -116,7 +116,7 @@ class CommandCSBan : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_BAN);
+		notice_help(s_ChanServ, u, CHAN_HELP_BAN);
 		return true;
 	}
 
@@ -174,7 +174,7 @@ class CommandCSUnban : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_UNBAN);
+		notice_help(s_ChanServ, u, CHAN_HELP_UNBAN);
 		return true;
 	}
 

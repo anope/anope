@@ -541,25 +541,39 @@ public:
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		// This needs to change XXX
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_NickServ, u, NICK_HELP_SASET);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_DISPLAY);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_PASSWORD);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_URL);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_EMAIL);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_ICQ);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_GREET);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_KILL);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_SECURE);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_PRIVATE);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_MSG);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_HIDE);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_NOEXPIRE);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_AUTOOP);
-		notice_lang(s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
+		if (subcommand.empty())
+			notice_help(s_NickServ, u, NICK_HELP_SASET);
+		else if (subcommand == "DISPLAY")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_DISPLAY);
+		else if (subcommand == "PASSWORD")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_PASSWORD);
+		else if (subcommand == "URL")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_URL);
+		else if (subcommand == "EMAIL")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_EMAIL);
+		else if (subcommand == "ICQ")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_ICQ);
+		else if (subcommand == "GREET")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_GREET);
+		else if (subcommand == "KILL")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_KILL);
+		else if (subcommand == "SECURE")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_SECURE);
+		else if (subcommand == "PRIVATE")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_PRIVATE);
+		else if (subcommand == "MSG")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_MSG);
+		else if (subcommand == "HIDE")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_HIDE);
+		else if (subcommand == "NOEXPIRE")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_NOEXPIRE);
+		else if (subcommand == "AUTOOP")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_AUTOOP);
+		else if (subcommand == "LANGUAGE")
+			notice_help(s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
 
 		return true;
 	}

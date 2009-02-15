@@ -237,15 +237,15 @@ class CommandMSSet : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (subcommand.empty())
-			notice_lang(s_MemoServ, u, MEMO_HELP_SET);
+			notice_help(s_MemoServ, u, MEMO_HELP_SET);
 		else if (subcommand == "NOTIFY")
-			notice_lang(s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
+			notice_help(s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
 		else if (subcommand == "LIMIT")
 		{
 			if (is_services_oper(u))
-				notice_lang(s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, MSMaxMemos);
+				notice_help(s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, MSMaxMemos);
 			else
-				notice_lang(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);
+				notice_help(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);
 		}
 
 		return true;

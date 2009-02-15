@@ -180,7 +180,7 @@ public:
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_LIST);
+		notice_help(s_ChanServ, u, CHAN_HELP_LIST);
 		return true;
 	}
 

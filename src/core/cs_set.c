@@ -652,55 +652,55 @@ class CommandCSSet : public Command
 		{
 			if (is_services_admin(u) || is_services_root(u))
 			{
-				notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET);
+				notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET);
 			}
 			else
 			{
-				notice_lang(s_ChanServ, u, CHAN_HELP_SET);
+				notice_help(s_ChanServ, u, CHAN_HELP_SET);
 			}
 		}
 		else if (subcommand == "FOUNDER")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_FOUNDER);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_FOUNDER);
 		else if (subcommand == "SUCCESSOR")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR);
 		else if (subcommand == "PASSWORD")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_PASSWORD);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_PASSWORD);
 		else if (subcommand == "DESC")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_DESC);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_DESC);
 		else if (subcommand == "URL")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_URL);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_URL);
 		else if (subcommand == "EMAIL")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_EMAIL);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_EMAIL);
 		else if (subcommand == "ENTRYMSG")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG);
 		else if (subcommand == "BANTYPE")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_BANTYPE);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_BANTYPE);
 		else if (subcommand == "PRIVATE")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_PRIVATE);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_PRIVATE);
 		else if (subcommand == "KEEPTOPIC")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_KEEPTOPIC);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_KEEPTOPIC);
 		else if (subcommand == "TOPICLOCK")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_TOPICLOCK);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_TOPICLOCK);
 		else if (subcommand == "MLOCK")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_MLOCK);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_MLOCK);
 		else if (subcommand == "RESTRICTED")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_RESTRICTED);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_RESTRICTED);
 		else if (subcommand == "SECURE")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_SECURE);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_SECURE);
 		else if (subcommand == "SECUREOPS")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_SECUREOPS);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_SECUREOPS);
 		else if (subcommand == "SECUREFOUNDER")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_SECUREFOUNDER);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_SECUREFOUNDER);
 		else if (subcommand == "SIGNKICK")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_SIGNKICK);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_SIGNKICK);
 		else if (subcommand == "OPNOTICE")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_OPNOTICE);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_OPNOTICE);
 		else if (subcommand == "XOP")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_XOP);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_XOP);
 		else if (subcommand == "PEACE")
-			notice_lang(s_ChanServ, u, CHAN_HELP_SET_PEACE);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_PEACE);
 		else if (subcommand == "NOEXPIRE")
-			notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
+			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
 		return true;
 	}
 

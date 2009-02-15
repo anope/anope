@@ -50,7 +50,7 @@ class CommandHSOff : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_OFF);
+		notice_help(s_HostServ, u, HOST_HELP_OFF);
 		return true;
 	}
 };

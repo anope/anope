@@ -103,7 +103,7 @@ class CommandCSIdentify : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_IDENTIFY);
+		notice_help(s_ChanServ, u, CHAN_HELP_IDENTIFY);
 		return true;
 	}
 

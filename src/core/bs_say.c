@@ -23,7 +23,7 @@ class CommandBSSay : public Command
 	CommandBSSay() : Command("SAY", 2, 2)
 	{
 	}
-	
+
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		ChannelInfo *ci;
@@ -36,25 +36,25 @@ class CommandBSSay : public Command
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 			return MOD_CONT;
 		}
-		
+
 		if (ci->flags & CI_FORBIDDEN)
 		{
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
-		
+
 		if (!ci->bi)
 		{
 			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
-		
+
 		if (!ci->c || ci->c->usercount < BSMinUsers)
 		{
 			notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
 			return MOD_CONT;
 		}
-		
+
 		if (!check_access(u, ci, CA_SAY))
 		{
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
@@ -66,7 +66,7 @@ class CommandBSSay : public Command
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		
+
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text);
 		ci->bi->lastmsg = time(NULL);
 		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
@@ -76,7 +76,7 @@ class CommandBSSay : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_SAY);
+		notice_help(s_BotServ, u, BOT_HELP_SAY);
 		return true;
 	}
 

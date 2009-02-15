@@ -299,7 +299,7 @@ class CommandOSSQLine : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_OperServ, u, OPER_HELP_SQLINE);
+		notice_help(s_OperServ, u, OPER_HELP_SQLINE);
 		return true;
 	}
 

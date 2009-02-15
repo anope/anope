@@ -115,8 +115,8 @@ class CommandCSLogout : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (is_services_admin(u) || is_services_root(u))
-			notice_lang(s_NickServ, u, CHAN_SERVADMIN_HELP_LOGOUT);
-		notice_lang(s_NickServ, u, CHAN_HELP_LOGOUT);
+			notice_help(s_NickServ, u, CHAN_SERVADMIN_HELP_LOGOUT);
+		notice_help(s_NickServ, u, CHAN_HELP_LOGOUT);
 		return true;
 	}
 

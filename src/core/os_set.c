@@ -268,21 +268,21 @@ class CommandOSSet : public Command
 			return false;
 
 		if (subcommand.empty())
-			notice_lang(s_OperServ, u, OPER_HELP_SET);
+			notice_help(s_OperServ, u, OPER_HELP_SET);
 		else if (subcommand == "LIST")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_LIST);
+			notice_help(s_OperServ, u, OPER_HELP_SET_LIST);
 		else if (subcommand == "READONLY")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_READONLY);
+			notice_help(s_OperServ, u, OPER_HELP_SET_READONLY);
 		else if (subcommand == "LOGCHAN")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_LOGCHAN);
+			notice_help(s_OperServ, u, OPER_HELP_SET_LOGCHAN);
 		else if (subcommand == "DEBUG")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_DEBUG);
+			notice_help(s_OperServ, u, OPER_HELP_SET_DEBUG);
 		else if (subcommand == "NOEXPIRE")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_NOEXPIRE);
+			notice_help(s_OperServ, u, OPER_HELP_SET_NOEXPIRE);
 		else if (subcommand == "IGNORE")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_IGNORE);
+			notice_help(s_OperServ, u, OPER_HELP_SET_IGNORE);
 		else if (subcommand == "SUPERADMIN")
-			notice_lang(s_OperServ, u, OPER_HELP_SET_SUPERADMIN);
+			notice_help(s_OperServ, u, OPER_HELP_SET_SUPERADMIN);
 
 		return true;
 	}

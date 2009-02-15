@@ -57,7 +57,7 @@ class CommandMSStaff : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_MemoServ, u, MEMO_HELP_STAFF);
+		notice_help(s_MemoServ, u, MEMO_HELP_STAFF);
 		return true;
 	}
 

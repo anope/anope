@@ -55,7 +55,7 @@ class CommandCSStatus : public Command
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
+		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
 		return true;
 	}
 

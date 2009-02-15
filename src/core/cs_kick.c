@@ -94,7 +94,7 @@ class CommandCSKick : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_KICK);
+		notice_help(s_ChanServ, u, CHAN_HELP_KICK);
 		return true;
 	}
 

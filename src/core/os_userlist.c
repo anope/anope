@@ -79,7 +79,7 @@ class CommandOSUserList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_USERLIST);
+		notice_help(s_OperServ, u, OPER_HELP_USERLIST);
 		return true;
 	}
 };

@@ -215,7 +215,6 @@ class CommandOSAdmin : public Command
  public:
 	CommandOSAdmin() : Command("ADMIN", 1, 2)
 	{
-		this->help_param1 = s_NickServ;
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -237,7 +236,7 @@ class CommandOSAdmin : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_ADMIN);
+		notice_help(s_OperServ, u, OPER_HELP_ADMIN, s_NickServ);
 		return true;
 	}
 

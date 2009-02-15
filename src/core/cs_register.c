@@ -144,7 +144,7 @@ class CommandCSRegister : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_REGISTER);
+		notice_help(s_ChanServ, u, CHAN_HELP_REGISTER);
 		return true;
 	}
 

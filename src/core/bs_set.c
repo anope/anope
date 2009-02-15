@@ -22,7 +22,6 @@ class CommandBSSet : public Command
  public:
 	CommandBSSet() : Command("SET", 3, 3)
 	{
-		this->help_param1 = s_ChanServ;
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -153,25 +152,24 @@ class CommandBSSet : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (subcommand == "DONTKICKOPS")
-		notice_lang(s_BotServ, u, BOT_HELP_SET_DONTKICKOPS);
+			notice_help(s_BotServ, u, BOT_HELP_SET_DONTKICKOPS);
 		else if (subcommand == "DONTKICKVOICES")
-		notice_lang(s_BotServ, u, BOT_HELP_SET_DONTKICKVOICES);
+			notice_help(s_BotServ, u, BOT_HELP_SET_DONTKICKVOICES);
 		else if (subcommand == "FANTASY")
-		notice_lang(s_BotServ, u, BOT_HELP_SET_FANTASY);
+			notice_help(s_BotServ, u, BOT_HELP_SET_FANTASY);
 		else if (subcommand == "GREET")
-		notice_lang(s_BotServ, u, BOT_HELP_SET_GREET);
+			notice_help(s_BotServ, u, BOT_HELP_SET_GREET);
 		else if (subcommand == "SYMBIOSIS")
-		notice_lang(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS);
+			notice_help(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS, s_ChanServ);
 		else if (subcommand == "NOBOT" && (is_services_admin(u) || is_services_root(u)))
-			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
+			notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
 		else if (subcommand == "PRIVATE" && (is_services_admin(u) || is_services_root(u)))
-			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_PRIVATE);
+			notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET_PRIVATE);
 		else if (subcommand.empty())
 		{
+			notice_help(s_BotServ, u, BOT_HELP_SET);
 			if (is_services_admin(u) || is_services_root(u))
-				notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
-			else
-				notice_lang(s_BotServ, u, BOT_HELP_SET);
+				notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
 		}
 
 		return true;

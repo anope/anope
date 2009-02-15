@@ -133,7 +133,7 @@ class CommandCSOp : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_OP);
+		notice_help(s_ChanServ, u, CHAN_HELP_OP);
 		return true;
 	}
 };
@@ -154,7 +154,7 @@ class CommandCSDeOp : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_DEOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_DEOP);
 		return true;
 	}
 };
@@ -175,7 +175,7 @@ class CommandCSVoice : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_VOICE);
+		notice_help(s_ChanServ, u, CHAN_HELP_VOICE);
 		return true;
 	}
 };
@@ -196,7 +196,7 @@ class CommandCSDeVoice : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_DEVOICE);
+		notice_help(s_ChanServ, u, CHAN_HELP_DEVOICE);
 		return true;
 	}
 };
@@ -223,7 +223,7 @@ class CommandCSHalfOp : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_HALFOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_HALFOP);
 		return true;
 	}
 };
@@ -249,7 +249,7 @@ class CommandCSDeHalfOp : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_DEHALFOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_DEHALFOP);
 		return true;
 	}
 };
@@ -275,7 +275,7 @@ class CommandCSProtect : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_PROTECT);
+		notice_help(s_ChanServ, u, CHAN_HELP_PROTECT);
 		return true;
 	}
 };
@@ -302,7 +302,7 @@ class CommandCSDeProtect : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_DEPROTECT);
+		notice_help(s_ChanServ, u, CHAN_HELP_DEPROTECT);
 		return true;
 	}
 };
@@ -356,7 +356,7 @@ class CommandCSOwner : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_OWNER);
+		notice_help(s_ChanServ, u, CHAN_HELP_OWNER);
 		return true;
 	}
 };
@@ -409,7 +409,7 @@ class CommandCSDeOwner : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_DEOWNER);
+		notice_help(s_ChanServ, u, CHAN_HELP_DEOWNER);
 		return true;
 	}
 };

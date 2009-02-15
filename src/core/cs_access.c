@@ -376,8 +376,8 @@ class CommandCSAccess : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_ACCESS);
-		notice_lang(s_ChanServ, u, CHAN_HELP_ACCESS_LEVELS);
+		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS);
+		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS_LEVELS);
 		return true;
 	}
 };
@@ -509,7 +509,7 @@ class CommandCSLevels : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_LEVELS);
+		notice_help(s_ChanServ, u, CHAN_HELP_LEVELS);
 		return true;
 	}
 };

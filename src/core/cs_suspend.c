@@ -109,7 +109,7 @@ class CommandCSSuspend : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_SUSPEND);
+		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
@@ -186,7 +186,7 @@ class CommandCSUnSuspend : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_UNSUSPEND);
+		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 

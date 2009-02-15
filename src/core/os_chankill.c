@@ -93,7 +93,7 @@ class CommandOSChanKill : public Command
 		if (!is_services_admin(u))
 			return false;
 
-		notice_lang(s_OperServ, u, OPER_HELP_CHANKILL);
+		notice_help(s_OperServ, u, OPER_HELP_CHANKILL);
 		return true;
 	}
 

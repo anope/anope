@@ -88,9 +88,9 @@ class CommandNSLogout : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (is_services_admin(u))
-			notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
+			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
 		else
-			notice_lang(s_NickServ, u, NICK_HELP_LOGOUT);
+			notice_help(s_NickServ, u, NICK_HELP_LOGOUT);
 
 		return true;
 	}

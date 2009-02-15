@@ -91,7 +91,7 @@ class CommandNSSuspend : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_SUSPEND);
+		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
@@ -161,7 +161,7 @@ class CommandNSUnSuspend : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_UNSUSPEND);
+		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 

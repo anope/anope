@@ -207,9 +207,9 @@ class CommandNSInfo : public Command
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (is_services_admin(u))
-			notice_lang(s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
+			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 		else
-			notice_lang(s_NickServ, u, NICK_HELP_INFO);
+			notice_help(s_NickServ, u, NICK_HELP_INFO);
 		return true;
 	}
 

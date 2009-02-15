@@ -49,7 +49,7 @@ class CommandHSDel : public Command
 		if (!is_host_remover(u))
 			return false;
 
-		notice_lang(s_HostServ, u, HOST_HELP_DEL);
+		notice_help(s_HostServ, u, HOST_HELP_DEL);
 		return true;
 	}
 

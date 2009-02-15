@@ -146,7 +146,7 @@ class CommandHSSet : public Command
 		if (!is_host_setter(u))
 			return false;
 
-		notice_lang(s_HostServ, u, HOST_HELP_SET);
+		notice_help(s_HostServ, u, HOST_HELP_SET);
 		return true;
 	}
 

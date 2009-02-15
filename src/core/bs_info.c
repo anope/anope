@@ -239,7 +239,7 @@ class CommandBSInfo : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_INFO);
+		notice_help(s_BotServ, u, BOT_HELP_INFO);
 		return true;
 	}
 

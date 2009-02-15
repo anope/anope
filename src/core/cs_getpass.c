@@ -74,7 +74,7 @@ class CommandCSGetPass : public Command
 	{
 		if (is_services_admin(u))
 		{
-			notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_GETPASS);
+			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_GETPASS);
 			return true;
 		}
 

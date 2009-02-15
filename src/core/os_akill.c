@@ -315,7 +315,7 @@ class CommandOSAKill : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_OperServ, u, OPER_HELP_AKILL);
+		notice_help(s_OperServ, u, OPER_HELP_AKILL);
 		return true;
 	}
 

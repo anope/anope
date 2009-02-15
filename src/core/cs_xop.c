@@ -456,7 +456,7 @@ class CommandCSAOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_AOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_AOP);
 		return true;
 	}
 
@@ -480,7 +480,7 @@ class CommandCSHOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_HOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_HOP);
 		return true;
 	}
 
@@ -504,7 +504,7 @@ class CommandCSSOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_SOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_SOP);
 		return true;
 	}
 
@@ -528,7 +528,7 @@ class CommandCSVOP : public XOPBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_VOP);
+		notice_help(s_ChanServ, u, CHAN_HELP_VOP);
 		return true;
 	}
 

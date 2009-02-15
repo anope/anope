@@ -57,7 +57,7 @@ class CommandOSModInfo : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_MODINFO);
+		notice_help(s_OperServ, u, OPER_HELP_MODINFO);
 		return true;
 	}
 

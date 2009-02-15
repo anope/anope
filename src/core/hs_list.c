@@ -142,7 +142,7 @@ class CommandHSList : public Command
 		if (!is_services_oper(u))
 			return false;
 
-		notice_lang(s_HostServ, u, HOST_HELP_LIST);
+		notice_help(s_HostServ, u, HOST_HELP_LIST);
 		return true;
 	}
 };

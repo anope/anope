@@ -77,7 +77,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		// Command requires registered users only
 		if (!nick_identified(u))
 		{
-			notice_lang(service, u, NICK_IDENTIFY_REQUIRED, service);
+			notice_lang(service, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 			alog("Access denied for unregistered user %s with service %s and command %s", u->nick, service, cmd);
 			return;
 		}

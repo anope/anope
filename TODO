@@ -21,6 +21,10 @@ Legend:
 [ ] Add support for +k, +q, etc type umodes
 [x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
 
+Outstanding issues:
+- autoid
+- * help set
+
 1.9.2
 -----
 [ ] Redo database insanity.

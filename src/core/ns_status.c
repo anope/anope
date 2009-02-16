@@ -22,6 +22,7 @@ class CommandNSStatus : public Command
  public:
 	CommandNSStatus() : Command("STATUS", 0, 16)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

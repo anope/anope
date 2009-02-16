@@ -216,6 +216,7 @@ class CommandNSRegister : public CommandNSConfirm
  public:
 	CommandNSRegister() : CommandNSConfirm("REGISTER", 1, 2)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

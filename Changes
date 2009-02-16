@@ -1,6 +1,14 @@
 Anope Version 1.9.1
 --------------------
 
+Provided by Adam <adam@anope.org> - 2009
+F Applied patch from Adam to fix some potential screwups
+F More fixes to bs_bot from Adam, plus an extra fix within DoAdd not covered in Adam's patch.
+F Fix bs_bot to use the correct parameters, patch from Adam.
+F Fix for bug #1004, based from second half of patch from Adam.
+F Partial patch by Adam, commenting fix for #1006 for future reference.
+F Forward-port r1946:  Patch by Adam fixing #1006 (originally caused by #922): modes set by ChanServ are reversed. Thanks!
+
 Provided by DukePyrolator <dukepyrolator@gmx.de> - 2009
 F Allow NS STATUS from unregistered users, thanks DP!
 F Wild pointers do not a happy Anope make. Thanks DP :)

@@ -264,7 +264,7 @@ class CommandCSAKick : public Command
 						if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci)
 								>= get_access(u, ci)))) {
 							snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
-							if (match_wild_nocase(mask, buf)) {
+							if (Anope::Match(mask, buf, false)) {
 								notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 								delete [] mask;
 								return MOD_CONT;
@@ -536,10 +536,10 @@ class CommandCSAKick : public Command
 						continue;
 					if (mask) {
 						if (!(akick->flags & AK_ISNICK)
-							&& !match_wild_nocase(mask, akick->u.mask))
+							&& !Anope::Match(mask, akick->u.mask, false))
 							continue;
 						if ((akick->flags & AK_ISNICK)
-							&& !match_wild_nocase(mask, akick->u.nc->display))
+							&& !Anope::Match(mask, akick->u.nc->display, false))
 							continue;
 					}
 					akick_list(u, i, ci, &sent_header);
@@ -565,10 +565,10 @@ class CommandCSAKick : public Command
 						continue;
 					if (mask) {
 						if (!(akick->flags & AK_ISNICK)
-							&& !match_wild_nocase(mask, akick->u.mask))
+							&& !Anope::Match(mask, akick->u.mask, false))
 							continue;
 						if ((akick->flags & AK_ISNICK)
-							&& !match_wild_nocase(mask, akick->u.nc->display))
+							&& !Anope::Match(mask, akick->u.nc->display, false))
 							continue;
 					}
 					akick_view(u, i, ci, &sent_header);

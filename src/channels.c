@@ -2154,13 +2154,13 @@ int entry_match(Entry * e, const char *nick, const char *user, const char *host,
 		&& (!user || stricmp(e->host, host) != 0))
 		return 0;
 	if ((e->type & ENTRYTYPE_NICK_WILD)
-		&& !match_wild_nocase(e->nick, nick))
+		&& !Anope::Match(e->nick, nick, false))
 		return 0;
 	if ((e->type & ENTRYTYPE_USER_WILD)
-		&& !match_wild_nocase(e->user, user))
+		&& !Anope::Match(e->user, user, false))
 		return 0;
 	if ((e->type & ENTRYTYPE_HOST_WILD)
-		&& !match_wild_nocase(e->host, host))
+		&& !Anope::Match(e->host, host, false))
 		return 0;
 
 	return 1;

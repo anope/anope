@@ -627,9 +627,6 @@ E char *strnrepl(char *s, int32 size, const char *old, const char *nstr);
 E const char *merge_args(int argc, char **argv);
 E const char *merge_args(int argc, const char **argv);
 
-// Use Anope::Match() instead of these.
-E int match_wild(const char *pattern, const char *str) MARK_DEPRECATED;
-E int match_wild_nocase(const char *pattern, const char *str) MARK_DEPRECATED;
 E int dotime(const char *s);
 E const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds);
 E const char *expire_left(NickCore *nc, char *buf, int len, time_t expires);

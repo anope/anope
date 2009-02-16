@@ -63,7 +63,7 @@ class CommandOSUserList : public Command
 					if (pattern)
 					{
 						snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
-						if (!match_wild_nocase(pattern, mask))
+						if (!Anope::Match(pattern, mask, false))
 							continue;
 						if (modes && !(u2->mode & modes))
 							continue;

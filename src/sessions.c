@@ -280,7 +280,7 @@ Exception *find_host_exception(const char *host)
 	int i;
 
 	for (i = 0; i < nexceptions; i++) {
-		if ((match_wild_nocase(exceptions[i].mask, host))) {
+		if ((Anope::Match(exceptions[i].mask, host, false))) {
 			return &exceptions[i];
 		}
 	}
@@ -295,9 +295,9 @@ Exception *find_hostip_exception(const char *host, const char *hostip)
 	int i;
 
 	for (i = 0; i < nexceptions; i++) {
-		if ((match_wild_nocase(exceptions[i].mask, host))
+		if ((Anope::Match(exceptions[i].mask, host, false))
 			|| ((ircd->nickip && hostip)
-				&& (match_wild_nocase(exceptions[i].mask, hostip)))) {
+				&& (Anope::Match(exceptions[i].mask, hostip, false)))) {
 			return &exceptions[i];
 		}
 	}

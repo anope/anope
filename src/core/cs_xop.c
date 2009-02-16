@@ -354,7 +354,7 @@ class XOPBase : public Command
 		{
 			for (int i = 0; i < ci->accesscount; ++i)
 			{
-				if (nick && ci->access[i].nc && !match_wild_nocase(nick, ci->access[i].nc->display))
+				if (nick && ci->access[i].nc && !Anope::Match(nick, ci->access[i].nc->display, false))
 					continue;
 				xop_list(u, i, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
 			}

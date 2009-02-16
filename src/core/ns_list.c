@@ -143,7 +143,7 @@ class CommandNSList : public Command
 					 * Instead we build a nice nick!user@host buffer to compare.
 					 * The output is then generated separately. -TheShadow */
 					snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->status & NS_FORBIDDEN) ? na->last_usermask : "*@*");
-					if (!stricmp(pattern, na->nick) || match_wild_nocase(pattern, buf))
+					if (!stricmp(pattern, na->nick) || Anope::Match(pattern, buf, false))
 					{
 						if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= NSListMax)
 						{
@@ -175,7 +175,7 @@ class CommandNSList : public Command
 				for (nr = nrlists[i]; nr; nr = nr->next)
 				{
 					snprintf(buf, sizeof(buf), "%s!*@*", nr->nick);
-					if (!stricmp(pattern, nr->nick) || match_wild_nocase(pattern, buf))
+					if (!stricmp(pattern, nr->nick) || Anope::Match(pattern, buf, false))
 					{
 						if (++nnicks <= NSListMax)
 						{

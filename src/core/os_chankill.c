@@ -27,7 +27,7 @@ class CommandOSChanKill : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *expiry, *channel;
-		char reason[BUFSIZE];
+		char reason[BUFSIZE], realreason[BUFSIZE];
 		time_t expires;
 		char mask[USERMAX + HOSTMAX + 2];
 		struct c_userlist *cu, *next;
@@ -65,7 +65,9 @@ class CommandOSChanKill : public Command
 		{
 
 			if (AddAkiller)
-				snprintf(reason, sizeof(reason), "[%s] %s", u->nick, reason);
+				snprintf(realreason, sizeof(realreason), "[%s] %s", u->nick, reason);
+			else
+				snprintf(realreason, sizeof(realreason), "%s", reason);
 
 			if ((c = findchan(channel)))
 			{
@@ -76,11 +78,11 @@ class CommandOSChanKill : public Command
 						continue;
 					strncpy(mask, "*@", 3); /* Use *@" for the akill's, */
 					strncat(mask, cu->user->host, HOSTMAX);
-					add_akill(NULL, mask, s_OperServ, expires, reason);
+					add_akill(NULL, mask, s_OperServ, expires, realreason);
 					check_akill(cu->user->nick, cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
 				}
 				if (WallOSAkill)
-					ircdproto->SendGlobops(s_OperServ, "%s used CHANKILL on %s (%s)", u->nick, channel, reason);
+					ircdproto->SendGlobops(s_OperServ, "%s used CHANKILL on %s (%s)", u->nick, channel, realreason);
 			}
 			else
 				notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, channel);

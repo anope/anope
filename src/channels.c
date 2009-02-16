@@ -14,6 +14,7 @@
 
 #include "services.h"
 #include "language.h"
+#include "modules.h"
 
 Channel *chanlist[1024];
 
@@ -639,8 +640,9 @@ void do_kick(const char *source, int ac, const char **av)
 		}
 		for (c = user->chans; c && stricmp(av[0], c->chan->name) != 0;
 			 c = c->next);
-		if (c) {
-			send_event(EVENT_CHAN_KICK, 2, user->nick, av[0]);
+		if (c)
+		{
+			FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, merge_args(ac - 2, av + 2)));
 			chan_deluser(user, c->chan);
 			if (c->next)
 				c->next->prev = c->prev;

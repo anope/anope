@@ -48,7 +48,7 @@
  */
 #define FOREACH_MOD(y,x) do { \
 	std::vector<Module*>::iterator safei; \
-	for (std::vector<Module*>::iterator _i = ServerInstance->Modules->EventHandlers[y].begin(); _i != ServerInstance->Modules->EventHandlers[y].end(); ) \
+	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
 	{ \
 		safei = _i; \
 		++safei; \
@@ -58,31 +58,7 @@
 		} \
 		catch (CoreException& modexcept) \
 		{ \
-			ServerInstance->Logs->Log("MODULE",DEFAULT,"Exception caught: %s",modexcept.GetReason()); \
-		} \
-		_i = safei; \
-	} \
-} while (0);
-
-/**
- * This #define allows us to call a method in all
- * loaded modules in a readable simple way and pass
- * an instance pointer to the macro. e.g.:
- * 'FOREACH_MOD_I(Instance, OnConnect, OnConnect(user));'
- */
-#define FOREACH_MOD_I(z,y,x) do { \
-	std::vector<Module*>::iterator safei; \
-	for (std::vector<Module*>::iterator _i = z->Modules->EventHandlers[y].begin(); _i != z->Modules->EventHandlers[y].end(); ) \
-	{ \
-		safei = _i; \
-		++safei; \
-		try \
-		{ \
-			(*_i)->x ; \
-		} \
-		catch (CoreException& modexcept) \
-		{ \
-			z->Logs->Log("MODULE",DEFAULT,"Exception caught: %s",modexcept.GetReason()); \
+			alog("Exception caught: %s",modexcept.GetReason()); \
 		} \
 		_i = safei; \
 	} \
@@ -97,7 +73,7 @@
 do { \
 	std::vector<Module*>::iterator safei; \
 	MOD_RESULT = 0; \
-	for (std::vector<Module*>::iterator _i = ServerInstance->Modules->EventHandlers[y].begin(); _i != ServerInstance->Modules->EventHandlers[y].end(); ) \
+	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
 	{ \
 		safei = _i; \
 		++safei; \
@@ -111,41 +87,12 @@ do { \
 		} \
 		catch (CoreException& modexcept) \
 		{ \
-			ServerInstance->Logs->Log("MODULE",DEFAULT,"Exception caught: %s",modexcept.GetReason()); \
+			alog("Exception caught: %s",modexcept.GetReason()); \
 		} \
 		_i = safei; \
 	} \
 } while(0);
 
-
-/**
- * This define is similar to the one above but returns a result in MOD_RESULT.
- * The first module to return a nonzero result is the value to be accepted,
- * and any modules after are ignored.
- */
-#define FOREACH_RESULT_I(z,y,x) \
-do { \
-	std::vector<Module*>::iterator safei; \
-	MOD_RESULT = 0; \
-	for (std::vector<Module*>::iterator _i = z->Modules->EventHandlers[y].begin(); _i != z->Modules->EventHandlers[y].end(); ) \
-	{ \
-		safei = _i; \
-		++safei; \
-		try \
-		{ \
-			int res = (*_i)->x ; \
-			if (res != 0) { \
-				MOD_RESULT = res; \
-				break; \
-			} \
-		} \
-		catch (CoreException& modexcept) \
-		{ \
-			z->Logs->Log("MODULE",DEBUG,"Exception caught: %s",modexcept.GetReason()); \
-		} \
-		_i = safei; \
-	} \
-} while (0);
 
 
 /** Priority types which can be returned from Module::Prioritize()
@@ -157,6 +104,7 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 enum Implementation
 {
 	I_BEGIN,
+		I_OnUserKicked,
 	I_END
 };
 
@@ -532,6 +480,16 @@ class CoreExport Module
 	 * @param name the name of the callback they wish to delete
 	 **/
 	void DelCallback(const char *name);
+
+
+
+	/** Called when the ircd notifies that a user has been kicked from a channel.
+	 * @param c The channel the user has been kicked from.
+	 * @param target The user that has been kicked.
+	 * @param kickmsg The reason for the kick.
+	 * NOTE: We may want to add a second User arg for sender in the future.
+	 */
+	virtual void OnUserKicked(Channel *c, User *target, const std::string &kickmsg) { }
 };
 
 

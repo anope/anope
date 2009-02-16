@@ -61,4 +61,3 @@
 #define EVENT_ACCESS_DEL "access_del"
 #define EVENT_ACCESS_CLEAR "access_clear"
 #define EVENT_NICK_LOGOUT "nick_logout"
-#define EVENT_CHAN_KICK "chan_kick"

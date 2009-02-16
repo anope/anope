@@ -813,7 +813,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "forceforbidreason", "no", new ValueContainerBool(&ForceForbidReason), DT_BOOLEAN, NoValidation},
 		{"options", "useprivmsg", "no", new ValueContainerBool(&UsePrivmsg), DT_BOOLEAN, NoValidation},
 		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
-		{"options", "dumpcore", "no", new ValueContainerBool(&DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
+		{"options", "dumpcore", "yes", new ValueContainerBool(&DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"options", "logusers", "no", new ValueContainerBool(&LogUsers), DT_BOOLEAN, NoValidation},
 		{"options", "hidestatso", "no", new ValueContainerBool(&HideStatsO), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycle", "no", new ValueContainerBool(&GlobalOnCycle), DT_BOOLEAN, NoValidation},

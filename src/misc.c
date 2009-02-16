@@ -219,7 +219,7 @@ const char *merge_args(int argc, char **argv)
  */
 int match_wild(const char *pattern, const char *str)
 {
-	return Anope::Match(pattern, str, true);
+	return Anope::Match(str, pattern, true);
 }
 
 /*************************************************************************/
@@ -233,7 +233,7 @@ int match_wild(const char *pattern, const char *str)
  */
 int match_wild_nocase(const char *pattern, const char *str)
 {
-	return Anope::Match(pattern, str, false);
+	return Anope::Match(str, pattern, false);
 }
 
 /*************************************************************************/

@@ -11,6 +11,9 @@
 #include "modules.h"
 #include "language.h"
 #include "version.h"
+#include <algorithm> // std::find
+
+std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
 void ModuleManager::LoadModuleList(int total_modules, char **module_list)
 {
@@ -291,4 +294,153 @@ void ModuleManager::DeleteModule(Module *m)
 		if ((dlclose(handle)) != 0)
 			alog("%s", dlerror());
 	}
+}
+
+bool ModuleManager::Attach(Implementation i, Module* mod)
+{
+	if (std::find(EventHandlers[i].begin(), EventHandlers[i].end(), mod) != EventHandlers[i].end())
+		return false;
+
+	EventHandlers[i].push_back(mod);
+	return true;
+}
+
+bool ModuleManager::Detach(Implementation i, Module* mod)
+{
+	std::vector<Module *>::iterator x = std::find(EventHandlers[i].begin(), EventHandlers[i].end(), mod);
+
+	if (x == EventHandlers[i].end())
+		return false;
+
+	EventHandlers[i].erase(x);
+	return true;
+}
+
+void ModuleManager::Attach(Implementation* i, Module* mod, size_t sz)
+{
+	for (size_t n = 0; n < sz; ++n)
+		Attach(i[n], mod);
+}
+
+void ModuleManager::DetachAll(Module* mod)
+{
+	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
+		Detach((Implementation)n, mod);
+}
+
+bool ModuleManager::SetPriority(Module* mod, Priority s)
+{
+	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
+		SetPriority(mod, (Implementation)n, s);
+
+	return true;
+}
+
+bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Module** modules, size_t sz)
+{
+	/** To change the priority of a module, we first find its position in the vector,
+	 * then we find the position of the other modules in the vector that this module
+	 * wants to be before/after. We pick off either the first or last of these depending
+	 * on which they want, and we make sure our module is *at least* before or after
+	 * the first or last of this subset, depending again on the type of priority.
+	 */
+	size_t swap_pos = 0;
+	size_t source = 0;
+	bool swap = true;
+	bool found = false;
+
+	/* Locate our module. This is O(n) but it only occurs on module load so we're
+	 * not too bothered about it
+	 */
+	for (size_t x = 0; x != EventHandlers[i].size(); ++x)
+	{
+		if (EventHandlers[i][x] == mod)
+		{
+			source = x;
+			found = true;
+			break;
+		}
+	}
+
+	/* Eh? this module doesnt exist, probably trying to set priority on an event
+	 * theyre not attached to.
+	 */
+	if (!found)
+		return false;
+
+	switch (s)
+	{
+		/* Dummy value */
+		case PRIORITY_DONTCARE:
+			swap = false;
+		break;
+		/* Module wants to be first, sod everything else */
+		case PRIORITY_FIRST:
+			swap_pos = 0;
+		break;
+		/* Module is submissive and wants to be last... awww. */
+		case PRIORITY_LAST:
+			if (EventHandlers[i].empty())
+				swap_pos = 0;
+			else
+				swap_pos = EventHandlers[i].size() - 1;
+		break;
+		/* Place this module after a set of other modules */
+		case PRIORITY_AFTER:
+		{
+			/* Find the latest possible position */
+			swap_pos = 0;
+			swap = false;
+			for (size_t x = 0; x != EventHandlers[i].size(); ++x)
+			{
+				for (size_t n = 0; n < sz; ++n)
+				{
+					if ((modules[n]) && (EventHandlers[i][x] == modules[n]) && (x >= swap_pos) && (source <= swap_pos))
+					{
+						swap_pos = x;
+						swap = true;
+					}
+				}
+			}
+		}
+		break;
+		/* Place this module before a set of other modules */
+		case PRIORITY_BEFORE:
+		{
+			swap_pos = EventHandlers[i].size() - 1;
+			swap = false;
+			for (size_t x = 0; x != EventHandlers[i].size(); ++x)
+			{
+				for (size_t n = 0; n < sz; ++n)
+				{
+					if ((modules[n]) && (EventHandlers[i][x] == modules[n]) && (x <= swap_pos) && (source >= swap_pos))
+					{
+						swap = true;
+						swap_pos = x;
+					}
+				}
+			}
+		}
+		break;
+	}
+
+	/* Do we need to swap? */
+	if (swap && (swap_pos != source))
+	{
+		/* Suggestion from Phoenix, "shuffle" the modules to better retain call order */
+		int incrmnt = 1;
+
+		if (source > swap_pos)
+			incrmnt = -1;
+
+		for (unsigned int j = source; j != swap_pos; j += incrmnt)
+		{
+			if (( j + incrmnt > EventHandlers[i].size() - 1) || (j + incrmnt < 0))
+				continue;
+
+			std::swap(EventHandlers[i][j], EventHandlers[i][j+incrmnt]);
+		}
+	}
+
+	return true;
 }

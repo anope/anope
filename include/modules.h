@@ -41,6 +41,126 @@
 #endif
 
 
+/**
+ * This #define allows us to call a method in all
+ * loaded modules in a readable simple way, e.g.:
+ * 'FOREACH_MOD(I_OnConnect,OnConnect(user));'
+ */
+#define FOREACH_MOD(y,x) do { \
+	std::vector<Module*>::iterator safei; \
+	for (std::vector<Module*>::iterator _i = ServerInstance->Modules->EventHandlers[y].begin(); _i != ServerInstance->Modules->EventHandlers[y].end(); ) \
+	{ \
+		safei = _i; \
+		++safei; \
+		try \
+		{ \
+			(*_i)->x ; \
+		} \
+		catch (CoreException& modexcept) \
+		{ \
+			ServerInstance->Logs->Log("MODULE",DEFAULT,"Exception caught: %s",modexcept.GetReason()); \
+		} \
+		_i = safei; \
+	} \
+} while (0);
+
+/**
+ * This #define allows us to call a method in all
+ * loaded modules in a readable simple way and pass
+ * an instance pointer to the macro. e.g.:
+ * 'FOREACH_MOD_I(Instance, OnConnect, OnConnect(user));'
+ */
+#define FOREACH_MOD_I(z,y,x) do { \
+	std::vector<Module*>::iterator safei; \
+	for (std::vector<Module*>::iterator _i = z->Modules->EventHandlers[y].begin(); _i != z->Modules->EventHandlers[y].end(); ) \
+	{ \
+		safei = _i; \
+		++safei; \
+		try \
+		{ \
+			(*_i)->x ; \
+		} \
+		catch (CoreException& modexcept) \
+		{ \
+			z->Logs->Log("MODULE",DEFAULT,"Exception caught: %s",modexcept.GetReason()); \
+		} \
+		_i = safei; \
+	} \
+} while (0);
+
+/**
+ * This define is similar to the one above but returns a result in MOD_RESULT.
+ * The first module to return a nonzero result is the value to be accepted,
+ * and any modules after are ignored.
+ */
+#define FOREACH_RESULT(y,x) \
+do { \
+	std::vector<Module*>::iterator safei; \
+	MOD_RESULT = 0; \
+	for (std::vector<Module*>::iterator _i = ServerInstance->Modules->EventHandlers[y].begin(); _i != ServerInstance->Modules->EventHandlers[y].end(); ) \
+	{ \
+		safei = _i; \
+		++safei; \
+		try \
+		{ \
+			int res = (*_i)->x ; \
+			if (res != 0) { \
+				MOD_RESULT = res; \
+				break; \
+			} \
+		} \
+		catch (CoreException& modexcept) \
+		{ \
+			ServerInstance->Logs->Log("MODULE",DEFAULT,"Exception caught: %s",modexcept.GetReason()); \
+		} \
+		_i = safei; \
+	} \
+} while(0);
+
+
+/**
+ * This define is similar to the one above but returns a result in MOD_RESULT.
+ * The first module to return a nonzero result is the value to be accepted,
+ * and any modules after are ignored.
+ */
+#define FOREACH_RESULT_I(z,y,x) \
+do { \
+	std::vector<Module*>::iterator safei; \
+	MOD_RESULT = 0; \
+	for (std::vector<Module*>::iterator _i = z->Modules->EventHandlers[y].begin(); _i != z->Modules->EventHandlers[y].end(); ) \
+	{ \
+		safei = _i; \
+		++safei; \
+		try \
+		{ \
+			int res = (*_i)->x ; \
+			if (res != 0) { \
+				MOD_RESULT = res; \
+				break; \
+			} \
+		} \
+		catch (CoreException& modexcept) \
+		{ \
+			z->Logs->Log("MODULE",DEBUG,"Exception caught: %s",modexcept.GetReason()); \
+		} \
+		_i = safei; \
+	} \
+} while (0);
+
+
+/** Priority types which can be returned from Module::Prioritize()
+ */
+enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
+
+/** Implementation-specific flags which may be set in Module::Implements()
+ */
+enum Implementation
+{
+	I_BEGIN,
+	I_END
+};
+
+
 /*************************************************************************/
 #define CMD_HASH(x)	  (((x)[0]&31)<<5 | ((x)[1]&31))	/* Will gen a hash from a string :) */
 #define MAX_CMD_HASH 1024
@@ -422,6 +542,11 @@ class CoreExport Module
 class CoreExport ModuleManager
 {
  public:
+	/** Event handler hooks.
+	 * This needs to be public to be used by FOREACH_MOD and friends.
+	 */
+	static std::vector<Module *> EventHandlers[I_END];
+ 
 	/** Load up a list of modules.
 	 * @param total_modules The number of modules to load
 	 * @param module_list The list of modules to load
@@ -445,6 +570,64 @@ class CoreExport ModuleManager
 	/** Run all pending module timer callbacks.
 	 */
 	static void RunCallbacks();
+
+
+
+
+
+
+
+	/** Change the priority of one event in a module.
+	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this
+	 * method (usually within void Module::Prioritize()) to set your events priority. You may use this call in other methods too, however, this is not supported behaviour
+	 * for a module.
+	 * @param mod The module to change the priority of
+	 * @param i The event to change the priority of
+	 * @param s The state you wish to use for this event. Use one of
+	 * PRIO_FIRST to set the event to be first called, PRIO_LAST to set it to be the last called, or PRIO_BEFORE and PRIO_AFTER
+	 * to set it to be before or after one or more other modules.
+	 * @param modules If PRIO_BEFORE or PRIO_AFTER is set in parameter 's', then this contains a list of one or more modules your module must be
+	 * placed before or after. Your module will be placed before the highest priority module in this list for PRIO_BEFORE, or after the lowest
+	 * priority module in this list for PRIO_AFTER.
+	 * @param sz The number of modules being passed for PRIO_BEFORE and PRIO_AFTER. Defaults to 1, as most of the time you will only want to prioritize your module
+	 * to be before or after one other module.
+	 */
+	static bool SetPriority(Module* mod, Implementation i, Priority s, Module** modules = NULL, size_t sz = 1);
+
+	/** Change the priority of all events in a module.
+	 * @param mod The module to set the priority of
+	 * @param s The priority of all events in the module.
+	 * Note that with this method, it is not possible to effectively use PRIO_BEFORE or PRIO_AFTER, you should use the more fine tuned
+	 * SetPriority method for this, where you may specify other modules to be prioritized against.
+	 */
+	static bool SetPriority(Module* mod, Priority s);
+
+	/** Attach an event to a module.
+	 * You may later detatch the event with ModuleManager::Detach(). If your module is unloaded, all events are automatically detatched.
+	 * @param i Event type to attach
+	 * @param mod Module to attach event to
+	 * @return True if the event was attached
+	 */
+	static bool Attach(Implementation i, Module* mod);
+
+	/** Detatch an event from a module.
+	 * This is not required when your module unloads, as the core will automatically detatch your module from all events it is attached to.
+	 * @param i Event type to detach
+	 * @param mod Module to detach event from
+	 * @param Detach true if the event was detached
+	 */
+	static bool Detach(Implementation i, Module* mod);
+
+	/** Detach all events from a module (used on unload)
+	 * @param mod Module to detach from
+	 */
+	static void DetachAll(Module* mod);
+
+	/** Attach an array of events to a module
+	 * @param i Event types (array) to attach
+	 * @param mod Module to attach events to
+	 */
+	static void Attach(Implementation* i, Module* mod, size_t sz);
 private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete

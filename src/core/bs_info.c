@@ -80,12 +80,12 @@ class CommandBSInfo : public Command
 									BOT_INFO_OPT_NONE));
 			notice_lang(s_BotServ, u, BOT_INFO_BOT_USAGE, bi->chancount);
 
-			if (u->nc->HasCommand("botserv/administration"))
+			if (u->nc->HasPriv("botserv/administration"))
 				this->send_bot_channels(u, bi);
 		}
 		else if ((ci = cs_findchan(query)))
 		{
-			if (!is_founder(u, ci) && !u->nc->HasCommand("botserv/administration"))
+			if (!is_founder(u, ci) && !u->nc->HasPriv("botserv/administration"))
 			{
 				notice_lang(s_BotServ, u, PERMISSION_DENIED);
 				return MOD_CONT;

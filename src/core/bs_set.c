@@ -66,7 +66,7 @@ class CommandBSSet : public Command
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-		else if (!u->nc->HasCommand("botserv/administration") && !check_access(u, ci, CA_SET))
+		else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else {
 			if (!stricmp(option, "DONTKICKOPS")) {

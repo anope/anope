@@ -30,7 +30,6 @@ class CommandCSRegister : public Command
 		const char *chan = params[0].c_str();
 		const char *pass = params[1].c_str();
 		const char *desc = params[2].c_str();
-		NickCore *nc;
 		Channel *c;
 		ChannelInfo *ci;
 		struct u_chaninfolist *uc;
@@ -72,8 +71,8 @@ class CommandCSRegister : public Command
 			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 		else if (!chan_has_user_status(c, u, CUS_OP))
 			notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
-		else if (!is_servadmin && CSMaxReg && nc->channelcount >= CSMaxReg)
-			notice_lang(s_ChanServ, u, nc->channelcount > CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
+		else if (!is_servadmin && CSMaxReg && u->nc->channelcount >= CSMaxReg)
+			notice_lang(s_ChanServ, u, u->nc->channelcount > CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
 		else if (!stricmp(u->nick, pass) || (StrictPasswords && strlen(pass) < 5))
 			notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
 		else if (enc_encrypt_check_len(strlen(pass), PASSMAX - 1))
@@ -99,7 +98,7 @@ class CommandCSRegister : public Command
 			ci->mlock_on = ircd->defmlock;
 			ci->memos.memomax = MSMaxMemos;
 			ci->last_used = ci->time_registered;
-			ci->founder = nc;
+			ci->founder = u->nc;
 
 			memcpy(ci->founderpass, founderpass, PASSMAX);
 			ci->desc = sstrdup(desc);

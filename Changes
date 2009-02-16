@@ -16,7 +16,7 @@ F Allow NS REGISTER to unregistered nicks, silly oversight. Thanks DP! :)
 F Fix call order, thanks to DP
 F Pass the right array to do_umode(), fixes mode tracking on Unreal. Thanks to DukePyrolator (yet again :P)
 F Fix bs_set help, thanks to DukePyrolator! :)
-F Fix segfault, noted by DukePyrolator. Thanks!
+F Fix two segfaults, noted by DukePyrolator. Thanks!
 F Fix part one of #1010, reported by DukePyrolator. (Language settings are not respected in message sending.) Thanks!
 
 

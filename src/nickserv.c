@@ -1115,6 +1115,7 @@ int delnick(NickAlias * na)
 	{
 		if (ircd->modeonunreg)
 			common_svsmode(finduser(na->nick), ircd->modeonunreg, "1");
+		u->nc = NULL;
 	}
 
 	delHostCore(na->nick);	  /* delete any vHost's for this nick */
@@ -1129,7 +1130,6 @@ int delnick(NickAlias * na)
 			if (!delcore(na->nc))
 				return 0;
 			na->nc = NULL;
-			u->nc = NULL;
 		}
 		else
 		{

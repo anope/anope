@@ -241,7 +241,8 @@ void sighandler(int signum)
 	 * always set when we need it. It seems some signals slip through to the
 	 * QUIT code without having a valid quitmsg. -GD
 	 */
-	snprintf(const_cast<char *>(quitmsg), BUFSIZE, "Services terminating on signal %d", signum);
+	if (!quitmsg)
+		quitmsg = "Services terminating via a signal.";
 
 	if (started)
 	{

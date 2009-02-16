@@ -382,7 +382,7 @@ class OSNews : public Module
 		this->SetOperHelp(myOperServHelp);
 	}
 
-	void reload_config(bool starting)
+	void OnReload(bool starting)
 	{
 		OSLogonNews->UpdateHelpParam();
 		OSOperNews->UpdateHelpParam();

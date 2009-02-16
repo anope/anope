@@ -335,7 +335,7 @@ class CommandCSAccess : public Command
 			} else {
 				for (i = 0; i < ci->accesscount; i++) {
 					if (nick && ci->access[i].nc
-						&& !Anope::Match(nick, ci->access[i].nc->display, false))
+						&& !match_wild_nocase(nick, ci->access[i].nc->display))
 						continue;
 					access_list(u, i, ci, &sent_header);
 				}

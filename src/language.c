@@ -130,7 +130,7 @@ static void load_lang(int index, const char *filename)
 		} else {
 			langtexts[index][i] = new char[len + 1];
 			fseek(f, pos, SEEK_SET);
-			if ((int32)fread(langtexts[index][i], 1, len, f) != len) {
+			if (fread(langtexts[index][i], 1, len, f) != len) {
 				alog("Failed to read string %d in language %d (%s)",
 					 i, index, filename);
 				while (--i >= 0) {

@@ -211,6 +211,34 @@ const char *merge_args(int argc, char **argv)
 /*************************************************************************/
 
 /**
+ * match_wild:  Case Senstive wild card search
+ * @param pattern To be matched
+ * @param str String in which the pattern is to be matched
+ * @return 1 if the string matches the pattern, 0 if not.
+ * NOTE: Deprecated by Anope::Match().
+ */
+int match_wild(const char *pattern, const char *str)
+{
+	return Anope::Match(pattern, str, true);
+}
+
+/*************************************************************************/
+
+/**
+ * match_wild:  Case Insenstive wild card search
+ * @param pattern To be matched
+ * @param str String in which the pattern is to be matched
+ * @return 1 if the string matches the pattern, 0 if not.
+ * NOTE: Deprecated by Anope::Match().
+ */
+int match_wild_nocase(const char *pattern, const char *str)
+{
+	return Anope::Match(pattern, str, false);
+}
+
+/*************************************************************************/
+
+/**
  * Process a string containing a number/range list in the form
  * "n1[-n2][,n3[-n4]]...", calling a caller-specified routine for each
  * number in the list.  If the callback returns -1, stop immediately.

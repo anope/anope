@@ -225,7 +225,7 @@ class CommandOSAKill : public Command
 			for (i = 0; i < akills.count; ++i)
 			{
 				snprintf(amask, sizeof(amask), "%s@%s", (static_cast<Akill *>(akills.list[i]))->user, (static_cast<Akill *>(akills.list[i]))->host);
-				if (!stricmp(mask, amask) || Anope::Match(mask, amask, false))
+				if (!stricmp(mask, amask) || match_wild_nocase(mask, amask))
 					akill_list(i + 1, static_cast<Akill *>(akills.list[i]), u, &sent_header);
 			}
 
@@ -268,7 +268,7 @@ class CommandOSAKill : public Command
 			for (i = 0; i < akills.count; ++i)
 			{
 				snprintf(amask, sizeof(amask), "%s@%s", (static_cast<Akill *>(akills.list[i]))->user, (static_cast<Akill *>(akills.list[i]))->host);
-				if (!stricmp(mask, amask) || Anope::Match(mask, amask, false))
+				if (!stricmp(mask, amask) || match_wild_nocase(mask, amask))
 					akill_view(i + 1, static_cast<Akill *>(akills.list[i]), u, &sent_header);
 			}
 

@@ -95,7 +95,7 @@ void sqline(char *mask, char *reason)
 				for (c = chanlist[i]; c; c = next) {
 					next = c->next;
 
-					if (!Anope::Match(mask, c->name, false)) {
+					if (!match_wild_nocase(mask, c->name)) {
 						continue;
 					}
 					for (cu = c->users; cu; cu = cunext) {

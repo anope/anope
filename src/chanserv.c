@@ -2202,11 +2202,11 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 			|| !(akick->flags & AK_STUCK))
 			continue;
 		/* Example: mask = *!*@*.org and akick->u.mask = *!*@*.anope.org */
-		if (Anope::Match(mask, akick->u.mask, false))
+		if (match_wild_nocase(mask, akick->u.mask))
 			return akick;
 		if (ircd->reversekickcheck) {
 			/* Example: mask = *!*@irc.anope.org and akick->u.mask = *!*@*.anope.org */
-			if (Anope::Match(akick->u.mask, mask, false))
+			if (match_wild_nocase(akick->u.mask, mask))
 				return akick;
 		}
 	}
@@ -2240,7 +2240,7 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 			if (ircd->reversekickcheck) {
 				/* If akick is wider than a ban already in place.
 				   Example: c->bans[i] = *!*@irc.epona.org and akick->u.mask = *!*@*.epona.org */
-				if (Anope::Match(akick->u.mask, ban->mask, false))
+				if (match_wild_nocase(akick->u.mask, ban->mask))
 					return;
 			}
 		}

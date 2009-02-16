@@ -49,7 +49,7 @@ class CommandNSAccess : public Command
 		notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
 		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
 		{
-			if (mask && !Anope::Match(mask, *access, true))
+			if (mask && !match_wild(mask, *access))
 				continue;
 			u->SendMessage(s_NickServ, "    %s", *access);
 		}
@@ -143,7 +143,7 @@ class CommandNSAccess : public Command
 		notice_lang(s_NickServ, u, NICK_ACCESS_LIST);
 		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
 		{
-			if (mask && !Anope::Match(mask, *access, true))
+			if (mask && !match_wild(mask, *access))
 				continue;
 			u->SendMessage(s_NickServ, "    %s", *access);
 		}

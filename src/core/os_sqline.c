@@ -209,7 +209,7 @@ class CommandOSSQLine : public Command
 			for (i = 0; i < sqlines.count; ++i)
 			{
 				amask = (static_cast<SXLine *>(sqlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || Anope::Match(mask, amask, false))
+				if (!stricmp(mask, amask) || match_wild_nocase(mask, amask))
 					sqline_list(i + 1, static_cast<SXLine *>(sqlines.list[i]), u, &sent_header);
 			}
 
@@ -252,7 +252,7 @@ class CommandOSSQLine : public Command
 			for (i = 0; i < sqlines.count; ++i)
 			{
 				amask = (static_cast<SXLine *>(sqlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || Anope::Match(mask, amask, false))
+				if (!stricmp(mask, amask) || match_wild_nocase(mask, amask))
 					sqline_view(i + 1, static_cast<SXLine *>(sqlines.list[i]), u, &sent_header);
 			}
 

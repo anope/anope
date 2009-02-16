@@ -542,7 +542,7 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 				}
 			}
 
-			if (Anope::Match(amask, mask,false)
+			if (match_wild_nocase(amask, mask)
 				&& (entry->expires >= expires || entry->expires == 0)) {
 				if (u)
 					notice_lang(s_OperServ, u, OPER_AKILL_ALREADY_COVERED,
@@ -550,7 +550,7 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 				return -1;
 			}
 
-			if (Anope::Match(mask, amask, false)
+			if (match_wild_nocase(mask, amask)
 				&& (entry->expires <= expires || expires == 0)) {
 				slist_delete(&akills, i);
 				deleted++;
@@ -628,16 +628,16 @@ int check_akill(const char *nick, const char *username, const char *host,
 		ak = static_cast<Akill *>(akills.list[i]);
 		if (!ak)
 			continue;
-		if (Anope::Match(ak->user, username, false)
-			&& Anope::Match(ak->host, host, false)) {
+		if (match_wild_nocase(ak->user, username)
+			&& match_wild_nocase(ak->host, host)) {
 			ircdproto->SendAkill(ak->user, ak->host, ak->by, ak->seton,
 							ak->expires, ak->reason);
 			return 1;
 		}
 		if (ircd->vhost) {
 			if (vhost) {
-				if (Anope::Match(ak->user, username, false)
-					&& Anope::Match(ak->host, vhost, false)) {
+				if (match_wild_nocase(ak->user, username)
+					&& match_wild_nocase(ak->host, vhost)) {
 					ircdproto->SendAkill(ak->user, ak->host, ak->by, ak->seton,
 									ak->expires, ak->reason);
 					return 1;
@@ -646,8 +646,8 @@ int check_akill(const char *nick, const char *username, const char *host,
 		}
 		if (ircd->nickip) {
 			if (ip) {
-				if (Anope::Match(ak->user, username, false)
-					&& Anope::Match(ak->host, ip, false)) {
+				if (match_wild_nocase(ak->user, username)
+					&& match_wild_nocase(ak->host, ip)) {
 					ircdproto->SendAkill(ak->user, ak->host, ak->by, ak->seton,
 									ak->expires, ak->reason);
 					return 1;
@@ -766,7 +766,7 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 				}
 			}
 
-			if (Anope::Match(entry->mask, mask, false)
+			if (match_wild_nocase(entry->mask, mask)
 				&& (entry->expires >= expires || entry->expires == 0)) {
 				if (u)
 					notice_lang(s_OperServ, u, OPER_SGLINE_ALREADY_COVERED,
@@ -774,7 +774,7 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 				return -1;
 			}
 
-			if (Anope::Match(mask, entry->mask, false)
+			if (match_wild_nocase(mask, entry->mask)
 				&& (entry->expires <= expires || expires == 0)) {
 				slist_delete(&sglines, i);
 				deleted++;
@@ -812,7 +812,7 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 		while (u2) {
 			next = nextuser();
 			if (!is_oper(u2)) {
-				if (Anope::Match(entry->mask, u2->realname, false)) {
+				if (match_wild_nocase(entry->mask, u2->realname)) {
 					kill_user(ServerName, u2->nick, buf);
 				}
 			}
@@ -837,7 +837,7 @@ int check_sgline(const char *nick, const char *realname)
 		if (!sx)
 			continue;
 
-		if (Anope::Match(sx->mask, realname, false)) {
+		if (match_wild_nocase(sx->mask, realname)) {
 			ircdproto->SendSGLine(sx->mask, sx->reason);
 			/* We kill nick since s_sgline can't */
 			ircdproto->SendSVSKill(ServerName, nick, "G-Lined: %s", sx->reason);
@@ -953,7 +953,7 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 				}
 			}
 
-			if (Anope::Match(entry->mask, mask, false)
+			if (match_wild_nocase(entry->mask, mask)
 				&& (entry->expires >= expires || entry->expires == 0)) {
 				if (u)
 					notice_lang(s_OperServ, u, OPER_SQLINE_ALREADY_COVERED,
@@ -961,7 +961,7 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 				return -1;
 			}
 
-			if (Anope::Match(mask, entry->mask, false)
+			if (match_wild_nocase(mask, entry->mask)
 				&& (entry->expires <= expires || expires == 0)) {
 				slist_delete(&sqlines, i);
 				deleted++;
@@ -999,7 +999,7 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 		while (u2) {
 			next = nextuser();
 			if (!is_oper(u2)) {
-				if (Anope::Match(entry->mask, u2->nick, false)) {
+				if (match_wild_nocase(entry->mask, u2->nick)) {
 					kill_user(ServerName, u2->nick, buf);
 				}
 			}
@@ -1031,7 +1031,7 @@ int check_sqline(const char *nick, int nick_change)
 				continue;
 		}
 
-		if (Anope::Match(sx->mask, nick, false)) {
+		if (match_wild_nocase(sx->mask, nick)) {
 			sqline(sx->mask, sx->reason);
 			/* We kill nick since s_sqline can't */
 			snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
@@ -1059,7 +1059,7 @@ int check_chan_sqline(const char *chan)
 		if (*sx->mask != '#')
 			continue;
 
-		if (Anope::Match(sx->mask, chan, false)) {
+		if (match_wild_nocase(sx->mask, chan)) {
 			sqline(sx->mask, sx->reason);
 			return 1;
 		}
@@ -1167,14 +1167,14 @@ int add_szline(User * u, const char *mask, const char *by, time_t expires,
 				}
 			}
 
-			if (Anope::Match(entry->mask, mask, false)) {
+			if (match_wild_nocase(entry->mask, mask)) {
 				if (u)
 					notice_lang(s_OperServ, u, OPER_SZLINE_ALREADY_COVERED,
 								mask, entry->mask);
 				return -1;
 			}
 
-			if (Anope::Match(mask, entry->mask, false)) {
+			if (match_wild_nocase(mask, entry->mask)) {
 				slist_delete(&szlines, i);
 				deleted++;
 			}
@@ -1227,7 +1227,7 @@ int check_szline(const char *nick, char *ip)
 			continue;
 		}
 
-		if (Anope::Match(sx->mask, ip, false)) {
+		if (match_wild_nocase(sx->mask, ip)) {
 			ircdproto->SendSZLine(sx->mask, sx->reason, sx->by);
 			return 1;
 		}

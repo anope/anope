@@ -187,7 +187,7 @@ class CommandOSOper : public Command
 
 			for (i = 0; i < servopers.count; ++i)
 			{
-				if (!stricmp(nick, (static_cast<NickCore *>(servopers.list[i]))->display) || Anope::Match(nick, (static_cast<NickCore *>(servopers.list[i]))->display, false))
+				if (!stricmp(nick, (static_cast<NickCore *>(servopers.list[i]))->display) || match_wild_nocase(nick, (static_cast<NickCore *>(servopers.list[i]))->display))
 					oper_list(i + 1, static_cast<NickCore *>(servopers.list[i]), u, &sent_header);
 			}
 

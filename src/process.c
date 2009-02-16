@@ -135,7 +135,7 @@ IgnoreData *get_ignore(const char *nick)
 		} else
 			snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 		for (ign = ignore; ign; ign = ign->next)
-			if (Anope::Match(ign->mask, tmp, false))
+			if (match_wild_nocase(ign->mask, tmp))
 				break;
 	}
 	/* Check whether the entry has timed out */

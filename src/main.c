@@ -32,6 +32,11 @@
 #include "datafiles.h"
 #include "modules.h"
 
+// getrlimit.
+#include <sys/time.h>
+#include <sys/resource.h>
+
+
 /******** Global variables! ********/
 
 /* Command-line options: (note that configuration variables are in config.c) */
@@ -408,6 +413,25 @@ int main(int ac, char **av, char **envp)
 	last_DefCon = time(NULL);
 
 	started = 1;
+
+#ifndef _WIN32
+	if (DumpCore)
+	{
+		rlimit rl;
+		if (getrlimit(RLIMIT_CORE, &rl) == -1)
+		{
+			alog("Failed to getrlimit()!");
+		}
+		else
+		{
+			rl.rlim_cur = rl.rlim_max;
+			if (setrlimit(RLIMIT_CORE, &rl) == -1)
+			{
+				alog("setrlimit() failed, cannot increase coredump size");
+			}
+		}
+	}
+#endif
 
 	/*** Main loop. ***/
 

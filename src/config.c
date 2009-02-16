@@ -1515,7 +1515,7 @@ ValueItem::ValueItem(int value) : v("")
 	v = n.str();
 }
 
-ValueItem::ValueItem(time_t value) : v("")
+ValueItem::ValueItem(long value) : v("")
 {
 	std::stringstream n;
 	n << value;

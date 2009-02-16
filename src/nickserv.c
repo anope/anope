@@ -1111,7 +1111,7 @@ int delnick(NickAlias * na)
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */
-	if (u = finduser(na->nick))
+	if ((u = finduser(na->nick)))
 	{
 		if (ircd->modeonunreg)
 			common_svsmode(finduser(na->nick), ircd->modeonunreg, "1");

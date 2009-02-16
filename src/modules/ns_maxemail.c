@@ -20,7 +20,6 @@
 
 void my_load_config();
 void my_add_languages();
-int my_event_reload(int argc, char **argv);
 CommandReturn check_email_limit_reached(const char *email, User * u);
 
 int NSEmailMax = 0;
@@ -90,10 +89,6 @@ class NSMaxEmail : public Module
 		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_HEAD);
 		this->AddCommand(NICKSERV, new CommandNSSet(), MOD_HEAD);
 
-		evt = createEventHook(EVENT_RELOAD, my_event_reload);
-		if ((status = this->AddEventHook(evt)))
-			throw ModuleException("ns_maxemail: Unable to hook to EVENT_RELOAD");
-
 		my_load_config();
 
 		const char *langtable_en_us[] = {
@@ -145,6 +140,11 @@ class NSMaxEmail : public Module
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 	}
+
+	void OnReload(bool started)
+	{
+		my_load_config();
+	}
 };
 
 
@@ -183,14 +183,6 @@ CommandReturn check_email_limit_reached(const char *email, User * u)
 		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
 
 	return MOD_STOP;
-}
-
-int my_event_reload(int argc, char **argv)
-{
-	if (argc > 0 && !stricmp(argv[0], EVENT_START))
-		my_load_config();
-
-	return MOD_CONT;
 }
 
 void my_load_config()

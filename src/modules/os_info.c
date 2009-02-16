@@ -49,7 +49,6 @@ int mLoadData();
 int mSaveData(int argc, char **argv);
 int mBackupData(int argc, char **argv);
 int mLoadConfig();
-int mEventReload(int argc, char **argv);
 
 static Module *me;
 
@@ -311,9 +310,6 @@ class OSInfo : public Module
 		hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
 		status = this->AddEventHook(hook);
 
-		hook = createEventHook(EVENT_RELOAD, mEventReload);
-		status = this->AddEventHook(hook);
-
 		this->SetNickHelp(mMainNickHelp);
 		this->SetChanHelp(mMainChanHelp);
 
@@ -557,6 +553,15 @@ class OSInfo : public Module
 		if (OSInfoDBName)
 			delete [] OSInfoDBName;
 	}
+
+	void OnReload(bool starting)
+	{
+		alog("os_info: Reloading configuration directives...");
+		int ret = mLoadConfig();
+
+		if (ret)
+			alog("os_info.c: ERROR: An error has occured while reloading the configuration file");
+	}
 };
 
 /*************************************************************************/
@@ -710,27 +715,6 @@ int mLoadConfig()
 	return 0;
 }
 
-/**
- * Manage the RELOAD EVENT
- * @return MOD_CONT
- **/
-int mEventReload(int argc, char **argv)
-{
-	int ret = 0;
-	if (argc >= 1)
-	{
-		if (!stricmp(argv[0], EVENT_START))
-		{
-			alog("os_info: Reloading configuration directives...");
-			ret = mLoadConfig();
-		}
-	}
-
-	if (ret)
-		alog("os_info.c: ERROR: An error has occured while reloading the configuration file");
-
-	return MOD_CONT;
-}
 
 /*************************************************************************/
 

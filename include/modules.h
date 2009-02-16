@@ -104,7 +104,7 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 enum Implementation
 {
 	I_BEGIN,
-		I_OnUserKicked,
+		I_OnUserKicked, I_OnReload,
 	I_END
 };
 
@@ -490,6 +490,11 @@ class CoreExport Module
 	 * NOTE: We may want to add a second User arg for sender in the future.
 	 */
 	virtual void OnUserKicked(Channel *c, User *target, const std::string &kickmsg) { }
+
+	/** Called when Services' configuration has been loaded.
+	 * @param startup True if Services is starting for the first time, false otherwise.
+	 */
+	virtual void OnReload(bool startup) {}
 };
 
 

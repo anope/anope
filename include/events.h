@@ -38,7 +38,6 @@
 #define EVENT_CONNECT "connect"
 #define EVENT_DB_EXPIRE "db_expire"
 #define EVENT_RESTART "restart"
-#define EVENT_RELOAD "reload"
 #define EVENT_SHUTDOWN "shutdown"
 #define EVENT_SIGNAL "signal"
 #define EVENT_NICK_REGISTERED "nick_registered"

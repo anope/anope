@@ -72,7 +72,6 @@ int backup_ignoredb(int argc, char **argv);
 void load_ignore_db();
 void save_ignore_db();
 void load_config();
-int reload_config(int argc, char **argv);
 
 /* ------------------------------------------------------------------------------- */
 
@@ -87,10 +86,6 @@ class OSIgnoreDB : public Module
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
-
-		hook = createEventHook(EVENT_RELOAD, reload_config);
-		if (this->AddEventHook(hook) != MOD_ERR_OK)
-			throw ModuleException("os_ignore_db: Can't hook to EVENT_RELOAD event");
 
 		hook = createEventHook(EVENT_DB_SAVING, save_ignoredb);
 		if (this->AddEventHook(hook) != MOD_ERR_OK)
@@ -113,6 +108,11 @@ class OSIgnoreDB : public Module
 		if (IgnoreDB)
 			delete [] IgnoreDB;
 	}
+
+	void OnReload(bool starting)
+	{
+		load_config();
+	}
 };
 
 
@@ -132,17 +132,6 @@ void load_config() {
 		alog("[os_ignore_db] debug: Set config vars: OSIgnoreDBName='%s'", IgnoreDB);
 }
 
-/**
- * Upon /os reload call the routines for reloading the configuration directives
- **/
-int reload_config(int argc, char **argv) {
-	if (argc >= 1) {
-		if (!stricmp(argv[0], EVENT_START)) {
-			load_config();
-		}
-	}
-	return MOD_CONT;
-}
 
 /**
  * When anope saves her databases, we do the same.

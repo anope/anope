@@ -34,7 +34,6 @@
 
 
 void myOperServHelp(User *u);
-int reload_config(int argc, char **argv);
 
 struct newsmsgs {
 	int16 type;
@@ -381,10 +380,12 @@ class OSNews : public Module
 		this->AddCommand(OPERSERV, new CommandOSRandomNews(), MOD_UNIQUE);
 
 		this->SetOperHelp(myOperServHelp);
+	}
 
-		EvtHook *hook = createEventHook(EVENT_RELOAD, reload_config);
-		if (this->AddEventHook(hook) != MOD_ERR_OK)
-			throw ModuleException("os_news: Can't hook to EVENT_RELOAD event");
+	void reload_config(bool starting)
+	{
+		OSLogonNews->UpdateHelpParam();
+		OSOperNews->UpdateHelpParam();
 	}
 };
 
@@ -403,18 +404,5 @@ void myOperServHelp(User *u)
 	}
 }
 
-/**
- * Upon /os reload refresh the count
- **/
-int reload_config(int argc, char **argv)
-{
-	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
-	{
-		OSLogonNews->UpdateHelpParam();
-		OSOperNews->UpdateHelpParam();
-	}
-
-	return MOD_CONT;
-}
 
 MODULE_INIT("os_news", OSNews)

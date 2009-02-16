@@ -260,7 +260,7 @@ void sighandler(int signum)
 				quitting = 1;
 			}
 
-			send_event(EVENT_RELOAD, 1, EVENT_START);
+			FOREACH_MOD(I_OnReload, OnReload(true));
 			return;
 
 		} else

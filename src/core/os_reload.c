@@ -35,7 +35,8 @@ class CommandOSReload : public Command
 				sprintf(const_cast<char *>(quitmsg), /* XXX */ "Error during the reload of the configuration file!");
 			quitting = 1;
 		}
-		send_event(EVENT_RELOAD, 1, EVENT_START);
+
+		FOREACH_MOD(I_OnReload, OnReload(false));
 		notice_lang(s_OperServ, u, OPER_RELOAD);
 		return MOD_CONT;
 	}

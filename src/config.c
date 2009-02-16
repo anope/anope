@@ -1159,7 +1159,7 @@ int ServerConfig::Read(bool bail)
 							if (ConfValue(config_data, static_cast<std::string>(MultiValues[Index].tag),
 								static_cast<std::string>(MultiValues[Index].items[valuenum]),
 								static_cast<std::string>(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines)) {
-								int time = dotime(item.c_str());
+								time_t time = dotime(item.c_str());
 								vl.push_back(ValueItem(time));
 							}
 							else vl.push_back(ValueItem(0));
@@ -1509,6 +1509,13 @@ int ServerConfig::ConfVarEnum(ConfigDataHash &target, const std::string &tag, in
 }
 
 ValueItem::ValueItem(int value) : v("")
+{
+	std::stringstream n;
+	n << value;
+	v = n.str();
+}
+
+ValueItem::ValueItem(time_t value) : v("")
 {
 	std::stringstream n;
 	n << value;

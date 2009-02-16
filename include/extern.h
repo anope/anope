@@ -630,7 +630,7 @@ E const char *merge_args(int argc, const char **argv);
 // Use Anope::Match() instead of these.
 E int match_wild(const char *pattern, const char *str) MARK_DEPRECATED;
 E int match_wild_nocase(const char *pattern, const char *str) MARK_DEPRECATED;
-E int dotime(const char *s);
+E time_t dotime(const char *s);
 E const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds);
 E const char *expire_left(NickCore *nc, char *buf, int len, time_t expires);
 E int doValidHost(const char *host, int type);

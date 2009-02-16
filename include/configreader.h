@@ -61,6 +61,8 @@ class ValueItem
 		ValueItem(const char *);
 		/** Initialize with an std::string */
 		ValueItem(const std::string &);
+		/** Initialize with time_t **/
+		ValueItem(time_t);
 		/** Change value to a char pointer */
 		//void Set(char *);
 		/** Change value to a const char pointer */

@@ -325,9 +325,9 @@ int process_numlist(const char *numstr, int *count_ret,
  *		  of seconds), or an integer followed by one of these characters:
  *		  "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
  * @param s String to convert
- * @return int
+ * @return time_t
  */
-int dotime(const char *s)
+time_t dotime(const char *s)
 {
 	int amount;
 
@@ -346,6 +346,10 @@ int dotime(const char *s)
 			return amount * 3600;
 		case 'd':
 			return amount * 86400;
+		case 'w':
+			return amount * 86400 * 7;
+		case 'y':
+			return amount * 86400 * 365;
 		default:
 			return -1;
 		}

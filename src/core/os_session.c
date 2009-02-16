@@ -224,7 +224,7 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		int expires = expiry ? dotime(expiry) : ExceptionExpiry;
+		time_t expires = expiry ? dotime(expiry) : ExceptionExpiry;
 		if (expires < 0)
 		{
 			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);

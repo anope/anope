@@ -24,7 +24,7 @@ class CommandOSIgnore : public Command
 	{
 		const char *time = params.size() > 1 ? params[1].c_str() : NULL;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
-		int t;
+		time_t t;
 
 		if (!time || !nick)
 		{

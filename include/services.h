@@ -1246,7 +1246,7 @@ class ServerConfig;
 #include "extern.h"
 #include "configreader.h"
 
-class IRCDProto
+class CoreExport IRCDProto
 {
  private:
 		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
@@ -1338,7 +1338,7 @@ class IRCDProto
 		virtual void SendAccountLogout(User *u, NickCore *account) { }
 };
 
-class IRCDTS6Proto : public IRCDProto
+class CoreExport IRCDTS6Proto : public IRCDProto
 {
 };
 

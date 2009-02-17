@@ -21,7 +21,7 @@
  * the next token, until none remain, at which point the method returns
  * an empty string.
  */
-class sepstream
+class CoreExport sepstream
 {
  private:
 	/** Original string.
@@ -61,7 +61,7 @@ class sepstream
 
 /** A derived form of sepstream, which seperates on commas
  */
-class commasepstream : public sepstream
+class CoreExport commasepstream : public sepstream
 {
  public:
 	/** Initialize with comma seperator
@@ -71,7 +71,7 @@ class commasepstream : public sepstream
 
 /** A derived form of sepstream, which seperates on spaces
  */
-class spacesepstream : public sepstream
+class CoreExport spacesepstream : public sepstream
 {
  public:
 	/** Initialize with space seperator

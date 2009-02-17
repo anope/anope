@@ -11,6 +11,7 @@
  *
  */
 
+#include "services.h"
 #include "hashcomp.h"
 
 sepstream::sepstream(const std::string &source, char seperator) : tokens(source), sep(seperator)

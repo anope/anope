@@ -23,7 +23,7 @@
 	typedef HMODULE ano_module_t;
 
 	#define dlopen(file, unused)		LoadLibrary(file)
-	MDE const char *dlerror();
+	E const char *dlerror();
 	#define dlsym(file, symbol)	(HMODULE)GetProcAddress(file, symbol)
 	#define dlclose(file)		FreeLibrary(file) ? 0 : 1
 	#define ano_modclearerr()		SetLastError(0)
@@ -219,7 +219,7 @@ enum CommandFlags
 
 /** Every services command is a class, inheriting from Command.
  */
-class Command
+class CoreExport Command
 {
 	int flags;
  public:
@@ -509,7 +509,7 @@ class CoreExport ModuleManager
 	 * This needs to be public to be used by FOREACH_MOD and friends.
 	 */
 	static std::vector<Module *> EventHandlers[I_END];
- 
+
 	/** Load up a list of modules.
 	 * @param total_modules The number of modules to load
 	 * @param module_list The list of modules to load

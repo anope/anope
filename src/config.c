@@ -1159,7 +1159,11 @@ int ServerConfig::Read(bool bail)
 							if (ConfValue(config_data, static_cast<std::string>(MultiValues[Index].tag),
 								static_cast<std::string>(MultiValues[Index].items[valuenum]),
 								static_cast<std::string>(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines)) {
+#ifdef _WIN32
+								long time = static_cast<long>(dotime(item.c_str()));
+#else
 								time_t time = dotime(item.c_str());
+#endif
 								vl.push_back(ValueItem(time));
 							}
 							else vl.push_back(ValueItem(0));

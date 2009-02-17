@@ -6,9 +6,9 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -23,6 +23,6 @@
 extern MDE Command *lookup_cmd(Command *list, char *name);
 extern MDE void mod_help_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);
 extern MDE void mod_run_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);
-extern MDE void do_help_limited(char *service, User * u, Command * c);
+//extern MDE void do_help_limited(char *service, User * u, Command * c);
 
 /*************************************************************************/

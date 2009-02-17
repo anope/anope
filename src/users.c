@@ -149,7 +149,7 @@ void User::SetVIdent(const std::string &sident)
 	update_host(this);
 }
 
-const std::string &User::GetVIdent() const            
+const std::string &User::GetVIdent() const
 {
 	if (ircd->vhostmode && (this->mode & ircd->vhostmode))
 		return this->vident;
@@ -597,7 +597,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 					  "DEFCON AKILL");
 			check_akill(nick, username, host, vhost, ipbuf);
 		}
-    
+
 		/* As with akill checks earlier, we can't not add the user record, as the user may be exempt from bans.
 		 * Instead, we'll just wait for the IRCd to tell us they are gone.
 		 */
@@ -1005,7 +1005,7 @@ char *create_mask(User * u)
 
 	// XXX: someone needs to rewrite this godawful kitten murdering pile of crap.
 	if (strspn(mhost.c_str(), "0123456789.") == mhost.length()
-		&& (s = strchr(mhost.c_str(), '.'))
+		&& (s = strchr(const_cast<char *>(mhost.c_str()), '.')) // XXX - Potentially unsafe cast
 		&& (s = strchr(s + 1, '.'))
 		&& (s = strchr(s + 1, '.'))
 		&& (!strchr(s + 1, '.')))
@@ -1018,7 +1018,7 @@ char *create_mask(User * u)
 	}
 	else
 	{
-		if ((s = strchr(mhost.c_str(), '.')) && strchr(s + 1, '.')) {
+		if ((s = strchr(const_cast<char *>(mhost.c_str()), '.')) && strchr(s + 1, '.')) {
 			s = sstrdup(strchr(mhost.c_str(), '.') - 1);
 			*s = '*';
 			strcpy(end, s);

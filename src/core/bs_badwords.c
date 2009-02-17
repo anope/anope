@@ -68,7 +68,7 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		pos = strrchr(word, ' ');
+		pos = strrchr(const_cast<char *>(word), ' '); // XXX - Potentially unsafe cast
 		if (pos)
 		{
 			opt = pos + 1;

@@ -10,18 +10,18 @@
  *
  * $Id$
  *
- */   
+ */
 
 #ifdef WIN32
+#include <windows.h>
+
 const char *dlerror()
 {
 	static char errbuf[513];
 	DWORD err = GetLastError();
-	if (err == 0)
+	if (!err)
 		return NULL;
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-				  FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512,
-				  NULL);
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512, NULL);
 	return errbuf;
 }
 #endif

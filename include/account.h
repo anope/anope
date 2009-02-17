@@ -47,7 +47,7 @@ class NickAlias
 	NickCore *nc;				/* I'm an alias of this */
 };
 
-class NickCore : public Extensible
+class CoreExport NickCore : public Extensible
 {
  public:
 	NickCore();

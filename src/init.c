@@ -477,7 +477,9 @@ int init_secondary(int ac, char **av)
 	/* Set signal handlers.  Catch certain signals to let us do things or
 	 * panic as necessary, and ignore all others.
 	 */
+#ifndef _WIN32
 	signal(SIGHUP, sighandler);
+#endif
 	signal(SIGTERM, sighandler);
 	signal(SIGINT, sighandler);
 

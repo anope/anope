@@ -77,9 +77,6 @@ class NSMaxEmail : public Module
  public:
 	NSMaxEmail(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		EvtHook *evt;
-		int status;
-
 		me = this;
 
 		this->SetAuthor(AUTHOR);
@@ -88,6 +85,8 @@ class NSMaxEmail : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_HEAD);
 		this->AddCommand(NICKSERV, new CommandNSSet(), MOD_HEAD);
+
+		ModuleManager::Attach(I_OnReload,  this);
 
 		my_load_config();
 

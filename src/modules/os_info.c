@@ -314,6 +314,7 @@ class OSInfo : public Module
 		this->SetChanHelp(mMainChanHelp);
 
 		mLoadData();
+		ModuleManager::Attach(I_OnReload, this);
 
 		const char* langtable_en_us[] = {
 			/* OINFO_SYNTAX */

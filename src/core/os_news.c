@@ -378,6 +378,7 @@ class OSNews : public Module
 		OSOperNews = new CommandOSOperNews();
 		this->AddCommand(OPERSERV, OSOperNews, MOD_UNIQUE);
 		this->AddCommand(OPERSERV, new CommandOSRandomNews(), MOD_UNIQUE);
+		ModuleManager::Attach(I_OnReload, this);
 
 		this->SetOperHelp(myOperServHelp);
 	}

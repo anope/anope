@@ -98,6 +98,7 @@ class OSIgnoreDB : public Module
 		load_config();
 		/* Load the ignore database and re-add them to anopes ignorelist. */
 		load_ignore_db();
+		ModuleManager::Attach(I_OnReload, this);
 	}
 
 	~OSIgnoreDB()

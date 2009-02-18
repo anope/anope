@@ -13,19 +13,17 @@
  */
 
 #define EVENT_START "start"
-#define EVENT_STOP  "stop"
+//#define EVENT_STOP  "stop"
 
 #define EVENT_DB_SAVING "db_saving"
 #define EVENT_DB_BACKUP "db_backup"
 #define EVENT_NEWNICK   "newnick"
-#define EVENT_BOT_UNASSIGN "bot_unassign"
 #define EVENT_BOT_JOIN "bot_join"
 #define EVENT_BOT_CREATE "bot_create"
 #define EVENT_BOT_CHANGE "bot_change"
 #define EVENT_BOT_FANTASY "bot_command"
 #define EVENT_BOT_FANTASY_NO_ACCESS "bot_command_no_access"
 #define EVENT_BOT_DEL "bot_del"
-#define EVENT_BOT_ASSIGN "bot_assign"
 #define EVENT_BOT_KICK "bot_kick"
 #define EVENT_BOT_BAN "bot_ban"
 #define EVENT_TOPIC_UPDATED "chan_topic_updated"

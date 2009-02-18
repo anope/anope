@@ -40,6 +40,15 @@
 	#define MODULE_EXT			".so"
 #endif
 
+/** Possible return types from events.
+ */
+enum EventReturn
+{
+	EVENT_STOP,
+	EVENT_CONTINUE,
+	EVENT_ALLOW
+};
+
 
 /**
  * This #define allows us to call a method in all
@@ -72,15 +81,15 @@
 #define FOREACH_RESULT(y,x) \
 do { \
 	std::vector<Module*>::iterator safei; \
-	MOD_RESULT = 0; \
+	MOD_RESULT = EVENT_CONTINUE; \
 	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
 	{ \
 		safei = _i; \
 		++safei; \
 		try \
 		{ \
-			int res = (*_i)->x ; \
-			if (res != 0) { \
+			EventReturn res = (*_i)->x ; \
+			if (res != EVENT_CONTINUE) { \
 				MOD_RESULT = res; \
 				break; \
 			} \
@@ -104,7 +113,7 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 enum Implementation
 {
 	I_BEGIN,
-		I_OnUserKicked, I_OnReload,
+		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign,
 	I_END
 };
 
@@ -495,8 +504,22 @@ class CoreExport Module
 	 * @param startup True if Services is starting for the first time, false otherwise.
 	 */
 	virtual void OnReload(bool startup) {}
-};
 
+	/** Called before a bot is assigned to a channel.
+	 * @param sender The user assigning the bot
+	 * @param ci The channel the bot is to be assigned to.
+	 * @param bi The bot being assigned.
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the assign.
+	 */
+	virtual EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) { return EVENT_CONTINUE; }
+
+	/** Called before a bot is unassigned from a channel.
+	 * @param sender The user unassigning the bot
+	 * @param ci The channel the bot is being removed from
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the unassign.
+	 */
+	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) { return EVENT_CONTINUE; }
+};
 
 
 

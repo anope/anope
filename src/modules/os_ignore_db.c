@@ -138,7 +138,7 @@ void load_config() {
  * When anope saves her databases, we do the same.
  **/
 int save_ignoredb(int argc, char **argv) {
-	if ((argc >= 1) && (!stricmp(argv[0], EVENT_STOP)))
+	if ((argc >= 1) && (!stricmp(argv[0], "stop")))
 		save_ignore_db();
 
 	return MOD_CONT;
@@ -149,7 +149,7 @@ int save_ignoredb(int argc, char **argv) {
  * When anope backs her databases up, we do the same.
  **/
 int backup_ignoredb(int argc, char **argv) {
-	if ((argc >= 1) && (!stricmp(argv[0], EVENT_STOP))) {
+	if ((argc >= 1) && (!stricmp(argv[0], "stop"))) {
 		if (debug)
 			alog("[os_ignore_db] debug: Backing up %s database...", IgnoreDB);
 		ModuleDatabaseBackup(IgnoreDB);

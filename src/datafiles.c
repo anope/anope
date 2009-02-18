@@ -694,7 +694,7 @@ void backup_databases()
 		rename_database(OperDBName, ext);
 		rename_database(NewsDBName, ext);
 		rename_database(ExceptionDBName, ext);
-		send_event(EVENT_DB_BACKUP, 1, EVENT_STOP);
+		send_event(EVENT_DB_BACKUP, 1, "stop");
 	}
 }
 

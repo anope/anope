@@ -10,6 +10,7 @@
  */
 
 #include "services.h"
+#include "modules.h"
 
 BotInfo::BotInfo(const char *nnick)
 {
@@ -89,6 +90,11 @@ void BotInfo::RejoinAll()
 
 void BotInfo::Assign(User *u, ChannelInfo *ci)
 {
+	EventReturn MOD_RESULT = EVENT_CONTINUE;
+	FOREACH_RESULT(I_OnBotAssign, OnBotAssign(u, ci, this));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
+
 	if (ci->bi)
 	{
 		if (u)
@@ -101,13 +107,14 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	this->chancount++;
 	if (ci->c && ci->c->usercount >= BSMinUsers)
 		bot_join(ci);
-
-	send_event(EVENT_BOT_ASSIGN, 2, ci->name, this->nick);
 }
 
 void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 {
-	send_event(EVENT_BOT_UNASSIGN, 2, ci->name, ci->bi->nick);
+	EventReturn MOD_RESULT = EVENT_CONTINUE;
+	FOREACH_RESULT(I_OnBotUnAssign, OnBotUnAssign(u, ci));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
 
 	if (u && ci->c && ci->c->usercount >= BSMinUsers)
 		ircdproto->SendPart(ci->bi, ci->name, "UNASSIGN from %s", u->nick);

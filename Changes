@@ -16,6 +16,7 @@ F Partial patch by Adam, commenting fix for #1006 for future reference.
 F Forward-port r1946:  Patch by Adam fixing #1006 (originally caused by #922): modes set by ChanServ are reversed. Thanks!
 
 Provided by DukePyrolator <dukepyrolator@gmx.de> - 2009
+F Patch converting all match calls to new method, thanks!
 F Add 'w' and 'y' support to dotime(), also prevent an overflow.
 F Allow NS STATUS from unregistered users, thanks DP!
 F Wild pointers do not a happy Anope make. Thanks DP :)

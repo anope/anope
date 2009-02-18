@@ -2,7 +2,7 @@ OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o comm
 		config.o datafiles.o encrypt.o events.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o timeout.o users.o module.o modulemanager.o configreader.o \
-		wildcard.o nickcore.o
+		wildcard.o nickcore.o nickalias.o
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
@@ -34,6 +34,7 @@ services:  $(OBJS) mod_version
 
 $(OBJS): Makefile
 nickcore.o:     nickcore.cpp $(INCLUDES)
+nickalias.o:    nickalias.cpp $(INCLUDES)
 actions.o:      actions.c   $(INCLUDES)
 base64.o:       base64.c    $(INCLUDES)
 bots.o:         bots.cpp    $(INCLUDES)

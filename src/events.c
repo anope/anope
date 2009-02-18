@@ -35,7 +35,8 @@ void send_event(const char *name, int argc, ...)
 	va_start(va, argc);
 	for (idx = 0; idx < argc; idx++) {
 		a = va_arg(va, char *);
-		argv[idx] = sstrdup(a);
+//		argv[idx] = sstrdup(a);
+		argv[idx] = a;
 	}
 	va_end(va);
 
@@ -48,7 +49,7 @@ void send_event(const char *name, int argc, ...)
 	 * Now that the events have seen the message, free it up
 	 **/
 	for (idx = 0; idx < argc; idx++) {
-		delete [] argv[idx];
+	//	delete [] argv[idx];
 	}
 	delete [] argv;
 }

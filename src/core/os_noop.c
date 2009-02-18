@@ -47,7 +47,7 @@ class CommandOSNOOP : public Command
 			for (u2 = firstuser(); u2; u2 = u3)
 			{
 				u3 = nextuser();
-				if (u2 && is_oper(u2) && u2->server->name && match_wild(server, u2->server->name))
+				if (u2 && is_oper(u2) && u2->server->name && Anope::Match(u2->server->name, server, true))
 					kill_user(s_OperServ, u2->nick, reason);
 			}
 		}

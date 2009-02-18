@@ -864,8 +864,8 @@ int is_on_access(User * u, NickCore * nc)
 
 	for (i = 0; i < nc->accesscount; i++)
 	{
-		if (match_wild_nocase(nc->access[i], buf)
-		        || (ircd->vhost ? match_wild_nocase(nc->access[i], buf2) : 0))
+		if (Anope::Match(buf, nc->access[i], false)
+		        || (ircd->vhost ? Anope::Match(buf2, nc->access[i], false) : 0))
 		{
 			delete [] buf;
 			if (ircd->vhost)

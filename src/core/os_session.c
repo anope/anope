@@ -382,7 +382,7 @@ class CommandOSException : public Command
 		{
 			for (i = 0; i < nexceptions; ++i)
 			{
-				if (!mask || match_wild_nocase(mask, exceptions[i].mask))
+				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
 					exception_list(u, i, &sent_header);
 			}
 		}
@@ -404,7 +404,7 @@ class CommandOSException : public Command
 		{
 			for (i = 0; i < nexceptions; ++i)
 			{
-				if (!mask || match_wild_nocase(mask, exceptions[i].mask))
+				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
 					exception_view(u, i, &sent_header);
 			}
 		}

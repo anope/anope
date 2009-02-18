@@ -928,14 +928,14 @@ int match_usermask(const char *mask, User * user)
 	}
 
 	if (nick) {
-		result = match_wild_nocase(nick, user->nick)
-			&& match_wild_nocase(username, user->GetIdent().c_str())
-			&& (match_wild_nocase(host, user->host)
-				|| match_wild_nocase(host, user->vhost));
+		result = Anope::Match(user->nick, nick, false)
+			&& Anope::Match(user->GetIdent().c_str(), username, false)
+			&& (Anope::Match(user->host, host, false)
+				|| Anope::Match(user->vhost, host, false));
 	} else {
-		result = match_wild_nocase(username, user->GetIdent().c_str())
-			&& (match_wild_nocase(host, user->host)
-				|| match_wild_nocase(host, user->vhost));
+		result = Anope::Match(user->GetIdent().c_str(), username, false)
+			&& (Anope::Match(user->host, host, false)
+				|| Anope::Match(user->vhost, host, false));
 	}
 
 	delete [] mask2;

@@ -44,7 +44,7 @@ class CommandBSBadwords : public Command
 				if (!(ci->badwords[i].in_use))
 					continue;
 				if (word && ci->badwords[i].word
-					&& !match_wild_nocase(word, ci->badwords[i].word))
+					&& !Anope::Match(ci->badwords[i].word, word, false))
 					continue;
 				badwords_list(u, i, ci, &sent_header);
 			}

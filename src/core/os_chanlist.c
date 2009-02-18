@@ -59,7 +59,7 @@ class CommandOSChanList : public Command
 			{
 				for (c = chanlist[i]; c; c = c->next)
 				{
-					if (pattern && !match_wild_nocase(pattern, c->name))
+					if (pattern && !Anope::Match(c->name, pattern, false))
 						continue;
 					if (modes && !(c->mode & modes))
 						continue;

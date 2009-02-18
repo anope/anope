@@ -180,7 +180,7 @@ class CommandOSAdmin : public Command
 			int i;
 
 			for (i = 0; i < servadmins.count; ++i) {
-				if (!stricmp(nick, (static_cast<NickCore *>(servadmins.list[i]))->display) || match_wild_nocase(nick, (static_cast<NickCore *>(servadmins.list[i]))->display))
+				if (!stricmp(nick, (static_cast<NickCore *>(servadmins.list[i]))->display) || Anope::Match((static_cast<NickCore *>(servadmins.list[i]))->display, nick, false))
 					admin_list(i + 1, static_cast<NickCore *>(servadmins.list[i]), u, &sent_header);
 			}
 

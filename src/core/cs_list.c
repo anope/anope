@@ -136,8 +136,8 @@ public:
 
 				if ((stricmp(pattern, ci->name) == 0)
 					  || (stricmp(spattern, ci->name) == 0)
-					  || match_wild_nocase(pattern, ci->name)
-					  || match_wild_nocase(spattern, ci->name))
+					  || Anope::Match(ci->name, pattern, false)
+					  || Anope::Match(ci->name, spattern, false))
 				{
 					if ((((count + 1 >= from) && (count + 1 <= to))
 						  || ((from == 0) && (to == 0)))

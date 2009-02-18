@@ -94,7 +94,7 @@ class CommandHSList : public Command
 			{
 				if (key)
 				{
-					if ((match_wild_nocase(key, current->nick) || match_wild_nocase(key, current->vHost)) && display_counter < NSListMax)
+					if ((Anope::Match(current->nick, key, false) || Anope::Match(current->vHost, key, false)) && display_counter < NSListMax)
 					{
 						++display_counter;
 						tm = localtime(&current->time);

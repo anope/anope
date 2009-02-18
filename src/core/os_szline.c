@@ -210,7 +210,7 @@ class CommandOSSZLine : public Command
 			for (i = 0; i < szlines.count; ++i)
 			{
 				amask = (static_cast<SXLine *>(szlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || match_wild_nocase(mask, amask))
+				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
 					szline_list(i + 1, static_cast<SXLine *>(szlines.list[i]), u, &sent_header);
 			}
 
@@ -251,7 +251,7 @@ class CommandOSSZLine : public Command
 			for (i = 0; i < szlines.count; ++i)
 			{
 				amask = (static_cast<SXLine *>(szlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || match_wild_nocase(mask, amask))
+				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
 					szline_view(i + 1, static_cast<SXLine *>(szlines.list[i]), u, &sent_header);
 			}
 

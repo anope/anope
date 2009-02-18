@@ -108,14 +108,6 @@ do { \
  */
 enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
 
-/** Implementation-specific flags which may be set in Module::Implements()
- */
-enum Implementation
-{
-	I_BEGIN,
-		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign,
-	I_END
-};
 
 
 /*************************************************************************/
@@ -519,8 +511,19 @@ class CoreExport Module
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the unassign.
 	 */
 	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) { return EVENT_CONTINUE; }
+
+	virtual void OnSaveDatabase() { }
 };
 
+
+/** Implementation-specific flags which may be set in Module::Implements()
+ */
+enum Implementation
+{
+	I_BEGIN,
+		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnSaveDatabase,
+	I_END
+};
 
 
 /** Used to manage modules.

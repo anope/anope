@@ -15,7 +15,6 @@
 #define EVENT_START "start"
 //#define EVENT_STOP  "stop"
 
-#define EVENT_DB_SAVING "db_saving"
 #define EVENT_DB_BACKUP "db_backup"
 #define EVENT_NEWNICK   "newnick"
 #define EVENT_BOT_JOIN "bot_join"

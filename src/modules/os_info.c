@@ -46,7 +46,6 @@ void mMainChanHelp(User *u);
 void mMainNickHelp(User *u);
 
 int mLoadData();
-int mSaveData(int argc, char **argv);
 int mBackupData(int argc, char **argv);
 int mLoadConfig();
 
@@ -304,8 +303,7 @@ class OSInfo : public Module
 		status = this->AddCommand(CHANSERV, new CommandCSOInfo(), MOD_HEAD);
 		status = this->AddCommand(CHANSERV, new CommandCSInfo(), MOD_TAIL);
 
-		hook = createEventHook(EVENT_DB_SAVING, mSaveData);
-		status = this->AddEventHook(hook);
+		ModuleManager::Attach(I_OnSaveDatabase, this);
 
 		hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
 		status = this->AddEventHook(hook);
@@ -532,8 +530,7 @@ class OSInfo : public Module
 
 	~OSInfo()
 	{
-		char *av[1];
-
+		OnSaveDatabase();
 		for (int i = 0; i < 1024; ++i)
 		{
 			/* Remove the nick Cores */
@@ -547,9 +544,8 @@ class OSInfo : public Module
 				}
 			}
 		}
-		av[0] = sstrdup(EVENT_START);
-		mSaveData(1, av);
-		delete [] av[0];
+
+		// XXX: shouldn't we also shrink ChanInfo?
 
 		if (OSInfoDBName)
 			delete [] OSInfoDBName;
@@ -563,6 +559,48 @@ class OSInfo : public Module
 		if (ret)
 			alog("os_info.c: ERROR: An error has occured while reloading the configuration file");
 	}
+
+	void OnSaveDatabase()
+	{
+		ChannelInfo *ci = NULL;
+		NickCore *nc = NULL;
+		int i = 0;
+		int ret = 0;
+		FILE *out;
+
+		if (!(out = fopen(OSInfoDBName, "w")))
+		{
+			alog("os_info: ERROR: can not open the database file!");
+			ircdproto->SendGlobops(s_OperServ, "os_info: ERROR: can not open the database file!");
+			ret = 1;
+		}
+		else
+		{
+			for (i = 0; i < 1024; ++i)
+			{
+				for (nc = nclists[i]; nc; nc = nc->next)
+				{
+					/* If we have any info on this user */
+					char *c;
+					if (nc->GetExt("os_info", c))
+						fprintf(out, "N %s %s\n", nc->display, c);
+				}
+			}
+
+			for (i = 0; i < 256; ++i)
+			{
+				for (ci = chanlists[i]; ci; ci = ci->next)
+				{
+					/* If we have any info on this channel */
+					char *c;
+					if (ci->GetExt("os_info", c))
+						fprintf(out, "C %s %s\n", ci->name, c);
+				}
+			}
+			fclose(out);
+		}
+	}
+
 };
 
 /*************************************************************************/
@@ -625,64 +663,6 @@ int mLoadData()
 			}
 		}
 	}
-	return ret;
-}
-
-/**
- * Save all our data to our db file
- * First walk through the nick CORE list, and any nick core which has
- * oper info attached to it, write to the file.
- * Next do the same again for ChannelInfos
- * @return 0 for success
- **/
-int mSaveData(int argc, char **argv)
-{
-	ChannelInfo *ci = NULL;
-	NickCore *nc = NULL;
-	int i = 0;
-	int ret = 0;
-	FILE *out;
-
-	if (argc >= 1)
-	{
-		if (!stricmp(argv[0], EVENT_START))
-		{
-			if (!(out = fopen(OSInfoDBName, "w")))
-			{
-				alog("os_info: ERROR: can not open the database file!");
-				ircdproto->SendGlobops(s_OperServ, "os_info: ERROR: can not open the database file!");
-				ret = 1;
-			}
-			else
-			{
-				for (i = 0; i < 1024; ++i)
-				{
-					for (nc = nclists[i]; nc; nc = nc->next)
-					{
-						/* If we have any info on this user */
-						char *c;
-						if (nc->GetExt("os_info", c))
-							fprintf(out, "N %s %s\n", nc->display, c);
-					}
-				}
-
-				for (i = 0; i < 256; ++i)
-				{
-					for (ci = chanlists[i]; ci; ci = ci->next)
-					{
-						/* If we have any info on this channel */
-						char *c;
-						if (ci->GetExt("os_info", c))
-							fprintf(out, "C %s %s\n", ci->name, c);
-					}
-				}
-				fclose(out);
-			}
-		}
-		else
-			ret = 0;
-	}
-
 	return ret;
 }
 

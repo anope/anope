@@ -134,7 +134,7 @@ extern void expire_all()
 
 void save_databases()
 {
-	send_event(EVENT_DB_SAVING, 1, EVENT_START);
+	FOREACH_MOD(I_OnSaveDatabase, OnSaveDatabase())
 	if (debug)
 		alog("debug: Saving FFF databases");
 	backup_databases();
@@ -152,7 +152,6 @@ void save_databases()
 	save_os_dbase();
 	save_news();
 	save_exceptions();
-	send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
 }
 
 /*************************************************************************/

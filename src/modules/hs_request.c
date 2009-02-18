@@ -60,9 +60,7 @@ int my_isvalidchar(const char c);
 void my_memo_lang(User *u, char *name, int z, int number, ...);
 void req_send_memos(User *u, char *vHost);
 
-void hsreq_save_db();
 void hsreq_load_db();
-int hsreqevt_db_saving(int argc, char **argv);
 int hsreqevt_db_backup(int argc, char **argv);
 
 void my_load_config();
@@ -455,8 +453,7 @@ class HSRequest : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSDrop(), MOD_HEAD);
 
-		hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
-		this->AddEventHook(hook);
+		ModuleManager::Attach(I_OnSaveDatabase, this);
 
 		hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
 		this->AddEventHook(hook);
@@ -730,13 +727,46 @@ class HSRequest : public Module
 
 	~HSRequest()
 	{
-		hsreq_save_db();
+		OnSaveDatabase();
 
 		/* Clean up all open host requests */
 		while (hs_request_head)
 			hs_request_head = deleteHostCore(hs_request_head, NULL);
 
 		delete [] HSRequestDBName;
+	}
+
+	void OnSaveDatabase()
+	{
+		FILE *fp;
+		const char *db_filename;
+		const char *vident;
+		HostCore *current;
+
+		if (HSRequestDBName)
+			db_filename = HSRequestDBName;
+		else
+			db_filename = HSREQ_DEFAULT_DBNAME;
+
+		fp = fopen(db_filename, "w");
+		if (!fp)
+		{
+			alog("[hs_request] Unable to open database ('%s') for writing", db_filename);
+			return;
+		}
+
+		current = hs_request_head;
+		while (current)
+		{
+			vident = current->vIdent ? current->vIdent : "(null)";
+			fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident, current->vHost, static_cast<uint32>(current->time), current->creator);
+			current = current->next;
+		}
+
+		fclose(fp);
+
+		if (debug)
+			alog("[hs_request] Succesfully saved database");
 	}
 };
 
@@ -845,21 +875,21 @@ void hs_help(User * u)
 void hsreq_load_db()
 {
 	FILE *fp;
-	const char *filename;
+	const char *db_filename;
 	char readbuf[1024];
 	char *nick, *vident, *vhost, *creator, *tmp;
 	int32 tmp_time;
 	char *buf;
 
 	if (HSRequestDBName)
-		filename = HSRequestDBName;
+		db_filename = HSRequestDBName;
 	else
-		filename = HSREQ_DEFAULT_DBNAME;
+		db_filename = HSREQ_DEFAULT_DBNAME;
 
-	fp = fopen(filename, "r");
+	fp = fopen(db_filename, "r");
 	if (!fp)
 	{
-		alog("[hs_request] Unable to open database ('%s') for reading", filename);
+		alog("[hs_request] Unable to open database ('%s') for reading", db_filename);
 		return;
 	}
 
@@ -904,47 +934,6 @@ void hsreq_load_db()
 
 	if (debug)
 		alog("[hs_request] Succesfully loaded database");
-}
-
-void hsreq_save_db()
-{
-	FILE *fp;
-	const char *filename;
-	const char *vident;
-	HostCore *current;
-
-	if (HSRequestDBName)
-		filename = HSRequestDBName;
-	else
-		filename = HSREQ_DEFAULT_DBNAME;
-
-	fp = fopen(filename, "w");
-	if (!fp)
-	{
-		alog("[hs_request] Unable to open database ('%s') for writing", filename);
-		return;
-	}
-
-	current = hs_request_head;
-	while (current)
-	{
-		vident = current->vIdent ? current->vIdent : "(null)";
-		fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident, current->vHost, static_cast<uint32>(current->time), current->creator);
-		current = current->next;
-	}
-
-	fclose(fp);
-
-	if (debug)
-		alog("[hs_request] Succesfully saved database");
-}
-
-int hsreqevt_db_saving(int argc, char **argv)
-{
-	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
-		hsreq_save_db();
-
-	return MOD_CONT;
 }
 
 int hsreqevt_db_backup(int argc, char **argv)

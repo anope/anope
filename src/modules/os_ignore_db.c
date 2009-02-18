@@ -67,10 +67,8 @@ int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...);
 int new_write_db_endofblock(DBFile *dbptr);
 void fill_db_ptr(DBFile *dbptr, int version, int core_version, char service[256], char filename[256]);
 
-int save_ignoredb(int argc, char **argv);
 int backup_ignoredb(int argc, char **argv);
 void load_ignore_db();
-void save_ignore_db();
 void load_config();
 
 /* ------------------------------------------------------------------------------- */
@@ -87,9 +85,7 @@ class OSIgnoreDB : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		hook = createEventHook(EVENT_DB_SAVING, save_ignoredb);
-		if (this->AddEventHook(hook) != MOD_ERR_OK)
-			throw ModuleException("os_ignore_db: Can't hook to EVENT_DB_SAVING event");
+		ModuleManager::Attach(I_OnSaveDatabase, this);
 
 		hook = createEventHook(EVENT_DB_BACKUP, backup_ignoredb);
 		if (this->AddEventHook(hook) != MOD_ERR_OK)
@@ -104,7 +100,7 @@ class OSIgnoreDB : public Module
 	~OSIgnoreDB()
 	{
 		/* Save the ignore database before bailing out.. */
-		save_ignore_db();
+		OnSaveDatabase();
 
 		if (IgnoreDB)
 			delete [] IgnoreDB;
@@ -114,6 +110,62 @@ class OSIgnoreDB : public Module
 	{
 		load_config();
 	}
+
+	void OnSaveDatabase()
+	{
+		DBFile *dbptr = new DBFile;
+		time_t now;
+		IgnoreData *ign, *next;
+
+		now = time(NULL);
+		fill_db_ptr(dbptr, 0, IGNOREDBVERSION, s_OperServ, IgnoreDB);
+
+		/* time to backup the old db */
+		rename(IgnoreDB, dbptr->temp_name);
+
+		if (new_open_db_write(dbptr)) {
+			rename(dbptr->temp_name, IgnoreDB);
+			delete dbptr;
+			return;				/* Bang, an error occurred */
+		}
+
+		/* Store the version of the DB in the DB as well...
+		 * This will make stuff a lot easier if the database scheme needs to modified. */
+		new_write_db_entry("IGNORE_DB_VERSION", dbptr, "%d", IGNOREDBVERSION);
+		new_write_db_endofblock(dbptr);
+
+		/* Go over the entire ignorelist, check whether each entry is still valid
+		 * and write it to the database if it is.*/
+		for (ign = ignore; ign; ign = next) {
+			next = ign->next;
+
+			if (ign->time != 0 && ign->time <= now) {
+				if (debug)
+					alog("[os_ignore_db] debug: Expiring ignore entry %s", ign->mask);
+				if (ign->prev)
+					ign->prev->next = ign->next;
+				else if (ignore == ign)
+					ignore = ign->next;
+				if (ign->next)
+					ign->next->prev = ign->prev;
+				delete [] ign->mask;
+				delete ign;
+				ign = NULL;
+			} else {
+				new_write_db_entry("m", dbptr, "%s", ign->mask);
+				new_write_db_entry("t", dbptr, "%d", ign->time);
+				new_write_db_endofblock(dbptr);
+			}
+		}
+
+		if (dbptr) {
+			new_close_db(dbptr->fptr, NULL, NULL);  /* close file */
+			remove(dbptr->temp_name);	   /* saved successfully, no need to keep the old one */
+			delete dbptr;		   /* free the db struct */
+		}
+	}
+
+
 };
 
 
@@ -132,18 +184,6 @@ void load_config() {
 	if (debug)
 		alog("[os_ignore_db] debug: Set config vars: OSIgnoreDBName='%s'", IgnoreDB);
 }
-
-
-/**
- * When anope saves her databases, we do the same.
- **/
-int save_ignoredb(int argc, char **argv) {
-	if ((argc >= 1) && (!stricmp(argv[0], "stop")))
-		save_ignore_db();
-
-	return MOD_CONT;
-}
-
 
 /**
  * When anope backs her databases up, we do the same.
@@ -254,60 +294,6 @@ void load_ignore_db() {
 	}					/* while */
 
 	delete dbptr;
-}
-
-
-void save_ignore_db() {
-	DBFile *dbptr = new DBFile;
-	time_t now;
-	IgnoreData *ign, *next;
-
-	now = time(NULL);
-	fill_db_ptr(dbptr, 0, IGNOREDBVERSION, s_OperServ, IgnoreDB);
-
-	/* time to backup the old db */
-	rename(IgnoreDB, dbptr->temp_name);
-
-	if (new_open_db_write(dbptr)) {
-		rename(dbptr->temp_name, IgnoreDB);
-		delete dbptr;
-		return;				/* Bang, an error occurred */
-	}
-
-	/* Store the version of the DB in the DB as well...
-	 * This will make stuff a lot easier if the database scheme needs to modified. */
-	new_write_db_entry("IGNORE_DB_VERSION", dbptr, "%d", IGNOREDBVERSION);
-	new_write_db_endofblock(dbptr);
-
-	/* Go over the entire ignorelist, check whether each entry is still valid
-	 * and write it to the database if it is.*/
-	for (ign = ignore; ign; ign = next) {
-		next = ign->next;
-
-		if (ign->time != 0 && ign->time <= now) {
-			if (debug)
-				alog("[os_ignore_db] debug: Expiring ignore entry %s", ign->mask);
-			if (ign->prev)
-				ign->prev->next = ign->next;
-			else if (ignore == ign)
-				ignore = ign->next;
-			if (ign->next)
-				ign->next->prev = ign->prev;
-			delete [] ign->mask;
-			delete ign;
-			ign = NULL;
-		} else {
-			new_write_db_entry("m", dbptr, "%s", ign->mask);
-			new_write_db_entry("t", dbptr, "%d", ign->time);
-			new_write_db_endofblock(dbptr);
-		}
-	}
-
-	if (dbptr) {
-		new_close_db(dbptr->fptr, NULL, NULL);  /* close file */
-		remove(dbptr->temp_name);	   /* saved successfully, no need to keep the old one */
-		delete dbptr;		   /* free the db struct */
-	}
 }
 
 

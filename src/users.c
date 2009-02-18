@@ -13,6 +13,7 @@
  */
 
 #include "services.h"
+#include "modules.h"
 
 #define HASH(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
 User *userlist[1024];
@@ -614,6 +615,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (LimitSessions && !is_ulined(server))
 			add_session(nick, host, ipbuf);
 
+		
 		/* Allocate User structure and fill it in. */
 		user = new User(nick, uid ? uid : "");
 		user->SetIdent(username);
@@ -634,7 +636,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 		display_news(user, NEWS_LOGON);
 		display_news(user, NEWS_RANDOM);
-		send_event(EVENT_NEWNICK, 1, nick);
+
+		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
 	} else {
 		/* An old user changing nicks. */
 		if (ircd->ts6)

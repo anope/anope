@@ -512,7 +512,16 @@ class CoreExport Module
 	 */
 	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) { return EVENT_CONTINUE; }
 
-	virtual void OnSaveDatabase() { }
+	/** Called when a new user connects to the network.
+	 * @param u The connecting user.
+	 */
+	virtual void OnUserConnect(User *u) { }
+
+	/** Called when anope saves databases.
+	 * NOTE: This event is deprecated pending new database handling.
+	 * XXX.
+	 */
+	virtual void OnSaveDatabase() MARK_DEPRECATED { }
 };
 
 
@@ -521,7 +530,7 @@ class CoreExport Module
 enum Implementation
 {
 	I_BEGIN,
-		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnSaveDatabase,
+		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnSaveDatabase, I_OnUserConnect,
 	I_END
 };
 

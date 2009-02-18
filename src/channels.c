@@ -1819,7 +1819,7 @@ Channel *join_user_update(User * user, Channel * chan, char *name,
 		if (chan->creation_time > chants && chants != 0)
 		{
 			struct c_userlist *cu;
-			const char *modes[6];
+			char *modes[6];
 
 			chan->creation_time = chants;
 			for (cu = chan->users; cu; cu = cu->next)
@@ -1833,7 +1833,7 @@ Channel *join_user_update(User * user, Channel * chan, char *name,
 			if (chan->ci && chan->ci->bi)
 			{
 				/* This is ugly, but it always works */
-				ircdproto->SendPart(chan->ci->bi, chan->name, "TS reop");
+				anope_cmd_part(chan->ci->bi->nick, chan->name, "TS reop");
 				bot_join(chan->ci);
 			}
 			/* XXX simple modes and bans */

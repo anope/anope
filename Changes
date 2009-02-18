@@ -8,6 +8,7 @@ Provided by Ankit <ankit@nevitus.com> - 2009
 F Segfault on shutdown
 
 Provided by Adam <adam@anope.org> - 2009
+F NickServ registration is sometimes denied.
 F Applied patch from Adam to fix some potential screwups
 F More fixes to bs_bot from Adam, plus an extra fix within DoAdd not covered in Adam's patch.
 F Fix bs_bot to use the correct parameters, patch from Adam.

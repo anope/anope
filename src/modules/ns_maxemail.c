@@ -30,11 +30,13 @@ int NSEmailMax = 0;
 
 static Module *me;
 
+// XXX: This should probably use an event one day.
 class CommandNSRegister : public Command
 {
  public:
 	CommandNSRegister() : Command("REGISTER", 2, 2)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

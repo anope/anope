@@ -533,7 +533,7 @@ class UnrealIRCdProto : public IRCDProto
 {
 	void ProcessUsermodes(User *user, int ac, const char **av)
 	{
-		int backup, add = 1; /* 1 if adding modes, 0 if deleting */
+		int add = 1; /* 1 if adding modes, 0 if deleting */
 		const char *modes = av[0];
 		--ac;
 		if (!user || !modes) return; /* Prevent NULLs from doing bad things */

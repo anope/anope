@@ -26,6 +26,12 @@ struct arc4_stream {
 	uint8 s[256];
 } rs;
 
+// XXX: remove me once the old event system is gone.
+void send_event(char const*,  int,  ...)
+{
+
+}
+
 /*************************************************************************/
 
 /**

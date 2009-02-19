@@ -195,8 +195,11 @@ typedef struct ModuleHash_ ModuleHash;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
-typedef struct EvtHook_ EvtHook;
-typedef struct EvtHookHash_ EvtHookHash;
+
+/*************************************************************************/
+
+
+
 
 extern MDE CommandHash *HOSTSERV[MAX_CMD_HASH];
 extern MDE CommandHash  *BOTSERV[MAX_CMD_HASH];
@@ -206,7 +209,6 @@ extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
 extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
 extern MDE MessageHash *IRCD[MAX_CMD_HASH];
 extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
-extern MDE EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
 
 struct ModuleLang_ {
 	int argc;
@@ -429,20 +431,6 @@ class CoreExport Module
 	 * @param ... The argument list
 	 **/
 	void NoticeLang(char *source, User * u, int number, ...);
-
-	/** Add a module message to the IRCD message hash
-	 * @param m the Message to add
-	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
-	 * @return MOD_ERR_OK on success, althing else on fail.
-	 **/
-	int AddEventHook(EvtHook *evh);
-
-	/**
-	 * remove the given message from the IRCD message hash
-	 * @param name the name of the message to remove
-	 * @return MOD_ERR_OK on success, althing else on fail.
-	 **/
-	int DelEventHook(const char *name);
 
 	/**
 	 * Add a module provided command to the given service.
@@ -675,20 +663,6 @@ struct ModuleCallBack_ {
 	ModuleCallBack *next;
 };
 
-struct EvtHook_ {
-	int (*func)(int argc, char **argv);
-	int core;
-	char *name;
-	char *mod_name;
-	EvtHook *next;
-};
-
-struct EvtHookHash_ {
-		char *name;
-		EvtHook *evh;
-		EvtHookHash *next;
-};
-
 
 /*************************************************************************/
 /* Module Managment Functions */
@@ -721,14 +695,6 @@ MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Mess
 MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
 int delMessage(MessageHash *msgTable[], Message *m);		/* Del a Message from a msg table */
 int destroyMessage(Message *m);					/* destroy a Message*/
-
-/*************************************************************************/
-
-MDE EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv));
-EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
-int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
-int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, const char *mod_name);
-int destroyEventHook(EvtHook * evh);
 
 /*************************************************************************/
 

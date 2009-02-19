@@ -69,10 +69,8 @@ Module::~Module()
 
 	int idx;
 	CommandHash *current = NULL;
-	EvtHookHash *ehcurrent = NULL;
 
 	Command *c;
-	EvtHook *eHook;
 	int status = 0;
 
 	/* Kill any active callbacks this module has */
@@ -126,16 +124,6 @@ Module::~Module()
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (stricmp(c->mod_name, this->name.c_str()) == 0)) {
 					this->DelCommand(OPERSERV, c->name.c_str());
-				}
-			}
-		}
-
-		for (ehcurrent = EVENTHOOKS[idx]; ehcurrent;
-			 ehcurrent = ehcurrent->next) {
-			for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {
-				if ((eHook->mod_name)
-					&& (stricmp(eHook->mod_name, this->name.c_str()) == 0)) {
-					status = delEventHook(EVENTHOOKS, eHook, this->name.c_str());
 				}
 			}
 		}

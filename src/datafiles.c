@@ -14,6 +14,7 @@
 
 #include "services.h"
 #include "datafiles.h"
+#include "modules.h"
 #include <fcntl.h>
 
 static int curday = 0;
@@ -671,8 +672,9 @@ void backup_databases()
 
 		char ext[9];
 
-		send_event(EVENT_DB_BACKUP, 1, EVENT_START);
+
 		alog("Backing up databases");
+		FOREACH_MOD(I_OnBackupDatabase, OnBackupDatabase())
 
 		remove_backups();
 
@@ -694,7 +696,6 @@ void backup_databases()
 		rename_database(OperDBName, ext);
 		rename_database(NewsDBName, ext);
 		rename_database(ExceptionDBName, ext);
-		send_event(EVENT_DB_BACKUP, 1, "stop");
 	}
 }
 

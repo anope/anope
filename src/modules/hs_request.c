@@ -61,7 +61,6 @@ void my_memo_lang(User *u, char *name, int z, int number, ...);
 void req_send_memos(User *u, char *vHost);
 
 void hsreq_load_db();
-int hsreqevt_db_backup(int argc, char **argv);
 
 void my_load_config();
 void my_add_languages();
@@ -441,8 +440,6 @@ class HSRequest : public Module
  public:
 	HSRequest(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		EvtHook *hook;
-
 		me = this;
 
 		this->AddCommand(HOSTSERV, new CommandHSRequest(), MOD_HEAD);
@@ -454,9 +451,7 @@ class HSRequest : public Module
 		this->AddCommand(NICKSERV, new CommandNSDrop(), MOD_HEAD);
 
 		ModuleManager::Attach(I_OnSaveDatabase, this);
-
-		hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
-		this->AddEventHook(hook);
+		ModuleManager::Attach(I_OnBackupDatabase, this);
 
 		this->SetHostHelp(hs_help);
 		this->SetAuthor(AUTHOR);
@@ -768,6 +763,14 @@ class HSRequest : public Module
 		if (debug)
 			alog("[hs_request] Succesfully saved database");
 	}
+
+	void OnBackupDatabase()
+	{
+		if (HSRequestDBName)
+			ModuleDatabaseBackup(HSRequestDBName);
+		else
+			ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
+	}
 };
 
 void my_memo_lang(User *u, char *name, int z, int number, ...)
@@ -934,19 +937,6 @@ void hsreq_load_db()
 
 	if (debug)
 		alog("[hs_request] Succesfully loaded database");
-}
-
-int hsreqevt_db_backup(int argc, char **argv)
-{
-	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
-	{
-		if (HSRequestDBName)
-			ModuleDatabaseBackup(HSRequestDBName);
-		else
-			ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
-	}
-
-	return MOD_CONT;
 }
 
 void my_load_config()

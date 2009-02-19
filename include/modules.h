@@ -522,6 +522,11 @@ class CoreExport Module
 	 * XXX.
 	 */
 	virtual void OnSaveDatabase() MARK_DEPRECATED { }
+
+	/** Called when anope backs up databases.
+	 * NOTE: This event is deprecated pending new database handling.
+	 */
+	virtual void OnBackupDatabase() MARK_DEPRECATED { }
 };
 
 
@@ -530,7 +535,7 @@ class CoreExport Module
 enum Implementation
 {
 	I_BEGIN,
-		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnSaveDatabase, I_OnUserConnect,
+		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnSaveDatabase, I_OnUserConnect, I_OnBackupDatabase,
 	I_END
 };
 

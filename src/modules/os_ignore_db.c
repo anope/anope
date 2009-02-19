@@ -67,7 +67,6 @@ int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...);
 int new_write_db_endofblock(DBFile *dbptr);
 void fill_db_ptr(DBFile *dbptr, int version, int core_version, char service[256], char filename[256]);
 
-int backup_ignoredb(int argc, char **argv);
 void load_ignore_db();
 void load_config();
 
@@ -78,7 +77,6 @@ class OSIgnoreDB : public Module
  public:
 	OSIgnoreDB(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		EvtHook *hook;
 		IgnoreDB = NULL;
 
 		this->SetAuthor(AUTHOR);
@@ -86,10 +84,7 @@ class OSIgnoreDB : public Module
 		this->SetType(SUPPORTED);
 
 		ModuleManager::Attach(I_OnSaveDatabase, this);
-
-		hook = createEventHook(EVENT_DB_BACKUP, backup_ignoredb);
-		if (this->AddEventHook(hook) != MOD_ERR_OK)
-			throw ModuleException("os_ignore_db: Can't hook to EVENT_DB_BACKUP event");
+		ModuleManager::Attach(I_OnBackupDatabase, this);
 
 		load_config();
 		/* Load the ignore database and re-add them to anopes ignorelist. */
@@ -165,10 +160,13 @@ class OSIgnoreDB : public Module
 		}
 	}
 
+	void OnBackupDatabase()
+	{
+		ModuleDatabaseBackup(IgnoreDB);
+	}
+
 
 };
-
-
 
 
 /* ------------------------------------------------------------------------------- */
@@ -183,18 +181,6 @@ void load_config() {
 
 	if (debug)
 		alog("[os_ignore_db] debug: Set config vars: OSIgnoreDBName='%s'", IgnoreDB);
-}
-
-/**
- * When anope backs her databases up, we do the same.
- **/
-int backup_ignoredb(int argc, char **argv) {
-	if ((argc >= 1) && (!stricmp(argv[0], "stop"))) {
-		if (debug)
-			alog("[os_ignore_db] debug: Backing up %s database...", IgnoreDB);
-		ModuleDatabaseBackup(IgnoreDB);
-	}
-	return MOD_CONT;
 }
 
 /* ------------------------------------------------------------------------------- */

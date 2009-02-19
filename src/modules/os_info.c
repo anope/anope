@@ -46,7 +46,6 @@ void mMainChanHelp(User *u);
 void mMainNickHelp(User *u);
 
 int mLoadData();
-int mBackupData(int argc, char **argv);
 int mLoadConfig();
 
 static Module *me;
@@ -304,9 +303,7 @@ class OSInfo : public Module
 		status = this->AddCommand(CHANSERV, new CommandCSInfo(), MOD_TAIL);
 
 		ModuleManager::Attach(I_OnSaveDatabase, this);
-
-		hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
-		status = this->AddEventHook(hook);
+		ModuleManager::Attach(I_OnBackupDatabase, this);
 
 		this->SetNickHelp(mMainNickHelp);
 		this->SetChanHelp(mMainChanHelp);
@@ -601,6 +598,11 @@ class OSInfo : public Module
 		}
 	}
 
+	void OnBackupDatabase()
+	{
+		ModuleDatabaseBackup(OSInfoDBName);
+	}
+
 };
 
 /*************************************************************************/
@@ -664,17 +666,6 @@ int mLoadData()
 		}
 	}
 	return ret;
-}
-
-/**
- * Backup our databases using the commands provided by Anope
- * @return MOD_CONT
- **/
-int mBackupData(int argc, char **argv)
-{
-	ModuleDatabaseBackup(OSInfoDBName);
-
-	return MOD_CONT;
 }
 
 /**

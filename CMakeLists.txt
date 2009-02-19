@@ -9,6 +9,159 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN3
   message(FATAL_ERROR "You can not use CMake to build Anope from the root of it's source tree! Remove the CMakeCache.txt file from this directory, then create a separate directory (either below this directory or elsewhere), and then re-run CMake from there.")
 endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
 
+# Set the project as C++ primarily, but have C enabled for the checks required later
+project(Anope CXX)
+enable_language(C)
+
+# A macro to handle appending to lists
+macro(append_to_list LIST)
+  if(CMAKE242_OR_BETTER)
+    # For CMake 2.4.2 or better, we can just use the APPEND sub-command of list()
+    list(APPEND ${LIST} ${ARGN})
+  else(CMAKE242_OR_BETTER)
+    # For CMake 2.4.x before 2.4.2, we have to do this manually use set() instead
+    set(${LIST} ${${LIST}} ${ARGN})
+  endif(CMAKE242_OR_BETTER)
+endmacro(append_to_list)
+
+# A macro to handle searching within a list
+macro(find_in_list LIST ITEM_TO_FIND FOUND)
+  if(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+    # For CMake 2.6.x or better (as well as CMake 2.4.8 or better), we can use the FIND sub-command of list()
+    list(FIND ${LIST} ${ITEM_TO_FIND} ITEM_FOUND)
+  else(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+    # For CMake 2.4.x before 2.4.8, we have to do this ourselves (NOTE: This is very slow due to a lack of break() as well), firstly we set that we a temporary boolean
+    set(ITEM_FOUND -1)
+    set(POS 0)
+    # Iterate through the list
+    foreach(ITEM ${${LIST}})
+      # If the item we are looking at is the item we are trying to find, set that we've found the item
+      if(${ITEM} STREQUAL ${ITEM_TO_FIND})
+        set(ITEM_FOUND ${POS})
+      endif(${ITEM} STREQUAL ${ITEM_TO_FIND})
+      math(EXPR POS "${POS} + 1")
+    endforeach(ITEM)
+  endif(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+  # Set the given FOUND variable to the result
+  set(${FOUND} ${ITEM_FOUND})
+endmacro(find_in_list)
+
+# A macro to handle removing duplicates from a list
+macro(remove_list_duplicates LIST)
+  if(CMAKE26_OR_BETTER)
+    # For CMake 2.6.x or better, this can be done automatically
+    list(REMOVE_DUPLICATES ${LIST})
+  else(CMAKE26_OR_BETTER)
+    # For CMake 2.4.x, we have to do this ourselves, firstly we'll clear a temporary list
+    set(NEW_LIST)
+    # Iterate through the old list
+    foreach(ITEM ${${LIST}})
+      # Check if the item is in the new list
+      find_in_list(NEW_LIST ${ITEM} FOUND_ITEM)
+      if(FOUND_ITEM EQUAL -1)
+        # If the item was not found, append it to the list
+        append_to_list(NEW_LIST ${ITEM})
+      endif(FOUND_ITEM EQUAL -1)
+    endforeach(ITEM)
+    # replace the old list with the new list
+    set(${LIST} ${NEW_LIST})
+  endif(CMAKE26_OR_BETTER)
+endmacro(remove_list_duplicates)
+
+# Start with empty defaults for library and include directories, to be used by GNU compilers only
+set(DEFAULT_LIBRARY_DIRS)
+set(DEFAULT_INCLUDE_DIRS)
+
+# If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
+if(CMAKE_COMPILER_IS_GNUCXX)
+  # First look for the compiler's default library directories
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -print-search-dirs OUTPUT_VARIABLE LINES OUTPUT_STRIP_TRAILING_WHITESPACE)
+  # Find only the part after "libraries: "
+  string(REGEX REPLACE ".*\nlibraries: (.*)$" "\\1" LINE "${LINES}")
+  # Replace the colons in the list with semicolons (only when not on MinGW, which uses semicolons already), and if on MinGW, just copy the line
+  if(NOT MINGW)
+    string(REGEX REPLACE ":" ";" LIBRARIES ${LINE})
+  else(NOT MINGW)
+    set(LIBRARIES "${LINE}")
+  endif(NOT MINGW)
+  # Iterate through the libraries
+  foreach(LIBRARY ${LIBRARIES})
+    # Check if the first character is an equal sign, and skip that library directory as it is (I believe) the primary default and shows up later in the list anyways
+    string(SUBSTRING ${LIBRARY} 0 1 FIRST_CHAR)
+    if(NOT FIRST_CHAR STREQUAL "=")
+      # If the directory had no = in front of it, make sure it's absolute and add it to the list of default library directories
+      get_filename_component(LIBRARY ${LIBRARY} ABSOLUTE)
+      append_to_list(DEFAULT_LIBRARY_DIRS ${LIBRARY})
+    endif(NOT FIRST_CHAR STREQUAL "=")
+  endforeach(LIBRARY)
+  # Remove duplicate entries from the list
+  remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
+  # Next, we look for the compiler's default include directories
+  # Create an empty temporary file
+  execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
+  # Run the command to find the default include directories
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_BINARY_DIR}/empty.c ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
+  # Convert the new lines to semicolons
+  string(REGEX REPLACE "\n" ";" LINES ${LINES})
+  # Temporary variable saying if we are in the search list or not
+  set(IN_SEARCH_LIST FALSE)
+  # Iterate through the lines
+  foreach(LINE ${LINES})
+    # If the line has the following on it, the next lines will contain directory names
+    if(LINE STREQUAL "#include <...> search starts here:")
+      set(IN_SEARCH TRUE)
+    # If the line has the following on it, we hit the end of the list
+    elseif(LINE STREQUAL "End of search list.")
+      set(IN_SEARCH FALSE)
+    # If we are within the block between the above two lines...
+    elseif(IN_SEARCH)
+      # Get everything but the first character of the line
+      string(LENGTH ${LINE} LINE_LENGTH)
+      math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
+      string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
+      # Convert the path to an absolute one, just in case it wasn't
+      get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
+      # Add that directory to the list of default include directories
+      append_to_list(DEFAULT_INCLUDE_DIRS ${INCLUDE})
+    endif(LINE STREQUAL "#include <...> search starts here:")
+  endforeach(LINE)
+  # Remove duplicate entries from the list
+  remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
+  # Delete the temporary file
+  execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
+# If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
+if(MSVC)
+  # If the path comes up as "/registry" from any of these, the path wasn't found, otherwise, we'll set WSDK_PATH to the corresponding path
+  # Look for the 2008 SDK under HKLM first
+  get_filename_component(WSDK2008_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
+  if(WSDK2008_PATH STREQUAL "/registry")
+    # If not found, look for the 2003 SDK under HKLM
+    get_filename_component(WSDK2003_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
+    if(WSDK2003_PATH STREQUAL "/registry")
+      # If not found, look for the 2008 SDK under HKCU
+      get_filename_component(WSDK2008_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
+      if(WSDK2008_PATH STREQUAL "/registry")
+        # If not found, look for the 2003 SDK under HKCU
+        get_filename_component(WSDK2003_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
+        if(WSDK2003_PATH STREQUAL "/regsitry")
+          # The SDK was never found, set the path to nothing
+          set(WSDK_PATH "")
+        else(WSDK2003_PATH STREQUAL "/regsitry")
+          set(WSDK_PATH "${WSDK2003_PATH}")
+        endif(WSDK2003_PATH STREQUAL "/regsitry")
+      else(WSDK2008_PATH STREQUAL "/registry")
+        set(WSDK_PATH "${WSDK2008_PATH}")
+      endif(WSDK2008_PATH STREQUAL "/registry")
+    else(WSDK2003_PATH STREQUAL "/registry")
+      set(WSDK_PATH "${WSDK2003_PATH}")
+    endif(WSDK2003_PATH STREQUAL "/registry")
+  else(WSDK2008_PATH STREQUAL "/registry")
+    set(WSDK_PATH "${WSDK2008_PATH}")
+  endif(WSDK2008_PATH STREQUAL "/registry")
+endif(MSVC)
+
 # Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
   set(CMAKE26_OR_BETTER TRUE)
@@ -42,10 +195,6 @@ if(NOT MSVC)
     set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
   endif(CMAKE_BUILD_TYPE)
 endif(NOT MSVC)
-
-# Set the project as C++ primarily, but have C enabled for the checks required later
-project(Anope CXX)
-enable_language(C)
 
 # If running under MinGW, we have to force the resource compiler settings (hopefully this will be fixed in a later version of CMake)
 if(MINGW)
@@ -193,24 +342,13 @@ if(CMAKE26_OR_BETTER)
   endif(LDFLAGS)
 endif(CMAKE26_OR_BETTER)
 
-# A macro to handle appending to lists
-macro(append_to_list LIST)
-  if(CMAKE242_OR_BETTER)
-    # For CMake 2.4.2 or better, we can just use the APPEND sub-command of list()
-    list(APPEND ${LIST} ${ARGN})
-  else(CMAKE242_OR_BETTER)
-    # For CMake 2.4.x before 2.4.2, we have to do this manually use set() instead
-    set(${LIST} ${${LIST}} ${ARGN})
-  endif(CMAKE242_OR_BETTER)
-endmacro(append_to_list)
-
 # A macro to handle reading specific lines from a file
 macro(read_from_file FILE REGEX STRINGS)
   if(CMAKE26_OR_BETTER)
     # For CMake 2.6.x or better, we can just use this function to get the lines that match the given regular expression
     file(STRINGS ${FILE} RESULT REGEX ${REGEX})
   else(CMAKE26_OR_BETTER)
-    # For CMake 2.4.x, we need to do this manually, firsly we read the file in
+    # For CMake 2.4.x, we need to do this manually, firstly we read the file in
     file(READ ${FILE} ALL_STRINGS)
     # Next we replace all newlines with semicolons
     string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
@@ -229,50 +367,6 @@ macro(read_from_file FILE REGEX STRINGS)
   # Set the given STRINGS variable to the result
   set(${STRINGS} ${RESULT})
 endmacro(read_from_file)
-
-# A macro to handle searching within a list
-macro(find_in_list LIST ITEM_TO_FIND FOUND)
-  if(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-    # For CMake 2.6.x or better (as well as CMake 2.4.8 or better), we can use the FIND sub-command of list()
-    list(FIND ${LIST} ${ITEM_TO_FIND} ITEM_FOUND)
-  else(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-    # For CMake 2.4.x before 2.4.8, we have to do this ourselves (NOTE: This is very slow due to a lack of break() as well), firstly we set that we a temporary boolean
-    set(ITEM_FOUND -1)
-    set(POS 0)
-    # Iterate through the list
-    foreach(ITEM ${${LIST}})
-      # If the item we are looking at is the item we are trying to find, set that we've found the item
-      if(${ITEM} STREQUAL ${ITEM_TO_FIND})
-        set(ITEM_FOUND ${POS})
-      endif(${ITEM} STREQUAL ${ITEM_TO_FIND})
-      math(EXPR POS "${POS} + 1")
-    endforeach(ITEM)
-  endif(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-  # Set the given FOUND variable to the result
-  set(${FOUND} ${ITEM_FOUND})
-endmacro(find_in_list)
-
-# A macro to handle removing duplicates from a list
-macro(remove_list_duplicates LIST)
-  if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, this can be done automatically
-    list(REMOVE_DUPLICATES ${LIST})
-  else(CMAKE26_OR_BETTER)
-    # For CMake 2.4.x, we have to do this ourselves, firstly we'll clear a temporary list
-    set(NEW_LIST)
-    # Iterate through the old list
-    foreach(ITEM ${${LIST}})
-      # Check if the item is in the new list
-      find_in_list(NEW_LIST ${ITEM} FOUND_ITEM)
-      if(FOUND_ITEM EQUAL -1)
-        # If the item was not found, append it to the list
-        append_to_list(NEW_LIST ${ITEM})
-      endif(FOUND_ITEM EQUAL -1)
-    endforeach(ITEM)
-    # replace the old list with the new list
-    set(${LIST} ${NEW_LIST})
-  endif(CMAKE26_OR_BETTER)
-endmacro(remove_list_duplicates)
 
 # Search for the following programs
 find_program(GREP grep)
@@ -496,7 +590,7 @@ macro(add_to_cpack_ignored_files ITEM)
 endmacro(add_to_cpack_ignored_files)
 
 # Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
-add_to_cpack_ignored_files(".git\;config.cache\;.svn\;CMakeFiles\;sysconf.h$\;Makefile.inc$\;config.log\;config.status\;build" TRUE)
+add_to_cpack_ignored_files(".git\;config.cache\;.svn\;CMakeFiles\;sysconf.h$\;Makefile.inc$\;config.log\;config.status\;build\;autom4te.cache" TRUE)
 # Add the files we don't want the periods converted for
 add_to_cpack_ignored_files(".\\\\\\\\.so$;.\\\\\\\\.o$;.\\\\\\\\.s$;${Anope_SOURCE_DIR}/Makefile$")
 # If the two directories are the same, we are building in-source, thus we need to ignore more files from the build

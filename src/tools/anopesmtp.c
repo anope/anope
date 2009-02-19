@@ -318,7 +318,7 @@ int smtp_connect(char *host, unsigned short port)
 /*************************************************************************/
 
 /* Send a line of text */
-int smtp_send(char *text)
+int smtp_send(const char *text)
 {
 	int result = ano_sockwrite(mail.sock, text, strlen(text));
 

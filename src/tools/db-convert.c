@@ -318,7 +318,6 @@ const std::string GetLanguageID(int id)
 int main(int argc, char *argv[])
 {
 	dbFILE *f;
-	HostCore *firsthc = NULL;
 	std::ofstream fs;
 	std::string hashm;
 
@@ -816,7 +815,6 @@ int main(int argc, char *argv[])
 
 
 	ChannelInfo *ci;
-	Memo *memos;
 
 	for (i = 0; i < 256; i++)
 	{

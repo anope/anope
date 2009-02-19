@@ -71,7 +71,6 @@ Module::~Module()
 	CommandHash *current = NULL;
 
 	Command *c;
-	int status = 0;
 
 	/* Kill any active callbacks this module has */
 	moduleCallBackPrepForUnload(this->name.c_str());

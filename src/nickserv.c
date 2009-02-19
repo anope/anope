@@ -227,7 +227,7 @@ void load_ns_dbase()
 	int failed = 0;
 	uint16 tmp16;
 	uint32 tmp32;
-	char *s, *pass;
+	char *s;
 
 	if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
 		return;

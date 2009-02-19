@@ -694,9 +694,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 			if (!nc_changed)
 			{
-				NickAlias *tmp = findnick(user->nick);
-				if (tmp)
-					tmp->status |= status;
+				NickAlias *tmpcore = findnick(user->nick);
+				if (tmpcore)
+					tmpcore->status |= status;
 			}
 			else
 			{
@@ -726,7 +726,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	}
 	else
 	{
-		char tsbuf[16];
 		ntmp->last_seen = time(NULL);
 
 		if (ntmp->last_usermask)
@@ -943,39 +942,6 @@ int match_usermask(const char *mask, User * user)
 
 	delete [] mask2;
 	return result;
-}
-
-/*************************************************************************/
-
-/* Split a usermask up into its constitutent parts.  Returned strings are
- * malloc()'d, and should be free()'d when done with.  Returns "*" for
- * missing parts.
- */
-
-void split_usermask(const char *mask, char **nick, char **user,
-					char **host)
-{
-	char *mask2 = sstrdup(mask);
-
-	*nick = strtok(mask2, "!");
-	*user = strtok(NULL, "@");
-	*host = strtok(NULL, "");
-	/* Handle special case: mask == user@host */
-	if (*nick && !*user && strchr(*nick, '@')) {
-		*nick = NULL;
-		*user = strtok(mask2, "@");
-		*host = strtok(NULL, "");
-	}
-	if (!*nick)
-		*nick = "*";
-	if (!*user)
-		*user = "*";
-	if (!*host)
-		*host = "*";
-	*nick = sstrdup(*nick);
-	*user = sstrdup(*user);
-	*host = sstrdup(*host);
-	delete [] mask2;
 }
 
 /*************************************************************************/

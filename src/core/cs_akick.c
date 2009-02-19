@@ -20,6 +20,37 @@ void myChanServHelp(User * u);
 
 
 
+/* Split a usermask up into its constitutent parts.  Returned strings are
+ * malloc()'d, and should be free()'d when done with.  Returns "*" for
+ * missing parts.
+ */
+
+static void split_usermask(const char *mask, const char **nick, const char **user,
+					const char **host)
+{
+	char *mask2 = sstrdup(mask);
+
+	*nick = strtok(mask2, "!");
+	*user = strtok(NULL, "@");
+	*host = strtok(NULL, "");
+	/* Handle special case: mask == user@host */
+	if (*nick && !*user && strchr(*nick, '@')) {
+		*nick = NULL;
+		*user = strtok(mask2, "@");
+		*host = strtok(NULL, "");
+	}
+	if (!*nick)
+		*nick = "*";
+	if (!*user)
+		*user = "*";
+	if (!*host)
+		*host = "*";
+	*nick = sstrdup(*nick);
+	*user = sstrdup(*user);
+	*host = sstrdup(*host);
+	delete [] mask2;
+}
+
 
 /**
  * Add the help response to anopes /cs help output.
@@ -194,7 +225,7 @@ class CommandCSAKick : public Command
 		} else if (stricmp(cmd, "ADD") == 0) {
 			NickAlias *na = findnick(mask), *na2;
 			NickCore *nc = NULL;
-			char *nick, *user, *host;
+			const char *nick, *user, *host;
 			int freemask = 0;
 
 			if (readonly) {

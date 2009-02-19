@@ -934,8 +934,6 @@ E int is_excepted(ChannelInfo * ci, User * user);
 E int is_excepted_mask(ChannelInfo * ci, const char *mask);
 
 E int match_usermask(const char *mask, User * user);
-E void split_usermask(const char *mask, char **nick, char **user,
-					  char **host);
 E char *create_mask(User * u);
 
 

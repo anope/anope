@@ -24,7 +24,7 @@ class CommandNSUpdate : public Command
 	{
 	}
 
-	CommandReturn Process(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
 

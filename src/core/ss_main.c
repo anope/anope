@@ -47,8 +47,8 @@ class SSMain : public Module
 
 		if (servsock == -1)
 		{
-			EvtHook *hook = createEventHook(EVENT_SERVER_CONNECT, statserv_create);
-			this->AddEventHook(hook);
+//			EvtHook *hook = createEventHook(EVENT_SERVER_CONNECT, statserv_create);
+//			this->AddEventHook(hook);
 		}
 		else
 			statserv_create(0, NULL);

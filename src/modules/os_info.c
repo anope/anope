@@ -283,8 +283,6 @@ class OSInfo : public Module
  public:
 	OSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		EvtHook *hook = NULL;
-
 		int status;
 
 		me = this;

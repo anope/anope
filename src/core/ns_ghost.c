@@ -22,6 +22,7 @@ class CommandNSGhost : public Command
  public:
 	CommandNSGhost() : Command("GHOST", 1, 2)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

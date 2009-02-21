@@ -123,7 +123,7 @@ class CommandCSAccess : public Command
 		 * Else (ADD), we require a level (which implies a nick). */
 		if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 :
 					 (stricmp(cmd, "DEL") == 0) ? (!nick || s) : !s)) {
-			syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
+			this->OnSyntaxError(u);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (ci->flags & CI_FORBIDDEN) {
@@ -306,8 +306,8 @@ class CommandCSAccess : public Command
 
 				/* After reordering only the entries at the end could still be empty.
 				 * We ll free the places no longer in use... */
-				for (i = ci->accesscount - 1; i >= 0; i--) {
-					if (ci->access[i].in_use == 1)
+				for (int j = ci->accesscount - 1; j >= 0; j--) {
+					if (ci->access[j].in_use == 1)
 						break;
 
 					ci->accesscount--;
@@ -369,7 +369,7 @@ class CommandCSAccess : public Command
 				 get_access(u, ci), chan);
 
 		} else {
-			syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
+			this->OnSyntaxError(u);
 		}
 		return MOD_CONT;
 	}
@@ -379,6 +379,11 @@ class CommandCSAccess : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS);
 		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS_LEVELS);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
 	}
 };
 
@@ -408,7 +413,7 @@ class CommandCSLevels : public Command
 		if (!cmd
 			|| ((stricmp(cmd, "SET") == 0) ? !s
 				: ((strnicmp(cmd, "DIS", 3) == 0)) ? (!what || s) : !!what)) {
-			syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
+			this->OnSyntaxError(u);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (ci->flags & CI_FORBIDDEN) {
@@ -421,7 +426,7 @@ class CommandCSLevels : public Command
 			level = strtol(s, &error, 10);
 
 			if (*error != '\0') {
-				syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
+				this->OnSyntaxError(u);
 				return MOD_CONT;
 			}
 
@@ -502,7 +507,7 @@ class CommandCSLevels : public Command
 				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_RESET, chan);
 		} else {
-			syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
+			this->OnSyntaxError(u);
 		}
 		return MOD_CONT;
 	}
@@ -511,6 +516,11 @@ class CommandCSLevels : public Command
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_LEVELS);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
 	}
 };
 

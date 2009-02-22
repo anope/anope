@@ -26,25 +26,27 @@ var installerQuestions = [
 		'short' : 'Install directory:',
 		'default_answer' : '',
 		'store_answer' : function(answer) {
-			if (!answer) {
+			if (!answer)
+			{
 				WScript.Echo("You must give a directory!\n");
 				return false;
 			}
-			if (!fso.FolderExists(answer)) {
-				if (fso.FileExists(answer)) {
+			if (!fso.FolderExists(answer))
+			{
+				if (fso.FileExists(answer))
+				{
 					WScript.Echo(answer + " exists, but is not a directory!\n");
 					return false;
 				}
 				WScript.Echo(answer + " does not exist.  Create it ([yes]/no)?\n");
 				var inputValue = InstallerInput().toLowerCase();
-				if (!inputValue) {
+				if (!inputValue)
 					inputValue = 'yes';
-				}
-				if (inputValue != 'no') {
+				if (inputValue != 'no')
 					fso.CreateFolder(answer);
-				}
 			}
-			else if (fso.FileExists(answer + '\\include\\services.h')) {
+			else if (fso.FileExists(answer + '\\include\\services.h'))
+			{
 				WScript.Echo("You cannot use the Anope source directory as a target directory.\n");
 				return false;
 			}
@@ -75,8 +77,10 @@ var installerQuestions = [
 			return true;
 		},
 		'cmake_argument' : function() {
-			if (installerResponses['Use NMake'] == 'yes') return '-G"NMake Makefiles"';
-			else return '';
+			if (installerResponses['Use NMake'] == 'yes')
+				return '-G"NMake Makefiles"';
+			else
+				return '';
 		}
 	},
 	{
@@ -94,9 +98,12 @@ var installerQuestions = [
 			return true;
 		},
 		'cmake_argument' : function() {
-			if (installerResponses['Debug'] == 'msvc') return '';
-			else if (installerResponses['Debug'] == 'yes') return '-DCMAKE_BUILD_TYPE:STRING=DEBUG';
-			else return '-DCMAKE_BUILD_TYPE:STRING=RELEASE';
+			if (installerResponses['Debug'] == 'msvc')
+				return '';
+			else if (installerResponses['Debug'] == 'yes')
+				return '-DCMAKE_BUILD_TYPE:STRING=DEBUG';
+			else
+				return '-DCMAKE_BUILD_TYPE:STRING=RELEASE';
 		}
 	},
 	{
@@ -115,8 +122,10 @@ var installerQuestions = [
 			return true;
 		},
 		'cmake_argument' : function() {
-			if (installerResponses['Visual Studio 2008'] == 'yes') return '-G"Visual Studio 9 2008"';
-			else return '';
+			if (installerResponses['Visual Studio 2008'] == 'yes')
+				return '-G"Visual Studio 9 2008"';
+			else
+				return '';
 		}
 	},
 ];
@@ -137,71 +146,78 @@ var ScriptPath = WScript.ScriptFullName.substr(0, WScript.ScriptFullName.length 
 var fso = WScript.CreateObject('Scripting.FileSystemObject');
 var x, y, z;
 
-if (fso.FileExists(ScriptPath + '.BANNER')) {
+if (fso.FileExists(ScriptPath + '.BANNER'))
+{
 	var bannerStream = fso.OpenTextFile(ScriptPath + '.BANNER');
 	var bannerText = bannerStream.ReadAll();
 	bannerStream.close();
 
-	for (x in bannerReplacements) {
+	for (x in bannerReplacements)
+	{
 		var thisReplacement = bannerReplacements[x];
 		bannerText = bannerText.replace(thisReplacement['findtext'], thisReplacement['replacement']);
 	}
 
 	WScript.Echo(bannerText + "\n");
 }
-else {
+else
 	WScript.Echo("ERROR: Cannot find banner file!\n");
-}
 
 WScript.Echo('Press Enter to Begin...');
 InstallerInput();
 WScript.Echo('');
 
-for (x in installerQuestions) {
+for (x in installerQuestions)
+{
 	var thisQuestion = installerQuestions[x];
 	var validResponse = false;
 	var validOpts = new Array();
-	if (thisQuestion.short == 'Build debug?' && installerResponses['Use NMake'] == 'no') {
+	if (thisQuestion.short == 'Build debug?' && installerResponses['Use NMake'] == 'no')
+	{
 		installerResponses['Debug'] = 'msvc';
 		continue;
 	}
-	if (thisQuestion.short == 'Using Visual Studio 2008?' && installerResponses['Debug'] != 'msvc') {
+	if (thisQuestion.short == 'Using Visual Studio 2008?' && installerResponses['Debug'] != 'msvc')
+	{
 		installerResponses['Visual Studio 2008'] = 'no';
 		continue;
 	}
-	while (!validResponse) {
-		for (y in thisQuestion.question) {
+	while (!validResponse)
+	{
+		for (y in thisQuestion.question)
+		{
 			var qLine = thisQuestion.question[y];
 			WScript.Echo(qLine);
 		}
 		WScript.Echo('');
 		var choiceLine = '';
-		if (thisQuestion.options) {
-			for (y in thisQuestion.options) {
+		if (thisQuestion.options)
+		{
+			for (y in thisQuestion.options)
+			{
 				choiceLine += thisQuestion.options[y] + ', ';
 				validOpts[thisQuestion.options[y]] = true;
 			}
 			choiceLine = choiceLine.substring(0, choiceLine.length - 2);
 			WScript.Echo('Available Options: ' + choiceLine);
 		}
-		if (thisQuestion.default_answer) WScript.Echo('Default Answer: ' + thisQuestion.default_answer + "\n");
+		if (thisQuestion.default_answer)
+			WScript.Echo('Default Answer: ' + thisQuestion.default_answer + "\n");
 		WScript.Echo(thisQuestion.short);
 		var inputValue = InstallerInput().toLowerCase();
-		if (!inputValue) {
+		if (!inputValue)
 			inputValue = thisQuestion.default_answer;
-		}
-		if (choiceLine && !validOpts[inputValue]) {
+		if (choiceLine && !validOpts[inputValue])
 			WScript.Echo("ERROR: Invalid option '" + inputValue + "'\n");
-		}
-		else if (thisQuestion.store_answer(inputValue)) {
+		else if (thisQuestion.store_answer(inputValue))
 			validResponse = true;
-		}
 	}
 	WScript.Echo('');
 }
 
 WScript.Echo("\nAnope will be compiled with the following options:\n");
-for (x in installerResponses) {
+for (x in installerResponses)
+{
 	var thisResponse = installerResponses[x];
 	WScript.Echo("\t" + x + ":\t\t[" + thisResponse.toUpperCase() + "]");
 }
@@ -210,7 +226,8 @@ WScript.Echo("\nTo continue, please press Enter...");
 InstallerInput();
 
 var cmake = 'cmake';
-for (x in installerQuestions) {
+for (x in installerQuestions)
+{
 	var thisQuestion = installerQuestions[x];
 	cmake += ' ' + thisQuestion.cmake_argument();
 }
@@ -220,50 +237,64 @@ WScript.Echo(cmake + "\n");
 
 var shell = WScript.CreateObject('WScript.Shell');
 var cmake_shell = shell.exec('%comspec% /c ' + cmake);
-while (!cmake_shell.StdOut.AtEndOfStream) {
-	var strLine = cmake_shell.StdOut.ReadLine();
-	WScript.Echo(strLine);
+while (!cmake_shell.Status)
+{
+	if (!cmake_shell.StdOut.AtEndOfStream)
+		WScript.Echo(cmake_shell.StdOut.ReadLine());
+	else if (!cmake_shell.StdErr.AtEndOfStream)
+		WScript.Echo(cmake_shell.StdErr.ReadLine());
 }
 
-if (installerResponses['Use NMake'] == 'yes') WScript.Echo("\nTo compile Anope, run 'nmake'. To install, run 'nmake install'.\n");
-else WScript.Echo("\nTo compile Anope, open Anope.sln and build the solution. To install,\ndo a build on the INSTALL project.\n");
-WScript.Echo("If you update Anope, you should run this script again to ensure\nall available options are set.\n");
+if (cmake_shell.ExitCode == 0)
+{
+	if (installerResponses['Use NMake'] == 'yes') WScript.Echo("\nTo compile Anope, run 'nmake'. To install, run 'nmake install'.\n");
+	else WScript.Echo("\nTo compile Anope, open Anope.sln and build the solution. To install,\ndo a build on the INSTALL project.\n");
+	WScript.Echo("If you update Anope, you should run this script again to ensure\nall available options are set.\n");
+}
+else
+	WScript.Echo("\nThere was an error attempting to run CMake! Check the above error message,\nand contact the Anope team if you are unsure how to proceed.\n");
 
 // -----------------------------------------------------------------
 
 // Functions
 
 function FindAnopeVersion() {
-	if (!fso.FileExists(ScriptPath + 'version.log')) {
+	if (!fso.FileExists(ScriptPath + 'version.log'))
+	{
 		anopeVersion = 'Unknown';
 		return;
 	}
 
 	var versionLog = fso.OpenTextFile(ScriptPath + 'version.log');
-	while (!versionLog.atEndOfStream) {
+	while (!versionLog.atEndOfStream)
+	{
 		var versionLine = versionLog.readline();
 		var thisMatch = versionLine.replace('\n', '');
-		while (thisMatch.match(/\"/g)) {
+		while (thisMatch.match(/\"/g))
 			thisMatch = thisMatch.replace('"', '');
-		}
 		versionLine = thisMatch;
-		if (versionLine.match(/VERSION_MAJOR=/g)) {
+		if (versionLine.match(/VERSION_MAJOR=/g))
+		{
 			vMaj = versionLine.replace('VERSION_MAJOR=', '');
 			continue;
 		}
-		if (versionLine.match(/VERSION_MINOR=/g)) {
+		if (versionLine.match(/VERSION_MINOR=/g))
+		{
 			vMin = versionLine.replace('VERSION_MINOR=', '');
 			continue;
 		}
-		if (versionLine.match(/VERSION_PATCH=/g)) {
+		if (versionLine.match(/VERSION_PATCH=/g))
+		{
 			vPat = versionLine.replace('VERSION_PATCH=', '');
 			continue;
 		}
-		if (versionLine.match(/VERSION_EXTRA=/g)) {
+		if (versionLine.match(/VERSION_EXTRA=/g))
+		{
 			vExtra = versionLine.replace('VERSION_EXTRA=', '');
 			continue;
 		}
-		if (versionLine.match(/VERSION_BUILD=/g)) {
+		if (versionLine.match(/VERSION_BUILD=/g))
+		{
 			vBuild = versionLine.replace('VERSION_BUILD=', '');
 			continue;
 		}

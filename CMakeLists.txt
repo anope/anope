@@ -13,60 +13,32 @@ endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT W
 project(Anope CXX)
 enable_language(C)
 
-# A macro to handle appending to lists
-macro(append_to_list LIST)
-  if(CMAKE242_OR_BETTER)
-    # For CMake 2.4.2 or better, we can just use the APPEND sub-command of list()
-    list(APPEND ${LIST} ${ARGN})
-  else(CMAKE242_OR_BETTER)
-    # For CMake 2.4.x before 2.4.2, we have to do this manually use set() instead
-    set(${LIST} ${${LIST}} ${ARGN})
-  endif(CMAKE242_OR_BETTER)
-endmacro(append_to_list)
+# Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+  set(CMAKE26_OR_BETTER TRUE)
+  set(CMAKE244_OR_BETTER TRUE)
+  set(CMAKE242_OR_BETTER TRUE)
+else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+  set(CMAKE26_OR_BETTER FALSE)
+  # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module is non-existant in earlier versions
+  if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+    set(CMAKE244_OR_BETTER TRUE)
+    set(CMAKE242_OR_BETTER TRUE)
+  else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+    set(CMAKE244_OR_BETTER FALSE)
+    # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
+    if(CMAKE_PATCH_VERSION GREATER 1)
+      set(CMAKE242_OR_BETTER TRUE)
+    else(CMAKE_PATCH_VERSION GREATER 1)
+      set(CMAKE242_OR_BETTER FALSE)
+    endif(CMAKE_PATCH_VERSION GREATER 1)
+  endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
 
-# A macro to handle searching within a list
-macro(find_in_list LIST ITEM_TO_FIND FOUND)
-  if(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-    # For CMake 2.6.x or better (as well as CMake 2.4.8 or better), we can use the FIND sub-command of list()
-    list(FIND ${LIST} ${ITEM_TO_FIND} ITEM_FOUND)
-  else(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-    # For CMake 2.4.x before 2.4.8, we have to do this ourselves (NOTE: This is very slow due to a lack of break() as well), firstly we set that we a temporary boolean
-    set(ITEM_FOUND -1)
-    set(POS 0)
-    # Iterate through the list
-    foreach(ITEM ${${LIST}})
-      # If the item we are looking at is the item we are trying to find, set that we've found the item
-      if(${ITEM} STREQUAL ${ITEM_TO_FIND})
-        set(ITEM_FOUND ${POS})
-      endif(${ITEM} STREQUAL ${ITEM_TO_FIND})
-      math(EXPR POS "${POS} + 1")
-    endforeach(ITEM)
-  endif(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-  # Set the given FOUND variable to the result
-  set(${FOUND} ${ITEM_FOUND})
-endmacro(find_in_list)
+# Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
+set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR})
 
-# A macro to handle removing duplicates from a list
-macro(remove_list_duplicates LIST)
-  if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, this can be done automatically
-    list(REMOVE_DUPLICATES ${LIST})
-  else(CMAKE26_OR_BETTER)
-    # For CMake 2.4.x, we have to do this ourselves, firstly we'll clear a temporary list
-    set(NEW_LIST)
-    # Iterate through the old list
-    foreach(ITEM ${${LIST}})
-      # Check if the item is in the new list
-      find_in_list(NEW_LIST ${ITEM} FOUND_ITEM)
-      if(FOUND_ITEM EQUAL -1)
-        # If the item was not found, append it to the list
-        append_to_list(NEW_LIST ${ITEM})
-      endif(FOUND_ITEM EQUAL -1)
-    endforeach(ITEM)
-    # replace the old list with the new list
-    set(${LIST} ${NEW_LIST})
-  endif(CMAKE26_OR_BETTER)
-endmacro(remove_list_duplicates)
+include(Anope)
 
 # Start with empty defaults for library and include directories, to be used by GNU compilers only
 set(DEFAULT_LIBRARY_DIRS)
@@ -97,10 +69,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # Remove duplicate entries from the list
   remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
   # Next, we look for the compiler's default include directories
-  # Create an empty temporary file
-  execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
   # Run the command to find the default include directories
-  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_BINARY_DIR}/empty.c ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_SOURCE_DIR}/empty.c ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
   # Convert the new lines to semicolons
   string(REGEX REPLACE "\n" ";" LINES ${LINES})
   # Temporary variable saying if we are in the search list or not
@@ -127,8 +97,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endforeach(LINE)
   # Remove duplicate entries from the list
   remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
-  # Delete the temporary file
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
@@ -161,28 +129,6 @@ if(MSVC)
     set(WSDK_PATH "${WSDK2008_PATH}")
   endif(WSDK2008_PATH STREQUAL "/registry")
 endif(MSVC)
-
-# Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
-if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-  set(CMAKE26_OR_BETTER TRUE)
-  set(CMAKE244_OR_BETTER TRUE)
-  set(CMAKE242_OR_BETTER TRUE)
-else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
-  set(CMAKE26_OR_BETTER FALSE)
-  # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module is non-existant in earlier versions
-  if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
-    set(CMAKE244_OR_BETTER TRUE)
-    set(CMAKE242_OR_BETTER TRUE)
-  else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
-    set(CMAKE244_OR_BETTER FALSE)
-    # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
-    if(CMAKE_PATCH_VERSION GREATER 1)
-      set(CMAKE242_OR_BETTER TRUE)
-    else(CMAKE_PATCH_VERSION GREATER 1)
-      set(CMAKE242_OR_BETTER FALSE)
-    endif(CMAKE_PATCH_VERSION GREATER 1)
-  endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
-endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
@@ -342,32 +288,6 @@ if(CMAKE26_OR_BETTER)
   endif(LDFLAGS)
 endif(CMAKE26_OR_BETTER)
 
-# A macro to handle reading specific lines from a file
-macro(read_from_file FILE REGEX STRINGS)
-  if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, we can just use this function to get the lines that match the given regular expression
-    file(STRINGS ${FILE} RESULT REGEX ${REGEX})
-  else(CMAKE26_OR_BETTER)
-    # For CMake 2.4.x, we need to do this manually, firstly we read the file in
-    file(READ ${FILE} ALL_STRINGS)
-    # Next we replace all newlines with semicolons
-    string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
-    # Clear the result list
-    set(RESULT)
-    # Iterate through all the lines of the file
-    foreach(STRING ${ALL_STRINGS})
-      # Check for a match against the given regular expression
-      string(REGEX MATCH ${REGEX} STRING_MATCH ${STRING})
-      # If we had a match, append the match to the list
-      if(STRING_MATCH)
-        append_to_list(RESULT ${STRING})
-      endif(STRING_MATCH)
-    endforeach(STRING)
-  endif(CMAKE26_OR_BETTER)
-  # Set the given STRINGS variable to the result
-  set(${STRINGS} ${RESULT})
-endmacro(read_from_file)
-
 # Search for the following programs
 find_program(GREP grep)
 find_program(SH sh)
@@ -440,32 +360,6 @@ if(CMAKE244_OR_BETTER)
   list(SORT ALL_HEADERS)
 endif(CMAKE244_OR_BETTER)
 
-# This function will take a #include line and extract the filename minus the quotes
-macro(extract_include_filename INCLUDE FILENAME)
-  # Detect if there is any trailing whitespace (basically see if the last character is a space or a tab)
-  string(LENGTH ${INCLUDE} INCLUDE_LEN)
-  math(EXPR LAST_CHAR_POS "${INCLUDE_LEN} - 1")
-  string(SUBSTRING ${INCLUDE} ${LAST_CHAR_POS} 1 LAST_CHAR)
-  # Only strip if the last character was a space or a tab
-  if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-    # Strip away trailing whitespace from the line
-    string(REGEX REPLACE "[ \t]*$" "" INCLUDE_STRIPPED ${INCLUDE})
-  else(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-    # Just copy INCLUDE to INCLUDE_STRIPPED so the below code doesn't complain about a lack of INCLUDE_STRIPPED
-    set(INCLUDE_STRIPPED ${INCLUDE})
-  endif(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-  # Find the filename including the quotes, it should be at the end of the line after whitespace was stripped
-  string(REGEX MATCH "\".*\"$" FILE ${INCLUDE_STRIPPED})
-  # Get the length of the filename with quotes
-  string(LENGTH ${FILE} FILENAME_LEN)
-  # Subtract 2 from this length, for the quotes
-  math(EXPR FILENAME_LEN "${FILENAME_LEN} - 2")
-  # Overwrite the filename with a version sans quotes
-  string(SUBSTRING ${FILE} 1 ${FILENAME_LEN} FILE)
-  # Set the filename to the the given variable
-  set(${FILENAME} "${FILE}")
-endmacro(extract_include_filename)
-
 # Preparse step 1: get filenames sans paths
 # Iterate through the headers
 foreach(HEADER ${ALL_HEADERS})
@@ -527,68 +421,6 @@ set(language.h_FULLPATH ${Anope_BINARY_DIR}/lang/language.h)
 set(sysconf.h_FULLPATH ${Anope_BINARY_DIR}/include/sysconf.h)
 set(version.h_FULLPATH ${Anope_BINARY_DIR}/include/version.h)
 
-# This function is used in most of the src (sub)directories to calculate the header file dependencies for the given source file
-macro(calculate_depends SRC)
-  # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace
-  read_from_file(${SRC} "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$" INCLUDES)
-  # Reset the list of headers to empty
-  set(HEADERS)
-  # Iterate through the strings containing #include (if any)
-  foreach(INCLUDE ${INCLUDES})
-    # Extract the filename from the #include line
-    extract_include_filename(${INCLUDE} FILENAME)
-    # Append the filename to the list of headers
-    append_to_list(HEADERS ${FILENAME})
-  endforeach(INCLUDE)
-  # Set the list of new headers to empty (this will store all the headers that the above list depends on)
-  set(NEW_HEADERS)
-  # Iterate through the list of headers
-  foreach(HEADER ${HEADERS})
-    # If the current header has it's own headers to depend on, append those to the list of new headers
-    if(${HEADER}_HEADERS)
-      append_to_list(NEW_HEADERS ${${HEADER}_HEADERS})
-    endif(${HEADER}_HEADERS)
-  endforeach(HEADER)
-  # If there were new headers, append them to the list of headers
-  if(NEW_HEADERS)
-    append_to_list(HEADERS ${NEW_HEADERS})
-  endif(NEW_HEADERS)
-  # If after all the above there is a list of header, we'll process them, converting them to full paths
-  if(HEADERS)
-    # Remove duplicate headers from the list and sort the list
-    remove_list_duplicates(HEADERS)
-    if(CMAKE244_OR_BETTER)
-      list(SORT HEADERS)
-    endif(CMAKE244_OR_BETTER)
-    # Set the list of full path headers to empty
-    set(HEADERS_FULL)
-    # Iterate through the list of headers
-    foreach(HEADER ${HEADERS})
-      # Append the full path of the header to the full path headers list
-      append_to_list(HEADERS_FULL ${${HEADER}_FULLPATH})
-    endforeach(HEADER)
-    # Set the given source file to depend on the headers given
-    set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS_FULL}")
-  endif(HEADERS)
-endmacro(calculate_depends)
-
-# A macro to update the environment variable CPACK_IGNORED_FILES which contains a list of files for CPack to ignore
-macro(add_to_cpack_ignored_files ITEM)
-  # Temporary copy of the orignal item
-  set(REAL_ITEM "${ITEM}")
-  # If we have 2+ arguments, assume that the second one was something like TRUE (doesn't matter really) and convert periods so they will be \\. for CPack
-  if(${ARGC} GREATER 1)
-    string(REPLACE "." "\\\\." REAL_ITEM ${REAL_ITEM})
-  endif(${ARGC} GREATER 1)
-  # If the environment variable is already defined, just tack the item to the end
-  if(DEFINED ENV{CPACK_IGNORED_FILES})
-    set(ENV{CPACK_IGNORED_FILES} "$ENV{CPACK_IGNORED_FILES};${REAL_ITEM}")
-  # Otherwise set the environment variable to the item
-  else(DEFINED ENV{CPACK_IGNORED_FILES})
-    set(ENV{CPACK_IGNORED_FILES} "${REAL_ITEM}")
-  endif(DEFINED ENV{CPACK_IGNORED_FILES})
-endmacro(add_to_cpack_ignored_files)
-
 # Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
 add_to_cpack_ignored_files(".git\;config.cache\;.svn\;CMakeFiles\;sysconf.h$\;Makefile.inc$\;config.log\;config.status\;build\;autom4te.cache" TRUE)
 # Add the files we don't want the periods converted for
@@ -639,8 +471,6 @@ endif(WIN32)
 
 # Only process the CPack section if we have CPack
 if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
-  # Override the module include path to include our directory, as we are using our own version of the NSIS template
-  set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR})
   # Various options for CPack
   set(CPACK_PACKAGE_NAME "Anope IRC Services")
   set(CPACK_PACKAGE_VENDOR "Anope Team")
@@ -663,17 +493,18 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
       "bin\\\\anope.bat\\\" \\\"-debug -nofork" "Anope IRC Services (Debug and Window Logging)"
       "bin\\\\anope.bat\\\" \\\"-nofork" "Anope IRC Services (Window Logging)"
       "bin\\\\anope.bat\\\" \\\"-nothird" "Anope IRC Services (No Third Party Modules)"
-      "http://www.anope.org" "Anope Web Site"
+      "http://www.anope.org/" "Anope Web Site"
     )
     # The following doesn't work, but a bug report has been filed about it
     #set(CPACK_CREATE_DESKTOP_LINK_${SERVICES_BINARY} TRUE)
     set(CPACK_NSIS_MUI_ICON "${Anope_SOURCE_DIR}/src\\\\anope-icon.ico")
     set(CPACK_NSIS_MUI_UNIICON "${Anope_SOURCE_DIR}/src\\\\anope-icon.ico")
     set(CPACK_NSIS_INSTALLED_ICON_NAME "${SERVICES_BINARY}")
-    set(CPACK_NSIS_URL_INFO_ABOUT "http://www.anope.org")
+    set(CPACK_NSIS_URL_INFO_ABOUT "http://www.anope.org/")
     set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")
   endif(WIN32)
   set(CPACK_SOURCE_PACKAGE_FILE_NAME "anope-${VERSION_FULL_NOBUILD}-source")
+  set(CPACK_SOURCE_GENERATOR "TGZ")
   set(CPACK_SOURCE_IGNORE_FILES "$ENV{CPACK_IGNORED_FILES}")
   set(CPACK_MONOLITHIC_INSTALL TRUE)
   include(CPack)

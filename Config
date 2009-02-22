@@ -157,6 +157,11 @@ USE_RUN_CC_PL="no"
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
 
+which cmake > /dev/null
+if [ $? -ne 0 ] ; then
+	BUILD_SYSTEM="configure"
+fi
+
 ###########################################################################
 # Check out the options
 ###########################################################################
@@ -247,6 +252,11 @@ while [ $ok -eq 0 ] ; do
 done
 BUILD_SYSTEM=$INPUT
 echo ""
+
+if [ "$SOURCE_DIR" != "." -a "$BUILD_SYSTEM" = "configure" ] ; then
+	echo "You can not use configure unless you are in the same folder as Config!"
+	exit 0
+fi
 
 ok=0
 echo "In what directory do you want the binaries to be installed?"

@@ -27,6 +27,7 @@ F Pass the right array to do_umode(), fixes mode tracking on Unreal. Thanks to D
 F Fix bs_set help, thanks to DukePyrolator! :)
 F Fix two segfaults, noted by DukePyrolator. Thanks!
 F Fix part one of #1010, reported by DukePyrolator. (Language settings are not respected in message sending.) Thanks!
+F Memory leak on +beI modes.
 
 
 Anope Version 1.9.0

@@ -762,7 +762,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 	Server *serv;
 	struct c_userlist *cu;
 	const char *s = NULL;
-	char *end, cubuf[7], *end2;
+	char *buf, *end, cubuf[7], *end2;
 	const char *modes[6];
 	int is_sqlined = 0;
 	int ts = 0;
@@ -823,7 +823,9 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 			if (ircd->sjoinbanchar) {
 				if (*s == ircd->sjoinbanchar && keep_their_modes) {
-					add_ban(c, myStrGetToken(s, ircd->sjoinbanchar, 1));
+					buf = myStrGetToken(s, ircd->sjoinbanchar, 1); 
+					add_ban(c, buf);
+					delete [] buf;
 					if (!end)
 						break;
 					s = end + 1;
@@ -832,8 +834,9 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 			if (ircd->sjoinexchar) {
 				if (*s == ircd->sjoinexchar && keep_their_modes) {
-					add_exception(c,
-								  myStrGetToken(s, ircd->sjoinexchar, 1));
+					buf = myStrGetToken(s, ircd->sjoinexchar, 1);
+					add_exception(c, buf);
+					delete [] buf;
 					if (!end)
 						break;
 					s = end + 1;
@@ -843,7 +846,9 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 			if (ircd->sjoininvchar) {
 				if (*s == ircd->sjoininvchar && keep_their_modes) {
-					add_invite(c, myStrGetToken(s, ircd->sjoininvchar, 1));
+					buf = myStrGetToken(s, ircd->sjoininvchar, 1);
+					add_invite(c, buf);
+					delete [] buf;
 					if (!end)
 						break;
 					s = end + 1;

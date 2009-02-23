@@ -419,6 +419,7 @@ char *sgets(char *buf, int len, ano_socket_t s)
 
 	if (len == 0)
 		return NULL;
+	FD_ZERO(&fds);
 	FD_SET(s, &fds);
 	tv.tv_sec = ReadTimeout;
 	tv.tv_usec = 0;

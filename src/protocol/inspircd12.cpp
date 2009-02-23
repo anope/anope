@@ -15,6 +15,7 @@
 
 #include "services.h"
 #include "pseudo.h"
+#include "hashcomp.h"
 
 #define UMODE_a 0x00000001
 #define UMODE_h 0x00000002
@@ -828,9 +829,6 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 {
 	const char *newav[30]; // hopefully 30 will do until the stupid ac/av stuff goes away.
 
-	/* value used for myStrGetToken */
-	int curtoken = 0;
-
 	/* storing the current nick */
 	char *curnick;
 
@@ -847,9 +845,12 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 	if (ac <= 3)
 		return MOD_CONT;
 
-	curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
-	while (curnick != NULL)
+	spacesepstream nicks(av[ac - 1]);
+	std::string nick;
+
+	while (nicks.GetToken(nick))
 	{
+		curnick = sstrdup(nick.c_str());
 		char *curnick_real = curnick;
 		for (; *curnick; curnick++)
 		{
@@ -887,8 +888,6 @@ endnick:
 		strncat(nicklist, prefixandnick, 513);
 		strncat(nicklist, " ", 513);
 		delete [] curnick_real;
-		curtoken++;
-		curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
 		nlen = 0;
 	}
 

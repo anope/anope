@@ -559,7 +559,7 @@ inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
                    time_t expires, char *reason)
 {
     send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who,
-             (long int) when, (long int) 86400 * 2, reason);
+             (long int) time(NULL), (long int) 86400 * 2, reason);
 }
 
 void inspircd_cmd_svskill(char *source, char *user, char *buf)

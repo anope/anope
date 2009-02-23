@@ -406,6 +406,7 @@ static int has_chgidentmod = 0;
 static int has_messagefloodmod = 0;
 static int has_banexceptionmod = 0;
 static int has_inviteexceptionmod = 0;
+static int has_hidechansmod = 0;
 
 
 /* CHGHOST */
@@ -1207,6 +1208,10 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		has_svsholdmod = 0;
 		has_chghostmod = 0;
 		has_chgidentmod = 0;
+		has_messagefloodmod = 0;
+		has_banexceptionmod = 0;
+		has_inviteexceptionmod = 0;
+		has_hidechansmod = 0;
 
 	} else if (strcasecmp(av[0], "MODULES") == 0) {
 		if (strstr(av[1], "m_globops.so")) {
@@ -1233,10 +1238,25 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		if (strstr(av[1], "m_inviteexception.so")) {
 			has_inviteexceptionmod = 1;
 		}
+		if (strstr(av[1], "m_hidechans.so")) {
+			has_hidechansmod = 1;
+		}
 	} else if (strcasecmp(av[0], "END") == 0) {
+		if (!has_globopsmod) {
+			send_cmd(NULL, "ERROR :m_globops is not loaded. This is required by Anope");
+			quitmsg = "Remote server does not have the m_globops module loaded, and this is required.";
+			quitting = 1;
+			return MOD_STOP;
+		}
 		if (!has_servicesmod) {
 			send_cmd(NULL, "ERROR :m_services_account.so is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
+			quitting = 1;
+			return MOD_STOP;
+		}
+		if (!has_hidechansmod) {
+			send_cmd(NULL, "ERROR :m_hidechans.so is not loaded. This is required by Anope");
+			quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}

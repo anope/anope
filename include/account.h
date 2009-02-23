@@ -24,7 +24,7 @@ class NickRequest
 
 class NickCore;
 
-class NickAlias
+class CoreExport NickAlias
 {
  public:
 	NickAlias();

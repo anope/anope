@@ -22,7 +22,7 @@ foreach(SRC ${PROTOCOL_SRCS})
   calculate_depends(${SRC})
   # For Visual Studio only, include win32_memory.cpp to the list of sources, required to override Visual Studio's overrides of the new/delete operators
   if(MSVC)
-    append_to_list(APPEND SRC ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
+    append_to_list(SRC ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
     set_source_files_properties(${Anope_SOURCE_DIR}/src/win32_memory.cpp LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
   endif(MSVC)
   # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand

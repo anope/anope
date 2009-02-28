@@ -75,7 +75,7 @@ class CommandMSSet : public Command
 		int32 limit;
 		NickCore *nc = u->nc;
 		ChannelInfo *ci = NULL;
-		int is_servadmin = is_services_admin(u);
+		bool is_servadmin = u->nc->HasPriv("memoserv/set-limit");
 
 		if (*p1 == '#')
 		{

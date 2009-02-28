@@ -33,7 +33,7 @@ class CommandMSInfo : public Command
 		int is_servadmin = is_services_admin(u);
 		int hardmax = 0;
 
-		if (is_servadmin && name && *name != '#')
+		if (name && *name != '#' && u->nc->HasPriv("memoserv/info"))
 		{
 			na = findnick(name);
 			if (!na)

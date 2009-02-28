@@ -30,6 +30,12 @@ class CommandMSSendAll : public Command
 		NickCore *nc;
 		const char *text = params[0].c_str();
 
+		if (!u->nc->HasCommand("memoserv/sendall"))
+		{
+			// XXX: error?
+			return MOD_CONT;
+		}
+
 		if (readonly)
 		{
 			notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);

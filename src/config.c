@@ -133,7 +133,6 @@ char *CSAutokickReason;
 time_t CSInhabit;
 bool CSListOpersOnly;
 unsigned CSListMax;
-bool CSRestrictGetPass;
 bool CSOpersOnly;
 
 unsigned MSMaxMemos;
@@ -871,7 +870,6 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "inhabit", "0", new ValueContainerTime(&CSInhabit), DT_TIME, ValidateNotZero},
 		{"chanserv", "listopersonly", "no", new ValueContainerBool(&CSListOpersOnly), DT_BOOLEAN, NoValidation},
 		{"chanserv", "listmax", "0", new ValueContainerUInt(&CSListMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "restrictgetpass", "no", new ValueContainerBool(&CSRestrictGetPass), DT_BOOLEAN, NoValidation},
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},

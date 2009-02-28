@@ -55,11 +55,6 @@ class CommandCSGetPass : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
-		if (CSRestrictGetPass && !is_services_root(u))
-		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
 		if(!enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1)==1)
 		{
 			notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);

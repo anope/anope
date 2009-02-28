@@ -38,7 +38,7 @@ class CommandCSTopic : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-		else if (!is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
+		else if (!check_access(u, ci, CA_TOPIC) && !u->nc->HasCommand("chanserv/topic"))
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 		else
 		{
@@ -57,7 +57,7 @@ class CommandCSTopic : public Command
 			else
 				c->topic_time = ci->last_topic_time;
 
-			if (is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
+			if (!check_access(u, ci, CA_TOPIC))
 				alog("%s: %s!%s@%s changed topic of %s as services admin.", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, c->name);
 			if (ircd->join2set && whosends(ci) == findbot(s_ChanServ))
 			{

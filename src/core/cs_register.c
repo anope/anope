@@ -33,7 +33,6 @@ class CommandCSRegister : public Command
 		Channel *c;
 		ChannelInfo *ci;
 		struct u_chaninfolist *uc;
-		int is_servadmin = is_services_admin(u);
 		char founderpass[PASSMAX];
 		char tmp_pass[PASSMAX];
 
@@ -71,7 +70,7 @@ class CommandCSRegister : public Command
 			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 		else if (!chan_has_user_status(c, u, CUS_OP))
 			notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
-		else if (!is_servadmin && CSMaxReg && u->nc->channelcount >= CSMaxReg)
+		else if (CSMaxReg && u->nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
 			notice_lang(s_ChanServ, u, u->nc->channelcount > CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
 		else if (!stricmp(u->nick, pass) || (StrictPasswords && strlen(pass) < 5))
 			notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);

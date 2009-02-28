@@ -44,7 +44,7 @@ public:
 		ChannelInfo *ci;
 		unsigned nchans, i;
 		char buf[BUFSIZE];
-		int is_servadmin = is_services_admin(u);
+		bool is_servadmin = u->nc->HasCommand("chanserv/list");
 		int count = 0, from = 0, to = 0, tofree = 0;
 		char *tmp = NULL;
 		char *s = NULL;

@@ -54,30 +54,7 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 
 	int is_same;
 
-	if (!chan) {
-		struct u_chanlist *uc;
-
-		av[0] = util->mode;
-		av[1] = u->nick;
-
-		/* Sets the mode to the user on every channels he is on. */
-
-		for (uc = u->chans; uc; uc = uc->next) {
-			if ((ci = uc->chan->ci) && !(ci->flags & CI_FORBIDDEN)
-				&& check_access(u, ci, util->levelself)) {
-				ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
-							   util->mode, u->nick);
-				chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
-
-				if (util->notice && ci->flags & util->notice)
-					ircdproto->SendMessage(whosends(ci), uc->chan->name,
-						   "%s command used for %s by %s", util->name,
-						   u->nick, u->nick);
-			}
-		}
-
-		return MOD_CONT;
-	} else if (!nick) {
+	if (!nick) {
 		nick = u->nick;
 	}
 
@@ -121,7 +98,7 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 class CommandCSOp : public Command
 {
  public:
-	CommandCSOp() : Command("OP", 0, 2)
+	CommandCSOp() : Command("OP", 1, 2)
 	{
 
 	}
@@ -142,7 +119,7 @@ class CommandCSOp : public Command
 class CommandCSDeOp : public Command
 {
  public:
-	CommandCSDeOp() : Command("DEOP", 0, 2)
+	CommandCSDeOp() : Command("DEOP", 1, 2)
 	{
 
 	}
@@ -163,7 +140,7 @@ class CommandCSDeOp : public Command
 class CommandCSVoice : public Command
 {
  public:
-	CommandCSVoice() : Command("VOICE", 0, 2)
+	CommandCSVoice() : Command("VOICE", 1, 2)
 	{
 
 	}
@@ -184,7 +161,7 @@ class CommandCSVoice : public Command
 class CommandCSDeVoice : public Command
 {
  public:
-	CommandCSDeVoice() : Command("DEVOICE", 0, 2)
+	CommandCSDeVoice() : Command("DEVOICE", 1, 2)
 	{
 
 	}
@@ -205,7 +182,7 @@ class CommandCSDeVoice : public Command
 class CommandCSHalfOp : public Command
 {
  public:
-	CommandCSHalfOp() : Command("HALFOP", 0, 2)
+	CommandCSHalfOp() : Command("HALFOP", 1, 2)
 	{
 
 	}
@@ -232,7 +209,7 @@ class CommandCSHalfOp : public Command
 class CommandCSDeHalfOp : public Command
 {
  public:
-	CommandCSDeHalfOp() : Command("DEHALFOP", 0, 2)
+	CommandCSDeHalfOp() : Command("DEHALFOP", 1, 2)
 	{
 
 	}
@@ -258,7 +235,7 @@ class CommandCSDeHalfOp : public Command
 class CommandCSProtect : public Command
 {
  public:
-	CommandCSProtect() : Command("PROTECT", 0, 2)
+	CommandCSProtect() : Command("PROTECT", 1, 2)
 	{
 
 	}
@@ -285,7 +262,7 @@ class CommandCSProtect : public Command
 class CommandCSDeProtect : public Command
 {
  public:
-	CommandCSDeProtect() : Command("DEPROTECT", 0, 2)
+	CommandCSDeProtect() : Command("DEPROTECT", 1, 2)
 	{
 
 	}
@@ -312,7 +289,7 @@ class CommandCSDeProtect : public Command
 class CommandCSOwner : public Command
 {
  public:
-	CommandCSOwner() : Command("OWNER", 2, 2)
+	CommandCSOwner() : Command("OWNER", 1, 2)
 	{
 
 	}
@@ -321,7 +298,7 @@ class CommandCSOwner : public Command
 	{
 		const char *av[2];
 		const char *chan = params[0].c_str();
-		const char *nick = params[1].c_str();
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		User *u2;
 		Channel *c;
 		ChannelInfo *ci;
@@ -366,7 +343,7 @@ class CommandCSOwner : public Command
 class CommandCSDeOwner : public Command
 {
  public:
-	CommandCSDeOwner() : Command("DEOWNER", 2, 2)
+	CommandCSDeOwner() : Command("DEOWNER", 1, 2)
 	{
 
 	}
@@ -375,7 +352,7 @@ class CommandCSDeOwner : public Command
 	{
 		const char *av[2];
 		const char *chan = params[0].c_str();
-		const char *nick = params[1].c_str();
+		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		User *u2;
 
 		Channel *c;

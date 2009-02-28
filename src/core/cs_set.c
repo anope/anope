@@ -33,7 +33,7 @@ class CommandCSSet : public Command
 		}
 
 		nc = na->nc;
-		if (CSMaxReg && nc->channelcount >= CSMaxReg && !is_services_admin(u)) {
+		if (CSMaxReg && nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit")) {
 			notice_lang(s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, param);
 			return MOD_CONT;
 		}
@@ -513,7 +513,8 @@ class CommandCSSet : public Command
 
 	CommandReturn DoSetNoExpire(User * u, ChannelInfo * ci, const char *param)
 	{
-		if (!is_services_admin(u)) {
+		if (!u->nc->HasCommand("chanserv/set/noexpire"))
+		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
@@ -541,7 +542,7 @@ class CommandCSSet : public Command
 		const char *cmd = params[1].c_str();
 		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
 		ChannelInfo *ci;
-		int is_servadmin = is_services_admin(u);
+		bool is_servadmin = u->nc->HasPriv("chanserv/set");
 
 		if (readonly) {
 			notice_lang(s_ChanServ, u, CHAN_SET_DISABLED);

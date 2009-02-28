@@ -32,6 +32,9 @@ class CommandCSStatus : public Command
 		const char *nick = params[1].c_str();
 		const char *temp = NULL;
 
+		if (!u->nc->HasCommand("chanserv/status"))
+			return MOD_CONT; // XXX: error?
+
 		if (!(ci = cs_findchan(chan)))
 		{
 			temp = chan;

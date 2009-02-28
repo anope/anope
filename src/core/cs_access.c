@@ -34,7 +34,8 @@ static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm,
 	char *nick;
 	if (!access->in_use)
 		return 0;
-	if (!is_services_admin(u) && uacc <= access->level) {
+	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/change"))
+	{
 		(*perm)++;
 		return 0;
 	}
@@ -116,7 +117,6 @@ class CommandCSAccess : public Command
 		unsigned i;
 		int level = 0, ulev;
 		int is_list = (cmd && stricmp(cmd, "LIST") == 0);
-		int is_servadmin = is_services_admin(u);
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
 		 * If DEL, we require a nick and no level.
@@ -134,9 +134,13 @@ class CommandCSAccess : public Command
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
 			else
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP, s_ChanServ);
-		} else if (((is_list && !check_access(u, ci, CA_ACCESS_LIST))
-					|| (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE)))
-					 && !is_servadmin) {
+		} else if (
+				(
+				 (is_list && !check_access(u, ci, CA_ACCESS_LIST) && !u->nc->HasCommand("chanserv/access/list"))
+				 ||
+				 (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->nc->HasPriv("chanserv/access/modify"))
+				))
+		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(cmd, "ADD") == 0) {
 			if (readonly) {
@@ -147,7 +151,8 @@ class CommandCSAccess : public Command
 			level = atoi(s);
 			ulev = get_access(u, ci);
 
-			if (!is_servadmin && level >= ulev) {
+			if (level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
+			{
 				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 				return MOD_CONT;
 			}
@@ -176,7 +181,8 @@ class CommandCSAccess : public Command
 				 access++, i++) {
 				if (access->nc == nc) {
 					/* Don't allow lowering from a level >= ulev */
-					if (!is_servadmin && access->level >= ulev) {
+					if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/change"))
+					{
 						notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 						return MOD_CONT;
 					}
@@ -270,7 +276,8 @@ class CommandCSAccess : public Command
 					return MOD_CONT;
 				}
 				access = &ci->access[i];
-				if (!is_servadmin && get_access(u, ci) <= access->level) {
+				if (get_access(u, ci) <= access->level && !u->nc->HasPriv("chanserv/access/change"))
+				{
 					deleted = 0;
 					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 				} else {
@@ -352,7 +359,8 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (!is_servadmin && !is_founder(u, ci)) {
+			if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change"))
+			{
 				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 				return MOD_CONT;
 			}
@@ -420,7 +428,7 @@ class CommandCSLevels : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (ci->flags & CI_XOP) {
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
-		} else if (!is_founder(u, ci) && !is_services_admin(u)) {
+		} else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change")) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(cmd, "SET") == 0) {
 			level = strtol(s, &error, 10);

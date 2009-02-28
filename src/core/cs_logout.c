@@ -52,7 +52,7 @@ class CommandCSLogout : public Command
 	}
 
  public:
-	CommandCSLogout() : Command("LOGOUT", 1, 2)
+	CommandCSLogout() : Command("LOGOUT", 2, 2)
 	{
 
 	}
@@ -63,20 +63,12 @@ class CommandCSLogout : public Command
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		ChannelInfo *ci;
 		User *u2 = NULL;
-		int is_servadmin = is_services_admin(u);
 
-		if (!nick && !is_servadmin)
-		{
-			// XXX: this should be permission denied.
-			syntax_error(s_ChanServ, u, "LOGOUT",
-						 (!is_servadmin ? CHAN_LOGOUT_SYNTAX :
-						  CHAN_LOGOUT_SERVADMIN_SYNTAX));
-		}
-		else if (!(ci = cs_findchan(chan)))
+		if (!(ci = cs_findchan(chan)))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		}
-		else if (!is_servadmin && (ci->flags & CI_FORBIDDEN))
+		else if ((ci->flags & CI_FORBIDDEN))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		}
@@ -84,7 +76,7 @@ class CommandCSLogout : public Command
 		{
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 		}
-		else if (!is_servadmin && u2 != u && !is_real_founder(u, ci))
+		else if (u2 != u && !is_real_founder(u, ci))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		}
@@ -114,8 +106,6 @@ class CommandCSLogout : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u) || is_services_root(u))
-			notice_help(s_NickServ, u, CHAN_SERVADMIN_HELP_LOGOUT);
 		notice_help(s_NickServ, u, CHAN_HELP_LOGOUT);
 		return true;
 	}

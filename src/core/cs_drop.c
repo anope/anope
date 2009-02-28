@@ -38,7 +38,6 @@ class CommandCSDrop : public Command
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci;
-		int is_servadmin = is_services_admin(u);
 
 		if (readonly)
 		{
@@ -52,19 +51,19 @@ class CommandCSDrop : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_servadmin && (ci->flags & CI_FORBIDDEN))
+		if ((ci->flags & CI_FORBIDDEN) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if (!is_servadmin && (ci->flags & CI_SUSPENDED))
+		if ((ci->flags & CI_SUSPENDED) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if (!is_servadmin && (ci->flags & CI_SECUREFOUNDER ? !is_real_founder(u, ci) : !is_founder(u, ci)))
+		if ((ci->flags & CI_SECUREFOUNDER ? !is_real_founder(u, ci) : !is_founder(u, ci)) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -95,7 +94,7 @@ class CommandCSDrop : public Command
 		/* We must make sure that the Services admin has not normally the right to
 		 * drop the channel before issuing the wallops.
 		 */
-		if (WallDrop && is_servadmin && level < ACCESS_FOUNDER)
+		if (WallDrop && level < ACCESS_FOUNDER)
 			ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
 
 		notice_lang(s_ChanServ, u, CHAN_DROPPED, chan);

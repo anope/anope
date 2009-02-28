@@ -44,6 +44,12 @@ class CommandCSForbid : public Command
 
 		Channel *c;
 
+		if (!u->nc->HasCommand("chanserv/forbid"))
+		{
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		if (ForceForbidReason && !reason)
 		{
 			syntax_error(s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);

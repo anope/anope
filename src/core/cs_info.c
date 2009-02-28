@@ -53,7 +53,7 @@ class CommandCSInfo : public Command
 		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;
-		int is_servadmin = is_services_admin(u);
+		bool has_auspex = u->nc->HasPriv("chanserv/auspex");
 		int show_all = 0;
 		time_t expt;
 
@@ -78,7 +78,7 @@ class CommandCSInfo : public Command
 
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (param && stricmp(param, "ALL") == 0 && (check_access(u, ci, CA_INFO) || is_servadmin))
+		if (param && stricmp(param, "ALL") == 0 && (check_access(u, ci, CA_INFO) || has_auspex))
 			show_all = 1;
 
 		notice_lang(s_ChanServ, u, CHAN_INFO_HEADER, chan);
@@ -137,7 +137,7 @@ class CommandCSInfo : public Command
 			}
 			else
 			{
-				if (is_servadmin)
+				if (has_auspex)
 				{
 					expt = ci->last_used + CSExpire;
 					tm = localtime(&expt);
@@ -151,7 +151,7 @@ class CommandCSInfo : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON)));
 		}
 
-		if (!show_all && (check_access(u, ci, CA_INFO) || is_servadmin))
+		if (!show_all && (check_access(u, ci, CA_INFO) || has_auspex))
 			notice_lang(s_ChanServ, u, NICK_INFO_FOR_MORE, s_ChanServ, ci->name);
 		return MOD_CONT;
 	}

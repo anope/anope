@@ -126,7 +126,7 @@ class XOPBase : public Command
 
 		short ulev = get_access(u, ci);
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !is_services_admin(u))
+		if ((level >= ulev || ulev < ACCESS_AOP) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -152,7 +152,7 @@ class XOPBase : public Command
 				/**
 				 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
 				 **/
-				if (access->level >= ulev && !is_services_admin(u))
+				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 				{
 					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 					return MOD_CONT;
@@ -229,7 +229,7 @@ class XOPBase : public Command
 
 		short ulev = get_access(u, ci);
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !is_services_admin(u))
+		if ((level >= ulev || ulev < ACCESS_AOP) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -275,7 +275,7 @@ class XOPBase : public Command
 			}
 
 			access = &ci->access[i];
-			if (!is_services_admin(u) && ulev <= access->level)
+			if (ulev <= access->level && !u->nc->HasPriv("chanserv/access/change"))
 			{
 				deleted = 0;
 				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
@@ -336,7 +336,7 @@ class XOPBase : public Command
 		int sent_header = 0;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 
-		if (!is_services_admin(u) && level < ACCESS_AOP)
+		if (level < ACCESS_AOP && !u->nc->HasCommand("chanserv/aop/list"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -379,7 +379,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_services_admin(u) && !is_founder(u, ci))
+		if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change"))
 		{
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -578,7 +578,7 @@ int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, i
 	char *nick = access->nc->display;
 	if (!access->in_use || access->level != xlev)
 		return 0;
-	if (!is_services_admin(u) && uacc <= access->level)
+	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/change"))
 	{
 		++(*perm);
 		return 0;

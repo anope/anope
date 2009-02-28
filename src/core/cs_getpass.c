@@ -39,6 +39,12 @@ class CommandCSGetPass : public Command
 		char tmp_pass[PASSMAX];
 		ChannelInfo *ci;
 
+		if (!u->nc->HasCommand("chanserv/getpass"))
+		{
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		if (!(ci = cs_findchan(chan)))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);

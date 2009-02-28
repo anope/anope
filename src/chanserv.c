@@ -111,8 +111,11 @@ CSModeUtil csmodeutils[] = {
 	{ "VOICE",	 "voice",	"+v", 0,		   CA_VOICE,   CA_VOICEME  },
 	{ "DEHALFOP",  "dehalfop", "-h", 0,		   CA_HALFOP,  CA_HALFOPME },
 	{ "HALFOP",	"halfop",   "+h", 0,		   CA_HALFOP,  CA_HALFOPME },
+	/* These get set later */
 	{ "DEPROTECT", "",		 "",   0,		   CA_PROTECT, CA_PROTECTME },
 	{ "PROTECT",   "",		 "",   0,		   CA_PROTECT, CA_PROTECTME },
+	{ "DEOWNER",	"",		"",		0,		ACCESS_FOUNDER,		ACCESS_FOUNDER},
+	{ "OWNER",		"",		"",		0,		ACCESS_FOUNDER,		ACCESS_FOUNDER},
 	{ NULL }
 };
 
@@ -1576,6 +1579,8 @@ int check_access(User * user, ChannelInfo * ci, int what)
 	if (level > 0)
 		ci->last_used = time(NULL);
 
+	if (what == ACCESS_FOUNDER)
+		return is_founder(user, ci);
 	if (level >= ACCESS_FOUNDER)
 		return (what == CA_AUTODEOP || what == CA_NOJOIN) ? 0 : 1;
 	/* Hacks to make flags work */

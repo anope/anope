@@ -296,39 +296,7 @@ class CommandCSOwner : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *av[2];
-		const char *chan = params[0].c_str();
-		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
-		User *u2;
-		Channel *c;
-		ChannelInfo *ci;
-
-		if (!ircd->owner)
-		{
-			return MOD_CONT;
-		}
-
-		if (!(c = findchan(chan))) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!(ci = c->ci)) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-		} else if (ci->flags & CI_FORBIDDEN) {
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-		} else if (!(u2 = finduser(nick))) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-		} else if (!is_on_chan(c, u2)) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
-		} else if (!is_founder(u, ci)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else {
-			ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerset,
-						u2->nick);
-
-			av[0] = ircd->ownerset;
-			av[1] = u2->nick;
-			chan_set_modes(s_ChanServ, c, 2, av, 1);
-		}
-		return MOD_CONT;
+		return do_util(u, &csmodeutils[MUT_OWNER], (params.size() > 0 ? params[0].c_str() : NULL), NULL);
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)
@@ -350,38 +318,7 @@ class CommandCSDeOwner : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *av[2];
-		const char *chan = params[0].c_str();
-		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
-		User *u2;
-
-		Channel *c;
-		ChannelInfo *ci;
-
-		if (!ircd->owner) {
-			return MOD_CONT;
-		}
-
-		if (!(c = findchan(chan))) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!(ci = c->ci)) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-		} else if (ci->flags & CI_FORBIDDEN) {
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-		} else if (!(u2 = finduser(nick))) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-		} else if (!is_on_chan(c, u2)) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
-		} else if (!is_founder(u, ci)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else {
-			ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerunset, u2->nick);
-
-			av[0] = ircd->ownerunset;
-			av[1] = u2->nick;
-			chan_set_modes(s_ChanServ, c, 2, av, 1);
-		}
-		return MOD_CONT;
+		return do_util(u, &csmodeutils[MUT_DEOWNER], (params.size() > 0 ? params[0].c_str() : NULL), NULL);
 	}
 
 	bool OnHelp(User *u, const std::string &subcommand)

@@ -1276,6 +1276,7 @@ void moduleAddIRCDMsgs() {
 	Message *m;
 
 	updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
+	updateOwnerDetails("OWNER", "DEOWNER", ircd->ownerset, ircd->ownerunset);
 
 	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
 	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);

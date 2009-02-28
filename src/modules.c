@@ -1035,6 +1035,25 @@ void updateProtectDetails(const char *level_info_protect_word,
 	}
 }
 
+void updateOwnerDetails(const char *fant_owner_add, const char *fant_owner_del, const char *owner_set_mode, const char *owner_del_mode)
+{
+	CSModeUtil ptr;
+	int i = 0;
+
+	ptr = csmodeutils[i];
+	while (ptr.name) {
+		if (!strcmp(ptr.name, "OWNER")) {
+			csmodeutils[i].bsname = sstrdup(fant_owner_add);
+			csmodeutils[i].mode = sstrdup(owner_set_mode);
+		}
+		else if (!strcmp(ptr.name, "DEOWNER")) {
+			csmodeutils[i].bsname = sstrdup(fant_owner_del);
+			csmodeutils[i].mode = sstrdup(owner_del_mode);
+		}
+		ptr = csmodeutils[++i];
+	}
+}
+
 void Module::NoticeLang(char *source, User * u, int number, ...)
 {
 	va_list va;

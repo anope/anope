@@ -1183,6 +1183,8 @@ typedef struct ircd_modes_ {
 #define MUT_HALFOP		5
 #define MUT_DEPROTECT   	6
 #define MUT_PROTECT	 	7
+#define MUT_DEOWNER		8
+#define MUT_OWNER		9
 
 /*************************************************************************/
 /* CAPAB stuffs */

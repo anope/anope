@@ -40,6 +40,9 @@ set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR})
 
 include(Anope)
 
+# Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
+set(ENV{LC_ALL} C)
+
 # Start with empty defaults for library and include directories, to be used by GNU compilers only
 set(DEFAULT_LIBRARY_DIRS)
 set(DEFAULT_INCLUDE_DIRS)

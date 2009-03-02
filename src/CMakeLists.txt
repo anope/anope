@@ -17,11 +17,24 @@ endif(CMAKE244_OR_BETTER)
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
 
+# Create an empty list to store extra include directories
+set(EXTRA_INCLUDES)
 # Iterate through all the source files
 foreach(SRC ${SRC_SRCS})
+  # Temporary variable for the current source's include directories
+  set(TEMP_INCLUDES)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC})
+  calculate_depends(${SRC} TEMP_INCLUDES)
+  # If there were some extra include directories, add them to the list
+  if(TEMP_INCLUDES)
+    append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
+  endif(TEMP_INCLUDES)
 endforeach(SRC)
+# If there were extra include directories, remove the duplicates and add the directories to the include path
+if(EXTRA_INCLUDES)
+  remove_list_duplicates(EXTRA_INCLUDES)
+  include_directories(${EXTRA_INCLUDES})
+endif(EXTRA_INCLUDES)
 
 # Under Windows, we also include a resource file to the build
 if(WIN32)

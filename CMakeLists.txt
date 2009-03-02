@@ -67,7 +67,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif(NOT FIRST_CHAR STREQUAL "=")
   endforeach(LIBRARY)
   # Remove duplicate entries from the list
-  remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
+  if(DEFAULT_LIBRARY_DIRS)
+    remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
+  endif(DEFAULT_LIBRARY_DIRS)
   # Next, we look for the compiler's default include directories
   # Run the command to find the default include directories
   execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_SOURCE_DIR}/empty.c ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
@@ -96,7 +98,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif(LINE STREQUAL "#include <...> search starts here:")
   endforeach(LINE)
   # Remove duplicate entries from the list
-  remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
+  if(DEFAULT_INCLUDE_DIRS)
+    remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
+  endif(DEFAULT_INCLUDE_DIRS)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
@@ -132,7 +136,7 @@ endif(MSVC)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
-# to Debug prior to calling PROJECT()
+# to Debug
 # Only do this if not using Visual Studio
 if(NOT MSVC)
   if(CMAKE_BUILD_TYPE)
@@ -276,17 +280,14 @@ check_type_size(int32_t INT32_T)
 check_type_size(uint32_t UINT32_T)
 check_type_size(u_int32_t U_INT32_T)
 
-# Only CMake 2.6.x and later contain the STRIP sub-command for string()
-if(CMAKE26_OR_BETTER)
-  # Strip the leading and trailing spaces from the compile flags
-  if(CXXFLAGS)
-    string(STRIP ${CXXFLAGS} CXXFLAGS)
-  endif(CXXFLAGS)
-  # Strip the leading and trailing spaces from the linker flags
-  if(LDFLAGS)
-    string(STRIP ${LDFLAGS} LDFLAGS)
-  endif(LDFLAGS)
-endif(CMAKE26_OR_BETTER)
+# Strip the leading and trailing spaces from the compile flags
+if(CXXFLAGS)
+  strip_string(STRIP ${CXXFLAGS} CXXFLAGS)
+endif(CXXFLAGS)
+# Strip the leading and trailing spaces from the linker flags
+if(LDFLAGS)
+  strip_string(STRIP ${LDFLAGS} LDFLAGS)
+endif(LDFLAGS)
 
 # Search for the following programs
 find_program(GREP grep)

@@ -1,4 +1,36 @@
 ###############################################################################
+# strip_string(<input string> <output string>)
+#
+# A macro to handle stripping the leading and trailing spaces from a string,
+#   uses string(STRIP) if using CMake 2.6.x or better, otherwise uses
+#   string(REGEX REPLACE).
+###############################################################################
+macro(strip_string INPUT_STRING OUTPUT_STRING)
+  if(CMAKE26_OR_BETTER)
+    # For CMake 2.6.x or better, we can just use the STRIP sub-command of string()
+    string(STRIP ${INPUT_STRING} ${OUTPUT_STRING})
+  else(CMAKE26_OR_BETTER)
+    # For CMake 2.4.x, we will have to use the REGEX REPLACE sub-command of string() instead
+    # First we detect if there is any leading whitespace and remove any if there is
+    string(SUBSTRING "${INPUT_STRING}" 0 1 FIRST_CHAR)
+    if(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
+      string(REGEX REPLACE "^[ \t]*" "" TEMP_STRING "${INPUT_STRING}")
+    else(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
+      set(TEMP_STRING "${INPUT_STRING}")
+    endif(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
+    # Next we detect if there is any trailing whitespace and remove any if there is
+    string(LENGTH "${TEMP_STRING}" STRING_LEN)
+    math(EXPR STRING_LEN "${STRING_LEN} - 1")
+    string(SUBSTRING "${TEMP_STRING}" ${STRING_LEN} 1 LAST_CHAR)
+    if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+      string(REGEX REPLACE "[ \t]*$" "" ${OUTPUT_STRING} "${TEMP_STRING}")
+    else(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+      set(${OUTPUT_STRING} "${TEMP_STRING}")
+    endif(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+  endif(CMAKE26_OR_BETTER)
+endmacro(strip_string)
+
+###############################################################################
 # append_to_list(<list> <args>...)
 #
 # A macro to handle appending to lists, uses list(APPEND) if using CMake 2.4.2
@@ -79,28 +111,39 @@ endmacro(remove_list_duplicates)
 #
 # A macro to handle reading specific lines from a file, uses file(STRINGS) if
 #   using CMake 2.6.x or better, otherwise we read in the entire file and
-#   perform a string(REGEX MATCH) on each line of the file instead.
+#   perform a string(REGEX MATCH) on each line of the file instead.  This
+#   macro can also be used to read in all the lines of a file if REGEX is set
+#   to "".
 ###############################################################################
 macro(read_from_file FILE REGEX STRINGS)
   if(CMAKE26_OR_BETTER)
-    # For CMake 2.6.x or better, we can just use this function to get the lines that match the given regular expression
-    file(STRINGS ${FILE} RESULT REGEX ${REGEX})
+    # For CMake 2.6.x or better, we can just use the STRINGS sub-command to get the lines that match the given regular expression (if one is given, otherwise get all lines)
+    if(REGEX STREQUAL "")
+      file(STRINGS ${FILE} RESULT)
+    else(REGEX STREQUAL "")
+      file(STRINGS ${FILE} RESULT REGEX ${REGEX})
+    endif(REGEX STREQUAL "")
   else(CMAKE26_OR_BETTER)
     # For CMake 2.4.x, we need to do this manually, firstly we read the file in
     file(READ ${FILE} ALL_STRINGS)
     # Next we replace all newlines with semicolons
     string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
-    # Clear the result list
-    set(RESULT)
-    # Iterate through all the lines of the file
-    foreach(STRING ${ALL_STRINGS})
-      # Check for a match against the given regular expression
-      string(REGEX MATCH ${REGEX} STRING_MATCH ${STRING})
-      # If we had a match, append the match to the list
-      if(STRING_MATCH)
-        append_to_list(RESULT ${STRING})
-      endif(STRING_MATCH)
-    endforeach(STRING)
+    if(REGEX STREQUAL "")
+      # For no regular expression, just set the result to all the lines
+      set(RESULT ${ALL_STRINGS})
+    else(REGEX STREQUAL "")
+      # Clear the result list
+      set(RESULT)
+      # Iterate through all the lines of the file
+      foreach(STRING ${ALL_STRINGS})
+        # Check for a match against the given regular expression
+        string(REGEX MATCH ${REGEX} STRING_MATCH ${STRING})
+        # If we had a match, append the match to the list
+        if(STRING_MATCH)
+          append_to_list(RESULT ${STRING})
+        endif(STRING_MATCH)
+      endforeach(STRING)
+    endif(REGEX STREQUAL "")
   endif(CMAKE26_OR_BETTER)
   # Set the given STRINGS variable to the result
   set(${STRINGS} ${RESULT})
@@ -109,23 +152,13 @@ endmacro(read_from_file)
 ###############################################################################
 # extract_include_filename(<line> <output variable> [<optional output variable of quote type>])
 #
-# This function will take a #include line and extract the filename.
+# This macro will take a #include line and extract the filename.
 ###############################################################################
 macro(extract_include_filename INCLUDE FILENAME)
-  # Detect if there is any trailing whitespace (basically see if the last character is a space or a tab)
-  string(LENGTH ${INCLUDE} INCLUDE_LEN)
-  math(EXPR LAST_CHAR_POS "${INCLUDE_LEN} - 1")
-  string(SUBSTRING ${INCLUDE} ${LAST_CHAR_POS} 1 LAST_CHAR)
-  # Only strip if the last character was a space or a tab
-  if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-    # Strip away trailing whitespace from the line
-    string(REGEX REPLACE "[ \t]*$" "" INCLUDE_STRIPPED ${INCLUDE})
-  else(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-    # Just copy INCLUDE to INCLUDE_STRIPPED so the below code doesn't complain about a lack of INCLUDE_STRIPPED
-    set(INCLUDE_STRIPPED ${INCLUDE})
-  endif(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-  # Find the filename including the quotes or angle brackets, it should be at the end of the line after whitespace was stripped
-  string(REGEX MATCH "[\"<].*[\">]$" FILE ${INCLUDE_STRIPPED})
+  # Strip the leading and trailing spaces from the include line
+  strip_string(${INCLUDE} INCLUDE_STRIPPED)
+  # Extract the filename including the quotes or angle brackets
+  string(REGEX REPLACE "^.*([\"<].*[\">]).*$" "\\1" FILE "${INCLUDE_STRIPPED}")
   # If an optional 3rd argument is given, we'll store if the quote style was quoted or angle bracketed
   if(${ARGC} GREATER 2)
     string(SUBSTRING ${FILE} 0 1 QUOTE)
@@ -135,33 +168,147 @@ macro(extract_include_filename INCLUDE FILENAME)
       set(${ARGV2} "quotes")
     endif(QUOTE STREQUAL "<")
   endif(${ARGC} GREATER 2)
-  # Get the length of the filename with quotes or angle brackets
-  string(LENGTH ${FILE} FILENAME_LEN)
-  # Subtract 2 from this length, for the quotes or angle brackets
-  math(EXPR FILENAME_LEN "${FILENAME_LEN} - 2")
-  # Overwrite the filename with a version sans quotes or angle brackets
-  string(SUBSTRING ${FILE} 1 ${FILENAME_LEN} FILE)
+  # Now remove the quotes or angle brackets
+  string(REGEX REPLACE "^[\"<](.*)[\">]$" "\\1" FILE "${FILE}")
   # Set the filename to the the given variable
   set(${FILENAME} "${FILE}")
 endmacro(extract_include_filename)
 
 ###############################################################################
-# calculate_depends(<source filename>)
+# find_includes(<source filename> <output variable>)
 #
-# This function is used in most of the src (sub)directories to calculate the
+# This macro will search through a file for #include lines, regardless of
+#   whitespace, but only returns the lines that are valid for the current
+#   platform CMake is running on.
+###############################################################################
+macro(find_includes SRC INCLUDES)
+  # Read all lines from the file that start with #, regardless of whitespace before the #
+  read_from_file(${SRC} "^[ \t]*#.*$" LINES)
+  # Set that any #include lines found are valid, and create temporary variables for the last found #ifdef/#ifndef
+  set(VALID_LINE TRUE)
+  set(LAST_DEF)
+  set(LAST_CHECK)
+  # Create an empty include list
+  set(INCLUDES_LIST)
+  # Iterate through all the # lines
+  foreach(LINE ${LINES})
+    # Search for #ifdef, #ifndef, #else, #endif, and #include
+    string(REGEX MATCH "^[ \t]*#[ \t]*ifdef[ \t]*.*$" FOUND_IFDEF ${LINE})
+    string(REGEX MATCH "^[ \t]*#[ \t]*ifndef[ \t]*.*$" FOUND_IFNDEF ${LINE})
+    string(REGEX MATCH "^[ \t]*#[ \t]*else.*$" FOUND_ELSE ${LINE})
+    string(REGEX MATCH "^[ \t]*#[ \t]*endif.*$" FOUND_ENDIF ${LINE})
+    string(REGEX MATCH "^[ \t]*#[ \t]*include[ \t]*[\"<].*[\">][\ t]*.*$" FOUND_INCLUDE ${LINE})
+    # If we found a #ifdef on the line, extract the data after the #ifdef and set if the lines after it are valid based on the variables in CMake
+    if(FOUND_IFDEF)
+      # Extract the define
+      string(REGEX REPLACE "^[ \t]*#[ \t]*ifdef[ \t]*(.*)$" "\\1" DEFINE ${LINE})
+      # Replace _WIN32 with WIN32, so we can check if the WIN32 variable of CMake is set instead of _WIN32
+      if(DEFINE STREQUAL "_WIN32")
+        set(DEFINE WIN32)
+      endif(DEFINE STREQUAL "_WIN32")
+      # Set the last define to this one, and set the last check to true, so when #else is encountered, we can do an opposing check
+      set(LAST_DEF ${DEFINE})
+      set(LAST_CHECK TRUE)
+      # If the define is true (it either exists or is a non-false result), the lines following will be checked, otherwise they will be skipped
+      if(${DEFINE})
+        set(VALID_LINE TRUE)
+      else(${DEFINE})
+        set(VALID_LINE FALSE)
+      endif(${DEFINE})
+    # If we found a #ifndef on the line, the same thing as #ifdef is done, except with the checks in the opposite direction
+    elseif(FOUND_IFNDEF)
+      # Extract the define
+      string(REGEX REPLACE "^[ \t]*#[ \t]*ifndef[ \t]*(.*)$" "\\1" DEFINE ${LINE})
+      # Replace _WIN32 with WIN32, so we can check if the WIN32 variable of CMake is set instead of _WIN32
+      if(DEFINE STREQUAL "_WIN32")
+        set(DEFINE WIN32)
+      endif(DEFINE STREQUAL "_WIN32")
+      # Set the last define to this one, and set the last check to false, so when #else is encountered, we can do an opposing check
+      set(LAST_DEF ${DEFINE})
+      set(LAST_CHECK FALSE)
+      # If the define is not true (it either doesn't exists or is a false result), the lines following will be checked, otherwise they will be skipped
+      if(NOT ${DEFINE})
+        set(VALID_LINE TRUE)
+      else(NOT ${DEFINE})
+        set(VALUE_LINE FALSE)
+      endif(NOT ${DEFINE})
+    # If we found a #else on the line, we check the last define in the opposite direction
+    elseif(FOUND_ELSE)
+      # When LAST_CHECK is true, we were inside a #ifdef, now act as if we are entering a #ifndef section by doing an opposing check
+      if(LAST_CHECK)
+        if(NOT ${LAST_DEF})
+          set(VALID_LINE TRUE)
+        else(NOT ${LAST_DEF})
+          set(VALID_LINE FALSE)
+        endif(NOT ${LAST_DEF})
+      # When LAST_CHECK is false, we were inside a #ifndef, now act as if we are entering a #ifdef section by doing an opposing check
+      else(LAST_CHECK)
+        if(${LAST_DEF})
+          set(VALID_LINE TRUE)
+        else(${LAST_DEF})
+          set(VALID_LINE FALSE)
+        endif(${LAST_DEF})
+      endif(LAST_CHECK)
+    # If we found a #endif on the line, we'll assume everything following the line is valid until we meet another one of the above lines
+    elseif(FOUND_ENDIF)
+      set(VALID_LINE TRUE)
+    # If we found a #include on the line, add the entire line to the list of includes unless the line isn't valid
+    elseif(FOUND_INCLUDE)
+      if(VALID_LINE)
+        append_to_list(INCLUDES_LIST "${LINE}")
+      endif(VALID_LINE)
+    endif(FOUND_IFDEF)
+  endforeach(LINE)
+  set(${INCLUDES} ${INCLUDES_LIST})
+endmacro(find_includes)
+
+###############################################################################
+# calculate_depends(<source filename> [<optional output variable for includes>])
+#
+# This macro is used in most of the src (sub)directories to calculate the
 #   header file dependencies for the given source file.
 ###############################################################################
 macro(calculate_depends SRC)
-  # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace
-  read_from_file(${SRC} "^[ \t]*#[ \t]*include[ \t]*\".*\"[ \t]*$" INCLUDES)
+  # Temporarily set that we didn't get a 2nd argument before we actually check if we did get one or not
+  set(CHECK_ANGLE_INCLUDES FALSE)
+  # Check for a second argument
+  if(${ARGC} GREATER 1)
+    set(CHECK_ANGLE_INCLUDES TRUE)
+  endif(${ARGC} GREATER 1)
+  # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace, but only if they are valid for the platform we are on
+  find_includes(${SRC} INCLUDES)
   # Reset the list of headers to empty
   set(HEADERS)
   # Iterate through the strings containing #include (if any)
   foreach(INCLUDE ${INCLUDES})
     # Extract the filename from the #include line
-    extract_include_filename(${INCLUDE} FILENAME)
-    # Append the filename to the list of headers
-    append_to_list(HEADERS ${FILENAME})
+    extract_include_filename(${INCLUDE} FILENAME QUOTE_TYPE)
+    if(QUOTE_TYPE STREQUAL "quotes")
+      # Append the filename to the list of headers
+      append_to_list(HEADERS ${FILENAME})
+    else(QUOTE_TYPE STREQUAL "quotes")
+      # The following checks will only be done if there was a request for angle includes to be checked
+      if(CHECK_ANGLE_INCLUDES)
+        # Find the path of the include file
+        if(DEFAULT_INCLUDE_DIRS OR WSDK_PATH)
+          find_path(FOUND_${FILENAME}_INCLUDE NAMES ${FILENAME} PATHS ${DEFAULT_INCLUDE_DIRS} ${WSDK_PATH}/include)
+        else(DEFAULT_INCLUDE_DIRS OR WSDK_PATH)
+          find_path(FOUND_${FILENAME}_INCLUDE NAMES ${FILENAME})
+        endif(DEFAULT_INCLUDE_DIRS OR WSDK_PATH)
+        # If the include file was found, add it's path to the list of include paths, but only if it doesn't already exist and isn't in the defaults for the compiler
+        if(FOUND_${FILENAME}_INCLUDE)
+          find_in_list(DEFAULT_INCLUDE_DIRS "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_DEFAULTS)
+          if(FOUND_IN_DEFAULTS EQUAL -1)
+            find_in_list(${ARGV1} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
+            if(FOUND_IN_INCLUDES EQUAL -1)
+              append_to_list(${ARGV1} "${FOUND_${FILENAME}_INCLUDE}")
+            endif(FOUND_IN_INCLUDES EQUAL -1)
+          endif(FOUND_IN_DEFAULTS EQUAL -1)
+        else(FOUND_${FILENAME}_INCLUDE)
+          message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+        endif(FOUND_${FILENAME}_INCLUDE)
+      endif(CHECK_ANGLE_INCLUDES)
+    endif(QUOTE_TYPE STREQUAL "quotes")
   endforeach(INCLUDE)
   # Set the list of new headers to empty (this will store all the headers that the above list depends on)
   set(NEW_HEADERS)

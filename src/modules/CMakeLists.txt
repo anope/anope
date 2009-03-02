@@ -14,12 +14,21 @@ endif(WIN32)
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${MODULES_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
 
+# Create an empty list to store extra include directories
+set(EXTRA_INCLUDES)
+
 # Iterate through all the source files
 foreach(SRC ${MODULES_SRCS})
   # Convert the source file extension to have a .so extension
   string(REGEX REPLACE "\\.(c|cpp)$" ".so" SO ${SRC})
+  # Temporary variable for the current source's include directories
+  set(TEMP_INCLUDES)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC})
+  calculate_depends(${SRC} TEMP_INCLUDES)
+  # If there were some extra include directories, add them to the list
+  if(TEMP_INCLUDES)
+    append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
+  endif(TEMP_INCLUDES)
   # Set up a temporary LDFLAGS for this file
   set(THIS_LDFLAGS "${LDFLAGS}")
   # Reset extra dependencies
@@ -39,11 +48,11 @@ foreach(SRC ${MODULES_SRCS})
     # Iterate through the libraries given
     foreach(LIBRARY ${REQUIRED_LIBRARY})
       # Locate the library to see if it exists
-      if(MSVC AND WSDK_PATH)
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${WSDK_PATH}/lib)
-      else(MSVC AND WSDK_PATH)
+      if(DEFAULT_LIBRARY_DIRS OR WSDK_PATH)
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib)
+      else(DEFAULT_LIBRARY_DIRS OR WSDK_PATH)
         find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY})
-      endif(MSVC AND WSDK_PATH)
+      endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH)
       # If the library was found, we will add it to the linker flags
       if(FOUND_${LIBRARY}_LIBRARY)
         # Get the path only of the library, to add it to linker flags
@@ -58,7 +67,7 @@ foreach(SRC ${MODULES_SRCS})
         endif(MSVC)
       else(FOUND_${LIBRARY}_LIBRARY)
         # In the case of the library not being found, we fatally error so CMake stops trying to generate
-        message(FATAL_ERROR "${SRC} need library ${LIBRARY} but we were unable to locate that library!  Check that the library is within the search path of your OS.")
+        message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
       endif(FOUND_${LIBRARY}_LIBRARY)
     endforeach(LIBRARY)
   endforeach(REQUIRED_LIBRARY)
@@ -77,7 +86,7 @@ foreach(SRC ${MODULES_SRCS})
   endif(LIBRARIES)
   # Iterate through library paths and add them to the linker flags
   foreach(LIBRARY_PATH ${LIBRARY_PATHS})
-    find_in_list(DEFAULT_LIBRARY_DIRS ${LIBRARY_PATH} FOUND_IN_DEFAULTS)
+    find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
     if(FOUND_IN_DEFAULTS EQUAL -1)
       set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
     endif(FOUND_IN_DEFAULTS EQUAL -1)
@@ -100,3 +109,9 @@ foreach(SRC ${MODULES_SRCS})
     DESTINATION data/modules
   )
 endforeach(SRC)
+
+# If there were extra include directories, remove the duplicates and add the directories to the include path
+if(EXTRA_INCLUDES)
+  remove_list_duplicates(EXTRA_INCLUDES)
+  include_directories(${EXTRA_INCLUDES})
+endif(EXTRA_INCLUDES)

@@ -1183,7 +1183,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			has_inviteexceptionmod = 1;
 		}
 		if (strstr(av[1], "m_hidechans.so")) {
-			has_hidechansmod = 0;
+			has_hidechansmod = 1;
 		}
 	} else if (strcasecmp(av[0], "END") == 0) {
 		if (!has_globopsmod) {

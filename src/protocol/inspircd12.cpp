@@ -988,7 +988,9 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
 int anope_event_kill(const char *source, int ac, const char **av)
 {
-	m_kill(av[0], av[1]);
+	User *u = find_byuid(av[0]);
+	BotInfo *bi = findbot(av[0]);
+	m_kill(u ? u->nick : (bi ? bi->nick : av[0]), av[1]);
 	return MOD_CONT;
 }
 

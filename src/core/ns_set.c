@@ -213,7 +213,7 @@ class CommandNSSet : public Command
 		if (param)
 		{
 			char buf[BUFSIZE];
-			const char *rest = params.size() > 1 ? params[2].c_str() : NULL;
+			const char *rest = params.size() > 2 ? params[2].c_str() : NULL;
 
 			snprintf(buf, sizeof(buf), "%s%s%s", param, rest ? " " : "", rest ? rest : "");
 

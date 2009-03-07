@@ -477,6 +477,9 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         if (!sent_header)
             notice_lang(s_ChanServ, u, xmsgs[7], chan);
     } else if (stricmp(cmd, "CLEAR") == 0) {
+		uint16 j = 0;
+		int a, b;
+
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
             return MOD_CONT;
@@ -496,8 +499,30 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
             if (ci->access[i].in_use && ci->access[i].level == xlev) {
                 ci->access[i].nc = NULL;
                 ci->access[i].in_use = 0;
+				j++;
             }
         }
+
+		for (b = 0; b < ci->accesscount; b++) {
+			if (ci->access[b].in_use) {
+				for (a = 0; a < ci->accesscount; a++) {
+					if (a > b)
+						break;
+					if (!ci->access[a].in_use) {
+						ci->access[a].in_use = 1;
+						ci->access[a].level = ci->access[b].level;
+						ci->access[a].nc = ci->access[b].nc;
+						ci->access[a].last_seen =
+							ci->access[b].last_seen;
+						ci->access[b].nc = NULL;
+						ci->access[b].in_use = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		ci->accesscount = ci->accesscount - j;
 
         send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
         

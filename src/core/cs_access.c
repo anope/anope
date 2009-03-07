@@ -279,6 +279,25 @@ int do_access(User * u)
             return MOD_CONT;
         }
 
+		for (b = 0; b < ci->accesscount; b++) {
+			if (ci->access[b].in_use) {
+				for (a = 0; a < ci->accesscount; a++) {
+					if (a > b)
+						break;
+					if (!ci->access[a].in_use) {
+						ci->access[a].in_use = 1;
+						ci->access[a].level = ci->access[b].level;
+						ci->access[a].nc = ci->access[b].nc;
+						ci->access[a].last_seen =
+							ci->access[b].last_seen;
+						ci->access[b].nc = NULL;
+						ci->access[b].in_use = 0;
+						break;
+					}
+				}
+			}
+		}
+
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
             int count, last = -1, perm = 0;
@@ -372,11 +391,32 @@ int do_access(User * u)
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;
+		int a, b;
 
         if (ci->accesscount == 0) {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
             return MOD_CONT;
         }
+
+		for (b = 0; b < ci->accesscount; b++) {
+			if (ci->access[b].in_use) {
+				for (a = 0; a < ci->accesscount; a++) {
+					if (a > b)
+						break;
+					if (!ci->access[a].in_use) {
+						ci->access[a].in_use = 1;
+						ci->access[a].level = ci->access[b].level;
+						ci->access[a].nc = ci->access[b].nc;
+						ci->access[a].last_seen =
+							ci->access[b].last_seen;
+						ci->access[b].nc = NULL;
+						ci->access[b].in_use = 0;
+						break;
+					}
+				}
+			}
+		}
+
         if (nick && strspn(nick, "1234567890,-") == strlen(nick)) {
             process_numlist(nick, NULL, access_list_callback, u, ci,
                             &sent_header);

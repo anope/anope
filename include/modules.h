@@ -328,7 +328,7 @@ class CoreExport Module
 
 	/** Destroys a module, freeing resources it has allocated.
 	 */
-	~Module();
+	virtual ~Module();
 
 	/** Sets a given type (CORE,PROTOCOL,3RD etc) on a module.
 	 * @param type The type to set the module as.

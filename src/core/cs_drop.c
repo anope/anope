@@ -94,8 +94,10 @@ class CommandCSDrop : public Command
 		/* We must make sure that the Services admin has not normally the right to
 		 * drop the channel before issuing the wallops.
 		 */
-		if (WallDrop && level < ACCESS_FOUNDER)
-			ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
+		if (WallDrop) {
+			if ((level < ACCESS_FOUNDER) || (!is_real_founder(u, ci) && ci->flags & CI_SECUREFOUNDER))
+				ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
+		}
 
 		notice_lang(s_ChanServ, u, CHAN_DROPPED, chan);
 		send_event(EVENT_CHAN_DROP, 1, chan);

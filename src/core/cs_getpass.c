@@ -55,7 +55,7 @@ class CommandCSGetPass : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
-		if(!enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1)==1)
+		if (!enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1))
 		{
 			notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
 			return MOD_CONT;
@@ -98,6 +98,10 @@ class CSGetPass : public Module
 		this->AddCommand(CHANSERV, new CommandCSGetPass(), MOD_UNIQUE);
 
 		this->SetChanHelp(myChanServHelp);
+
+		char tmp_pass[PASSMAX];
+		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
+			throw ModuleException("Incompatible with the encryption module being used");
 	}
 };
 

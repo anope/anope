@@ -103,6 +103,10 @@ class CSSendPass : public Module
 
 		if (!UseMail)
 			throw ModuleException("sendpass may not be loaded if UseMail is loaded");
+
+		char tmp_pass[PASSMAX];
+		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
+			throw ModuleException("Incompatible with the encryption module being used");
 	}
 };
 

@@ -91,6 +91,10 @@ class NSGetPass : public Module
 		this->AddCommand(NICKSERV, new CommandNSGetPass(), MOD_UNIQUE);
 
 		this->SetNickHelp(myNickServHelp);
+
+		char tmp_pass[PASSMAX];
+		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
+			throw ModuleException("Incompatible with the encryption module being used");
 	}
 };
 

@@ -100,6 +100,10 @@ class NSSendPass : public Module
 
 		if (!UseMail)
 			throw ModuleException("Not using mail, whut.");
+
+		char tmp_pass[PASSMAX];
+		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
+			throw ModuleException("Incompatible with the encryption module being used");
 	}
 };
 

@@ -665,30 +665,12 @@ void load_cs_dbase(void)
             SAFE(read_int32(&ci->mlock_limit, f));
             SAFE(read_string(&ci->mlock_key, f));
             if (ver >= 10) {
-                if (ircd->fmode) {
-                    SAFE(read_string(&ci->mlock_flood, f));
-                } else {
-                    SAFE(read_string(&s, f));
-                    if (s)
-                        free(s);
-                }
-                if (ircd->Lmode) {
-                    SAFE(read_string(&ci->mlock_redirect, f));
-                } else {
-                    SAFE(read_string(&s, f));
-                    if (s)
-                        free(s);
-                }
+                SAFE(read_string(&ci->mlock_flood, f));
+                SAFE(read_string(&ci->mlock_redirect, f));
                 /* We added support for channelmode +j tracking,
                  * however unless for some other reason we need to
                  * change the DB format, it is being saved to DB. ~ Viper
-                if (ircd->jmode) {
-                    SAFE(read_string(&ci->mlock_throttle, f));
-                } else {
-                    SAFE(read_string(&s, f));
-                    if (s)
-                        free(s);
-                }*/
+                SAFE(read_string(&ci->mlock_throttle, f));*/
             }
 
             SAFE(read_int16(&tmp16, f));
@@ -938,23 +920,10 @@ void save_cs_dbase(void)
             SAFE(write_int32(ci->mlock_off, f));
             SAFE(write_int32(ci->mlock_limit, f));
             SAFE(write_string(ci->mlock_key, f));
-            if (ircd->fmode) {
-                SAFE(write_string(ci->mlock_flood, f));
-            } else {
-                SAFE(write_string(NULL, f));
-            }
-            if (ircd->Lmode) {
-                SAFE(write_string(ci->mlock_redirect, f));
-            } else {
-                SAFE(write_string(NULL, f));
-            }
+            SAFE(write_string(ci->mlock_flood, f));
+            SAFE(write_string(ci->mlock_redirect, f));
             /* Current DB format does not hold +j yet..  ~ Viper
-            if (ircd->jmode) {
-                SAFE(write_string(ci->mlock_throttle, f));
-            } else {
-                SAFE(write_string(NULL, f));
-            }
-            */
+            SAFE(write_string(ci->mlock_throttle, f));*/
             SAFE(write_int16(ci->memos.memocount, f));
             SAFE(write_int16(ci->memos.memomax, f));
             memos = ci->memos.memos;
@@ -2429,7 +2398,11 @@ char *cs_get_flood(ChannelInfo * ci)
     if (!ci) {
         return NULL;
     } else {
-        return ci->mlock_flood;
+        if (ircd->fmode) {
+            return ci->mlock_flood;
+        } else {
+            return NULL;
+        }
     }
 }
 
@@ -2440,7 +2413,11 @@ char *cs_get_throttle(ChannelInfo * ci)
     if (!ci) {
         return NULL;
     } else {
-        return ci->mlock_throttle;
+        if (ircd->jmode) {
+            return ci->mlock_throttle;
+        } else {
+            return NULL;
+        }
     }
 }
 
@@ -2480,7 +2457,11 @@ char *cs_get_redirect(ChannelInfo * ci)
     if (!ci) {
         return NULL;
     } else {
-        return ci->mlock_redirect;
+        if (ircd->Lmode) {
+            return ci->mlock_redirect;
+        } else {
+            return NULL;
+        }
     }
 }
 

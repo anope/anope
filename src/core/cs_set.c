@@ -15,6 +15,7 @@
 
 #include "module.h"
 #include "encrypt.h"
+#include "hashcomp.h"
 
 class CommandCSSet : public Command
 {
@@ -186,7 +187,7 @@ class CommandCSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetMLock(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetMLock(User * u, ChannelInfo * ci, const char *modes)
 	{
 		int add = -1;			   /* 1 if adding, 0 if deleting, -1 if neither */
 		unsigned char mode;
@@ -212,7 +213,17 @@ class CommandCSSet : public Command
 			ci->mlock_redirect = NULL;
 		}
 
-		while ((mode = *param++)) {
+		std::string params(modes), param;
+		unsigned space = params.find(' ');
+		if (space != std::string::npos)
+		{
+			param = params.substr(space + 1);
+			params = params.substr(0, space);
+			modes = params.c_str();
+		}
+		spacesepstream modeparams(param);
+
+		while ((mode = *modes++)) {
 			switch (mode) {
 			case '+':
 				add = 1;
@@ -234,7 +245,10 @@ class CommandCSSet : public Command
 					ci->mlock_on |= cbm->flag;
 					ci->mlock_off &= ~cbm->flag;
 					if (cbm->cssetvalue)
-						cbm->cssetvalue(ci, strtok(NULL, " "));
+					{
+						modeparams.GetToken(param);
+						cbm->cssetvalue(ci, param.c_str());
+					}
 				} else {
 					ci->mlock_off |= cbm->flag;
 					if (ci->mlock_on & cbm->flag) {
@@ -246,7 +260,7 @@ class CommandCSSet : public Command
 			} else {
 				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_UNKNOWN_CHAR, mode);
 			}
-		}						   /* while (*param) */
+		}						   /* while (*modes) */
 
 		if (ircd->Lmode) {
 			/* We can't mlock +L if +l is not mlocked as well. */

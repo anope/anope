@@ -374,6 +374,7 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                 if (perm) {
                     notice_lang(s_ChanServ, u, PERMISSION_DENIED);
                 } else if (count == 1) {
+                    last = atoi(nick);
                     notice_lang(s_ChanServ, u, xmsgs[5], last, ci->name);
                 } else {
                     notice_lang(s_ChanServ, u, xmsgs[7], ci->name);

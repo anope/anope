@@ -246,6 +246,7 @@ class CommandCSAccess : public Command
 					if (perm) {
 						notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 					} else if (count == 1) {
+						last = atoi(nick);
 						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_SUCH_ENTRY,
 									last, ci->name);
 					} else {

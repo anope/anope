@@ -455,20 +455,8 @@ void load_cs_dbase()
 			SAFE(read_int32(&ci->mlock_off, f));
 			SAFE(read_int32(&ci->mlock_limit, f));
 			SAFE(read_string(&ci->mlock_key, f));
-			if (ircd->fmode) {
-				SAFE(read_string(&ci->mlock_flood, f));
-			} else {
-				SAFE(read_string(&s, f));
-				if (s)
-					delete [] s;
-			}
-			if (ircd->Lmode) {
-				SAFE(read_string(&ci->mlock_redirect, f));
-			} else {
-				SAFE(read_string(&s, f));
-				if (s)
-					delete [] s;
-			}
+			SAFE(read_string(&ci->mlock_flood, f));
+			SAFE(read_string(&ci->mlock_redirect, f));
 
 			SAFE(read_int16(&tmp16, f));
 			if (tmp16) ci->memos.memos.resize(tmp16);
@@ -650,16 +638,8 @@ void save_cs_dbase()
 			SAFE(write_int32(ci->mlock_off, f));
 			SAFE(write_int32(ci->mlock_limit, f));
 			SAFE(write_string(ci->mlock_key, f));
-			if (ircd->fmode) {
-				SAFE(write_string(ci->mlock_flood, f));
-			} else {
-				SAFE(write_string(NULL, f));
-			}
-			if (ircd->Lmode) {
-				SAFE(write_string(ci->mlock_redirect, f));
-			} else {
-				SAFE(write_string(NULL, f));
-			}
+			SAFE(write_string(ci->mlock_flood, f));
+			SAFE(write_string(ci->mlock_redirect, f));
 			SAFE(write_int16(ci->memos.memos.size(), f));
 			SAFE(write_int16(ci->memos.memomax, f));
 			for (j = 0; j < ci->memos.memos.size(); j++) {
@@ -1974,7 +1954,7 @@ int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen)
 		return 0;
 
 	std::string vident = u->GetIdent();
-	
+
 	switch (ci->bantype) {
 	case 0:
 		snprintf(ret, retlen, "*!%s@%s", vident.c_str(),
@@ -2010,7 +1990,10 @@ char *cs_get_flood(ChannelInfo * ci)
 	if (!ci) {
 		return NULL;
 	} else {
-		return ci->mlock_flood;
+		if (ircd->fmode)
+			return ci->mlock_flood;
+		else
+			return NULL;
 	}
 }
 
@@ -2050,7 +2033,10 @@ char *cs_get_redirect(ChannelInfo * ci)
 	if (!ci) {
 		return NULL;
 	} else {
-		return ci->mlock_redirect;
+		if (ircd->Lmode)
+			return ci->mlock_redirect;
+		else
+			return NULL;
 	}
 }
 

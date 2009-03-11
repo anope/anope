@@ -66,10 +66,10 @@ endmacro(append_to_list)
 #   the item.
 ###############################################################################
 macro(find_in_list LIST ITEM_TO_FIND FOUND)
-  if(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
-    # For CMake 2.6.x or better (as well as CMake 2.4.8 or better), we can use the FIND sub-command of list()
+  if(CMAKE248_OR_BETTER)
+    # For CMake 2.4.8 or better, we can use the FIND sub-command of list()
     list(FIND ${LIST} ${ITEM_TO_FIND} ITEM_FOUND)
-  else(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+  else(CMAKE248_OR_BETTER)
     # For CMake 2.4.x before 2.4.8, we have to do this ourselves (NOTE: This is very slow due to a lack of break() as well)
     # Firstly we set the position to -1 indicating nothing found, we also use a temporary position
     set(ITEM_FOUND -1)
@@ -83,7 +83,7 @@ macro(find_in_list LIST ITEM_TO_FIND FOUND)
       # Increase the position value by 1
       math(EXPR POS "${POS} + 1")
     endforeach(ITEM)
-  endif(CMAKE26_OR_BETTER OR ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.7)
+  endif(CMAKE248_OR_BETTER)
   # Set the given FOUND variable to the result
   set(${FOUND} ${ITEM_FOUND})
 endmacro(find_in_list)
@@ -120,26 +120,31 @@ endmacro(remove_list_duplicates)
 ###############################################################################
 # remove_item_from_list(<list> <value>)
 #
-# A macro to handle removing a value from a list, uses list(REMOVE_ITEM) if
-#   using CMake 2.4.2 or better, otherwise it uses a slower method of creating
-#   a temporary list and adding every item except the one given.
+# A macro to handle removing a value from a list, uses list(REMOVE_ITEM) in
+#   both cases, but can remove the value itself using CMake 2.4.2 or better,
+#   while older versions use a slower method of iterating the list to find the
+#   index of the value to remove.
 ###############################################################################
 macro(remove_item_from_list LIST VALUE)
   if(CMAKE242_OR_BETTER)
     # For CMake 2.4.2 or better, this can be done automatically
     list(REMOVE_ITEM ${LIST} ${VALUE})
   else(CMAKE242_OR_BETTER)
-    # For CMake 2.4.x before 2.4.2, we have to do this ourselves, firstly we'll create a temporary list
-    set(NEW_LIST)
+    # For CMake 2.4.x before 2.4.2, we have to do this ourselves, firstly we set the index and a variable to indicate if the item was found
+    set(INDEX 0)
+    set(FOUND FALSE)
     # Iterate through the old list
     foreach(ITEM ${${LIST}})
-      # Check if the current item is the same as the item we are removing, and if it isn't, append it to the list
-      if(NOT ITEM STREQUAL ${VALUE})
-        append_to_list(NEW_LIST ${ITEM})
-      endif(NOT ITEM STREQUAL ${VALUE})
+      # If the item hasn't been found yet, but the current item is the same, remove it
+      if(NOT FOUND)
+        if(ITEM STREQUAL ${VALUE})
+          set(FOUND TRUE)
+          list(REMOVE_ITEM ${LIST} ${INDEX})
+        endif(ITEM STREQUAL ${VALUE})
+      endif(NOT FOUND)
+      # Increase the index value by 1
+      math(EXPR INDEX "${INDEX} + 1")
     endforeach(ITEM)
-    # Replace the old list with the new list
-    set(${LIST} ${NEW_LIST})
   endif(CMAKE242_OR_BETTER)
 endmacro(remove_item_from_list)
 
@@ -166,11 +171,12 @@ macro(sort_list LIST)
       foreach(NEW_ITEM ${NEW_LIST})
         # Compare the items, only if nothing was found before
         if(NOT FOUND)
-          if(NEW_ITEM STRGREATER ${ITEM})
+          if(NEW_ITEM STRGREATER "${ITEM}")
             set(FOUND TRUE)
             list(INSERT NEW_LIST ${INDEX} ${ITEM})
-          endif(NEW_ITEM STRGREATER ${ITEM})
+          endif(NEW_ITEM STRGREATER "${ITEM}")
         endif(NOT FOUND)
+        # Increase the index value by 1
         math(EXPR INDEX "${INDEX} + 1")
       endforeach(NEW_ITEM)
       # If the item was never found, just append it to the end

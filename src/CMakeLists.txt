@@ -4,15 +4,13 @@ file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
 # If not using Visual Studio, don't include win32_memory.cpp, it's only required by Visual Studio to override it's override of the new/delete operators
 if(NOT MSVC)
-  list(REMOVE_ITEM SRC_SRCS win32_memory.cpp)
+  remove_item_from_list(SRC_SRCS win32_memory.cpp)
 endif(NOT MSVC)
 # If not using Windows, don't include windows.cpp, as it's Windows-specific
 if(NOT WIN32)
-  list(REMOVE_ITEM SRC_SRCS windows.cpp)
+  remove_item_from_list(SRC_SRCS windows.cpp)
 endif(NOT WIN32)
-if(CMAKE244_OR_BETTER)
-  list(SORT SRC_SRCS)
-endif(CMAKE244_OR_BETTER)
+sort_list(SRC_SRCS)
 
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")

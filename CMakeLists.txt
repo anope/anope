@@ -14,17 +14,17 @@ project(Anope CXX)
 enable_language(C)
 
 # Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
-if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+if(CMAKE_MINOR_VERSION GREATER 5)
   set(CMAKE26_OR_BETTER TRUE)
   set(CMAKE244_OR_BETTER TRUE)
   set(CMAKE242_OR_BETTER TRUE)
-else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+else(CMAKE_MINOR_VERSION GREATER 5)
   set(CMAKE26_OR_BETTER FALSE)
   # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module is non-existant in earlier versions
-  if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+  if(CMAKE_PATCH_VERSION GREATER 3)
     set(CMAKE244_OR_BETTER TRUE)
     set(CMAKE242_OR_BETTER TRUE)
-  else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
+  else(CMAKE_PATCH_VERSION GREATER 3)
     set(CMAKE244_OR_BETTER FALSE)
     # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
     if(CMAKE_PATCH_VERSION GREATER 1)
@@ -32,8 +32,8 @@ else(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
     else(CMAKE_PATCH_VERSION GREATER 1)
       set(CMAKE242_OR_BETTER FALSE)
     endif(CMAKE_PATCH_VERSION GREATER 1)
-  endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION} GREATER 2.4.3)
-endif(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+  endif(CMAKE_PATCH_VERSION GREATER 3)
+endif(CMAKE_MINOR_VERSION GREATER 5)
 
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
 set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR})
@@ -85,19 +85,23 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     # If the line has the following on it, the next lines will contain directory names
     if(LINE STREQUAL "#include <...> search starts here:")
       set(IN_SEARCH TRUE)
-    # If the line has the following on it, we hit the end of the list
-    elseif(LINE STREQUAL "End of search list.")
-      set(IN_SEARCH FALSE)
-    # If we are within the block between the above two lines...
-    elseif(IN_SEARCH)
-      # Get everything but the first character of the line
-      string(LENGTH ${LINE} LINE_LENGTH)
-      math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
-      string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
-      # Convert the path to an absolute one, just in case it wasn't
-      get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
-      # Add that directory to the list of default include directories
-      append_to_list(DEFAULT_INCLUDE_DIRS ${INCLUDE})
+    else(LINE STREQUAL "#include <...> search starts here:")
+      # If the line has the following on it, we hit the end of the list
+      if(LINE STREQUAL "End of search list.")
+        set(IN_SEARCH FALSE)
+      else(LINE STREQUAL "End of search list.")
+        # If we are within the block between the above two lines...
+        if(IN_SEARCH)
+          # Get everything but the first character of the line
+          string(LENGTH ${LINE} LINE_LENGTH)
+          math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
+          string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
+          # Convert the path to an absolute one, just in case it wasn't
+          get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
+          # Add that directory to the list of default include directories
+          append_to_list(DEFAULT_INCLUDE_DIRS ${INCLUDE})
+        endif(IN_SEARCH)
+      endif(LINE STREQUAL "End of search list.")
     endif(LINE STREQUAL "#include <...> search starts here:")
   endforeach(LINE)
   # Remove duplicate entries from the list
@@ -359,10 +363,10 @@ foreach(HEADER ${ALL_HEADERS})
   endif(NOT HEADER MATCHES ".*obsolete.*")
 endforeach(HEADER)
 # Set the list of headers to be all the non-obsolete ones, then sort the list
-set(ALL_HEADERS ${TMP_HEADERS})
-if(CMAKE244_OR_BETTER)
-  list(SORT ALL_HEADERS)
-endif(CMAKE244_OR_BETTER)
+if(TMP_HEADERS)
+  set(ALL_HEADERS ${TMP_HEADERS})
+  sort_list(ALL_HEADERS)
+endif(TMP_HEADERS)
 
 # Preparse step 1: get filenames sans paths
 # Iterate through the headers
@@ -411,9 +415,7 @@ foreach(HEADER ${ALL_HEADERS})
     endwhile(HEADERS)
     # OLD_HEADERS will now contain all headers that the current header relies on, remove duplicate headers from the list and sort the list
     remove_list_duplicates(OLD_HEADERS)
-    if(CMAKE244_OR_BETTER)
-      list(SORT OLD_HEADERS)
-    endif(CMAKE244_OR_BETTER)
+    sort_list(OLD_HEADERS)
     # Set the current header's list of headers to the cleaned up list from above
     set(${HEADER_FILENAME}_HEADERS ${OLD_HEADERS})
   endif(${HEADER_FILENAME}_HEADERS)

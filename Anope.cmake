@@ -11,22 +11,33 @@ macro(strip_string INPUT_STRING OUTPUT_STRING)
     string(STRIP ${INPUT_STRING} ${OUTPUT_STRING})
   else(CMAKE26_OR_BETTER)
     # For CMake 2.4.x, we will have to use the REGEX REPLACE sub-command of string() instead
-    # First we detect if there is any leading whitespace and remove any if there is
-    string(SUBSTRING "${INPUT_STRING}" 0 1 FIRST_CHAR)
-    if(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
-      string(REGEX REPLACE "^[ \t]*" "" TEMP_STRING "${INPUT_STRING}")
-    else(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
-      set(TEMP_STRING "${INPUT_STRING}")
-    endif(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
-    # Next we detect if there is any trailing whitespace and remove any if there is
-    string(LENGTH "${TEMP_STRING}" STRING_LEN)
-    math(EXPR STRING_LEN "${STRING_LEN} - 1")
-    string(SUBSTRING "${TEMP_STRING}" ${STRING_LEN} 1 LAST_CHAR)
-    if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-      string(REGEX REPLACE "[ \t]*$" "" ${OUTPUT_STRING} "${TEMP_STRING}")
-    else(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
-      set(${OUTPUT_STRING} "${TEMP_STRING}")
-    endif(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+    # First check if the input string is empty or not
+    if (${INPUT_STRING} STREQUAL "")
+      set(${OUTPUT_STRING} "")
+    else(${INPUT_STRING} STREQUAL "")
+      # Determine if the string is entirely empty or not
+      string(REGEX MATCH "^[ \t]*$" EMPTY_STRING "${INPUT_STRING}")
+      if(EMPTY_STRING)
+        set(${OUTPUT_STRING} "")
+      else(EMPTY_STRING)
+        # We detect if there is any leading whitespace and remove any if there is
+        string(SUBSTRING "${INPUT_STRING}" 0 1 FIRST_CHAR)
+        if(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
+          string(REGEX REPLACE "^[ \t]+" "" TEMP_STRING "${INPUT_STRING}")
+        else(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
+          set(TEMP_STRING "${INPUT_STRING}")
+        endif(FIRST_CHAR STREQUAL " " OR FIRST_CHAR STREQUAL "\t")
+        # Next we detect if there is any trailing whitespace and remove any if there is
+        string(LENGTH "${TEMP_STRING}" STRING_LEN)
+        math(EXPR STRING_LEN "${STRING_LEN} - 1")
+        string(SUBSTRING "${TEMP_STRING}" ${STRING_LEN} 1 LAST_CHAR)
+        if(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+          string(REGEX REPLACE "[ \t]+$" "" ${OUTPUT_STRING} "${TEMP_STRING}")
+        else(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+          set(${OUTPUT_STRING} "${TEMP_STRING}")
+        endif(LAST_CHAR STREQUAL " " OR LAST_CHAR STREQUAL "\t")
+      endif(EMPTY_STRING)
+    endif(${INPUT_STRING} STREQUAL "")
   endif(CMAKE26_OR_BETTER)
 endmacro(strip_string)
 
@@ -101,10 +112,76 @@ macro(remove_list_duplicates LIST)
         append_to_list(NEW_LIST ${ITEM})
       endif(FOUND_ITEM EQUAL -1)
     endforeach(ITEM)
-    # replace the old list with the new list
+    # Replace the old list with the new list
     set(${LIST} ${NEW_LIST})
   endif(CMAKE26_OR_BETTER)
 endmacro(remove_list_duplicates)
+
+###############################################################################
+# remove_item_from_list(<list> <value>)
+#
+# A macro to handle removing a value from a list, uses list(REMOVE_ITEM) if
+#   using CMake 2.4.2 or better, otherwise it uses a slower method of creating
+#   a temporary list and adding every item except the one given.
+###############################################################################
+macro(remove_item_from_list LIST VALUE)
+  if(CMAKE242_OR_BETTER)
+    # For CMake 2.4.2 or better, this can be done automatically
+    list(REMOVE_ITEM ${LIST} ${VALUE})
+  else(CMAKE242_OR_BETTER)
+    # For CMake 2.4.x before 2.4.2, we have to do this ourselves, firstly we'll create a temporary list
+    set(NEW_LIST)
+    # Iterate through the old list
+    foreach(ITEM ${${LIST}})
+      # Check if the current item is the same as the item we are removing, and if it isn't, append it to the list
+      if(NOT ITEM STREQUAL ${VALUE})
+        append_to_list(NEW_LIST ${ITEM})
+      endif(NOT ITEM STREQUAL ${VALUE})
+    endforeach(ITEM)
+    # Replace the old list with the new list
+    set(${LIST} ${NEW_LIST})
+  endif(CMAKE242_OR_BETTER)
+endmacro(remove_item_from_list)
+
+###############################################################################
+# sort_list(<list>)
+#
+# A macro to handle sorting a list, uses list(SORT) if using CMake 2.4.4 or
+#   better, otherwise it uses a slower method of creating a temporary list and
+#   adding elements in alphabetical order.
+###############################################################################
+macro(sort_list LIST)
+  if(CMAKE244_OR_BETTER)
+    # For CMake 2.4.4 or better, this can be done automatically
+    list(SORT ${LIST})
+  else(CMAKE244_OR_BETTER)
+    # For CMake 2.4.x before 2.4.4, we have to do this ourselves, firstly we'll create a teporary list
+    set(NEW_LIST)
+    # Iterate through the old list
+    foreach(ITEM ${${LIST}})
+      # Temporary index position for the new list, as well as temporary value to store if the item was ever found
+      set(INDEX 0)
+      set(FOUND FALSE)
+      # Iterate through the new list
+      foreach(NEW_ITEM ${NEW_LIST})
+        # Compare the items, only if nothing was found before
+        if(NOT FOUND)
+          if(NEW_ITEM STRGREATER ${ITEM})
+            set(FOUND TRUE)
+            list(INSERT NEW_LIST ${INDEX} ${ITEM})
+          endif(NEW_ITEM STRGREATER ${ITEM})
+        endif(NOT FOUND)
+        math(EXPR INDEX "${INDEX} + 1")
+      endforeach(NEW_ITEM)
+      # If the item was never found, just append it to the end
+      if(NOT FOUND)
+        append_to_list(NEW_LIST ${ITEM})
+      endif(NOT FOUND)
+    endforeach(ITEM)
+    # Replace the old list with the new list
+    set(${LIST} ${NEW_LIST})
+  endif(CMAKE244_OR_BETTER)
+endmacro(sort_list)
 
 ###############################################################################
 # read_from_file(<filename> <regex> <output variable>)
@@ -125,7 +202,7 @@ macro(read_from_file FILE REGEX STRINGS)
     endif(REGEX STREQUAL "")
   else(CMAKE26_OR_BETTER)
     # For CMake 2.4.x, we need to do this manually, firstly we read the file in
-    file(READ ${FILE} ALL_STRINGS)
+    execute_process(COMMAND ${CMAKE_COMMAND} -DFILE:STRING=${FILE} -P ${Anope_SOURCE_DIR}/ReadFile.cmake ERROR_VARIABLE ALL_STRINGS)
     # Next we replace all newlines with semicolons
     string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
     if(REGEX STREQUAL "")
@@ -157,19 +234,24 @@ endmacro(read_from_file)
 macro(extract_include_filename INCLUDE FILENAME)
   # Strip the leading and trailing spaces from the include line
   strip_string(${INCLUDE} INCLUDE_STRIPPED)
-  # Extract the filename including the quotes or angle brackets
-  string(REGEX REPLACE "^.*([\"<].*[\">]).*$" "\\1" FILE "${INCLUDE_STRIPPED}")
-  # If an optional 3rd argument is given, we'll store if the quote style was quoted or angle bracketed
-  if(${ARGC} GREATER 2)
-    string(SUBSTRING ${FILE} 0 1 QUOTE)
-    if(QUOTE STREQUAL "<")
-      set(${ARGV2} "angle brackets")
-    else(QUOTE STREQUAL "<")
-      set(${ARGV2} "quotes")
-    endif(QUOTE STREQUAL "<")
-  endif(${ARGC} GREATER 2)
-  # Now remove the quotes or angle brackets
-  string(REGEX REPLACE "^[\"<](.*)[\">]$" "\\1" FILE "${FILE}")
+  # Make sure to only do the following if there is a string
+  if(INCLUDE_STRIPPED STREQUAL "")
+    set(FILE "")
+  else(INCLUDE_STRIPPED STREQUAL "")
+    # Extract the filename including the quotes or angle brackets
+    string(REGEX REPLACE "^.*([\"<].*[\">]).*$" "\\1" FILE "${INCLUDE_STRIPPED}")
+    # If an optional 3rd argument is given, we'll store if the quote style was quoted or angle bracketed
+    if(${ARGC} GREATER 2)
+      string(SUBSTRING ${FILE} 0 1 QUOTE)
+      if(QUOTE STREQUAL "<")
+        set(${ARGV2} "angle brackets")
+      else(QUOTE STREQUAL "<")
+        set(${ARGV2} "quotes")
+      endif(QUOTE STREQUAL "<")
+    endif(${ARGC} GREATER 2)
+    # Now remove the quotes or angle brackets
+    string(REGEX REPLACE "^[\"<](.*)[\">]$" "\\1" FILE "${FILE}")
+  endif(INCLUDE_STRIPPED STREQUAL "")
   # Set the filename to the the given variable
   set(${FILENAME} "${FILE}")
 endmacro(extract_include_filename)
@@ -215,48 +297,56 @@ macro(find_includes SRC INCLUDES)
       else(${DEFINE})
         set(VALID_LINE FALSE)
       endif(${DEFINE})
-    # If we found a #ifndef on the line, the same thing as #ifdef is done, except with the checks in the opposite direction
-    elseif(FOUND_IFNDEF)
-      # Extract the define
-      string(REGEX REPLACE "^[ \t]*#[ \t]*ifndef[ \t]*(.*)$" "\\1" DEFINE ${LINE})
-      # Replace _WIN32 with WIN32, so we can check if the WIN32 variable of CMake is set instead of _WIN32
-      if(DEFINE STREQUAL "_WIN32")
-        set(DEFINE WIN32)
-      endif(DEFINE STREQUAL "_WIN32")
-      # Set the last define to this one, and set the last check to false, so when #else is encountered, we can do an opposing check
-      set(LAST_DEF ${DEFINE})
-      set(LAST_CHECK FALSE)
-      # If the define is not true (it either doesn't exists or is a false result), the lines following will be checked, otherwise they will be skipped
-      if(NOT ${DEFINE})
-        set(VALID_LINE TRUE)
-      else(NOT ${DEFINE})
-        set(VALUE_LINE FALSE)
-      endif(NOT ${DEFINE})
-    # If we found a #else on the line, we check the last define in the opposite direction
-    elseif(FOUND_ELSE)
-      # When LAST_CHECK is true, we were inside a #ifdef, now act as if we are entering a #ifndef section by doing an opposing check
-      if(LAST_CHECK)
-        if(NOT ${LAST_DEF})
+    else(FOUND_IFDEF)
+      # If we found a #ifndef on the line, the same thing as #ifdef is done, except with the checks in the opposite direction
+      if(FOUND_IFNDEF)
+        # Extract the define
+        string(REGEX REPLACE "^[ \t]*#[ \t]*ifndef[ \t]*(.*)$" "\\1" DEFINE ${LINE})
+        # Replace _WIN32 with WIN32, so we can check if the WIN32 variable of CMake is set instead of _WIN32
+        if(DEFINE STREQUAL "_WIN32")
+          set(DEFINE WIN32)
+        endif(DEFINE STREQUAL "_WIN32")
+        # Set the last define to this one, and set the last check to false, so when #else is encountered, we can do an opposing check
+        set(LAST_DEF ${DEFINE})
+        set(LAST_CHECK FALSE)
+        # If the define is not true (it either doesn't exists or is a false result), the lines following will be checked, otherwise they will be skipped
+        if(NOT ${DEFINE})
           set(VALID_LINE TRUE)
-        else(NOT ${LAST_DEF})
-          set(VALID_LINE FALSE)
-        endif(NOT ${LAST_DEF})
-      # When LAST_CHECK is false, we were inside a #ifndef, now act as if we are entering a #ifdef section by doing an opposing check
-      else(LAST_CHECK)
-        if(${LAST_DEF})
-          set(VALID_LINE TRUE)
-        else(${LAST_DEF})
-          set(VALID_LINE FALSE)
-        endif(${LAST_DEF})
-      endif(LAST_CHECK)
-    # If we found a #endif on the line, we'll assume everything following the line is valid until we meet another one of the above lines
-    elseif(FOUND_ENDIF)
-      set(VALID_LINE TRUE)
-    # If we found a #include on the line, add the entire line to the list of includes unless the line isn't valid
-    elseif(FOUND_INCLUDE)
-      if(VALID_LINE)
-        append_to_list(INCLUDES_LIST "${LINE}")
-      endif(VALID_LINE)
+        else(NOT ${DEFINE})
+          set(VALUE_LINE FALSE)
+        endif(NOT ${DEFINE})
+      else(FOUND_IFNDEF)
+        # If we found a #else on the line, we check the last define in the opposite direction
+        if(FOUND_ELSE)
+          # When LAST_CHECK is true, we were inside a #ifdef, now act as if we are entering a #ifndef section by doing an opposing check
+          if(LAST_CHECK)
+            if(NOT ${LAST_DEF})
+              set(VALID_LINE TRUE)
+            else(NOT ${LAST_DEF})
+              set(VALID_LINE FALSE)
+            endif(NOT ${LAST_DEF})
+          # When LAST_CHECK is false, we were inside a #ifndef, now act as if we are entering a #ifdef section by doing an opposing check
+          else(LAST_CHECK)
+            if(${LAST_DEF})
+              set(VALID_LINE TRUE)
+            else(${LAST_DEF})
+              set(VALID_LINE FALSE)
+            endif(${LAST_DEF})
+          endif(LAST_CHECK)
+        else(FOUND_ELSE)
+          # If we found a #endif on the line, we'll assume everything following the line is valid until we meet another one of the above lines
+          if(FOUND_ENDIF)
+            set(VALID_LINE TRUE)
+          else(FOUND_ENDIF)
+            # If we found a #include on the line, add the entire line to the list of includes unless the line isn't valid
+            if(FOUND_INCLUDE)
+              if(VALID_LINE)
+                append_to_list(INCLUDES_LIST "${LINE}")
+              endif(VALID_LINE)
+            endif(FOUND_INCLUDE)
+          endif(FOUND_ENDIF)
+        endif(FOUND_ELSE)
+      endif(FOUND_IFNDEF)
     endif(FOUND_IFDEF)
   endforeach(LINE)
   set(${INCLUDES} ${INCLUDES_LIST})
@@ -327,9 +417,7 @@ macro(calculate_depends SRC)
   if(HEADERS)
     # Remove duplicate headers from the list and sort the list
     remove_list_duplicates(HEADERS)
-    if(CMAKE244_OR_BETTER)
-      list(SORT HEADERS)
-    endif(CMAKE244_OR_BETTER)
+    sort_list(HEADERS)
     # Set the list of full path headers to empty
     set(HEADERS_FULL)
     # Iterate through the list of headers

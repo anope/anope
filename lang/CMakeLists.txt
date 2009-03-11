@@ -53,9 +53,7 @@ add_to_cpack_ignored_files("${index_RELATIVE}$")
 
 # Find all the *.l files within the current source directory, and sort the list
 file(GLOB LANG_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.l")
-if(CMAKE244_OR_BETTER)
-  list(SORT LANG_SRCS)
-endif(CMAKE244_OR_BETTER)
+sort_list(LANG_SRCS)
 
 # Iterate through the language files
 foreach(LANG_L ${LANG_SRCS})

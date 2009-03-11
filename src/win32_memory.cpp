@@ -11,6 +11,8 @@
  * ---------------------------------------------------
  */
 
+#ifdef _WIN32
+
 #include <windows.h>
 #include <exception>
 #include <new>
@@ -55,3 +57,5 @@ void operator delete[](void *ptr)
 {
 	HeapFree(GetProcessHeap(), 0, ptr);
 }
+
+#endif

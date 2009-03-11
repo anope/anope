@@ -2,9 +2,7 @@
 file(GLOB TOOLS_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
 file(GLOB TOOLS_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(TOOLS_SRCS ${TOOLS_SRCS_C} ${TOOLS_SRCS_CPP})
-if(CMAKE244_OR_BETTER)
-  list(SORT TOOLS_SRCS)
-endif(CMAKE244_OR_BETTER)
+sort_list(TOOLS_SRCS)
 
 # Set all the files to use C++ as well as set their compile flags
 set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")

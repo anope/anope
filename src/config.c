@@ -924,7 +924,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&MaxSessionKill), DT_INTEGER, NoValidation},
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&AddAkiller), DT_BOOLEAN, NoValidation},
-		{"opserver", "opersonly", "no", new ValueContainerBool(&OSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"operserv", "opersonly", "no", new ValueContainerBool(&OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
 		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
 		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},

@@ -89,7 +89,7 @@ int protocol_module_init()
 		{
 			if (!Numeric)
 			{
-				alog("This IRCd protocol requires a server numeric to be set in Anope's configuration.");
+				alog("This IRCd protocol requires a server id to be set in Anope's configuration.");
 				ret = -1;
 			}
 			else

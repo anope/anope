@@ -162,7 +162,7 @@ class CommandBSBadwords : public Command
 
 			for (i = 0; i < ci->bwcount; i++)
 			{
-				if (!ci->badwords[i].in_use)
+				if (ci->badwords[i].in_use && !stricmp(ci->badwords[i].word, word))
 					break;
 			}
 

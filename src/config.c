@@ -860,7 +860,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "modules", "", new ValueContainerChar(&ChanCoreModules), DT_CHARPTR, NoValidation},
-		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
+		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&CSMaxReg), DT_UINTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
 		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},

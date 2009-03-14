@@ -421,7 +421,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 			/* Strip off the fantasy character */
 			cmd++;
 
-			if (check_access(u, ci, CA_FANTASIA))              
+			if (check_access(u, ci, CA_FANTASIA))
 			{
 				std::string bbuf = std::string(cmd) + " " + ci->name;
 				if (params)
@@ -758,7 +758,11 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
 		return;
 
 	bd->ttb[ttbtype]++;
-	if (bd->ttb[ttbtype] == ci->ttb[ttbtype]) {
+	if (ci->ttb[ttbtype] && bd->ttb[ttbtype] >= ci->ttb[ttbtype])
+	{
+		/* Should not use == here because bd->ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
+		 * if the TTB was changed after it was not set (0) before and the user had already been
+		 * kicked a few times. Bug #1056 - Adam */
 		const char *av[4];
 		int ac;
 		char mask[BUFSIZE];

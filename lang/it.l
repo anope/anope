@@ -4192,7 +4192,7 @@ CHAN_HELP_CMD_GETKEY
 CHAN_HELP_CMD_INFO
 	    INFO       Mostra le informazioni su un canale
 CHAN_HELP_CMD_INVITE
-	    INVITE     Richiede un invito per un canale
+	    INVITE     Tells ChanServ to invite you into a channel
 CHAN_HELP_CMD_KICK
 	    KICK       Espelle un utente da un canale (kick)
 CHAN_HELP_CMD_LIST

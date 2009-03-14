@@ -4186,7 +4186,7 @@ CHAN_HELP_CMD_GETKEY
 CHAN_HELP_CMD_INFO
 	    INFO       Mostra informações sobre algum canal registrado
 CHAN_HELP_CMD_INVITE
-	    INVITE     Pede ao ChanServ para convidar você ou um nick fornecido para um canal
+	    INVITE     Tells ChanServ to invite you into a channel
 CHAN_HELP_CMD_KICK
 	    KICK       Kicka (expulsa) um nick de um canal
 CHAN_HELP_CMD_LIST

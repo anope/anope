@@ -5276,7 +5276,7 @@ CHAN_HELP_CMD_INFO
 	    INFO        Pokazuje informacje o zarejestrowanym kanale
 
 CHAN_HELP_CMD_INVITE
-	    INVITE      Zaprasza Ciebie lub wskazany nick na kana³
+	    INVITE      Tells ChanServ to invite you into a channel
 
 CHAN_HELP_CMD_KICK
 	    KICK        Wyrzuca wskazany nick z kana³u

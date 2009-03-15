@@ -26,13 +26,13 @@ class CommandMSRSend : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *name = params[0].c_str();
+		const char *nick = params[0].c_str();
 		const char *text = params[1].c_str();
 		NickAlias *na = NULL;
 		int z = 3;
 
 		/* prevent user from rsend to themselves */
-		if ((na = findnick(name)))
+		if ((na = findnick(nick)))
 		{
 			if (na->nc == u->nc)
 			{
@@ -41,7 +41,7 @@ class CommandMSRSend : public Command
 			}
 			else
 			{
-				notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
+				notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, nick);
 				return MOD_CONT;
 			}
 		}
@@ -50,13 +50,13 @@ class CommandMSRSend : public Command
 		{
 			/* Services opers and above can use rsend */
 			if (is_services_oper(u))
-				memo_send(u, name, text, z);
+				memo_send(u, nick, text, z);
 			else
 				notice_lang(s_MemoServ, u, ACCESS_DENIED);
 		}
 		else if (MSMemoReceipt == 2)
 			/* Everybody can use rsend */
-			memo_send(u, name, text, z);
+			memo_send(u, nick, text, z);
 		else
 		{
 			/* rsend has been disabled */

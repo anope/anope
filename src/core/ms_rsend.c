@@ -28,6 +28,11 @@ int AnopeInit(int argc, char **argv)
 {
     Command *c;
 
+    if (!MSMemoReceipt) {
+	alog("MSMemoReceipt not enabled in services.conf");
+        return MOD_STOP;
+    }
+
     moduleAddAuthor("Anope");
     moduleAddVersion
         ("$Id$");
@@ -37,9 +42,6 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
     moduleSetMemoHelp(myMemoServHelp);
 
-    if (!MSMemoReceipt) {
-        return MOD_STOP;
-    }
 
     return MOD_CONT;
 }

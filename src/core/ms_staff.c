@@ -69,7 +69,7 @@ class CommandMSStaff : public Command
 
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+		syntax_error(s_MemoServ, u, "STAFF", MEMO_STAFF_SYNTAX);
 	}
 };
 

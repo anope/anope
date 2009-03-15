@@ -1812,7 +1812,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s actualmente tiene muchos memos y no puede recibir mas.
 MEMO_SENT
 	Memo enviado a %s.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	Un massmemo ha sido enviado a todos los usuarios registrados.

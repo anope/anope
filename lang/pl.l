@@ -2373,6 +2373,10 @@ MEMO_MASS_SENT
 	Wiadomo¶æ zosta³a wys³ana do wszystkich zarejestrowanych u¿ytkowników.
 	
 
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
 	CANCEL {nick | kana³}

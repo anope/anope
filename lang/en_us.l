@@ -1783,7 +1783,11 @@ MEMO_SENT
 	Memo sent to %s.
 MEMO_MASS_SENT
 	A massmemo has been sent to all registered users.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
 	CANCEL {nick | channel}

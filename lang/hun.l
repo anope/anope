@@ -1814,6 +1814,10 @@ MEMO_SENT
 MEMO_MASS_SENT
 	Egy massmemo elküldve minden regisztrált felhasználónak.
 
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL válaszok
 MEMO_CANCEL_SYNTAX
 	CANCEL {nick | #szoba}

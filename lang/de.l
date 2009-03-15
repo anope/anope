@@ -1818,7 +1818,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s hat zu viele Memos gespeichert und kann keine weiteren empfangen.
 MEMO_SENT
 	Memo wurde an %s versandt.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	Ein Massen-Memo wurde an alle regsitrierte User gesendet.

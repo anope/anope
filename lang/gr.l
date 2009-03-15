@@ -1816,7 +1816,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s έχεις πολλά μηνύματα και δεν μπορείς να λάβεις άλλα.
 MEMO_SENT
 	Το μήνυμα στάλθηκε στον %s.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	A massmemo has been sent to all registered users.

@@ -1823,7 +1823,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s a trop de memos et ne peut en recevoir plus.
 MEMO_SENT
 	Memo envoyé à %s.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	Un mass memo a été envoyé a tout les pseudos enregistrés.

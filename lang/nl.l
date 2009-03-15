@@ -1807,7 +1807,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s heeft momenteel te veel memo's en kan er geen meer ontvangen.
 MEMO_SENT
 	Memo verstuurd naar %s.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	Een memo werd gestuurd naar alle geregistreerde gebruikers.

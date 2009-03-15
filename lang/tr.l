@@ -1811,7 +1811,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s nickinin limiti dolduðundan daha fazla mesaj alamaz.
 MEMO_SENT
 	%s nickine mesajýnýz gönderildi.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	A massmemo has been sent to all registered users.

@@ -1792,6 +1792,10 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 MEMO_SENT
 	Memo inviato a %s.
 
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	Un memo di massa è stato inviato a tutti gli utenti registrati.

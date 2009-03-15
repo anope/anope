@@ -1814,7 +1814,11 @@ MEMO_X_HAS_TOO_MANY_MEMOS
 	%s actualment te molts memos i no pot rebre'n mes.
 MEMO_SENT
 	Memo enviat a %s.
-	
+
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+
 # CANCEL responses
 MEMO_MASS_SENT
 	A massmemo has been sent to all registered users.

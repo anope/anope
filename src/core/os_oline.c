@@ -27,7 +27,7 @@ class CommandOSOLine : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *nick = params[0].c_str();
-		const char *flags = params[1].c_str();
+		const char *flag = params[1].c_str();
 		User *u2 = NULL;
 
 		/* Only allow this if SuperAdmin is enabled */
@@ -40,19 +40,19 @@ class CommandOSOLine : public Command
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
 			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (u2 && flags[0] == '+')
+		else if (u2 && flag[0] == '+')
 		{
-			ircdproto->SendSVSO(s_OperServ, nick, flags);
+			ircdproto->SendSVSO(s_OperServ, nick, flag);
 			ircdproto->SendMode(findbot(s_OperServ), nick, "+o");
 			common_svsmode(u2, "+o", NULL);
 			notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
-			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
+			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
 			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
 		}
-		else if (u2 && flags[0] == '-')
+		else if (u2 && flag[0] == '-')
 		{
-			ircdproto->SendSVSO(s_OperServ, nick, flags);
-			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
+			ircdproto->SendSVSO(s_OperServ, nick, flag);
+			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
 			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
 		}
 		else

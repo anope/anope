@@ -2151,6 +2151,10 @@ CHAN_LIST_END
 # INVITE responses
 CHAN_INVITE_SYNTAX
 	INVITE kana³
+CHAN_INVITE_ALREADY_IN
+	You are already in %s! 
+CHAN_INVITE_SUCCESS
+	You have been invited to %s.
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX

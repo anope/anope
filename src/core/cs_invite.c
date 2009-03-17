@@ -64,8 +64,13 @@ class CommandCSInvite : public Command
 			return MOD_CONT;
 		}
 
-		ircdproto->SendInvite(whosends(ci), chan, u->nick);
-		// XXX: maybe send a message about it succeeding.
+		if (is_on_chan(c, u))
+			notice_lang(s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name);
+		else
+		{
+			ircdproto->SendInvite(whosends(ci), chan, u->nick);
+			notice_lang(s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name);
+		}
 		return MOD_CONT;
 	}
 

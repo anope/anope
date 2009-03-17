@@ -1084,6 +1084,8 @@ CHAN_IDENTIFY_SUCCEEDED
 	Пароль принят, теперь ваш уровень доступа на канале %s - владелец.
 CHAN_LOGOUT_FOUNDER_FAILED
 	Вы не можете деидентифицировать себя отностительно канала %s т.к. вы его реальный владелец.
+CHAN_LOGOUT_NOT_LOGGEDIN
+	%s was not logged into %s.
 
 # LOGOUT responses
 CHAN_LOGOUT_SYNTAX

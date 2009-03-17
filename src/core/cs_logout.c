@@ -28,12 +28,12 @@ void myChanServHelp(User * u)
 class CommandCSLogout : public Command
 {
  private:
-	void make_unidentified(User * u, ChannelInfo * ci)
+	int make_unidentified(User *u, ChannelInfo *ci)
 	{
 		struct u_chaninfolist *uci;
 
 		if (!u || !ci)
-			return;
+			return 0;
 
 		for (uci = u->founder_chans; uci; uci = uci->next)
 		{
@@ -46,13 +46,16 @@ class CommandCSLogout : public Command
 				else
 					u->founder_chans = uci->next;
 				delete uci;
-				break;
+
+				return 1;
 			}
 		}
+
+		return 0;
 	}
 
  public:
-	CommandCSLogout() : Command("LOGOUT", 2, 2)
+	CommandCSLogout() : Command("LOGOUT", 1, 2)
 	{
 
 	}
@@ -63,41 +66,41 @@ class CommandCSLogout : public Command
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		ChannelInfo *ci;
 		User *u2 = NULL;
+		int is_admin = u->nc->HasCommand("chanserv/logout");
 
-		if (!(ci = cs_findchan(chan)))
-		{
+		if (!is_admin && !nick)
+			this->OnSyntaxError(u);
+		else if (!(ci = cs_findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		}
 		else if ((ci->flags & CI_FORBIDDEN))
-		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-		}
 		else if (nick && !(u2 = finduser(nick)))
-		{
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-		}
-		else if (u2 != u && !is_real_founder(u, ci))
-		{
+		else if (u2 != u && !is_real_founder(u, ci) && !is_admin)
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		}
 		else if (u2 == u && is_real_founder(u, ci))
-		{
 			/* Since founders can not logout we should tell them -katsklaw */
 			notice_lang(s_ChanServ, u, CHAN_LOGOUT_FOUNDER_FAILED, chan);
-		}
-		else {
-			if (u2) {
-				make_unidentified(u2, ci);
-				notice_lang(s_ChanServ, u, CHAN_LOGOUT_SUCCEEDED, nick, chan);
-				alog("%s: User %s!%s@%s has been logged out of channel %s.",
-					 s_ChanServ, u2->nick, u2->GetIdent().c_str(), u2->host, chan);
-			} else {
+		else
+		{
+			if (u2)
+			{
+				if (make_unidentified(u2, ci))
+				{
+					notice_lang(s_ChanServ, u, CHAN_LOGOUT_SUCCEEDED, nick, chan);
+					alog("%s: User %s!%s@%s has been logged out of channel %s.", s_ChanServ, u2->nick, u2->GetIdent().c_str(), u2->host, chan);
+				}
+				else
+					notice_lang(s_ChanServ, u, CHAN_LOGOUT_NOT_LOGGEDIN, nick, chan);
+			}
+			else
+			{
 				int i;
 				for (i = 0; i < 1024; i++)
 					for (u2 = userlist[i]; u2; u2 = u2->next)
 						make_unidentified(u2, ci);
 				notice_lang(s_ChanServ, u, CHAN_LOGOUT_ALL_SUCCEEDED, chan);
-				alog("%s: All users identified have been logged out of channel %s.", s_ChanServ, chan);
+				alog("%s: User %s!%s@%s logged all identified users out of channel %s.", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, chan);
 			}
 
 		}
@@ -106,13 +109,19 @@ class CommandCSLogout : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		notice_help(s_NickServ, u, CHAN_HELP_LOGOUT);
+		if (u->nc->HasCommand("chanserv/logout"))
+			notice_help(s_NickServ, u, CHAN_SERVADMIN_HELP_LOGOUT);
+		else
+			notice_help(s_NickServ, u, CHAN_HELP_LOGOUT);
 		return true;
 	}
 
 	void OnSyntaxError(User *u)
 	{
-		syntax_error(s_NickServ, u, "LOGOUT", CHAN_LOGOUT_SYNTAX);
+		if (u->nc->HasCommand("chanserv/logout"))
+			syntax_error(s_NickServ, u, "LOGOUT", CHAN_LOGOUT_SERVADMIN_SYNTAX);
+		else
+			syntax_error(s_NickServ, u, "LOGOUT", CHAN_LOGOUT_SYNTAX);
 	}
 };
 
@@ -129,7 +138,5 @@ class CSLogout : public Module
 		this->SetChanHelp(myChanServHelp);
 	}
 };
-
-
 
 MODULE_INIT("cs_logout", CSLogout)

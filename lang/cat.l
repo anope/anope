@@ -1117,6 +1117,8 @@ CHAN_LOGOUT_ALL_SUCCEEDED
 	Tots els usuaris identificats han estat desconnectats del canal %s (except the channel founder).
 CHAN_LOGOUT_FOUNDER_FAILED
 	You may not log out of %s (you are founder).
+CHAN_LOGOUT_NOT_LOGGEDIN
+	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX

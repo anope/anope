@@ -1129,6 +1129,8 @@ CHAN_LOGOUT_SUCCEEDED
 	Der User %s wurde vom Channel %s ausgeloggt.
 CHAN_LOGOUT_ALL_SUCCEEDED
 	Alle identifizierten User wurden vom Channel ausgeloggt %s (except the channel founder).
+CHAN_LOGOUT_NOT_LOGGEDIN
+	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX

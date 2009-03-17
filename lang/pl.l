@@ -1432,6 +1432,8 @@ CHAN_LOGOUT_ALL_SUCCEEDED
 	Wylogowano zidentyfikowanych u¿ytkowników z kana³u %s (bez w³a¶ciciela).
 CHAN_LOGOUT_FOUNDER_FAILED
 	Nie mo¿esz siê wylogowaæ z %s (jeste¶ w³a¶cicielem).
+CHAN_LOGOUT_NOT_LOGGEDIN
+	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX

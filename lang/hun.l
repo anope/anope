@@ -1107,6 +1107,8 @@ CHAN_LOGOUT_ALL_SUCCEEDED
 	Minden felhasználó kijelentkezett a %s csatornáról (except the channel founder).
 CHAN_LOGOUT_FOUNDER_FAILED
 	You may not log out of %s (you are founder).
+CHAN_LOGOUT_NOT_LOGGEDIN
+	%s was not logged into %s.
 
 # DROP válaszok
 CHAN_DROP_SYNTAX

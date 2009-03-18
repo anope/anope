@@ -111,7 +111,7 @@ int m_motd(char *source)
 
 int m_privmsg(char *source, char *receiver, char *msg)
 {
-    char *s;
+    char *s, *target;
     time_t starttime, stoptime; /* When processing started and finished */
 
     BotInfo *bi;
@@ -143,7 +143,9 @@ int m_privmsg(char *source, char *receiver, char *msg)
         if (allow_ignore && !is_oper(u)) {
             IgnoreData *ign = get_ignore(source);
             if (ign) {
-                alog("Ignored message from %s: \"%s\"", source, inbuf);
+				target = myStrGetToken(msg, ' ', 0);
+				alog("Ignored message from %s to %s using command %s", source, receiver, target);
+                free(target);
                 return MOD_CONT;
             }
         }

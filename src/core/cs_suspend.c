@@ -33,7 +33,10 @@ class CommandCSSuspend : public Command
 		Channel *c;
 
 		if (!u->nc->HasCommand("chanserv/suspend"))
+		{
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT; // XXX: error?
+		}
 
 		/* Assumes that permission checking has already been done. */
 		if (ForceForbidReason && !reason)

@@ -238,42 +238,47 @@ class CommandCSAccess : public Command
 			}
 
 			/* Special case: is it a number/list?  Only do search if it isn't. */
-			if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
+			if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
+			{
 				int count, last = -1, perm = 0;
 				deleted = process_numlist(nick, &count, access_del_callback, u,
 											ci, &last, &perm, get_access(u, ci));
-				if (!deleted) {
-					if (perm) {
+				if (!deleted)
+				{
+					if (perm)
 						notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-					} else if (count == 1) {
+					else if (count == 1)
+					{
 						last = atoi(nick);
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_SUCH_ENTRY,
-									last, ci->name);
-					} else {
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH,
-									ci->name);
+						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_SUCH_ENTRY, last, ci->name);
 					}
-				} else if (deleted == 1) {
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_ONE,
-								ci->name);
-				} else {
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL,
-								deleted, ci->name);
+					else
+						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name);
 				}
-			} else {
+				else
+				{
+					alog("%s: %s!%s@%s (level %d) deleted access of user%s %s on %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, get_access(u, ci), deleted == 1 ? "" : "s", nick, chan);
+					if (deleted == 1)
+						notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name);
+					else
+						notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL, deleted, ci->name);
+				}
+			}
+			else
+			{
 				na = findnick(nick);
-				if (!na) {
+				if (!na)
+				{
 					notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
 					return MOD_CONT;
 				}
 				nc = na->nc;
-				for (i = 0; i < ci->accesscount; i++) {
+				for (i = 0; i < ci->accesscount; i++)
 					if (ci->access[i].nc == nc)
 						break;
-				}
-				if (i == ci->accesscount) {
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick,
-								chan);
+				if (i == ci->accesscount)
+				{
+					notice_lang(s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
 					return MOD_CONT;
 				}
 				access = &ci->access[i];
@@ -281,9 +286,10 @@ class CommandCSAccess : public Command
 				{
 					deleted = 0;
 					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-				} else {
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED,
-								access->nc->display, ci->name);
+				}
+				else
+				{
+					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name);
 					alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, get_access(u, ci), na->nick, access->nc->display, chan);
 					access->nc = NULL;
 					access->in_use = 0;

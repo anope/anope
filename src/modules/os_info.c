@@ -59,6 +59,7 @@ class CommandNSOInfo : public Command
 	{
 		const char *nick = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
+		char *c;
 		NickAlias *na = NULL;
 
 		if (!info)
@@ -69,6 +70,11 @@ class CommandNSOInfo : public Command
 
 		if ((na = findnick(nick))) /* ok we've found the user */
 		{
+			if (na->nc->GetExt("os_info", c))
+			{
+				delete [] c;
+				na->nc->Shrink("os_info");
+			}
 			/* Add the module data to the user */
 			na->nc->Extend("os_info", sstrdup(info));
 			me->NoticeLang(s_NickServ, u, OINFO_ADD_SUCCESS, nick);
@@ -173,6 +179,7 @@ class CommandCSOInfo : public Command
 	{
 		const char *chan = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
+		char *c;
 		ChannelInfo *ci = NULL;
 
 		if (!info)
@@ -183,6 +190,11 @@ class CommandCSOInfo : public Command
 
 		if ((ci = cs_findchan(chan)))
 		{
+			if (ci->GetExt("os_info", c))
+			{
+				delete [] c;
+				ci->Shrink("os_info");
+			}
 			/* Add the module data to the channel */
 			ci->Extend("os_info", sstrdup(info));
 			me->NoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);

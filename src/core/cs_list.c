@@ -129,7 +129,7 @@ public:
 			for (ci = chanlists[i]; ci; ci = ci->next)
 			{
 				if (!is_servadmin && ((ci->flags & CI_PRIVATE)
-							    || (ci->flags & CI_FORBIDDEN)))
+					|| (ci->flags & CI_FORBIDDEN) || (ci->flags & CI_SUSPENDED)))
 					continue;
 				if ((matchflags != 0) && !(ci->flags & matchflags))
 					continue;

@@ -314,13 +314,16 @@ int do_access(User * u)
                     notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH,
                                 ci->name);
                 }
-            } else if (deleted == 1) {
-                notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_ONE,
+			} else {
+				alog("%s: %s!%s@%s (level %d) deleted access of user%s %s on %s",
+					s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), (deleted == 1 ? "" : "s"), nick, chan);
+				if (deleted == 1)
+					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_ONE,
                             ci->name);
-            } else {
-                notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL,
-                            deleted, ci->name);
-            }
+				else
+					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL,
+								deleted, ci->name);
+			}
         } else {
             na = findnick(nick);
             if (!na) {

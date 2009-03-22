@@ -154,7 +154,7 @@ int do_list(User * u)
         for (i = 0; i < 256; i++) {
             for (ci = chanlists[i]; ci; ci = ci->next) {
                 if (!is_servadmin && ((ci->flags & CI_PRIVATE)
-                                      || (ci->flags & CI_VERBOTEN)))
+                                      || (ci->flags & CI_VERBOTEN) || (ci->flags & CI_SUSPENDED)))
                     continue;
                 if ((matchflags != 0) && !(ci->flags & matchflags))
                     continue;

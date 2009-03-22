@@ -9,11 +9,39 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1939"
+VERSION_BUILD="2182"
 
-# $Log$
+# $Log$ # Changes since 1.8.0 Release
+
+#Revision 2182 - Fix memleak in channels.c from DukePyrolator. (Same fix applied to 1.9 earlier). Thanks DP!
+#Revision 2181 - Backport of bugfix for bug #1043 from SVN r2178, patch from Adam, CS LIST will no longer show suspended channels to normal users.
+#Revision 2180 - Backport of bugfix for bug #1030 from SVN r2179, patch from Adam, deleting from the channel access list now logs a message about the deleted items.
+#Revision 2175 - #1054 Backported fix from 1.9 to hide password in log/logchan whilst user is ignored.
+#Revision 2166 - Patch from DukePyrolator to log an entry for when NSMemoReceipt isn't defined in the config.
+#Revision 2152 - Backport of bugfix for bug #1025 from SVN r2148, the message for "no such entry" should show whatever was passed in to the command, not -1 every time.
+#Revision 2151 - Backport of bugfix for bug #1020 from SVN r2150, read and write the mlock for flood and redirect regardless of the IRCd's setting for the mode.
+#Revision 2145 - Applied adams patch for re-ordering lists
+#Revision 2132 - Backport of fix from r2131, inspircd11 module should send the current timestamp, not the timestamp that the akill was set at.
+#Revision 2127 - Backport fix in sgets which lacked FD_ZERO() call before FD_SET().
+#Revision 2110 - Fix compile caused by careless backport, thanks DP.
+#Revision 2024 - Backport: Correctly lower TS (if the ircd provided it) on reciept of JOIN messages. This fixes dropped mode changes coming from services on TS6 (and TS6-alike) ircds for channels where TS is dropped elsewhere on the network.
+#Revision 2023 - Backport from 1.9.1 - inspircd11: Pass chants in JOIN message to not blow away timestamps.
+#Revision 1946 - Patch by Adam fixing #1006 (originally caused by #922): modes set by ChanServ are reversed. Thanks!
+#Revision 1943 - Applied patch by mooncup to re-apply the cloaked host when using /hs off for unreal32 
+#Revision 1941 - Giving credits for +j support..
+#Revision 1940 - Bug 1001: Added support for internal tracking of +j channel mode (throttling).
+#Revision 1937 - Manual backport of r1935 / 183bf6525b84: check noexpire/readonly in expire_all(), otherwise stuff will get expired on shutdown.
+#Revision 1936 - Don't allow an empty ident when reading HS vident. Rob, this needs review before I want to push it to SVN.
+#Revision 1926 - Backport of fix for bug 1000, do not allow a nick to be grouped if the IRCd protocol deems the nick invalid.
+#Revision 1924 - Fixed check for backtrace() in configure.
+#Revision 1923 - Initialized 1.8 SVN. & Fixed MySQL dumping failing on unsafe queries. [Bug #994]
+#Revision 1915 - Update install.js with correct url for windows build help links.
+#Revision 1913 - More housekeeping contact address updates.
+#Revision 1912 - Update copyright & contact information within files.
 #
-
+#
+# Leading up to 1.8.0 Release
+#
 # BUILD : 1.8.0 (1899)
 # BUGS  :
 # NOTES : 1.8.0 Release

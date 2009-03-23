@@ -26,6 +26,11 @@ class CommandOSShutdown : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
+		if (!u->nc->HasCommand("operserv/shutdown")) {
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return MOD_STOP;
+		}
+
 		quitmsg = new char[32 + strlen(u->nick)];
 		if (!quitmsg)
 			quitmsg = "SHUTDOWN command received, but out of memory!";
@@ -41,7 +46,7 @@ class CommandOSShutdown : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_root(u))
+		if (!u->nc->HasCommand("operserv/shutdown"))
 			return false;
 
 		notice_help(s_OperServ, u, OPER_HELP_SHUTDOWN);

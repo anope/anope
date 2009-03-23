@@ -158,7 +158,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (nickIsServices(oldnick, 0))
+		if (stricmp(oldnick, nick) && nickIsServices(oldnick, 0))
 		{
 			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;
@@ -182,7 +182,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (nickIsServices(nick, 0))
+		if (stricmp(oldnick, nick) && nickIsServices(nick, 0))
 		{
 			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;

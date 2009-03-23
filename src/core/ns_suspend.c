@@ -75,6 +75,7 @@ void myNickServHelp(User * u)
 int do_suspend(User * u)
 {
     NickAlias *na, *na2;
+    User *u2;
     char *nick = strtok(NULL, " ");
     char *reason = strtok(NULL, "");
     int i;
@@ -115,6 +116,11 @@ int do_suspend(User * u)
             if (na2->nc == na->nc) {
                 na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
                 na2->last_quit = sstrdup(reason);
+                /* remove nicktracking */
+                if ((u2 = finduser(na2->nick)))
+                    u2->nc = NULL;
+                /* force guestnick */
+                collide(na2, 0);
             }
         }
 

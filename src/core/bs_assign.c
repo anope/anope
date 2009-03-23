@@ -43,12 +43,6 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if (bi->flags & BI_PRIVATE && !u->nc->HasCommand("botserv/assign/private"))
-		{
-			notice_lang(s_BotServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
-
 		if (!(ci = cs_findchan(chan)))
 		{
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
@@ -61,15 +55,21 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if ((ci->bi) && (stricmp(ci->bi->nick, nick) == 0))
-		{
-			notice_lang(s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
-			return MOD_CONT;
-		}
-
 		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->nc->HasPriv("botserv/administration")))
 		{
 			notice_lang(s_BotServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
+
+		if (bi->flags & BI_PRIVATE && !u->nc->HasCommand("botserv/assign/private"))
+		{
+			notice_lang(s_BotServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
+
+		if ((ci->bi) && (stricmp(ci->bi->nick, nick) == 0))
+		{
+			notice_lang(s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
 			return MOD_CONT;
 		}
 

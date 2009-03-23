@@ -199,7 +199,8 @@ class CommandNSInfo : public Command
 				}
 			}
 
-			notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, na->nick);
+			if (!show_hidden)
+				notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, na->nick);
 		}
 		return MOD_CONT;
 	}

@@ -173,19 +173,19 @@ class XOPBase : public Command
 			access->last_seen = 0;
 		}
 
-		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
+		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", level, na->nick, nc->display, ci->name);
 
-		snprintf(event_access, BUFSIZE, "%d", access->level);
+		snprintf(event_access, BUFSIZE, "%d", level);
 
 		if (!change)
 		{
 			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
-			notice_lang(s_ChanServ, u, messages[XOP_ADDED], access->nc->display, ci->name);
+			notice_lang(s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name);
 		}
 		else
 		{
 			send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
-			notice_lang(s_ChanServ, u, messages[XOP_MOVED], access->nc->display, ci->name);
+			notice_lang(s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name);
 		}
 
 		return MOD_CONT;

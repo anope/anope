@@ -199,7 +199,7 @@ class CommandCSAccess : public Command
 				snprintf(event_access, BUFSIZE, "%d", access->level);
 				send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
 				alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, access->nc->display, chan, level);
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, chan, level);
 				return MOD_CONT;
 			}
 
@@ -211,10 +211,10 @@ class CommandCSAccess : public Command
 
 			ci->AddAccess(nc, level);
 
-			snprintf(event_access, BUFSIZE, "%d", access->level);
+			snprintf(event_access, BUFSIZE, "%d", level);
 			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
-			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
-			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, access->level);
+			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name);
+			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, level);
 		}
 		else if (!stricmp(cmd, "DEL"))
 		{

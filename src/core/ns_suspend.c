@@ -27,6 +27,7 @@ class CommandNSSuspend : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickAlias *na, *na2;
+		User *u2;
 		const char *nick = params[0].c_str();
 		const char *reason = params[1].c_str();
 		int i;
@@ -68,6 +69,11 @@ class CommandNSSuspend : public Command
 				{
 					na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
 					na2->last_quit = sstrdup(reason);
+					/* removes nicktracking */
+					if ((u2 = finduser(na2->nick)))
+						u2->nc = NULL;
+					/* force guestnick */
+					collide(na2, 0);
 				}
 			}
 

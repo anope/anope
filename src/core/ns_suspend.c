@@ -117,8 +117,12 @@ int do_suspend(User * u)
                 na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
                 na2->last_quit = sstrdup(reason);
                 /* remove nicktracking */
-                if ((u2 = finduser(na2->nick)))
-                    u2->nc = NULL;
+                if ((u2 = finduser(na2->nick))) {
+                    if (u2->nickTrack) {
+                        free(u2->nickTrack);
+                        u2->nickTrack = NULL;
+                    }
+                }
                 /* force guestnick */
                 collide(na2, 0);
             }

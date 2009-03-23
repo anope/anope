@@ -71,16 +71,7 @@ class CommandNSConfirm : public Command
 		na->time_registered = na->last_seen = time(NULL);
 
 		if (NSAddAccessOnReg)
-		{
-			na->nc->accesscount = 1;
-			na->nc->access = static_cast<char **>(scalloc(sizeof(char *), 1));
-			na->nc->access[0] = create_mask(u);
-		}
-		else
-		{
-			na->nc->accesscount = 0;
-			na->nc->access = NULL;
-		}
+			na->nc->AddAccess(create_mask(u));
 
 		na->nc->language = NSDefLanguage;
 		if (nr->email)
@@ -91,7 +82,7 @@ class CommandNSConfirm : public Command
 			u->nc = na->nc;
 			alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
 			if (NSAddAccessOnReg)
-				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->access[0]);
+				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->GetAccess(0).c_str());
 			else
 				notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
 			send_event(EVENT_NICK_REGISTERED, 1, u->nick);
@@ -311,7 +302,7 @@ class CommandNSRegister : public CommandNSConfirm
 			this->OnSyntaxError(u);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, NSRegDelay);
-		else if ((na = findnick(u->nick))) 
+		else if ((na = findnick(u->nick)))
 		{
 			/* i.e. there's already such a nick regged */
 			if (na->status & NS_FORBIDDEN)

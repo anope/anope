@@ -79,7 +79,6 @@ void get_core_stats(long *nrec, long *memuse)
 	long count = 0, mem = 0;
 	int i, j;
 	NickCore *nc;
-	char **accptr;
 
 	for (i = 0; i < 1024; i++)
 	{
@@ -100,13 +99,9 @@ void get_core_stats(long *nrec, long *memuse)
 			if (nc->greet)
 				mem += strlen(nc->greet) + 1;
 
-			mem += sizeof(char *) * nc->accesscount;
-			for (accptr = nc->access, j = 0; j < nc->accesscount;
-			        accptr++, j++)
-			{
-				if (*accptr)
-					mem += strlen(*accptr) + 1;
-			}
+			mem += sizeof(std::string) * nc->access.size();
+			for (j = 0; j < nc->access.size(); ++j)
+				mem += nc->GetAccess(j).length() + 1;
 
 			mem += nc->memos.memos.size() * sizeof(Memo);
 			for (j = 0; j < nc->memos.memos.size(); j++)
@@ -280,14 +275,20 @@ void load_ns_dbase()
 			if (nc->flags & NI_SERVICES_OPER)
 				slist_add(&servopers, nc);
 
-			SAFE(read_int16(&nc->accesscount, f));
-			if (nc->accesscount)
+			uint16 accesscount;
+			SAFE(read_int16(&accesscount, f));
+			if (accesscount)
 			{
-				char **access;
-				access = static_cast<char **>(scalloc(sizeof(char *) * nc->accesscount, 1));
-				nc->access = access;
-				for (j = 0; j < nc->accesscount; j++, access++)
-					SAFE(read_string(access, f));
+				for (j = 0; j < accesscount; ++j)
+				{
+					char *access;
+					SAFE(read_string(&access, f));
+					if (access)
+					{
+						nc->AddAccess(access);
+						delete [] access;
+					}
+				}
 			}
 
 			SAFE(read_int16(&tmp16, f));
@@ -415,7 +416,6 @@ void save_ns_dbase()
 	int i, j;
 	NickAlias *na;
 	NickCore *nc;
-	char **access;
 	static time_t lastwarn = 0;
 
 	if (!(f = open_db(s_NickServ, NickDBName, "w", NICK_VERSION)))
@@ -438,10 +438,12 @@ void save_ns_dbase()
 			SAFE(write_int32(nc->flags, f));
 			SAFE(write_int16(nc->language, f));
 
-			SAFE(write_int16(nc->accesscount, f));
-			for (j = 0, access = nc->access; j < nc->accesscount;
-			        j++, access++)
-				SAFE(write_string(*access, f));
+			SAFE(write_int16(nc->access.size(), f));
+			for (j = 0; j < nc->access.size(); ++j)
+			{
+				std::string access = nc->GetAccess(j);
+				SAFE(write_string(access.c_str(), f));
+			}
 
 			SAFE(write_int16(nc->memos.memos.size(), f));
 			SAFE(write_int16(nc->memos.memomax, f));
@@ -848,7 +850,7 @@ int is_on_access(User * u, NickCore * nc)
 	char *buf;
 	char *buf2 = NULL;
 
-	if (nc->accesscount == 0)
+	if (nc->access.empty())
 		return 0;
 
 	buf = new char[u->GetIdent().length() + strlen(u->host) + 2];
@@ -862,10 +864,11 @@ int is_on_access(User * u, NickCore * nc)
 		}
 	}
 
-	for (i = 0; i < nc->accesscount; i++)
+	for (i = 0; i < nc->access.size(); i++)
 	{
-		if (Anope::Match(buf, nc->access[i], false)
-		        || (ircd->vhost ? Anope::Match(buf2, nc->access[i], false) : 0))
+		std::string access = nc->GetAccess(i);
+		if (Anope::Match(buf, access, false)
+		        || (ircd->vhost ? Anope::Match(buf2, access, false) : 0))
 		{
 			delete [] buf;
 			if (ircd->vhost)
@@ -1049,15 +1052,7 @@ static int delcore(NickCore * nc)
 	if (nc->url)
 		delete [] nc->url;
 
-	if (nc->access)
-	{
-		for (i = 0; i < nc->accesscount; i++)
-		{
-			if (nc->access[i])
-				delete [] nc->access[i];
-		}
-		free(nc->access);
-	}
+	nc->ClearAccess();
 
 	if (!nc->memos.memos.empty())
 	{

@@ -23,10 +23,9 @@ class CommandNSAccess : public Command
 	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params, NickCore *nc)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
-		char **access;
-		int i;
+		unsigned i;
 
-		if (!nc->accesscount)
+		if (nc->access.empty())
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display);
 			return MOD_CONT;
@@ -47,11 +46,12 @@ class CommandNSAccess : public Command
 		}
 
 		notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
-		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
+		for (i = 0; i < nc->access.size(); ++i)
 		{
-			if (mask && !Anope::Match(*access, mask, true))
+			std::string access = nc->GetAccess(i);
+			if (mask && !Anope::Match(access, mask, true))
 				continue;
-			u->SendMessage(s_NickServ, "    %s", *access);
+			u->SendMessage(s_NickServ, "    %s", access.c_str());
 		}
 
 		return MOD_CONT;
@@ -59,33 +59,25 @@ class CommandNSAccess : public Command
 
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
 	{
-		char **access;
-		int i;
-
 		if (!mask)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (nc->accesscount >= NSAccessMax)
+		if (nc->access.size() >= NSAccessMax)
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_REACHED_LIMIT, NSAccessMax);
 			return MOD_CONT;
 		}
 
-		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
+		if (nc->FindAccess(mask))
 		{
-			if (!strcmp(*access, mask))
-			{
-				notice_lang(s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, *access);
-				return MOD_CONT;
-			}
+			notice_lang(s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, *access);
+			return MOD_CONT;
 		}
 
-		++nc->accesscount;
-		nc->access = static_cast<char **>(srealloc(nc->access, sizeof(char *) * nc->accesscount));
-		nc->access[nc->accesscount - 1] = sstrdup(mask);
+		nc->AddAccess(mask);
 		notice_lang(s_NickServ, u, NICK_ACCESS_ADDED, mask);
 
 		return MOD_CONT;
@@ -93,59 +85,41 @@ class CommandNSAccess : public Command
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
 	{
-		char **access;
-		int i;
-
 		if (!mask)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
-		{
-			if (!stricmp(*access, mask))
-				break;
-		}
-		if (i == nc->accesscount)
+		if (!nc->FindAccess(mask))
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_NickServ, u, NICK_ACCESS_DELETED, *access);
-		delete [] *access;
-		--nc->accesscount;
-		if (i < nc->accesscount) /* if it wasn't the last entry... */
-			memmove(access, access + 1, (nc->accesscount - i) * sizeof(char *));
-		if (nc->accesscount) /* if there are any entries left... */
-			nc->access = static_cast<char **>(srealloc(nc->access, nc->accesscount * sizeof(char *)));
-		else
-		{
-			free(nc->access);
-			nc->access = NULL;
-		}
+		notice_lang(s_NickServ, u, NICK_ACCESS_DELETED, mask);
+		nc->EraseAccess(mask);
 
 		return MOD_CONT;
 	}
 
 	CommandReturn DoList(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
 	{
-		char **access;
-		int i;
+		unsigned i;
 
-		if (!nc->accesscount)
+		if (nc->access.empty())
 		{
 			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick);
 			return MOD_CONT;
 		}
 
 		notice_lang(s_NickServ, u, NICK_ACCESS_LIST);
-		for (access = nc->access, i = 0; i < nc->accesscount; ++access, ++i)
+		for (i = 0; i < nc->access.size(); ++i)
 		{
-			if (mask && !Anope::Match(*access, mask, true))
+			std::string access = nc->GetAccess(i);
+			if (mask && !Anope::Match(access, mask, true))
 				continue;
-			u->SendMessage(s_NickServ, "    %s", *access);
+			u->SendMessage(s_NickServ, "    %s", access.c_str());
 		}
 
 		return MOD_CONT;
@@ -185,6 +159,12 @@ class CommandNSAccess : public Command
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, std::string &subcommand)
+	{
+		notice_help(s_NickServ, u, NICK_HELP_ACCESS);
+		return true;
 	}
 
 	void OnSyntaxError(User *u)

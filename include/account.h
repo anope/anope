@@ -55,8 +55,7 @@ class CoreExport NickCore : public Extensible
 	char *url;				/* URL associated to the nick */
 	uint32 flags;				/* See NI_* below */
 	uint16 language;			/* Language selected by nickname owner (LANG_*) */
-	uint16 accesscount;			/* # of entries */
-	char **access;				/* Array of strings */
+	std::vector<std::string> access; /* Access list, vector of strings */
 	MemoInfo memos;
 	uint16 channelcount;			/* Number of channels currently registered */
 
@@ -77,5 +76,45 @@ class CoreExport NickCore : public Extensible
 	  * @return True if this opertype has the specified priv, false otherwise.
 	  */
 	bool HasPriv(const std::string &privstr) const;
+
+	/** Add an entry to the nick's access list
+	 *
+	 * @param entry The nick!ident@host entry to add to the access list
+	 *
+	 * Adds a new entry into the access list.
+	 */
+	void AddAccess(const std::string &entry);
+
+	/** Get an entry from the nick's access list by index
+	 *
+	 * @param entry Index in the access list vector to retrieve
+	 * @return The access list entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
+	 *
+	 * Retrieves an entry from the access list corresponding to the given index.
+	 */
+	std::string GetAccess(unsigned entry);
+
+	/** Find an entry in the nick's access list
+	 *
+	 * @param entry The nick!ident@host entry to search for
+	 * @return True if the entry is found in the access list, false otherwise
+	 *
+	 * Search for an entry within the access list.
+	 */
+	bool FindAccess(const std::string &entry);
+
+	/** Erase an entry from the nick's access list
+	 *
+	 * @param entry The nick!ident@host entry to remove
+	 *
+	 * Removes the specified access list entry from the access list.
+	 */
+	void EraseAccess(const std::string &entry);
+
+	/** Clears the entire nick's access list
+	 *
+	 * Deletes all the memory allocated in the access list vector and then clears the vector.
+	 */
+	void ClearAccess();
 };
 

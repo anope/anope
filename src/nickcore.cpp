@@ -7,7 +7,7 @@ NickCore::NickCore()
 	ot = NULL;
 	pass[0] = '\0';
 	icq = flags = 0;
-	language = accesscount = channelcount = 0;
+	language = channelcount = 0;
 	lastmail = 0;
 }
 
@@ -31,4 +31,40 @@ bool NickCore::HasPriv(const std::string &privstr) const
 	}
 
 	return this->ot->HasPriv(privstr);
+}
+
+void NickCore::AddAccess(const std::string &entry)
+{
+	access.push_back(entry);
+}
+
+std::string NickCore::GetAccess(unsigned entry)
+{
+	if (access.empty() || entry >= access.size())
+		return "";
+	return access[entry];
+}
+
+bool NickCore::FindAccess(const std::string &entry)
+{
+	for (unsigned i = 0; i < access.size(); ++i)
+		if (access[i] == entry)
+			return true;
+
+	return false;
+}
+
+void NickCore::EraseAccess(const std::string &entry)
+{
+	for (unsigned i = 0; i < access.size(); ++i)
+		if (access[i] == entry)
+		{
+			access.erase(access.begin() + i);
+			break;
+		}
+}
+
+void NickCore::ClearAccess()
+{
+	access.clear();
 }

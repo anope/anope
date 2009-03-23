@@ -4940,12 +4940,9 @@ CHAN_HELP_KICK
 	and above on the channel.
 
 CHAN_HELP_BAN
-	Syntax: BAN [#channel [nick [reason]]]
+	Syntax: BAN #channel nick [reason]
 	
-	Bans a selected nick on a channel. If nick is not given,
-	it will ban you. If channel and nick are not given,
-	it will ban you on all channels you're on, provided you
-	have the rights to.
+	Bans a selected nick on a channel.
 	
 	By default, limited to AOPs or those with level 5 access 
 	and above on the channel.

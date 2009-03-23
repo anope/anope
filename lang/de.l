@@ -5182,12 +5182,9 @@ CHAN_HELP_KICK
 	von mindestens 5 erforderlich.
 
 CHAN_HELP_BAN
-	Syntax: BAN [Channel [Nickname [Grund]]]
+	Syntax: BAN Channel Nickname [Grund]
 	
-	Bannt einen Nicknamen im Channel. Falls kein Nickname angegeben
-	wird, wirst du gebannt. Falls kein Nickname und kein Channel
-	angegeben werden, wirst du in allen Channels gebannt,
-	vorausgesetzt du hast die nötige Berechtigung.
+	Bannt einen Nicknamen im Channel.
 	
 	Standardmässig auf AOPs oder User mit Access Level 5 oder
 	höher beschränkt.

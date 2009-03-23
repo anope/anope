@@ -6170,15 +6170,9 @@ CHAN_HELP_KICK
 	dostêpu 5 lub wy¿szy.
 
 CHAN_HELP_BAN
-	Sk³adnia: BAN [kana³ [nick [powód]]]
+	Sk³adnia: BAN kana³ nick [powód]
 	
 	Banuje wskazanego u¿ytkownika na kanale.
-	Pominiêcie nicka powoduje zbanowanie osoby
-	wydaj±cej polecenie. Dodatkowo pominiêcie
-	nazwy kana³u powoduje zbanowanie wydaj±cego
-	polecenie na wszystkich kana³ach, na których
-	przebywa z uwzglêdnieniem uprawnieñ na nich
-	przys³uguj±cych.
 
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych poziom

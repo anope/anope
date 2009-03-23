@@ -5137,12 +5137,9 @@ CHAN_HELP_KICK
 	acceso 5 y mayor en el canal.
 
 CHAN_HELP_BAN
-	Sintaxis: BAN [#canal [nick [razon]]]
+	Sintaxis: BAN #canal nick [razon]
 	
-	Banea un nick seleccionado en un canal. Si el nick no
-	es dado, te baneara a ti. Si canal y nick no son dados,
-	te baneara de todos los canales, siempre y cuando tengas
-	permiso para hacerlo.
+	Banea un nick seleccionado en un canal.
 	
 	Por defecto, limitado a AOPs o aquellos con nivel de
 	acceso 5 y mayor en el canal.

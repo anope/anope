@@ -5076,12 +5076,9 @@ CHAN_HELP_KICK
 	niveau 5 of hoger op het kanaal.
 
 CHAN_HELP_BAN
-	Gebruik: BAN [#kanaal [nick [reden]]]
+	Gebruik: BAN #kanaal nick [reden]
 	
-	Bant de gegeven nick op het gegeven kanaal. Als nick niet
-	is gegeven wordt je zelf gebanned. Als kanaal en nick niet
-	zijn gegeven wordt je zelf gebanned op alle kanalen waar je
-	momenteel bent, mits je de rechten daartoe hebt.
+	Bant de gegeven nick op het gegeven kanaal.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met
 	niveau 5 of hoger op het kanaal.

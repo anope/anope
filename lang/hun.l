@@ -5056,12 +5056,9 @@ CHAN_HELP_KICK
 	kell rendelkezned a csatornán, hogy használhasd.
 	
 CHAN_HELP_BAN
-	Syntax: BAN [#szoba [nick [indok]]]
+	Syntax: BAN #szoba nick [indok]
 	
 	Kitilt egy kiválaszott nicket a csatornáról.
-	Ha nem adsz meg nevet akkor téged tilt ki, ha
-	nem adsz meg csatit és nicket, akkor minden csatornáról
-	ahol bent vagy és van jogod rá, onnan kitilt.
 	
 	Alapbeállítás szerint, minimum AOP vagy 5-ös access 
 	szinttel kell rendelkezned a csatornán, hogy használhasd.

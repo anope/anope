@@ -5080,11 +5080,9 @@ CHAN_HELP_KICK
 	olanlar bu komutu kullanabilir.
 
 CHAN_HELP_BAN
-	Kullanýmý: BAN [#kanaladi [nick [sebep]]]
+	Kullanýmý: BAN #kanaladi nick [sebep]
 	
-	Belirtilen nicki kanaldan banlar. Eger nick belirtilmezse
-	sizi banlar. Eger nick ve kanal belirtilmezse sizi bulundugunuz
-	tüm kanallardan banlar.
+	Belirtilen nicki kanaldan banlar.
 	
 	Varsayilan olarak, AOP larin veya 5. seviyeden access i olanlarin
 	ve üstünün kullanma yetkisi vardir.

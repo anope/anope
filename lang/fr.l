@@ -5206,12 +5206,9 @@ CHAN_HELP_KICK
 	d'accès de 5 ou plus sur le canal.
 
 CHAN_HELP_BAN
-	Syntaxe: BAN [#canal [pseudo [raison]]]
+	Syntaxe: BAN #canal pseudo [raison]
 	
-	Bannit le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous bannira sur le canal donné. Si pseudo et
-	canal ne sont pas donnés, vous bannira sur tous
-	les canaux où vous êtes.
+	Bannit le pseudo sélectionné sur un canal.
 
 	Par défaut, limité aux AOPs ou à ceux ayant un niveau 
 	d'accès de 5 ou plus sur le canal.

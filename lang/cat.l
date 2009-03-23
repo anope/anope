@@ -5165,12 +5165,9 @@ CHAN_HELP_KICK
 	accés 5 i major en el canal.
 
 CHAN_HELP_BAN
-	Sintàxi: BAN [#canal [nick [raó]]]
+	Sintàxi: BAN #canal nick [raó]
 	
-	Baneja un nick seleccionat en un canal. Si el nick no
-	és donat, et banejarà a ti. Si el canal i el nick no són donats,
-	et banejara en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	Baneja un nick seleccionat en un canal.
 	
 	Per defecte, limitat a AOPs o aquells amb nivell d'
 	accés 5 i major en el canal.

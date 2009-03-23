@@ -5068,14 +5068,10 @@ CHAN_HELP_KICK
 	livello di accesso 5 o superiori sul canale.
 
 CHAN_HELP_BAN
-	Sintassi: BAN [canale [nick [motivo]]]
+	Sintassi: BAN canale nick [motivo]
 	
 	Banna (non permette l'accesso) il nick specificato sul
-	canale. Se non viene indicato alcun nick, banna l'utente
-	che ha inviato il comando. Se non viene indicato né il
-	nick né il canale, l'utente che ha inviato il comando verrà
-	bannato su tutti i canali in cui si trova e in cui ha
-	abbastanza privilegi.
+	canale.
 	
 	Di default, il comando è limitato agli AOP o agli utenti con
 	livello di accesso 5 o superiori sul canale.

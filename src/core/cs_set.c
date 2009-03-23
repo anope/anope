@@ -185,7 +185,8 @@ int do_set(User * u)
     if (!param && (!cmd || (stricmp(cmd, "SUCCESSOR") != 0 &&
                             stricmp(cmd, "URL") != 0 &&
                             stricmp(cmd, "EMAIL") != 0 &&
-                            stricmp(cmd, "ENTRYMSG") != 0))) {
+                            stricmp(cmd, "ENTRYMSG") != 0 &&
+                            stricmp(cmd, "MLOCK") != 0))) {
         syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
     } else if (!(ci = cs_findchan(chan))) {
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
@@ -492,7 +493,7 @@ int do_set_mlock(User * u, ChannelInfo * ci, char *param)
         ci->mlock_redirect = NULL;
     }
 
-    while ((mode = *param++)) {
+    while (param && (mode = *param++)) {
         switch (mode) {
         case '+':
             add = 1;

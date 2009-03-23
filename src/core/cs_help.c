@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -18,29 +18,21 @@
 class CommandCSHelp : public Command
 {
  public:
-	CommandCSHelp() : Command("HELP", 0, 2)
+	CommandCSHelp() : Command("HELP", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *cmd = params.size() > 0 ? params[0].c_str() : NULL;
+		const char *cmd = params[0].c_str();
 
-		if (!cmd)
-		{
-			notice_help(s_ChanServ, u, CHAN_HELP);
-			moduleDisplayHelp(2, u);
-			if (CSExpire >= 86400)
-				notice_help(s_ChanServ, u, CHAN_HELP_EXPIRES,	CSExpire / 86400);
-			if (is_services_oper(u))
-				notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP);
-		}
-		else if (stricmp(cmd, "LEVELS DESC") == 0)
+		if (!stricmp(cmd, "LEVELS DESC"))
 		{
 			int i;
 			notice_help(s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
-			if (!levelinfo_maxwidth) {
+			if (!levelinfo_maxwidth)
+			{
 				for (i = 0; levelinfo[i].what >= 0; i++)
 				{
 					int len = strlen(levelinfo[i].name);
@@ -50,16 +42,23 @@ class CommandCSHelp : public Command
 			}
 			for (i = 0; levelinfo[i].what >= 0; i++)
 			{
-				notice_help(s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT,
-							levelinfo_maxwidth, levelinfo[i].name,
-							getstring(u, levelinfo[i].desc));
+				notice_help(s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name, getstring(u, levelinfo[i].desc));
 			}
 		}
 		else
-		{
 			mod_help_cmd(s_ChanServ, u, CHANSERV, cmd);
-		}
+
 		return MOD_CONT;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		notice_help(s_ChanServ, u, CHAN_HELP);
+		moduleDisplayHelp(2, u);
+		if (CSExpire >= 86400)
+			notice_help(s_ChanServ, u, CHAN_HELP_EXPIRES, CSExpire / 86400);
+		if (is_services_oper(u))
+			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP);
 	}
 };
 

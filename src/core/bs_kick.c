@@ -315,7 +315,9 @@ class CommandBSKick : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (subcommand == "BADWORDS")
+		if (subcommand.empty())
+			notice_help(s_BotServ, u, BOT_HELP_KICK);
+		else if (subcommand == "BADWORDS")
 			notice_help(s_BotServ, u, BOT_HELP_KICK_BADWORDS);
 		else if (subcommand == "BOLDS")
 			notice_help(s_BotServ, u, BOT_HELP_KICK_BOLDS);
@@ -332,7 +334,8 @@ class CommandBSKick : public Command
 		else if (subcommand == "UNDERLINES")
 			notice_help(s_BotServ, u, BOT_HELP_KICK_UNDERLINES);
 		else
-			notice_help(s_BotServ, u, BOT_HELP_KICK);
+			return false;
+
 		return true;
 	}
 

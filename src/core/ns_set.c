@@ -463,8 +463,6 @@ class CommandNSSet : public Command
 */
 		if (u->nc->flags & NI_SUSPENDED)
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
-		else if (!nick_identified(u))
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!stricmp(cmd, "DISPLAY"))
 			return this->DoSetDisplay(u, params, u->nc);
 		else if (!stricmp(cmd, "PASSWORD"))
@@ -498,7 +496,9 @@ class CommandNSSet : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (subcommand == "DISPLAY")
+		if (subcommand.empty())
+			notice_help(s_NickServ, u, NICK_HELP_SET);
+		else if (subcommand == "DISPLAY")
 			notice_help(s_NickServ, u, NICK_HELP_SET_DISPLAY);
 		else if (subcommand == "PASSWORD")
 			notice_help(s_NickServ, u, NICK_HELP_SET_PASSWORD);
@@ -523,7 +523,7 @@ class CommandNSSet : public Command
 		else if (subcommand == "AUTOOP")
 			notice_help(s_NickServ, u, NICK_HELP_SET_AUTOOP);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_SET);
+			return false;
 
 		return true;
 	}

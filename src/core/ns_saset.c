@@ -569,6 +569,8 @@ public:
 			notice_help(s_NickServ, u, NICK_HELP_SASET_AUTOOP);
 		else if (subcommand == "LANGUAGE")
 			notice_help(s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
+		else
+			return false;
 
 		return true;
 	}

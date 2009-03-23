@@ -283,6 +283,8 @@ class CommandOSSet : public Command
 			notice_help(s_OperServ, u, OPER_HELP_SET_IGNORE);
 		else if (subcommand == "SUPERADMIN")
 			notice_help(s_OperServ, u, OPER_HELP_SET_SUPERADMIN);
+		else
+			return false;
 
 		return true;
 	}

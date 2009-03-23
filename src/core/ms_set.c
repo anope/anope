@@ -249,6 +249,8 @@ class CommandMSSet : public Command
 			else
 				notice_help(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);
 		}
+		else
+			return false;
 
 		return true;
 	}

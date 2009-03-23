@@ -668,14 +668,9 @@ class CommandCSSet : public Command
 	{
 		if (subcommand.empty())
 		{
-			if (is_services_admin(u) || is_services_root(u))
-			{
+			notice_help(s_ChanServ, u, CHAN_HELP_SET);
+			if (is_services_admin(u))
 				notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET);
-			}
-			else
-			{
-				notice_help(s_ChanServ, u, CHAN_HELP_SET);
-			}
 		}
 		else if (subcommand == "FOUNDER")
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_FOUNDER);
@@ -719,6 +714,9 @@ class CommandCSSet : public Command
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_PEACE);
 		else if (subcommand == "NOEXPIRE")
 			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
+		else
+			return false;
+
 		return true;
 	}
 

@@ -150,7 +150,13 @@ class CommandBSSet : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (subcommand == "DONTKICKOPS")
+		if (subcommand.empty())
+		{
+			notice_help(s_BotServ, u, BOT_HELP_SET);
+			if (is_services_admin(u))
+				notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
+		}
+		else if (subcommand == "DONTKICKOPS")
 			notice_help(s_BotServ, u, BOT_HELP_SET_DONTKICKOPS);
 		else if (subcommand == "DONTKICKVOICES")
 			notice_help(s_BotServ, u, BOT_HELP_SET_DONTKICKVOICES);
@@ -164,12 +170,8 @@ class CommandBSSet : public Command
 			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
 		else if (subcommand == "PRIVATE")
 			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_PRIVATE);
-		else if (subcommand.empty())
-		{
-			notice_help(s_BotServ, u, BOT_HELP_SET);
-			if (is_services_admin(u) || is_services_root(u))
-				notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
-		}
+		else
+			return false;
 
 		return true;
 	}

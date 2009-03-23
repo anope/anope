@@ -28,7 +28,7 @@ bool sepstream::GetToken(std::string &token)
 		if (*n == sep || n + 1 == tokens.end())
 		{
 			last_starting_position = n + 1;
-			token = std::string(lsp, n + 1 == tokens.end() ? n + 1 : ++n);
+			token = std::string(lsp, n + 1 == tokens.end() ? n + 1 : n++);
 
 			while (token.length() && token.find_last_of(sep) == token.length() - 1)
 				token.erase(token.end() - 1);

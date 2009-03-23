@@ -15,6 +15,7 @@
 #include "services.h"
 #include "commands.h"
 #include "language.h"
+#include "hashcomp.h"
 
 /*************************************************************************/
 
@@ -96,7 +97,7 @@ XXX: priv checking
 		return;
 	}
   */
-  
+
 	std::vector<std::string> params;
 	std::string curparam;
 	char *s = NULL;
@@ -180,23 +181,21 @@ void do_help_limited(char *service, User * u, Command * c)
 void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 				  const char *cmd)
 {
-	Command *c = findCommand(cmdTable, cmd);
-	Command *current;
 	bool has_had_help = false;
 	int cont = MOD_CONT;
-	const char *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL;
 
-	for (current = c; (current) && (cont == MOD_CONT);
-		 current = current->next) {
-		p1 = current->help_param1;
-		p2 = current->help_param2;
-		p3 = current->help_param3;
-		p4 = current->help_param4;
-		has_had_help = current->OnHelp(u, ""); // XXX: this needs finishing to actually pass a subcommand
-	}
-	if (has_had_help == false) {
+	spacesepstream tokens(cmd);
+	std::string token;
+	tokens.GetToken(token);
+
+	Command *c = findCommand(cmdTable, token.c_str());
+
+	std::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
+
+	for (Command *current = c; current && cont == MOD_CONT; current = current->next)
+		has_had_help = current->OnHelp(u, subcommand);
+	if (!has_had_help)
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
-	}
 	//else {
 	//	do_help_limited(service, u, c);
 	//}

@@ -124,9 +124,15 @@ int do_recover(User * u)
     } else {
         if (group_identified(u, na->nc)
             || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
+            char relstr[192];
+
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
             collide(na, 0);
-            notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick);
+
+            /* Convert NSReleaseTimeout second to string format */
+            duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
+
+            notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);
         }

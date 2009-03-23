@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2187"
+VERSION_BUILD="2189"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2189 - Backport of bugfix for bug #1064 from SVN r2188, original patch from DukePyrolator, fixes NS RECOVER so it doesn't display "(null)" in some places.
 #Revision 2187 - Backport of bugfix for bug #1062 from SVN r2185 and 2186, patch from Adam, BS ASSIGN, BS ACT, and BS SAY should no longer send revealing error messages to users without access.
 #Revision 2182 - Fix memleak in channels.c from DukePyrolator. (Same fix applied to 1.9 earlier). Thanks DP!
 #Revision 2181 - Backport of bugfix for bug #1043 from SVN r2178, patch from Adam, CS LIST will no longer show suspended channels to normal users.

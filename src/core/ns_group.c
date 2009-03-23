@@ -24,6 +24,7 @@ class CommandNSGroup : public Command
  public:
 	CommandNSGroup() : Command("GROUP", 2, 2)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -92,13 +93,11 @@ class CommandNSGroup : public Command
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, NSRegDelay);
-		else if (u->nc->flags & NI_SUSPENDED)
+		else if (u->nc && (u->nc->flags & NI_SUSPENDED))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		}
-		else if (!nick_identified(u))
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (target && (target->nc->flags & NI_SUSPENDED))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
@@ -106,7 +105,7 @@ class CommandNSGroup : public Command
 		}
 		else if (target->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
-		else if (target->nc == u->nc)
+		else if (u->nc && (target->nc == u->nc))
 			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
 		else if (NSMaxAliases && (target->nc->aliases.count >= NSMaxAliases) && !nick_is_services_admin(target->nc))
 			notice_lang(s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, s_NickServ, s_NickServ);

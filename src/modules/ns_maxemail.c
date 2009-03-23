@@ -34,14 +34,14 @@ static Module *me;
 class CommandNSRegister : public Command
 {
  public:
-	CommandNSRegister() : Command("REGISTER", 2, 2)
+	CommandNSRegister() : Command("REGISTER", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		return check_email_limit_reached(params[1].c_str(), u);
+		return check_email_limit_reached(params.size() > 1 ? params[1].c_str() : NULL, u);
 	}
 
 	void OnSyntaxError(User *u)

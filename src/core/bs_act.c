@@ -41,6 +41,12 @@ class CommandBSAct : public Command
 			return MOD_CONT;
 		}
 
+		if (!check_access(u, ci, CA_SAY))
+		{
+			notice_lang(s_BotServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		if (!ci->bi)
 		{
 			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
@@ -50,12 +56,6 @@ class CommandBSAct : public Command
 		if (!ci->c || ci->c->usercount < BSMinUsers)
 		{
 			notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
-			return MOD_CONT;
-		}
-
-		if (!check_access(u, ci, CA_SAY))
-		{
-			notice_lang(s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

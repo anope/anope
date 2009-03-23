@@ -74,12 +74,12 @@ int do_act(User * u)
         notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
     else if (ci->flags & CI_VERBOTEN)
         notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
+    else if (!check_access(u, ci, CA_SAY))
+        notice_lang(s_BotServ, u, ACCESS_DENIED);
     else if (!ci->bi)
         notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
     else if (!ci->c || ci->c->usercount < BSMinUsers)
         notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
-    else if (!check_access(u, ci, CA_SAY))
-        notice_lang(s_BotServ, u, ACCESS_DENIED);
     else {
         strnrepl(text, BUFSIZE, "\001", "");
         anope_cmd_action(ci->bi->nick, ci->name, "%s", text);

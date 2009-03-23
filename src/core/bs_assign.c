@@ -80,13 +80,13 @@ int do_assign(User * u)
         notice_lang(s_BotServ, u, PERMISSION_DENIED);
     else if (!(ci = cs_findchan(chan)))
         notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
+    else if ((ci->botflags & BS_NOBOT)
+             || (!check_access(u, ci, CA_ASSIGN) && !is_services_admin(u)))
+        notice_lang(s_BotServ, u, PERMISSION_DENIED);
     else if (ci->flags & CI_VERBOTEN)
         notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
     else if ((ci->bi) && (stricmp(ci->bi->nick, nick) == 0))
         notice_lang(s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
-    else if ((ci->botflags & BS_NOBOT)
-             || (!check_access(u, ci, CA_ASSIGN) && !is_services_admin(u)))
-        notice_lang(s_BotServ, u, PERMISSION_DENIED);
     else {
         if (ci->bi)
             unassign(u, ci);

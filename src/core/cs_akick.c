@@ -176,7 +176,7 @@ int get_access_nc(NickCore *nc, ChannelInfo *ci)
 	if (!ci || !nc)
 		return 0;
 
-	if ((access = get_access_entry(nc, ci)))
+	if ((access = ci->GetAccess(nc)))
 		return access->level;
 	return 0;
 }

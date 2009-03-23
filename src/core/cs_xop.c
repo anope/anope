@@ -109,7 +109,7 @@ class XOPBase : public Command
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
-		int change = 0, i;
+		int change = 0;
 		char event_access[BUFSIZE];
 
 		if (!nick)
@@ -145,43 +145,33 @@ class XOPBase : public Command
 		}
 
 		NickCore *nc = na->nc;
-		for (access = ci->access, i = 0; i < ci->accesscount; ++access, ++i)
+		access = ci->GetAccess(nc);
+		if (access)
 		{
-			if (access->nc == nc)
+			/**
+			 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
+			 **/
+			if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 			{
-				/**
-				 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
-				 **/
-				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
-				{
-					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-					return MOD_CONT;
-				}
-				++change;
-				break;
+				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+				return MOD_CONT;
 			}
+			++change;
+		}
+
+		if (!change && ci->access.size() >= CSAccessMax)
+		{
+			notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT, CSAccessMax);
+			return MOD_CONT;
 		}
 
 		if (!change)
+			ci->AddAccess(nc, level);
+		else
 		{
-			if (i < CSAccessMax)
-			{
-				++ci->accesscount;
-				ci->access = static_cast<ChanAccess *>(srealloc(ci->access, sizeof(ChanAccess) * ci->accesscount));
-			}
-			else
-			{
-				notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT, CSAccessMax);
-				return MOD_CONT;
-			}
-
-			access = &ci->access[i];
-			access->nc = nc;
+			access->level = level;
+			access->last_seen = 0;
 		}
-
-		access->in_use = 1;
-		access->level = level;
-		access->last_seen = 0;
 
 		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
 
@@ -205,9 +195,8 @@ class XOPBase : public Command
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
-		int i;
 
-		int deleted, a, b;
+		int deleted;
 
 		if (!nick)
 		{
@@ -221,7 +210,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!ci->accesscount)
+		if (ci->access.empty())
 		{
 			notice_lang(s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
 			return MOD_CONT;
@@ -266,18 +255,14 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 			NickCore *nc = na->nc;
+			access = ci->GetAccess(nc, level);
 
-			for (i = 0; i < ci->accesscount; ++i)
-				if (ci->access[i].nc == nc && ci->access[i].level == level)
-					break;
-
-			if (i == ci->accesscount)
+			if (!access)
 			{
 				notice_lang(s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name);
 				return MOD_CONT;
 			}
 
-			access = &ci->access[i];
 			if (ulev <= access->level && !u->nc->HasPriv("chanserv/access/change"))
 			{
 				deleted = 0;
@@ -294,41 +279,10 @@ class XOPBase : public Command
 		}
 		if (deleted)
 		{
-			/* Reordering - DrStein */
-			for (b = 0; b < ci->accesscount; ++b)
-			{
-				if (ci->access[b].in_use)
-				{
-					for (a = 0; a < ci->accesscount; ++a)
-					{
-						if (a > b)
-							break;
-						if (!ci->access[a].in_use)
-						{
-							ci->access[a].in_use = 1;
-							ci->access[a].level = ci->access[b].level;
-							ci->access[a].nc = ci->access[b].nc;
-							ci->access[a].last_seen = ci->access[b].last_seen;
-							ci->access[b].nc = NULL;
-							ci->access[b].in_use = 0;
-							break;
-						}
-					}
-				}
-			}
-
 			/* If the patch provided in bug #706 is applied, this should be placed
 			 * before sending the events! */
-			/* After reordering only the entries at the end could still be empty.
-			 * We ll free the places no longer in use... */
-			for (i = ci->accesscount - 1; i >= 0; --i)
-			{
-				if (ci->access[i].in_use == 1)
-					break;
-
-				--ci->accesscount;
-			}
-			ci->access = static_cast<ChanAccess *>(srealloc(ci->access, sizeof(ChanAccess) * ci->accesscount));
+			/* We'll free the access entries no longer in use... */
+			ci->CleanAccess();
 		}
 
 		return MOD_CONT;
@@ -345,7 +299,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!ci->accesscount)
+		if (ci->access.empty())
 		{
 			notice_lang(s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
 			return MOD_CONT;
@@ -355,9 +309,10 @@ class XOPBase : public Command
 			process_numlist(nick, NULL, xop_list_callback, u, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
 		else
 		{
-			for (int i = 0; i < ci->accesscount; ++i)
+			for (int i = 0; i < ci->access.size(); ++i)
 			{
-				if (nick && ci->access[i].nc && !Anope::Match(ci->access[i].nc->display, nick, false))
+				ChanAccess *access = ci->GetAccess(i);
+				if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
 					continue;
 				xop_list(u, i, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
 			}
@@ -376,7 +331,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!ci->accesscount)
+		if (ci->access.empty())
 		{
 			notice_lang(s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
 			return MOD_CONT;
@@ -388,13 +343,11 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		for (int i = 0; i < ci->accesscount; ++i)
+		for (unsigned i = ci->access.size(); i > 0; --i)
 		{
-			if (ci->access[i].in_use && ci->access[i].level == level)
-			{
-				ci->access[i].nc = NULL;
-				ci->access[i].in_use = 0;
-			}
+			ChanAccess *access = ci->GetAccess(i - 1);
+			if (access->in_use && access->level == level)
+				ci->EraseAccess(i - 1);
 		}
 
 		send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
@@ -600,17 +553,17 @@ int xop_del_callback(User *u, int num, va_list args)
 	int uacc = va_arg(args, int);
 	int xlev = va_arg(args, int);
 
-	if (num < 1 || num > ci->accesscount)
+	if (num < 1 || num > ci->access.size())
 		return 0;
 	*last = num;
 
-	return xop_del(u, ci, &ci->access[num - 1], perm, uacc, xlev);
+	return xop_del(u, ci, ci->GetAccess(num - 1), perm, uacc, xlev);
 }
 
 
 int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, int xmsg)
 {
-	ChanAccess *access = &ci->access[index];
+	ChanAccess *access = ci->GetAccess(index);
 
 	if (!access->in_use || access->level != xlev)
 		return 0;
@@ -632,7 +585,7 @@ int xop_list_callback(User *u, int num, va_list args)
 	int xlev = va_arg(args, int);
 	int xmsg = va_arg(args, int);
 
-	if (num < 1 || num > ci->accesscount)
+	if (num < 1 || num > ci->access.size())
 		return 0;
 
 	return xop_list(u, num - 1, ci, sent_header, xlev, xmsg);

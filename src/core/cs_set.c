@@ -464,8 +464,8 @@ class CommandCSSet : public Command
 				int i;
 				ChanAccess *access;
 
-				for (access = ci->access, i = 0; i < ci->accesscount;
-					 access++, i++) {
+				for (i = 0; i < ci->access.size(); i++) {
+					access = ci->GetAccess(i);
 					if (!access->in_use)
 						continue;
 					/* This will probably cause wrong levels to be set, but hey,
@@ -489,6 +489,9 @@ class CommandCSSet : public Command
 						access->nc = NULL;
 					}
 				}
+
+				/* The above may have set an access entry to not be in use, this will clean that up. */
+				ci->CleanAccess();
 
 				reset_levels(ci);
 				ci->flags |= CI_XOP;

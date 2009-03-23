@@ -185,7 +185,6 @@ E ChannelInfo *cs_findchan(const char *chan);
 E int check_access(User * user, ChannelInfo * ci, int what);
 E int is_founder(User * user, ChannelInfo * ci);
 E int get_access(User * user, ChannelInfo * ci);
-E ChanAccess *get_access_entry(NickCore * nc, ChannelInfo * ci);
 E void update_cs_lastseen(User * user, ChannelInfo * ci);
 E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
 E AutoKick *is_stuck(ChannelInfo * ci, const char *mask);

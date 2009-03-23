@@ -205,7 +205,8 @@ void get_chanserv_stats(long *nrec, long *memuse)
 				mem += strlen(ci->url) + 1;
 			if (ci->email)
 				mem += strlen(ci->email) + 1;
-			mem += ci->accesscount * sizeof(ChanAccess);
+			if (!ci->access.empty())
+				mem += ci->access.size() * sizeof(ChanAccess);
 			mem += ci->akickcount * sizeof(AutoKick);
 			for (j = 0; j < ci->akickcount; j++) {
 				if (!(ci->akick[j].flags & AK_ISNICK)
@@ -393,27 +394,29 @@ void load_cs_dbase()
 					ci->levels[j] = static_cast<int16>(tmp16);
 			}
 
-			SAFE(read_int16(&ci->accesscount, f));
-			if (ci->accesscount) {
-				ci->access = static_cast<ChanAccess *>(scalloc(ci->accesscount, sizeof(ChanAccess)));
-				for (j = 0; j < ci->accesscount; j++) {
-					SAFE(read_int16(&ci->access[j].in_use, f));
-					if (ci->access[j].in_use) {
-						SAFE(read_int16(&tmp16, f));
-						ci->access[j].level = static_cast<int16>(tmp16);
+			uint16 accesscount = 0;
+			SAFE(read_int16(&accesscount, f));
+			if (accesscount) {
+				for (j = 0; j < accesscount; j++) {
+					uint16 in_use = 0;
+					SAFE(read_int16(&in_use, f));
+					if (in_use) {
+						uint16 level;
+						SAFE(read_int16(&level, f));
+						NickCore *nc;
 						SAFE(read_string(&s, f));
 						if (s) {
-							ci->access[j].nc = findcore(s);
+							nc = findcore(s);
 							delete [] s;
 						}
-						if (ci->access[j].nc == NULL)
-							ci->access[j].in_use = 0;
-						SAFE(read_int32(&tmp32, f));
-						ci->access[j].last_seen = tmp32;
+						else
+							nc = NULL;
+						uint32 last_seen;
+						SAFE(read_int32(&last_seen, f));
+						if (nc)
+							ci->AddAccess(nc, level, last_seen);
 					}
 				}
-			} else {
-				ci->access = NULL;
 			}
 
 			SAFE(read_int16(&ci->akickcount, f));
@@ -610,14 +613,15 @@ void save_cs_dbase()
 			for (j = 0; j < CA_SIZE; j++)
 				SAFE(write_int16(ci->levels[j], f));
 
-			SAFE(write_int16(ci->accesscount, f));
-			for (j = 0; j < ci->accesscount; j++) {
-				SAFE(write_int16(ci->access[j].in_use, f));
-				if (ci->access[j].in_use) {
-					SAFE(write_int16(ci->access[j].level, f));
-					SAFE(write_string(ci->access[j].nc->display, f));
-					SAFE(write_int32(ci->access[j].last_seen, f));
-				}
+			SAFE(write_int16(ci->access.empty() ? 0 : ci->access.size(), f));
+			for (j = 0; j < ci->access.size(); j++) {
+				ChanAccess *access = ci->GetAccess(j);
+				if (!access->in_use)
+					continue;
+				SAFE(write_int16(access->in_use, f));
+				SAFE(write_int16(access->level, f));
+				SAFE(write_string(access->nc->display, f));
+				SAFE(write_int32(access->last_seen, f));
 			}
 
 			SAFE(write_int16(ci->akickcount, f));
@@ -1441,11 +1445,12 @@ void cs_remove_nick(const NickCore * nc)
 			if (ci->successor == nc)
 				ci->successor = NULL;
 
-			for (ca = ci->access, j = ci->accesscount; j > 0; ca++, j--) {
-				if (ca->in_use && ca->nc == nc) {
-					ca->in_use = 0;
-					ca->nc = NULL;
-				}
+			for (j = ci->access.size(); j > 0; --j)
+			{
+				ca = ci->GetAccess(j - 1);
+
+				if (ca->in_use && ca->nc == nc)
+					ci->EraseAccess(j - 1);
 			}
 
 			for (akick = ci->akick, j = 0; j < ci->akickcount; akick++, j++) {
@@ -1730,8 +1735,6 @@ int delchan(ChannelInfo * ci)
 		delete [] ci->forbidby;
 	if (ci->forbidreason)
 		delete [] ci->forbidreason;
-	if (ci->access)
-		free(ci->access);
 	if (debug >= 2) {
 		alog("debug: delchan() top of the akick list");
 	}
@@ -1874,26 +1877,6 @@ int is_identified(User * user, ChannelInfo * ci)
 
 /*************************************************************************/
 
-/* Returns the ChanAccess entry for an user */
-
-ChanAccess *get_access_entry(NickCore * nc, ChannelInfo * ci)
-{
-	ChanAccess *access;
-	int i;
-
-	if (!ci || !nc) {
-		return NULL;
-	}
-
-	for (access = ci->access, i = 0; i < ci->accesscount; access++, i++)
-		if (access->in_use && access->nc == nc)
-			return access;
-
-	return NULL;
-}
-
-/*************************************************************************/
-
 /* Return the access level the given user has on the channel.  If the
  * channel doesn't exist, the user isn't on the access list, or the channel
  * is CS_SECURE and the user hasn't IDENTIFY'd with NickServ, return 0. */
@@ -1917,7 +1900,7 @@ int get_access(User * user, ChannelInfo * ci)
 
 	if (nick_identified(user)
 		|| (nick_recognized(user) && !(ci->flags & CI_SECURE)))
-		if ((access = get_access_entry(user->nc, ci)))
+		if ((access = ci->GetAccess(user->nc)))
 			return access->level;
 
 	if (nick_identified(user))
@@ -1937,7 +1920,7 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 
 	if (is_founder(user, ci) || nick_identified(user)
 		|| (nick_recognized(user) && !(ci->flags & CI_SECURE)))
-		if ((access = get_access_entry(user->nc, ci)))
+		if ((access = ci->GetAccess(user->nc)))
 			access->last_seen = time(NULL);
 }
 
@@ -2117,28 +2100,19 @@ void cs_set_redirect(ChannelInfo * ci, const char *value)
 int get_access_level(ChannelInfo * ci, NickAlias * na)
 {
 	ChanAccess *access;
-	int num;
 
-	if (!ci || !na) {
+	if (!ci || !na)
 		return 0;
-	}
 
-	if (na->nc == ci->founder) {
+	if (na->nc == ci->founder)
 		return ACCESS_FOUNDER;
-	}
 
-	for (num = 0; num < ci->accesscount; num++) {
+	access = ci->GetAccess(na->nc);
 
-		access = &ci->access[num];
-
-		if (access->nc && access->nc == na->nc && access->in_use) {
-			return access->level;
-		}
-
-	}
-
-	return 0;
-
+	if (!access)
+		return 0;
+	else
+		return access->level;
 }
 
 const char *get_xop_level(int level)

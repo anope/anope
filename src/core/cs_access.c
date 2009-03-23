@@ -52,35 +52,34 @@ static int access_del_callback(User * u, int num, va_list args)
 	int *last = va_arg(args, int *);
 	int *perm = va_arg(args, int *);
 	int uacc = va_arg(args, int);
-	if (num < 1 || num > ci->accesscount)
+	if (num < 1 || num > ci->access.size())
 		return 0;
 	*last = num;
-	return access_del(u, ci, &ci->access[num - 1], perm, uacc);
+	return access_del(u, ci, ci->GetAccess(num - 1), perm, uacc);
 }
 
 
-static int access_list(User * u, int index, ChannelInfo * ci,
-					   int *sent_header)
+static int access_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
-	ChanAccess *access = &ci->access[index];
+	ChanAccess *access = ci->GetAccess(index);
 	const char *xop;
 
 	if (!access->in_use)
 		return 0;
 
-	if (!*sent_header) {
+	if (!*sent_header)
+	{
 		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name);
 		*sent_header = 1;
 	}
 
-	if (ci->flags & CI_XOP) {
+	if (ci->flags & CI_XOP)
+	{
 		xop = get_xop_level(access->level);
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, index + 1,
-					xop, access->nc->display);
-	} else {
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_AXS_FORMAT, index + 1,
-					access->level, access->nc->display);
+		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, index + 1, xop, access->nc->display);
 	}
+	else
+		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_AXS_FORMAT, index + 1, access->level, access->nc->display);
 	return 1;
 }
 
@@ -88,7 +87,7 @@ static int access_list_callback(User * u, int num, va_list args)
 {
 	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 	int *sent_header = va_arg(args, int *);
-	if (num < 1 || num > ci->accesscount)
+	if (num < 1 || num > ci->access.size())
 		return 0;
 	return access_list(u, num - 1, ci, sent_header);
 }
@@ -116,34 +115,35 @@ class CommandCSAccess : public Command
 
 		unsigned i;
 		int level = 0, ulev;
-		int is_list = (cmd && stricmp(cmd, "LIST") == 0);
+		int is_list = (cmd && !stricmp(cmd, "LIST"));
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
-		if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 :
-					 (stricmp(cmd, "DEL") == 0) ? (!nick || s) : !s)) {
+		if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 : (!stricmp(cmd, "DEL")) ? (!nick || s) : !s))
 			this->OnSyntaxError(u);
-		} else if (!(ci = cs_findchan(chan))) {
+		else if (!(ci = cs_findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_FORBIDDEN) {
+		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-			/* We still allow LIST in xOP mode, but not others */
-		} else if ((ci->flags & CI_XOP) && !is_list) {
+		/* We still allow LIST in xOP mode, but not others */
+		else if ((ci->flags & CI_XOP) && !is_list)
+		{
 			if (ircd->halfop)
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
 			else
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP, s_ChanServ);
-		} else if (
-				(
+		}
+		else if ((
 				 (is_list && !check_access(u, ci, CA_ACCESS_LIST) && !u->nc->HasCommand("chanserv/access/list"))
 				 ||
 				 (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->nc->HasPriv("chanserv/access/modify"))
 				))
-		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (stricmp(cmd, "ADD") == 0) {
-			if (readonly) {
+		else if (!stricmp(cmd, "ADD"))
+		{
+			if (readonly)
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
 				return MOD_CONT;
 			}
@@ -157,82 +157,76 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (level == 0) {
+			if (!level)
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_NONZERO);
 				return MOD_CONT;
-			} else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER) {
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_RANGE,
-							ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			}
+			else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
+			{
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 				return MOD_CONT;
 			}
 
 			na = findnick(nick);
-			if (!na) {
+			if (!na)
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
 				return MOD_CONT;
 			}
-			if (na->status & NS_FORBIDDEN) {
+			if (na->status & NS_FORBIDDEN)
+			{
 				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
 
 			nc = na->nc;
-			for (access = ci->access, i = 0; i < ci->accesscount;
-				 access++, i++) {
-				if (access->nc == nc) {
-					/* Don't allow lowering from a level >= ulev */
-					if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/change"))
-					{
-						notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-						return MOD_CONT;
-					}
-					if (access->level == level) {
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_UNCHANGED,
-									access->nc->display, chan, level);
-						return MOD_CONT;
-					}
-					access->level = level;
-					snprintf(event_access, BUFSIZE, "%d", access->level);
-					send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick,
-								 na->nick, event_access);
-					alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED,
-								access->nc->display, chan, level);
+			access = ci->GetAccess(nc);
+			if (access)
+			{
+				/* Don't allow lowering from a level >= ulev */
+				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/change"))
+				{
+					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 					return MOD_CONT;
 				}
-			}
-
-			if (i < CSAccessMax) {
-				ci->accesscount++;
-				ci->access =
-					static_cast<ChanAccess *>(srealloc(ci->access,
-							sizeof(ChanAccess) * ci->accesscount));
-			} else {
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT,
-							CSAccessMax);
+				if (access->level == level)
+				{
+					notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display, chan, level);
+					return MOD_CONT;
+				}
+				access->level = level;
+				snprintf(event_access, BUFSIZE, "%d", access->level);
+				send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
+				alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, access->nc->display, chan, level);
 				return MOD_CONT;
 			}
 
-			access = &ci->access[i];
-			access->nc = nc;
-			access->in_use = 1;
-			access->level = level;
-			access->last_seen = 0;
+			if (ci->access.size() >= CSAccessMax)
+			{
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT, CSAccessMax);
+				return MOD_CONT;
+			}
+
+			ci->AddAccess(nc, level);
 
 			snprintf(event_access, BUFSIZE, "%d", access->level);
-			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick,
-						 event_access);
+			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
 			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
-			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display,
-						ci->name, access->level);
-		} else if (stricmp(cmd, "DEL") == 0) {
-			int deleted, a, b;
-			if (readonly) {
+			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, access->level);
+		}
+		else if (!stricmp(cmd, "DEL"))
+		{
+			int deleted;
+			if (readonly)
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
 				return MOD_CONT;
 			}
 
-			if (ci->accesscount == 0) {
+			if (ci->access.empty())
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
@@ -241,8 +235,7 @@ class CommandCSAccess : public Command
 			if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
 			{
 				int count, last = -1, perm = 0;
-				deleted = process_numlist(nick, &count, access_del_callback, u,
-											ci, &last, &perm, get_access(u, ci));
+				deleted = process_numlist(nick, &count, access_del_callback, u, ci, &last, &perm, get_access(u, ci));
 				if (!deleted)
 				{
 					if (perm)
@@ -273,15 +266,12 @@ class CommandCSAccess : public Command
 					return MOD_CONT;
 				}
 				nc = na->nc;
-				for (i = 0; i < ci->accesscount; i++)
-					if (ci->access[i].nc == nc)
-						break;
-				if (i == ci->accesscount)
+				access = ci->GetAccess(nc);
+				if (!access)
 				{
 					notice_lang(s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
 					return MOD_CONT;
 				}
-				access = &ci->access[i];
 				if (get_access(u, ci) <= access->level && !u->nc->HasPriv("chanserv/access/change"))
 				{
 					deleted = 0;
@@ -297,37 +287,10 @@ class CommandCSAccess : public Command
 				}
 			}
 
-			if (deleted) {
-				/* Reordering - DrStein */
-				for (b = 0; b < ci->accesscount; b++) {
-					if (ci->access[b].in_use) {
-						for (a = 0; a < ci->accesscount; a++) {
-							if (a > b)
-								break;
-							if (!ci->access[a].in_use) {
-								ci->access[a].in_use = 1;
-								ci->access[a].level = ci->access[b].level;
-								ci->access[a].nc = ci->access[b].nc;
-								ci->access[a].last_seen =
-									ci->access[b].last_seen;
-								ci->access[b].nc = NULL;
-								ci->access[b].in_use = 0;
-								break;
-							}
-						}
-					}
-				}
-
-				/* After reordering only the entries at the end could still be empty.
-				 * We ll free the places no longer in use... */
-				for (int j = ci->accesscount - 1; j >= 0; j--) {
-					if (ci->access[j].in_use == 1)
-						break;
-
-					ci->accesscount--;
-				}
-				ci->access =
-					static_cast<ChanAccess *>(srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount));
+			if (deleted)
+			{
+				/* We'll free the access entries no longer in use... */
+				ci->CleanAccess();
 
 				/* We don't know the nick if someone used numbers, so we trigger the event without
 				 * nick param. We just do this once, even if someone enters a range. -Certus */
@@ -336,32 +299,37 @@ class CommandCSAccess : public Command
 				else
 					send_event(EVENT_ACCESS_DEL, 2, ci->name, u->nick);
 			}
-		} else if (stricmp(cmd, "LIST") == 0) {
+		}
+		else if (!stricmp(cmd, "LIST"))
+		{
 			int sent_header = 0;
 
-			if (ci->accesscount == 0) {
+			if (ci->access.empty())
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
-			if (nick && strspn(nick, "1234567890,-") == strlen(nick)) {
-				process_numlist(nick, NULL, access_list_callback, u, ci,
-								&sent_header);
-			} else {
-				for (i = 0; i < ci->accesscount; i++) {
-					if (nick && ci->access[i].nc
-						&& !Anope::Match(ci->access[i].nc->display, nick, false))
+			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
+				process_numlist(nick, NULL, access_list_callback, u, ci, &sent_header);
+			else
+			{
+				for (i = 0; i < ci->access.size(); i++)
+				{
+					access = ci->GetAccess(i);
+					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
 						continue;
 					access_list(u, i, ci, &sent_header);
 				}
 			}
-			if (!sent_header) {
+			if (!sent_header)
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
-			} else {
+			else
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
-			}
-		} else if (stricmp(cmd, "CLEAR") == 0) {
-
-			if (readonly) {
+		}
+		else if (!stricmp(cmd, "CLEAR"))
+		{
+			if (readonly)
+			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
 				return MOD_CONT;
 			}
@@ -372,9 +340,7 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			free(ci->access);
-			ci->access = NULL;
-			ci->accesscount = 0;
+			ci->ClearAccess();
 
 			send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
 
@@ -383,9 +349,9 @@ class CommandCSAccess : public Command
 				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
 				 get_access(u, ci), chan);
 
-		} else {
-			this->OnSyntaxError(u);
 		}
+		else
+			this->OnSyntaxError(u);
 		return MOD_CONT;
 	}
 

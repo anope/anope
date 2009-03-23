@@ -213,7 +213,7 @@ class CommandCSSet : public Command
 			ci->mlock_redirect = NULL;
 		}
 
-		std::string params(modes), param;
+		std::string params(modes ? modes : ""), param;
 		unsigned space = params.find(' ');
 		if (space != std::string::npos)
 		{
@@ -223,7 +223,7 @@ class CommandCSSet : public Command
 		}
 		spacesepstream modeparams(param);
 
-		while ((mode = *modes++)) {
+		while (modes && (mode = *modes++)) {
 			switch (mode) {
 			case '+':
 				add = 1;
@@ -569,7 +569,8 @@ class CommandCSSet : public Command
 		if (!param && (!cmd || (stricmp(cmd, "SUCCESSOR") != 0 &&
 								stricmp(cmd, "URL") != 0 &&
 								stricmp(cmd, "EMAIL") != 0 &&
-								stricmp(cmd, "ENTRYMSG") != 0))) {
+								stricmp(cmd, "ENTRYMSG") != 0) &&
+								stricmp(cmd, "MLOCK") != 0)) {
 			syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);

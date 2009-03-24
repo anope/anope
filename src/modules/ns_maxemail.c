@@ -53,14 +53,14 @@ class CommandNSRegister : public Command
 class CommandNSSet : public Command
 {
  public:
-	CommandNSSet() : Command("SET", 2, 2)
+	CommandNSSet() : Command("SET", 1, 3)
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *set = params[0].c_str();
-		const char *email = params[1].c_str();
+		const char *email = params[1].size() > 1 ? params[1].c_str() : NULL;
 
 		if (!stricmp(set, "email"))
 			return MOD_CONT;

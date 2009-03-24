@@ -537,7 +537,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	Artýk %s INFO da e-mail adresiniz gözükmeyecek.
 NICK_SET_HIDE_EMAIL_OFF
@@ -662,7 +662,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	The E-mail address of %s will now be hidden from %s INFO displays.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3781,7 +3781,7 @@ NICK_HELP_SET_PRIVATE
 	komutunu kullanarak hakkýnýzda bilgi alabilir.)
 
 NICK_HELP_SET_HIDE
-	Kullanýmý: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Kullanýmý: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Birisi hakkýnýzda bilgi almak için %S INFO komutunu 
 	kullandýðýnda bazý bilgilerin burada gözükmemesini saðlar.

@@ -533,7 +533,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	La teva adreça e-mail no sera mostrada a %s INFO displays.
 NICK_SET_HIDE_EMAIL_OFF
@@ -657,7 +657,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	The E-mail address of %s will now be hidden from %s INFO displays.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3783,7 +3783,7 @@ NICK_HELP_SET_PRIVATE
 	la teva informació utilitzant la comanda INFO.)
 
 NICK_HELP_SET_HIDE
-	Sintaxis: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Sintaxis: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Permet prevenir que certa informació sobre el teu nick sigui donada
 	quant es sol.licitada mitjançant la comanda %S INFO.

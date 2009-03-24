@@ -531,7 +531,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE válaszok
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	 E-mail címed most rejtve lesz a %s INFO kiírásnál.
 NICK_SET_HIDE_EMAIL_OFF
@@ -653,7 +653,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	The E-mail address of %s will now be hidden from %s INFO displays.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3702,7 +3702,7 @@ NICK_HELP_SET_PRIVATE
 	használva az INFO parancsot.)
 
 NICK_HELP_SET_HIDE
-	Syntax: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Syntax: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Lehetõséget nyújt arra, hogy megelõzd néhány adatnak a
 	szerepelését a %S INFO parancs használatakor .

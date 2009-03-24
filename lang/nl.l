@@ -540,7 +540,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	Je e-mail adres zal vanaf nu verborgen worden op %s INFO schermen.
 NICK_SET_HIDE_EMAIL_OFF
@@ -665,7 +665,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	The E-mail address of %s will now be hidden from %s INFO displays.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3737,12 +3737,12 @@ NICK_HELP_SET_PRIVATE
 	mbv het INFO commando.
 
 NICK_HELP_SET_HIDE
-	Gebruik: SET HIDE {EMAIL | MASK | QUIT} {ON | OFF}
+	Gebruik: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Deze optie stelt je in staat verschillende informatie te
 	verbergen wanneer iemand een %S INFO op jouw nick
 	doet. Je kan je e-mail adres (EMAIL), laatst bekende
-	gebruikter@host mask (MASK) en laatste quit bericht (QUIT)
+	gebruikter@host mask (USERMASK) en laatste quit bericht (QUIT)
 	verbergen. De tweede paramenter geeft aan of de informatie
 	moet worden weergegeven (OFF) of verborgen (ON).
 

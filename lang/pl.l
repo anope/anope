@@ -652,7 +652,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 
 NICK_SET_HIDE_EMAIL_ON
 	Twój adres e-mail bêdzie ukrywany w informacjach %s.
@@ -812,7 +812,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SASET nick HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SASET nick HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 
 NICK_SASET_HIDE_EMAIL_ON
 	Adres e-mail osoby %s bêdzie ukrywany w informacjach %s.

@@ -551,7 +551,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	Deine eMail-Adresse wird jetzt in der %s INFO Anzeige nicht mehr erscheinen.
 NICK_SET_HIDE_EMAIL_OFF
@@ -673,7 +673,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SASET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	Die Emailadresse %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_EMAIL_OFF

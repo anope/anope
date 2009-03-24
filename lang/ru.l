@@ -522,7 +522,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	С этого момента, ваш email-адрес будет скрыт из информации по %s INFO
 NICK_SET_HIDE_EMAIL_OFF
@@ -644,7 +644,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET ник HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET ник HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	С этого момента, email-адрес ника %s будет скрыт из информации по %s INFO.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3683,7 +3683,7 @@ NICK_HELP_SET_PRIVATE
 	получить информацию о вас используя команду INFO.
 
 NICK_HELP_SET_HIDE
-	Синтаксис: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Синтаксис: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Данная опция позволяет вам скрыть часть информации о вашем нике,
 	которая может запрошена у %S с помощью команды INFO
@@ -3826,7 +3826,7 @@ NICK_HELP_SASET_PRIVATE
 	имеет возможность получить информацию о нем используя команду INFO.
 
 NICK_HELP_SASET_HIDE
-	Синтаксис: SASET ник HIDE {EMAIL|STATUS|USERMASK|QUIT} {ON|OFF}
+	Синтаксис: SASET ник HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Данная опция позволяет вам скрыть часть информации об указанном
 	нике, которая может запрошена у %S с помощью команды INFO

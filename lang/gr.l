@@ -531,7 +531,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	Η διεύθυνση του e-mail δεν θα παρουσιάζεται στην %s INFO εντολή
 NICK_SET_HIDE_EMAIL_OFF
@@ -655,7 +655,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	The E-mail address of %s will now be hidden from %s INFO displays.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3784,7 +3784,7 @@ NICK_HELP_SET_PRIVATE
 	εντολή INFO)
 
 NICK_HELP_SET_HIDE
-	Σύνταξη: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Σύνταξη: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Σας επιτρέπει να εμποδίσετε την εμφάνιση συγκεκριμένων
 	πληροφοριών όταν κάποιος εκτελεί την εντολή του %S INFO, στο

@@ -528,7 +528,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	Il tuo indirizzo e-mail sarà nascosto dai messaggi INFO di %s.
 NICK_SET_HIDE_EMAIL_OFF
@@ -650,7 +650,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	L'indirizzo e-mail di %s verrà ora nascosto da %s INFO.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3669,7 +3669,7 @@ NICK_HELP_SET_PRIVATE
 	comando INFO.
 
 NICK_HELP_SET_HIDE
-	Sintassi: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Sintassi: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Ti permette di nascondere alcune informazioni quando qualcuno
 	effettua un %S INFO sul tuo nick. Puoi nascondere il tuo

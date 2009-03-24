@@ -538,7 +538,7 @@ NICK_SET_PRIVATE_OFF
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
 	Votre adresse e-mail ne sera plus affichée par la commande INFO de %s.
 NICK_SET_HIDE_EMAIL_OFF
@@ -664,7 +664,7 @@ NICK_SASET_PRIVATE_OFF
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET pseudo HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET pseudo HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
 	L'adresse E-mail de %s sera caché dans la commande INFO de %s.
 NICK_SASET_HIDE_EMAIL_OFF
@@ -3817,7 +3817,7 @@ NICK_HELP_SET_PRIVATE
 	la commande INFO).
 
 NICK_HELP_SET_HIDE
-	Syntaxe: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Syntaxe: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Vous permet d'empêcher l'affichage de certaines parties
 	des informations quand quelqu'un fait un %S INFO sur votre

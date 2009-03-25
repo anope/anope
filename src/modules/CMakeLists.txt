@@ -46,11 +46,11 @@ foreach(SRC ${MODULES_SRCS})
     # Iterate through the libraries given
     foreach(LIBRARY ${REQUIRED_LIBRARY})
       # Locate the library to see if it exists
-      if(DEFAULT_LIBRARY_DIRS OR WSDK_PATH)
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib)
-      else(DEFAULT_LIBRARY_DIRS OR WSDK_PATH)
+      if(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib $ENV{VCINSTALLDIR}/lib)
+      else(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
         find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY})
-      endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH)
+      endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
       # If the library was found, we will add it to the linker flags
       if(FOUND_${LIBRARY}_LIBRARY)
         # Get the path only of the library, to add it to linker flags

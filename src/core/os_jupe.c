@@ -36,8 +36,8 @@ class CommandOSJupe : public Command
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick, reason ? ": " : "", reason ? reason : "");
 			if (findserver(servlist, jserver))
 				ircdproto->SendSquit(jserver, rbuf);
-			ircdproto->SendServer(jserver, 2, rbuf);
-			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
+			Server *juped_server = new_server(me_server, jserver, rbuf, SERVER_JUPED, ircd->ts6 ? ts6_sid_retrieve() : NULL);
+			ircdproto->SendServer(juped_server);
 
 			if (WallOSJupe)
 				ircdproto->SendGlobops(s_OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick, jserver);

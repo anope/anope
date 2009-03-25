@@ -841,6 +841,8 @@ E void ts6_uid_init();
 E void ts6_uid_increment(unsigned int slot);
 E const char *ts6_uid_retrieve();
 
+E const char *ts6_sid_retrieve();
+
 /**** sessions.c ****/
 
 E Exception *exceptions;

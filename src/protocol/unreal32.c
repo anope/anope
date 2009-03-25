@@ -538,17 +538,17 @@ class UnrealIRCdProto : public IRCDProto
 		--ac;
 		if (!user || !modes) return; /* Prevent NULLs from doing bad things */
 		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-		
+
 		while (*modes) {
 			uint32 backup = user->mode;
-			
+
 			/* This looks better, much better than "add ? (do_add) : (do_remove)".
 			 * At least this is readable without paying much attention :) -GD */
 			if (add)
 				user->mode |= umodes[static_cast<int>(*modes)];
 			else
 				user->mode &= ~umodes[static_cast<int>(*modes)];
-			
+
 			switch (*modes++)
 			{
 				case '+':
@@ -682,10 +682,12 @@ class UnrealIRCdProto : public IRCDProto
 
 	/* SERVER name hop descript */
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
-	void SendServer(const char *servname, int hop, const char *descript)
+	void SendServer(Server *server)
 	{
-		if (Numeric) send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric, descript);
-		else send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+		if (Numeric)
+			send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", server->name, server->hops, Numeric, server->desc);
+		else
+			send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
 	}
 
 	/* JOIN */
@@ -750,11 +752,13 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		if (Numeric) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
-		else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 		unreal_cmd_capab();
 		unreal_cmd_pass(uplink_server->password);
-		SendServer(ServerName, 1, ServerDesc);
+		if (Numeric)
+			me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
+		else
+			me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		SendServer(me_server);
 	}
 
 	/* SVSHOLD - set */
@@ -1200,7 +1204,7 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 */
 /*
  do_nick(const char *source, char *nick, char *username, char *host,
-			  char *server, char *realname, time_t ts, 
+			  char *server, char *realname, time_t ts,
 			  uint32 ip, char *vhost, char *uid)
 */
 int anope_event_nick(const char *source, int ac, const char **av)

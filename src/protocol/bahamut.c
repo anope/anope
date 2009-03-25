@@ -698,17 +698,17 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SERVER */
-	void SendServer(const char *servname, int hop, const char *descript)
+	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+		send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
 	}
 
 	void SendConnect()
 	{
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 		bahamut_cmd_pass(uplink_server->password);
 		bahamut_cmd_capab();
-		SendServer(ServerName, 1, ServerDesc);
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		SendServer(me_server);
 		bahamut_cmd_svinfo();
 		bahamut_cmd_burst();
 	}

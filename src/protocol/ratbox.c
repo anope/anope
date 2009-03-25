@@ -585,18 +585,18 @@ class RatboxProto : public IRCDTS6Proto
 	}
 
 	/* SERVER name hop descript */
-	void SendServer(const char *servname, int hop, const char *descript)
+	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+		send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
 	}
 
 	void SendConnect()
 	{
-		/* Make myself known to myself in the serverlist */
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
 		ratbox_cmd_pass(uplink_server->password);
 		ratbox_cmd_capab();
-		SendServer(ServerName, 1, ServerDesc);
+		/* Make myself known to myself in the serverlist */
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+		SendServer(me_server);
 		ratbox_cmd_svinfo();
 	}
 

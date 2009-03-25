@@ -560,9 +560,9 @@ class InspIRCdProto : public IRCDProto
 
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
-	void SendServer(const char *servname, int hop, const char *descript)
+	void SendServer(Server *server)
 	{
-		send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
+		send_cmd(ServerName, "SERVER %s %s %d :%s", server->name, currentpass, server->hops, server->desc);
 	}
 
 	/* JOIN */
@@ -604,10 +604,10 @@ class InspIRCdProto : public IRCDProto
 	void SendConnect()
 	{
 		inspircd_cmd_pass(uplink_server->password);
-		SendServer(ServerName, 0, ServerDesc);
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		SendServer(me_server);
 		send_cmd(NULL, "BURST");
 		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 	}
 
 	/* CHGIDENT */

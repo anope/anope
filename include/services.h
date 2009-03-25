@@ -1321,7 +1321,7 @@ class CoreExport IRCDProto
 		virtual void SendSVSPart(const char *, const char *, const char *) { }
 		virtual void SendSWhois(const char *, const char *, const char *) { }
 		virtual void SendEOB() { }
-		virtual void SendServer(const char *, int, const char *) = 0;
+		virtual void SendServer(Server *) = 0;
 		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int IsNickValid(const char *) { return 1; }
 		virtual int IsChannelValid(const char *) { return 1; }

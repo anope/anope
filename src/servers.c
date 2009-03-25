@@ -641,4 +641,78 @@ const char *ts6_uid_retrieve()
 	return ts6_new_uid;
 }
 
+/*******************************************************************/
+
+/*
+ * TS6 generator code, provided by DukePyrolator
+ */
+
+static int ts6_sid_initted = 0;
+static char ts6_new_sid[4];
+
+static void ts6_sid_increment(unsigned pos)
+{
+	/*
+	 * An SID must be exactly 3 characters long, starts with a digit,
+	 * and the other two characters are A-Z or digits
+	 * The rules for generating an SID go like this...
+	 * --> ABCDEFGHIJKLMNOPQRSTUVWXYZ --> 0123456789 --> WRAP
+	 */
+	if (!pos)
+	{
+		/* At pos 0, if we hit '9', we've run out of available SIDs,
+		 * reset the SID to the smallest possible value and try again. */
+		if (ts6_new_sid[pos] == '9')
+		{
+			ts6_new_sid[0] = '0';
+			ts6_new_sid[1] = 'A';
+			ts6_new_sid[2] = 'A';
+		}
+		else
+			// But if we haven't, just keep incrementing merrily.
+			++ts6_new_sid[0];
+	}
+	else
+	{
+		if (ts6_new_sid[pos] == 'Z')
+			ts6_new_sid[pos] = '0';
+		else if (ts6_new_sid[pos] == '9')
+		{
+			ts6_new_sid[pos] = 'A';
+			ts6_sid_increment(pos - 1);
+		}
+		else
+			++ts6_new_sid[pos];
+	}
+}
+
+const char *ts6_sid_retrieve()
+{
+	if (!ircd->ts6)
+	{
+		if (debug)
+			alog("TS6 not supported on this ircd");
+		return "";
+	}
+
+	if (!ts6_sid_initted)
+	{
+		// Initialize ts6_new_sid with the services server SID
+		snprintf(ts6_new_sid, 4, "%s", TS6SID);
+		ts6_sid_initted = 1;
+	}
+	while (1)
+	{
+		// Check if the new SID is used by a known server
+		if (!findserver_uid(servlist, ts6_new_sid))
+			// return the new SID
+			return ts6_new_sid;
+
+		// Add one to the last SID
+		ts6_sid_increment(2);
+	}
+	/* not reached */
+	return "";
+}
+
 /* EOF */

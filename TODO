@@ -11,15 +11,16 @@ Legend:
 [ ] burn do_sjoin with fire
 [x] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
   Remaining issues:
-    ? [ ] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
+    [?] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
     [ ] (think on this carefully): some commands (e.g. !help) need to strip the pre-provided channelname from them.
     [ ] (will require wider re-work): allow replies/notifications to fantasy commands to go to the channel via notice
 [x] HelpServ must die
-[-] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
+[+] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 [ ] Add support for +k, +q, etc type umodes
 [x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
+[+] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
 
 Outstanding issues:
 - autoid
@@ -53,7 +54,7 @@ Future
 	the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
 [ ] generic database routines modules can use to create their own database
 [ ] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
-? [ ] a way for a module to queue itself (or even another module) for unloading
+[?] a way for a module to queue itself (or even another module) for unloading
 [ ] add overridden form of SendGlobops accepting BotInfo
 [ ] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
 [ ] chan_set_modes should take BotInfo, possibly with override for User *?
@@ -76,12 +77,12 @@ Future
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
   XXX: is SUSPEND overlapping with OS IGNORE functionality?
 [ ] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
-? [ ] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
-? [ ] Don't allow soper accounts to expire
-? [ ] Reason for CS SET RESTRICTED
+[?] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
+[?] Don't allow soper accounts to expire
+[?] Reason for CS SET RESTRICTED
 [ ] NS IDENTIFY changes
-  ? [ ] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
-  ? [ ] Last successful login time/ip? perhaps both of these should be a new nick setting
+  [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
+  [?] Last successful login time/ip? perhaps both of these should be a new nick setting
 [ ] AKILL/SGLINE/etc..
   [ ] Setter
   [ ] Time added
@@ -90,12 +91,11 @@ Future
   [ ] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
-[ ] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
 [ ] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK?
 [ ] General options block, ability to turn LOGCHAN on from the config file..
 [ ] Method to list suspended/forbidden nicks/channels?
-? [ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
-? [ ] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
-? [ ] Review settings like NSModeOnID for whether they actually have a point existing (Rob says it does not - and that it should probably be a nickname setting)
-? [ ] OS INJECT
-? [ ] Drop CS SET ENTRYMSG, replace with a 'news' type system? (limited to a configured number of items, default 3)
+[?] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
+[?] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
+[?] Review settings like NSModeOnID for whether they actually have a point existing (Rob says it does not - and that it should probably be a nickname setting)
+[?] OS INJECT
+[?] Drop CS SET ENTRYMSG, replace with a 'news' type system? (limited to a configured number of items, default 3)

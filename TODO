@@ -25,7 +25,6 @@ Legend:
 Outstanding issues:
 - autoid
 - reset +r on change to grouped nick
-- * help set
 - ss_main is broken (using oldevent)
 
 1.9.2

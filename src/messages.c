@@ -142,7 +142,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 			if (ign) {
 				target = myStrGetToken(msg, ' ', 0);
 				alog("Ignored message from %s to %s using command %s", source, receiver, target);
-				free(target);
+				delete [] target;
 				return MOD_CONT;
 			}
 		}

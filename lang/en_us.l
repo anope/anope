@@ -5987,7 +5987,7 @@ BOT_HELP
 	%S allows you to have a bot on your own channel.
 	It has been created for users that can't host or
 	configure a bot, or for use on networks that don't
-	allow users' bot. Available commands are listed 
+	allow user bots. Available commands are listed 
 	below; to use them, type %R%S command.  For 
 	more information on a specific command, type %R
 	%S HELP command.

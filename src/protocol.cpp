@@ -201,7 +201,7 @@ void IRCDProto::SendSquit(const char *servname, const char *message)
 
 void IRCDProto::SendChangeBotNick(BotInfo *bi, const char *newnick)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NICK %s", newnick);
+	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NICK %s %ld", newnick, static_cast<long>(time(NULL)));
 }
 void IRCDProto::SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
 {

@@ -89,7 +89,7 @@ class CommandCSSuspend : public Command
 
 					av[0] = c->name;
 					av[1] = cu->user->nick;
-					av[2] = reason ? reason : "CHAN_SUSPEND_REASON";
+					av[2] = reason ? reason : getstring(cu->user->nc, CHAN_SUSPEND_REASON);
 					ircdproto->SendKick(findbot(s_ChanServ), av[0], av[1], av[2]);
 					do_kick(s_ChanServ, 3, av);
 				}

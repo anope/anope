@@ -1696,7 +1696,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -5119,13 +5119,7 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Gebruik: GETKEY kanaal
 	
-	Geef de key van het gegeven kanaal terug. Dit is een
-	commando wat vooral bedoeld is voor gebruik door bots of
-	scripts, dus is de output in het volgende formaat:
-	
-	KEY <kanaal> <key>
-	
-	key is "NO KEY" als er geen key is ingesteld.
+	Geef de key van het gegeven kanaal terug.
 	
 CHAN_HELP_SENDPASS
 	Gebruik: SENDPASS kanaal

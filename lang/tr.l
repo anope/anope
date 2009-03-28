@@ -1698,7 +1698,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -5121,13 +5121,7 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Kullanýmý: GETKEY kanaladý
 	
-	Belirtilen kanalýn anahtarýný söyler. Bu komut botlar
-	veya scriptler tarafýndan kullanýlmak üzere tasarlanmýþtýr,
-	ve çýktýsý þu þekildedir:
-	
-	KEY <kanaladý> <anahtar>
-	
-	Eðer bir anahtar yoksa anahtar kýsmýnda "NO KEY" olacaktýr.
+	Belirtilen kanalýn anahtarýný söyler.
 
 CHAN_HELP_SENDPASS
 	Kullanýmý: SENDPASS kanaladý

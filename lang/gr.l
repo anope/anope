@@ -1703,7 +1703,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -5154,13 +5154,7 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Σύνταξη: GETKEY κανάλι
 	
-	Σας δείχνει το κλειδί του συγκεκριμένου καναλιού. Αυτή η εντολή
-	χρησιμοποιείται κυρίως από τα bots και/ή scripts.Μπορείται να
-	βάλετε και εσείς με τον εξής τρόπο:
-	
-	KEY <κανάλι> <κλειδί>
-	
-	κλειδί είναι "ΚΑΝΕΝΑ ΚΛΕΙΔΙ" αν δεν υπάρχει κανένα κλειδί.
+	Σας δείχνει το κλειδί του συγκεκριμένου καναλιού.
 	
 CHAN_HELP_SENDPASS
 	Σύνταξη: SENDPASS κανάλι

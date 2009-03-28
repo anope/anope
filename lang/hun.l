@@ -1698,7 +1698,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -5096,13 +5096,7 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Syntax: GETKEY #szoba 
 	
-	Megadja a szoba kulcsot. Ez a parancs kimondottan hasznos
-	botok és/vagy scriptek számára, tehát a kimeneti rész
-	a következõképpen néz ki:
-	
-	KEY <szoba> <kulcs>
-	
-	A kulcs "NO KEY", ha nincs kulcs beállítva.
+	Megadja a szoba kulcsot.
 	
 CHAN_HELP_SENDPASS
 	Syntax: SENDPASS #szoba

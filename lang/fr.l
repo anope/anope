@@ -1710,7 +1710,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	Le canal %s n'a pas de clé.
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -5248,14 +5248,7 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Syntaxe: GETKEY canal
 	
-	Retourne la clef du canal donné. GETKEY est une commande
-	qui est principalement destiné à être utilisée par des
-	bots ou des scripts, pour cela, la réponse a le format
-	suivant:
-	
-	KEY <canal> <clef>
-	
-	La clef sera "NO KEY" si aucune clef n'est définie.
+	Retourne la clef du canal donné.
 	
 CHAN_HELP_SENDPASS
 	Syntaxe: SENDPASS canal

@@ -1672,7 +1672,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -4983,13 +4983,7 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Syntax: GETKEY channel
 	
-	Returns the key of the given channel. This is a command
-	mainly intended to be used by bots and/or scripts, so
-	the output is in the following way:
-	
-	KEY <channel> <key>
-	
-	key is "NO KEY" if no key is set.
+	Returns the key of the given channel.
 	
 CHAN_HELP_SENDPASS
 	Syntax: SENDPASS channel

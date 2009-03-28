@@ -2215,7 +2215,7 @@ CHAN_GETKEY_NOKEY
 	Kana³ %s nie posiada klucza.
 
 CHAN_GETKEY_KEY
-	KEY %s %s
+	Key for channel %s is %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -6209,13 +6209,6 @@ CHAN_HELP_GETKEY
 	Sk³adnia: GETKEY kana³
 	
 	Zwraca has³o wstêpu do wskazanego kana³u.
-	Komenda jest g³ównie przeznaczona dla botów,
-	dlatego wynik ma format:
-	
-	KEY <kana³> <klucz>
-	
-	Je¶li kana³ nie ma klucza zostanie zwrócona
-	warto¶æ "NO KEY".
 
 CHAN_HELP_SENDPASS
 	Sk³adnia: SENDPASS kana³

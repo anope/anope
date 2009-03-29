@@ -1128,6 +1128,9 @@ int check_kick(User * user, const char *chan, time_t chants)
 
 	if (ci->flags & CI_SUSPENDED || ci->flags & CI_FORBIDDEN)
 	{
+		if (is_oper(user))
+			return 0;
+
 		get_idealban(ci, user, mask, sizeof(mask));
 		reason = ci->forbidreason ? ci->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
 		set_modes = true;

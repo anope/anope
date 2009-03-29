@@ -58,7 +58,7 @@ void hs_help(User *u);
 void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 int my_isvalidchar(const char c);
 void my_memo_lang(User *u, char *name, int z, int number, ...);
-void req_send_memos(User *u, char *vHost);
+void req_send_memos(User *u, char *vIdent, char *vHost);
 
 void hsreq_load_db();
 
@@ -171,7 +171,7 @@ class CommandHSRequest : public Command
 			my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
 
 			me->NoticeLang(s_HostServ, u, LNG_REQUESTED);
-			req_send_memos(u, hostmask);
+			req_send_memos(u, vIdent, hostmask);
 			alog("New vHost Requested by %s", nick);
 		}
 		else
@@ -817,27 +817,33 @@ void my_memo_lang(User *u, char *name, int z, int number, ...)
 		alog("%s: INVALID language string call, language: [%d], String [%d]", me->name.c_str(), lang, number);
 }
 
-void req_send_memos(User *u, char *vHost)
+void req_send_memos(User *u, char *vIdent, char *vHost)
 {
 	int i;
 	int z = 2;
+	char host[50];
 
 	if (checkDefCon(DEFCON_NO_NEW_MEMOS))
 		return;
 
+	if (vIdent)
+		sprintf(host, "%s@%s", vIdent, vHost);
+	else
+		sprintf(host, "%s", vHost);
+
 	if (HSRequestMemoOper == 1)
 	{
 		for (i = 0; i < servopers.count; ++i)
-			my_memo_lang(u, (static_cast<NickCore *>(servopers.list[i]))->display, z, LNG_REQUEST_MEMO, vHost);
+			my_memo_lang(u, (static_cast<NickCore *>(servopers.list[i]))->display, z, LNG_REQUEST_MEMO, host);
 		for (i = 0; i < servadmins.count; ++i)
-			my_memo_lang(u, (static_cast<NickCore *>(servadmins.list[i]))->display, z, LNG_REQUEST_MEMO, vHost);
+			my_memo_lang(u, (static_cast<NickCore *>(servadmins.list[i]))->display, z, LNG_REQUEST_MEMO, host);
 		for (i = 0; i < RootNumber; ++i)
-			my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, vHost);
+			my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, host);
 	}
 	if (HSRequestMemoSetters == 1)
 	{
 		for (i = 0; i < HostNumber; ++i)
-			my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, vHost);
+			my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, host);
 	}
 }
 

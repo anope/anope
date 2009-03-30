@@ -134,6 +134,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
     int16 cstatus = 0;
     char *cmd;
     UserData *ud;
+    int was_action = 0;
 
     if (!u || !buf || !ci) {
         return;
@@ -148,8 +149,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
      * at the end, because one character just doesn't matter,
      * but the ACTION may create strange behaviours with the
      * caps or badwords kickers */
-    if (!strnicmp(buf, "\1ACTION ", 8))
+    if (!strnicmp(buf, "\1ACTION ", 8)) {
         buf += 8;
+        was_action = 1;
+    }
 
     /* Now we can make kicker stuff. We try to order the checks
      * from the fastest one to the slowest one, since there's
@@ -410,7 +413,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
     /* Fantaisist commands */
 
-    if (buf && (ci->botflags & BS_FANTASY) && *buf == *BSFantasyCharacter) {
+    if (buf && (ci->botflags & BS_FANTASY) && *buf == *BSFantasyCharacter && !was_action) {
         cmd = strtok(buf, " ");
 
         if (cmd && (cmd[0] == *BSFantasyCharacter)) {

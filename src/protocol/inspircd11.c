@@ -1812,7 +1812,8 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
 int inspircd_jointhrottle_mode_check(char *value)
 {
     char *tempValue, *one, *two;
-    int param1, param2;
+    int param1 = 0;
+    int param2 = 0;
 
     if (!value)
         return 0;

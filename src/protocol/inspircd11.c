@@ -551,7 +551,13 @@ inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void inspircd_cmd_vhost_off(User * u)
 {
-    send_cmd(s_HostServ, "MODE %s -x", u->nick);
+	 send_cmd(s_OperServ,  "MODE %s -%s",  u->nick,  myIrcd->vhostchar);
+	 inspircd_cmd_chghost(u->nick, u->host);
+
+	 if (has_chgidentmod && u->username && u->vident && strcmp(u->username, u->vident) > 0)
+	 {
+		 inspircd_cmd_chgident(u->nick, u->username);
+	 }
 }
 
 void

@@ -9,11 +9,14 @@ Provided by Anope Dev. <team@anope.org> - 2009
 01/26 F Readonly/noexpire are now checked before saving on shutdown.     [  #00]
 
 Provided by mooncup <mooncup@anonnet.org> - 2009
-02/04 F Automatically reapply vhost on hs off for unreal32.		 [  #00]
+02/04 F Automatically reapply vhost on hs off for unreal32.              [  #00]
 
 Provided by Adam <Adam@SubZeroIRC.net> - 2009
-07/03 F Channel list re-ordering.					 [#1024]
+03/07 F Channel list re-ordering.                                        [#1024]
 01/28 F Added internal support for +j channelmodes.                      [#1001]
+
+Provided by Szymek <> - 2009
+03/30 F Fix HS OFF to work in all cases on InspIRCd.                     [#1075]
 
 Anope Version 1.8.0
 -------------------

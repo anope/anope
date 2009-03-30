@@ -275,6 +275,7 @@ void ModuleManager::DeleteModule(Module *m)
 		return;
 	}
 
+	DetachAll(m);
 	handle = m->handle;
 
 	ano_modclearerr();

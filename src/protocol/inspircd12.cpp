@@ -499,6 +499,7 @@ class InspIRCdProto : public IRCDProto
 	void SendVhostDel(User *u)
 	{
 		inspircd_cmd_chghost(u->nick, (u->mode & umodes[static_cast<int>('x')] ? u->chost.c_str() : u->host));
+		notice_lang(s_HostServ, u, HOST_OFF);
 
 		if (has_chgidentmod && u->GetIdent() != u->GetVIdent())
 		{

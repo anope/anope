@@ -161,10 +161,6 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 	if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
 		serv_uplink = serv;
 
-	/* Write the StartGlobal (to non-juped servers) */
-	if (GlobalOnCycle && GlobalOnCycleUP && !(flags & SERVER_JUPED))
-		notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
-
 	return serv;
 }
 
@@ -402,8 +398,15 @@ void do_server(const char *source, const char *servername, const char *hops,
 	if (s == NULL)
 		throw CoreException("Recieved a server from a nonexistant uplink?");
 
+	/* Create a server structure. */
 	new_server(s, servername, descript, 0, numeric);
-	FOREACH_MOD(I_OnServerConnect, OnServerConnect(servername));
+
+	/* Announce services being online. */
+	if (GlobalOnCycle && GlobalOnCycleUP)
+		notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
+
+	/* Let modules know about the connection */
+	FOREACH_MOD(I_OnServerConnect, OnServerConnect(s));
 }
 
 /*************************************************************************/

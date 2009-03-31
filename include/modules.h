@@ -506,9 +506,9 @@ class CoreExport Module
 	virtual void OnUserConnect(User *u) { }
 
 	/** Called when a new server connects to the network.
-	 * @param sname The server name that is connecting
+	 * @param s The server that has connected to the network
 	 */
-	virtual void OnServerConnect(const std::string &sname) { }
+	virtual void OnServerConnect(Server *s) { }
 
 	/** Called when anope saves databases.
 	 * NOTE: This event is deprecated pending new database handling.

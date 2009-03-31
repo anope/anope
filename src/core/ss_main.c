@@ -72,7 +72,8 @@ class SSMain : public Module
 		}
 	}
 
-	void OnServerConnect(const std::string &sname)
+	/** This hack is necessary to replace delayed loading,  for now */
+	void OnServerConnect(Server *)
 	{
 		statserv = findbot("StatServ");
 		if (!statserv)

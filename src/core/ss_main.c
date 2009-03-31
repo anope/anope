@@ -47,12 +47,12 @@ class SSMain : public Module
 
 		if (servsock == -1)
 		{
-//			EvtHook *hook = createEventHook(EVENT_SERVER_CONNECT, statserv_create);
-//			this->AddEventHook(hook);
+			ModuleManager::Attach(I_OnServerConnect, this);
 		}
 		else
 			statserv_create(0, NULL);
 	}
+
 	~SSMain()
 	{
 		CommandHash *current;
@@ -71,18 +71,17 @@ class SSMain : public Module
 			delete statserv;
 		}
 	}
-};
 
-int statserv_create(int argc, char **argv)
-{
-	statserv = findbot("StatServ");
-	if (!statserv)
+	void OnServerConnect(const std::string &sname)
 	{
-		statserv = new BotInfo("StatServ", ServiceUser, ServiceHost, "Stats Service");
-		ircdproto->SendClientIntroduction("StatServ", ServiceUser, ServiceHost, "Stats Service", ircd->pseudoclient_mode, statserv->uid.c_str());
+		statserv = findbot("StatServ");
+		if (!statserv)
+		{
+			statserv = new BotInfo("StatServ", ServiceUser, ServiceHost, "Stats Service");
+			ircdproto->SendClientIntroduction("StatServ", ServiceUser, ServiceHost, "Stats Service", ircd->pseudoclient_mode, statserv->uid.c_str());
+		}
+		statserv->cmdTable = cmdTable;
 	}
-	statserv->cmdTable = cmdTable;
-	return MOD_CONT;
-}
+};
 
 MODULE_INIT("ss_main", SSMain)

@@ -13,6 +13,7 @@
  */
 
 #include "services.h"
+#include "modules.h"
 
 Server *servlist = NULL;
 Server *me_server = NULL;	   /* This are we		*/
@@ -402,7 +403,7 @@ void do_server(const char *source, const char *servername, const char *hops,
 		throw CoreException("Recieved a server from a nonexistant uplink?");
 
 	new_server(s, servername, descript, 0, numeric);
-	send_event(EVENT_SERVER_CONNECT, 1, servername);
+	FOREACH_MOD(I_OnServerConnect, OnServerConnect(servername));
 }
 
 /*************************************************************************/

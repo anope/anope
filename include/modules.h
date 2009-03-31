@@ -505,6 +505,11 @@ class CoreExport Module
 	 */
 	virtual void OnUserConnect(User *u) { }
 
+	/** Called when a new server connects to the network.
+	 * @param sname The server name that is connecting
+	 */
+	virtual void OnServerConnect(const std::string &sname) { }
+
 	/** Called when anope saves databases.
 	 * NOTE: This event is deprecated pending new database handling.
 	 * XXX.
@@ -523,7 +528,8 @@ class CoreExport Module
 enum Implementation
 {
 	I_BEGIN,
-		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnSaveDatabase, I_OnUserConnect, I_OnBackupDatabase,
+		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect, I_OnServerConnect,
+		I_OnSaveDatabase, I_OnBackupDatabase,
 	I_END
 };
 

@@ -403,7 +403,7 @@ void do_server(const char *source, const char *servername, const char *hops,
 
 	/* Announce services being online. */
 	if (GlobalOnCycle && GlobalOnCycleUP)
-		notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
+		notice_server(s_GlobalNoticer, s, "%s", GlobalOnCycleUP);
 
 	/* Let modules know about the connection */
 	FOREACH_MOD(I_OnServerConnect, OnServerConnect(s));

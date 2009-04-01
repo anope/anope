@@ -362,31 +362,6 @@ CS_LIST_INCORRECT_RANGE
 	Aby wyszukaæ kana³y o nazwach zaczynaj±cych siê znakiem #
 	nale¿y ten znak pomin±æ (anope zamiast #anope).
 
-# Generic help limited to messages
-HELP_LIMIT_SERV_OPER
-	
-	Polecenie dostêpne tylko dla operatorów serwisów.
-
-HELP_LIMIT_SERV_ADMIN
-	
-	Polecenie dostêpne tylko dla administratorów serwisów.
-
-HELP_LIMIT_SERV_ROOT
-	
-	Polecenie dostêpne tylko dla Services Roots.
-
-HELP_LIMIT_IRC_OPER
-	
-	Polecenie dostêpne tylko dla IRC operatorów.
-
-HELP_LIMIT_HOST_SETTER
-	
-	Polecenie dostêpne tylko dla Host Setters.
-
-HELP_LIMIT_HOST_REMOVER
-	
-	Polecenie dostêpne tylko dla Host Removers.
-
 ###########################################################################
 #
 # NickServ messages

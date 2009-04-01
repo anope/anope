@@ -329,27 +329,6 @@ CS_LIST_INCORRECT_RANGE
 ###########################################################################
 
 # Automatic messages
-HELP_LIMIT_SERV_OPER
-	Diese Funktion  ist beschränkt auf Services Operatoren.
-HELP_LIMIT_SERV_ADMIN
-	Diese Funktion  ist beschränkt auf Services Administratoren.
-HELP_LIMIT_SERV_ROOT
-	Diese Funktion  ist beschränkt auf Services Root-Administratoren.
-HELP_LIMIT_IRC_OPER
-	Diese Funktion  ist beschränkt auf IRC Operatoren.
-HELP_LIMIT_HOST_SETTER
-	Diese Funktion  ist beschränkt auf Host Setters.
-HELP_LIMIT_HOST_REMOVER
-	Diese Funktion  ist beschränkt auf Host Removers.
-
-
-###########################################################################
-#
-# NickServ messages
-#
-###########################################################################
-
-# Automatic messages
 NICK_IS_REGISTERED
 	Dieser Nickname gehört schon jemand anderem. Bitte wähle einen anderen.
 	(Sollte dieser Nickname dir gehören, tippe %R%s IDENTIFY Passwort.)

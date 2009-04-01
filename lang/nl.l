@@ -309,33 +309,6 @@ CS_LIST_INCORRECT_RANGE
 ###########################################################################
 
 # Automatic messages
-HELP_LIMIT_SERV_OPER
-	
-	Gelimiteerd tot Services Operators.
-HELP_LIMIT_SERV_ADMIN
-	
-	Gelimiteerd tot Services Administrators.
-HELP_LIMIT_SERV_ROOT
-	
-	Gelimiteerd tot Services Roots.
-HELP_LIMIT_IRC_OPER
-	
-	Gelimiteerd tot IRC Operators.
-HELP_LIMIT_HOST_SETTER
-	
-	Gelimiteerd tot Host Setters.
-HELP_LIMIT_HOST_REMOVER
-	
-	Gelimiteerd tot Host Removers.
-
-
-###########################################################################
-#
-# NickServ messages
-#
-###########################################################################
-
-# Automatic messages
 NICK_IS_REGISTERED
 	Deze nick is eigendom van iemand anders.  Kies een andere.
 	(Als dit jouw nick is, type %R%s IDENTIFY wachtwoord.)

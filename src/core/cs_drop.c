@@ -106,7 +106,7 @@ class CommandCSDrop : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u) || is_services_root(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_DROP);
 		else
 			notice_help(s_ChanServ, u, CHAN_HELP_DROP);

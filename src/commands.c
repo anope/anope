@@ -88,16 +88,6 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		// Check whether or not access string is empty
 	}
 
-/*
-XXX: priv checking
-	if (c->has_priv != NULL && !c->has_priv(u))
-	{
-		notice_lang(service, u, ACCESS_DENIED);
-		alog("Access denied for %s with service %s and command %s", u->nick, service, cmd);
-		return;
-	}
-  */
-
 	std::vector<std::string> params;
 	std::string curparam;
 	char *s = NULL;
@@ -145,32 +135,6 @@ XXX: priv checking
 /*************************************************************************/
 
 /**
- * Output the 'Limited to' line for the given command
- * @param service Services Client
- * @param u User Struct
- * @param c Command Struct
- * @return void
- *
-void do_help_limited(char *service, User * u, Command * c)
-{
-	if (c->has_priv == is_services_oper)
-		notice_lang(service, u, HELP_LIMIT_SERV_OPER);
-	else if (c->has_priv == is_services_admin)
-		notice_lang(service, u, HELP_LIMIT_SERV_ADMIN);
-	else if (c->has_priv == is_services_root)
-		notice_lang(service, u, HELP_LIMIT_SERV_ROOT);
-	else if (c->has_priv == is_oper)
-		notice_lang(service, u, HELP_LIMIT_IRC_OPER);
-	else if (c->has_priv == is_host_setter)
-		notice_lang(service, u, HELP_LIMIT_HOST_SETTER);
-	else if (c->has_priv == is_host_remover)
-		notice_lang(service, u, HELP_LIMIT_HOST_REMOVER);
-}
-*/
-
-/*************************************************************************/
-
-/**
  * Prints the help message for a given command.
  * @param services Services Client
  * @param u User Struct
@@ -196,9 +160,6 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 		has_had_help = current->OnHelp(u, subcommand);
 	if (!has_had_help)
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
-	//else {
-	//	do_help_limited(service, u, c);
-	//}
 }
 
 /*************************************************************************/

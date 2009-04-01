@@ -71,6 +71,11 @@ class CoreExport NickCore : public Extensible
 	  */
 	bool HasCommand(const std::string &cmdstr) const;
 
+	/** Checks whether this account is a services oper or not.
+	 * @return True if this account is a services oper, false otherwise.
+	 */
+	bool IsServicesOper() const;
+
 	/** Check whether this opertype has access to the given special permission.
 	  * @param privstr The priv to check for, e.g. users/auspex.
 	  * @return True if this opertype has the specified priv, false otherwise.

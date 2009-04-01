@@ -50,7 +50,7 @@ class CommandNSSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (NSSecureAdmins && nick_is_services_admin(na->nc) && !is_services_root(u))
+		if (NSSecureAdmins && na->nc->IsServicesOper())
 		{
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -137,7 +137,7 @@ class CommandNSUnSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (NSSecureAdmins && nick_is_services_admin(na->nc) && !is_services_root(u))
+		if (NSSecureAdmins && na->nc->IsServicesOper())
 		{
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 			return MOD_CONT;

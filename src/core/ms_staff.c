@@ -51,7 +51,7 @@ class CommandMSStaff : public Command
 		{
 			for (nc = nclists[i]; nc; nc = nc->next)
 			{
-				if (nick_is_services_oper(nc))
+				if (nc->IsServicesOper())
 					memo_send(u, nc->display, text, z);
 			}
 		}

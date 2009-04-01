@@ -755,9 +755,6 @@ E void os_remove_nick(NickCore *nc);
 E int is_services_root(User *u);
 E int is_services_admin(User *u);
 E int is_services_oper(User *u);
-E int nick_is_services_root(NickCore * nc);
-E int nick_is_services_admin(NickCore *nc);
-E int nick_is_services_oper(NickCore *nc);
 
 E int add_akill(User *u, const char *mask, const char *by, const time_t expires, const char *reason);
 E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);

@@ -22,6 +22,14 @@ bool NickCore::HasCommand(const std::string &cmdstr) const
 	return this->ot->HasCommand(cmdstr);
 }
 
+bool NickCore::IsServicesOper() const
+{
+	if (this->ot)
+		return true;
+
+	return false;
+}
+
 bool NickCore::HasPriv(const std::string &privstr) const
 {
 	if (!this->ot)

@@ -98,23 +98,14 @@ class CommandNSInfo : public Command
 
 			notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
 
-			if (show_hidden)
+			// XXX: we should perhaps show their opertype here.
+			if (na->nc->IsServicesOper())
 			{
-				if (nick_is_services_root(na->nc))
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ROOT, na->nick);
-				else if (nick_is_services_admin(na->nc))
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ADMIN, na->nick);
-				else if (nick_is_services_oper(na->nc))
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPER, na->nick);
-			}
-			else
-			{
-				if (nick_is_services_root(na->nc) && !(na->nc->flags & NI_HIDE_STATUS))
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ROOT, na->nick);
-				else if (nick_is_services_admin(na->nc) && !(na->nc->flags & NI_HIDE_STATUS))
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ADMIN, na->nick);
-				else if (nick_is_services_oper(na->nc) && !(na->nc->flags & NI_HIDE_STATUS))
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPER, na->nick);
+				if (show_hidden || (!na->nc->flags & NI_HIDE_STATUS))
+				{
+					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
+
+				}
 			}
 
 			if (nick_online)

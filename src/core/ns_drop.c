@@ -69,7 +69,7 @@ class CommandNSDrop : public Command
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!is_mine && !is_servadmin)
 			notice_lang(s_NickServ, u, ACCESS_DENIED);
-		else if (NSSecureAdmins && !is_mine && nick_is_services_admin(na->nc) && !is_services_root(u))
+		else if (NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 		else
 		{

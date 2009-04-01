@@ -107,7 +107,7 @@ class CommandNSGroup : public Command
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
 		else if (u->nc && (target->nc == u->nc))
 			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
-		else if (NSMaxAliases && (target->nc->aliases.count >= NSMaxAliases) && !nick_is_services_admin(target->nc))
+		else if (NSMaxAliases && (target->nc->aliases.count >= NSMaxAliases) && !target->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, s_NickServ, s_NickServ);
 		else if (enc_check_password(pass, target->nc->pass) != 1)
 		{

@@ -753,12 +753,8 @@ NICK_INFO_SYNTAX
 	INFO nick [ALL]
 NICK_INFO_REALNAME
 	%s is %s
-NICK_INFO_SERVICES_OPER
-	%s is een services beheerder.
-NICK_INFO_SERVICES_ADMIN
-	%s is een services eigenaar.
-NICK_INFO_SERVICES_ROOT
-	%s is a services root administrator.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 NICK_INFO_ADDRESS
 	Laatst bekende adres: %s
 NICK_INFO_ADDRESS_ONLINE

@@ -931,14 +931,8 @@ NICK_INFO_SYNTAX
 NICK_INFO_REALNAME
 	%s to %s
 
-NICK_INFO_SERVICES_OPER
-	%s jest operatorem serwisów.
-
-NICK_INFO_SERVICES_ADMIN
-	%s jest administratorem serwisów.
-
-NICK_INFO_SERVICES_ROOT
-	%s jest g³ównym administratorem serwisów.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 
 NICK_INFO_ADDRESS
 	  Ostatni host: %s

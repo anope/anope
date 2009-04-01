@@ -731,12 +731,8 @@ NICK_INFO_SYNTAX
 	INFO ник [ALL]
 NICK_INFO_REALNAME
 	%s это %s
-NICK_INFO_SERVICES_OPER
-	%s имеет привилегии Оператора сервисов.
-NICK_INFO_SERVICES_ADMIN
-	%s имеет привилегии Администратора сервисов.
-NICK_INFO_SERVICES_ROOT
-	%s имеет привилегии Рута сервисов.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 NICK_INFO_ADDRESS
 	Последняя маска.........: %s
 NICK_INFO_ADDRESS_ONLINE

@@ -747,12 +747,8 @@ NICK_INFO_SYNTAX
 	INFO nick [ALL]
 NICK_INFO_REALNAME
 	%s es %s
-NICK_INFO_SERVICES_OPER
-	%s es un operador de servicios.
-NICK_INFO_SERVICES_ADMIN
-	%s es un administrador de servicios.
-NICK_INFO_SERVICES_ROOT
-	%s is a services root administrator.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 NICK_INFO_ADDRESS
 	Ultima direccion vista: %s
 NICK_INFO_ADDRESS_ONLINE

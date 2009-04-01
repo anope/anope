@@ -762,12 +762,8 @@ NICK_INFO_SYNTAX
 	INFO Nickname [ALL]
 NICK_INFO_REALNAME
 	%s ist %s
-NICK_INFO_SERVICES_OPER
-	%s ist ein Services Operator.
-NICK_INFO_SERVICES_ADMIN
-	%s ist ein Services Administrator.
-NICK_INFO_SERVICES_ROOT
-	%s ist ein Services Root Administrator.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 NICK_INFO_ADDRESS
 	Letzte gesehene Hostmaske: %s
 NICK_INFO_ADDRESS_ONLINE

@@ -750,12 +750,8 @@ NICK_INFO_SYNTAX
 	INFO nick [ALL]
 NICK_INFO_REALNAME
 	   %s                isim: %s
-NICK_INFO_SERVICES_OPER
-	      %s servis operatörüdür.
-NICK_INFO_SERVICES_ADMIN
-	      %s servis adminidir.
-NICK_INFO_SERVICES_ROOT
-	%s is a services root administrator.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 NICK_INFO_ADDRESS
 	      Son görüldüðü adres: %s
 NICK_INFO_ADDRESS_ONLINE

@@ -741,12 +741,8 @@ NICK_INFO_SYNTAX
 	INFO nick [ALL]
 NICK_INFO_REALNAME
 	%s az %s
-NICK_INFO_SERVICES_OPER
-	%s egy szervíz operátor.
-NICK_INFO_SERVICES_ADMIN
-	%s egy szervíz adminisztrátor.
-NICK_INFO_SERVICES_ROOT
-	%s egy szervíz root adminisztrátor.
+NICK_INFO_SERVICES_OPERTYPE
+	%s is a services operator of type %s.
 NICK_INFO_ADDRESS
 	Utoljára látott cím: %s
 NICK_INFO_ADDRESS_ONLINE

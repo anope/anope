@@ -41,7 +41,7 @@ class CommandNSAList : public Command
 		NickAlias *na;
 
 		int min_level = 0;
-		int is_servadmin = is_services_admin(u);
+		int is_servadmin = u->nc->IsServicesOper();
 		int lev_param = 0;
 
 		if (!is_servadmin)
@@ -134,7 +134,7 @@ class CommandNSAList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_ALIST);

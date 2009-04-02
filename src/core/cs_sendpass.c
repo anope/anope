@@ -30,7 +30,7 @@ class CommandCSSendPass : public Command
 		ChannelInfo *ci;
 		NickCore *founder;
 
-		if (RestrictMail && !is_services_oper(u))
+		if (RestrictMail && !u->nc->HasCommand("chanserv/sendpass"))
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 		else if (!(ci = cs_findchan(chan)) || !(founder = ci->founder))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);

@@ -60,9 +60,6 @@ class CommandMSStaff : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_MemoServ, u, MEMO_HELP_STAFF);
 		return true;
 	}
@@ -92,8 +89,7 @@ class MSStaff : public Module
  **/
 void myMemoServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_STAFF);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_STAFF);
 }
 
 MODULE_INIT("ms_staff", MSStaff)

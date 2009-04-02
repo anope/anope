@@ -23,9 +23,7 @@ void myChanServHelp(User * u);
  **/
 void myChanServHelp(User * u)
 {
-	if (is_services_admin(u)) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_FORBID);
-	}
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_FORBID);
 }
 
 class CommandCSForbid : public Command

@@ -62,9 +62,6 @@ class CommandMSSendAll : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_MemoServ, u, MEMO_HELP_SENDALL);
 		return true;
 	}
@@ -94,8 +91,7 @@ class MSSendAll : public Module
  **/
 void myMemoServHelp(User *u)
 {
-	if (is_services_admin(u))
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
 }
 
 MODULE_INIT("ms_sendall", MSSendAll)

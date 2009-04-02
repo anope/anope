@@ -30,7 +30,6 @@ class CommandMSInfo : public Command
 		NickAlias *na = NULL;
 		ChannelInfo *ci = NULL;
 		const char *name = params.size() ? params[0].c_str() : NULL;
-		int is_servadmin = is_services_admin(u);
 		int hardmax = 0;
 
 		if (name && *name != '#' && u->nc->HasPriv("memoserv/info"))
@@ -176,14 +175,14 @@ class CommandMSInfo : public Command
 
 			if (!mi->memomax)
 			{
-				if (!is_servadmin && hardmax)
+				if (!u->nc->IsServicesOper() && hardmax)
 					notice_lang(s_MemoServ, u, MEMO_INFO_HARD_LIMIT_ZERO);
 				else
 					notice_lang(s_MemoServ, u, MEMO_INFO_LIMIT_ZERO);
 			}
 			else if (mi->memomax > 0)
 			{
-				if (!is_servadmin && hardmax)
+				if (!u->nc->IsServicesOper() && hardmax)
 					notice_lang(s_MemoServ, u, MEMO_INFO_HARD_LIMIT, mi->memomax);
 				else
 					notice_lang(s_MemoServ, u, MEMO_INFO_LIMIT, mi->memomax);
@@ -206,7 +205,7 @@ class CommandMSInfo : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_MemoServ, u, MEMO_SERVADMIN_HELP_INFO);
 		else
 			notice_help(s_MemoServ, u, MEMO_HELP_INFO);

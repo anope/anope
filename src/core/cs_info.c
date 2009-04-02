@@ -158,7 +158,7 @@ class CommandCSInfo : public Command
 
 	bool OnUserHelp(User *u)
 	{
-		if (is_services_admin(u) || is_services_root(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
 		else
 			notice_lang(s_NickServ, u, CHAN_HELP_INFO);

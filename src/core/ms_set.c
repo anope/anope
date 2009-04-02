@@ -244,7 +244,7 @@ class CommandMSSet : public Command
 			notice_help(s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
 		else if (subcommand == "LIMIT")
 		{
-			if (is_services_oper(u))
+			if (u->nc && u->nc->IsServicesOper())
 				notice_help(s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, MSMaxMemos);
 			else
 				notice_help(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);

@@ -55,9 +55,6 @@ class CommandCSStatus : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
 		return true;
 	}
@@ -89,8 +86,7 @@ class CSStatus : public Module
  **/
 void myChanServHelp(User *u)
 {
-	if (is_services_admin(u))
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_STATUS);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_STATUS);
 }
 
 MODULE_INIT("cs_status", CSStatus)

@@ -139,9 +139,6 @@ class CommandHSList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_HostServ, u, HOST_HELP_LIST);
 		return true;
 	}
@@ -167,8 +164,7 @@ class HSList : public Module
  **/
 void myHostServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_LIST);
+	notice_lang(s_HostServ, u, HOST_HELP_CMD_LIST);
 }
 
 MODULE_INIT("hs_list", HSList)

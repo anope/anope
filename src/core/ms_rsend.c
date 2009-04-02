@@ -49,7 +49,7 @@ class CommandMSRSend : public Command
 		if (MSMemoReceipt == 1)
 		{
 			/* Services opers and above can use rsend */
-			if (is_services_oper(u))
+			if (u->nc->IsServicesOper())
 				memo_send(u, nick, text, z);
 			else
 				notice_lang(s_MemoServ, u, ACCESS_DENIED);
@@ -102,8 +102,7 @@ class MSRSend : public Module
  **/
 void myMemoServHelp(User *u)
 {
-	if ((MSMemoReceipt == 1 && is_services_oper(u)) || MSMemoReceipt == 2)
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_RSEND);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_RSEND);
 }
 
 MODULE_INIT("ms_rsend", MSRSend)

@@ -57,7 +57,7 @@ class CommandCSHelp : public Command
 		moduleDisplayHelp(2, u);
 		if (CSExpire >= 86400)
 			notice_help(s_ChanServ, u, CHAN_HELP_EXPIRES, CSExpire / 86400);
-		if (is_services_oper(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP);
 	}
 };

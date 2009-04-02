@@ -135,7 +135,7 @@ class CommandNSAccess : public Command
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
 
-		if (!stricmp(cmd, "LIST") && is_services_admin(u) && mask && (na = findnick(params[1].c_str())))
+		if (!stricmp(cmd, "LIST") && u->nc->IsServicesOper() && mask && (na = findnick(params[1].c_str())))
 			return this->DoServAdminList(u, params, na->nc);
 
 		if (mask && !strchr(mask, '@'))

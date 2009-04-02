@@ -112,9 +112,6 @@ class CommandCSSuspend : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
@@ -189,9 +186,6 @@ class CommandCSUnSuspend : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
@@ -224,11 +218,8 @@ class CSSuspend : public Module
  **/
 void myChanServHelp(User *u)
 {
-	if (is_services_oper(u))
-	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
-	}
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
 }
 
 MODULE_INIT("cs_suspend", CSSuspend)

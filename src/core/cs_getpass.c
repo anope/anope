@@ -21,9 +21,7 @@
  **/
 void myChanServHelp(User * u)
 {
-	if (is_services_admin(u)) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETPASS);
-	}
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETPASS);
 }
 
 class CommandCSGetPass : public Command
@@ -72,13 +70,8 @@ class CommandCSGetPass : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
-		{
-			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_GETPASS);
-			return true;
-		}
-
-		return false;
+		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_GETPASS);
+		return true;
 	}
 
 	void OnSyntaxError(User *u)

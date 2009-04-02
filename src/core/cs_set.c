@@ -670,7 +670,7 @@ class CommandCSSet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(s_ChanServ, u, CHAN_HELP_SET);
-			if (is_services_admin(u))
+			if (u->nc && u->nc->IsServicesOper())
 				notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET);
 		}
 		else if (subcommand == "FOUNDER")

@@ -119,7 +119,6 @@ bool NSSecureAdmins;
 bool NSStrictPrivileges;
 bool NSEmailReg;
 bool NSModeOnID;
-bool NSRestrictGetPass;
 bool NSAddAccessOnReg;
 
 static std::string CSDefaults;
@@ -848,7 +847,6 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "secureadmins", "no", new ValueContainerBool(&NSSecureAdmins), DT_BOOLEAN, NoValidation},
 		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&NSStrictPrivileges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "modeonid", "no", new ValueContainerBool(&NSModeOnID), DT_BOOLEAN, NoValidation},
-		{"nickserv", "restrictgetpass", "no", new ValueContainerBool(&NSRestrictGetPass), DT_BOOLEAN, NoValidation},
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerChar(&SendMailPath), DT_CHARPTR, ValidateMail},

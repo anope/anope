@@ -31,6 +31,12 @@ class CommandNSGetPass : public Command
 		NickAlias *na;
 		NickRequest *nr = NULL;
 
+		if (!u->nc->HasCommand("nickserv/getpass"))
+		{
+			notice_lang(s_NickServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
+
 		if (!(na = findnick(nick)))
 		{
 			if ((nr = findrequestnick(nick)))
@@ -46,8 +52,6 @@ class CommandNSGetPass : public Command
 		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (NSSecureAdmins && na->nc->IsServicesOper())
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
-		else if (NSRestrictGetPass && !is_services_root(u))
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 		else
 		{
@@ -66,9 +70,6 @@ class CommandNSGetPass : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_GETPASS);
 		return true;
 	}

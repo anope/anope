@@ -315,7 +315,6 @@ E bool  NSSecureAdmins;
 E bool  NSStrictPrivileges;
 E bool  NSEmailReg;
 E bool  NSModeOnID;
-E bool  NSRestrictGetPass;
 E bool  NSAddAccessOnReg;
 
 E int   CSDefFlags;

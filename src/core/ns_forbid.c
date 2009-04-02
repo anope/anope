@@ -90,9 +90,6 @@ class CommandNSForbid : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
 		return true;
 	}
@@ -124,8 +121,7 @@ class NSForbid : public Module
  **/
 void myNickServHelp(User *u)
 {
-	if (is_services_admin(u))
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
 }
 
 NickAlias *makenick(const char *nick)

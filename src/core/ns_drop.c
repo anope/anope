@@ -29,11 +29,10 @@ class CommandNSDrop : public Command
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 		NickAlias *na;
 		NickRequest *nr = NULL;
-		int is_servadmin = is_services_admin(u);
 		int is_mine; /* Does the nick being dropped belong to the user that is dropping? */
 		char *my_nick = NULL;
 
-		if (readonly && !is_servadmin)
+		if (readonly)
 		{
 			notice_lang(s_NickServ, u, NICK_DROP_DISABLED);
 			return MOD_CONT;
@@ -43,10 +42,8 @@ class CommandNSDrop : public Command
 		{
 			if (nick)
 			{
-				if ((nr = findrequestnick(nick)) && is_servadmin)
+				if ((nr = findrequestnick(nick)) && u->nc->IsServicesOper())
 				{
-					if (readonly)
-						notice_lang(s_NickServ, u, READ_ONLY_MODE);
 					if (WallDrop)
 						ircdproto->SendGlobops(s_NickServ, "\2%s\2 used DROP on \2%s\2", u->nick, nick);
 					alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->nick, nr->email);
@@ -67,7 +64,7 @@ class CommandNSDrop : public Command
 
 		if (is_mine && !nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-		else if (!is_mine && !is_servadmin)
+		else if (!is_mine && !u->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, ACCESS_DENIED);
 		else if (NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
@@ -104,7 +101,7 @@ class CommandNSDrop : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_DROP);

@@ -9,14 +9,9 @@ Command::Command(const std::string &sname, size_t min_params, size_t max_params)
 	this->help_param3 = NULL;
 	this->help_param4 = NULL;
 	this->core = 0;
-	this->next = NULL;
 	this->mod_name = NULL;
 	this->service = NULL;
-	this->all_help = NULL;
-	this->regular_help = NULL;
-	this->oper_help = NULL;
-	this->admin_help = NULL;
-	this->root_help = NULL;
+	this->next = NULL;
 }
 
 Command::~Command()
@@ -27,7 +22,6 @@ Command::~Command()
 	if (this->service) {
 		delete [] this->service;
 	}
-	this->next = NULL;
 }
 
 /** Execute this command.

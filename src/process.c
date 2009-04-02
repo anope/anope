@@ -351,16 +351,6 @@ void process()
 			alog("debug: av[0] = NULL");
 	}
 
-	if (mod_current_buffer) {
-		delete [] mod_current_buffer;
-	}
-
-	if (ac >= 1) {
-			mod_current_buffer = (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-	} else {
-		mod_current_buffer = NULL;
-	}
-
 	/* Do something with the message. */
 	m = find_message(cmd);
 	if (m) {

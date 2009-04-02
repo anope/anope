@@ -45,7 +45,7 @@ class CommandNSList : public Command
 		NickCore *mync;
 		unsigned nnicks, i;
 		char buf[BUFSIZE];
-		int is_servadmin = is_services_admin(u);
+		bool is_servadmin = u->nc->IsServicesOper();
 		int16 matchflags = 0;
 		NickRequest *nr = NULL;
 		int nronly = 0;
@@ -194,7 +194,7 @@ class CommandNSList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_LIST);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_LIST);
@@ -204,7 +204,7 @@ class CommandNSList : public Command
 
 	void OnSyntaxError(User *u)
 	{
-		if (is_services_admin(u))
+		if (u->nc->IsServicesOper())
 			syntax_error(s_NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
 		else
 			syntax_error(s_NickServ, u, "LIST", NICK_LIST_SYNTAX);

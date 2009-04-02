@@ -208,11 +208,10 @@ class CommandNSGList : public Command
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 
 		NickCore *nc = u->nc;
-		int is_servadmin = is_services_admin(u);
 		int nick_ided = nick_identified(u);
 		int i;
 
-		if (nick ? (stricmp(nick, u->nick) ? !is_servadmin : !nick_ided) : !nick_ided)
+		if (nick ? (stricmp(nick, u->nick) ? !u->nc->IsServicesOper() : !nick_ided) : !nick_ided)
 			notice_lang(s_NickServ, u, nick_ided ? ACCESS_DENIED : NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (nick && (!findnick(nick) || !(nc = findnick(nick)->nc)))
 			notice_lang(s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
@@ -237,7 +236,7 @@ class CommandNSGList : public Command
 						tm = localtime(&expt);
 						strftime_lang(buf, sizeof(buf), finduser(na2->nick), STRFTIME_DATE_TIME_FORMAT, tm);
 					}
-					notice_lang(s_NickServ, u, is_services_admin(u) && !wont_expire ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY, wont_expire ? '!' : ' ', na2->nick, buf);
+					notice_lang(s_NickServ, u, u->nc->IsServicesOper() && !wont_expire ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY, wont_expire ? '!' : ' ', na2->nick, buf);
 				}
 			}
 			notice_lang(s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.count);
@@ -248,7 +247,7 @@ class CommandNSGList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_GLIST);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_GLIST);

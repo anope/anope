@@ -53,7 +53,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 {
 	Command *c = findCommand(cmdTable, cmd);
 	int retVal = 0;
-	Command *current;
+
 
 	if (!c)
 	{
@@ -120,16 +120,12 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		return;
 	}
 
+	EventReturn MOD_RESULT = EVENT_CONTINUE;
+	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->name, params));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
+
 	retVal = c->Execute(u, params);
-	if (retVal == MOD_CONT)
-	{
-		current = c->next;
-		while (current && retVal == MOD_CONT)
-		{
-			retVal = current->Execute(u, params);
-			current = current->next;
-		}
-	}
 }
 
 /*************************************************************************/
@@ -145,9 +141,6 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 				  const char *cmd)
 {
-	bool has_had_help = false;
-	int cont = MOD_CONT;
-
 	spacesepstream tokens(cmd);
 	std::string token;
 	tokens.GetToken(token);
@@ -156,9 +149,7 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
 
 	std::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
 
-	for (Command *current = c; current && cont == MOD_CONT; current = current->next)
-		has_had_help = current->OnHelp(u, subcommand);
-	if (!has_had_help)
+	if (!c->OnHelp(u, subcommand))
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
 }
 

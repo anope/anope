@@ -211,35 +211,15 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 			&& (!strcmp(c->service, current->c->service) == 0)) {
 			continue;
 		}
-		if ((stricmp(c->name.c_str(), current->name) == 0)) {   /* the cmd exist's we are a addHead */
-			if (pos == 1) {
-				c->next = current->c;
-				current->c = c;
-				if (debug)
-					alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
-						 static_cast<void *>(c->next), static_cast<void *>(c));
-				return MOD_ERR_OK;
-			} else if (pos == 2) {
-
-				tail = current->c;
-				while (tail->next)
-					tail = tail->next;
-				if (debug)
-					alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
-						 static_cast<void *>(tail), static_cast<void *>(c));
-				tail->next = c;
-				c->next = NULL;
-
-				return MOD_ERR_OK;
-			} else
-				return MOD_ERR_EXISTS;
+		if ((stricmp(c->name.c_str(), current->name) == 0))
+		{
+			/* the cmd exists, throw an error */
+			return MOD_ERR_EXISTS;
 		}
 		lastHash = current;
 	}
 
-	if (!(newHash = new CommandHash)) {
-		fatal("Out of memory");
-	}
+	newHash = new CommandHash;
 	newHash->next = NULL;
 	newHash->name = sstrdup(c->name.c_str());
 	newHash->c = c;
@@ -803,96 +783,6 @@ void moduleCallBackPrepForUnload(const char *mod_name)
 		moduleCallBackDeleteEntry(tmp);
 		tmp = moduleCallBackFindEntry(mod_name, &found);
 	}
-}
-
-/**
- * Return a copy of the complete last buffer.
- * This is needed for modules who cant trust the strtok() buffer, as we dont know who will have already messed about with it.
- * @reutrn a pointer to a copy of the last buffer - DONT mess with this, copy if first if you must do things to it.
- **/
-char *moduleGetLastBuffer()
-{
-	char *tmp = NULL;
-	if (mod_current_buffer) {
-		tmp = strchr(mod_current_buffer, ' ');
-		if (tmp) {
-			tmp++;
-		}
-	}
-	return tmp;
-}
-
-/*******************************************************************************
- * Module HELP Functions
- *******************************************************************************/
- /**
-  * Add help for Root admins.
-  * @param c the Command to add help for
-  * @param func the function to run when this help is asked for
-  **/
-int moduleAddRootHelp(Command * c, int (*func) (User * u))
-{
-	if (c) {
-		c->root_help = func;
-		return MOD_STOP;
-	}
-	return MOD_CONT;
-}
-
- /**
-  * Add help for Admins.
-  * @param c the Command to add help for
-  * @param func the function to run when this help is asked for
-  **/
-int moduleAddAdminHelp(Command * c, int (*func) (User * u))
-{
-	if (c) {
-		c->admin_help = func;
-		return MOD_STOP;
-	}
-	return MOD_CONT;
-}
-
- /**
-  * Add help for opers..
-  * @param c the Command to add help for
-  * @param func the function to run when this help is asked for
-  **/
-int moduleAddOperHelp(Command * c, int (*func) (User * u))
-{
-	if (c) {
-		c->oper_help = func;
-		return MOD_STOP;
-	}
-	return MOD_CONT;
-}
-
-/**
-  * Add help for registered users
-  * @param c the Command to add help for
-  * @param func the function to run when this help is asked for
-  **/
-int moduleAddRegHelp(Command * c, int (*func) (User * u))
-{
-	if (c) {
-		c->regular_help = func;
-		return MOD_STOP;
-	}
-	return MOD_CONT;
-}
-
-/**
-  * Add help for all users
-  * @param c the Command to add help for
-  * @param func the function to run when this help is asked for
-  **/
-int moduleAddHelp(Command * c, int (*func) (User * u))
-{
-	if (c) {
-		c->all_help = func;
-		return MOD_STOP;
-	}
-	return MOD_CONT;
 }
 
 void Module::SetNickHelp(void (*func)(User *))

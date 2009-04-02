@@ -52,18 +52,17 @@ class CommandNSInfo : public Command
 		NickAlias *na;
 		NickRequest *nr = NULL;
 		/* Being an oper is enough from now on -GD */
-		int is_servadmin = is_services_oper(u);
 
 		if (!(na = findnick(nick)))
 		{
 			if ((nr = findrequestnick(nick)))
 			{
 				notice_lang(s_NickServ, u, NICK_IS_PREREG);
-				if (param && !stricmp(param, "ALL") && is_servadmin)
+				if (param && !stricmp(param, "ALL") && u->nc->IsServicesOper())
 					notice_lang(s_NickServ, u, NICK_INFO_EMAIL, nr->email);
 				else
 				{
-					if (is_servadmin)
+					if (u->nc->IsServicesOper())
 						notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, nr->nick);
 				}
 			}
@@ -93,7 +92,7 @@ class CommandNSInfo : public Command
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL
 			 * parameter is used. -TheShadow */
-			if (param && !stricmp(param, "ALL") && u->nc && (na->nc == u->nc || is_servadmin))
+			if (param && !stricmp(param, "ALL") && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
 				show_hidden = 1;
 
 			notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
@@ -180,7 +179,7 @@ class CommandNSInfo : public Command
 					notice_lang(s_NickServ, u, NICK_INFO_NO_EXPIRE);
 				else
 				{
-					if (is_services_admin(u))
+					if (u->nc->IsServicesOper())
 					{
 						expt = na->last_seen + NSExpire;
 						tm = localtime(&expt);
@@ -198,7 +197,7 @@ class CommandNSInfo : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_INFO);

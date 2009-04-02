@@ -44,7 +44,7 @@ class CommandNSHelp : public Command
 	{
 		notice_help(s_NickServ, u, NICK_HELP);
 		moduleDisplayHelp(1, u);
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP);
 		if (NSExpire >= 86400)
 			notice_help(s_NickServ, u, NICK_HELP_EXPIRES, NSExpire / 86400);

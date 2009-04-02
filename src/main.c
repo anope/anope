@@ -91,7 +91,6 @@ const char version_build[] =
 /* the space is needed cause if you build with nothing it will complain */
 const char version_flags[] = " " VER_OS VER_MYSQL VER_MODULE;
 
-extern char *mod_current_buffer;
 
 /******** Local variables! ********/
 
@@ -211,8 +210,6 @@ static void services_shutdown()
 		ircdproto->SendSquit(ServerName, quitmsg);
 		if (uplink)
 			delete [] uplink;
-		if (mod_current_buffer)
-			delete [] mod_current_buffer;
 		if (ircd->chanmodes) {
 			delete [] ircd->chanmodes;
 		}

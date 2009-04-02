@@ -281,13 +281,7 @@ class CoreExport Command
 	int core;		   /* Can this command be deleted? */
 	char *mod_name;	/* Name of the module who owns us, NULL for core's  */
 	char *service;	/* Service we provide this command for */
-	int (*all_help)(User *u);
-	int (*regular_help)(User *u);
-	int (*oper_help)(User *u);
-	int (*admin_help)(User *u);
-	int (*root_help)(User *u);
-
-	Command *next;	/* Next command responsible for the same command */
+	Command *next;
 };
 /** Every module in Anope is actually a class.
  */
@@ -510,6 +504,14 @@ class CoreExport Module
 	 */
 	virtual void OnServerConnect(Server *s) { }
 
+	/** Called before a command is due to be executed.
+	 * @param u The user executing the command
+	 * @param command The command the user is executing
+	 * @param params The parameters the user is sending
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnPreCommand(User *u, const std::string &command, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
 	/** Called when anope saves databases.
 	 * NOTE: This event is deprecated pending new database handling.
 	 * XXX.
@@ -529,6 +531,7 @@ enum Implementation
 {
 	I_BEGIN,
 		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect, I_OnServerConnect,
+		I_OnPreCommand,
 		I_OnSaveDatabase, I_OnBackupDatabase,
 	I_END
 };
@@ -678,14 +681,7 @@ int encryption_module_init(); /* Load the encryption module */
 int protocol_module_init();	/* Load the IRCD Protocol Module up*/
 void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
-MDE char *moduleGetLastBuffer();
 MDE void moduleDisplayHelp(int service, User *u);
-MDE int moduleAddHelp(Command * c, int (*func) (User * u));
-MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));
-MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));
-MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
-MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
-extern MDE char *mod_current_buffer;
 
 /*************************************************************************/
 /*************************************************************************/

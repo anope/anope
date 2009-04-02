@@ -118,6 +118,8 @@ void inspircd_cmd_nc_change(User * u);
 void inspircd_cmd_svid_umode2(User * u, char *ts);
 void inspircd_cmd_svid_umode3(User * u, char *ts);
 void inspircd_cmd_eob();
+void inspircd_cmd_chghost(char *nick, char *vhost);
+void inspircd_cmd_chgident(char *nick, char *vIdent);
 int inspircd_flood_mode_check(char *value);
 void inspircd_cmd_jupe(char *jserver, char *who, char *reason);
 int inspircd_valid_nick(char *nick);

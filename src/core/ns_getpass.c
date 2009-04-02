@@ -105,8 +105,7 @@ class NSGetPass : public Module
  **/
 void myNickServHelp(User *u)
 {
-	if (is_services_admin(u))
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
 }
 
 MODULE_INIT("ns_getpass", NSGetPass)

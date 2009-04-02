@@ -82,12 +82,6 @@ class CommandNSIdentify : public Command
 			{
 				len = strlen(ircd->modeonreg);
 				strncpy(modes, ircd->modeonreg, 512);
-				if (ircd->rootmodeonid && is_services_root(u))
-					strncat(modes, ircd->rootmodeonid, 512 - len);
-				else if (ircd->adminmodeonid && is_services_admin(u))
-					strncat(modes, ircd->adminmodeonid, 512 - len);
-				else if (ircd->opermodeonid && is_services_oper(u))
-					strncat(modes, ircd->opermodeonid, 512 - len);
 				if (ircd->tsonmode)
 					common_svsmode(u, modes, tsbuf);
 				else

@@ -456,9 +456,6 @@ struct ircdvars_ {
 	const char *adminset;				/* Mode to set for admin	*/
 	const char *adminunset;			/* Mode to unset for admin	*/
 	const char *modeonreg;			/* Mode on Register		*/
-	const char *rootmodeonid;					 /* Mode on ID for ROOTS		 */
-	const char *adminmodeonid;					/* Mode on ID for ADMINS		*/
-	const char *opermodeonid;					 /* Mode on ID for OPERS		 */
 	const char *modeonunreg;			/* Mode on Unregister		*/
 	const char *modeonnick;			/* Mode on nick change		*/
 	int sgline;				/* Supports SGline		*/

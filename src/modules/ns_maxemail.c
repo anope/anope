@@ -20,7 +20,7 @@
 
 void my_load_config();
 void my_add_languages();
-CommandReturn check_email_limit_reached(const char *email, User * u);
+bool check_email_limit_reached(const char *email, User * u);
 
 int NSEmailMax = 0;
 
@@ -29,50 +29,6 @@ int NSEmailMax = 0;
 #define LNG_NSEMAILMAX_REACHED_ONE	1
 
 static Module *me;
-
-// XXX: This should probably use an event one day.
-class CommandNSRegister : public Command
-{
- public:
-	CommandNSRegister() : Command("REGISTER", 1, 2)
-	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-	}
-
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
-	{
-		return check_email_limit_reached(params.size() > 1 ? params[1].c_str() : NULL, u);
-	}
-
-	void OnSyntaxError(User *u)
-	{
-		// no-op
-	}
-};
-
-class CommandNSSet : public Command
-{
- public:
-	CommandNSSet() : Command("SET", 1, 3)
-	{
-	}
-
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
-	{
-		const char *set = params[0].c_str();
-		const char *email = params[1].size() > 1 ? params[1].c_str() : NULL;
-
-		if (!stricmp(set, "email"))
-			return MOD_CONT;
-
-		return check_email_limit_reached(email, u);
-	}
-
-	void OnSyntaxError(User *u)
-	{
-		// no-op
-	}
-};
 
 class NSMaxEmail : public Module
 {
@@ -85,10 +41,8 @@ class NSMaxEmail : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_HEAD);
-		this->AddCommand(NICKSERV, new CommandNSSet(), MOD_HEAD);
-
-		ModuleManager::Attach(I_OnReload,  this);
+		ModuleManager::Attach(I_OnReload, this);
+		ModuleManager::Attach(I_OnPreCommand, this);
 
 		my_load_config();
 
@@ -146,6 +100,28 @@ class NSMaxEmail : public Module
 	{
 		my_load_config();
 	}
+
+	EventReturn OnPreCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params)
+	{
+		if (service == s_NickServ)
+		{
+			if (command == "REGISTER")
+			{
+				if (check_email_limit_reached(params.size() > 1 ? params[1].c_str() : NULL, u))
+					return EVENT_STOP;
+			}
+			else if (command == "SET")
+			{
+				const char *set = params[0].c_str();
+				const char *email = params[1].size() > 1 ? params[1].c_str() : NULL;
+
+				if (!stricmp(set, "email") && check_email_limit_reached(email, u))
+					return EVENT_STOP;
+			}
+		}
+
+		return EVENT_CONTINUE;
+	}
 };
 
 
@@ -170,20 +146,20 @@ int count_email_in_use(const char *email, User * u)
 	return count;
 }
 
-CommandReturn check_email_limit_reached(const char *email, User * u)
+bool check_email_limit_reached(const char *email, User * u)
 {
 	if (NSEmailMax < 1 || !email || is_services_admin(u))
-		return MOD_CONT;
+		return false;
 
 	if (count_email_in_use(email, u) < NSEmailMax)
-		return MOD_CONT;
+		return false;
 
 	if (NSEmailMax == 1)
 		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
 	else
 		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
 
-	return MOD_STOP;
+	return true;
 }
 
 void my_load_config()

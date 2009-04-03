@@ -141,37 +141,6 @@ class CommandNSOInfo : public Command
 	}
 };
 
-class CommandNSInfo : public Command
-{
- public:
-	CommandNSInfo() : Command("INFO", 1, 1)
-	{
-	}
-
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
-	{
-		const char *nick = params[0].c_str();
-		NickAlias *na = NULL;
-
-		if (is_oper(u)) /* Only show our goodies to opers */
-		{
-			if ((na = findnick(nick))) /* ok we've found the user */
-			{
-				/* If we have any info on this user */
-				char *c;
-				if (na->nc->GetExt("os_info", c))
-					u->SendMessage(s_NickServ, " OperInfo: %s", c);
-			}
-		}
-		return MOD_CONT;
-	}
-
-	void OnSyntaxError(User *u)
-	{
-		// no-op
-	}
-};
-
 class CommandCSOInfo : public Command
 {
  private:
@@ -259,37 +228,6 @@ class CommandCSOInfo : public Command
 	}
 };
 
-class CommandCSInfo : public Command
-{
- public:
-	CommandCSInfo() : Command("INFO", 1, 1)
-	{
-	}
-
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
-	{
-		const char *chan = params[0].c_str();
-		ChannelInfo *ci = NULL;
-
-		if (is_oper(u)) /* Only show our goodies to opers */
-		{
-			if ((ci = cs_findchan(chan)))
-			{
-				/* If we have any info on this channel */
-				char *c;
-				if (ci->GetExt("os_info", c))
-					u->SendMessage(s_ChanServ, " OperInfo: %s", c);
-			}
-		}
-		return MOD_CONT;
-	}
-
-	void OnSyntaxError(User *u)
-	{
-		// no-op
-	}
-};
-
 class OSInfo : public Module
 {
  public:
@@ -307,11 +245,10 @@ class OSInfo : public Module
 			throw ModuleException("Unable to load config");
 
 		status = this->AddCommand(NICKSERV, new CommandNSOInfo(), MOD_HEAD);
-		status = this->AddCommand(NICKSERV, new CommandNSInfo(), MOD_TAIL);
 
 		status = this->AddCommand(CHANSERV, new CommandCSOInfo(), MOD_HEAD);
-		status = this->AddCommand(CHANSERV, new CommandCSInfo(), MOD_TAIL);
 
+		ModuleManager::Attach(I_OnPostCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);
 		ModuleManager::Attach(I_OnBackupDatabase, this);
 
@@ -565,6 +502,45 @@ class OSInfo : public Module
 
 		if (ret)
 			alog("os_info.c: ERROR: An error has occured while reloading the configuration file");
+	}
+
+	void OnPostCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params)
+	{
+		if (command == "INFO")
+		{
+			if (service == s_NickServ)
+			{
+				const char *nick = params[0].c_str();
+				NickAlias *na = NULL;
+
+				if (is_oper(u)) /* Only show our goodies to opers */
+				{
+					if ((na = findnick(nick))) /* ok we've found the user */
+					{
+						/* If we have any info on this user */
+						char *c;
+						if (na->nc->GetExt("os_info", c))
+							u->SendMessage(s_NickServ, " OperInfo: %s", c);
+					}
+				}
+			}
+			else if (service == s_ChanServ)
+			{
+				const char *chan = params[0].c_str();
+				ChannelInfo *ci = NULL;
+
+				if (is_oper(u)) /* Only show our goodies to opers */
+				{
+					if ((ci = cs_findchan(chan)))
+					{
+						/* If we have any info on this channel */
+						char *c;
+						if (ci->GetExt("os_info", c))
+							u->SendMessage(s_ChanServ, " OperInfo: %s", c);
+					}
+				}
+			}
+		}
 	}
 
 	void OnSaveDatabase()

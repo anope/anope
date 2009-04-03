@@ -366,27 +366,6 @@ class HSListBase : public Command
 	}
 };
 
-class CommandHSList : public HSListBase
-{
- public:
-	CommandHSList() : HSListBase("LIST", 0, 1)
-	{
-	}
-
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
-	{
-		const char *key = params.size() ? params[0].c_str() : NULL;
-
-		if (!key)
-			return MOD_CONT;
-
-		if (stricmp(key, "+req"))
-			return MOD_CONT;
-
-		return this->DoList(u, params);
-	}
-};
-
 class CommandHSWaiting : public HSListBase
 {
  public:
@@ -412,29 +391,6 @@ class CommandHSWaiting : public HSListBase
 	}
 };
 
-class CommandNSDrop : public Command
-{
- public:
-	CommandNSDrop() : Command("DROP", 0, 0)
-	{
-	}
-
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
-	{
-		HostCore *tmp;
-		bool found = false;
-		NickAlias *na;
-
-		na = findnick(u->nick);
-		tmp = findHostCore(hs_request_head, u->nick, &found);
-
-		if (found && na)
-			hs_request_head = deleteHostCore(hs_request_head, tmp);
-
-		return MOD_CONT;
-	}
-};
-
 class HSRequest : public Module
 {
  public:
@@ -446,10 +402,8 @@ class HSRequest : public Module
 		this->AddCommand(HOSTSERV, new CommandHSActivate(), MOD_HEAD);
 		this->AddCommand(HOSTSERV, new CommandHSReject(), MOD_HEAD);
 		this->AddCommand(HOSTSERV, new CommandHSWaiting(), MOD_HEAD);
-		this->AddCommand(HOSTSERV, new CommandHSList(), MOD_HEAD);
 
-		this->AddCommand(NICKSERV, new CommandNSDrop(), MOD_HEAD);
-
+		ModuleManager::Attach(I_OnPreCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);
 		ModuleManager::Attach(I_OnBackupDatabase, this);
 
@@ -729,6 +683,39 @@ class HSRequest : public Module
 			hs_request_head = deleteHostCore(hs_request_head, NULL);
 
 		delete [] HSRequestDBName;
+	}
+
+	EventReturn OnPreCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params)
+	{
+		if (service == s_HostServ)
+		{
+			if (command == "LIST")
+			{
+				const char *key = params.size() ? params[0].c_str() : NULL;
+
+				if (key && !stricmp(key, "+req"))
+				{
+					std::vector<std::string> emptyParams;
+					Command *c = findCommand(HOSTSERV, "WAITING");
+					c->Execute(u, emptyParams);
+					return EVENT_STOP;
+				}
+			}
+		}
+		else if (service == s_NickServ)
+		{
+			if (command == "DROP")
+			{
+				bool found = false;
+				NickAlias *na = findnick(u->nick);
+				HostCore *tmp = findHostCore(hs_request_head, u->nick, &found);
+
+				if (found && na)
+					hs_request_head = deleteHostCore(hs_request_head, tmp);
+			}
+		}
+
+		return EVENT_CONTINUE;
 	}
 
 	void OnSaveDatabase()

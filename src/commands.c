@@ -121,11 +121,13 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	}
 
 	EventReturn MOD_RESULT = EVENT_CONTINUE;
-	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->name, params));
+	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name, params));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
 	retVal = c->Execute(u, params);
+
+	FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name, params));
 }
 
 /*************************************************************************/

@@ -506,11 +506,20 @@ class CoreExport Module
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
+	 * @param service The service the command is associated with
 	 * @param command The command the user is executing
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(User *u, const std::string &command, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
+	/** Called after a command has been executed.
+	 * @param u The user executing the command
+	 * @param service The service the command is associated with
+	 * @param command The command the user executed
+	 * @param params The parameters the user sent
+	 */
+	virtual void OnPostCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params) { }
 
 	/** Called when anope saves databases.
 	 * NOTE: This event is deprecated pending new database handling.
@@ -531,7 +540,7 @@ enum Implementation
 {
 	I_BEGIN,
 		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect, I_OnServerConnect,
-		I_OnPreCommand,
+		I_OnPreCommand, I_OnPostCommand,
 		I_OnSaveDatabase, I_OnBackupDatabase,
 	I_END
 };

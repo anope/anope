@@ -521,8 +521,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendSQLine(const char *mask, const char *reason)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi ? bi->uid : s_OperServ, "RESV * %s :%s", mask, reason);
+		send_cmd(TS6SID, "RESV * %s :%s", mask, reason);
 	}
 
 	void SendSGLineDel(const char *mask)
@@ -545,8 +544,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendSQLineDel(const char *user)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi ? bi->uid : s_OperServ, "UNRESV * %s", user);
+		send_cmd(TS6SID, "UNRESV * %s", user);
 	}
 
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)

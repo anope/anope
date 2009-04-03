@@ -165,32 +165,41 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
 		starttime = time(NULL);
 
-		if (!stricmp(receiver, s_OperServ)) {
-			if (!is_oper(u) && OSOpersOnly) {
-				notice_lang(s_OperServ, u, ACCESS_DENIED);
-				if (WallBadOS)
-					ircdproto->SendGlobops(s_OperServ,
-									 "Denied access to %s from %s!%s@%s (non-oper)",
-									 s_OperServ, u->nick, u->GetIdent().c_str(),
-									 u->host);
-			} else {
-				operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+		bi = findbot(receiver);
+
+		if (bi)
+		{
+			if (!stricmp(bi->nick, s_OperServ))
+			{
+				if (!is_oper(u) && OSOpersOnly)
+				{
+					notice_lang(s_OperServ, u, ACCESS_DENIED);
+					if (WallBadOS)
+						ircdproto->SendGlobops(s_OperServ, "Denied access to %s from %s!%s@%s (non-oper)", s_OperServ, u->nick, u->GetIdent().c_str(), u->host);
+				}
+				else
+					operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
-		} else if (!stricmp(receiver, s_NickServ)) {
-			nickserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-		} else if (!stricmp(receiver, s_ChanServ)) {
-			if (!is_oper(u) && CSOpersOnly)
-				notice_lang(s_ChanServ, u, ACCESS_DENIED);
-			else
-				chanserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-		} else if (!stricmp(receiver, s_MemoServ)) {
-			memoserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-		} else if (s_HostServ && !stricmp(receiver, s_HostServ)) {
-			hostserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-		} else if (s_BotServ && !stricmp(receiver, s_BotServ)) {
-			botserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-		} else if (s_BotServ && (bi = findbot(receiver))) {
-			botmsgs(u, bi, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			else if (!stricmp(bi->nick, s_NickServ))
+				nickserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			else if (!stricmp(bi->nick, s_ChanServ))
+			{
+				if (!is_oper(u) && CSOpersOnly)
+					notice_lang(s_ChanServ, u, ACCESS_DENIED);
+				else
+					chanserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			}
+			else if (!stricmp(bi->nick, s_MemoServ))
+				memoserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			else if (s_HostServ && !stricmp(bi->nick, s_HostServ))
+				hostserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			else if (s_BotServ)
+			{
+				if (!stricmp(bi->nick, s_BotServ))
+					botserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				else
+					botmsgs(u, bi, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			}
 		}
 
 		/* Add to ignore list if the command took a significant amount of time. */

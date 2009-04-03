@@ -87,6 +87,7 @@ class CommandNSIdentify : public Command
 				else
 					common_svsmode(u, modes, "");
 			}
+			ircdproto->SendAccountLogin(u, u->nc);
 			send_event(EVENT_NICK_IDENTIFY, 1, u->nick);
 			alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick);
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);

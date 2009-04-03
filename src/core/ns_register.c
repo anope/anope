@@ -85,6 +85,8 @@ class CommandNSConfirm : public Command
 				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->GetAccess(0).c_str());
 			else
 				notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
+
+			ircdproto->SendAccountLogin(u, u->nc);
 			send_event(EVENT_NICK_REGISTERED, 1, u->nick);
 
 			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)

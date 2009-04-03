@@ -76,6 +76,8 @@ class CommandNSLogout : public Command
 			if (u->nc->flags & NI_KILLPROTECT)
 				del_ns_timeout(na, TO_COLLIDE);
 
+			ircdproto->SendAccountLogout(u2, u2->nc);
+
 			u2->nc = NULL;
 
 			/* Send out an event */

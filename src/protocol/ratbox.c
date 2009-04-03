@@ -600,8 +600,7 @@ class RatboxProto : public IRCDTS6Proto
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		EnforceQlinedNick(nick, NULL);
-		const char *uidbuf = ts6_uid_retrieve();
-		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uid, real);
 		SendSQLine(nick, "Reserved for services");
 	}
 

@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2251"
+VERSION_BUILD="2253"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2253 - Backport of bugfix for bug #1004 from SVN r2003, Modechanges from ulined server are no longer being blocked by SECUREOPS.
 #Revision 2251 - Fixed non-standard C-style comment.
 #Revision 2250 - Updated example.conf regarding removal of the inspirc10 protocol module and SRA requirement for SuperAdmin.
 #Revision 2249 - Someone seems to have forgotten about Changes.. added most significant commits to Changes.

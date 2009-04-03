@@ -20,6 +20,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 03/23 F Force a user off a nick when it is suspended.                    [#1065]
 03/23 F Fixed CS SET MLOCK requiring a param to allow clearing.          [#1044]
 03/30 F Fantasy commands in CTCP ACTIONs will now be ignored.            [#1073]
+04/03 F SECUREOPS now igores modechanges from ulined servers.            [#1004]
 
 Provided by Adam <Adam@SubZeroIRC.net> - 2009
 01/28 F Added internal support for +j channelmodes.                      [#1001]

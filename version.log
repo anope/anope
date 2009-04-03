@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2245"
+VERSION_BUILD="2249"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2249 - Someone seems to have forgotten about Changes.. added most significant commits to Changes.
 #Revision 2245 - Backport of bugfix for bug #1050 from SVN r2163, patch from Adam, MS STAFF's syntax shows correctly, required adding a language string as well, currently they are all English until they can be properly translated.
 #Revision 2240 - Fix compile error with inspircd11 module.
 #Revision 2221 - Modified patch to change vhost removal to work correctly in all cases, originally by Szymek.

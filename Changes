@@ -1,19 +1,39 @@
 Anope Version 1.8 SVN
 -------------------
 Provided by Anope Dev. <team@anope.org> - 2009
+03/30 R Removed InspIRCd 1.0 support.                                    [  #00]
 01/03 F Updated install.js url for windows build help.                   [  #00]
 01/17 F Fixed MySQL DB saving failing due to unsafe queries.             [ #994]
 01/18 F Fixed check for backtrace() in configure.                        [  #00]
 01/22 F Do not allow invalied nicks to be grouped.                       [#1000]
 01/26 F Do not allow empty vIdent when loading from MySQL.               [  #00]
 01/26 F Readonly/noexpire are now checked before saving on shutdown.     [  #00]
+02/12 F Fixed timestamps blowing away on JOIN in InspIRCd 1.1.           [  #00]
+02/12 F Fixed dropped mode changes coming from Anope on TS6 IRCds.       [  #00]
+02/23 F Added missing FD_ZERO() call before FD_SET().                    [  #00]
+02/23 F Send correct akill timestamp on  InspIRCd 1.1.                   [  #00]
+03/10 F MLOCK +f parameter isn't correctly read on DB load.              [#1020]
+03/10 F Buggy message when deleting invalid number from ACCESS/XOP list. [#1025]
+03/18 F Hide password for ignored users in log/logchan.                  [#1054]
+03/23 F Some BS cmds no longer send error msgs to users without access.  [#1062]
+03/23 F Fixed NS RECOVER sending "(null)" in some places.                [#1064]
+03/23 F Force a user off a nick when it is suspended.                    [#1065]
+03/23 F Fixed CS SET MLOCK requiring a param to allow clearing.          [#1044]
+03/30 F Fantasy commands in CTCP ACTIONs will now be ignored.            [#1073]
+
+Provided by Adam <Adam@SubZeroIRC.net> - 2009
+01/28 F Added internal support for +j channelmodes.                      [#1001]
+02/07 F CS OP/PROTECT/etc now enforced SECUREOPS setting.                [#1006]
+03/07 F Channel list re-ordering.                                        [#1024]
+03/22 F Log message about the deleting from channel access list.         [#1030]
 
 Provided by mooncup <mooncup@anonnet.org> - 2009
 02/04 F Automatically reapply vhost on hs off for unreal32.              [  #00]
+04/03 F MS STAFF sends wrong syntax error.                               [#1050]
 
-Provided by Adam <Adam@SubZeroIRC.net> - 2009
-03/07 F Channel list re-ordering.                                        [#1024]
-01/28 F Added internal support for +j channelmodes.                      [#1001]
+Provided by DukePyrolator <> - 2009
+03/15 F Log error when NSMemoReceipt isn't defined in config.            [  #00]
+03/22 F Fixed memleak in channels.c.                                     [  #00]
 
 Provided by Szymek <> - 2009
 03/30 F Fix HS OFF to work in all cases on InspIRCd.                     [#1075]

@@ -53,7 +53,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 {
 	Command *c = findCommand(cmdTable, cmd);
 	int retVal = 0;
-
+	ChannelInfo *ci;
 
 	if (!c)
 	{
@@ -125,6 +125,27 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
+	if (params.size() > 0 && ircdproto->IsChannelValid(params[0].c_str()))
+	{
+		if ((ci = cs_findchan(params[0].c_str())))
+		{
+			if ((ci->flags & CI_FORBIDDEN) && (!c->HasFlag(CFLAG_ALLOW_FORBIDDEN)))
+			{
+				notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name);
+				alog("Access denied for user %s with service %s and command %s because of FORBIDDEN channel %s",
+					u->nick, service, cmd, ci->name);
+				return;
+			}
+			else if ((ci->flags & CI_SUSPENDED) && (!c->HasFlag(CFLAG_ALLOW_SUSPENDED)))
+			{
+				notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name);
+				alog("Access denied for user %s with service %s and command %s because of SUSPENDED channel %s",
+					u->nick, service, cmd, ci->name);
+				return;
+			}
+		}
+	}
+
 	retVal = c->Execute(u, params);
 
 	FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name, params));
@@ -140,8 +161,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
  * @param cmd Command
  * @return void
  */
-void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
-				  const char *cmd)
+void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[], const char *cmd)
 {
 	spacesepstream tokens(cmd);
 	std::string token;

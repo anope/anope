@@ -44,8 +44,6 @@ class CommandCSStatus : public Command
 		}
 		if (!ci)
 			notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
-		else if (ci->flags & CI_FORBIDDEN)
-			notice_lang(s_ChanServ, u, CHAN_STATUS_FORBIDDEN, chan);
 		else if ((u2 = finduser(nick)))
 			notice_lang(s_ChanServ, u, CHAN_STATUS_INFO, chan, nick, get_access(u2, ci));
 		else /* !u2 */

@@ -366,8 +366,6 @@ class XOPBase : public Command
 
 		if (!(ci = cs_findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (ci->flags & CI_FORBIDDEN)
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		else if (!(ci->flags & CI_XOP))
 			notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
 		else if (!stricmp(cmd, "ADD"))

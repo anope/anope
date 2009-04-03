@@ -217,7 +217,9 @@ struct ModuleLang_ {
 
 enum CommandFlags
 {
-	CFLAG_ALLOW_UNREGISTERED = 1
+	CFLAG_ALLOW_UNREGISTERED = 1,
+	CFLAG_ALLOW_FORBIDDEN = 2,
+	CFLAG_ALLOW_SUSPENDED = 4
 };
 
 /** Every services command is a class, inheriting from Command.

@@ -29,6 +29,7 @@ class CommandCSGetPass : public Command
  public:
 	CommandCSGetPass() : Command("GETPASS", 1, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -46,11 +47,6 @@ class CommandCSGetPass : public Command
 		if (!(ci = cs_findchan(chan)))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
-		if (ci->flags & CI_FORBIDDEN)
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 		if (!enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1))

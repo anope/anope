@@ -72,8 +72,6 @@ class CommandCSLogout : public Command
 			this->OnSyntaxError(u);
 		else if (!(ci = cs_findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if ((ci->flags & CI_FORBIDDEN))
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		else if (nick && !(u2 = finduser(nick)))
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (u2 != u && !is_real_founder(u, ci) && !is_admin)

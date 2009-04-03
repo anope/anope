@@ -88,11 +88,6 @@ class CommandMSSet : public Command
 				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
 				return MOD_CONT;
 			}
-			else if (ci->flags & CI_FORBIDDEN)
-			{
-				notice_lang(s_MemoServ, u, CHAN_X_FORBIDDEN, chan);
-				return MOD_CONT;
-			}
 			else if (!is_servadmin && !check_access(u, ci, CA_MEMO))
 			{
 				notice_lang(s_MemoServ, u, ACCESS_DENIED);

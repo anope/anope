@@ -255,12 +255,6 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->flags & CI_FORBIDDEN)
-		{
-			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-			return MOD_CONT;
-		}
-
 		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->nc->HasPriv("botserv/administration")))
 		{
 			notice_lang(s_BotServ, u, ACCESS_DENIED);

@@ -45,8 +45,6 @@ class CommandCSClear : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!(ci = c->ci)) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_FORBIDDEN) {
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (!u || !check_access(u, ci, CA_CLEAR)) {
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 		} else if (stricmp(what, "bans") == 0) {

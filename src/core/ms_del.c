@@ -48,11 +48,6 @@ class CommandMSDel : public Command
 				notice_lang(s_MemoServ, u, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
-			else if (ci->flags & CI_FORBIDDEN)
-			{
-				notice_lang(s_MemoServ, u, CHAN_X_FORBIDDEN, chan);
-				return MOD_CONT;
-			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
 				notice_lang(s_MemoServ, u, ACCESS_DENIED);

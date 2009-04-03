@@ -44,6 +44,8 @@ class CommandCSInfo : public Command
 	CommandCSInfo() : Command("INFO", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
+		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

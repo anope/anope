@@ -574,8 +574,6 @@ class CommandCSSet : public Command
 			syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_FORBIDDEN) {
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (!is_servadmin && !check_access(u, ci, CA_SET)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(cmd, "FOUNDER") == 0) {

@@ -49,12 +49,6 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->flags & CI_FORBIDDEN)
-		{
-			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-			return MOD_CONT;
-		}
-
 		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->nc->HasPriv("botserv/administration")))
 		{
 			notice_lang(s_BotServ, u, PERMISSION_DENIED);

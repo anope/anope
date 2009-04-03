@@ -124,8 +124,6 @@ class CommandCSAccess : public Command
 			this->OnSyntaxError(u);
 		else if (!(ci = cs_findchan(chan)))
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (ci->flags & CI_FORBIDDEN)
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		/* We still allow LIST in xOP mode, but not others */
 		else if ((ci->flags & CI_XOP) && !is_list)
 		{
@@ -397,8 +395,6 @@ class CommandCSLevels : public Command
 			this->OnSyntaxError(u);
 		} else if (!(ci = cs_findchan(chan))) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		} else if (ci->flags & CI_FORBIDDEN) {
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 		} else if (ci->flags & CI_XOP) {
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
 		} else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change")) {

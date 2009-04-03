@@ -127,6 +127,7 @@ class CommandCSUnSuspend : public Command
  public:
 	CommandCSUnSuspend() : Command("UNSUSPEND", 1, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

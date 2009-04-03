@@ -42,8 +42,6 @@ class CommandBSKick : public Command
 			syntax_error(s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (!(ci = cs_findchan(chan)))
 			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (ci->flags & CI_FORBIDDEN)
-			notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
 		else if (!check_access(u, ci, CA_SET) && !u->nc->HasPriv("botserv/administration"))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)

@@ -663,6 +663,16 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(source->uid, "INVITE %s %s", u ? u->GetUID().c_str(): nick, chan);
 	}
 
+	void SendAccountLogin(User *u, NickCore *account)
+	{
+		send_cmd(TS6SID, "ENCAP * SU %s %s", u->GetUID().c_str(), account->display);
+	}
+
+	void SendAccountLogout(User *u, NickCore *account)
+	{
+		send_cmd(TS6SID, "ENCAP * SU %s", u->GetUID().c_str());
+	}
+
 	int IsNickValid(const char *nick)
 	{
 		/* TS6 Save extension -Certus */

@@ -506,6 +506,12 @@ class CoreExport Module
 	 */
 	virtual void OnServerConnect(Server *s) { }
 
+	/** Called after a user changed the nick
+	 * @param u The user.
+	 * @param oldnick the old nick of the user
+	 */
+	virtual void OnUserNickChange(User *u, const char *oldnick) { }
+
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
 	 * @param service The service the command is associated with
@@ -542,7 +548,7 @@ enum Implementation
 {
 	I_BEGIN,
 		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect, I_OnServerConnect,
-		I_OnPreCommand, I_OnPostCommand,
+		I_OnPreCommand, I_OnPostCommand, I_OnUserNickChange,
 		I_OnSaveDatabase, I_OnBackupDatabase,
 	I_END
 };

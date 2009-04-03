@@ -699,13 +699,12 @@ class InspIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendAccountLogin(User *u,  NickCore *account)
+	void SendAccountLogin(User *u, NickCore *account)
 	{
 		send_cmd(TS6SID, "METADATA %s accountname :%s", u->GetUID().c_str(), account->display);
-
 	}
 
-	void SendAccountLogout(User *u,  NickCore *account)
+	void SendAccountLogout(User *u, NickCore *account)
 	{
 		send_cmd(TS6SID, "METADATA %s accountname :", u->GetUID().c_str());
 	}

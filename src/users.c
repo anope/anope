@@ -687,7 +687,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 
 			user->SetNewNick(nick);
-			send_event(EVENT_CHANGE_NICK, 1, nick);
+			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, source));
 
 			if ((old_na ? old_na->nc : NULL) == user->nc)
 				nc_changed = 0;
@@ -700,7 +700,10 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 			else
 			{
-				ircdproto->SendUnregisteredNick(user);
+				if (!nick_identified(user) || !nick_recognized(user))
+				{
+					ircdproto->SendUnregisteredNick(user);
+				}
 			}
 		}
 

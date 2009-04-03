@@ -5117,7 +5117,9 @@ CHAN_HELP_CLEAR
 	     BANS     Καθαρίζει όλα τα bans από το κανάλι.
 	     EXCEPTS  Καθαρίζει όλα τα excepts από το κανάλι.
 	     OPS      Αφαιρεί το channel-operator status (mode +o) από
-	                  όλους τους channel operators.
+	                  όλους τους channel operators. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Removes channel-halfoperator status (mode +h) from
 	                  all channel halfoperators, if supported.
 	     VOICES   Αφαιρεί τα "voice" status (mode +v) από τον καθένα.

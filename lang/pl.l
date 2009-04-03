@@ -6167,7 +6167,9 @@ CHAN_HELP_CLEAR
 	   MODES     Zdejmuje wszystkie tryby z kana³u
 	   BANS      Zdejmuje wszystkie bany na kanale
 	   EXCEPTS   Zdejmuje wyj±tki od banów na kanale
-	   OPS       Odbiera wszystkim status operatora
+	   OPS       Odbiera wszystkim status operatora. If supported, removes
+	             channel-admin (mode +a) and channel-owner (mode +q)
+	             as well.
 	   HOPS      Odbiera wszystkim status pó³-operatora
 	   VOICES    Odbiera wszystkim prawo g³osu
 	   USERS     Wykopuje wszystkich z kana³u

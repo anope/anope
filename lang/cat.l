@@ -5169,8 +5169,10 @@ CHAN_HELP_CLEAR
 	                  neteja els Modes i,k,l,m,n,p,s,t).
 	     BANS     neteja tots els bans en el canal.
 	     EXCEPTS  neteja tots els excepts en el canal.
-	     OPS      Esborra estatus d'operador de canal(Mode +o)
-	                  de tots els operadors de canal.
+	     OPS      Esborra estatus d'operador de canal (Mode +o)
+	                  de tots els operadors de canal. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Removes channel-halfoperator status (mode +h) from
 	                  all channel halfoperators, if supported.
 	     VOICES   Esborra l'estatus "voice" (Mode +v) de qui

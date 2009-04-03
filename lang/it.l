@@ -5073,7 +5073,9 @@ CHAN_HELP_CLEAR
 	                  i modi i,k,l,m,n,p,s,t).
 	     BANS     Annulla tutti i ban del canale.
 	     OPS      Rimuove lo stato di operatore (modo +o) da
-	                  tutti gli operatori del canale.
+	                  tutti gli operatori del canale. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Rimuove lo stato di halfoperator (modo +h) da
 	                  tutti gli halfoperator del canale, se supportato.
 	     VOICES   Rimuove lo stato di voice (modo +v) da tutti

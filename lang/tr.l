@@ -5084,7 +5084,9 @@ CHAN_HELP_CLEAR
 	     BANS     Kanaldaki tüm banlarý kaldýrýr.
 	     EXCEPTS  Clears all excepts on the channel.
 	     OPS      Kanal opu statüsünde olanlarýn (mode +o)
-	                  oplarýný alýr.
+	                  oplarýný alýr. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Removes channel-halfoperator status (mode +h) from
 	                  all channel halfoperators, if supported.
 	     VOICES   Voice statüsünde olanlarýn (mode +v) voice larýný

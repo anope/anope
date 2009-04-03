@@ -5141,8 +5141,10 @@ CHAN_HELP_CLEAR
 	                  limpia los modos i,k,l,m,n,p,s,t).
 	     BANS     Limpia todos los bans en el canal.
 	     EXCEPTS  Limpia todos los excepts en el canal.
-	     OPS      Remueve estatus de operador de canal(modo +o)
-	                  de todos los operadores de canal.
+	     OPS      Remueve estatus de operador de canal (modo +o)
+	                  de todos los operadores de canal. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Removes channel-halfoperator status (mode +h) from
 	                  all channel halfoperators, if supported.
 	     VOICES   Remueve el estatus "voice" (modo +v) de quien

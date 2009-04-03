@@ -5060,7 +5060,9 @@ CHAN_HELP_CLEAR
 	             mode lockjában.
 	    BANS     Törli az összes tiltást a csatornán.
 	    EXCEPTS  Törli az összes kivételt a csatornán.
-	    OPS      Elvesz minden opot a csatornán
+	    OPS      Elvesz minden opot a csatornán. If supported, removes
+			     channel-admin (mode +a) and channel-owner (mode +q)
+			     as well.
 	    HOPS     Eltávolít minden félop csatorna státuszt (+h mód)
 	             az összes csatornán lévõ féloperátortól, ha támogatott.
 	    VOICES   Elvesz minden "voice"-t (mode +v) a csatornán.

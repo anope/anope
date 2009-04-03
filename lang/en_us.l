@@ -4945,7 +4945,9 @@ CHAN_HELP_CLEAR
 	     BANS     Clears all bans on the channel.
 	     EXCEPTS  Clears all excepts on the channel.
 	     OPS      Removes channel-operator status (mode +o) from
-	                  all channel operators.
+	                  all channel operators. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Removes channel-halfoperator status (mode +h) from
 	                  all channel halfoperators, if supported.
 	     VOICES   Removes "voice" status (mode +v) from anyone

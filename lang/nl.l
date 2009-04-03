@@ -5074,7 +5074,9 @@ CHAN_HELP_CLEAR
 	                  modes i,k,l,m,n,p,s,t).
 	     BANS     Verwijder alle bans op het kanaal.
 	     OPS      Verwijder kanaal-operator status (mode +o) van
-	                  alle kanaal-operators.
+	                  alle kanaal-operators. If supported, removes
+	                  channel-admin (mode +a) and channel-owner (mode +q)
+	                  as well.
 	     HOPS     Verwijder kanaal-halfoperator status (mode +h)
 	                  van alle kanaal-halfoperators, indien deze
 			  mode ondersteund wordt.

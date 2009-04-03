@@ -1785,6 +1785,10 @@ MEMO_SENT
 	Мемо-сообщение для %s успешно отправлено.
 MEMO_MASS_SENT
 	Массовое сообщение успешно отправлено всем зарегистрированным пользователям.
+	
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
 
 # CANCEL responses
 MEMO_CANCEL_SYNTAX

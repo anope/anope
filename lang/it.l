@@ -1798,6 +1798,10 @@ MEMO_SENT
 MEMO_MASS_SENT
 	Un memo di massa è stato inviato a tutti gli utenti registrati.
 	
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+	
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
 	CANCEL {nick | canale}

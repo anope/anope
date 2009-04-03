@@ -9,10 +9,15 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2218"
+VERSION_BUILD="2245"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2245 - Backport of bugfix for bug #1050 from SVN r2163, patch from Adam, MS STAFF's syntax shows correctly, required adding a language string as well, currently they are all English until they can be properly translated.
+#Revision 2240 - Fix compile error with inspircd11 module.
+#Revision 2221 - Modified patch to change vhost removal to work correctly in all cases, originally by Szymek.
+#Revision 2220 - Correctly initialise variables in jointhrottle check, noted by Szymek.
+#Revision 2219 - Remove insp1.0 protocol modules. 1.0 has been unsupported by upstream for a very long time, and they contain a number of bugs since fixed in the 1.1 module.
 #Revision 2218 - Backport of bugfix for bug #1073 from SVN r2217, fantasy commands in CTCP ACTIONS will now be ignored instead of processed.
 #Revision 2199 - Correct backport of bug #1064, patch from DukePyrolator, there is no nc on the User struct in 1.8.x, use nickTrack instead, oops.
 #Revision 2196 - Backport of bugfix for bug #1044 from SVN r2195, CS SET MLOCK no longer requires a parameter, and leaving out the parameter renders the mlock to +r as it should be.

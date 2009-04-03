@@ -1808,6 +1808,10 @@ MEMO_SENT
 MEMO_MASS_SENT
 	Uma mensagem global foi enviada a todos os usuários registrados.
 	
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+	
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
 	CANCEL {nick | canal}

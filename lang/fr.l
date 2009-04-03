@@ -1830,6 +1830,10 @@ MEMO_SENT
 MEMO_MASS_SENT
 	Un mass memo a été envoyé a tout les pseudos enregistrés.
 	
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
+	
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
 	CANCEL {pseudo | canal}

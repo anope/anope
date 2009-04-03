@@ -79,7 +79,7 @@ int do_staff(User * u)
         notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
         return MOD_CONT;
     } else if (text == NULL) {
-        syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+        syntax_error(s_MemoServ, u, "STAFF", MEMO_STAFF_SYNTAX);
         return MOD_CONT;
     }
 

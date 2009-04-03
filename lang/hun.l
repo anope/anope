@@ -1826,6 +1826,10 @@ MEMO_CANCEL_NONE
 	Nincs visszavont memo üzenet.
 MEMO_CANCELLED
 	%s részére küldött utolsó memo üzenet visszavonva.
+	
+# STAFF responses
+MEMO_STAFF_SYNTAX
+	STAFF memo-text
 
 # LIST válaszok
 MEMO_LIST_SYNTAX

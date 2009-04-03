@@ -1823,7 +1823,7 @@ Channel *join_user_update(User * user, Channel * chan, char *name,
 		chan = chan_create(name, chants);
 	else
 	{
-		// Check chants against 0, as not every ircd sends JOIN with a TS.
+		/* Check chants against 0, as not every ircd sends JOIN with a TS. */
 		if (chan->creation_time > chants && chants != 0)
 		{
 			struct c_userlist *cu;

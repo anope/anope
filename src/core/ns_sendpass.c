@@ -29,7 +29,7 @@ class CommandNSSendPass : public Command
 		const char *nick = params[0].c_str();
 		NickAlias *na;
 
-		if (RestrictMail && !is_services_oper(u))
+		if (RestrictMail && !u->nc->HasCommand("nickserv/sendpass"))
 			notice_lang(s_NickServ, u, PERMISSION_DENIED);
 		else if (!(na = findnick(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);

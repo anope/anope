@@ -132,7 +132,7 @@ class CommandNSConfirm : public Command
 
 			if (!nr)
 			{
-				if (is_services_admin(u))
+				if (u->nc->IsServicesOper())
 				{
 					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
 					   of the user they are trying to validate, and push that user through regardless of passcode */

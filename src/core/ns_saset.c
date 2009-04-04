@@ -536,9 +536,6 @@ public:
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		if (subcommand.empty())
 			notice_help(s_NickServ, u, NICK_HELP_SASET);
 		else if (subcommand == "DISPLAY")
@@ -602,8 +599,7 @@ public:
  **/
 void myNickServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_SASET);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_SASET);
 }
 
 MODULE_INIT("ns_saset", NSSASet)

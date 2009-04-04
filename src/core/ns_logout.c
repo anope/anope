@@ -34,7 +34,7 @@ class CommandNSLogout : public Command
 		User *u2;
 		NickAlias *na;
 
-		if (!is_services_admin(u) && nick)
+		if (!u->nc->IsServicesOper() && nick)
 			this->OnSyntaxError(u);
 		else if (!(u2 = (nick ? finduser(nick) : u)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
@@ -47,7 +47,7 @@ class CommandNSLogout : public Command
 		}
 		else if (!nick && !nick_identified(u))
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-		else if (nick && is_services_admin(u2))
+		else if (nick && !u2->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
 		else
 		{
@@ -88,7 +88,7 @@ class CommandNSLogout : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (is_services_admin(u))
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_LOGOUT);

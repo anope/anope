@@ -343,51 +343,6 @@ void os_remove_nick(NickCore * nc)
 }
 
 /*************************************************************************/
-
-/* Does the given user have Services root privileges?
-   Now enhanced. */
-
-int is_services_root(User * u)
-{
-	if ((NSStrictPrivileges && !is_oper(u))
-		|| (!nick_identified(u)))
-		return 0;
-	if ((u->nc->flags & NI_SERVICES_ROOT))
-		return 1;
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Does the given user have Services admin privileges? */
-
-int is_services_admin(User * u)
-{
-	if ((NSStrictPrivileges && !is_oper(u))
-		|| (!nick_identified(u)))
-		return 0;
-	if ((u->nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT)))
-		return 1;
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Does the given user have Services oper privileges? */
-
-int is_services_oper(User * u)
-{
-	if ((NSStrictPrivileges && !is_oper(u))
-		|| (!nick_identified(u)))
-		return 0;
-	if ((u->nc->
-			flags & (NI_SERVICES_OPER | NI_SERVICES_ADMIN |
-					 NI_SERVICES_ROOT)))
-		return 1;
-	return 0;
-}
-
-/*************************************************************************/
 /*********************** OperServ command functions **********************/
 /*************************************************************************/
 

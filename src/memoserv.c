@@ -201,7 +201,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 	MemoInfo *mi;
 	time_t now = time(NULL);
 	char *source = u->nc->display;
-	int is_servoper = is_services_oper(u);
+	int is_servoper = u->nc && u->nc->IsServicesOper();
 
 	if (readonly) {
 		notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
@@ -232,7 +232,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 			}
 		}
 	} else if (z != 2 && MSSendDelay > 0 &&
-			   u && u->lastmemosend + MSSendDelay > now && !is_servoper) {
+			   u && u->lastmemosend + MSSendDelay > now) {
 		u->lastmemosend = now;
 		if (z == 0)
 			notice_lang(s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, MSSendDelay);

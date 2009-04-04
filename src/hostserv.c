@@ -519,7 +519,7 @@ int is_host_setter(User * u)
 	int i, j;
 	NickAlias *na;
 
-	if (is_services_oper(u)) {
+	if (u->nc && u->nc->IsServicesOper()) {
 		return 1;
 	}
 	if (!nick_identified(u)) {

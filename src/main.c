@@ -362,10 +362,10 @@ std::string GetFullProgDir(char *argv0)
 
 int main(int ac, char **av, char **envp)
 {
-	volatile time_t last_update;		/* When did we last update the databases? */
-	volatile time_t last_expire;		/* When did we last expire nicks/channels? */
-	volatile time_t last_check; /* When did we last check timeouts? */
-	volatile time_t last_DefCon;		/* When was DefCon last checked? */
+	time_t last_update;		/* When did we last update the databases? */
+	time_t last_expire;		/* When did we last expire nicks/channels? */
+	time_t last_check; /* When did we last check timeouts? */
+	time_t last_DefCon;		/* When was DefCon last checked? */
 
 	int i;
 	char *progname;

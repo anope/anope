@@ -210,6 +210,12 @@ class CommandHSActivate : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
+		if (!u->nc->HasPriv("hostserv/set"))
+		{
+			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		const char *nick = params[0].c_str();
 		NickAlias *na;
 		HostCore *tmp, *hc;
@@ -245,9 +251,6 @@ class CommandHSActivate : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_host_setter(u))
-			return false;
-
 		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
 		me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
@@ -272,6 +275,12 @@ class CommandHSReject : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
+		if (!u->nc->HasPriv("hostserv/set"))
+		{
+			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		const char *nick = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 		HostCore *tmp, *hc;
@@ -305,9 +314,6 @@ class CommandHSReject : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_host_setter(u))
-			return false;
-
 		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
 		me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT);
@@ -328,6 +334,12 @@ class HSListBase : public Command
  protected:
 	CommandReturn DoList(User *u, std::vector<std::string> &params)
 	{
+		if (!u->nc->HasPriv("hostserv/set"))
+		{
+			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		struct tm *tm;
 		char buf[BUFSIZE];
 		int counter = 1;
@@ -380,9 +392,6 @@ class CommandHSWaiting : public HSListBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_host_setter(u))
-			return false;
-
 		me->NoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
 		me->NoticeLang(s_HostServ, u, LNG_HELP_WAITING);
@@ -829,8 +838,9 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 	}
 	if (HSRequestMemoSetters == 1)
 	{
+		/* Needs to be rethought because of removal of HostSetters in favor of opertype priv -- CyberBotX
 		for (i = 0; i < HostNumber; ++i)
-			my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, host);
+			my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, host);*/
 	}
 }
 
@@ -864,8 +874,7 @@ int my_isvalidchar(const char c)
 void hs_help(User * u)
 {
 	me->NoticeLang(s_HostServ, u, LNG_HELP);
-	if (is_host_setter(u))
-		me->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
+	me->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
 
 void hsreq_load_db()

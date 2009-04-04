@@ -66,10 +66,6 @@ char *BotDBName;
 char *OperDBName;
 char *NewsDBName;
 
-static char *HostSetter;
-char **HostSetters;
-int HostNumber = 0;			 /* needs to be set to 0 */
-
 bool NoBackupOkay;
 bool StrictPasswords;
 unsigned BadPassLimit;
@@ -892,7 +888,6 @@ int ServerConfig::Read(bool bail)
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
 		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
 		{"hostserv", "modules", "", new ValueContainerChar(&HostCoreModules), DT_CHARPTR, NoValidation},
-		{"hostserv", "hostsetters", "", new ValueContainerChar(&HostSetter), DT_CHARPTR, NoValidation},
 		{"operserv", "nick", "OperServ", new ValueContainerChar(&s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -1787,9 +1782,6 @@ int read_config(int reload)
 			}
 		} while ((s = strtok(NULL, " ")));
 	}
-
-	/* Host Setters building... :P */
-	HostSetters = buildStringList(HostSetter ? HostSetter : "", &HostNumber);
 
 	/* Modules Autoload building... :P */
 	ModulesAutoload = buildStringList(Modules, &ModulesNumber);

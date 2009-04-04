@@ -26,6 +26,12 @@ class CommandHSDelAll : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
+		if (!u->nc->HasPriv("hostserv/set"))
+		{
+			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
 		int i;
 		const char *nick = params[0].c_str();
 		NickAlias *na;
@@ -53,9 +59,6 @@ class CommandHSDelAll : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_host_remover(u))
-			return false;
-
 		notice_help(s_HostServ, u, HOST_HELP_DELALL);
 		return true;
 	}
@@ -87,8 +90,7 @@ class HSDelAll : public Module
  **/
 void myHostServHelp(User *u)
 {
-	if (is_host_remover(u))
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
+	notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
 }
 
 MODULE_INIT("hs_delall", HSDelAll)

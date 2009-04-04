@@ -284,9 +284,6 @@ E bool   RestrictOperNicks;
 E unsigned NewsCount;
 E char *Numeric;
 
-E char **HostSetters;
-E int HostNumber;
-
 E bool  UseMail;
 E char *SendMailPath;
 E char *SendFrom;
@@ -467,8 +464,6 @@ E void hostserv_init();
 E void addHostCore(const char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
 E char *getvIdent(char *nick);
 E char *getvHost(char *nick);
-E int is_host_remover(User * u);
-E int is_host_setter(User *u);
 E HostCore *hostCoreListHead();
 E HostCore *findHostCore(HostCore * head, const char *nick, bool *found);
 E HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);

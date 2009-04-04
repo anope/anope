@@ -514,35 +514,6 @@ int do_on_id(User * u)
 }
 
 /*************************************************************************/
-int is_host_setter(User * u)
-{
-	int i, j;
-	NickAlias *na;
-
-	if (u->nc && u->nc->IsServicesOper()) {
-		return 1;
-	}
-	if (!nick_identified(u)) {
-		return 0;
-	}
-
-	/* Look through all user's aliases (0000412) */
-	for (i = 0; i < u->nc->aliases.count; i++) {
-		na = static_cast<NickAlias *>(u->nc->aliases.list[i]);
-		for (j = 0; j < HostNumber; j++) {
-			if (stricmp(HostSetters[j], na->nick) == 0) {
-				return 1;
-			}
-		}
-	}
-
-	return 0;
-}
-
-int is_host_remover(User * u)
-{
-	return is_host_setter(u);   /* only here incase we want to split them up later */
-}
 
 /*
  * Sets the last_usermak properly. Using virtual ident and/or host

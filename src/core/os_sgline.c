@@ -309,9 +309,6 @@ class CommandOSSGLine : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_SGLINE);
 		return true;
 	}
@@ -347,8 +344,7 @@ class OSSGLine : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SGLINE);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_SGLINE);
 }
 
 /* Lists an SGLINE entry, prefixing it with the header if needed */

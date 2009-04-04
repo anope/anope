@@ -296,9 +296,6 @@ class CommandOSSQLine : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_SQLINE);
 		return true;
 	}
@@ -333,8 +330,7 @@ class OSSQLine : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SQLINE);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_SQLINE);
 }
 
 int sqline_view(int number, SXLine *sx, User *u, int *sent_header)

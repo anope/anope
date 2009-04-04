@@ -295,9 +295,6 @@ class CommandOSSZLine : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_SZLINE);
 		return true;
 	}
@@ -332,8 +329,7 @@ class OSSZLine : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
 }
 
 int szline_view(int number, SXLine *sx, User *u, int *sent_header)

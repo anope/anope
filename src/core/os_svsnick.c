@@ -80,9 +80,6 @@ class CommandOSSVSNick : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_root(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_SVSNICK);
 		return true;
 	}
@@ -117,8 +114,7 @@ class OSSVSNick : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_admin(u) && u->isSuperAdmin)
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SVSNICK);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_SVSNICK);
 }
 
 MODULE_INIT("os_svsnick", OSSVSNick)

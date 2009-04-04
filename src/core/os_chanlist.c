@@ -74,9 +74,6 @@ class CommandOSChanList : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_CHANLIST);
 		return true;
 	}

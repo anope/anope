@@ -196,10 +196,15 @@ class NewsBase : public Command
 
 	CommandReturn DoNews(User *u, std::vector<std::string> &params, short type)
 	{
-		int is_servadmin = is_services_admin(u);
 		const char *cmd = params[0].c_str();
 		const char *type_name;
 		int *msgs;
+
+		if (!u->nc->HasCommand("operserv/news"))
+		{
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
 
 		msgs = findmsgs(type, &type_name);
 		if (!msgs)
@@ -212,17 +217,11 @@ class NewsBase : public Command
 			return this->DoList(u, params, type, msgs);
 		else if (!stricmp(cmd, "ADD"))
 		{
-			if (is_servadmin)
-				return this->DoAdd(u, params, type, msgs);
-			else
-				notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return this->DoAdd(u, params, type, msgs);
 		}
 		else if (!stricmp(cmd, "DEL"))
 		{
-			if (is_servadmin)
-				return this->DoDel(u, params, type, msgs);
-			else
-				notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return this->DoDel(u, params, type, msgs);
 		}
 		else
 			this->OnSyntaxError(u);
@@ -267,9 +266,6 @@ class CommandOSLogonNews : public NewsBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_OperServ, u, NEWS_HELP_LOGON, this->help_param1);
 		return true;
 	}
@@ -313,9 +309,6 @@ class CommandOSOperNews : public NewsBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_OperServ, u, NEWS_HELP_OPER, this->help_param1);
 		return true;
 	}
@@ -351,9 +344,6 @@ class CommandOSRandomNews : public NewsBase
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_OperServ, u, NEWS_HELP_RANDOM);
 		return true;
 	}
@@ -397,12 +387,9 @@ class OSNews : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_admin(u))
-	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
-	}
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
 }
 
 

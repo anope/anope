@@ -78,8 +78,7 @@ class OSRestart : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_root(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_RESTART);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_RESTART);
 }
 
 MODULE_INIT("os_restart", OSRestart)

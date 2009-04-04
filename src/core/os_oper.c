@@ -34,12 +34,6 @@ class CommandOSOper : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_services_root(u))
-		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
-
 		if (!(na = findnick(nick)))
 		{
 			notice_lang(s_OperServ, u, NICK_X_NOT_REGISTERED, nick);
@@ -68,11 +62,6 @@ class CommandOSOper : public Command
 		{
 			if (na->nc->flags & NI_SERVICES_ADMIN && (res = slist_indexof(&servadmins, na->nc)) != -1)
 			{
-				if (!is_services_root(u))
-				{
-					notice_lang(s_OperServ, u, PERMISSION_DENIED);
-					return MOD_CONT;
-				}
 				slist_delete(&servadmins, res);
 				na->nc->flags |= NI_SERVICES_OPER;
 				notice_lang(s_OperServ, u, OPER_OPER_MOVED, nick);
@@ -99,12 +88,6 @@ class CommandOSOper : public Command
 		if (!nick)
 		{
 			this->OnSyntaxError(u);
-			return MOD_CONT;
-		}
-
-		if (!is_services_root(u))
-		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
@@ -202,12 +185,6 @@ class CommandOSOper : public Command
 
 	CommandReturn DoClear(User *u, std::vector<std::string> &params)
 	{
-		if (!is_services_root(u))
-		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
-
 		if (!servopers.count)
 		{
 			notice_lang(s_OperServ, u, OPER_OPER_LIST_EMPTY);
@@ -227,6 +204,12 @@ class CommandOSOper : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
+
+		if (!u->nc->HasCommand("operserv/oper"))
+		{
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
 
 		if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params);

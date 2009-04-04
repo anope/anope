@@ -148,7 +148,7 @@ int count_email_in_use(const char *email, User * u)
 
 bool check_email_limit_reached(const char *email, User * u)
 {
-	if (NSEmailMax < 1 || !email || is_services_admin(u))
+	if (NSEmailMax < 1 || !email)
 		return false;
 
 	if (count_email_in_use(email, u) < NSEmailMax)

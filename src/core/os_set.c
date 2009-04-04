@@ -264,9 +264,6 @@ class CommandOSSet : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_root(u))
-			return false;
-
 		if (subcommand.empty())
 			notice_help(s_OperServ, u, OPER_HELP_SET);
 		else if (subcommand == "LIST")
@@ -316,8 +313,7 @@ class OSSet : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_root(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SET);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_SET);
 }
 
 MODULE_INIT("os_set", OSSet)

@@ -47,9 +47,6 @@ class CommandOSJupe : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_admin(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_JUPE);
 		return true;
 	}
@@ -81,8 +78,7 @@ class OSJupe : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_admin(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_JUPE);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_JUPE);
 }
 
 MODULE_INIT("os_jupe", OSJupe)

@@ -34,7 +34,7 @@ class CommandOSAdmin : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_services_root(u))
+		if (!u->nc->HasCommand("operserv/admin"))
 		{
 			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
@@ -94,12 +94,6 @@ class CommandOSAdmin : public Command
 		if (!nick)
 		{
 			this->OnSyntaxError(u);
-			return MOD_CONT;
-		}
-
-		if (!is_services_root(u))
-		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 			return MOD_CONT;
 		}
 
@@ -195,12 +189,6 @@ class CommandOSAdmin : public Command
 
 	CommandReturn DoClear(User *u, std::vector<std::string> &params)
 	{
-		if (!is_services_root(u))
-		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
-
 		if (!servadmins.count)
 		{
 			notice_lang(s_OperServ, u, OPER_ADMIN_LIST_EMPTY);
@@ -220,6 +208,12 @@ class CommandOSAdmin : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
+
+		if (!u->nc->HasCommand("operserv/admin"))
+		{
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
 
 		if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params);

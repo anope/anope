@@ -126,13 +126,8 @@ class CommandOSStats : public Command
 
 	CommandReturn DoStatsReset(User *u, std::vector<std::string> &params)
 	{
-		if (is_services_admin(u))
-		{
-			maxusercnt = usercnt;
-			notice_lang(s_OperServ, u, OPER_STATS_RESET);
-		}
-		else
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+		maxusercnt = usercnt;
+		notice_lang(s_OperServ, u, OPER_STATS_RESET);
 		return MOD_CONT;
 	}
 
@@ -302,10 +297,10 @@ class CommandOSStats : public Command
 		if (!extra || (stricmp(extra, "MEMORY") && stricmp(extra, "UPLINK")))
 			this->DoStatsUptime(u, params);
 
-		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "UPLINK")) && is_services_admin(u))
+		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "UPLINK")))
 			this->DoStatsUplink(u, params);
 
-		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "MEMORY")) && is_services_admin(u))
+		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "MEMORY")))
 			this->DoStatsMemory(u, params);
 
 		return MOD_CONT;

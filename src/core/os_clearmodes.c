@@ -235,9 +235,6 @@ class CommandOSClearModes : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_CLEARMODES);
 		return true;
 	}
@@ -269,8 +266,7 @@ class OSClearModes : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
 }
 
 MODULE_INIT("os_clearmodes", OSClearModes)

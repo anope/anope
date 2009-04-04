@@ -35,8 +35,6 @@ class CommandOSMode : public Command
 			notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
 		else if (c->bouncy_modes)
 			notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
-		else if (ircd->adminmode && !is_services_admin(u) && (c->mode & ircd->adminmode))
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 		else
 		{
 			ircdproto->SendMode(findbot(s_OperServ), chan, "%s", modes);
@@ -53,9 +51,6 @@ class CommandOSMode : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_MODE);
 		return true;
 	}
@@ -87,8 +82,7 @@ class OSMode : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODE);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_MODE);
 }
 
 MODULE_INIT("os_mode", OSMode)

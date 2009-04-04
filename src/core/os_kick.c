@@ -55,9 +55,6 @@ class CommandOSKick : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!is_services_oper(u))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_KICK);
 		return true;
 	}
@@ -89,8 +86,7 @@ class OSKick : public Module
  **/
 void myOperServHelp(User *u)
 {
-	if (is_services_oper(u))
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_KICK);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_KICK);
 }
 
 MODULE_INIT("os_kick", OSKick)

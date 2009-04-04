@@ -193,7 +193,7 @@ class CommandCSEnforce : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-		else if (!is_services_admin(u) && !check_access(u, ci, CA_AKICK))
+		else if (!check_access(u, ci, CA_AKICK))
 			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 		else
 		{

@@ -4430,11 +4430,8 @@ CHAN_HELP_SET_RESTRICTED
 	Syntax: SET channel RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
-	channel.  When restricted access is set, users who would
-	normally be disallowed from having channel operator
-	privileges (users with negative access levels and, if
-	secure ops is set, users not on the access list) will
-	instead be kicked and banned from the channel.
+	channel.  When restricted access is set, users not on
+	the access list will instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	Syntax: SET channel SECURE {ON | OFF}

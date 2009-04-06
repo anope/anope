@@ -4517,13 +4517,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Sintassi: SET canale RESTRICTED {ON | OFF}
 	
-	Attiva o disattiva l'accesso limitato (restricted)
-	per il canale. Quando questa opzione è attiva, gli
-	utenti che non potrebbero avere i privilegi di operatore
-	di canale (gli utenti con livelli di accesso negativi e,
-	se l'opzione secure ops è attiva, tutti gli utenti che
-	non si trovano in alcuna lista di accesso) verrano invece
-	kickati e bannati dal canale.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on
+	the access list will instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	Sintassi: SET canale SECURE {ON | OFF}

@@ -4548,12 +4548,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Gebruik: SET kanaal RESTRICTED {ON | OFF}
 	
-	Zet de beperkte toegang optie aan of uit voor een kanaal.
-	Wanneer beperkte toegang aan staat zullen gebruikers die
-	normaliter geen kanaaloperator status mogen hebben (dwz
-	gebruikers met negatieve toegangsniveaus en, als de veilige
-	ops optie aan staat, ook gebruikers die niet op de toegangs-
-	lijst staan) worden gekicked en gebanned van het kanaal.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on
+	the access list will instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	Gebruik: SET kanaal SECURE {ON | OFF}

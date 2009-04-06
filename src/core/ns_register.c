@@ -184,6 +184,7 @@ class CommandNSConfirm : public Command
  public:
 	CommandNSConfirm(const std::string &cmdn, int min, int max) : Command(cmdn, min, max)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -372,6 +373,7 @@ class CommandNSResend : public Command
  public:
 	CommandNSResend() : Command("RESEND", 0, 0)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

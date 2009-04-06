@@ -4553,13 +4553,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Sintaxis: SET canal RESTRICTED {ON | OFF}
 	
-	Habilita o deshabilita la opcion de acceso restringido
-	para un canal. Cuando el acceso restringido esta
-	seteado, Los usuarios seran inhabilitados de tener
-	privilegios de operador de canal. (usuarios con acceso
-	negativo y, si seguridad de ops esta seteada,
-	usuarios no en la lista de acceso) seran en vez
-	kickeados y baneados del canal.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on the access list will
+	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	Sintaxis: SET canal SECURE {ON | OFF}

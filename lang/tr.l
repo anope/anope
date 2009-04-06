@@ -4544,11 +4544,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Kullanýmý: SET kanaladý RESTRICTED {ON | OFF}
 	
-	Bir kanal için izinli giriþ özelliðini açar yada kapatýr.
-	izinli giriþ özelliði aktifse, kanal opu özelliði olmayan
-	kullanýcýlar(negatif access seviyesi olanlar, secure ops
-	özelliði aktif olanlar, ve access listesinde olmayan 
-	kullanýcýlar) kanaldan atýlýp banlanýrlar.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on the access list will
+	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	Kullanýmý: SET kanaladý SECURE {ON | OFF}

@@ -4477,13 +4477,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Syntax: SET #szoba RESTRICTED {ON | OFF}
 	
-	Engedélyezi vagy letiltja a korlátozott hozzáférés
-	opciót a csatornán. Amikor a korlátozott hozzáférés
-	be van kapcsolva, a userek nem kaphatnak szoba
-	operátori jogokat (userek negatív access szinttel,
-	ha a secure opsopció be van kapcsolva, akkor azok a
-	userek, akik nem szerepelnek az access listán) azonnal
-	ki lesznek rúgva és tiltva a szobából belépéskor.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on the access list will
+	instead be kicked and banned from the channel.
 	
 CHAN_HELP_SET_SECURE
 	Syntax: SET #szoba SECURE {ON | OFF}

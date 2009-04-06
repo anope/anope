@@ -4472,9 +4472,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	—интаксис: SET #канал RESTRICTED {ON | OFF}
 	
-	јктивирует/деактивирует ограниченный доступ на канал. ƒанный режим
-	позвол€ет  запретить доступ на канал всем тем пользовател€м, которые
-	не числ€тс€ в списке доступа канала.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on the access list will
+	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	—интаксис: SET #канал SECURE {ON | OFF}

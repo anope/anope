@@ -5541,12 +5541,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Sk³adnia: SET kana³ RESTRICTED {ON | OFF}
 	
-	W³±cza lub wy³±cza ograniczenie dostêpu do kana³u.
-	W³±czenie tej opcji powoduje usuwanie z kana³u
-	u¿ytkowników, którzy nie maj± uprawnieñ operatora.
-	Przy w³±czonej opcji secure ops u¿ytkownicy bez
-	zdefiniowanego poziomu dostêpu oraz z ujemnym poziomem
-	tak¿e bêd± usuwani.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on the access list will
+	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
 	Sk³adnia: SET kana³ SECURE {ON | OFF}

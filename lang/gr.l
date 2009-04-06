@@ -4560,10 +4560,9 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Σύνταξη: SET κανάλι RESTRICTED {ON | OFF}
 	
-	Ενεργοποιεί ή απερνεργοποιεί την restricted access επιλογή του
-	καναλιού.  Όταν ενεργοπιηθεί η restricted access , χρήστες οι
-	οποίοι δεν έχουν access στο κανάλι, οι υπηρεσίες θα τους κάνουν
-	kick και ban από το κανάλι.
+	Enables or disables the restricted access option for a
+	channel.  When restricted access is set, users not on the access list will
+	instead be kicked and banned from the channel.
 	
 CHAN_HELP_SET_SECURE
 	Σύνταξη: SET κανάλι SECURE {ON | OFF}

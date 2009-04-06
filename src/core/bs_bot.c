@@ -300,9 +300,10 @@ class CommandBSBot : public Command
 
 		if (user)
 		{
-			ircdproto->SendQuit(bi, "Quit: Be right back");
-			// This isn't the nicest way to do this, unfortunately.
-			bi->uid = ts6_uid_retrieve();
+			if (ircd->ts6) {
+				// This isn't the nicest way to do this, unfortunately.
+				bi->uid = ts6_uid_retrieve();
+			}
 			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
 					ircd->pseudoclient_mode, bi->uid.c_str());
 			bi->RejoinAll();

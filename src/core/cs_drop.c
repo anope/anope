@@ -15,18 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User * u);
-
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DROP);
-}
-
 class CommandCSDrop : public Command
 {
  public:
@@ -133,8 +121,10 @@ class CSDrop : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSDrop(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DROP);
 	}
 };
 

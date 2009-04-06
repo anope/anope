@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSMode : public Command
 {
  public:
@@ -71,18 +69,11 @@ class OSMode : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSMode(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODE);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_MODE);
-}
 
 MODULE_INIT("os_mode", OSMode)

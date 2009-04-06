@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSDrop : public Command
 {
  public:
@@ -120,18 +118,11 @@ class NSDrop : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSDrop(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_DROP);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_DROP);
-}
 
 MODULE_INIT("ns_drop", NSDrop)

@@ -15,34 +15,6 @@
 
 #include "module.h"
 
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	if (ircd->owner) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OWNER);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
-	}
-	if (ircd->protect) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
-	} else if (ircd->admin) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ADMIN);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEADMIN);
-	}
-
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OP);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOP);
-	if (ircd->halfop) {
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
-	}
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOICE);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
-}
-
 /* do_util: not a command, but does the job of other */
 
 static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const char *nick)
@@ -364,8 +336,29 @@ class CSModes : public Module
 			this->AddCommand(CHANSERV, new CommandCSOwner(), MOD_UNIQUE);
 			this->AddCommand(CHANSERV, new CommandCSDeOwner(), MOD_UNIQUE);
 		}
+	}
+	void ChanServHelp(User *u)
+	{
+		if (ircd->owner) {
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OWNER);
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
+		}
+		if (ircd->protect) {
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
+		} else if (ircd->admin) {
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ADMIN);
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEADMIN);
+		}
 
-		this->SetChanHelp(myChanServHelp);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOP);
+		if (ircd->halfop) {
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
+		}
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOICE);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
 	}
 };
 

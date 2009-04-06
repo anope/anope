@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myMemoServHelp(User *u);
-
 class CommandMSSet : public Command
 {
  private:
@@ -266,18 +264,11 @@ class MSSet : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(MEMOSERV, new CommandMSSet(), MOD_UNIQUE);
-
-		this->SetMemoHelp(myMemoServHelp);
+	}
+	void MemoServHelp(User *u)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SET);
 	}
 };
-
-/**
- * Add the help response to anopes /hs help output.
- * @param u The user who is requesting help
- **/
-void myMemoServHelp(User *u)
-{
-	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SET);
-}
 
 MODULE_INIT("ms_set", MSSet)

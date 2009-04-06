@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 NickAlias *makealias(const char *nick, NickCore *nc);
 
 class CommandNSGroup : public Command
@@ -267,20 +265,13 @@ class NSGroup : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSGroup(), MOD_UNIQUE);
 		this->AddCommand(NICKSERV, new CommandNSGList(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GROUP);
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GLIST);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_GROUP);
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_GLIST);
-}
 
 /* Creates a new alias in NickServ database. */
 NickAlias *makealias(const char *nick, NickCore *nc)

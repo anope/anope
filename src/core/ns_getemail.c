@@ -20,8 +20,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSGetEMail : public Command
 {
  public:
@@ -80,18 +78,11 @@ class NSGetEMail : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSGetEMail(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
-}
 
 MODULE_INIT("ns_getemail", NSGetEMail)

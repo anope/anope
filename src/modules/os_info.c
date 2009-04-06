@@ -42,9 +42,6 @@
 
 char *OSInfoDBName = NULL;
 
-void mMainChanHelp(User *u);
-void mMainNickHelp(User *u);
-
 int mLoadData();
 int mLoadConfig();
 
@@ -251,9 +248,6 @@ class OSInfo : public Module
 		ModuleManager::Attach(I_OnPostCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);
 		ModuleManager::Attach(I_OnBackupDatabase, this);
-
-		this->SetNickHelp(mMainNickHelp);
-		this->SetChanHelp(mMainChanHelp);
 
 		mLoadData();
 		ModuleManager::Attach(I_OnReload, this);
@@ -589,6 +583,17 @@ class OSInfo : public Module
 		ModuleDatabaseBackup(OSInfoDBName);
 	}
 
+	void NickServHelp(User *u)
+	{
+		if (is_oper(u))
+			this->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
+	}
+
+	void ChanServHelp(User *u)
+	{
+		if (is_oper(u))
+			this->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
+	}
 };
 
 /*************************************************************************/
@@ -673,22 +678,6 @@ int mLoadConfig()
 	return 0;
 }
 
-
-/*************************************************************************/
-
-/* This help will be added to the main NickServ list */
-void mMainNickHelp(User *u)
-{
-	if (is_oper(u))
-		me->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
-}
-
-/* This help will be added to the main ChanServ list */
-void mMainChanHelp(User *u)
-{
-	if (is_oper(u))
-		me->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
-}
 
 /*************************************************************************/
 

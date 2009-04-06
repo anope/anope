@@ -16,7 +16,6 @@
 #include "module.h"
 
 int del_memo_callback(User *u, int num, va_list args);
-void myMemoServHelp(User *u);
 
 class CommandMSDel : public Command
 {
@@ -158,18 +157,12 @@ class MSDel : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSDel(), MOD_UNIQUE);
-		this->SetMemoHelp(myMemoServHelp);
+	}
+	void MemoServHelp(User *u)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_DEL);
 	}
 };
-
-/**
- * Add the help response to anopes /ms help output.
- * @param u The user who is requesting help
- **/
-void myMemoServHelp(User *u)
-{
-	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_DEL);
-}
 
 /**
  * Delete a single memo from a MemoInfo. callback function

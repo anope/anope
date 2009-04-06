@@ -725,11 +725,6 @@ class CommandCSSet : public Command
 	}
 };
 
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SET);
-}
-
 class CSSet : public Module
 {
  public:
@@ -739,9 +734,11 @@ class CSSet : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSSet(), MOD_UNIQUE);
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SET);
 	}
 };
-
 
 MODULE_INIT("cs_set", CSSet)

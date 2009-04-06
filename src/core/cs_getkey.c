@@ -15,16 +15,6 @@
 
 #include "module.h"
 
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
-}
-
 class CommandCSGetKey : public Command
 {
  public:
@@ -88,8 +78,10 @@ class CSGetKey : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSGetKey(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
 	}
 };
 

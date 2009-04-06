@@ -15,20 +15,6 @@
 
 #include "module.h"
 
-
-void myChanServHelp(User * u);
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
-}
-
-
 static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm, int uacc)
 {
 	char *nick;
@@ -513,7 +499,11 @@ class CSAccess : public Module
 
 		this->AddCommand(CHANSERV, new CommandCSAccess(), MOD_UNIQUE);
 		this->AddCommand(CHANSERV, new CommandCSLevels(), MOD_UNIQUE);
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
 	}
 };
 

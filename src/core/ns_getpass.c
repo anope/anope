@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSGetPass : public Command
 {
  public:
@@ -91,21 +89,14 @@ class NSGetPass : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSGetPass(), MOD_UNIQUE);
 
-		this->SetNickHelp(myNickServHelp);
-
 		char tmp_pass[PASSMAX];
 		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
 			throw ModuleException("Incompatible with the encryption module being used");
 	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
+	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
-}
 
 MODULE_INIT("ns_getpass", NSGetPass)

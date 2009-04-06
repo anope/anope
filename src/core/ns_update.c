@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSUpdate : public Command
 {
  public:
@@ -64,18 +62,11 @@ class NSUpdate : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(NICKSERV, new CommandNSUpdate(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_UPDATE);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_UPDATE);
-}
 
 MODULE_INIT("ns_update", NSUpdate)

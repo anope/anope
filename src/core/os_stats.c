@@ -16,7 +16,6 @@
 #include "module.h"
 
 void get_operserv_stats(long *nrec, long *memuse);
-void myOperServHelp(User *u);
 
 /**
  * Count servers connected to server s
@@ -323,20 +322,12 @@ class OSStats : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSStats(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_STATS);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_STATS);
-}
 
 void get_operserv_stats(long *nrec, long *memuse)
 {

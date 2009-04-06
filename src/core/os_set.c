@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSSet : public Command
 {
  private:
@@ -302,18 +300,11 @@ class OSSet : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSSet(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_SET);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_SET);
-}
 
 MODULE_INIT("os_set", OSSet)

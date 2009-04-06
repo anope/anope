@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSNOOP : public Command
 {
  public:
@@ -83,20 +81,11 @@ class OSNOOP : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSNOOP(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_NOOP);
 	}
 };
-
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_NOOP);
-}
 
 MODULE_INIT("os_noop", OSNOOP)

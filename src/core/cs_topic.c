@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User *u);
-
 class CommandCSTopic : public Command
 {
  public:
@@ -91,18 +89,11 @@ class CSTopic : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(CHANSERV, new CommandCSTopic(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
 	}
 };
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User *u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
-}
 
 MODULE_INIT("cs_topic", CSTopic)

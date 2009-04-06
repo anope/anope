@@ -15,11 +15,6 @@
 
 #include "module.h"
 
-
-void myChanServHelp(User * u);
-
-
-
 /* Split a usermask up into its constitutent parts.  Returned strings are
  * malloc()'d, and should be free()'d when done with.  Returns "*" for
  * missing parts.
@@ -49,16 +44,6 @@ static void split_usermask(const char *mask, const char **nick, const char **use
 	*user = sstrdup(*user);
 	*host = sstrdup(*host);
 	delete [] mask2;
-}
-
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AKICK);
 }
 
 int akick_del(User * u, AutoKick * akick)
@@ -688,8 +673,10 @@ class CSAKick : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSAKick(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AKICK);
 	}
 };
 

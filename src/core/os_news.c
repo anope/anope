@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-
 /* List of messages for each news type.  This simplifies message sending. */
 
 #define MSG_SYNTAX	0
@@ -31,9 +30,6 @@
 #define MSG_DEL_NONE	10
 #define MSG_DELETED_ALL	11
 #define MSG_MAX		11
-
-
-void myOperServHelp(User *u);
 
 struct newsmsgs {
 	int16 type;
@@ -369,8 +365,12 @@ class OSNews : public Module
 		this->AddCommand(OPERSERV, OSOperNews, MOD_UNIQUE);
 		this->AddCommand(OPERSERV, new CommandOSRandomNews(), MOD_UNIQUE);
 		ModuleManager::Attach(I_OnReload, this);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
 	}
 
 	void OnReload(bool starting)
@@ -379,18 +379,5 @@ class OSNews : public Module
 		OSOperNews->UpdateHelpParam();
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
-}
-
 
 MODULE_INIT("os_news", OSNews)

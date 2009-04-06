@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSQuit : public Command
 {
  public:
@@ -63,19 +61,11 @@ class OSQuit : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSQuit(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_QUIT);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_QUIT);
-}
 
 MODULE_INIT("os_quit", OSQuit)

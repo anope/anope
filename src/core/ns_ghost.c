@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSGhost : public Command
 {
  public:
@@ -98,18 +96,11 @@ class NSGhost : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSGhost(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GHOST);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_GHOST);
-}
 
 MODULE_INIT("ns_ghost", NSGhost)

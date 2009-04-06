@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User *u);
-
 class CommandCSSuspend : public Command
 {
  public:
@@ -208,19 +206,12 @@ class CSSuspend : public Module
 
 		this->AddCommand(CHANSERV, new CommandCSSuspend(), MOD_UNIQUE);
 		this->AddCommand(CHANSERV, new CommandCSUnSuspend(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
 	}
 };
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User *u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
-}
 
 MODULE_INIT("cs_suspend", CSSuspend)

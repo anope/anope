@@ -15,12 +15,6 @@
 Module::Module(const std::string &mname, const std::string &creator)
 {
 	this->name = mname;				/* Our name */
-	this->nickHelp = NULL;
-	this->chanHelp = NULL;
-	this->memoHelp = NULL;
-	this->botHelp = NULL;
-	this->operHelp = NULL;
-	this->hostHelp = NULL;
 	this->type = THIRD;
 	this->handle = NULL;
 

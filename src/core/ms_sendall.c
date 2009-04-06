@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myMemoServHelp(User *u);
-
 class CommandMSSendAll : public Command
 {
  public:
@@ -81,17 +79,11 @@ class MSSendAll : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSSendAll(), MOD_UNIQUE);
-		this->SetMemoHelp(myMemoServHelp);
+	}
+	void MemoServHelp(User *u)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
 	}
 };
-
-/**
- * Add the help response to anopes /ms help output.
- * @param u The user who is requesting help
- **/
-void myMemoServHelp(User *u)
-{
-	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
-}
 
 MODULE_INIT("ms_sendall", MSSendAll)

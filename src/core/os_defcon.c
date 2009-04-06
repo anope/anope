@@ -17,8 +17,6 @@
 
 void defcon_sendlvls(User *u);
 
-void myOperServHelp(User *u);
-
 class CommandOSDEFCON : public Command
 {
  public:
@@ -98,19 +96,12 @@ class OSDEFCON : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSDEFCON(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_DEFCON);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_DEFCON);
-}
 
 /**
  * Send a message to the oper about which precautions are "active" for this level

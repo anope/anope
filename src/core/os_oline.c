@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSOLine : public Command
 {
  public:
@@ -83,22 +81,13 @@ class OSOLine : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSOLine(), MOD_UNIQUE);
 
-		this->SetOperHelp(myOperServHelp);
-
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
-
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_OLINE);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_OLINE);
-}
 
 MODULE_INIT("os_oline", OSOLine)

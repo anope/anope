@@ -43,9 +43,6 @@ int m_isIRCop = 0;
 
 char *NSAutoOPDBName;
 
-int myNickServAutoOpHelp(User * u);
-void myNickServHelp(User * u);
-
 int noop(User * u);
 int mEventJoin(int argc, char **argv);
 int setAutoOp(User * u);

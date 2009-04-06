@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User *u);
-
 class CommandCSSendPass : public Command
 {
  public:
@@ -97,8 +95,6 @@ class CSSendPass : public Module
 
 		this->AddCommand(CHANSERV, new CommandCSSendPass(), MOD_UNIQUE);
 
-		this->SetChanHelp(myChanServHelp);
-
 		if (!UseMail)
 			throw ModuleException("sendpass may not be loaded if UseMail is loaded");
 
@@ -106,15 +102,10 @@ class CSSendPass : public Module
 		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
 			throw ModuleException("Incompatible with the encryption module being used");
 	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SENDPASS);
+	}
 };
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User *u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SENDPASS);
-}
 
 MODULE_INIT("cs_sendpass", CSSendPass)

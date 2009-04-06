@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSSuspend : public Command
 {
  public:
@@ -182,19 +180,12 @@ class NSSuspend : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSSuspend(), MOD_UNIQUE);
 		this->AddCommand(NICKSERV, new CommandNSUnSuspend(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_SUSPEND);
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_SUSPEND);
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
-}
 
 MODULE_INIT("ns_suspend", NSSuspend)

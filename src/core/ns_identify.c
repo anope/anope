@@ -18,8 +18,6 @@
 #define TO_COLLIDE 0 /* Collide the user with this nick */
 #define TO_RELEASE 1 /* Release a collided nick */
 
-void myNickServHelp(User *u);
-
 class CommandNSIdentify : public Command
 {
  public:
@@ -135,18 +133,11 @@ class NSIdentify : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSIdentify("IDENTIFY"), MOD_UNIQUE);
 		this->AddCommand(NICKSERV, new CommandNSIdentify("ID"), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
-}
 
 MODULE_INIT("ns_identify", NSIdentify)

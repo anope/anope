@@ -15,19 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User * u);
-
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_BAN);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNBAN);
-}
-
 class CommandCSBan : public Command
 {
  public:
@@ -188,8 +175,11 @@ class CSBan : public Module
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSBan(), MOD_UNIQUE);
 		this->AddCommand(CHANSERV, new CommandCSUnban(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_BAN);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNBAN);
 	}
 };
 

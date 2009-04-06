@@ -16,8 +16,6 @@
 #include "module.h"
 #include "hashcomp.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSList : public Command
 {
  public:
@@ -221,19 +219,12 @@ class NSList : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSList(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		if (!NSListOpersOnly || is_oper(u))
+			notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	if (!NSListOpersOnly || is_oper(u))
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
-}
 
 MODULE_INIT("ns_list", NSList)

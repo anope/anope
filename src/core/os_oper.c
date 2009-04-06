@@ -17,7 +17,6 @@
 
 int oper_list_callback(SList *slist, int number, void *item, va_list args);
 int oper_list(int number, NickCore *nc, User *u, int *sent_header);
-void myOperServHelp(User *u);
 
 class CommandOSOper : public Command
 {
@@ -245,20 +244,12 @@ class OSOper : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(OPERSERV, new CommandOSOper(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPER);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_OPER);
-}
 
 /* Lists an oper entry, prefixing it with the header if needed */
 int oper_list(int number, NickCore *nc, User *u, int *sent_header)

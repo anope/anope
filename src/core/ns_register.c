@@ -16,7 +16,6 @@
 #include "module.h"
 #include "encrypt.h"
 
-void myNickServHelp(User *u);
 NickRequest *makerequest(const char *nick);
 NickAlias *makenick(const char *nick);
 int do_sendregmail(User *u, NickRequest *nr);
@@ -423,24 +422,17 @@ class NSRegister : public Module
 		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_UNIQUE);
 		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 0, 1), MOD_UNIQUE);
 		this->AddCommand(NICKSERV, new CommandNSResend(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_REGISTER);
+		if (NSEmailReg)
+		{
+			notice_lang(s_NickServ, u, NICK_HELP_CMD_CONFIRM);
+			notice_lang(s_NickServ, u, NICK_HELP_CMD_RESEND);
+		}
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_REGISTER);
-	if (NSEmailReg)
-	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_CONFIRM);
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_RESEND);
-	}
-}
 
 /*************************************************************************/
 

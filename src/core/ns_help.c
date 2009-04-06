@@ -43,7 +43,7 @@ class CommandNSHelp : public Command
 	void OnSyntaxError(User *u)
 	{
 		notice_help(s_NickServ, u, NICK_HELP);
-		moduleDisplayHelp(1, u);
+		moduleDisplayHelp(s_NickServ, u);
 		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP);
 		if (NSExpire >= 86400)

@@ -48,8 +48,6 @@
 #define LNG_CHAN_HELP_APPENDTOPIC	1
 #define LNG_APPENDTOPIC_SYNTAX		2
 
-void my_cs_help(User *u);
-
 static Module *me;
 
 class CommandCSAppendTopic : public Command
@@ -145,7 +143,6 @@ class CSAppendTopic : public Module
 		this->SetType(SUPPORTED);
 
 		this->AddCommand(CHANSERV, new CommandCSAppendTopic(), MOD_HEAD);
-		this->SetChanHelp(my_cs_help);
 
 		/* English (US) */
 		const char* langtable_en_us[] = {
@@ -227,11 +224,10 @@ class CSAppendTopic : public Module
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 	}
+	void ChanServHelp(User *u)
+	{
+		this->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+	}
 };
-
-void my_cs_help(User *u)
-{
-	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
-}
 
 MODULE_INIT("cs_appendtopic", CSAppendTopic)

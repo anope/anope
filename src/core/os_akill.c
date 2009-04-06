@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
 int akill_view_callback(SList *slist, int number, void *item, va_list args);
 int akill_list_callback(SList *slist, int number, void *item, va_list args);
 int akill_view(int number, Akill *ak, User *u, int *sent_header);
@@ -331,19 +330,12 @@ class OSAKill : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(OPERSERV, new CommandOSAKill(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_AKILL);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_AKILL);
-}
 
 int akill_view(int number, Akill *ak, User *u, int *sent_header)
 {

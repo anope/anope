@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSClearModes : public Command
 {
  public:
@@ -255,18 +253,11 @@ class OSClearModes : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSClearModes(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
-}
 
 MODULE_INIT("os_clearmodes", OSClearModes)

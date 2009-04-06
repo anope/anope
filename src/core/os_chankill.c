@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSChanKill : public Command
 {
  public:
@@ -112,18 +110,11 @@ class OSChanKill : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSChanKill(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANKILL);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANKILL);
-}
 
 MODULE_INIT("os_chankill", OSChanKill)

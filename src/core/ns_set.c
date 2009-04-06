@@ -16,8 +16,6 @@
 #include "module.h"
 #include "encrypt.h"
 
-void myNickServHelp(User *u);
-
 class CommandNSSet : public Command
 {
  private:
@@ -544,18 +542,11 @@ class NSSet : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSSet(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_SET);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_SET);
-}
 
 MODULE_INIT("ns_set", NSSet)

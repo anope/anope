@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myBotServHelp(User * u);
-
 class CommandBSSay : public Command
 {
  public:
@@ -90,20 +88,11 @@ class BSSay : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(BOTSERV, new CommandBSSay(), MOD_UNIQUE);
-
-		this->SetBotHelp(myBotServHelp);
+	}
+	void BotServHelp(User *u)
+	{
+		notice_lang(s_BotServ, u, BOT_HELP_CMD_SAY);
 	}
 };
-
-
-/**
- * Add the help response to Anopes /bs help output.
- * @param u The user who is requesting help
- **/
-void myBotServHelp(User * u)
-{
-	notice_lang(s_BotServ, u, BOT_HELP_CMD_SAY);
-}
-
 
 MODULE_INIT("bs_say", BSSay)

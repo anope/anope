@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myNickServHelp(User *u);
 NickAlias *makenick(const char *nick);
 
 class CommandNSForbid : public Command
@@ -110,19 +109,12 @@ class NSForbid : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSForbid(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
-}
 
 NickAlias *makenick(const char *nick)
 {

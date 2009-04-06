@@ -17,7 +17,6 @@
 
 int do_kickcmd(User * u);
 
-void myBotServHelp(User * u);
 class CommandBSKick : public Command
 {
  public:
@@ -352,20 +351,11 @@ class BSKick : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(BOTSERV, new CommandBSKick(), MOD_UNIQUE);
-
-		this->SetBotHelp(myBotServHelp);
+	}
+	void BotServHelp(User *u)
+	{
+		notice_lang(s_BotServ, u, BOT_HELP_CMD_KICK);
 	}
 };
-
-
-/**
- * Add the help response to Anopes /bs help output.
- * @param u The user who is requesting help
- **/
-void myBotServHelp(User * u)
-{
-	notice_lang(s_BotServ, u, BOT_HELP_CMD_KICK);
-}
-
 
 MODULE_INIT("bs_kick", BSKick)

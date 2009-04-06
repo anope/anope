@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myChanServHelp(User * u);
-
 class CommandCSRegister : public Command
 {
  public:
@@ -150,18 +148,11 @@ class CSRegister : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(CHANSERV, new CommandCSRegister(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
 	}
 };
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User *u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
-}
 
 MODULE_INIT("cs_register", CSRegister)

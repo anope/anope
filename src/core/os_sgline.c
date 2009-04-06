@@ -16,7 +16,6 @@
 #include "module.h"
 #include "hashcomp.h"
 
-void myOperServHelp(User *u);
 int sgline_view_callback(SList *slist, int number, void *item, va_list args);
 int sgline_list_callback(SList *slist, int number, void *item, va_list args);
 int sgline_view(int number, SXLine *sx, User *u, int *sent_header);
@@ -331,21 +330,14 @@ class OSSGLine : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSSGLine(), MOD_UNIQUE);
 
-		this->SetOperHelp(myOperServHelp);
-
 		if (!ircd->sgline)
 			throw ModuleException("Your IRCd does not support SGLine");
 	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_SGLINE);
+	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_SGLINE);
-}
 
 /* Lists an SGLINE entry, prefixing it with the header if needed */
 int sgline_view(int number, SXLine *sx, User *u, int *sent_header)

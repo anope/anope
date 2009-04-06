@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSSession : public Command
 {
  private:
@@ -464,19 +462,12 @@ class OSSession : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSSession(), MOD_UNIQUE);
 		this->AddCommand(OPERSERV, new CommandOSException(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_SESSION);
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_SESSION);
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
-}
 
 MODULE_INIT("os_session", OSSession)

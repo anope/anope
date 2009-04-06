@@ -53,8 +53,6 @@ char *HSRequestDBName = NULL;
 #define LNG_WAITING_SYNTAX		19
 #define LNG_HELP_WAITING		20
 
-void hs_help(User *u);
-
 void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 int my_isvalidchar(const char c);
 void my_memo_lang(User *u, char *name, int z, int number, ...);
@@ -416,7 +414,6 @@ class HSRequest : public Module
 		ModuleManager::Attach(I_OnSaveDatabase, this);
 		ModuleManager::Attach(I_OnBackupDatabase, this);
 
-		this->SetHostHelp(hs_help);
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
@@ -767,6 +764,12 @@ class HSRequest : public Module
 		else
 			ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
 	}
+
+	void HostServHelp(User *u)
+	{
+		this->NoticeLang(s_HostServ, u, LNG_HELP);
+		this->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
+	}
 };
 
 void my_memo_lang(User *u, char *name, int z, int number, ...)
@@ -869,12 +872,6 @@ int my_isvalidchar(const char c)
 		return 1;
 	else
 		return 0;
-}
-
-void hs_help(User * u)
-{
-	me->NoticeLang(s_HostServ, u, LNG_HELP);
-	me->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
 
 void hsreq_load_db()

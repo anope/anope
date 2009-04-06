@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSReload : public Command
 {
  public:
@@ -58,19 +56,11 @@ class OSReload : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSReload(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_RELOAD);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_RELOAD);
-}
 
 MODULE_INIT("os_reload", OSReload)

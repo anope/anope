@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
 int szline_view_callback(SList *slist, int number, void *item, va_list args);
 int szline_list_callback(SList *slist, int number, void *item, va_list args);
 int szline_view(int number, SXLine *sx, User *u, int *sent_header);
@@ -316,21 +315,14 @@ class OSSZLine : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSSZLine(), MOD_UNIQUE);
 
-		this->SetOperHelp(myOperServHelp);
 		if (!ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");
 	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
+	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
-}
 
 int szline_view(int number, SXLine *sx, User *u, int *sent_header)
 {

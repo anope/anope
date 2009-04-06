@@ -21,7 +21,6 @@
 #define AUTHOR "Rob"
 #define VERSION "$Id$"
 
-void myHelp(User *u);
 void mySendResponse(User *u, const char *channel, char *mask, const char *time);
 
 void addBan(Channel *c, time_t timeout, char *banmask);
@@ -94,7 +93,6 @@ class CSTBan : public Module
 	{
 		me = this;
 
-		this->SetChanHelp(myHelp);
 		this->AddCommand(CHANSERV, new CommandCSTBan(), MOD_HEAD);
 
 		this->SetAuthor(AUTHOR);
@@ -158,12 +156,11 @@ class CSTBan : public Module
 		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 	}
+	void ChanServHelp(User *u)
+	{
+		this->NoticeLang(s_ChanServ, u, TBAN_HELP);
+	}
 };
-
-void myHelp(User *u)
-{
-	me->NoticeLang(s_ChanServ, u, TBAN_HELP);
-}
 
 void mySendResponse(User *u, const char *channel, char *mask, const char *time)
 {

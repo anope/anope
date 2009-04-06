@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSIgnore : public Command
 {
  private:
@@ -141,18 +139,11 @@ class OSIgnore : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(OPERSERV, new CommandOSIgnore(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_IGNORE);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_IGNORE);
-}
 
 MODULE_INIT("os_ignore", OSIgnore)

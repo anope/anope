@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myHostServHelp(User *u);
 extern int do_hs_sync(NickCore *nc, char *vIdent, char *hostmask, char *creator, time_t time);
 
 class CommandHSSetAll : public Command
@@ -169,17 +168,11 @@ class HSSetAll : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HOSTSERV, new CommandHSSetAll(), MOD_UNIQUE);
-		this->SetHostHelp(myHostServHelp);
+	}
+	void HostServHelp(User *u)
+	{
+		notice_lang(s_HostServ, u, HOST_HELP_CMD_SETALL);
 	}
 };
-
-/**
- * Add the help response to anopes /hs help output.
- * @param u The user who is requesting help
- **/
-void myHostServHelp(User *u)
-{
-	notice_lang(s_HostServ, u, HOST_HELP_CMD_SETALL);
-}
 
 MODULE_INIT("hs_setall", HSSetAll)

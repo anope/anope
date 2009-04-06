@@ -16,19 +16,6 @@
 #include "module.h"
 #include "hashcomp.h"
 
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	if (!CSListOpersOnly || (is_oper(u)))
-	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
-	}
-}
-
-
 class CommandCSList : public Command
 {
 public:
@@ -198,7 +185,13 @@ public:
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSList(), MOD_UNIQUE);
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		if (!CSListOpersOnly || (is_oper(u)))
+		{
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
+		}
 	}
 };
 

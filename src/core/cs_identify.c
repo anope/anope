@@ -15,18 +15,6 @@
 
 #include "module.h"
 
-
-
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_IDENTIFY);
-}
-
 class CommandCSIdentify : public Command
 {
  public:
@@ -118,10 +106,11 @@ class CSIdentify : public Module
 		this->AddCommand(CHANSERV, new CommandCSIdentify("IDENTIFY"), MOD_UNIQUE);
 		// XXX: we need aliases.
 		this->AddCommand(CHANSERV, new CommandCSIdentify("ID"), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_IDENTIFY);
 	}
 };
-
 
 MODULE_INIT("cs_identify", CSIdentify)

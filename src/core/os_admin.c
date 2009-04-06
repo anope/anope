@@ -17,7 +17,6 @@
 
 int admin_list_callback(SList *slist, int number, void *item, va_list args);
 int admin_list(int number, NickCore *nc, User *u, int *sent_header);
-void myOperServHelp(User *u);
 
 class CommandOSAdmin : public Command
 {
@@ -250,19 +249,12 @@ class OSAdmin : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSAdmin(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
-}
 
 int admin_list_callback(SList *slist, int number, void *item, va_list args)
 {

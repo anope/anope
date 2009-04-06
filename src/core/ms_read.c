@@ -17,7 +17,6 @@
 
 int read_memo_callback(User *u, int num, va_list args);
 int read_memo(User *u, int index, MemoInfo *mi, const char *chan);
-void myMemoServHelp(User *u);
 extern void rsend_notify(User *u, Memo *m, const char *chan);
 
 class CommandMSRead : public Command
@@ -131,18 +130,12 @@ class MSRead : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSRead(), MOD_UNIQUE);
-		this->SetMemoHelp(myMemoServHelp);
+	}
+	void MemoServHelp(User *u)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
 	}
 };
-
-/**
- * Add the help response to anopes /ms help output.
- * @param u The user who is requesting help
- **/
-void myMemoServHelp(User *u)
-{
-	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
-}
 
 /**
  * Read a memo callback function

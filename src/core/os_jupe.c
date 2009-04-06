@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSJupe : public Command
 {
  public:
@@ -67,18 +65,11 @@ class OSJupe : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSJupe(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_JUPE);
 	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_JUPE);
-}
 
 MODULE_INIT("os_jupe", OSJupe)

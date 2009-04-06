@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myBotServHelp(User * u);
 int badwords_del_callback(User * u, int num, va_list args);
 int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header);
 int badwords_list_callback(User * u, int num, va_list args);
@@ -311,20 +310,12 @@ class BSBadwords : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(BOTSERV, new CommandBSBadwords, MOD_UNIQUE);
-
-		this->SetBotHelp(myBotServHelp);
+	}
+	void BotServHelp(User *u)
+	{
+		notice_lang(s_BotServ, u, BOT_HELP_CMD_BADWORDS);
 	}
 };
-
-
-/**
- * Add the help response to Anopes /bs help output.
- * @param u The user who is requesting help
- **/
-void myBotServHelp(User * u)
-{
-	notice_lang(s_BotServ, u, BOT_HELP_CMD_BADWORDS);
-}
 
 int badwords_del_callback(User * u, int num, va_list args)
 {

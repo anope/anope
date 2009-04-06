@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myMemoServHelp(User *u);
-
 class CommandMSRSend : public Command
 {
  public:
@@ -89,20 +87,14 @@ class MSRSend : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSRSend(), MOD_UNIQUE);
-		this->SetMemoHelp(myMemoServHelp);
 
 		if (!MSMemoReceipt)
 			throw ModuleException("Don't like memo reciepts, or something.");
 	}
+	void MemoServHelp(User *u)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_RSEND);
+	}
 };
-
-/**
- * Add the help response to anopes /ms help output.
- * @param u The user who is requesting help
- **/
-void myMemoServHelp(User *u)
-{
-	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_RSEND);
-}
 
 MODULE_INIT("ms_rsend", MSRSend)

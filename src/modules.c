@@ -785,61 +785,33 @@ void moduleCallBackPrepForUnload(const char *mod_name)
 	}
 }
 
-void Module::SetNickHelp(void (*func)(User *))
-{
-	this->nickHelp = func;
-}
-
-void Module::SetChanHelp(void (*func)(User *))
-{
-	this->chanHelp = func;
-}
-
-void Module::SetMemoHelp(void (*func)(User *))
-{
-	this->memoHelp = func;
-}
-
-void Module::SetBotHelp(void (*func)(User *))
-{
-	this->botHelp = func;
-}
-
-void Module::SetOperHelp(void (*func)(User *))
-{
-	this->operHelp = func;
-}
-
-void Module::SetHostHelp(void (*func)(User *))
-{
-	this->hostHelp = func;
-}
-
 /**
  * Display any extra module help for the given service.
  * @param services which services is help being dispalyed for?
  * @param u which user is requesting the help
  **/
-void moduleDisplayHelp(int service, User * u)
+void moduleDisplayHelp(const char *service, User * u)
 {
 	int idx;
 	ModuleHash *current = NULL;
 
+	if (!service)
+		return;
+
 	for (idx = 0; idx != MAX_CMD_HASH; idx++) {
 		for (current = MODULE_HASH[idx]; current; current = current->next) {
-			if ((service == 1) && current->m->nickHelp) {
-				current->m->nickHelp(u);
-			} else if ((service == 2) && current->m->chanHelp) {
-				current->m->chanHelp(u);
-			} else if ((service == 3) && current->m->memoHelp) {
-				current->m->memoHelp(u);
-			} else if ((service == 4) && current->m->botHelp) {
-				current->m->botHelp(u);
-			} else if ((service == 5) && current->m->operHelp) {
-				current->m->operHelp(u);
-			} else if ((service == 6) && current->m->hostHelp) {
-				current->m->hostHelp(u);
-			}
+			if (!strcmp(s_NickServ, service))
+				current->m->NickServHelp(u);
+			else if (!strcmp(s_ChanServ, service))
+				current->m->ChanServHelp(u);
+			else if (!strcmp(s_MemoServ, service))
+				current->m->MemoServHelp(u);
+			else if (!strcmp(s_BotServ, service))
+				current->m->BotServHelp(u);
+			else if (!strcmp(s_OperServ, service))
+				current->m->OperServHelp(u);
+			else if (!strcmp(s_HostServ, service))
+				current->m->HostServHelp(u);
 		}
 	}
 }

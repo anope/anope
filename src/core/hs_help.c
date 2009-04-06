@@ -32,7 +32,7 @@ class CommandHSHelp : public Command
 	void OnSyntaxError(User *u)
 	{
 		notice_help(s_HostServ, u, HOST_HELP, s_HostServ);
-		moduleDisplayHelp(6, u);
+		moduleDisplayHelp(s_HostServ, u);
 	}
 };
 

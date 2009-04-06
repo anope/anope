@@ -15,17 +15,6 @@
 
 #include "module.h"
 
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User * u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INFO);
-}
-
-
 class CommandCSInfo : public Command
 {                  // cannot be const, as it is modified.
 	void CheckOptStr(std::string &buf, int opt, const std::string &str, ChannelInfo *ci, NickCore *nc)
@@ -185,8 +174,10 @@ class CSInfo : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSInfo(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INFO);
 	}
 };
 

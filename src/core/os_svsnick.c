@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSSVSNick : public Command
 {
  public:
@@ -101,20 +99,13 @@ class OSSVSNick : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSSVSNick(), MOD_UNIQUE);
 
-		this->SetOperHelp(myOperServHelp);
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_SVSNICK);
+	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_SVSNICK);
-}
 
 MODULE_INIT("os_svsnick", OSSVSNick)

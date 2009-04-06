@@ -18,8 +18,6 @@
 #define AUTHOR "Anope"
 #define VERSION "$Id$"
 
-void my_cs_help(User *u);
-
 #define LNG_NUM_STRINGS	6
 
 #define LNG_CHAN_HELP						   0
@@ -262,8 +260,6 @@ class CSEnforce : public Module
 
 		this->AddCommand(CHANSERV, new CommandCSEnforce(), MOD_HEAD);
 
-		this->SetChanHelp(my_cs_help);
-
 		/* English (US) */
 		const char* langtable_en_us[] = {
 			/* LNG_CHAN_HELP */
@@ -472,12 +468,10 @@ class CSEnforce : public Module
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 	}
+	void ChanServHelp(User *u)
+	{
+		this->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+	}
 };
-
-/* Language and response stuff */
-void my_cs_help(User *u)
-{
-	me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
-}
 
 MODULE_INIT("cs_enforce", CSEnforce)

@@ -307,13 +307,6 @@ class CoreExport Module
 
 	MODType type;
 
-	void (*nickHelp)(User *u); /* service 1 */
-	void (*chanHelp)(User *u); /* 2 */
-	void (*memoHelp)(User *u); /* 3 */
-	void (*botHelp)(User *u); /* 4 */
-	void (*operHelp)(User *u); /* 5 */
-	void (*hostHelp)(User *u); /* 6 */
-
 	MessageHash *msgList[MAX_CMD_HASH];
 	ModuleLang lang[NUM_LANGS];
 
@@ -355,47 +348,47 @@ class CoreExport Module
 	 */
 	void SetAuthor(const std::string &author);
 
-	/**
-	 * Add output to nickserv help.
-	 * when doing a /msg nickserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetNickHelp(void (*func)(User *));
+	/** Add output to NickServ Help.
+	 * When doing /msg NickServ HELP, this function will be calloed to allow it to send out
+	 * a notice witht he code you wish to display
+	 * @Param u The user executing the command
+	 */
+	virtual void NickServHelp(User *u) { }
 
-	/**
-	 * Add output to chanserv help.
-	 * when doing a /msg chanserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetChanHelp(void (*func)(User *));
+	/** Add output to ChanServ Help.
+	 * When doing /msg ChanServ HELP, this function will be calloed to allow it to send out
+	 * a notice witht he code you wish to display
+	 * @Param u The user executing the command
+	 */
+	virtual void ChanServHelp(User *u) { }
 
-	/**
-	 * Add output to memoserv help.
-	 * when doing a /msg memoserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetMemoHelp(void (*func)(User *));
+	/** Add output to MemoServ Help.
+	 * When doing /msg MemoServ HELP, this function will be calloed to allow it to send out
+	 * a notice witht he code you wish to display
+	 * @Param u The user executing the command
+	 */
+	virtual void MemoServHelp(User *u) { }
 
-	/**
-	 * Add output to botserv help.
-	 * when doing a /msg botserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetBotHelp(void (*func)(User *));
+	/** Add output to BotServ Help.
+	 * When doing /msg BotServ HELP, this function will be calloed to allow it to send out
+	 * a notice witht he code you wish to display
+	 * @Param u The user executing the command
+	 */
+	virtual void BotServHelp(User *u) { }
 
-	/**
-	 * Add output to operserv help.
-	 * when doing a /msg operserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetOperHelp(void (*func)(User *));
+	/** Add output to OperServ Help.
+	 * When doing /msg OperServ HELP, this function will be calloed to allow it to send out
+	 * a notice witht he code you wish to display
+	 * @Param u The user executing the command
+	 */
+	virtual void OperServHelp(User *u) { }
 
-	/**
-	 * Add output to hostserv help.
-	 * when doing a /msg hostserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
-	 * @param func a pointer to the function which will display the code
-	 **/
-	void SetHostHelp(void (*func)(User *));
+	/** Add output to HostServ Help.
+	 * When doing /msg HostServ HELP, this function will be calloed to allow it to send out
+	 * a notice witht he code you wish to display
+	 * @Param u The user executing the command
+	 */
+	virtual void HostServHelp(User *u) { }
 
 	/**
 	 * Allow a module to add a set of language strings to anope
@@ -465,8 +458,6 @@ class CoreExport Module
 	 * @param name the name of the callback they wish to delete
 	 **/
 	void DelCallback(const char *name);
-
-
 
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
@@ -588,12 +579,6 @@ class CoreExport ModuleManager
 	 */
 	static void RunCallbacks();
 
-
-
-
-
-
-
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this
 	 * method (usually within void Module::Prioritize()) to set your events priority. You may use this call in other methods too, however, this is not supported behaviour
@@ -698,7 +683,7 @@ int encryption_module_init(); /* Load the encryption module */
 int protocol_module_init();	/* Load the IRCD Protocol Module up*/
 void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
-MDE void moduleDisplayHelp(int service, User *u);
+MDE void moduleDisplayHelp(const char *service, User *u);
 
 /*************************************************************************/
 /*************************************************************************/

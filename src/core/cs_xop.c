@@ -18,7 +18,6 @@
 int xop_del_callback(User *u, int num, va_list args);
 int xop_list_callback(User *u, int num, va_list args);
 int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, int xmsg);
-void myChanServHelp(User *u);
 
 enum
 {
@@ -506,23 +505,16 @@ class CSXOP : public Module
 			this->AddCommand(CHANSERV, new CommandCSHOP(), MOD_UNIQUE);
 		this->AddCommand(CHANSERV, new CommandCSSOP(), MOD_UNIQUE);
 		this->AddCommand(CHANSERV, new CommandCSVOP(), MOD_UNIQUE);
-
-		this->SetChanHelp(myChanServHelp);
+	}
+	void ChanServHelp(User *u)
+	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
+		if (ircd->halfop)
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOP);
 	}
 };
-
-/**
- * Add the help response to anopes /cs help output.
- * @param u The user who is requesting help
- **/
-void myChanServHelp(User *u)
-{
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
-	if (ircd->halfop)
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HOP);
-	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOP);
-}
 
 /* `last' is set to the last index this routine was called with
  * `perm' is incremented whenever a permission-denied error occurs

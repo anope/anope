@@ -17,7 +17,6 @@
 
 int list_memo_callback(User *u, int num, va_list args);
 int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, const char *chan);
-void myMemoServHelp(User *u);
 
 class CommandMSList : public Command
 {
@@ -124,18 +123,12 @@ class MSList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSList(), MOD_UNIQUE);
-		this->SetMemoHelp(myMemoServHelp);
+	}
+	void MemoServHelp(User *u)
+	{
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_LIST);
 	}
 };
-
-/**
- * Add the help response to anopes /ms help output.
- * @param u The user who is requesting help
- **/
-void myMemoServHelp(User *u)
-{
-	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_LIST);
-}
 
 /**
  * list memno callback function

@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
 int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u);
 
 class CommandOSModInfo : public Command
@@ -75,20 +74,12 @@ class OSModInfo : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(OPERSERV, new CommandOSModInfo(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODINFO);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_MODINFO);
-}
 
 int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u)
 {

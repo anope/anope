@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
-
 class CommandOSUMode : public Command
 {
  public:
@@ -87,20 +85,13 @@ class OSUMode : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSUMode(), MOD_UNIQUE);
 
-		this->SetOperHelp(myOperServHelp);
-
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");
 	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_UMODE);
+	}
 };
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_UMODE);
-}
 
 MODULE_INIT("os_umode", OSUMode)

@@ -18,8 +18,6 @@
 #define TO_COLLIDE 0 /* Collide the user with this nick */
 #define TO_RELEASE 1 /* Release a collided nick */
 
-void myNickServHelp(User *u);
-
 class CommandNSLogout : public Command
 {
  public:
@@ -112,18 +110,11 @@ class NSLogout : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSLogout(), MOD_UNIQUE);
-
-		this->SetNickHelp(myNickServHelp);
+	}
+	void NickServHelp(User *u)
+	{
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_LOGOUT);
 	}
 };
-
-/**
- * Add the help response to anopes /ns help output.
- * @param u The user who is requesting help
- **/
-void myNickServHelp(User *u)
-{
-	notice_lang(s_NickServ, u, NICK_HELP_CMD_LOGOUT);
-}
 
 MODULE_INIT("ns_logout", NSLogout)

@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-void myHostServHelp(User *u);
-
 class CommandHSDelAll : public Command
 {
  public:
@@ -79,18 +77,11 @@ class HSDelAll : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HOSTSERV, new CommandHSDelAll(), MOD_UNIQUE);
-
-		this->SetHostHelp(myHostServHelp);
+	}
+	void HostServHelp(User *u)
+	{
+		notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
 	}
 };
-
-/**
- * Add the help response to anopes /hs help output.
- * @param u The user who is requesting help
- **/
-void myHostServHelp(User *u)
-{
-	notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
-}
 
 MODULE_INIT("hs_delall", HSDelAll)

@@ -15,7 +15,6 @@
 
 #include "module.h"
 
-void myOperServHelp(User *u);
 int opers_list_callback(SList *slist, int number, void *item, va_list args);
 int opers_list(int number, NickCore *nc, User *u, char *level);
 
@@ -85,20 +84,12 @@ class OSStaff : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSStaff(), MOD_UNIQUE);
-
-		this->SetOperHelp(myOperServHelp);
+	}
+	void OperServHelp(User *u)
+	{
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
 	}
 };
-
-
-/**
- * Add the help response to anopes /os help output.
- * @param u The user who is requesting help
- **/
-void myOperServHelp(User *u)
-{
-	notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
-}
 
 /**
  * Function for the enumerator to call

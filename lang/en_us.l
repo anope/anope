@@ -2817,17 +2817,6 @@ OPER_SET_NOEXPIRE_ERROR
 	Setting for NOEXPIRE must be ON or OFF.
 OPER_SET_UNKNOWN_OPTION
 	Unknown option %s.
-OPER_SET_SQL_ON
-	SQL code will be used.
-OPER_SET_SQL_OFF
-	SQL code will not be used.
-OPER_SET_SQL_ERROR
-	Setting for SQL must be ON or OFF.
-OPER_SET_SQL_ERROR_INIT
-	Error during init of SQL, check your logs to correct.
-OPER_SET_SQL_ERROR_DISABLED
-	SQL is not configured for this network. Please edit the
-	configuration file (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s is enabled
 OPER_SET_LIST_OPTION_OFF
@@ -5729,7 +5718,6 @@ OPER_HELP_SET
 	    DEBUG      Activate or deactivate debug mode
 	    NOEXPIRE   Activate or deactivate no expire mode
 	    SUPERADMIN Activate or deactivate super-admin mode
-	    SQL        Activate or deactivate sql mode
 	    IGNORE     Activate or deactivate ignore mode
 	    LIST       List the options
 
@@ -5791,13 +5779,6 @@ OPER_HELP_SET_SUPERADMIN
 
 	This option is not persistent, and should only be used when
 	needed, and set back to OFF when no longer needed.
-
-OPER_HELP_SET_SQL
-	Syntax: SET SQL {ON | OFF}
-
-	Setting this will toggle Anope's usage of SQL, this should
-	be used to disable and enable SQL should your SQL server go down
-	while services are running.
 
 OPER_HELP_SET_IGNORE
 	Syntax: SET IGNORE {ON | OFF}

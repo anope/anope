@@ -575,9 +575,6 @@ struct memo_ {
 	time_t time;	/* When it was sent */
 	char sender[NICKMAX];
 	char *text;
-#ifdef USE_MYSQL
-	uint32 id;		/* Database ID; see mysql.c */
-#endif
 };
 
 typedef struct {

@@ -2841,17 +2841,6 @@ OPER_SET_NOEXPIRE_ERROR
 	Opção NOEXPIRE deve ser ON ou OFF.
 OPER_SET_UNKNOWN_OPTION
 	Opção desconhecida: %s.
-OPER_SET_SQL_ON
-	Código SQL será usado.
-OPER_SET_SQL_OFF
-	Código SQL não será usado.
-OPER_SET_SQL_ERROR
-	Ajuste para SQL deve ser ON ou OFF.
-OPER_SET_SQL_ERROR_INIT
-	Erro durante inicialização de SQL, verifique seus logs para corrigir.
-OPER_SET_SQL_ERROR_DISABLED
-	SQL não está configurada para esta rede. Por favor, edite o
-	arquivo de configuração (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s está ativada
 OPER_SET_LIST_OPTION_OFF
@@ -5844,7 +5833,6 @@ OPER_HELP_SET
 	    DEBUG       Ativa ou desativa o modo de depuração (debug)
 	    NOEXPIRE    Ativa ou desativa o modo não-expira
 	    SUPERADMIN  Ativa ou desativa o modo Super-Admin
-	    SQL         Ativa ou desativa o modo SQL
 	    IGNORE      Ativa ou desativa o modo Ignore
 	    LIST        Lista as opções atuais
 	
@@ -5909,13 +5897,6 @@ OPER_HELP_SET_SUPERADMIN
 
 	Esta opção não é permanente, e deve ser usada somente quando
 	necessária, e desativada quando não for mais necessária.
-
-OPER_HELP_SET_SQL
-	Sintaxe: SET SQL {ON | OFF}
-	
-	Ajustando esta opção, fará os Services usarem ou não SQL. Isso deve
-	ser usado para ativar ou desativar SQL caso seu servidor SQL caia
-	enquanto os Services estiverem rodando.
 
 OPER_HELP_SET_IGNORE
 	Sintaxe: SET IGNORE {ON | OFF}

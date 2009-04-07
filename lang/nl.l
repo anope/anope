@@ -2870,17 +2870,6 @@ OPER_SET_NOEXPIRE_ERROR
 	Instelling voor NOEXPIRE moet ON of OFF zijn.
 OPER_SET_UNKNOWN_OPTION
 	Onbekende optie %s.
-OPER_SET_SQL_ON
-	SQL code wordt gebruikt.
-OPER_SET_SQL_OFF
-	SQL code wordt niet gebruikt.
-OPER_SET_SQL_ERROR
-	Instelling voor SQL moet ON of OFF zijn.
-OPER_SET_SQL_ERROR_INIT
-	Fout tijdens het initialiseren van SQL. Controleer de logs om dit op te lossen.
-OPER_SET_SQL_ERROR_DISABLED
-	SQL is not configured for this network. Please edit the
-	configuration file (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s is ingeschakeld
 OPER_SET_LIST_OPTION_OFF
@@ -5897,7 +5886,6 @@ OPER_HELP_SET
 	    DEBUG      (De)activeer debug mode
 	    NOEXPIRE   (De)activeer de geen-verloop mode
 	    SUPERADMIN (De)activeer SuperAdministrator mode
-	    SQL   	 Activate or deactivate sql mode
 	    IGNORE     Activate or deactivate ignore mode
 	    LIST       List the options
 
@@ -5958,13 +5946,6 @@ OPER_HELP_SET_SUPERADMIN
 	Deze optie is niet persistent, en moet alleen gebruikt worden
 	wanneer het echt nodig is, en terug op OFF gezet worden als het
 	niet meer nodig is.
-
-OPER_HELP_SET_SQL
-	Gebruik: SET SQL {ON | OFF}
-	
-	Deze instelling schakelt Anope's SQL gebruik. Zo kan al het SQL
-	verkeer worden uitgezet als de SQL server onbereikbaar wordt
-	terwijl services nog draaien.
 
 OPER_HELP_SET_IGNORE
 	Syntax: SET IGNORE {ON | OFF}

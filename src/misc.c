@@ -882,9 +882,6 @@ void rand_init()
 	int n, fd;
 #endif
 	struct {
-#ifdef USE_MYSQL
-		int sqlrand;
-#endif
 #ifndef _WIN32
 		struct timeval nowt;	/* time */
 		char rnd[32];		   /* /dev/urandom */
@@ -895,11 +892,6 @@ void rand_init()
 	} rdat;
 
 	arc4_init();
-
-	/* Grab "random" MYSQL data */
-#ifdef USE_MYSQL
-	rdat.sqlrand = mysql_rand();
-#endif
 
 	/* Grab OS specific "random" data */
 #ifndef _WIN32

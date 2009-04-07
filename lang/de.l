@@ -2867,17 +2867,6 @@ OPER_SET_NOEXPIRE_ERROR
 	Die Einstellung von NOEXPIRE kann nur ON oder OFF sein.
 OPER_SET_UNKNOWN_OPTION
 	Unbekannte Option %s.
-OPER_SET_SQL_ON
-	SQL code wird jetzt benutzt.
-OPER_SET_SQL_OFF
-	SQL code wird jetzt NICHT mehr benutzt.
-OPER_SET_SQL_ERROR
-	Einstellungen für SQL können nur ON oder OFF sein.
-OPER_SET_SQL_ERROR_INIT
-	SQL FEHLER, schaue bitte in deine Logs nach um zu sehen wie du es berichtigen kannst.
-OPER_SET_SQL_ERROR_DISABLED
-	SQL ist für den Netzwerk nicht konfiguriert. Um SQL code zu
-	benutzen mußt du es in deine services.conf richtig Konfigurieren.
 OPER_SET_LIST_OPTION_ON
 	%s ist eingeschaltet
 OPER_SET_LIST_OPTION_OFF
@@ -6059,7 +6048,6 @@ OPER_HELP_SET
 	    NOEXPIRE   Auslauf-Modus der Services
 	                 an oder aus
 	    SUPERADMIN Den Super-Admin Modus an oder aus
-	    SQL   	 SQL-Modus an oder aus
 	    IGNORE     Ignore-Modus an oder aus
 	    LIST       Optionen-Liste
 
@@ -6125,12 +6113,6 @@ OPER_HELP_SET_SUPERADMIN
 	Dieser Modus ist nicht dauerhaft und sollte nur genutzt
 	werden, wenn er wirklich gebraucht wird. Danach sollte er
 	sofort wieder ausgeschaltet werden.
-
-OPER_HELP_SET_SQL
-	Syntax: SET SQL {ON | OFF}
-
-	Diese Einstellung wird Anope veranlassen SQL zu benutzen oder nicht.
-	Kann nützlich sein wenn zB der MySQL-Server aus ist.
 
 OPER_HELP_SET_IGNORE
 	Syntax: SET IGNORE {ON | OFF}

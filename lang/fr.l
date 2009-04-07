@@ -2925,17 +2925,6 @@ OPER_SET_NOEXPIRE_ERROR
 	La valeur de NOEXPIRE doit être ON ou OFF.
 OPER_SET_UNKNOWN_OPTION
 	Option inconnue %s.
-OPER_SET_SQL_ON
-	Le code SQL dois etre utilisé.
-OPER_SET_SQL_OFF
-	Le code SQL ne dois pas etre utilisé.
-OPER_SET_SQL_ERROR
-	Les configurations pour SQL doivent etre ON ou OFF.
-OPER_SET_SQL_ERROR_INIT
-	Erreur durant l'initialisation de SQL, verifier les logs pour corriger l'erreur.
-OPER_SET_SQL_ERROR_DISABLED
-	SQL n'est pas configuré pour ce réseau. Editer le fichier
-	de configuration (services.conf) pour l'activer.
 OPER_SET_LIST_OPTION_ON
 	%s est activé
 OPER_SET_LIST_OPTION_OFF
@@ -6083,7 +6072,6 @@ OPER_HELP_SET
 	    DEBUG      Active ou désactive le mode de déboguage
 	    NOEXPIRE   Active ou désactive le mode sans expiration
 	    SUPERADMIN Active ou désactive le mode super-admin
-	    SQL   	   Active ou désactive le mode SQL
 	    IGNORE     Active ou désactive le mode ignore
 	    LIST       Liste les options
 	
@@ -6148,13 +6136,6 @@ OPER_HELP_SET_SUPERADMIN
 
 	Utilisation temporaire.
 
-OPER_HELP_SET_SQL
-	Syntaxe: SET SQL {ON | OFF}
-
-	Activer cette option fera utiliser SQL a anope, cette option est 
-	utilisé pour activé ou désactiver mysql lorsque votre serveur est
-	down et que les services sont en cour de fonctionnement.
-	
 OPER_HELP_SET_IGNORE
 	Syntaxe: SET IGNORE {ON | OFF}
 

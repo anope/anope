@@ -3802,22 +3802,6 @@ OPER_SET_NOEXPIRE_ERROR
 OPER_SET_UNKNOWN_OPTION
 	Nieznana opcja %s.
 
-OPER_SET_SQL_ON
-	Obs³uga SQL zosta³a w³±czona.
-
-OPER_SET_SQL_OFF
-	Obs³uga SQL zosta³a wy³±czona.
-
-OPER_SET_SQL_ERROR
-	Parametrem opcji SQL musi byæ ON albo OFF.
-
-OPER_SET_SQL_ERROR_INIT
-	B³±d podczas inicjacji SQL, sprawd¼ logi.
-
-OPER_SET_SQL_ERROR_DISABLED
-	SQL nie jest skonfigurowany dla tej sieci.
-	Wprowad¼ zmiany w pliku konfiguracyjnym.
-
 OPER_SET_LIST_OPTION_ON
 	%s jest w³±czone
 
@@ -6969,7 +6953,6 @@ OPER_HELP_SET
 	    DEBUG      W³±cza lub wy³±cza tryb debugowania
 	    NOEXPIRE   W³±cza lub wy³±cza tryb noexpire
 	    SUPERADMIN W³±cza lub wy³±cza tryb super administratora
-	    SQL        W³±cza lub wy³±cza obs³ugê SQL
 	    IGNORE     W³±cza lub wy³±cza tryb ignorowania
 	    LIST       Listuje aktualne ustawienia
 
@@ -7027,13 +7010,6 @@ OPER_HELP_SET_SUPERADMIN
 	
 	Ta opcja powinna byæ u¿ywana tylko wtedy, kiedy
 	jest taka potrzeba. Nale¿y j± pó¼niej wy³±czyæ.
-
-OPER_HELP_SET_SQL
-	Sk³adnia: SET SQL {ON | OFF}
-	
-	W³±cza lub wy³±cza korzystanie z bazy danych SQL.
-	Komenda ta pozwala na wy³±czenie serwera SQL
-	podczas nieprzerwanej pracy serwisów.
 
 OPER_HELP_SET_IGNORE
 	Sk³adnia: SET IGNORE {ON | OFF}

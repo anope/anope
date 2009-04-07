@@ -2829,17 +2829,6 @@ OPER_SET_NOEXPIRE_ERROR
 	Il parametro dell'opzione NOEXPIRE deve essere ON o OFF.
 OPER_SET_UNKNOWN_OPTION
 	Opzione %s sconosciuta.
-OPER_SET_SQL_ON
-	Il codice SQL viene utilizzato.
-OPER_SET_SQL_OFF
-	Il codice SQL non viene utilizzato.
-OPER_SET_SQL_ERROR
-	L'impostazione per SQL dev'essere ON o OFF.
-OPER_SET_SQL_ERROR_INIT
-	Errore durante l'inizializzazione di SQL, controlla i tuoi log per correggere.
-OPER_SET_SQL_ERROR_DISABLED
-	SQL non è configurato per questo network. Modifica
-	il file di configurazione (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s è attivato
 OPER_SET_LIST_OPTION_OFF
@@ -5900,7 +5889,6 @@ OPER_HELP_SET
 	    DEBUG      Attiva o disattiva la modalità di debug
 	    NOEXPIRE   Attiva o disattiva la modalità no expire
 	    SUPERADMIN Attiva o disattiva la modalità SuperAdmin
-	    SQL   	 Attiva o disattiva la modalità sql
 	    IGNORE     Attiva o disattiva la modalità ignore
 	    LIST       Elenca le opzioni
 	
@@ -5968,13 +5956,6 @@ OPER_HELP_SET_SUPERADMIN
 	
 	Questa opzione NON è persistente, e dovrebbe essere usata
 	solo quando necessario, e reimpostata a OFF al più presto.
-
-OPER_HELP_SET_SQL
-	Sintassi: SET SQL {ON | OFF}
-
-	Questa impostazione abilita o disabilita l'utilizzo di SQL da parte
-	di Anope. Da usare nel caso che il server SQL diventa irraggiungibile
-	mentre i services stanno lavorando.
 
 OPER_HELP_SET_IGNORE
 	Sintassi: SET IGNORE {ON | OFF}

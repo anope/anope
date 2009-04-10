@@ -68,6 +68,12 @@ class CommandBSAct : public Command
 	{
 		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
 	}
+
+	bool OnHelp(User *u, const std::string &subcommand)
+	{
+		notice_help(s_BotServ, u, BOT_HELP_ACT);
+		return true;
+	}
 };
 
 class BSAct : public Module

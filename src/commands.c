@@ -171,7 +171,7 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[], const char 
 
 	std::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
 
-	if (!c->OnHelp(u, subcommand))
+	if (!c || !c->OnHelp(u, subcommand))
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
 }
 

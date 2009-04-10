@@ -147,7 +147,7 @@ class CommandCSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnUserHelp(User *u)
+	bool OnHelp(User *u, const std::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
 			notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);

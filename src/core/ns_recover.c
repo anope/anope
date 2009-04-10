@@ -96,7 +96,7 @@ class CommandNSRecover : public Command
 		notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
 		//do_help_limited(s_NickServ, u, this);
 
-		return MOD_CONT;
+		return true;
 	}
 
 	void OnSyntaxError(User *u)

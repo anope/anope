@@ -560,6 +560,9 @@ int main(int ac, char **av, char **envp)
     }
 #endif
 
+    /* Clean out the module runtime directory prior to running, just in case files were left behind on a previous run */
+    ModuleRunTimeDirCleanUp();
+
     /* General initialization first */
     if ((i = init_primary(ac, av)) != 0)
         return i;

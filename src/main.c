@@ -387,6 +387,9 @@ int main(int ac, char **av, char **envp)
 	binary_dir = GetFullProgDir(av[0]);
 	services_dir = binary_dir + "/../data";
 
+	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
+	ModuleRunTimeDirCleanUp();
+
 	/* General initialization first */
 	if ((i = init_primary(ac, av)) != 0)
 		return i;

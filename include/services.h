@@ -237,6 +237,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include <exception>
 #include <list>
 #include <vector>
+#include <deque>
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
@@ -321,7 +322,7 @@ class CoreExport Extensible
 	 *
 	 * @return Returns true on success, false if otherwise
 	 */
-	template<typename T> bool Extend(const std::string &key, T* p)
+	template<typename T> bool Extend(const std::string &key, T *p)
 	{
 		/* This will only add an item if it doesnt already exist,
 		 * the return value is a std::pair of an iterator to the
@@ -373,7 +374,7 @@ class CoreExport Extensible
 	 * @param p If you provide a non-existent key, this value will be NULL. Otherwise a pointer to the item you requested will be placed in this templated parameter.
 	 * @return Returns true if the item was found and false if it was nor, regardless of wether 'p' is NULL. This allows you to store NULL values in Extensible.
 	 */
-	template<typename T> bool GetExt(const std::string &key, T* &p)
+	template<typename T> bool GetExt(const std::string &key, T *&p)
 	{
 		std::map<std::string, void *>::iterator iter = this->Extension_Items.find(key); /* Find the item */
 		if(iter != this->Extension_Items.end())
@@ -401,6 +402,20 @@ class CoreExport Extensible
 	{
 		return (this->Extension_Items.find(key) != this->Extension_Items.end());
 	}
+
+	/** Get a list of all extension items names.
+	 * @param list A deque of strings to receive the list
+	 * @return This function writes a list of all extension items stored
+	 *         in this object by name into the given deque and returns void.
+	 */
+	void GetExtList(std::deque<std::string> &list)
+	{
+		for (std::map<std::string, void *>::iterator i = Extension_Items.begin(); i != Extension_Items.end(); ++i)
+		{
+			list.push_back(i->first);
+		}
+	}
+
 };
 
 /*************************************************************************/

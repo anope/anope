@@ -47,7 +47,7 @@ void anope_SendNumeric(const char *source, int numeric, const char *dest, const 
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->SendNumeric(source, numeric, dest, *buf ? buf : NULL);
+	ircdproto->SendNumeric(source, numeric, dest, buf);
 }
 
 /**

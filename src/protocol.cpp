@@ -225,6 +225,6 @@ void IRCDProto::SendNumeric(const char *source, int numeric, const char *dest, c
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendNumericInternal(source, numeric, dest, *buf ? buf : NULL);
+	SendNumericInternal(source, numeric, dest, buf);
 }
 

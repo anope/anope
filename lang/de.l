@@ -1542,7 +1542,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Channel %s ist nicht registriert
 CHAN_STATUS_FORBIDDEN
@@ -1743,6 +1743,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s passt zur Ausnahme von %s und kann nicht gebannt werden, solange die Ausnahme nicht gelöscht wird.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -4083,9 +4105,6 @@ NICK_HELP_SENDPASS
 	
 	Kann in manchen Netzen auf IRC Operatoren begrenzt
 	sein.
-	
-	Dieses Kommando ist nicht verfügbar, wenn die Datenbanken
-	verschlüsselt angelegt sind.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4991,124 +5010,100 @@ CHAN_HELP_LIST
 	ohne '#' angegeben werden.
 
 CHAN_HELP_OP
-	Syntax: OP [Channel [Nickname]]
+	Syntax: OP Channel [Nickname]
 	
 	Setzt den Operator-Status des angegebenen Nicknamen 
-	in dem Channel. Wird kein Nickname angegeben, wird
-	ChanServ dich oppen, vorausgesetzt, du hast die
-	entsprechenden Rechte in der Zugriffsliste um
-	diesen Befehl auszuführen.
+	in dem Channel. If nick is not given,
+	it will op you.
 	
 	Standardmässig ist dafür ein Level von 5 oder
 	grösser erforderlich.
 
 CHAN_HELP_DEOP
-	Syntax: DEOP [Channel [Nickname]]
+	Syntax: DEOP #Channel [Nickname]
 	
 	Entfernt den Operator-Status eines bestimmten Nickname
 	in dem Channel. Wird kein Nickname angegeben, wird ChanServ
-	dich deoppen. Wird weder Channel noch Nick als Parameter
-	übergeben, wird ChanServ dich in allen Channels deoppen
-	in denen du die entsprechenden Rechte hast.
+	dich deoppen.
 	
 	Standardmässig ist dafür ein Level von 5 oder
 	grösser erforderlich.
 	
 CHAN_HELP_VOICE
-	Syntax: VOICE [Channel [Nickname]]
+	Syntax: VOICE #Channel [Nickname]
 	
 	Erteilt dem angegebenen Nickname Voice-Status in dem
 	Channel. Wird kein Nick angegeben, wird ChanServ dich
-	voicen. Wird weder Channel noch Nickane angegeben, wird
-	ChanServ dich in allen Channels voicen, in denen du
-	die entsprechenden Rechte hast.
+	voicen.
 	
 	Standardmässig brauchst du dafür ein Level von 5
 	um anderen Voice zu erteilen, oder Level 3 um dich
 	selbst zu voicen.
 
 CHAN_HELP_DEVOICE
-	Syntax: DEVOICE [Channel [Nickname]]
+	Syntax: DEVOICE #Channel [Nickname]
 	
 	Entfernt den Voice-Status des Nicknamen in dem Channel.
-	Wird kein Nickname angegeben, wird ChanServ dich devoicen.
-	Wird weder Channel noch Nick angegeben, wird ChanServ
-	dich in allen Channels voicen, in denen du die
-	entsprechenden Rechte hast.
+	If nick is not given, it will devoice you.
 	
 	Standardmässig brauchst du dafür ein Level von 5
 	um andere zu devoicen, oder Level 3 um dich selbst
 	vom Voice-Flag zu befreien.
 	
 CHAN_HELP_HALFOP
-	Syntax: HALFOP [Channel [Nickname]]
+	Syntax: HALFOP #Channel [Nickname]
 	
 	Setzt den Half-Op-Status des angegebenen Nicknamen in dem
 	Channel. Wird kein Nickname angegeben, wird ChanServ dich
-	halfoppen. Wird weder Channel noch Nickname angegeben,
-	wird ChanServ dich in allen Channels halfoppen, in denen
-	du die entsprechenden Rechte hast.
+	halfoppen.
 	
 	Standardmässig brauchst du dafür ein Level von 5
 	um andere zu halfoppen, oder Level 4 um dich selbst zu
 	halfoppen.
 
 CHAN_HELP_DEHALFOP
-	Syntax: DEHALFOP [Channel [Nickname]]
+	Syntax: DEHALFOP #Channel [Nickname]
 	
 	Entfernt den Half-Op-Status des angegebenen Nicknamen in dem
 	Channel. Wird kein Nickname angegeben, wird ChanServ dich
-	dehalfoppen. Wird weder Channel noch Nickname angegeben,
-	wird ChanServ dich in allen Channels dehalfoppen, in denen
-	du die entsprechenden Rechte hast.
+	dehalfoppen.
 	
 	Standardmässig brauchst du dafür ein Level von 5
 	um andere zu dehalfoppen, oder Level 4 um dich selbst zu
 	dehalfoppen.
 	
 CHAN_HELP_PROTECT
-	Syntax: PROTECT [Channel [Nickname]]
+	Syntax: PROTECT #Channel [Nickname]
 	
 	Beschützt den angegebenen Nicknamen in dem Channel. Wird kein
-	Nickname angegeben, wird ChanServ dich beschützen. Wird weder
-	Nickname noch Channel angegeben, wird ChanServ dich in allen
-	Channels beschützen in denen du die entsprechenden
-	Rechte hast.
+	Nickname angegeben, wird ChanServ dich beschützen.
 	
 	Standardmässig lässt sich diese Funktion vom Founder
 	aufrufen oder von denjenigen mit Level 10 und grösser, 
 	die den Schutz auf sich selbst anwenden.
 
 CHAN_HELP_DEPROTECT
-	Syntax: DEPROTECT [Channel [Nickname]]
+	Syntax: DEPROTECT #Channel [Nickname]
 	
 	Entfernt den Schutz auf den angegebenen Nickname in dem Channel.
 	Wird kein Nickname angegeben, wird ChanServ dich nicht mehr
-	beschützen. Wird weder Nickname noch Channel angegeben, wird
-	ChanServ dich in allen Channels nicht länger schützen,
-	in denen du die entsprechenden Rechte hast.
+	beschützen.
 	
 	Standardmässig lässt sich diese Funktion vom Founder
 	aufrufen oder von denjenigen mit Level 10 und grösser,
 	die den Schutz von sich selbst aufheben wollen.
 	
 CHAN_HELP_OWNER
-	Syntax: OWNER [Channel]
+	Syntax: OWNER #Channel
 	
-	Gibt dir Owner Status im Channel. Für den Fall, dass
-	kein Channel angegeben wird, wird dir in jedem Channel,
-	in dem du ausreichend Rechte besitzt, Owner Status
-	gegeben.
+	Gibt dir Owner Status im Channel.
 	
 	Benötigt Founder Zugriffslevel im jeweiligen Channel.
 
 CHAN_HELP_DEOWNER
-	Syntax: DEOWNER [Channel]
+	Syntax: DEOWNER #Channel
 	
-	Nimmt dir Owner Status im Channel. Für den Fall, dass    
-	kein Channel angegeben wird, wird dir in jedem Channel,        
-	in dem du ausreichend Rechte besitzt, Owner Status 
-	genommen.
+	Nimmt dir Owner Status im Channel.
 	
 	Benötigt Founder Zugriffslevel im jeweiligen Channel.
 
@@ -5199,9 +5194,6 @@ CHAN_HELP_SENDPASS
 	
 	Kann in einigen Netzen auf IRC Operatoren beschränkt
 	sein.
-	
-	Dieser Befehl ist nicht verfügbar, wenn die
-	Datenbank verschlüsselt gespeichert wird.
 
 CHAN_SERVADMIN_HELP
 	

@@ -1538,7 +1538,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Channel %s not registered
 CHAN_STATUS_FORBIDDEN
@@ -1713,6 +1713,28 @@ CHAN_FORBID_FAILED
 # Misc responses
 CHAN_FORBID_REASON
 	This channel has been forbidden.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 # SUSPEND responses
 CHAN_SUSPEND_SYNTAX
@@ -4078,8 +4100,6 @@ NICK_HELP_SENDPASS
 	
 	Pot ser limitat a operadors d'IRC en certes
 	xarxes.
-	
-	Aquesta comanda no esta disponible quant encriptació esta habilitada.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4984,115 +5004,94 @@ CHAN_HELP_LIST
 	llistats.)
 
 CHAN_HELP_OP
-	Sintàxi: OP [#canal [nick]]
+	Sintàxi: OP #canal [nick]
 	
 	Opeja al nick seleccionat en un canal. Si un nick no és
-	donat, t'opejarà a tu. Si el canal i el nick no són donats,
-	te opejarà en tots els canals en els que estiguis,
-	sempre i quan tinguis els permisos per a fer-ho.
+	donat, t'opejarà a tu.
 	
 	Per defecte, limitat a AOPs o aquells amb nivelll d'
 	accés 5 i major en el canal.
 
 CHAN_HELP_DEOP
-	Sintàxi: DEOP [#canal [nick]]
+	Sintàxi: DEOP #canal [nick]
 	
 	Desopeja al nick seleccionado en un canal. Si el nick no és
-	donat, et desopejarà a tu. Si el canal i el nick no són donats,
-	et desopejarà a tu en tots els canals en els que estiguis,
-	sempre i quan tinguis els permisos per a fer-ho.
+	donat, et desopejarà a tu.
 	
 	Per defecte, limitat a AOPs o aquells amb nivelll d'
 	accés 5 i major en el canal.
 	
 CHAN_HELP_VOICE
-	Sintàxi: VOICE [#canal [nick]]
+	Sintàxi: VOICE #canal [nick]
 	
 	Dóna voice al nick seleccionat en un canal. Si el nick no
-	és donat, et donarà voice a ti. Si el canal i el nick no són
-	donats, et donarà voice en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a
-	fer-ho.
+	és donat, et donarà voice a ti.
 	
 	Per defecte, limitat AOPs o aquells amb nivelll d'
 	accés 5 i major en el canal, o a VOPs o aquells
 	amb nivelll 3 i major per a donar-se voice a si mateixos.
 
 CHAN_HELP_DEVOICE
-	Sintàxi: DEVOICE [#canal [nick]]
+	Sintàxi: DEVOICE #canal [nick]
 	
 	Treu voice al nick seleccionat en un canal. Si el nick no
-	és donat, et treurà voice a tu. Si el canal i el nick no són
-	donats, et treurà voice en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	és donat, et treurà voice a tu.
 	
 	Per defecte, limitat a AOPs o aquells amb nivelll d'
 	accés 5 i major en el canal, o a VOPs o aquells amb
 	nivelll 3 i major per a donar-se voice a si mateixos.
 	
 CHAN_HELP_HALFOP
-	Sintàxi: HALFOP [#canal [nick]]
+	Sintàxi: HALFOP #canal [nick]
 	
 	Dóna Halfop al nick seleccionat en un canal. Si el nick no
-	és donat, et donarà halfop a tu. Si el canal i el nick no són
-	donats, et donarà halfop en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	és donat, et donarà halfop a tu.
 	
 	Per defecte, limitat a AOPs i aquells amb nivelll d'
 	accés 5 i major en el canal, o a HOPs o aquells amb nivelll
 	4 i major per a donar-se halfop a si mateixos.
 
 CHAN_HELP_DEHALFOP
-	Sintàxi: DEHALFOP [#canal [nick]]
+	Sintàxi: DEHALFOP #canal [nick]
 	
 	Treu Halfop al nick seleccionat en un canal. Si el nick no
-	és donat, et treurà halfop a tu. Si el canal i el nick no són
-	donats, et treurà halfop en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	és donat, et treurà halfop a tu.
 	
 	Per defecte, limitat a AOPs i aquells amb nivelll d'
 	accés 5 i major en el canal, o a HOPs o aquells amb
 	nivelll 4 i major per a treure's halfop a si mateixos.
 
 CHAN_HELP_PROTECT
-	Sintàxi: PROTECT [#canal [nick]]
+	Sintàxi: PROTECT #canal [nick]
 	
 	Protejeix al nick seleccionat en un canal. Si el nick no és
-	donat, et protegirà a tu. Si el canal i el nick no són donats,
-	et protejirà en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho..
+	donat, et protegirà a tu.
 	
 	Per defecte, limitat al fundador, o a SOPs o aquells
 	amb nivell 10 i major en el canal per a protejerse a si
 	mismos.
 
 CHAN_HELP_DEPROTECT
-	Sintàxi: DEPROTECT [#canal [nick]]
+	Sintàxi: DEPROTECT #canal [nick]
 	
 	Desprotejeix al nick seleccionat en un canal. Si el nick no
-	és donat, et desprotegirà a tu. Si el canal i el nick no són
-	donats, et desprotegirà en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho..
+	és donat, et desprotegirà a tu.
 	
 	Per defecte, limitat al fundador, o a SOPs o aquells
 	amb nivelll 10 i major en el canal per a desprotegir-se a
 	si mateixos.
 
 CHAN_HELP_OWNER
-	Sintàxi: OWNER [#canal]
+	Sintàxi: OWNER #canal
 	
-	Et dóna l'estatus de propietari del canal. Si el canal no
-	és donat, et donarà estatus de propietari en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	Et dóna l'estatus de propietari del canal.
 	
 	Limitad a aquells amb nivelll de fundador en el canal.
 
 CHAN_HELP_DEOWNER
-	Sintàxi: DEOWNER [#canal]
+	Sintàxi: DEOWNER #canal
 	
-	Esborra l'estatus de propietari del canal. Si el canal no
-	és donat, esborra l'estatus de propietari en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	Esborra l'estatus de propietari del canal.
 	
 	Limitat a aquells amb nivelll de fundador en el canal.
 
@@ -5180,8 +5179,6 @@ CHAN_HELP_SENDPASS
 	és sumament útil per a recuperar claus perdudes.
 	
 	pot ser limitat a  Operadors de IRC en certas xarxes.
-	
-	Aquesta comanda no és disponible quan l'encriptació està habilitada.
 
 CHAN_SERVADMIN_HELP
 	

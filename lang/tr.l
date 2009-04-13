@@ -1535,7 +1535,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Channel %s not registered
 CHAN_STATUS_FORBIDDEN
@@ -1736,6 +1736,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s matches an except on %s and cannot be banned until the except have been removed.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -4069,8 +4091,6 @@ NICK_HELP_SENDPASS
 	email adresine gönderir.
 	
 	Bazý networklerde sadece IRC operatörleri kullanabilir.
-	
-	Eðer þifreleme(encryption) aktifse bu komut devre dýþý kalýr.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4903,114 +4923,92 @@ CHAN_HELP_LIST
 	(PRIVATE özelliði aktif olan kanallar listelenmez.)
 
 CHAN_HELP_OP
-	Kullanýmý: OP [#kanaladý [nick]]
+	Kullanýmý: OP #kanaladý [nick]
 	
 	Belirtilen nicki kanalda oplar. Eðer nick belirtilmemiþse,
-	kendinizi oplarsýnýz. Eðer kanal ve nick belirtilmemiþse,
-	bulunduðunuz tüm kanalda sizi oplar, tabi eðer op accessiniz
-	ve bu komutu kullanmaya yetkiniz varsa.
+	kendinizi oplarsýnýz.
 	
 	Varsayýlan olarak, AOP lar ile access seviyesi 5 ve üzeri
 	olanlar kullanabilir.
 
 CHAN_HELP_DEOP
-	Kullanýmý: DEOP [#kanaladý [nick]]
+	Kullanýmý: DEOP #kanaladý [nick]
 	
 	Belirtilen nicki kanalda deoplar. Eðer nick belirtilmemiþse,
-	kendinizi deoplarsýnýz. Eðer nick ve kanal belirtilmemiþse,
-	bulunduðunuz tüm kanallarda sizi deoplar, tabi eðer bu komutu 
-	kullanmaya yetkiniz varsa.
+	kendinizi deoplarsýnýz.
 	
 	Varsayýlan olarak, AOP lar veya access seviyesi 5 ve üzeri
 	olanlar kullanabilir.
 
 CHAN_HELP_VOICE
-	Kullanýmý: VOICE [#kanaladý [nick]]
+	Kullanýmý: VOICE #kanaladý [nick]
 	
 	Belirtilen nicke kanalda voice verir. Eðer nick belirtilmemiþse,
-	size voice verir. Eðer kanal ve nick belirtilmemiþse, size
-	bulunduðunuz tüm kanallarda voice verir, tabi eðer accessiniz ve
-	bu komutu kullanmaya izniniz varsa.
+	size voice verir.
 	
 	Varsayýlan olarak, AOP lar ile access seviyesi 5 ve üzeri olanlar
 	kullanabilir, veya VOP lar ile access seviyesi 3 ve yukarý olanlar
 	kendilerine voice vermek için kullanabilirler.
 
 CHAN_HELP_DEVOICE
-	Kullanýmý: DEVOICE [#kanaladý [nick]]
+	Kullanýmý: DEVOICE #kanaladý [nick]
 	
 	Belirtilen nicki kanalda devoice eder. Eðer nick belirtilmemiþse,
-	sizi devoice eder. Eðer kanal ve nick belirtilmemiþse sizi,
-	bulunduðunuz tüm kanallarda devoice eder, tabi eðer accessiniz
-	ve bu komutu kullanmaya izniniz varsa.
+	sizi devoice eder.
 	
 	Varsayýlan olarak, AOP lar, access seviyesi 5 ve üzeri olanlar
 	kullanabilir, veya VOP lar ile access seviyesi 3 ve üzeri olanlar
 	kendilerini devoice etmek için kullanabilirler.
 
 CHAN_HELP_HALFOP
-	Kullanýmý: HALFOP [#kanaladý [nick]]
+	Kullanýmý: HALFOP #kanaladý [nick]
 	
 	Belirtilen nicki kanalda halfop(yarýmop) yapar. Eðer nick
-	belirtilmemiþse, sizi halfop yapar. Eðer nick ve kanal
-	belirtilmemiþse, sizi bulunduðunuz tüm kanallarda halfop yapar,
-	tabi eðer bu komutu kullanmaya izniniz varsa.
+	belirtilmemiþse, sizi halfop yapar.
 	
 	Varsayýlan olarak, AOP lar ile access seviyesi 5 ve üzeri
 	olanlar kullanabilir, veya HOP lar ile access seviyesi 4 ve
 	üzeri olanlar kendilerini halfop yapmak için kullanabilir.
 
 CHAN_HELP_DEHALFOP
-	Kullanýmý: DEHALFOP [#kanaladý [nick]]
+	Kullanýmý: DEHALFOP #kanaladý [nick]
 	
 	Belirtilen nickin halfopunu(yarýmop) alýr. Eðer nick
-	belirtilmemiþse, sizin halfopunuz alýr. Eðer kanal ve nick 
-	belirtilmemiþse, bulunduðunuz tüm kanallardan halfopunuzu
-	alýr, tabi eðer bu komutu kullanmaya izniniz varsa.
+	belirtilmemiþse, sizin halfopunuz alýr.
 	
 	Varsayýlan olarak, AOP lar veya 5 ve üzeri access seviyesi
 	olanlar kullanabilir, ayrica HOP lar veya access seviyesi
 	4 ve üzeri olanlar kendi halfoplarýný alabilirler.
 
 CHAN_HELP_PROTECT
-	Kullanýmý: PROTECT [#kanaladý [nick]]
+	Kullanýmý: PROTECT #kanaladý [nick]
 	
 	Belirtilen nicki kanalda korur. Eðer nick belirtilmezse,
-	sizi korur. Eðer nick ve kanal belirtilmezse sizi bulunduðunuz
-	tüm kanallarda koruyacaktýr, tabi eðer bu komutu kullanmaya
-	izniniz varsa.
+	sizi korur.
 	
 	Varsayýlan olarak, founder kullanabilir, veya SOP lar ile access
 	seviyesi 10 ve üzeri olanlar kendilerinde kullanabilirler.
 
 CHAN_HELP_DEPROTECT
-	Kullanýmý: DEPROTECT [#kanaladý [nick]]
+	Kullanýmý: DEPROTECT #kanaladý [nick]
 	
 	Belirtilen nickin korumasýný kaldýrýr. Eðer nick belirtilmemiþse,
-	sizin korumanýzý kaldýrýr. Eðer kanal ve nick belirtilmezse, 
-	sizin bulunduðunuz tüm kanallardaki korumalarýnýz kaldýrýr, 
-	tabi eðer bu komutu kullanmaya izniniz varsa.
+	sizin korumanýzý kaldýrýr.
 	
 	Varsayýlan olarak, founder kullanabilir, veya SOP lar ile
 	access seviyesi 10 ve üzeri olanlar kendilerinde kullanabilir.
 
 CHAN_HELP_OWNER
-	Kullanýmý: OWNER [#kanaladi]
+	Kullanýmý: OWNER #kanaladi
 	
-	Belirtilen kanalda owner statüsü verilir. Eger kanal
-	belirtilmemisse bulundugunuz tüm kanallarda size owner
-	statüsü verilir. Tabi bu yetkinizin olup olmamasina
-	baglidir.
+	Belirtilen kanalda owner statüsü verilir.
 	
 	Belirtilen kanal founderlarinin kullanma yetkisi vardir.
 
 CHAN_HELP_DEOWNER
-	Kullanýmý: DEOWNER [#kanaladi]
+	Kullanýmý: DEOWNER #kanaladi
 	
-	Belirtilen kanaldaki owner statünüzü kaldirir. Eger
-	kanal belirtilmezse bulundugunuz tüm kanallardaki owner
-	statünüzü kaldirir. Tabi bu yetkinizin olup olmamasina
-	baglidir.
+	Belirtilen kanaldaki owner statünüzü kaldirir.
 	
 	Belirtilen kanal founderlarinin kullanma yetkisi vardir.
 
@@ -5096,8 +5094,6 @@ CHAN_HELP_SENDPASS
 	
 	Bazý networklerde IRC operatörlerinin Kullanýmýyla 
 	sýnýrlandýrýlmýþ olabilir.
-	
-	Bu komut þifreleme(encryption) aktifken devre dýþýdýr.
 
 CHAN_SERVADMIN_HELP
 	

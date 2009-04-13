@@ -1508,7 +1508,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Channel %s not registered
 CHAN_STATUS_FORBIDDEN
@@ -1708,6 +1708,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s matches an except on %s and cannot be banned until the except have been removed.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -3914,8 +3936,6 @@ NICK_HELP_SENDPASS
 	to deal with lost passwords.
 	
 	May be limited to IRC operators on certain networks.
-	
-	This command is unavailable when encryption is enabled.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4763,112 +4783,92 @@ CHAN_HELP_LIST
 	are to be written without '#'.
 
 CHAN_HELP_OP
-	Syntax: OP [#channel [nick]]
+	Syntax: OP #channel [nick]
 	
 	Ops a selected nick on a channel. If nick is not given,
-	it will op you. If channel and nick are not given,
-	it will op you on all channels you're on, provided you
-	have the rights to.
+	it will op you.
 	
 	By default, limited to AOPs or those with level 5 access 
 	and above on the channel.
 
 CHAN_HELP_DEOP
-	Syntax: DEOP [#channel [nick]]
+	Syntax: DEOP #channel [nick]
 	
 	Deops a selected nick on a channel. If nick is not given,
-	it will deop you. If channel and nick are not given,
-	it will deop you on all channels you're on, provided you
-	have the rights to.
+	it will deop you.
 	
 	By default, limited to AOPs or those with level 5 access 
 	and above on the channel.
 	
 CHAN_HELP_VOICE
-	Syntax: VOICE [#channel [nick]]
+	Syntax: VOICE #channel [nick]
 	
 	Voices a selected nick on a channel. If nick is not given,
-	it will voice you. If channel and nick are not given,
-	it will voice you on all channels you're on, provided you
-	have the rights to.
+	it will voice you.
 	
 	By default, limited to AOPs or those with level 5 access 
 	and above on the channel, or to VOPs or those with level 3 
 	and above for self voicing.
 
 CHAN_HELP_DEVOICE
-	Syntax: DEVOICE [#channel [nick]]
+	Syntax: DEVOICE #channel [nick]
 	
 	Devoices a selected nick on a channel. If nick is not given,
-	it will devoice you. If channel and nick are not given,
-	it will devoice you on all channels you're on, provided you
-	have the rights to.
+	it will devoice you.
 	
 	By default, limited to AOPs or those with level 5 access 
 	and above on the channel, or to VOPs or those with level 3 
 	and above for self devoicing.
 	
 CHAN_HELP_HALFOP
-	Syntax: HALFOP [#channel [nick]]
+	Syntax: HALFOP #channel [nick]
 	
 	Halfops a selected nick on a channel. If nick is not given,
-	it will halfop you. If channel and nick are not given,
-	it will halfop you on all channels you're on, provided you
-	have the rights to.
+	it will halfop you.
 	
 	By default, limited to AOPs and those with level 5 access 
 	and above on the channel, or to HOPs or those with level 4 
 	and above for self halfopping.
 
 CHAN_HELP_DEHALFOP
-	Syntax: DEHALFOP [#channel [nick]]
+	Syntax: DEHALFOP #channel [nick]
 	
 	Dehalfops a selected nick on a channel. If nick is not given,
-	it will dehalfop you. If channel and nick are not given,
-	it will dehalfop you on all channels you're on, provided you
-	have the rights to.
+	it will dehalfop you.
 	
 	By default, limited to AOPs and those with level 5 access 
 	and above on the channel, or to HOPs or those with level 4 
 	and above for self dehalfopping.
 	
 CHAN_HELP_PROTECT
-	Syntax: PROTECT [#channel [nick]]
+	Syntax: PROTECT #channel [nick]
 	
 	Protects a selected nick on a channel. If nick is not given,
-	it will protect you. If channel and nick are not given,
-	it will protect you on all channels you're on, provided you
-	have the rights to.
+	it will protect you.
 	
 	By default, limited to the founder, or to SOPs or those with 
 	level 10 and above on the channel for self protecting.
 
 CHAN_HELP_DEPROTECT
-	Syntax: DEPROTECT [#channel [nick]]
+	Syntax: DEPROTECT #channel [nick]
 	
 	Deprotects a selected nick on a channel. If nick is not given,
-	it will deprotect you. If channel and nick are not given,
-	it will deprotect you on all channels you're on, provided you
-	have the rights to.
+	it will deprotect you.
 	
 	By default, limited to the founder, or to SOPs or those with 
 	level 10 and above on the channel for self deprotecting.
 
 CHAN_HELP_OWNER
-	Syntax: OWNER [#channel]
+	Syntax: OWNER #channel
 	
-	Gives you owner status on channel. If channel is not 
-	given, it will give you owner status on all channels you're 
-	on, provided you have the rights to.
+	Gives you owner status on channel.
 	
 	Limited to those with founder access on the channel.
 
 CHAN_HELP_DEOWNER
-	Syntax: DEOWNER [#channel]
+	Syntax: DEOWNER #channel
 	
-	Removes your owner status on channel. If channel is 
-	not given, it will remove your owner status on all channels 
-	you're on, provided you have the rights to.
+	Removes your owner status on channel.
 	
 	Limited to those with founder access on the channel.
 
@@ -4956,8 +4956,6 @@ CHAN_HELP_SENDPASS
 	useful to deal with lost passwords.
 	
 	May be limited to IRC operators on certain networks.
-	
-	This command is unavailable when encryption is enabled.
 
 CHAN_SERVADMIN_HELP
 	 

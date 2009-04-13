@@ -149,10 +149,9 @@ class CommandCSInfo : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
+		notice_lang(s_ChanServ, u, CHAN_HELP_INFO);
 		if (u->nc && u->nc->IsServicesOper())
 			notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
-		else
-			notice_lang(s_NickServ, u, CHAN_HELP_INFO);
 
 		return true;
 	}

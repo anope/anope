@@ -1527,7 +1527,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Erro de sintaxe. Use a sintaxe STATUS canal nick.
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Canal %s não está registrado
 CHAN_STATUS_FORBIDDEN
@@ -1728,6 +1728,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s combina com uma Except no %s e não pode ser banido até que a Except sejá removida.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -3969,8 +3991,6 @@ NICK_HELP_SENDPASS
 	de senhas perdidas.
 	
 	Poder ser limitado a Operadores de IRC em algumas redes.
-	
-	Este comando não está disponível quando estiver usando encriptação.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4821,40 +4841,31 @@ CHAN_HELP_LIST
 	fornecido. (Canais com opção PRIVATE ativada não serão listados).
 
 CHAN_HELP_OP
-	Sintaxe: OP #canal nick
+	Sintaxe: OP #canal [nick]
 	
 	Atribui status de Operador ao nick dado em um determinado
 	canal. Se não for fornecido um nick, o status será atribuído
-	a você mesmo. Se nem canal nem nick forem fornecidos, o
-	status será atribuído a você mesmo em todos os canais onde
-	estiver, caso tenha nível suficiente para usar o comando em
-	cada um.
+	a você mesmo.
 	
 	Por padrão, é limitado aos AOPs ou àqueles que possuem
 	nível de acesso 5 ou superior no canal.
 
 CHAN_HELP_DEOP
-	Sintaxe: DEOP #canal nick
+	Sintaxe: DEOP #canal [nick]
 	
 	Remove o status de Operador do nick dado em um determinado
 	canal. Se não for fornecido um nick, o status será removido
-	de você mesmo. Se nem canal nem nick forem fornecidos, o
-	status será removido de você mesmo em todos os canais onde
-	estiver, caso tenha nível suficiente para usar o comando em
-	cada um.
+	de você mesmo.
 	
 	Por padrão, é limitado aos AOPs ou àqueles que possuem
 	nível de acesso 5 ou superior no canal.
 
 CHAN_HELP_VOICE
-	Sintaxe: VOICE [#canal [nick]]
+	Sintaxe: VOICE #canal [nick]
 	
 	Atribui status de Voice ao nick dado em um determinado
 	canal. Se não for fornecido um nick, o status será atribuído
-	a você mesmo. Se nem canal nem nick forem fornecidos, o
-	status será atribuído a você mesmo em todos os canais onde
-	estiver, caso tenha nível suficiente para usar o comando em
-	cada um.
+	a você mesmo.
 	
 	Por padrão, é limitado aos AOPs ou àqueles que possuem
 	nível de acesso 5 ou superior no canal; ou aos VOPs ou
@@ -4862,14 +4873,11 @@ CHAN_HELP_VOICE
 	atribuírem o status a eles mesmos.
 
 CHAN_HELP_DEVOICE
-	Sintaxe: DEVOICE [#canal [nick]]
+	Sintaxe: DEVOICE #canal [nick]
 	
 	Remove o status de Voice do nick dado em um determinado
 	canal. Se não for fornecido um nick, o status será removido
-	de você mesmo. Se nem canal nem nick forem fornecidos, o
-	status será removido de você mesmo em todos os canais onde
-	estiver, caso tenha nível suficiente para usar o comando em
-	cada um.
+	de você mesmo.
 	
 	Por padrão, é limitado aos AOPs ou àqueles que possuem
 	nível de acesso 5 ou superior no canal; ou aos VOPs ou
@@ -4877,14 +4885,11 @@ CHAN_HELP_DEVOICE
 	atribuírem o status a eles mesmos.
 	
 CHAN_HELP_HALFOP
-	Sintaxe: HALFOP [#canal [nick]]
+	Sintaxe: HALFOP #canal [nick]
 	
 	Atribui status de HalfOP ao nick dado em um determinado
 	canal. Se não for fornecido um nick, o status será atribuído
-	a você mesmo. Se nem canal nem nick forem fornecidos, o
-	status será atribuído a você mesmo em todos os canais onde
-	estiver, caso tenha nível suficiente para usar o comando em
-	cada um.
+	a você mesmo.
 	
 	Por padrão, é limitado aos AOPs ou àqueles que possuem
 	nível de acesso 5 ou superior no canal; ou aos HOPs ou
@@ -4892,14 +4897,11 @@ CHAN_HELP_HALFOP
 	atribuírem o status a eles mesmos.
 
 CHAN_HELP_DEHALFOP
-	Sintaxe: DEHALFOP [#canal [nick]]
+	Sintaxe: DEHALFOP #canal [nick]
 	
 	Remove o status de HalfOP do nick dado em um determinado
 	canal. Se não for fornecido um nick, o status será removido
-	de você mesmo. Se nem canal nem nick forem fornecidos, o
-	status será removido de você mesmo em todos os canais onde
-	estiver, caso tenha nível suficiente para usar o comando em
-	cada um.
+	de você mesmo.
 	
 	Por padrão, é limitado aos AOPs ou àqueles que possuem
 	nível de acesso 5 ou superior no canal; ou aos HOPs ou
@@ -4907,47 +4909,34 @@ CHAN_HELP_DEHALFOP
 	atribuírem o status a eles mesmos.
 
 CHAN_HELP_PROTECT
-	Sintaxe: PROTECT [#canal [nick]]
+	Sintaxe: PROTECT #canal [nick]
 	
 	Protege um determinado nick no canal. Se nick não for
-	fornecido, isso irá lhe proteger. Sem nem canal nem nick
-	forem fornecidos, irá lhe proteger em todos os canais em que
-	você estiver, caso você tenha nível suficiente para usar o
-	comando em cada um.
+	fornecido, isso irá lhe proteger.
 	
 	Por padrão, limitado ao Founder, a SOPs ou àqueles com nível
 	10 ou superior no canal para se auto-protegerem.
 
 CHAN_HELP_DEPROTECT
-	Sintaxe: DEPROTECT [#canal [nick]]
+	Sintaxe: DEPROTECT #canal [nick]
 	
 	Desprotege um determinado nick no canal. Se nick não for
-	fornecido, isso irá lhe desproteger. Sem nem canal nem nick
-	forem fornecidos, irá lhe desproteger em todos os canais em que
-	você estiver, caso você tenha nível suficiente para usar o
-	comando em cada um.
+	fornecido, isso irá lhe desproteger.
 	
 	Por padrão, limitado ao Founder, a SOPs ou àqueles com nível
 	10 ou superior no canal para se auto-desprotegerem.
 
 CHAN_HELP_OWNER
-	Sintaxe: OWNER [#canal]
+	Sintaxe: OWNER #canal
 	
-	Te concede status de owner no canal. Isso irá lhe
-	proteger inclusive daqueles que possuem status "Protect".
-	Se canal não for fornecido, irá lhe dar status de owner
-	em todos os canais em que você estiver, caso você tenha
-	nível suficiente para usar o comando em cada um.
+	Te concede status de owner no canal.
 	
 	Limitado àqueles que possuem acesso de Founder no canal.
 
 CHAN_HELP_DEOWNER
-	Sintaxe: DEOWNER [#canal]
+	Sintaxe: DEOWNER #canal
 	
-	Remove seu status de owner no canal. Se canal não
-	for fornecido, irá remover seu status de owner em todos os
-	canais em que você estiver, caso você tenha nível suficiente
-	para usar o comando em cada um.
+	Remove seu status de owner no canal.
 	
 	Limitado àqueles que possuem acesso de Founder no canal.
 
@@ -5037,9 +5026,6 @@ CHAN_HELP_SENDPASS
 	
 	Pode estar limitado aos Operadores de IRC em
 	algumas Redes.
-	
-	Este comando só funciona se o modo de encriptação
-	não estiver ligado.
 
 CHAN_SERVADMIN_HELP
 	

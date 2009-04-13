@@ -1517,7 +1517,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Errore di sintassi
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Il canale %s non è registrato
 CHAN_STATUS_FORBIDDEN
@@ -1716,6 +1716,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s corrisponde a un'eccezione %s e non può essere bannato finché l'eccezione non sarà rimossa.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -3966,8 +3988,6 @@ NICK_HELP_SENDPASS
 	utile quando un utente ha dimenticato la password.
 	
 	Potrebbe essere disponibile soltanto per gli IrcOp.
-	
-	Questo comando non è utilizzabile quando la criptazione è attiva.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4867,133 +4887,105 @@ CHAN_HELP_LIST
 	attiva non saranno mostrati.
 
 CHAN_HELP_OP
-	Sintassi: OP [canale [nick]]
+	Sintassi: OP canale [nick]
 	
 	Assegna lo stato di operatore (op, +o) a un utente sul
 	canale specificato. Se non viene indicato alcun nick,
-	"oppa" l'utente che invia il comando. Se non viene
-	indicato né canale né nick, opperà l'utente che invia
-	il comando su tutti i canali in cui si trova e in cui
-	ha abbastanza privilegi.
+	"oppa" l'utente che invia il comando.
 	
 	Di default, il comando è limitato agli AOP o agli utenti
 	con livello di accesso 5 o superiori.
 
 CHAN_HELP_DEOP
-	Sintassi: DEOP [canale [nick]]
+	Sintassi: DEOP canale [nick]
 	
 	Rimuove lo stato di operatore (op, -o) a un utente sul
 	canale specificato. Se non viene indicato alcun nick,
-	"deoppa" l'utente che invia il comando. Se non viene
-	indicato né canale né nick, deopperà l'utente che invia
-	il comando su tutti i canali in cui si trova e in cui
-	ha abbastanza privilegi.
+	"deoppa" l'utente che invia il comando.
 	
 	Di default, il comando è limitato agli AOP o agli utenti
 	con livello di accesso 5 o superiori.
 	
 CHAN_HELP_VOICE
-	Sintassi: VOICE [canale [nick]]
+	Sintassi: VOICE canale [nick]
 	
 	Assegna lo stato di voice (+v) a un utente sul canale
 	specificato. Se non viene indicato alcun nick, dà il
-	voice all'utente che invia il comando. Se non viene
-	indicato né canale né nick, dà il voice all'utente che
-	invia il comando su tutti i canali in cui si trova e in
-	cui ha abbastanza privilegi.
+	voice all'utente che invia il comando.
 	
 	Di default, il comando è limitato agli AOP o agli utenti
 	con livello di accesso 5 o superiori, oppure ai VOP o agli
 	utenti con livello 3 o superiori per il voice su se stessi.
 
 CHAN_HELP_DEVOICE
-	Sintassi: DEVOICE [canale [nick]]
+	Sintassi: DEVOICE canale [nick]
 	
 	Rimuove lo stato di voice (-v) da un utente sul canale
 	specificato. Se non viene indicato alcun nick, toglie il
-	voice all'utente che invia il comando. Se non viene
-	indicato né canale né nick, toglie il voice all'utente che
-	invia il comando su tutti i canali in cui si trova e in
-	cui ha abbastanza privilegi.
+	voice all'utente che invia il comando.
 	
 	Di default, il comando è limitato agli AOP o agli utenti
 	con livello di accesso 5 o superiori, oppure ai VOP o agli
 	utenti con livello 3 o superiori per il devoice su se stessi.
 
 CHAN_HELP_HALFOP
-	Sintassi: HALFOP [canale [nick]]
+	Sintassi: HALFOP canale [nick]
 	
 	Assegna lo stato di mezzo operatore (halfop, +h) a un utente
 	sul canale specificato. Se non viene indicato alcun nick,
-	dà l'halfop all'utente che invia il comando. Se non viene
-	indicato né canale né nick, dà l'halfop all'utente che invia
-	il comando su tutti i canali in cui si trova e in cui ha
-	abbastanza privilegi.
+	dà l'halfop all'utente che invia il comando.
 	
 	Di default, il comando è limitato agli AOP o agli utenti
 	con livello di accesso 5 o superiori, oppure ai HOP o agli
 	utenti con livello 4 o superiori per l'halfop su se stessi.
 
 CHAN_HELP_DEHALFOP
-	Sintassi: DEHALFOP [canale [nick]]
+	Sintassi: DEHALFOP canale [nick]
 	
 	Rimuove lo stato di mezzo operatore (halfop, -h) da un utente
 	sul canale specificato. Se non viene indicato alcun nick,
-	toglie l'halfop all'utente che invia il comando. Se non viene
-	indicato né canale né nick, toglie l'halfop all'utente che
-	invia il comando su tutti i canali in cui si trova e in cui ha
-	abbastanza privilegi.
+	toglie l'halfop all'utente che invia il comando.
 	
 	Di default, il comando è limitato agli AOP o agli utenti
 	con livello di accesso 5 o superiori, oppure ai HOP o agli
 	utenti con livello 4 o superiori per il dehalfop su se stessi.
 	
 CHAN_HELP_PROTECT
-	Sintassi: PROTECT [canale [nick]]
+	Sintassi: PROTECT canale [nick]
 	
 	Assegna lo stato di protezione (+a) a un utente sul canale
 	specificato. Se non viene indicato alcun nick, dà la
-	protezione all'utente che invia il comando. Se non viene
-	indicato né canale né nick, dà la protezione all'utente che
-	invia il comando su tutti i canali in cui si trova e in
-	cui ha abbastanza privilegi.
+	protezione all'utente che invia il comando.
 	
 	Di default, il comando è limitato al fondatore del canale,
 	oppure ai SOP o agli utenti con livello 10 o superiori per
 	la protezione su se stessi.
 
 CHAN_HELP_DEPROTECT
-	Sintassi: DEPROTECT [canale [nick]]
+	Sintassi: DEPROTECT canale [nick]
 	
 	Rimuove lo stato di protezione (-a) da un utente sul canale
 	specificato. Se non viene indicato alcun nick, toglie la
-	protezione all'utente che invia il comando. Se non viene
-	indicato né canale né nick, toglie la protezione all'utente
-	che invia il comando su tutti i canali in cui si trova e in
-	cui ha abbastanza privilegi.
+	protezione all'utente che invia il comando.
 	
 	Di default, il comando è limitato al fondatore del canale,
 	oppure ai SOP o agli utenti con livello 10 o superiori per
 	la rimozione della protezione su se stessi.
 
 CHAN_HELP_OWNER
-	Sintassi: OWNER [canale]
+	Sintassi: OWNER canale
 	
 	Ti assegna lo stato di proprietario (owner, +q) sul canale
-	che specifichi. Se non indichi nessun canale, lo stato di
-	proprietario ti sarà assegnato su tutti i canali su cui ti
-	trovi e in cui hai abbastanza privilegi.
+	che specifichi.
 	
 	Il comando è limitato agli utenti che hanno accesso di
 	fondatore.
 
 CHAN_HELP_DEOWNER
-	Sintassi: DEOWNER [canale]
+	Sintassi: DEOWNER canale
 	
 	Ti toglie lo stato di proprietario (owner, -q) sul canale
-	che specifichi. Se non indichi nessun canale, lo stato di
-	proprietario ti sarà rimosso su tutti i canali su cui ti
-	trovi e in cui hai abbastanza privilegi.
+	che specifichi.
 	
 	Il comando è limitato agli utenti che hanno accesso di
 	fondatore.
@@ -5084,8 +5076,6 @@ CHAN_HELP_SENDPASS
 	la password del canale.
 	
 	Potrebbe essere disponibile soltanto per gli IrcOp.
-	
-	Questo comando non è utilizzabile quando la criptazione è attiva.
 
 CHAN_SERVADMIN_HELP
 	

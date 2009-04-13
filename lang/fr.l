@@ -1548,7 +1548,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	ERREUR STATUS : Erreur de syntaxe.
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	ERREUR STATUS : Le canal %s n'est pas enregistré.
 CHAN_STATUS_FORBIDDEN
@@ -1749,6 +1749,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s a trouvé un except sur %s et ne peut le bannir tant que l'except n'a pas été retiré.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -4112,9 +4134,6 @@ NICK_HELP_SENDPASS
 	
 	Peut être limitée aux IRC operators sur certains
 	réseaux.
-	
-	Cette commande est indisponible quand l'encryption est
-	activée.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -5025,116 +5044,96 @@ CHAN_HELP_LIST
 	sont pas listés.)
 
 CHAN_HELP_OP
-	Syntaxe: OP [#canal [pseudo]]
+	Syntaxe: OP #canal [pseudo]
 	
 	Op le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous oppera sur le canal donné. Si pseudo et
-	#canal ne sont pas donnés, vous oppera sur tous
-	les canaux où vous êtes.
+	donné, vous oppera sur le canal donné.
 	
 	Par défaut, limité aux AOPs ou à ceux ayant un niveau
 	d'accès de 5 ou plus sur le canal.
 
 CHAN_HELP_DEOP
-	Syntaxe: DEOP [#canal [pseudo]]
+	Syntaxe: DEOP #canal [pseudo]
 	
 	Deop le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous deoppera sur le canal donné. Si pseudo et
-	#canal ne sont pas donnés, vous deoppera sur tous
-	les canaux où vous êtes.
+	donné, vous deoppera sur le canal donné.
 
 	Par défaut, limité aux AOPs ou à ceux ayant un niveau 
 	d'accès de 5 ou plus sur le canal.
 	
 CHAN_HELP_VOICE
-	Syntaxe: VOICE [#canal [pseudo]]
+	Syntaxe: VOICE #canal [pseudo]
 	
 	Voice le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous voicera sur le canal donné. Si pseudo et
-	canal ne sont pas donnés, vous voicera sur tous
-	les canaux où vous êtes.
+	donné, vous voicera sur le canal donné.
 	
 	Par défaut, limité aux AOPs ou à ceux ayant un level d'accès 
 	de 5 ou plus sur le canal, ou aux VOPs ou à ceux ayant un 
 	niveau d'accès de 3 ou plus en cas de voice de soi-même.
 
 CHAN_HELP_DEVOICE
-	Syntaxe: DEVOICE [#canal [pseudo]]
+	Syntaxe: DEVOICE #canal [pseudo]
 	
 	Devoice le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous devoicera sur le canal donné. Si pseudo et
-	#canal ne sont pas donnés, vous devoicera sur tous
-	les canaux où vous êtes.
+	donné, vous devoicera sur le canal donné.
 
 	Par défaut, limité aux AOPs ou à ceux ayant un level d'accès 
 	de 5 ou plus sur le canal, ou aux VOPs ou à ceux ayant un 
 	niveau d'accès de 3 ou plus en cas de devoice de soi-même.
 	
 CHAN_HELP_HALFOP
-	Syntaxe: HALFOP [#canal [pseudo]]
+	Syntaxe: HALFOP #canal [pseudo]
 	
 	Halfop le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous halfoppera sur le canal donné. Si pseudo et
-	#canal ne sont pas donnés, vous halfoppera sur tous
-	les canaux où vous êtes.
+	donné, vous halfoppera sur le canal donné.
 	
 	Par défaut, limité aux AOPs ou à ceux ayant un level d'accès 
 	de 5 ou plus sur le canal, ou aux HOPs ou à ceux ayant un 
 	niveau d'accès de 4 ou plus en cas de halfop de soi-même.
 
 CHAN_HELP_DEHALFOP
-	Syntaxe: DEHALFOP [#canal [pseudo]]
+	Syntaxe: DEHALFOP #canal [pseudo]
 	
 	Dehalfop le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous dehalfoppera sur le canal donné. Si pseudo et
-	#canal ne sont pas donnés, vous dehalfoppera sur tous
-	les canaux où vous êtes.
+	donné, vous dehalfoppera sur le canal donné.
 
 	Par défaut, limité aux AOPs ou à ceux ayant un level d'accès 
 	de 5 ou plus sur le canal, ou aux HOPs ou à ceux ayant un 
 	niveau d'accès de 4 ou plus en cas de dehalfop de soi-même.
 	
 CHAN_HELP_PROTECT
-	Syntaxe: PROTECT [#canal [pseudo]]
+	Syntaxe: PROTECT #canal [pseudo]
 	
 	Protège le pseudo sélectionné sur un canal. Si pseudo n'est pas
-	donné, vous protègera sur le canal donné. Si pseudo et
-	#canal ne sont pas donnés, vous protègera sur tous
-	les canaux où vous êtes.
+	donné, vous protègera sur le canal donné.
 	
 	Par défaut, limité au propriétaire du channel, ou aux SOPs 
 	ou à ceux ayant un niveau d'accès de 10 ou plus en cas de 
 	protection de soi-même.
 
 CHAN_HELP_DEPROTECT
-	Syntaxe: DEPROTECT [#canal [pseudo]]
+	Syntaxe: DEPROTECT #canal [pseudo]
 	
 	Enlève la protection du pseudo sélectionné sur un canal. Si 
 	pseudo n'est pas donné, vous déprotègera sur le canal 
-	donné. Si pseudo et #canal ne sont pas donnés, vous 
-	déprotègera sur tous les canaux où vous êtes.
+	donné.
 
 	Par défaut, limité au propriétaire du canal, ou aux SOPs 
 	ou à ceux ayant un niveau d'accès de 10 ou plus en cas de 
 	suppression de protection pour soi-même.
 
 CHAN_HELP_OWNER
-	Syntaxe: OWNER [#canal]
+	Syntaxe: OWNER #canal
 	
 	Vous donne le status de propriétaire sur le canal donné. 
-	Si #canal n'est pas donné, vous donnera le status de
-	propriétaire sur tous les canaux où vous êtes, à condition
-	bien sûr d'y avoir droit.
 	
 	Limité à ceux ayant un accès de propriétaire sur le canal.
 
 CHAN_HELP_DEOWNER
-	Syntaxe: DEOWNER [#canal]
+	Syntaxe: DEOWNER #canal
 	
 	Vous supprime le status de propriétaire sur le canal 
-	donné. Si canal n'est pas donné, vous donnera le status 
-	de propriétaire sur tous les canaux où vous êtes, à 
-	condition bien sûr d'y avoir droit.
+	donné.
 	
 	Limité à ceux ayant un accès de propriétaire sur le canal.
 
@@ -5223,9 +5222,6 @@ CHAN_HELP_SENDPASS
 	
 	Peut être limitée aux IRC operators sur certains
 	réseaux.
-	
-	Cette commande est indisponible quand l'encryption est
-	activée.
 
 CHAN_SERVADMIN_HELP
 	

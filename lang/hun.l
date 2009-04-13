@@ -1535,7 +1535,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Channel %s not registered
 CHAN_STATUS_FORBIDDEN
@@ -1734,6 +1734,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc válaszok
 CHAN_EXCEPTED
 	%s megegyezik egy kivétellel (%s) nem tiltható, amíg a kivétel él.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################
 #
@@ -3989,8 +4011,6 @@ NICK_HELP_SENDPASS
 	a jelszavadat.
 	
 	Korlátozni lehet IRC operátorokra egyes hálózatokon.
-	
-	Parancs nem elérhetõ, ha az encryption használatban van.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcodE
@@ -4863,37 +4883,28 @@ CHAN_HELP_LIST
 	 megjelenni a listában.)
 
 CHAN_HELP_OP
-	Syntax: OP [#szoba [nick]]
+	Syntax: OP #szoba [nick]
 	
 	Opolja a megadott nicket a megadott csatornán.
 	Ha nem adsz meg nicket, magadat opolod.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) opolod magad,
-	ahol meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a minimum AOP listán
 	vagy 5-ös accessen szereplo userek használhatják.
 	
 CHAN_HELP_DEOP
-	Syntax: DEOP [#szoba [nick]]
+	Syntax: DEOP #szoba [nick]
 	
 	Deopolja a megadott nicket a megadott csatornán.
 	Ha nem adsz meg nicket, magadat deopolod.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) deopolod magad,
-	ahol meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a minimum AOP listán
 	vagy 5-ös access szinten szereplo userek használhatják.
 	
 CHAN_HELP_VOICE
-	Syntax: VOICE [#szoba [nick]]
+	Syntax: VOICE #szoba [nick]
 	
 	Voiceolja a megadott nicket a megadott csatornán.
 	Ha nem adsz meg nicket, magadat voiceolod.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) voiceolod magad, ahol megvan
-	hozzá a jogod.
 	
 	Alap beállítás szerint csak a minimum AOP listán
 	vagy 5-ös accessen szereplo userek használhatják vagy min.
@@ -4901,13 +4912,10 @@ CHAN_HELP_VOICE
 	használhatják saját maguk voiceolására.
 	
 CHAN_HELP_DEVOICE
-	Syntax: DEVOICE [#szoba [nick]]
+	Syntax: DEVOICE #szoba [nick]
 	
 	Elveszi a voiceot a megadott nicktõl a megadott csatornán.
 	Ha nem adsz meg nicket, magadatól veszed el.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) elveszed magadtól, ahol
-	meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a minimum AOP listán vagy
 	5-ös accessen szereplõ userek használhatják vagy min.
@@ -4915,13 +4923,10 @@ CHAN_HELP_DEVOICE
 	használhatják saját maguktól elvenni voiceot.
 	
 CHAN_HELP_HALFOP
-	Syntax: HALFOP [#szoba [nick]]
+	Syntax: HALFOP #szoba [nick]
 	
 	Félopot ad a megadott nicknek a megadott csatornán.
 	Ha nem adsz meg nicket, magadnak adsz.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) magadnak adsz félopot, ahol
-	meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a minimum AOP listán vagy
 	5-ös accessen szereplo userek használhatják vagy min.
@@ -4929,13 +4934,10 @@ CHAN_HELP_HALFOP
 	használhatják saját maguknak félop adására.
 	
 CHAN_HELP_DEHALFOP
-	Syntax: DEHALFOP [#szoba [nick]]
+	Syntax: DEHALFOP #szoba [nick]
 	
 	Elveszi a félopot a megadott nicktõl a megadott csatornán.
 	Ha nem adsz meg nicket, magadatól veszed el.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) elveszed magadtól a félopot,
-	ahol meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a minimum AOP listán vagy
 	5-ös accessen szereplo userek használhatják vagy min.
@@ -4943,46 +4945,36 @@ CHAN_HELP_DEHALFOP
 	használhatják, hogy saját maguktól elvegyék a félopot
 	
 CHAN_HELP_PROTECT
-	Syntax: PROTECT [#szoba [nick]]
+	Syntax: PROTECT #szoba [nick]
 	
 	Protectet ad a megadott nicknek a megadott csatornán.
 	Ha nem adsz meg nicket, magadat protecteled.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) protectet adsz magadnak,
-	ahol meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a founder tudja használni,
 	vagy minimum a SOP listán vagy 10-es access szinten
 	szereplõ userek használhatják saját maguk protectolására.
 
 CHAN_HELP_DEPROTECT
-	Syntax: DEPROTECT [#szoba [nick]]
+	Syntax: DEPROTECT #szoba [nick]
 	
 	Elveszi a protectet a nicktõl a megadott csatornán.
 	Ha nem adsz meg nicket, magadat deprotecteled.
-	Ha nem adsz meg csatornát és nicket se, akkor minden
-	csatornán (ahol bent vagy) elveszed a protectet magadtól,
-	ahol meg van hozzá a jogod.
 	
 	Alap beállítás szerint csak a founder tudja használni,
 	vagy min. az SOP listán vagy 10-es access szinten
 	szereplõ userek használhatják maguk deprotectolására.
 	
 CHAN_HELP_OWNER
-	Syntax: OWNER [#szoba]
+	Syntax: OWNER #szoba
 	
-	Tulajdonosi státuszt ad a csatornán. Ha a szoba nincs
-	megadva, akkor minden csatornán, ahol bent vagy ownert 
-	kapsz, ahol meg van ehhez van jogod is.
+	Tulajdonosi státuszt ad a csatornán.
 	
 	Csak founder szintû user használhatja.
 	
 CHAN_HELP_DEOWNER
-	Syntax: DEOWNER [#szoba]
+	Syntax: DEOWNER #szoba
 	
-	Elveszi a tulajdonosi státuszt a csatornán.Ha a szoba
-	nincs megadva, akkor mindenhol, ahol bent vagy elveszed
-	magadtól az ownert, ahol meg van ehhez van jogod is.
+	Elveszi a tulajdonosi státuszt a csatornán.
 	
 	Csak founder szintu user használhatja.
 	
@@ -5068,8 +5060,6 @@ CHAN_HELP_SENDPASS
 	a parancsot és elõször azonosítanod kell magadat.
 	
 	Lehet korlátozni IRC operatorok részére a hálózaton.
-	
-	A parancs nem használható ha az encryption engedélyezett.
 	
 CHAN_SERVADMIN_HELP
 	

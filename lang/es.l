@@ -1536,7 +1536,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Error de sintaxis
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR El canal %s no esta registrado
 CHAN_STATUS_FORBIDDEN
@@ -1737,6 +1737,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s coincide con una excepcion en %s y no puede ser baneado hasta que la excepcion haya sido removida.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -4048,8 +4070,6 @@ NICK_HELP_SENDPASS
 	
 	Puede ser limitado a operadores de IRC en ciertas
 	redes.
-	
-	Este comando no esta disponible cuando encripcion esta habilitada.
 
 NICK_HELP_CONFIRM
 	Sintaxis: CONFIRM passcode
@@ -4954,34 +4974,28 @@ CHAN_HELP_LIST
 	listados.)
 
 CHAN_HELP_OP
-	Sintaxis: OP [#canal [nick]]
+	Sintaxis: OP #canal [nick]
 	
 	Opea al nick seleccionado en un canal. Si nick no es
-	dado, te opeara a ti. SI canal y nick no son dados,
-	te opeara en todos los canales en los que estes,
-	siempre y cuando tengas los permisos para hacerlo.
+	dado, te opeara a ti.
 	
 	Por defecto, limitado a AOPs o aquellos con nivel de
 	acceso 5 y mayor en el canal.
 
 CHAN_HELP_DEOP
-	Sintaxis: DEOP [#canal [nick]]
+	Sintaxis: DEOP #canal [nick]
 	
 	Deopea al nick seleccionado en un canal. Si nick no es
-	dado, te deopeara a ti. Si canal y nick no son dados,
-	te deopeara a ti en todos los canales en los que estes,
-	siempre y cuando tengas los permisos para hacerlo.
+	dado, te deopeara a ti.
 	
 	Por defecto, limitado a AOPs o aquellos con nivel de
 	acceso 5 y mayor en el canal.
 	
 CHAN_HELP_VOICE
-	Sintaxis: VOICE [#canal [nick]]
+	Sintaxis: VOICE #canal [nick]
 	
 	Da voice al nick seleccionado en un canal. Si nick no
-	es dado, te dara voice a ti. Si canal y nick no son
-	dados, te dara voice en todos los canales en los que
-	estes, siempre y cuando tengas los permisos para
+	es dado, te dara voice a ti.
 	hacerlo.
 	
 	Por defecto, limitado AOPs o aquellos con nivel de
@@ -4989,82 +5003,66 @@ CHAN_HELP_VOICE
 	con nivel 3 y mayor para darse voice a si mismos.
 
 CHAN_HELP_DEVOICE
-	Sintaxis: DEVOICE [#canal [nick]]
+	Sintaxis: DEVOICE #canal [nick]
 	
 	Quita voice al nick seleccionado en un canal. Si nick no
-	es dado, te quitara voice a ti. Si canal y nick no son
-	dados, te quitara voice en todos los canales en los que
-	estes, siempre y cuando tengas los permisos para hacerlo.
+	es dado, te quitara voice a ti.
 	
 	Por defecto, limitado a AOPs o aquellos con nivel de
 	acceso 5 y mayor en el canal, o a VOPs o aquellos con
 	nivel 3 y mayor para darse voice a si mismos.
 	
 CHAN_HELP_HALFOP
-	Sintaxis: HALFOP [#canal [nick]]
+	Sintaxis: HALFOP #canal [nick]
 	
 	Da Halfop al nick seleccionado en un canal. Si nick no
-	es dado, te dara halfop a ti. Si canal y nick no son
-	dados, te dara halfop en todos los canales en los que
-	estes, siempre y cuando tengas los permisos para hacerlo.
+	es dado, te dara halfop a ti.
 	
 	Por defecto, limitado a AOPs y aquellos con nivel de
 	acceso 5 y mayor en el canal, o a HOPs o aquellos con nivel
 	4 y mayor para darse halfop a si mismos.
 
 CHAN_HELP_DEHALFOP
-	Sintaxis: DEHALFOP [#canal [nick]]
+	Sintaxis: DEHALFOP #canal [nick]
 	
 	Quita Halfop al nick seleccionado en un canal. Si nick no
-	es dado, te quitara halfop a ti. Si canal y nick no son
-	dados, te quitara halfop en todos los canales en los que
-	estes, siempre y cuando tengas los permisos para hacerlo.
+	es dado, te quitara halfop a ti.
 	
 	Por defecto, limitado a AOPs y aquellos con nivel de
 	acceso 5 y mayor en el canal, o a HOPs o aquellos con
 	nivel 4 y mayor para quitarse halfop a si mismos.
 
 CHAN_HELP_PROTECT
-	Sintaxis: PROTECT [#canal [nick]]
+	Sintaxis: PROTECT #canal [nick]
 	
 	Proteje al nick seleccionado en un canal. Si nick no es
-	dado, te protejera a ti. Si canal y nick no son dados,
-	te protejera en todos los canales en los que estes,
-	siempre y cuando tengas los permisos para hacerlo.
+	dado, te protejera a ti.
 	
 	Por defecto, limitado al fundador, o a SOPs o aquellos
 	con nivel 10 y mayor en el canal para protejerse a si
 	mismos.
 
 CHAN_HELP_DEPROTECT
-	Sintaxis: DEPROTECT [#canal [nick]]
+	Sintaxis: DEPROTECT #canal [nick]
 	
 	Desproteje al nick seleccionado en un canal. Si nick no
-	es dado, te desprotejera a ti. Si canal y nick no son
-	dados, te desprotejera en todos los canales en los que
-	estes, siempre y cuando tengas los permisos para hacerlo.
+	es dado, te desprotejera a ti.
 	
 	Por defecto, limitado al fundador, o a SOPs o aquellos
 	con nivel 10 y mayor en el canal para desprotejerse a
 	si mismos.
 
 CHAN_HELP_OWNER
-	Sintaxis: OWNER [#canal]
+	Sintaxis: OWNER #canal
 	
-	Te da el estatus de dueño en canal. Si canal no
-	es dado, te dara estatus de dueño en todos los
-	canales en los que estes, siempre y cuando tengas
-	permiso para hacerlo.
+	Te da el estatus de dueño en canal.
 	
 	Limitado a aquellos con nivel de fundador en el canal.
 
 CHAN_HELP_DEOWNER
-	Sintaxis: DEOWNER [#canal]
+	Sintaxis: DEOWNER #canal
 	
-	Remueve tu estatus de dueño en canal. Si canal no
-	es dado, remueve tu estatus de dueño en todos los
-	canales en los que estes, siempre y cuando tengas
-	permiso para hacerlo.
+	Remueve tu estatus de dueño en canal.
 	
 	Limitado a aquellos con nivel de fundador en el canal.
 
@@ -5152,8 +5150,6 @@ CHAN_HELP_SENDPASS
 	es sumamente util para lidiar con claves perdidas.
 	
 	Puede ser limitado a  Operadores de IRC en ciertas redes.
-	
-	Este comando no es disponible cuando encripcion esta abilitada.
 
 CHAN_SERVADMIN_HELP
 	

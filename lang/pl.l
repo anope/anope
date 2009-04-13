@@ -1994,7 +1994,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR B³±d sk³adni
+	STATUS channel item
 
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Kana³ %s nie jest zarejestrowany
@@ -2266,6 +2266,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s posiada wyj±tek na %s i nie mo¿e byæ zbanowany póki nie zostanie usuniêty.
+
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -5035,8 +5057,6 @@ NICK_HELP_SENDPASS
 	
 	Ta komenda w niektórych sieciach mo¿e byæ dostêpna
 	jedynie dla osób z uprawnieniami IRC operatora.
-	
-	Ta komenda jest niedostêpna kiedy has³a s± szyfrowane.
 
 NICK_HELP_CONFIRM
 	Sk³adnia: CONFIRM kod
@@ -5935,45 +5955,33 @@ CHAN_HELP_LIST
 	nazwy kana³ów powinny byæ pisane bez znaku '#'.
 
 CHAN_HELP_OP
-	Sk³adnia: OP [kana³ [nick]]
+	Sk³adnia: OP kana³ [nick]
 	
 	Nadaje status operatora wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych poziom
 	dostêpu 5 lub wy¿szy.
 
 CHAN_HELP_DEOP
-	Sk³adnia: DEOP [kana³ [nick]]
+	Sk³adnia: DEOP kana³ [nick]
 	
 	Odbiera status operatora wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych poziom
 	dostêpu 5 lub wy¿szy.
 
 CHAN_HELP_VOICE
-	Sk³adnia: VOICE [kana³ [nick]]
+	Sk³adnia: VOICE kana³ [nick]
 	
 	Nadaje prawo g³osu wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych przynajmniej
@@ -5982,15 +5990,11 @@ CHAN_HELP_VOICE
 	jedynie na sobie.
 
 CHAN_HELP_DEVOICE
-	Sk³adnia: DEVOICE [kana³ [nick]]
+	Sk³adnia: DEVOICE kana³ [nick]
 	
 	Odbiera prawo g³osu wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych przynajmniej
@@ -5999,15 +6003,11 @@ CHAN_HELP_DEVOICE
 	jedynie na sobie.
 
 CHAN_HELP_HALFOP
-	Sk³adnia: HALFOP [kana³ [nick]]
+	Sk³adnia: HALFOP kana³ [nick]
 	
 	Nadaje status pó³-operatora wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych przynajmniej
@@ -6016,15 +6016,11 @@ CHAN_HELP_HALFOP
 	jedynie na sobie.
 
 CHAN_HELP_DEHALFOP
-	Sk³adnia: DEHALFOP [kana³ [nick]]
+	Sk³adnia: DEHALFOP kana³ [nick]
 	
 	Odbiera status pó³-operatora wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych przynajmniej
@@ -6033,54 +6029,38 @@ CHAN_HELP_DEHALFOP
 	jedynie na sobie.
 
 CHAN_HELP_PROTECT
-	Sk³adnia: PROTECT [kana³ [nick]]
+	Sk³adnia: PROTECT kana³ [nick]
 	
 	Nadaje ochronê wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê SOP lub posiadaj±cych przynajmniej
 	10. poziom dostêpu.
 
 CHAN_HELP_DEPROTECT
-	Sk³adnia: DEPROTECT [kana³ [nick]]
+	Sk³adnia: DEPROTECT kana³ [nick]
 	
 	Usuwa ochronê wskazanemu u¿ytkownikowi.
 	Je¶li nie zostanie podany nick operacja bêdzie
 	przeprowadzona na osobie wydaj±cej t± komendê.
-	Je¶li tak¿e nie zostanie podany kana³ operacja
-	bêdzie przeprowadzona na wszystkich kana³ach na
-	których przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê SOP lub posiadaj±cych przynajmniej
 	10. poziom dostêpu.
 
 CHAN_HELP_OWNER
-	Sk³adnia: OWNER [kana³]
+	Sk³adnia: OWNER kana³
 	
 	Nadaje uprawnienia w³a¶ciciela kana³u.
-	Je¶li nie zostanie podany kana³ operacja bêdzie
-	przeprowadzona na wszystkich kana³ach na których
-	przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna tylko dla w³a¶ciciela kana³u.
 
 CHAN_HELP_DEOWNER
-	Sk³adnia: DEOWNER [kana³]
+	Sk³adnia: DEOWNER kana³
 	
 	Odbiera uprawnienia w³a¶ciciela kana³u.
-	Je¶li nie zostanie podany kana³ operacja bêdzie
-	przeprowadzona na wszystkich kana³ach na których
-	przebywa osoba wydaj±ca to polecenie z
-	uwzglêdnieniem posiadanych uprawnieñ.
 	
 	Standardowo ta komenda jest dostêpna tylko dla w³a¶ciciela kana³u.
 
@@ -6171,8 +6151,6 @@ CHAN_HELP_SENDPASS
 	
 	Ta komenda w niektórych sieciach mo¿e byæ dostêpna
 	jedynie dla osób z uprawnieniami IRC operatora.
-	
-	Ta komenda jest niedostêpna kiedy has³a s± szyfrowane.
 
 CHAN_SERVADMIN_HELP
 	

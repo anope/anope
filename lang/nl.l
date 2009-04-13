@@ -1527,7 +1527,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS channel item
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Channel %s not registered
 CHAN_STATUS_FORBIDDEN
@@ -1726,6 +1726,28 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s komt overeen met een uitzondering op %s en kan niet worden gebanned totdat de uitzondering is verwijderd.
+	
+#Mode syntax responses
+CHAN_OP_SYNTAX
+	OP #channel [nick]
+CHAN_HALFOP_SYNTAX
+	HALFOP #channel [nick]
+CHAN_VOICE_SYNTAX
+	VOICE #channel [nick]
+CHAN_PROTECT_SYNTAX
+	PROTECT #channel [nick]
+CHAN_OWNER_SYNTAX
+	OWNER #channel
+CHAN_DEOP_SYNTAX
+	DEOP #channel [nick]
+CHAN_DEHALFOP_SYNTAX
+	DEHALFOP #channel [nick]
+CHAN_DEVOICE_SYNTAX
+	DEVOICE #channel [nick]
+CHAN_DEPROTECT_SYNTAX
+	DEROTECT #channel [nick]
+CHAN_DEOWNER_SYNTAX
+	DEOWNER #channel
 
 ###########################################################################
 #
@@ -3994,8 +4016,6 @@ NICK_HELP_SENDPASS
 	verloren wachtwoorden terug te krijgen.
 	
 	Kan gelimiteerd zijn tot IRC operators op sommige netwerken.
-	
-	Dit commando is alleen beschikbaar als encryptie is uitgeschakeld.
 
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
@@ -4883,122 +4903,98 @@ CHAN_HELP_LIST
 	worden niet weergegeven.)
 
 CHAN_HELP_OP
-	Gebruik: OP [#kanaal [nick]]
+	Gebruik: OP #kanaal [nick]
 	
 	Geeft de gegeven nick op-status op een kanaal. Als er geen
-	nick is gegeven zal je zelf op-status krijgen. Als er geen
-	kanaal en nick zijn gegeven zal je op-status krijgen op
-	alle kanalen waar je die rechten hebt.
+	nick is gegeven zal je zelf op-status krijgen.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met niveau
 	5 of hoger op het kanaal.
 
 CHAN_HELP_DEOP
-	Gebruik: DEOP [#kanaal [nick]]
+	Gebruik: DEOP #kanaal [nick]
 	
 	Verwijderd de op status van de gegeven nick op een kanaal.
 	Als er geen nick is gegeven zal je zelf je opstatus kwijt
-	raken. Als er geen kanaal en nick zijn gegeveen zal je
-	je op status kwijtraken op alle kanalen waar je momenteel
-	bent waar je die rechten hebt.
+	raken.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met niveau
 	5 of hoger op het kanaal.
 
 CHAN_HELP_VOICE
-	Gebruik: VOICE [#kanaal [nick]]
+	Gebruik: VOICE #kanaal [nick]
 	
 	Geeft de geselecteerde nick voice status op een kanaal. Als
 	er geen nick gegeven is zal je zelf voice status krijgen.
-	Als er geen kanaal en geen nick gegeven zijn zal je op alle
-	kanalen waar je momenteel bent en de rechten daartoe hebt
-	voice status krijgen.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met niveau
 	5 of hoger op het kanaal, of tot VOPs of degenen met niveau
 	3 of hoger voor het voice status geven van zichzelf.
 
 CHAN_HELP_DEVOICE
-	Gebruik: DEVOICE [#kanaal [nick]]
+	Gebruik: DEVOICE #kanaal [nick]
 	
 	Verwijdert de voice status van de gegeven nick op een kanaal.
 	Als er geen nick is gegeven zal je zelf je voice status
-	kwijtraken. Als er geen kanaal en nick gegeven zijn zal je
-	zelf je voice status kwijtraken op alle kanalen waar je
-	momenteel bent en de rechten ervoor hebt.
+	kwijtraken.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met niveau
 	5 of hoger op het kanaal, of tot VOPs of degenen met niveau
 	3 of hoger voor het voice status geven van zichzelf.
 
 CHAN_HELP_HALFOP
-	Gebruik: HALFOP [#kanaal [nick]]
+	Gebruik: HALFOP #kanaal [nick]
 	
 	Geeft de geselecteerde nick halfop status op een kanaal. Als
 	er geen nick is gegeven zul je zelf halfop status krijgen.
-	Als er geen kanaal en geen nick gegeven zijn zul je op alle
-	kanalen waar je momenteel bent halfop krijgen, mits je daar
-	rechten toe hebt.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met niveau
 	5 of hoger op het kanaal, of tot HOPs of degenen met niveau
 	4 of hoger voor het halfop status geven van zichzelf.
 
 CHAN_HELP_DEHALFOP
-	Gebruik: DEHALFOP [#kanaal [nick]]
+	Gebruik: DEHALFOP #kanaal [nick]
 	
 	Verwijdert de halfop status van de gegeven nick op een kanaal.
 	Als er geen nick is gegeven zal je zelf je halfop status
-	kwijtraken. Als er geen nick en geen kanaal zijn gegeven zal
-	je zelf je halfop status kwijt raken op alle kanalen waar je
-	momenteel bent, mits je de rechten daartoe hebt.
+	kwijtraken.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met niveau
 	5 of hoger op het kanaal, of tot HOPs of degenen met niveau
 	4 of hoger voor het halfop status geven van zichzelf.
 
 CHAN_HELP_PROTECT
-	Gebruik: PROTECT [#kanaal [nick]]
+	Gebruik: PROTECT #kanaal [nick]
 	
 	Beschermt de geselecteerde nick op een kanaal. Als nick niet
-	is gegeven, zal je zelf beschermd worden. Als kanaal en nick
-	beiden niet zijn gegeven, zal je zelf op alle kanalen waar
-	je momenteel bent beschermd worden, mits je de rechten
-	daartoe hebt.
+	is gegeven, zal je zelf beschermd worden.
 	
 	Standaard is dit gelimiteerd tot de oprichter, SOPs, of
 	degenen met een niveau van 10 of hoger op het kanaal voor
 	zelf-protectie.
 
 CHAN_HELP_DEPROTECT
-	Gebruik: DEPROTECT [#kanaal [nick]]
+	Gebruik: DEPROTECT #kanaal [nick]
 	
 	Heft de bescherming van de gegeven nick op een kanaal op.
 	Als nick niet is gegeven, zal de beschermen van jezelf
-	opgeheven worden. Als kanaal en nick niet zijn gegeven,
-	zal de bescherming van jezelf op alle kanalen waar je
-	momenteel bent worden opgeheven, mits je de rechten
-	daartoe hebt.
+	opgeheven worden.
 	
 	Standaard is dit gelimiteerd tot de stichter, SOPs, of
 	degenen met een niveau van 10 of hoger op het kanaal voor
 	zelf-protectie.
 
 CHAN_HELP_OWNER
-	Gebruik: OWNER [#kanaal]
+	Gebruik: OWNER #kanaal
 	
-	Geeft je eigenaar status op kanaal. Als kanaal niet is
-	gegeven krijg je eigenaar status op alle kanalen waar je
-	momenteel bent, mits je de rechten daartoe hebt.
+	Geeft je eigenaar status op kanaal.
 	
 	Gelimiteerd tot degenen met stichter-rechten op het kanaal.
 
 CHAN_HELP_DEOWNER
-	Gebruik: DEOWNER [#kanaal]
+	Gebruik: DEOWNER #kanaal
 	
-	Verwijdert je eigenaar status op channel. Als kanaal niet
-	is gegeven wordt je eigenaar status op alle kanalen waar je
-	momenteel bent verwijderd, mits je de rechten daartoe hebt.
+	Verwijdert je eigenaar status op channel.
 	
 	Gelimiteerd tot degenen met stichter-rechten op het kanaal.
 
@@ -5087,8 +5083,6 @@ CHAN_HELP_SENDPASS
 	woorden terug te halen.
 	
 	Kan gelimiteerd zijn tot IRC operators op sommige netwerken.
-	
-	Dit commando is onbeschikbaar wanneer encryptie is ingeschakeld.
 
 CHAN_SERVADMIN_HELP
 	

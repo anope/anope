@@ -83,6 +83,11 @@ class CommandCSOp : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_OP);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
+	}
 };
 
 
@@ -103,6 +108,11 @@ class CommandCSDeOp : public Command
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEOP);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
 	}
 };
 
@@ -125,6 +135,11 @@ class CommandCSVoice : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_VOICE);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
+	}
 };
 
 
@@ -145,6 +160,11 @@ class CommandCSDeVoice : public Command
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEVOICE);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
 	}
 };
 
@@ -173,6 +193,11 @@ class CommandCSHalfOp : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_HALFOP);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
+	}
 };
 
 
@@ -199,6 +224,11 @@ class CommandCSDeHalfOp : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_DEHALFOP);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
+	}
 };
 
 
@@ -224,6 +254,11 @@ class CommandCSProtect : public Command
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_PROTECT);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
 	}
 };
 
@@ -252,6 +287,11 @@ class CommandCSDeProtect : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_DEPROTECT);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
+	}
 };
 
 /*************************************************************************/
@@ -274,6 +314,11 @@ class CommandCSOwner : public Command
 		notice_help(s_ChanServ, u, CHAN_HELP_OWNER);
 		return true;
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
+	}
 };
 
 /*************************************************************************/
@@ -295,6 +340,11 @@ class CommandCSDeOwner : public Command
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEOWNER);
 		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
 	}
 };
 

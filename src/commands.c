@@ -146,6 +146,13 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		}
 	}
 
+	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED 
+	if (!c->permission.empty() && (!u->nc || !u->nc->HasCommand(c->permission)))
+	{
+		notice_lang(service, u, ACCESS_DENIED);
+		return;
+	}
+
 	retVal = c->Execute(u, params);
 
 	FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name, params));

@@ -112,19 +112,10 @@ int protocol_module_init()
  * And if that isn't enough discouragement, you'll wake up with your
  * both legs broken tomorrow ;) -GD
  */
-void modules_unload_all(bool fini, bool unload_proto)
+void modules_unload_all(bool unload_proto)
 {
 	int idx;
 	ModuleHash *mh, *next;
-
-	if (!fini)
-	{
-		/*
-		 * XXX: This was used to stop modules from executing destructors, we don't really
-		 * support this now, so just return.. dirty. We need to rewrite the code that uses this param.
-		 */
-		return;
-	}
 
 	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
 		mh = MODULE_HASH[idx];

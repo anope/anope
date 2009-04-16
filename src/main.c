@@ -167,8 +167,8 @@ static void services_restart()
 	disconn(servsock);
 	close_log();
 	/* First don't unload protocol module, then do so */
-	modules_unload_all(true, false);
-	modules_unload_all(true, true);
+	modules_unload_all(false);
+	modules_unload_all(true);
 	chdir(binary_dir.c_str());
 	execve(SERVICES_BIN, my_av, my_envp);
 	if (!readonly) {
@@ -223,8 +223,8 @@ static void services_shutdown()
 	send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
 	disconn(servsock);
 	/* First don't unload protocol module, then do so */
-	modules_unload_all(true, false);
-	modules_unload_all(true, true);
+	modules_unload_all(false);
+	modules_unload_all(true);
 	/* just in case they weren't all removed at least run once */
 	ModuleRunTimeDirCleanUp();
 }

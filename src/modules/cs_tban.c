@@ -214,7 +214,7 @@ int canBanUser(Channel * c, User * u, User * u2)
 	else if (ircd->except && is_excepted(ci, u2))
 		notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
 	else if (ircd->protectedumode && is_protected(u2))
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
 	else
 		ok = 1;
 

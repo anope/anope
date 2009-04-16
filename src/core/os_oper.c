@@ -142,7 +142,7 @@ class CommandOSOper : public Command
 
 		if (!is_oper(u))
 		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			notice_lang(s_OperServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -206,7 +206,7 @@ class CommandOSOper : public Command
 
 		if (!u->nc->HasCommand("operserv/oper"))
 		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			notice_lang(s_OperServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

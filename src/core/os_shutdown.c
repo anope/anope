@@ -25,7 +25,7 @@ class CommandOSShutdown : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		if (!u->nc->HasCommand("operserv/shutdown")) {
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			notice_lang(s_OperServ, u, ACCESS_DENIED);
 			return MOD_STOP;
 		}
 

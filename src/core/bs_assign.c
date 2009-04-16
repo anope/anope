@@ -49,13 +49,13 @@ class CommandBSAssign : public Command
 
 		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->nc->HasPriv("botserv/administration")))
 		{
-			notice_lang(s_BotServ, u, PERMISSION_DENIED);
+			notice_lang(s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (bi->flags & BI_PRIVATE && !u->nc->HasCommand("botserv/assign/private"))
 		{
-			notice_lang(s_BotServ, u, PERMISSION_DENIED);
+			notice_lang(s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

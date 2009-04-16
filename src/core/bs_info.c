@@ -85,7 +85,7 @@ class CommandBSInfo : public Command
 		{
 			if (!is_founder(u, ci) && !u->nc->HasPriv("botserv/administration"))
 			{
-				notice_lang(s_BotServ, u, PERMISSION_DENIED);
+				notice_lang(s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 

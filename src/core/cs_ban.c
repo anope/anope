@@ -58,7 +58,7 @@ class CommandCSBan : public Command
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (!is_same && (ci->flags & CI_PEACE)
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			/*
 			 * Dont ban/kick the user on channels where he is excepted
 			 * to prevent services <-> server wars.
@@ -66,7 +66,7 @@ class CommandCSBan : public Command
 		} else if (ircd->except && is_excepted(ci, u2)) {
 			notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
 		} else if (ircd->protectedumode && is_protected(u2)) {
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else {
 			const char *av[3];
 			char mask[BUFSIZE];
@@ -141,7 +141,7 @@ class CommandCSUnban : public Command
 
 		if (!check_access(u, ci, CA_UNBAN))
 		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

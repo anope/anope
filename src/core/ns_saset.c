@@ -68,7 +68,7 @@ private:
 
 		if (NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
 		{
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (!stricmp(nc->display, param) || (StrictPasswords && len < 5))
@@ -133,7 +133,7 @@ private:
 		}
 		else if (NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
 		{
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (param && !MailValidate(param))

@@ -40,7 +40,7 @@ class CommandCSInvite : public Command
 		}
 		else if (!u || !check_access(u, ci, CA_INVITE))
 		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

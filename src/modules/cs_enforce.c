@@ -192,7 +192,7 @@ class CommandCSEnforce : public Command
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 		else if (!check_access(u, ci, CA_AKICK))
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
 			if (!what || !stricmp(what, "SET"))

@@ -60,9 +60,9 @@ class CommandCSKick : public Command
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (!is_same && (ci->flags & CI_PEACE)
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (is_protected(u2)) {
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else {
 			const char *av[3];
 

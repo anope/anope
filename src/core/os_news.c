@@ -198,7 +198,7 @@ class NewsBase : public Command
 
 		if (!u->nc->HasCommand("operserv/news"))
 		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			notice_lang(s_OperServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

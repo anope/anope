@@ -532,7 +532,7 @@ class CommandCSSet : public Command
 	{
 		if (!u->nc->HasCommand("chanserv/set/noexpire"))
 		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		if (stricmp(param, "ON") == 0) {

@@ -175,17 +175,8 @@ PASSWORD_INCORRECT
 INVALID_TARGET
 	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
 
-# Mi a különbség a "Hozzáférés megtagadva" és az "Engedély letiltva" között?
-# Nagyon kicsi; ha ugyanazt az üzenetet írod mindkettõre, nem igazán veszít
-# a jelentésbõl. Ha különbséget akarsz tenni, akkor a "Hozzáférés megtagadva"
-# általánosabb értelemben használatos, például, ha egy nem oper próbál 
-# hozzáférni az OperServhez, akkor azt kapja, hogy "Hozzáférés megtagadva",
-# amikor egy nem Szervíz admin próbálja használni a NickServ SET NOEXPIRE
-# opciót, akkor õ azt kapja, hogy "Endegély letiltva".
 ACCESS_DENIED
 	Hozzáférés megtagadva.
-PERMISSION_DENIED
-	Engedély megtagadva.
 MORE_OBSCURE_PASSWORD
 	Próbálj nehezebb jelszót használni .Jelszavad  min. öt
 	karakter legyen,	és nem kitalálható legyen, (ne a

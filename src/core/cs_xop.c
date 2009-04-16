@@ -127,7 +127,7 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -152,7 +152,7 @@ class XOPBase : public Command
 			 **/
 			if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 			{
-				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			++change;
@@ -219,7 +219,7 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -231,7 +231,7 @@ class XOPBase : public Command
 			if (!deleted)
 			{
 				if (perm)
-					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+					notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				else if (count == 1)
 				{
 					last = atoi(nick);
@@ -265,7 +265,7 @@ class XOPBase : public Command
 			if (ulev <= access->level && !u->nc->HasPriv("chanserv/access/change"))
 			{
 				deleted = 0;
-				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			}
 			else
 			{
@@ -338,7 +338,7 @@ class XOPBase : public Command
 
 		if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change"))
 		{
-			notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

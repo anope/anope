@@ -31,7 +31,7 @@ class CommandNSGetPass : public Command
 
 		if (!u->nc->HasCommand("nickserv/getpass"))
 		{
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -50,7 +50,7 @@ class CommandNSGetPass : public Command
 		else if (na->status & NS_FORBIDDEN)
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (NSSecureAdmins && na->nc->IsServicesOper())
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)

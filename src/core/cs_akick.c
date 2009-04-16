@@ -248,7 +248,7 @@ class CommandCSAKick : public Command
 			 * or whether the mask matches a user with higher/equal access - Viper */
 			if ((ci->flags & CI_PEACE) && nc) {
 				if ((nc == ci->founder) || (get_access_nc(nc, ci) >= get_access(u, ci))) {
-					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+					notice_lang(s_ChanServ, u, ACCESS_DENIED);
 					if (freemask)
 						delete [] mask;
 					return MOD_CONT;
@@ -261,7 +261,7 @@ class CommandCSAKick : public Command
 					for (u2 = userlist[i]; u2; u2 = u2->next) {
 						if (is_founder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci))) {
 							if (match_usermask(mask, u2)) {
-								notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+								notice_lang(s_ChanServ, u, ACCESS_DENIED);
 								delete [] mask;
 								return MOD_CONT;
 							}
@@ -280,7 +280,7 @@ class CommandCSAKick : public Command
 								>= get_access(u, ci)))) {
 							snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
 							if (Anope::Match(buf, mask, false)) {
-								notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+								notice_lang(s_ChanServ, u, ACCESS_DENIED);
 								delete [] mask;
 								return MOD_CONT;
 							}

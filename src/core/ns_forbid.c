@@ -47,7 +47,7 @@ class CommandNSForbid : public Command
 		{
 			if (NSSecureAdmins && na->nc->IsServicesOper())
 			{
-				notice_lang(s_NickServ, u, PERMISSION_DENIED);
+				notice_lang(s_NickServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			delnick(na);

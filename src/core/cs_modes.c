@@ -45,9 +45,9 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
 	} else if (*util->mode == '-' && !is_same && (ci->flags & CI_PEACE)
 			   && (get_access(u2, ci) >= get_access(u, ci))) {
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
 	} else if (*util->mode == '-' && is_protected(u2) && !is_same) {
-		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
 	} else {
 		ircdproto->SendMode(whosends(ci), c->name, "%s %s", util->mode,
 					   u2->nick);

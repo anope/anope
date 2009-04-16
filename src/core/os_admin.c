@@ -35,7 +35,7 @@ class CommandOSAdmin : public Command
 
 		if (!u->nc->HasCommand("operserv/admin"))
 		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			notice_lang(s_OperServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -210,7 +210,7 @@ class CommandOSAdmin : public Command
 
 		if (!u->nc->HasCommand("operserv/admin"))
 		{
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			notice_lang(s_OperServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

@@ -28,7 +28,7 @@ class CommandNSSendPass : public Command
 		NickAlias *na;
 
 		if (RestrictMail && !u->nc->HasCommand("nickserv/sendpass"))
-			notice_lang(s_NickServ, u, PERMISSION_DENIED);
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->status & NS_FORBIDDEN)

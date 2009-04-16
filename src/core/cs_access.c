@@ -137,7 +137,7 @@ class CommandCSAccess : public Command
 
 			if (level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 			{
-				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -171,7 +171,7 @@ class CommandCSAccess : public Command
 				/* Don't allow lowering from a level >= ulev */
 				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/change"))
 				{
-					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+					notice_lang(s_ChanServ, u, ACCESS_DENIED);
 					return MOD_CONT;
 				}
 				if (access->level == level)
@@ -223,7 +223,7 @@ class CommandCSAccess : public Command
 				if (!deleted)
 				{
 					if (perm)
-						notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+						notice_lang(s_ChanServ, u, ACCESS_DENIED);
 					else if (count == 1)
 					{
 						last = atoi(nick);
@@ -259,7 +259,7 @@ class CommandCSAccess : public Command
 				if (get_access(u, ci) <= access->level && !u->nc->HasPriv("chanserv/access/change"))
 				{
 					deleted = 0;
-					notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+					notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				}
 				else
 				{
@@ -320,7 +320,7 @@ class CommandCSAccess : public Command
 
 			if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change"))
 			{
-				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 

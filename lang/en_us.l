@@ -167,16 +167,8 @@ PASSWORD_INCORRECT
 INVALID_TARGET
 	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
 
-# What's the difference between "Access denied" and "Permission denied"?
-# Very little; you can safely make them the same message with no real loss
-# of meaning.  If you want to make a distinction, "Access denied" is
-# usually used more generally; for example, a non-oper trying to access
-# OperServ gets "Access denied", while a non-Services admin trying to use
-# NickServ SASET NOEXPIRE gets "Permission denied".
 ACCESS_DENIED
 	Access denied.
-PERMISSION_DENIED
-	Permission denied.
 
 MORE_OBSCURE_PASSWORD
 	Please try again with a more obscure password.  Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters.

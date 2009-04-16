@@ -1,3 +1,13 @@
+/*
+ * Copyright (C) 2008-2009 Robin Burchell <w00t@inspircd.org>
+ * Copyright (C) 2008-2009 Anope Team <team@anope.org>
+ *
+ * Please read COPYING and README for further details.
+ *
+ *
+ * $Id$
+ *
+ */
 #include "services.h"
 #include "modules.h"
 
@@ -24,44 +34,29 @@ Command::~Command()
 	}
 }
 
-/** Execute this command.
- * @param u The user executing the command.
- */
 CommandReturn Command::Execute(User *u, std::vector<std::string> &) { return MOD_CONT; }
 
-/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
- * @param u The user requesting help
- * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of "FOO BAR LOL")
- * @return true if help was provided to the user, false otherwise.
- */
 bool Command::OnHelp(User *u, const std::string &subcommand) { return false; }
 
-/** Requested when the user provides bad syntax to this command (not enough params, etc).
- * @param u The user executing the command.
- */
 void Command::OnSyntaxError(User *u) { }
 
-/** Set a certain flag on this command.
- * @param flag The CommandFlag to set on this command.
- */
 void Command::SetFlag(CommandFlags flag)
 {
 	this->flags |= flag;
 }
 
-/** Remove a certain flag from this command.
- * @param flag The CommandFlag to unset.
- */
 void Command::UnsetFlag(CommandFlags flag)
 {
 	this->flags &= ~flag;
 }
 
-/** Check whether a certain flag is set on this command.
- * @param flag The CommandFlag to check.
- * @return bool True if the flag is set, false else.
- */
 bool Command::HasFlag(CommandFlags flag) const
 {
 	return this->flags & flag;
 }
+
+void Command::SetPermission(const std::string &reststr)
+{
+	this->permission = reststr;
+}
+

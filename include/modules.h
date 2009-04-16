@@ -231,6 +231,7 @@ class CoreExport Command
 	size_t MaxParams;
 	size_t MinParams;
 	std::string name;
+	std::string permission;
 
 	/** Create a new command.
 	 * @param min_params The minimum number of parameters the parser will require to execute this command
@@ -273,6 +274,11 @@ class CoreExport Command
 	 * @return bool True if the flag is set, false else.
 	 */
 	bool HasFlag(CommandFlags flag) const;
+
+	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
+	 * @param reststr The permission required to successfully execute this command
+	 */
+	void SetPermission(const std::string &reststr);
 
 	char *help_param1;
 	char *help_param2;

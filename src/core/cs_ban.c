@@ -107,8 +107,7 @@ class CommandCSBan : public Command
 
 	void OnSyntaxError(User *u)
 	{
-		// XXX: temporary, this can be tackled when the language system isn't so goddamn hairy.
-		syntax_error(s_ChanServ, u, "BAN", CHAN_UNBAN_SYNTAX);
+		syntax_error(s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
 	}
 };
 

@@ -1748,6 +1748,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5016,12 +5024,9 @@ CHAN_HELP_UNBAN
 	niveau 5 of hoger op het kanaal.
 
 CHAN_HELP_KICK
-	Gebruik: KICK [#kanaal [nick [reden]]]
+	Gebruik: KICK #kanaal nick [reden]
 	
-	Kickt de gegeven nick van het gegeven kanaal. Als nick niet
-	is gegeven wordt je zelf gekicked. Als kanaal en nick niet
-	zijn gegeven wordt je zelf gekicked op alle kanalen waar je
-	bent, mits je de rechten daartoe hebt.
+	Kickt de gegeven nick van het gegeven kanaal.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met
 	niveau 5 of hoger op het kanaal.

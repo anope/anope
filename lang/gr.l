@@ -1763,6 +1763,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5058,13 +5066,10 @@ CHAN_HELP_UNBAN
 	παραπάνω στο κανάλι.
 	    
 CHAN_HELP_KICK
-	Σύνταξη: KICK [#κανάλι [ψευδώνυμο [λόγος]]]
+	Σύνταξη: KICK #κανάλι ψευδώνυμο [λόγος]
 	
-	Κάνει kick το ψευδώνυμο που του δίνεις στο κανάλι. Αν δεν δώσεις ψευδώνυμο,
-	θα κάνει kick εσένα. Αν δεν δώσεις κανάλι και ψευδώνυμο,
-	θα κάνει kick εσένα σε όλα τα κανάλια που είσαι εφόσον έχεις το δικαίωμα 
-	(access).
-	    
+	Κάνει kick το ψευδώνυμο που του δίνεις στο κανάλι.
+	
 	Από default, χρησιμοποιείται από τους AOPs ή αυτούς που έχουν level 5 access 
 	και παραπάνω στο κανάλι.
 

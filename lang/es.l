@@ -1759,6 +1759,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5084,12 +5092,9 @@ CHAN_HELP_UNBAN
 	y mayor en el canal.
 
 CHAN_HELP_KICK
-	Sintaxis: KICK [#canal [nick [razon]]]
+	Sintaxis: KICK #canal nick [razon]
 	
-	Kickea al nick seleccionado en el canal. Si nick no es
-	dado, te kickeara a ti. Si canal y nick no son dados,
-	te kickeara en todos los canales, siempre y cuando tengas
-	permiso para hacerlo.
+	Kickea al nick seleccionado en el canal.
 	
 	Por defecto, limitado a AOPs o aquellos con nivel de
 	acceso 5 y mayor en el canal.

@@ -1738,6 +1738,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5008,13 +5016,9 @@ CHAN_HELP_UNBAN
 	livello di accesso 5 o superiori sul canale.
 	
 CHAN_HELP_KICK
-	Sintassi: KICK [canale [nick [motivo]]]
+	Sintassi: KICK canale nick [motivo]
 	
-	Espelle (kick) il nick specificato dal canale. Se non viene
-	indicato alcun nick, kicka l'utente che ha inviato il comando.
-	Se non viene indicato né il nick né il canale, l'utente che
-	ha inviato il comando verrà kickato da tutti i canali in cui
-	si trova e in cui ha abbastanza privilegi.
+	Espelle (kick) il nick specificato dal canale.
 	
 	Di default, il comando è limitato agli AOP o agli utenti con
 	livello di accesso 5 o superiori sul canale.

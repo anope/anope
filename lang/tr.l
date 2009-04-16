@@ -1758,6 +1758,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5030,11 +5038,9 @@ CHAN_HELP_UNBAN
 	kullanabilir.
 
 CHAN_HELP_KICK
-	Kullanýmý: KICK [#kanaladý [nick [sebep]]]
+	Kullanýmý: KICK #kanaladý nick [sebep]
 	
-	Belirtilen nicki kanaldan atar. Eðer nick belirtilmemiþse
-	sizi atar. Eðer kanal ve nick belirtilmemiþse, sizi 
-	bulunduðunuz tüm kanallardan atar.
+	Belirtilen nicki kanaldan atar.
 	
 	Varsayýlan olarak, AOP lar ile access seviyesi 5 ve üzeri
 	olanlar bu komutu kullanabilir.

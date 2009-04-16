@@ -2288,6 +2288,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -6085,15 +6093,9 @@ CHAN_HELP_UNBAN
 	dostêpu 5 lub wy¿szy.
 
 CHAN_HELP_KICK
-	Sk³adnia: KICK [kana³ [nick [powód]]]
+	Sk³adnia: KICK kana³ nick [powód]
 	
 	Wykopuje wskazanego u¿ytkownika z kana³u.
-	Pominiêcie nicka powoduje wyrzucenie osoby
-	wydaj±cej polecenie. Dodatkowo pominiêcie
-	nazwy kana³u powoduje wyrzucenie wydaj±cego
-	polecenie ze wszystkich kana³ów, na których
-	przebywa z uwzglêdnieniem uprawnieñ na nich
-	przys³uguj±cych.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych poziom

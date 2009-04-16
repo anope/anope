@@ -1765,6 +1765,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5125,13 +5133,9 @@ CHAN_HELP_UNBAN
 	5 (oder UNBAN)ist.
 	
 CHAN_HELP_KICK
-	Syntax: KICK [Channel [Nickname [Grund]]]
+	Syntax: KICK Channel Nickname [Grund]
 	
-	Kickt den ausgewählten Nicknamen aus dem Channel. Wird
-	kein Nickname angegeben, wird ChanServ dich (!) kicken.
-	Wenn weder Nickname noch Channel angegeben werden, wird
-	ChanServ dich aus allen Channels kicken, in denen
-	du die entsprechenden Rechte hast.
+	Kickt den ausgewählten Nicknamen aus dem Channel.
 	
 	Standardmässig ist für diese Funktion ein Level
 	von mindestens 5 erforderlich.

@@ -1756,6 +1756,14 @@ CHAN_DEPROTECT_SYNTAX
 	DEROTECT #channel [nick]
 CHAN_DEOWNER_SYNTAX
 	DEOWNER #channel
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################
 #
@@ -4996,13 +5004,9 @@ CHAN_HELP_UNBAN
 	kell rendelkezned, hogy használhasd.	
 	
 CHAN_HELP_KICK
-	Syntax: KICK [#szoba [nick [indok]]]
+	Syntax: KICK #szoba nick [indok]
 	
 	A ChanServ kirúgja a megadott nicknevet a csatornáról.
-	Ha nem adsz meg nicket, akkor téged fog kirúgni.
-	Ha nem adsz meg szobát és nicket sem, akkor téged
-	fog minden csatornáról, ahol bent vagy kirúgni, ha
-	meg van a parancs használatához a szükséges szinted.
 	
 	Alapbeállítás szerint, min. AOP vagy 5-ös access szinttel
 	kell rendelkezned a csatornán, hogy használhasd.

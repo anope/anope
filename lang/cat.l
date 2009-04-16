@@ -1761,6 +1761,14 @@ CHAN_UNSUSPEND_FAILED
 # Misc responses
 CHAN_EXCEPTED
 	%s matches an except on %s and cannot be banned until the except have been removed.
+	
+#Kick responces
+CHAN_KICK_SYNTAX
+	KICK #channel nick [reason]
+
+#Ban responces
+CHAN_BAN_SYNTAX
+	BAN #channel nick [reason]
 
 ###########################################################################
 #
@@ -5113,12 +5121,9 @@ CHAN_HELP_UNBAN
 	i major en el canal.
 
 CHAN_HELP_KICK
-	Sintàxi: KICK [#canal [nick [raó]]]
+	Sintàxi: KICK #canal nick [raó]
 	
-	Kickeja al nick seleccionat en el canal. Si el nick no és
-	donat, et kickejara a tu. Si el canal i el nick no són donats,
-	et kickejarà en tots els canals en els que
-	estiguis, sempre i quan tinguis els permisos per a fer-ho.
+	Kickeja al nick seleccionat en el canal.
 	
 	Per defecte, limitat a AOPs o aquells amb nivell d'
 	accés 5 i major en el canal.

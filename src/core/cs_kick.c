@@ -89,8 +89,7 @@ class CommandCSKick : public Command
 
 	void OnSyntaxError(User *u)
 	{
-		// XXX: best I can do for now, fixme
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, "");
+		syntax_error(s_ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
 	}
 };
 

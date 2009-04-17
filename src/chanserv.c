@@ -1499,6 +1499,12 @@ int check_kick(User * user, char *chan, time_t chants)
     if (user->isSuperAdmin == 1)
         return 0;
 
+    /* We don't enforce services restrictions on clients on ulined services 
+     * as this will likely lead to kick/rejoin floods. ~ Viper */
+    if (is_ulined(user->server->name)) {
+        return 0;
+    }
+
     if (ci->flags & CI_VERBOTEN) {
         get_idealban(ci, user, mask, sizeof(mask));
         reason =
@@ -1550,10 +1556,6 @@ int check_kick(User * user, char *chan, time_t chants)
             reason = akick->reason ? akick->reason : CSAutokickReason;
             goto kick;
         }
-    }
-
-    if (is_ulined(user->server->name)) {
-        return 0;
     }
 
     if (check_access(user, ci, CA_NOJOIN)) {

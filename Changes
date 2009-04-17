@@ -1,7 +1,6 @@
 Anope Version 1.9.1
 --------------------
-
-
+F Don't enforce akick/forbidden/etc.-restrictions on clients on ulined servers.
 
 
 Provided by Ankit <ankit@nevitus.com> - 2009

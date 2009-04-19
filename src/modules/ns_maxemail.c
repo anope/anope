@@ -113,7 +113,7 @@ class NSMaxEmail : public Module
 			else if (command == "SET")
 			{
 				const char *set = params[0].c_str();
-				const char *email = params[1].size() > 1 ? params[1].c_str() : NULL;
+				const char *email = params.size() > 1 ? params[1].c_str() : NULL;
 
 				if (!stricmp(set, "email") && check_email_limit_reached(email, u))
 					return EVENT_STOP;

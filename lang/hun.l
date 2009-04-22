@@ -2924,7 +2924,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE válaszok
 OPER_IGNORE_SYNTAX
-	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [idõ] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [idõ] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Használj érvényes számot idõnek. 
 	(Adj meg érvényes számot az idõhöz.)
@@ -2997,7 +2997,7 @@ OPER_STAFF_AFORMAT
 # DefCon Üzenet
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Szervíz Defcon módban fut, próbáld késõbb.
 OPER_DEFCON_NO_CONF
@@ -3251,7 +3251,7 @@ NEWS_RANDOM_TEXT
 	[Véletlenszerû Hír] - %s %s
 
 NEWS_LOGON_SYNTAX
-	Syntax: LOGONNEWS { ADD | DEL | LIST } [szöveg|szám]
+	LOGONNEWS { ADD | DEL | LIST } [szöveg|szám]
 NEWS_LOGON_LIST_HEADER
 	Fellépési hírek:
 NEWS_LOGON_LIST_ENTRY
@@ -3277,7 +3277,7 @@ NEWS_LOGON_DELETED_ALL
 	Összes fellépési hír tétel törölve.
 
 NEWS_OPER_SYNTAX
-	Syntax: OPERNEWS { ADD | DEL |LIST } [ szöveg | szám ]
+	OPERNEWS { ADD | DEL |LIST } [ szöveg | szám ]
 NEWS_OPER_LIST_HEADER
 	Oper hírek listája:
 NEWS_OPER_LIST_ENTRY
@@ -3303,7 +3303,7 @@ NEWS_OPER_DELETED_ALL
 	Összes oper hír törölve.
 
 NEWS_RANDOM_SYNTAX
-	Syntax: RANDOMNEWS { ADD | DEL | LIST } [ szöveg | szám ]
+	RANDOMNEWS { ADD | DEL | LIST } [ szöveg | szám ]
 NEWS_RANDOM_LIST_HEADER
 	Véletlenszerû hírek listája:
 NEWS_RANDOM_LIST_ENTRY
@@ -6409,7 +6409,7 @@ HOST_SETALL
 HOST_DELALL
 	A %s csoport vhostja törölve.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	A %s csoport vhostja erre változott: %s@%s.
 HOST_SET_ERROR
@@ -6423,9 +6423,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	%s felhasználó nincs a nickserv db fájlban.
 HOST_SET_SYNTAX
-	Syntax %R%s set <nick> <hosztmaszk>.
+	SET <nick> <hosztmaszk>.
 HOST_SETALL_SYNTAX
-	Syntax %R%s setall <nick> <hosztmaszk>.
+	SETALL <nick> <hosztmaszk>.
 HOST_DENIED
 	Hozzáférés megtagadva.
 HOST_NOT_ASSIGNED
@@ -6441,7 +6441,7 @@ HOST_NOT_REGED
 HOST_DEL
 	%s vhosztja törölve lett.
 HOST_DEL_SYNTAX
-	Szintaktika: %R%s del <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

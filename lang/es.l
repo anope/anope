@@ -2934,7 +2934,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE responses
 OPER_IGNORE_SYNTAX
-	Sintaxis: IGNORE {ADD|DEL|LIST|CLEAR} [tiempo] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [tiempo] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Debes ingresar un numero valido como tiempo.
 OPER_IGNORE_TIME_DONE
@@ -3026,7 +3026,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Sintaxis: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Los servicios estan deshabilitados temporalmente, por favor intenta mas tarde 
 OPER_DEFCON_NO_CONF
@@ -3299,7 +3299,7 @@ NEWS_RANDOM_TEXT
 	[Noticias al Azar - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Sintaxis: LOGONNEWS {ADD|DEL|LIST} [texto|numero]
+	LOGONNEWS {ADD|DEL|LIST} [texto|numero]
 NEWS_LOGON_LIST_HEADER
 	Noticias de entrada:
 NEWS_LOGON_LIST_ENTRY
@@ -3325,7 +3325,7 @@ NEWS_LOGON_DELETED_ALL
 	Todas las noticias de entrada borradas.
 
 NEWS_OPER_SYNTAX
-	Sintaxis: OPERNEWS {ADD|DEL|LIST} [texto|numero]
+	OPERNEWS {ADD|DEL|LIST} [texto|numero]
 NEWS_OPER_LIST_HEADER
 	Noticias de oper:
 NEWS_OPER_LIST_ENTRY
@@ -3351,7 +3351,7 @@ NEWS_OPER_DELETED_ALL
 	Todas las noticias de oper borradas.
 
 NEWS_RANDOM_SYNTAX
-	Sintaxis: RANDOMNEWS {ADD|DEL|LIST} [texto|numero]
+	RANDOMNEWS {ADD|DEL|LIST} [texto|numero]
 NEWS_RANDOM_LIST_HEADER
 	Noticias al Azar:
 NEWS_RANDOM_LIST_ENTRY
@@ -6592,7 +6592,7 @@ HOST_SETALL
 HOST_DELALL
 	El vhost para el group %s ha sido removido.
 HOST_DELALL_SYNTAX
-	Sintaxis: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost para el grupo %s seteado a %s@%s.
 HOST_SET_ERROR
@@ -6606,9 +6606,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Usuario %s no encontrado en la base de datos de nickserv.
 HOST_SET_SYNTAX
-	Sintaxis %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Sintaxis %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Acceso Denegado.
 HOST_NOT_ASSIGNED
@@ -6624,7 +6624,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost para %s removido.
 HOST_DEL_SYNTAX
-	Sintaxis: %R%s del <nick>.
+	DEL <nick>.
 
 ###########################################################################
 #

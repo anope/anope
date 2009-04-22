@@ -3865,7 +3865,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Sk³adnia: IGNORE {ADD|DEL|LIST|CLEAR} [czas] [nick | maska]
+	IGNORE {ADD|DEL|LIST|CLEAR} [czas] [nick | maska]
 
 OPER_IGNORE_VALID_TIME
 	Musisz podaæ prawid³ow± liczbê dla czasu.
@@ -3957,7 +3957,7 @@ OPER_STAFF_AFORMAT
 
 # DefCon Messages
 OPER_DEFCON_SYNTAX
-	Sk³adnia: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 
 OPER_DEFCON_DENIED
 	Serwisy s± w trybie defcon, spróbuj ponownie pó¼niej.
@@ -4249,7 +4249,7 @@ NEWS_RANDOM_TEXT
 	[Losowa wiadomo¶æ - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Sk³adnia: LOGONNEWS {ADD|DEL|LIST} [tekst|numer]
+	LOGONNEWS {ADD|DEL|LIST} [tekst|numer]
 
 NEWS_LOGON_LIST_HEADER
 	Wiadomo¶ci powitalne:
@@ -4286,7 +4286,7 @@ NEWS_LOGON_DELETED_ALL
 	Wszystkie wiadomo¶ci powitalne zosta³ skasowane.
 
 NEWS_OPER_SYNTAX
-	Sk³adnia: OPERNEWS {ADD|DEL|LIST} [tekst|numer]
+	OPERNEWS {ADD|DEL|LIST} [tekst|numer]
 
 NEWS_OPER_LIST_HEADER
 	Wiadomo¶ci dla operatorów:
@@ -4323,7 +4323,7 @@ NEWS_OPER_DELETED_ALL
 	Wszystkie wiadomo¶ci dla operatorów zosta³y skasowane.
 
 NEWS_RANDOM_SYNTAX
-	Sk³adnia: RANDOMNEWS {ADD|DEL|LIST} [tekst|numer]
+	RANDOMNEWS {ADD|DEL|LIST} [tekst|numer]
 
 NEWS_RANDOM_LIST_HEADER
 	Losowe wiadomo¶ci:
@@ -7454,7 +7454,7 @@ HOST_DELALL
 	Vhosty dla grupy %s zosta³y usuniête.
 
 HOST_DELALL_SYNTAX
-	Sk³adnia: DELALL <nick>.
+	DELALL <nick>.
 
 HOST_IDENT_SETALL
 	Vhosty dla grupy %s zosta³y zmienione na %s@%s.
@@ -7475,10 +7475,10 @@ HOST_NOREG
 	Nie znaleziono %s w bazie serwisu NickServ.
 
 HOST_SET_SYNTAX
-	Sk³adnia %R%s SET <nick> <maska-hosta>.
+	SET <nick> <maska-hosta>.
 
 HOST_SETALL_SYNTAX
-	Sk³adnia %R%s SETALL <nick> <maska-hosta>.
+	SETALL <nick> <maska-hosta>.
 
 HOST_DENIED
 	Brak dostêpu.
@@ -7502,7 +7502,7 @@ HOST_DEL
 	Vhost dla %s zosta³ usuniêty.
 
 HOST_DEL_SYNTAX
-	Sk³adnia: %R%s DEL <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

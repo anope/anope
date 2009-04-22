@@ -2929,7 +2929,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Je moet een geldig nummer als tijd invoeren.
 OPER_IGNORE_TIME_DONE
@@ -3011,7 +3011,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Services zijn in Defcon modus. Probeer later opnieuw.
 OPER_DEFCON_NO_CONF
@@ -3274,7 +3274,7 @@ NEWS_RANDOM_TEXT
 	[Willekeurig Nieuws - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Genbruik: LOGONNEWS {ADD|DEL|LIST} [text|nr]
+	LOGONNEWS {ADD|DEL|LIST} [text|nr]
 NEWS_LOGON_LIST_HEADER
 	Login nieuwsberichten:
 NEWS_LOGON_LIST_ENTRY
@@ -3300,7 +3300,7 @@ NEWS_LOGON_DELETED_ALL
 	Alle login nieuwsberichten zijn verwijderd.
 
 NEWS_OPER_SYNTAX
-	Gebruik: OPERNEWS {ADD|DEL|LIST} [text|nr]
+	OPERNEWS {ADD|DEL|LIST} [text|nr]
 NEWS_OPER_LIST_HEADER
 	Oper nieuwsberichten:
 NEWS_OPER_LIST_ENTRY
@@ -3326,7 +3326,7 @@ NEWS_OPER_DELETED_ALL
 	Alle oper nieuwsberichten zijn verwijderd.
 
 NEWS_RANDOM_SYNTAX
-	Gebruik: RANDOMNEWS {ADD|DEL|LIST} [text|nr]
+	RANDOMNEWS {ADD|DEL|LIST} [text|nr]
 NEWS_RANDOM_LIST_HEADER
 	Willekeurige nieuwsberichten:
 NEWS_RANDOM_LIST_ENTRY
@@ -6435,7 +6435,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts voor group %s zijn verwijderd.
 HOST_DELALL_SYNTAX
-	Gebruik: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost voor groep %s gezet op %s@%s.
 HOST_SET_ERROR
@@ -6449,9 +6449,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Gebruiker %s niet gevonden in de nickserv database.
 HOST_SET_SYNTAX
-	Gebruik %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Gebruik %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Toegang geweigerd.
 HOST_NOT_ASSIGNED
@@ -6467,7 +6467,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost voor %s verwijderd.
 HOST_DEL_SYNTAX
-	Gebruik: %R%s del <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

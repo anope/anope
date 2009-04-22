@@ -2900,7 +2900,7 @@ OPER_CANNOT_RESTART
 
 # LISTIGNORE responses
 OPER_IGNORE_SYNTAX
-	Sintaxe: IGNORE {ADD|DEL|LIST|CLEAR} [tempo] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [tempo] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Você precisa digitar um número válido como tempo.
 OPER_IGNORE_TIME_DONE
@@ -2972,7 +2972,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Sintaxe: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Este serviço está temporariamente desabilitado, por favor tente novamente mais tarde
 OPER_DEFCON_NO_CONF
@@ -6398,7 +6398,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts do grupo %s foi removido.
 HOST_DELALL_SYNTAX
-	Sintaxe: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost do grupo %s ajustado para %s@%s.
 HOST_SET_ERROR
@@ -6412,9 +6412,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Usuário %s não encontrado na DB do NickServ.
 HOST_SET_SYNTAX
-	Sintaxe: %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Sintaxe: %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Acesso Negado.
 HOST_NOT_ASSIGNED
@@ -6430,7 +6430,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost para %s removido.
 HOST_DEL_SYNTAX
-	Sintaxe: %R%s del <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

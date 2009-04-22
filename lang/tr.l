@@ -2959,7 +2959,7 @@ OPER_CANNOT_RESTART
 
 # LISTIGNORE responses
 OPER_IGNORE_SYNTAX
-	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	You have to enter a valid number as time.
 OPER_IGNORE_TIME_DONE
@@ -3051,7 +3051,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	This service is temporarly disabled, please try again later
 OPER_DEFCON_NO_CONF
@@ -3322,7 +3322,7 @@ NEWS_RANDOM_TEXT
 	[Karisik Haberler - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Kullanýmý: LOGONNEWS {ADD|DEL|LIST} [yazý|num]
+	LOGONNEWS {ADD|DEL|LIST} [yazý|num]
 NEWS_LOGON_LIST_HEADER
 	Baðlantý haberleri:
 NEWS_LOGON_LIST_ENTRY
@@ -3348,7 +3348,7 @@ NEWS_LOGON_DELETED_ALL
 	Tüm baðlantý haberleri silindi.
 
 NEWS_OPER_SYNTAX
-	Kullanýmý: OPERNEWS {ADD|DEL|LIST} [yazý|num]
+	OPERNEWS {ADD|DEL|LIST} [yazý|num]
 NEWS_OPER_LIST_HEADER
 	Operatör haberleri:
 NEWS_OPER_LIST_ENTRY
@@ -3374,7 +3374,7 @@ NEWS_OPER_DELETED_ALL
 	Tüm operatör haberleri maddeleri silindi.
 
 NEWS_RANDOM_SYNTAX
-	Kullanýmý: RANDOMNEWS {ADD|DEL|LIST} [yazi|no]
+	RANDOMNEWS {ADD|DEL|LIST} [yazi|no]
 NEWS_RANDOM_LIST_HEADER
 	Karisik haberler:
 NEWS_RANDOM_LIST_ENTRY
@@ -6441,7 +6441,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts for group %s have been removed.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost for group %s set to %s@%s.
 HOST_SET_ERROR
@@ -6455,9 +6455,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	User %s not found in the nickserv db.
 HOST_SET_SYNTAX
-	Syntax %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Syntax %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Access Denied.
 HOST_NOT_ASSIGNED
@@ -6473,7 +6473,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: %R%s del <nick>.
+	DEL <nick>.
 
 ###########################################################################
 #

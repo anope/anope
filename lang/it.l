@@ -2888,7 +2888,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE responses
 OPER_IGNORE_SYNTAX
-	Sintassi: IGNORE {ADD|DEL|LIST|CLEAR} [tempo] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [tempo] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Devi inserire un numero valido per indicare il tempo.
 OPER_IGNORE_TIME_DONE
@@ -2959,7 +2959,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Sintassi: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	I servizi sono in modalità Defcon, prego riprovare più tardi.
 OPER_DEFCON_NO_CONF
@@ -3212,7 +3212,7 @@ NEWS_RANDOM_TEXT
 	[Messaggio del giorno - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Sintassi: LOGONNEWS {ADD|DEL|LIST} [testo|numero]
+	LOGONNEWS {ADD|DEL|LIST} [testo|numero]
 NEWS_LOGON_LIST_HEADER
 	Lista delle Logon News:
 NEWS_LOGON_LIST_ENTRY
@@ -3238,7 +3238,7 @@ NEWS_LOGON_DELETED_ALL
 	Tutte le Logon News sono state eliminate.
 
 NEWS_OPER_SYNTAX
-	Sintassi: OPERNEWS {ADD|DEL|LIST} [testo|numero]
+	OPERNEWS {ADD|DEL|LIST} [testo|numero]
 NEWS_OPER_LIST_HEADER
 	Lista delle Oper News:
 NEWS_OPER_LIST_ENTRY
@@ -3264,7 +3264,7 @@ NEWS_OPER_DELETED_ALL
 	Tutte le Oper News sono state eliminate.
 
 NEWS_RANDOM_SYNTAX
-	Sintassi: RANDOMNEWS {ADD|DEL|LIST} [testo|numero]
+	RANDOMNEWS {ADD|DEL|LIST} [testo|numero]
 NEWS_RANDOM_LIST_HEADER
 	Lista delle Random News:
 NEWS_RANDOM_LIST_ENTRY
@@ -6471,7 +6471,7 @@ HOST_SETALL
 HOST_DELALL
 	i vhost per il gruppo %s sono stati rimossi.
 HOST_DELALL_SYNTAX
-	Sintassi: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	Il vhost per il gruppo di %s è stato impostato a %s@%s.
 HOST_SET_ERROR
@@ -6485,9 +6485,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	L'utente %s non è presente nel database di NickServ.
 HOST_SET_SYNTAX
-	Sintassi: %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Sintassi: %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Accesso negato.
 HOST_NOT_ASSIGNED
@@ -6503,7 +6503,7 @@ HOST_NOT_REGED
 HOST_DEL
 	Il vhost di %s è stato rimosso.
 HOST_DEL_SYNTAX
-	Sintassi: %R%s del <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

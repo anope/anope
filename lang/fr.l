@@ -2997,7 +2997,7 @@ OPER_CANNOT_RESTART
 
 # LISTIGNORE responses
 OPER_IGNORE_SYNTAX
-	Syntaxe: IGNORE {ADD|DEL|LIST|CLEAR} [durée] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [durée] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Vous devez entrer une durée valide
 OPER_IGNORE_TIME_DONE
@@ -3089,7 +3089,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntaxe: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Ce service est temporairement désactivé, veuillez réessayer ultérieurement.
 OPER_DEFCON_NO_CONF
@@ -3365,7 +3365,7 @@ NEWS_RANDOM_TEXT
 	[News Aléatoire - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Syntaxe: LOGONNEWS {ADD|DEL|LIST} [texte|nombre]
+	LOGONNEWS {ADD|DEL|LIST} [texte|nombre]
 NEWS_LOGON_LIST_HEADER
 	Articles des logon news:
 NEWS_LOGON_LIST_ENTRY
@@ -3374,13 +3374,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	Il n'y a pas de logon news.
 NEWS_LOGON_ADD_SYNTAX
-	Syntaxe: LOGONNEWS ADD texte
+	LOGONNEWS ADD texte
 NEWS_LOGON_ADD_FULL
 	La liste des News est pleine!
 NEWS_LOGON_ADDED
 	Ajouté un nouvel article de logon news (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Syntaxe: LOGONNEWS DEL {num | ALL}
+	LOGONNEWS DEL {num | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Article de logon news #%d non trouvé!
 NEWS_LOGON_DELETED
@@ -3417,7 +3417,7 @@ NEWS_OPER_DELETED_ALL
 	Tous les articles oper news supprimés.
 
 NEWS_RANDOM_SYNTAX
-	Syntaxe: RANDOMNEWS {ADD|DEL|LIST} [texte|nombre]
+	RANDOMNEWS {ADD|DEL|LIST} [texte|nombre]
 NEWS_RANDOM_LIST_HEADER
 	Nouvelles aléatoires:
 NEWS_RANDOM_LIST_ENTRY
@@ -3426,13 +3426,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	Il n'y a pas de nouvelles aléatoires.
 NEWS_RANDOM_ADD_SYNTAX
-	Syntaxe: RANDOMNEWS ADD texte
+	RANDOMNEWS ADD texte
 NEWS_RANDOM_ADD_FULL
 	La liste de nouvelles est pleine!
 NEWS_RANDOM_ADDED
 	Nouvelle aléatoire ajoutée (n°%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Syntaxe: RANDOMNEWS DEL {num | ALL}
+	RANDOMNEWS DEL {num | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Nouvelle aléatoire n°%d non trouvée!
 NEWS_RANDOM_DELETED
@@ -6765,7 +6765,7 @@ HOST_SETALL
 HOST_DELALL
 	Le vhosts pour le groupe %s a été supprimé.
 HOST_DELALL_SYNTAX
-	Syntaxe: DELALL <pseudo>.
+	DELALL <pseudo>.
 HOST_IDENT_SETALL
 	Le vhost pour le groupe %s enregistrée en %s@%s.
 HOST_SET_ERROR
@@ -6797,7 +6797,7 @@ HOST_NOT_REGED
 HOST_DEL
 	Le vhost pour %s a été supprimé.
 HOST_DEL_SYNTAX
-	Syntaxe: %R%s del <pseudo>.
+	DEL <pseudo>.
 
 ###########################################################################
 #

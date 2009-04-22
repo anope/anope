@@ -74,7 +74,7 @@ int do_delall(User * u)
     NickAlias *na;
     NickCore *nc;
     if (!nick) {
-        notice_lang(s_HostServ, u, HOST_DELALL_SYNTAX, s_HostServ);
+    	syntax_error(s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
         return MOD_CONT;
     }
     if ((na = findnick(nick))) {

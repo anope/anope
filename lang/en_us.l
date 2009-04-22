@@ -2884,7 +2884,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	You have to enter a valid number as time.
 OPER_IGNORE_TIME_DONE
@@ -2954,7 +2954,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Services are in Defcon mode, Please try again later.
 OPER_DEFCON_NO_CONF
@@ -3197,7 +3197,7 @@ NEWS_RANDOM_TEXT
 	[Random News - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Syntax: LOGONNEWS {ADD|DEL|LIST} [text|num]
+	LOGONNEWS {ADD|DEL|LIST} [text|num]
 NEWS_LOGON_LIST_HEADER
 	Logon news items:
 NEWS_LOGON_LIST_ENTRY
@@ -3206,13 +3206,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	There is no logon news.
 NEWS_LOGON_ADD_SYNTAX
-	Syntax: LOGONNEWS ADD text
+	LOGONNEWS ADD text
 NEWS_LOGON_ADD_FULL
 	News list is full!
 NEWS_LOGON_ADDED
 	Added new logon news item (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Syntax: LOGONNEWS DEL {num | ALL}
+	LOGONNEWS DEL {num | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Logon news item #%d not found!
 NEWS_LOGON_DELETED
@@ -3223,7 +3223,7 @@ NEWS_LOGON_DELETED_ALL
 	All logon news items deleted.
 
 NEWS_OPER_SYNTAX
-	Syntax: OPERNEWS {ADD|DEL|LIST} [text|num]
+	OPERNEWS {ADD|DEL|LIST} [text|num]
 NEWS_OPER_LIST_HEADER
 	Oper news items:
 NEWS_OPER_LIST_ENTRY
@@ -3232,13 +3232,13 @@ NEWS_OPER_LIST_ENTRY
 NEWS_OPER_LIST_NONE
 	There is no oper news.
 NEWS_OPER_ADD_SYNTAX
-	Syntax: OPERNEWS ADD text
+	OPERNEWS ADD text
 NEWS_OPER_ADD_FULL
 	News list is full!
 NEWS_OPER_ADDED
 	Added new oper news item (#%d).
 NEWS_OPER_DEL_SYNTAX
-	Syntax: OPERNEWS DEL {num | ALL}
+	OPERNEWS DEL {num | ALL}
 NEWS_OPER_DEL_NOT_FOUND
 	Oper news item #%d not found!
 NEWS_OPER_DELETED
@@ -3249,7 +3249,7 @@ NEWS_OPER_DELETED_ALL
 	All oper news items deleted.
 
 NEWS_RANDOM_SYNTAX
-	Syntax: RANDOMNEWS {ADD|DEL|LIST} [text|num]
+	RANDOMNEWS {ADD|DEL|LIST} [text|num]
 NEWS_RANDOM_LIST_HEADER
 	Random news items:
 NEWS_RANDOM_LIST_ENTRY
@@ -3258,13 +3258,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	There is no random news.
 NEWS_RANDOM_ADD_SYNTAX
-	Syntax: RANDOMNEWS ADD text
+	RANDOMNEWS ADD text
 NEWS_RANDOM_ADD_FULL
 	News list is full!
 NEWS_RANDOM_ADDED
 	Added new random news item (#%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Syntax: RANDOMNEWS DEL {num | ALL}
+	RANDOMNEWS DEL {num | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Random news item #%d not found!
 NEWS_RANDOM_DELETED
@@ -6346,7 +6346,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts for group %s have been removed.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost for group %s set to %s@%s.
 HOST_SET_ERROR
@@ -6378,7 +6378,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: %R%s del <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored. 
 HOST_OFF_UNREAL

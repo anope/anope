@@ -2972,7 +2972,7 @@ OPER_CANNOT_RESTART
 
 # LISTIGNORE responses
 OPER_IGNORE_SYNTAX
-	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	You have to enter a valid number as time.
 OPER_IGNORE_TIME_DONE
@@ -3064,7 +3064,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	This service is temporarly disabled, please try again later
 OPER_DEFCON_NO_CONF
@@ -3337,7 +3337,7 @@ NEWS_RANDOM_TEXT
 	[Notícies al Atzar - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Sintaxis: LOGONNEWS {ADD|DEL|LIST} [text|numero]
+	LOGONNEWS {ADD|DEL|LIST} [text|numero]
 NEWS_LOGON_LIST_HEADER
 	Notícies d'entrada:
 NEWS_LOGON_LIST_ENTRY
@@ -3346,13 +3346,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	No hi ha notícies de entrada.
 NEWS_LOGON_ADD_SYNTAX
-	Sintaxis: LOGONNEWS ADD texto
+	LOGONNEWS ADD texto
 NEWS_LOGON_ADD_FULL
 	La llista de notícies esta plena!
 NEWS_LOGON_ADDED
 	Noves notícies d'entrada afegida (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Sintaxis: LOGONNEWS DEL {numero | ALL}
+	LOGONNEWS DEL {numero | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Notícia d'entrada #%d no trobada!
 NEWS_LOGON_DELETED
@@ -3389,7 +3389,7 @@ NEWS_OPER_DELETED_ALL
 	Totes les notícies de oper esborrades.
 
 NEWS_RANDOM_SYNTAX
-	Sintaxis: RANDOMNEWS {ADD|DEL|LIST} [text|numero]
+	RANDOMNEWS {ADD|DEL|LIST} [text|numero]
 NEWS_RANDOM_LIST_HEADER
 	Notícies al Azar:
 NEWS_RANDOM_LIST_ENTRY
@@ -3398,13 +3398,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	No hi ha notícies al azar.
 NEWS_RANDOM_ADD_SYNTAX
-	Sintaxis: RANDOMNEWS ADD text
+	RANDOMNEWS ADD text
 NEWS_RANDOM_ADD_FULL
 	La llista de notícies esta plena!
 NEWS_RANDOM_ADDED
 	Nova noticia a l'atzar afegida (#%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Sintaxis: RANDOMNEWS DEL {numero | ALL}
+	RANDOMNEWS DEL {numero | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Noticia a l'atzar #%d no trobada!
 NEWS_RANDOM_DELETED
@@ -6713,7 +6713,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts for group %s have been removed.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost for group %s set to %s@%s.
 HOST_SET_ERROR
@@ -6745,7 +6745,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: %R%s del <nick>.
+	DEL <nick>.
 
 ###########################################################################
 #

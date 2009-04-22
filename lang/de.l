@@ -2938,7 +2938,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [Zeit] [Nickname | Hostmaske]
+	IGNORE {ADD|DEL|LIST|CLEAR} [Zeit] [Nickname | Hostmaske]
 OPER_IGNORE_VALID_TIME
 	Du musst eine zulässige Zahl als Zeit eingeben.
 OPER_IGNORE_TIME_DONE
@@ -3016,7 +3016,7 @@ OPER_STAFF_FORMAT
 OPER_STAFF_AFORMAT
 	 %c %s  %s [%s]
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Dieser Service ist derzeit deaktiviert, bitte versuche es später nochmal
 OPER_DEFCON_NO_CONF
@@ -3288,7 +3288,7 @@ NEWS_RANDOM_TEXT
 	[Random News - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Syntax: LOGONNEWS {ADD|DEL|LIST} [Text|Nummer]
+	LOGONNEWS {ADD|DEL|LIST} [Text|Nummer]
 NEWS_LOGON_LIST_HEADER
 	Logon News Einträge:
 NEWS_LOGON_LIST_ENTRY
@@ -3297,13 +3297,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	Es gibt keine Logon News.
 NEWS_LOGON_ADD_SYNTAX
-	Syntax: LOGONNEWS ADD Text
+	LOGONNEWS ADD Text
 NEWS_LOGON_ADD_FULL
 	Die News-Liste ist voll!
 NEWS_LOGON_ADDED
 	Neuer Logon News-Eintrag hinzugefügt (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Syntax: LOGONNEWS DEL {Nummer | ALL}
+	LOGONNEWS DEL {Nummer | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Logon News-Eintrag #%d konnte nicht gefunden werden!
 NEWS_LOGON_DELETED
@@ -3340,7 +3340,7 @@ NEWS_OPER_DELETED_ALL
 	Alle Oper-News-Einträge wurden entfernt.
 
 NEWS_RANDOM_SYNTAX
-	Syntax: RANDOMNEWS {ADD|DEL|LIST} [Text|Nummer]
+	RANDOMNEWS {ADD|DEL|LIST} [Text|Nummer]
 NEWS_RANDOM_LIST_HEADER
 	Random news Einträge:
 NEWS_RANDOM_LIST_ENTRY
@@ -3349,13 +3349,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	Keine randomnews vorhanden.
 NEWS_RANDOM_ADD_SYNTAX
-	Syntax: RANDOMNEWS ADD Text
+	RANDOMNEWS ADD Text
 NEWS_RANDOM_ADD_FULL
 	Die News Liste ist voll!
 NEWS_RANDOM_ADDED
 	Neuer randomnews Eintrag hinzugefügt (#%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Syntax: RANDOMNEWS DEL {Nummer | ALL}
+	RANDOMNEWS DEL {Nummer | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Randomnews Eintrag #%d nicht gefunden!
 NEWS_RANDOM_DELETED
@@ -6711,7 +6711,7 @@ HOST_SETALL
 HOST_DELALL
 	vHost für die Gruppe %s wurden gelöscht.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL Nickname.
+	DELALL Nickname.
 HOST_IDENT_SETALL
 	vHost für die Gruppe %s wurde gesetzt: %s@%s.
 HOST_SET_ERROR
@@ -6745,7 +6745,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vHost für %s wurde gelöscht.
 HOST_DEL_SYNTAX
-	Syntax: %R%s DEL Nickname.
+	DEL Nickname.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

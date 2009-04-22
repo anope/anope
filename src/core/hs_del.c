@@ -85,7 +85,7 @@ int do_del(User * u)
             notice_lang(s_HostServ, u, HOST_NOREG, nick);
         }
     } else {
-        notice_lang(s_HostServ, u, HOST_DEL_SYNTAX, s_HostServ);
+    	syntax_error(s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
     }
     return MOD_CONT;
 }

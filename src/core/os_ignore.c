@@ -72,7 +72,7 @@ int do_ignoreuser(User * u)
     int t;
 
     if (!cmd) {
-        notice_lang(s_OperServ, u, OPER_IGNORE_SYNTAX);
+    	syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
         return MOD_CONT;
     }
 
@@ -82,10 +82,10 @@ int do_ignoreuser(User * u)
         char *rest = strtok(NULL, "");
 
         if (!nick) {
-            notice_lang(s_OperServ, u, OPER_IGNORE_SYNTAX);
+	    syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
             return MOD_CONT;
         } else if (!time) {
-            notice_lang(s_OperServ, u, OPER_IGNORE_SYNTAX);
+	    syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
             return MOD_CONT;
         } else {
             t = dotime(time);
@@ -108,7 +108,7 @@ int do_ignoreuser(User * u)
     } else if (!stricmp(cmd, "DEL")) {
         char *nick = strtok(NULL, " ");
         if (!nick) {
-            notice_lang(s_OperServ, u, OPER_IGNORE_SYNTAX);
+	    syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
         } else {
             if (delete_ignore(nick)) {
                 notice_lang(s_OperServ, u, OPER_IGNORE_DEL_DONE, nick);
@@ -121,7 +121,7 @@ int do_ignoreuser(User * u)
         notice_lang(s_OperServ, u, OPER_IGNORE_LIST_CLEARED);
         return MOD_CONT;
     } else
-        notice_lang(s_OperServ, u, OPER_IGNORE_SYNTAX);
+    	syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
 
     return MOD_CONT;
 }

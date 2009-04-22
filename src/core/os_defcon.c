@@ -96,7 +96,7 @@ int do_defcon(User * u)
     }
     newLevel = atoi(lvl);
     if (newLevel < 1 || newLevel > 5) {
-        notice_lang(s_OperServ, u, OPER_DEFCON_SYNTAX);
+	syntax_error(s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
         return MOD_CONT;
     }
     DefConLevel = newLevel;

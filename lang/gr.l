@@ -2975,7 +2975,7 @@ OPER_CANNOT_RESTART
 
 # LISTIGNORE responses
 OPER_IGNORE_SYNTAX
-	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	You have to enter a valid number as time.
 OPER_IGNORE_TIME_DONE
@@ -3067,7 +3067,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	This service is temporarly disabled, please try again later
 OPER_DEFCON_NO_CONF
@@ -3329,7 +3329,7 @@ NEWS_RANDOM_TEXT
 	[Νέα σχετικά με το δίκτυο - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Σύνταξη: LOGONNEWS {ADD|DEL|LIST} [περιεχόμενο|νούμερο]
+	LOGONNEWS {ADD|DEL|LIST} [περιεχόμενο|νούμερο]
 NEWS_LOGON_LIST_HEADER
 	Κανονισμοί:
 NEWS_LOGON_LIST_ENTRY
@@ -3338,13 +3338,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	Δεν υπάρχουν κανονισμοί ή πληροφορίες.
 NEWS_LOGON_ADD_SYNTAX
-	Σύνταξη: LOGONNEWS ADD περιεχόμενο
+	LOGONNEWS ADD περιεχόμενο
 NEWS_LOGON_ADD_FULL
 	Η λίστα των νέων είναι γεμάτη!
 NEWS_LOGON_ADDED
 	Προστέθηκε ένας κανονισμός ή πληροφορία στη θέση (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Σύνταξη: LOGONNEWS DEL {νούμερο | ALL}
+	LOGONNEWS DEL {νούμερο | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Κανονισμός στη θέση #%d δεν βρέθηκε!
 NEWS_LOGON_DELETED
@@ -3381,7 +3381,7 @@ NEWS_OPER_DELETED_ALL
 	Όλα τα νέα για τους opers διαγράφηκαν.
 
 NEWS_RANDOM_SYNTAX
-	Σύνταξη: RANDOMNEWS {ADD|DEL|LIST} [περιεχόμενο|νούμερο]
+	RANDOMNEWS {ADD|DEL|LIST} [περιεχόμενο|νούμερο]
 NEWS_RANDOM_LIST_HEADER
 	Νέα για το δίκτυο:
 NEWS_RANDOM_LIST_ENTRY
@@ -3390,13 +3390,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	Δεν υπάρχουν νέα.
 NEWS_RANDOM_ADD_SYNTAX
-	Σύνταξη: RANDOMNEWS ADD περιεχόμενο
+	RANDOMNEWS ADD περιεχόμενο
 NEWS_RANDOM_ADD_FULL
 	Η λίστα είναι γεμάτη!
 NEWS_RANDOM_ADDED
 	Προσθέθηκε ένα νέο μήνυμα στην θέση (#%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Σύνταξη: RANDOMNEWS DEL {νούμερο | ALL}
+	RANDOMNEWS DEL {νούμερο | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Το μήνυμα στην θέση #%d δεν βρέθηκε!
 NEWS_RANDOM_DELETED
@@ -6599,7 +6599,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts for group %s have been removed.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost for group %s set to %s@%s.
 HOST_SET_ERROR
@@ -6631,7 +6631,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: %R%s del <nick>.
+	DEL <nick>.
 
 ###########################################################################
 #

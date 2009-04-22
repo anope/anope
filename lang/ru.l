@@ -2881,7 +2881,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Синтакстс: IGNORE {ADD|DEL|LIST|CLEAR} [время] [ник]
+	IGNORE {ADD|DEL|LIST|CLEAR} [время] [ник]
 OPER_IGNORE_VALID_TIME
 	Значение параметра "время" указано не верно.
 OPER_IGNORE_TIME_DONE
@@ -2951,7 +2951,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Синтаксис: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	На данный момент сервисы работают в DEFCON-режиме. Повторите свой запрос позже.
 OPER_DEFCON_NO_CONF
@@ -3210,7 +3210,7 @@ NEWS_RANDOM_TEXT
 	[Случайная новость - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Синтаксис: LOGONNEWS {ADD|DEL|LIST} [текст|номер]
+	LOGONNEWS {ADD|DEL|LIST} [текст|номер]
 NEWS_LOGON_LIST_HEADER
 	Текущие список новостей:
 NEWS_LOGON_LIST_ENTRY
@@ -3219,13 +3219,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	Список новостей пуст.
 NEWS_LOGON_ADD_SYNTAX
-	Синтаксис: LOGONNEWS ADD текст
+	LOGONNEWS ADD текст
 NEWS_LOGON_ADD_FULL
 	Список новостей переполнен.
 NEWS_LOGON_ADDED
 	Новость успешно добавлена, ее номер: #%d
 NEWS_LOGON_DEL_SYNTAX
-	Синтаксис: LOGONNEWS DEL {номер | ALL}
+	LOGONNEWS DEL {номер | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Новость под номером #%d не обнаружена.
 NEWS_LOGON_DELETED
@@ -3262,7 +3262,7 @@ NEWS_OPER_DELETED_ALL
 	Список новостей для операторов полностью очищен.
 
 NEWS_RANDOM_SYNTAX
-	Синтаксис: RANDOMNEWS {ADD|DEL|LIST} [текст|номер]
+	RANDOMNEWS {ADD|DEL|LIST} [текст|номер]
 NEWS_RANDOM_LIST_HEADER
 	Список случайных новостей:
 NEWS_RANDOM_LIST_ENTRY
@@ -3271,13 +3271,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	Список случайных новостей пуст.
 NEWS_RANDOM_ADD_SYNTAX
-	Синтаксис: RANDOMNEWS ADD текст
+	RANDOMNEWS ADD текст
 NEWS_RANDOM_ADD_FULL
 	Список случайных новостей переполнен.
 NEWS_RANDOM_ADDED
 	Новость успешно добавлена, ее номер: #%d
 NEWS_RANDOM_DEL_SYNTAX
-	Синтаксис: RANDOMNEWS DEL {номер | ALL}
+	RANDOMNEWS DEL {номер | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Новость под номером #%d не обнаружена.
 NEWS_RANDOM_DELETED
@@ -6636,7 +6636,7 @@ HOST_SETALL
 HOST_DELALL
 	Все виртуальные хосты для группы %s были удалены.
 HOST_DELALL_SYNTAX
-	Синтаксис: DELALL <ник>.
+	DELALL <ник>.
 HOST_IDENT_SETALL
 	Виртуальный хост для группы %s установлен в %s@%s.
 HOST_SET_ERROR
@@ -6668,7 +6668,7 @@ HOST_NOT_REGED
 HOST_DEL
 	Виртуальный хост для %s удален.
 HOST_DEL_SYNTAX
-	Синтаксис: %R%s del <ник>.
+	DEL <ник>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

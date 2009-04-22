@@ -2944,7 +2944,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Je moet een geldig nummer als tijd invoeren.
 OPER_IGNORE_TIME_DONE
@@ -3026,7 +3026,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Services zijn in Defcon modus. Probeer later opnieuw.
 OPER_DEFCON_NO_CONF
@@ -3289,7 +3289,7 @@ NEWS_RANDOM_TEXT
 	[Willekeurig Nieuws - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Genbruik: LOGONNEWS {ADD|DEL|LIST} [text|nr]
+	LOGONNEWS {ADD|DEL|LIST} [text|nr]
 NEWS_LOGON_LIST_HEADER
 	Login nieuwsberichten:
 NEWS_LOGON_LIST_ENTRY
@@ -3298,13 +3298,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	Er is geen login nieuws.
 NEWS_LOGON_ADD_SYNTAX
-	Gebruik: LOGONNEWS ADD text
+	LOGONNEWS ADD text
 NEWS_LOGON_ADD_FULL
 	Nieuws lijst is vol!
 NEWS_LOGON_ADDED
 	Nieuw login nieuws toegevoegd (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Gebruik: LOGONNEWS DEL {nr | ALL}
+	LOGONNEWS DEL {nr | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Login nieuwsbericht #%d niet gevonden!
 NEWS_LOGON_DELETED
@@ -3341,7 +3341,7 @@ NEWS_OPER_DELETED_ALL
 	Alle oper nieuwsberichten zijn verwijderd.
 
 NEWS_RANDOM_SYNTAX
-	Gebruik: RANDOMNEWS {ADD|DEL|LIST} [text|nr]
+	RANDOMNEWS {ADD|DEL|LIST} [text|nr]
 NEWS_RANDOM_LIST_HEADER
 	Willekeurige nieuwsberichten:
 NEWS_RANDOM_LIST_ENTRY
@@ -3350,13 +3350,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	Er is geen willekeurig nieuws.
 NEWS_RANDOM_ADD_SYNTAX
-	Gebruik: RANDOMNEWS ADD text
+	RANDOMNEWS ADD text
 NEWS_RANDOM_ADD_FULL
 	Nieuwslijst is vol!
 NEWS_RANDOM_ADDED
 	Nieuw willekeurig nieuwsbericht toegevoegd (#%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Gebruik: RANDOMNEWS DEL {nr | ALL}
+	RANDOMNEWS DEL {nr | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Willekeurig nieuwsbericht #%d niet gevonden!
 NEWS_RANDOM_DELETED
@@ -6529,7 +6529,7 @@ HOST_SETALL
 HOST_DELALL
 	vhosts voor group %s zijn verwijderd.
 HOST_DELALL_SYNTAX
-	Gebruik: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost voor groep %s gezet op %s@%s.
 HOST_SET_ERROR
@@ -6561,7 +6561,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost voor %s verwijderd.
 HOST_DEL_SYNTAX
-	Gebruik: %R%s del <nick>.
+	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
 HOST_OFF_UNREAL

@@ -2946,7 +2946,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE responses
 OPER_IGNORE_SYNTAX
-	Sintaxis: IGNORE {ADD|DEL|LIST|CLEAR} [tiempo] [nick | mask]
+	IGNORE {ADD|DEL|LIST|CLEAR} [tiempo] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Debes ingresar un numero valido como tiempo.
 OPER_IGNORE_TIME_DONE
@@ -3038,7 +3038,7 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Sintaxis: DEFCON [1|2|3|4|5]
+	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Los servicios estan deshabilitados temporalmente, por favor intenta mas tarde 
 OPER_DEFCON_NO_CONF
@@ -3311,7 +3311,7 @@ NEWS_RANDOM_TEXT
 	[Noticias al Azar - %s] %s
 
 NEWS_LOGON_SYNTAX
-	Sintaxis: LOGONNEWS {ADD|DEL|LIST} [texto|numero]
+	LOGONNEWS {ADD|DEL|LIST} [texto|numero]
 NEWS_LOGON_LIST_HEADER
 	Noticias de entrada:
 NEWS_LOGON_LIST_ENTRY
@@ -3320,13 +3320,13 @@ NEWS_LOGON_LIST_ENTRY
 NEWS_LOGON_LIST_NONE
 	No hay Noticias de entrada.
 NEWS_LOGON_ADD_SYNTAX
-	Sintaxis: LOGONNEWS ADD texto
+	LOGONNEWS ADD texto
 NEWS_LOGON_ADD_FULL
 	La lista de noticias esta llena!
 NEWS_LOGON_ADDED
 	Nueva noticia de entrada anadida (#%d).
 NEWS_LOGON_DEL_SYNTAX
-	Sintaxis: LOGONNEWS DEL {numero | ALL}
+	LOGONNEWS DEL {numero | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
 	Noticia de entrada #%d no encontrada!
 NEWS_LOGON_DELETED
@@ -3363,7 +3363,7 @@ NEWS_OPER_DELETED_ALL
 	Todas las noticias de oper borradas.
 
 NEWS_RANDOM_SYNTAX
-	Sintaxis: RANDOMNEWS {ADD|DEL|LIST} [texto|numero]
+	RANDOMNEWS {ADD|DEL|LIST} [texto|numero]
 NEWS_RANDOM_LIST_HEADER
 	Noticias al Azar:
 NEWS_RANDOM_LIST_ENTRY
@@ -3372,13 +3372,13 @@ NEWS_RANDOM_LIST_ENTRY
 NEWS_RANDOM_LIST_NONE
 	No hay Noticias al azar.
 NEWS_RANDOM_ADD_SYNTAX
-	Sintaxis: RANDOMNEWS ADD texto
+	RANDOMNEWS ADD texto
 NEWS_RANDOM_ADD_FULL
 	La lista de noticias esta llena!
 NEWS_RANDOM_ADDED
 	Nueva noticia al azar anadida (#%d).
 NEWS_RANDOM_DEL_SYNTAX
-	Sintaxis: RANDOMNEWS DEL {numero | ALL}
+	RANDOMNEWS DEL {numero | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
 	Noticia al azar #%d no encontrada!
 NEWS_RANDOM_DELETED
@@ -6682,7 +6682,7 @@ HOST_SETALL
 HOST_DELALL
 	El vhost para el group %s ha sido removido.
 HOST_DELALL_SYNTAX
-	Sintaxis: DELALL <nick>.
+	DELALL <nick>.
 HOST_IDENT_SETALL
 	vhost para el grupo %s seteado a %s@%s.
 HOST_SET_ERROR
@@ -6714,7 +6714,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost para %s removido.
 HOST_DEL_SYNTAX
-	Sintaxis: %R%s del <nick>.
+	DEL <nick>.
 
 ###########################################################################
 #

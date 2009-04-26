@@ -1889,7 +1889,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF }
 MEMO_SET_NOTIFY_ON
 	%s sizi yeni mesajlar için baðlandýðýnýzda veya mesajlar size gönderildiði anda uyaracak.
 MEMO_SET_NOTIFY_LOGON
@@ -5325,7 +5325,7 @@ MEMO_HELP_SET
 	%R%S HELP SET özellik yazýn.
 
 MEMO_HELP_SET_NOTIFY
-	Kullanýmý: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Kullanýmý: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Yeni mesajlarda ne zaman uyarýlacaðýnýzý belirler:
 	
@@ -5336,6 +5336,9 @@ MEMO_HELP_SET_NOTIFY
 	               dönüþte uyarýlýrsýnýz.
 	    NEW     Yeni mesajlar için sadece size gönderildikleri 
 	               anda uyarýlýrsýnýz.
+	    MAIL    You will be notified of memos by email aswell as
+	               any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     Yeni mesajlar için herhangi bir uyarý almazsýnýz.
 	
 	ON parametresi LOGON ve NEW 'in kombinasyonudur

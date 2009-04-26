@@ -1877,7 +1877,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF }
 MEMO_SET_NOTIFY_ON
 	%s zal je nu informeren over memo's zodra je inlogt en wanneer deze naar je toe gezonden worden.
 MEMO_SET_NOTIFY_LOGON
@@ -5311,7 +5311,7 @@ MEMO_HELP_SET
 	een specifieke optie.
 
 MEMO_HELP_SET_NOTIFY
-	Gebruik: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Gebruik: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Verandert wanneer je geinformeerd zal worden over nieuwe memo's:
 	
@@ -5322,6 +5322,9 @@ MEMO_HELP_SET_NOTIFY
 	               of wanneer je terugkomt van /AWAY.
 	    NEW     Je wordt alleen geinformeerd over memo's wanner ze
 	               naar je worden verstuurd.
+	    MAIL    You will be notified of memos by email aswell as
+		           any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     Je zal geen informaties over memo's ontvangen.
 	
 	ON is wezenlijk LOGON en NEW gecombineerd.

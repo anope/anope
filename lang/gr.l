@@ -1894,7 +1894,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF }
 MEMO_SET_NOTIFY_ON
 	%s από τώρα όταν θα κάνεις εντολή logon θα βλέπεις τα μηνύματα που θα σου στέλνουν καθώς θασαι στο δίκτυο.
 MEMO_SET_NOTIFY_LOGON
@@ -5363,7 +5363,7 @@ MEMO_HELP_SET
 	σε μια συγκεκριμένη επιλογή.
 
 MEMO_HELP_SET_NOTIFY
-	Σύνταξη: SET NOTIFY {ON | LOGON | NEW | OFF}	
+	Σύνταξη: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Αλλαγές για το πως θέλετε να ενημερώνεστε για νέα μηνύματα:
 	
@@ -5374,6 +5374,9 @@ MEMO_HELP_SET_NOTIFY
 	               on ή όταν θα επανέρχεστε από /AWAY.
 	    NEW     Θα ενημερώνεστε για τα μηνύματα σας μόνο όταν θα σας
 	               τα στέλνουν.
+	    MAIL    You will be notified of memos by email aswell as
+	               any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     Δεν θα ενημερώνεστε ποτέ για νέα μηνύματα ή παλιά.
 	
 	Η επιλογή ON πιο ουσιώδης,η LOGON και η NEW συνδιαστική.

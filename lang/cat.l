@@ -1892,7 +1892,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF }
 MEMO_SET_NOTIFY_ON
 	%s ara et notificara dels teus memos quant et conectis i quant et siguin enviats.
 MEMO_SET_NOTIFY_LOGON
@@ -5426,7 +5426,7 @@ MEMO_HELP_SET
 	sobre una opció específica.
 
 MEMO_HELP_SET_NOTIFY
-	Sintàxi: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Sintàxi: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Canvia quan se't notificarà de nous memos:
 	
@@ -5437,6 +5437,9 @@ MEMO_HELP_SET_NOTIFY
 	               o quan treguis /AWAY.
 	    NEW     Sols seras notificat de memos quan se't 
 	               enviin.
+	    MAIL    You will be notified of memos by email aswell as
+	               any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     No rebràs cap notificació per memos.
 	
 	ON és escencialment LOGON i NEW combinats.

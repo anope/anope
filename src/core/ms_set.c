@@ -56,7 +56,7 @@ class CommandMSSet : public Command
 		}
 		else if (!stricmp(param, "OFF"))
 		{
-			u->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE);
+			u->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE | NI_MEMO_MAIL);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
 		}
 		else

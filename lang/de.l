@@ -1894,7 +1894,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF }
 MEMO_SET_NOTIFY_ON
 	%s wird dich beim Einloggen über eingegangene Memos informieren. 
 MEMO_SET_NOTIFY_LOGON
@@ -5449,7 +5449,7 @@ MEMO_HELP_SET
 	über eine bestimmte Option.
 
 MEMO_HELP_SET_NOTIFY
-	Syntax: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Syntax: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Ändert den Zeitpunkt, wann MemoServ dich über neue
 	eingegangene Memos informiert:
@@ -5462,6 +5462,9 @@ MEMO_HELP_SET_NOTIFY
 	            machst.
 	    NEW     Du wirst nur informiert, wenn sie an dich
 	            gesendet werden.
+	    MAIL    You will be notified of memos by email aswell as
+	            any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     Es wird keine Benachrichtigung über neue
 	            Memos stattfinden.
 	

@@ -28,8 +28,8 @@ class CommandOSChanKill : public Command
 		char reason[BUFSIZE], realreason[BUFSIZE];
 		time_t expires;
 		char mask[USERMAX + HOSTMAX + 2];
-		struct c_userlist *cu, *next;
-		int last_param = 1;
+		struct c_userlist *cu, *cunext;
+		unsigned last_param = 1;
 		Channel *c;
 
 		channel = params[0].c_str();
@@ -53,12 +53,12 @@ class CommandOSChanKill : public Command
 		else if (expires > 0)
 			expires += time(NULL);
 
-		if (params.size() < last_param)
+		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 1 ? " " : "", last_param == 1 ? params[2].c_str() : "");
+		snprintf(reason, sizeof(reason), "%s%s", params[last_param].c_str(), (params.size() > last_param + 1 ? params[last_param + 1].c_str() : ""));
 		if (*reason)
 		{
 
@@ -69,9 +69,9 @@ class CommandOSChanKill : public Command
 
 			if ((c = findchan(channel)))
 			{
-				for (cu = c->users; cu; cu = next)
+				for (cu = c->users; cu; cu = cunext)
 				{
-					next = cu->next;
+					cunext = cu->next;
 					if (is_oper(cu->user))
 						continue;
 					strncpy(mask, "*@", 3); /* Use *@" for the akill's, */

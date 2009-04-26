@@ -132,7 +132,7 @@ int do_set_notify(User * u, MemoInfo * mi, char *param)
         u->na->nc->flags &= ~NI_MEMO_MAIL;
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
     } else if (stricmp(param, "OFF") == 0) {
-        u->na->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE);
+        u->na->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE | NI_MEMO_MAIL);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
     } else {
         syntax_error(s_MemoServ, u, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);

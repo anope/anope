@@ -2467,7 +2467,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | MAIL | OFF }
+	SET NOTIFY {ON | LOGON | NEW | MAIL | MAIL | NOMAIL | OFF }
 
 MEMO_SET_NOTIFY_ON
 	%s powiadomi Ciê o wiadomo¶ciach podczas logowania i w momencie ich nadej¶cia.
@@ -6495,7 +6495,7 @@ MEMO_HELP_SET
 	%R%S HELP SET opcja
 
 MEMO_HELP_SET_NOTIFY
-	Sk³adnia: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Sk³adnia: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Ustala sposób wys³ania powiadomieñ o nowych wiadomo¶ciach:
 	
@@ -6508,6 +6508,9 @@ MEMO_HELP_SET_NOTIFY
 	           trybu /AWAY.
 	   NEW     Powiadomienie bêdzie wysy³ane jedynie w 
 	           momencie otrzymania wiadomo¶ci.
+	   MAIL    You will be notified of memos by email aswell as
+	           any other settings you have.
+	   NOMAIL  You will not be notified of memos by email.
 	   OFF     Powiadomienia nie bêd± wysy³ane.
 	
 	Opcja ON jest kombinacj± opcji LOGON oraz NEW.

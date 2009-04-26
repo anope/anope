@@ -1854,7 +1854,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 MEMO_SET_NOTIFY_ON
 	С этого момента, %s будет уведомлять вас о новых сообщениях сразу после идентификации к нику или при поступлении новых сообщений.
 MEMO_SET_NOTIFY_LOGON
@@ -5413,7 +5413,7 @@ MEMO_HELP_SET
 	командой %R%S HELP SET опция.
 
 MEMO_HELP_SET_NOTIFY
-	Синтаксис: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Синтаксис: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Данная опция позволяет настроить ваш личный метод уведомления о
 	новых сообщениях, посланных вам кем-либо.
@@ -5427,6 +5427,9 @@ MEMO_HELP_SET_NOTIFY
 	            /AWAY (отошел).
 	    NEW     уведомление будет поступать сразу, как только кто-то
 	            отправит вам новое сообщение.
+	    MAIL    You will be notified of memos by email aswell as
+	               any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     уведомлений о получении новых сообщений поступать
 	            не будет
 	

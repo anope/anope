@@ -1885,7 +1885,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY válaszok
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 MEMO_SET_NOTIFY_ON
 	%s értesíteni fog az üzenetekrõl csatlakozáskor.
 MEMO_SET_NOTIFY_LOGON
@@ -5377,7 +5377,7 @@ MEMO_HELP_SET
 	További információért írd be: %R%S HELP SET opció
 	
 MEMO_HELP_SET_NOTIFY
-	Syntax: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Syntax: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Itt tudod beállítani, ha értesítést szeretnél kapni
 	az új üzenetekrõl:
@@ -5387,6 +5387,9 @@ MEMO_HELP_SET_NOTIFY
 	    LOGON   Értesítést kapsz az új üzenetekrõl csatlakozáskor
 	            vagy ha visszajössz /AWAY-ból.
 	    NEW     Csak akkor kapsz értesítést, ha új üzenet érkezett.
+	    MAIL    You will be notified of memos by email aswell as
+	            any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     Nem kapsz értesítést az üzeneteidrõl.
 	
 	Az ON ekvivalens a LOGON és a NEW kombinálásával.

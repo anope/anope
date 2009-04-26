@@ -1891,7 +1891,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 MEMO_SET_NOTIFY_ON
 	%s ahora te notificara de tus memos cuando te conectes y cuando te sean enviados.
 MEMO_SET_NOTIFY_LOGON
@@ -5469,7 +5469,7 @@ MEMO_HELP_SET
 	acerca de una opcion especifica.
 
 MEMO_HELP_SET_NOTIFY
-	Sintaxis: SET NOTIFY {ON | LOGON | NEW | OFF}
+	Sintaxis: SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}
 	
 	Cambia cuando seras notificado acerca de nuevos memos:
 	
@@ -5480,6 +5480,9 @@ MEMO_HELP_SET_NOTIFY
 	               o cuando saques tu /AWAY.
 	    NEW     Solo seras notificado de memos cuando te sean
 	               enviados.
+	    MAIL    You will be notified of memos by email aswell as
+	               any other settings you have.
+	    NOMAIL  You will not be notified of memos by email.
 	    OFF     No recibiras ninguna notificacion por memos.
 	
 	ON es escencialmente LOGON y NEW combinados.

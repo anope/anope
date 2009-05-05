@@ -18,7 +18,7 @@
 class CommandOSModLoad : public Command
 {
  public:
-	CommandOSModLoad() : Command("MODLOAD", 1, 1)
+	CommandOSModLoad() : Command("MODLOAD", 1, 1, "operserv/modload")
 	{
 	}
 

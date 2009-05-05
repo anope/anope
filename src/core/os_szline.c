@@ -269,7 +269,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSSZLine() : Command("SZLINE", 1, 4)
+	CommandOSSZLine() : Command("SZLINE", 1, 4, "operserv/szline")
 	{
 	}
 

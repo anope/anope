@@ -33,12 +33,6 @@ class CommandOSAdmin : public Command
 			return MOD_CONT;
 		}
 
-		if (!u->nc->HasCommand("operserv/admin"))
-		{
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 		if (!(na = findnick(nick)))
 		{
 			notice_lang(s_OperServ, u, NICK_X_NOT_REGISTERED, nick);
@@ -200,19 +194,13 @@ class CommandOSAdmin : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSAdmin() : Command("ADMIN", 1, 2)
+	CommandOSAdmin() : Command("ADMIN", 1, 2, "operserv/admin")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-
-		if (!u->nc->HasCommand("operserv/admin"))
-		{
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
 
 		if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params);

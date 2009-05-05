@@ -23,7 +23,7 @@
 class CommandNSGetEMail : public Command
 {
  public:
-	CommandNSGetEMail() : Command("GETEMAIL", 1, 1)
+	CommandNSGetEMail() : Command("GETEMAIL", 1, 1, "nickserv/getemail")
 	{
 	}
 

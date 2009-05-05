@@ -196,19 +196,13 @@ class CommandOSOper : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSOper() : Command("OPER", 1, 2)
+	CommandOSOper() : Command("OPER", 1, 2, "operserv/oper")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *cmd = params[0].c_str();
-
-		if (!u->nc->HasCommand("operserv/oper"))
-		{
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
 
 		if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params);

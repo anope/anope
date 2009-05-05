@@ -18,7 +18,7 @@
 class CommandOSClearModes : public Command
 {
  public:
-	CommandOSClearModes() : Command("CLEARMODES", 1, 2)
+	CommandOSClearModes() : Command("CLEARMODES", 1, 2, "operserv/clearmodes")
 	{
 	}
 

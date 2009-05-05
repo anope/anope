@@ -18,16 +18,12 @@
 class CommandOSShutdown : public Command
 {
  public:
-	CommandOSShutdown() : Command("SHUTDOWN", 0, 0)
+	CommandOSShutdown() : Command("SHUTDOWN", 0, 0, "operserv/shutdown")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		if (!u->nc->HasCommand("operserv/shutdown")) {
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_STOP;
-		}
 
 		quitmsg = new char[32 + strlen(u->nick)];
 		if (!quitmsg)

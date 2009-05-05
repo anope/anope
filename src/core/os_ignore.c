@@ -96,7 +96,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSIgnore() : Command("IGNORE", 1, 3)
+	CommandOSIgnore() : Command("IGNORE", 1, 3, "operserv/ignore")
 	{
 	}
 

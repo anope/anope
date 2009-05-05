@@ -225,7 +225,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
  public:
-	NewsBase(const std::string &newstype) : Command(newstype, 1, 2)
+	NewsBase(const std::string &newstype) : Command(newstype, 1, 2, "operserv/news")
 	{
 	}
 
@@ -366,6 +366,7 @@ class OSNews : public Module
 		this->AddCommand(OPERSERV, new CommandOSRandomNews(), MOD_UNIQUE);
 		ModuleManager::Attach(I_OnReload, this);
 	}
+
 	void OperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);

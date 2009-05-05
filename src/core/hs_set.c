@@ -18,18 +18,12 @@
 class CommandHSSet : public Command
 {
  public:
-	CommandHSSet() : Command("SET", 2, 2)
+	CommandHSSet() : Command("SET", 2, 2, "hostserv/set")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		if (!u->nc->HasPriv("hostserv/set"))
-		{
-			notice_lang(s_HostServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 		const char *nick = params[0].c_str();
 		const char *rawhostmask = params[1].c_str();
 		char *hostmask = new char[HOSTMAX];

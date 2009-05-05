@@ -106,7 +106,7 @@ class CommandNSOInfo : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandNSOInfo() : Command("OINFO", 2, 3)
+	CommandNSOInfo() : Command("OINFO", 2, 3, "nickserv/oinfo")
 	{
 	}
 
@@ -193,7 +193,7 @@ class CommandCSOInfo : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandCSOInfo() : Command("OINFO", 2, 3)
+	CommandCSOInfo() : Command("OINFO", 2, 3, "chanserv/oinfo")
 	{
 	}
 

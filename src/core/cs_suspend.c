@@ -18,7 +18,7 @@
 class CommandCSSuspend : public Command
 {
  public:
-	CommandCSSuspend() : Command("SUSPEND", 1, 2)
+	CommandCSSuspend() : Command("SUSPEND", 1, 2, "chanserv/suspend")
 	{
 	}
 
@@ -29,12 +29,6 @@ class CommandCSSuspend : public Command
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		Channel *c;
-
-		if (!u->nc->HasCommand("chanserv/suspend"))
-		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-			return MOD_CONT; // XXX: error?
-		}
 
 		/* Assumes that permission checking has already been done. */
 		if (ForceForbidReason && !reason)
@@ -123,7 +117,7 @@ class CommandCSSuspend : public Command
 class CommandCSUnSuspend : public Command
 {
  public:
-	CommandCSUnSuspend() : Command("UNSUSPEND", 1, 1)
+	CommandCSUnSuspend() : Command("UNSUSPEND", 1, 1, "chanserv/suspend")
 	{
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}

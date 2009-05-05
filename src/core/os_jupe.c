@@ -18,7 +18,7 @@
 class CommandOSJupe : public Command
 {
  public:
-	CommandOSJupe() : Command("JUPE", 1, 2)
+	CommandOSJupe() : Command("JUPE", 1, 2, "operserv/jupe")
 	{
 	}
 

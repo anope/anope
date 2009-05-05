@@ -18,7 +18,7 @@
 class CommandNSSuspend : public Command
 {
  public:
-	CommandNSSuspend() : Command("SUSPEND", 2, 2)
+	CommandNSSuspend() : Command("SUSPEND", 2, 2, "nickserv/suspend")
 	{
 	}
 
@@ -105,7 +105,7 @@ class CommandNSSuspend : public Command
 class CommandNSUnSuspend : public Command
 {
  public:
-	CommandNSUnSuspend() : Command("UNSUSPEND", 1, 1)
+	CommandNSUnSuspend() : Command("UNSUSPEND", 1, 1, "nickserv/suspend")
 	{
 	}
 

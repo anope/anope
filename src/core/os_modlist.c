@@ -18,7 +18,7 @@
 class CommandOSModList : public Command
 {
  public:
-	CommandOSModList() : Command("MODLIST", 0, 1)
+	CommandOSModList() : Command("MODLIST", 0, 1, "operserv/modlist")
 	{
 	}
 

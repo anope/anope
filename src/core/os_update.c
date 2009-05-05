@@ -18,7 +18,7 @@
 class CommandOSUpdate : public Command
 {
  public:
-	CommandOSUpdate() : Command("UPDATE", 0, 0)
+	CommandOSUpdate() : Command("UPDATE", 0, 0, "operserv/update")
 	{
 	}
 

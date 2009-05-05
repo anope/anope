@@ -473,7 +473,7 @@ private:
 		return MOD_CONT;
 	}
 public:
-	CommandNSSASet() : Command("SASET", 2, 4)
+	CommandNSSASet() : Command("SASET", 2, 4, "nickserv/saset")
 	{
 	}
 

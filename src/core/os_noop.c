@@ -18,7 +18,7 @@
 class CommandOSNOOP : public Command
 {
  public:
-	CommandOSNOOP() : Command("NOOP", 2, 2)
+	CommandOSNOOP() : Command("NOOP", 2, 2, "operserv/noop")
 	{
 	}
 

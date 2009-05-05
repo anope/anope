@@ -21,7 +21,7 @@ int opers_list(int number, NickCore *nc, User *u, char *level);
 class CommandOSStaff : public Command
 {
  public:
-	CommandOSStaff() : Command("STAFF", 0, 0)
+	CommandOSStaff() : Command("STAFF", 0, 0, "operserv/staff")
 	{
 	}
 

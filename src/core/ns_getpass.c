@@ -18,7 +18,7 @@
 class CommandNSGetPass : public Command
 {
  public:
-	CommandNSGetPass() : Command("GETPASS", 1, 1)
+	CommandNSGetPass() : Command("GETPASS", 1, 1, "nickserv/getpass")
 	{
 	}
 
@@ -28,12 +28,6 @@ class CommandNSGetPass : public Command
 		char tmp_pass[PASSMAX];
 		NickAlias *na;
 		NickRequest *nr = NULL;
-
-		if (!u->nc->HasCommand("nickserv/getpass"))
-		{
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
 
 		if (!(na = findnick(nick)))
 		{

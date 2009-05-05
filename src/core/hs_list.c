@@ -18,7 +18,7 @@
 class CommandHSList : public Command
 {
  public:
-	CommandHSList() : Command("LIST", 0, 1)
+	CommandHSList() : Command("LIST", 0, 1, "hostserv/list")
 	{
 	}
 

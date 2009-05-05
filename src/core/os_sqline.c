@@ -270,7 +270,7 @@ class CommandOSSQLine : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSSQLine() : Command("SQLINE", 1, 4)
+	CommandOSSQLine() : Command("SQLINE", 1, 4, "operserv/sqline")
 	{
 	}
 

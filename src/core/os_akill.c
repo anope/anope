@@ -286,7 +286,7 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSAKill() : Command("AKILL", 1, 4)
+	CommandOSAKill() : Command("AKILL", 1, 4, "operserv/akill")
 	{
 	}
 

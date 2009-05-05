@@ -233,7 +233,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSSet() : Command("SET", 1, 2)
+	CommandOSSet() : Command("SET", 1, 2, "operserv/set")
 	{
 	}
 

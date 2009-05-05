@@ -88,6 +88,17 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		// Check whether or not access string is empty
 	}
 
+	if (!c->permission.empty())
+	{
+		if (!u->nc->HasPriv(c->permission) && !u->nc->HasCommand(c->permission))
+		{
+			notice_lang(service, u, ACCESS_DENIED);
+			alog("Access denied for user %s with service %s and command %s", u->nick, service, cmd);
+			return;
+		}
+
+	}
+
 	std::vector<std::string> params;
 	std::string curparam;
 	char *s = NULL;

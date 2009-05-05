@@ -18,7 +18,7 @@
 class CommandOSKick : public Command
 {
  public:
-	CommandOSKick() : Command("KICK", 3, 3)
+	CommandOSKick() : Command("KICK", 3, 3, "operserv/kick")
 	{
 	}
 

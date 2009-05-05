@@ -18,7 +18,7 @@
 class CommandOSChanKill : public Command
 {
  public:
-	CommandOSChanKill() : Command("CHANKILL", 2, 3)
+	CommandOSChanKill() : Command("CHANKILL", 2, 3, "operserv/chankill")
 	{
 	}
 

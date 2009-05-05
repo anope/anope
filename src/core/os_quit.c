@@ -18,16 +18,12 @@
 class CommandOSQuit : public Command
 {
  public:
-	CommandOSQuit() : Command("QUIT", 0, 0)
+	CommandOSQuit() : Command("QUIT", 0, 0, "operserv/quit")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		if (!u->nc->HasCommand("operserv/quit")) {
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_STOP;
-		}
 
 		quitmsg = new char[28 + strlen(u->nick)];
 		if (!quitmsg)

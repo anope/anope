@@ -275,7 +275,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSStats() : Command("STATS", 0, 1)
+	CommandOSStats() : Command("STATS", 0, 1, "operserv/stats")
 	{
 	}
 

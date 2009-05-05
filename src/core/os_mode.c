@@ -18,7 +18,7 @@
 class CommandOSMode : public Command
 {
  public:
-	CommandOSMode() : Command("MODE", 2, 2)
+	CommandOSMode() : Command("MODE", 2, 2, "operserv/mode")
 	{
 	}
 

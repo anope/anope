@@ -18,7 +18,7 @@
 class CommandOSGlobal : public Command
 {
  public:
-	CommandOSGlobal() : Command("GLOBAL", 1, 1)
+	CommandOSGlobal() : Command("GLOBAL", 1, 1, "operserv/global")
 	{
 	}
 

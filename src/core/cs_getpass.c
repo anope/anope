@@ -18,7 +18,7 @@
 class CommandCSGetPass : public Command
 {
  public:
-	CommandCSGetPass() : Command("GETPASS", 1, 1)
+	CommandCSGetPass() : Command("GETPASS", 1, 1, "chanserv/getpass")
 	{
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
@@ -28,12 +28,6 @@ class CommandCSGetPass : public Command
 		const char *chan = params[0].c_str();
 		char tmp_pass[PASSMAX];
 		ChannelInfo *ci;
-
-		if (!u->nc->HasCommand("chanserv/getpass"))
-		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
 
 		if (!(ci = cs_findchan(chan)))
 		{

@@ -18,18 +18,12 @@
 class CommandHSDelAll : public Command
 {
  public:
-	CommandHSDelAll() : Command("DELALL", 1, 1)
+	CommandHSDelAll() : Command("DELALL", 1, 1, "hostserv/set")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		if (!u->nc->HasPriv("hostserv/set"))
-		{
-			notice_lang(s_HostServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 		int i;
 		const char *nick = params[0].c_str();
 		NickAlias *na;

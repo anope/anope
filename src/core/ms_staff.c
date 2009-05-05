@@ -18,7 +18,7 @@
 class CommandMSStaff : public Command
 {
  public:
-	CommandMSStaff() : Command("STAFF", 1, 1)
+	CommandMSStaff() : Command("STAFF", 1, 1, "memoserv/staff")
 	{
 	}
 
@@ -27,12 +27,6 @@ class CommandMSStaff : public Command
 		NickCore *nc;
 		int i, z = 0;
 		const char *text = params[0].c_str();
-
-		if (!u->nc->HasCommand("memoserv/staff"))
-		{
-			// XXX: error?
-			return MOD_CONT;
-		}
 
 		if (readonly)
 		{

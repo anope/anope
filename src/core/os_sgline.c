@@ -283,7 +283,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSSGLine() : Command("SGLINE", 1, 3)
+	CommandOSSGLine() : Command("SGLINE", 1, 3, "operserv/sgline")
 	{
 	}
 

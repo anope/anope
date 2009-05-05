@@ -20,7 +20,7 @@ NickAlias *makenick(const char *nick);
 class CommandNSForbid : public Command
 {
  public:
-	CommandNSForbid() : Command("FORBID", 1, 2)
+	CommandNSForbid() : Command("FORBID", 1, 2, "nickserv/forbid")
 	{
 	}
 

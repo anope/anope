@@ -238,7 +238,7 @@ class CoreExport Command
 	 * @param max_params The maximum number of parameters the parser will create, after max_params, all will be combined into the last argument.
 	 * NOTE: If max_params is not set (default), there is no limit to the max number of params.
 	 */
-	Command(const std::string &sname, size_t min_params, size_t max_params = 0);
+	Command(const std::string &sname, size_t min_params, size_t max_params = 0, const std::string &spermission = "");
 
 	virtual ~Command();
 

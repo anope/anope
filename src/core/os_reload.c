@@ -18,7 +18,7 @@
 class CommandOSReload : public Command
 {
  public:
-	CommandOSReload() : Command("RELOAD", 0, 0)
+	CommandOSReload() : Command("RELOAD", 0, 0, "operserv/reload")
 	{
 	}
 

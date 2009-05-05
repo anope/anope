@@ -58,7 +58,7 @@ class CommandOSSession : public Command
 		return MOD_CONT;
 	}
  public:
-	CommandOSSession() : Command("SESSION", 2, 2)
+	CommandOSSession() : Command("SESSION", 2, 2, "operserv/session")
 	{
 	}
 

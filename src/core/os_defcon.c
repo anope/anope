@@ -20,7 +20,7 @@ void defcon_sendlvls(User *u);
 class CommandOSDEFCON : public Command
 {
  public:
-	CommandOSDEFCON() : Command("DEFCON", 1, 1)
+	CommandOSDEFCON() : Command("DEFCON", 1, 1, "operserv/defcon")
 	{
 	}
 

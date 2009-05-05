@@ -18,7 +18,7 @@
 class CommandMSSendAll : public Command
 {
  public:
-	CommandMSSendAll() : Command("SENDALL", 1, 1)
+	CommandMSSendAll() : Command("SENDALL", 1, 1, "memoserv/sendall")
 	{
 	}
 
@@ -27,12 +27,6 @@ class CommandMSSendAll : public Command
 		int i, z = 1;
 		NickCore *nc;
 		const char *text = params[0].c_str();
-
-		if (!u->nc->HasCommand("memoserv/sendall"))
-		{
-			// XXX: error?
-			return MOD_CONT;
-		}
 
 		if (readonly)
 		{

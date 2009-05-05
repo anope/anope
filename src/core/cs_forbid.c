@@ -18,7 +18,7 @@
 class CommandCSForbid : public Command
 {
  public:
-	CommandCSForbid() : Command("FORBID", 1, 2)
+	CommandCSForbid() : Command("FORBID", 1, 2, "chanserv/forbid")
 	{
 
 	}
@@ -30,12 +30,6 @@ class CommandCSForbid : public Command
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		Channel *c;
-
-		if (!u->nc->HasCommand("chanserv/forbid"))
-		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
 
 		if (ForceForbidReason && !reason)
 		{

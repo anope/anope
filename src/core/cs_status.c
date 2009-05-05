@@ -18,7 +18,7 @@
 class CommandCSStatus : public Command
 {
  public:
-	CommandCSStatus() : Command("STATUS", 2, 2)
+	CommandCSStatus() : Command("STATUS", 2, 2, "chanserv/status")
 	{
 	}
 
@@ -29,9 +29,6 @@ class CommandCSStatus : public Command
 		const char *chan = params[0].c_str();
 		const char *nick = params[1].c_str();
 		const char *temp = NULL;
-
-		if (!u->nc->HasCommand("chanserv/status"))
-			return MOD_CONT; // XXX: error?
 
 		if (!(ci = cs_findchan(chan)))
 		{

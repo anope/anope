@@ -18,16 +18,12 @@
 class CommandOSRestart : public Command
 {
  public:
-	CommandOSRestart() : Command("RESTART", 0, 0)
+	CommandOSRestart() : Command("RESTART", 0, 0, "operserv/restart")
 	{
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		if (!u->nc->HasCommand("operserv/restart")) {
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_STOP;
-		}
 
 #ifdef SERVICES_BIN
 		quitmsg = new char[31 + strlen(u->nick)];
@@ -48,9 +44,6 @@ class CommandOSRestart : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (!u->nc->HasCommand("operserv/restart"))
-			return false;
-
 		notice_help(s_OperServ, u, OPER_HELP_RESTART);
 		return true;
 	}

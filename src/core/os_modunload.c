@@ -18,7 +18,7 @@
 class CommandOSModUnLoad : public Command
 {
  public:
-	CommandOSModUnLoad() : Command("MODUNLOAD", 1, 1)
+	CommandOSModUnLoad() : Command("MODUNLOAD", 1, 1, "operserv/modload")
 	{
 	}
 

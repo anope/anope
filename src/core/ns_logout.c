@@ -73,6 +73,7 @@ int do_logout(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *param = strtok(NULL, " ");
+    struct u_chaninfolist *ci, *ci2;
     User *u2;
 
     if (!is_services_admin(u) && nick) {
@@ -111,14 +112,23 @@ int do_logout(User * u)
         else
             notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
+        /* remove founderstatus from this user in all channels */
+        ci = u2->founder_chans;
+        while (ci) {
+           ci2 = ci->next;
+           free(ci);
+           ci = ci2;
+       }
+       u->founder_chans = NULL;
+
+
         /* Stop nick tracking if enabled */
         if (NSNickTracking)
-			/* Shouldn't this be u2? -GD */
-            nsStopNickTracking(u);
+            nsStopNickTracking(u2);
 
         /* Clear any timers again */
-        if (u->na->nc->flags & NI_KILLPROTECT) {
-            del_ns_timeout(u->na, TO_COLLIDE);
+        if (u2->na->nc->flags & NI_KILLPROTECT) {
+            del_ns_timeout(u2->na, TO_COLLIDE);
         }
 		
 		/* Send out an event */

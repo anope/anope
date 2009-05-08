@@ -2963,10 +2963,10 @@ OPER_NOOP_REVOKE
 # JUPE responses
 OPER_JUPE_SYNTAX
 	JUPE nom-du-serveur [raison]
-
-# RAW responses
 OPER_JUPE_HOST_ERROR
 	Veuillez indiquer un nom de serveur valide pour JUPE.
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 	
 # RAW responses
 OPER_RAW_SYNTAX

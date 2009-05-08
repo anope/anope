@@ -26,9 +26,12 @@ class CommandOSJupe : public Command
 	{
 		const char *jserver = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		Server *server = findserver(servlist, jserver);
 
 		if (!isValidHost(jserver, 3))
 			notice_lang(s_OperServ, u, OPER_JUPE_HOST_ERROR);
+		else if (server && ((server->flags & SERVER_ISME) || (server->flags & SERVER_ISUPLINK)))
+			notice_lang(s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else {
 			char rbuf[256];
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick, reason ? ": " : "", reason ? reason : "");

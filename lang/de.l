@@ -2905,10 +2905,10 @@ OPER_NOOP_REVOKE
 # JUPE responses
 OPER_JUPE_SYNTAX
 	JUPE Servername [Grund]
-
-# RAW responses
 OPER_JUPE_HOST_ERROR
 	Benutze bitte einen gültigen hostnamen, wenn du jupiterst
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 	
 # RAW responses
 OPER_RAW_SYNTAX

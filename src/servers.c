@@ -158,8 +158,10 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 		server_uplink->links = serv;
 	}
 	/* Check if this is our uplink server */
-	if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
+	if ((server_uplink == me_server) && !(flags & SERVER_JUPED)) {
 		serv_uplink = serv;
+		serv->flags |= SERVER_ISUPLINK;
+	}
 
 	return serv;
 }

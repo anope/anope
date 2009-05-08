@@ -2853,6 +2853,8 @@ OPER_JUPE_SYNTAX
 	JUPE им€_сервера [причина]
 OPER_JUPE_HOST_ERROR
 	¬ качестве основного параметра вы должны указать реальное им€ серевера 
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 
 # RAW responses
 OPER_RAW_SYNTAX

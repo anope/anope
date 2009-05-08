@@ -831,6 +831,7 @@ struct server_ {
 
 #define SERVER_ISME  0x0001
 #define SERVER_JUPED 0x0002
+#define SERVER_ISUPLINK	0x0004
 
 /*************************************************************************/
 #include "users.h"

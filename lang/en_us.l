@@ -2865,6 +2865,8 @@ OPER_JUPE_SYNTAX
 	JUPE servername [reason]
 OPER_JUPE_HOST_ERROR
 	Please use a valid server name when juping
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 	
 # RAW responses
 OPER_RAW_SYNTAX

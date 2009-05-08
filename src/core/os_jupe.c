@@ -74,8 +74,11 @@ int do_jupe(User * u)
     if (!jserver) {
         syntax_error(s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
     } else {
+		Server *server = findserver(servlist, jserver);
         if (!isValidHost(jserver, 3)) {
             notice_lang(s_OperServ, u, OPER_JUPE_HOST_ERROR);
+		} else if (server && ((server->flags & SERVER_ISME) || (server->flags & SERVER_ISUPLINK))) {
+			notice_lang(s_OperServ, u, OPER_JUPE_INVALID_SERVER);
         } else {
             anope_cmd_jupe(jserver, u->nick, reason);
 

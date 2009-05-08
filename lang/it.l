@@ -2879,6 +2879,8 @@ OPER_JUPE_SYNTAX
 	JUPE nomeserver [motivo]
 OPER_JUPE_HOST_ERROR
 	Prego utilizzare un nome server valido per jupe
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 	
 # RAW responses
 OPER_RAW_SYNTAX

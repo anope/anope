@@ -2915,6 +2915,8 @@ OPER_JUPE_SYNTAX
 	JUPE szervernév [leírás]
 OPER_JUPE_HOST_ERROR
 	Kérlek használj érvényes szerver nevet amikor jupolsz!
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 
 # RAW válaszok
 OPER_RAW_SYNTAX

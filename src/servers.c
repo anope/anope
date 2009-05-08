@@ -155,8 +155,10 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
         uplink->links = serv;
     }
     /* Check if this is our uplink server */
-    if ((uplink == me_server) && !(flags & SERVER_JUPED))
+	if ((uplink == me_server) && !(flags & SERVER_JUPED)) {
         serv_uplink = serv;
+		serv->flags |= SERVER_ISUPLINK;
+	}
 
     /* Write the StartGlobal (to non-juped servers) */
     if (GlobalOnCycle && GlobalOnCycleUP && !(flags & SERVER_JUPED))

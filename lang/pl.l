@@ -3868,6 +3868,8 @@ OPER_JUPE_SYNTAX
 
 OPER_JUPE_HOST_ERROR
 	Proszê u¿yæ prawid³owej nazwy serwera.
+OPER_JUPE_INVALID_SERVER
+	You can not jupe your services server or your uplink server.
 
 # RAW responses
 OPER_RAW_SYNTAX

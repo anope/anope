@@ -21,6 +21,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 03/23 F Fixed CS SET MLOCK requiring a param to allow clearing.          [#1044]
 03/30 F Fantasy commands in CTCP ACTIONs will now be ignored.            [#1073]
 04/03 F SECUREOPS now igores modechanges from ulined servers.            [#1004]
+04/06 F Patch to update documentation on CS RESTRICTED...                [#1039]
 04/18 F Don't enforce akicks/forbidden/.. on clients on ulined servers.  [  #00]
 
 Provided by Adam <Adam@SubZeroIRC.net> - 2009
@@ -28,6 +29,8 @@ Provided by Adam <Adam@SubZeroIRC.net> - 2009
 02/07 F CS OP/PROTECT/etc now enforced SECUREOPS setting.                [#1006]
 03/07 F Channel list re-ordering.                                        [#1024]
 03/22 F Log message about the deleting from channel access list.         [#1030]
+05/08 F Allow jupe on all bar uplink and self.                           [#1076]
+05/10 F MySQL query should no longer fail when password/salt are long    [#1078]
 
 Provided by mooncup <mooncup@anonnet.org> - 2009
 02/04 F Automatically reapply vhost on hs off for unreal32.              [  #00]

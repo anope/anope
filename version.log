@@ -9,11 +9,19 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2284"
+VERSION_BUILD="2299"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2299 - Fix bug #1078, MySQL query should no longer fail when password and salt are too long, patch from Adam.
+#Revision 2297 - Patch to allow jupe on all bar uplink and self. Thanks Adam. (Bug #1076)
+#Revision 2294 - Fix link to Link Block Generator on our site. Good find whoever it was :)
+#Revision 2293 - Patch from DukeP - founderstatus (gained by /cs identify) is not removed on logout, and on remote logout the nicktracking and the timers are removed from the wrong user (u instead of u2). Cheers! :)
+#Revision 2289 - Backport from 1.9 to document the use of /ms set notify mail and nomail (Adam)
+#Revision 2287 - Patch to rectify Syntax output from langfiles and update certain modules to use syntax_error rather than notice_lang. (Adam)
 #Revision 2284 - Don't enfoce akick/forbidden/etc.. settings on clients on ulined servers.
+#Revision 2272 - Backport of r2271, remove files from the modules runtime directory on startup, just in case files were left behind during a previous run.
+#Revision 2262 - Patch to update documentation on CS RESTRICTED to reflect historical behaviour.
 #Revision 2253 - Backport of bugfix for bug #1004 from SVN r2003, Modechanges from ulined server are no longer being blocked by SECUREOPS.
 #Revision 2251 - Fixed non-standard C-style comment.
 #Revision 2250 - Updated example.conf regarding removal of the inspirc10 protocol module and SRA requirement for SuperAdmin.

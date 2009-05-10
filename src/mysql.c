@@ -250,6 +250,7 @@ char *db_mysql_secure(char *pass, int size)
 {
     char tmp_pass[PASSMAX];
     char *str, *tmp;
+    unsigned bufsize = (2 * PASSMAX + 15 + sizeof(MysqlSecure));
 
     /* Initialize the buffer. Bug #86 */
     memset(tmp_pass, 0, PASSMAX);
@@ -258,26 +259,26 @@ char *db_mysql_secure(char *pass, int size)
     if (!pass)
         return NULL;
 
-    str = scalloc(2 * PASSMAX + 15, sizeof(char));
+    str = scalloc(bufsize, sizeof(char));
     if (enc_decrypt(pass, tmp_pass, PASSMAX - 1) != 1) {
         /* We couldnt decrypt the pass... */
         /* Make sure the hash is MySQL safe.. */
         tmp = db_mysql_quote_buffer(pass, size);
-        snprintf(str, 2 * PASSMAX + 15, "'%s'", tmp);
+        snprintf(str, bufsize, "'%s'", tmp);
         free(tmp);
     } else {                    /* if we could decrypt the pass */
         /* Make sure the pass itself pass is MySQL safe.. */
         tmp = db_mysql_quote_buffer(tmp_pass, strlen(tmp_pass));
         if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
-            snprintf(str, 2 * PASSMAX + 15, "'%s'", tmp);
+            snprintf(str, bufsize, "'%s'", tmp);
         } else if (strcmp(MysqlSecure, "des") == 0) {
-            snprintf(str, 2 * PASSMAX + 15, "ENCRYPT('%s')", tmp);
+            snprintf(str, bufsize, "ENCRYPT('%s')", tmp);
         } else if (strcmp(MysqlSecure, "md5") == 0) {
-            snprintf(str, 2 * PASSMAX + 15, "MD5('%s')", tmp);
+            snprintf(str, bufsize, "MD5('%s')", tmp);
         } else if (strcmp(MysqlSecure, "sha") == 0) {
-            snprintf(str, 2 * PASSMAX + 15, "SHA('%s')", tmp);
+            snprintf(str, bufsize, "SHA('%s')", tmp);
         } else {
-            snprintf(str, 2 * PASSMAX + 15, "ENCODE('%s','%s')", tmp, MysqlSecure);
+            snprintf(str, bufsize, "ENCODE('%s','%s')", tmp, MysqlSecure);
         }
         free(tmp);
     }

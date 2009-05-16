@@ -44,7 +44,7 @@ class CommandNSAList : public Command
 
 		if (!is_servadmin)
 			/* Non service admins can only see their own levels */
-			na = findnick(u->nick);
+			na = findnick(u->nc->display);
 		else
 		{
 			/* Services admins can request ALIST on nicks.
@@ -81,7 +81,7 @@ class CommandNSAList : public Command
 				min_level = atoi(lev);
 		}
 
-		if (!nick_identified(u))
+		if (!na)
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (is_servadmin && nick && !na)
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);

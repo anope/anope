@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2299"
+VERSION_BUILD="2301"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2301 - Change sizeof() to strlen() in db_mysql_secure(), patch by DukePyrolator.
 #Revision 2299 - Fix bug #1078, MySQL query should no longer fail when password and salt are too long, patch from Adam.
 #Revision 2297 - Patch to allow jupe on all bar uplink and self. Thanks Adam. (Bug #1076)
 #Revision 2294 - Fix link to Link Block Generator on our site. Good find whoever it was :)

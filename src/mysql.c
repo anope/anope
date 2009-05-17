@@ -250,7 +250,7 @@ char *db_mysql_secure(char *pass, int size)
 {
     char tmp_pass[PASSMAX];
     char *str, *tmp;
-    unsigned bufsize = (2 * PASSMAX + 15 + sizeof(MysqlSecure));
+    unsigned bufsize = (2 * PASSMAX + 15 + strlen(MysqlSecure));
 
     /* Initialize the buffer. Bug #86 */
     memset(tmp_pass, 0, PASSMAX);

@@ -39,6 +39,7 @@ Provided by mooncup <mooncup@anonnet.org> - 2009
 Provided by DukePyrolator <> - 2009
 03/15 F Log error when NSMemoReceipt isn't defined in config.            [  #00]
 03/22 F Fixed memleak in channels.c.                                     [  #00]
+05/17 F Change sizeof() to strlen() in db_mysql_secure().                 [  #00]
 
 Provided by Szymek <> - 2009
 03/30 F Fix HS OFF to work in all cases on InspIRCd.                     [#1075]

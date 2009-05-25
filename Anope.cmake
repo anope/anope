@@ -437,6 +437,78 @@ macro(calculate_depends SRC)
 endmacro(calculate_depends)
 
 ###############################################################################
+# calculate_libraries(<source filename> <output variable for linker flags> <output variable for extra depends>)
+#
+# This macro is used in most of the src (sub)directories to calculate the
+#   library dependencies for the given source file.
+###############################################################################
+macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
+  # Set up a temporary LDFLAGS for this file
+  set(THIS_LDFLAGS "${LDFLAGS}")
+  # Reset extra dependencies
+  set(EXTRA_DEPENDENCIES)
+  # Reset library paths
+  set(LIBRARY_PATHS)
+  # Reset libraries
+  set(LIBRARIES)
+  # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
+  read_from_file(${SRC} "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/" REQUIRED_LIBRARIES)
+  # Iterate through those lines
+  foreach(REQUIRED_LIBRARY ${REQUIRED_LIBRARIES})
+    # Strip off the /* RequiredLibraries: and */ from the line
+    string(REGEX REPLACE "/\\*[ \t]*RequiredLibraries:[ \t]*([^ \t]*)[ \t]*\\*/" "\\1" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
+    # Replace all commas with semicolons
+    string(REGEX REPLACE "," ";" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
+    # Iterate through the libraries given
+    foreach(LIBRARY ${REQUIRED_LIBRARY})
+      # Locate the library to see if it exists
+      if(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib $ENV{VCINSTALLDIR}/lib)
+      else(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY})
+      endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
+      # If the library was found, we will add it to the linker flags
+      if(FOUND_${LIBRARY}_LIBRARY)
+        # Get the path only of the library, to add it to linker flags
+        get_filename_component(LIBRARY_PATH ${FOUND_${LIBRARY}_LIBRARY} PATH)
+        if(MSVC)
+          # For Visual Studio, instead of editing the linker flags, we'll add the library to a separate list of extra dependencies
+          append_to_list(EXTRA_DEPENDENCIES "${FOUND_${LIBRARY}_LIBRARY}")
+        else(MSVC)
+          # For all others, add the library paths and libraries
+          append_to_list(LIBRARY_PATHS "${LIBRARY_PATH}")
+          append_to_list(LIBRARIES "${LIBRARY}")
+        endif(MSVC)
+      else(FOUND_${LIBRARY}_LIBRARY)
+        # In the case of the library not being found, we fatally error so CMake stops trying to generate
+        message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
+      endif(FOUND_${LIBRARY}_LIBRARY)
+    endforeach(LIBRARY)
+  endforeach(REQUIRED_LIBRARY)
+  # Remove duplicates from the library paths
+  if(LIBRARY_PATHS)
+    remove_list_duplicates(LIBRARY_PATHS)
+  endif(LIBRARY_PATHS)
+  # Remove diplicates from the libraries
+  if(LIBRARIES)
+    remove_list_duplicates(LIBRARIES)
+  endif(LIBRARIES)
+  # Iterate through library paths and add them to the linker flags
+  foreach(LIBRARY_PATH ${LIBRARY_PATHS})
+    find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
+    if(FOUND_IN_DEFAULTS EQUAL -1)
+      set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
+    endif(FOUND_IN_DEFAULTS EQUAL -1)
+  endforeach(LIBRARY_PATH)
+  # Iterate through libraries and add them to the linker flags
+  foreach(LIBRARY ${LIBRARIES})
+    set(THIS_LDFLAGS "${THIS_LDFLAGS} -l${LIBRARY}")
+  endforeach(LIBRARY)
+  set(${SRC_LDFLAGS} ${THIS_LDFLAGS})
+  set(${EXTRA_DEPENDS} ${EXTRA_DEPENDENCIES})
+endmacro(calculate_libraries)
+
+###############################################################################
 # add_to_cpack_ignored_files(<item> [TRUE])
 #
 # A macro to update the environment variable CPACK_IGNORED_FILES which

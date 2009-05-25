@@ -315,11 +315,11 @@ check_type_size(u_int32_t U_INT32_T)
 
 # Strip the leading and trailing spaces from the compile flags
 if(CXXFLAGS)
-  strip_string(STRIP ${CXXFLAGS} CXXFLAGS)
+  strip_string(${CXXFLAGS} CXXFLAGS)
 endif(CXXFLAGS)
 # Strip the leading and trailing spaces from the linker flags
 if(LDFLAGS)
-  strip_string(STRIP ${LDFLAGS} LDFLAGS)
+  strip_string(${LDFLAGS} LDFLAGS)
 endif(LDFLAGS)
 
 # Search for the following programs

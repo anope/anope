@@ -60,9 +60,7 @@ class CommandNSDrop : public Command
 		if (is_mine && !nick)
 			my_nick = sstrdup(na->nick);
 
-		if (is_mine && !nick_identified(u))
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-		else if (!is_mine && !u->nc->IsServicesOper())
+		if (!is_mine && !u->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, ACCESS_DENIED);
 		else if (NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, ACCESS_DENIED);

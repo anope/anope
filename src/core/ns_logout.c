@@ -43,8 +43,6 @@ class CommandNSLogout : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
 		}
-		else if (!nick && !nick_identified(u))
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (nick && !u2->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
 		else

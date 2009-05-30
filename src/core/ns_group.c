@@ -206,11 +206,10 @@ class CommandNSGList : public Command
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 
 		NickCore *nc = u->nc;
-		int nick_ided = nick_identified(u);
 		int i;
 
-		if (nick ? (stricmp(nick, u->nick) ? !u->nc->IsServicesOper() : !nick_ided) : !nick_ided)
-			notice_lang(s_NickServ, u, nick_ided ? ACCESS_DENIED : NICK_IDENTIFY_REQUIRED, s_NickServ);
+		if (nick && (stricmp(nick, u->nick) && !u->nc->IsServicesOper()))
+			notice_lang(s_NickServ, u, ACCESS_DENIED, s_NickServ);
 		else if (nick && (!findnick(nick) || !(nc = findnick(nick)->nc)))
 			notice_lang(s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
 /*		else if (na->status & NS_FORBIDDEN)

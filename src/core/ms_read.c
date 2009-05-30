@@ -51,11 +51,6 @@ class CommandMSRead : public Command
 		}
 		else
 		{
-			if (!nick_identified(u))
-			{
-				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-				return MOD_CONT;
-			}
 			mi = &u->nc->memos;
 		}
 		num = numstr ? atoi(numstr) : -1;

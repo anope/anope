@@ -67,13 +67,8 @@ class CommandMSInfo : public Command
 			notice_lang(s_MemoServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
-		else /* !name */
+		else 
 		{
-			if (!nick_identified(u))
-			{
-				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-				return MOD_CONT;
-			}
 			mi = &u->nc->memos;
 			hardmax = u->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;
 		}

@@ -214,8 +214,6 @@ class CommandMSSet : public Command
 			notice_lang(s_MemoServ, u, MEMO_SET_DISABLED);
 			return MOD_CONT;
 		}
-		if (!nick_identified(u))
-			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!stricmp(cmd, "NOTIFY"))
 			return this->DoNotify(u, params, mi);
 		else if (!stricmp(cmd, "LIMIT")) {

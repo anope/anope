@@ -56,11 +56,6 @@ class CommandMSDel : public Command
 		}
 		else
 		{
-			if (!nick_identified(u))
-			{
-				notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-				return MOD_CONT;
-			}
 			mi = &u->nc->memos;
 		}
 		if (!numstr || (!isdigit(*numstr) && stricmp(numstr, "ALL") && stricmp(numstr, "LAST")))

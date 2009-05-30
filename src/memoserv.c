@@ -65,11 +65,7 @@ void memoserv(User * u, char *buf)
 		}
 		ircdproto->SendCTCP(findbot(s_MemoServ), u->nick, "PING %s", s);
 	} else {
-		if (!u->nc && stricmp(cmd, "HELP") != 0)
-			notice_lang(s_MemoServ, u, NICK_NOT_REGISTERED_HELP,
-						s_NickServ);
-		else
-			mod_run_cmd(s_MemoServ, u, MEMOSERV, cmd);
+		mod_run_cmd(s_MemoServ, u, MEMOSERV, cmd);
 	}
 }
 

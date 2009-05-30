@@ -36,12 +36,6 @@ class CommandCSIdentify : public Command
 			return MOD_CONT;
 		}
 
-		if (!nick_identified(u))
-		{
-			notice_lang(s_ChanServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-			return MOD_CONT;
-		}
-
 		if (is_founder(u, ci))
 		{
 			notice_lang(s_ChanServ, u, NICK_ALREADY_IDENTIFIED);

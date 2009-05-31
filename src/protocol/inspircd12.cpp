@@ -675,6 +675,13 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(bi->uid, "SVSPART %s %s", u->GetUID().c_str(), chan);
 	}
 
+	void SendSWhois(const char *source, const char *who, const char *mask)
+	{
+		User *u = finduser(who);
+		
+		send_cmd(TS6SID, "METADATA %s swhois :%s", u->GetUID().c_str(), mask);
+	}
+
 	void SendEOB()
 	{
 		send_cmd(TS6SID, "ENDBURST");

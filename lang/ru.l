@@ -4251,7 +4251,7 @@ CHAN_HELP_CMD_GETKEY
 CHAN_HELP_CMD_INFO
 	    INFO       Запрос информации об указанном канале
 CHAN_HELP_CMD_INVITE
-            INVITE     Tells ChanServ to invite you into a channel
+	    INVITE     Tells ChanServ to invite you into a channel
 CHAN_HELP_CMD_KICK
 	    KICK       Выкидывает указанного пользователя с канала
 CHAN_HELP_CMD_LIST

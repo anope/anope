@@ -4395,7 +4395,7 @@ CHAN_HELP_CMD_GETKEY
 CHAN_HELP_CMD_INFO
 	    INFO       Liste les informations sur un canal enregistré
 CHAN_HELP_CMD_INVITE
-            INVITE     Tells ChanServ to invite you into a channel
+	    INVITE     Tells ChanServ to invite you into a channel
 CHAN_HELP_CMD_KICK
 	    KICK       Kick le pseudo spécifié d'un canal
 CHAN_HELP_CMD_LIST

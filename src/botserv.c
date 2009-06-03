@@ -493,6 +493,25 @@ void load_bs_dbase()
 		bi->created = tmp32;
 		SAFE(read_int16(&tmp16, f));
 		bi->chancount = tmp16;
+
+		/* Fixes bug #1080, services bot names may have been
+		 * changed in the config and different from database
+		 * names
+		 */
+		if (s_ChanServ && bi->flags & BI_CHANSERV && strcmp(bi->nick, s_ChanServ))
+			bi->ChangeNick(s_ChanServ);
+		else if (s_BotServ && bi->flags & BI_BOTSERV && strcmp(bi->nick, s_BotServ))
+			bi->ChangeNick(s_BotServ);
+		else if (s_HostServ && bi->flags & BI_HOSTSERV && strcmp(bi->nick, s_HostServ))
+			bi->ChangeNick(s_HostServ);
+		else if (s_OperServ && bi->flags & BI_OPERSERV && strcmp(bi->nick, s_OperServ))
+			bi->ChangeNick(s_OperServ);
+		else if (s_MemoServ && bi->flags & BI_MEMOSERV && strcmp(bi->nick, s_MemoServ))
+			bi->ChangeNick(s_MemoServ);
+		else if (s_NickServ && bi->flags & BI_NICKSERV && strcmp(bi->nick, s_NickServ))
+			bi->ChangeNick(s_NickServ);
+		else if (s_GlobalNoticer && bi->flags & BI_GLOBAL && strcmp(bi->nick, s_GlobalNoticer))
+			bi->ChangeNick(s_GlobalNoticer);
 	}
 
 	close_db(f);

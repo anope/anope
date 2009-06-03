@@ -1178,6 +1178,13 @@ typedef struct ircd_modes_ {
 #define DEF_LANGUAGE	LANG_EN_US
 
 #define BI_PRIVATE		0x0001
+#define BI_CHANSERV		0x0002
+#define BI_BOTSERV		0x0004
+#define BI_HOSTSERV		0x0008
+#define BI_OPERSERV		0x0010
+#define BI_MEMOSERV		0x0020
+#define BI_NICKSERV		0x0040
+#define BI_GLOBAL		0x0080
 
 #define CUS_OP			0x0001
 #define CUS_VOICE		0x0002

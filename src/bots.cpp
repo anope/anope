@@ -20,6 +20,21 @@ BotInfo::BotInfo(const char *nnick)
 	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
 	this->cmdTable = NULL;
+
+	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
+		this->flags |= BI_CHANSERV;
+	else if (s_BotServ && !stricmp(s_BotServ, nnick))
+		this->flags |= BI_BOTSERV;
+	else if (s_HostServ && !stricmp(s_BotServ, nnick))
+		this->flags |= BI_HOSTSERV;
+	else if (s_OperServ && !stricmp(s_OperServ, nnick))
+		this->flags |= BI_OPERSERV;
+	else if (s_MemoServ && !stricmp(s_MemoServ, nnick))
+		this->flags |= BI_MEMOSERV;
+	else if (s_NickServ && !stricmp(s_NickServ, nnick))
+		this->flags |= BI_NICKSERV;
+	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
+		this->flags |= BI_GLOBAL;
 }
 
 BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const char *nreal)
@@ -33,6 +48,21 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
 	this->cmdTable = NULL;
+
+	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
+		this->flags |= BI_CHANSERV;
+	else if (s_BotServ && !stricmp(s_BotServ, nnick))
+		this->flags |= BI_BOTSERV;
+	else if (s_HostServ && !stricmp(s_BotServ, nnick))
+		this->flags |= BI_HOSTSERV;
+	else if (s_OperServ && !stricmp(s_OperServ, nnick))
+		this->flags |= BI_OPERSERV;
+	else if (s_MemoServ && !stricmp(s_MemoServ, nnick))
+		this->flags |= BI_MEMOSERV;
+	else if (s_NickServ && !stricmp(s_NickServ, nnick))
+		this->flags |= BI_NICKSERV;
+	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
+		this->flags |= BI_GLOBAL;
 }
 
 BotInfo::~BotInfo()

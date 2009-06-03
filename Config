@@ -368,7 +368,7 @@ if [ "$USE_RUN_CC_PL" = "yes" ] ; then
 	TEMP_YN="y"
 fi
 echo "You can optionally have the build run through run-cc.pl, which will"
-echo "cause warnings and errors (if any) to be colored yellow and run,"
+echo "cause warnings and errors (if any) to be colored yellow and red,"
 echo "respectively. This relies on Perl being installed, so if you say yes"
 echo "to this without Perl, the option will be ignored."
 echo "NOTE: If you are using MinGW, it is NOT recommended to say yes to"

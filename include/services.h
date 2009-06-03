@@ -328,7 +328,7 @@ class CoreExport Extensible
 		 * the return value is a std::pair of an iterator to the
 		 * element, and a bool saying if it was actually inserted.
 		 */
-		return this->Extension_Items.insert(std::make_pair(key, static_cast<char *>(p))).second;
+		return this->Extension_Items.insert(std::make_pair(key, reinterpret_cast<char *>(p))).second;
 	}
 
 	/** Extend an Extensible class.

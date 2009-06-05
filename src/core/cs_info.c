@@ -44,7 +44,7 @@ class CommandCSInfo : public Command
 		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;
-		bool has_auspex = u->nc->HasPriv("chanserv/auspex");
+		bool has_auspex = u->nc && u->nc->HasPriv("chanserv/auspex");
 		int show_all = 0;
 		time_t expt;
 

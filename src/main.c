@@ -109,7 +109,8 @@ extern void expire_all()
 		return;
 	}
 
-	send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
+	FOREACH_MOD(I_OnPreDatabaseExpire, OnPreDatabaseExpire());
+
 	if (debug)
 		alog("debug: Running expire routines");
 	expire_nicks();
@@ -126,7 +127,8 @@ extern void expire_all()
 		expire_szlines();
 	}
 	expire_exceptions();
-	send_event(EVENT_DB_EXPIRE, 1, EVENT_STOP);
+
+	FOREACH_MOD(I_OnDatabaseExpire, OnDatabaseExpire());
 }
 
 /*************************************************************************/
@@ -160,7 +162,9 @@ void save_databases()
 static void services_restart()
 {
 	alog("Restarting");
-	send_event(EVENT_RESTART, 1, EVENT_START);
+
+	FOREACH_MOD(I_OnPreRestart, OnPreRestart());
+
 	if (!quitmsg)
 		quitmsg = "Restarting";
 	ircdproto->SendSquit(ServerName, quitmsg);
@@ -201,7 +205,7 @@ static void services_shutdown()
 {
 	User *u, *next;
 
-	send_event(EVENT_SHUTDOWN, 1, EVENT_START);
+	FOREACH_MOD(I_OnPreShutdown, OnPreShutdown());
 
 	if (!quitmsg)
 		quitmsg = "Terminating, reason unknown";
@@ -220,7 +224,7 @@ static void services_shutdown()
 			u = next;
 		}
 	}
-	send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
+	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	disconn(servsock);
 	/* First don't unload protocol module, then do so */
 	modules_unload_all(false);
@@ -295,7 +299,7 @@ void sighandler(int signum)
 
 
 	/* Should we send the signum here as well? -GD */
-	send_event(EVENT_SIGNAL, 1, quitmsg);
+	FOREACH_MOD(I_OnSignal, OnSignal(quitmsg));
 
 	if (started)
 	{

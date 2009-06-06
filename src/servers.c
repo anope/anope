@@ -437,7 +437,7 @@ void do_squit(const char *source, int ac, const char **av)
 		alog("SQUIT for nonexistent server (%s)!!", av[0]);
 		return;
 	}
-	send_event(EVENT_SERVER_SQUIT, 1, s->name);
+	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
 
 	/* If this is a juped server, send a nice global to inform the online
 	 * opers that we received it.

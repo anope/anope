@@ -130,7 +130,7 @@ class CommandBSBot : public Command
 		notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
 			bi->host, bi->real);
 
-		send_event(EVENT_BOT_CREATE, 1, bi->nick);
+		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
 		return MOD_CONT;
 	}
 
@@ -310,7 +310,7 @@ class CommandBSBot : public Command
 		notice_lang(s_BotServ, u, BOT_BOT_CHANGED,
 			oldnick, bi->nick, bi->user, bi->host, bi->real);
 
-		send_event(EVENT_BOT_CHANGE, 1, bi->nick);
+		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
 		return MOD_CONT;
 	}
 
@@ -337,7 +337,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		send_event(EVENT_BOT_DEL, 1, bi->nick);
+		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
 
 		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick);
 		ircdproto->SendSQLineDel(bi->nick);

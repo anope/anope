@@ -604,7 +604,7 @@ int init_secondary(int ac, char **av)
 	/* Save the databases back to file/mysql to reflect any changes */
 		alog("Info: Reflecting database records.");
 		save_databases();
-	send_event(EVENT_CONNECT, 1, EVENT_START);
+	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 
 	/* Connect to the remote server */
 	std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
@@ -620,7 +620,7 @@ int init_secondary(int ac, char **av)
 	if (curr_uplink == end_uplink) fatal_perror("Can't connect to any servers");
 
 	ircdproto->SendConnect();
-	send_event(EVENT_CONNECT, 1, EVENT_STOP);
+	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
 
 	sgets2(inbuf, sizeof(inbuf), servsock);
 	if (strnicmp(inbuf, "ERROR", 5) == 0) {

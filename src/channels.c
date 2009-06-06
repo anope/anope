@@ -550,11 +550,9 @@ void do_join(const char *source, int ac, const char **av)
 			while (c) {
 				nextc = c->next;
 				channame = sstrdup(c->chan->name);
-				send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick,
-						   channame);
+				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 				chan_deluser(user, c->chan);
-				send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
-						   channame);
+				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan));
 				delete [] channame;
 				delete c;
 				c = nextc;
@@ -563,8 +561,10 @@ void do_join(const char *source, int ac, const char **av)
 			continue;
 		}
 
+		chan = findchan(s);
+
 		/* how about not triggering the JOIN event on an actual /part :) -certus */
-		send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, source, s);
+		FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, s));
 
 		/* Make sure check_kick comes before chan_adduser, so banned users
 		 * don't get to see things like channel keys. */
@@ -581,11 +581,10 @@ void do_join(const char *source, int ac, const char **av)
 			}
 		}
 
-		chan = findchan(s);
 		chan = join_user_update(user, chan, s, ts);
 		chan_set_correct_modes(user, chan, 1);
 
-		send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP, source, s);
+		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, chan));
 	}
 }
 
@@ -667,7 +666,6 @@ void do_part(const char *source, int ac, const char **av)
 	User *user;
 	char *s, *t;
 	struct u_chanlist *c;
-	char *channame;
 
 	if (ircd->ts6) {
 		user = find_byuid(source);
@@ -697,11 +695,12 @@ void do_part(const char *source, int ac, const char **av)
 				alog("user: BUG parting %s: channel entry found but c->chan NULL", s);
 				return;
 			}
-			channame = sstrdup(c->chan->name);
-			send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_START,
-					   user->nick, channame, (ac >= 2 ? av[1] : ""));
+			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 
 			chan_deluser(user, c->chan);
+
+			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan));
+
 			if (c->next)
 				c->next->prev = c->prev;
 			if (c->prev)
@@ -709,10 +708,6 @@ void do_part(const char *source, int ac, const char **av)
 			else
 				user->chans = c->next;
 			delete c;
-
-			send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_STOP,
-					   user->nick, channame, (ac >= 2 ? av[1] : ""));
-			delete [] channame;
 		}
 	}
 }
@@ -881,8 +876,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
-					send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
-							   user->nick, av[1]);
+					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 					/* Make the user join; if the channel does not exist it
 					 * will be created there. This ensures that the channel
@@ -907,8 +901,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 						restore_topic(c->name);
 					chan_set_correct_modes(user, c, 1);
 
-					send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP,
-							   user->nick, av[1]);
+					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
 				}
 			}
 
@@ -966,8 +959,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
-					send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
-							   user->nick, av[1]);
+					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 					/* Make the user join; if the channel does not exist it
 					 * will be created there. This ensures that the channel
@@ -989,8 +981,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 					chan_set_correct_modes(user, c, 1);
 
-					send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP,
-							   user->nick, av[1]);
+					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
 				}
 			}
 
@@ -1041,8 +1032,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
-					send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
-							   user->nick, av[1]);
+					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 					/* Make the user join; if the channel does not exist it
 					 * will be created there. This ensures that the channel
@@ -1064,8 +1054,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 					chan_set_correct_modes(user, c, 1);
 
-					send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP,
-							   user->nick, av[1]);
+					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
 				}
 			}
 
@@ -1101,16 +1090,14 @@ void do_sjoin(const char *source, int ac, const char **av)
 		if (is_sqlined && !is_oper(user)) {
 			ircdproto->SendKick(findbot(s_OperServ), av[1], user->nick, "Q-Lined");
 		} else {
-			send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, user->nick,
-					   av[1]);
+			FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 			c = join_user_update(user, c, av[1], ts);
 			if (is_created && c->ci)
 				restore_topic(c->name);
 			chan_set_correct_modes(user, c, 1);
 
-			send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP, user->nick,
-					   av[1]);
+			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
 		}
 	}
 }
@@ -1261,11 +1248,7 @@ void do_topic(const char *source, int ac, const char **av)
 
 	record_topic(av[0]);
 
-	if (ci && ci->last_topic) {
-		send_event(EVENT_TOPIC_UPDATED, 2, av[0], ci->last_topic);
-	} else {
-		send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
-	}
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[0]));
 }
 
 /*************************************************************************/

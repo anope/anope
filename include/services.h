@@ -229,7 +229,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 /* Miscellaneous definitions. */
 #include "defs.h"
 #include "slist.h"
-#include "events.h"
 
 /* pull in the various bits of STL to pull in */
 #include <string>

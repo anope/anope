@@ -1265,7 +1265,7 @@ void resetDefCon(int level)
 		if ((DefContimer)
 			&& (time(NULL) - DefContimer >= DefConTimeOut)) {
 			DefConLevel = level;
-			send_event(EVENT_DEFCON_LEVEL, 1, strLevel);
+			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(strLevel));
 			alog("Defcon level timeout, returning to lvl %d", level);
 			ircdproto->SendGlobops(s_OperServ,
 							 getstring(OPER_DEFCON_WALL),

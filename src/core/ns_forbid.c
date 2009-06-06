@@ -77,7 +77,8 @@ class CommandNSForbid : public Command
 
 			alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);
 			notice_lang(s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
-			send_event(EVENT_NICK_FORBIDDEN, 1, nick);
+
+			FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
 		}
 		else
 		{

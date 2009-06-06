@@ -889,10 +889,12 @@ int anope_event_topic(const char *source, int ac, const char **av)
 
 	record_topic(av[0]);
 
-	if (ac > 1 && *av[1])
-		send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
-	else
-		send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+	if (ac > 1 && *av[1]) {
+		FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[1]));
+	}
+	else {
+		FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, ""));
+	}
 
 	return MOD_CONT;
 }

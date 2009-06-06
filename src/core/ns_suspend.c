@@ -80,7 +80,8 @@ class CommandNSSuspend : public Command
 
 			alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
 			notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
-			send_event(EVENT_NICK_SUSPENDED, 1, nick);
+			
+			FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na))
 		}
 		else
 		{
@@ -147,7 +148,8 @@ class CommandNSUnSuspend : public Command
 
 			alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick, nick);
 			notice_lang(s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
-			send_event(EVENT_NICK_UNSUSPEND, 1, nick);
+			
+			FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 		}
 		else
 		{

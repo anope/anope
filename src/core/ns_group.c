@@ -155,7 +155,8 @@ class CommandNSGroup : public Command
 
 				u->nc = na->nc;
 
-				send_event(EVENT_GROUP, 1, u->nick);
+				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
+
 				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
 				notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 

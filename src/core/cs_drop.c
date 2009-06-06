@@ -90,7 +90,9 @@ class CommandCSDrop : public Command
 		}
 
 		notice_lang(s_ChanServ, u, CHAN_DROPPED, chan);
-		send_event(EVENT_CHAN_DROP, 1, chan);
+
+		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
+
 		return MOD_CONT;
 	}
 

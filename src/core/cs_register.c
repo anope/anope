@@ -121,7 +121,8 @@ class CommandCSRegister : public Command
 				ircdproto->SendMode(findbot(s_ChanServ), chan, "%s %s", ircd->adminset, u->nick);
 			if (ircd->owner && ircd->ownerset)
 				ircdproto->SendMode(findbot(s_ChanServ), chan, "%s %s", ircd->ownerset, u->nick);
-			send_event(EVENT_CHAN_REGISTERED, 1, chan);
+			
+			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
 		}
 		return MOD_CONT;
 	}

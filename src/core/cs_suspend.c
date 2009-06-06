@@ -92,7 +92,8 @@ class CommandCSSuspend : public Command
 
 			alog("%s: %s set SUSPEND for channel %s", s_ChanServ, u->nick, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
-			send_event(EVENT_CHAN_SUSPENDED, 1, chan);
+
+			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
 		else
 		{
@@ -167,7 +168,8 @@ class CommandCSUnSuspend : public Command
 
 			alog("%s: %s set UNSUSPEND for channel %s", s_ChanServ, u->nick, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
-			send_event(EVENT_CHAN_UNSUSPEND, 1, chan);
+
+			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 		}
 		else
 		{

@@ -1396,7 +1396,7 @@ void expire_chans()
 				&& !(ci->
 					 flags & (CI_FORBIDDEN | CI_NO_EXPIRE | CI_SUSPENDED)))
 			{
-				send_event(EVENT_CHAN_EXPIRE, 1, ci->name);
+				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci->name));
 				alog("Expiring channel %s (founder: %s)", ci->name,
 					 (ci->founder ? ci->founder->display : "(none)"));
 				delchan(ci);

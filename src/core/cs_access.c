@@ -28,7 +28,9 @@ static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm,
 	nick = access->nc->display;
 	access->nc = NULL;
 	access->in_use = 0;
-	send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);
+
+	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nick));
+
 	return 1;
 }
 
@@ -92,7 +94,6 @@ class CommandCSAccess : public Command
 		const char *cmd = params[1].c_str();
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
-		char event_access[BUFSIZE];
 
 		ChannelInfo *ci;
 		NickAlias *na = NULL;
@@ -180,8 +181,9 @@ class CommandCSAccess : public Command
 					return MOD_CONT;
 				}
 				access->level = level;
-				snprintf(event_access, BUFSIZE, "%d", access->level);
-				send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
+
+				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
+
 				alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, chan, level);
 				return MOD_CONT;
@@ -195,8 +197,8 @@ class CommandCSAccess : public Command
 
 			ci->AddAccess(nc, level);
 
-			snprintf(event_access, BUFSIZE, "%d", level);
-			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
+			
 			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, level);
 		}
@@ -278,10 +280,7 @@ class CommandCSAccess : public Command
 
 				/* We don't know the nick if someone used numbers, so we trigger the event without
 				 * nick param. We just do this once, even if someone enters a range. -Certus */
-				if (na)
-					send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
-				else
-					send_event(EVENT_ACCESS_DEL, 2, ci->name, u->nick);
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, (na->nick ? na->nick : NULL)));
 			}
 		}
 		else if (!stricmp(cmd, "LIST"))
@@ -326,7 +325,7 @@ class CommandCSAccess : public Command
 
 			ci->ClearAccess();
 
-			send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
+			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
 			notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name);
 			alog("%s: %s!%s@%s (level %d) cleared access list on %s",

@@ -729,7 +729,7 @@ void expire_nicks()
 				     (na->nc->email ? na->nc->email : "none"));
 				tmpnick = sstrdup(na->nick);
 				delnick(na);
-				send_event(EVENT_NICK_EXPIRE, 1, tmpnick);
+				FOREACH_MOD(I_OnNickExpire, OnNickExpire(tmpnick));
 				delete [] tmpnick;
 			}
 		}

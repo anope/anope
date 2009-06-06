@@ -536,17 +536,284 @@ class CoreExport Module
 	 * NOTE: This event is deprecated pending new database handling.
 	 */
 	virtual void OnBackupDatabase() MARK_DEPRECATED { }
+
+	/** Called on fantasy command
+	 * @param command The command
+	 * @param u The user using the command
+	 * @param ci The channel it's being used in
+	 * @param params The params
+	 */
+	virtual void OnBotFantasy(char *command, User *u, ChannelInfo *ci, char *params) { }
+
+	/** Called on fantasy command without access
+	 * @param command The command
+	 * @param u The user using the command
+	 * @param ci The channel it's being used in
+	 * @param params The params
+	 */
+	virtual void OnBotNoFantasyAccess(const char *command, User *u, ChannelInfo *ci, const char *params) { }
+
+	/** Called after a bot joins a channel
+	 * @param ci The channael
+	 * @param bi The bot
+	 */
+	virtual void OnBotJoin(ChannelInfo *ci, BotInfo *bi) { }
+
+	/** Called when a bot places a ban
+	 * @param u User being banned
+	 * @param ci Channel the ban is placed on
+	 * @param mask The mask being banned
+	 */
+	virtual void OnBotBan(User *u, ChannelInfo *ci, const char *mask) { }
+
+	/** Called when a bot kicks a user
+	 * @param u The user being kicked
+	 * @param ci The channel
+	 * @param reason The reason
+	 */
+	virtual void OnBotKick(User *u, ChannelInfo *ci, const char *reason) { }
+
+	/** Called before a user parts a channel
+	 * @param u The user
+	 * @param c The channel
+	 */
+	virtual void OnPrePartChannel(User *u, Channel *c) {}
+
+	/** Called when a user parts a channel
+	 * @param u The user
+	 * @param c The channel
+	 */
+	virtual void OnPartChannel(User *u, Channel *c) { }
+
+	/** Called before a user joins a channel
+	 * @param u The user
+	 * @param channel The channel
+	 */
+	virtual void OnPreJoinChannel(User *u, const char *channel) { }
+
+	/** Called when a user joins a channel
+	 * @param u The user
+	 * @param channel The channel
+	 */
+	virtual void OnJoinChannel(User *u, Channel *c) { }
+
+	/** Called when a new topic is set
+	 * @param c The channel
+	 * @param topic The new topic
+	 */
+	virtual void OnTopicUpdated(Channel *c, const char *topic) { }
+
+	/** Called when a channel expires
+	 * @param chname The channel name
+	 */
+	virtual void OnChanExpire(const char *chname) { }
+
+	/** Called before anope connects to its uplink
+	 */
+	virtual void OnPreServerConnect() { }
+
+	/** Called when anope connects to its uplink
+	 */
+	virtual void OnServerConnect() { }
+
+	/** Called before the database expire routines are called
+	* Note: Code that is in seperate expiry routines should just be done
+	* when we save the DB, theres no need to have both 
+	*/
+	virtual void OnPreDatabaseExpire() MARK_DEPRECATED { }
+
+	/** Called when the database expire routines are called
+	 */
+	virtual void OnDatabaseExpire() MARK_DEPRECATED { }
+
+	/** Called before services restart
+	*/
+	virtual void OnPreRestart() { }
+
+	/** Called when services restart
+	*/
+	virtual void OnRestart() { }
+
+	/** Called before services shutdown
+	 */
+	virtual void OnPreShutdown() { }
+
+	/** Called when services shutdown
+	 */
+	virtual void OnShutdown() { }
+
+	/** Called on signal
+	 * @param msg The quitmsg
+	 */
+	virtual void OnSignal(const char *msg) { }
+
+	/** Called when a nick drops
+	 * @param nick The nick
+	 */
+	virtual void OnNickExpire(const char *nick) { }
+
+	/** Called when defcon level changes
+	 * @param level The level
+	 */
+	virtual void OnDefconLevel(const char *level) { }
+
+	/** Called when a server quits
+	 * @param server The server
+	 */
+	virtual void OnServerQuit(Server *server) { }
+
+	/** Called when a user disconnects
+	 * @param nick The name of the user
+	 */
+	virtual void OnUserLogoff(const char *nick) { }
+
+	/** Called when a new bot is made
+	 * @param bi The bot
+	 */
+	virtual void OnBotCreate(BotInfo *bi) { }
+
+	/** Called when a bot is changed
+	 * @param bi The bot
+	 */
+	virtual void OnBotChange(BotInfo *bi) { }
+
+	/** Called when a bot is deleted
+	 * @param bi The bot
+	 */
+	virtual void OnBotDelete(BotInfo *bi) { }
+
+	/** Called when access is deleted from a channel
+	 * @param ci The channel
+	 * @param u The user who removed the access
+	 * @param nick The name of the user whos access was removed
+	 */
+	virtual void OnAccessDel(ChannelInfo *ci, User *u, const char *nick) { }
+
+	/** Called when access is changed
+	 * @param ci The channel
+	 * @param u The user who changed the access
+	 * @param nick The nick whos access was changed
+	 * @param level The level of the new access
+	 */
+	virtual void OnAccessChange(ChannelInfo *ci, User *u, const char *nick, int level) { }
+
+	/** Called when access is added
+	 * @param ci The channel
+	 * @param u The user who added the access
+	 * @param nick The nick who was added to access
+	 * @param level The level they were added at
+	 */
+	virtual void OnAccessAdd(ChannelInfo *ci, User *u, const char *nick, int level) { }
+
+	/** Called when the access list is cleared
+	 * @param ci The channel
+	 * @param u The user who cleared the access
+	 */
+	virtual void OnAccessClear(ChannelInfo *ci, User *u) { }
+
+	/** Called when a channel is dropped
+	 * @param chname The channel name
+	 */
+	virtual void OnChanDrop(const char *chname) { }
+	
+	/** Called when a channel is forbidden
+	 * @param ci The channel
+	 */
+	virtual void OnChanForbidden(ChannelInfo *ci) { }
+
+	/** Called when a channel is registered
+	 * @param ci The channel
+	 */
+	virtual void OnChanRegistered(ChannelInfo *ci) { }
+
+	/** Called when a channel is suspended
+	 * @param ci The channel
+	 */
+	virtual void OnChanSuspend(ChannelInfo *ci) { }
+
+	/** Called when a channel is unsuspended
+	 * @param ci The channel
+	 */
+	virtual void OnChanUnsuspend(ChannelInfo *ci) { }
+
+	/** Called when a nick is dropped
+	 * @param nick The nick
+	 */
+	virtual void OnNickDrop(const char *nick) { }
+
+	/** Called when a nick is forbidden
+	 * @param na The nick alias of the forbidden nick
+	 */
+	virtual void OnNickForbidden(NickAlias *na) { }
+
+	/** Called when a user groups their nick
+	 * @param u The user grouping
+	 * @param target The target they're grouping to
+	 */
+	virtual void OnNickGroup(User *u, NickAlias *target) { }
+
+	/** Called when a user identifies
+	 * @param u The user
+	 */
+	virtual void OnNickIdentify(User *u) { }
+	
+	/** Called when a nick logs out
+	 * @param u The nick
+	 */
+	virtual void OnNickLogout(User *u) { }
+
+	/** Called when a nick is registered
+	 * @param The user
+	 */
+	virtual void OnNickRegister(User *u) { }
+
+	/** Called when a nick is suspended
+	 * @param na The nick alias
+	 */
+	virtual void OnNickSuspend(NickAlias *na) { }
+	
+	/** Called when a nick is unsuspneded
+	 * @param na The nick alias
+	 */
+	virtual void OnNickUnsuspended(NickAlias *na) { }
+
+	/** Called when the defcon level is changed
+	 * @param level The level
+	 */
+	virtual void OnDefconLevel(int level) { }
 };
 
 
-/** Implementation-specific flags which may be set in Module::Implements()
+/** Implementation-specific flags which may be set in ModuleManager::Attach()
  */
 enum Implementation
 {
 	I_BEGIN,
-		I_OnUserKicked, I_OnReload, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect, I_OnServerConnect,
-		I_OnPreCommand, I_OnPostCommand, I_OnUserNickChange,
-		I_OnSaveDatabase, I_OnBackupDatabase,
+		/* NickServ */
+		I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
+		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
+
+		/* ChanServ */
+		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
+		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend,
+
+		/* BotServ */
+
+		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
+		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan,
+
+		/* Users */
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
+
+		/* OperServ */
+		I_OnDefconLevel,
+
+		/* Other */
+
+		I_OnReload, I_OnPreServerConnect, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnSaveDatabase, I_OnBackupDatabase,
+		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
+		I_OnServerQuit, I_OnTopicUpdated,
+		
 	I_END
 };
 

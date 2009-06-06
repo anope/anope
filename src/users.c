@@ -227,7 +227,7 @@ User::~User()
 		delete [] srealname;
 	}
 
-	send_event(EVENT_USER_LOGOFF, 1, this->nick);
+	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this->nick));
 
 	if (debug >= 2)
 		alog("debug: User::~User() called");

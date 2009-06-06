@@ -49,7 +49,9 @@ class CommandOSDEFCON : public Command
 			return MOD_CONT;
 		}
 		DefConLevel = newLevel;
-		send_event(EVENT_DEFCON_LEVEL, 1, lvl);
+
+		FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(newLevel));
+
 		DefContimer = time(NULL);
 		notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
 		defcon_sendlvls(u);

@@ -109,7 +109,6 @@ class XOPBase : public Command
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
 		int change = 0;
-		char event_access[BUFSIZE];
 
 		if (!nick)
 		{
@@ -174,16 +173,14 @@ class XOPBase : public Command
 
 		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", level, na->nick, nc->display, ci->name);
 
-		snprintf(event_access, BUFSIZE, "%d", level);
-
 		if (!change)
 		{
-			send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
 			notice_lang(s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name);
 		}
 		else
 		{
-			send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
+			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
 			notice_lang(s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name);
 		}
 
@@ -272,7 +269,9 @@ class XOPBase : public Command
 				notice_lang(s_ChanServ, u, messages[XOP_DELETED], access->nc->display, ci->name);
 				access->nc = NULL;
 				access->in_use = 0;
-				send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
+
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nick));
+
 				deleted = 1;
 			}
 		}
@@ -349,7 +348,7 @@ class XOPBase : public Command
 				ci->EraseAccess(i - 1);
 		}
 
-		send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
+		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
 		notice_lang(s_ChanServ, u, messages[XOP_CLEAR], ci->name);
 
@@ -531,7 +530,9 @@ int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, i
 	}
 	access->nc = NULL;
 	access->in_use = 0;
-	send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);
+
+	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nick));
+
 	return 1;
 }
 

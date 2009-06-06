@@ -420,7 +420,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 		if (cmd && (cmd[0] == *BSFantasyCharacter)) {
 			char *params = strtok(NULL, "");
-			const char *event_name = EVENT_BOT_FANTASY_NO_ACCESS;
 
 			/* Strip off the fantasy character */
 			cmd++;
@@ -434,13 +433,11 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 					bbuf += params;
 				}
 				chanserv(u, const_cast<char *>(bbuf.c_str())); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-				event_name = EVENT_BOT_FANTASY;
+				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(cmd, u, ci, params));
 			}
-
-			if (params)
-				send_event(event_name, 4, cmd, u->nick, ci->name, params);
 			else
-				send_event(event_name, 3, cmd, u->nick, ci->name);
+				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(cmd, u, ci, params));
+
 		}
 	}
 }
@@ -766,7 +763,7 @@ void bot_join(ChannelInfo * ci)
 	}
 	ircdproto->SendJoin(ci->bi, ci->c->name, ci->c->creation_time);
 	ircdproto->SendBotOp(ci->bi->nick, ci->c->name);
-	send_event(EVENT_BOT_JOIN, 2, ci->name, ci->bi->nick);
+	FOREACH_MOD(I_OnBotJoin, OnBotJoin(ci, ci->bi));
 }
 
 /*************************************************************************/
@@ -812,7 +809,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
 
 		ircdproto->SendMode(ci->bi, ci->name, "+b %s", mask);
 		do_cmode(ci->bi->nick, ac, av);
-		send_event(EVENT_BOT_BAN, 3, u->nick, ci->name, mask);
+		FOREACH_MOD(I_OnBotBan, OnBotBan(u, ci, mask));
 	}
 }
 
@@ -842,7 +839,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 	av[2] = buf;
 	ircdproto->SendKick(ci->bi, av[0], av[1], "%s", av[2]);
 	do_kick(ci->bi->nick, 3, av);
-	send_event(EVENT_BOT_KICK, 3, u->nick, ci->name, buf);
+	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, buf));
 }
 
 /*************************************************************************/
@@ -922,7 +919,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 		ircdproto->SendKick(ci->bi, kav[0], kav[1], "%s", kav[2]);
 
 	do_kick(ci->bi->nick, 3, kav);
-	send_event(EVENT_BOT_KICK, 3, kav[1], kav[0], kav[2]);
+	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, kav[2]));
 }
 
 /*************************************************************************/
@@ -969,7 +966,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	else
 		ircdproto->SendKick(ci->bi, av[0], av[1], "%s", av[2]);
 	do_kick(ci->bi->nick, 3, av);
-	send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
+	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, av[2]));
 }
 
 /*************************************************************************/

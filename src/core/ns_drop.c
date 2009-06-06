@@ -74,7 +74,8 @@ class CommandNSDrop : public Command
 
 			alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, na->nick, na->nc->display, na->nc->email ? na->nc->email : "none");
 			delnick(na);
-			send_event(EVENT_NICK_DROPPED, 1, my_nick ? my_nick : nick);
+
+			FOREACH_MOD(I_OnNickDrop, OnNickDrop(my_nick ? my_nick : nick));
 
 			if (!is_mine)
 			{

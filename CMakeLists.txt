@@ -275,6 +275,11 @@ if(NOT MSVC)
     if(HAVE_SOCKET_LIB)
       set(LDFLAGS "${LDFLAGS} -lsocket")
     endif(HAVE_SOCKET_LIB)
+    # Check if inet_addr is within the nsl library (if the library exists), and add it to the linker flags if needed
+    check_library_exists(nsl inet_addr "" HAVE_NSL_LIB)
+    if(HAVE_NSL_LIB)
+      set(LDFLAGS "${LDFLAGS} -lnsl")
+    endif(HAVE_NSL_LIB)
   endif(NOT WIN32)
 endif(NOT MSVC)
 

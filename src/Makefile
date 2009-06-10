@@ -1,13 +1,13 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
 		config.o datafiles.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
-		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o timeout.o users.o module.o modulemanager.o configreader.o \
-		wildcard.o nickcore.o nickalias.o
+		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o users.o module.o modulemanager.o configreader.o \
+		wildcard.o nickcore.o nickalias.o timers.o
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
 	../include/encrypt.h ../include/messages.h ../include/services.h \
-	../include/timeout.h ../include/datafiles.h ../include/extern.h \
+	../include/timers.h ../include/datafiles.h ../include/extern.h \
 	../include/modules.h ../include/slist.h ../include/hashcomp.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
@@ -33,6 +33,7 @@ services:  $(OBJS) mod_version
 	@$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
+timers.o:	timers.cpp $(INCLUDES)
 nickcore.o:     nickcore.cpp $(INCLUDES)
 nickalias.o:    nickalias.cpp $(INCLUDES)
 actions.o:      actions.c   $(INCLUDES)
@@ -72,7 +73,6 @@ sessions.o:     sessions.c  $(INCLUDES)
 slist.o:        slist.c     $(INCLUDES)
 sockutil.o:     sockutil.c  $(INCLUDES)
 opertype.o:   opertype.cpp  $(INCLUDES)
-timeout.o:      timeout.c   $(INCLUDES)
 users.o:        users.c     $(INCLUDES)
 vsnprintf.o:    vsnprintf.c $(INCLUDES)
 wildcard.o:     wildcard.cpp $(INCLUDES)

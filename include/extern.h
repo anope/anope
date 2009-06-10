@@ -726,7 +726,6 @@ E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
 E NickCore  *findcore(const char *nick);
-E void clean_ns_timeouts(NickAlias * na);
 E int is_on_access(User * u, NickCore * nc);
 
 /**** operserv.c  ****/

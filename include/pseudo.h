@@ -14,7 +14,7 @@
 
 #include "commands.h"
 #include "language.h"
-#include "timeout.h"
+#include "timers.h"
 #include "encrypt.h"
 #include "datafiles.h"
 #include "slist.h"

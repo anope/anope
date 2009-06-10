@@ -127,6 +127,28 @@ void moduleAddChanServCmds() {
 
 /* *INDENT-ON* */
 /*************************************************************************/
+
+class ChanServTimer : public Timer
+{
+	private:
+		std::string channel;
+	
+	public:
+		ChanServTimer(long delay, const std::string &chan) : Timer(delay), channel(chan)
+		{
+		}
+		
+		void Tick(time_t ctime)
+		{
+			ChannelInfo *ci = cs_findchan(channel.c_str());
+
+			if (ci)
+				ci->flags &= ~CI_INHABIT;
+
+			ircdproto->SendPart(findbot(s_ChanServ), channel.c_str(), NULL);
+		}
+};
+
 /*************************************************************************/
 
 /* Returns modes for mlock in a nice way. */
@@ -1083,21 +1105,6 @@ int check_should_protect(User * user, char *chan)
 
 /*************************************************************************/
 
-/* Tiny helper routine to get ChanServ out of a channel after it went in. */
-
-static void timeout_leave(Timeout * to)
-{
-	const char *chan = static_cast<const char *>(to->data);
-	ChannelInfo *ci = cs_findchan(chan);
-
-	if (ci)					 /* Check cos the channel may be dropped in the meantime */
-		ci->flags &= ~CI_INHABIT;
-
-	ircdproto->SendPart(findbot(s_ChanServ), chan, NULL);
-	delete [] static_cast<const char *>(to->data);
-}
-
-
 /* Check whether a user is permitted to be on a channel.  If so, return 0;
  * else, kickban the user with an appropriate message (could be either
  * AKICK or restricted access) and return 1.  Note that this is called
@@ -1118,7 +1125,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	char buf[BUFSIZE];
 	char mask[BUFSIZE];
 	const char *reason;
-	Timeout *t;
+	ChanServTimer *t;
 
 	if (!ci)
 		return 0;
@@ -1207,8 +1214,8 @@ int check_kick(User * user, const char *chan, time_t chants)
 		{
 			ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
 		}
-		t = add_timeout(CSInhabit, timeout_leave, 0);
-		t->data = sstrdup(chan);
+		
+		t = new ChanServTimer(CSInhabit, chan);
 		ci->flags |= CI_INHABIT;
 	}
 

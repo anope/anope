@@ -27,7 +27,7 @@
  */
 
 #include "services.h"
-#include "timeout.h"
+#include "timers.h"
 #include "version.h"
 #include "datafiles.h"
 #include "modules.h"
@@ -90,7 +90,6 @@ const char version_build[] =
 	"build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */
 const char version_flags[] = " " VER_OS VER_MODULE;
-
 
 /******** Local variables! ********/
 
@@ -479,7 +478,7 @@ int main(int ac, char **av, char **envp)
 		ModuleManager::RunCallbacks();
 
 		if (t - last_check >= TimeoutCheck) {
-			check_timeouts();
+			TimerManager::TickTimers(t);
 			last_check = t;
 		}
 

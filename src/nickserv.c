@@ -31,7 +31,94 @@ unsigned int guestnum;		  /* Current guest number */
 
 /*************************************************************************/
 
-static void add_ns_timeout(NickAlias * na, int type, time_t delay);
+class NickServCollide;
+class NickServRelease;
+
+static std::map<NickAlias *, NickServCollide *> NickServCollides;
+static std::map<NickAlias *, NickServRelease *> NickServReleases;
+
+class NickServCollide : public Timer
+{
+  public:
+	NickAlias *na;
+	
+	NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+	{
+		NickServCollides.insert(std::make_pair(nickalias, this));
+	}
+	
+	void Tick(time_t ctime)
+	{
+		/* If they identified or don't exist anymore, don't kill them. */
+		if ((na->status & NS_IDENTIFIED) || !finduser(na->nick)
+				|| finduser(na->nick)->my_signon > this->GetSetTime())
+			return;
+		/* The RELEASE timeout will always add to the beginning of the
+		 * list, so we won't see it.  Which is fine because it can't be
+		 * triggered yet anyway. */
+		collide(na, 1);
+	}
+	
+	static void ClearTimers(NickAlias *na)
+	{
+		std::map<NickAlias *, NickServCollide *>::iterator i = NickServCollides.find(na);
+		NickServCollide *t;
+
+		if (i != NickServCollides.end())
+		{
+			t = i->second;
+
+			NickServCollides.erase(i);
+			TimerManager::DelTimer(t);
+		}
+	}
+};
+
+class NickServRelease : public Timer
+{
+  public:
+	NickAlias *na;
+	std::string uid;
+	
+	NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+	{
+		NickServReleases.insert(std::make_pair(nickalias, this));
+	}
+	
+	void Tick(time_t ctime)
+	{
+		if (ircd->svshold)
+		{
+			ircdproto->SendSVSHoldDel(na->nick);
+		}
+		else
+		{
+			if (ircd->ts6 && !uid.empty())
+				ircdproto->SendQuit(uid.c_str(), NULL);
+			else
+				ircdproto->SendQuit(na->nick, NULL);
+		}
+		na->status &= ~NS_KILL_HELD;
+	}
+	
+	static void ClearTimers(NickAlias *na, bool dorelease = false)
+	{
+		std::map<NickAlias *, NickServRelease *>::iterator i = NickServReleases.find(na);
+		NickServRelease *t;
+		
+		if (i != NickServReleases.end())
+		{
+			t = i->second;
+
+			NickServReleases.erase(i);
+		
+			if (dorelease)
+				release(na, 1);
+		
+			TimerManager::DelTimer(t);
+		}
+	}
+};
 
 /*************************************************************************/
 /* *INDENT-OFF* */
@@ -536,6 +623,7 @@ int validate_user(User * u)
 {
 	NickAlias *na;
 	NickRequest *nr;
+	NickServCollide *t;
 
 	int on_access;
 
@@ -598,12 +686,12 @@ int validate_user(User * u)
 		else if (na->nc->flags & NI_KILL_QUICK)
 		{
 			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
-			add_ns_timeout(na, TO_COLLIDE, 20);
+			t = new NickServCollide(na, 20);
 		}
 		else
 		{
 			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
-			add_ns_timeout(na, TO_COLLIDE, 60);
+			t = new NickServCollide(na, 60);
 		}
 	}
 
@@ -618,6 +706,8 @@ int validate_user(User * u)
 void cancel_user(User * u)
 {
 	NickAlias *na = findnick(u->nick);
+	NickServRelease *t;
+	std::string uid;
 
 	if (na)
 	{
@@ -629,8 +719,10 @@ void cancel_user(User * u)
 			}
 			else if (ircd->svsnick)
 			{
-				ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser, NSEnforcerHost, "Services Enforcer", "+", ts6_uid_retrieve());
-				add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+				uid = ts6_uid_retrieve();
+				ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser, NSEnforcerHost, "Services Enforcer", "+", uid.c_str());
+				t = new NickServRelease(na, NSReleaseTimeout);
+				t->uid = uid;
 			}
 			else
 			{
@@ -644,7 +736,7 @@ void cancel_user(User * u)
 			na->status &= ~NS_TEMPORARY;
 		}
 
-		del_ns_timeout(na, TO_COLLIDE);
+		NickServCollide::ClearTimers(na);
 	}
 }
 
@@ -1102,7 +1194,8 @@ int delnick(NickAlias * na)
 {
 	User *u = NULL;
 	/* First thing to do: remove any timeout belonging to the nick we're deleting */
-	clean_ns_timeouts(na);
+	NickServCollide::ClearTimers(na);
+	NickServRelease::ClearTimers(na, true);
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */
@@ -1171,7 +1264,7 @@ void collide(NickAlias * na, int from_timeout)
 	char guestnick[NICKMAX];
 
 	if (!from_timeout)
-		del_ns_timeout(na, TO_COLLIDE);
+		NickServCollide::ClearTimers(na);
 
 	/* Old system was unsure since there can be more than one collide
 	 * per second. So let use another safer method.
@@ -1207,9 +1300,10 @@ void collide(NickAlias * na, int from_timeout)
 void release(NickAlias * na, int from_timeout)
 {
 	if (!from_timeout)
-		del_ns_timeout(na, TO_RELEASE);
+		NickServRelease::ClearTimers(na);
+
 	if (ircd->svshold)
-	{
+	{ 
 		ircdproto->SendSVSHoldDel(na->nick);
 	}
 	else
@@ -1220,179 +1314,13 @@ void release(NickAlias * na, int from_timeout)
 }
 
 /*************************************************************************/
-/*************************************************************************/
-
-static struct my_timeout
-{
-	struct my_timeout *next, *prev;
-	NickAlias *na;
-	Timeout *to;
-	int type;
-} *my_timeouts;
-
-/*************************************************************************/
-
-/* Remove a collide/release timeout from our private list. */
-
-static void rem_ns_timeout(NickAlias * na, int type)
-{
-	struct my_timeout *t, *t2;
-
-	t = my_timeouts;
-	while (t)
-	{
-		if (t->na == na && t->type == type)
-		{
-			t2 = t->next;
-			if (t->next)
-				t->next->prev = t->prev;
-			if (t->prev)
-				t->prev->next = t->next;
-			else
-				my_timeouts = t->next;
-			delete t;
-			t = t2;
-		}
-		else
-		{
-			t = t->next;
-		}
-	}
-}
-
-/*************************************************************************/
-
-/* Collide a nick on timeout. */
-
-static void timeout_collide(Timeout * t)
-{
-	NickAlias *na = static_cast<NickAlias *>(t->data);
-
-	rem_ns_timeout(na, TO_COLLIDE);
-	/* If they identified or don't exist anymore, don't kill them. */
-	if ((na->status & NS_IDENTIFIED) || !finduser(na->nick)
-	        || finduser(na->nick)->my_signon > t->settime)
-		return;
-	/* The RELEASE timeout will always add to the beginning of the
-	 * list, so we won't see it.  Which is fine because it can't be
-	 * triggered yet anyway. */
-	collide(na, 1);
-}
-
-/*************************************************************************/
-
-/* Release a nick on timeout. */
-
-static void timeout_release(Timeout * t)
-{
-	NickAlias *na = static_cast<NickAlias *>(t->data);
-
-	rem_ns_timeout(na, TO_RELEASE);
-	release(na, 1);
-}
-
-/*************************************************************************/
-
-/* Add a collide/release timeout. */
-
-static void add_ns_timeout(NickAlias * na, int type, time_t delay)
-{
-	Timeout *to;
-	struct my_timeout *t;
-	void (*timeout_routine) (Timeout *);
-
-	if (type == TO_COLLIDE)
-		timeout_routine = timeout_collide;
-	else if (type == TO_RELEASE)
-		timeout_routine = timeout_release;
-	else
-	{
-		alog("NickServ: unknown timeout type %d! na=0x%p (%s), delay=%ld",
-		     type, static_cast<void *>(na), na->nick, static_cast<long>(delay));
-		return;
-	}
-
-	to = add_timeout(delay, timeout_routine, 0);
-	to->data = na;
-
-	t = new my_timeout;
-	t->na = na;
-	t->to = to;
-	t->type = type;
-
-	t->prev = NULL;
-	t->next = my_timeouts;
-	my_timeouts = t;
-	/* Andy Church should stop coding while being drunk.
-	 * Here's the two lines he forgot that produced the timed_update evil bug
-	 * and a *big* memory leak.
-	 */
-	if (t->next)
-		t->next->prev = t;
-}
-
-/*************************************************************************/
-
-/* Delete a collide/release timeout. */
 
 void del_ns_timeout(NickAlias * na, int type)
 {
-	struct my_timeout *t, *t2;
-
-	t = my_timeouts;
-	while (t)
-	{
-		if (t->na == na && t->type == type)
-		{
-			t2 = t->next;
-			if (t->next)
-				t->next->prev = t->prev;
-			if (t->prev)
-				t->prev->next = t->next;
-			else
-				my_timeouts = t->next;
-			del_timeout(t->to);
-			delete t;
-			t = t2;
-		}
-		else
-		{
-			t = t->next;
-		}
-	}
-}
-
-/*************************************************************************/
-
-/* Deletes all timeouts belonging to a given nick.
- * This should only be called before nick deletion.
- */
-
-void clean_ns_timeouts(NickAlias * na)
-{
-	struct my_timeout *t, *next;
-
-	for (t = my_timeouts; t; t = next)
-	{
-		next = t->next;
-		if (t->na == na)
-		{
-			if (debug)
-				alog("debug: %s deleting timeout type %d from %s",
-				     s_NickServ, t->type, t->na->nick);
-			/* If the timeout has the TO_RELEASE type, we should release the user */
-			if (t->type == TO_RELEASE)
-				release(na, 1);
-			if (t->next)
-				t->next->prev = t->prev;
-			if (t->prev)
-				t->prev->next = t->next;
-			else
-				my_timeouts = t->next;
-			del_timeout(t->to);
-			delete t;
-		}
-	}
+	if (type == TO_COLLIDE)
+		NickServCollide::ClearTimers(na);
+	else if (type == TO_RELEASE)
+		NickServRelease::ClearTimers(na);
 }
 
 /*************************************************************************/

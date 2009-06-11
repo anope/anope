@@ -1398,7 +1398,7 @@ void charybdis_cmd_mode(char *source, char *dest, char *buf)
         send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "MODE %s %s",
                  dest, buf);
     } else {
-        send_cmd(source, "MODE %s %s", dest, buf);
+        send_cmd(NULL, "MODE %s %s", dest, buf);
     }
 }
 

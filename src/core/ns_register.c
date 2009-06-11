@@ -35,7 +35,7 @@ class CommandNSConfirm : public Command
 			return MOD_CONT;
 		}
 
-		int i, len;
+		int len;
 		char tsbuf[16];
 		char tmp_pass[PASSMAX];
 		char modes[512];
@@ -202,14 +202,13 @@ class CommandNSRegister : public CommandNSConfirm
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		NickRequest *nr = NULL, *anr = NULL;
-		NickCore *nc = NULL;
 		NickAlias *na;
 		int prefixlen = strlen(NSGuestNickPrefix);
 		int nicklen = strlen(u->nick);
 		const char *pass = params[0].c_str();
 		const char *email = params.size() > 1 ? params[1].c_str() : NULL;
 		char passcode[11];
-		int idx, min = 1, max = 62, i = 0;
+		int idx, min = 1, max = 62;
 		int chars[] =
 			{ ' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
 				'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
@@ -262,11 +261,11 @@ class CommandNSRegister : public CommandNSConfirm
 
 		if (RestrictOperNicks)
 		{
-			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 			{
-				const std::string nick = it->first;
+				std::string nick = it->first;
 
-				if (stristr(u->nick, const_cast<char *>(it->first.c_str())) && !is_oper(u))
+				if (stristr(u->nick, nick.c_str()) && !is_oper(u))
 				{
 					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
 					return MOD_CONT;

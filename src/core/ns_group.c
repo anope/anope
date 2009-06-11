@@ -62,11 +62,11 @@ class CommandNSGroup : public Command
 
 		if (RestrictOperNicks)
 		{
-			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 			{
-				const std::string nick = it->first;
+				std::string nick = it->first;
 
-				if (stristr(u->nick, const_cast<char *>(it->first.c_str())) && !is_oper(u))
+				if (stristr(u->nick, nick.c_str()) && !is_oper(u))
 				{
 					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
 					return MOD_CONT;

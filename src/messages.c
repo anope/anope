@@ -216,7 +216,6 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
 int m_stats(const char *source, int ac, const char **av)
 {
-	int i;
 	User *u;
 	NickCore *nc;
 
@@ -245,13 +244,12 @@ int m_stats(const char *source, int ac, const char **av)
 		} else {
 			std::list<std::pair<std::string, std::string> >::iterator it;
 
-			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 			{
-				const std::string nick = it->first;
-				const std::string type = it->second;
+				std::string nick = it->first, type = it->second;
 
-				if ((nc = findcore(it->first.c_str())))
-					ircdproto->SendNumeric(ServerName, 243, source, "O * * %s %s 0", it->first.c_str(), it->second.c_str());
+				if ((nc = findcore(nick.c_str())))
+					ircdproto->SendNumeric(ServerName, 243, source, "O * * %s %s 0", nick.c_str(), type.c_str());
 			}
 
 			ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');

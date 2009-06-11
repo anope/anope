@@ -1614,19 +1614,17 @@ int read_config(int reload)
 	char *s;
 	int defconCount = 0;
 	std::list<std::pair<std::string, std::string> >::iterator it;
-	NickCore *nc;
-	std::string nick;
 
 	/* Clear current opers for reload */
-	for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+	for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 	{
-		nick = it->first;
-
-		if ((nc = findcore(nick.c_str())))
+		std::string nick = it->first;
+		NickCore *nc = findcore(nick.c_str());
+		if (nc)
 			nc->ot = NULL;
 	}
 	svsopers_in_config.clear();
-	
+
 	retval = serverConfig.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
 

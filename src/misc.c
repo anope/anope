@@ -112,9 +112,9 @@ char *strscpy(char *d, const char *s, size_t len)
  * @param s2 String 2
  * @return first occurrence of s2
  */
-char *stristr(char *s1, char *s2)
+const char *stristr(const char *s1, const char *s2)
 {
-	register char *s = s1, *d = s2;
+	register const char *s = s1, *d = s2;
 
 	while (*s1) {
 		if (tolower(*s1) == tolower(*d)) {

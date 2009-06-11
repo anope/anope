@@ -36,11 +36,10 @@ class CommandOSStaff : public Command
 
 		notice_lang(s_OperServ, u, OPER_STAFF_LIST_HEADER);
 
-		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 		{
 			found = 0;
-			const std::string nick = it->first;
-			const std::string type = it->second;
+			std::string nick = it->first, type = it->second;
 
 			if ((au = finduser(nick.c_str())))
 			{

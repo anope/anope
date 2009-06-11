@@ -613,7 +613,7 @@ E size_t strlcpy(char *, const char *, size_t);
 #ifndef HAVE_STRLCAT
 E size_t strlcat(char *, const char *, size_t);
 #endif
-E char *stristr(char *s1, char *s2);
+E const char *stristr(const char *s1, const char *s2);
 E char *strnrepl(char *s, int32 size, const char *old, const char *nstr);
 E const char *merge_args(int argc, char **argv);
 E const char *merge_args(int argc, const char **argv);

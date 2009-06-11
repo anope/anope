@@ -772,7 +772,7 @@ class HSRequest : public Module
 	}
 };
 
-void my_memo_lang(User *u, char *name, int z, int number, ...)
+void my_memo_lang(User *u, const char *name, int z, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -832,10 +832,10 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 
 	if (HSRequestMemoOper == 1)
 	{
-		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 		{
-			const std::string nick = it->first;
-			my_memo_lang(u, const_cast<char *>(nick.c_str()), z, LNG_REQUEST_MEMO, host);
+			std::string nick = it->first;
+			my_memo_lang(u, nick.c_str(), z, LNG_REQUEST_MEMO, host);
 		}
 	}
 	if (HSRequestMemoSetters == 1)

@@ -17,21 +17,10 @@
 
 /*************************************************************************/
 
-/* List of Services administrators */
-SList servadmins;
-/* List of Services operators */
-SList servopers;
 /* AKILL, SGLINE, SQLINE and SZLINE lists */
 SList akills, sglines, sqlines, szlines;
 
 /*************************************************************************/
-
-static int compare_adminlist_entries(SList * slist, void *item1,
-									 void *item2);
-static int compare_operlist_entries(SList * slist, void *item1,
-									void *item2);
-static void free_adminlist_entry(SList * slist, void *item);
-static void free_operlist_entry(SList * slist, void *item);
 
 static int is_akill_entry_equal(SList * slist, void *item1, void *item2);
 static void free_akill_entry(SList * slist, void *item);
@@ -60,13 +49,8 @@ void moduleAddOperServCmds();
 
 /* Options for the lists */
 SListOpts akopts = { 0, NULL, &is_akill_entry_equal, &free_akill_entry };
-SListOpts saopts = { SLISTF_SORT, &compare_adminlist_entries, NULL,
-	&free_adminlist_entry
-};
 
 SListOpts sgopts = { 0, NULL, &is_sgline_entry_equal, &free_sgline_entry };
-SListOpts soopts =
-	{ SLISTF_SORT, &compare_operlist_entries, NULL, &free_operlist_entry };
 SListOpts sqopts =
 	{ SLISTF_SORT, NULL, &is_sqline_entry_equal, &free_sqline_entry };
 SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
@@ -86,12 +70,6 @@ void moduleAddOperServCmds() {
 void os_init()
 {
 	moduleAddOperServCmds();
-
-	/* Initialization of the lists */
-	slist_init(&servadmins);
-	servadmins.opts = &saopts;
-	slist_init(&servopers);
-	servopers.opts = &soopts;
 
 	slist_init(&akills);
 	akills.opts = &akopts;
@@ -332,15 +310,6 @@ void save_os_dbase()
 
 #undef SAFE
 
-/*************************************************************************/
-
-/* Removes the nick structure from OperServ lists. */
-
-void os_remove_nick(NickCore * nc)
-{
-	slist_remove(&servadmins, nc);
-	slist_remove(&servopers, nc);
-}
 
 /*************************************************************************/
 /*********************** OperServ command functions **********************/
@@ -1200,48 +1169,6 @@ static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 		return 1;
 	else
 		return 0;
-}
-
-/*************************************************************************/
-
-/* Callback function used to sort the admin list */
-
-static int compare_adminlist_entries(SList * slist, void *item1,
-									 void *item2)
-{
-	NickCore *nc1 = static_cast<NickCore *>(item1), *nc2 = static_cast<NickCore *>(item2);
-	if (!nc1 || !nc2)
-		return -1;			  /* To tell to continue */
-	return stricmp(nc1->display, nc2->display);
-}
-
-/* Callback function used when an admin list entry is deleted */
-
-static void free_adminlist_entry(SList * slist, void *item)
-{
-	NickCore *nc = static_cast<NickCore *>(item);
-	nc->flags &= ~NI_SERVICES_ADMIN;
-}
-
-/*************************************************************************/
-
-/* Callback function used to sort the oper list */
-
-static int compare_operlist_entries(SList * slist, void *item1,
-									void *item2)
-{
-	NickCore *nc1 = static_cast<NickCore *>(item1), *nc2 = static_cast<NickCore *>(item2);
-	if (!nc1 || !nc2)
-		return -1;			  /* To tell to continue */
-	return stricmp(nc1->display, nc2->display);
-}
-
-/* Callback function used when an oper list entry is deleted */
-
-static void free_operlist_entry(SList * slist, void *item)
-{
-	NickCore *nc = static_cast<NickCore *>(item);
-	nc->flags &= ~NI_SERVICES_OPER;
 }
 
 /*************************************************************************/

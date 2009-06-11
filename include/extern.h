@@ -346,8 +346,6 @@ E bool  GlobalOnCycle;
 E bool  AnonymousGlobal;
 E char *GlobalOnCycleMessage;
 E char *GlobalOnCycleUP;
-E char **ServicesRoots;
-E int   RootNumber;
 E bool  LogMaxUsers;
 E bool  SuperAdmin;
 E bool  LogBot;
@@ -731,8 +729,6 @@ E int is_on_access(User * u, NickCore * nc);
 /**** operserv.c  ****/
 
 E SList akills, sglines, sqlines, szlines;
-E SList servadmins;
-E SList servopers;
 
 E int DefConModesSet;
 E uint32 DefConModesOn;
@@ -743,8 +739,6 @@ E void operserv(User *u, char *buf);
 E void os_init();
 E void load_os_dbase();
 E void save_os_dbase();
-
-E void os_remove_nick(NickCore *nc);
 
 E int add_akill(User *u, const char *mask, const char *by, const time_t expires, const char *reason);
 E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);

@@ -151,9 +151,6 @@ bool AnonymousGlobal;
 bool RestrictOperNicks;
 char *GlobalOnCycleMessage;
 char *GlobalOnCycleUP;
-static char *ServicesRoot;
-char **ServicesRoots;
-int RootNumber;
 bool SuperAdmin;
 bool LogBot;
 bool LogMaxUsers;
@@ -896,7 +893,6 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "modules", "", new ValueContainerChar(&OperCoreModules), DT_CHARPTR, NoValidation},
-		{"operserv", "servicesroot", "", new ValueContainerChar(&ServicesRoot), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&LogMaxUsers), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&AutokillExpiry), DT_TIME, ValidateNotZero},
@@ -1617,7 +1613,20 @@ int read_config(int reload)
 	int retval = 1;
 	char *s;
 	int defconCount = 0;
+	std::list<std::pair<std::string, std::string> >::iterator it;
+	NickCore *nc;
+	std::string nick;
 
+	/* Clear current opers for reload */
+	for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+	{
+		nick = it->first;
+
+		if ((nc = findcore(nick.c_str())))
+			nc->ot = NULL;
+	}
+	svsopers_in_config.clear();
+	
 	retval = serverConfig.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
 
@@ -1745,27 +1754,6 @@ int read_config(int reload)
 			else if (notice == "forbid") WallForbid = true;
 			else if (notice == "drop") WallDrop = true;
 		}
-	}
-
-	/* Services Root building */
-
-	if (ServicesRoot && !reload) {	  /* Check to prevent segmentation fault if it's missing */
-		RootNumber = 0;
-
-		s = strtok(ServicesRoot, " ");
-		do {
-			if (s) {
-				RootNumber++;
-				ServicesRoots =
-					static_cast<char **>(realloc(ServicesRoots, sizeof(char *) * RootNumber));
-				ServicesRoots[RootNumber - 1] = sstrdup(s);
-			}
-		} while ((s = strtok(NULL, " ")));
-	}
-
-	if (!RootNumber) {
-		error(0, "No ServicesRoot defined");
-		retval = 0;
 	}
 
 	/* Ulines */

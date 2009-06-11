@@ -1135,10 +1135,10 @@ typedef struct ircd_modes_ {
 #define NI_HIDE_QUIT		0x00000200  /* Don't show last quit message in INFO */
 #define NI_KILL_QUICK		0x00000400  /* Kill in 20 seconds instead of 60 */
 #define NI_KILL_IMMED		0x00000800  /* Kill immediately instead of in 60 sec */
-#define NI_SERVICES_OPER 	0x00001000  /* User is a Services operator */
-#define NI_SERVICES_ADMIN	0x00002000  /* User is a Services admin */
+//#define NI_SERVICES_OPER 	0x00001000  /* No longer used */
+//#define NI_SERVICES_ADMIN	0x00002000  /* No longer used */
 #define NI_ENCRYPTEDPW		0x00004000  /* Nickname password is encrypted */
-#define NI_SERVICES_ROOT		0x00008000  /* User is a Services root */
+//#define NI_SERVICES_ROOT		0x00008000  /* No longer used */
 #define NI_MEMO_MAIL			0x00010000  /* User gets email on memo */
 #define NI_HIDE_STATUS		  0x00020000  /* Don't show services access status */
 #define NI_SUSPENDED		0x00040000  /* Nickname is suspended */

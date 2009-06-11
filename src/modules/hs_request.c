@@ -818,9 +818,9 @@ void my_memo_lang(User *u, char *name, int z, int number, ...)
 
 void req_send_memos(User *u, char *vIdent, char *vHost)
 {
-	int i;
 	int z = 2;
-	char host[50];
+	char host[BUFSIZE];
+	std::list<std::pair<std::string, std::string> >::iterator it;
 
 	if (checkDefCon(DEFCON_NO_NEW_MEMOS))
 		return;
@@ -832,12 +832,11 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 
 	if (HSRequestMemoOper == 1)
 	{
-		for (i = 0; i < servopers.count; ++i)
-			my_memo_lang(u, (static_cast<NickCore *>(servopers.list[i]))->display, z, LNG_REQUEST_MEMO, host);
-		for (i = 0; i < servadmins.count; ++i)
-			my_memo_lang(u, (static_cast<NickCore *>(servadmins.list[i]))->display, z, LNG_REQUEST_MEMO, host);
-		for (i = 0; i < RootNumber; ++i)
-			my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, host);
+		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+		{
+			const std::string nick = it->first;
+			my_memo_lang(u, const_cast<char *>(nick.c_str()), z, LNG_REQUEST_MEMO, host);
+		}
 	}
 	if (HSRequestMemoSetters == 1)
 	{

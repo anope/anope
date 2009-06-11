@@ -355,13 +355,6 @@ void load_ns_dbase()
 				nc->flags &= ~NI_KILL_IMMED;
 			SAFE(read_int16(&nc->language, f));
 
-			/* Add services opers and admins to the appropriate list, but
-			   only if the database version is more than 10. */
-			if (nc->flags & NI_SERVICES_ADMIN)
-				slist_add(&servadmins, nc);
-			if (nc->flags & NI_SERVICES_OPER)
-				slist_add(&servopers, nc);
-
 			uint16 accesscount;
 			SAFE(read_int16(&accesscount, f));
 			if (accesscount)
@@ -441,8 +434,6 @@ void load_ns_dbase()
 					na->last_realname = sstrdup("");
 			}
 
-			na->nc->flags &= ~NI_SERVICES_ROOT;
-
 			*nalast = na;
 			nalast = &na->next;
 			na->prev = naprev;
@@ -470,10 +461,6 @@ void load_ns_dbase()
 				continue;
 			}
 
-			/* Add the Services root flag if needed. */
-			for (j = 0; j < RootNumber; j++)
-				if (!stricmp(ServicesRoots[j], na->nick))
-					na->nc->flags |= NI_SERVICES_ROOT;
 		}
 	}
 }
@@ -1121,7 +1108,6 @@ static int delcore(NickCore * nc)
 	int i;
 	/* (Hopefully complete) cleanup */
 	cs_remove_nick(nc);
-	os_remove_nick(nc);
 
 	/* Remove the core from the list */
 	if (nc->next)

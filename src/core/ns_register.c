@@ -44,14 +44,6 @@ class CommandNSConfirm : public Command
 		na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
 
 		na->nc->flags |= NSDefFlags;
-		for (i = 0; i < RootNumber; ++i)
-		{
-			if (!stricmp(ServicesRoots[i], nr->nick))
-			{
-				na->nc->flags |= NI_SERVICES_ROOT;
-				break;
-			}
-		}
 
 		na->nc->memos.memomax = MSMaxMemos;
 
@@ -225,6 +217,7 @@ class CommandNSRegister : public CommandNSConfirm
 				'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
 				'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 			};
+		std::list<std::pair<std::string, std::string> >::iterator it;
 
 		if (readonly)
 		{
@@ -269,25 +262,11 @@ class CommandNSRegister : public CommandNSConfirm
 
 		if (RestrictOperNicks)
 		{
-			for (i = 0; i < RootNumber; ++i)
+			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
 			{
-				if (stristr(u->nick, ServicesRoots[i]) && !is_oper(u))
-				{
-					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
-					return MOD_CONT;
-				}
-			}
-			for (i = 0; i < servadmins.count && (nc = static_cast<NickCore *>(servadmins.list[i])); ++i)
-			{
-				if (stristr(u->nick, nc->display) && !is_oper(u))
-				{
-					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
-					return MOD_CONT;
-				}
-			}
-			for (i = 0; i < servopers.count && (nc = static_cast<NickCore *>(servopers.list[i])); ++i)
-			{
-				if (stristr(u->nick, nc->display) && !is_oper(u))
+				const std::string nick = it->first;
+
+				if (stristr(u->nick, const_cast<char *>(it->first.c_str())) && !is_oper(u))
 				{
 					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
 					return MOD_CONT;

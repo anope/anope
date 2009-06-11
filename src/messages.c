@@ -243,14 +243,16 @@ int m_stats(const char *source, int ac, const char **av)
 		if (u && !is_oper(u) && HideStatsO) {
 			ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
 		} else {
-			for (i = 0; i < RootNumber; i++)
-				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Root 0", ServicesRoots[i]);
-			for (i = 0; i < servadmins.count && (nc = static_cast<NickCore *>(servadmins.list[i]));
-				 i++)
-				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Admin 0", nc->display);
-			for (i = 0; i < servopers.count && (nc = static_cast<NickCore *>(servopers.list[i]));
-				 i++)
-				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Oper 0", nc->display);
+			std::list<std::pair<std::string, std::string> >::iterator it;
+
+			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+			{
+				const std::string nick = it->first;
+				const std::string type = it->second;
+
+				if ((nc = findcore(it->first.c_str())))
+					ircdproto->SendNumeric(ServerName, 243, source, "O * * %s %s 0", it->first.c_str(), it->second.c_str());
+			}
 
 			ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
 		}

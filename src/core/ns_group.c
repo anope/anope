@@ -35,6 +35,7 @@ class CommandNSGroup : public Command
 		char tsbuf[16];
 		char modes[512];
 		int len;
+		std::list<std::pair<std::string, std::string> >::iterator it;
 
 		if (NSEmailReg && findrequestnick(u->nick))
 		{
@@ -61,25 +62,11 @@ class CommandNSGroup : public Command
 
 		if (RestrictOperNicks)
 		{
-			for (i = 0; i < RootNumber; ++i)
+			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
 			{
-				if (stristr(u->nick, ServicesRoots[i]) && !is_oper(u))
-				{
-					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
-					return MOD_CONT;
-				}
-			}
-			for (i = 0; i < servadmins.count && (nc = static_cast<NickCore *>(servadmins.list[i])); ++i)
-			{
-				if (stristr(u->nick, nc->display) && !is_oper(u))
-				{
-					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
-					return MOD_CONT;
-				}
-			}
-			for (i = 0; i < servopers.count && (nc = static_cast<NickCore *>(servopers.list[i])); ++i)
-			{
-				if (stristr(u->nick, nc->display) && !is_oper(u))
+				const std::string nick = it->first;
+
+				if (stristr(u->nick, const_cast<char *>(it->first.c_str())) && !is_oper(u))
 				{
 					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
 					return MOD_CONT;
@@ -140,18 +127,6 @@ class CommandNSGroup : public Command
 				na->last_realname = sstrdup(u->realname);
 				na->time_registered = na->last_seen = time(NULL);
 				na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
-
-				if (!(na->nc->flags & NI_SERVICES_ROOT))
-				{
-					for (i = 0; i < RootNumber; ++i)
-					{
-						if (!stricmp(ServicesRoots[i], u->nick))
-						{
-							na->nc->flags |= NI_SERVICES_ROOT;
-							break;
-						}
-					}
-				}
 
 				u->nc = na->nc;
 

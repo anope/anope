@@ -31,8 +31,7 @@ class CommandNSUpdate : public Command
 			return MOD_CONT;
 		}
 
-		if (NSModeOnID)
-			do_setmodes(u);
+		do_setmodes(u);
 		check_memos(u);
 
 		if (na->last_realname)

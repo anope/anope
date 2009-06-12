@@ -73,8 +73,7 @@ int do_nickupdate(User * u)
         notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
     } else {
         na = u->na;
-        if (NSModeOnID)
-            do_setmodes(u);
+        do_setmodes(u);
         check_memos(u);
         if (na->last_realname)
             free(na->last_realname);

@@ -115,6 +115,8 @@ int do_suspend(User * u)
             na2 = na->nc->aliases.list[i];
             if (na2->nc == na->nc) {
                 na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+		if (na2->last_quit)
+			free(na2->last_quit);
                 na2->last_quit = sstrdup(reason);
                 /* remove nicktracking */
                 if ((u2 = finduser(na2->nick))) {

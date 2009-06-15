@@ -34,6 +34,7 @@ Provided by Adam <Adam@SubZeroIRC.net> - 2009
 05/08 F Allow jupe on all bar uplink and self.                           [#1076]
 05/10 F MySQL query should no longer fail when password/salt are long    [#1078]
 06/11 F Fixed potential crash in Charybdis protocol module.              [  #00]
+06/15 F Fix memory leak in NS SUSPEND.                                   [  #00]
 
 Provided by mooncup <mooncup@anonnet.org> - 2009
 02/04 F Automatically reapply vhost on hs off for unreal32.              [  #00]

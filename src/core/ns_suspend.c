@@ -66,6 +66,8 @@ class CommandNSSuspend : public Command
 				if (na2->nc == na->nc)
 				{
 					na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+					if (na2->last_quit)
+						delete [] na2->last_quit;
 					na2->last_quit = sstrdup(reason);
 					/* removes nicktracking */
 					if ((u2 = finduser(na2->nick)))

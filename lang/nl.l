@@ -3447,7 +3447,7 @@ NICK_HELP_REGISTER
 	toestaat andere nicks onder dezelfde configuratie, dezelfde
 	memos en dezelfde kanaalrechten te delen. Voor meer informatie
 	over deze functie, type %R%S HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Gebruik: GROUP doel wachtwoord
 	

@@ -3459,7 +3459,7 @@ NICK_HELP_REGISTER
 	die dann automatisch die gleiche Konfiguration und
 	Channel-Privilegien bekommen. Für weitere Informationen
 	über diese Funktion tippe %R%S HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Syntax: GROUP Ziel Passwort
 	

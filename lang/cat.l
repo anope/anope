@@ -3493,7 +3493,7 @@ NICK_HELP_REGISTER
 	la mateixa configuració, memos i privilegis. Per més
 	informació sobre aquesta característica, escriu %R%S
 	HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Sintaxis: GROUP grupo clau
 	

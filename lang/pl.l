@@ -4449,7 +4449,6 @@ NICK_HELP_REGISTER
 	prawa na kanale oraz ustawienia wiadomo¶ci.
 	Aby uzyskaæ wiêcej informacji napisz: 
 	%R%S HELP GROUP.
-	
 
 NICK_HELP_GROUP
 	Sk³adnia: GROUP nazwa has³o

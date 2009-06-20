@@ -3360,7 +3360,7 @@ NICK_HELP_REGISTER
 	the same configuration, the same set of memos and the
 	same channel privileges. For more information on this
 	feature, type %R%S HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Syntax: GROUP target password
 	

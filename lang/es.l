@@ -3465,7 +3465,7 @@ NICK_HELP_REGISTER
 	la misma configuracion, memos y privilegios. Para mayor
 	informacion acerca de esta caracteristica, tipea %R%S
 	HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Sintaxis: GROUP grupo clave
 	

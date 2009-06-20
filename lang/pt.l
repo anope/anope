@@ -3397,7 +3397,7 @@ NICK_HELP_REGISTER
 	as mesmas configurações, os mesmos memos e os mesmos 
 	privilégios em canais. Para maiores informações neste recurso,
 	digite %R%S HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Sintaxe: GROUP alvo senha
 	

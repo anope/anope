@@ -3494,7 +3494,6 @@ NICK_HELP_REGISTER
 	saðlar. Bu özellik hakkýnda daha fazla bilgi için, 
 	%R%S HELP GROUP yazýn.
 
-
 NICK_HELP_GROUP
 	Kullanýmý: GROUP hedef þifre
 	

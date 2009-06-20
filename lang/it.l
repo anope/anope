@@ -3385,7 +3385,7 @@ NICK_HELP_REGISTER
 	la stessa configurazione, gli stessi memo e gli stessi
 	privilegi sui canali. Per maggiori informazioni su questo
 	servizio, digita %R%S HELP GROUP.
-	
+
 NICK_HELP_GROUP
 	Sintassi: GROUP destinazione password
 	

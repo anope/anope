@@ -118,6 +118,7 @@ class CommandBSBot : public Command
 		bi->host = sstrdup(host);
 		bi->real = sstrdup(real);
 		bi->created = time(NULL);
+		bi->flags = 0;
 		bi->chancount = 0;
 
 		/* We check whether user with this nick is online, and kill it if so */

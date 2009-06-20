@@ -195,7 +195,7 @@ class CommandNSInfo : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (u->nc->IsServicesOper())
+		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_INFO);

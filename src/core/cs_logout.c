@@ -97,7 +97,7 @@ class CommandCSLogout : public Command
 
 	bool OnHelp(User *u, const std::string &subcommand)
 	{
-		if (u->nc->HasCommand("chanserv/logout"))
+		if (u->nc && u->nc->HasCommand("chanserv/logout"))
 			notice_help(s_NickServ, u, CHAN_SERVADMIN_HELP_LOGOUT);
 		else
 			notice_help(s_NickServ, u, CHAN_HELP_LOGOUT);

@@ -149,7 +149,7 @@ class CommandBSSet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(s_BotServ, u, BOT_HELP_SET);
-			if (u->nc->IsServicesOper())
+			if (u->nc && u->nc->IsServicesOper())
 				notice_help(s_BotServ, u, BOT_SERVADMIN_HELP_SET);
 		}
 		else if (subcommand == "DONTKICKOPS")

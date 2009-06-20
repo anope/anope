@@ -56,11 +56,11 @@ class CommandNSInfo : public Command
 			if ((nr = findrequestnick(nick)))
 			{
 				notice_lang(s_NickServ, u, NICK_IS_PREREG);
-				if (param && !stricmp(param, "ALL") && u->nc->IsServicesOper())
+				if (param && !stricmp(param, "ALL") && u->nc && u->nc->IsServicesOper())
 					notice_lang(s_NickServ, u, NICK_INFO_EMAIL, nr->email);
 				else
 				{
-					if (u->nc->IsServicesOper())
+					if (u->nc && u->nc->IsServicesOper())
 						notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, nr->nick);
 				}
 			}

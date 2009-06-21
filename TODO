@@ -17,7 +17,7 @@ Legend:
 [x] HelpServ must die
 [+] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
-[ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
+[x] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 [ ] Add support for +k, +q, etc type umodes
 [x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
 [+] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)

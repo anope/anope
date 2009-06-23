@@ -743,7 +743,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 
 	if (ac != 2) {
 		user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
-					   strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
+					   strtoul(av[2], NULL, 10), strtoul(av[8], NULL, 0),
 					   NULL, NULL);
 		if (user) {
 			ircdproto->ProcessUsermodes(user, 1, &av[3]);

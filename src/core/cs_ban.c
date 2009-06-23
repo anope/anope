@@ -36,7 +36,7 @@ class CommandCSBan : public Command
 
 		}
 
-		Channel *c;
+		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 		User *u2;
 
@@ -47,10 +47,11 @@ class CommandCSBan : public Command
 
 		is_same = (stricmp(target, u->nick) == 0);
 
-		if (!(c = findchan(chan))) {
+		if (c)
+			ci = c->ci;
+
+		if (!c) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!(ci = c->ci)) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, target);
 		} else if (!is_same ? !check_access(u, ci, CA_BAN) :
@@ -133,11 +134,7 @@ class CommandCSUnban : public Command
 			return MOD_CONT;
 		}
 
-		if (!(ci = c->ci))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = c->ci;
 
 		if (!check_access(u, ci, CA_UNBAN))
 		{

@@ -30,11 +30,7 @@ class CommandCSIdentify : public Command
 		ChannelInfo *ci;
 		struct u_chaninfolist *uc;
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = cs_findchan(chan);
 
 		if (is_founder(u, ci))
 		{

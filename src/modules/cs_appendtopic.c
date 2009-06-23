@@ -62,13 +62,14 @@ class CommandCSAppendTopic : public Command
 		const char *chan = params[0].c_str();
 		const char *newtopic = params[1].c_str();
 		char topic[1024];
-		Channel *c;
+		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 
-		if (!(c = findchan(chan)))
+		if (c)
+			ci = c->ci;
+
+		if (!c)
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		else if (!(ci = c->ci))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
 		else if (ci->flags & CI_FORBIDDEN)
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 		else if (!check_access(u, ci, CA_TOPIC))

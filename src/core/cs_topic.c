@@ -30,10 +30,11 @@ class CommandCSTopic : public Command
 		Channel *c;
 		ChannelInfo *ci;
 
-		if (!(c = findchan(chan)))
+		if ((c = findchan(chan)))
+			ci = c->ci;
+
+		if (!c)
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		else if (!(ci = c->ci))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
 		else if (!check_access(u, ci, CA_TOPIC) && !u->nc->HasCommand("chanserv/topic"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else

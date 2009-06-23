@@ -20,7 +20,7 @@
 static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const char *nick)
 {
 	const char *av[2];
-	Channel *c;
+	Channel *c = findchan(chan);
 	ChannelInfo *ci;
 	User *u2;
 
@@ -32,10 +32,11 @@ static CommandReturn do_util(User *u, CSModeUtil *util, const char *chan, const 
 
 	is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick) == 0);
 
-	if (!(c = findchan(chan))) {
+	if (c)
+		ci = c->ci;
+
+	if (!c) {
 		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-	} else if (!(ci = c->ci)) {
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
 	} else if (is_same ? !(u2 = u) : !(u2 = finduser(nick))) {
 		notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 	} else if (!is_on_chan(c, u2)) {

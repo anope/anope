@@ -29,11 +29,8 @@ class CommandCSGetPass : public Command
 		char tmp_pass[PASSMAX];
 		ChannelInfo *ci;
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = cs_findchan(chan);
+		
 		if (!enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1))
 		{
 			notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);

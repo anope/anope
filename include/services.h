@@ -1340,7 +1340,7 @@ class CoreExport IRCDProto
 		virtual void SendServer(Server *) = 0;
 		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int IsNickValid(const char *) { return 1; }
-		virtual int IsChannelValid(const char *) { return 1; }
+		virtual int IsChannelValid(const char *);
 		virtual int IsFloodModeParamValid(const char *) { return 0; }
 		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...);
 

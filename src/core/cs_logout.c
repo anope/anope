@@ -54,14 +54,12 @@ class CommandCSLogout : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 		User *u2 = NULL;
 		int is_admin = u->nc->HasCommand("chanserv/logout");
 
 		if (!is_admin && !nick)
 			this->OnSyntaxError(u);
-		else if (!(ci = cs_findchan(chan)))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (nick && !(u2 = finduser(nick)))
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (u2 != u && !is_real_founder(u, ci) && !is_admin)

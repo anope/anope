@@ -37,12 +37,9 @@ class CommandMSRead : public Command
 		{
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1].c_str() : NULL;
-			if (!(ci = cs_findchan(chan)))
-			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
-				return MOD_CONT;
-			}
-			else if (!check_access(u, ci, CA_MEMO))
+			ci = cs_findchan(chan);
+			
+			if (!check_access(u, ci, CA_MEMO))
 			{
 				notice_lang(s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;

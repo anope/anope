@@ -144,6 +144,11 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 				return;
 			}
 		}
+		else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
+		{
+			notice_lang(service, u, CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED 

@@ -899,7 +899,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	int IsChannelValid(const char *chan)
 	{
-		if (strchr(chan, ':')) return 0;
+		if (strchr(chan, ':') || *chan != '#') return 0;
 		return 1;
 	}
 

@@ -37,12 +37,8 @@ class CommandMSDel : public Command
 		{
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1].c_str() : NULL;
-			if (!(ci = cs_findchan(chan)))
-			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
-				return MOD_CONT;
-			}
-			else if (readonly)
+			ci = cs_findchan(chan);
+			if (readonly)
 			{
 				notice_lang(s_MemoServ, u, READ_ONLY_MODE);
 				return MOD_CONT;

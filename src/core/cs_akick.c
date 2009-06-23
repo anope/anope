@@ -186,7 +186,7 @@ class CommandCSAKick : public Command
 			reason = params[3].c_str();
 		}
 
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 		AutoKick *akick;
 		int i;
 		Channel *c;
@@ -201,8 +201,6 @@ class CommandCSAKick : public Command
 								 || !stricmp(cmd, "DEL")))) {
 
 			syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
-		} else if (!(ci = cs_findchan(chan))) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/change"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);

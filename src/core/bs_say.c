@@ -29,11 +29,7 @@ class CommandBSSay : public Command
 		const char *chan = params[0].c_str();
 		const char *text = params[1].c_str();
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = cs_findchan(chan);
 
 		if (!check_access(u, ci, CA_SAY))
 		{

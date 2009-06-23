@@ -31,7 +31,7 @@ class CommandBSKick : public Command
 		const char *value = params[2].c_str();
 		const char *ttb = params.size() > 3 ? params[3].c_str() : NULL;
 
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 
 		if (readonly)
 			notice_lang(s_BotServ, u, BOT_KICK_DISABLED);
@@ -39,8 +39,6 @@ class CommandBSKick : public Command
 			syntax_error(s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (stricmp(value, "ON") && stricmp(value, "OFF"))
 			syntax_error(s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
-		else if (!(ci = cs_findchan(chan)))
-			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (!check_access(u, ci, CA_SET) && !u->nc->HasPriv("botserv/administration"))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)

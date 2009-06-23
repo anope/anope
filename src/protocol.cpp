@@ -228,3 +228,10 @@ void IRCDProto::SendNumeric(const char *source, int numeric, const char *dest, c
 	SendNumericInternal(source, numeric, dest, buf);
 }
 
+int IRCDProto::IsChannelValid(const char *chan)
+{
+	if (*chan != '#')
+		return 0;
+
+	return 1;
+}

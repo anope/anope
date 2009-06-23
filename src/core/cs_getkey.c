@@ -34,11 +34,7 @@ class CommandCSGetKey : public Command
 			return MOD_CONT;
 		}
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = cs_findchan(chan);
 
 		if (!check_access(u, ci, CA_GETKEY))
 		{

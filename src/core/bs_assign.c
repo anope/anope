@@ -41,11 +41,7 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = cs_findchan(chan);
 
 		if ((ci->botflags & BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->nc->HasPriv("botserv/administration")))
 		{

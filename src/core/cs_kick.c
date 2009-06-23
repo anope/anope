@@ -35,7 +35,7 @@ class CommandCSKick : public Command
 			reason = params[2].c_str();
 		}
 
-		Channel *c;
+		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 		User *u2;
 
@@ -47,10 +47,11 @@ class CommandCSKick : public Command
 
 		is_same = (target == u->nick) ? 1 : (stricmp(target, u->nick) == 0);
 
-		if (!(c = findchan(chan))) {
+		if (c)
+			ci = c->ci;
+
+		if (!c) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!(ci = c->ci)) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
 			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, target);
 		} else if (!is_on_chan(c, u2)) {

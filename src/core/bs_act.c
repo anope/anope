@@ -25,13 +25,7 @@ class CommandBSAct : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		ChannelInfo *ci;
-
-		if (!(ci = cs_findchan(params[0].c_str())))
-		{
-			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return MOD_CONT;
-		}
+		ChannelInfo *ci = cs_findchan(params[0].c_str());
 
 		if (!check_access(u, ci, CA_SAY))
 		{

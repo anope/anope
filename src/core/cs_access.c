@@ -95,7 +95,7 @@ class CommandCSAccess : public Command
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 		NickAlias *na = NULL;
 		NickCore *nc;
 		ChanAccess *access;
@@ -109,8 +109,6 @@ class CommandCSAccess : public Command
 		 * Else (ADD), we require a level (which implies a nick). */
 		if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 : (!stricmp(cmd, "DEL")) ? (!nick || s) : !s))
 			this->OnSyntaxError(u);
-		else if (!(ci = cs_findchan(chan)))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		/* We still allow LIST in xOP mode, but not others */
 		else if ((ci->flags & CI_XOP) && !is_list)
 		{
@@ -367,7 +365,7 @@ class CommandCSLevels : public Command
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 		char *error;
 
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 		int level;
 		int i;
 
@@ -378,8 +376,6 @@ class CommandCSLevels : public Command
 			|| ((stricmp(cmd, "SET") == 0) ? !s
 				: ((strnicmp(cmd, "DIS", 3) == 0)) ? (!what || s) : !!what)) {
 			this->OnSyntaxError(u);
-		} else if (!(ci = cs_findchan(chan))) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (ci->flags & CI_XOP) {
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
 		} else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change")) {

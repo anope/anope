@@ -360,11 +360,9 @@ class XOPBase : public Command
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
 
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 
-		if (!(ci = cs_findchan(chan)))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (!(ci->flags & CI_XOP))
+		if (!(ci->flags & CI_XOP))
 			notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
 		else if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params, ci, level, messages);

@@ -33,12 +33,10 @@ class CommandCSInvite : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 			return MOD_CONT;
 		}
-		else if (!(ci = c->ci))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
-		else if (!u || !check_access(u, ci, CA_INVITE))
+
+		ci = c->ci;
+
+		if (!u || !check_access(u, ci, CA_INVITE))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;

@@ -27,13 +27,14 @@ class CommandCSClear : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *what = params[1].c_str();
-		Channel *c;
+		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 
-		if (!(c = findchan(chan))) {
+		if (c)
+			ci = c->ci;
+
+		if (!c) {
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!(ci = c->ci)) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (!u || !check_access(u, ci, CA_CLEAR)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(what, "bans") == 0) {

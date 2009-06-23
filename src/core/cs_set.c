@@ -558,7 +558,7 @@ class CommandCSSet : public Command
 		const char *chan = params[0].c_str();
 		const char *cmd = params[1].c_str();
 		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 		bool is_servadmin = u->nc->HasPriv("chanserv/set");
 
 		if (readonly) {
@@ -572,8 +572,6 @@ class CommandCSSet : public Command
 								stricmp(cmd, "ENTRYMSG") != 0) &&
 								stricmp(cmd, "MLOCK") != 0)) {
 			syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
-		} else if (!(ci = cs_findchan(chan))) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		} else if (!is_servadmin && !check_access(u, ci, CA_SET)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(cmd, "FOUNDER") == 0) {

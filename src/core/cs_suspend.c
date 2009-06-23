@@ -24,9 +24,9 @@ class CommandCSSuspend : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		ChannelInfo *ci;
 		const char *chan = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		ChannelInfo *ci = cs_findchan(chan);
 
 		Channel *c;
 
@@ -40,13 +40,6 @@ class CommandCSSuspend : public Command
 		if (chan[0] != '#')
 		{
 			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
-			return MOD_CONT;
-		}
-
-		/* Only SUSPEND existing channels, otherwise use FORBID (bug #54) */
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 			return MOD_CONT;
 		}
 
@@ -125,8 +118,8 @@ class CommandCSUnSuspend : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		ChannelInfo *ci;
 		const char *chan = params[0].c_str();
+		ChannelInfo *ci = cs_findchan(chan);
 
 		if (chan[0] != '#')
 		{
@@ -137,12 +130,6 @@ class CommandCSUnSuspend : public Command
 			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
 
 		/* Only UNSUSPEND already suspended channels */
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
-
 		if (!(ci->flags & CI_SUSPENDED))
 		{
 			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);

@@ -25,13 +25,11 @@ class CommandCSSendPass : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		ChannelInfo *ci;
-		NickCore *founder;
+		ChannelInfo *ci = cs_findchan(chan);
+		NickCore *founder = ci->founder;;
 
 		if (RestrictMail && !u->nc->HasCommand("chanserv/sendpass"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		else if (!(ci = cs_findchan(chan)) || !(founder = ci->founder))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else
 		{
 			char buf[BUFSIZE];

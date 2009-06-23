@@ -48,11 +48,7 @@ class CommandCSInfo : public Command
 		int show_all = 0;
 		time_t expt;
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-			return MOD_CONT;
-		}
+		ci = cs_findchan(chan);
 
 		if (ci->flags & CI_FORBIDDEN)
 		{

@@ -27,12 +27,10 @@ class CommandBSUnassign : public Command
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		ChannelInfo *ci;
+		ChannelInfo *ci = cs_findchan(chan);
 
 		if (readonly)
 			notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
-		else if (!(ci = cs_findchan(chan)))
-			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
 		else if (!u->nc->HasPriv("botserv/administration")  && !check_access(u, ci, CA_ASSIGN))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)

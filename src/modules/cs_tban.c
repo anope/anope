@@ -203,13 +203,9 @@ int delBan(int argc, char **argv)
 
 int canBanUser(Channel * c, User * u, User * u2)
 {
-	ChannelInfo *ci;
+	ChannelInfo *ci = c->ci;
 	int ok = 0;
-	if (!(ci = c->ci))
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-	else if (ci->flags & CI_FORBIDDEN)
-		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, c->name);
-	else if (!check_access(u, ci, CA_BAN))
+	if (!check_access(u, ci, CA_BAN))
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
 	else if (ircd->except && is_excepted(ci, u2))
 		notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);

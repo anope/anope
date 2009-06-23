@@ -35,6 +35,8 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		}
 
+		ci = cs_findchan(chan);
+
 		if (u->nc->HasCommand("botserv/set/private") && !stricmp(option, "PRIVATE"))
 		{
 			BotInfo *bi;
@@ -60,9 +62,7 @@ class CommandBSSet : public Command
 				syntax_error(s_BotServ, u, "SET PRIVATE", BOT_SET_PRIVATE_SYNTAX);
 			}
 			return MOD_CONT;
-		} else if (!(ci = cs_findchan(chan)))
-			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
+		} else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else {
 			if (!stricmp(option, "DONTKICKOPS")) {

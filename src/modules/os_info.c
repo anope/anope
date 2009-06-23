@@ -146,7 +146,7 @@ class CommandCSOInfo : public Command
 		const char *chan = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
 		char *c;
-		ChannelInfo *ci = NULL;
+		ChannelInfo *ci = cs_findchan(chan);
 
 		if (!info)
 		{
@@ -154,19 +154,14 @@ class CommandCSOInfo : public Command
 			return MOD_CONT;
 		}
 
-		if ((ci = cs_findchan(chan)))
+		if (ci->GetExt("os_info", c))
 		{
-			if (ci->GetExt("os_info", c))
-			{
-				delete [] c;
-				ci->Shrink("os_info");
-			}
-			/* Add the module data to the channel */
-			ci->Extend("os_info", sstrdup(info));
-			me->NoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
+			delete [] c;
+			ci->Shrink("os_info");
 		}
-		else
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+		/* Add the module data to the channel */
+		ci->Extend("os_info", sstrdup(info));
+		me->NoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
 
 		return MOD_CONT;
 	}
@@ -174,21 +169,16 @@ class CommandCSOInfo : public Command
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
 		const char *chan = params[1].c_str();
-		ChannelInfo *ci = NULL;
+		ChannelInfo *ci = cs_findchan(chan);
 
-		if ((ci = cs_findchan(chan)))
+		/* Del the module data from the channel */
+		char *c;
+		if (ci->GetExt("os_info", c))
 		{
-			/* Del the module data from the channel */
-			char *c;
-			if (ci->GetExt("os_info", c))
-			{
-				delete [] c;
-				ci->Shrink("os_info");
-			}
-			me->NoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
+			delete [] c;
+			ci->Shrink("os_info");
 		}
-		else
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+		me->NoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
 
 		return MOD_CONT;
 	}

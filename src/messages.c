@@ -33,7 +33,14 @@ int m_away(char *source, char *msg)
 {
     User *u;
 
-    u = finduser(source);
+    /* When using TS6, we get a UID. ~ Viper */
+    if (UseTS6 && ircd->ts6) {
+        u = find_byuid(source);
+        if (!u)
+            u = finduser(source);
+    } else {
+        u = finduser(source);
+    }
 
     if (u && msg == 0)          /* un-away */
         check_memos(u);
@@ -66,18 +73,25 @@ int m_kill(char *nick, char *msg)
 
 int m_time(char *source, int ac, char **av)
 {
+    User *u;
     time_t t;
     struct tm *tm;
     char buf[64];
 
-    if (!source) {
-        return MOD_CONT;
+    /* When using TS6, we get a UID. ~ Viper */
+    if (UseTS6 && ircd->ts6) {
+        u = find_byuid(source);
+        if (!u)
+            u = finduser(source);
+    } else {
+        u = finduser(source);
     }
+    if (!u) return MOD_CONT;
 
     time(&t);
     tm = localtime(&t);
     strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-    anope_cmd_391(source, buf);
+    anope_cmd_391(u->nick, buf);
     return MOD_CONT;
 }
 
@@ -85,24 +99,31 @@ int m_time(char *source, int ac, char **av)
 
 int m_motd(char *source)
 {
+    User *u;
     FILE *f;
     char buf[BUFSIZE];
 
-    if (!source) {
-        return MOD_CONT;
+    /* When using TS6, we get a UID. ~ Viper */
+    if (UseTS6 && ircd->ts6) {
+        u = find_byuid(source);
+        if (!u)
+            u = finduser(source);
+    } else {
+        u = finduser(source);
     }
+    if (!u) return MOD_CONT;
 
     f = fopen(MOTDFilename, "r");
     if (f) {
-        anope_cmd_375(source);
+        anope_cmd_375(u->nick);
         while (fgets(buf, sizeof(buf), f)) {
             buf[strlen(buf) - 1] = 0;
-            anope_cmd_372(source, buf);
+            anope_cmd_372(u->nick, buf);
         }
         fclose(f);
-        anope_cmd_376(source);
+        anope_cmd_376(u->nick);
     } else {
-        anope_cmd_372_error(source);
+        anope_cmd_372_error(u->nick);
     }
     return MOD_CONT;
 }
@@ -122,6 +143,7 @@ int m_privmsg(char *source, char *receiver, char *msg)
         return MOD_CONT;
     }
 
+    /* We always get the nick.. the protocol module translates for us.. ~ Viper */
     u = finduser(source);
 
     if (!u) {
@@ -143,8 +165,8 @@ int m_privmsg(char *source, char *receiver, char *msg)
         if (allow_ignore && !is_oper(u)) {
             IgnoreData *ign = get_ignore(source);
             if (ign) {
-				target = myStrGetToken(msg, ' ', 0);
-				alog("Ignored message from %s to %s using command %s", source, receiver, target);
+                target = myStrGetToken(msg, ' ', 0);
+                alog("Ignored message from %s to %s using command %s", source, receiver, target);
                 free(target);
                 return MOD_CONT;
             }
@@ -238,78 +260,82 @@ int m_stats(char *source, int ac, char **av)
     if (ac < 1)
         return MOD_CONT;
 
+    /* When using TS6, we get a UID. ~ Viper */
+    if (UseTS6 && ircd->ts6) {
+        u = find_byuid(source);
+        if (!u)
+            u = finduser(source);
+    } else {
+        u = finduser(source);
+    }
+    if (!u) return MOD_CONT;
+
     switch (*av[0]) {
     case 'l':
-        u = finduser(source);
-
-        if (u && is_oper(u)) {
-
+        if (is_oper(u)) {
             if (servernum == 1) {
                 anope_cmd_211
                     ("%s Server SendBuf SentBytes SentMsgs RecvBuf "
-                     "RecvBytes RecvMsgs ConnTime", source);
-                anope_cmd_211("%s %s %d %d %d %d %d %d %ld", source,
+                     "RecvBytes RecvMsgs ConnTime", u->nick);
+                anope_cmd_211("%s %s %d %d %d %d %d %d %ld", u->nick,
                               RemoteServer, write_buffer_len(),
                               total_written, -1, read_buffer_len(),
                               total_read, -1, time(NULL) - start_time);
             } else if (servernum == 2) {
                 anope_cmd_211
                     ("%s Server SendBuf SentBytes SentMsgs RecvBuf "
-                     "RecvBytes RecvMsgs ConnTime", source);
-                anope_cmd_211("%s %s %d %d %d %d %d %d %ld", source,
+                     "RecvBytes RecvMsgs ConnTime", u->nick);
+                anope_cmd_211("%s %s %d %d %d %d %d %d %ld", u->nick,
                               RemoteServer2, write_buffer_len(),
                               total_written, -1, read_buffer_len(),
                               total_read, -1, time(NULL) - start_time);
             } else if (servernum == 3) {
                 anope_cmd_211
                     ("%s Server SendBuf SentBytes SentMsgs RecvBuf "
-                     "RecvBytes RecvMsgs ConnTime", source);
-                anope_cmd_211("%s %s %d %d %d %d %d %d %ld", source,
+                     "RecvBytes RecvMsgs ConnTime", u->nick);
+                anope_cmd_211("%s %s %d %d %d %d %d %d %ld", u->nick,
                               RemoteServer3, write_buffer_len(),
                               total_written, -1, read_buffer_len(),
                               total_read, -1, time(NULL) - start_time);
             }
         }
 
-        anope_cmd_219(source, av[0]);
+        anope_cmd_219(u->nick, av[0]);
         break;
     case 'o':
     case 'O':
-/* Check whether the user is an operator */
-        u = finduser(source);
-        if (u && !is_oper(u) && HideStatsO) {
-            anope_cmd_219(source, av[0]);
+        /* Check whether the user is an operator */
+        if (!is_oper(u) && HideStatsO) {
+            anope_cmd_219(u->nick, av[0]);
         } else {
             for (i = 0; i < RootNumber; i++)
-                anope_cmd_243("%s O * * %s Root 0", source,
-                              ServicesRoots[i]);
+                anope_cmd_243("%s O * * %s Root 0", u->nick, ServicesRoots[i]);
             for (i = 0; i < servadmins.count && (nc = servadmins.list[i]);
                  i++)
-                anope_cmd_243("%s O * * %s Admin 0", source, nc->display);
+                anope_cmd_243("%s O * * %s Admin 0", u->nick, nc->display);
             for (i = 0; i < servopers.count && (nc = servopers.list[i]);
                  i++)
-                anope_cmd_243("%s O * * %s Oper 0", source, nc->display);
+                anope_cmd_243("%s O * * %s Oper 0", u->nick, nc->display);
 
-            anope_cmd_219(source, av[0]);
+            anope_cmd_219(u->nick, av[0]);
         }
-
         break;
 
     case 'u':{
             int uptime = time(NULL) - start_time;
             anope_cmd_242("%s :Services up %d day%s, %02d:%02d:%02d",
-                          source, uptime / 86400,
+                          u->nick, uptime / 86400,
                           (uptime / 86400 == 1) ? "" : "s",
                           (uptime / 3600) % 24, (uptime / 60) % 60,
                           uptime % 60);
             anope_cmd_250("%s :Current users: %d (%d ops); maximum %d",
-                          source, usercnt, opcnt, maxusercnt);
-            anope_cmd_219(source, av[0]);
+                          u->nick, usercnt, opcnt, maxusercnt);
+            anope_cmd_219(u->nick, av[0]);
             break;
         }                       /* case 'u' */
 
     default:
-        anope_cmd_219(source, av[0]);
+        anope_cmd_219(u->nick, av[0]);
         break;
     }
     return MOD_CONT;
@@ -319,9 +345,19 @@ int m_stats(char *source, int ac, char **av)
 
 int m_version(char *source, int ac, char **av)
 {
-    if (source) {
-        anope_cmd_351(source);
+    User *u; 
+
+    /* When using TS6, we get a UID. ~ Viper */
+    if (UseTS6 && ircd->ts6) {
+        u = find_byuid(source);
+        if (!u)
+            u = finduser(source);
+    } else {
+        u = finduser(source);
     }
+    if (!u) return MOD_CONT;
+
+    anope_cmd_351(u->nick);
     return MOD_CONT;
 }
 
@@ -330,11 +366,22 @@ int m_version(char *source, int ac, char **av)
 
 int m_whois(char *source, char *who)
 {
+    User *u; 
     BotInfo *bi;
     NickAlias *na;
     const char *clientdesc;
 
-    if (source && who) {
+    /* When using TS6, we get a UID. ~ Viper */
+    if (UseTS6 && ircd->ts6) {
+        u = find_byuid(source);
+        if (!u)
+            u = finduser(source);
+    } else {
+        u = finduser(source);
+    }
+    if (!u) return MOD_CONT;
+
+    if (who) {
         if (stricmp(who, s_NickServ) == 0)
             clientdesc = desc_NickServ;
         else if (stricmp(who, s_ChanServ) == 0)
@@ -355,15 +402,15 @@ int m_whois(char *source, char *who)
             clientdesc = desc_DevNull;
         else if (s_BotServ && (bi = findbot(who))) {
             /* Bots are handled separately */
-            anope_cmd_311("%s %s %s %s * :%s", source, bi->nick,
+            anope_cmd_311("%s %s %s %s * :%s", u->nick, bi->nick,
                           bi->user, bi->host, bi->real);
-            anope_cmd_307("%s %s :is a registered nick", source, bi->nick);
-            anope_cmd_312("%s %s %s :%s", source, bi->nick, ServerName,
+            anope_cmd_307("%s %s :is a registered nick", u->nick, bi->nick);
+            anope_cmd_312("%s %s %s :%s", u->nick, bi->nick, ServerName,
                           ServerDesc);
             anope_cmd_317("%s %s %ld %ld :seconds idle, signon time",
-                          source, bi->nick, time(NULL) - bi->lastmsg,
+                          u->nick, bi->nick, time(NULL) - bi->lastmsg,
                           start_time);
-            anope_cmd_318(source, bi->nick);
+            anope_cmd_318(u->nick, bi->nick);
             return MOD_CONT;
         } else if (!(ircd->svshold && UseSVSHOLD) && (na = findnick(who))
                    && (na->status & NS_KILL_HELD)) {
@@ -371,22 +418,22 @@ int m_whois(char *source, char *who)
              * We can't just say it doesn't exist here, even tho it does for
              * other servers :) -GD
              */
-            anope_cmd_311("%s %s %s %s * :Services Enforcer", source,
+            anope_cmd_311("%s %s %s %s * :Services Enforcer", u->nick,
                           na->nick, NSEnforcerUser, NSEnforcerHost);
-            anope_cmd_312("%s %s %s :%s", source, na->nick, ServerName,
+            anope_cmd_312("%s %s %s :%s", u->nick, na->nick, ServerName,
                           ServerDesc);
-            anope_cmd_318(source, na->nick);
+            anope_cmd_318(u->nick, na->nick);
             return MOD_CONT;
         } else {
-            anope_cmd_401(source, who);
+            anope_cmd_401(u->nick, who);
             return MOD_CONT;
         }
-        anope_cmd_311("%s %s %s %s * :%s", source, who,
+        anope_cmd_311("%s %s %s %s * :%s", u->nick, who,
                       ServiceUser, ServiceHost, clientdesc);
-        anope_cmd_312("%s %s %s :%s", source, who, ServerName, ServerDesc);
-        anope_cmd_317("%s %s %ld %ld :seconds idle, signon time", source,
+        anope_cmd_312("%s %s %s :%s", u->nick, who, ServerName, ServerDesc);
+        anope_cmd_317("%s %s %ld %ld :seconds idle, signon time", u->nick,
                       who, time(NULL) - start_time, start_time);
-        anope_cmd_318(source, who);
+        anope_cmd_318(u->nick, who);
     }
     return MOD_CONT;
 }

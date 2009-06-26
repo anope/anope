@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="0"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2327"
+VERSION_BUILD="2337"
 
 # $Log$ # Changes since 1.8.0 Release
 
+#Revision 2337 - Fixed several bugs in messages.c regarding parsing TS6 encoded commands. This is a prerequisite for an InspIRCd 1.2 protocol module.
 #Revision 2327 - Fix memory leak in NS SUSPEND, patch by Adam.
 #Revision 2322 - Bugfix for bug #1082, remove check for NSModeOnID from NS UPDATE, it's not logical to check for NSModeOnID since you must be identified to use NS UPDATE anyways.
 #Revision 2321 - Fix potential crash in Charybdis protocol module, patch by Adam.

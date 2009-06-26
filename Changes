@@ -25,6 +25,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 04/18 F Don't enforce akicks/forbidden/.. on clients on ulined servers.  [  #00]
 06/02 F Fixing CS HELP output to not imply you can invite anyone...      [#1081]
 06/11 F Remove check for NSModeOnID from NS UPDATE.                      [#1082]
+06/26 F Fixed several bugs in parsing TS6 encoded commands.              [  #00]
 
 Provided by Adam <Adam@SubZeroIRC.net> - 2009
 01/28 F Added internal support for +j channelmodes.                      [#1001]

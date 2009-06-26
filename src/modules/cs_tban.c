@@ -24,7 +24,6 @@
 void mySendResponse(User *u, const char *channel, char *mask, const char *time);
 
 void addBan(Channel *c, time_t timeout, char *banmask);
-int delBan(int argc, char **argv);
 int canBanUser(Channel *c, User *u, User *u2);
 
 void mAddLanguages();
@@ -167,6 +166,31 @@ void mySendResponse(User *u, const char *channel, char *mask, const char *time)
 	me->NoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
+class TempBan : public Timer
+{
+	private:
+		std::string chan;
+		std::string mask;
+
+	public:
+		TempBan(time_t seconds, const std::string &channel, const std::string &banmask) : Timer(seconds), chan(channel), mask(banmask) { }
+
+		void Tick(time_t ctime)
+		{
+			const char *av[3];
+			Channel *c;
+
+			av[0] = "-b";
+			av[1] = mask.c_str();
+
+			if ((c = findchan(chan.c_str())) && c->ci)
+			{
+				ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
+				chan_set_modes(s_ChanServ, c, 2, av, 1);
+			}
+		}
+};
+
 void addBan(Channel *c, time_t timeout, char *banmask)
 {
 	const char *av[3];
@@ -181,24 +205,7 @@ void addBan(Channel *c, time_t timeout, char *banmask)
 	ircdproto->SendMode(whosends(c->ci), c->name, "+b %s", av[1]);
 	chan_set_modes(s_ChanServ, c, 2, av, 1);
 
-	me->AddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
-}
-
-int delBan(int argc, char **argv)
-{
-	const char *av[3];
-	Channel *c;
-
-	av[0] = "-b";
-	av[1] = argv[1];
-
-	if ((c = findchan(argv[0])) && c->ci)
-	{
-		ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
-		chan_set_modes(s_ChanServ, c, 2, av, 1);
-	}
-
-	return MOD_CONT;
+	me->AddCallBack(new TempBan(timeout, c->name, banmask));
 }
 
 int canBanUser(Channel * c, User * u, User * u2)

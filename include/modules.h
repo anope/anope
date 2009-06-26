@@ -17,6 +17,7 @@
 #include <time.h>
 #include "services.h"
 #include <stdio.h>
+#include "timers.h"
 
 /* Cross OS compatibility macros */
 #ifdef _WIN32
@@ -194,7 +195,6 @@ typedef struct ModuleLang_ ModuleLang;
 typedef struct ModuleHash_ ModuleHash;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
-typedef struct ModuleCallBack_ ModuleCallBack;
 
 /*************************************************************************/
 
@@ -306,6 +306,10 @@ class CoreExport Module
 	/** The temporary path/filename
 	 */
 	std::string filename;
+
+	/** Timers used in this module
+	 */
+	std::list<Timer *> CallBacks;
 
 	ano_module_t handle;
 	time_t created;
@@ -448,23 +452,18 @@ class CoreExport Module
 	int DelCommand(CommandHash * cmdTable[], const char *name);
 
 	/**
-	 * Adds a timed callback for the current module.
-	 * This allows modules to request that anope executes one of there functions at a time in the future, without an event to trigger it
-	 * @param name the name of the callback, this is used for refrence mostly, but is needed it you want to delete this particular callback later on
-	 * @param when when should the function be executed, this is a time in the future, seconds since 00:00:00 1970-01-01 UTC
-	 * @param func the function to be executed when the callback is ran, its format MUST be int func(int argc, char **argv);
-	 * @param argc the argument count for the argv paramter
-	 * @param atgv a argument list to be passed to the called function.
-	 * @return MOD_ERR_OK on success, anything else on fail.
-	 * @see moduleDelCallBack
-	 **/
-	int AddCallback(const char *name, time_t when, int (*func) (int argc, char *argv[]), int argc, char **argv);
+	 * Adds a timer to the current module
+	 * The timer handling will take care of everything for this timer, this is only here
+	 * so we have a list of timers to destroy when this module is unloaded
+	 * @param t A timer derived class
+	 */
+	void AddCallBack(Timer *t);
 
 	/**
-	 * Allow modules to delete a timed callback by name.
-	 * @param name the name of the callback they wish to delete
-	 **/
-	void DelCallback(const char *name);
+	 * Deletes a timer for the current module
+	 * @param t The timer
+	 */
+	bool DelCallBack(Timer *t);
 
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
@@ -849,10 +848,6 @@ class CoreExport ModuleManager
 	 */
 	static int UnloadModule(Module *m, User * u);
 
-	/** Run all pending module timer callbacks.
-	 */
-	static void RunCallbacks();
-
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this
 	 * method (usually within void Module::Prioritize()) to set your events priority. You may use this call in other methods too, however, this is not supported behaviour
@@ -904,6 +899,12 @@ class CoreExport ModuleManager
 	 * @param mod Module to attach events to
 	 */
 	static void Attach(Implementation* i, Module* mod, size_t sz);
+
+	/** Delete all timers attached to a module
+	 * @param m The module
+	 */
+	static void ClearTimers(Module *m);
+
 private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
@@ -938,25 +939,12 @@ struct MessageHash_ {
 		MessageHash *next;
 };
 
-struct ModuleCallBack_ {
-	char *name;
-	char *owner_name;
-	time_t when;
-	int (*func)(int argc, char *argv[]);
-	int argc;
-	char **argv;
-	ModuleCallBack *next;
-};
-
-
 /*************************************************************************/
 /* Module Managment Functions */
 MDE Module *findModule(const char *name);				/* Find a module */
 
 int encryption_module_init(); /* Load the encryption module */
 int protocol_module_init();	/* Load the IRCD Protocol Module up*/
-void moduleCallBackPrepForUnload(const char *mod_name);
-MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
 MDE void moduleDisplayHelp(const char *service, User *u);
 
 /*************************************************************************/

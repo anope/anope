@@ -445,3 +445,21 @@ bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Modul
 
 	return true;
 }
+
+/** Delete all timers attached to a module
+ * @param m The module
+ */
+void ModuleManager::ClearTimers(Module *m)
+{
+	std::list<Timer *>::iterator it;
+	Timer *t2;
+
+	for (it = m->CallBacks.begin(); it != m->CallBacks.end(); ++it)
+	{
+		t2 = *it;
+
+		TimerManager::DelTimer(t2);
+	}
+
+	m->CallBacks.clear();
+}

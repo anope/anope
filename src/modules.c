@@ -28,8 +28,6 @@ MessageHash *IRCD[MAX_CMD_HASH];
 ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 
 char *mod_current_buffer = NULL;
-ModuleCallBack *moduleCallBackHead = NULL;
-
 
 char *ModuleGetErrStr(int status)
 {
@@ -621,159 +619,39 @@ int destroyMessage(Message * m)
  * Module Callback Functions
  *******************************************************************************/
 
-int Module::AddCallback(const char *nname, time_t when,
-					  int (*func) (int argc, char *argv[]), int argc,
-					  char **argv)
+/**
+ * Adds a timer to the current module
+ * The timer handling will take care of everything for this timer, this is only here
+ * so we have a list of timers to destroy when this module is unloaded
+ * @param t A timer derived class
+ */
+void Module::AddCallBack(Timer *t)
 {
-	ModuleCallBack *newcb, *tmp, *prev;
-	int i;
-	newcb = new ModuleCallBack;
-	if (!newcb)
-		return MOD_ERR_MEMORY;
-
-	if (nname)
-		newcb->name = sstrdup(nname);
-	else
-		newcb->name = NULL;
-	newcb->when = when;
-	newcb->owner_name = sstrdup(this->name.c_str());
-	newcb->func = func;
-	newcb->argc = argc;
-	newcb->argv = new char *[argc];
-	for (i = 0; i < argc; i++) {
-		newcb->argv[i] = sstrdup(argv[i]);
-	}
-	newcb->next = NULL;
-
-	if (moduleCallBackHead == NULL) {
-		moduleCallBackHead = newcb;
-	} else {					/* find place in list */
-		tmp = moduleCallBackHead;
-		prev = tmp;
-		if (newcb->when < tmp->when) {
-			newcb->next = tmp;
-			moduleCallBackHead = newcb;
-		} else {
-			while (tmp && newcb->when >= tmp->when) {
-				prev = tmp;
-				tmp = tmp->next;
-			}
-			prev->next = newcb;
-			newcb->next = tmp;
-		}
-	}
-	if (debug)
-		alog("debug: added module CallBack: [%s] due to execute at %ld",
-			 newcb->name ? newcb->name : "?", static_cast<long>(newcb->when));
-	return MOD_ERR_OK;
+	this->CallBacks.push_back(t);
 }
 
 /**
- * Removes a entry from the modules callback list
- * @param prev a pointer to the previous entry in the list, NULL for the head
- **/
-void moduleCallBackDeleteEntry(ModuleCallBack * prev)
+ * Deletes a timer for the current module
+ * @param t The timer
+ */
+bool Module::DelCallBack(Timer *t)
 {
-	ModuleCallBack *tmp = NULL;
-	int i;
-	if (prev == NULL) {
-		tmp = moduleCallBackHead;
-		moduleCallBackHead = tmp->next;
-	} else {
-		tmp = prev->next;
-		prev->next = tmp->next;
-	}
-	if (tmp->name)
-		delete [] tmp->name;
-	if (tmp->owner_name)
-		delete [] tmp->owner_name;
-	tmp->func = NULL;
-	for (i = 0; i < tmp->argc; i++) {
-		delete [] tmp->argv[i];
-	}
-	delete [] tmp->argv;
-	tmp->argc = 0;
-	tmp->next = NULL;
-	delete tmp;
-}
+	std::list<Timer *>::iterator it;
+	Timer *t2;
 
-/**
- * Search the module callback list for a given module
- * @param mod_name the name of the module were looking for
- * @param found have we found it?
- * @return a pointer to the ModuleCallBack struct or NULL - dont forget to check the found paramter!
- **/
-static ModuleCallBack *moduleCallBackFindEntry(const char *mod_name, bool * found)
-{
-	ModuleCallBack *prev = NULL, *current = NULL;
-	*found = false;
-	current = moduleCallBackHead;
-	while (current != NULL) {
-		if (current->owner_name
-			&& (strcmp(mod_name, current->owner_name) == 0)) {
-			*found = true;
-			break;
-		} else {
-			prev = current;
-			current = current->next;
+	for (it = this->CallBacks.begin(); it != this->CallBacks.end(); ++it)
+	{
+		t2 = *it;
+
+		if (t == t2)
+		{
+			TimerManager::DelTimer(t2);
+			this->CallBacks.erase(it);
+			return true;
 		}
 	}
-	if (current == moduleCallBackHead) {
-		return NULL;
-	} else {
-		return prev;
-	}
-}
 
-void Module::DelCallback(const char *nname)
-{
-	ModuleCallBack *current = NULL;
-	ModuleCallBack *prev = NULL, *tmp = NULL;
-	int del = 0;
-
-	current = moduleCallBackHead;
-
-	while (current) {
-		if ((current->owner_name) && (current->name)) {
-			if ((strcmp(this->name.c_str(), current->owner_name) == 0)
-				&& (strcmp(current->name, nname) == 0)) {
-				if (debug) {
-					alog("debug: removing CallBack %s for module %s", nname, this->name.c_str());
-				}
-				tmp = current->next;	/* get a pointer to the next record, as once we delete this record, we'll lose it :) */
-				moduleCallBackDeleteEntry(prev);		/* delete this record */
-				del = 1;		/* set the record deleted flag */
-			}
-		}
-		if (del == 1) {		 /* if a record was deleted */
-			current = tmp;	  /* use the value we stored in temp */
-			tmp = NULL;		 /* clear it for next time */
-			del = 0;			/* reset the flag */
-		} else {
-			prev = current;	 /* just carry on as normal */
-			current = current->next;
-		}
-	}
-}
-
-/**
- * Remove all outstanding module callbacks for the given module.
- * When a module is unloaded, any callbacks it had outstanding must be removed, else when they attempt to execute the func pointer will no longer be valid, and we'll seg.
- * @param mod_name the name of the module we are preping for unload
- **/
-void moduleCallBackPrepForUnload(const char *mod_name)
-{
-	bool found = false;
-	ModuleCallBack *tmp = NULL;
-
-	tmp = moduleCallBackFindEntry(mod_name, &found);
-	while (found) {
-		if (debug) {
-			alog("debug: removing CallBack for module %s", mod_name);
-		}
-		moduleCallBackDeleteEntry(tmp);
-		tmp = moduleCallBackFindEntry(mod_name, &found);
-	}
+	return false;
 }
 
 /**
@@ -1056,23 +934,6 @@ void ModuleRunTimeDirCleanUp()
 #endif
 	if (debug) {
 		alog("debug: Module run time directory has been cleaned out");
-	}
-}
-
-/**
- * Execute a stored call back
- **/
-void ModuleManager::RunCallbacks()
-{
-	ModuleCallBack *tmp;
-
-	while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
-		if (debug)
-			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
-		if (tmp->func) {
-			tmp->func(tmp->argc, tmp->argv);
-			moduleCallBackDeleteEntry(NULL);
-		}
 	}
 }
 

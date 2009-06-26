@@ -475,8 +475,6 @@ int main(int ac, char **av, char **envp)
 		if (delayed_quit)
 			break;
 
-		ModuleManager::RunCallbacks();
-
 		if (t - last_check >= TimeoutCheck) {
 			TimerManager::TickTimers(t);
 			last_check = t;

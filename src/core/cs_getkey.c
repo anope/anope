@@ -28,15 +28,9 @@ class CommandCSGetKey : public Command
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci;
 
-		if (!u->nc->HasCommand("chanserv/getkey"))
-		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 		ci = cs_findchan(chan);
 
-		if (!check_access(u, ci, CA_GETKEY))
+		if (!check_access(u, ci, CA_GETKEY) && !u->nc->HasCommand("chanserv/getkey"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;

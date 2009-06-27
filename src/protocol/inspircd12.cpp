@@ -508,9 +508,10 @@ class InspIRCdProto : public IRCDProto
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = expires - time(NULL);
-		if (timeleft > 172800)
+		if (timeleft > 172800 || !expires)
 			timeleft = 172800;
-		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
 	}
 
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
@@ -678,7 +679,7 @@ class InspIRCdProto : public IRCDProto
 	void SendSWhois(const char *source, const char *who, const char *mask)
 	{
 		User *u = finduser(who);
-		
+
 		send_cmd(TS6SID, "METADATA %s swhois :%s", u->GetUID().c_str(), mask);
 	}
 

@@ -21,6 +21,7 @@ class CommandCSList : public Command
 public:
 	CommandCSList() : Command("LIST",1,2)
 	{
+		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

@@ -11,8 +11,8 @@ Legend:
 [ ] burn do_sjoin with fire
 [x] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
   Remaining issues:
-    [?] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
-    [ ] (think on this carefully): some commands (e.g. !help) need to strip the pre-provided channelname from them.
+    [x] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
+    [x] (think on this carefully): some commands (e.g. !help) need to strip the pre-provided channelname from them.
     [ ] (will require wider re-work): allow replies/notifications to fantasy commands to go to the channel via notice
 [x] HelpServ must die
 [+] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.

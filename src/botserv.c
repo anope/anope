@@ -136,6 +136,8 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 	char *cmd;
 	UserData *ud;
 	bool was_action = false;
+	Command *command;
+	std::string bbuf;
 
 	if (!u || !buf || !ci) {
 		return;
@@ -426,13 +428,34 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 			if (check_access(u, ci, CA_FANTASIA))
 			{
-				std::string bbuf = std::string(cmd) + " " + ci->name;
-				if (params)
+				if ((command = findCommand(CHANSERV, cmd)))
 				{
-					bbuf += " ";
-					bbuf += params;
+					/* Command exists but can not be called by fantasy */
+					if (command->HasFlag(CFLAG_DISABLE_FANTASY))
+						notice_lang(s_ChanServ, u, UNKNOWN_COMMAND_HELP, cmd, s_ChanServ);
+					else
+					{
+						bbuf = std::string(cmd);
+
+						/* Some commands don't need the channel name added.. eg !help */
+						if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
+						{
+							bbuf += " ";
+							bbuf += ci->name;
+						}
+
+						if (params)
+						{
+							bbuf += " ";
+							bbuf += params;
+						}
+
+						chanserv(u, const_cast<char *>(bbuf.c_str())); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+					}
 				}
-				chanserv(u, const_cast<char *>(bbuf.c_str())); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				else
+					notice_lang(s_ChanServ, u, UNKNOWN_COMMAND_HELP, cmd, s_ChanServ);
+
 				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(cmd, u, ci, params));
 			}
 			else

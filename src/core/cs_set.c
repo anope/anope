@@ -14,7 +14,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "encrypt.h"
 #include "hashcomp.h"
 
 class CommandCSSet : public Command

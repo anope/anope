@@ -13,41 +13,9 @@
  */
 
 #include "services.h"
-#include "encrypt.h"
-
-Encryption encryption;
+#include "modules.h"
 
 /******************************************************************************/
-void encmodule_encrypt(int (*func)
-						(const char *src, int len, char *dest, int size))
-{
-	encryption.encrypt = func;
-}
-
-void encmodule_encrypt_in_place(int (*func) (char *buf, int size))
-{
-	encryption.encrypt_in_place = func;
-}
-
-void encmodule_encrypt_check_len(int (*func) (int passlen, int bufsize))
-{
-	encryption.encrypt_check_len = func;
-}
-
-void encmodule_decrypt(int (*func) (const char *src, char *dest, int size))
-{
-	encryption.decrypt = func;
-}
-
-void encmodule_check_password(int (*func)
-							   (const char *plaintext,
-								const char *password))
-{
-	encryption.check_password = func;
-}
-
-/******************************************************************************/
-
 
 /** 
  * Encrypt string `src' of length `len', placing the result in buffer
@@ -55,10 +23,13 @@ void encmodule_check_password(int (*func)
  **/
 int enc_encrypt(const char *src, int len, char *dest, int size)
 {
-	if (encryption.encrypt) {
-		return encryption.encrypt(src, len, dest, size);
-	}
-	return -1;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, len, dest, size));
+	if (MOD_RESULT == EVENT_ALLOW)
+		return 1;
+	if (MOD_RESULT == EVENT_ERROR)
+		return -1;
+	return 0;
 }
 
 /**
@@ -68,10 +39,14 @@ int enc_encrypt(const char *src, int len, char *dest, int size)
  **/
 int enc_encrypt_in_place(char *buf, int size)
 {
-	if (encryption.encrypt_in_place) {
-		return encryption.encrypt_in_place(buf, size);
-	}
-	return -1;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnEncryptInPlace, OnEncryptInPlace(buf, size));
+	if (MOD_RESULT == EVENT_ALLOW)
+	        return 1;
+	if (MOD_RESULT == EVENT_ERROR)
+		return -1;
+	return 0;
+
 }
 
 /** 
@@ -84,10 +59,13 @@ int enc_encrypt_in_place(char *buf, int size)
  **/
 int enc_encrypt_check_len(int passlen, int bufsize)
 {
-	if (encryption.encrypt_check_len) {
-		return encryption.encrypt_check_len(passlen, bufsize);
-	}
-	return -1;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnEncryptCheckLen, OnEncryptCheckLen(passlen, bufsize));
+	if (MOD_RESULT == EVENT_ALLOW)
+	        return 1;
+	if (MOD_RESULT == EVENT_ERROR)
+		return -1;
+	return 0;
 }
 
 /**
@@ -98,10 +76,13 @@ int enc_encrypt_check_len(int passlen, int bufsize)
  **/
 int enc_decrypt(const char *src, char *dest, int size)
 {
-	if (encryption.decrypt) {
-		return encryption.decrypt(src, dest, size);
-	}
-	return -1;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(src, dest, size));
+	if (MOD_RESULT == EVENT_ALLOW)
+	        return 1;
+	if (MOD_RESULT == EVENT_ERROR)
+		return -1;
+	return 0;
 }
 
 /**
@@ -113,10 +94,13 @@ int enc_decrypt(const char *src, char *dest, int size)
  **/
 int enc_check_password(const char *plaintext, const char *password)
 {
-	if (encryption.check_password) {
-		return encryption.check_password(plaintext, password);
-	}
-	return -1;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(plaintext, password));
+	if (MOD_RESULT == EVENT_ALLOW)
+	        return 1;
+	if (MOD_RESULT == EVENT_ERROR)
+		return -1;
+	return 0;
 }
 
 /* EOF */

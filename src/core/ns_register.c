@@ -14,7 +14,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "encrypt.h"
 
 NickRequest *makerequest(const char *nick);
 NickAlias *makenick(const char *nick);

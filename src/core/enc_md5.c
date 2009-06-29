@@ -317,67 +317,10 @@ void Decode (UINT4 *output, unsigned char *input, unsigned int len)
 
 /*************************************************************************/
 
-/* Our own high-level routines.  See encrypt.h for documentation. */
+/* Our own high-level routines. */
 
 #define XTOI(c) ((c)>9 ? (c)-'A'+10 : (c)-'0')
 
-int md5_encrypt(const char *src, int len, char *dest, int size)
-{
-	MD5_CTX context;
-	char tmp[33];
-
-	if (size < 16)
-	return -1;
-
-	MD5Init(&context);
-	MD5Update(&context, (unsigned char *)src, len);
-	MD5Final((unsigned char *)dest, &context);
-	
-	if(debug) {
-		memset(tmp,0,33);
-		binary_to_hex((unsigned char *)dest,tmp,16);
-	/* Dont log source if we were encrypting in place :) */
-		if (memcmp(src, dest, 16) != 0) {
-			alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 
-	} else {
-			alog("enc_md5: hashed password to [%s]",tmp); 
-	}
-	}
-	
-	return 0;
-}
-
-
-int md5_encrypt_in_place(char *buf, int size)
-{
-	return md5_encrypt(buf, strlen(buf), buf, size);
-}
-
-
-int md5_encrypt_check_len(int passlen, int bufsize)
-{
-	if (bufsize < 16)
-	fatal("enc_md5: md5_check_len(): buffer too small (%d)", bufsize);
-	return 0;
-}
-
-
-int md5_decrypt(const char *src, char *dest, int size)
-{
-	return 0;
-}
-
-
-int md5_check_password(const char *plaintext, const char *password)
-{
-	char buf[BUFSIZE];
-
-	if (md5_encrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) < 0)
-	return -1;
-	if (memcmp(buf, password, 16) == 0)
-	return 1;
-	return 0;
-}
 
 /*************************************************************************/
 
@@ -392,24 +335,78 @@ class EMD5 : public Module
 		this->SetVersion("$Id$");
 		this->SetType(ENCRYPTION);
 
-		encmodule_encrypt(md5_encrypt);
-		encmodule_encrypt_in_place(md5_encrypt_in_place);
-		encmodule_encrypt_check_len(md5_encrypt_check_len);
-		encmodule_decrypt(md5_decrypt);
-		encmodule_check_password(md5_check_password);
+
+		ModuleManager::Attach(I_OnEncrypt, this);
+		ModuleManager::Attach(I_OnEncryptInPlace, this);
+		ModuleManager::Attach(I_OnEncryptCheckLen, this);
+		ModuleManager::Attach(I_OnDecrypt, this);
+		ModuleManager::Attach(I_OnCheckPassword, this);
+
 	}
 
-	~EMD5()
+
+	EventReturn OnEncrypt(const char *src, int len, char *dest, int size)
 	{
-		encmodule_encrypt(NULL);
-		encmodule_encrypt_in_place(NULL);
-		encmodule_encrypt_check_len(NULL);
-		encmodule_decrypt(NULL);
-		encmodule_check_password(NULL);
+		MD5_CTX context;
+		char tmp[33];
+	
+		if (size < 16)
+			return EVENT_ERROR;
+	
+		MD5Init(&context);
+		MD5Update(&context, (unsigned char *)src, len);
+		MD5Final((unsigned char *)dest, &context);
+		
+		if(debug) 
+		{
+			memset(tmp,0,33);
+			binary_to_hex((unsigned char *)dest,tmp,16);
+			/* Dont log source if we were encrypting in place :) */
+			if (memcmp(src, dest, 16) != 0) 
+			{
+				alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 
+			} else {
+				alog("enc_md5: hashed password to [%s]",tmp); 
+			}
+		}
+		
+		return EVENT_STOP;
+	}
+
+
+	EventReturn OnEncryptInPlace(char *buf, int size)
+	{
+		return OnEncrypt(buf, strlen(buf), buf, size);
+	}
+
+
+	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
+	{
+		if (bufsize < 16)
+			fatal("enc_md5: md5_check_len(): buffer too small (%d)", bufsize);
+		return EVENT_STOP;
+	}
+
+
+	EventReturn OnDecrypt(const char *src, char *dest, int size)
+	{
+		return EVENT_STOP;
+	}
+
+
+	EventReturn OnCheckPassword(const char *plaintext, const char *password)
+	{
+		char buf[BUFSIZE];
+
+		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_ERROR)
+			return EVENT_ERROR;
+		if (memcmp(buf, password, 16) == 0)
+		{
+			return EVENT_ALLOW; 
+		}
+		return EVENT_CONTINUE; 
 	}
 };
-
-
 
 /*************************************************************************/
 

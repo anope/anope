@@ -47,7 +47,8 @@ enum EventReturn
 {
 	EVENT_STOP,
 	EVENT_CONTINUE,
-	EVENT_ALLOW
+	EVENT_ALLOW,
+	EVENT_ERROR
 };
 
 
@@ -539,6 +540,15 @@ class CoreExport Module
 	 */
 	virtual void OnBackupDatabase() MARK_DEPRECATED { }
 
+	/** Called when anope needs to check passwords against encryption
+	 *  see src/encrypt.c for detailed informations
+	 */
+	virtual EventReturn OnEncrypt(const char *src,int len,char *dest,int size) { return EVENT_CONTINUE; }
+	virtual EventReturn OnEncryptInPlace(char *buf, int size) { return EVENT_CONTINUE; }
+	virtual EventReturn OnEncryptCheckLen(int passlen, int bufsize) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDecrypt(const char *src, char *dest, int size) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckPassword(const char *plaintext, const char *password) { return EVENT_CONTINUE; }
+
 	/** Called on fantasy command
 	 * @param command The command
 	 * @param u The user using the command
@@ -805,17 +815,17 @@ enum Implementation
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan,
 
 		/* Users */
-		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel, 
+		I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */
 		I_OnDefconLevel,
 
 		/* Other */
-
 		I_OnReload, I_OnPreServerConnect, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnSaveDatabase, I_OnBackupDatabase,
 		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
-		
+		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 	I_END
 };
 
@@ -943,9 +953,9 @@ struct MessageHash_ {
 
 /*************************************************************************/
 /* Module Managment Functions */
-MDE Module *findModule(const char *name);				/* Find a module */
+MDE Module *findModule(const char *name);	/* Find a module */
 
-int encryption_module_init(); /* Load the encryption module */
+int encryption_module_init();	/* Load the encryption module */
 int protocol_module_init();	/* Load the IRCD Protocol Module up*/
 MDE void moduleDisplayHelp(const char *service, User *u);
 

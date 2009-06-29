@@ -324,74 +324,6 @@ static void Decode(UINT4 *output, unsigned char *input, unsigned int len)
 #define XTOI(c) ((c)>9 ? (c)-'A'+10 : (c)-'0')
 
 
-/* Encrypt `src' of length `len' and store the result in `dest'.  If the
- * resulting string would be longer than `size', return -1 and leave `dest'
- * unchanged; else return 0.
- */
-int old_encrypt(const char *src, int len, char *dest, int size)
-{
-
-	MD5_CTX context;
-	char digest[33];
-	char tmp[33];
-	int i;
-
-	if (size < 16)
-		return -1;
-
-	memset(&context, 0, sizeof(context));
-	memset(&digest, 0, sizeof(digest));
-
-	MD5Init(&context);
-	MD5Update(&context, (unsigned char *)src, len);
-	MD5Final((unsigned char *)digest, &context);
-	for (i = 0; i < 32; i += 2)
-		dest[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
-
-	if(debug) {
-		memset(tmp,0,33);
-		binary_to_hex((unsigned char *)dest,tmp,16);
-		alog("enc_old: Converted [%s] to [%s]",src,tmp); 
-	}
-
-	return 0;
-
-}
-
-
-/* Shortcut for encrypting a null-terminated string in place. */
-int old_encrypt_in_place(char *buf, int size)
-{
-	return old_encrypt(buf, strlen(buf), buf, size);
-}
-
-int old_encrypt_check_len(int passlen, int bufsize)
-{
-	if (bufsize < 16)
-		fatal("enc_old: old_check_len(): buffer too small (%d)", bufsize);
-	return 0;
-}
-
-
-/* Compare a plaintext string against an encrypted password.  Return 1 if
- * they match, 0 if not, and -1 if something went wrong. */
-
-int old_check_password(const char *plaintext, const char *password)
-{
-	char buf[BUFSIZE];
-
-	if (old_encrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) < 0)
-		return -1;
-	if (memcmp(buf, password, 16) == 0)
-		return 1;
-	else
-		return 0;
-}
-
-int old_decrypt(const char *src, char *dest, int size)
-{
-	return 0;
-}
 
 class EOld : public Module
 {
@@ -402,21 +334,85 @@ class EOld : public Module
 		this->SetVersion("$Id$");
 		this->SetType(ENCRYPTION);
 
-		encmodule_encrypt(old_encrypt);
-		encmodule_encrypt_in_place(old_encrypt_in_place);
-		encmodule_encrypt_check_len(old_encrypt_check_len);
-		encmodule_decrypt(old_decrypt);
-		encmodule_check_password(old_check_password);
+		ModuleManager::Attach(I_OnEncrypt, this);
+		ModuleManager::Attach(I_OnEncryptInPlace, this);
+		ModuleManager::Attach(I_OnEncryptCheckLen, this);
+		ModuleManager::Attach(I_OnDecrypt, this);
+		ModuleManager::Attach(I_OnCheckPassword, this);
+
 	}
 
-	~EOld()
+
+	/* Encrypt `src' of length `len' and store the result in `dest'.  If the
+	 * resulting string would be longer than `size', return -1 and leave `dest'
+	 * unchanged; else return 0.
+	 */
+	EventReturn OnEncrypt(const char *src, int len, char *dest, int size)
 	{
-		encmodule_encrypt(NULL);
-		encmodule_encrypt_in_place(NULL);
-		encmodule_encrypt_check_len(NULL);
-		encmodule_decrypt(NULL);
-		encmodule_check_password(NULL);
+
+		MD5_CTX context;
+		char digest[33];
+		char tmp[33];
+		int i;
+
+		if (size < 16)
+			return EVENT_ERROR;
+
+		memset(&context, 0, sizeof(context));
+		memset(&digest, 0, sizeof(digest));
+
+		MD5Init(&context);
+		MD5Update(&context, (unsigned char *)src, len);
+		MD5Final((unsigned char *)digest, &context);
+		for (i = 0; i < 32; i += 2)
+			dest[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
+
+		if(debug) 
+		{
+			memset(tmp,0,33);
+			binary_to_hex((unsigned char *)dest,tmp,16);
+			alog("enc_old: Converted [%s] to [%s]",src,tmp); 
+		}
+
+		return EVENT_STOP; 
 	}
+
+
+	/* Shortcut for encrypting a null-terminated string in place. */
+	EventReturn OnEncryptInPlace(char *buf, int size)
+	{
+		return OnEncrypt(buf, strlen(buf), buf, size);
+	}
+
+	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
+	{
+		if (bufsize < 16)
+			fatal("enc_old: old_check_len(): buffer too small (%d)", bufsize);
+		return EVENT_STOP; 
+	}
+
+
+	/* Compare a plaintext string against an encrypted password.  Return 1 if
+	 * they match, 0 if not, and -1 if something went wrong. */
+
+	EventReturn OnCheckPassword(const char *plaintext, const char *password)
+	{
+		char buf[BUFSIZE];
+
+		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_ERROR)
+			return EVENT_ERROR;
+		if (memcmp(buf, password, 16) == 0)
+		{
+			return EVENT_ALLOW; 
+		}
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnDecrypt(const char *src, char *dest, int size)
+	{
+		return EVENT_CONTINUE; // 0
+	}
+
 };
 
 /*************************************************************************/

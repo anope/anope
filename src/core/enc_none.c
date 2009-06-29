@@ -1,4 +1,4 @@
-/* Module for encryption using MD5.
+/* Module for plain text encryption.
  *
  * (C) 2003-2009 Anope Team
  * Contact us at team@anope.org
@@ -9,12 +9,6 @@
 
 #include "module.h"
 
-int plain_encrypt(const char *src,int len,char *dest,int size);
-int plain_encrypt_in_place(char *buf, int size);
-int plain_encrypt_check_len(int passlen, int bufsize);
-int plain_decrypt(const char *src, char *dest, int size);
-int plain_check_password(const char *plaintext, const char *password);
-
 class ENone : public Module
 {
  public:
@@ -24,58 +18,54 @@ class ENone : public Module
 		this->SetVersion("$Id$");
 		this->SetType(ENCRYPTION);
 
-		encmodule_encrypt(plain_encrypt);
-		encmodule_encrypt_in_place(plain_encrypt_in_place);
-		encmodule_encrypt_check_len(plain_encrypt_check_len);
-		encmodule_decrypt(plain_decrypt);
-		encmodule_check_password(plain_check_password);
+		ModuleManager::Attach(I_OnEncrypt, this);
+		ModuleManager::Attach(I_OnEncryptInPlace, this);
+		ModuleManager::Attach(I_OnEncryptCheckLen, this);
+		ModuleManager::Attach(I_OnDecrypt, this);
+		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
 
-	~ENone()
+	EventReturn OnEncrypt(const char *src,int len,char *dest,int size) 
 	{
-		encmodule_encrypt(NULL);
-		encmodule_encrypt_in_place(NULL);
-		encmodule_encrypt_check_len(NULL);
-		encmodule_decrypt(NULL);
-		encmodule_check_password(NULL);
+		if(size>=len) 
+		{
+			memset(dest,0,size);
+			strncpy(dest,src,len);
+			dest[len] = '\0';
+			return EVENT_STOP; 
+		}
+		return EVENT_ERROR; 
 	}
-};
 
-int plain_encrypt(const char *src,int len,char *dest,int size) {
-	if(size>=len) {
+	EventReturn OnEncryptInPlace(char *buf, int size) 
+	{
+		return EVENT_STOP; 
+	}
+
+	EventReturn OnEncryptCheckLen(int passlen, int bufsize) 
+	{
+		if(bufsize>=passlen) {
+			return EVENT_STOP;  
+		}
+		return EVENT_ALLOW; // return 1 
+	}
+
+	EventReturn OnDecrypt(const char *src, char *dest, int size) {
 		memset(dest,0,size);
-		strncpy(dest,src,len);
-		dest[len] = '\0';
-		return 0;
+		strncpy(dest,src,size);
+		dest[size] = '\0';
+		return EVENT_ALLOW;
 	}
-	return -1;
-}
 
-int plain_encrypt_in_place(char *buf, int size) {
-	return 0;
-}
-
-int plain_encrypt_check_len(int passlen, int bufsize) {
-	if(bufsize>=passlen) {
-		return 0;
+	EventReturn OnCheckPassword(const char *plaintext, const char *password) {
+		if(strcmp(plaintext,password)==0) 
+		{
+			return EVENT_ALLOW;
+		}
+		return EVENT_CONTINUE;
 	}
-	return bufsize;
-}
 
-int plain_decrypt(const char *src, char *dest, int size) {
-	memset(dest,0,size);
-	strncpy(dest,src,size);
-	dest[size] = '\0';
-	return 1;
-}
-
-int plain_check_password(const char *plaintext, const char *password) {
-	if(strcmp(plaintext,password)==0) {
-		return 1;
-	}
-	return 0;
-}
-
+};
 /* EOF */
 
 

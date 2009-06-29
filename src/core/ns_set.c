@@ -14,7 +14,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "encrypt.h"
 
 class CommandNSSet : public Command
 {

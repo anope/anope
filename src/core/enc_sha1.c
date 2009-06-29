@@ -175,74 +175,6 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 
 /*****************************************************************************/
 
-int sha1_encrypt(const char *src, int len, char *dest, int size)
-{
-	SHA1_CTX context;
-	unsigned char tmp[41];
-
-	if (size < 20)
-		return -1;
-
-	memset(dest,0,size);
-
-	SHA1Init(&context);
-	SHA1Update(&context, (unsigned char *)src, len);
-	SHA1Final((unsigned char *)dest, &context);
-
-	if(debug) {
-		memset(tmp,0,41);
-		binary_to_hex((unsigned char *)dest,(char *)tmp,20);
-	   /* Dont log source if we were encrypting in place :) */
-		if (memcmp(src, dest, 20) != 0) {
-			alog("enc_sha1: hashed from [%s] to [%s]",src,tmp); 
-		} else {
-			alog("enc_sha1: hashed password to [%s]",tmp); 
-		}
-	}
-	
-	return 0;
-}
-
-
-int sha1_encrypt_in_place(char *buf, int size)
-{
-	char tmp[41];
-
-	memset(tmp,0,41);
-	if(sha1_encrypt(buf, strlen(buf), tmp, size)==0) {
-		memcpy(buf, tmp, size);
-	} else {
-		return -1;
-	}
-	return 0;
-}
-
-
-int sha1_encrypt_check_len(int passlen, int bufsize)
-{
-	if (bufsize < 20)
-		fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
-	return 0;
-}
-
-
-int sha1_decrypt(const char *src, char *dest, int size)
-{
-	return 0;
-}
-
-
-int sha1_check_password(const char *plaintext, const char *password)
-{
-	char buf[BUFSIZE];
-
-	if (sha1_encrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) < 0)
-		return -1;
-	if (memcmp(buf, password, 20) == 0)
-		return 1;
-
-	return 0;
-}
 
 /*************************************************************************/
 
@@ -257,21 +189,86 @@ class ESHA1 : public Module
 		this->SetVersion("$Id$");
 		this->SetType(ENCRYPTION);
 
-		encmodule_encrypt(sha1_encrypt);
-		encmodule_encrypt_in_place(sha1_encrypt_in_place);
-		encmodule_encrypt_check_len(sha1_encrypt_check_len);
-		encmodule_decrypt(sha1_decrypt);
-		encmodule_check_password(sha1_check_password);
+		ModuleManager::Attach(I_OnEncrypt, this);
+		ModuleManager::Attach(I_OnEncryptInPlace, this);
+		ModuleManager::Attach(I_OnEncryptCheckLen, this);
+		ModuleManager::Attach(I_OnDecrypt, this);
+		ModuleManager::Attach(I_OnCheckPassword, this);
+
 	}
 
-	~ESHA1()
+
+	EventReturn OnEncrypt(const char *src, int len, char *dest, int size)
 	{
-		encmodule_encrypt(NULL);
-		encmodule_encrypt_in_place(NULL);
-		encmodule_encrypt_check_len(NULL);
-		encmodule_decrypt(NULL);
-		encmodule_check_password(NULL);
+		SHA1_CTX context;
+		unsigned char tmp[41];
+
+		if (size < 20)
+			return EVENT_ALLOW; 
+
+		memset(dest,0,size);
+
+		SHA1Init(&context);
+		SHA1Update(&context, (unsigned char *)src, len);
+		SHA1Final((unsigned char *)dest, &context);
+
+		if(debug) 
+		{
+			memset(tmp,0,41);
+			binary_to_hex((unsigned char *)dest,(char *)tmp,20);
+			/* Dont log source if we were encrypting in place :) */
+			if (memcmp(src, dest, 20) != 0) 
+			{
+				alog("enc_sha1: hashed from [%s] to [%s]",src,tmp); 
+			} else {
+				alog("enc_sha1: hashed password to [%s]",tmp); 
+			}
+		}
+		return EVENT_STOP; 
 	}
+
+
+	EventReturn OnEncryptInPlace(char *buf, int size)
+	{
+		char tmp[41];
+
+		memset(tmp,0,41);
+		if(OnEncrypt(buf, strlen(buf), tmp, size)==EVENT_STOP) 
+		{
+			memcpy(buf, tmp, size);
+		} else {
+			return EVENT_STOP; 
+		}
+		return EVENT_STOP; 
+	}
+
+
+	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
+	{
+		if (bufsize < 20)
+			fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
+		return EVENT_STOP; 
+	}
+
+
+	EventReturn OnDecrypt(const char *src, char *dest, int size)
+	{
+		return EVENT_STOP; 
+	}
+
+
+	EventReturn OnCheckPassword(const char *plaintext, const char *password)
+	{
+		char buf[BUFSIZE];
+		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_ALLOW)
+			return EVENT_STOP; 
+		if (memcmp(buf, password, 20) == 0) 
+		{
+			return EVENT_ALLOW;
+		}
+		return EVENT_CONTINUE; 
+	}
+
 };
 
 

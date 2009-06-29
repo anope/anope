@@ -378,7 +378,7 @@ int anope_check_sync(const char *name)
 void do_server(const char *source, const char *servername, const char *hops,
 			   const char *descript, const char *numeric)
 {
-	Server *s;
+	Server *s, *newserver;
 
 	if (debug) {
 		if (!*source) {
@@ -401,14 +401,14 @@ void do_server(const char *source, const char *servername, const char *hops,
 		throw CoreException("Recieved a server from a nonexistant uplink?");
 
 	/* Create a server structure. */
-	new_server(s, servername, descript, 0, numeric);
+	newserver = new_server(s, servername, descript, 0, numeric);
 
 	/* Announce services being online. */
 	if (GlobalOnCycle && GlobalOnCycleUP)
-		notice_server(s_GlobalNoticer, s, "%s", GlobalOnCycleUP);
+		notice_server(s_GlobalNoticer, newserver, "%s", GlobalOnCycleUP);
 
 	/* Let modules know about the connection */
-	FOREACH_MOD(I_OnServerConnect, OnServerConnect(s));
+	FOREACH_MOD(I_OnServerConnect, OnServerConnect(newserver));
 }
 
 /*************************************************************************/

@@ -10,7 +10,7 @@ services.h: sysconf.h config.h extern.h
 extern.h: slist.h
 	touch $@
 
-pseudo.h: commands.h timers.h encrypt.h datafiles.h slist.h
+pseudo.h: commands.h timers.h datafiles.h slist.h
 	touch $@
 
 clean:

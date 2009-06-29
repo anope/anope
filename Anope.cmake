@@ -504,8 +504,8 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   foreach(LIBRARY ${LIBRARIES})
     set(THIS_LDFLAGS "${THIS_LDFLAGS} -l${LIBRARY}")
   endforeach(LIBRARY)
-  set(${SRC_LDFLAGS} ${THIS_LDFLAGS})
-  set(${EXTRA_DEPENDS} ${EXTRA_DEPENDENCIES})
+  set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
+  set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")
 endmacro(calculate_libraries)
 
 ###############################################################################

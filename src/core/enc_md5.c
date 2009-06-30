@@ -351,7 +351,7 @@ class EMD5 : public Module
 		char tmp[33];
 	
 		if (size < 16)
-			return EVENT_ERROR;
+			return EVENT_STOP;
 	
 		MD5Init(&context);
 		MD5Update(&context, (unsigned char *)src, len);
@@ -398,8 +398,8 @@ class EMD5 : public Module
 	{
 		char buf[BUFSIZE];
 
-		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_ERROR)
-			return EVENT_ERROR;
+		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
+			return EVENT_STOP;
 		if (memcmp(buf, password, 16) == 0)
 		{
 			return EVENT_ALLOW; 

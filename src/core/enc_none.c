@@ -34,7 +34,7 @@ class ENone : public Module
 			dest[len] = '\0';
 			return EVENT_STOP; 
 		}
-		return EVENT_ERROR; 
+		return EVENT_STOP; 
 	}
 
 	EventReturn OnEncryptInPlace(char *buf, int size) 

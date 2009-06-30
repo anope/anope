@@ -356,7 +356,7 @@ class EOld : public Module
 		int i;
 
 		if (size < 16)
-			return EVENT_ERROR;
+			return EVENT_STOP;
 
 		memset(&context, 0, sizeof(context));
 		memset(&digest, 0, sizeof(digest));
@@ -399,8 +399,8 @@ class EOld : public Module
 	{
 		char buf[BUFSIZE];
 
-		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_ERROR)
-			return EVENT_ERROR;
+		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
+			return EVENT_STOP;
 		if (memcmp(buf, password, 16) == 0)
 		{
 			return EVENT_ALLOW; 

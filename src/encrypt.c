@@ -27,7 +27,7 @@ int enc_encrypt(const char *src, int len, char *dest, int size)
 	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, len, dest, size));
 	if (MOD_RESULT == EVENT_ALLOW)
 		return 1;
-	if (MOD_RESULT == EVENT_ERROR)
+	if (MOD_RESULT == EVENT_STOP)
 		return -1;
 	return 0;
 }
@@ -43,7 +43,7 @@ int enc_encrypt_in_place(char *buf, int size)
 	FOREACH_RESULT(I_OnEncryptInPlace, OnEncryptInPlace(buf, size));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 1;
-	if (MOD_RESULT == EVENT_ERROR)
+	if (MOD_RESULT == EVENT_STOP)
 		return -1;
 	return 0;
 
@@ -63,7 +63,7 @@ int enc_encrypt_check_len(int passlen, int bufsize)
 	FOREACH_RESULT(I_OnEncryptCheckLen, OnEncryptCheckLen(passlen, bufsize));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 1;
-	if (MOD_RESULT == EVENT_ERROR)
+	if (MOD_RESULT == EVENT_STOP)
 		return -1;
 	return 0;
 }
@@ -80,7 +80,7 @@ int enc_decrypt(const char *src, char *dest, int size)
 	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(src, dest, size));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 1;
-	if (MOD_RESULT == EVENT_ERROR)
+	if (MOD_RESULT == EVENT_STOP)
 		return -1;
 	return 0;
 }
@@ -98,7 +98,7 @@ int enc_check_password(const char *plaintext, const char *password)
 	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(plaintext, password));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 1;
-	if (MOD_RESULT == EVENT_ERROR)
+	if (MOD_RESULT == EVENT_STOP)
 		return -1;
 	return 0;
 }

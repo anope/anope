@@ -47,8 +47,7 @@ enum EventReturn
 {
 	EVENT_STOP,
 	EVENT_CONTINUE,
-	EVENT_ALLOW,
-	EVENT_ERROR
+	EVENT_ALLOW
 };
 
 

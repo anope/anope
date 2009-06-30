@@ -7,20 +7,15 @@ Legend:
 -----
 [x] Remove modules_unload_all fini + hack that goes with it
   [x] signal handling cleanup
-[ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
-[ ] burn do_sjoin with fire
 [x] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
   Remaining issues:
     [x] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
     [x] (think on this carefully): some commands (e.g. !help) need to strip the pre-provided channelname from them.
-    [ ] (will require wider re-work): allow replies/notifications to fantasy commands to go to the channel via notice
 [x] HelpServ must die
-[+] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
-[ ] Fix permanent channels support properly. This will require removing do_sjoin().
+[x] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [x] Make NS ENFORCE/RELEASE stuff more sane, redo timers
-[ ] Add support for +k, +q, etc type umodes
 [x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
-[+] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
+[x] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
 
 Outstanding issues:
 - autoid
@@ -41,13 +36,18 @@ Outstanding issues:
   [ ] Asynchronous, using select() (multiple engines? not really needed..)
   [ ] Callbacks, event style, see also inspircd
   [ ] Asynchronous DNS?
+
+Future
+------
+[ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
 [ ] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
 [?] Remote identification (1.9.1? will this break stuff?)
   [ ] Requires a rejig of how Alias vs Core works
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
-
-Future
-------
+[ ] Add support for +k, +q, etc type umodes
+[ ] Fix permanent channels support properly. This will require removing do_sjoin().
+	[ ] burn do_sjoin with fire
+[ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [ ] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
 	the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
 [ ] generic database routines modules can use to create their own database

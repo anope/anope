@@ -20,7 +20,7 @@ static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm,
 	char *nick;
 	if (!access->in_use)
 		return 0;
-	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/change"))
+	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
 	{
 		(*perm)++;
 		return 0;
@@ -168,7 +168,7 @@ class CommandCSAccess : public Command
 			if (access)
 			{
 				/* Don't allow lowering from a level >= ulev */
-				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/change"))
+				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 				{
 					notice_lang(s_ChanServ, u, ACCESS_DENIED);
 					return MOD_CONT;
@@ -256,7 +256,7 @@ class CommandCSAccess : public Command
 					notice_lang(s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
 					return MOD_CONT;
 				}
-				if (get_access(u, ci) <= access->level && !u->nc->HasPriv("chanserv/access/change"))
+				if (get_access(u, ci) <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
 				{
 					deleted = 0;
 					notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -315,7 +315,7 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change"))
+			if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 			{
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
@@ -378,7 +378,7 @@ class CommandCSLevels : public Command
 			this->OnSyntaxError(u);
 		} else if (ci->flags & CI_XOP) {
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
-		} else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change")) {
+		} else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify")) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(cmd, "SET") == 0) {
 			level = strtol(s, &error, 10);

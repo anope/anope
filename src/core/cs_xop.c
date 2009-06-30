@@ -259,7 +259,7 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 
-			if (ulev <= access->level && !u->nc->HasPriv("chanserv/access/change"))
+			if (ulev <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
 			{
 				deleted = 0;
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -335,7 +335,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/change"))
+		if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -521,7 +521,7 @@ int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, i
 	char *nick = access->nc->display;
 	if (!access->in_use || access->level != xlev)
 		return 0;
-	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/change"))
+	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
 	{
 		++(*perm);
 		return 0;

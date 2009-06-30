@@ -201,7 +201,7 @@ class CommandCSAKick : public Command
 								 || !stricmp(cmd, "DEL")))) {
 
 			syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
-		} else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/change"))
+		} else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (stricmp(cmd, "ADD") == 0) {

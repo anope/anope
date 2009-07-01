@@ -388,9 +388,9 @@ echo ""
 
 ####
 
-echo "Are there any extra aguments you wish to pass to $BUILD_SYSTEM?"
+echo "Are there any extra arguments you wish to pass to $BUILD_SYSTEM?"
 echo "(You may only need to do this if $BUILD_SYSTEM is unable to locate"
-echo "missing dependancies without hints)"
+echo "missing dependencies without hints)"
 echo2 "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 EXTRA_CONFIG_ARGS=$INPUT

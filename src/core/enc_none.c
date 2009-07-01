@@ -32,22 +32,23 @@ class ENone : public Module
 			memset(dest,0,size);
 			strncpy(dest,src,len);
 			dest[len] = '\0';
-			return EVENT_STOP; 
+			return EVENT_ALLOW; 
 		}
-		return EVENT_STOP; 
+		return EVENT_STOP;
 	}
 
 	EventReturn OnEncryptInPlace(char *buf, int size) 
 	{
-		return EVENT_STOP; 
+		return EVENT_ALLOW;
 	}
 
 	EventReturn OnEncryptCheckLen(int passlen, int bufsize) 
 	{
-		if(bufsize>=passlen) {
-			return EVENT_STOP;  
+		if(bufsize>=passlen) 
+		{
+			return EVENT_ALLOW;
 		}
-		return EVENT_ALLOW; // return 1 
+		return EVENT_STOP;
 	}
 
 	EventReturn OnDecrypt(const char *src, char *dest, int size) {
@@ -62,7 +63,7 @@ class ENone : public Module
 		{
 			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 
 };

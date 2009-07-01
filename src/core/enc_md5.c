@@ -370,7 +370,7 @@ class EMD5 : public Module
 			}
 		}
 		
-		return EVENT_STOP;
+		return EVENT_ALLOW;
 	}
 
 
@@ -383,8 +383,11 @@ class EMD5 : public Module
 	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
 	{
 		if (bufsize < 16)
+		{
 			fatal("enc_md5: md5_check_len(): buffer too small (%d)", bufsize);
-		return EVENT_STOP;
+			return EVENT_STOP;
+		}
+		return EVENT_ALLOW;
 	}
 
 
@@ -402,9 +405,9 @@ class EMD5 : public Module
 			return EVENT_STOP;
 		if (memcmp(buf, password, 16) == 0)
 		{
-			return EVENT_ALLOW; 
+			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE; 
+		return EVENT_STOP;
 	}
 };
 

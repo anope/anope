@@ -204,7 +204,7 @@ class ESHA1 : public Module
 		unsigned char tmp[41];
 
 		if (size < 20)
-			return EVENT_ALLOW; 
+			return EVENT_STOP; 
 
 		memset(dest,0,size);
 
@@ -224,7 +224,7 @@ class ESHA1 : public Module
 				alog("enc_sha1: hashed password to [%s]",tmp); 
 			}
 		}
-		return EVENT_STOP; 
+		return EVENT_ALLOW; 
 	}
 
 
@@ -233,11 +233,10 @@ class ESHA1 : public Module
 		char tmp[41];
 
 		memset(tmp,0,41);
-		if(OnEncrypt(buf, strlen(buf), tmp, size)==EVENT_STOP) 
+		if(OnEncrypt(buf, strlen(buf), tmp, size)==EVENT_ALLOW) 
 		{
 			memcpy(buf, tmp, size);
-		} else {
-			return EVENT_STOP; 
+			return EVENT_ALLOW;
 		}
 		return EVENT_STOP; 
 	}
@@ -246,8 +245,11 @@ class ESHA1 : public Module
 	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
 	{
 		if (bufsize < 20)
+		{
 			fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
-		return EVENT_STOP; 
+			return EVENT_STOP; 
+		}
+		return EVENT_ALLOW;
 	}
 
 
@@ -260,13 +262,13 @@ class ESHA1 : public Module
 	EventReturn OnCheckPassword(const char *plaintext, const char *password)
 	{
 		char buf[BUFSIZE];
-		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_ALLOW)
-			return EVENT_STOP; 
-		if (memcmp(buf, password, 20) == 0) 
+		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
+			return EVENT_STOP;
+		if (memcmp(buf, password, 20) == 0)
 		{
 			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE; 
+		return EVENT_STOP;
 	}
 
 };

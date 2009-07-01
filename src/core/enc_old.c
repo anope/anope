@@ -367,14 +367,14 @@ class EOld : public Module
 		for (i = 0; i < 32; i += 2)
 			dest[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
 
-		if(debug) 
+		if(debug)
 		{
 			memset(tmp,0,33);
 			binary_to_hex((unsigned char *)dest,tmp,16);
 			alog("enc_old: Converted [%s] to [%s]",src,tmp); 
 		}
 
-		return EVENT_STOP; 
+		return EVENT_ALLOW;
 	}
 
 
@@ -387,8 +387,11 @@ class EOld : public Module
 	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
 	{
 		if (bufsize < 16)
+		{
 			fatal("enc_old: old_check_len(): buffer too small (%d)", bufsize);
-		return EVENT_STOP; 
+			return EVENT_STOP;
+		}
+		return EVENT_ALLOW;
 	}
 
 
@@ -405,12 +408,12 @@ class EOld : public Module
 		{
 			return EVENT_ALLOW; 
 		}
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 
 	EventReturn OnDecrypt(const char *src, char *dest, int size)
 	{
-		return EVENT_CONTINUE; // 0
+		return EVENT_STOP; // 0
 	}
 
 };

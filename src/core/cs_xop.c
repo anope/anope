@@ -307,7 +307,7 @@ class XOPBase : public Command
 			process_numlist(nick, NULL, xop_list_callback, u, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
 		else
 		{
-			for (int i = 0; i < ci->access.size(); ++i)
+			for (size_t i = 0; i < ci->access.size(); ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
 				if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
@@ -362,7 +362,9 @@ class XOPBase : public Command
 
 		ChannelInfo *ci = cs_findchan(chan);
 
-		if (!(ci->flags & CI_XOP))
+		if (!ci)
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+		else if (!(ci->flags & CI_XOP))
 			notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
 		else if (!stricmp(cmd, "ADD"))
 			return this->DoAdd(u, params, ci, level, messages);
@@ -542,7 +544,7 @@ int xop_del_callback(User *u, int num, va_list args)
 	int uacc = va_arg(args, int);
 	int xlev = va_arg(args, int);
 
-	if (num < 1 || num > ci->access.size())
+	if (num < 1 || num > static_cast<int>(ci->access.size()))
 		return 0;
 	*last = num;
 
@@ -574,7 +576,7 @@ int xop_list_callback(User *u, int num, va_list args)
 	int xlev = va_arg(args, int);
 	int xmsg = va_arg(args, int);
 
-	if (num < 1 || num > ci->access.size())
+	if (num < 1 || num > static_cast<int>(ci->access.size()))
 		return 0;
 
 	return xop_list(u, num - 1, ci, sent_header, xlev, xmsg);

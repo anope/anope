@@ -350,6 +350,7 @@ class CommandBSBot : public Command
  public:
 	CommandBSBot() : Command("BOT", 1, 6)
 	{
+		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

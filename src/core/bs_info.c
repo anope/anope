@@ -49,6 +49,7 @@ class CommandBSInfo : public Command
  public:
 	CommandBSInfo() : Command("INFO", 1, 1)
 	{
+		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)

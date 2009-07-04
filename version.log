@@ -8,11 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="1"
-VERSION_EXTRA=""
-VERSION_BUILD="2357"
+VERSION_EXTRA="-svn"
+VERSION_BUILD="2358"
 
-# $Log$ # Changes since 1.8.0 Release
+# $Log$ # Changes since 1.8.1 Release
 
+
+
+# Leading up to 1.8.1 Release
 #Revision 2337 - Fixed several bugs in messages.c regarding parsing TS6 encoded commands. This is a prerequisite for an InspIRCd 1.2 protocol module.
 #Revision 2329 - Update to allow windows build to function with the removal of inspircd10.c
 #Revision 2327 - Fix memory leak in NS SUSPEND, patch by Adam.

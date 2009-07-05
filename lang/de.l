@@ -11,9 +11,7 @@
 # Translated by chemical <chem@gmx.net>,shine <dh@shinewelt.de> bis 28.02.2003
 # - Solltest du irgendwelche Rechtschreibfehler oder sonstige
 #   Verbesserungsvorschläge haben, immer her damit!
-#
-# letzte Änderung: 28.02.2003
-#
+##########################################################################
 #
 # This program is free but copyrighted software; see the file COPYING for
 # details.
@@ -49,7 +47,7 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ##########################################################################
 #
-# INFO ::: Letzte Änderung:	19.10.2008	-- Han` --
+# INFO ::: Letzte Änderung:	05.07.2009	-- Han` -- Han@mefalcon.org --
 #
 ##########################################################################
 
@@ -1130,7 +1128,7 @@ CHAN_LOGOUT_SERVADMIN_SYNTAX
 CHAN_LOGOUT_SUCCEEDED
 	Der User %s wurde vom Channel %s ausgeloggt.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	Alle identifizierten User wurden vom Channel ausgeloggt %s (except the channel founder).
+	Alle identifizierten User wurden vom Channel ausgeloggt %s (außer dem Channel Founder).
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1160,7 +1158,7 @@ CHAN_SUCCESSOR_CHANGED
 CHAN_SUCCESSOR_UNSET
 	Der Eintrag des Vertreters für %s wurde entfernt.
 CHAN_SUCCESSOR_IS_FOUNDER
-	%s kann nicht gleichzeitig Gründer und Vertreter im Channel %s sein.
+	%s kann nicht gleichzeitig Founder und Vertreter im Channel %s sein.
 
 # SET PASSWORD responses
 CHAN_SET_PASSWORD_FAILED
@@ -1559,7 +1557,7 @@ CHAN_LEVELS_LIST_HEADER
 CHAN_LEVELS_LIST_DISABLED
 	    %-*s  (deaktiviert)
 CHAN_LEVELS_LIST_FOUNDER
-	    %-*s  (nur Gründer)
+	    %-*s  (nur Founder)
 CHAN_LEVELS_LIST_NORMAL
 	    %-*s  %d
 CHAN_LEVELS_RESET
@@ -1583,9 +1581,9 @@ CHAN_INFO_SYNTAX
 CHAN_INFO_HEADER
 	Informationen über den Channel %s:
 CHAN_INFO_FOUNDER
-	           Gründer: %s (%s)
+	           Founder: %s (%s)
 CHAN_INFO_NO_FOUNDER
-	           Gründer: %s
+	           Founder: %s
 CHAN_INFO_SUCCESSOR
 	         Vertreter: %s (%s)
 CHAN_INFO_NO_SUCCESSOR
@@ -1699,7 +1697,7 @@ CHAN_GETPASS_PASSWORD_IS
 CHAN_GETKEY_SYNTAX
 	GETKEY Channel
 CHAN_GETKEY_NOKEY
-	Der Channel %s hat keinen Schlüßel.
+	Der Channel %s hat kein Passwort.
 CHAN_GETKEY_KEY
 	KEY %s %s
 
@@ -2767,7 +2765,7 @@ OPER_SGLINE_VIEW_FORMAT
 OPER_SGLINE_CLEAR
 	Die SGLINE-Liste wurde geleert.
 
-# SZLINE responses
+# SQLINE responses
 OPER_SQLINE_SYNTAX
 	SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmaske | entry-liste} [Grund]]
 OPER_SQLINE_CHANNELS_UNSUPPORTED
@@ -2918,9 +2916,9 @@ OPER_JUPE_SYNTAX
 
 # RAW responses
 OPER_JUPE_HOST_ERROR
-	Benutze bitte einen gültigen hostnamen, wenn du jupiterst
+	Benutze bitte einen gültigen Hostnamen, wenn du den JUPE Befehl benutzt.
 OPER_JUPE_INVALID_SERVER
-	You can not jupe your services server or your uplink server.
+	Du kannst den JUPE Befehl nicht gegen Deinen Services Server oder Hub Server richten.
 	
 # RAW responses
 OPER_RAW_SYNTAX
@@ -3349,13 +3347,13 @@ NEWS_RANDOM_LIST_ENTRY
 	%5d (%s von %s)
 	    %s
 NEWS_RANDOM_LIST_NONE
-	Keine randomnews vorhanden.
+	Keine Randomnews vorhanden.
 NEWS_RANDOM_ADD_SYNTAX
 	RANDOMNEWS ADD Text
 NEWS_RANDOM_ADD_FULL
 	Die News Liste ist voll!
 NEWS_RANDOM_ADDED
-	Neuer randomnews Eintrag hinzugefügt (#%d).
+	Neuer Randomnews Eintrag hinzugefügt (#%d).
 NEWS_RANDOM_DEL_SYNTAX
 	RANDOMNEWS DEL {Nummer | ALL}
 NEWS_RANDOM_DEL_NOT_FOUND
@@ -3363,9 +3361,9 @@ NEWS_RANDOM_DEL_NOT_FOUND
 NEWS_RANDOM_DELETED
 	Randomnews Eintrag #%d gelöscht.
 NEWS_RANDOM_DEL_NONE
-	Keine randomnews Einträge zu löschen!
+	Keine Randomnews Einträge zu löschen!
 NEWS_RANDOM_DELETED_ALL
-	Ale randomnews Einträge wurden gelöscht.
+	Ale Randomnews Einträge wurden gelöscht.
 
 NEWS_HELP_LOGON
 	Syntax: LOGONNEWS ADD Text
@@ -3377,7 +3375,7 @@ NEWS_HELP_LOGON
 	angezeigt. (Es werden jedoch nur max. %s angezeigt, um ein
 	Flooding des Users zu verhindern. Wenn mehr News
 	existieren, werden nur die neuesten angezeigt.)
-	NewsCount can be configured in services.conf.
+	Die Anzahl der News können in der services.conf festgelegt werden.
 	
 	LOGONNEWS LIST kann von jedem IRC Operator benutzt werden
 	um die aktuelle Liste der Logon News anzeigen zu lassen.
@@ -3395,7 +3393,7 @@ NEWS_HELP_OPER
 	(Es werden jedoch nur max. %s Nachrichten angezeigt, um ein
 	Flooding des Users zu verhindern. Wenn mehr News
 	existieren, werden nur die neüsten angezeigt.)
-	NewsCount can be configured in services.conf.
+	Die Anzahl der News können in der services.conf festgelegt werden.
 	
 	OPERNEWS LIST kann von jedem IRC Operator benutzt werden
 	um die aktuelle Liste der Oper-News anzeigen zu lassen.
@@ -3622,7 +3620,7 @@ NICK_HELP_UPDATE
 
 	Updatet deinen derzeiten Status, z.B. prüft es auf neue Nachrichten,
 	setzt benötigte Channel-Modes (ModeonID), aktualisiert deinen vHost und
-	deine userflags (lastseentime, etc).
+	deine Userflags (lastseentime, etc).
 	
 NICK_HELP_LOGOUT
 	Syntax: LOGOUT
@@ -4355,11 +4353,11 @@ CHAN_HELP_CMD_DEVOICE
 	    DEVOICE    Enfernt den Voice-Status des angegebenen Nicknamens
 	               in einen Channel
 CHAN_HELP_CMD_GETKEY
-	    GETKEY     Gibt den Channel-Schlüßel wieder
+	    GETKEY     Gibt das Channel-Passwort wieder
 CHAN_HELP_CMD_INFO
 	    INFO       Zeigt Informationen über den angegebenen Channel
 CHAN_HELP_CMD_INVITE
-	    INVITE     Tells ChanServ to invite you into a channel
+	    INVITE     Befiehlt Chanserv Dich in einen Channel einzuladen
 CHAN_HELP_CMD_KICK
 	    KICK       Kickt den angegebenen Nicknamen aus einen Channel
 CHAN_HELP_CMD_LIST
@@ -4371,7 +4369,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Ändert den Topic des angegebenen Channels
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Enfernt ein ban(s) die dich betreffen aus einen Channel
+	    UNBAN      Enfernt den oder die ban(s) die dich betreffen aus einen Channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Gibt den angegebenen User Voice-Status in einen Channel
 CHAN_HELP_CMD_VOP
@@ -4380,7 +4378,7 @@ CHAN_HELP_CMD_DEHALFOP
 	    DEHALFOP   Enfernt den HalfOP-Status des angegebenen Nicknamens
 	               in einen Channel
 CHAN_HELP_CMD_DEOWNER
-	    DEOWNER    Entfernt dein Gründer Status in einen Channel
+	    DEOWNER    Entfernt dein Founder (Gründer) Status in einen Channel
 CHAN_HELP_CMD_DEPROTECT
 	    DEPROTECT  Entfernt den schutz des angegebenen Nicknamens 
 	               in einen Channel
@@ -4389,7 +4387,7 @@ CHAN_HELP_CMD_HALFOP
 CHAN_HELP_CMD_HOP
 	    HOP        Verwaltet die HOP-Liste von einen Channel
 CHAN_HELP_CMD_OWNER
-	    OWNER      Gibt dir Gründer Staus in einen Channel
+	    OWNER      Gibt dir Founder (Gründer) Staus in einen Channel
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Schützt den angegebenen Nicknamen in einen Channel
 CHAN_HELP_CMD_ADMIN
@@ -4447,7 +4445,7 @@ CHAN_HELP_IDENTIFY
 	Syntax: IDENTIFY Channel Passwort
 	
 	Identifiziert ein Nickname gegenüber %S als 
-	Gründer (Founder) des angegebenen Channels. 
+	Founder (Gründer) des angegebenen Channels. 
 	Das Passwort muss dasselbe wie bei der 
 	registrierung des angegebenen Channels sein
 	und ist in der Regel von den Real-Founder des
@@ -4476,7 +4474,7 @@ CHAN_HELP_SET
 	
 	Verfügbare Optionen:
 	
-	    FOUNDER       Stellt den Gründer des Channels ein
+	    FOUNDER       Stellt den Founder (Gründer) des Channels ein
 	    SUCCESSOR     Stellt den Vertreter des Founders ein
 	    PASSWORD      Ändert das Passwort des Channel-Founders
 	    DESC          Ändert die Channel-Beschreibung
@@ -4515,10 +4513,10 @@ CHAN_HELP_SET_FOUNDER
 CHAN_HELP_SET_SUCCESSOR
 	Syntax: SET Channel SUCCESSOR Nickname
 	
-	Ändert den Vertreter des Gründers in dem Channel. Wenn
-	der Nickname des Gründers ausläuft oder gedropped wird,
+	Ändert den Vertreter des Founders (Gründer) in dem Channel.
+	Wenn der Nickname des Founders ausläuft oder gedropped wird,
 	wenn der Channel registriert ist, wird der Vertreter
-	der neue Gründer des Channels. Wenn jedoch der 
+	der neue Founder des Channels. Wenn jedoch der 
 	Vertreter bereits zu viele Channels registriert hat
 	(max %d), wird der Channel gedropped.
 	
@@ -4648,9 +4646,13 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Syntax: SET Channel RESTRICTED {ON | OFF}
 	
-	Enables or disables the restricted access option for a
-	channel.  When restricted access is set, users not on
-	the access list will instead be kicked and banned from the channel.
+	Aktiviert oder deaktiviert den restricted access
+	(beschränkter Zugriff)-Modi für einen Channel. Wenn 
+	restricted access eingeschaltet ist, werden
+	User die sonst keinen Channel Operator-Status besitzen
+	würden (Nicknamen mit negativem Zugriffslevel, oder wenn
+	Secure Ops aktiv ist, Nicknamen die nicht auf der
+	Zugriffsliste sind) vom Channel gekicked und gebanned.
 
 CHAN_HELP_SET_SECURE
 	Syntax: SET Channel SECURE {ON | OFF}
@@ -4706,7 +4708,7 @@ CHAN_HELP_SET_XOP
 	wechselst, werden die Zugriffslevel geändert, folglich wirst du
 	nicht die selben Werte finden, wenn du zu Access zurückwechselst.
 	
-	Du solltest nach einem Wechsel zum xOP System darauf achten, 
+	Du solltest nach einem Wechsel zum XOP System darauf achten, 
 	dass die User das richtige Level besitzen, da das Umwechseln
 	auf Vermutung basiert und nicht immer perfekt funktioniert. 
 	Es ist nicht empfohlen nach einer Änderung der Levels das xOP
@@ -5062,9 +5064,9 @@ CHAN_HELP_OP
 	
 	Setzt den Operator-Status des angegebenen Nicknamen 
 	in dem Channel. Wird kein Nickname angegeben, wird
-	ChanServ dich oppen, vorausgesetzt, du hast die
-	entsprechenden Rechte in der Zugriffsliste um
-	diesen Befehl auszuführen.
+	ChanServ Dir Op Status geben, vorausgesetzt,
+	du hast dieentsprechenden Rechte in der Zugriffsliste
+	um diesen Befehl auszuführen.
 	
 	Standardmässig ist dafür ein Level von 5 oder
 	grösser erforderlich.
@@ -5073,10 +5075,11 @@ CHAN_HELP_DEOP
 	Syntax: DEOP [Channel [Nickname]]
 	
 	Entfernt den Operator-Status eines bestimmten Nickname
-	in dem Channel. Wird kein Nickname angegeben, wird ChanServ
-	dich deoppen. Wird weder Channel noch Nick als Parameter
-	übergeben, wird ChanServ dich in allen Channels deoppen
-	in denen du die entsprechenden Rechte hast.
+	in dem Channel. Wird kein Nickname angegeben, wird 
+	ChanServ Dir den Op Status nehmen. Wird weder Channel
+	noch Nick als Parameter übergeben, wird ChanServ Dir 
+	in allen Channels den Op Status nehmen, in denen Du die
+	entsprechenden Rechte hast.
 	
 	Standardmässig ist dafür ein Level von 5 oder
 	grösser erforderlich.
@@ -5085,53 +5088,53 @@ CHAN_HELP_VOICE
 	Syntax: VOICE [Channel [Nickname]]
 	
 	Erteilt dem angegebenen Nickname Voice-Status in dem
-	Channel. Wird kein Nick angegeben, wird ChanServ dich
-	voicen. Wird weder Channel noch Nickane angegeben, wird
-	ChanServ dich in allen Channels voicen, in denen du
-	die entsprechenden Rechte hast.
+	Channel. Wird kein Nick angegeben, wird ChanServ Dir
+	Voice geben. Wird weder Channel noch Nickane angegeben,
+	wird ChanServ Dir in allen Channels Voice geben,
+	in denen Du die entsprechenden Rechte hast.
 	
 	Standardmässig brauchst du dafür ein Level von 5
-	um anderen Voice zu erteilen, oder Level 3 um dich
-	selbst zu voicen.
+	um anderen Voice zu erteilen, oder Level 3 um Dir
+	selbst Voice zu geben.
 
 CHAN_HELP_DEVOICE
 	Syntax: DEVOICE [Channel [Nickname]]
 	
 	Entfernt den Voice-Status des Nicknamen in dem Channel.
-	Wird kein Nickname angegeben, wird ChanServ dich devoicen.
-	Wird weder Channel noch Nick angegeben, wird ChanServ
-	dich in allen Channels voicen, in denen du die
-	entsprechenden Rechte hast.
+	Wird kein Nickname angegeben, wird ChanServ Dir den
+	Voice Status nehmen.Wird weder Channel noch Nick angegeben,
+	wird ChanServ Dir in allen Channels den Voice Status nehmen,
+	in denen Du die entsprechenden Rechte hast.
 	
 	Standardmässig brauchst du dafür ein Level von 5
-	um andere zu devoicen, oder Level 3 um dich selbst
-	vom Voice-Flag zu befreien.
+	um anderen den Voice Status zu nehmen, oder Level 3 um
+	dich selbst vom Voice-Flag zu befreien.
 	
 CHAN_HELP_HALFOP
 	Syntax: HALFOP [Channel [Nickname]]
 	
 	Setzt den Half-Op-Status des angegebenen Nicknamen in dem
-	Channel. Wird kein Nickname angegeben, wird ChanServ dich
-	halfoppen. Wird weder Channel noch Nickname angegeben,
-	wird ChanServ dich in allen Channels halfoppen, in denen
-	du die entsprechenden Rechte hast.
+	Channel. Wird kein Nickname angegeben, wird ChanServ Dir
+	den Halfop geben. Wird weder Channel noch Nickname angegeben,
+	wird ChanServ Dir in allen Channels den Halfop geben,
+	in denen du die entsprechenden Rechte hast.
 	
 	Standardmässig brauchst du dafür ein Level von 5
-	um andere zu halfoppen, oder Level 4 um dich selbst zu
-	halfoppen.
+	um andere den Halfop Status zu geben, oder Level 4 
+	um Dir selbst den Halfop Status zu geben.
 
 CHAN_HELP_DEHALFOP
 	Syntax: DEHALFOP [Channel [Nickname]]
 	
 	Entfernt den Half-Op-Status des angegebenen Nicknamen in dem
-	Channel. Wird kein Nickname angegeben, wird ChanServ dich
-	dehalfoppen. Wird weder Channel noch Nickname angegeben,
-	wird ChanServ dich in allen Channels dehalfoppen, in denen
+	Channel. Wird kein Nickname angegeben, wird ChanServ Dir
+	den Halfop nehmen. Wird weder Channel noch Nickname angegeben,
+	wird ChanServ Dir in allen Channels den Halfop nehmen, in denen
 	du die entsprechenden Rechte hast.
 	
 	Standardmässig brauchst du dafür ein Level von 5
-	um andere zu dehalfoppen, oder Level 4 um dich selbst zu
-	dehalfoppen.
+	um andere den Halfop Status zu nehmen, oder Level 4 
+	um Dir selbst den Halfop Status zu nehmen.
 	
 CHAN_HELP_PROTECT
 	Syntax: PROTECT [Channel [Nickname]]
@@ -5549,13 +5552,16 @@ MEMO_HELP_SET_NOTIFY
 	            machst.
 	    NEW     Du wirst nur informiert, wenn sie an dich
 	            gesendet werden.
-	    MAIL    You will be notified of memos by email aswell as
-	            any other settings you have.
-	    NOMAIL  You will not be notified of memos by email.
+	    MAIL    Du wirst über neue memos per email informiert.
+	    NOMAIL  Du wirst nicht über neue memos informiert per email.
 	    OFF     Es wird keine Benachrichtigung über neue
 	            Memos stattfinden.
 	
 	ON ist eine Kombination aus LOGON und NEW.
+	MAIL und NOMAIL sind optionale Einstellungen und
+	beeinflussen ON | LOGON | NEW nicht. Nach der Einstellung
+	OFF muß die Option Mail erneut gesetzt werden, damit
+	memos per email zugestellt werden sollen.
 
 MEMO_HELP_SET_LIMIT
 	Syntax: SET LIMIT [Channel] Limit

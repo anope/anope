@@ -119,7 +119,7 @@ int do_logout(User * u)
            free(ci);
            ci = ci2;
        }
-       u->founder_chans = NULL;
+       u2->founder_chans = NULL;
 
 
         /* Stop nick tracking if enabled */

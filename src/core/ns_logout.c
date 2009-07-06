@@ -31,6 +31,7 @@ class CommandNSLogout : public Command
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 		User *u2;
 		NickAlias *na;
+		struct u_chaninfolist *ci, *ci2;
 
 		if (!u->nc->IsServicesOper() && nick)
 			this->OnSyntaxError(u);
@@ -62,6 +63,16 @@ class CommandNSLogout : public Command
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
 			alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u2->nick);
+
+			/* Remove founder status from this user in all channels */
+			ci = u2->founder_chans;
+			while (ci)
+			{
+				ci2 = ci->next;
+				delete ci;
+				ci = ci2;
+			}
+			u2->founder_chans = NULL;
 
 			if (nick)
 				notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);

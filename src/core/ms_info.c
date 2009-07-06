@@ -48,8 +48,12 @@ class CommandMSInfo : public Command
 		}
 		else if (name && *name == '#')
 		{
-			ci = cs_findchan(name);
-			if (!check_access(u, ci, CA_MEMO))
+			if (!(ci = cs_findchan(name)))
+			{
+				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, name);
+				return MOD_CONT;
+			}
+			else if (!check_access(u, ci, CA_MEMO))
 			{
 				notice_lang(s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;

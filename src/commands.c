@@ -125,7 +125,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (params.size() > 0)
+	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (cmdTable == CHANSERV || cmdTable == BOTSERV))
 	{
 		if (ircdproto->IsChannelValid(params[0].c_str()))
 		{
@@ -153,7 +153,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 			}
 		}
 		/* A user not giving a channel name for a param that should be a channel */
-		else if ((cmdTable == CHANSERV || cmdTable == BOTSERV) && !c->HasFlag(CFLAG_STRIP_CHANNEL))
+		else
 		{
 			notice_lang(service, u, CHAN_X_INVALID, params[0].c_str());
 			return;

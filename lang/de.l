@@ -5244,6 +5244,7 @@ CHAN_HELP_CLEAR
 	              (z.B. Modi i,k,l,m,n,p,s und t)
 	     BANS     Entfernt alle Bans in dem Channel
 	     EXCEPTS  Entfernt alle Excepts in dem Channel
+	     INVITES  Clears all invites on the channel
 	     OPS      Entfernt jeden Operator-Status (mode +o)
 	              in dem Channel.
 	     HOPS     Entfernt jeden Halfoperator-Status (mode +h) 

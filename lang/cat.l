@@ -5223,6 +5223,7 @@ CHAN_HELP_CLEAR
 	                  neteja els Modes i,k,l,m,n,p,s,t).
 	     BANS     neteja tots els bans en el canal.
 	     EXCEPTS  neteja tots els excepts en el canal.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Esborra estatus d'operador de canal(Mode +o)
 	                  de tots els operadors de canal.
 	     HOPS     Removes channel-halfoperator status (mode +h) from

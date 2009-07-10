@@ -5078,6 +5078,7 @@ CHAN_HELP_CLEAR
 	                travados com MLOCK.
 	     BANS     Remove todos os bans do canal.
 	     EXCEPTS  Remove todos os excepts do canal.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Remove o status de Operador de canal (modo +o)
 	                de todos os Operadores do canal.
 	     HOPS     Remove o status de Half-Operador de canal (modo +h)

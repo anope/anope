@@ -5264,6 +5264,7 @@ CHAN_HELP_CLEAR
 	     MODES   Réinitialise tous les modes d'un canal
 	     BANS    Enlève tous les bans d'un canal.
 	     EXCEPTS Enlève tous les excepts d'un canal.
+	     INVITES Clears all invites on the channel.
 	     OPS     Enlève le status d'opérateur du canal à
 	             tous les opérateurs du canal.
 	     HOPS    Enlève le status d'halfop (mode +h) a tout les halfop

@@ -5114,6 +5114,7 @@ CHAN_HELP_CLEAR
 	             mode lockjában.
 	    BANS     Törli az összes tiltást a csatornán.
 	    EXCEPTS  Törli az összes kivételt a csatornán.
+	    INVITES  Clears all invites on the channel.
 	    OPS      Elvesz minden opot a csatornán
 	    HOPS     Eltávolít minden félop csatorna státuszt (+h mód)
 	             az összes csatornán lévõ féloperátortól, ha támogatott.

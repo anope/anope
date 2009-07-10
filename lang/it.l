@@ -4981,6 +4981,8 @@ CHAN_HELP_CLEAR
 	     MODES    Annulla tutti i modi di canale (cioè elimina
 	                  i modi i,k,l,m,n,p,s,t).
 	     BANS     Annulla tutti i ban del canale.
+	     EXCEPTS  Clears all excepts on the channel.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Rimuove lo stato di operatore (modo +o) da
 	                  tutti gli operatori del canale. If supported, removes
 	                  channel-admin (mode +a) and channel-owner (mode +q)

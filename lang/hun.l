@@ -4968,6 +4968,7 @@ CHAN_HELP_CLEAR
 	             mode lockjában.
 	    BANS     Törli az összes tiltást a csatornán.
 	    EXCEPTS  Törli az összes kivételt a csatornán.
+	    INVITES  Clears all invites on the channel.
 	    OPS      Elvesz minden opot a csatornán. If supported, removes
 			     channel-admin (mode +a) and channel-owner (mode +q)
 			     as well.

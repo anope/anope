@@ -5029,6 +5029,7 @@ CHAN_HELP_CLEAR
 	                  modes i,k,l,m,n,p,s,t).
 	     BANS     Καθαρίζει όλα τα bans από το κανάλι.
 	     EXCEPTS  Καθαρίζει όλα τα excepts από το κανάλι.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Αφαιρεί το channel-operator status (mode +o) από
 	                  όλους τους channel operators. If supported, removes
 	                  channel-admin (mode +a) and channel-owner (mode +q)

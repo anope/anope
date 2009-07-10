@@ -4863,6 +4863,7 @@ CHAN_HELP_CLEAR
 	                  modes i,k,l,m,n,p,s,t).
 	     BANS     Clears all bans on the channel.
 	     EXCEPTS  Clears all excepts on the channel.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Removes channel-operator status (mode +o) from
 	                  all channel operators. If supported, removes
 	                  channel-admin (mode +a) and channel-owner (mode +q)

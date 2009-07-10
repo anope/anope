@@ -4988,6 +4988,8 @@ CHAN_HELP_CLEAR
 	     MODES    Verwijder alle modes op het kanaal (verwijdert
 	                  modes i,k,l,m,n,p,s,t).
 	     BANS     Verwijder alle bans op het kanaal.
+	     EXCEPTS  Clears all excepts on the channel.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Verwijder kanaal-operator status (mode +o) van
 	                  alle kanaal-operators. If supported, removes
 	                  channel-admin (mode +a) and channel-owner (mode +q)

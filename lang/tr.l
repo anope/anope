@@ -4999,6 +4999,7 @@ CHAN_HELP_CLEAR
 	                   modlarýný temizler).
 	     BANS     Kanaldaki tüm banlarý kaldýrýr.
 	     EXCEPTS  Clears all excepts on the channel.
+	     INVITES  Clears all invites on the channel.
 	     OPS      Kanal opu statüsünde olanlarýn (mode +o)
 	                  oplarýný alýr. If supported, removes
 	                  channel-admin (mode +a) and channel-owner (mode +q)

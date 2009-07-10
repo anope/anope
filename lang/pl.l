@@ -6029,6 +6029,7 @@ CHAN_HELP_CLEAR
 	   MODES     Zdejmuje wszystkie tryby z kana³u
 	   BANS      Zdejmuje wszystkie bany na kanale
 	   EXCEPTS   Zdejmuje wyj±tki od banów na kanale
+	   INVITES   Clears all invites on the channel.
 	   OPS       Odbiera wszystkim status operatora. If supported, removes
 	             channel-admin (mode +a) and channel-owner (mode +q)
 	             as well.

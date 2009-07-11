@@ -1,6 +1,10 @@
 Anope Version 1.8 SVN
 -------------------
 
+Anope Version 1.8.2
+-------------------
+07/06 F Fix unsetting founder_chans when logging out other users         [  #00]
+07/07 F Fix a crash when mysql is used without MysqlSecure defined.      [  #00]
 
 Anope Version 1.8.1
 -------------------

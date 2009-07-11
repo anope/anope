@@ -7,13 +7,15 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
-VERSION_PATCH="1"
+VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2358"
+VERSION_BUILD="2370"
 
-# $Log$ # Changes since 1.8.1 Release
+# $Log$ # Changes since 1.8.2 Release
 
-
+# Leading up to 1.8.2 Release
+#Revision 2364 - Fix a crash when mysql is used without MysqlSecure defined. Thanks to jerrcs for finding and testing.
+#Revision 2362 - Fix unsetting founder_chans when logging out other users
 
 # Leading up to 1.8.1 Release
 #Revision 2337 - Fixed several bugs in messages.c regarding parsing TS6 encoded commands. This is a prerequisite for an InspIRCd 1.2 protocol module.

@@ -2025,7 +2025,7 @@ CHAN_LEVELS_LIST_NORMAL
 CHAN_LEVELS_RESET
 	Poziomy dostêpu kana³u %s zosta³y zresetowane do domy¶lnych.
 
-# Status Messages
+# Status messages
 CHAN_STATUS_SYNTAX
 	STATUS ERROR B³±d sk³adni
 
@@ -2378,7 +2378,7 @@ MEMO_MASS_SENT
 	
 # STAFF responses
 MEMO_STAFF_SYNTAX
-	STAFF memo-text
+	STAFF tre¶æ wiadomo¶ci
 
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
@@ -3868,8 +3868,9 @@ OPER_JUPE_SYNTAX
 
 OPER_JUPE_HOST_ERROR
 	Proszê u¿yæ prawid³owej nazwy serwera.
+
 OPER_JUPE_INVALID_SERVER
-	You can not jupe your services server or your uplink server.
+	Nie mo¿na wykluczyæ samych serwisów lub uplinka serwisów.
 
 # RAW responses
 OPER_RAW_SYNTAX
@@ -3890,7 +3891,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	IGNORE {ADD|DEL|LIST|CLEAR} [czas] [nick | maska]
+	IGNORE {ADD|DEL|LIST|CLEAR} [czas] [nick | maska]
 
 OPER_IGNORE_VALID_TIME
 	Musisz podaæ prawid³ow± liczbê dla czasu.
@@ -4274,7 +4275,7 @@ NEWS_RANDOM_TEXT
 	[Losowa wiadomo¶æ - %s] %s
 
 NEWS_LOGON_SYNTAX
-	LOGONNEWS {ADD|DEL|LIST} [tekst|numer]
+	LOGONNEWS {ADD|DEL|LIST} [tekst|numer]
 
 NEWS_LOGON_LIST_HEADER
 	Wiadomo¶ci powitalne:
@@ -4287,7 +4288,7 @@ NEWS_LOGON_LIST_NONE
 	Nie ma wiadomo¶ci powitalnych.
 
 NEWS_LOGON_ADD_SYNTAX
-	Sk³adnia: LOGONNEWS ADD tekst
+	LOGONNEWS ADD tekst
 
 NEWS_LOGON_ADD_FULL
 	Lista wiadomo¶ci powitalnych jest pe³na!
@@ -4296,7 +4297,7 @@ NEWS_LOGON_ADDED
 	Dodano now± wiadomo¶æ powitaln± (#%d).
 
 NEWS_LOGON_DEL_SYNTAX
-	LOGONNEWS DEL {numer | ALL}
+	LOGONNEWS DEL {numer | ALL}
 
 NEWS_LOGON_DEL_NOT_FOUND
 	Wiadomo¶æ powitalna #%d nie zosta³a znaleziona!
@@ -4311,7 +4312,7 @@ NEWS_LOGON_DELETED_ALL
 	Wszystkie wiadomo¶ci powitalne zosta³ skasowane.
 
 NEWS_OPER_SYNTAX
-	Sk³adnia: OPERNEWS {ADD|DEL|LIST} [tekst|numer]
+	OPERNEWS {ADD|DEL|LIST} [tekst|numer]
 
 NEWS_OPER_LIST_HEADER
 	Wiadomo¶ci dla operatorów:
@@ -4324,7 +4325,7 @@ NEWS_OPER_LIST_NONE
 	Nie ma wiadomo¶ci dla operatorów.
 
 NEWS_OPER_ADD_SYNTAX
-	Sk³adnia: OPERNEWS ADD tekst
+	OPERNEWS ADD tekst
 
 NEWS_OPER_ADD_FULL
 	Lista wiadomo¶ci jest pe³na!
@@ -4333,7 +4334,7 @@ NEWS_OPER_ADDED
 	Dodano now± wiadomo¶æ dla operatorów (#%d).
 
 NEWS_OPER_DEL_SYNTAX
-	Sk³adnia: OPERNEWS DEL {numer | ALL}
+	OPERNEWS DEL {numer | ALL}
 
 NEWS_OPER_DEL_NOT_FOUND
 	Wiadomo¶æ dla operatorów #%d nie zosta³a znaleziona!
@@ -4348,7 +4349,7 @@ NEWS_OPER_DELETED_ALL
 	Wszystkie wiadomo¶ci dla operatorów zosta³y skasowane.
 
 NEWS_RANDOM_SYNTAX
-	RANDOMNEWS {ADD|DEL|LIST} [tekst|numer]
+	RANDOMNEWS {ADD|DEL|LIST} [tekst|numer]
 
 NEWS_RANDOM_LIST_HEADER
 	Losowe wiadomo¶ci:
@@ -4361,7 +4362,7 @@ NEWS_RANDOM_LIST_NONE
 	Nie ma losowych wiadomo¶ci.
 
 NEWS_RANDOM_ADD_SYNTAX
-	RANDOMNEWS ADD tekst
+	RANDOMNEWS ADD tekst
 
 NEWS_RANDOM_ADD_FULL
 	Lista wiadomo¶ci jest pe³na!
@@ -4370,7 +4371,7 @@ NEWS_RANDOM_ADDED
 	Dodano now± losow± wiadomo¶æ (#%d).
 
 NEWS_RANDOM_DEL_SYNTAX
-	RANDOMNEWS DEL {numer | ALL}
+	RANDOMNEWS DEL {numer | ALL}
 
 NEWS_RANDOM_DEL_NOT_FOUND
 	Losowa wiadomo¶æ #%d nie zosta³a znaleziona!
@@ -5312,7 +5313,7 @@ CHAN_HELP_CMD_INFO
 	    INFO        Pokazuje informacje o zarejestrowanym kanale
 
 CHAN_HELP_CMD_INVITE
-	    INVITE     Tells ChanServ to invite you into a channel
+	    INVITE      Zaprasza osobê wydaj±c± polecenie na kana³
 
 CHAN_HELP_CMD_KICK
 	    KICK        Wyrzuca wskazany nick z kana³u
@@ -5598,9 +5599,10 @@ CHAN_HELP_SET_PRIVATE
 CHAN_HELP_SET_RESTRICTED
 	Sk³adnia: SET kana³ RESTRICTED {ON | OFF}
 	
-	Enables or disables the restricted access option for a
-	channel.  When restricted access is set, users not on
-	the access list will instead be kicked and banned from the channel.
+	W³±cza lub wy³±cza opcjê ograniczonego dostêpu do kana³u.
+	Po w³±czeniu tej opcji tylko osoby znajduj±ce siê na
+	li¶cie dostêpu bêd± mog³y przebywaæ na kanale. Pozostali
+	u¿ytkownicy bêd± banowani, a nastêpnie usuwani z kana³u.
 
 CHAN_HELP_SET_SECURE
 	Sk³adnia: SET kana³ SECURE {ON | OFF}
@@ -6224,14 +6226,14 @@ CHAN_HELP_CLEAR
 	Umo¿liwia kompleksowe usuniêcie niektórych ustawieñ na
 	kanale poprzez %S. Dostêpne opcje:
 	
-	   MODES     Zdejmuje wszystkie tryby z kana³u
-	   BANS      Zdejmuje wszystkie bany na kanale
-	   EXCEPTS   Zdejmuje wyj±tki od banów na kanale
-	   INVITES   Clears all invites on the channel.
+	   MODES     Usuwa tryby z kana³u
+	   BANS      Usuwa bany z kana³u
+	   EXCEPTS   Usuwa wyj±tki od banów z kana³u
+	   INVITES   Usuwa zaproszenia z kana³u
 	   OPS       Odbiera wszystkim status operatora
 	   HOPS      Odbiera wszystkim status pó³-operatora
 	   VOICES    Odbiera wszystkim prawo g³osu
-	   USERS     Wykopuje wszystkich z kana³u
+	   USERS     Usuwa u¿ytkowników z kana³u
 	
 	Standardowo ta komenda jest dostêpna dla w³a¶ciciela kana³u.
 	
@@ -6511,9 +6513,9 @@ MEMO_HELP_SET_NOTIFY
 	           trybu /AWAY.
 	   NEW     Powiadomienie bêdzie wysy³ane jedynie w 
 	           momencie otrzymania wiadomo¶ci.
-	   MAIL    You will be notified of memos by email aswell as
-	           any other settings you have.
-	   NOMAIL  You will not be notified of memos by email.
+	   MAIL    Powiadomienia bêd± wysy³ane e-mailem oraz
+	           wedle pozosta³ych ustawieñ.
+	   NOMAIL  Powiadomienia nie bêd± wysy³ane e-mailem.
 	   OFF     Powiadomienia nie bêd± wysy³ane.
 	
 	Opcja ON jest kombinacj± opcji LOGON oraz NEW.
@@ -7581,7 +7583,7 @@ HOST_DELALL
 	Vhosty dla grupy %s zosta³y usuniête.
 
 HOST_DELALL_SYNTAX
-	DELALL <nick>.
+	DELALL <nick>.
 
 HOST_IDENT_SETALL
 	Vhosty dla grupy %s zosta³y zmienione na %s@%s.
@@ -7602,10 +7604,10 @@ HOST_NOREG
 	Nie znaleziono %s w bazie serwisu NickServ.
 
 HOST_SET_SYNTAX
-	Sk³adnia %R%s SET <nick> <maska-hosta>.
+	Sk³adnia: %R%s SET <nick> <maska-hosta>.
 
 HOST_SETALL_SYNTAX
-	Sk³adnia %R%s SETALL <nick> <maska-hosta>.
+	Sk³adnia: %R%s SETALL <nick> <maska-hosta>.
 
 HOST_DENIED
 	Brak dostêpu.
@@ -7631,7 +7633,7 @@ HOST_DEL
 HOST_DEL_SYNTAX
 	DEL <nick>.
 HOST_OFF
-	Your vhost was removed and the normal cloaking restored.
+	Twój vhost zosta³ usuniêty i zosta³o w³±czone normalne ukrywanie hosta.
 HOST_OFF_UNREAL
 	Twój vhost zosta³ usuniêty. Aby w³±czyæ standardowe ukrywanie hosta wpisz /mode %s +%s
 

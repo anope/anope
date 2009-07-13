@@ -6525,9 +6525,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	%s felhasználó nincs a nickserv db fájlban.
 HOST_SET_SYNTAX
-	Syntax %R%s set <nick> <hosztmaszk>.
+	SET <nick> <hosztmaszk>.
 HOST_SETALL_SYNTAX
-	Syntax %R%s setall <nick> <hosztmaszk>.
+	SETALL <nick> <hosztmaszk>.
 HOST_DENIED
 	Hozzáférés megtagadva.
 HOST_NOT_ASSIGNED

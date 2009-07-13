@@ -6655,9 +6655,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Пользователь %s не найден в сервисной базе данных ников.
 HOST_SET_SYNTAX
-	Ситаксис: %R%s SET <ник> <хостмаска>.
+	SET <ник> <хостмаска>.
 HOST_SETALL_SYNTAX
-	Синтаксис %R%s SETALL <ник> <хостмаска>.
+	SETALL <ник> <хостмаска>.
 HOST_DENIED
 	Доступ запрещен.
 HOST_NOT_ASSIGNED

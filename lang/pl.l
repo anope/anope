@@ -7604,10 +7604,10 @@ HOST_NOREG
 	Nie znaleziono %s w bazie serwisu NickServ.
 
 HOST_SET_SYNTAX
-	Sk³adnia: %R%s SET <nick> <maska-hosta>.
+	SET <nick> <maska-hosta>.
 
 HOST_SETALL_SYNTAX
-	Sk³adnia: %R%s SETALL <nick> <maska-hosta>.
+	SETALL <nick> <maska-hosta>.
 
 HOST_DENIED
 	Brak dostêpu.

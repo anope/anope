@@ -80,7 +80,7 @@ int myDoSet(User * u)
     char *vIdent = NULL;
 
     if (!nick || !rawhostmask) {
-        notice_lang(s_HostServ, u, HOST_SET_SYNTAX, s_HostServ);
+        syntax_error(s_HostServ, u, "SET", HOST_SET_SYNTAX);
         free(hostmask);
         return MOD_CONT;
     }
@@ -89,7 +89,7 @@ int myDoSet(User * u)
     if (vIdent) {
         rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);      /* get the remaining string */
         if (!rawhostmask) {
-            notice_lang(s_HostServ, u, HOST_SET_SYNTAX, s_HostServ);
+            syntax_error(s_HostServ, u, "SET", HOST_SET_SYNTAX);
             free(vIdent);
             free(hostmask);
             return MOD_CONT;

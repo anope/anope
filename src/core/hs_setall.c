@@ -82,7 +82,7 @@ int do_setall(User * u)
     char *vIdent = NULL;
 
     if (!nick || !rawhostmask) {
-        notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
+        syntax_error(s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
         free(hostmask);
         return MOD_CONT;
     }
@@ -91,7 +91,7 @@ int do_setall(User * u)
     if (vIdent) {
         rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);      /* get the remaining string */
         if (!rawhostmask) {
-            notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
+            syntax_error(s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
             free(vIdent);
             free(hostmask);
             return MOD_CONT;

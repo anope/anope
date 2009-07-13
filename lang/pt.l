@@ -6515,9 +6515,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Usuário %s não encontrado na DB do NickServ.
 HOST_SET_SYNTAX
-	Sintaxe: %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Sintaxe: %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Acesso Negado.
 HOST_NOT_ASSIGNED

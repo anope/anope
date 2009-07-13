@@ -82,7 +82,7 @@ int do_rsend(User * u)
 
     /* check if the variables are here */
     if (!name || !text) {
-        notice_lang(s_MemoServ, u, MEMO_RSEND_SYNTAX);
+        syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
         return MOD_CONT;
     }
 

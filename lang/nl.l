@@ -6550,9 +6550,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Gebruiker %s niet gevonden in de nickserv database.
 HOST_SET_SYNTAX
-	Gebruik %R%s set <nick> <hostmask>.
+	SET <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Gebruik %R%s setall <nick> <hostmask>.
+	SETALL <nick> <hostmask>.
 HOST_DENIED
 	Toegang geweigerd.
 HOST_NOT_ASSIGNED

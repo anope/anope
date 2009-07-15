@@ -98,7 +98,7 @@ class CommandNSInfo : public Command
 			// XXX: we should perhaps show their opertype here.
 			if (na->nc->IsServicesOper())
 			{
-				if (show_hidden || (!na->nc->flags & NI_HIDE_STATUS))
+				if (show_hidden || (!(na->nc->flags & NI_HIDE_STATUS)))
 				{
 					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
 

@@ -507,7 +507,7 @@ void load_bs_dbase()
 		SAFE(read_string(&bi->real, f));
 		if (ver >= 10) {
 			SAFE(read_int16(&tmp16, f));
-			bi->flags = tmp16;
+			bi->flags |= tmp16;
 		}
 		SAFE(read_int32(&tmp32, f));
 		bi->created = tmp32;

@@ -1106,6 +1106,24 @@ void change_core_display(NickCore * nc)
 static int delcore(NickCore * nc)
 {
 	int i;
+	User *user;
+
+	/* Clean up this nick core from any users online using it
+	 * (ones that /nick but remain unidentified)
+	 */
+	for (i = 0; i < 1024; ++i)
+	{
+		for (user = userlist[i]; user; user = user->next)
+		{
+			if (user->nc && user->nc == nc)
+			{
+				ircdproto->SendAccountLogout(user, user->nc);
+				user->nc = NULL;
+				FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
+			}
+		}
+	}
+
 	/* (Hopefully complete) cleanup */
 	cs_remove_nick(nc);
 

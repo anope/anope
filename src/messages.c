@@ -44,15 +44,14 @@ int m_kill(const char *nick, const char *msg)
 	BotInfo *bi;
 
 	/* Recover if someone kills us. */
-	/* use nickIsServices() to reduce the number of lines of code  - TSL */
-	if (nickIsServices(nick, 0)) {
-		introduce_user(nick);
-	} else if (s_BotServ && (bi = findbot(nick))) {
+	if (s_BotServ && (bi = findbot(nick)))
+	{
 		introduce_user(nick);
 		bi->RejoinAll();
-	} else {
-		do_kill(nick, msg);
 	}
+	else
+		do_kill(nick, msg);
+
 	return MOD_CONT;
 }
 

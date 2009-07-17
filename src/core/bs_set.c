@@ -20,6 +20,7 @@ class CommandBSSet : public Command
  public:
 	CommandBSSet() : Command("SET", 3, 3)
 	{
+		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
@@ -34,8 +35,6 @@ class CommandBSSet : public Command
 			notice_lang(s_BotServ, u, BOT_SET_DISABLED);
 			return MOD_CONT;
 		}
-
-		ci = cs_findchan(chan);
 
 		if (u->nc->HasCommand("botserv/set/private") && !stricmp(option, "PRIVATE"))
 		{
@@ -62,7 +61,9 @@ class CommandBSSet : public Command
 				syntax_error(s_BotServ, u, "SET PRIVATE", BOT_SET_PRIVATE_SYNTAX);
 			}
 			return MOD_CONT;
-		} else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
+		} else if (!(ci = cs_findchan(chan)))
+			notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
+		else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else {
 			if (!stricmp(option, "DONTKICKOPS")) {

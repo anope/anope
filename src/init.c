@@ -582,7 +582,12 @@ int init_secondary(int ac, char **av)
 
 
 	/* this is only used on the first run of Anope. */
-	BotInfo *bi = findbot("NickServ");
+	/* s_NickServ will always be an existing bot (if there
+	 * are databases) because Anope now tracks what nick
+	 * each core bot is on, and changes them if needed
+	 * when loading the databases
+	 */
+	BotInfo *bi = findbot(s_NickServ);
 	if (!bi)
 	{
 		if (s_OperServ)

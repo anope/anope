@@ -226,8 +226,7 @@ CREATE TABLE anope_ns_access (
   display varchar(255) NOT NULL default '',
   access text NOT NULL,
   active tinyint(1) NOT NULL default '1',
-  PRIMARY KEY  (na_id),
-  UNIQUE KEY display (display)
+  PRIMARY KEY  (na_id)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

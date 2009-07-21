@@ -747,6 +747,11 @@ class CoreExport Module
 	 */
 	virtual void OnChanUnsuspend(ChannelInfo *ci) { }
 
+	/** Called when a channel is being deleted, for any reason
+	 * @param ci The channel
+	 */
+	virtual void OnDelChan(ChannelInfo *ci) { }
+
 	/** Called when a nick is dropped
 	 * @param nick The nick
 	 */
@@ -854,7 +859,7 @@ enum Implementation
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
-		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend,
+		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,

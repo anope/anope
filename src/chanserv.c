@@ -1665,6 +1665,8 @@ int delchan(ChannelInfo * ci)
 		return 0;
 	}
 
+	FOREACH_MOD(I_OnDelChan, OnDelChan(ci));
+
 	nc = ci->founder;
 
 	if (debug >= 2) {

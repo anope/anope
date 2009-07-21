@@ -1,4 +1,5 @@
 #include "services.h"
+#include "pseudo.h"
 
 NickCore::NickCore()
 {
@@ -74,5 +75,6 @@ void NickCore::EraseAccess(const std::string &entry)
 
 void NickCore::ClearAccess()
 {
+	FOREACH_MOD(I_OnNickClearAccess, OnNickClearAccess(this));
 	access.clear();
 }

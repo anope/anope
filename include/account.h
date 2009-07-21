@@ -24,7 +24,7 @@ class NickRequest
 
 class NickCore;
 
-class CoreExport NickAlias
+class CoreExport NickAlias : public Extensible
 {
  public:
 	NickAlias();
@@ -48,14 +48,14 @@ class CoreExport NickCore : public Extensible
 	NickCore *next, *prev;
 
 	char *display;				/* How the nick is displayed */
-	char pass[PASSMAX];				/* Password of the nicks */
+	char pass[PASSMAX];			/* Password of the nicks */
 	char *email;				/* E-mail associated to the nick */
 	char *greet;				/* Greet associated to the nick */
 	uint32 icq;				/* ICQ # associated to the nick */
 	char *url;				/* URL associated to the nick */
 	uint32 flags;				/* See NI_* below */
 	uint16 language;			/* Language selected by nickname owner (LANG_*) */
-	std::vector<std::string> access; /* Access list, vector of strings */
+	std::vector<std::string> access; 	/* Access list, vector of strings */
 	MemoInfo memos;
 	uint16 channelcount;			/* Number of channels currently registered */
 

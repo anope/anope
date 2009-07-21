@@ -676,7 +676,7 @@ class CoreExport Module
 	/** Called when a user disconnects
 	 * @param nick The name of the user
 	 */
-	virtual void OnUserLogoff(const char *nick) { }
+	virtual void OnUserLogoff(User *u) { }
 
 	/** Called when a new bot is made
 	 * @param bi The bot
@@ -792,6 +792,52 @@ class CoreExport Module
 	 * @param level The level
 	 */
 	virtual void OnDefconLevel(int level) { }
+
+	/** Called on findnick()
+	 * @param nick nickname to be searched for
+	 */
+	virtual void OnFindNick(const std::string &nick) { }
+
+	/** Called on delnick()
+	 * @ param na pointer to the nickalias
+	 */
+	virtual void OnDelNick(NickAlias *na) { }
+
+	/* Called on findcore()
+	 * @param nick nickname to be searched for (nc->display)
+	 */
+	virtual void OnFindCore(const std::string &nick) { }
+
+	/** Called on delcore()
+	 * @param nc pointer to the NickCore
+	 */
+	virtual void OnDelCore(NickCore *nc) { }
+
+	/** Called on change_core_display()
+	 * @param nc pointer to the NickCore
+	 * @param newdisplay the new display
+	 */
+	virtual void OnChangeCoreDisplay(NickCore *nc, const std::string &newdisplay) { }
+
+	/** Called on findrequestnick()
+	 * @param nick nicname to be searched for
+	 */
+	virtual void OnFindRequestNick(const std::string &nick) { }
+
+	/** called from ns_register.c, after the NickRequest have been created
+	 * @param nr pointer to the NickRequest
+	 */
+	virtual void OnMakeNickRequest(NickRequest *nr) { }
+
+	/** called on delnickrequest()
+	 * @param nr pointer to the NickRequest
+	 */
+	virtual void OnDelNickRequest(NickRequest *nr) { }
+
+	/** called from NickCore::ClearAccess()
+	 * @param nc pointer to the NickCore
+	 */
+	virtual void OnNickClearAccess(NickCore *nc) { }
 };
 
 
@@ -803,13 +849,14 @@ enum Implementation
 		/* NickServ */
 		I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
+		I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
+		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess,
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend,
 
 		/* BotServ */
-
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan,
 

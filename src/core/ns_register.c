@@ -305,6 +305,7 @@ class CommandNSRegister : public CommandNSConfirm
 			if (email)
 				nr->email = sstrdup(email);
 			nr->requested = time(NULL);
+			FOREACH_MOD(I_OnMakeNickRequest, OnMakeNickRequest(nr));
 			if (NSEmailReg)
 			{
 				if (!do_sendregmail(u, nr))

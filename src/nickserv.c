@@ -851,10 +851,14 @@ NickRequest *findrequestnick(const char *nick)
 		return NULL;
 	}
 
+	FOREACH_MOD(I_OnFindRequestNick, OnFindRequestNick(nick));
+
 	for (nr = nrlists[HASH(nick)]; nr; nr = nr->next)
 	{
 		if (stricmp(nr->nick, nick) == 0)
+		{
 			return nr;
+		}
 	}
 	return NULL;
 }
@@ -875,12 +879,15 @@ NickAlias *findnick(const char *nick)
 		return NULL;
 	}
 
+	FOREACH_MOD(I_OnFindNick, OnFindNick(nick));
+
 	for (na = nalists[HASH(nick)]; na; na = na->next)
 	{
 		if (stricmp(na->nick, nick) == 0)
+		{
 			return na;
+		}
 	}
-
 	return NULL;
 }
 
@@ -907,10 +914,14 @@ NickCore *findcore(const char *nick)
 		return NULL;
 	}
 
+	FOREACH_MOD(I_OnFindCore, OnFindCore(nick));
+
 	for (nc = nclists[HASH(nick)]; nc; nc = nc->next)
 	{
 		if (stricmp(nc->display, nick) == 0)
+		{
 			return nc;
+		}
 	}
 
 	return NULL;
@@ -1070,6 +1081,7 @@ void change_core_display(NickCore * nc, const char *newdisplay)
 		}
 	*/
 	/* Log ... */
+	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
 	alog("%s: changing %s nickname group display to %s", s_NickServ,
 	     nc->display, newdisplay);
 
@@ -1107,6 +1119,8 @@ static int delcore(NickCore * nc)
 {
 	int i;
 	User *user;
+
+	FOREACH_MOD(I_OnDelCore, OnDelCore(nc));
 
 	/* Clean up this nick core from any users online using it
 	 * (ones that /nick but remain unidentified)
@@ -1171,6 +1185,7 @@ int delnickrequest(NickRequest * nr)
 {
 	if (nr)
 	{
+		FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(nr));
 		nrlists[HASH(nr->nick)] = nr->next;
 		if (nr->nick)
 			delete [] nr->nick;
@@ -1200,6 +1215,8 @@ int delnick(NickAlias * na)
 	/* First thing to do: remove any timeout belonging to the nick we're deleting */
 	NickServCollide::ClearTimers(na);
 	NickServRelease::ClearTimers(na, true);
+
+	FOREACH_MOD(I_OnDelNick, OnDelNick(na));
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */

@@ -143,7 +143,7 @@ class CommandCSOInfo : public Command
  private:
 	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
 	{
-		const char *chan = params[1].c_str();
+		const char *chan = params[0].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
 		char *c;
 		ChannelInfo *ci = cs_findchan(chan);
@@ -168,7 +168,7 @@ class CommandCSOInfo : public Command
 
 	CommandReturn DoDel(User *u, std::vector<std::string> &params)
 	{
-		const char *chan = params[1].c_str();
+		const char *chan = params[0].c_str();
 		ChannelInfo *ci = cs_findchan(chan);
 
 		/* Del the module data from the channel */
@@ -189,7 +189,7 @@ class CommandCSOInfo : public Command
 
 	CommandReturn Execute(User *u, std::vector<std::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		const char *cmd = params[1].c_str();
 
 		if (!strcasecmp(cmd, "ADD"))
 			return this->DoAdd(u, params);
@@ -220,8 +220,6 @@ class OSInfo : public Module
  public:
 	OSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		int status;
-
 		me = this;
 
 		this->SetAuthor(AUTHOR);
@@ -231,13 +229,14 @@ class OSInfo : public Module
 		if (mLoadConfig())
 			throw ModuleException("Unable to load config");
 
-		status = this->AddCommand(NICKSERV, new CommandNSOInfo(), MOD_HEAD);
-
-		status = this->AddCommand(CHANSERV, new CommandCSOInfo(), MOD_HEAD);
+		this->AddCommand(NICKSERV, new CommandNSOInfo(), MOD_HEAD);
+		this->AddCommand(CHANSERV, new CommandCSOInfo(), MOD_HEAD);
 
 		ModuleManager::Attach(I_OnPostCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);
 		ModuleManager::Attach(I_OnBackupDatabase, this);
+		ModuleManager::Attach(I_OnDelCore, this);
+		ModuleManager::Attach(I_OnDelChan, this);
 
 		mLoadData();
 		ModuleManager::Attach(I_OnReload, this);
@@ -250,7 +249,7 @@ class OSInfo : public Module
 			/* OINFO_DEL_SUCCESS */
 			"OperInfo line has been removed from nick %s",
 			/* OCINFO_SYNTAX */
-			"Syntax: OINFO [ADD|DEL] chan <info>",
+			"Syntax: OINFO #chan [ADD|DEL] <info>",
 			/* OCINFO_ADD_SUCCESS */
 			"OperInfo line has been added to channel %s",
 			/* OCINFO_DEL_SUCCESS */
@@ -261,7 +260,7 @@ class OSInfo : public Module
 			"This will show up when any oper /ns info nick's the user.\n"
 			"and can be used for 'tagging' users etc....",
 			/* OCINFO_HELP */
-			"Syntax: OINFO [ADD|DEL] chan <info>\n"
+			"Syntax: OINFO #chan [ADD|DEL] <info>\n"
 			"Add or Delete Oper information for the given channel\n"
 			"This will show up when any oper /cs info's the channel.\n"
 			"and can be used for 'tagging' channels etc....",
@@ -458,22 +457,37 @@ class OSInfo : public Module
 
 	~OSInfo()
 	{
+		int i;
+		NickCore *nc;
+		char *c;
+		ChannelInfo *ci;
+
 		OnSaveDatabase();
-		for (int i = 0; i < 1024; ++i)
+
+		for (i = 0; i < 1024; ++i)
 		{
 			/* Remove the nick Cores */
-			for (NickCore *nc = nclists[i]; nc; nc = nc->next)
+			for (nc = nclists[i]; nc; nc = nc->next)
 			{
-				char *c;
-				if (nc->GetExt("os_modinfo", c));
+				if (nc->GetExt("os_info", c));
 				{
 					delete [] c;
-					nc->Shrink("os_modinfo");
+					nc->Shrink("os_info");
 				}
 			}
 		}
 
-		// XXX: shouldn't we also shrink ChanInfo?
+		for (i = 0; i < 256; ++i)
+		{
+			for (ci = chanlists[i]; ci; ci = ci->next)
+			{
+				if (ci->GetExt("os_info", c))
+				{
+					delete [] c;
+					ci->Shrink("os_info");
+				}
+			}
+		}
 
 		if (OSInfoDBName)
 			delete [] OSInfoDBName;
@@ -573,6 +587,28 @@ class OSInfo : public Module
 		ModuleDatabaseBackup(OSInfoDBName);
 	}
 
+	void OnDelCore(NickCore *nc)
+	{
+		char *c;
+
+		if (nc->GetExt("os_info", c))
+		{
+			delete [] c;
+			nc->Shrink("os_info");
+		}
+	}
+
+	void OnDelChan(ChannelInfo *ci)
+	{
+		char *c;
+
+		if (ci->GetExt("os_info", c))
+		{
+			delete [] c;
+			ci->Shrink("os_info");
+		}
+	}
+
 	void NickServHelp(User *u)
 	{
 		if (is_oper(u))
@@ -631,12 +667,12 @@ int mLoadData()
 						if (!stricmp(type, "C"))
 						{
 							if ((ci = cs_findchan(name)))
-								ci->Extend("os_info", strdup("info"));
+								ci->Extend("os_info", sstrdup(info));
 						}
 						else if (!stricmp(type, "N"))
 						{
 							if ((na = findnick(name)))
-								na->nc->Extend("os_info", strdup(info));
+								na->nc->Extend("os_info", sstrdup(info));
 						}
 						delete [] info;
 					}

@@ -14,6 +14,99 @@
 #include "services.h"
 #include "hashcomp.h"
 
+/******************************************************
+ *
+ * This is the implementation of our special irc::string
+ * class which is a case-insensitive equivalent to
+ * std::string which is not only case-insensitive but
+ * can also do scandanavian comparisons, e.g. { = [, etc.
+ *
+ * This class depends on the const array 'national_case_insensitive_map'.
+ *
+ ******************************************************/
+
+bool irc::irc_char_traits::eq(char c1st, char c2nd)
+{
+	return rfc_case_insensitive_map[static_cast<unsigned char>(c1st)] == rfc_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+}
+
+bool irc::irc_char_traits::ne(char c1st, char c2nd)
+{
+	return rfc_case_insensitive_map[static_cast<unsigned char>(c1st)] != rfc_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+}
+
+bool irc::irc_char_traits::lt(char c1st, char c2nd)
+{
+	return rfc_case_insensitive_map[static_cast<unsigned char>(c1st)] < rfc_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+}
+
+int irc::irc_char_traits::compare(const char *str1, const char *str2, size_t n)
+{
+	for (unsigned i = 0; i < n; ++i)
+	{
+		if (rfc_case_insensitive_map[static_cast<unsigned char>(*str1)] > rfc_case_insensitive_map[static_cast<unsigned char>(*str2)])
+			return 1;
+
+		if (rfc_case_insensitive_map[static_cast<unsigned char>(*str1)] < rfc_case_insensitive_map[static_cast<unsigned char>(*str2)])
+			return -1;
+
+		if (!*str1 || !*str2)
+			return 0;
+
+		++str1;
+		++str2;
+	}
+	return 0;
+}
+
+const char *irc::irc_char_traits::find(const char *s1, int n, char c)
+{
+	while (n-- > 0 && rfc_case_insensitive_map[static_cast<unsigned char>(*s1)] != rfc_case_insensitive_map[static_cast<unsigned char>(c)])
+		++s1;
+	return n >= 0 ? s1 : NULL;
+}
+
+bool ci::ci_char_traits::eq(char c1st, char c2nd)
+{
+	return ascii_case_insensitive_map[static_cast<unsigned char>(c1st)] == ascii_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+}
+
+bool ci::ci_char_traits::ne(char c1st, char c2nd)
+{
+	return ascii_case_insensitive_map[static_cast<unsigned char>(c1st)] != ascii_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+}
+
+bool ci::ci_char_traits::lt(char c1st, char c2nd)
+{
+	return ascii_case_insensitive_map[static_cast<unsigned char>(c1st)] < ascii_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+}
+
+int ci::ci_char_traits::compare(const char *str1, const char *str2, size_t n)
+{
+	for (unsigned i = 0; i < n; ++i)
+	{
+		if (ascii_case_insensitive_map[static_cast<unsigned char>(*str1)] > ascii_case_insensitive_map[static_cast<unsigned char>(*str2)])
+			return 1;
+
+		if (ascii_case_insensitive_map[static_cast<unsigned char>(*str1)] < ascii_case_insensitive_map[static_cast<unsigned char>(*str2)])
+			return -1;
+
+		if (!*str1 || !*str2)
+			return 0;
+
+		++str1;
+		++str2;
+	}
+	return 0;
+}
+
+const char *ci::ci_char_traits::find(const char *s1, int n, char c)
+{
+	while (n-- > 0 && ascii_case_insensitive_map[static_cast<unsigned char>(*s1)] != ascii_case_insensitive_map[static_cast<unsigned char>(c)])
+		++s1;
+	return n >= 0 ? s1 : NULL;
+}
+
 sepstream::sepstream(const std::string &source, char seperator) : tokens(source), sep(seperator)
 {
 	last_starting_position = n = tokens.begin();

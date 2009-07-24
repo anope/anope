@@ -491,7 +491,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (subcommand.empty())
 			notice_help(s_NickServ, u, NICK_HELP_SET);

@@ -228,7 +228,7 @@ class CommandCSEnforce : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");

@@ -184,7 +184,7 @@ class CommandHSRequest : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
@@ -247,7 +247,7 @@ class CommandHSActivate : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
@@ -310,7 +310,7 @@ class CommandHSReject : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
@@ -388,7 +388,7 @@ class CommandHSWaiting : public HSListBase
 		return this->DoList(u, params);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
 		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");

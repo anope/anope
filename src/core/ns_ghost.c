@@ -74,7 +74,7 @@ class CommandNSGhost : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP_GHOST);
 		return true;

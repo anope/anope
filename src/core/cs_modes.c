@@ -79,7 +79,7 @@ class CommandCSOp : public Command
 		return do_util(u, &csmodeutils[MUT_OP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_OP);
 		return true;
@@ -105,7 +105,7 @@ class CommandCSDeOp : public Command
 		return do_util(u, &csmodeutils[MUT_DEOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEOP);
 		return true;
@@ -131,7 +131,7 @@ class CommandCSVoice : public Command
 		return do_util(u, &csmodeutils[MUT_VOICE], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_VOICE);
 		return true;
@@ -157,7 +157,7 @@ class CommandCSDeVoice : public Command
 		return do_util(u, &csmodeutils[MUT_DEVOICE], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEVOICE);
 		return true;
@@ -189,7 +189,7 @@ class CommandCSHalfOp : public Command
 		return do_util(u, &csmodeutils[MUT_HALFOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_HALFOP);
 		return true;
@@ -220,7 +220,7 @@ class CommandCSDeHalfOp : public Command
 		return do_util(u, &csmodeutils[MUT_DEHALFOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEHALFOP);
 		return true;
@@ -251,7 +251,7 @@ class CommandCSProtect : public Command
 		return do_util(u, &csmodeutils[MUT_PROTECT], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_PROTECT);
 		return true;
@@ -283,7 +283,7 @@ class CommandCSDeProtect : public Command
 		return do_util(u, &csmodeutils[MUT_DEPROTECT], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEPROTECT);
 		return true;
@@ -310,7 +310,7 @@ class CommandCSOwner : public Command
 		return do_util(u, &csmodeutils[MUT_OWNER], (params.size() > 0 ? params[0].c_str() : NULL), NULL);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_OWNER);
 		return true;
@@ -337,7 +337,7 @@ class CommandCSDeOwner : public Command
 		return do_util(u, &csmodeutils[MUT_DEOWNER], (params.size() > 0 ? params[0].c_str() : NULL), NULL);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_DEOWNER);
 		return true;

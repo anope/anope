@@ -183,7 +183,7 @@ class CommandNSConfirm : public Command
 		return this->DoConfirm(u, params);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP_CONFIRM);
 		return true;
@@ -331,7 +331,7 @@ class CommandNSRegister : public CommandNSConfirm
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP_REGISTER);
 		return true;
@@ -382,7 +382,7 @@ class CommandNSResend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP_RESEND);
 		return true;

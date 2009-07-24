@@ -38,7 +38,7 @@ class CommandOSShutdown : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (!u->nc->HasCommand("operserv/shutdown"))
 			return false;

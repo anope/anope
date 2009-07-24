@@ -235,7 +235,7 @@ class NewsBase : public Command
 
 	virtual CommandReturn Execute(User *u, std::vector<std::string> &params) = 0;
 
-	virtual bool OnHelp(User *u, const std::string &subcommand) = 0;
+	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
 	virtual void OnSyntaxError(User *u) = 0;
 };
@@ -260,7 +260,7 @@ class CommandOSLogonNews : public NewsBase
 		return this->DoNews(u, params, NEWS_LOGON);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_OperServ, u, NEWS_HELP_LOGON, this->help_param1);
 		return true;
@@ -303,7 +303,7 @@ class CommandOSOperNews : public NewsBase
 		return this->DoNews(u, params, NEWS_OPER);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_OperServ, u, NEWS_HELP_OPER, this->help_param1);
 		return true;
@@ -338,7 +338,7 @@ class CommandOSRandomNews : public NewsBase
 		return this->DoNews(u, params, NEWS_RANDOM);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_OperServ, u, NEWS_HELP_RANDOM);
 		return true;

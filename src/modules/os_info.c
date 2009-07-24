@@ -123,7 +123,7 @@ class CommandNSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (!is_oper(u))
 			return false;
@@ -200,7 +200,7 @@ class CommandCSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (!is_oper(u))
 			return false;

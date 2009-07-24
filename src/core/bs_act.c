@@ -50,7 +50,7 @@ class CommandBSAct : public Command
 		{
 			params[1].erase(i, 1);
 		}
-		
+
 		ircdproto->SendAction(ci->bi, ci->name, "%s", params[1].c_str());
 		ci->bi->lastmsg = time(NULL);
 		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
@@ -63,7 +63,7 @@ class CommandBSAct : public Command
 		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_BotServ, u, BOT_HELP_ACT);
 		return true;

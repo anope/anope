@@ -36,7 +36,7 @@ Command::~Command()
 
 CommandReturn Command::Execute(User *u, std::vector<std::string> &) { return MOD_CONT; }
 
-bool Command::OnHelp(User *u, const std::string &subcommand) { return false; }
+bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
 
 void Command::OnSyntaxError(User *u) { }
 

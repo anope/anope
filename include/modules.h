@@ -18,6 +18,7 @@
 #include "services.h"
 #include <stdio.h>
 #include "timers.h"
+#include "hashcomp.h"
 
 /* Cross OS compatibility macros */
 #ifdef _WIN32
@@ -255,7 +256,7 @@ class CoreExport Command
 	 * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of "FOO BAR LOL")
 	 * @return true if help was provided to the user, false otherwise.
 	 */
-	virtual bool OnHelp(User *u, const std::string &subcommand);
+	virtual bool OnHelp(User *u, const ci::string &subcommand);
 
 	/** Requested when the user provides bad syntax to this command (not enough params, etc).
 	 * @param u The user executing the command.
@@ -629,7 +630,7 @@ class CoreExport Module
 
 	/** Called before the database expire routines are called
 	* Note: Code that is in seperate expiry routines should just be done
-	* when we save the DB, theres no need to have both 
+	* when we save the DB, theres no need to have both
 	*/
 	virtual void OnPreDatabaseExpire() MARK_DEPRECATED { }
 
@@ -726,7 +727,7 @@ class CoreExport Module
 	 * @param chname The channel name
 	 */
 	virtual void OnChanDrop(const char *chname) { }
-	
+
 	/** Called when a channel is forbidden
 	 * @param ci The channel
 	 */
@@ -772,7 +773,7 @@ class CoreExport Module
 	 * @param u The user
 	 */
 	virtual void OnNickIdentify(User *u) { }
-	
+
 	/** Called when a nick logs out
 	 * @param u The nick
 	 */
@@ -787,7 +788,7 @@ class CoreExport Module
 	 * @param na The nick alias
 	 */
 	virtual void OnNickSuspend(NickAlias *na) { }
-	
+
 	/** Called when a nick is unsuspneded
 	 * @param na The nick alias
 	 */
@@ -866,7 +867,7 @@ enum Implementation
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan,
 
 		/* Users */
-		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel, 
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel,
 		I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */

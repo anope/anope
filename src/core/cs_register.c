@@ -121,13 +121,13 @@ class CommandCSRegister : public Command
 				ircdproto->SendMode(findbot(s_ChanServ), chan, "%s %s", ircd->adminset, u->nick);
 			if (ircd->owner && ircd->ownerset)
 				ircdproto->SendMode(findbot(s_ChanServ), chan, "%s %s", ircd->ownerset, u->nick);
-			
+
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_REGISTER, s_ChanServ);
 		return true;

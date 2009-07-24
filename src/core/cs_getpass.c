@@ -30,7 +30,7 @@ class CommandCSGetPass : public Command
 		ChannelInfo *ci;
 
 		ci = cs_findchan(chan);
-		
+
 		if (!enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1))
 		{
 			notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
@@ -46,7 +46,7 @@ class CommandCSGetPass : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_GETPASS);
 		return true;

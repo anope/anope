@@ -160,7 +160,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		}
 	}
 
-	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED 
+	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty())
 	{
 		if (!u->nc->HasPriv(c->permission) && !u->nc->HasCommand(c->permission))
@@ -195,7 +195,7 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[], const char 
 
 	Command *c = findCommand(cmdTable, token.c_str());
 
-	std::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
+	ci::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining().c_str();
 
 	if (!c || !c->OnHelp(u, subcommand))
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);

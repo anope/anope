@@ -196,7 +196,7 @@ class CommandCSAccess : public Command
 			ci->AddAccess(nc, level);
 
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
-			
+
 			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, level);
 		}
@@ -336,7 +336,7 @@ class CommandCSAccess : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS);
 		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS_LEVELS);
@@ -470,7 +470,7 @@ class CommandCSLevels : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_LEVELS);
 		return true;

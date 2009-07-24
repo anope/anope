@@ -66,7 +66,7 @@ class CommandMSInfo : public Command
 			notice_lang(s_MemoServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
-		else 
+		else
 		{
 			mi = &u->nc->memos;
 			hardmax = u->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;
@@ -190,7 +190,7 @@ class CommandMSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
 			notice_help(s_MemoServ, u, MEMO_SERVADMIN_HELP_INFO);

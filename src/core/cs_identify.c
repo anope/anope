@@ -73,7 +73,7 @@ class CommandCSIdentify : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_IDENTIFY);
 		return true;

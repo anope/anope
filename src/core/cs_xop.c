@@ -387,7 +387,7 @@ class XOPBase : public Command
 
 	virtual CommandReturn Execute(User *u, std::vector<std::string> &params) = 0;
 
-	virtual bool OnHelp(User *u, const std::string &subcommand) = 0;
+	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
 	virtual void OnSyntaxError(User *u) = 0;
 };
@@ -404,7 +404,7 @@ class CommandCSAOP : public XOPBase
 		return this->DoXop(u, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_AOP);
 		return true;
@@ -428,7 +428,7 @@ class CommandCSHOP : public XOPBase
 		return this->DoXop(u, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_HOP);
 		return true;
@@ -452,7 +452,7 @@ class CommandCSSOP : public XOPBase
 		return this->DoXop(u, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_SOP);
 		return true;
@@ -476,7 +476,7 @@ class CommandCSVOP : public XOPBase
 		return this->DoXop(u, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP_VOP);
 		return true;

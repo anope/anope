@@ -70,7 +70,7 @@ class CommandCSTBan : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		this->OnSyntaxError(u);
 		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");

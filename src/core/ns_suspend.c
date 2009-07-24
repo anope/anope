@@ -82,7 +82,7 @@ class CommandNSSuspend : public Command
 
 			alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
 			notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
-			
+
 			FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na))
 		}
 		else
@@ -93,7 +93,7 @@ class CommandNSSuspend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_SUSPEND);
 		return true;
@@ -150,7 +150,7 @@ class CommandNSUnSuspend : public Command
 
 			alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick, nick);
 			notice_lang(s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
-			
+
 			FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 		}
 		else
@@ -161,7 +161,7 @@ class CommandNSUnSuspend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_UNSUSPEND);
 		return true;

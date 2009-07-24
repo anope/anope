@@ -59,7 +59,7 @@ class CommandMSCancel : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_MemoServ, u, MEMO_HELP_CANCEL);
 		return true;

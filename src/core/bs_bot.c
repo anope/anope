@@ -425,7 +425,7 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
 		return true;

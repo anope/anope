@@ -102,13 +102,13 @@ class CommandCSForbid : public Command
 
 		alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick, ci->name);
 		notice_lang(s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
-		
+
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
 		return true;

@@ -118,7 +118,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const std::string &subcommand)
+	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_OperServ, u, OPER_HELP_IGNORE);
 		return true;

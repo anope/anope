@@ -47,10 +47,9 @@ class CommandCSLogout : public Command
  public:
 	CommandCSLogout() : Command("LOGOUT", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;

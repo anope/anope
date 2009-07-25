@@ -36,7 +36,7 @@ class CommandNSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		/* Show hidden info to nick owners and sadmins when the "ALL" parameter is
 		 * supplied. If a nick is online, the "Last seen address" changes to "Is
@@ -45,7 +45,7 @@ class CommandNSInfo : public Command
 		 * -TheShadow (13 Mar 1999)
 		 */
 		const char *nick = params[0].c_str();
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
 		NickAlias *na;
 		NickRequest *nr = NULL;
@@ -56,7 +56,7 @@ class CommandNSInfo : public Command
 			if ((nr = findrequestnick(nick)))
 			{
 				notice_lang(s_NickServ, u, NICK_IS_PREREG);
-				if (param && !stricmp(param, "ALL") && u->nc && u->nc->IsServicesOper())
+				if (!param.empty() && param == "ALL" && u->nc && u->nc->IsServicesOper())
 					notice_lang(s_NickServ, u, NICK_INFO_EMAIL, nr->email);
 				else
 				{
@@ -90,7 +90,7 @@ class CommandNSInfo : public Command
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL
 			 * parameter is used. -TheShadow */
-			if (param && !stricmp(param, "ALL") && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
+			if (!param.empty() && param == "ALL" && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
 				show_hidden = 1;
 
 			notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);

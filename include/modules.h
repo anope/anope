@@ -249,7 +249,7 @@ class CoreExport Command
 	/** Execute this command.
 	 * @param u The user executing the command.
 	 */
-	virtual CommandReturn Execute(User *u, std::vector<std::string> &);
+	virtual CommandReturn Execute(User *u, std::vector<ci::string> &);
 
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
 	 * @param u The user requesting help
@@ -519,7 +519,7 @@ class CoreExport Module
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
 	 * @param u The user executing the command
@@ -527,7 +527,7 @@ class CoreExport Module
 	 * @param command The command the user executed
 	 * @param params The parameters the user sent
 	 */
-	virtual void OnPostCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params) { }
+	virtual void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { }
 
 	/** Called when anope saves databases.
 	 * NOTE: This event is deprecated pending new database handling.

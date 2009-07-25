@@ -178,10 +178,10 @@ class CommandCSEnforce : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *what = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string what = params.size() > 1 ? params[1] : "";
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 
@@ -196,30 +196,30 @@ class CommandCSEnforce : public Command
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
-			if (!what || !stricmp(what, "SET"))
+			if (what.empty() || what == "SET")
 			{
 				this->DoSet(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what ? what : "SET");
+				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, !what.empty() ? what.c_str() : "SET");
 			}
-			else if (!stricmp(what, "MODES"))
+			else if (what == "MODES")
 			{
 				this->DoModes(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what);
+				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
-			else if (!stricmp(what, "SECUREOPS"))
+			else if (what == "SECUREOPS")
 			{
 				this->DoSecureOps(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what);
+				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
-			else if (!stricmp(what, "RESTRICTED"))
+			else if (what == "RESTRICTED")
 			{
 				this->DoRestricted(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what);
+				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
-			else if (!stricmp(what, "+R"))
+			else if (what == "+R")
 			{
 				this->DoCModeR(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what);
+				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else
 				this->OnSyntaxError(u);

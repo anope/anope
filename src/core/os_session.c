@@ -18,7 +18,7 @@
 class CommandOSSession : public Command
 {
  private:
-	CommandReturn DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<ci::string> &params)
 	{
 		Session *session;
 		int mincount, i;
@@ -43,7 +43,7 @@ class CommandOSSession : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, std::vector<std::string> &params)
+	CommandReturn DoView(User *u, std::vector<ci::string> &params)
 	{
 		const char *param = params[1].c_str();
 		Session *session = findsession(param);
@@ -62,9 +62,9 @@ class CommandOSSession : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
 		if (!LimitSessions)
 		{
@@ -72,9 +72,9 @@ class CommandOSSession : public Command
 			return MOD_CONT;
 		}
 
-		if (!stricmp(cmd, "LIST"))
+		if (cmd == "LIST")
 			return this->DoList(u, params);
-		else if (!stricmp(cmd, "VIEW"))
+		else if (cmd == "VIEW")
 			return this->DoView(u, params);
 		else
 			this->OnSyntaxError(u);
@@ -181,7 +181,7 @@ static int exception_view_callback(User *u, int num, va_list args)
 class CommandOSException : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
 	{
 		const char *mask, *expiry, *limitstr;
 		char reason[BUFSIZE];
@@ -255,7 +255,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
 	{
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 		int i;
@@ -314,7 +314,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoMove(User *u, std::vector<std::string> &params)
+	CommandReturn DoMove(User *u, std::vector<ci::string> &params)
 	{
 		Exception *exception;
 		const char *n1str = params.size() > 1 ? params[1].c_str() : NULL; /* From position */
@@ -365,7 +365,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u, std::vector<ci::string> &params)
 	{
 		int sent_header = 0, i;
 		expire_exceptions();
@@ -387,7 +387,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, std::vector<std::string> &params)
+	CommandReturn DoView(User *u, std::vector<ci::string> &params)
 	{
 		int sent_header = 0, i;
 		expire_exceptions();
@@ -413,9 +413,9 @@ class CommandOSException : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
 		if (!LimitSessions)
 		{
@@ -423,19 +423,18 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		if (!stricmp(cmd, "ADD"))
+		if (cmd == "ADD")
 			return this->DoAdd(u, params);
-		else if (!stricmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 			return this->DoDel(u, params);
-		else if (!stricmp(cmd, "MOVE"))
+		else if (cmd == "MOVE")
 			return this->DoMove(u, params);
-		else if (!stricmp(cmd, "LIST"))
+		else if (cmd == "LIST")
 			return this->DoList(u, params);
-		else if (!stricmp(cmd, "VIEW"))
+		else if (cmd == "VIEW")
 			return this->DoView(u, params);
-		else {
+		else
 			this->OnSyntaxError(u);
-		}
 		return MOD_CONT;
 	}
 

@@ -40,7 +40,7 @@ int stats_count_servers(Server *s)
 class CommandOSStats : public Command
 {
  private:
-	CommandReturn DoStatsAkill(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsAkill(User *u)
 	{
 		int timeout;
 		/* AKILLs */
@@ -123,14 +123,14 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsReset(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsReset(User *u)
 	{
 		maxusercnt = usercnt;
 		notice_lang(s_OperServ, u, OPER_STATS_RESET);
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsUptime(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsUptime(User *u)
 	{
 		char timebuf[64];
 		time_t uptime = time(NULL) - start_time;
@@ -200,7 +200,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsUplink(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsUplink(User *u)
 	{
 		char buf[512];
 		int buflen, i;
@@ -240,7 +240,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsMemory(User *u, std::vector<std::string> &params)
+	CommandReturn DoStatsMemory(User *u)
 	{
 		long count, mem;
 
@@ -279,28 +279,28 @@ class CommandOSStats : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *extra = params.size() ? params[0].c_str() : NULL;
+		ci::string extra = params.size() ? params[0] : "";
 
-		if (extra && stricmp(extra, "ALL"))
+		if (!extra.empty() && extra != "ALL")
 		{
-			if (!stricmp(extra, "AKILL"))
-				return this->DoStatsAkill(u, params);
-			else if (!stricmp(extra, "RESET"))
-				return this->DoStatsReset(u, params);
-			else if (stricmp(extra, "MEMORY") && stricmp(extra, "UPLINK"))
-				notice_lang(s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra);
+			if (extra == "AKILL")
+				return this->DoStatsAkill(u);
+			else if (extra == "RESET")
+				return this->DoStatsReset(u);
+			else if (extra != "MEMORY" && extra != "UPLINK")
+				notice_lang(s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra.c_str());
 		}
 
-		if (!extra || (stricmp(extra, "MEMORY") && stricmp(extra, "UPLINK")))
-			this->DoStatsUptime(u, params);
+		if (extra.empty() || (extra != "MEMORY" && extra != "UPLINK"))
+			this->DoStatsUptime(u);
 
-		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "UPLINK")))
-			this->DoStatsUplink(u, params);
+		if (!extra.empty() && (extra == "ALL" || extra == "UPLINK"))
+			this->DoStatsUplink(u);
 
-		if (extra && (!stricmp(extra, "ALL") || !stricmp(extra, "MEMORY")))
-			this->DoStatsMemory(u, params);
+		if (!extra.empty() && (extra == "ALL" || extra == "MEMORY"))
+			this->DoStatsMemory(u);
 
 		return MOD_CONT;
 	}

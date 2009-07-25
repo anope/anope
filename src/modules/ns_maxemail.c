@@ -101,7 +101,7 @@ class NSMaxEmail : public Module
 		my_load_config();
 	}
 
-	EventReturn OnPreCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params)
+	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
 		if (service == s_NickServ)
 		{
@@ -112,10 +112,10 @@ class NSMaxEmail : public Module
 			}
 			else if (command == "SET")
 			{
-				const char *set = params[0].c_str();
+				ci::string set = params[0];
 				const char *email = params.size() > 1 ? params[1].c_str() : NULL;
 
-				if (!stricmp(set, "email") && check_email_limit_reached(email, u))
+				if (set == "email" && check_email_limit_reached(email, u))
 					return EVENT_STOP;
 			}
 		}

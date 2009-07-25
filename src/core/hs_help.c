@@ -23,9 +23,9 @@ class CommandHSHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		mod_help_cmd(s_HostServ, u, HOSTSERV, params.size() > 0 ? params[0].c_str() : NULL);
+		mod_help_cmd(s_HostServ, u, HOSTSERV, params[0].c_str());
 		return MOD_CONT;
 	}
 

@@ -37,10 +37,10 @@ class CommandCSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;
@@ -63,9 +63,8 @@ class CommandCSInfo : public Command
 			return MOD_CONT;
 		}
 
-
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (param && stricmp(param, "ALL") == 0 && (check_access(u, ci, CA_INFO) || has_auspex))
+		if (!param.empty() && param == "ALL" && (check_access(u, ci, CA_INFO) || has_auspex))
 			show_all = 1;
 
 		notice_lang(s_ChanServ, u, CHAN_INFO_HEADER, chan);
@@ -158,8 +157,6 @@ class CommandCSInfo : public Command
 	}
 };
 
-
-
 class CSInfo : public Module
 {
  public:
@@ -175,8 +172,5 @@ class CSInfo : public Module
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INFO);
 	}
 };
-
-
-
 
 MODULE_INIT("cs_info", CSInfo)

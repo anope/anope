@@ -552,10 +552,10 @@ class CommandCSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
 		ChannelInfo *ci = cs_findchan(chan);
 		bool is_servadmin = u->nc->HasPriv("chanserv/set");
@@ -565,15 +565,11 @@ class CommandCSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (!param && (!cmd || (stricmp(cmd, "SUCCESSOR") != 0 &&
-								stricmp(cmd, "URL") != 0 &&
-								stricmp(cmd, "EMAIL") != 0 &&
-								stricmp(cmd, "ENTRYMSG") != 0) &&
-								stricmp(cmd, "MLOCK") != 0)) {
+		if (!param && cmd != "SUCCESSOR" && cmd != "URL" && cmd != "EMAIL" && cmd != "ENTRYMSG" && cmd != "MLOCK")
 			syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
-		} else if (!is_servadmin && !check_access(u, ci, CA_SET)) {
+		else if (!is_servadmin && !check_access(u, ci, CA_SET))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (stricmp(cmd, "FOUNDER") == 0) {
+		else if (cmd == "FOUNDER") {
 			if (!is_servadmin
 				&& (ci->
 					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
@@ -583,7 +579,7 @@ class CommandCSSet : public Command
 			} else {
 				DoSetFounder(u, ci, param);
 			}
-		} else if (stricmp(cmd, "SUCCESSOR") == 0) {
+		} else if (cmd == "SUCCESSOR") {
 			if (!is_servadmin
 				&& (ci->
 					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
@@ -593,7 +589,7 @@ class CommandCSSet : public Command
 			} else {
 				DoSetSuccessor(u, ci, param);
 			}
-		} else if (stricmp(cmd, "PASSWORD") == 0) {
+		} else if (cmd == "PASSWORD") {
 			if (!is_servadmin
 				&& (ci->
 					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
@@ -603,29 +599,29 @@ class CommandCSSet : public Command
 			} else {
 				DoSetPassword(u, ci, param);
 			}
-		} else if (stricmp(cmd, "DESC") == 0) {
+		} else if (cmd == "DESC") {
 			DoSetDesc(u, ci, param);
-		} else if (stricmp(cmd, "URL") == 0) {
+		} else if (cmd == "URL") {
 			DoSetURL(u, ci, param);
-		} else if (stricmp(cmd, "EMAIL") == 0) {
+		} else if (cmd == "EMAIL") {
 			DoSetEMail(u, ci, param);
-		} else if (stricmp(cmd, "ENTRYMSG") == 0) {
+		} else if (cmd == "ENTRYMSG") {
 			DoSetEntryMsg(u, ci, param);
-		} else if (stricmp(cmd, "TOPIC") == 0) {
+		} else if (cmd == "TOPIC") {
 			notice_lang(s_ChanServ, u, OBSOLETE_COMMAND, "TOPIC");
-		} else if (stricmp(cmd, "BANTYPE") == 0) {
+		} else if (cmd == "BANTYPE") {
 			DoSetBanType(u, ci, param);
-		} else if (stricmp(cmd, "MLOCK") == 0) {
+		} else if (cmd == "MLOCK") {
 			DoSetMLock(u, ci, param);
-		} else if (stricmp(cmd, "KEEPTOPIC") == 0) {
+		} else if (cmd == "KEEPTOPIC") {
 			DoSetKeepTopic(u, ci, param);
-		} else if (stricmp(cmd, "TOPICLOCK") == 0) {
+		} else if (cmd == "TOPICLOCK") {
 			DoSetTopicLock(u, ci, param);
-		} else if (stricmp(cmd, "PRIVATE") == 0) {
+		} else if (cmd == "PRIVATE") {
 			DoSetPrivate(u, ci, param);
-		} else if (stricmp(cmd, "SECUREOPS") == 0) {
+		} else if (cmd == "SECUREOPS") {
 			DoSetSecureOps(u, ci, param);
-		} else if (stricmp(cmd, "SECUREFOUNDER") == 0) {
+		} else if (cmd == "SECUREFOUNDER") {
 			if (!is_servadmin
 				&& (ci->
 					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
@@ -635,26 +631,26 @@ class CommandCSSet : public Command
 			} else {
 				DoSetSecureFounder(u, ci, param);
 			}
-		} else if (stricmp(cmd, "RESTRICTED") == 0) {
+		} else if (cmd == "RESTRICTED") {
 			DoSetRestricted(u, ci, param);
-		} else if (stricmp(cmd, "SECURE") == 0) {
+		} else if (cmd == "SECURE") {
 			DoSetSecure(u, ci, param);
-		} else if (stricmp(cmd, "SIGNKICK") == 0) {
+		} else if (cmd == "SIGNKICK") {
 			DoSetSignKick(u, ci, param);
-		} else if (stricmp(cmd, "OPNOTICE") == 0) {
+		} else if (cmd == "OPNOTICE") {
 			DoSetOpNotice(u, ci, param);
-		} else if (stricmp(cmd, "XOP") == 0) {
+		} else if (cmd == "XOP") {
 			if (!(findModule("cs_xop"))) {
-				notice_lang(s_ChanServ, u, CHAN_XOP_NOT_AVAILABLE, cmd);
+				notice_lang(s_ChanServ, u, CHAN_XOP_NOT_AVAILABLE, cmd.c_str());
 			} else {
 				DoSetXOP(u, ci, param);
 			}
-		} else if (stricmp(cmd, "PEACE") == 0) {
+		} else if (cmd == "PEACE") {
 			DoSetPeace(u, ci, param);
-		} else if (stricmp(cmd, "NOEXPIRE") == 0) {
+		} else if (cmd == "NOEXPIRE") {
 			DoSetNoExpire(u, ci, param);
 		} else {
-			notice_lang(s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, cmd);
+			notice_lang(s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, cmd.c_str());
 			notice_lang(s_ChanServ, u, MORE_INFO, s_ChanServ, "SET");
 		}
 		return MOD_CONT;

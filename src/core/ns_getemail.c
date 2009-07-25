@@ -27,30 +27,30 @@ class CommandNSGetEMail : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *email = params[0].c_str();
+		ci::string email = params[0];
 		int i, j = 0;
 		NickCore *nc;
 
-		alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, email);
+		alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, email.c_str());
 		for (i = 0; i < 1024; ++i)
 		{
 			for (nc = nclists[i]; nc; nc = nc->next)
 			{
 				if (nc->email)
 				{
-					if (!stricmp(nc->email, email))
+					if (nc->email == email)
 					{
 						++j;
-						notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email);
+						notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
 					}
 				}
 			}
 		}
 		if (j <= 0)
 		{
-			notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email);
+			notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
 			return MOD_CONT;
 		}
 		return MOD_CONT;

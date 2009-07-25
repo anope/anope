@@ -22,7 +22,7 @@ class CommandNSDrop : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 		NickAlias *na;

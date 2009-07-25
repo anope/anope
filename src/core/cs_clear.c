@@ -23,10 +23,10 @@ class CommandCSClear : public Command
 
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *what = params[1].c_str();
+		ci::string what = params[1];
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 
@@ -37,7 +37,7 @@ class CommandCSClear : public Command
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!u || !check_access(u, ci, CA_CLEAR)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (stricmp(what, "bans") == 0) {
+		} else if (what == "bans") {
 			const char *av[2];
 			Entry *ban, *bnext;
 
@@ -52,7 +52,7 @@ class CommandCSClear : public Command
 			}
 
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
-		} else if (ircd->except && stricmp(what, "excepts") == 0) {
+		} else if (ircd->except && what == "excepts") {
 			const char *av[2];
 			Entry *except, *bnext;
 
@@ -67,7 +67,7 @@ class CommandCSClear : public Command
 			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
 
-		} else if (ircd->invitemode && stricmp(what, "invites") == 0) {
+		} else if (ircd->invitemode && what == "invites") {
 			const char *av[2];
 			Entry *invite, *bnext;
 
@@ -82,7 +82,7 @@ class CommandCSClear : public Command
 			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
 
-		} else if (stricmp(what, "modes") == 0) {
+		} else if (what == "modes") {
 			const char *argv[2];
 
 			if (c->mode) {
@@ -124,7 +124,7 @@ class CommandCSClear : public Command
 			}
 
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
-		} else if (stricmp(what, "ops") == 0) {
+		} else if (what == "ops") {
 			const char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
 			int ac, isop, isadmin, isown, count, i;
 			char buf[BUFSIZE], tmp[BUFSIZE], tmp2[BUFSIZE];
@@ -212,7 +212,7 @@ class CommandCSClear : public Command
 				}
 			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
-		} else if (ircd->halfop && stricmp(what, "hops") == 0) {
+		} else if (ircd->halfop && what == "hops") {
 			const char *av[4];
 			int ac;
 			char buf[BUFSIZE];
@@ -256,7 +256,7 @@ class CommandCSClear : public Command
 				do_cmode(s_ChanServ, ac, av);
 			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
-		} else if (stricmp(what, "voices") == 0) {
+		} else if (what == "voices") {
 			const char *av[4];
 			int ac;
 			char buf[BUFSIZE];
@@ -301,7 +301,7 @@ class CommandCSClear : public Command
 				do_cmode(s_ChanServ, ac, av);
 			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
-		} else if (stricmp(what, "users") == 0) {
+		} else if (what == "users") {
 			const char *av[3];
 			struct c_userlist *cu, *bnext;
 			char buf[256];

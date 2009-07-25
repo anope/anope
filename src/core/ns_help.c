@@ -23,11 +23,11 @@ class CommandNSHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
-		if (!stricmp(cmd, "SET LANGUAGE"))
+		if (cmd == "SET LANGUAGE")
 		{
 			int i;
 			notice_help(s_NickServ, u, NICK_HELP_SET_LANGUAGE);
@@ -35,7 +35,7 @@ class CommandNSHelp : public Command
 				u->SendMessage(s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
 		}
 		else
-			mod_help_cmd(s_NickServ, u, NICKSERV, cmd);
+			mod_help_cmd(s_NickServ, u, NICKSERV, cmd.c_str());
 
 		return MOD_CONT;
 	}

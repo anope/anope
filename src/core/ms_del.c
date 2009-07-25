@@ -24,23 +24,23 @@ class CommandMSDel : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		MemoInfo *mi;
 		ChannelInfo *ci;
-		const char *numstr = params.size() ? params[0].c_str() : NULL, *chan = NULL;
+		ci::string numstr = params.size() ? params[0] : "", chan;
 		int last, last0, i;
 		char buf[BUFSIZE], *end;
 		int delcount, count, left;
 
-		if (numstr && *numstr == '#')
+		if (!numstr.empty() && numstr[0] == '#')
 		{
 			chan = numstr;
-			numstr = params.size() > 1 ? params[1].c_str() : NULL;
+			numstr = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan)))
+			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
+				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (readonly)
@@ -59,25 +59,25 @@ class CommandMSDel : public Command
 		{
 			mi = &u->nc->memos;
 		}
-		if (!numstr || (!isdigit(*numstr) && stricmp(numstr, "ALL") && stricmp(numstr, "LAST")))
+		if (numstr.empty() || (!isdigit(numstr[0]) && numstr != "ALL" && numstr != "LAST"))
 			this->OnSyntaxError(u);
 		else if (mi->memos.empty())
 		{
-			if (chan)
-				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
+			if (!chan.empty())
+				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
 				notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
-			if (isdigit(*numstr))
+			if (isdigit(numstr[0]))
 			{
 				/* Delete a specific memo or memos. */
 				last = -1; /* Last memo deleted */
 				last0 = -1; /* Beginning of range of last memos deleted */
 				end = buf;
 				left = sizeof(buf);
-				delcount = process_numlist(numstr, &count, del_memo_callback, u, mi, &last, &last0, &end, &left);
+				delcount = process_numlist(numstr.c_str(), &count, del_memo_callback, u, mi, &last, &last0, &end, &left);
 				if (last != -1)
 				{
 					/* Some memos got deleted; tell them which ones. */
@@ -97,12 +97,12 @@ class CommandMSDel : public Command
 				{
 					/* No memos were deleted.  Tell them so. */
 					if (count == 1)
-						notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, atoi(numstr));
+						notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, atoi(numstr.c_str()));
 					else
 						notice_lang(s_MemoServ, u, MEMO_DELETED_NONE);
 				}
 			}
-			else if (!stricmp(numstr, "LAST"))
+			else if (numstr == "LAST")
 			{
 				/* Delete last memo. */
 				for (i = 0; i < mi->memos.size(); ++i)
@@ -119,8 +119,8 @@ class CommandMSDel : public Command
 					delete mi->memos[i];
 				}
 				mi->memos.clear();
-				if (chan)
-					notice_lang(s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan);
+				if (!chan.empty())
+					notice_lang(s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan.c_str());
 				else
 					notice_lang(s_MemoServ, u, MEMO_DELETED_ALL);
 			}

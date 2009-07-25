@@ -88,7 +88,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		// Check whether or not access string is empty
 	}
 
-	std::vector<std::string> params;
+	std::vector<ci::string> params;
 	std::string curparam;
 	char *s = NULL;
 	while ((s = strtok(NULL, " ")))
@@ -111,7 +111,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		curparam.erase(curparam.size() - 1, curparam.size());
 
 		// Add it
-		params.push_back(curparam);
+		params.push_back(curparam.c_str());
 	}
 
 	if (params.size() < c->MinParams)
@@ -121,7 +121,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	}
 
 	EventReturn MOD_RESULT = EVENT_CONTINUE;
-	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name, params));
+	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name.c_str(), params));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -174,7 +174,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 
 	retVal = c->Execute(u, params);
 
-	FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name, params));
+	FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name.c_str(), params));
 }
 
 /*************************************************************************/

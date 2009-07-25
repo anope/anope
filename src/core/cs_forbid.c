@@ -20,10 +20,9 @@ class CommandCSForbid : public Command
  public:
 	CommandCSForbid() : Command("FORBID", 1, 2, "chanserv/forbid")
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		ChannelInfo *ci;
 		const char *chan = params[0].c_str();
@@ -53,7 +52,6 @@ class CommandCSForbid : public Command
 		{
 			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
 			return MOD_CONT;
-
 		}
 
 		if ((ci = cs_findchan(chan)) != NULL)
@@ -135,6 +133,5 @@ class CSForbid : public Module
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_FORBID);
 	}
 };
-
 
 MODULE_INIT("cs_forbid", CSForbid)

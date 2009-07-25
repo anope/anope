@@ -24,28 +24,28 @@ class CommandBSKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *option = params[1].c_str();
-		const char *value = params[2].c_str();
+		ci::string option = params[1];
+		ci::string value = params[2];
 		const char *ttb = params.size() > 3 ? params[3].c_str() : NULL;
 
 		ChannelInfo *ci = cs_findchan(chan);
 
 		if (readonly)
 			notice_lang(s_BotServ, u, BOT_KICK_DISABLED);
-		else if (!chan || !option || !value)
+		else if (!chan || option.empty() || value.empty())
 			syntax_error(s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
-		else if (stricmp(value, "ON") && stricmp(value, "OFF"))
+		else if (value != "ON" && value != "OFF")
 			syntax_error(s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (!check_access(u, ci, CA_SET) && !u->nc->HasPriv("botserv/administration"))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)
 			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
 		else {
-			if (!stricmp(option, "BADWORDS")) {
-				if (!stricmp(value, "ON")) {
+			if (option == "BADWORDS") {
+				if (value == "ON") {
 					if (ttb) {
 						ci->ttb[TTB_BADWORDS] =
 							strtol(ttb, NULL, 10);
@@ -74,8 +74,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_BADWORDS;
 					notice_lang(s_BotServ, u, BOT_KICK_BADWORDS_OFF);
 				}
-			} else if (!stricmp(option, "BOLDS")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "BOLDS") {
+				if (value == "ON") {
 					if (ttb) {
 						ci->ttb[TTB_BOLDS] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
@@ -99,8 +99,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_BOLDS;
 					notice_lang(s_BotServ, u, BOT_KICK_BOLDS_OFF);
 				}
-			} else if (!stricmp(option, "CAPS")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "CAPS") {
+				if (value == "ON") {
 					char *min = strtok(NULL, " ");
 					char *percent = strtok(NULL, " ");
 
@@ -144,8 +144,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_CAPS;
 					notice_lang(s_BotServ, u, BOT_KICK_CAPS_OFF);
 				}
-			} else if (!stricmp(option, "COLORS")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "COLORS") {
+				if (value == "ON") {
 					if (ttb) {
 						ci->ttb[TTB_COLORS] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
@@ -169,8 +169,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_COLORS;
 					notice_lang(s_BotServ, u, BOT_KICK_COLORS_OFF);
 				}
-			} else if (!stricmp(option, "FLOOD")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "FLOOD") {
+				if (value == "ON") {
 					char *lines = strtok(NULL, " ");
 					char *secs = strtok(NULL, " ");
 
@@ -214,8 +214,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_FLOOD;
 					notice_lang(s_BotServ, u, BOT_KICK_FLOOD_OFF);
 				}
-			} else if (!stricmp(option, "REPEAT")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "REPEAT") {
+				if (value == "ON") {
 					char *times = strtok(NULL, " ");
 
 					if (ttb) {
@@ -250,8 +250,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_REPEAT;
 					notice_lang(s_BotServ, u, BOT_KICK_REPEAT_OFF);
 				}
-			} else if (!stricmp(option, "REVERSES")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "REVERSES") {
+				if (value == "ON") {
 					if (ttb) {
 						ci->ttb[TTB_REVERSES] =
 							strtol(ttb, NULL, 10);
@@ -276,8 +276,8 @@ class CommandBSKick : public Command
 					ci->botflags &= ~BS_KICK_REVERSES;
 					notice_lang(s_BotServ, u, BOT_KICK_REVERSES_OFF);
 				}
-			} else if (!stricmp(option, "UNDERLINES")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "UNDERLINES") {
+				if (value == "ON") {
 					if (ttb) {
 						ci->ttb[TTB_UNDERLINES] =
 							strtol(ttb, NULL, 10);
@@ -303,7 +303,7 @@ class CommandBSKick : public Command
 					notice_lang(s_BotServ, u, BOT_KICK_UNDERLINES_OFF);
 				}
 			} else
-				notice_help(s_BotServ, u, BOT_KICK_UNKNOWN, option);
+				notice_help(s_BotServ, u, BOT_KICK_UNKNOWN, option.c_str());
 		}
 		return MOD_CONT;
 	}

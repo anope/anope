@@ -22,7 +22,7 @@ class CommandNSAList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		/*
 		 * List the channels that the given nickname has access on
@@ -34,7 +34,6 @@ class CommandNSAList : public Command
 		 */
 
 		const char *nick = NULL;
-		const char *lev = NULL;
 
 		NickAlias *na;
 
@@ -63,22 +62,23 @@ class CommandNSAList : public Command
 		}
 
 		/* If available, get level from arguments */
-		lev = params.size() > lev_param ? params[lev_param].c_str() : NULL;
+		ci::string lev = params.size() > lev_param ? params[lev_param] : "";
 
 		/* if a level was given, make sure it's an int for later */
-		if (lev) {
-			if (!stricmp(lev, "FOUNDER"))
+		if (!lev.empty())
+		{
+			if (lev == "FOUNDER")
 				min_level = ACCESS_FOUNDER;
-			else if (!stricmp(lev, "SOP"))
+			else if (lev == "SOP")
 				min_level = ACCESS_SOP;
-			else if (!stricmp(lev, "AOP"))
+			else if (lev == "AOP")
 				min_level = ACCESS_AOP;
-			else if (!stricmp(lev, "HOP"))
+			else if (lev == "HOP")
 				min_level = ACCESS_HOP;
-			else if (!stricmp(lev, "VOP"))
+			else if (lev == "VOP")
 				min_level = ACCESS_VOP;
 			else
-				min_level = atoi(lev);
+				min_level = atoi(lev.c_str());
 		}
 
 		if (!na)

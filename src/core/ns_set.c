@@ -18,11 +18,11 @@
 class CommandNSSet : public Command
 {
  private:
-	CommandReturn DoSetDisplay(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetDisplay(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -35,7 +35,7 @@ class CommandNSSet : public Command
 		for (i = 0; i < nc->aliases.count; ++i)
 		{
 			na = static_cast<NickAlias *>(nc->aliases.list[i]);
-			if (!stricmp(na->nick, param))
+			if (na->nick == param)
 			{
 				param = na->nick; /* Because case may differ */
 				break;
@@ -48,25 +48,25 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		change_core_display(nc, param);
+		change_core_display(nc, param.c_str());
 		notice_lang(s_NickServ, u, NICK_SET_DISPLAY_CHANGED, nc->display);
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPassword(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetPassword(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		int len = strlen(param);
+		int len = param.size();
 		char tmp_pass[PASSMAX];
 
-		if (!stricmp(nc->display, param) || (StrictPasswords && len < 5))
+		if (nc->display == param || (StrictPasswords && len < 5))
 		{
 			notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
@@ -77,7 +77,7 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (enc_encrypt(param, len, nc->pass, PASSMAX - 1) < 0)
+		if (enc_encrypt(param.c_str(), len, nc->pass, PASSMAX - 1) < 0)
 		{
 			params[1].clear();
 			alog("%s: Failed to encrypt password for %s (set)", s_NickServ, nc->display);
@@ -96,7 +96,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetLanguage(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetLanguage(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -124,7 +124,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetUrl(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetUrl(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -144,7 +144,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetEmail(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetEmail(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -177,7 +177,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetICQ(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetICQ(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -200,7 +200,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetGreet(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetGreet(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -225,29 +225,29 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetKill(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetKill(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : NULL;
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(param, "ON"))
+		if (param == "ON")
 		{
 			nc->flags |= NI_KILLPROTECT;
 			nc->flags &= ~(NI_KILL_QUICK | NI_KILL_IMMED);
 			notice_lang(s_NickServ, u, NICK_SET_KILL_ON);
 		}
-		else if (!stricmp(param, "QUICK"))
+		else if (param == "QUICK")
 		{
 			nc->flags |= NI_KILLPROTECT | NI_KILL_QUICK;
 			nc->flags &= ~NI_KILL_IMMED;
 			notice_lang(s_NickServ, u, NICK_SET_KILL_QUICK);
 		}
-		else if (!stricmp(param, "IMMED"))
+		else if (param == "IMMED")
 		{
 			if (NSAllowKillImmed)
 			{
@@ -258,7 +258,7 @@ class CommandNSSet : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_SET_KILL_IMMED_DISABLED);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
 			notice_lang(s_NickServ, u, NICK_SET_KILL_OFF);
@@ -268,22 +268,22 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSecure(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetSecure(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(param, "ON"))
+		if (param == "ON")
 		{
 			nc->flags |= NI_SECURE;
 			notice_lang(s_NickServ, u, NICK_SET_SECURE_ON);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			nc->flags &= ~NI_SECURE;
 			notice_lang(s_NickServ, u, NICK_SET_SECURE_OFF);
@@ -293,22 +293,22 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPrivate(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetPrivate(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(param, "ON"))
+		if (param == "ON")
 		{
 			nc->flags |= NI_PRIVATE;
 			notice_lang(s_NickServ, u, NICK_SET_PRIVATE_ON);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			nc->flags &= ~NI_PRIVATE;
 			notice_lang(s_NickServ, u, NICK_SET_PRIVATE_OFF);
@@ -318,11 +318,11 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetMsg(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetMsg(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -334,12 +334,12 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (!stricmp(param, "ON"))
+		if (param == "ON")
 		{
 			nc->flags |= NI_MSG;
 			notice_lang(s_NickServ, u, NICK_SET_MSG_ON);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			nc->flags &= ~NI_MSG;
 			notice_lang(s_NickServ, u, NICK_SET_MSG_OFF);
@@ -349,11 +349,11 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetHide(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetHide(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -361,25 +361,25 @@ class CommandNSSet : public Command
 
 		int flag, onmsg, offmsg;
 
-		if (!stricmp(param, "EMAIL"))
+		if (param == "EMAIL")
 		{
 			flag = NI_HIDE_EMAIL;
 			onmsg = NICK_SET_HIDE_EMAIL_ON;
 			offmsg = NICK_SET_HIDE_EMAIL_OFF;
 		}
-		else if (!stricmp(param, "USERMASK"))
+		else if (param == "USERMASK")
 		{
 			flag = NI_HIDE_MASK;
 			onmsg = NICK_SET_HIDE_MASK_ON;
 			offmsg = NICK_SET_HIDE_MASK_OFF;
 		}
-		else if (!stricmp(param, "STATUS"))
+		else if (param == "STATUS")
 		{
 			flag = NI_HIDE_STATUS;
 			onmsg = NICK_SET_HIDE_STATUS_ON;
 			offmsg = NICK_SET_HIDE_STATUS_OFF;
 		}
-		else if (!stricmp(param, "QUIT"))
+		else if (param == "QUIT")
 		{
 			flag = NI_HIDE_QUIT;
 			onmsg = NICK_SET_HIDE_QUIT_ON;
@@ -391,15 +391,15 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		param = params.size() > 2 ? params[2].c_str() : NULL;
-		if (!param)
+		param = params.size() > 2 ? params[2] : "";
+		if (param.empty())
 			syntax_error(s_NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
-		else if (!stricmp(param, "ON"))
+		else if (param == "ON")
 		{
 			nc->flags |= flag;
 			notice_lang(s_NickServ, u, onmsg, s_NickServ);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			nc->flags &= ~flag;
 			notice_lang(s_NickServ, u, offmsg, s_NickServ);
@@ -409,11 +409,11 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetAutoOP(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoSetAutoOP(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -424,12 +424,12 @@ class CommandNSSet : public Command
 		 * This is so when people upgrade, and dont have the flag
 		 * the default is on
 		 **/
-		if (!stricmp(param, "ON"))
+		if (param == "ON")
 		{
 			nc->flags &= ~NI_AUTOOP;
 			notice_lang(s_NickServ, u, NICK_SET_AUTOOP_ON);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			nc->flags |= NI_AUTOOP;
 			notice_lang(s_NickServ, u, NICK_SET_AUTOOP_OFF);
@@ -444,9 +444,9 @@ class CommandNSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
 		if (readonly)
 		{
@@ -460,34 +460,34 @@ class CommandNSSet : public Command
 */
 		if (u->nc->flags & NI_SUSPENDED)
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
-		else if (!stricmp(cmd, "DISPLAY"))
+		else if (cmd == "DISPLAY")
 			return this->DoSetDisplay(u, params, u->nc);
-		else if (!stricmp(cmd, "PASSWORD"))
+		else if (cmd == "PASSWORD")
 			return this->DoSetPassword(u, params, u->nc);
-		else if (!stricmp(cmd, "LANGUAGE"))
+		else if (cmd == "LANGUAGE")
 			return this->DoSetLanguage(u, params, u->nc);
-		else if (!stricmp(cmd, "URL"))
+		else if (cmd == "URL")
 			return this->DoSetUrl(u, params, u->nc);
-		else if (!stricmp(cmd, "EMAIL"))
+		else if (cmd == "EMAIL")
 			return this->DoSetEmail(u, params, u->nc);
-		else if (!stricmp(cmd, "ICQ"))
+		else if (cmd == "ICQ")
 			return this->DoSetICQ(u, params, u->nc);
-		else if (!stricmp(cmd, "GREET"))
+		else if (cmd == "GREET")
 			return this->DoSetGreet(u, params, u->nc);
-		else if (!stricmp(cmd, "KILL"))
+		else if (cmd == "KILL")
 			return this->DoSetKill(u, params, u->nc);
-		else if (!stricmp(cmd, "SECURE"))
+		else if (cmd == "SECURE")
 			return this->DoSetSecure(u, params, u->nc);
-		else if (!stricmp(cmd, "PRIVATE"))
+		else if (cmd == "PRIVATE")
 			return this->DoSetPrivate(u, params, u->nc);
-		else if (!stricmp(cmd, "MSG"))
+		else if (cmd == "MSG")
 			return this->DoSetMsg(u, params, u->nc);
-		else if (!stricmp(cmd, "HIDE"))
+		else if (cmd == "HIDE")
 			return this->DoSetHide(u, params, u->nc);
-		else if (!stricmp(cmd, "AUTOOP"))
+		else if (cmd == "AUTOOP")
 			return this->DoSetAutoOP(u, params, u->nc);
 		else
-			notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd);
+			notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd.c_str());
 		return MOD_CONT;
 	}
 

@@ -24,11 +24,11 @@ class CommandCSHelp : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
-		if (!stricmp(cmd, "LEVELS DESC"))
+		if (cmd == "LEVELS DESC")
 		{
 			int i;
 			notice_help(s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
@@ -47,7 +47,7 @@ class CommandCSHelp : public Command
 			}
 		}
 		else
-			mod_help_cmd(s_ChanServ, u, CHANSERV, cmd);
+			mod_help_cmd(s_ChanServ, u, CHANSERV, cmd.c_str());
 
 		return MOD_CONT;
 	}

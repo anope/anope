@@ -25,22 +25,21 @@ class CommandMSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *param = params.size() ? params[0].c_str() : NULL, *chan = NULL;
+		ci::string param = params.size() ? params[0] : "", chan;
 		ChannelInfo *ci;
 		MemoInfo *mi;
-		Memo *m;
 		int i;
 
-		if (param && *param == '#')
+		if (!param.empty() && param[0] == '#')
 		{
 			chan = param;
-			param = params.size() > 1 ? params[1].c_str() : NULL;
+			param = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan)))
+			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
+				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
@@ -54,24 +53,23 @@ class CommandMSList : public Command
 		{
 			mi = &u->nc->memos;
 		}
-		if (param && !isdigit(*param) && stricmp(param, "NEW"))
+		if (!param.empty() && !isdigit(param[0]) && param != "NEW")
 			this->OnSyntaxError(u);
 		else if (!mi->memos.size())
 		{
-			if (chan)
-				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
+			if (!chan.empty())
+				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
 				notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
 			int sent_header = 0;
-			if (param && isdigit(*param))
-				process_numlist(param, NULL, list_memo_callback, u,
-								mi, &sent_header, chan);
+			if (!param.empty() && isdigit(param[0]))
+				process_numlist(param.c_str(), NULL, list_memo_callback, u, mi, &sent_header, chan.c_str());
 			else
 			{
-				if (param)
+				if (!param.empty())
 				{
 					for (i = 0; i < mi->memos.size(); ++i)
 					{
@@ -80,8 +78,8 @@ class CommandMSList : public Command
 					}
 					if (i == mi->memos.size())
 					{
-						if (chan)
-							notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan);
+						if (!chan.empty())
+							notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 						else
 							notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 						return MOD_CONT;
@@ -89,9 +87,9 @@ class CommandMSList : public Command
 				}
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
-					if (param && !(mi->memos[i]->flags & MF_UNREAD))
+					if (!param.empty() && !(mi->memos[i]->flags & MF_UNREAD))
 						continue;
-					list_memo(u, i, mi, &sent_header, param != NULL, chan);
+					list_memo(u, i, mi, &sent_header, !param.empty(), chan.c_str());
 				}
 			}
 		}

@@ -18,7 +18,7 @@
 class CommandOSSet : public Command
 {
  private:
-	CommandReturn DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u)
 	{
 		int index;
 
@@ -36,22 +36,22 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetIgnore(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetIgnore(User *u, std::vector<ci::string> &params)
 	{
-		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string setting = params.size() > 1 ? params[1] : "";
 
-		if (!setting)
+		if (setting.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(setting, "ON"))
+		if (setting == "ON")
 		{
 			allow_ignore = 1;
 			notice_lang(s_OperServ, u, OPER_SET_IGNORE_ON);
 		}
-		else if (!stricmp(setting, "OFF"))
+		else if (setting == "OFF")
 		{
 			allow_ignore = 0;
 			notice_lang(s_OperServ, u, OPER_SET_IGNORE_OFF);
@@ -62,24 +62,24 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetReadOnly(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetReadOnly(User *u, std::vector<ci::string> &params)
 	{
-		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string setting = params.size() > 1 ? params[1] : "";
 
-		if (!setting)
+		if (setting.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(setting, "ON"))
+		if (setting == "ON")
 		{
 			readonly = 1;
 			alog("Read-only mode activated");
 			close_log();
 			notice_lang(s_OperServ, u, OPER_SET_READONLY_ON);
 		}
-		else if (!stricmp(setting, "OFF"))
+		else if (setting == "OFF")
 		{
 			readonly = 0;
 			open_log();
@@ -92,12 +92,12 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetLogChan(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetLogChan(User *u, std::vector<ci::string> &params)
 	{
-		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string setting = params.size() > 1 ? params[1] : "";
 		Channel *c;
 
-		if (!setting)
+		if (setting.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -109,7 +109,7 @@ class CommandOSSet : public Command
 		 *
 		 * -jester
 		 */
-		if (LogChannel && !stricmp(setting, "ON"))
+		if (LogChannel && setting == "ON")
 		{
 			if (ircd->join2msg)
 			{
@@ -120,7 +120,7 @@ class CommandOSSet : public Command
 			alog("Now sending log messages to %s", LogChannel);
 			notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_ON, LogChannel);
 		}
-		else if (LogChannel && !stricmp(setting, "OFF"))
+		else if (LogChannel && setting == "OFF")
 		{
 			alog("No longer sending log messages to a channel");
 			if (ircd->join2msg)
@@ -134,11 +134,11 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSuperAdmin(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetSuperAdmin(User *u, std::vector<ci::string> &params)
 	{
-		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string setting = params.size() > 1 ? params[1] : "";
 
-		if (!setting)
+		if (setting.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -151,14 +151,14 @@ class CommandOSSet : public Command
 		 **/
 		if (!SuperAdmin)
 			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_NOT_ENABLED);
-		else if (!stricmp(setting, "ON"))
+		else if (setting == "ON")
 		{
 			u->isSuperAdmin = 1;
 			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ON);
 			alog("%s: %s is a SuperAdmin ", s_OperServ, u->nick);
 			ircdproto->SendGlobops(s_OperServ, getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick);
 		}
-		else if (!stricmp(setting, "OFF"))
+		else if (setting == "OFF")
 		{
 			u->isSuperAdmin = 0;
 			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_OFF);
@@ -171,31 +171,31 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetDebug(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetDebug(User *u, std::vector<ci::string> &params)
 	{
-		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string setting = params.size() > 1 ? params[1] : "";
 
-		if (!setting)
+		if (setting.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(setting, "ON"))
+		if (setting == "ON")
 		{
 			debug = 1;
 			alog("Debug mode activated");
 			notice_lang(s_OperServ, u, OPER_SET_DEBUG_ON);
 		}
-		else if (!stricmp(setting, "OFF") || (*setting == '0' && !atoi(setting)))
+		else if (setting == "OFF" || (setting[0] == '0' && !atoi(setting.c_str())))
 		{
 			alog("Debug mode deactivated");
 			debug = 0;
 			notice_lang(s_OperServ, u, OPER_SET_DEBUG_OFF);
 		}
-		else if (isdigit(*setting) && atoi(setting) > 0)
+		else if (isdigit(setting[0]) && atoi(setting.c_str()) > 0)
 		{
-			debug = atoi(setting);
+			debug = atoi(setting.c_str());
 			alog("Debug mode activated (level %d)", debug);
 			notice_lang(s_OperServ, u, OPER_SET_DEBUG_LEVEL, debug);
 		}
@@ -205,23 +205,23 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetNoExpire(User *u, std::vector<std::string> &params)
+	CommandReturn DoSetNoExpire(User *u, std::vector<ci::string> &params)
 	{
-		const char *setting = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string setting = params.size() > 1 ? params[1] : "";
 
-		if (!setting)
+		if (setting.empty())
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
 		}
 
-		if (!stricmp(setting, "ON"))
+		if (setting == "ON")
 		{
 			noexpire = 1;
 			alog("No expire mode activated");
 			notice_lang(s_OperServ, u, OPER_SET_NOEXPIRE_ON);
 		}
-		else if (!stricmp(setting, "OFF"))
+		else if (setting == "OFF")
 		{
 			noexpire = 0;
 			alog("No expire mode deactivated");
@@ -237,26 +237,26 @@ class CommandOSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *option = params[0].c_str();
+		ci::string option = params[0];
 
-		if (!stricmp(option, "LIST"))
-			return this->DoList(u, params);
-		else if (!stricmp(option, "IGNORE"))
+		if (option == "LIST")
+			return this->DoList(u);
+		else if (option == "IGNORE")
 			return this->DoSetIgnore(u, params);
-		else if (!stricmp(option, "READONLY"))
+		else if (option == "READONLY")
 			return this->DoSetReadOnly(u, params);
-		else if (!stricmp(option, "LOGCHAN"))
+		else if (option == "LOGCHAN")
 			return this->DoSetLogChan(u, params);
-		else if (!stricmp(option, "SUPERADMIN"))
+		else if (option == "SUPERADMIN")
 			return this->DoSetSuperAdmin(u, params);
-		else if (!stricmp(option, "DEBUG"))
+		else if (option == "DEBUG")
 			return this->DoSetDebug(u, params);
-		else if (!stricmp(option, "NOEXPIRE"))
+		else if (option == "NOEXPIRE")
 			return this->DoSetNoExpire(u, params);
 		else
-			notice_lang(s_OperServ, u, OPER_SET_UNKNOWN_OPTION, option);
+			notice_lang(s_OperServ, u, OPER_SET_UNKNOWN_OPTION, option.c_str());
 		return MOD_CONT;
 	}
 

@@ -24,7 +24,7 @@ class CommandCSDrop : public Command
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci;
@@ -108,8 +108,6 @@ class CommandCSDrop : public Command
 	}
 };
 
-
-
 class CSDrop : public Module
 {
  public:
@@ -125,8 +123,5 @@ class CSDrop : public Module
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DROP);
 	}
 };
-
-
-
 
 MODULE_INIT("cs_drop", CSDrop)

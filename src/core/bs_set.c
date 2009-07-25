@@ -23,11 +23,11 @@ class CommandBSSet : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *option = params[1].c_str();
-		const char *value = params[2].c_str();
+		ci::string option = params[1];
+		ci::string value = params[2];
 		ChannelInfo *ci;
 
 		if (readonly)
@@ -36,7 +36,7 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (u->nc->HasCommand("botserv/set/private") && !stricmp(option, "PRIVATE"))
+		if (u->nc->HasCommand("botserv/set/private") && option == "PRIVATE")
 		{
 			BotInfo *bi;
 
@@ -46,12 +46,12 @@ class CommandBSSet : public Command
 				return MOD_CONT;
 			}
 
-			if (!stricmp(value, "ON"))
+			if (value == "ON")
 			{
 				bi->flags |= BI_PRIVATE;
 				notice_lang(s_BotServ, u, BOT_SET_PRIVATE_ON, bi->nick);
 			}
-			else if (!stricmp(value, "OFF"))
+			else if (value == "OFF")
 			{
 				bi->flags &= ~BI_PRIVATE;
 				notice_lang(s_BotServ, u, BOT_SET_PRIVATE_OFF, bi->nick);
@@ -66,12 +66,12 @@ class CommandBSSet : public Command
 		else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else {
-			if (!stricmp(option, "DONTKICKOPS")) {
-				if (!stricmp(value, "ON")) {
+			if (option == "DONTKICKOPS") {
+				if (value == "ON") {
 					ci->botflags |= BS_DONTKICKOPS;
 					notice_lang(s_BotServ, u, BOT_SET_DONTKICKOPS_ON,
 								ci->name);
-				} else if (!stricmp(value, "OFF")) {
+				} else if (value == "OFF") {
 					ci->botflags &= ~BS_DONTKICKOPS;
 					notice_lang(s_BotServ, u, BOT_SET_DONTKICKOPS_OFF,
 								ci->name);
@@ -79,12 +79,12 @@ class CommandBSSet : public Command
 					syntax_error(s_BotServ, u, "SET DONTKICKOPS",
 								 BOT_SET_DONTKICKOPS_SYNTAX);
 				}
-			} else if (!stricmp(option, "DONTKICKVOICES")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "DONTKICKVOICES") {
+				if (value == "ON") {
 					ci->botflags |= BS_DONTKICKVOICES;
 					notice_lang(s_BotServ, u, BOT_SET_DONTKICKVOICES_ON,
 								ci->name);
-				} else if (!stricmp(value, "OFF")) {
+				} else if (value == "OFF") {
 					ci->botflags &= ~BS_DONTKICKVOICES;
 					notice_lang(s_BotServ, u, BOT_SET_DONTKICKVOICES_OFF,
 								ci->name);
@@ -92,46 +92,46 @@ class CommandBSSet : public Command
 					syntax_error(s_BotServ, u, "SET DONTKICKVOICES",
 								 BOT_SET_DONTKICKVOICES_SYNTAX);
 				}
-			} else if (!stricmp(option, "FANTASY")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "FANTASY") {
+				if (value == "ON") {
 					ci->botflags |= BS_FANTASY;
 					notice_lang(s_BotServ, u, BOT_SET_FANTASY_ON, ci->name);
-				} else if (!stricmp(value, "OFF")) {
+				} else if (value == "OFF") {
 					ci->botflags &= ~BS_FANTASY;
 					notice_lang(s_BotServ, u, BOT_SET_FANTASY_OFF, ci->name);
 				} else {
 					syntax_error(s_BotServ, u, "SET FANTASY",
 								 BOT_SET_FANTASY_SYNTAX);
 				}
-			} else if (!stricmp(option, "GREET")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "GREET") {
+				if (value == "ON") {
 					ci->botflags |= BS_GREET;
 					notice_lang(s_BotServ, u, BOT_SET_GREET_ON, ci->name);
-				} else if (!stricmp(value, "OFF")) {
+				} else if (value == "OFF") {
 					ci->botflags &= ~BS_GREET;
 					notice_lang(s_BotServ, u, BOT_SET_GREET_OFF, ci->name);
 				} else {
 					syntax_error(s_BotServ, u, "SET GREET",
 								 BOT_SET_GREET_SYNTAX);
 				}
-			} else if (u->nc->HasCommand("botserv/set/nobot") && !stricmp(option, "NOBOT")) {
-				if (!stricmp(value, "ON")) {
+			} else if (u->nc->HasCommand("botserv/set/nobot") && option == "NOBOT") {
+				if (value == "ON") {
 					ci->botflags |= BS_NOBOT;
 					if (ci->bi)
 						ci->bi->UnAssign(u, ci);
 					notice_lang(s_BotServ, u, BOT_SET_NOBOT_ON, ci->name);
-				} else if (!stricmp(value, "OFF")) {
+				} else if (value == "OFF") {
 					ci->botflags &= ~BS_NOBOT;
 					notice_lang(s_BotServ, u, BOT_SET_NOBOT_OFF, ci->name);
 				} else {
 					syntax_error(s_BotServ, u, "SET NOBOT",
 								 BOT_SET_NOBOT_SYNTAX);
 				}
-			} else if (!stricmp(option, "SYMBIOSIS")) {
-				if (!stricmp(value, "ON")) {
+			} else if (option == "SYMBIOSIS") {
+				if (value == "ON") {
 					ci->botflags |= BS_SYMBIOSIS;
 					notice_lang(s_BotServ, u, BOT_SET_SYMBIOSIS_ON, ci->name);
-				} else if (!stricmp(value, "OFF")) {
+				} else if (value == "OFF") {
 					ci->botflags &= ~BS_SYMBIOSIS;
 					notice_lang(s_BotServ, u, BOT_SET_SYMBIOSIS_OFF, ci->name);
 				} else {
@@ -139,7 +139,7 @@ class CommandBSSet : public Command
 								 BOT_SET_SYMBIOSIS_SYNTAX);
 				}
 			} else {
-				notice_help(s_BotServ, u, BOT_SET_UNKNOWN, option);
+				notice_help(s_BotServ, u, BOT_SET_UNKNOWN, option.c_str());
 			}
 		}
 		return MOD_CONT;

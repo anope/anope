@@ -26,7 +26,7 @@ class CommandSSHelp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		ircdproto->SendMessage(statserv, u->nick, "This is a test of the emergency StatServ system.");
 		return MOD_CONT;
@@ -72,7 +72,7 @@ class SSMain : public Module
 		}
 	}
 
-	/** This hack is necessary to replace delayed loading,  for now */
+	/** This hack is necessary to replace delayed loading, for now */
 	void OnServerConnect(Server *)
 	{
 		statserv = findbot("StatServ");

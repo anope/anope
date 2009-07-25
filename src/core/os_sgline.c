@@ -24,7 +24,7 @@ int sgline_list(int number, SXLine *sx, User *u, int *sent_header);
 class CommandOSSGLine : public Command
 {
  private:
-	CommandReturn OnAdd(User *u, std::vector<std::string> &params)
+	CommandReturn OnAdd(User *u, std::vector<ci::string> &params)
 	{
 		int deleted = 0;
 		unsigned last_param = 2;
@@ -142,7 +142,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnDel(User *u, std::vector<std::string> &params)
+	CommandReturn OnDel(User *u, std::vector<ci::string> &params)
 	{
 		const char *mask;
 		int res = 0;
@@ -192,7 +192,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnList(User *u, std::vector<std::string> &params)
+	CommandReturn OnList(User *u, std::vector<ci::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -234,7 +234,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnView(User *u, std::vector<std::string> &params)
+	CommandReturn OnView(User *u, std::vector<ci::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -275,7 +275,7 @@ class CommandOSSGLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnClear(User *u, std::vector<std::string> &params)
+	CommandReturn OnClear(User *u)
 	{
 		slist_clear(&sglines, 1);
 		notice_lang(s_OperServ, u, OPER_SGLINE_CLEAR);
@@ -287,20 +287,20 @@ class CommandOSSGLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
-		if (!stricmp(cmd, "ADD"))
+		if (cmd == "ADD")
 			return this->OnAdd(u, params);
-		else if (!stricmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 			return this->OnDel(u, params);
-		else if (!stricmp(cmd, "LIST"))
+		else if (cmd == "LIST")
 			return this->OnList(u, params);
-		else if (!stricmp(cmd, "VIEW"))
+		else if (cmd == "VIEW")
 			return this->OnView(u, params);
-		else if (!stricmp(cmd, "CLEAR"))
-			return this->OnClear(u, params);
+		else if (cmd == "CLEAR")
+			return this->OnClear(u);
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;

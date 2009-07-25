@@ -26,21 +26,21 @@ class CommandMSRead : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		MemoInfo *mi;
 		ChannelInfo *ci;
-		const char *numstr = params.size() ? params[0].c_str() : NULL, *chan = NULL;
+		ci::string numstr = params.size() ? params[0] : "", chan;
 		int num, count;
 
-		if (numstr && *numstr == '#')
+		if (!numstr.empty() && numstr[0] == '#')
 		{
 			chan = numstr;
-			numstr = params.size() > 1 ? params[1].c_str() : NULL;
+			numstr = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan)))
+			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
+				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
@@ -54,51 +54,51 @@ class CommandMSRead : public Command
 		{
 			mi = &u->nc->memos;
 		}
-		num = numstr ? atoi(numstr) : -1;
-		if (!numstr || (stricmp(numstr, "LAST") && stricmp(numstr, "NEW") && num <= 0))
+		num = !numstr.empty() ? atoi(numstr.c_str()) : -1;
+		if (numstr.empty() || (numstr != "LAST" && numstr != "NEW" && num <= 0))
 			this->OnSyntaxError(u);
 		else if (mi->memos.empty())
 		{
-			if (chan)
-				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
+			if (!chan.empty())
+				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
 				notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else {
 			int i;
 
-			if (!stricmp(numstr, "NEW"))
+			if (numstr == "NEW")
 			{
 				int readcount = 0;
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
 					if (mi->memos[i]->flags & MF_UNREAD)
 					{
-						read_memo(u, i, mi, chan);
+						read_memo(u, i, mi, chan.c_str());
 						++readcount;
 					}
 				}
 				if (!readcount)
 				{
-					if (chan)
-						notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan);
+					if (!chan.empty())
+						notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 					else
 						notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
-			else if (!stricmp(numstr, "LAST"))
+			else if (numstr == "LAST")
 			{
 				for (i = 0; i < mi->memos.size() - 1; ++i);
-				read_memo(u, i, mi, chan);
+				read_memo(u, i, mi, chan.c_str());
 			}
 			else /* number[s] */
 			{
-				if (!process_numlist(numstr, &count, read_memo_callback, u, mi, chan))
+				if (!process_numlist(numstr.c_str(), &count, read_memo_callback, u, mi, chan.c_str()))
 				{
 					if (count == 1)
 						notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);
 					else
-						notice_lang(s_MemoServ, u, MEMO_LIST_NOT_FOUND, numstr);
+						notice_lang(s_MemoServ, u, MEMO_LIST_NOT_FOUND, numstr.c_str());
 				}
 			}
 		}

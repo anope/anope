@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -23,8 +23,8 @@ class CommandBSHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
-	
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		mod_help_cmd(s_BotServ, u, BOTSERV, params[0].c_str());
 		return MOD_CONT;

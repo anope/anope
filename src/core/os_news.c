@@ -98,7 +98,7 @@ static int *findmsgs(int16 type, const char **type_name)
 class NewsBase : public Command
 {
  protected:
-	CommandReturn DoList(User *u, std::vector<std::string> &params, short type, int *msgs)
+	CommandReturn DoList(User *u, short type, int *msgs)
 	{
 		int i, count = 0;
 		char timebuf[64];
@@ -124,7 +124,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params, short type, int *msgs)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params, short type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
 		int n;
@@ -148,7 +148,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params, short type, int *msgs)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params, short type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
 		int i, num;
@@ -190,9 +190,9 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoNews(User *u, std::vector<std::string> &params, short type)
+	CommandReturn DoNews(User *u, std::vector<ci::string> &params, short type)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 		const char *type_name;
 		int *msgs;
 
@@ -209,16 +209,12 @@ class NewsBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!stricmp(cmd, "LIST"))
-			return this->DoList(u, params, type, msgs);
-		else if (!stricmp(cmd, "ADD"))
-		{
+		if (cmd == "LIST")
+			return this->DoList(u, type, msgs);
+		else if (cmd == "ADD")
 			return this->DoAdd(u, params, type, msgs);
-		}
-		else if (!stricmp(cmd, "DEL"))
-		{
+		else if (cmd == "DEL")
 			return this->DoDel(u, params, type, msgs);
-		}
 		else
 			this->OnSyntaxError(u);
 
@@ -233,7 +229,7 @@ class NewsBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, std::vector<std::string> &params) = 0;
+	virtual CommandReturn Execute(User *u, std::vector<ci::string> &params) = 0;
 
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
@@ -255,7 +251,7 @@ class CommandOSLogonNews : public NewsBase
 		delete [] this->help_param1;
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_LOGON);
 	}
@@ -298,7 +294,7 @@ class CommandOSOperNews : public NewsBase
 		delete [] this->help_param1;
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_OPER);
 	}
@@ -333,7 +329,7 @@ class CommandOSRandomNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_RANDOM);
 	}

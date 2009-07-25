@@ -173,10 +173,10 @@ class CommandCSAKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
 		const char *reason = NULL;
 
@@ -196,15 +196,11 @@ class CommandCSAKick : public Command
 		const char *argv[3];
 		int count = 0;
 
-		if (!cmd || (!mask && (!stricmp(cmd, "ADD") || !stricmp(cmd, "STICK")
-								 || !stricmp(cmd, "UNSTICK")
-								 || !stricmp(cmd, "DEL")))) {
-
+		if (!mask && (cmd == "ADD" || cmd == "STICK" || cmd == "UNSTICK" || cmd == "DEL"))
 			syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
-		} else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/modify"))
-		{
+		else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/modify"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (stricmp(cmd, "ADD") == 0) {
+		else if (cmd == "ADD") {
 			NickAlias *na = findnick(mask), *na2;
 			NickCore *nc = NULL;
 			const char *nick, *user, *host;
@@ -363,7 +359,7 @@ class CommandCSAKick : public Command
 			if (freemask)
 				delete [] mask;
 
-		} else if (stricmp(cmd, "STICK") == 0) {
+		} else if (cmd == "STICK") {
 			NickAlias *na;
 			NickCore *nc;
 
@@ -399,7 +395,7 @@ class CommandCSAKick : public Command
 
 			if (ci->c)
 				stick_mask(ci, akick);
-		} else if (stricmp(cmd, "UNSTICK") == 0) {
+		} else if (cmd == "UNSTICK") {
 			NickAlias *na;
 			NickCore *nc;
 
@@ -433,7 +429,7 @@ class CommandCSAKick : public Command
 			notice_lang(s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->u.mask,
 						ci->name);
 
-		} else if (stricmp(cmd, "DEL") == 0) {
+		} else if (cmd == "DEL") {
 			int deleted, a, b;
 
 			if (readonly) {
@@ -531,7 +527,7 @@ class CommandCSAKick : public Command
 				ci->akick =
 					static_cast<AutoKick *>(srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount));
 			}
-		} else if (stricmp(cmd, "LIST") == 0) {
+		} else if (cmd == "LIST") {
 			int sent_header = 0;
 
 			if (ci->akickcount == 0) {
@@ -561,7 +557,7 @@ class CommandCSAKick : public Command
 			if (!sent_header)
 				notice_lang(s_ChanServ, u, CHAN_AKICK_NO_MATCH, chan);
 
-		} else if (stricmp(cmd, "VIEW") == 0) {
+		} else if (cmd == "VIEW") {
 			int sent_header = 0;
 			if (ci->akickcount == 0) {
 				notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, chan);
@@ -590,7 +586,7 @@ class CommandCSAKick : public Command
 			if (!sent_header)
 				notice_lang(s_ChanServ, u, CHAN_AKICK_NO_MATCH, chan);
 
-		} else if (stricmp(cmd, "ENFORCE") == 0) {
+		} else if (cmd == "ENFORCE") {
 			c = findchan(ci->name);
 			cu = NULL;
 			count = 0;
@@ -622,8 +618,7 @@ class CommandCSAKick : public Command
 
 			notice_lang(s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, chan, count);
 
-		} else if (stricmp(cmd, "CLEAR") == 0) {
-
+		} else if (cmd == "CLEAR") {
 			if (readonly) {
 				notice_lang(s_ChanServ, u, CHAN_AKICK_DISABLED);
 				return MOD_CONT;

@@ -18,7 +18,7 @@
 class CommandNSAccess : public Command
 {
  private:
-	CommandReturn DoServAdminList(User *u, std::vector<std::string> &params, NickCore *nc)
+	CommandReturn DoServAdminList(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
 		unsigned i;
@@ -55,7 +55,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
+	CommandReturn DoAdd(User *u, NickCore *nc, const char *mask)
 	{
 		if (!mask)
 		{
@@ -81,7 +81,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
+	CommandReturn DoDel(User *u, NickCore *nc, const char *mask)
 	{
 		if (!mask)
 		{
@@ -101,7 +101,7 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<std::string> &params, NickCore *nc, const char *mask)
+	CommandReturn DoList(User *u, NickCore *nc, const char *mask)
 	{
 		unsigned i;
 
@@ -127,13 +127,13 @@ class CommandNSAccess : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
 
-		if (!stricmp(cmd, "LIST") && u->nc->IsServicesOper() && mask && (na = findnick(params[1].c_str())))
+		if (cmd == "LIST" && u->nc->IsServicesOper() && mask && (na = findnick(params[1].c_str())))
 			return this->DoServAdminList(u, params, na->nc);
 
 		if (mask && !strchr(mask, '@'))
@@ -148,12 +148,12 @@ class CommandNSAccess : public Command
 			*/
 		else if (u->nc->flags & NI_SUSPENDED)
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
-		else if (!stricmp(cmd, "ADD"))
-			return this->DoAdd(u, params, u->nc, mask);
-		else if (!stricmp(cmd, "DEL"))
-			return this->DoDel(u, params, u->nc, mask);
-		else if (!stricmp(cmd, "LIST"))
-			return this->DoList(u, params, u->nc, mask);
+		else if (cmd == "ADD")
+			return this->DoAdd(u, u->nc, mask);
+		else if (cmd == "DEL")
+			return this->DoDel(u, u->nc, mask);
+		else if (cmd == "LIST")
+			return this->DoList(u, u->nc, mask);
 		else
 			this->OnSyntaxError(u);
 		return MOD_CONT;

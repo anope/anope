@@ -22,15 +22,15 @@ class CommandOSUserList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
-		const char *opt = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string opt = params.size() > 1 ? params[1] : "";
 
 		Channel *c;
 		int modes = 0;
 
-		if (opt && !stricmp(opt, "INVISIBLE"))
+		if (!opt.empty() && opt == "INVISIBLE")
 			modes |= anope_get_invis_mode();
 
 		if (pattern && (c = findchan(pattern)))

@@ -104,7 +104,7 @@ int xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 class XOPBase : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
@@ -187,7 +187,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
@@ -286,7 +286,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoList(User *u, std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
 		int sent_header = 0;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
@@ -321,7 +321,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, std::vector<std::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoClear(User *u, std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
 		if (readonly)
 		{
@@ -355,22 +355,22 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
  protected:
-	CommandReturn DoXop(User *u, std::vector<std::string> &params, int level, int *messages)
+	CommandReturn DoXop(User *u, std::vector<ci::string> &params, int level, int *messages)
 	{
 		const char *chan = params[0].c_str();
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 
 		ChannelInfo *ci = cs_findchan(chan);
 
 		if (!(ci->flags & CI_XOP))
 			notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
-		else if (!stricmp(cmd, "ADD"))
+		else if (cmd == "ADD")
 			return this->DoAdd(u, params, ci, level, messages);
-		else if (!stricmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 			return this->DoDel(u, params, ci, level, messages);
-		else if (!stricmp(cmd, "LIST"))
+		else if (cmd == "LIST")
 			return this->DoList(u, params, ci, level, messages);
-		else if (!stricmp(cmd, "CLEAR"))
+		else if (cmd == "CLEAR")
 			return this->DoClear(u, params, ci, level, messages);
 		else
 			this->OnSyntaxError(u);
@@ -385,7 +385,7 @@ class XOPBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, std::vector<std::string> &params) = 0;
+	virtual CommandReturn Execute(User *u, std::vector<ci::string> &params) = 0;
 
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
@@ -399,7 +399,7 @@ class CommandCSAOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
 	}
@@ -423,7 +423,7 @@ class CommandCSHOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
 	}
@@ -447,7 +447,7 @@ class CommandCSSOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
 	}
@@ -471,7 +471,7 @@ class CommandCSVOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
 	}

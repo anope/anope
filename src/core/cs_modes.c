@@ -71,10 +71,9 @@ class CommandCSOp : public Command
  public:
 	CommandCSOp() : Command("OP", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return do_util(u, &csmodeutils[MUT_OP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
@@ -97,10 +96,9 @@ class CommandCSDeOp : public Command
  public:
 	CommandCSDeOp() : Command("DEOP", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return do_util(u, &csmodeutils[MUT_DEOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
@@ -123,10 +121,9 @@ class CommandCSVoice : public Command
  public:
 	CommandCSVoice() : Command("VOICE", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return do_util(u, &csmodeutils[MUT_VOICE], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
@@ -149,10 +146,9 @@ class CommandCSDeVoice : public Command
  public:
 	CommandCSDeVoice() : Command("DEVOICE", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return do_util(u, &csmodeutils[MUT_DEVOICE], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
 	}
@@ -175,15 +171,13 @@ class CommandCSHalfOp : public Command
  public:
 	CommandCSHalfOp() : Command("HALFOP", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!ircd->halfop)
 		{
 			return MOD_CONT;
-
 		}
 
 		return do_util(u, &csmodeutils[MUT_HALFOP], (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL));
@@ -207,10 +201,9 @@ class CommandCSDeHalfOp : public Command
  public:
 	CommandCSDeHalfOp() : Command("DEHALFOP", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!ircd->halfop)
 		{
@@ -238,10 +231,9 @@ class CommandCSProtect : public Command
  public:
 	CommandCSProtect() : Command("PROTECT", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!ircd->protect && !ircd->admin)
 		{
@@ -270,10 +262,9 @@ class CommandCSDeProtect : public Command
  public:
 	CommandCSDeProtect() : Command("DEPROTECT", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!ircd->protect && !ircd->admin)
 		{
@@ -302,10 +293,9 @@ class CommandCSOwner : public Command
  public:
 	CommandCSOwner() : Command("OWNER", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return do_util(u, &csmodeutils[MUT_OWNER], (params.size() > 0 ? params[0].c_str() : NULL), NULL);
 	}
@@ -329,10 +319,9 @@ class CommandCSDeOwner : public Command
  public:
 	CommandCSDeOwner() : Command("DEOWNER", 1, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		return do_util(u, &csmodeutils[MUT_DEOWNER], (params.size() > 0 ? params[0].c_str() : NULL), NULL);
 	}

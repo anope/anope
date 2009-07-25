@@ -234,15 +234,15 @@ class CommandBSBadwords : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 		const char *word = params.size() > 2 ? params[2].c_str() : NULL;
 		ChannelInfo *ci;
-		int need_args = (cmd && (!stricmp(cmd, "LIST") || !stricmp(cmd, "CLEAR")));
+		bool need_args = cmd == "LIST" || cmd == "CLEAR";
 
-		if (!cmd || (need_args ? 0 : !word))
+		if (need_args ? 0 : !word)
 		{
 			this->OnSyntaxError(u);
 			return MOD_CONT;
@@ -262,26 +262,16 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		if (stricmp(cmd, "ADD") == 0)
-		{
+		if (cmd == "ADD")
 			return this->DoAdd(u, ci, word);
-		}
-		else if (stricmp(cmd, "DEL") == 0)
-		{
+		else if (cmd == "DEL")
 			return this->DoDelete(u, ci, word);
-		}
-		else if (stricmp(cmd, "LIST") == 0)
-		{
+		else if (cmd == "LIST")
 			return this->DoList(u, ci, word);
-		}
-		else if (stricmp(cmd, "CLEAR") == 0)
-		{
+		else if (cmd == "CLEAR")
 			return this->DoClear(u, ci, word);
-		}
 		else
-		{
 			this->OnSyntaxError(u);
-		}
 		return MOD_CONT;
 	}
 

@@ -18,7 +18,7 @@
 class CommandOSIgnore : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
 	{
 		const char *time = params.size() > 1 ? params[1].c_str() : NULL;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
@@ -53,7 +53,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u)
 	{
 		IgnoreData *id;
 
@@ -70,7 +70,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		if (!nick)
@@ -88,7 +88,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, std::vector<std::string> &params)
+	CommandReturn DoClear(User *u)
 	{
 		clear_ignores();
 		notice_lang(s_OperServ, u, OPER_IGNORE_LIST_CLEARED);
@@ -100,18 +100,18 @@ class CommandOSIgnore : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
-		if (!stricmp(cmd, "ADD"))
+		if (cmd == "ADD")
 			return this->DoAdd(u, params);
-		else if (!stricmp(cmd, "LIST"))
-			return this->DoList(u, params);
-		else if (!stricmp(cmd, "DEL"))
+		else if (cmd == "LIST")
+			return this->DoList(u);
+		else if (cmd == "DEL")
 			return this->DoDel(u, params);
-		else if (!stricmp(cmd, "CLEAR"))
-			return this->DoClear(u, params);
+		else if (cmd == "CLEAR")
+			return this->DoClear(u);
 		else
 			this->OnSyntaxError(u);
 

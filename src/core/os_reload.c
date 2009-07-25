@@ -22,7 +22,7 @@ class CommandOSReload : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!read_config(1))
 		{

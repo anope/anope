@@ -22,7 +22,7 @@ class CommandOSShutdown : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 
 		quitmsg = new char[32 + strlen(u->nick)];

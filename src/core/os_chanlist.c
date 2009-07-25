@@ -22,15 +22,15 @@ class CommandOSChanList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
-		const char *opt = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string opt = params.size() > 1 ? params[1] : "";
 
 		int modes = 0;
 		User *u2;
 
-		if (opt && !stricmp(opt, "SECRET"))
+		if (!opt.empty() && opt == "SECRET")
 			modes |= (anope_get_secret_mode() | anope_get_private_mode());
 
 		if (pattern && (u2 = finduser(pattern)))

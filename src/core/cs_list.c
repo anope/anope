@@ -19,12 +19,12 @@
 class CommandCSList : public Command
 {
 public:
-	CommandCSList() : Command("LIST",1,2)
+	CommandCSList() : Command("LIST", 1, 2)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *pattern = params[0].c_str();
 		int spattern_size;
@@ -93,14 +93,15 @@ public:
 		if (is_servadmin && params.size() > 1)
 		{
 			std::string keyword;
-			spacesepstream keywords(params[1]);
+			spacesepstream keywords(params[1].c_str());
 			while (keywords.GetToken(keyword))
 			{
-				if (stricmp(keyword.c_str(), "FORBIDDEN") == 0)
+				ci::string keyword_ci = keyword.c_str();
+				if (keyword_ci == "FORBIDDEN")
 					matchflags |= CI_FORBIDDEN;
-				if (stricmp(keyword.c_str(), "SUSPENDED") == 0)
+				if (keyword_ci == "SUSPENDED")
 					matchflags |= CI_SUSPENDED;
-				if (stricmp(keyword.c_str(), "NOEXPIRE") == 0)
+				if (keyword_ci == "NOEXPIRE")
 					matchflags |= CI_NO_EXPIRE;
 
 			}
@@ -109,7 +110,6 @@ public:
 		spattern_size = (strlen(pattern) + 2) * sizeof(char);
 		spattern = new char[spattern_size];
 		snprintf(spattern, spattern_size, "#%s", pattern);
-
 
 		notice_lang(s_ChanServ, u, CHAN_LIST_HEADER, pattern);
 		for (i = 0; i < 256; i++)

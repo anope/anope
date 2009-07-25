@@ -22,7 +22,7 @@ class CommandOSMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		int ac;
 		const char **av;
@@ -37,7 +37,7 @@ class CommandOSMode : public Command
 		{
 			ircdproto->SendMode(findbot(s_OperServ), chan, "%s", modes);
 
-			ac = split_buf((char *)modes, &av, 1);
+			ac = split_buf(const_cast<char *>(modes), /* XXX */ &av, 1);
 			chan_set_modes(s_OperServ, c, ac, av, -1);
 			free(av);
 

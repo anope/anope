@@ -22,9 +22,8 @@ class CommandOSClearModes : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *s;
 		const char *argv[2];
 		const char *chan = params[0].c_str();
 		Channel *c;
@@ -44,9 +43,9 @@ class CommandOSClearModes : public Command
 		}
 		else
 		{
-			s = params.size() > 1 ? params[1].c_str() : NULL;
-			if (s) {
-				if (!stricmp(s, "ALL"))
+			ci::string s = params.size() > 1 ? params[1] : "";
+			if (!s.empty()) {
+				if (s == "ALL")
 					all = 1;
 				else {
 					this->OnSyntaxError(u);

@@ -20,10 +20,9 @@ class CommandCSGetKey : public Command
  public:
 	CommandCSGetKey() : Command("GETKEY", 1, 1)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci;

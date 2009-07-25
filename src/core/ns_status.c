@@ -23,7 +23,7 @@ class CommandNSStatus : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		User *u2;
 		NickAlias *na = NULL;

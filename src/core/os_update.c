@@ -22,7 +22,7 @@ class CommandOSUpdate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		notice_lang(s_OperServ, u, OPER_UPDATING);
 		save_data = 1;

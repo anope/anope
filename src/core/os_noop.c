@@ -22,12 +22,12 @@ class CommandOSNOOP : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 		const char *server = params[1].c_str();
 
-		if (!stricmp(cmd, "SET"))
+		if (cmd == "SET")
 		{
 			User *u2;
 			User *u3 = NULL;
@@ -49,7 +49,7 @@ class CommandOSNOOP : public Command
 					kill_user(s_OperServ, u2->nick, reason);
 			}
 		}
-		else if (!stricmp(cmd, "REVOKE"))
+		else if (cmd == "REVOKE")
 		{
 			ircdproto->SendSVSNOOP(server, 0);
 			notice_lang(s_OperServ, u, OPER_NOOP_REVOKE, server);

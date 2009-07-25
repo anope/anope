@@ -20,10 +20,9 @@ class CommandBSAct : public Command
  public:
 	CommandBSAct() : Command("ACT", 2, 2)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0].c_str());
 
@@ -47,9 +46,7 @@ class CommandBSAct : public Command
 
 		size_t i = 0;
 		while ((i = params[1].find_first_of("\001"), i) && i != std::string::npos)
-		{
 			params[1].erase(i, 1);
-		}
 
 		ircdproto->SendAction(ci->bi, ci->name, "%s", params[1].c_str());
 		ci->bi->lastmsg = time(NULL);

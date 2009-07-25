@@ -52,7 +52,7 @@ static Module *me;
 class CommandNSOInfo : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
@@ -83,7 +83,7 @@ class CommandNSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		NickAlias *na = NULL;
@@ -110,13 +110,13 @@ class CommandNSOInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
-		if (!strcasecmp(cmd, "ADD"))
+		if (cmd == "ADD")
 			return this->DoAdd(u, params);
-		else if (!strcasecmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 			return this->DoDel(u, params);
 		else
 			this->OnSyntaxError(u);
@@ -141,7 +141,7 @@ class CommandNSOInfo : public Command
 class CommandCSOInfo : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
@@ -166,7 +166,7 @@ class CommandCSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci = cs_findchan(chan);
@@ -187,13 +187,13 @@ class CommandCSOInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 
-		if (!strcasecmp(cmd, "ADD"))
+		if (cmd == "ADD")
 			return this->DoAdd(u, params);
-		else if (!strcasecmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 			return this->DoDel(u, params);
 		else
 			this->OnSyntaxError(u);
@@ -502,7 +502,7 @@ class OSInfo : public Module
 			alog("os_info.c: ERROR: An error has occured while reloading the configuration file");
 	}
 
-	void OnPostCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params)
+	void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
 		if (command == "INFO")
 		{

@@ -23,7 +23,7 @@ class CommandNSGhost : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		const char *pass = params.size() > 1 ? params[1].c_str() : NULL;

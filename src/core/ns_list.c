@@ -23,7 +23,7 @@ class CommandNSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		/* SADMINS can search for nicks based on their NS_FORBIDDEN and NS_NO_EXPIRE
 		 * status. The keywords FORBIDDEN and NOEXPIRE represent these two states
@@ -104,16 +104,17 @@ class CommandNSList : public Command
 		if (is_servadmin && params.size() > 1)
 		{
 			std::string keyword;
-			spacesepstream keywords(params[1]);
+			spacesepstream keywords(params[1].c_str());
 			while (keywords.GetToken(keyword))
 			{
-				if (!stricmp(keyword.c_str(), "FORBIDDEN"))
+				ci::string keyword_ci = keyword.c_str();
+				if (keyword_ci == "FORBIDDEN")
 					matchflags |= NS_FORBIDDEN;
-				if (!stricmp(keyword.c_str(), "NOEXPIRE"))
+				if (keyword_ci == "NOEXPIRE")
 					matchflags |= NS_NO_EXPIRE;
-				if (!stricmp(keyword.c_str(), "SUSPENDED"))
+				if (keyword_ci == "SUSPENDED")
 					susp_keyword = 1;
-				if (!stricmp(keyword.c_str(), "UNCONFIRMED"))
+				if (keyword_ci == "UNCONFIRMED")
 					nronly = 1;
 			}
 		}

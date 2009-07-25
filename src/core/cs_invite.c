@@ -20,9 +20,9 @@ class CommandCSInvite : public Command
  public:
 	CommandCSInvite() : Command("INVITE", 1, 1)
 	{
-
 	}
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		Channel *c;
@@ -64,9 +64,6 @@ class CommandCSInvite : public Command
 	}
 };
 
-
-
-
 class CSInvite : public Module
 {
  public:
@@ -82,7 +79,5 @@ class CSInvite : public Module
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INVITE);
 	}
 };
-
-
 
 MODULE_INIT("cs_invite", CSInvite)

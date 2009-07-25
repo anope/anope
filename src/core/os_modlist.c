@@ -22,7 +22,7 @@ class CommandOSModList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		int idx;
 		int count = 0;
@@ -33,7 +33,7 @@ class CommandOSModList : public Command
 		int showSupported = 1;
 		int showQA = 1;
 
-		const char *param = params.size() ? params[0].c_str() : NULL;
+		ci::string param = params.size() ? params[0] : "";
 		ModuleHash *current = NULL;
 
 		char core[] = "Core";
@@ -43,9 +43,9 @@ class CommandOSModList : public Command
 		char supported[] = "Supported";
 		char qa[] = "QATested";
 
-		if (param)
+		if (!param.empty())
 		{
-			if (!stricmp(param, core))
+			if (param == core)
 			{
 				showCore = 1;
 				showThird = 0;
@@ -54,7 +54,7 @@ class CommandOSModList : public Command
 				showSupported = 0;
 				showQA = 0;
 			}
-			else if (!stricmp(param, third))
+			else if (param == third)
 			{
 				showCore = 0;
 				showThird = 1;
@@ -63,7 +63,7 @@ class CommandOSModList : public Command
 				showProto = 0;
 				showEnc = 0;
 			}
-			else if (!stricmp(param, proto))
+			else if (param == proto)
 			{
 				showCore = 0;
 				showThird = 0;
@@ -72,7 +72,7 @@ class CommandOSModList : public Command
 				showSupported = 0;
 				showQA = 0;
 			}
-			else if (!stricmp(param, supported))
+			else if (param == supported)
 			{
 				showCore = 0;
 				showThird = 0;
@@ -81,7 +81,7 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showQA = 0;
 			}
-			else if (!stricmp(param, qa))
+			else if (param == qa)
 			{
 				showCore = 0;
 				showThird = 0;
@@ -90,7 +90,7 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showQA = 1;
 			}
-			else if (!stricmp(param, enc))
+			else if (param == enc)
 			{
 				showCore = 0;
 				showThird = 0;

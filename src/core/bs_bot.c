@@ -18,7 +18,7 @@
 class CommandBSBot : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<std::string> &params)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		const char *user = params.size() > 2 ? params[2].c_str() : NULL;
@@ -135,7 +135,7 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoChange(User *u, std::vector<std::string> &params)
+	CommandReturn DoChange(User *u, std::vector<ci::string> &params)
 	{
 		const char *oldnick = params[1].c_str();
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
@@ -315,7 +315,7 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<std::string> &params)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		BotInfo *bi;
@@ -353,9 +353,9 @@ class CommandBSBot : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		const char *cmd = params[0].c_str();
+		ci::string cmd = params[0];
 
 		if (readonly)
 		{
@@ -363,7 +363,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (!stricmp(cmd, "ADD"))
+		if (cmd == "ADD")
 		{
 			// ADD nick user host real - 5
 			if (!u->nc->HasCommand("botserv/bot/add"))
@@ -384,7 +384,7 @@ class CommandBSBot : public Command
 
 			return this->DoAdd(u, params);
 		}
-		else if (!stricmp(cmd, "CHANGE"))
+		else if (cmd == "CHANGE")
 		{
 			// CHANGE oldn newn user host real - 6
 			// but only oldn and newn are required
@@ -402,7 +402,7 @@ class CommandBSBot : public Command
 
 			return this->DoChange(u, params);
 		}
-		else if (!stricmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 		{
 			// DEL nick
 			if (!u->nc->HasCommand("botserv/bot/del"))

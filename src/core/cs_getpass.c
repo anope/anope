@@ -23,7 +23,7 @@ class CommandCSGetPass : public Command
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		char tmp_pass[PASSMAX];

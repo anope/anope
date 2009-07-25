@@ -20,10 +20,9 @@ class CommandCSKick : public Command
  public:
 	CommandCSKick() : Command("KICK", 2, 3)
 	{
-
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *target = params[1].c_str();

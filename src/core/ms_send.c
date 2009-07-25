@@ -22,7 +22,7 @@ class CommandMSSend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		const char *text = params[1].c_str();

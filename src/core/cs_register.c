@@ -23,7 +23,7 @@ class CommandCSRegister : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *pass = params[1].c_str();
@@ -70,7 +70,6 @@ class CommandCSRegister : public Command
 		{
 			alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
 			notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
-
 		}
 		else if (strscpy(founderpass, pass, PASSMAX), enc_encrypt_in_place(founderpass, PASSMAX) < 0)
 		{

@@ -25,10 +25,10 @@ class CommandNSLogout : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params.size() ? params[0].c_str() : NULL;
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 		User *u2;
 		NickAlias *na;
 		struct u_chaninfolist *ci, *ci2;
@@ -48,7 +48,7 @@ class CommandNSLogout : public Command
 			notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
 		else
 		{
-			if (nick && param && !stricmp(param, "REVALIDATE"))
+			if (nick && !param.empty() && param == "REVALIDATE")
 			{
 				cancel_user(u2);
 				validate_user(u2);

@@ -88,10 +88,10 @@ class CommandCSAccess : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 
@@ -102,12 +102,12 @@ class CommandCSAccess : public Command
 
 		unsigned i;
 		int level = 0, ulev;
-		int is_list = (cmd && !stricmp(cmd, "LIST"));
+		bool is_list = cmd == "LIST";
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
-		if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 : (!stricmp(cmd, "DEL")) ? (!nick || s) : !s))
+		if (is_list || cmd == "CLEAR" ? 0 : (cmd == "DEL" ? (!nick || s) : !s))
 			this->OnSyntaxError(u);
 		/* We still allow LIST in xOP mode, but not others */
 		else if ((ci->flags & CI_XOP) && !is_list)
@@ -123,7 +123,7 @@ class CommandCSAccess : public Command
 				 (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->nc->HasPriv("chanserv/access/modify"))
 				))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		else if (!stricmp(cmd, "ADD"))
+		else if (cmd == "ADD")
 		{
 			if (readonly)
 			{
@@ -200,7 +200,7 @@ class CommandCSAccess : public Command
 			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, level);
 		}
-		else if (!stricmp(cmd, "DEL"))
+		else if (cmd == "DEL")
 		{
 			int deleted;
 			if (readonly)
@@ -281,7 +281,7 @@ class CommandCSAccess : public Command
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, (na->nick ? na->nick : NULL)));
 			}
 		}
-		else if (!stricmp(cmd, "LIST"))
+		else if (cmd == "LIST")
 		{
 			int sent_header = 0;
 
@@ -307,7 +307,7 @@ class CommandCSAccess : public Command
 			else
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
 		}
-		else if (!stricmp(cmd, "CLEAR"))
+		else if (cmd == "CLEAR")
 		{
 			if (readonly)
 			{
@@ -357,10 +357,10 @@ class CommandCSLevels : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *cmd = params[1].c_str();
+		ci::string cmd = params[1];
 		const char *what = params.size() > 2 ? params[2].c_str() : NULL;
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 		char *error;
@@ -372,15 +372,13 @@ class CommandCSLevels : public Command
 		/* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only
 		 * one; else, we want none.
 		 */
-		if (!cmd
-			|| ((stricmp(cmd, "SET") == 0) ? !s
-				: ((strnicmp(cmd, "DIS", 3) == 0)) ? (!what || s) : !!what)) {
+		if (cmd == "SET" ? !s : (cmd.substr(0, 3) == "DIS" ? (!what || s) : !!what))
 			this->OnSyntaxError(u);
-		} else if (ci->flags & CI_XOP) {
+		else if (ci->flags & CI_XOP)
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
-		} else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify")) {
+		else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (stricmp(cmd, "SET") == 0) {
+		else if (cmd == "SET") {
 			level = strtol(s, &error, 10);
 
 			if (*error != '\0') {
@@ -409,7 +407,7 @@ class CommandCSLevels : public Command
 
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, s_ChanServ);
 
-		} else if (stricmp(cmd, "DIS") == 0 || stricmp(cmd, "DISABLE") == 0) {
+		} else if (cmd == "DIS" || cmd == "DISABLE") {
 			for (i = 0; levelinfo[i].what >= 0; i++) {
 				if (stricmp(levelinfo[i].name, what) == 0) {
 					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
@@ -424,7 +422,7 @@ class CommandCSLevels : public Command
 			}
 
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, s_ChanServ);
-		} else if (stricmp(cmd, "LIST") == 0) {
+		} else if (cmd == "LIST") {
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, chan);
 
 			if (!levelinfo_maxwidth) {
@@ -458,7 +456,7 @@ class CommandCSLevels : public Command
 				}
 			}
 
-		} else if (stricmp(cmd, "RESET") == 0) {
+		} else if (cmd == "RESET") {
 			reset_levels(ci);
 
 			alog("%s: %s!%s@%s reset levels definitions on channel %s",

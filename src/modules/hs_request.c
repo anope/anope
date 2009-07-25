@@ -74,7 +74,7 @@ class CommandHSRequest : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		char *nick;
 		const char *rawhostmask = params[0].c_str();
@@ -206,7 +206,7 @@ class CommandHSActivate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
@@ -271,7 +271,7 @@ class CommandHSReject : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
@@ -330,7 +330,7 @@ class CommandHSReject : public Command
 class HSListBase : public Command
 {
  protected:
-	CommandReturn DoList(User *u, std::vector<std::string> &params)
+	CommandReturn DoList(User *u)
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
@@ -383,9 +383,9 @@ class CommandHSWaiting : public HSListBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		return this->DoList(u, params);
+		return this->DoList(u);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -691,17 +691,17 @@ class HSRequest : public Module
 		delete [] HSRequestDBName;
 	}
 
-	EventReturn OnPreCommand(User *u, const std::string &service, const std::string &command, const std::vector<std::string> &params)
+	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
 		if (service == s_HostServ)
 		{
 			if (command == "LIST")
 			{
-				const char *key = params.size() ? params[0].c_str() : NULL;
+				ci::string key = params.size() ? params[0] : "";
 
-				if (key && !stricmp(key, "+req"))
+				if (!key.empty() && key == "+req")
 				{
-					std::vector<std::string> emptyParams;
+					std::vector<ci::string> emptyParams;
 					Command *c = findCommand(HOSTSERV, "WAITING");
 					c->Execute(u, emptyParams);
 					return EVENT_STOP;

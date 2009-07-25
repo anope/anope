@@ -22,14 +22,12 @@ class CommandNSUpdate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
 
 		if (!na)
-		{
 			return MOD_CONT;
-		}
 
 		do_setmodes(u);
 		check_memos(u);

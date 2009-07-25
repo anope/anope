@@ -52,7 +52,7 @@ class CommandBSInfo : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		BotInfo *bi;
 		ChannelInfo *ci;

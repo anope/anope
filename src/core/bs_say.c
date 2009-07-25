@@ -22,7 +22,7 @@ class CommandBSSay : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<std::string> &params)
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		ChannelInfo *ci;
 
@@ -36,7 +36,6 @@ class CommandBSSay : public Command
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
-
 
 		if (!ci->bi)
 		{

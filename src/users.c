@@ -567,6 +567,38 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 			delete [] logrealname;
 		}
+		
+		/* Allocate User structure and fill it in. */
+		user = new User(nick, uid ? uid : "");
+		user->SetIdent(username);
+		user->host = sstrdup(host);
+		user->server = findserver(servlist, server);
+		user->realname = sstrdup(realname);
+		user->timestamp = ts;
+		user->my_signon = time(NULL);
+		user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
+		user->SetVIdent(username);
+		/* We now store the user's ip in the user_ struct,
+		 * because we will use it in serveral places -- DrStein */
+		if (ircd->nickip) {
+			user->hostip = sstrdup(ipbuf);
+		} else {
+			user->hostip = NULL;
+		}
+
+		/* Now we check for akills/s*lines/sessions after a user class has been created
+		 * this is because some ircds (like Unreal) do not send any type of message
+		 * to the servers once a (SVS)KILL has been done, which previously
+		 * resulted in memory leaks for users that did not exist, and possibly
+		 * multiple users on the same nick
+		 *
+		 * This also caused session limits to incorrectly be decremented if
+		 * a user connected two times in a row (the user class from the first
+		 * connect still existed) resulting in their limit to be decremented
+		 * incorrectly.
+		 *
+		 * Hopefully this will fix these problems - Adam
+		 */
 
 		/* We used to ignore the ~ which a lot of ircd's use to indicate no
 		 * identd response.  That caused channel bans to break, so now we
@@ -614,25 +646,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		/* Now check for session limits */
 		if (LimitSessions && !is_ulined(server))
 			add_session(nick, host, ipbuf);
-
-		
-		/* Allocate User structure and fill it in. */
-		user = new User(nick, uid ? uid : "");
-		user->SetIdent(username);
-		user->host = sstrdup(host);
-		user->server = findserver(servlist, server);
-		user->realname = sstrdup(realname);
-		user->timestamp = ts;
-		user->my_signon = time(NULL);
-		user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
-		user->SetVIdent(username);
-		/* We now store the user's ip in the user_ struct,
-		 * because we will use it in serveral places -- DrStein */
-		if (ircd->nickip) {
-			user->hostip = sstrdup(ipbuf);
-		} else {
-			user->hostip = NULL;
-		}
 
 		display_news(user, NEWS_LOGON);
 		display_news(user, NEWS_RANDOM);

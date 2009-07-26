@@ -151,9 +151,14 @@ int add_session(const char *nick, const char *host, char *hostip)
 			if (SessionLimitDetailsLoc)
 				ircdproto->SendMessage(findbot(s_OperServ), nick, "%s", SessionLimitDetailsLoc);
 
-			/* We don't use kill_user() because a user stucture has not yet
-			 * been created. Simply kill the user. -TheShadow
+			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
+			 * decremented in do_quit, which caused problems and fixed here
+			 *
+			 * Now, we create the user struture before calling this (to fix some user tracking issues..
+			 * read users.c), so we must increment this here no matter what because it will either be
+			 * decremented in do_kill or in do_quit - Adam
 			 */
+			session->count++;
 			kill_user(s_OperServ, nick, "Session limit exceeded");
 
 			session->hits++;

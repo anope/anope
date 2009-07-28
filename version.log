@@ -9,9 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2370"
+VERSION_BUILD="2395"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2395 - Added german language support to hs_request.c. Patch provided by Han.
+#Revision 2394 - Updated german language file. Update provided by Han.
 
 # Leading up to 1.8.2 Release
 #Revision 2364 - Fix a crash when mysql is used without MysqlSecure defined. Thanks to jerrcs for finding and testing.

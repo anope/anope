@@ -976,11 +976,62 @@ void my_add_languages(void)
         "Questo comando è per comodità. Praticamente è la stessa cosa che\n"
             "eseguire un LIST +req ."
     };
+	
+    char *langtable_de[] = {
+        /* LNG_REQUEST_SYNTAX */
+        "Syntax: \002REQUEST \037vhost\037\002",
+        /* LNG_REQUESTED */
+        "Dein vHost wurde beantragt",
+        /* LNG_REQUEST_WAIT */
+        "Bitte warte %d Sekunden bevor Du einen neuen vHost beantragst",
+        /* LNG_REQUEST_MEMO */
+        "[auto memo] vHost \002%s\002 wurde beantragt.",
+        /* LNG_ACTIVATE_SYNTAX */
+        "Syntax: \002ACTIVATE \037nick\037\002",
+        /* LNG_ACTIVATED */
+        "vHost für %s wurde aktiviert",
+        /* LNG_ACTIVATE_MEMO */
+        "[auto memo] Dein beantragter vHost wurde freigegeben.",
+        /* LNG_REJECT_SYNTAX */
+        "Syntax: \002REJECT \037nick\037\002",
+        /* LNG_REJECTED */
+        "vHost für %s wurde abgelehnt",
+        /* LNG_REJECT_MEMO */
+        "[auto memo] Dein beantragter vHost wurde abgelehnt.",
+        /* LNG_REJECT_MEMO_REASON */
+        "[auto memo] Dein beantragter vHost wurde abgelehnt. Begründung: %s",
+        /* LNG_NO_REQUEST */
+        "Keine vHost Beantragung für Nick %s gefunden.",
+        /* LNG_HELP */
+        "    REQUEST     Beantrage einen vHost für Deinen Nick",
+        /* LNG_HELP_SETTER */
+        "    ACTIVATE    Freigeben eines beantragten vHostes von einem User\n"
+            "    REJECT      Ablehnen eines beantragten vHostes von einem User\n"
+            "    WAITING     Vereinfachter Befehl für LIST +req",
+        /* LNG_HELP_REQUEST */
+        "Beantragt den angegebenen vHost für Deinen Nick, um von den\n"
+            "Network Administratoren aktiviert zu werden. Bitte gedulde Dich eine Weile,\n"
+            "bis über Deine Anfrage entschieden wurde.",
+        /* LNG_HELP_ACTIVATE */
+        "Aktivert den beantragten vHost für den angegebenen Nick.",
+        /* LNG_HELP_ACTIVATE_MEMO */
+        "Eine Memo wird an den User gesendet, um ihn zu informieren.",
+        /* LNG_HELP_REJECT */
+        "Lehnt den beantragten vHost für den genannten Nick ab.",
+        /* LNG_HELP_REJECT_MEMO */
+        "Eine Memo wird an den User gesendet, um ihn zu informieren.",
+        /* LNG_WAITING_SYNTAX */
+        "Syntax: \002WAITING\002",
+        /* LNG_HELP_WAITING */
+        "Dieser Befehl ist Benutzerfreundlicher. Es ist genau derselbe\n"
+            "als wenn man LIST +req benutzt."
+    };
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
     moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+	moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
 }
 
 /* EOF */

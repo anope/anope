@@ -47,7 +47,7 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ##########################################################################
 #
-# INFO ::: Letzte Änderung:	05.07.2009	-- Han` -- Han@mefalcon.org --
+# INFO ::: Letzte Änderung:	28.07.2009	-- Han` -- Han@mefalcon.org --
 #
 ##########################################################################
 
@@ -317,10 +317,13 @@ END_OF_ANY_LIST
 
 # Automatic messages
 LIST_INCORRECT_RANGE
-	Incorrect range specified. The correct syntax is #from-to.
+	Du hast einen fehlerhaften Bereich angegeben. 
+	Die richtige Schreibweise ist #von-bis.
+	Beispiel: #1-50 oder #1-100
 CS_LIST_INCORRECT_RANGE
-	To search for channels starting with #, search for the channel
-	name without the #-sign prepended (anope instead of #anope).
+	Um nach Channeln zu suchen die mit # beginnen, suche nach Channelnamen
+	ohne das #-Symbol voranszutellen (anope anstatt #anope).
+	Wildcards können verwendet werden.
 
 ###########################################################################
 #
@@ -4276,7 +4279,7 @@ NICK_SERVADMIN_HELP_GETPASS
 NICK_SERVADMIN_HELP_GETEMAIL
 	Syntax: GETEMAIL user@emailhost
 
-	Gibt die passenden Nicknamen auf, welche die gegebene eMail benutzen. 
+	Gibt die passenden Nicknamen an, welche die angegebene eMail benutzen. 
 	Beachte, dass du keine wildcards für den User oder emailhost
 	verwenden kannst. Immer, wenn dieser Befehl benutzt wird, wird
 	eine Nachricht mit dem Nickname der Person mitgeloggt.
@@ -5244,7 +5247,7 @@ CHAN_HELP_CLEAR
 	              (z.B. Modi i,k,l,m,n,p,s und t)
 	     BANS     Entfernt alle Bans in dem Channel
 	     EXCEPTS  Entfernt alle Excepts in dem Channel
-	     INVITES  Clears all invites on the channel
+	     INVITES  Löscht alle Einladungen im Channel.
 	     OPS      Entfernt jeden Operator-Status (mode +o)
 	              in dem Channel.
 	     HOPS     Entfernt jeden Halfoperator-Status (mode +h) 
@@ -6738,9 +6741,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	User %s wurde nicht in der NickServ Datenbank gefunden.
 HOST_SET_SYNTAX
-	SET Nickname Hostmaske.
+	Syntax %R%s SET Nickname Hostmaske.
 HOST_SETALL_SYNTAX
-	SETALL Nickname Hostmaske.
+	Syntax %R%s SETALL Nickname Hostmaske.
 HOST_DENIED
 	Zugriff verweigert.
 HOST_NOT_ASSIGNED
@@ -6758,9 +6761,9 @@ HOST_DEL
 HOST_DEL_SYNTAX
 	DEL Nickname.
 HOST_OFF
-	Your vhost was removed and the normal cloaking restored.
+	Dein vHost wurde deaktiviert und die normale Host-Verschlüsselung wiederhergestellt.
 HOST_OFF_UNREAL
-	Dein vHost wurde gelöscht. Um die normale Host-Verschlüsselung zu reaktivieren, tippe /mode %s +%s
+	Dein vHost wurde deaktiviert. Um die normale Host-Verschlüsselung zu reaktivieren, tippe /mode %s +%s
 HOST_NO_VIDENT
 	Dein IRCd unterstützt keine vIdents. Falls das inkorrekt sein sollte, melde das bitte als einen Bug.
 HOST_GROUP

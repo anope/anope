@@ -302,8 +302,10 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
         }
     }
 
-    /* Don't bounce modes from u:lined clients or servers, bug #1004. */
+    /* Don't bounce modes from u:lined clients or servers, bug #1004. *
+     * We can get UUIDs as well.. don not assume nick ~ Viper */
     user = finduser(source);
+    if (!user && UseTS6 && ircd->ts6) user = find_byuid(source);
     if ((user && is_ulined(user->server->name)) || is_ulined((char *)source))
         return;
 
@@ -317,7 +319,9 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
             real_ac--;
             real_av++;
             for (i = 0; i < real_ac; i++) {
-                if ((user = finduser(*real_av)) && is_on_chan(chan, user)) {
+                user = finduser(*real_av);
+                if (!user && UseTS6 && ircd->ts6) user = find_byuid(*real_av);
+                if (user && is_on_chan(chan, user)) {
                     if (check < 2)
                         chan_set_correct_modes(user, chan, 0);
                     else if ((chan->ci->flags) && (chan->ci->flags & CI_SECUREOPS))

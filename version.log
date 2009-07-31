@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2397"
+VERSION_BUILD="2398"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2398 - Fixed a TS6 bug in chan_set_modes() causing restrictions such as secureops to fail if the IRCd sends UUIDs instead of nicks.
 #Revision 2397 - Fixed a bug in UMODE causing anope to send an extra umode change as a channel mode change.
 #Revision 2395 - Added german language support to hs_request.c. Patch provided by Han.
 #Revision 2394 - Updated german language file. Update provided by Han.

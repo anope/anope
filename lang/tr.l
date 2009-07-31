@@ -1043,11 +1043,6 @@ CHAN_REGISTER_DISABLED
 	Kanal kaydý geçici olarak devre dýþýdýr.
 CHAN_REGISTER_NOT_LOCAL
 	Local kanallar kayýt edilemezler.
-CHAN_MUST_REGISTER_NICK
-	Önce nickinizi kayýt etmeniz gerekiyor.  Nick kayýt hakkýnda bilgi için %R%s HELP yazýnýz.
-CHAN_MUST_IDENTIFY_NICK
-	Lütfen önce %s ile bu komutu kullanarak nickinizi tanýtýn:
-	%R%s IDENTIFY þifreniz
 CHAN_MAY_NOT_BE_REGISTERED
 	%s kanalý kayýt edilemez.
 CHAN_ALREADY_REGISTERED
@@ -6403,10 +6398,6 @@ HOST_ACTIVATED
 	Your vhost of %s is now activated.
 HOST_IDENT_ACTIVATED
 	Your vhost of %s@%s is now activated.
-HOST_ID
-	Please identify to services first.
-HOST_NOT_REGED
-	You need to register before a vhost can be assigned to you.
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX

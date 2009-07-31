@@ -1015,11 +1015,6 @@ CHAN_REGISTER_DISABLED
 	Sorry, channel registration is temporarily disabled.
 CHAN_REGISTER_NOT_LOCAL
 	Local channels cannot be registered.
-CHAN_MUST_REGISTER_NICK
-	You must register your nickname first.  Type %R%s HELP for information on registering nicknames.
-CHAN_MUST_IDENTIFY_NICK
-	Please identify with %s first, using the command:
-	%R%s IDENTIFY password
 CHAN_MAY_NOT_BE_REGISTERED
 	Channel %s may not be registered.
 CHAN_ALREADY_REGISTERED
@@ -6228,10 +6223,6 @@ HOST_ACTIVATED
 	Your vhost of %s is now activated.
 HOST_IDENT_ACTIVATED
 	Your vhost of %s@%s is now activated.
-HOST_ID
-	Please identify to services first.
-HOST_NOT_REGED
-	You need to register before a vhost can be assigned to you.
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX

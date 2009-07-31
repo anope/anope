@@ -24,39 +24,30 @@ class CommandHSOn : public Command
 
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		NickAlias *na;
 		char *vHost;
 		char *vIdent = NULL;
-		if ((na = findnick(u->nick)))
-		{
-			if (na->status & NS_IDENTIFIED)
-			{
-				vHost = getvHost(u->nick);
-				vIdent = getvIdent(u->nick);
-				if (!vHost)
-					notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-				else
-				{
-					if (vIdent)
-						notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent, vHost);
-					else
-						notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
-					ircdproto->SendVhost(u->nick, vIdent, vHost);
-					if (ircd->vhost)
-						u->vhost = sstrdup(vHost);
-					if (ircd->vident)
-					{
-						if (vIdent)
-							u->SetVIdent(vIdent);
-					}
-					set_lastmask(u);
-				}
-			}
-			else
-				notice_lang(s_HostServ, u, HOST_ID);
-		}
+		
+		vHost = getvHost(u->nick);
+		vIdent = getvIdent(u->nick);
+		if (!vHost)
+			notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
 		else
-			notice_lang(s_HostServ, u, HOST_NOT_REGED);
+		{
+			if (vIdent)
+				notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent, vHost);
+			else
+				notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
+			ircdproto->SendVhost(u->nick, vIdent, vHost);
+			if (ircd->vhost)
+				u->vhost = sstrdup(vHost);
+			if (ircd->vident)
+			{
+				if (vIdent)
+					u->SetVIdent(vIdent);
+			}
+			set_lastmask(u);
+		}
+		
 		return MOD_CONT;
 	}
 

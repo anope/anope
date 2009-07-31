@@ -1049,11 +1049,6 @@ CHAN_REGISTER_DISABLED
 	Désolés, l'enregistrement des cannaux est temporairement désactivé.
 CHAN_REGISTER_NOT_LOCAL
 	Les cannaux locaux ne peuvent être enregistrés.
-CHAN_MUST_REGISTER_NICK
-	Vous devez d'abord enregistrer votre pseudo.  Tapez %R%s HELP pour savoir comment enregistrer votre pseudo.
-CHAN_MUST_IDENTIFY_NICK
-	Vous devez d'abord vous identifier avec %s, en utilisant la commande:
-	%R%s IDENTIFY motdepasse
 CHAN_MAY_NOT_BE_REGISTERED
 	Le canal %s ne peut être enregistré.
 CHAN_ALREADY_REGISTERED
@@ -6638,10 +6633,6 @@ HOST_ACTIVATED
 	Votre vhost %s est activée.
 HOST_IDENT_ACTIVATED
 	Votre vhost %s@%s est activée.
-HOST_ID
-	Veuillez vous identifier avant d'utiliser cette commande.
-HOST_NOT_REGED
-	Vous devez être enregistré avant d'utiliser cette commande.
 HOST_DEL
 	Le vhost pour %s a été supprimé.
 HOST_DEL_SYNTAX

@@ -1027,11 +1027,6 @@ CHAN_REGISTER_DISABLED
 	Sajnálom,  a csatorna regisztráció jelenleg szünetel.
 CHAN_REGISTER_NOT_LOCAL
 	Helyi csatornák nem regisztrálhatók.
-CHAN_MUST_REGISTER_NICK
-	Elõször regisztrálnod kell a nevedet. %R%s help
-CHAN_MUST_IDENTIFY_NICK
-	Kérlek azonosíts a %s-be, használd ezt a parancsot:
-	%R%s IDENTIFY jelszó
 CHAN_MAY_NOT_BE_REGISTERED
 	Ez a csatorna %s nem regisztrálható. 
 CHAN_ALREADY_REGISTERED
@@ -6374,10 +6369,6 @@ HOST_ACTIVATED
 	A %s virtuális hosztod aktiválva.
 HOST_IDENT_ACTIVATED
 	A  %s@%s virtuális hosztod aktiválva.
-HOST_ID
-	Kérlek azonosíts elõbb a szervízben.
-HOST_NOT_REGED
-	Csak regisztrált nickhez tudsz vhostot társítani.
 HOST_DEL
 	%s vhosztja törölve lett.
 HOST_DEL_SYNTAX

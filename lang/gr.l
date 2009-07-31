@@ -1036,11 +1036,6 @@ CHAN_REGISTER_DISABLED
 	Συγνώμη, η υπηρεσία κατοχύρωσεις καναλιών δεν λειτουργεί για την ώρα.
 CHAN_REGISTER_NOT_LOCAL
 	Κανάλια τοπικά δεν μπορούν να κατοχυρωθούν.
-CHAN_MUST_REGISTER_NICK
-	Πρέπει να κατοχυρώσεις το ψευδώνυμό σου πρώτα.  Γράψε %R%s HELP για πληροφορίες σχετικά με τα ονόματα που έχουν κατοχυρωθεί..
-CHAN_MUST_IDENTIFY_NICK
-	Παρακαλώ κάνε την εντολή αναγνώρισης με τον %s πρώτα, χρησιμοποιώντας την εντολή:
-	%R%s IDENTIFY password
 CHAN_MAY_NOT_BE_REGISTERED
 	Το κανάλι %s δεν μπορεί να κατοχυρωθεί.
 CHAN_ALREADY_REGISTERED
@@ -6471,10 +6466,6 @@ HOST_ACTIVATED
 	Your vhost of %s is now activated.
 HOST_IDENT_ACTIVATED
 	Your vhost of %s@%s is now activated.
-HOST_ID
-	Please identify to services first.
-HOST_NOT_REGED
-	You need to register before a vhost can be assigned to you.
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX

@@ -26,7 +26,6 @@ class CommandHSGroup : public Command
 
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-		NickAlias *na;
 		HostCore *tmp;
 		char *vHost = NULL;
 		char *vIdent = NULL;
@@ -37,42 +36,33 @@ class CommandHSGroup : public Command
 
 		head = hostCoreListHead();
 
-		if ((na = findnick(u->nick)))
+		tmp = findHostCore(head, u->nick, &found);
+		if (found)
 		{
-			if (na->status & NS_IDENTIFIED)
-			{
-				tmp = findHostCore(head, u->nick, &found);
-				if (found)
-				{
-					if (!tmp)
-						tmp = head; /* incase first in list */
-					else if (tmp->next) /* we dont want the previous entry were not inserting! */
-						tmp = tmp->next; /* jump to the next */
+			if (!tmp)
+				tmp = head; /* incase first in list */
+			else if (tmp->next) /* we dont want the previous entry were not inserting! */
+				tmp = tmp->next; /* jump to the next */
 
-					vHost = sstrdup(tmp->vHost);
-					if (tmp->vIdent)
-						vIdent = sstrdup(tmp->vIdent);
-					creator = sstrdup(tmp->creator);
-					time = tmp->time;
+			vHost = sstrdup(tmp->vHost);
+			if (tmp->vIdent)
+				vIdent = sstrdup(tmp->vIdent);
+			creator = sstrdup(tmp->creator);
+			time = tmp->time;
 
-					do_hs_sync(na->nc, vIdent, vHost, creator, time);
-					if (tmp->vIdent)
-						notice_lang(s_HostServ, u, HOST_IDENT_GROUP, na->nc->display, vIdent, vHost);
-					else
-						notice_lang(s_HostServ, u, HOST_GROUP, na->nc->display, vHost);
-					delete [] vHost;
-					if (vIdent)
-						delete [] vIdent;
-					delete [] creator;
-				}
-				else
-					notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-			}
+			do_hs_sync(u->nc, vIdent, vHost, creator, time);
+			if (tmp->vIdent)
+				notice_lang(s_HostServ, u, HOST_IDENT_GROUP, u->nc->display, vIdent, vHost);
 			else
-				notice_lang(s_HostServ, u, HOST_ID);
+				notice_lang(s_HostServ, u, HOST_GROUP, u->nc->display, vHost);
+			delete [] vHost;
+			if (vIdent)
+				delete [] vIdent;
+			delete [] creator;
 		}
 		else
-			notice_lang(s_HostServ, u, HOST_NOT_REGED);
+			notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+
 		return MOD_CONT;
 	}
 

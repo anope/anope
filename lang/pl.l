@@ -1331,13 +1331,6 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Lokalne kana³y nie mog± byæ rejestrowane.
 
-CHAN_MUST_REGISTER_NICK
-	Musisz mieæ zarejestrowany nick. Napisz %R%s HELP, aby uzyskaæ	wiêcej informacji.
-
-CHAN_MUST_IDENTIFY_NICK
-	Zidentyfikuj siê najpierw u %s komend±:
-	%R%s IDENTIFY has³o
-
 CHAN_MAY_NOT_BE_REGISTERED
 	Kana³u %s nie mo¿na rejestrowaæ.
 
@@ -7403,12 +7396,6 @@ HOST_ACTIVATED
 
 HOST_IDENT_ACTIVATED
 	Twój vhost %s@%s jest teraz aktywny.
-
-HOST_ID
-	Najpierw zidentyfikuj siê u serwisów.
-
-HOST_NOT_REGED
-	Aby uzyskaæ vhosta musisz byæ najpierw zarejestrowany.
 
 HOST_DEL
 	Vhost dla %s zosta³ usuniêty.

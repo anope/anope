@@ -1036,11 +1036,6 @@ CHAN_REGISTER_DISABLED
 	Desculpe, o registro de canais está temporariamente desativado.
 CHAN_REGISTER_NOT_LOCAL
 	Canais locais não podem ser registrados.
-CHAN_MUST_REGISTER_NICK
-	Você deve registrar seu nick primeiro.  Digite %R%s HELP para maiores informações sobre registro de nick.
-CHAN_MUST_IDENTIFY_NICK
-	Por favor se identifique com o %s primeiro, usando o comando:
-	%R%s IDENTIFY senha
 CHAN_MAY_NOT_BE_REGISTERED
 	O canal %s não pode ser registrado.
 CHAN_ALREADY_REGISTERED
@@ -6363,10 +6358,6 @@ HOST_ACTIVATED
 	Seu vhost %s está agora ativado.
 HOST_IDENT_ACTIVATED
 	Seu vhost %s@%s está agora ativado.
-HOST_ID
-	Por favor, identifique-se aos Services primeiro.
-HOST_NOT_REGED
-	Primeiro você precisa registrar seu nick senão um vhost não pode ser associado a você.
 HOST_DEL
 	vhost para %s removido.
 HOST_DEL_SYNTAX

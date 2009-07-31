@@ -1034,11 +1034,6 @@ CHAN_REGISTER_DISABLED
 	Sorry, kanaal registratie is tijdelijk uitgeschakeld.
 CHAN_REGISTER_NOT_LOCAL
 	Lokale kanalen kunnen niet geregistreerd worden.
-CHAN_MUST_REGISTER_NICK
-	Je moet je nickname eerst registreren.  Type %R%s HELP voor meer informatie over het registreren van nicknames.
-CHAN_MUST_IDENTIFY_NICK
-	Identificeer eerst met %s, door middel van het commando:
-	%R%s IDENTIFY wachtwoord
 CHAN_MAY_NOT_BE_REGISTERED
 	Kanaal %s mag niet geregistreerd worden.
 CHAN_ALREADY_REGISTERED
@@ -6401,10 +6396,6 @@ HOST_ACTIVATED
 	Je vhost van %s is nu geactiveerd.
 HOST_IDENT_ACTIVATED
 	Je vhost van %s@%s is nu geactiveerd.
-HOST_ID
-	Identificeer eerst bij Services.
-HOST_NOT_REGED
-	Je moet je eerst registreren voordat een vhost aan je nick kan worden gebonden.
 HOST_DEL
 	vhost voor %s verwijderd.
 HOST_DEL_SYNTAX

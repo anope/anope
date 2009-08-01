@@ -39,7 +39,11 @@ class CommandHSOn : public Command
 				notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
 			ircdproto->SendVhost(u->nick, vIdent, vHost);
 			if (ircd->vhost)
+			{
+				if (u->vhost)
+					delete [] u->vhost;
 				u->vhost = sstrdup(vHost);
+			}
 			if (ircd->vident)
 			{
 				if (vIdent)

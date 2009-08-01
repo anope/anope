@@ -84,11 +84,16 @@ int do_on(User * u)
                 }
                 anope_cmd_vhost_on(u->nick, vIdent, vHost);
                 if (ircd->vhost) {
+                    if (u->vhost)
+                        free(u->vhost);
                     u->vhost = sstrdup(vHost);
                 }
                 if (ircd->vident) {
-                    if (vIdent)
+                    if (vIdent) {
+                        if (u->vident)
+                            free(u->vident);
                         u->vident = sstrdup(vIdent);
+                    }
                 }
                 set_lastmask(u);
             }

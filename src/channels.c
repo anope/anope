@@ -173,7 +173,12 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
         alog("debug: Changing modes for %s to %s", chan->name,
              merge_args(ac, av));
 
-    u = finduser(source);
+    if (UseTS6 && ircd->ts6) { 
+        u = find_byuid(source);
+        if (!u) u = finduser(source);
+    } else
+        u = finduser(source);
+
     if (u && (chan_get_user_status(chan, u) & CUS_DEOPPED)) {
         char *s;
 
@@ -239,12 +244,14 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 }
             }
 
-            if (!(user = finduser(*av))
-                && !(UseTS6 && ircd->ts6 && (user = find_byuid(*av)))) {
-                if (debug) {
-                    alog("debug: MODE %s %c%c for nonexistent user %s",
+            if (UseTS6 && ircd->ts6) { 
+                user = find_byuid(*av);
+                if (!user) user = finduser(*av);
+            } else
+                user = finduser(*av);
+            if (!user && debug) {
+                alog("debug: MODE %s %c%c for nonexistent user %s",
                          chan->name, (add ? '+' : '-'), mode, *av);
-                }
                 continue;
             }
 
@@ -304,8 +311,12 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
 
     /* Don't bounce modes from u:lined clients or servers, bug #1004. *
      * We can get UUIDs as well.. don not assume nick ~ Viper */
-    user = finduser(source);
-    if (!user && UseTS6 && ircd->ts6) user = find_byuid(source);
+    if (UseTS6 && ircd->ts6) {
+        user = find_byuid(source);
+        if (!user) user = finduser(source);
+    } else
+        user = finduser(source);
+
     if ((user && is_ulined(user->server->name)) || is_ulined((char *)source))
         return;
 
@@ -319,7 +330,12 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
             real_ac--;
             real_av++;
             for (i = 0; i < real_ac; i++) {
-                user = finduser(*real_av);
+                if (UseTS6 && ircd->ts6) {
+                    user = find_byuid(*real_av);
+                    if (!user) user = finduser(*real_av);
+                } else
+                    user = finduser(*real_av);
+
                 if (!user && UseTS6 && ircd->ts6) user = find_byuid(*real_av);
                 if (user && is_on_chan(chan, user)) {
                     if (check < 2)

@@ -1,11 +1,13 @@
 Anope Version 1.8 SVN
 -------------------
-
-Provided by Han` <Han@mefalcon.org> 2009
-07/28 F Updated german language file.                                    [  #00]
-07/28 F Added german language support to hs_request.c.                   [  #00]
+Provided by Anope Dev. <team@anope.org> - 2009
 07/31 F Fixed anope sending umode change using channels' syntax.         [  #00]
 07/31 F Fixed TS6 UUID issue while parsing modechanges.                  [  #00]
+08/01 F Fixed several memory leaks in HostServ.                          [  #00]
+
+Provided by Han` <Han@mefalcon.org> - 2009
+07/28 F Updated german language file.                                    [  #00]
+07/28 F Added german language support to hs_request.c.                   [  #00]
 
 Anope Version 1.8.2
 -------------------

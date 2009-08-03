@@ -122,6 +122,10 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
 {
     Server *serv;
 
+    if (debug) 
+        alog("debug: Creating %s(%s) uplinked to %s", name, suid ? suid : "", 
+                uplink ? uplink->name : "No uplink");
+
     serv = scalloc(sizeof(Server), 1);
     if (!name)
         name = "";
@@ -155,10 +159,10 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
         uplink->links = serv;
     }
     /* Check if this is our uplink server */
-	if ((uplink == me_server) && !(flags & SERVER_JUPED)) {
+    if ((uplink == me_server) && !(flags & SERVER_JUPED)) {
         serv_uplink = serv;
-		serv->flags |= SERVER_ISUPLINK;
-	}
+        serv->flags |= SERVER_ISUPLINK;
+    }
 
     /* Write the StartGlobal (to non-juped servers) */
     if (GlobalOnCycle && GlobalOnCycleUP && !(flags & SERVER_JUPED))
@@ -186,14 +190,15 @@ static void delete_server(Server * serv, const char *quitreason)
     NickAlias *na;
 
     if (!serv) {
-        if (debug) {
+        if (debug)
             alog("debug: delete_server() called with NULL arg!");
-        }
         return;
     }
 
     if (debug)
-        alog("debug: delete_server() called for %s", serv->name);
+        alog("debug: Deleting %s(%s) uplinked to %s(%s)", serv->name, 
+                serv->suid ? serv->suid : "", serv->uplink ? serv->uplink->name : "???",
+                serv->uplink ? serv->uplink->suid : "");
 
     if (ircdcap->noquit || ircdcap->qs) {
         if ((uplink_capab & ircdcap->noquit)
@@ -366,11 +371,17 @@ void do_server(const char *source, char *servername, char *hops,
                  source);
         }
     }
-
     if (source[0] == '\0')
         s = me_server;
-    else
+    else if (UseTS6 && ircd->ts6) {
+        s = findserver_uid(servlist, source);
+        if (!s)
+            s = findserver(servlist, source);
+    } else
         s = findserver(servlist, source);
+
+    if (!s)
+        fatal("FATAL ERROR: Received new server from nonexistant uplink.");
 
     new_server(s, servername, descript, 0, numeric);
     send_event(EVENT_SERVER_CONNECT, 1, servername);
@@ -573,9 +584,6 @@ static unsigned int ts6_uid_index = 9;  /* last slot in uid buf */
 
 void ts6_uid_init(void)
 {
-    unsigned int i;
-    char buf[BUFSIZE];
-
     /* check just in case... you can never be too safe. */
     if (TS6SID != NULL) {
         snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);

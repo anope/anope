@@ -1147,7 +1147,8 @@ class ProtoRatbox : public Module
 		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
-		TS6SID = sstrdup(Numeric);
+		if (Numeric)
+			TS6SID = sstrdup(Numeric);
 		UseTSMODE = 1;  /* TMODE */
 
 		pmodule_ircd_version("Ratbox IRCD 2.0+");

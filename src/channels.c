@@ -249,9 +249,10 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 if (!user) user = finduser(*av);
             } else
                 user = finduser(*av);
-            if (!user && debug) {
-                alog("debug: MODE %s %c%c for nonexistent user %s",
-                         chan->name, (add ? '+' : '-'), mode, *av);
+            if (!user) {
+                if (debug)
+                    alog("debug: MODE %s %c%c for nonexistent user %s",
+                            chan->name, (add ? '+' : '-'), mode, *av);
                 continue;
             }
 

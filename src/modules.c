@@ -669,17 +669,17 @@ void moduleDisplayHelp(const char *service, User * u)
 
 	for (idx = 0; idx != MAX_CMD_HASH; idx++) {
 		for (current = MODULE_HASH[idx]; current; current = current->next) {
-			if (!strcmp(s_NickServ, service))
+			if (s_NickServ && !strcmp(s_NickServ, service))
 				current->m->NickServHelp(u);
-			else if (!strcmp(s_ChanServ, service))
+			else if (s_ChanServ && !strcmp(s_ChanServ, service))
 				current->m->ChanServHelp(u);
-			else if (!strcmp(s_MemoServ, service))
+			else if (s_MemoServ && !strcmp(s_MemoServ, service))
 				current->m->MemoServHelp(u);
-			else if (!strcmp(s_BotServ, service))
+			else if (s_BotServ && !strcmp(s_BotServ, service))
 				current->m->BotServHelp(u);
-			else if (!strcmp(s_OperServ, service))
+			else if (s_OperServ && !strcmp(s_OperServ, service))
 				current->m->OperServHelp(u);
-			else if (!strcmp(s_HostServ, service))
+			else if (s_HostServ && !strcmp(s_HostServ, service))
 				current->m->HostServHelp(u);
 		}
 	}

@@ -137,9 +137,6 @@ const std::string &User::GetUID() const
 }
 
 
-
-
-
 void User::SetVIdent(const std::string &sident)
 {
 	this->vident = sident;
@@ -174,9 +171,6 @@ const std::string &User::GetIdent() const
 {
 	return this->ident;
 }
-
-
-
 
 
 void User::SetRealname(const std::string &srealname)
@@ -323,6 +317,34 @@ void User::SendMessage(const char *source, const std::string &msg)
 	else
 	{
 		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
+	}
+}
+
+/** Check if the user should become identified because
+ * their svid matches the one stored in their nickcore
+ * @param svid Services id
+ */
+void User::CheckAuthenticationToken(const char *svid)
+{
+	NickCore *tnc;
+	const char *c;
+	NickAlias *na;
+
+	if ((tnc = findcore(this->nick)))
+	{
+		if (tnc->GetExt("authenticationtoken", c))
+		{
+			if (svid && c && !strcmp(svid, c))
+			{
+				/* Users authentication token matches so they should become identified */
+				if ((na = findnick(this->nick)))
+				{
+					na->status |= NS_IDENTIFIED;
+					check_memos(this);
+					this->nc = tnc;
+				}
+			}
+		}
 	}
 }
 

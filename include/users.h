@@ -117,9 +117,6 @@ public: // XXX: exposing a tiny bit too much
 	 */
 	const std::string &GetIdent() const;
 
-
-
-
 	/** Updates the realname of the user record.
 	 */
 	void SetRealname(const std::string &realname);
@@ -133,5 +130,11 @@ public: // XXX: exposing a tiny bit too much
 	 */
 	void SendMessage(const char *source, const char *fmt, ...);
 	void SendMessage(const char *source, const std::string &msg);
+
+	/** Check if the user should become identified because
+	 * their svid matches the one stored in their nickcore
+	 * @param svid Services id
+	 */
+	void CheckAuthenticationToken(const char *svid);
 };
 

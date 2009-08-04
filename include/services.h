@@ -469,9 +469,7 @@ struct ircdvars_ {
 	const char *ownerunset;			/* Mode to unset for a owner	*/
 	const char *adminset;				/* Mode to set for admin	*/
 	const char *adminunset;			/* Mode to unset for admin	*/
-	const char *modeonreg;			/* Mode on Register		*/
 	const char *modeonunreg;			/* Mode on Unregister		*/
-	const char *modeonnick;			/* Mode on nick change		*/
 	int sgline;				/* Supports SGline		*/
 	int sqline;				/* Supports SQline		*/
 	int szline;				/* Supports SZline		*/
@@ -1355,6 +1353,11 @@ class CoreExport IRCDProto
 		 * @param account The account the user is logging out of
 		 */
 		virtual void SendAccountLogout(User *u, NickCore *account) { }
+
+		/** Set a users auto identification token
+		 * @param u The user
+		 */
+		virtual void SetAutoIdentificationToken(User *u) { }
 };
 
 class CoreExport IRCDTS6Proto : public IRCDProto

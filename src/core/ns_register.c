@@ -34,10 +34,7 @@ class CommandNSConfirm : public Command
 			return MOD_CONT;
 		}
 
-		int len;
-		char tsbuf[16];
 		char tmp_pass[PASSMAX];
-		char modes[512];
 
 		memcpy(na->nc->pass, nr->password, PASSMAX);
 		na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
@@ -77,6 +74,7 @@ class CommandNSConfirm : public Command
 				notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
 
 			ircdproto->SendAccountLogin(u, u->nc);
+			ircdproto->SetAutoIdentificationToken(u);
 
 			FOREACH_MOD(I_OnNickRegister, OnNickRegister(u));
 
@@ -84,19 +82,6 @@ class CommandNSConfirm : public Command
 				notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
 
 			u->lastnickreg = time(NULL);
-			if (ircd->modeonreg)
-			{
-				len = strlen(ircd->modeonreg);
-				strncpy(modes, ircd->modeonreg, 512);
-
-				if (ircd->tsonmode)
-				{
-					snprintf(tsbuf, sizeof(tsbuf), "%lu", static_cast<unsigned long>(u->timestamp));
-					common_svsmode(u, modes, tsbuf);
-				}
-				else
-					common_svsmode(u, modes, NULL);
-			}
 		}
 		else
 			notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);

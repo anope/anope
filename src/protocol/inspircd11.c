@@ -84,9 +84,7 @@ IRCDVar myIrcd[] = {
 	 "-q",					  /* Mode to unset for an owner */
 	 "+a",					  /* Mode to set for channel admin */
 	 "-a",					  /* Mode to unset for channel admin */
-	 "+r",					  /* Mode On Reg		  */
-	 "-r",					  /* Mode on UnReg		*/
-	 "-r",					  /* Mode on Nick Change  */
+	 "-r",					  /* Mode on UnReg */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
@@ -678,6 +676,26 @@ class InspIRCdProto : public IRCDProto
 		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
 		else return 0;
 	}
+
+	void SetAutoIdentificationToken(User *u)
+	{
+		int *c;
+		char svidbuf[15];
+
+		if (!u->nc)
+			return;
+
+		snprintf(svidbuf, sizeof(svidbuf), "%ld", u->timestamp);
+
+		if (u->nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			u->nc->Shrink("authenticationtoken");
+		}
+
+		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
+	}
+
 } ircd_proto;
 
 
@@ -1080,6 +1098,11 @@ int anope_event_nick(const char *source, int ac, const char **av)
 						   av[7],   /* realname */
 						   ts, htonl(*ad), av[3], NULL);
 			if (user) {
+				/* InspIRCd1.1 has no user mode +d so we
+				 * use nick timestamp to check for auth - Adam
+				 */
+				user->CheckAuthenticationToken(av[0]);
+
 				ircdproto->ProcessUsermodes(user, 1, &av[5]);
 				user->chost = av[3];
 			}
@@ -1348,7 +1371,21 @@ class ProtoInspIRCd : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
+
+		ModuleManager::Attach(I_OnDelCore, this);
 	}
+
+	void OnDelCore(NickCore *nc)
+	{
+		char *c;
+
+		if (nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			nc->Shrink("authenticationtoken");
+		}
+	}
+
 };
 
 MODULE_INIT("inspircd11", ProtoInspIRCd)

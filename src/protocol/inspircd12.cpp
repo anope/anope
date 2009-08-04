@@ -84,9 +84,7 @@ IRCDVar myIrcd[] = {
 	 "-q",					  /* Mode to unset for an owner */
 	 "+a",					  /* Mode to set for channel admin */
 	 "-a",					  /* Mode to unset for channel admin */
-	 "+r",					  /* Mode On Reg		  */
 	 "-r",					  /* Mode on UnReg		*/
-	 "-r",					  /* Mode on Nick Change  */
 	 0,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
@@ -709,7 +707,19 @@ class InspIRCdProto : public IRCDProto
 
 	void SendAccountLogin(User *u, NickCore *account)
 	{
+		char *c;
+
 		send_cmd(TS6SID, "METADATA %s accountname :%s", u->GetUID().c_str(), account->display);
+
+		if (account->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			account->Shrink("authenticationtoken");
+		}
+
+		account->Extend("authenticationtoken", sstrdup(account->display));
+
+		common_svsmode(u, "+rd", account->display);
 	}
 
 	void SendAccountLogout(User *u, NickCore *account)
@@ -724,6 +734,7 @@ class InspIRCdProto : public IRCDProto
 			return 0;
 		return 1;
 	}
+
 } ircd_proto;
 
 
@@ -1210,6 +1221,27 @@ int anope_event_whois(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
+int anope_event_metadata(const char *source, int ac, const char **av)
+{
+	User *u;
+
+	if (ac < 3)
+		return MOD_CONT;
+	else if (!strcmp(av[1], "accountname"))
+	{
+		if ((u = find_byuid(av[0])))
+		{
+			/* Check to see if the account name is the same
+			 * as the one saved for this nick, if so identify
+			 * them - Adam
+			 */
+			u->CheckAuthenticationToken(av[2]);
+		}
+	}
+
+	return MOD_CONT;
+}
+
 int anope_event_capab(const char *source, int ac, const char **av)
 {
 	int argc;
@@ -1378,6 +1410,7 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("FTOPIC",	anope_event_ftopic); addCoreMessage(IRCD,m);
 	m = createMessage("OPERTYPE",  anope_event_opertype); addCoreMessage(IRCD,m);
 	m = createMessage("IDLE",	  anope_event_idle); addCoreMessage(IRCD,m);
+	m = createMessage("METADATA", anope_event_metadata); addCoreMessage(IRCD,m);
 }
 
 class ProtoInspIRCd : public Module
@@ -1415,11 +1448,24 @@ class ProtoInspIRCd : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
+
+		ModuleManager::Attach(I_OnDelCore, this);
 	}
 
 	~ProtoInspIRCd()
 	{
 		delete [] TS6SID;
+	}
+
+	void OnDelCore(NickCore *nc)
+	{
+		char *c;
+
+		if (nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			nc->Shrink("authenticationtoken");
+		}
 	}
 };
 

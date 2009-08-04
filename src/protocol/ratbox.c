@@ -60,9 +60,7 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* Mode to unset for an owner */
 	 NULL,					  /* Mode to set for chan admin */
 	 NULL,					  /* Mode to unset for chan admin */
-	 NULL,					  /* Mode On Reg		  */
-	 NULL,					  /* Mode on UnReg		*/
-	 NULL,					  /* Mode on Nick Change  */
+	 NULL,					  /* Mode on UnReg       */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 0,						 /* Supports SZlines	 */
@@ -684,6 +682,25 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		send_cmd(bi->uid, "TOPIC %s :%s", chan, topic);
 	}
+
+	void SetAutoIdentificationToken(User *u)
+	{
+		char svidbuf[15], *c;
+
+		if (!u->nc)
+			return;
+		
+		snprintf(svidbuf, sizeof(svidbuf), "%ld", u->timestamp);
+
+		if (u->nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			u->nc->Shrink("authenticationtoken");
+		}
+
+		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
+	}
+
 } ircd_proto;
 
 
@@ -732,6 +749,11 @@ int anope_event_nick(const char *source, int ac, const char **av)
 					   strtoul(av[2], NULL, 10), 0, "*", av[7]);
 		if (user)
 		{
+			/* No usermode +d on ratbox so we use
+			 * nick timestamp to check for auth - Adam
+			 */
+			user->CheckAuthenticationToken(av[2]);
+
 			ircdproto->ProcessUsermodes(user, 1, &av[3]);
 		}
 	} else {
@@ -1174,11 +1196,24 @@ class ProtoRatbox : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
+
+		ModuleManager::Attach(I_OnDelCore, this);
 	}
 
 	~ProtoRatbox()
 	{
 		delete [] TS6SID;
+	}
+
+	void OnDelCore(NickCore *nc)
+	{
+		char *c;
+
+		if (nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			nc->Shrink("authenticationtoken");
+		}
 	}
 
 };

@@ -32,9 +32,6 @@ class CommandNSIdentify : public Command
 		NickAlias *na;
 		NickRequest *nr;
 		int res;
-		char tsbuf[16];
-		char modes[512];
-		int len;
 
 		if (!(na = findnick(u->nick)))
 		{
@@ -74,18 +71,8 @@ class CommandNSIdentify : public Command
 			na->last_seen = time(NULL);
 			u->nc = na->nc;
 
-			snprintf(tsbuf, sizeof(tsbuf), "%lu", static_cast<unsigned long>(u->timestamp));
-
-			if (ircd->modeonreg)
-			{
-				len = strlen(ircd->modeonreg);
-				strncpy(modes, ircd->modeonreg, 512);
-				if (ircd->tsonmode)
-					common_svsmode(u, modes, tsbuf);
-				else
-					common_svsmode(u, modes, "");
-			}
 			ircdproto->SendAccountLogin(u, u->nc);
+			ircdproto->SetAutoIdentificationToken(u);
 
 			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 

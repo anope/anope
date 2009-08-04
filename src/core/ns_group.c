@@ -28,13 +28,8 @@ class CommandNSGroup : public Command
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		NickAlias *na, *target;
-		NickCore *nc;
 		const char *nick = params[0].c_str();
 		const char *pass = params[1].c_str();
-		int i;
-		char tsbuf[16];
-		char modes[512];
-		int len;
 		std::list<std::pair<std::string, std::string> >::iterator it;
 
 		if (NSEmailReg && findrequestnick(u->nick))
@@ -131,21 +126,12 @@ class CommandNSGroup : public Command
 				u->nc = na->nc;
 
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
+				ircdproto->SetAutoIdentificationToken(u);
 
 				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
 				notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
 				u->lastnickreg = time(NULL);
-				snprintf(tsbuf, sizeof(tsbuf), "%lu", static_cast<unsigned long>(u->timestamp));
-				if (ircd->modeonreg)
-				{
-					len = strlen(ircd->modeonreg);
-					strncpy(modes, ircd->modeonreg, 512);
-					if (ircd->tsonmode)
-						common_svsmode(u, modes, tsbuf);
-					else
-						common_svsmode(u, modes, NULL);
-				}
 
 				check_memos(u);
 			}

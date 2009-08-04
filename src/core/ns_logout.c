@@ -58,7 +58,7 @@ class CommandNSLogout : public Command
 				na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
 			}
 
-			if (ircd->modeonreg)
+			if (ircd->modeonunreg)
 				common_svsmode(u2, ircd->modeonunreg, "1");
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */

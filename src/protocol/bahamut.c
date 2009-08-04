@@ -75,9 +75,7 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* Mode to unset for an owner */
 	 NULL,					  /* Mode to set for channel admin */
 	 NULL,					  /* Mode to unset for channel admin */
-	 "+rd",					 /* Mode On Reg		  */
-	 "-r+d",					/* Mode on UnReg		*/
-	 "+d",					  /* Mode on Nick Change  */
+	 "-r+d",					/* Mode on UnReg        */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
@@ -709,6 +707,29 @@ class BahamutIRCdProto : public IRCDProto
 		bahamut_cmd_svinfo();
 		bahamut_cmd_burst();
 	}
+
+	void SetAutoIdentificationToken(User *u)
+	{
+		int *c;
+		char svidbuf[15];
+
+		if (!u->nc)
+			return;
+
+		srand(time(NULL));
+		snprintf(svidbuf, sizeof(svidbuf), "%i", rand());
+
+		if (u->nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			u->nc->Shrink("authenticationtoken");
+		}
+
+		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
+
+		common_svsmode(u, "+rd", svidbuf);
+	}
+
 } ircd_proto;
 
 
@@ -746,6 +767,11 @@ int anope_event_nick(const char *source, int ac, const char **av)
 					   strtoul(av[2], NULL, 10), strtoul(av[8], NULL, 0),
 					   NULL, NULL);
 		if (user) {
+			/* Check to see if the user should be identified because their
+			 * services id matches the one in their nickcore
+			 */
+			user->CheckAuthenticationToken(av[7]);
+
 			ircdproto->ProcessUsermodes(user, 1, &av[3]);
 		}
 	} else {
@@ -1046,7 +1072,21 @@ class ProtoBahamut : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
+
+		ModuleManager::Attach(I_OnDelCore, this);
 	}
+
+	void OnDelCore(NickCore *nc)
+	{
+		char *c;
+
+		if (nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			nc->Shrink("authenticationtoken");
+		}
+	}
+
 };
 
 MODULE_INIT("bahamut", ProtoBahamut)

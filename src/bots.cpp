@@ -26,7 +26,7 @@ BotInfo::BotInfo(const char *nnick)
 		this->flags |= BI_CHANSERV;
 	else if (s_BotServ && !stricmp(s_BotServ, nnick))
 		this->flags |= BI_BOTSERV;
-	else if (s_HostServ && !stricmp(s_BotServ, nnick))
+	else if (s_HostServ && !stricmp(s_HostServ, nnick))
 		this->flags |= BI_HOSTSERV;
 	else if (s_OperServ && !stricmp(s_OperServ, nnick))
 		this->flags |= BI_OPERSERV;
@@ -55,7 +55,7 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 		this->flags |= BI_CHANSERV;
 	else if (s_BotServ && !stricmp(s_BotServ, nnick))
 		this->flags |= BI_BOTSERV;
-	else if (s_HostServ && !stricmp(s_BotServ, nnick))
+	else if (s_HostServ && !stricmp(s_HostServ, nnick))
 		this->flags |= BI_HOSTSERV;
 	else if (s_OperServ && !stricmp(s_OperServ, nnick))
 		this->flags |= BI_OPERSERV;

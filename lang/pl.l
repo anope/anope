@@ -2681,7 +2681,7 @@ BOT_NOT_ON_CHANNEL
 
 # Kick reasons (must be a single line)
 BOT_REASON_BADWORD
-	Nie u¿ywaj s³owa \"%s\" na tym kanale!
+	Nie u¿ywaj s³owa "%s" na tym kanale!
 
 BOT_REASON_BADWORD_GENTLE
 	Uwa¿aj co piszesz!

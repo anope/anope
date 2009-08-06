@@ -707,19 +707,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendAccountLogin(User *u, NickCore *account)
 	{
-		char *c;
-
 		send_cmd(TS6SID, "METADATA %s accountname :%s", u->GetUID().c_str(), account->display);
-
-		if (account->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			account->Shrink("authenticationtoken");
-		}
-
-		account->Extend("authenticationtoken", sstrdup(account->display));
-
-		common_svsmode(u, "+r", "");
 	}
 
 	void SendAccountLogout(User *u, NickCore *account)
@@ -733,6 +721,24 @@ class InspIRCdProto : public IRCDProto
 		if (isdigit(*nick))
 			return 0;
 		return 1;
+	}
+
+	void SetAutoIdentificationToken(User *u)
+	{
+		char *c;
+
+		if (!u->nc)
+			return;
+
+		if (u->nc->GetExt("authenticationtoken", c))
+		{
+			delete [] c;
+			u->nc->Shrink("authenticationtoken");
+		}
+
+		u->nc->Extend("authenticationtoken", sstrdup(u->nc->display));
+
+		common_svsmode(u, "+r", NULL);
 	}
 
 } ircd_proto;

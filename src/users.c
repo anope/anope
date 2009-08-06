@@ -771,7 +771,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		ntmp->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
 		sprintf(ntmp->last_usermask, "%s@%s",
 				user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
-		ircdproto->SendAccountLogin(user, user->nc);
 		ircdproto->SetAutoIdentificationToken(user);
 		alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
 	}
@@ -781,7 +780,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	{
 		if (nick_identified(user))
 		{
-			ircdproto->SendAccountLogin(user, user->nc);
 			ircdproto->SetAutoIdentificationToken(user);
 		}
 	}

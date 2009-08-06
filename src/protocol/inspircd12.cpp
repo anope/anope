@@ -719,7 +719,7 @@ class InspIRCdProto : public IRCDProto
 
 		account->Extend("authenticationtoken", sstrdup(account->display));
 
-		common_svsmode(u, "+rd", account->display);
+		common_svsmode(u, "+r", "");
 	}
 
 	void SendAccountLogout(User *u, NickCore *account)

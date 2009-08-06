@@ -5551,7 +5551,7 @@ OPER_HELP_CMD_SHUTDOWN
 OPER_HELP_CMD_DEFCON
 	    DEFCON      Manipulálja a DefCon rendszert
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL    Kirúgja az összes usert a csatornáról
+	    CHANKILL    AKILL az összes usert a csatornáról
 OPER_HELP_CMD_OLINE
 	    OLINE       Operflaget ad a biztos felhasználónak
 OPER_HELP_CMD_UMODE

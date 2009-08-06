@@ -5750,7 +5750,7 @@ OPER_HELP_CMD_SHUTDOWN
 OPER_HELP_CMD_DEFCON
 	    DEFCON      Active/Désactive DefCon
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL    Kill tout les utilisateurs d'un canal spécifique
+	    CHANKILL    AKILL tout les utilisateurs d'un canal spécifique
 OPER_HELP_CMD_OLINE
 	    OLINE       Donne les flags d'un Oper à un utilisateur
 OPER_HELP_CMD_UMODE

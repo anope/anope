@@ -5583,7 +5583,7 @@ OPER_HELP_CMD_SHUTDOWN
 OPER_HELP_CMD_DEFCON
 	    DEFCON      Manipola il sistema DefCon
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL    Killa tutti gli utenti su di un canale specifico
+	    CHANKILL    AKILL tutti gli utenti su di un canale specifico
 OPER_HELP_CMD_OLINE
 	    OLINE       Imposta le operflag di un utente
 OPER_HELP_CMD_UMODE

@@ -5670,7 +5670,7 @@ OPER_HELP_CMD_SHUTDOWN
 OPER_HELP_CMD_DEFCON
 	    DEFCON      Manipulate the DefCon system
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL    Kill all users on a specific channel
+	    CHANKILL    AKILL all users on a specific channel
 OPER_HELP_CMD_OLINE
 	    OLINE	Otorga privilegios IRCOP temporarios
 OPER_HELP_CMD_UMODE

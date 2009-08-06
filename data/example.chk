@@ -9,7 +9,7 @@
 ###############################################################
 
 # Anope binary directory
-ANOPATH=/home/ircd/services/
+ANOPATH=/home/ircd/services/bin
 
 # Name of the pid file
 ANOPIDF=services.pid

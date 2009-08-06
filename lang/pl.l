@@ -6483,7 +6483,7 @@ OPER_HELP_CMD_DEFCON
 	    DEFCON      Modyfikuje poziom systemu DefCon
 
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL    Od³±cza wszystkich u¿ytkowników na kanale
+	    CHANKILL    AKILL wszystkich u¿ytkowników na kanale
 
 OPER_HELP_CMD_OLINE
 	    OLINE       Daje flagi operatora wybranemu u¿ytkownikowi

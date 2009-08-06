@@ -5559,7 +5559,7 @@ OPER_HELP_CMD_SHUTDOWN
 OPER_HELP_CMD_DEFCON
 	    DEFCON        Ändert das  DefCon System
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL      Killt alle User des angegebenen  Channels
+	    CHANKILL      AKILL alle User des angegebenen  Channels
 OPER_HELP_CMD_OLINE
 	    OLINE         Einem User "Operflags" setzen
 OPER_HELP_CMD_UMODE

@@ -1,0 +1,309 @@
+Troubleshooting Guide for Anope 1.9
+------------------------------------------------
+
+NOTE: 
+An updated version of this guide can be found on our wiki:
+
+http://wiki.anope.org/index.php/Troubleshooting
+
+Table of Contents
+-----------------
+
+1) General
+    1.1) Anope complains in the logfile about being unable to load the default
+         language.
+    1.2) Anope spricht kein Deutsch!, etc. (Anope doesn't speak my language!)
+    1.3) I selected a language other than English, but sometimes Anope sends
+         responses in English instead.
+    1.4) Anope always dies after about five minutes, saying "FATAL ERROR! Can't
+         back up nick.db".
+    1.5) Anope crashed with a segmentation fault.
+    1.6) I've found a bug that's not mentioned here or in the README or BUGS
+         files.  What should I do?
+    1.7) My FreeBSD box complains about 'Shared object "nss_dns.so.1" not
+         found'
+    1.8) Anope and long (more then 30 character) nicknames.
+
+2) Installation / Configuration
+    2.1) When I run "make", I get an error message like "missing separator",
+         "Unassociated shell command", "Unexpected end of line seen", etc.
+    2.2) I get an error like "Makefile.inc not found".
+    2.3) I typed "./services" at the command line, but nothing happened!
+    2.4) Whenever I start Anope, I get a message on my IRC server saying
+         "connection refused" or something similar, and Anope gives an error
+         message from the server saying "Closing Link: ...".
+    2.5) My IRC server is giving me messages like "Connection to
+         services.whatever.net[127.0.0.1] activated" and then "Access denied --
+         no N line".  Why?
+    2.6) When I say "/connect services.*", it doesn't work!
+    2.7) Anope starts up okay, but if I try to register a nickname, it comes
+         back with "Sorry, registration failed."
+    2.8) Anope reports (via /stats u or /msg OperServ STATS) a different number
+         of users online than I get from doing /lusers.
+         
+3) BotServ
+    3.1) How do I add bots to BotServ?
+    3.2) Why do kick triggers and fantasy commands fail to work with my Bahamut
+         IRCd?
+         
+4) ChanServ
+    4.1) Anope's channel mode setting doesn't work.  I can't set modes with
+         OperServ, and every time ChanServ tries to set a mode, my server
+         reverses the change.
+    4.2) Anope ignored the SET SUCCESSOR setting and deleted a channel when the
+         founder expired.
+    4.3) How to auto voice all those whom join my #channel?
+    4.4) Channel options like RESTRICTED or SECUREOPS don't work. What's wrong?
+
+5) OperServ
+    5.1) Using the OperServ JUPE command results in server messages like 
+         "Server juped.server introduced by non-hub server services.my.net".
+    5.2) When I add an AKILL, the users matching it don't get killed.
+    5.3) Trying to use OperServ gives me "Access denied".
+    5.4) I can't get /OS UMODES and /OS SVSNICK to work!
+    5.5) What is a Super-Admin? How does it work? Why might it not work?    
+
+-------------------------------------------------------------------------------
+
+1) General
+
+1.1) Anope complains in the logfile about being unable to load the default
+     language.
+
+    You forgot to run "make install".
+
+1.2) Anope spricht kein Deutsch!, etc. (Anope doesn't speak my language!)
+
+    See section 5 of the README file.
+
+1.3) I selected a language other than English, but sometimes Anope sends
+     responses in English instead.
+
+    Some language files are not complete--in other words, they only have a
+    translation of some of the message Anope uses.  In this case, the 
+    missing messages will be displayed in English.  You can either wait for 
+    the primary translator to provide us with a translation, or do the
+    translation yourself and send us the messages translated into your
+    language.
+    
+1.4) Anope always dies after about five minutes, saying "FATAL ERROR! Can't
+     back up nick.db".
+
+    Make sure that the user Anope runs as has write access to the data
+    directory, and that the data directory actually exists (the latter
+    shouldn't be a problem if you ran the Config script). This means Anope
+    needs write and execute permission on the data directory itself and execute
+    permission on every parent directory of the data directory.
+
+1.5) Anope crashed with a segmentation fault.
+
+    See if you can reproduce this by doing a certain sequence of things.  If
+    so, please report it to us (see part 6 of README file).  If not, you're
+    probably out of luck; if you like, you can report it to us anyway, but
+    chances are it won't get fixed if we don't have instructions on reproducing
+    it.  If you do have such a problem, you may find the crontab utility useful
+    for dealing with it.
+    
+    Also, see the DumpCore directive in the configuration file. It allows Anope
+    to dump its core whenever it's segfaulting, usually calling it core and
+    placing it into Anope's main directory. Open up gdb by issuing the
+    following command at your shell:
+    
+        * gdb services core
+    
+    (of course replacing 'core' with the name of the core if different) and
+    type 'bt' at the gdb prompt. After that, send us the output you got and
+    keep the core file in a safe place, in case we need it to dig deeper into
+    the problem.
+
+1.6) I've found a bug that's not mentioned here or in the README or BUGS files.
+      What should I do?
+
+    See section 6 of the README file.
+
+1.7) My FreeBSD box complains about 'Shared object "nss_dns.so.1" not found'
+
+    We haven't figured out the exact cause yet, but as a quickfix you can
+    delete the /etc/nsswitch.conf file. Please keep in mind that removing a
+    configuration file can be dangerous, so only do this if you know what you
+    are doing.
+
+1.8) Anope and long (more then 30 character) nicknames.
+
+    By default, Anope only supports nicknames up to 30 characters (NICKLEN=30).
+    If your IRCd allows for longer nicknames or has been modified to do so 
+    Anope will start logging a lot of ("NICK from nonexistent nick") messages.
+    This is because once a user uses a nick that is too long for Anope to handle, 
+    Anope loses track of the user for the remainder of the session.
+    It is POSSIBLE but not NOT RECOMMENDED to extend the maximum length of nicknames
+    Anope can track, however this will also break database compatibility. DBs saved
+    with Anope set to allow for example 40 chars cannot be read by a clean Anope
+    installation and vice versa. So changing the maximum nick length is only possible
+    when starting with fresh databases and even then the consequences of this are
+    UNTESTED.
+    In order to change the maximum internal nick length, change the NICKMAX setting
+    in include/config.h, recompile anope and start without databases.
+
+
+2) Installation / Configuration
+
+2.1) When I run "make", I get an error message like "missing separator",
+     "Unassociated shell command", "Unexpected end of line seen", etc.
+
+    Your make program isn't compatible with the Makefile for Anope. The
+    Makefile was designed to work with GNU make, and as such may not work on
+    other systems' "make" programs.  If you get an error from "make", obtain
+    GNU make from ftp://prep.ai.mit.edu/pub/gnu/make/ (or wherever you prefer) and
+    use it instead of your system's default "make". Note that GNU make may
+    already be installed on your system; try using the command "gmake" instead
+    of "make".
+    
+    The make programs bundled with SunOS/Solaris and FreeBSD have been reported
+    not to work; you will need to use GNU make on these systems.
+
+2.2) I get an error like "Makefile.inc not found".
+
+    You forgot to run the Config script first.  See the INSTALL file for
+    compilation instructions.
+
+2.3) I typed "./services" at the command line, but nothing happened!
+
+    Anope puts itself in the background when it starts, so you get your shell
+    prompt right back. Meanwhile, Anope will continue setting up, then connect
+    to the IRC server specified in services.conf (or on the command line).  If
+    it doesn't connect, you probably specified the wrong IRCd or RemoteServer in 
+    the configuration file. Check to make sure that you are actually running one of
+    the supported IRCds, also. A list of supported IRCds can be found in the README
+    file.
+    
+    You can also check the log file (services.log by default) for error
+    messages. Starting services with the -support command line option
+    will prevent it from running in the background will output the
+    messages written to the log file to the console as well. Please note that this
+    will also prevent 3rd party modules from loading and will put Anope into
+    debug mode.
+
+2.4) Whenever I start Anope, I get a message on my IRC server saying
+     "connection refused" or something similar, and Anope gives an error
+     message from the server saying "Closing Link: ...".
+
+    See section 3 of the INSTALL file.
+
+2.5) My IRC server is giving me messages like "Connection to
+     services.whatever.net[127.0.0.1] activated" and then "Access denied -- no
+     N line".  Why?
+
+    This is typically caused by including a port number in the C:line for
+    services, which tells your server to try to autoconnect to it (depending on
+    the class (Y:line) settings).  This is not what you want, because Anope
+    will connect to the server itself, but does not listen for servers to
+    connect to it.  The solution is to remove the port number from the C:line.
+
+2.6) When I say "/connect services.*", it doesn't work!
+
+    You cannot /connect services. When you start Anope, it will attempt to
+    connect to the server you specified in services.conf. Please see the answer
+    above for more information.
+
+2.7) Anope starts up okay, but if I try to register a nickname, it comes back
+     with "Sorry, registration failed."
+
+    Make sure you've selected the correct IRC server type in the configure
+    script; see section 3 of the INSTALL file for details.
+
+2.8) Anope reports (via /stats u or /msg OperServ STATS) a different number of
+     users online than I get from doing /lusers.
+
+    Anope doesn't count its own pseudo-clients (NickServ, ChanServ, etc.) in
+    its user count, while the IRC server does.
+
+3) BotServ
+
+3.1) How do I add bots to BotServ?
+
+    Read /msg BotServ HELP and /msg BotServ HELP BOT. Note that you need to be
+    opered up and identified as a Services Administrator in Anope before you
+    can use the BOT command.
+
+3.2) Why do kick triggers and fantasy commands fail to work with my Bahamut
+     IRCd?
+
+    Bahamut allows you to setup a server as 'serviceshub'. This will filter
+    certain data that services usually don't need to process. This option also
+    filters channel messages, because DALnet's services have no use for them.
+    Anope parses the channel messages for kick triggers and fantasy commands.
+    To make sure these work the server type of the hub they're linked to should
+    be simply 'hub' and not 'serviceshub'.
+
+
+4) ChanServ
+
+4.1) Anope's channel mode setting doesn't work.  I can't set modes with
+     OperServ, and every time ChanServ tries to set a mode, my server reverses
+     the change.
+
+    Make sure EVERY server on your network has a U: line for Services in
+    ircd.conf, for example:
+    
+        U:services.whatever.net:*:*
+
+4.2) Anope ignored the SET SUCCESSOR setting and deleted a channel when the
+     founder expired.
+
+    Normally, this is because the successor had too many channels registered.
+    In this case, you will see an entry in the log file like the following:
+    
+        [date] Successor (SuccessorNick) of channel #somechannel owns too many
+        channels, deleting channel #somechannel
+    
+    If you don't get a message like this or you can verify that the successor
+    wasn't running into the channel limit, please report it using the
+    bug-reporting procedure in section 6 of the README file.
+
+4.3) How to auto voice all those whom join my #channel?
+
+    Execute the following commands (/cs is an alias for /msg ChanServ):
+    
+        /cs set #channel secure off
+        /cs set #channel xop off
+        /cs levels #channel set AUTOVOICE -1
+
+4.4) Channel options like RESTRICTED or SECUREOPS don't work. What's wrong?
+
+    Make sure that you didn't put any of your normal IRCd's as a ULined server
+    in Anope. Some access checks for clients from ULined servers are skipped to
+    avoid fights between the ULined servers. This is usually only useful when
+    you have a statistics server connected to your network.
+
+5) OperServ
+
+5.1) Using the OperServ JUPE command results in server messages like  "Server
+     juped.server introduced by non-hub server services.my.net".
+
+    Services' uplink must have an H: line for Services in the ircd.conf file,
+    which looks something like:
+    
+        H:*::services.whatever.net
+
+5.2) When I add an AKILL, the users matching it don't get killed.
+
+    Use the AkillOnAdd configuration directive.
+
+5.3) Trying to use OperServ gives me "Access denied".
+
+     Check that you're opered on your IRCd (ie, moded +o)
+     Check that you're identified to a nickname listed within an opertype allowed to do the command you're trying.
+     Check whether you can use /msg operserv staff
+
+5.4) I can't get /OS UMODES and /OS SVSNICK to work!
+
+    You need to be a SuperAdmin to be able to use these commands.
+
+5.5) What is a Super-Admin? How does it work? Why might it not work?
+
+    SuperAdmin's have extra privileges, including being founder on all
+    channels. It must be activated on a per user basis and is only available to
+    Services Roots. It is set using OperServ and is not persistent. It only
+    works if SuperAdmin is not commented in the services configuration file,
+    which is commented out by default. Read /msg OperServ HELP SET SUPERADMIN
+    for further help.

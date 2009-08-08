@@ -380,7 +380,7 @@ class CommandBSBot : public Command
 
 			// ADD takes less params than CHANGE, so we need to take 6 if given and append it with a space to 5.
 			if (params.size() >= 6)
-				params[5] = params[5] + " " + params[6];
+				params[4] = params[4] + " " + params[5];
 
 			return this->DoAdd(u, params);
 		}

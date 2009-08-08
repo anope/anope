@@ -6127,12 +6127,10 @@ OPER_HELP_SET
 	Ändert globale Einstellungen der Services Optionen.
 	Diese Optionen lassen sich ändern:
 	
-	    READONLY   Nur-Lese Modus der Datenbank an
-	                      oder aus
+	    READONLY   Nur-Lese Modus der Datenbank an oder aus
 	    LOGCHAN    Zeigt Logmessages in einem Chan
 	    DEBUG      Debug-Modus der Services an oder aus
-	    NOEXPIRE   Auslauf-Modus der Services
-	                      an oder aus
+	    NOEXPIRE   Auslauf-Modus der Services an oder aus
 	    SUPERADMIN Den Super-Admin Modus an oder aus
 	    SQL        SQL-Modus an oder aus
 	    IGNORE     Ignore-Modus an oder aus

@@ -642,17 +642,6 @@ int init_secondary(int ac, char **av)
 						 strerror(openlog_errno));
 	}
 
-	/* Bring in our pseudo-clients */
-	introduce_user(NULL);
-
-	/* And hybrid needs Global joined in the logchan */
-	if (logchan && ircd->join2msg) {
-		/* XXX might desync */
-		ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
-	}
-
-	ircdproto->SendEOB();
-
 	/* Success! */
 	return 0;
 }

@@ -17,8 +17,6 @@
 BotInfo *statserv = NULL;
 CommandHash *cmdTable[MAX_CMD_HASH];
 
-int statserv_create(int argc, char **argv);
-
 class CommandSSHelp : public Command
 {
  public:
@@ -45,12 +43,14 @@ class SSMain : public Module
 
 		this->AddCommand(cmdTable, new CommandSSHelp(), MOD_HEAD);
 
-		if (servsock == -1)
+		statserv = findbot("StatServ");
+		if (!statserv)
 		{
-			ModuleManager::Attach(I_OnServerConnect, this);
+			alog("Creating SS");
+			statserv = new BotInfo("StatServ", ServiceUser, ServiceHost, "Stats Service");
 		}
-		else
-			statserv_create(0, NULL);
+		alog("Done creating SS");
+		statserv->cmdTable = cmdTable;
 	}
 
 	~SSMain()
@@ -70,18 +70,6 @@ class SSMain : public Module
 			ircdproto->SendQuit(statserv, "Quit due to module unload.");
 			delete statserv;
 		}
-	}
-
-	/** This hack is necessary to replace delayed loading, for now */
-	void OnServerConnect(Server *)
-	{
-		statserv = findbot("StatServ");
-		if (!statserv)
-		{
-			statserv = new BotInfo("StatServ", ServiceUser, ServiceHost, "Stats Service");
-			ircdproto->SendClientIntroduction("StatServ", ServiceUser, ServiceHost, "Stats Service", ircd->pseudoclient_mode, statserv->uid.c_str());
-		}
-		statserv->cmdTable = cmdTable;
 	}
 };
 

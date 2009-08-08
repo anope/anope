@@ -36,6 +36,11 @@ BotInfo::BotInfo(const char *nnick)
 		this->flags |= BI_NICKSERV;
 	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
 		this->flags |= BI_GLOBAL;
+
+	// If we're synchronised with the uplink already, call introduce_user() for this bot.
+	alog("serv_uplink is %p and status is %d", serv_uplink, serv_uplink ? serv_uplink->sync == SSYNC_DONE : 0);
+	if (serv_uplink && serv_uplink->sync == SSYNC_DONE)
+		ircdproto->SendClientIntroduction(this->nick, this->user, this->host, this->real, ircd->pseudoclient_mode, this->uid.c_str());
 }
 
 BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const char *nreal)
@@ -65,6 +70,11 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 		this->flags |= BI_NICKSERV;
 	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
 		this->flags |= BI_GLOBAL;
+
+	// If we're synchronised with the uplink already, call introduce_user() for this bot.
+	alog("serv_uplink is %p and status is %d", serv_uplink, serv_uplink ? serv_uplink->sync == SSYNC_DONE : 0);
+	if (serv_uplink && serv_uplink->sync == SSYNC_DONE)
+		ircdproto->SendClientIntroduction(this->nick, this->user, this->host, this->real, ircd->pseudoclient_mode, this->uid.c_str());
 }
 
 BotInfo::~BotInfo()

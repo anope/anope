@@ -11,6 +11,9 @@
 # Translated by chemical <chem@gmx.net>,shine <dh@shinewelt.de> bis 28.02.2003
 # - Solltest du irgendwelche Rechtschreibfehler oder sonstige
 #   Verbesserungsvorschläge haben, immer her damit!
+#
+# INFO ::: Letzte Änderung:	08.08.2009	-- Han` -- Han@mefalcon.org --
+#
 ##########################################################################
 #
 # This program is free but copyrighted software; see the file COPYING for
@@ -46,13 +49,6 @@
 # Finally, remember to put a tab at the beginning of every line of text
 # (including empty lines).  This has to be a tab, not spaces.
 ##########################################################################
-#
-# INFO ::: Letzte Änderung:	28.07.2009	-- Han` -- Han@mefalcon.org --
-#
-##########################################################################
-
-
-###########################################################################
 #
 # Name of this language
 #
@@ -790,7 +786,7 @@ NICK_INFO_EMAIL
 NICK_INFO_VHOST
 	                   vHost: %s
 NICK_INFO_VHOST2
-	            	vHost: %s@%s
+	                 vHost: %s@%s
 NICK_INFO_ICQ
 	                   ICQ #: %d
 NICK_INFO_GREET
@@ -2621,7 +2617,7 @@ OPER_SVSNICK_NEWNICK
 OPER_ADMIN_SYNTAX
 	ADMIN {ADD|DEL|LIST|CLEAR} [Nickname | entry-liste]
 OPER_ADMIN_SKELETON
-	Services sind im Basis-Modus. Das ADMIN-Befehl ist nicht verfügbar.	
+	Services sind im Basis-Modus. Der ADMIN-Befehl ist nicht verfügbar.
 OPER_ADMIN_EXISTS
 	%s existiert bereits auf der Services Administratoren-Liste.
 OPER_ADMIN_REACHED_LIMIT
@@ -3245,7 +3241,7 @@ OPER_HELP_STAFF
 OPER_HELP_DEFCON
 	Syntax: DEFCON [1|2|3|4|5]
 
-	Das Defcon-System kann benutzt werden, um vordefinierte	Einstellung  
+	Das Defcon-System kann benutzt werden, um vordefinierte Einstellung
 	von einschränkungen der Services einzubinden - nützlich während 
 	versuchter Angriffe auf das Netzwerk.
 
@@ -3766,7 +3762,7 @@ NICK_HELP_SET_GREET
 	gesendet, wenn du in einen Channel eintrittst, der
 	die GREET Option eingeschaltet hat. Vorausgesetzt
 	du hast den nötigen Zugriffslevel in der Access-Liste
-	des Channels. 	
+	des Channels.
 
 NICK_HELP_SET_KILL
 	Syntax: SET KILL {ON | QUICK | IMMED | OFF}
@@ -4116,7 +4112,7 @@ NICK_HELP_ALIST
 NICK_HELP_GLIST
 	Syntax: GLIST
 	
-	Zeigt alle Nicknamen die in deiner Gruppe enthalten sind.	
+	Zeigt alle Nicknamen die in deiner Gruppe enthalten sind.
 	
 NICK_HELP_STATUS
 	Syntax: STATUS Nickname
@@ -4428,7 +4424,7 @@ CHAN_HELP_REGISTER
 	einstellst, erlaubt es später anderen Änderungen 
 	am Channel durchzuführen.Der letzte Parameter, der 
 	angegeben werden MUSS,sollte eine allgemeine 
-	Beschreibung des Channels bzw dessen Zweck beinhalten.	
+	Beschreibung des Channels bzw dessen Zweck beinhalten.
 	
 	Wenn du einen Channel registrierst, wird dein Nickname
 	als Founder (Gründer) eingetragen. Der Channel-Founder 
@@ -4441,7 +4437,7 @@ CHAN_HELP_REGISTER
 	
 	Hinweis: Für das Registrieren eines Channels musst du 
 	einen registrierten und identifizierten Nickname benutzen. 
-	Hast du dies noch nicht getan, tippe %R%s HELP REGISTER 
+	Hast du dies noch nicht getan, tippe %R%s HELP REGISTER
 	um weitere Informationen darüber zu erhalten.
 
 CHAN_HELP_IDENTIFY
@@ -4605,7 +4601,7 @@ CHAN_HELP_SET_MLOCK
 	
 	Die Modes die gelockt werden können sind von dein IRCD abhängig.
 	Jede einzelne dieser Modes kann ein/aus oder gar nicht gelockt werden. 
-	Der Modi Parameter ist genauso aufgebaut wie das jeweilige /MODE Befehl. 
+	Der Modi Parameter ist genauso aufgebaut wie das jeweilige /MODE Befehl.
 	Dies bedeutet, Modi die durch ein + gekennzeichnet sind, sind aktiviert,
 	durch ein - sind sie deaktiviert.
 	
@@ -5311,7 +5307,7 @@ CHAN_SERVADMIN_HELP_DROP
 	
 	Entfernt die Registrierung des angegebenen Channels aus
 	der Datenbank. Zusätzlich werden Zugriffslisten, 
-	Einstellungen usw mit aus der Datenbank entfernt.	
+	Einstellungen usw mit aus der Datenbank entfernt.
 	
 	Nur Services Administratoren können Channel DROPEN, 
 	(löschen) ohne sich vorher gegenüber dem Channel als 
@@ -5726,7 +5722,7 @@ OPER_HELP_CMD_SHUTDOWN
 OPER_HELP_CMD_DEFCON
 	    DEFCON        Ändert das  DefCon System
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL      AKILL alle User des angegebenen  Channels
+	    CHANKILL      Setzt einen AKILL auf alle User des angegebenen Channels.
 OPER_HELP_CMD_OLINE
 	    OLINE         Einem User "Operflags" setzen
 OPER_HELP_CMD_UMODE
@@ -6132,13 +6128,13 @@ OPER_HELP_SET
 	Diese Optionen lassen sich ändern:
 	
 	    READONLY   Nur-Lese Modus der Datenbank an
-	                 oder aus
+	                      oder aus
 	    LOGCHAN    Zeigt Logmessages in einem Chan
 	    DEBUG      Debug-Modus der Services an oder aus
 	    NOEXPIRE   Auslauf-Modus der Services
-	                 an oder aus
+	                      an oder aus
 	    SUPERADMIN Den Super-Admin Modus an oder aus
-	    SQL   	 SQL-Modus an oder aus
+	    SQL        SQL-Modus an oder aus
 	    IGNORE     Ignore-Modus an oder aus
 	    LIST       Optionen-Liste
 
@@ -6295,7 +6291,7 @@ OPER_HELP_RESTART
 	
 	Die Services werden sich bei diesem Befehl beenden,
 	die Datenbanken speichern, und danach neustarten
-	(die ausführbare Datei erneut aufrufen).	
+	(die ausführbare Datei erneut aufrufen).
 
 OPER_HELP_CHANLIST
 	Syntax: CHANLIST [{Muster | Nickname} [SECRET]]

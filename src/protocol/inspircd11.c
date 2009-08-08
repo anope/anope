@@ -1299,6 +1299,12 @@ int anope_event_capab(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
+int anope_event_endburst(const char *source, int ac, const char **av)
+{
+	finish_sync(serv_uplink, 1);
+	return MOD_CONT;
+}
+
 
 void moduleAddIRCDMsgs() {
 	Message *m;
@@ -1306,6 +1312,7 @@ void moduleAddIRCDMsgs() {
 	updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
 	updateOwnerDetails("OWNER", "DEOWNER", ircd->ownerset, ircd->ownerunset);
 
+	m = createMessage("ENDBURST",  anope_event_endburst); addCoreMessage(IRCD, m);
 	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
 	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
 	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);

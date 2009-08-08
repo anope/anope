@@ -157,9 +157,12 @@ void save_databases()
 /*************************************************************************/
 
 /* Restarts services */
-
-static void services_restart()
+void do_restart_services()
 {
+	if (!readonly) {
+		expire_all();
+		save_databases();
+	}
 	alog("Restarting");
 
 	FOREACH_MOD(I_OnPreRestart, OnPreRestart());
@@ -179,20 +182,6 @@ static void services_restart()
 		log_perror("Restart failed");
 		close_log();
 	}
-}
-
-/*************************************************************************/
-/**
- * Added to allow do_restart from operserv access to the static functions without making them
- * fair game to every other function - not exactly ideal :|
- **/
-void do_restart_services()
-{
-	if (!readonly) {
-		expire_all();
-		save_databases();
-	}
-	services_restart();
 	exit(1);
 }
 

@@ -521,7 +521,6 @@ struct ircdvars_ {
 	int supporthelper;			/* +h helper umodes */
 	int p10;					/* ircd is P10  */
 	char *nickchars;			/* character set */
-	int sync;					/* reports sync state */
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
 							 * 0 for no support, 1 for strict cidr support, anything else
 							 * for ircd specific support (nefarious only cares about first /mask) */
@@ -807,9 +806,8 @@ typedef struct {
 /* Server data */
 
 typedef enum {
-	SSYNC_UNKNOWN	   = 0,	/* We can't get the sync state   */
-	SSYNC_IN_PROGRESS   = 1,	/* Sync is currently in progress */
-	SSYNC_DONE		  = 2		/* We're in sync				 */
+	SSYNC_IN_PROGRESS   = 0,	/* Sync is currently in progress */
+	SSYNC_DONE		  = 1		/* We're in sync				 */
 } SyncState;
 
 struct server_ {

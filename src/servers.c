@@ -137,10 +137,8 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 	} else {
 		serv->suid = NULL;
 	}
-	if (ircd->sync)
-		serv->sync = SSYNC_IN_PROGRESS;
-	else
-		serv->sync = SSYNC_UNKNOWN;
+
+	serv->sync = SSYNC_IN_PROGRESS;
 	serv->links = NULL;
 	serv->prev = NULL;
 
@@ -539,7 +537,7 @@ int is_ulined(const char *server)
  */
 int is_sync(Server * server)
 {
-	if ((server->sync == SSYNC_DONE) || (server->sync == SSYNC_UNKNOWN))
+	if (server->sync == SSYNC_DONE)
 		return 1;
 	return 0;
 }

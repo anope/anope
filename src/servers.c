@@ -155,19 +155,24 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 			server_uplink->links->prev = serv;
 		server_uplink->links = serv;
 	}
+
 	/* Check if this is our uplink server */
-	if ((server_uplink == me_server) && !(flags & SERVER_JUPED)) {
+	if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
+	{
+		// XXX: Apparantly we set ourselves as serv_uplink before we (really) set the uplink when we recieve SERVER. This is wrong and ugly.
+		if (serv_uplink != NULL)
+		{
+			/* Bring in our pseudo-clients */
+			introduce_user(NULL);
+
+			/* And hybrid needs Global joined in the logchan */
+			if (logchan && ircd->join2msg) {
+				/* XXX might desync */
+				ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
+			}
+		}
 		serv_uplink = serv;
 		serv->flags |= SERVER_ISUPLINK;
-
-		/* Bring in our pseudo-clients */
-		introduce_user(NULL);
-
-		/* And hybrid needs Global joined in the logchan */
-		if (logchan && ircd->join2msg) {
-			/* XXX might desync */
-			ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
-		}
 	}
 
 	return serv;

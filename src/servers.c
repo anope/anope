@@ -159,6 +159,15 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 	if ((server_uplink == me_server) && !(flags & SERVER_JUPED)) {
 		serv_uplink = serv;
 		serv->flags |= SERVER_ISUPLINK;
+
+		/* Bring in our pseudo-clients */
+		introduce_user(NULL);
+
+		/* And hybrid needs Global joined in the logchan */
+		if (logchan && ircd->join2msg) {
+			/* XXX might desync */
+			ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
+		}
 	}
 
 	return serv;
@@ -589,21 +598,12 @@ void finish_sync(Server * serv, int sync_links)
 
 	if (serv == serv_uplink)
 	{
-		/* Bring in our pseudo-clients */
-		introduce_user(NULL);
-
-		/* And hybrid needs Global joined in the logchan */
-		if (logchan && ircd->join2msg) {
-			/* XXX might desync */
-			ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
-		}
-
 		ircdproto->SendEOB();
 	}
 
 	/* Do some general stuff which should only be done once */
 	// XXX: this doesn't actually match the description. finish_sync(), depending on the ircd, can be called multiple times
-	// Perhaps this belongs in the above if?
+	// Perhaps this should be done if serv == serv_uplink?
 	restore_unsynced_topics();
 	alog("Server %s is done syncing", serv->name);
 }

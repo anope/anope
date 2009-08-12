@@ -64,6 +64,8 @@ class CommandNSConfirm : public Command
 		if (nr->email)
 			na->nc->email = sstrdup(nr->email);
 
+		SetOperType(na->nc);
+
 		if (!force)
 		{
 			u->nc = na->nc;

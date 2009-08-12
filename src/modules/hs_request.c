@@ -342,7 +342,7 @@ class HSListBase : public Command
 		char buf[BUFSIZE];
 		int counter = 1;
 		int from = 0, to = 0;
-		int display_counter = 0;
+		unsigned display_counter = 0;
 		HostCore *current;
 
 		current = hs_request_head;
@@ -772,7 +772,7 @@ class HSRequest : public Module
 	}
 };
 
-void my_memo_lang(User *u, const char *name, int z, int number, ...)
+void my_memo_lang(User *u, char *name, int z, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -835,7 +835,7 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 		{
 			std::string nick = it->first;
-			my_memo_lang(u, nick.c_str(), z, LNG_REQUEST_MEMO, host);
+			my_memo_lang(u, const_cast<char *>(nick.c_str()), z, LNG_REQUEST_MEMO, host);
 		}
 	}
 	if (HSRequestMemoSetters == 1)

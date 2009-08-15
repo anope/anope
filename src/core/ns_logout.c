@@ -37,23 +37,18 @@ class CommandNSLogout : public Command
 			this->OnSyntaxError(u);
 		else if (!(u2 = (nick ? finduser(nick) : u)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (!(na = findnick(u2->nick)))
-		{
-			if (nick)
-				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-			else
-				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
-		}
 		else if (nick && u2->nc && !u2->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
 		else
 		{
+			na = findnick(u2->nick);
+
 			if (nick && !param.empty() && param == "REVALIDATE")
 			{
 				cancel_user(u2);
 				validate_user(u2);
 			}
-			else
+			else if (na)
 			{
 				na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
 			}
@@ -80,7 +75,7 @@ class CommandNSLogout : public Command
 				notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
 			/* Clear any timers again */
-			if (u->nc->flags & NI_KILLPROTECT)
+			if (na && u->nc->flags & NI_KILLPROTECT)
 				del_ns_timeout(na, TO_COLLIDE);
 
 			ircdproto->SendAccountLogout(u2, u2->nc);

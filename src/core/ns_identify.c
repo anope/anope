@@ -44,7 +44,11 @@ class CommandNSIdentify : public Command
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->flags & NI_SUSPENDED)
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (nick_identified(u))
+		/* You can now identify for other nicks without logging out first,
+		 * however you can not identify again for the group you're already
+		 * identified as
+		 */
+		else if (u->nc && u->nc == na->nc)
 			notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
 		else if (!(res = enc_check_password(pass, na->nc->pass)))
 		{
@@ -56,6 +60,11 @@ class CommandNSIdentify : public Command
 			notice_lang(s_NickServ, u, NICK_IDENTIFY_FAILED);
 		else
 		{
+			if (nick_identified(u))
+			{
+				alog("%s: %s!%s@%s logged out of account %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nc->display);
+			}
+
 			if (!(na->status & NS_IDENTIFIED) && !(na->status & NS_RECOGNIZED))
 			{
 				if (na->last_usermask)

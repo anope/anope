@@ -730,8 +730,15 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (!nc_changed)
 			{
 				NickAlias *tmpcore = findnick(user->nick);
+
 				if (tmpcore)
 					tmpcore->status |= status;
+
+				/* If the new nick isnt registerd or its registerd and not yours */
+				if (!tmpcore || (old_na && tmpcore->nc != old_na->nc))
+				{
+					ircdproto->SendUnregisteredNick(user);
+				}
 			}
 			else
 			{
@@ -757,7 +764,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		nc_changed = 0;
 	}
 
-	if (nc_changed || !nick_recognized(user))
+	if (!ntmp || ntmp->nc != user->nc || nc_changed)
 	{
 		if (validate_user(user))
 			check_memos(user);

@@ -1,6 +1,6 @@
 # Italian language file.
 #
-# (C) 2003-2008 Anope Team
+# (C) 2003-2009 Anope Team
 # Contact us at team@anope.org
 #
 # Please read COPYING and README for further details.
@@ -167,7 +167,7 @@ READ_ONLY_MODE
 PASSWORD_INCORRECT
 	Password errata.
 INVALID_TARGET
-	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
+	"/msg %s" non è più supportato. Usa "/msg %s@%s" o "/%s".
 
 ACCESS_DENIED
 	Accesso negato.
@@ -175,7 +175,7 @@ ACCESS_DENIED
 MORE_OBSCURE_PASSWORD
 	Per favore, prova di nuovo con una password più oscura. Le password devono essere lunghe almeno 5 caratteri, non devono essere indovinate facilmente (ad es. il proprio nome o nick), e non possono contenere i caratteri di spazio e di tabulazione.
 PASSWORD_TOO_LONG
-	Your password is too long. Please try again with a shorter password.
+	La tua password è troppo lunga. Riprova con una password piu corta.
 
 NICK_NOT_REGISTERED
 	Il tuo nick non è registrato.
@@ -278,20 +278,14 @@ EXPIRES_1D
 
 # Generic Footer message
 END_OF_ANY_LIST
-	End of %s list.
+	Fine della lista %s.
 
-###########################################################################
-#
-# NickServ messages
-#
-###########################################################################
-
-# Automatic messages
+# Generic List error messages
 LIST_INCORRECT_RANGE
-	Incorrect range specified. The correct syntax is #from-to.
+	Intervallo specificato erroneo. La sintassi corretta è #da-a.
 CS_LIST_INCORRECT_RANGE
-	To search for channels starting with #, search for the channel
-	name without the #-sign prepended (anope instead of #anope).
+	Per cercare canali che cominciano con #, cerca il nome del canale
+	senza il segno # (anope invece di #anope).
 
 ###########################################################################
 #
@@ -529,9 +523,9 @@ NICK_SET_MSG_OFF
 NICK_SET_AUTOOP_SYNTAX
 	SET AUTOOP {ON | OFF}
 NICK_SET_AUTOOP_ON
-	Services will now autoop you in channels.
+	I servizi ti opperanno automaticamente nei canali.
 NICK_SET_AUTOOP_OFF
-	Services will no longer autoop you in channels.
+	I servizi non ti opperanno più automaticamente nei canali.
 
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
@@ -659,17 +653,17 @@ NICK_SASET_NOEXPIRE_OFF
 NICK_SASET_AUTOOP_SYNTAX
 	SASET nickname AUTOOP {ON | OFF}
 NICK_SASET_AUTOOP_ON
-	Services will now autoop %s in channels.
+	I servizi opperanno %s automaticamente nei canali.
 NICK_SASET_AUTOOP_OFF
-	Services will no longer autoop %s in channels.
+	I servizi non opperanno più %s automaticamente nei canali.
 
 # SASET LANGUAGE responses
 NICK_SASET_LANGUAGE_SYNTAX
-	SASET nickname LANGUAGE number
+	SASET nickname LANGUAGE numero
 NICK_SASET_LANGUAGE_UNKNOWN
-	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
+	Numero di lingua %d sconosciuto. Digita %R%s HELP SET LANGUAGE per la lista delle lingue.
 NICK_SASET_LANGUAGE_CHANGED
-	Language changed to Italian.
+	Lingua cambiata in Italiano.
 
 
 # ACCESS responses
@@ -710,7 +704,7 @@ NICK_INFO_SYNTAX
 NICK_INFO_REALNAME
 	%s è %s
 NICK_INFO_SERVICES_OPERTYPE
-	%s is a services operator of type %s.
+	%s è un services operator di tipo %s.
 NICK_INFO_ADDRESS
 	     Ultimo indirizzo usato: %s
 NICK_INFO_ADDRESS_ONLINE
@@ -1016,7 +1010,7 @@ CHAN_NOT_ALLOWED_TO_JOIN
 
 # REGISTER responses
 CHAN_X_INVALID
-	Channel %s is not a valid channel.
+	Il canale %s non è un canale valido.
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
@@ -1065,9 +1059,9 @@ CHAN_LOGOUT_SUCCEEDED
 CHAN_LOGOUT_ALL_SUCCEEDED
 	Tutti gli utenti non sono più identificati per il canale %s (except the channel founder).
 CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
+	Non puoi eseguire il logout da %s (sei founder).
 CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
+	%s non è stato loggato in %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1255,7 +1249,7 @@ CHAN_XOP_ACCESS
 	Questo comando non è utilizzabile; usa il comando ACCESS.
 	Digita %R%s HELP ACCESS per avere maggiori informazioni.
 CHAN_XOP_NOT_AVAILABLE
-	xOP system is not available.
+	Il sistema xOP non è disponibile.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1388,9 +1382,9 @@ CHAN_ACCESS_XOP
 	Questo comando non è utilizzabile; usa i comandi SOP, AOP, HOP e VOP.
 	Digita %R%s HELP comando per ottenere maggiori informazioni.
 CHAN_ACCESS_XOP_HOP
-	You can't use this command. 
-	Use the AOP, SOP, HOP and VOP commands instead.
-	Type %R%s HELP command for more information.
+	Non puoi utilizzare questo comando.
+	Utilizza invece i comandi AOP, SOP, HOP e VOP.
+	Digita %R%s HELP comando per maggiori informazioni.
 CHAN_ACCESS_DISABLED
 	Spiacente, la modifica della lista di accesso dei canali è temporaneamente disabilitata.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1503,7 +1497,7 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS channel item
+	STATUS canale elemento
 CHAN_STATUS_NOT_REGGED
 	STATUS ERROR Il canale %s non è registrato
 CHAN_STATUS_FORBIDDEN
@@ -1593,9 +1587,9 @@ CHAN_LIST_END
 CHAN_INVITE_SYNTAX
 	INVITE canale
 CHAN_INVITE_ALREADY_IN
-	You are already in %s! 
+	Sei già in %s! 
 CHAN_INVITE_SUCCESS
-	You have been invited to %s.
+	Sei stato invitato in %s.
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
@@ -1641,7 +1635,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	Il canale %s non ha una key.
 CHAN_GETKEY_KEY
-	Key for channel %s is %s.
+	La key per il canale %s è %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX

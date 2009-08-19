@@ -712,7 +712,7 @@ NICK_SASET_LANGUAGE_SYNTAX
 NICK_SASET_LANGUAGE_UNKNOWN
 	Bilinmeyen dil numarasý %d.  Lütfen %R%s HELP SET LANGUAGE komutu ile diller ve kodlarý hakkýnda bilgi alýnýz.
 NICK_SASET_LANGUAGE_CHANGED
-	Diliniz Türkçe olarak ayarlandý.
+	Language for %s changed to %s.
 
 
 # ACCESS responses

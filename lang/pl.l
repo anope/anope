@@ -882,7 +882,7 @@ NICK_SASET_LANGUAGE_UNKNOWN
 	Napisz %R%s HELP SET LANGUAGE, aby uzyskaæ listê dostêpnych jêzyków.
 
 NICK_SASET_LANGUAGE_CHANGED
-	Jêzyk zosta³ zmieniony na Polski.
+	Language for %s changed to %s.
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX

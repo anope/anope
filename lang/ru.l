@@ -694,7 +694,7 @@ NICK_SASET_LANGUAGE_SYNTAX
 NICK_SASET_LANGUAGE_UNKNOWN
 	языка под номером %d не существует. —писок доступных €зыков: %R%s HELP SET LANGUAGE.
 NICK_SASET_LANGUAGE_CHANGED
-	язык дл€ указанного ника изменен на –усский.
+	Language for %s changed to %s.
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX

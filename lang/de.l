@@ -721,7 +721,7 @@ NICK_SASET_LANGUAGE_UNKNOWN
 	Unbekannte Sprachen-Nummer %d. 
 	Tippe %R%s HELP SET LANGUAGE um eine Liste aller verfügbaren Sprachen zu erhalten.
 NICK_SASET_LANGUAGE_CHANGED
-	Sprache wurde geändert zu Deutsch.
+	Language for %s changed to %s.
 
 
 # ACCESS responses

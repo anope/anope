@@ -525,7 +525,7 @@ int do_saset_language(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
     nc->language = langlist[langnum];
-    notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
+    notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED, nc->display, getstring2(nc, LANG_NAME));
 
     return MOD_CONT;
 }

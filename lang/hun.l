@@ -704,7 +704,7 @@ NICK_SASET_LANGUAGE_SYNTAX
 NICK_SASET_LANGUAGE_UNKNOWN
 	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
 NICK_SASET_LANGUAGE_CHANGED
-	Language changed to Hungarian.
+	Language for %s changed to %s.
 
 
 # ACCESS responses

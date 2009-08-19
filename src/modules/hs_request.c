@@ -693,7 +693,7 @@ class HSRequest : public Module
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
-		if (service == s_HostServ)
+		if (s_HostServ && service == s_HostServ)
 		{
 			if (command == "LIST")
 			{

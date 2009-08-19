@@ -162,7 +162,7 @@ class CommandBSSet : public Command
 		else if (subcommand == "GREET")
 			notice_help(s_BotServ, u, BOT_HELP_SET_GREET);
 		else if (subcommand == "SYMBIOSIS")
-		notice_lang(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS);
+		notice_lang(s_BotServ, u, BOT_HELP_SET_SYMBIOSIS, s_ChanServ);
 		else if (subcommand == "NOBOT")
 			notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_SET_NOBOT);
 		else if (subcommand == "PRIVATE")

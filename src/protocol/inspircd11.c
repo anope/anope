@@ -678,13 +678,12 @@ class InspIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		int *c;
-		char svidbuf[15];
+		char svidbuf[15], *c;
 
 		if (!u->nc)
 			return;
 
-		snprintf(svidbuf, sizeof(svidbuf), "%ld", u->timestamp);
+		snprintf(svidbuf, sizeof(svidbuf), "%ld", static_cast<long>(u->timestamp));
 
 		if (u->nc->GetExt("authenticationtoken", c))
 		{

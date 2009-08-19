@@ -18,6 +18,9 @@ Legend:
 [x] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
 
 Outstanding issues:
+- Correct CMake's auto-library search
+- Check Autotools build system to make sure it still works
+- Add some events that were not present before but useful for future versions
 
 1.9.2
 -----
@@ -44,10 +47,10 @@ Future
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] Add support for +k, +q, etc type umodes
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
-	[ ] burn do_sjoin with fire
+  [ ] burn do_sjoin with fire
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [ ] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
-	the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
+    the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
 [ ] generic database routines modules can use to create their own database
 [ ] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
 [?] a way for a module to queue itself (or even another module) for unloading

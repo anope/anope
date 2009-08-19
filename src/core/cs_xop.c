@@ -307,7 +307,7 @@ class XOPBase : public Command
 			process_numlist(nick, NULL, xop_list_callback, u, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
 		else
 		{
-			for (int i = 0; i < ci->access.size(); ++i)
+			for (unsigned i = 0; i < ci->access.size(); ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
 				if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))

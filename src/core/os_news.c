@@ -84,8 +84,7 @@ struct newsmsgs msgarray[] = {
 
 static int *findmsgs(int16 type, const char **type_name)
 {
-	int i;
-	for (i = 0; i < lenof(msgarray); i++) {
+	for (unsigned i = 0; i < lenof(msgarray); i++) {
 		if (msgarray[i].type == type) {
 			if (type_name)
 				*type_name = msgarray[i].name;
@@ -151,7 +150,7 @@ class NewsBase : public Command
 	CommandReturn DoDel(User *u, std::vector<ci::string> &params, short type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
-		int i, num;
+		int num;
 
 		if (!text)
 			this->OnSyntaxError(u);
@@ -169,7 +168,7 @@ class NewsBase : public Command
 				{
 					notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
 					/* Reset the order - #0000397 */
-					for (i = 0; i < nnews; ++i)
+					for (int i = 0; i < nnews; ++i)
 					{
 						if (news[i].type == type && news[i].num > num)
 							--news[i].num;

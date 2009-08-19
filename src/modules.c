@@ -187,7 +187,6 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 	CommandHash *current = NULL;
 	CommandHash *newHash = NULL;
 	CommandHash *lastHash = NULL;
-	Command *tail = NULL;
 
 	if (!cmdTable || !c || (pos < 0 || pos > 2)) {
 		return MOD_ERR_PARAMS;

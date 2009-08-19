@@ -39,7 +39,7 @@ class CommandNSAList : public Command
 
 		int min_level = 0;
 		int is_servadmin = u->nc->IsServicesOper();
-		int lev_param = 0;
+		unsigned lev_param = 0;
 
 		if (!is_servadmin)
 			/* Non service admins can only see their own levels */

@@ -41,12 +41,12 @@ class NickServCollide : public Timer
 {
   public:
 	NickAlias *na;
-	
+
 	NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 	{
 		NickServCollides.insert(std::make_pair(nickalias, this));
 	}
-	
+
 	void Tick(time_t ctime)
 	{
 		/* If they identified or don't exist anymore, don't kill them. */
@@ -58,7 +58,7 @@ class NickServCollide : public Timer
 		 * triggered yet anyway. */
 		collide(na, 1);
 	}
-	
+
 	static void ClearTimers(NickAlias *na)
 	{
 		std::map<NickAlias *, NickServCollide *>::iterator i = NickServCollides.find(na);
@@ -79,12 +79,12 @@ class NickServRelease : public Timer
   public:
 	NickAlias *na;
 	std::string uid;
-	
+
 	NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 	{
 		NickServReleases.insert(std::make_pair(nickalias, this));
 	}
-	
+
 	void Tick(time_t ctime)
 	{
 		if (ircd->svshold)
@@ -100,21 +100,21 @@ class NickServRelease : public Timer
 		}
 		na->status &= ~NS_KILL_HELD;
 	}
-	
+
 	static void ClearTimers(NickAlias *na, bool dorelease = false)
 	{
 		std::map<NickAlias *, NickServRelease *>::iterator i = NickServReleases.find(na);
 		NickServRelease *t;
-		
+
 		if (i != NickServReleases.end())
 		{
 			t = i->second;
 
 			NickServReleases.erase(i);
-		
+
 			if (dorelease)
 				release(na, 1);
-		
+
 			TimerManager::DelTimer(t);
 		}
 	}
@@ -164,7 +164,7 @@ void get_aliases_stats(long *nrec, long *memuse)
 void get_core_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	int i, j;
+	unsigned i, j;
 	NickCore *nc;
 
 	for (i = 0; i < 1024; i++)
@@ -303,7 +303,8 @@ void load_ns_req_db()
 void load_ns_dbase()
 {
 	dbFILE *f;
-	int ver, i, j, c;
+	int ver, c;
+	unsigned i, j;
 	NickAlias *na, **nalast, *naprev;
 	NickCore *nc, **nclast, *ncprev;
 	int failed = 0;
@@ -487,7 +488,7 @@ void load_ns_dbase()
 void save_ns_dbase()
 {
 	dbFILE *f;
-	int i, j;
+	unsigned i, j;
 	NickAlias *na;
 	NickCore *nc;
 	static time_t lastwarn = 0;
@@ -936,7 +937,7 @@ NickCore *findcore(const char *nick)
 
 int is_on_access(User * u, NickCore * nc)
 {
-	int i;
+	unsigned i;
 	char *buf;
 	char *buf2 = NULL;
 
@@ -1117,7 +1118,7 @@ void change_core_display(NickCore * nc)
 
 static int delcore(NickCore * nc)
 {
-	int i;
+	unsigned i;
 	User *user;
 
 	FOREACH_MOD(I_OnDelCore, OnDelCore(nc));
@@ -1324,7 +1325,7 @@ void release(NickAlias * na, int from_timeout)
 		NickServRelease::ClearTimers(na);
 
 	if (ircd->svshold)
-	{ 
+	{
 		ircdproto->SendSVSHoldDel(na->nick);
 	}
 	else
@@ -1361,7 +1362,7 @@ void SetOperType(NickCore *nc)
 			/* Nonexistant nick */
 			continue;
 		}
-		
+
 		if (na->nc == nc)
 		{
 			 for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); ++tit)

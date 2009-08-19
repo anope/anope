@@ -460,10 +460,9 @@ class CommandCSSet : public Command
 	{
 		if (stricmp(param, "ON") == 0) {
 			if (!(ci->flags & CI_XOP)) {
-				int i;
 				ChanAccess *access;
 
-				for (i = 0; i < ci->access.size(); i++) {
+				for (unsigned i = 0; i < ci->access.size(); i++) {
 					access = ci->GetAccess(i);
 					if (!access->in_use)
 						continue;

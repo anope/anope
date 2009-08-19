@@ -902,14 +902,13 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		int *c;
-		char svidbuf[15];
+		char svidbuf[15], *c;
 
 		if (!u->nc)
 			return;
 
 		srand(time(NULL));
-		snprintf(svidbuf, sizeof(svidbuf), "%i", rand());
+		snprintf(svidbuf, sizeof(svidbuf), "%d", rand());
 
 		if (u->nc->GetExt("authenticationtoken", c))
 		{
@@ -1479,7 +1478,7 @@ class ProtoUnreal : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
-		
+
 		ModuleManager::Attach(I_OnDelCore, this);
 	}
 

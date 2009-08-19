@@ -27,7 +27,7 @@ class CommandNSStatus : public Command
 	{
 		User *u2;
 		NickAlias *na = NULL;
-		int i = 0;
+		unsigned i = 0;
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 
 		/* If no nickname is given, we assume that the user

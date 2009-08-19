@@ -81,7 +81,7 @@ void memoserv(User * u, char *buf)
 void check_memos(User * u)
 {
 	NickCore *nc;
-	int i, newcnt = 0;
+	unsigned i, newcnt = 0;
 
 	if (!u) {
 		if (debug) {
@@ -254,7 +254,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (mi->memos.size() > 1) {
 			m->number = mi->memos[mi->memos.size() - 2]->number + 1;
 			if (m->number < 1) {
-				int i;
+				unsigned i;
 				for (i = 0; i < mi->memos.size(); i++) {
 					mi->memos[i]->number = i + 1;
 				}
@@ -333,7 +333,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
  */
 int delmemo(MemoInfo * mi, int num)
 {
-	int i;
+	unsigned i;
 	if (mi->memos.empty()) return 0;
 
 	for (i = 0; i < mi->memos.size(); i++) {

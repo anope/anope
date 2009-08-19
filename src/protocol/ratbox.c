@@ -688,8 +688,8 @@ class RatboxProto : public IRCDTS6Proto
 
 		if (!u->nc)
 			return;
-		
-		snprintf(svidbuf, sizeof(svidbuf), "%ld", u->timestamp);
+
+		snprintf(svidbuf, sizeof(svidbuf), "%ld", static_cast<long>(u->timestamp));
 
 		if (u->nc->GetExt("authenticationtoken", c))
 		{

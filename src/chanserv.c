@@ -132,12 +132,12 @@ class ChanServTimer : public Timer
 {
 	private:
 		std::string channel;
-	
+
 	public:
 		ChanServTimer(long delay, const std::string &chan) : Timer(delay), channel(chan)
 		{
 		}
-		
+
 		void Tick(time_t ctime)
 		{
 			ChannelInfo *ci = cs_findchan(channel.c_str());
@@ -214,7 +214,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 void get_chanserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	int i, j;
+	unsigned i, j;
 	ChannelInfo *ci;
 
 	for (i = 0; i < 256; i++) {
@@ -325,7 +325,8 @@ void chanserv(User * u, char *buf)
 void load_cs_dbase()
 {
 	dbFILE *f;
-	int ver, i, j, c;
+	int ver, c;
+	unsigned i, j;
 	ChannelInfo *ci, **last, *prev;
 	int failed = 0;
 
@@ -594,7 +595,7 @@ void load_cs_dbase()
 void save_cs_dbase()
 {
 	dbFILE *f;
-	int i, j;
+	unsigned i, j;
 	ChannelInfo *ci;
 	static time_t lastwarn = 0;
 
@@ -1133,7 +1134,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	if (user->isSuperAdmin == 1)
 		return 0;
 
-	/* We don't enforce services restrictions on clients on ulined services 
+	/* We don't enforce services restrictions on clients on ulined services
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
 	if (is_ulined(user->server->name)) {
 		return 0;
@@ -1214,7 +1215,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 		{
 			ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
 		}
-		
+
 		t = new ChanServTimer(CSInhabit, chan);
 		ci->flags |= CI_INHABIT;
 	}
@@ -1653,7 +1654,7 @@ ChannelInfo *makechan(const char *chan)
 
 int delchan(ChannelInfo * ci)
 {
-	int i;
+	unsigned i;
 	NickCore *nc;
 	User *u;
 	struct u_chaninfolist *cilist, *cilist_next;

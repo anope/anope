@@ -1014,7 +1014,7 @@ MDE void moduleDisplayHelp(const char *service, User *u);
 /*************************************************************************/
 /*************************************************************************/
 /* Command Managment Functions */
-Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
+MDE Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
 
 /*************************************************************************/
 

@@ -9,7 +9,7 @@
  *
  */
 
-class OperType
+class CoreExport OperType
 {
  private:
 	/** The name of this opertype, e.g. "sra".

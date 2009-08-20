@@ -1397,9 +1397,9 @@ class Anope
 /** Pair of nick/opertype lookup. It's stored like this currently, because config is parsed before db load.
  * XXX: It would be nice to not need this. UGH.
  */
-extern std::list<std::pair<std::string, std::string> > svsopers_in_config;
+E std::list<std::pair<std::string, std::string> > svsopers_in_config;
 /** List of available opertypes.
  */
-extern std::list<OperType *> MyOperTypes;
+E std::list<OperType *> MyOperTypes;
 
 #endif	/* SERVICES_H */

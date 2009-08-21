@@ -21,6 +21,7 @@ BotInfo::BotInfo(const char *nnick)
 	nbots++;
 	this->cmdTable = NULL;
 	this->flags = 0;
+	this->chancount = 0;
 
 	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
 		this->flags |= BI_CHANSERV;
@@ -55,6 +56,7 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	nbots++;
 	this->cmdTable = NULL;
 	this->flags = 0;
+	this->chancount = 0;
 
 	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
 		this->flags |= BI_CHANSERV;

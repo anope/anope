@@ -107,26 +107,14 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		bi = new BotInfo(nick);
-		if (!bi)
+		if (!(bi = new BotInfo(nick, user, host, real)))
 		{
 			notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
 			return MOD_CONT;
 		}
 
-		bi->user = sstrdup(user);
-		bi->host = sstrdup(host);
-		bi->real = sstrdup(real);
-		bi->created = time(NULL);
-		bi->flags = 0;
-		bi->chancount = 0;
-
 		/* We check whether user with this nick is online, and kill it if so */
 		EnforceQlinedNick(nick, s_BotServ);
-
-		/* We make the bot online, ready to serve */
-		ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
-				ircd->pseudoclient_mode, bi->uid.c_str());
 
 		notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
 			bi->host, bi->real);

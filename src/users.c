@@ -429,6 +429,7 @@ User *finduser(const char *nick)
 		user = user->next;
 	if (debug >= 3)
 		alog("debug: finduser(%s) -> 0x%p", nick, static_cast<void *>(user));
+	FOREACH_MOD(I_OnFindUser, OnFindUser(user));
 	return user;
 }
 
@@ -474,6 +475,7 @@ User *find_byuid(const char *uid)
 	while (u) {
 		next = next_uid();
 		if (u->GetUID() == uid) {
+			FOREACH_MOD(I_OnFindUser, OnFindUser(u));
 			return u;
 		}
 		u = next;

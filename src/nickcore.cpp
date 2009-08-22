@@ -68,6 +68,7 @@ void NickCore::EraseAccess(const std::string &entry)
 	for (unsigned i = 0; i < access.size(); ++i)
 		if (access[i] == entry)
 		{
+			FOREACH_MOD(I_OnNickEraseAccess, OnNickEraseAccess(this, entry));
 			access.erase(access.begin() + i);
 			break;
 		}

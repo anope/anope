@@ -185,7 +185,7 @@ HostCore *findHostCore(HostCore * phead, const char *nick, bool* found)
 	if (!nick) {
 		return NULL;
 	}
-
+	FOREACH_MOD(I_OnFindHostCore, OnFindHostCore(nick));
 	while (current != NULL) {
 		if (stricmp(nick, current->nick) == 0) {
 			*found = true;
@@ -258,6 +258,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 			newCore->next = tmp;
 		}
 	}
+	FOREACH_MOD(I_OnInsertHostCore, OnInsertHostCore(newCore));
 	return phead;
 }
 
@@ -274,6 +275,7 @@ HostCore *deleteHostCore(HostCore * phead, HostCore * prev)
 		tmp = prev->next;
 		prev->next = tmp->next;
 	}
+	FOREACH_MOD(I_OnDeleteHostCore, OnDeleteHostCore(tmp));
 	delete [] tmp->vHost;
 	delete [] tmp->nick;
 	delete [] tmp->creator;

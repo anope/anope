@@ -799,6 +799,10 @@ class CoreExport Module
 	 */
 	virtual void OnDefconLevel(int level) { }
 
+	/** Called on finduser()
+	 * @param u pointer to the user
+	 */
+	virtual void OnFindUser(User *u) { }
 	/** Called on findnick()
 	 * @param nick nickname to be searched for
 	 */
@@ -844,6 +848,28 @@ class CoreExport Module
 	 * @param nc pointer to the NickCore
 	 */
 	virtual void OnNickClearAccess(NickCore *nc) { }
+
+	/** called from NickCore::EraseAccess()
+	 * @param nc pointer to the NickCore
+	 * @param entry The access mask
+	 */
+	virtual void OnNickEraseAccess(NickCore *nc, const std::string &entry) { }
+
+	/** called when a HostCore is deleted 
+	 * @param hc pointer to the HostCore
+	 */
+	virtual void OnDeleteHostCore(HostCore *hc) { }
+
+	/** called on findHostCore
+	 * @param nick the name of the HostCore we are searching for
+	 */
+	virtual void OnFindHostCore(const std::string &nick) { }
+
+	/** called when a new HostCore is inserted
+	 * @param hc pointer to the HostCore
+	 */
+	virtual void OnInsertHostCore(HostCore *hc) { }
+
 };
 
 
@@ -855,8 +881,8 @@ enum Implementation
 		/* NickServ */
 		I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
-		I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
-		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess,
+		I_OnFindUser, I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
+		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickEraseAccess,
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
@@ -865,6 +891,9 @@ enum Implementation
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan,
+
+		/* HostServ */
+		I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,
 
 		/* Users */
 		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel,

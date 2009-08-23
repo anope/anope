@@ -24,7 +24,6 @@ class CommandOSRestart : public Command
 
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
-#ifdef SERVICES_BIN
 		quitmsg = new char[31 + strlen(u->nick)];
 		if (!quitmsg)
 			quitmsg = "RESTART command received, but out of memory!";
@@ -35,9 +34,6 @@ class CommandOSRestart : public Command
 			oper_global(NULL, "%s", GlobalOnCycleMessage);
 		/*	raise(SIGHUP); */
 		do_restart_services();
-#else
-		notice_lang(s_OperServ, u, OPER_CANNOT_RESTART);
-#endif
 		return MOD_CONT;
 	}
 

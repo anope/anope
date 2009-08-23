@@ -183,8 +183,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (nick_identified(this) ||
-			(!(this->nc->flags & NI_SECURE) && nick_recognized(this))))
+	if (na && (nick_identified(this) || (!this->nc || (this->nc && !(this->nc->flags & NI_SECURE) && nick_recognized(this)))))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;
@@ -591,7 +590,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 			delete [] logrealname;
 		}
-		
+
 		/* Allocate User structure and fill it in. */
 		user = new User(nick, uid ? uid : "");
 		user->SetIdent(username);

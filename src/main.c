@@ -43,6 +43,8 @@
 
 /* Command-line options: (note that configuration variables are in config.c) */
 std::string services_dir;	  /* -dir dirname */
+std::string services_bin;	/* Binary as specified by the user */
+std::string orig_cwd;		/* Original current working directory */
 const char *log_filename = LOG_FILENAME;	  /* -log filename */
 int debug = 0;				  /* -debug */
 int readonly = 0;			   /* -readonly */
@@ -175,8 +177,8 @@ void do_restart_services()
 	/* First don't unload protocol module, then do so */
 	modules_unload_all(false);
 	modules_unload_all(true);
-	chdir(binary_dir.c_str());
-	execve(SERVICES_BIN, my_av, my_envp);
+	chdir(orig_cwd.c_str());
+	execve(services_bin.c_str(), my_av, my_envp);
 	if (!readonly) {
 		open_log();
 		log_perror("Restart failed");
@@ -324,6 +326,7 @@ std::string GetFullProgDir(char *argv0)
 	if (GetModuleFileName(NULL, buffer, PATH_MAX))
 	{
 		std::string fullpath = buffer;
+		services_dir = fullpath.substr(orig_cwd.size() + 1);
 		std::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
 		return std::string(fullpath, 0, n);
 	}
@@ -336,10 +339,12 @@ std::string GetFullProgDir(char *argv0)
 		/* Does argv[0] start with /? If so, it's a full path, use it */
 		if (remainder[0] == '/')
 		{
+			services_bin = remainder.substr(orig_cwd.size() + 1);
 			std::string::size_type n = remainder.rfind("/" SERVICES_BIN);
 			return std::string(remainder, 0, n);
 		}
 
+		services_bin = remainder;
 		std::string fullpath = static_cast<std::string>(buffer) + "/" + remainder;
 		std::string::size_type n = fullpath.rfind("/" SERVICES_BIN);
 		return std::string(fullpath, 0, n);
@@ -365,6 +370,14 @@ int main(int ac, char **av, char **envp)
 	my_av = av;
 	my_envp = envp;
 
+	char cwd[PATH_MAX] = "";
+#ifdef _WIN32
+	GetCurrentDirectory(PATH_MAX, cwd);
+#else
+	getcwd(cwd, PATH_MAX);
+#endif
+	orig_cwd = cwd;
+
 #ifndef _WIN32
 	/* If we're root, issue a warning now */
 	if ((getuid() == 0) && (getgid() == 0)) {
@@ -377,7 +390,13 @@ int main(int ac, char **av, char **envp)
 #endif
 
 	binary_dir = GetFullProgDir(av[0]);
-	services_dir = binary_dir + "/../data";
+#ifdef _WIN32
+	std::string::size_type n = binary_dir.rfind("\\");
+	services_dir = binary_dir.substr(0, n) + "\\data";
+#else
+	std::string::size_type n = binary_dir.rfind("/");
+	services_dir = binary_dir.substr(0, n) + "/data";
+#endif
 
 	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
 	ModuleRunTimeDirCleanUp();
@@ -496,25 +515,20 @@ int main(int ac, char **av, char **envp)
 
 	/* Check for restart instead of exit */
 	if (save_data == -2) {
-#ifdef SERVICES_BIN
 		alog("Restarting");
 		if (!quitmsg)
 			quitmsg = "Restarting";
 		ircdproto->SendSquit(ServerName, quitmsg);
 		disconn(servsock);
 		close_log();
-		chdir(binary_dir.c_str());
-		execve(SERVICES_BIN, av, envp);
+		chdir(orig_cwd.c_str());
+		execve(services_bin.c_str(), av, envp);
 		if (!readonly) {
 			open_log();
 			log_perror("Restart failed");
 			close_log();
 		}
 		return 1;
-#else
-		quitmsg =
-			"Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
-#endif
 	}
 
 	/* Disconnect and exit */

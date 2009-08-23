@@ -2197,7 +2197,7 @@ int entry_match(Entry * e, char *nick, char *user, char *host, uint32 ip)
         && (!user || stricmp(e->user, user) != 0))
         return 0;
     if ((e->type & ENTRYTYPE_HOST)
-        && (!user || stricmp(e->host, host) != 0))
+        && (!host || stricmp(e->host, host) != 0))
         return 0;
     if ((e->type & ENTRYTYPE_NICK_WILD)
         && !match_wild_nocase(e->nick, nick))

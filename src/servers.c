@@ -227,7 +227,7 @@ static void delete_server(Server * serv, const char *quitreason)
 							(quitreason ? sstrdup(quitreason) : NULL);
 					}
 
-					if (LimitSessions) {
+					if (LimitSessions && !is_ulined(server)) {
 						del_session(u->host);
 					}
 					delete u;

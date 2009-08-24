@@ -422,7 +422,7 @@ int anope_event_idle(const char *source, int ac, const char **av)
 	if (!bi)
 		return MOD_CONT;
 
-	send_cmd(bi->uid, "IDLE %s %ld 0", source, static_cast<long>(time(NULL)));
+	send_cmd(bi->uid, "IDLE %s %ld %ld", source, start_time, time(NULL) - bi->lastmsg);
 	return MOD_CONT;
 }
 

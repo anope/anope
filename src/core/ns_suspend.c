@@ -33,12 +33,14 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1, -1,
+    c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1,
+                      NICK_SERVADMIN_HELP_SUSPEND,
                       NICK_SERVADMIN_HELP_SUSPEND,
                       NICK_SERVADMIN_HELP_SUSPEND);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("UNSUSPEND", do_unsuspend, is_services_oper, -1, -1,
-                      -1, NICK_SERVADMIN_HELP_UNSUSPEND,
+                      NICK_SERVADMIN_HELP_UNSUSPEND,
+                      NICK_SERVADMIN_HELP_UNSUSPEND,
                       NICK_SERVADMIN_HELP_UNSUSPEND);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 

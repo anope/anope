@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2448"
+VERSION_BUILD="2471"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2471 - Fixed a bug in help to show /chanserv help (un)suspend and /nickserv help (un)suspend to services operators
 #Revision 2448 - Updated Turkish language file
 #Revision 2406 - Fixed possible segfault introduced by TS6 fix in rev. 2401.
 #Revision 2402 - Fixed do_server() so it doesn't go nuts if a SID is the source. Added some sanity checks and debug output as well.

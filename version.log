@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2472"
+VERSION_BUILD="2473"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2473 - Made help system fall back to the highest help string available instead of giving "no help" to services opers everywhere
 #Revision 2472 - Show services opers /nickserv help saset
 #Revision 2471 - Fixed a bug in help to show /chanserv help (un)suspend and /nickserv help (un)suspend to services operators
 #Revision 2448 - Updated Turkish language file

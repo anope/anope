@@ -167,6 +167,8 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     const char *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL;
     Module *calling_module = mod_current_module;
     char *calling_module_name = mod_current_module_name;
+    int help_message;
+    int (*help_message_ptr)(User *u);
 
     for (current = c; (current) && (cont == MOD_CONT);
          current = current->next) {
@@ -180,6 +182,10 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
         p2 = current->help_param2;
         p3 = current->help_param3;
         p4 = current->help_param4;
+
+        help_message = 0;
+        help_message_ptr = NULL;
+
         if (current->helpmsg_all >= 0) {
             notice_help(service, u, current->helpmsg_all, p1, p2, p3, p4);
             has_had_help = 1;
@@ -187,43 +193,38 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
             cont = current->all_help(u);
             has_had_help = 1;
         }
-        if (is_services_root(u)) {
-            if (current->helpmsg_root >= 0) {
-                notice_help(service, u, current->helpmsg_root, p1, p2, p3,
-                            p4);
-                has_had_help = 1;
-            } else if (current->root_help) {
-                cont = current->root_help(u);
-                has_had_help = 1;
-            }
-        } else if (is_services_admin(u)) {
-            if (current->helpmsg_admin >= 0) {
-                notice_help(service, u, current->helpmsg_admin, p1, p2, p3,
-                            p4);
-                has_had_help = 1;
-            } else if (current->admin_help) {
-                cont = current->admin_help(u);
-                has_had_help = 1;
-            }
-        } else if (is_services_oper(u)) {
-            if (current->helpmsg_oper >= 0) {
-                notice_help(service, u, current->helpmsg_oper, p1, p2, p3,
-                            p4);
-                has_had_help = 1;
-            } else if (current->oper_help) {
-                cont = current->oper_help(u);
-                has_had_help = 1;
-            }
+
+        if (is_services_root(u) && (current->helpmsg_root >= 0 || current->root_help)) {
+            if (current->helpmsg_root >= 0)
+	        help_message = current->helpmsg_root;
+            else if (current->root_help)
+	        help_message_ptr = current->root_help;
+        } else if (is_services_admin(u) && (current->helpmsg_admin >= 0 || current->admin_help)) {
+            if (current->helpmsg_admin >= 0)
+	        help_message = current->helpmsg_admin;
+            else if (current->admin_help)
+	        help_message_ptr = current->admin_help;
+        } else if (is_services_oper(u) && (current->helpmsg_oper >= 0 || current->oper_help)) {
+            if (current->helpmsg_oper >= 0)
+	        help_message = current->helpmsg_oper;
+            else if (current->oper_help)
+	        help_message_ptr = current->oper_help;
         } else {
-            if (current->helpmsg_reg >= 0) {
-                notice_help(service, u, current->helpmsg_reg, p1, p2, p3,
-                            p4);
-                has_had_help = 1;
-            } else if (current->regular_help) {
-                cont = current->regular_help(u);
-                has_had_help = 1;
-            }
+            /* Shouldn't we check for the user to be identified? */
+            if (current->helpmsg_reg >= 0)
+                help_message = current->helpmsg_reg;
+            else if (current->regular_help)
+                help_message_ptr = current->regular_help;
         }
+
+        if (help_message) {
+            notice_lang(service, u, help_message, p1, p2, p3, p4);
+            has_had_help = 1;
+        } else if (help_message_ptr) {
+            cont = help_message_ptr(u);
+            has_had_help = 1;
+        }
+
     }
     if (has_had_help == 0) {
         notice_lang(service, u, NO_HELP_AVAILABLE, cmd);

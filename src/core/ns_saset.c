@@ -47,8 +47,8 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("SASET", do_saset, is_services_oper, -1, -1, -1,
-                      NICK_HELP_SASET, NICK_HELP_SASET);
+    c = createCommand("SASET", do_saset, is_services_oper, -1, -1,
+                      NICK_HELP_SASET, NICK_HELP_SASET, NICK_HELP_SASET);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET DISPLAY", NULL, is_services_oper,
                       NICK_HELP_SASET_DISPLAY, -1, -1, -1, -1);
@@ -84,7 +84,7 @@ int AnopeInit(int argc, char **argv)
                       NICK_HELP_SASET_HIDE, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET NOEXPIRE", NULL, is_services_oper, -1, -1,
-                      -1, NICK_HELP_SASET_NOEXPIRE,
+                      NICK_HELP_SASET_NOEXPIRE, NICK_HELP_SASET_NOEXPIRE,
                       NICK_HELP_SASET_NOEXPIRE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET AUTOOP", NULL, is_services_oper, -1, -1,

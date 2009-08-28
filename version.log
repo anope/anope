@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2477"
+VERSION_BUILD="2478"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2478 - Updated German language file
 #Revision 2477 - Corrected help replies for /operserv HELP *NEWS to say services admin is always required
 #Revision 2475 - Clarified installing of PSDK for windows installation requirements in Win32.txt
 #Revision 2474 - Updated docs/README to include real help for incorporating new languages into builds

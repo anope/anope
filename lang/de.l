@@ -3376,7 +3376,7 @@ NEWS_HELP_LOGON
 	existieren, werden nur die neuesten angezeigt.)
 	Die Anzahl der News können in der services.conf festgelegt werden.
 	
-	LOGONNEWS may only be used by Services admins. 
+	Diese Funktion ist beschränkt auf die Services Administartoren.
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD Text
@@ -3391,7 +3391,7 @@ NEWS_HELP_OPER
 	existieren, werden nur die neüsten angezeigt.)
 	Die Anzahl der News können in der services.conf festgelegt werden.
 	
-	OPERNEWS may only be used by Services admins. 
+	Diese Funktion ist beschränkt auf die Services Administartoren.
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD Text
@@ -3402,7 +3402,7 @@ NEWS_HELP_RANDOM
 	Wenn ein User zum Network verbindet, wird eine (und nur eine!) dieser
 	RandomNews Nachrichten zufällig gewählt und an den User gesendet.
 	
-	RANDOMNEWS may only be used by Services admins. 
+	Diese Funktion ist beschränkt auf die Services Administartoren.
 
 ###########################################################################
 #

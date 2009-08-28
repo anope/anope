@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2474"
+VERSION_BUILD="2476"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2475 - Clarified installing of PSDK for windows installation requirements in Win32.txt
 #Revision 2474 - Updated docs/README to include real help for incorporating new languages into builds
 #Revision 2473 - Made help system fall back to the highest help string available instead of giving "no help" to services opers everywhere
 #Revision 2472 - Show services opers /nickserv help saset

@@ -19,7 +19,8 @@ Table of Contents
 3) Installation
 4) Command Line Options
 5) Messages Translation
-6) Contact and Mailing List
+6) Adding Your Translation Into The Source
+7) Contact and Mailing List
 
 1) Credits
 
@@ -339,10 +340,9 @@ Table of Contents
           by most speakers of that language ;)).
 
         * When this is done, you have two solutions: either patch Services
-          source code so they take in account the new language file
-          (basically, you'll have to modify lang/Makefile, language.c and
-          maybe services.h), or send us the translated file so we can make
-          the patch and include your language in the next Anope release.
+          source code so they take in account the new language file (section 6),
+          or send us the translated file so we can make the patch and include
+          your language in the next Anope release.
 
         * Note that there is a language tool on bin/langtool.pl that can aid
           the verification process on newly created language files. Try to
@@ -358,7 +358,50 @@ Table of Contents
     credit for it, and will even get future final major releases before
     anyone else to complete the translation!... ;) 
 
-6) Contact
+6) Adding Your Translation Into The Source
+
+    First, get the latest svn version of Anope. This can be done by doing
+    'svn co http://anope.svn.sourceforge.net/svnroot/anope/stable ./anope-stable`
+
+    Second, Place your language file in lang/, and type 'svn add file.l`. Where file is
+    your language file.
+
+    Next, edit lang/Makefile and add your file into both the LANGOBJS variable and
+    the LANGSRCS variable (alphabetically please). Then, go down and add an entry for
+    it similar the others, eg:
+       en_us:    en_us.l    langcomp index
+       ./langcomp $@.l
+    (which creates the english language file)
+
+    Now, edit include/services.h and search for "#define LANG_EN_US", and add your language to
+    the bottom of the list, eg:
+    #define LANG_BLAH                16       /* Blah language! */
+    (given the language above its number is 15).
+    Then change the NUM_LANGS to one more than it currently is (in this case, 17)
+    and add one to USED_LANGS.
+    
+    Finially, edit src/language.c and add your language to the bottom of the array there, eg:
+       ...
+       LANG_HUN,                   /* Hungarian */
+       LANG_PL,                    /* Polish */
+       LANG_BLAH,                  /* Blah language! */
+    };
+    then, go down and add it with the others using load_lang(), eg:
+       ...
+       load_lang(LANG_HUN, "hun");
+       load_lang(LANG_PL, "pl");
+       load_lang(LANG_BLAH, "blah");
+
+    Now use 'svn diff > language.diff` to get the changes you made, and if it looks good (test it)
+    email it to team@anope.org!
+
+    Please be aware we will only include a new language if there is sufficient demand for it.
+
+    Please do not be disappointed if we do not include your language within Anope.
+
+    Check Changes.lang in order for your language to continue to work on your copy of Anope upgrades.
+
+7) Contact
 
     For announcements and discussions about Anope, please visit our
     Portal and Forums at http://www.anope.org/ -- make sure you register

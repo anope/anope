@@ -38,9 +38,12 @@ Anope for Windows
 	    http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
 
 	    (NOTE: Although this says for Windows Server 2003, it does infact work on all supported
-	    versions of Windows. When installing, you should select the Custom option, and ensure
-	    that only the top selection, and the bottom selection are checked. This will cut down
-	    install time dramatically)
+	    versions of Windows.)
+	    
+	    When installing, you should select the Custom option, and ensure that the top option relating to 
+	    the registering of environment varibales, is enabled in addition to the default selections.
+
+	    If you do not do this, you may run into problems with the PSDK not being found properly during install.
 
         * MySQL for Windows (only needed if building with MySQL enabled):
             http://dev.mysql.com/

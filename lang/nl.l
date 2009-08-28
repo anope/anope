@@ -3381,10 +3381,7 @@ NEWS_HELP_LOGON
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
 	
-	LOGONNEWS LIST mag door elke IRC operator worden gebruikt om
-	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
-	alleen door Services admins gebruikt worden.
-
+	LOGONNEWS may only be used by Services admins. 
 
 NEWS_HELP_OPER
 	Gebruik: OPERNEWS ADD text
@@ -3399,9 +3396,7 @@ NEWS_HELP_OPER
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
 	
-	OPERNEWS LIST mag door elke IRC operator worden gebruikt om
-	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
-	alleen door Services admins gebruikt worden.
+	OPERNEWS may only be used by Services admins. 
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD text
@@ -3414,9 +3409,7 @@ NEWS_HELP_RANDOM
 	nieuwsberichten willekeurig uitgekozen en naar hem/haar
 	verstuurd.
 	
-	RANDOMNEWS LIST mag door elke IRC operator worden gebruikt om
-	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
-	alleen door Services admins gebruikt worden.
+	RANDOMNEWS may only be used by Services admins. 
 
 ###########################################################################
 #

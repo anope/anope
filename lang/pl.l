@@ -4396,9 +4396,7 @@ NEWS_HELP_LOGON
 	wys³anych (aby zapobiec floodowaniu). Warto¶æ NewsCount
 	mo¿e zostaæ zmieniona w pliku konfiguracyjym serwisów.
 	
-	Polecenie LOGONNEWS LIST mo¿e byæ u¿yte przez ka¿dego
-	IRC operatora w celu wylistowania wiadomo¶ci. Polecenia
-	ADD i DEL s± zarezerwowane dla administratorów serwisów.
+	LOGONNEWS may only be used by Services admins.
 
 NEWS_HELP_OPER
 	Sk³adnia: OPERNEWS ADD tekst
@@ -4411,9 +4409,7 @@ NEWS_HELP_OPER
 	wys³anych (aby zapobiec floodowaniu). Warto¶æ NewsCount
 	mo¿e zostaæ zmieniona w pliku konfiguracyjym serwisów.
 	
-	Polecenie OPERNEWS LIST mo¿e byæ u¿yte przez ka¿dego
-	IRC operatora w celu wylistowania wiadomo¶ci. Polecenia
-	ADD i DEL s± zarezerwowane dla administratorów serwisów.
+	OPERNEWS may only be used by Services admins. 
 
 NEWS_HELP_RANDOM
 	Sk³adnia: RANDOMNEWS ADD tekst
@@ -4424,9 +4420,7 @@ NEWS_HELP_RANDOM
 	Po po³±czeniu z sieci± u¿ytkownik otrzyma dok³adnie
 	jedn± wylosowan± z tej listy wiadomo¶æ.
 	
-	Polecenie RANDOMNEWS LIST mo¿e byæ u¿yte przez ka¿dego
-	IRC operatora w celu wylistowania wiadomo¶ci. Polecenia
-	ADD i DEL s± zarezerwowane dla administratorów serwisów.
+	RANDOMNEWS may only be used by Services admins. 
 
 ###########################################################################
 #

@@ -3354,9 +3354,7 @@ NEWS_HELP_LOGON
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST may be used by any IRC operator to list the
-	current news messages.  ADD and DEL may only be used by
-	Services admins.
+	LOGONNEWS may only be used by Services admins. 
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD text
@@ -3370,9 +3368,7 @@ NEWS_HELP_OPER
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST may be used by any IRC operator to list the
-	current oper news messages.  ADD and DEL may only be used by
-	Services admins.
+	OPERNEWS may only be used by Services admins. 
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD szöveg
@@ -3383,9 +3379,7 @@ NEWS_HELP_RANDOM
 	egy felhasználó csatlakozik a hálózathoz, egy (csak egy)
 	random newst fog véletlenszerûen elküldeni részére.
 	
-	RANDOMNEWS LIST IRC operátorok,használhatják a parancsot
-	részükre listázza az aktuális oper news üzeneteket. Add és 
-	Del -t csak szervíz adminok használhatják
+	RANDOMNEWS may only be used by Services admins. 
 	
 ###########################################################
 #

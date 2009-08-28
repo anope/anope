@@ -3423,9 +3423,7 @@ NEWS_HELP_LOGON
 	bunlardan en yenileri kullanýcýya ulaþtýrýlýr.)
 	NewsCount(Giriþ haberleri) Özellikleri services.conf'ta belirtilmiþtir ve bu dosyadan ayarlanabilir.
 	
-	LOGONNEWS LIST(listele) komutu tüm irc operatorlerinin kontrolu icin kullanýma acik olmasýna
-	raðmen ADD(ekle) ve DEL(sil) komutlarý güvenlik gereði ile sadece  
-	Servis Yöneticilerine(Services Admins) açýlmýþtýr.
+	LOGONNEWS may only be used by Services admins. 
 
 NEWS_HELP_OPER
 	Kullanýmý: OPERNEWS ADD text
@@ -3439,9 +3437,7 @@ NEWS_HELP_OPER
 	bunlardan en yenileri kullanýcýya ulaþtýrýlýr.)
 	NewsCount(Giriþ haberleri) Özellikleri services.conf'ta belirtilmiþtir ve bu dosyadan ayarlanabilir.
 	
-	OPERNEWS LIST komutu tüm irc operatorlerinin kontrolu icin kullanýma acik olmasýna
-	raðmen ADD(ekle) ve DEL(sil) komutlarý güvenlik gereði ile sadece  
-	Servis Yöneticilerine(Services Admins) açýlmýþtýr.
+	OPERNEWS may only be used by Services admins. 
 
 NEWS_HELP_RANDOM
 	Kullanimi: RANDOMNEWS ADD yazi
@@ -3452,9 +3448,7 @@ NEWS_HELP_RANDOM
 	network e baglandigi zaman, karisik haberlerden bir tanesi
 	seçilerek kullaniciya gönderilir.
 	
-	RANDOMNEWS LIST herhangi bir IRC operatörü tarafindan
-	haberleri listelemek için kullanilabilir. ADD ve DEL
-	komutlarini sadece Servis adminlerinin kullanabilir.
+	RANDOMNEWS may only be used by Services admins. 
 
 ###########################################################################
 #

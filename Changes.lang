@@ -1,5 +1,13 @@
 Anope Version 1.8 SVN
 ---------------------
+*** New Strings:
+
+*** Mod Strings:
+NEWS_HELP_LOGON
+NEWS_HELP_OPER
+NEWS_HELP_RANDOM
+
+*** Del Strings:
 
 Anope Version 1.8.2
 -------------------

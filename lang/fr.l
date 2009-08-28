@@ -3456,9 +3456,7 @@ NEWS_HELP_LOGON
 	plus messages de news, seuls les plus récents seront envoyés.)
 	NewsCount peut être configuré en services.conf.
 	
-	LOGONNEWS LIST peut être utilisée par tout IRC operator pour
-	lister les messages de news courants. ADD et DEL peuvent
-	uniquement être utilisés par les Services admins.
+	LOGONNEWS may only be used by Services admins. 
 
 NEWS_HELP_OPER
 	Syntaxe: OPERNEWS ADD texte
@@ -3472,9 +3470,7 @@ NEWS_HELP_OPER
 	messages news, seuls les plus récents seront envoyés.)
 	NewsCount peut être configuré en services.conf.
 	
-	OPERNEWS LIST peut être utilisée par tout IRC operator pour
-	lister les messages oper news actuels. ADD et DEL peuvent 
-	uniquement être utilisés par les Services admins.
+	OPERNEWS may only be used by Services admins. 
 
 NEWS_HELP_RANDOM
 	Syntaxe: RANDOMNEWS ADD texte
@@ -3485,10 +3481,7 @@ NEWS_HELP_RANDOM
 	utilisateur se connecte au réseau, une (et une seule) de ces
 	nouvelles sera choisie et lui sera envoyée.
 	
-	RANDOMNEWS LIST peut être utilisée par tout opérateur IRC pour
-	lister les nouvelles aléatoires actuellement définies. ADD et 
-	DEL ne peuvent être utilisés que par les administrateurs des
-	services.
+	RANDOMNEWS may only be used by Services admins. 
 
 ###########################################################################
 #

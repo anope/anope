@@ -2843,10 +2843,6 @@ OPER_JUPE_HOST_ERROR
 	Por favor usa un nombre de servidor valido cuando use JUPE
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
-	
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW texto
 
 # UPDATE responses
 OPER_UPDATING
@@ -3317,9 +3313,7 @@ NEWS_HELP_LOGON
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST may be used by any IRC operator to list the
-	current news messages.  ADD and DEL may only be used by
-	Services admins.
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD text
@@ -3333,9 +3327,7 @@ NEWS_HELP_OPER
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST may be used by any IRC operator to list the
-	current oper news messages.  ADD and DEL may only be used by
-	Services admins.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Sintaxis: RANDOMNEWS ADD texto
@@ -3346,9 +3338,7 @@ NEWS_HELP_RANDOM
 	Cuando un usuario se conecta a la red, uno (y solo uno) de los
 	mensajes al azar sera elejido y enviado a ellos.
 	
-	RANDOMNEWS LIST puede ser usado por cualquier operador de
-	IRC para listar la lista de noticias actual. ADD y DEL
-	solo pueden ser usados por administradores de Servicios.
+	RANDOMNEWS may only be used by Services Operators.
 
 ###########################################################################
 #
@@ -3717,23 +3707,17 @@ NICK_HELP_SASET
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_DISPLAY
 	Syntax: SASET nickname DISPLAY new-display
 	
 	Changes the display used to refer to the nickname group in 
 	Services. The new display MUST be a nick of the group.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntax: SASET nickname PASSWORD new-password
 	
 	Changes the password used to identify as the nick's	owner.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_URL
 	Syntax: SASET nickname URL url
@@ -3741,15 +3725,11 @@ NICK_HELP_SASET_URL
 	Associates the given URL with the nickname.  This URL
 	will be displayed whenever someone requests information
 	on the nick with the INFO command.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-	Limited to Services admins.
 	
 NICK_HELP_SASET_ICQ
 	Syntax: SASET nickname ICQ number
@@ -3758,8 +3738,6 @@ NICK_HELP_SASET_ICQ
 	number will be displayed whenever someone requests 
 	information on the nick with the INFO command.
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
 	
@@ -3767,8 +3745,6 @@ NICK_HELP_SASET_GREET
 	will be displayed when joining a channel that has GREET
 	option enabled, provided that the user has the necessary 
 	access on it.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_KILL
 	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
@@ -3785,8 +3761,6 @@ NICK_HELP_SASET_KILL
 	warned first or given a chance to change their nick; please
 	do not use this option unless necessary.  Also, your
 	network's administrators may have disabled this option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_SECURE
 	Syntax: SASET nickname SECURE {ON | OFF}
@@ -3798,8 +3772,6 @@ NICK_HELP_SASET_SECURE
 	list.  However, if you are on the access list, %S
 	will not auto-kill you regardless of the setting of the
 	KILL option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntax: SASET nickname PRIVATE {ON | OFF}
@@ -3809,8 +3781,6 @@ NICK_HELP_SASET_PRIVATE
 	nickname lists generated with %S's LIST command.
 	(However, anyone who knows the nickname can still get
 	information on it using the INFO command.)
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_HIDE
 	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
@@ -3823,24 +3793,18 @@ NICK_HELP_SASET_HIDE
 	The second parameter specifies whether the information should
 	be displayed (OFF) or hidden (ON).
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_MSG
 	Syntax: SASET nickname MSG {ON | OFF}
 	
 	Allows you to choose the way Services are communicating with 
 	the given user. With MSG set, Services will use messages,
 	else they'll use notices.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntax: SASET nickname NOEXPIRE {ON | OFF}
 	
 	Sets whether the given nickname will expire.  Setting this
 	to ON prevents the nickname from expiring.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
@@ -4119,8 +4083,6 @@ NICK_SERVADMIN_HELP_GETEMAIL
 	sea que el comando se use, un mensaje incluyendo la persona que uso
 	el comando y el email sera logeado.
 
-	Limitado a Services admins.
-
 NICK_SERVADMIN_HELP_FORBID
 	Sintaxis: FORBID nickname [razon]
 	
@@ -4141,8 +4103,6 @@ NICK_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
 
 	SUSPENDs / UNSUSPENDs a nickname from being identified to
-	
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -4154,8 +4114,6 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND nickname
 
 	UNSUSPENDS a nickname from being used.
-
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -5398,9 +5356,6 @@ MEMO_HELP_STAFF
 	Sintaxis: STAFF texto-memo
 
 	Envia a todo el staff de services un memo conteniendo texto-memo.
-	Nota: Si tienes operadores en la lista de opers y en la lista de
-	admins, reciviran el memo dos veces. Lo mismo de aplica para
-	operadores en la lista de Root y en otras listas. 
 
 ###########################################################################
 #
@@ -5451,11 +5406,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Envia un mensaje a todos los usuarios
 OPER_HELP_CMD_STATS
 	    STATS       Muestra estatus de los Servicios y la red
-OPER_HELP_CMD_OPER
-	    OPER        Modifica la lista de operadores de Servicios
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Modifica la lista de administradores de
-	                Servicios
 OPER_HELP_CMD_STAFF
 	    STAFF	Muestra la lista del staff y su status
 OPER_HELP_CMD_MODE
@@ -5568,7 +5518,7 @@ OPER_HELP_STATS
 OPER_HELP_IGNORE
 	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 	
-	Allows Services Admins to make Services ignore a nick or mask
+	Allows Services Operators to make Services ignore a nick or mask
 	for a certain time or until the next restart. The default
 	time format is seconds. You can specify it by using units.
 	Valid units are: s for seconds, m for minutes, 
@@ -5960,18 +5910,6 @@ OPER_HELP_JUPE
 	
 	Limitado a administradores de Servicios.
 
-OPER_HELP_RAW
-	Sintaxis: RAW texto
-	
-	Envia una linea de texto directamente al servidor al cual
-	los Servicios estan conectados. Este comando tiene un
-	uso muy limitado y puede trastornar a una red si es
-	usado de manera impropia. NO USES ESTE COMANDO a
-	menos que estes absolutamente seguro de lo que estas
-	haciendo!
-	
-	Limitado a administradores de Servicios.
-
 OPER_HELP_UPDATE
 	Sintaxis: UPDATE
 	
@@ -6053,30 +5991,21 @@ OPER_HELP_MODLOAD
 	Este comando carga el modulo llamado NombreArchivo del directorio de 
 	modulos.
 
-	Limitado a Services Roots.
-
 OPER_HELP_MODUNLOAD
 	Sintaxis: MODUNLOAD NombreArchivo
 
 	Este comando descarga el modulo llamado NombreArchivo del directorio 
 	de modulos.
 
-	Limitado a Services Roots.
-
 OPER_HELP_MODINFO
 	Sintaxis: MODINFO NombreArchivo
 
 	Este comando lista informacion sobre el modulo cargado pedido 
 
-	Limitado a Services Roots.
-
 OPER_HELP_MODLIST
 	Sintaxis: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 
 	Lista todos los modulos actualmente cargados.
-
-	Limitado a Services Roots.
-
 
 ###########################################################################
 #

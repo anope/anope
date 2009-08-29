@@ -384,7 +384,7 @@ NICK_LOGOUT_SUCCEEDED
 NICK_LOGOUT_X_SUCCEEDED
 	Nick %s has been logged out.
 NICK_LOGOUT_SERVICESADMIN
-	Can't logout %s because he's a services administrator.
+	Can't logout %s because he's a Services Operator.
 
 # DROP responses
 NICK_DROP_DISABLED
@@ -2079,7 +2079,7 @@ BOT_BOTLIST_FOOTER
 	%d bots available.
 BOT_BOTLIST_EMPTY
 	There are no bots available at this time.
-	Ask a Services admin to create one!
+	Ask a Services Operator to create one!
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
@@ -2788,10 +2788,6 @@ OPER_JUPE_HOST_ERROR
 	Please use a valid server name when juping
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
-	
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW text
 
 # UPDATE responses
 OPER_UPDATING
@@ -3016,7 +3012,7 @@ OPER_HELP_EXCEPTION
 	        EXCEPTION LIST [mask | list]
 	        EXCEPTION VIEW [mask | list]
 	
-	Allows Services admins to manipulate the list of hosts that
+	Allows Services Operators to manipulate the list of hosts that
 	have specific session limits - allowing certain machines, 
 	such as shell servers, to carry more than the default number
 	of clients at a time. Once a host reaches it's session limit,
@@ -3052,7 +3048,7 @@ OPER_HELP_SESSION
 	Syntax: SESSION LIST threshold
 	        SESSION VIEW host
 	
-	Allows Services admins to view the session list.
+	Allows Services Operators to view the session list.
 
 	SESSION LIST lists hosts with at least threshold sessions.
 	The threshold must be a number greater than 1. This is to 
@@ -3209,9 +3205,7 @@ NEWS_HELP_LOGON
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST may be used by any IRC operator to list the
-	current news messages.  ADD and DEL may only be used by
-	Services admins.
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD text
@@ -3225,9 +3219,7 @@ NEWS_HELP_OPER
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST may be used by any IRC operator to list the
-	current oper news messages.  ADD and DEL may only be used by
-	Services admins.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD text
@@ -3238,9 +3230,7 @@ NEWS_HELP_RANDOM
 	user connects to the network, one (and only one) of the
 	random news will be randomly chosen and sent to them.
 	
-	RANDOMNEWS LIST may be used by any IRC operator to list the
-	current news messages.  ADD and DEL may only be used by
-	Services admins.
+	RANDOMNEWS may only be used by Services Operators.
 
 ###########################################################################
 #
@@ -3886,7 +3876,7 @@ NICK_HELP_RESEND
 
 NICK_SERVADMIN_HELP
 	 
-	Services admins can also drop any nickname without needing
+	Services Operators can also drop any nickname without needing
 	to identify for the nick, and may view the access list for
 	any nickname (%R%S ACCESS LIST nick).
 
@@ -3900,7 +3890,7 @@ NICK_SERVADMIN_HELP_LOGOUT
 	
 	With a parameter, does the same for the given nick. If you 
 	specify REVALIDATE as well, Services will ask the given nick
-	to re-identify. This use limited to Services admins.
+	to re-identify. This use limited to Services Operators.
 
 NICK_SERVADMIN_HELP_DROP
 	Syntax: DROP [nickname]
@@ -3911,26 +3901,26 @@ NICK_SERVADMIN_HELP_DROP
 	With a parameter, drops the named nick from the database.
 	You may drop any nick within your group without any 
 	special privileges. Dropping any nick is limited to 
-	Services admins.
+	Services Operators.
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Services admins may use the ALL parameter with any nick.
+	Services Operators may use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	Lists all registered nicknames which match the given
 	pattern, in nick!user@host format.  Nicks with the PRIVATE
-	option set will only be displayed to Services admins.  Nicks
+	option set will only be displayed to Services Operators.  Nicks
 	with the NOEXPIRE option set will have a ! appended to
-	the nickname for Services admins.
+	the nickname for Services Operators.
 	
 	If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only
 	nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the
 	NOEXPIRE flag set will be displayed. If multiple options are
 	given, all nicks matching at least one option will be displayed.
-	These options are limited to Services admins.  
+	These options are limited to Services Operators.  
 
 	Examples:
 	
@@ -3953,7 +3943,7 @@ NICK_SERVADMIN_HELP_ALIST
 	on. With two parameters lists channels that nickname has 
 	level access or greater on.
 
-	This use limited to Services admins.
+	This use limited to Services Operators.
 
 NICK_SERVADMIN_HELP_GLIST
 	Syntax: GLIST [nickname]
@@ -3963,7 +3953,7 @@ NICK_SERVADMIN_HELP_GLIST
 	
 	With a parameter, lists all nicknames that are in the
 	group of the given nick.
-	This use limited to Services admins.
+	This use limited to Services Operators.
 
 NICK_SERVADMIN_HELP_GETPASS
 	Syntax: GETPASS nickname
@@ -4888,7 +4878,7 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	 
-	Services admins can also drop any channel without needing
+	Services Operators can also drop any channel without needing
 	to identify via password, and may view the access, AKICK,
 	and level setting lists for any channel.
 	
@@ -4901,7 +4891,7 @@ CHAN_SERVADMIN_HELP_LOGOUT
 	If you are the founder of the channel, you can log out anybody,
 	else you can only log out yourself.
 	
-	If you are a Services admin, you can log out 
+	If you are a Services Operators, you can log out 
 	anybody of any channel without having to be the founder
 	of the channel. Also, you can omit the nickname parameter;
 	this will log out all identified users from the channel.
@@ -4909,14 +4899,14 @@ CHAN_SERVADMIN_HELP_LOGOUT
 CHAN_SERVADMIN_HELP_DROP
 	Syntax: DROP channel
 	
-	Unregisters the named channel.  Only Services admins
+	Unregisters the named channel.  Only Services Operators
 	can drop a channel for which they have not identified.
 
 CHAN_SERVADMIN_HELP_SET
 	
-	Services admins can also set the option NOEXPIRE, with
+	Services Operators can also set the option NOEXPIRE, with
 	which channels can be prevented from expiring.
-	Additionally, Services admins can set options for any
+	Additionally, Services Operators can set options for any
 	channel without identifying by password for the channel.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
@@ -4927,21 +4917,21 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 
 CHAN_SERVADMIN_HELP_INFO
 	
-	Services admins can use the ALL parameter with any channel.
+	Services Operators can use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]
 	
 	Lists all registered channels matching the given pattern.
 	Channels with the PRIVATE option set will only be displayed
-	to Services admins. Channels with the NOEXPIRE option set 
-	will have a ! appended to the channel name for Services admins.
+	to Services Operators. Channels with the NOEXPIRE option set 
+	will have a ! appended to the channel name for Services Operators.
 	
 	If the FORBIDDEN, SUSPENDED or NOEXPIRE options are given, only 
 	channels which, respectively, are FORBIDden, SUSPENDed or have 
 	the NOEXPIRE flag set will be displayed.  If multiple options are 
 	given, more types of channels will be displayed. These options are 
-	limited to Services admins.
+	limited to Services Operators.
 
 CHAN_SERVADMIN_HELP_GETPASS
 	Syntax: GETPASS channel
@@ -5181,10 +5171,6 @@ MEMO_HELP_STAFF
 	Syntax: STAFF memo-text
 
 	Sends all services staff a memo containing memo-text.
-	Note: If you have opers on both the oper list and the
-	admin list they will receive the memo twice.  The same
-	applies for oper's on the Root list as well as other
-	lists.
 
 MEMO_HELP_SENDALL
 	Syntax: SENDALL memo-text
@@ -5217,10 +5203,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Send a message to all users
 OPER_HELP_CMD_STATS
 	    STATS       Show status of Services and network
-OPER_HELP_CMD_OPER
-	    OPER        Modify the Services operator list
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Modify the Services admin list
 OPER_HELP_CMD_STAFF
 	    STAFF       Display Services staff and online status
 OPER_HELP_CMD_MODE
@@ -5333,7 +5315,7 @@ OPER_HELP_STATS
 OPER_HELP_IGNORE
 	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 	
-	Allows Services Admins to make Services ignore a nick or mask
+	Allows Services Operators to make Services ignore a nick or mask
 	for a certain time or until the next restart. The default
 	time format is seconds. You can specify it by using units.
 	Valid units are: s for seconds, m for minutes, 
@@ -5682,15 +5664,6 @@ OPER_HELP_JUPE
 	otherwise, the server information field will contain the
 	text "Juped by <nick>", showing the nickname of the
 	person who jupitered the server.
-
-OPER_HELP_RAW
-	Syntax: RAW text
-	
-	Sends a string of text directly to the server to which
-	Services is connected.  This command has a very limited
-	range of uses, and can wreak havoc on a network if used
-	improperly.  DO NOT USE THIS COMMAND unless you are
-	absolutely certain you know what you are doing!
 
 OPER_HELP_UPDATE
 	Syntax: UPDATE
@@ -6075,7 +6048,7 @@ BOT_SERVADMIN_HELP_BOT
 	        BOT CHANGE oldnick newnick [user [host [real]]]
 	        BOT DEL nick
 	
-	Allows Services admins to create, modify, and delete
+	Allows Services Operators to create, modify, and delete
 	bots that users will be able to use on their own
 	channels.
 	
@@ -6093,7 +6066,7 @@ BOT_SERVADMIN_HELP_BOT
 
 BOT_SERVADMIN_HELP_SET
 	
-	These options are reserved to Services admins:
+	These options are reserved to Services Operators:
 	
 	    NOBOT            Prevent a bot from being assigned to 
 	                        a channel

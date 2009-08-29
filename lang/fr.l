@@ -2896,10 +2896,6 @@ OPER_JUPE_HOST_ERROR
 	Veuillez indiquer un nom de serveur valide pour JUPE.
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
-	
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW texte
 
 # UPDATE responses
 OPER_UPDATING
@@ -3156,7 +3152,7 @@ OPER_HELP_EXCEPTION
 	        EXCEPTION LIST [mask | liste]
 	        EXCEPTION VIEW [mask | liste]
 	
-	Permet aux Services admins de manipuler la liste des hosts qui
+	Permet aux Services operators de manipuler la liste des hosts qui
 	ont des limites de session spécifiques - autoriser certaines
 	machines, telles que des servers de shell, pour supporter plus
 	que le nombre de clients par défaut à la fois. Une fois qu'une
@@ -3192,14 +3188,12 @@ OPER_HELP_EXCEPTION
 	grandes listes d'exception et les exceptions utilisant
 	excessivement les wildcards entrainent une dégradation des
 	performances des Services.
-	
-	Réservée aux Services admins.
 
 OPER_HELP_SESSION
 	Syntax: SESSION LIST minimal
 	        SESSION VIEW host
 	
-	Permet aux Services admins de voir la liste des sessions.
+	Permet aux Services Operators de voir la liste des sessions.
 	
 	SESSION LIST liste les hosts ayant au minimum minimal
 	sessions. La limite minimale doit être un nombre supérieur à
@@ -3214,8 +3208,6 @@ OPER_HELP_SESSION
 	Consultez l'aide de EXCEPTION pour plus d'informations 
 	concernant la limitation et comment définir les limites de
 	sessions pour certaines hosts et groupes.
-	
-	Réservée aux Services admins.
 
 ###########################################################################
 #
@@ -3374,9 +3366,7 @@ NEWS_HELP_LOGON
 	plus messages de news, seuls les plus récents seront envoyés.)
 	NewsCount peut être configuré en services.conf.
 	
-	LOGONNEWS LIST peut être utilisée par tout IRC operator pour
-	lister les messages de news courants. ADD et DEL peuvent
-	uniquement être utilisés par les Services admins.
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Syntaxe: OPERNEWS ADD texte
@@ -3390,9 +3380,7 @@ NEWS_HELP_OPER
 	messages news, seuls les plus récents seront envoyés.)
 	NewsCount peut être configuré en services.conf.
 	
-	OPERNEWS LIST peut être utilisée par tout IRC operator pour
-	lister les messages oper news actuels. ADD et DEL peuvent 
-	uniquement être utilisés par les Services admins.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Syntaxe: RANDOMNEWS ADD texte
@@ -3403,10 +3391,7 @@ NEWS_HELP_RANDOM
 	utilisateur se connecte au réseau, une (et une seule) de ces
 	nouvelles sera choisie et lui sera envoyée.
 	
-	RANDOMNEWS LIST peut être utilisée par tout opérateur IRC pour
-	lister les nouvelles aléatoires actuellement définies. ADD et 
-	DEL ne peuvent être utilisés que par les administrateurs des
-	services.
+	RANDOMNEWS may only be used by Services Operators.
 
 ###########################################################################
 #
@@ -3778,9 +3763,7 @@ NICK_HELP_SASET
 	
 	Taper %R%S HELP SASET option pour plus d'information
 	sur une option spécifique. L'option devra etre mise avec le pseudo
-	en prefix. 
-	
-	Limité aux Services admins.
+	en prefix.
 
 NICK_HELP_SASET_DISPLAY
 	Syntaxe: SASET pseudo DISPLAY nouvel-affichage
@@ -3788,16 +3771,12 @@ NICK_HELP_SASET_DISPLAY
 	Change l'affichage utilisé pour nommer le groupe du
 	pseudos dans les services. Le nouvel affichage DOIT être un
 	pseudo de votre groupe.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntaxe: SASET pseudo PASSWORD nouveau-mot-de-passe
 	
 	Change le mot de passe utilisé pour s'identifier comme propiétaire
 	du pseudo.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_URL
 	Syntaxe: SASET pseudo URL url
@@ -3805,15 +3784,11 @@ NICK_HELP_SASET_URL
 	Associe l'URL donné au pseudo. Cette URL sera affiché
 	a toutes les personnes demandant des informations sur
 	le pseudo via la commande INFO.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntaxe: SASET pseudo EMAIL adresse-email
 	
 	Associe l'E-mail donné au pseudo.
-	
-	Limité aux Services admins.
 	
 NICK_HELP_SASET_ICQ
 	Syntaxe: SASET pseudo ICQ numéro
@@ -3822,8 +3797,6 @@ NICK_HELP_SASET_ICQ
 	a toutes les personnes demandant des informations sur le pseudo
 	via la commande INFO.
 	
-	Limité aux Services admins.
-	
 NICK_HELP_SASET_GREET
 	Syntaxe: SASET pseudo GREET message
 	
@@ -3831,8 +3804,6 @@ NICK_HELP_SASET_GREET
 	affiché lorsqu'il joint un channel qui a l'option
 	GREET active, à condition d'avoir un niveau d'accès
 	suffisant.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_KILL
 	Syntaxe: SASET pseudo KILL {ON | QUICK | IMMED | OFF}
@@ -3848,8 +3819,6 @@ NICK_HELP_SASET_KILL
 	immédiatement sans être d'abord prévenu et sans avoir de chance
 	pour changer son pseudo, n'utilisez cette option que si nécessaire.
 	Les administrateurs de votre réseau peuvent avoir désactivé cette option.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_SECURE
 	Syntaxe: SASET pseudo SECURE {ON | OFF}
@@ -3860,8 +3829,6 @@ NICK_HELP_SASET_SECURE
 	propriétaire du pseudo, que son masque soit dans la liste d'accès
 	ou non. Cependant, si vous êtes sur la liste d'accès, %S ignorera
 	la configuration de la protection offerte par SET KILL.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntaxe: SASET pseudo PRIVATE {ON | OFF}
@@ -3872,8 +3839,6 @@ NICK_HELP_SASET_PRIVATE
 	de %S. (Cependant, quiconque connaissant son pseudo peut
 	tout de même avoir des informations en utilisant
 	la commande INFO).
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_HIDE
 	Syntaxe: SASET pseudo HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
@@ -3885,16 +3850,12 @@ NICK_HELP_SASET_HIDE
 	raison de /QUIT (QUIT). Le second paramètre indique si
 	l'option doit être affichée (OFF) ou cachée (ON).
 	
-	Limité aux Services admins.
-	
 NICK_HELP_SASET_MSG
 	Syntaxe: SASET pseudo MSG {ON | OFF}
 	
 	Vous permet de choisir la façon dont les services communiquent
 	le pseudo donné. Si cette option est activée, ils utiliseront des
 	messages, sinon ils utiliseront des notices.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntaxe: SASET pseudo NOEXPIRE {ON | OFF}
@@ -3902,8 +3863,6 @@ NICK_HELP_SASET_NOEXPIRE
 	Permet d'activer le mode NOEXPIRE au pseudo donné.
 	Configurez ce paramètres sur ON pour que le 
 	pseudo n'expire pas.
-	
-	Limité aux Services admins.
 
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
@@ -4082,7 +4041,7 @@ NICK_HELP_RESEND
 
 NICK_SERVADMIN_HELP
 	
-	Les Services admins peuvent également effacer n'importe quel
+	Les Services Operators peuvent également effacer n'importe quel
 	pseudo sans avoir besoin de s'identifier pour le nick, et 
 	peuvent voir l'access list pour n'importe quel pseudo
 	(%R%S ACCESS LIST nick).
@@ -4098,7 +4057,7 @@ NICK_SERVADMIN_HELP_LOGOUT
 	Avec un paramètre, fait la même chose avec le pseudo donné. Si
 	vous spécifiez également REVALIDATE, les Services demanderont
 	au pseudo donné de se ré-identifier. Cette utilisation est 
-	réservée aux Services admins.
+	réservée aux Services Operators.
 
 NICK_SERVADMIN_HELP_DROP
 	Syntaxe: DROP [pseudo]
@@ -4110,11 +4069,11 @@ NICK_SERVADMIN_HELP_DROP
 	données. Vous pouvez effacer n'importe quel pseudo de votre
 	groupe sans privilèges particuliers. La possibilité 
 	d'effacer n'importe quel pseudo est cependant réservée aux 
-	Services admins.
+	Services Operators.
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Les services admins peuvent utiliser le paramètre ALL 
+	Les services operators peuvent utiliser le paramètre ALL 
 	avec n'importe quel pseudo.
 
 NICK_SERVADMIN_HELP_LIST
@@ -4122,15 +4081,15 @@ NICK_SERVADMIN_HELP_LIST
 	
 	Liste tous les pseudos enregistrés qui correspondent au modèle
 	donné, de format nick!user@host. Les pseudos ayant l'option
-	PRIVATE ne seront affichés qu'aux Services admins. Les
+	PRIVATE ne seront affichés qu'aux Services operators. Les
 	pseudos ayant l'option NOEXPIRE seront préfixés par un !
-	devant leur pseudo pour les Services admins. 
+	devant leur pseudo pour les Services operators. 
 	
 	Si les option FORBIDDEN, SUSPENDED, NOEXPIRE ou UNCONFIRMED sont donné,
 	les pseudos qui sont FORBID, SUSPENDED, NON CONFIRMER ou ont l'option
 	NOEXPIRE seront affiché. Si plus options sont indiquées,
 	tout les pseudos correspondant aux une des critères seront affichés.
-	Réservé aux Services admins.  
+	Réservé aux Services operators.  
 	
 	Exemples:
 	
@@ -4153,8 +4112,6 @@ NICK_SERVADMIN_HELP_ALIST
 	   level liste les canaux auquel le pseudo donné a un accès supérieur
 	             ou égale au level donné
 
-	Réservé aux Services admins.
-
 NICK_SERVADMIN_HELP_GLIST
 	Syntaxe: GLIST [nick]
 	
@@ -4174,8 +4131,6 @@ NICK_SERVADMIN_HELP_GETPASS
 	la personne qui a émis la commande et le pseudo sur lequel
 	il a été utilisé sera enregistré et envoyé en WALLOPS/GLOBOPS.
 	
-	Réservée aux Services admins.
-	
 	Cette commande est indisponible quand l'encryption est activée.
 
 NICK_SERVADMIN_HELP_GETEMAIL
@@ -4188,8 +4143,6 @@ NICK_SERVADMIN_HELP_GETEMAIL
 		 le pseudo de la personne qui a utilisé la commande et
 		 vers quel email a été destiné la commande dans les logs.
 
-	Limité aux Services admins.
-
 NICK_SERVADMIN_HELP_FORBID
 	Syntaxe: FORBID nick [raison]
 	
@@ -4197,8 +4150,6 @@ NICK_SERVADMIN_HELP_FORBID
 	quelqu'un. Peut être annulé en effaçant le pseudo.
 	
 	Sur certains réseaux, la raison est requise.
-	
-	Réservée aux Services admins.
 
 ###########################################################################
 #
@@ -4210,8 +4161,6 @@ NICK_SERVADMIN_HELP_SUSPEND
 	Syntaxe: SUSPEND pseudo raison / UNSUSPEND pseudo
 
 	Suspend / libere le pseudo pseudo spécifié.
-		
-	Limité aux Services admins.
 
 ###########################################################################
 #
@@ -4223,8 +4172,6 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntaxe: UNSUSPEND pseudo
 
 	Libere un pseudo suspendu.
-
-	Limité aux Services admins.
 
 ###########################################################################
 #
@@ -5152,7 +5099,7 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Les Services admins peuvent aussi effacer tout canal sans
+	Les Services operators peuvent aussi effacer tout canal sans
 	avoir besoin de s'identifier avec un mot de pass, et peuvent
 	voir l'access, AKICK, et level lists de tout canaux.
 
@@ -5166,7 +5113,7 @@ CHAN_SERVADMIN_HELP_LOGOUT
 	la commande sur n'importe qui, sinon vous ne pouvez que
 	l'utiliser sur vous même.
 	
-	Si vous êtes un Services admin, vous pouvez utiliser
+	Si vous êtes un Services operaror, vous pouvez utiliser
 	cette commande sur n'importe qui pour n'importe quel 
 	canal sans avoir besoin d'être le propriétaire du canal.
 	Vous pouvez également omettre le paramètre pseudo, cela aura
@@ -5176,15 +5123,15 @@ CHAN_SERVADMIN_HELP_LOGOUT
 CHAN_SERVADMIN_HELP_DROP
 	Syntaxe: DROP canal
 	
-	Efface le canal nommé. Seuls les Services admins
+	Efface le canal nommé. Seuls les Services operators
 	peuvent effacer un canal pour lequel ils n'ont
 	pas été identifiés.
 
 CHAN_SERVADMIN_HELP_SET
 	
-	Les Services admins peuvent aussi définir l'option 
+	Les Services operators peuvent aussi définir l'option 
 	NOEXPIRE, avec lequel les canaux peuvent être empêchés
-	d'expirer. De plus, les Services admins peuvent définir
+	d'expirer. De plus, les Services operators peuvent définir
 	les options de tout canal sans s'identifier avec le
 	mot de passe du canal. 
 
@@ -5193,12 +5140,10 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	
 	Définit si le canal donné expirera. Mettre ceci à ON
 	empêche le canal d'expirer.
-	
-	Réservée aux Services admins.
 
 CHAN_SERVADMIN_HELP_INFO
 	
-	Les services admins peuvent utiliser le paramètre ALL 
+	Les services operators peuvent utiliser le paramètre ALL 
 	avec n'importe quel canal.
 
 CHAN_SERVADMIN_HELP_LIST
@@ -5206,14 +5151,14 @@ CHAN_SERVADMIN_HELP_LIST
 	
 	Liste tous les canaux enregistrés correspondants au modèle
 	donné. Les canaux avec l'option PRIVATE seront uniquement
-	affichés aux Services admins. Les canaux ayant l'option 
-	NOEXPIRE seront préfixés par un ! pour les Services admins. 
+	affichés aux Services operators. Les canaux ayant l'option 
+	NOEXPIRE seront préfixés par un ! pour les Services operators. 
 	
 	Si les options FORBIDDEN ou NOEXPIRE sont données, seuls 
 	les canaux qui, respectivement, sont interdits ou ont l'option
 	NOEXPIRE active seront affichés. Si plus options sont
 	données, les deux types de canaux seront affichés. Ces options
-	sont réservées aux Services admins.
+	sont réservées aux Services operators.
 
 CHAN_SERVADMIN_HELP_GETPASS
 	Syntaxe: GETPASS canal
@@ -5223,8 +5168,6 @@ CHAN_SERVADMIN_HELP_GETPASS
 	la personne qui a utilisé cette commande et le canal
 	pour lequel elle a été utilisée sera loggée et envoyée en
 	un WALLOPS/GLOBOPS.
-	
-	Réservée aux Services admins.
 
 CHAN_SERVADMIN_HELP_FORBID
 	Syntaxe: FORBID canal [raison]
@@ -5233,8 +5176,6 @@ CHAN_SERVADMIN_HELP_FORBID
 	canal donné. Peut être annulé en effacant le canal.
 	
 	La raison peut être requise sur certains réseaux.
-	
-	Réservée aux Services admins.
 
 CHAN_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND canal [raison]
@@ -5244,8 +5185,6 @@ CHAN_SERVADMIN_HELP_SUSPEND
 	les données et configurations.
 	
 	Une raison peut etre demandé sur certain réseaux.
-	
-	Limité aux Services admins.
 
 CHAN_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND canal
@@ -5253,8 +5192,6 @@ CHAN_SERVADMIN_HELP_UNSUSPEND
 	Libère un canal qui a été suspendu. Toutes les données
 	et configurations seront restauré tel qu'elles etait
 	avant la suspension.
-	
-	Limité aux Services admins.
 
 CHAN_SERVADMIN_HELP_STATUS
 	Syntaxe: STATUS canal pseudo
@@ -5267,8 +5204,6 @@ CHAN_SERVADMIN_HELP_STATUS
 	Si une erreur se produit, la réponse sera de la forme:
 	
 	    STATUS ERROR error-message
-	
-	Réservée aux Services admins.
 
 ###########################################################################
 #
@@ -5449,7 +5384,7 @@ MEMO_SERVADMIN_HELP_SET_LIMIT
 	antérieure a été définie avec HARD).
 	
 	Cette utilisation de la commande SET LIMIT est réservée aux
-	Services admins. Les autres utilisateurs peuvent uniquement
+	Services operators. Les autres utilisateurs peuvent uniquement
 	entrer une limite pour eux-mêmes ou un canal sur lequel ils
 	ont de tels privilèges, ne peuvent supprimer %d limite, et
 	ne peuvent définir de limite stricte.
@@ -5479,8 +5414,6 @@ MEMO_HELP_STAFF
 
 	Envoie un memo à tout le staff des services contenant le
 	texte.
-	Note: Si vous avez un bot ou des clones dans la liste des
-	oper et admins, ils recevront aussi un memo.
 
 ###########################################################################
 #
@@ -5533,10 +5466,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Envoie un message à tous les utilisateurs
 OPER_HELP_CMD_STATS
 	    STATS       Affiche le status des Services et du réseau
-OPER_HELP_CMD_OPER
-	    OPER        Modifie la liste des opérateurs des Services
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Modifie la liste des administrateurs des Services
 OPER_HELP_CMD_STAFF
 	    STAFF       Affiche le staff des services et leurs status 
 OPER_HELP_CMD_MODE
@@ -5638,7 +5567,7 @@ OPER_HELP_STATS
 	Avec l'option AKILL, affiche la taille actuelle de la liste
 	d'AKILL et le temps d'échéance par défaut.
 	
-	L'option ALL est réservée uniquement aux Services admins,
+	L'option ALL est réservée uniquement aux Services operators,
 	et affiche des informations sur l'utilisation de la mémoire
 	par les Services. L'utilisation de cette commande peut geler
 	les Services pendant un court instant sur de grands réseaux,
@@ -5658,7 +5587,7 @@ OPER_HELP_STATS
 OPER_HELP_IGNORE
 	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 	
-	Allows Services Admins to make Services ignore a nick or mask
+	Allows Services operators to make Services ignore a nick or mask
 	for a certain time or until the next restart. The default
 	time format is seconds. You can specify it by using units.
 	Valid units are: s for seconds, m for minutes, 
@@ -5929,8 +5858,6 @@ OPER_HELP_SET
 	    SUPERADMIN Active ou désactive le mode super-admin
 	    IGNORE     Active ou désactive le mode ignore
 	    LIST       Liste les options
-	
-	Réservée aux Services admins.
 
 OPER_HELP_SET_READONLY
 	Syntaxe: SET READONLY {ON | OFF}
@@ -6029,28 +5956,12 @@ OPER_HELP_JUPE
 	serveur, sinon, l'information du serveur contiendra le 
 	texte "Juped by <pseudo>", laissant paraître le pseudo
 	de la personne qui a jupé le serveur.
-	
-	Réservée aux Services admins.
-
-OPER_HELP_RAW
-	Syntaxe: RAW texte
-	
-	Envoie une chaîne de texte directement au serveur sur 
-	lequel les Services sont connectés. Cette commande a un
-	champ d'utilisation très limité, et peut causer des
-	troubles dans un réseau en cas de mauvaise utilisation.
-	N'UTILISEZ PAS CETTE COMMANDE à moins d'être absolument
-	sûr de ce que vous faites!
-	
-	Réservée aux Services admins.
 
 OPER_HELP_UPDATE
 	Syntaxe: UPDATE
 	
 	Provoque la mise à jour de toutes les bases de données dès
 	que vous le demandez.
-	
-	Réservée aux Services admins.
 	
 OPER_HELP_RELOAD
 	Syntaxe: RELOAD
@@ -6060,8 +5971,6 @@ OPER_HELP_RELOAD
 	de même le redémarrage des Services pour prendre effet
 	(comme le nom des services, l'activation de la limite
 	de sessions, etc.)
-	
-	Réservée aux Services admins.
 
 OPER_HELP_QUIT
 	Syntaxe: QUIT
@@ -6071,16 +5980,12 @@ OPER_HELP_QUIT
 	utilisée à moins que des dommages dans la copie en mémoire des
 	bases de données ne soient soupçonnés. Pour des arrêts normaux,
 	utilisez la commande SHUTDOWN.
-	
-	Réservée aux Services admins.
 
 OPER_HELP_SHUTDOWN
 	Syntaxe: SHUTDOWN
 	
 	Provoque la sauvegarde de toutes les bases de données puis
 	l'arrêt des services.
-	
-	Réservée aux Services admins.
 
 OPER_HELP_RESTART
 	Syntaxe: RESTART
@@ -6088,8 +5993,6 @@ OPER_HELP_RESTART
 	Provoque la sauvegarde de toutes les bases de données et
 	le redémarrage des Services (c'est à dire qu'il arrête
 	le programme et le relance immédiatement).
-	
-	Réservée aux Services admins.
 
 OPER_HELP_CHANLIST
 	Syntaxe: CHANLIST [{modèle | pseudo} [SECRET]]
@@ -6102,8 +6005,6 @@ OPER_HELP_CHANLIST
 	ce pseudo seront listés. Si SECRET est spécifié, liste seulement les canaux 
 	correspondants à modèle qui ont le mode +s ou +p.
 	
-	Réservée aux Services admins.
-	
 OPER_HELP_USERLIST
 	Syntaxe: USERLIST [{modèle | canal} [INVISIBLE]]
 	
@@ -6114,8 +6015,6 @@ OPER_HELP_USERLIST
 	correspondants seront listés. Si canal est donné, seuls les 
 	utilisateurs du canal seront listés. +i INVISIBLE est spécifié,
 	seuls les utilisateurs avec le mode +i seront listés.
-	
-	Réservée aux Services admins.
 
 OPER_HELP_MODLOAD
 	Syntaxe: MODLOAD Fichier
@@ -6123,29 +6022,21 @@ OPER_HELP_MODLOAD
 	Cette commande charge le module depuis le fichier situé dans le repertoire
 	des modules.
 
-	Limité aux Services Roots.
-
 OPER_HELP_MODUNLOAD
 	Syntaxe: MODUNLOAD Fichier
 
 	Cette commande décharge le module depuis le fichier situé dans le repertoire
 	des modules.
 
-	Limité aux Services Roots.
-
 OPER_HELP_MODINFO
 	Syntaxe: MODINFO Fichier
 
 	Cette commande donne des informations sur un module chargé.
 
-	Limité aux Services Roots.
-
 OPER_HELP_MODLIST
 	Syntaxe: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 
 	Liste les modules actuelement chargés.
-
-	Limité aux Services Roots.
 
 
 ###########################################################################
@@ -6479,7 +6370,7 @@ BOT_SERVADMIN_HELP_BOT
 	        BOT CHANGE ancien-pseudo nouveau-pseudo [user [host [real]]]
 	        BOT DEL pseudo
 	
-	Permet aux Services admins de créer, modifier, et
+	Permet aux Services operators de créer, modifier, et
 	supprimer les bots que les utilisateurs pourront
 	utiliser sur leurs canaux.
 	
@@ -6498,7 +6389,7 @@ BOT_SERVADMIN_HELP_BOT
 	
 BOT_SERVADMIN_HELP_SET
 	
-	Ces options sont réservées aux Services admins:
+	Ces options sont réservées aux Services operators:
 	
 	    NOBOT            Empêche un bot d'être attribué à
 	                         un canal

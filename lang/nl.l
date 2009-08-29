@@ -2842,10 +2842,6 @@ OPER_JUPE_HOST_ERROR
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
 
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW text
-
 # UPDATE responses
 OPER_UPDATING
 	Bijwerken databases.
@@ -3089,7 +3085,7 @@ OPER_HELP_EXCEPTION
 	         EXCEPTION LIST [mask | lijst]
 	         EXCEPTION VIEW [mask | lijst]
 	
-	Staat Services admin toe de lijst van hosts met een specifieke
+	Staat Services Operator toe de lijst van hosts met een specifieke
 	sessielimit aan te passen, zodat zeker machines, bijvoorbeeld
 	shell servers, meer dan het standaard aantal clients kunnen
 	hebben. Zodra een host zijn seesie limiet bereikt, zullen alle
@@ -3131,7 +3127,7 @@ OPER_HELP_SESSION
 	Gebruik: SESSION LIST drempel
 	         SESSION VIEW host
 	
-	Stelt Services admins instaat de sessie lijst te bekijken.
+	Stelt Services Operators instaat de sessie lijst te bekijken.
 	
 	SESSION LIST geeft hosts weer met tenminste drempel
 	sessies weer. Deze drempel moet een nummer groter dan 1 zijn.
@@ -3295,10 +3291,7 @@ NEWS_HELP_LOGON
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
 	
-	LOGONNEWS LIST mag door elke IRC operator worden gebruikt om
-	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
-	alleen door Services admins gebruikt worden.
-
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Gebruik: OPERNEWS ADD text
@@ -3313,9 +3306,7 @@ NEWS_HELP_OPER
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
 	
-	OPERNEWS LIST mag door elke IRC operator worden gebruikt om
-	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
-	alleen door Services admins gebruikt worden.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD text
@@ -3328,9 +3319,7 @@ NEWS_HELP_RANDOM
 	nieuwsberichten willekeurig uitgekozen en naar hem/haar
 	verstuurd.
 	
-	RANDOMNEWS LIST mag door elke IRC operator worden gebruikt om
-	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
-	alleen door Services admins gebruikt worden.
+	RANDOMNEWS may only be used by Services Operators.
 
 ###########################################################################
 #
@@ -3965,7 +3954,7 @@ NICK_HELP_RESEND
 	to the e-mail address of the user whom is performing it.
 
 NICK_SERVADMIN_HELP
-	Services admins kunnen ook de registratie van elke nick
+	Services Operators kunnen ook de registratie van elke nick
 	opheffen zonder zich voor die nick te identificeren, en
 	mogen de toegangslijst voor elke nick bekijken.
 	(%R%S ACCESS LIST nick)
@@ -3981,7 +3970,7 @@ NICK_SERVADMIN_HELP_LOGOUT
 	Met een paramenter doet dit commando hetzelfde voor de
 	gegeven nick. Als je ook REVALIDATE meegeeft zullen de
 	Services de gegeven nick vragen opnieuw te identificeren.
-	Het gebruik hiervan is gelimiteerd tot Services admins.
+	Het gebruik hiervan is gelimiteerd tot Services Operators.
 
 NICK_SERVADMIN_HELP_DROP
 	Gebruik: DROP [nick]
@@ -3992,11 +3981,11 @@ NICK_SERVADMIN_HELP_DROP
 	Met een paramenter wordt de gegeven nick uit de database
 	verwijderd. Je kan de registratie van elke nick in je groep
 	ongedaan maken zonder speciale privileges. Het verwijderen
-	van elke nick is gelimiteerd tot Services admins.
+	van elke nick is gelimiteerd tot Services Operators.
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Services admins mogen het ALL parameter met elke nick gebruiken.
+	Services Operators mogen het ALL parameter met elke nick gebruiken.
 
 NICK_SERVADMIN_HELP_LIST
 	Gebruik: trefbeeld [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4004,15 +3993,15 @@ NICK_SERVADMIN_HELP_LIST
 	Geeft alle geregistreerde nicknames weer die overeen komen
 	met het gegeven trefbeeld, in nick!gebruiker@host formaat.
 	Nicks met de PRIVATE optie in worden alleen weergegeven
-	aan Services admins. Nicks met de NOEXPIRE optie aan zullen
-	een ! voor de naam hebben als een Services admin de lijst
+	aan Services Operators. Nicks met de NOEXPIRE optie aan zullen
+	een ! voor de naam hebben als een Services Operator de lijst
 	bekijkt.
 	
 	If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only
 	nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the
 	NOEXPIRE flag set will be displayed. If multiple options are
 	given, all nicks matching at least one option will be displayed.
-	These options are limited to Services admins.  
+	These options are limited to Services Operators.  
 	
 	Voorbeelden:
 	
@@ -4036,7 +4025,7 @@ NICK_SERVADMIN_HELP_ALIST
 	kanalen weer waar nick een toegangsniveau van tenminste
 	niveau heeft.
 	
-	Dit gebruik is gelimiteerd tot Services adminstrators.
+	Dit gebruik is gelimiteerd tot Services Operatorstrators.
 
 NICK_SERVADMIN_HELP_GLIST
 	Gebruik: GLIST [nick]
@@ -4047,7 +4036,7 @@ NICK_SERVADMIN_HELP_GLIST
 	Indied een paramenter gegeven is worden alle nicks
 	weergegeven die zich in de groep van de gegeven nick
 	bevinden.
-	Dit gebruik is gelimiteerd tot Services admins.
+	Dit gebruik is gelimiteerd tot Services Operators.
 
 NICK_SERVADMIN_HELP_GETPASS
 	Gebruik: GETPASS nick
@@ -5016,7 +5005,7 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Services administrators kunnen ook elk kanaal dropped zonder dat
+	Services Operators kunnen ook elk kanaal dropped zonder dat
 	ze hoeven te indentificeren via een wachtwoord, en kunnen de
 	toegangs-, AKICK-, en niveau-lijsten bekijken voor elk kanaal.
 
@@ -5029,7 +5018,7 @@ CHAN_SERVADMIN_HELP_LOGOUT
 	Als je de stichter van het kanaal bent kun je iedereen
 	uitloggen, anders kun je alleen jezelf uitloggen.
 	
-	Als je een Services adminstrator bent kun je iedereen
+	Als je een Services Operatorstrator bent kun je iedereen
 	uitloggen van elke kanaal zonder daar stichter-rechten te
 	hebben. Je kan ook het nick-paramenter weglaten: dit
 	zorgt ervoor dat iedereen uitgelogd zal worden.
@@ -5038,12 +5027,12 @@ CHAN_SERVADMIN_HELP_DROP
 	Gebruik: DROP kanaal
 	
 	Zegt de registratie van het gegeven kanaal op. Alleen
-	Services admins kunnen elk kanaal droppen, ook al zijn
+	Services Operators kunnen elk kanaal droppen, ook al zijn
 	ze niet voor het betreffende kanaal geindtificeerd.
 
 CHAN_SERVADMIN_HELP_SET
 	
-	Services adminstrators kunnen ook de NOEXPIRE optie
+	Services Operatorstrators kunnen ook de NOEXPIRE optie
 	instellen, waarmee kanalen niet kunnen verlopen. Ook
 	kunnen ze elke optie voor elk kanaal zet zonder zich te
 	identificeren met het wachtwoord voor het kanaal.
@@ -5056,7 +5045,7 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 
 CHAN_SERVADMIN_HELP_INFO
 	
-	Services adminstrators kunnen het ALL parameter gebruiken
+	Services Operatorstrators kunnen het ALL parameter gebruiken
 	bij elk kanaal.
 
 CHAN_SERVADMIN_HELP_LIST
@@ -5064,16 +5053,16 @@ CHAN_SERVADMIN_HELP_LIST
 	
 	Geeft alle geregistreerde kanalen weer die overeen komen met
 	het gegeven tgrefbeeld. Kanalen met de PRIVATE optie aan
-	worden alleen weergegeven aan Services administrators.
+	worden alleen weergegeven aan Services Operators.
 	Kanalen met de NOEXPIRE aan zullen een ! voor de kanaal-
-	naam hebben voor Services administrators.
+	naam hebben voor Services Operators.
 	
 	Als de FORBIDDEN, SUSPENDED of NOEXPIRE opties zijn gegeven
 	worden alleen kanalen die, respectievelijk, verboden,
 	tijdelijk buiten werken gesteld zijn, of als niet-verlopen
 	gemarkeerd zijn weergegeven. Als er meerdere opties worden
 	gegeven worden alle gevraagde types weergegeven. Deze opties
-	zijn gelimiteerd tot Services adminstrators.
+	zijn gelimiteerd tot Services Operatorstrators.
 
 CHAN_SERVADMIN_HELP_GETPASS
 	Gebruik: GETPASS kanaal
@@ -5294,7 +5283,7 @@ MEMO_SERVADMIN_HELP_SET_LIMIT
 	(zelfs als een vorige limiet is ingesteld met HARD).
 	
 	Het gebruiken van het SET LIMIT commando is gelimiteerd tot
-	Services admins. Andere gebruikers mogen alleen een limiet
+	Services Operators. Andere gebruikers mogen alleen een limiet
 	voor zichzelf of voor een kanaal waar ze genoeg rechten hebben
 	instellen, mogen geen limiet instellen boven %d, en mogen geen
 	harde limiet instellen.
@@ -5311,7 +5300,7 @@ MEMO_SERVADMIN_HELP_INFO
 	
 	Met een nick paramenter wordt dezelfde informatie voor de
 	gegeven nick weergegeven. Dit gebruik is gelimiteerd tot
-	Services admins.
+	Services Operators.
 
 ###########################################################################
 #
@@ -5322,11 +5311,7 @@ MEMO_SERVADMIN_HELP_INFO
 MEMO_HELP_STAFF
 	Gebruik: STAFF memo-text
 	
-	Stuurt alle services-staf een memo die memo-text bevat.
-	Let op: Als je opers op de operator- en op de administrator-
-	lijst hebt zullen ze de memo twee keer ontvangen. Hetzelfde
-	geldt voor oper's die tegelijk op de root-lijst als op een
-	andere lijst staan.
+	Sends all services staff a memo containing memo-text.
 
 MEMO_HELP_SENDALL
 	Gebruik: SENDALL memo-text
@@ -5374,10 +5359,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Stuurt een bericht naar alle gebruikers
 OPER_HELP_CMD_STATS
 	    STATS       Geeft de status van Services en netwerk weer
-OPER_HELP_CMD_OPER
-	    OPER        Wijzig de Services operator lijst
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Wijzig de Services Administrator lijst
 OPER_HELP_CMD_STAFF
 	    STAFF       Display Services staff and online status
 OPER_HELP_CMD_MODE
@@ -5477,7 +5458,7 @@ OPER_HELP_STATS
 	Met de AKILL optie worden de huidige grootte van de AKILL
 	lijst en de huidige standaard verloop-tijd weergegeven.
 	
-	De ALL optie is alleen beschikbaar voor Services administrators
+	De ALL optie is alleen beschikbaar voor Services Operators
 	en geeft informatie over het geheugen gebruik van Services.
 	Het gebruiken van dit commando van er voor zorgen dat de Services
 	gedurende een korte tijd niet meer reageren indien ze gebruikt
@@ -5489,7 +5470,7 @@ OPER_HELP_STATS
 OPER_HELP_IGNORE
 	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
 	
-	Stelt Services administrators in staat de Services een nick
+	Stelt Services Operators in staat de Services een nick
 	of mask voor een bepaalde tijd of tot de volgende herstart te
 	laten negeren. Standaard wordt de tijd gegeven in seconden.
 	Je kan de tijd opgegeven met behulup van units. Geldige units 
@@ -5841,15 +5822,6 @@ OPER_HELP_JUPE
 	deze in het server informatie veld geplaatsd, anders zal het
 	informatie veld de text "Juped by <nick>" bevatten, waar
 	<nick> vervangen wordt door de <nick> die de server JUPEt.
-
-OPER_HELP_RAW
-	Gebruik: RAW text
-	
-	Stuurt text direct naar de server waarmee Services verbonden
-	zijn. Dit commando heeft een beperkt aantal mogelijkheden, en
-	kan voor chaos zorgen op een netwerk als het onjuist gebruikt
-	wordt. GEBRUIK DIT COMMANDO NIET tenzij je absoluut zeker
-	bent van wat je doet!
 
 OPER_HELP_UPDATE
 	Gebruik: UPDATE
@@ -6242,7 +6214,7 @@ BOT_SERVADMIN_HELP_BOT
 	         BOT CHANGE oldnick newnick [gebruiker [host [echte naam]]]
 	         BOT DEL nick
 	
-	Stelt Services administrators in staat om bots te maken,
+	Stelt Services Operators in staat om bots te maken,
 	wijzigen en verwijderen die gebruikers op hun eigen kanaal
 	kunnen gebruiken.
 	
@@ -6260,7 +6232,7 @@ BOT_SERVADMIN_HELP_BOT
 
 BOT_SERVADMIN_HELP_SET
 	
-	Deze opties zijn gereserveerd voor Services administrators:
+	Deze opties zijn gereserveerd voor Services Operators:
 	
 	    NOBOT            Zorg dat een bot niet aan een kanaal kan
 	                        worden toegevoegd

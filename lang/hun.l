@@ -395,7 +395,7 @@ NICK_LOGOUT_SUCCEEDED
 NICK_LOGOUT_X_SUCCEEDED
 	 %s nick sikeresen kijelentkezett.
 NICK_LOGOUT_SERVICESADMIN
-	%s nem tud kijelentkezni, mert õ egy services admin.
+	%s nem tud kijelentkezni, mert õ egy Services Operator.
 	
 # DROP válaszok
 NICK_DROP_DISABLED
@@ -2835,10 +2835,6 @@ OPER_JUPE_HOST_ERROR
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
 
-# RAW válaszok
-OPER_RAW_SYNTAX
-	RAW text
-
 # UPDATE válaszok
 OPER_UPDATING
 	Adatbázis mentve.
@@ -3271,9 +3267,7 @@ NEWS_HELP_LOGON
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST may be used by any IRC operator to list the
-	current news messages.  ADD and DEL may only be used by
-	Services admins.
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD text
@@ -3287,9 +3281,7 @@ NEWS_HELP_OPER
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST may be used by any IRC operator to list the
-	current oper news messages.  ADD and DEL may only be used by
-	Services admins.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD szöveg
@@ -3300,9 +3292,7 @@ NEWS_HELP_RANDOM
 	egy felhasználó csatlakozik a hálózathoz, egy (csak egy)
 	random newst fog véletlenszerûen elküldeni részére.
 	
-	RANDOMNEWS LIST IRC operátorok,használhatják a parancsot
-	részükre listázza az aktuális oper news üzeneteket. Add és 
-	Del -t csak szervíz adminok használhatják
+	RANDOMNEWS may only be used by Services Operators.
 	
 ###########################################################
 #
@@ -3666,23 +3656,17 @@ NICK_HELP_SASET
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_DISPLAY
 	Syntax: SASET nickname DISPLAY new-display
 	
 	Changes the display used to refer to the nickname group in 
 	Services. The new display MUST be a nick of the group.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntax: SASET nickname PASSWORD new-password
 	
 	Changes the password used to identify as the nick's	owner.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_URL
 	Syntax: SASET nickname URL url
@@ -3690,15 +3674,11 @@ NICK_HELP_SASET_URL
 	Associates the given URL with the nickname.  This URL
 	will be displayed whenever someone requests information
 	on the nick with the INFO command.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-	Limited to Services admins.
 	
 NICK_HELP_SASET_ICQ
 	Syntax: SASET nickname ICQ number
@@ -3707,8 +3687,6 @@ NICK_HELP_SASET_ICQ
 	number will be displayed whenever someone requests 
 	information on the nick with the INFO command.
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
 	
@@ -3716,8 +3694,6 @@ NICK_HELP_SASET_GREET
 	will be displayed when joining a channel that has GREET
 	option enabled, provided that the user has the necessary 
 	access on it.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_KILL
 	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
@@ -3734,8 +3710,6 @@ NICK_HELP_SASET_KILL
 	warned first or given a chance to change their nick; please
 	do not use this option unless necessary.  Also, your
 	network's administrators may have disabled this option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_SECURE
 	Syntax: SASET nickname SECURE {ON | OFF}
@@ -3747,8 +3721,6 @@ NICK_HELP_SASET_SECURE
 	list.  However, if you are on the access list, %S
 	will not auto-kill you regardless of the setting of the
 	KILL option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntax: SASET nickname PRIVATE {ON | OFF}
@@ -3758,8 +3730,6 @@ NICK_HELP_SASET_PRIVATE
 	nickname lists generated with %S's LIST command.
 	(However, anyone who knows the nickname can still get
 	information on it using the INFO command.)
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_HIDE
 	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
@@ -3772,24 +3742,18 @@ NICK_HELP_SASET_HIDE
 	The second parameter specifies whether the information should
 	be displayed (OFF) or hidden (ON).
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_MSG
 	Syntax: SASET nickname MSG {ON | OFF}
 	
 	Allows you to choose the way Services are communicating with 
 	the given user. With MSG set, Services will use messages,
 	else they'll use notices.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntax: SASET nickname NOEXPIRE {ON | OFF}
 	
 	Sets whether the given nickname will expire.  Setting this
 	to ON prevents the nickname from expiring.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
@@ -3797,8 +3761,6 @@ NICK_HELP_SASET_AUTOOP
 	Sets whether the given nickname will be opped automatically.
 	Set to ON to allow ChanServ to op the given nickname 
 	automatically when joining channels.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_LANGUAGE
 	Syntax: SASET nickname LANGUAGE number
@@ -4004,7 +3966,7 @@ NICK_SERVADMIN_HELP_LIST
 	Ha a FORBIDDEN, SUSPENDED vagy NOEXPIRE opció meg van adva, csak azok
 	a nickek amelyek vagy forbidoltak vagy NOEXPIRE flegjük van
 	fognak  megjelenik. Ha mindkét opció meg van adva mindkét
-	tipus megjelenik. Az opciók korlátozva Services adminoknak.
+	tipus megjelenik. Az opciók korlátozva Services Operatoroknak.
 	
 	Példák:
 	
@@ -4082,8 +4044,6 @@ NICK_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
 
 	SUSPENDs / UNSUSPENDs a nickname from being identified to
-	
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -4095,8 +4055,6 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND nickname
 
 	UNSUSPENDS a nickname from being used.
-
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -5011,7 +4969,7 @@ CHAN_SERVADMIN_HELP_LOGOUT
 CHAN_SERVADMIN_HELP_DROP
 	Syntax: DROP #szoba
 	
-	Törli a regisztrációt a csatornáról.Csak Services admins
+	Törli a regisztrációt a csatornáról.Csak Services Operators
 	droppolhat csatornát,úgy hogy nem használja a szoba
 	jelszavát.
 	
@@ -5040,8 +4998,8 @@ CHAN_SERVADMIN_HELP_LIST
 	
 	Lists all registered channels matching the given pattern.
 	Channels with the PRIVATE option set will only be displayed
-	to Services admins. Channels with the NOEXPIRE option set 
-	will have a ! prepended to the channel name for Services admins.
+	to Services Operators. Channels with the NOEXPIRE option set 
+	will have a ! prepended to the channel name for Services Operators.
 	
 	If the FORBIDDEN, SUSPENDED or NOEXPIRE options are given, only 
 	channels which, respectively, are FORBIDden, SUSPENDed or have 
@@ -5298,9 +5256,6 @@ MEMO_HELP_STAFF
 	Syntax: STAFF memo-üzenet
 	
 	Memo üzenet küldése az opereknek/adminoknak.
-	Megjegyzés: Ha valamelyik nick szerepel az oper
-	és admin listán is, akkor a memot kétszer kapja meg.
-	Hasonló a helyzet a root és más listákkal.
 	
 MEMO_HELP_SENDALL
 	Syntax: SENDALL memo-üzenet
@@ -5334,10 +5289,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Üzenetet küld összes felhasználónak
 OPER_HELP_CMD_STATS
 	    STATS       Mutatja a Szervít és hálózat állapotát
-OPER_HELP_CMD_OPER
-	    OPER        Módosítja a Szervíz operátorok listáját
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Módosítja a Szervíz admin listát
 OPER_HELP_CMD_STAFF
 	    STAFF       Kijelzi a szervízt és aktív állapotát
 OPER_HELP_CMD_MODE
@@ -5444,7 +5395,7 @@ OPER_HELP_STATS
 OPER_HELP_IGNORE
 	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 	
-	Allows Services Admins to make Services ignore a nick or mask
+	Allows Services Operators to make Services ignore a nick or mask
 	for a certain time or until the next restart. The default
 	time format is seconds. You can specify it by using units.
 	Valid units are: s for seconds, m for minutes, 
@@ -5799,18 +5750,7 @@ OPER_HELP_JUPE
 	person who jupitered the server.
 	
 	Korlátozva Szervíz adminoknak.
-	
-OPER_HELP_RAW
-	Syntax: RAW szöveg
-	
-	Sends a string of text directly to the server to which
-	Services is connected.  This command has a very limited
-	range of uses, and can wreak havoc on a network if used
-	improperly.  DO NOT USE THIS COMMAND unless you are
-	absolutely certain you know what you are doing!
-	
-	Korlátozva Szervíz adminoknak.
-	
+
 OPER_HELP_UPDATE
 	Syntax: UPDATE
 	
@@ -5838,7 +5778,7 @@ OPER_HELP_QUIT
 	Normál leállításokhoz használd kérlek a
 	SHUTDOWN parancsot!
 	
-	Korlátozva Services adminoknak.
+	Korlátozva Services Operatoroknak.
 	
 OPER_HELP_SHUTDOWN
 	Syntax: SHUTDOWN
@@ -5889,29 +5829,21 @@ OPER_HELP_MODLOAD
 	Ez a parancs betölti azt modult, a modules könyvtárból,
 	amelyiknek a fájlnevét megadtad.
 	
-	Korlátozva Szervíz Rootnak.
-	
 OPER_HELP_MODUNLOAD
 	Syntax: MODUNLOAD FileName
 	
 	Ez a parancs kitölti a megnevezett fájlnevû msdult a 
 	modulok listájából.
-		
-	Korlátozva Szervíz Rootnak.
 	
 OPER_HELP_MODINFO
 	Syntax: MODINFO Fájlnév
 	
 	A parancs részletes információt ad a betöltött modulokról.
 	
-	Korlátozva Szervíz Rootnak.
-	
 OPER_HELP_MODLIST
 	Syntax: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 	
 	Listázza az összes betöltött aktív modult.
-	
-	Korlátozva Szervíz Rootnak.
 		
 ###########################################################
 #
@@ -6217,7 +6149,7 @@ BOT_SERVADMIN_HELP_BOT
 			BOT CHANGE  réginick   újnick [user  [ hoszt  [ valós ]]]
 			BOT DEL nick
 	
-	Lehetõvé teszi a Services adminoknak, hogy létrehozzanak
+	Lehetõvé teszi a Services Operatoroknak, hogy létrehozzanak
 	töröljenek, módosítsanak botokat, amiket a userek
 	használhatnak a csatornáikon.
 	

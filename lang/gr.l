@@ -396,7 +396,7 @@ NICK_LOGOUT_X_SUCCEEDED
 
 # DROP responses
 NICK_LOGOUT_SERVICESADMIN
-	Can't logout %s because he's a services administrator.
+	Can't logout %s because he's a Services Operator.
 
 # DROP responses
 NICK_DROP_DISABLED
@@ -2144,7 +2144,7 @@ BOT_BOTLIST_FOOTER
 	%d bots διαθέσιμα.
 BOT_BOTLIST_EMPTY
 	Δεν υπάρχουν διαθέσιμα bots αυτή τη στιγμή.
-	Ρώτα τον Services admin να σου φτιάξει ένα!
+	Ρώτα τον Services Operator να σου φτιάξει ένα!
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
@@ -2875,10 +2875,6 @@ OPER_JUPE_HOST_ERROR
 	Please use a valid server name when juping
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
-	
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW text
 
 # UPDATE responses
 OPER_UPDATING
@@ -3133,7 +3129,7 @@ OPER_HELP_EXCEPTION
 	        EXCEPTION LIST [mask | list]
 	        EXCEPTION VIEW [mask | list]
 	
-	Επιτρέπουν στους Services admins να ορίσουν την λίστα των hosts τα
+	Επιτρέπουν στους Services Operators να ορίσουν την λίστα των hosts τα
 	οποία έχουν ένα συγκεκριμένο όριο - αφήνοντας ασφαλής μηχανήματα, 
 	όπως είναι τα shell servers, to carry more than the default number
 	of clients at a time. Αν κάποιο host περάσει από το session limit,
@@ -3337,9 +3333,7 @@ NEWS_HELP_LOGON
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST may be used by any IRC operator to list the
-	current news messages.  ADD and DEL may only be used by
-	Services admins.
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD text
@@ -3353,9 +3347,7 @@ NEWS_HELP_OPER
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST may be used by any IRC operator to list the
-	current oper news messages.  ADD and DEL may only be used by
-	Services admins.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Σύνταξη: RANDOMNEWS ADD περιεχόμενα
@@ -3366,9 +3358,7 @@ NEWS_HELP_RANDOM
 	Όταν ένας χρήστης συνδεθεί στο δίκτυο, ένα (και μόνο ένα) από τα
 	μηνύματα θα επιλεχθεί τυχαία και θα σταλεί.
 	
-	RANDOMNEWS LIST μπορεί να χρησιμοποιηθεί από τους IRC operators για να
-	δούν τα μηνύματα.  ADD και DEL μπορεί να χρησιμοποιήσουν οι
-	επικεφαλείς των υπηρεσιών (Services admins).
+	RANDOMNEWS may only be used by Services Operators.
 
 ###########################################################################
 #
@@ -3748,23 +3738,17 @@ NICK_HELP_SASET
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_DISPLAY
 	Syntax: SASET nickname DISPLAY new-display
 	
 	Changes the display used to refer to the nickname group in 
 	Services. The new display MUST be a nick of the group.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntax: SASET nickname PASSWORD new-password
 	
 	Changes the password used to identify as the nick's	owner.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_URL
 	Syntax: SASET nickname URL url
@@ -3772,15 +3756,11 @@ NICK_HELP_SASET_URL
 	Associates the given URL with the nickname.  This URL
 	will be displayed whenever someone requests information
 	on the nick with the INFO command.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-	Limited to Services admins.
 	
 NICK_HELP_SASET_ICQ
 	Syntax: SASET nickname ICQ number
@@ -3789,8 +3769,6 @@ NICK_HELP_SASET_ICQ
 	number will be displayed whenever someone requests 
 	information on the nick with the INFO command.
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
 	
@@ -3798,8 +3776,6 @@ NICK_HELP_SASET_GREET
 	will be displayed when joining a channel that has GREET
 	option enabled, provided that the user has the necessary 
 	access on it.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_KILL
 	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
@@ -3816,8 +3792,6 @@ NICK_HELP_SASET_KILL
 	warned first or given a chance to change their nick; please
 	do not use this option unless necessary.  Also, your
 	network's administrators may have disabled this option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_SECURE
 	Syntax: SASET nickname SECURE {ON | OFF}
@@ -3829,8 +3803,6 @@ NICK_HELP_SASET_SECURE
 	list.  However, if you are on the access list, %S
 	will not auto-kill you regardless of the setting of the
 	KILL option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntax: SASET nickname PRIVATE {ON | OFF}
@@ -3840,8 +3812,6 @@ NICK_HELP_SASET_PRIVATE
 	nickname lists generated with %S's LIST command.
 	(However, anyone who knows the nickname can still get
 	information on it using the INFO command.)
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_HIDE
 	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
@@ -3854,24 +3824,18 @@ NICK_HELP_SASET_HIDE
 	The second parameter specifies whether the information should
 	be displayed (OFF) or hidden (ON).
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_MSG
 	Syntax: SASET nickname MSG {ON | OFF}
 	
 	Allows you to choose the way Services are communicating with 
 	the given user. With MSG set, Services will use messages,
 	else they'll use notices.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntax: SASET nickname NOEXPIRE {ON | OFF}
 	
 	Sets whether the given nickname will expire.  Setting this
 	to ON prevents the nickname from expiring.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
@@ -4049,7 +4013,7 @@ NICK_HELP_RESEND
 	to the e-mail address of the user whom is performing it.
 	
 NICK_SERVADMIN_HELP
-	Οι Services admins (επικεφαλείς) μπορούν να διαγράψουν ένα ψευδώνυμο χωρίς να
+	Οι Services operators (επικεφαλείς) μπορούν να διαγράψουν ένα ψευδώνυμο χωρίς να
 	χρειαστεί να κάνουν εντολή αναγνώρισης και καν αλλαγή ψευδώνυμου, και μπορούν να
 	δουν την  λίστα access  για κάθε ψευδώνυμο (%R%S ACCESS LIST nick).
 	
@@ -4062,7 +4026,7 @@ NICK_SERVADMIN_HELP_LOGOUT
 	    
 	Με την παράμετρο αυτή, κάνει το ίδιο για το δωσμένο ψευδώνυμο. Αν κάνεις 
 	REVALIDATE, οι υπηρεσίες θα σε ρωτήσουν για ποιο ψευδώνυμο.
-	Αυτό το κάνουν μόνο οι (επικεφαλείς) Services admins.
+	Αυτό το κάνουν μόνο οι (επικεφαλείς) Services operators.
 	
 NICK_SERVADMIN_HELP_DROP
 	Σύνταξη: DROP [ψευδώνυμο]
@@ -4073,11 +4037,11 @@ NICK_SERVADMIN_HELP_DROP
 	Με την παράμετρο, σβήνει ο ψευδώνυμο από την βάση δεδομένων.
 	Μπορεί να σβήσεις κάποιο ψευδώνυμο που μπορεί να είναι στην ομάδα σου χωρίς 
 	να έχεις ξεχωριστά δικαιώματα. Το σβήσιμο του ψευδώνυμου έχουν το δικαίωμα να το 
-	κάνουν οι (επικεφαλείς) Services admins.
+	κάνουν οι (επικεφαλείς) Services Operators.
 	
 NICK_SERVADMIN_HELP_INFO
 	
-	Οι Services admins μπορούν να χρησιμοποιούν την ALL παράμετρο για 
+	Οι Services Operators μπορούν να χρησιμοποιούν την ALL παράμετρο για 
 	κάθε ψευδώνυμο.
 
 NICK_SERVADMIN_HELP_LIST
@@ -4085,9 +4049,9 @@ NICK_SERVADMIN_HELP_LIST
 	
 	Δίνει την λίστα όλων των κατοχυρωμένων ψευδώνυμων που ταιριάζουν με το ανάλογο
 	pattern, σε σύνταξη nick!user@host.  Ψευδώνυμα με επιλογή PRIVATE
-	θα φαίνονται μόνο στους (επικεφαλείς) Services admins.  Ψευδώνυμα με
+	θα φαίνονται μόνο στους (επικεφαλείς) Services Operators.  Ψευδώνυμα με
 	επιλογή NOEXPIRE θα έχουν ένα ! μπροστά από το ψευδώνυμο το οποίο θα το
-	λέπουν οι (επικεφαλείς) Services admins.
+	λέπουν οι (επικεφαλείς) Services Operators.
 	    
 	Παραδείγματα:
 	
@@ -4108,8 +4072,6 @@ NICK_SERVADMIN_HELP_ALIST
 	on. With two parameters lists channels that nickname has 
 	level access or greater on.
 
-	This use limited to Services admins.
-
 NICK_SERVADMIN_HELP_GLIST
 	Σύνταξη: GLIST [ψευδώνυμο]
 	
@@ -4117,7 +4079,7 @@ NICK_SERVADMIN_HELP_GLIST
 	στην ομάδα σου.
 	    
 	Με την παράμετρο, εμφανίζει όλα τα ψευδώνυμα που είναι στην ομάδα
-	του ζητούμενου ψευδώνυμου. Μόνο οι Services admins 
+	του ζητούμενου ψευδώνυμου. Μόνο οι Services Operators 
 	μπορούν να το κάνουν.
 	
 NICK_SERVADMIN_HELP_GETPASS
@@ -4128,7 +4090,7 @@ NICK_SERVADMIN_HELP_GETPASS
 	συγκεκριμένο θα καταγραφεί και η εντολή που εκτελέστηκε και το ψευδώνυμο
 	και θα σταλεί μέσω WALLOPS/GLOBOPS.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 	
 	Αυτή η εντολή δεν είναι διαθέσιμη αν είναι ενεργή η κωδικοποίηση.
 
@@ -4140,8 +4102,6 @@ NICK_SERVADMIN_HELP_GETEMAIL
 	this command is used, a message including the person who issued
 	the command and the email it was used on will be logged.
 
-	Limited to Services admins.
-
 NICK_SERVADMIN_HELP_FORBID
 	Σύνταξη: FORBID ψευδώνυμο [λόγος]
 	
@@ -4150,7 +4110,7 @@ NICK_SERVADMIN_HELP_FORBID
 	
 	Σε ορισμένα δίκτυα, ο λόγος που γίνεται αυτό χρειάζεται.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 ###########################################################################
 #
@@ -4162,8 +4122,6 @@ NICK_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
 
 	SUSPENDs / UNSUSPENDs a nickname from being identified to
-	
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -4175,8 +4133,6 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND nickname
 
 	UNSUSPENDS a nickname from being used.
-
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -5053,7 +5009,7 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Οι Services admins μπορούν να διαγράψουν οποιοδήποτε κανάλι,  χωρίς να κάνουν
+	Οι Services Operators μπορούν να διαγράψουν οποιοδήποτε κανάλι,  χωρίς να κάνουν
 	εντολή αναγνώρισης μέσω κωδικού, μπορούν να δούν την access, AKICK,
 	και τα level οποιουδήποτε καναλιού.
 	
@@ -5066,7 +5022,7 @@ CHAN_SERVADMIN_HELP_LOGOUT
 	Μπορεί ένας founder ενός καναλιού, να κάνει log out οποιοδήποτε,
 	ακόμα και τον εαυτό του.
 	
-	Αν είσαι Services admin, μπορείς να κάνεις log out 
+	Αν είσαι Services Operator, μπορείς να κάνεις log out 
 	οποιοδήποε από το κανάλι χωρίς να είσαι ο founder ή να γίνεις ο founder
 	του καναλιού. Επίσης, μπορείς να χρησιμοποιήσεις αυτή την παράμετρο για
 	ψευδώνυμο; με αυτό θα κάνεις log out όλους τους αναγνωρισμένους (identified)
@@ -5075,15 +5031,15 @@ CHAN_SERVADMIN_HELP_LOGOUT
 CHAN_SERVADMIN_HELP_DROP
 	Σύνταξη: DROP κανάλι
 	
-	Ξε-κατοχυρώνει το ζητούμενο κανάλι.  Μόνο οι Services admins
+	Ξε-κατοχυρώνει το ζητούμενο κανάλι.  Μόνο οι Services Operators
 	μπορουν να το κάνουν αυτό σε ένα κανάλι, χωρίς να κάνουν εντολή αναγνώρισης
 	για το κανάλι.
 
 CHAN_SERVADMIN_HELP_SET
 	
-	Οι Services admins μπορούν να επιλέξουν την NOEXPIRE εντολή, σε
+	Οι Services Operators μπορούν να επιλέξουν την NOEXPIRE εντολή, σε
 	αυτά που δεν θέλουν ποτέ να λήξουν.
-	Επίσης, οι Services admins μπορούν να αλλάξουν τις επιλογές για κάθε κανάλι
+	Επίσης, οι Services Operators μπορούν να αλλάξουν τις επιλογές για κάθε κανάλι
 	χωρίς να κάνουν εντολή αναγνώρισης σε κάθε κανάλι.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
@@ -5093,26 +5049,26 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	είσαι υποχρεωμένος να κάνεις εντολή αναγνώρισης στο χρονικό
 	περιθώριο που σου δίνεται.
 	
-	Μόνο οι Services admins μπορούν να το κάνουν.
+	Μόνο οι Services Operators μπορούν να το κάνουν.
 
 CHAN_SERVADMIN_HELP_INFO
 	
-	Οι Services admins μπορούν να χρησιμοποιήσουν την παράμετρο ALL για κάθε
+	Οι Services Operators μπορούν να χρησιμοποιήσουν την παράμετρο ALL για κάθε
 	κανάλι.
 
 CHAN_SERVADMIN_HELP_LIST
 	Σύνταξη: LIST pattern [FORBIDDEN] [NOEXPIRE]
 	
 	Εμφανίζει όλα τα κατοχυρωμένα κανάλια σε σχέση με το ζητούμενο κανάλι.
-	Κανάλια που είναι PRIVATE θα εμφανίζονται μόνο στους Services admins.
+	Κανάλια που είναι PRIVATE θα εμφανίζονται μόνο στους Services Operators.
 	Κανάλια που είναι NOEXPIRE θα έχουν ένα ! δίπλα από το όνομα του 
-	καναλιού, μόνο για τους Services admins.
+	καναλιού, μόνο για τους Services Operators.
 	
 	Αν γράψετε για FORBIDDEN ή NOEXPIRE, θα δείτε τα κανάλια αυτά τα
 	οποία είναι FORBIDden ή είναι NOEXPIRE.
 	Αν γράψετε και τα δυο μαζί θα εμφανιστούν τα κανάλια που έχουν και τα
 	δύο,δηλ αυτα που είναι FORBIDden και άλλα που είναι NOEXPIRE.
-	Αυτές οι επιλογές είναι για τους Services admins.
+	Αυτές οι επιλογές είναι για τους Services Operators.
 
 CHAN_SERVADMIN_HELP_GETPASS
 	Σύνταξη: GETPASS κανάλι
@@ -5122,7 +5078,7 @@ CHAN_SERVADMIN_HELP_GETPASS
 	χρήστη που εκτέλεσε αυτή την εντολή και το κανάλι για το οποίο
 	χρησιμοποιήθηκε και θα σταλεί με WALLOPS/GLOBOPS.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 	
 CHAN_SERVADMIN_HELP_FORBID
 	Σύνταξη: FORBID κανάλι [λόγος]
@@ -5132,7 +5088,7 @@ CHAN_SERVADMIN_HELP_FORBID
 	
 	Ο λόγος απαιτείται σε ορισμένα δίκτυα.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 	
 CHAN_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND channel [reason]
@@ -5142,16 +5098,12 @@ CHAN_SERVADMIN_HELP_SUSPEND
 	command to preserve all previous channel data/settings.
 	
 	Reason may be required on certain networks.
-	
-	Limited to Services admins.
 
 CHAN_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND channel
 	
 	Releases a suspended channel. All data and settings
 	are preserved from before the suspension.
-	
-	Limited to Services admins.
 
 CHAN_SERVADMIN_HELP_STATUS
 	Σύνταξη: STATUS κανάλι ψευδώνυμο
@@ -5165,7 +5117,7 @@ CHAN_SERVADMIN_HELP_STATUS
 	
 	    STATUS ERROR λάθος-μήνυμα
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 ###########################################################################
 #
@@ -5370,10 +5322,6 @@ MEMO_HELP_STAFF
 	Syntax: STAFF memo-text
 
 	Sends all services staff a memo containing memo-text.
-	Note: If you have opers on both the oper list and the
-	admin list they will recive the memo twice.  The same
-	applies for oper's on the Root list as well as other
-	lists.
 
 ###########################################################################
 #
@@ -5425,10 +5373,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Στέλνει μήνυμα σε όλους τους χρήστες
 OPER_HELP_CMD_STATS
 	    STATS       Δείχνει στατιστικά σχετικά με τα Services και το δίκτυο
-OPER_HELP_CMD_OPER
-	    OPER        Αλλάζει την λίστα των Services operator
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Αλλάζει την λίστα των Services admin
 OPER_HELP_CMD_STAFF
 	    STAFF       Display Services staff and online status
 OPER_HELP_CMD_MODE
@@ -5535,7 +5479,7 @@ OPER_HELP_STATS
 OPER_HELP_IGNORE
 	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 	
-	Allows Services Admins to make Services ignore a nick or mask
+	Allows Services Operators to make Services ignore a nick or mask
 	for a certain time or until the next restart. The default
 	time format is seconds. You can specify it by using units.
 	Valid units are: s for seconds, m for minutes, 
@@ -5800,7 +5744,7 @@ OPER_HELP_SET
 	    IGNORE     Activate or deactivate ignore mode
 	    LIST       List the options
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_SET_READONLY
 	Σύνταξη: SET READONLY {ON | OFF}
@@ -5886,7 +5830,7 @@ OPER_HELP_NOOP
 	Σημείωση: Ο server δεν ελέγχεται από τα
 	Services.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_JUPE
 	Σύνταξη: JUPE server [λόγος]
@@ -5900,18 +5844,7 @@ OPER_HELP_JUPE
 	text "Juped by <ψευδώνυμο>", δείχνοντας το ψευδώνυμο του
 	χρήστη που έκανε jupitered τον server.
 	
-	Μόνο για τους Services admins.
-
-OPER_HELP_RAW
-	Σύνταξη: RAW μήνυμα
-	
-	Στέλνεις μηνύματα μέσω του server με τον οποίο τα
-	Services είναι συνδεδεμένα.  Αυτή η εντολή έχει περιορισμένη χρήση
-	και μπορεί να καταστρέψει το δίκτυο αν χρησιμοποιείται
-	ακατάλληλα.  ΜΗΝ ΧΡΗΣΙΜΟΠΟΙΕΙΤΑΙ ΑΥΤΗ ΤΗΝ ΕΝΤΟΛΗ εκτός και αν είστε
-	σίγουροι για το τι κάνετε!
-	    
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_UPDATE
 	Σύνταξη: UPDATE
@@ -5919,7 +5852,7 @@ OPER_HELP_UPDATE
 	Έxei ως αποτέλεσμα τα Services να κάνουν update σε όλες τις βάσεις δεδομένων
 	το συντομότερο που κάνετε αυτή την εντολή.
 	    
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 	
 OPER_HELP_RELOAD
 	Σύνταξη: RELOAD
@@ -5929,7 +5862,7 @@ OPER_HELP_RELOAD
 	των Services (όπως Services' ψευδώνυμα, ενεργοποίηση της session 
 	limitation, κλπ.)
 	    
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_QUIT
 	Σύνταξη: QUIT
@@ -5940,7 +5873,7 @@ OPER_HELP_QUIT
 	και δεν γίνεται να γραφτούν(δεν γίνεται να γίνουν save).
 	Για κανονικό τερματισμό, κάντε την εντολή SHUTDOWN.
 	    
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_SHUTDOWN
 	Σύνταξη: SHUTDOWN
@@ -5948,7 +5881,7 @@ OPER_HELP_SHUTDOWN
 	Έχει ως αποτέλεσμα τα Services να γράψουν όλη την βάση δεδομένων και να 
 	τερματιστούν.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_RESTART
 	Σύνταξη: RESTART
@@ -5957,7 +5890,7 @@ OPER_HELP_RESTART
 	επανεκκινηθούν (δηλ να κλείσουν και αμέσως να 
 	ξανατρεχτεί το εκτελέσιμο αρχείο).
 	
-	Μόνο για τους Services admins.	
+	Μόνο για τους Services Operators.	
 
 OPER_HELP_CHANLIST
 	Σύνταξη: CHANLIST [{επιλογή | ψευδώνυμο} [SECRET]]	
@@ -5970,7 +5903,7 @@ OPER_HELP_CHANLIST
 	χρήστης.  Αν δίνετε SECRET εμφανίζει μόνο τα κανάλια που ταιριάζουν με την
 	επιλογή που έχουν +s ή +p mode.
 	    
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_USERLIST
 	Σύνταξη: USERLIST [{επιλογή | κανάλι} [INVISIBLE]]
@@ -5983,7 +5916,7 @@ OPER_HELP_USERLIST
 	Αν δίνετε το κανάλι, εμφανίζονται λίστες των χρηστών που είναι στο κανάλι 
 	αυτό. Αν δίνετε INVISIBLE, μόνο χρήστες με +i flag θα εμφανίζονται.
 	    
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 OPER_HELP_MODLOAD
 	Syntax: MODLOAD FileName
@@ -5991,30 +5924,21 @@ OPER_HELP_MODLOAD
 	This command loads the module named FileName from the modules
 	directory.
 
-	Limited to Services Roots.
-
 OPER_HELP_MODUNLOAD
 	Syntax: MODUNLOAD FileName
 
 	This command unloads the module named FileName from the modules
 	directory.
 
-	Limited to Services Roots.
-
 OPER_HELP_MODINFO
 	Syntax: MODINFO FileName
 
 	This command lists information about the specified loaded module
 
-	Limited to Services Roots.
-
 OPER_HELP_MODLIST
 	Syntax: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
-
+	
 	Lists all currently loaded modules.
-
-	Limited to Services Roots.
-
 
 ###########################################################################
 #
@@ -6322,7 +6246,7 @@ BOT_SERVADMIN_HELP_BOT
 	        BOT CHANGE παλιό-ψευδώνυμοick νέο-ψευδώνυμο [ID [host [πραγματικό όνομα]]]
 	    BOT DEL ψευδώνυμο	        
 	
-	Επιτρέπει μόνο στους Services admins να δημιουργήσουν, αλλάξουν, και 
+	Επιτρέπει μόνο στους Services Operators να δημιουργήσουν, αλλάξουν, και 
 	να σβήσουν τα bots στα οποία οι χρήστες θα μπορούν να χρησιμοποιήσουν 
 	στα δικά τους τα κανάλια.
 	    
@@ -6340,7 +6264,7 @@ BOT_SERVADMIN_HELP_BOT
 
 BOT_SERVADMIN_HELP_SET
 	
-	Αυτές οι επιλογές είναι μόνο για τους Services admins:
+	Αυτές οι επιλογές είναι μόνο για τους Services Operators:
 	
 	    NOBOT            Δείχνει το bot που έγινε assign από το κανάλι 
 	    PRIVATE          Δελιχνει το bot που έγινε assigned από μη IRC operators
@@ -6352,7 +6276,7 @@ BOT_SERVADMIN_HELP_SET_NOBOT
 	το bot είναι ήδη assigned στο κανάλι, θα γίνει unassigned
 	αυτόματα, όταν θα ενεργοποιήσεις αυτή την επιλογή.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 
 BOT_SERVADMIN_HELP_SET_PRIVATE
 	Σύνταξη: SET ψευδώνυμο-bot PRIVATE {ON|OFF}
@@ -6360,7 +6284,7 @@ BOT_SERVADMIN_HELP_SET_PRIVATE
 	Αυτή η επιλογή κάνει το bot από assigned σε κανάλια
 	των χρηστων που δεν είναι IRC operators.
 	
-	Μόνο για τους Services admins.
+	Μόνο για τους Services Operators.
 HOST_EMPTY
 	The vhost list is empty.
 HOST_ENTRY
@@ -6493,16 +6417,11 @@ HOST_HELP_SET
 	SET <nick> <ident>@<hostmask> set idents for users as 
 	well as vhosts.
 
-	Limited to Services operators.
-
 HOST_HELP_DELALL
 	Syntax: DELALL <nick>.
 
 	Deletes the vhost for all nick's in the same group as
 	that of the given nick.
-
-	Limited to Host Removers.
-
 
 HOST_HELP_SETALL
 	Syntax: SETALL <nick> <hostmask>.
@@ -6514,8 +6433,6 @@ HOST_HELP_SETALL
 
 	* NOTE, this will not update the vhost for any nick's
 	added to the group after this command was used.
-
-	Limited to Services operators.
 
 HOST_HELP_OFF
 	Syntax: OFF
@@ -6529,8 +6446,6 @@ HOST_HELP_DEL
 
 	Deletes the vhost assigned to the given nick from the
 	database.
-
-	Limited to Services operators.
 
 HOST_HELP_LIST
 	Syntax: LIST [<key>|<#X-Y>]
@@ -6546,8 +6461,6 @@ HOST_HELP_LIST
 
 	The list uses the value of NSListMax as a hard limit for the
 	number of items to display to a operator at any 1 time.
-
-	Limited to Services operators.
 
 HOST_HELP_GROUP
 	Syntax: GROUP

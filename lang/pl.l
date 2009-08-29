@@ -3748,10 +3748,6 @@ OPER_JUPE_HOST_ERROR
 OPER_JUPE_INVALID_SERVER
 	Nie mo¿na wykluczyæ samych serwisów lub uplinka serwisów.
 
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW tekst
-
 # UPDATE responses
 OPER_UPDATING
 	Aktualizacja baz danych.
@@ -4273,9 +4269,7 @@ NEWS_HELP_LOGON
 	wys³anych (aby zapobiec floodowaniu). Warto¶æ NewsCount
 	mo¿e zostaæ zmieniona w pliku konfiguracyjym serwisów.
 	
-	Polecenie LOGONNEWS LIST mo¿e byæ u¿yte przez ka¿dego
-	IRC operatora w celu wylistowania wiadomo¶ci. Polecenia
-	ADD i DEL s± zarezerwowane dla administratorów serwisów.
+	LOGONNEWS may only be used by Services Operators.
 
 NEWS_HELP_OPER
 	Sk³adnia: OPERNEWS ADD tekst
@@ -4288,9 +4282,7 @@ NEWS_HELP_OPER
 	wys³anych (aby zapobiec floodowaniu). Warto¶æ NewsCount
 	mo¿e zostaæ zmieniona w pliku konfiguracyjym serwisów.
 	
-	Polecenie OPERNEWS LIST mo¿e byæ u¿yte przez ka¿dego
-	IRC operatora w celu wylistowania wiadomo¶ci. Polecenia
-	ADD i DEL s± zarezerwowane dla administratorów serwisów.
+	OPERNEWS may only be used by Services Operators.
 
 NEWS_HELP_RANDOM
 	Sk³adnia: RANDOMNEWS ADD tekst
@@ -4301,9 +4293,7 @@ NEWS_HELP_RANDOM
 	Po po³±czeniu z sieci± u¿ytkownik otrzyma dok³adnie
 	jedn± wylosowan± z tej listy wiadomo¶æ.
 	
-	Polecenie RANDOMNEWS LIST mo¿e byæ u¿yte przez ka¿dego
-	IRC operatora w celu wylistowania wiadomo¶ci. Polecenia
-	ADD i DEL s± zarezerwowane dla administratorów serwisów.
+	RANDOMNEWS may only be used by Services Operators.
 
 ###########################################################################
 #
@@ -6398,12 +6388,6 @@ OPER_HELP_CMD_GLOBAL
 OPER_HELP_CMD_STATS
 	    STATS       Pokazuje informacje o serwisach i sieci
 
-OPER_HELP_CMD_OPER
-	    OPER        Zarz±dza list± operatorów serwisów
-
-OPER_HELP_CMD_ADMIN
-	    ADMIN       Zarz±dza list± administratorów serwisów
-
 OPER_HELP_CMD_STAFF
 	    STAFF       Wy¶wietla ekipê serwisów oraz jej status
 
@@ -6849,15 +6833,6 @@ OPER_HELP_JUPE
 	standardowego polecenia SQUIT. Je¶li zostanie podany
 	powód bêdzie on wy¶wietlany w polu informacyjnym serwera,
 	w przeciwnym wypadku wy¶wietlane bêdzie "Juped by <nick>".
-
-OPER_HELP_RAW
-	Sk³adnia: RAW tekst
-	
-	Wysy³a tekst bezpo¶rednio do serwera, do którego s±
-	pod³±czone serwisy. To polecenie ma bardzo ograniczone
-	zastosowanie i mo¿e powodowaæ chaos, kiedy jest u¿ywane
-	w sposób nieprawid³owy. NIE U¯YWAJ TEGO POLECENIA
-	je¶li nie masz pewno¶ci co robisz.
 
 OPER_HELP_UPDATE
 	Sk³adnia: UPDATE

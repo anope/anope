@@ -2838,10 +2838,6 @@ OPER_JUPE_HOST_ERROR
 	Benutze bitte einen gültigen hostnamen, wenn du jupiterst
 OPER_JUPE_INVALID_SERVER
 	You can not jupe your services server or your uplink server.
-	
-# RAW responses
-OPER_RAW_SYNTAX
-	RAW Text
 
 # UPDATE responses
 OPER_UPDATING
@@ -3296,10 +3292,7 @@ NEWS_HELP_LOGON
 	existieren, werden nur die neuesten angezeigt.)
 	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST kann von jedem IRC Operator benutzt werden
-	um die aktuelle Liste der Logon News anzeigen zu lassen.
-	ADD oder DEL können allerdings nur von Services Admins
-	ausgeführt werden.
+	Diese Funktion ist beschr?nkt auf die Services Administartoren.
 
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD Text
@@ -3314,10 +3307,7 @@ NEWS_HELP_OPER
 	existieren, werden nur die neüsten angezeigt.)
 	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST kann von jedem IRC Operator benutzt werden
-	um die aktuelle Liste der Oper-News anzeigen zu lassen.
-	ADD oder DEL können allerdings nur von Services Admins
-	ausgeführt werden.
+	 Diese Funktion ist beschr?nkt auf die Services Administartoren.
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD Text
@@ -3328,9 +3318,7 @@ NEWS_HELP_RANDOM
 	Wenn ein User zum Network verbindet, wird eine (und nur eine!) dieser
 	RandomNews Nachrichten zufällig gewählt und an den User gesendet.
 	
-	RANDOMNEWS LIST kann von jedem IRC Operator genutzt werden um die
-	aktuellen News Nachrichten aufzulisten.  ADD und DEL können nur von
-	Services Administratoren genutzt werden.
+	Diese Funktion ist beschr?nkt auf die Services Administartoren.
 
 ###########################################################################
 #
@@ -4084,9 +4072,6 @@ NICK_SERVADMIN_HELP_DROP
 	Mit dem Nicknamen als Parameter, wird dieser Nickname
 	von der Datenbank entfernt. Du kannst jeden Nickname 
 	in deiner Gruppe ohne bestimmte Privilegien entfernen.
-	
-	Das Entfernen eines beliebigen Nicknamen ist beschränkt
-	auf Services Administratoren.
 
 NICK_SERVADMIN_HELP_INFO
 	
@@ -5149,7 +5134,7 @@ CHAN_SERVADMIN_HELP_DROP
 	der Datenbank. Zusätzlich werden Zugriffslisten, 
 	Einstellungen usw mit aus der Datenbank entfernt.	
 	
-	Nur Services Administratoren können Channel DROPEN, 
+	Nur Services Operators können Channel DROPEN, 
 	(löschen) ohne sich vorher gegenüber dem Channel als 
 	Founder zu identifizieren.
 
@@ -5169,8 +5154,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Ändert das NOEXPIRE-Flag an einem Channel. Wird es
 	auf ON gestellt, wird der Channel bei Nichtnutzung
 	nicht auslaufen.
-	
-	Diese Funktion ist beschränkt auf Services Administratoren.
 
 CHAN_SERVADMIN_HELP_INFO
 	
@@ -5461,9 +5444,6 @@ MEMO_HELP_STAFF
 
 	Sendet allen Usern mit Zugriff auf die Services eine Nachricht mit
 	dem Memo-Text.
-	Note: Wenn du Operatoren an beide der Services-Zugriffs-Listen 
-	(Oper und Admin) hast, so werden die alle diese Nachricht erhalten. 
-	Das gleichte trifft für die Operatoren auf der Root-Liste zu.
 
 MEMO_HELP_SENDALL
 	Syntax: SENDALL Memo-Text
@@ -5498,10 +5478,6 @@ OPER_HELP_CMD_GLOBAL
 	    GLOBAL       Eine Notice an alle User schicken
 OPER_HELP_CMD_STATS
 	    STATS        Status des Netzes und der Services anzeigen
-OPER_HELP_CMD_OPER
-	    OPER         Die Services Operatoren Liste bearbeiten
-OPER_HELP_CMD_ADMIN
-	    ADMIN        Liste der Services Administratoren bearbeiten
 OPER_HELP_CMD_STAFF
 	    STAFF        Zeigt alle Nicknamen, die Zugriff auf die 
 	                 Services haben, Onlinestatus und Level
@@ -5998,16 +5974,6 @@ OPER_HELP_JUPE
 	entfernt werden. Wird ein Grund angegeben,
 	wird dieser im Server Informationsfeld angezeigt,
 	ansonsten nur "Jupitered by <nick>".
-
-OPER_HELP_RAW
-	Syntax: RAW Text
-	
-	Sendet die Zeichenkette von text direkt an den Server,
-	zu denen die Services verbunden sind. Dieses Kommando
-	hat einen sehr beschränkten Nutzenfaktor, und kann
-	leicht den Ablauf des Netzes stören, wenn es falsch
-	benutz wird. BENUTZE DIESES KOMMANDO NICHT so lange
-	du nicht genau weisst, was du tust!
 
 OPER_HELP_UPDATE
 	Syntax: UPDATE

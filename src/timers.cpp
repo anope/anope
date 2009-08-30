@@ -25,6 +25,7 @@ Timer::Timer(long time_from_now, time_t now, bool repeating)
 	trigger = now + time_from_now;
 	secs = time_from_now;
 	repeat = repeating;
+	settime = now;
 
 	TimerManager::AddTimer(this);
 }

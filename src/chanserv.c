@@ -778,7 +778,7 @@ void check_modes(Channel * c)
 	/* Initialize the modes-var to set all modes not set yet but which should
 	 * be set as by mlock and defcon.
 	 */
-	if (ci) 
+	if (ci)
 		modes = ~c->mode & ci->mlock_on;
 	if (DefConModesSet)
 		modes |= (~c->mode & DefConModesOn);
@@ -802,7 +802,7 @@ void check_modes(Channel * c)
 					value = cbmi->csgetvalue(ci);
 				else {
 					value = NULL;
-					if (debug) 
+					if (debug)
 						alog ("Warning: setting modes with unknown origin.");
 				}
 
@@ -895,7 +895,7 @@ void check_modes(Channel * c)
 	*end = 0;
 	*end2 = 0;
 
-	ircdproto->SendMode((ci ? whosends(ci) : s_OperServ), c->name, "%s%s", modebuf,
+	ircdproto->SendMode((ci ? whosends(ci) : findbot(s_OperServ)), c->name, "%s%s", modebuf,
 				   (end2 == argbuf ? "" : argbuf));
 }
 

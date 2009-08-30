@@ -731,7 +731,7 @@ void save_cs_dbase()
 void check_modes(Channel * c)
 {
 	char modebuf[64], argbuf[BUFSIZE], *end = modebuf, *end2 = argbuf;
-	uint32 modes;
+	uint32 modes = 0;
 	ChannelInfo *ci;
 	CBModeInfo *cbmi;
 	CBMode *cbm;
@@ -816,9 +816,9 @@ void check_modes(Channel * c)
 				}
 			}
 		} else if (cbmi->getvalue && cbmi->csgetvalue
-				   && ((ci->mlock_on & cbmi->flag)
-					   || (DefConModesOn & cbmi->flag))
-				   && (c->mode & cbmi->flag)) {
+					&& ((ci && (ci->mlock_on & cbmi->flag))
+						|| (DefConModesOn & cbmi->flag))
+					&& (c->mode & cbmi->flag)) {
 			char *value = cbmi->getvalue(c);
 			char *csvalue;
 

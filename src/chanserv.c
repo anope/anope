@@ -771,13 +771,15 @@ void check_modes(Channel * c)
 				ircdproto->SendMode(whosends(ci), c->name, "-r");
 			}
 		}
-		return;
+		/* Channels that are not regged also need the defcon modes.. ~ Viper */
+		/* return; */
 	}
 
-	/* Initialize te modes-var to set all modes not set yet but which should
+	/* Initialize the modes-var to set all modes not set yet but which should
 	 * be set as by mlock and defcon.
 	 */
-	modes = ~c->mode & ci->mlock_on;
+	if (ci) 
+		modes = ~c->mode & ci->mlock_on;
 	if (DefConModesSet)
 		modes |= (~c->mode & DefConModesOn);
 
@@ -796,8 +798,13 @@ void check_modes(Channel * c)
 				/* Check if it's a defcon or mlock mode */
 				if (DefConModesOn & cbmi->flag)
 					value = cbmi->csgetvalue(&DefConModesCI);
-				else
+				else if (ci)
 					value = cbmi->csgetvalue(ci);
+				else {
+					value = NULL;
+					if (debug) 
+						alog ("Warning: setting modes with unknown origin.");
+				}
 
 				cbm = &cbmodes[static_cast<int>(cbmi->mode)];
 				cbm->setvalue(c, value);
@@ -818,8 +825,13 @@ void check_modes(Channel * c)
 			/* Check if it's a defcon or mlock mode */
 			if (DefConModesOn & cbmi->flag)
 				csvalue = cbmi->csgetvalue(&DefConModesCI);
-			else
+			else if (ci)
 				csvalue = cbmi->csgetvalue(ci);
+			else {
+				csvalue = NULL;
+				if (debug)
+					alog ("Warning: setting modes with unknown origin.");
+			}
 
 			/* Lock and actual values don't match, so fix the mode */
 			if (value && csvalue && strcmp(value, csvalue)) {
@@ -838,9 +850,15 @@ void check_modes(Channel * c)
 	if (*(end - 1) == '+')
 		end--;
 
-	modes = c->mode & ci->mlock_off;
+	modes = 0;
+	if (ci) {
+		modes = c->mode & ci->mlock_off;
+		/* Make sure we don't remove a mode just set by defcon.. ~ Viper */
+		if (DefConModesSet)
+			modes &= ~(modes & DefConModesOn);
+	}
 	if (DefConModesSet)
-		modes |= (~c->mode & DefConModesOff);
+		modes |= c->mode & DefConModesOff;
 
 	if (modes) {
 		*end++ = '-';
@@ -877,7 +895,7 @@ void check_modes(Channel * c)
 	*end = 0;
 	*end2 = 0;
 
-	ircdproto->SendMode(whosends(ci), c->name, "%s%s", modebuf,
+	ircdproto->SendMode((ci ? whosends(ci) : s_OperServ), c->name, "%s%s", modebuf,
 				   (end2 == argbuf ? "" : argbuf));
 }
 

@@ -1223,8 +1223,8 @@ void runDefCon()
 		if (DefConChanModes && !DefConModesSet) {
 			if (DefConChanModes[0] == '+' || DefConChanModes[0] == '-') {
 				alog("DEFCON: setting %s on all chan's", DefConChanModes);
-				do_mass_mode(DefConChanModes);
 				DefConModesSet = 1;
+				do_mass_mode(DefConChanModes);
 			}
 		}
 	} else {

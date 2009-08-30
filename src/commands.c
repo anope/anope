@@ -199,6 +199,24 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[], const char 
 
 	if (!c || !c->OnHelp(u, subcommand))
 		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
+	else
+	{
+		u->SendMessage(service, " ");
+
+		/* Inform the user what permission is required to use the command */
+		if (!c->permission.empty())
+			notice_lang(service, u, COMMAND_REQUIRES_PERM, c->permission.c_str());
+
+		/* User isn't identified and needs to be to use this command */
+		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !nick_identified(u))
+			notice_lang(service, u, COMMAND_IDENTIFY_REQUIRED);
+		/* User doesn't have the proper permission to use this command */
+		else if (!c->permission.empty() && (!u->nc || (!u->nc->HasCommand(c->permission))))
+			notice_lang(service, u, COMMAND_CANNOT_USE);
+		/* User can use this command */
+		else
+			notice_lang(service, u, COMMAND_CAN_USE);
+	}
 }
 
 /*************************************************************************/

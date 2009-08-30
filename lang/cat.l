@@ -135,6 +135,15 @@ STRFTIME_MONTHS_LONG
 COMMA_SPACE
 	, 
 
+# Command help replies
+COMMAND_REQUIRES_PERM
+	Access to this command requires the permission %s to be present in your opertype.
+COMMAND_IDENTIFY_REQUIRED
+	You need to be identified to use this command.
+COMMAND_CANNOT_USE
+	You cannot use this command.
+COMMAND_CAN_USE
+	You can use this command.
 
 # Various error messages.
 USER_RECORD_NOT_FOUND

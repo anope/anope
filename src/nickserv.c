@@ -74,7 +74,6 @@ class NickServCollide : public Timer
 		{
 			t = i->second;
 
-			NickServCollides.erase(i);
 			TimerManager::DelTimer(t);
 		}
 	}
@@ -121,8 +120,6 @@ class NickServRelease : public Timer
 		if (i != NickServReleases.end())
 		{
 			t = i->second;
-
-			NickServReleases.erase(i);
 
 			if (dorelease)
 				release(na, 1);

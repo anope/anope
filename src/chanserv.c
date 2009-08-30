@@ -1202,8 +1202,12 @@ void check_modes(Channel * c)
         end--;
 
     modes = 0;
-    if (ci) 
+    if (ci) {
         modes = c->mode & ci->mlock_off;
+        /* Make sure we don't remove a mode just set by defcon.. ~ Viper */
+        if (DefConModesSet)
+            modes &= ~(modes & DefConModesOn);
+    }
     if (DefConModesSet)
         modes |= c->mode & DefConModesOff;
 

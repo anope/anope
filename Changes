@@ -14,6 +14,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 08/27 F Fixed services sending no or wrong help to opers.                [#1103]
 08/27 F Fixed services sending no or wrong help to opers.                [#1104]
 08/29 F Fixed defcon failing to set and remove modes.                    [#1101]
+08/30 F Fixed MLOCK superseding DEFCON mode lock.                        [  #00]
 
 Provided by Han` <Han@mefalcon.org> - 2009
 07/28 F Updated german language file.                                    [  #00]

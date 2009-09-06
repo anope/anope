@@ -71,7 +71,7 @@ tr:       tr.l       langcomp index
 	@./langcomp $@.l $@
 
 langcomp: langcomp.c
-	@$(MAKEBIN) $(CC) $(CFLAGS) langcomp.c -o $@
+	$(MAKEBIN) $(CC) $(CFLAGS) langcomp.c -o $@
 
 
 language.h: index Makefile

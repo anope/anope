@@ -23,13 +23,13 @@ install:
 distclean: spotless
 
 .c.o:
-	@$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .cpp.o:
-	@$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .o.s:
-	@$(MAKEBIN) $(CC) ${SHARED} ../mod_version.o $< -o $*.so ${PROFILE}
+	$(MAKEBIN) $(CC) ${SHARED} ../mod_version.o $< -o $*.so ${PROFILE}
 	@$(TOUCH) $*.s
 
 subs:

@@ -19,7 +19,6 @@ Legend:
 
 Outstanding issues:
 - Correct CMake's auto-library search
-- Check Autotools build system to make sure it still works
 - Add some events that were not present before but useful for future versions
 
 1.9.2

@@ -6891,6 +6891,10 @@ if test "${with_makebin+set}" = set; then
   withval=$with_makebin; MAKEBIN=$withval
 fi
 
+# If we're using run-cc.pl suppress the make process (run-cc.pl does it for us)
+if test "$MAKEBIN"; then
+	MAKEBIN="@$MAKEBIN"
+fi
 
 
 

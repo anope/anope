@@ -19,10 +19,10 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'MAKEBIN=${MAKEBIN}'
 
 .c.o:
-	@$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
+	$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
 
 .cpp.o:
-	@$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
+	$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
 
 all: services
 
@@ -30,7 +30,7 @@ distclean: spotless
 distclean_modules: clean_modules spotless
 
 services:  $(OBJS) mod_version
-	@$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
+	$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
 timers.o:	timers.cpp $(INCLUDES)
@@ -78,7 +78,7 @@ vsnprintf.o:    vsnprintf.c $(INCLUDES)
 wildcard.o:     wildcard.cpp $(INCLUDES)
 
 mod_version:	mod_version.c	$(INCLUDES)
-	@$(MAKEBIN) $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
+	$(MAKEBIN) $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
 
 modules: DUMMY
 	@modules/configure modules

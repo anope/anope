@@ -17,7 +17,6 @@ BotInfo::BotInfo(const char *nnick)
 	this->nick = sstrdup(nnick);
 	this->lastmsg = time(NULL);
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
-	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
 	this->cmdTable = NULL;
 	this->flags = 0;
@@ -37,6 +36,10 @@ BotInfo::BotInfo(const char *nnick)
 		this->flags |= BI_NICKSERV;
 	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
 		this->flags |= BI_GLOBAL;
+	
+	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
+	
+	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 
 	// If we're synchronised with the uplink already, call introduce_user() for this bot.
 	alog("serv_uplink is %p and status is %d", static_cast<void *>(serv_uplink), serv_uplink ? serv_uplink->sync == SSYNC_DONE : 0);
@@ -52,7 +55,6 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	this->real = sstrdup(nreal);
 	this->lastmsg = time(NULL);
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
-	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
 	this->cmdTable = NULL;
 	this->flags = 0;
@@ -72,6 +74,10 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 		this->flags |= BI_NICKSERV;
 	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
 		this->flags |= BI_GLOBAL;
+	
+	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
+	
+	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 
 	// If we're synchronised with the uplink already, call introduce_user() for this bot.
 	alog("serv_uplink is %p and status is %d", static_cast<void *>(serv_uplink), serv_uplink ? serv_uplink->sync == SSYNC_DONE : 0);

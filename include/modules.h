@@ -578,6 +578,12 @@ class CoreExport Module
 	 */
 	virtual void OnBotBan(User *u, ChannelInfo *ci, const char *mask) { }
 
+	/** Called after a bot has been created, but NOT added to the internal
+	 * list and NOT introduced
+	 * @param bi The bot
+	 */
+	virtual void OnBotPreLoad(BotInfo *bi) { }
+
 	/** Called when a bot kicks a user
 	 * @param u The user being kicked
 	 * @param ci The channel
@@ -890,7 +896,7 @@ enum Implementation
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
-		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan,
+		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBotPreLoad,
 
 		/* HostServ */
 		I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,

@@ -42,6 +42,7 @@ class SSMain : public Module
 		this->SetPermanent(true);
 
 		this->AddCommand(cmdTable, new CommandSSHelp(), MOD_HEAD);
+		ModuleManager::Attach(I_OnBotPreLoad, this);
 
 		statserv = findbot("StatServ");
 		if (!statserv)
@@ -69,6 +70,16 @@ class SSMain : public Module
 		{
 			ircdproto->SendQuit(statserv, "Quit due to module unload.");
 			delete statserv;
+		}
+	}
+
+	void OnBotPreLoad(BotInfo *bi)
+	{
+		if (!strcmp(bi->nick, "StatServ"))
+		{
+			delete statserv;
+			statserv = bi;
+			statserv->cmdTable = cmdTable;
 		}
 	}
 };

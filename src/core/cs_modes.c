@@ -220,7 +220,7 @@ int do_owner(User * u)
 
     if (!chan) {
         av[0] = sstrdup(ircd->ownerset);
-        av[1] = u->nick;
+        av[1] = GET_USER(u);
 
         /* Sets the mode to the user on every channels he is on. */
 
@@ -228,7 +228,7 @@ int do_owner(User * u)
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && is_founder(u, ci)) {
                 anope_cmd_mode(whosends(ci), uc->chan->name, "%s %s",
-                               av[0], u->nick);
+                               av[0], GET_USER(u));
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
             }
         }
@@ -249,10 +249,10 @@ int do_owner(User * u)
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
         anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerset,
-                       u->nick);
+                       GET_USER(u));
 
         av[0] = sstrdup(ircd->ownerset);
-        av[1] = u->nick;
+        av[1] = GET_USER(u);
         chan_set_modes(s_ChanServ, c, 2, av, 1);
         free(av[0]);
     }
@@ -276,7 +276,7 @@ int do_deowner(User * u)
 
     if (!chan) {
         av[0] = sstrdup(ircd->ownerunset);
-        av[1] = u->nick;
+        av[1] = GET_USER(u);
 
         /* Sets the mode to the user on every channels he is on. */
 
@@ -284,7 +284,7 @@ int do_deowner(User * u)
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && is_founder(u, ci)) {
                 anope_cmd_mode(whosends(ci), uc->chan->name, "%s %s",
-                               av[0], u->nick);
+                               av[0], GET_USER(u));
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
             }
         }
@@ -305,10 +305,10 @@ int do_deowner(User * u)
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
         anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
-                       u->nick);
+                       GET_USER(u));
 
         av[0] = sstrdup(ircd->ownerunset);
-        av[1] = u->nick;
+        av[1] = GET_USER(u);
         chan_set_modes(s_ChanServ, c, 2, av, 1);
         free(av[0]);
     }
@@ -341,7 +341,7 @@ int do_util(User * u, CSModeUtil * util)
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && check_access(u, ci, util->levelself)) {
                 anope_cmd_mode(whosends(ci), uc->chan->name, "%s %s",
-                               util->mode, u->nick);
+                               util->mode, GET_USER(u));
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
 
                 if (util->notice && ci->flags & util->notice)
@@ -378,10 +378,10 @@ int do_util(User * u, CSModeUtil * util)
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
         anope_cmd_mode(whosends(ci), c->name, "%s %s", util->mode,
-                       u2->nick);
+                       GET_USER(u2));
 
         av[0] = util->mode;
-        av[1] = u2->nick;
+        av[1] = GET_USER(u2);
         chan_set_modes(s_ChanServ, c, 2, av, 3);
 
         if (util->notice && ci->flags & util->notice)

@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2491"
+VERSION_BUILD="2495"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2495 - Fixed a number of TS6 issues, mainly related to nicks instead of IDs being given to anope_cmd_mode() in combination with a status change (Bug #1096). Also Fixed a small bug in os_oline.
 #Revision 2491 - Fixed typo in install.js so it will correctly detect MySQL 5.1 on Windows
 #Revision 2485 - Fixed MLOCK locked mode removal getting priority over DEFCON locked mode setting.
 #Revision 2480 - Fixed defcon not setting modes on newly created unregged channels and failing to force remove defcon-locked modes. 

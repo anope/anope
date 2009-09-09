@@ -213,13 +213,13 @@ int do_clear(User * u)
                     av[2] = tmp;
                     /* We have to give as much nicks as modes.. - Viper */
                     for (i = 0; i < count; i++)
-                        av[i+3] = cu->user->nick;
+                        av[i+3] = GET_USER(cu->user);
                     ac = 3 + i;
                 } else {
                     av[1] = tmp;
                     /* We have to give as much nicks as modes.. - Viper */
                     for (i = 0; i < count; i++)
-                        av[i+2] = cu->user->nick;
+                        av[i+2] = GET_USER(cu->user);
                     ac = 2 + i;
                 }
 
@@ -240,8 +240,8 @@ int do_clear(User * u)
                 snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ? 
                         ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
                 /* We need to send the IRCd a nick for every mode.. - Viper */
-                snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""), 
-                        (isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
+                snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? GET_USER(cu->user) : ""), 
+                        (isadmin ? GET_USER(cu->user) : ""), (isown ? GET_USER(cu->user) : ""));
 
                 if (ircdcap->tsmode) {
                     snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
@@ -249,7 +249,7 @@ int do_clear(User * u)
                     av[2] = tmp;
                     /* We have to give as much nicks as modes.. - Viper */
                     for (i = 0; i < count; i++)
-                        av[i+3] = cu->user->nick;
+                        av[i+3] = GET_USER(cu->user);
                     ac = 3 + i;
 
                     anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2], tmp2);
@@ -257,7 +257,7 @@ int do_clear(User * u)
                     av[1] = tmp;
                     /* We have to give as much nicks as modes.. - Viper */
                     for (i = 0; i < count; i++)
-                        av[i+2] = cu->user->nick;
+                        av[i+2] = GET_USER(cu->user);
                     ac = 2 + i;
 
                     anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1], tmp2);
@@ -283,12 +283,12 @@ int do_clear(User * u)
                 av[0] = sstrdup(chan);
                 av[1] = buf;
                 av[2] = sstrdup("-h");
-                av[3] = sstrdup(cu->user->nick);
+                av[3] = sstrdup(GET_USER(cu->user));
                 ac = 4;
             } else {
                 av[0] = sstrdup(chan);
                 av[1] = sstrdup("-h");
-                av[2] = sstrdup(cu->user->nick);
+                av[2] = sstrdup(GET_USER(cu->user));
                 ac = 3;
             }
 
@@ -337,12 +337,12 @@ int do_clear(User * u)
                 av[0] = sstrdup(chan);
                 av[1] = buf;
                 av[2] = sstrdup("-v");
-                av[3] = sstrdup(cu->user->nick);
+                av[3] = sstrdup(GET_USER(cu->user));
                 ac = 4;
             } else {
                 av[0] = sstrdup(chan);
                 av[1] = sstrdup("-v");
-                av[2] = sstrdup(cu->user->nick);
+                av[2] = sstrdup(GET_USER(cu->user));
                 ac = 3;
             }
 
@@ -386,7 +386,7 @@ int do_clear(User * u)
         for (cu = c->users; cu; cu = next) {
             next = cu->next;
             av[0] = sstrdup(chan);
-            av[1] = sstrdup(cu->user->nick);
+            av[1] = sstrdup(GET_USER(cu->user));
             av[2] = sstrdup(buf);
             anope_cmd_kick(whosends(ci), av[0], av[1], av[2]);
             do_kick(s_ChanServ, 3, av);

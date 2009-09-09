@@ -1477,7 +1477,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, tmp);
             free(tmp);
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         } else {
             add_modes &= ~CUS_OWNER;
         }
@@ -1486,14 +1486,14 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, tmp);
             free(tmp);
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         } else {
             add_modes &= ~CUS_PROTECT;
         }
         if ((add_modes & CUS_OP) && !(status & CUS_OP)) {
             strcat(modebuf, "o");
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
             rem_modes |= CUS_DEOPPED;
         } else {
             add_modes &= ~CUS_OP;
@@ -1501,14 +1501,14 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
         if ((add_modes & CUS_HALFOP) && !(status & CUS_HALFOP)) {
             strcat(modebuf, "h");
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         } else {
             add_modes &= ~CUS_HALFOP;
         }
         if ((add_modes & CUS_VOICE) && !(status & CUS_VOICE)) {
             strcat(modebuf, "v");
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         } else {
             add_modes &= ~CUS_VOICE;
         }
@@ -1520,25 +1520,25 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, tmp);
             free(tmp);
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         }
         if (rem_modes & CUS_PROTECT) {
             tmp = stripModePrefix(ircd->adminset);
             strcat(modebuf, tmp);
             free(tmp);
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         }
         if (rem_modes & CUS_OP) {
             strcat(modebuf, "o");
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
             add_modes |= CUS_DEOPPED;
         }
         if (rem_modes & CUS_HALFOP) {
             strcat(modebuf, "h");
             strcat(userbuf, " ");
-            strcat(userbuf, user->nick);
+            strcat(userbuf, GET_USER(user));
         }
     }
 

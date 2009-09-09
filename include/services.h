@@ -265,6 +265,10 @@ typedef enum { false, true } boolean;
 
 /* Protocol tweaks */
 
+/* If the IRCd supports TS6 / p10 and it s being used, this selects the uid instead of the nick.. */
+#define GET_USER(u) ((ircd->p10 || (UseTS6 && ircd->ts6)) ? (u->uid ? u->uid : u->nick) : u->nick)
+#define GET_BOT(bot) ((ircd->p10 || (UseTS6 && ircd->ts6)) ? (find_uid(bot) ? find_uid(bot)->uid : bot) : bot)
+
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
 

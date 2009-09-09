@@ -1268,13 +1268,13 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
     if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
         notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
         anope_cmd_mode(whosends(chan->ci), chan->name, "%s %s",
-                       ircd->adminunset, user->nick);
+                       ircd->adminunset, GET_USER(user));
         return 0;
     }
 
     if (check_access(user, chan->ci, CA_AUTODEOP)) {
         anope_cmd_mode(whosends(chan->ci), chan->name, "%s %s",
-                       ircd->adminunset, user->nick);
+                       ircd->adminunset, GET_USER(user));
         return 0;
     }
 
@@ -1305,40 +1305,40 @@ int check_valid_op(User * user, Channel * chan, int servermode)
                     tmp = stripModePrefix(ircd->ownerunset);
                     anope_cmd_mode(whosends(chan->ci), chan->name,
                                    "%so%s %s %s %s", ircd->adminunset,
-                                   tmp, user->nick,
-                                   user->nick, user->nick);
+                                   tmp, GET_USER(user),
+                                   GET_USER(user), GET_USER(user));
                     free(tmp);
                 } else {
                     tmp = stripModePrefix(ircd->ownerunset);
                     anope_cmd_mode(whosends(chan->ci), chan->name,
                                    "%sho%s %s %s %s %s",
                                    ircd->adminunset, tmp,
-                                   user->nick, user->nick, user->nick,
-                                   user->nick);
+                                   GET_USER(user), GET_USER(user), GET_USER(user),
+                                   GET_USER(user));
                     free(tmp);
                 }
             } else if (!ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
                                    "%so %s %s", ircd->adminunset,
-                                   user->nick, user->nick);
+                                   GET_USER(user), GET_USER(user));
                 } else {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
                                    "%soh %s %s %s", ircd->adminunset,
-                                   user->nick, user->nick, user->nick);
+                                   GET_USER(user), GET_USER(user), GET_USER(user));
                 }
             } else {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
                     anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
-                                   user->nick);
+                                   GET_USER(user));
                 } else {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-ho %s %s", user->nick, user->nick);
+                                   "-ho %s %s", GET_USER(user), GET_USER(user));
                 }
             }
         } else {
             anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
-                           user->nick);
+                           GET_USER(user));
         }
         return 0;
     }
@@ -1349,16 +1349,16 @@ int check_valid_op(User * user, Channel * chan, int servermode)
                 tmp = stripModePrefix(ircd->ownerunset);
                 anope_cmd_mode(whosends(chan->ci), chan->name,
                                "%sho%s %s %s %s %s", ircd->adminunset,
-                               tmp, user->nick, user->nick,
-                               user->nick, user->nick);
+                               tmp, GET_USER(user), GET_USER(user),
+                               GET_USER(user), GET_USER(user));
                 free(tmp);
             } else {
                 anope_cmd_mode(whosends(chan->ci), chan->name, "-ho %s %s",
-                               user->nick, user->nick);
+                               GET_USER(user), GET_USER(user));
             }
         } else {
             anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
-                           user->nick);
+                           GET_USER(user));
         }
         return 0;
     }
@@ -1383,7 +1383,7 @@ int check_should_op(User * user, char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOOP)) {
-        anope_cmd_mode(whosends(ci), chan, "+o %s", user->nick);
+        anope_cmd_mode(whosends(ci), chan, "+o %s", GET_USER(user));
         return 1;
     }
 
@@ -1406,7 +1406,7 @@ int check_should_voice(User * user, char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOVOICE)) {
-        anope_cmd_mode(whosends(ci), chan, "+v %s", user->nick);
+        anope_cmd_mode(whosends(ci), chan, "+v %s", GET_USER(user));
         return 1;
     }
 
@@ -1423,7 +1423,7 @@ int check_should_halfop(User * user, char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOHALFOP)) {
-        anope_cmd_mode(whosends(ci), chan, "+h %s", user->nick);
+        anope_cmd_mode(whosends(ci), chan, "+h %s", GET_USER(user));
         return 1;
     }
 
@@ -1443,8 +1443,8 @@ int check_should_owner(User * user, char *chan)
     if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
         || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))) {
         tmp = stripModePrefix(ircd->ownerset);
-        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
-                       user->nick);
+        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, GET_USER(user),
+                       GET_USER(user));
         free(tmp);
         return 1;
     }
@@ -1464,8 +1464,8 @@ int check_should_protect(User * user, char *chan)
 
     if (check_access(user, ci, CA_AUTOPROTECT)) {
         tmp = stripModePrefix(ircd->adminset);
-        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
-                       user->nick);
+        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, GET_USER(user),
+                       GET_USER(user));
         free(tmp);
         return 1;
     }
@@ -1701,7 +1701,7 @@ void restore_topic(char *chan)
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
             anope_cmd_join(s_ChanServ, chan, c->creation_time);
-            anope_cmd_mode(NULL, chan, "+o %s", s_ChanServ);
+            anope_cmd_mode(NULL, chan, "+o %s", GET_BOT(s_ChanServ));
         }
     }
     anope_cmd_topic(whosends(ci), c->name, c->topic_setter,
@@ -1763,7 +1763,7 @@ int check_topiclock(Channel * c, time_t topic_time)
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
             anope_cmd_join(s_ChanServ, c->name, c->creation_time);
-            anope_cmd_mode(NULL, c->name, "+o %s", s_ChanServ);
+            anope_cmd_mode(NULL, c->name, "+o %s", GET_BOT(s_ChanServ));
         }
     }
 

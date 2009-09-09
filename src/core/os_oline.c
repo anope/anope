@@ -90,7 +90,6 @@ int do_operoline(User * u)
             notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
         } else if (u2 && flags[0] == '+') {
             anope_cmd_svso(s_OperServ, nick, flags);
-            anope_cmd_mode(s_OperServ, nick, "+o");
             common_svsmode(u2, "+o", NULL);
             notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
             notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);

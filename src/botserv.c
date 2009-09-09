@@ -1078,13 +1078,13 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
         av[0] = ci->name;
         av[1] = buf;
         av[2] = mode;
-        av[3] = nick;
+        av[3] = GET_USER(u);
         ac = 4;
         anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[2], av[3]);
     } else {
         av[0] = ci->name;
         av[1] = mode;
-        av[2] = nick;
+        av[2] = GET_USER(u);
         ac = 3;
         anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
     }

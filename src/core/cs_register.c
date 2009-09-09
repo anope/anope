@@ -180,11 +180,11 @@ int do_register(User * u)
         /* On most ircds you do not receive the admin/owner mode till its registered */
         if (ircd->admin) {
             anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->adminset,
-                           u->nick);
+                           GET_USER(u));
         }
         if (ircd->owner && ircd->ownerset) {
             anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->ownerset,
-                           u->nick);
+                           GET_USER(u));
         }
         send_event(EVENT_CHAN_REGISTERED, 1, chan);
     }

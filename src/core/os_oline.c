@@ -41,7 +41,6 @@ class CommandOSOLine : public Command
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(s_OperServ, nick, flag);
-			ircdproto->SendMode(findbot(s_OperServ), nick, "+o");
 			common_svsmode(u2, "+o", NULL);
 			notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
 			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);

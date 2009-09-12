@@ -2296,7 +2296,9 @@ Entry *elist_match_user(EList * list, User * u)
 	/* Match what we ve got against the lists.. */
 	res = elist_match(list, u->nick, u->GetIdent().c_str(), u->host, ip);
 	if (!res)
-		res = elist_match(list, u->nick, u->GetIdent().c_str(), u->vhost, ip);
+		res = elist_match(list, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip);
+	if (!res && !u->GetCloakedHost().empty() && u->GetCloakedHost() != u->GetDisplayedHost())
+		res = elist_match(list, u->nick, u->GetIdent().c_str(), u->GetCloakedHost().c_str(), ip);
 
 	if (host)
 		delete [] host;

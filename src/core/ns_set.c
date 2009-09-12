@@ -227,7 +227,7 @@ class CommandNSSet : public Command
 
 	CommandReturn DoSetKill(User *u, std::vector<ci::string> &params, NickCore *nc)
 	{
-		ci::string param = params.size() > 1 ? params[1] : NULL;
+		ci::string param = params.size() > 1 ? params[1] : "";
 
 		if (param.empty())
 		{

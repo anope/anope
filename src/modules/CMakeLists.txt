@@ -95,7 +95,7 @@ foreach(FILE ${MODULES_FILES})
 
       # Append this source file's linker flags to the subdirectoy's linker flags, if there are any to append
       if(TEMP_LDFLAGS)
-        append_to_list(SUBDIR_LDFLAGS ${TEMP_LDFLAGS})
+        set(SUBDIR_LDFLAGS "${SUBDIR_LDFLAGS} ${TEMP_LDFLAGS}")
       endif(TEMP_LDFLAGS)
       # Append this source file's extra dependencies to the subdirector's extra dependencies, if there are any to append
       if(TEMP_DEPENDENCIES)

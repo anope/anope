@@ -18,7 +18,6 @@ Legend:
 [x] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
 
 Outstanding issues:
-- Correct CMake's auto-library search
 - Add some events that were not present before but useful for future versions
 
 1.9.2

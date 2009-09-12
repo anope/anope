@@ -949,6 +949,7 @@ int is_on_access(User * u, NickCore * nc)
 	unsigned i;
 	char *buf;
 	char *buf2 = NULL;
+	char *buf3 = NULL;
 
 	if (nc->access.empty())
 		return 0;
@@ -962,13 +963,17 @@ int is_on_access(User * u, NickCore * nc)
 			buf2 = new char[u->GetIdent().length() + strlen(u->vhost) + 2];
 			sprintf(buf2, "%s@%s", u->GetIdent().c_str(), u->vhost);
 		}
+		if (!u->GetCloakedHost().empty())
+		{
+			buf3 = new char[u->GetIdent().length() + u->GetCloakedHost().length() + 2];
+			sprintf(buf3, "%s@%s", u->GetIdent().c_str(), u->GetCloakedHost().c_str());
+		}
 	}
 
 	for (i = 0; i < nc->access.size(); i++)
 	{
 		std::string access = nc->GetAccess(i);
-		if (Anope::Match(buf, access, false)
-		        || (ircd->vhost ? Anope::Match(buf2, access, false) : 0))
+		if (Anope::Match(buf, access, false) || (buf2 && Anope::Match(buf2, access, false)) || (buf3 && Anope::Match(buf3, access, false)))
 		{
 			delete [] buf;
 			if (ircd->vhost)
@@ -976,6 +981,10 @@ int is_on_access(User * u, NickCore * nc)
 				if (u->vhost)
 				{
 					delete [] buf2;
+				}
+				if (!u->GetCloakedHost().empty())
+				{
+					delete [] buf3;
 				}
 			}
 			return 1;
@@ -985,6 +994,7 @@ int is_on_access(User * u, NickCore * nc)
 	if (ircd->vhost)
 	{
 		delete [] buf2;
+		delete [] buf3;
 	}
 	return 0;
 }

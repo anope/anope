@@ -6483,8 +6483,6 @@ HOST_DEL_SYNTAX
 	DEL Nickname.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	Dein vHost wurde gelöscht. Um die normale Host-Verschlüsselung zu reaktivieren, tippe /mode %s +%s
 HOST_NO_VIDENT
 	Dein IRCd unterstützt keine vIdents. Falls das inkorrekt sein sollte, melde das bitte als einen Bug.
 HOST_GROUP

@@ -6146,8 +6146,6 @@ HOST_DEL_SYNTAX
 	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	Your vhost was removed. To re-enable the standard host cloaking, type /mode %s +%s
 HOST_NO_VIDENT
 	Your IRCD does not support vIdent's, if this is incorrect, please report this as a possible bug
 HOST_GROUP

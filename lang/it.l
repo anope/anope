@@ -6240,8 +6240,6 @@ HOST_DEL_SYNTAX
 	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	Il tuo vhost è stato rimosso. Per riattivare il mascheramento standard del tuo host o IP, digita /mode %s +%s
 HOST_NO_VIDENT
 	Il tuo IRCD non supporta i vIdent; se li supporta, invia un messaggio al team di sviluppo dei Services indicandolo come possibile bug.
 HOST_GROUP

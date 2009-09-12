@@ -6251,9 +6251,6 @@ HOST_DEL_SYNTAX
 	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	A vhostod kikapcsolva. Hogy újra használd az alap
-	hosztrejtést írd be /mode %s +%s
 HOST_NO_VIDENT
 	Ön ircdje nem támogatja a videnteket, ha ez nem igaz,
 	akkor kérem jelentse ezt, mint lehetséges hibát.

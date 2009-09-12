@@ -117,19 +117,42 @@ void User::SetDisplayedHost(const std::string &shost)
 	update_host(this);
 }
 
-
+/** Get the displayed vhost of a user record.
+ * @return The displayed vhost of the user, where ircd-supported, or the user's real host.
+ */
 const std::string User::GetDisplayedHost() const
 {
-	if (ircd->vhostmode && (this->mode & ircd->vhostmode))
+	if (ircd->vhost && this->vhost)
 		return this->vhost;
-	else if (ircd->vhost && this->vhost)
-		return this->vhost;
+	else if (ircd->vhostmode && (this->mode & ircd->vhostmode) && !this->GetCloakedHost().empty())
+		return this->GetCloakedHost();
 	else
 		return this->host;
 }
 
+/** Update the cloaked host of a user
+ * @param host The cloaked host
+ */
+void User::SetCloakedHost(const std::string &newhost)
+{
+	if (newhost.empty())
+		throw "empty host in User::SetCloakedHost";
+	
+	chost = newhost;
 
+	if (debug)
+		alog("debug: %s changed cloaked host to %s", this->nick, newhost.c_str());
+	
+	update_host(this);
+}
 
+/** Get the cloaked host of a user
+ * @return The cloaked host
+ */
+const std::string &User::GetCloakedHost() const
+{
+	return chost;
+}
 
 const std::string &User::GetUID() const
 {
@@ -208,7 +231,7 @@ User::~User()
 		{
 			alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
 				this->nick, this->GetIdent().c_str(), this->host,
-				(this->vhost ? this->vhost : "(none)"), srealname, this->server->name);
+				this->GetDisplayedHost().c_str(), srealname, this->server->name);
 		}
 		else
 		{
@@ -232,9 +255,9 @@ User::~User()
 
 	if (debug >= 2)
 		alog("debug: User::~User(): free user data");
-
+	
 	delete [] this->host;
-
+	
 	if (this->vhost)
 		delete [] this->vhost;
 
@@ -599,7 +622,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		user->realname = sstrdup(realname);
 		user->timestamp = ts;
 		user->my_signon = time(NULL);
-		user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
+		user->SetCloakedHost(vhost);
 		user->SetVIdent(username);
 		/* We now store the user's ip in the user_ struct,
 		 * because we will use it in serveral places -- DrStein */
@@ -693,7 +716,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (LogUsers) {
 			logrealname = normalizeBuffer(user->realname);
 			if (ircd->vhost) {
-				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick, user->GetIdent().c_str(), user->host, (user->vhost ? user->vhost : "(none)"), logrealname, nick, user->server->name);
+				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick, user->GetIdent().c_str(), user->host, user->GetDisplayedHost().c_str(), logrealname, nick, user->server->name);
 			} else {
 				alog("LOGUSERS: %s (%s@%s) (%s) changed nick to %s (%s).",
 					 user->nick, user->GetIdent().c_str(), user->host, logrealname,
@@ -979,11 +1002,11 @@ int match_usermask(const char *mask, User * user)
 		result = Anope::Match(user->nick, nick, false)
 			&& Anope::Match(user->GetIdent().c_str(), username, false)
 			&& (Anope::Match(user->host, host, false)
-				|| Anope::Match(user->vhost, host, false));
+				|| Anope::Match(user->GetDisplayedHost().c_str(), host, false));
 	} else {
 		result = Anope::Match(user->GetIdent().c_str(), username, false)
 			&& (Anope::Match(user->host, host, false)
-				|| Anope::Match(user->vhost, host, false));
+				|| Anope::Match(user->GetDisplayedHost().c_str(), host, false));
 	}
 
 	delete [] mask2;

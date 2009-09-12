@@ -6420,8 +6420,6 @@ HOST_DEL_SYNTAX
 	DEL <ник>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	Ваш виртуальный хост деактивирован. Для ре-активации используйте: /MODE %s +%s
 HOST_NO_VIDENT
 	IRCd вашей сети не поддерживает виртуальные иденты. Если это не так, сообщите нам (разработчкам) о данном факте.
 HOST_GROUP

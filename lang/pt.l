@@ -6173,8 +6173,6 @@ HOST_DEL_SYNTAX
 	DEL <nick>.
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	Seu vhost foi removido. Para reabilitar a encriptação padrão de host, digite /mode %s +%s
 HOST_NO_VIDENT
 	Seu IRCD não suporta vIdent's, se isto não está certo, por favor reporte isso como um possível bug.
 HOST_GROUP

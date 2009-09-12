@@ -181,7 +181,7 @@ void common_unban(ChannelInfo * ci, char *nick)
 		for (ban = ci->c->bans->entries; ban; ban = next) {
 			next = ban->next;
 			if (entry_match(ban, u->nick, u->GetIdent().c_str(), u->host, ip) ||
-				entry_match(ban, u->nick, u->GetIdent().c_str(), u->vhost, ip)) {
+				entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip)) {
 				ircdproto->SendMode(whosends(ci), ci->name, "-b %s", ban->mask);
 				if (ircdcap->tsmode)
 					av[3] = ban->mask;

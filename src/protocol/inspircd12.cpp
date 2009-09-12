@@ -471,7 +471,21 @@ class InspIRCdProto : public IRCDProto
 					}
 					break;
 				case 'x':
-					if (add) user->chost = user->vhost;
+					if (add && user->vhost)
+					{
+						/* If +x is recieved then User::vhost IS the cloaked host,
+						 * set the cloaked host correctly and destroy the vhost - Adam
+						 */
+						user->SetCloakedHost(user->vhost);
+						delete [] user->vhost;
+						user->vhost = NULL;
+					}
+					else
+					{
+						if (user->vhost)
+							delete [] user->vhost;
+						user->vhost = NULL;
+					}
 					update_host(user);
 			}
 		}
@@ -492,8 +506,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		inspircd_cmd_chghost(u->nick, (u->mode & umodes[static_cast<int>('x')] ? u->chost.c_str() : u->host));
-		notice_lang(s_HostServ, u, HOST_OFF);
+		inspircd_cmd_chghost(u->nick, (u->mode & umodes[static_cast<int>('x')] ? u->GetCloakedHost().c_str() : u->host));
 
 		if (has_chgidentmod && u->GetIdent() != u->GetVIdent())
 		{
@@ -1161,7 +1174,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	if (user)
 	{
 		ircdproto->ProcessUsermodes(user, 1, &av[8]);
-		user->chost = av[4];
+		user->SetCloakedHost(av[4]);
 	}
 
 	return MOD_CONT;

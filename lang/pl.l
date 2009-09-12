@@ -7318,8 +7318,6 @@ HOST_DEL_SYNTAX
 	DEL <nick>.
 HOST_OFF
 	Twój vhost zosta³ usuniêty i zosta³o w³±czone normalne ukrywanie hosta.
-HOST_OFF_UNREAL
-	Twój vhost zosta³ usuniêty. Aby w³±czyæ standardowe ukrywanie hosta wpisz /mode %s +%s
 
 HOST_NO_VIDENT
 	Twoje IRCD nie obs³uguje vIdentów, je¶li nie jest to prawda zg³o¶ b³±d.

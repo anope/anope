@@ -32,7 +32,10 @@ class CommandHSOff : public Command
 		if (!vhost && !vident)
 			notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
 		else
+		{
 			ircdproto->SendVhostDel(u);
+			notice_lang(s_HostServ, u, HOST_OFF);
+		}
 		
 		return MOD_CONT;
 	}

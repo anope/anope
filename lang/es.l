@@ -6427,8 +6427,6 @@ HOST_DEL_SYNTAX
 ###########################################################################
 HOST_OFF
 	Your vhost was removed and the normal cloaking restored.
-HOST_OFF_UNREAL
-	Tu vhost ha sido removido. Para habilitar nuevamente el enmascaramiento de hosts tipea /mode %s +%s
 HOST_NO_VIDENT
 	Tu IRCD no soporta vIdent's. Si esto es incorrecto, por favor reportalo como un posible bug.
 

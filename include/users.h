@@ -87,6 +87,15 @@ public: // XXX: exposing a tiny bit too much
 	 */
 	const std::string GetDisplayedHost() const;
 
+	/** Update the cloaked host of a user
+	 * @param host The cloaked host
+	 */
+	void SetCloakedHost(const std::string &newhost);
+
+	/** Get the cloaked host of a user
+	 * @return The cloaked host
+	 */
+	const std::string &GetCloakedHost() const;
 
 	/** Retrieves the UID of the user, where applicable, if set.
 	 * This is not used on some IRCds, but is for a lot e.g. P10, TS6 protocols.

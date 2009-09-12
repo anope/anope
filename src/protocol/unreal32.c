@@ -575,7 +575,30 @@ class UnrealIRCdProto : public IRCDProto
 						user->mode &= ~UMODE_r;
 					}
 					break;
+				case 't':
+					if (add && !user->vhost && !user->GetCloakedHost().empty())
+					{
+						/* The user was introduced with a vhost as their host, so we don't
+						 * know their cloaked host.. Set their vhost correctly and clear
+						 * the chost so we can request it later (if needed)
+						 */
+						user->SetDisplayedHost(user->GetCloakedHost());
+						user->chost.clear();
+					}
+					break;
 				case 'x':
+					if (add)
+					{
+						/* We don't know their cloaked host.. get it */
+						if (user->GetCloakedHost().empty())
+							send_cmd(NULL, "USERHOST :%s", user->nick);
+					}
+					else
+					{
+						if (user->vhost)
+							delete [] user->vhost;
+						user->vhost = NULL;
+					}
 					update_host(user);
 					break;
 				default:
@@ -603,9 +626,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		send_cmd(s_HostServ, "v %s -xt", u->nick);
-		send_cmd(s_HostServ, "v %s +x", u->nick);
-		notice_lang(s_HostServ, u, HOST_OFF);
+		common_svsmode(u, "-xt", NULL);
+		common_svsmode(u, "+x", NULL);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
@@ -1187,7 +1209,25 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	u->SetDisplayedHost(av[0]);
+	/* If a user has a custom host and a server splits and reconnects
+	 * Unreal does not send the users cloaked host to Anope.. so we do not know it.
+	 * However, they will be +t if this is the case, so we will set their vhost 
+	 * to the sethost value (which really is their vhost) and clear the chost.
+	 * The chost will be request later (if needed) - Adam
+	 */
+	if (u->mode & UMODE_t)
+	{
+		u->SetDisplayedHost(av[0]);
+		u->chost.clear();
+	}
+	/* If the new host doesn't match the real host or ip.. set it
+	 * else we will not set a cloaked host, and request it later if needed
+	 */
+	else if ((u->host && strcmp(av[0], u->host)) || (u->hostip && strcmp(av[0], u->hostip)))
+	{
+		u->SetCloakedHost(av[0]);
+	}
+
 	return MOD_CONT;
 }
 
@@ -1365,6 +1405,32 @@ int anope_event_sdesc(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
+int anope_event_userhost(const char *source, int ac, const char **av)
+{
+	/** Hack to get around Unreal:
+	 * This is the USERHOST reply, we only send a request if we do not know the users cloaked host
+	 * (they got introducted using a vhost) - Adam
+	 */
+	if (ac < 2)
+		return MOD_CONT;
+	
+	std::string reply = av[1];
+	std::string user = std::string(reply.begin(), std::find(reply.begin(), reply.end(), '='));
+	if (user[user.length() - 1] == '*')
+		user.erase(user.length() - 1);
+	std::string host = std::string(std::find(reply.begin(), reply.end(), '@'), reply.end());
+	host.erase(host.begin());
+
+	User *u = finduser(user.c_str());
+	if (u)
+	{
+		u->SetCloakedHost(host);
+		update_host(u);
+	}
+
+	return MOD_CONT;
+}
+
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
 	do_sjoin(source, ac, av);
@@ -1438,6 +1504,7 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("~",		anope_event_sjoin); addCoreMessage(IRCD,m);
 	m = createMessage("SDESC",	  anope_event_sdesc); addCoreMessage(IRCD,m);
 	m = createMessage("AG",	   anope_event_sdesc); addCoreMessage(IRCD,m);
+	m = createMessage("302",	anope_event_userhost); addCoreMessage(IRCD,m);
 
 	/* The non token version of these is in messages.c */
 	m = createMessage("2",		 m_stats); addCoreMessage(IRCD,m);

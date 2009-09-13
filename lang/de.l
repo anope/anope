@@ -5627,14 +5627,14 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntax: UMODE User Modi
 	
-	Erlaubt es Super Adminstratoren die Usermodi eines 
+	Erlaubt es Services Operators die Usermodi eines 
 	beliebigen Users zu ändern. Der Paramater hat das gleiche 
 	Format wie der normale /MODE Befehl.
 
 OPER_HELP_OLINE
 	Syntax: OLINE User Flags
 	
-	Erlaubt es Super Adminstratoren einem User Operflags 
+	Erlaubt es Services Operators einem User Operflags 
 	zu setzen.Den Flags muss ein "+" oder ein "-" vorangestellt 
 	werden. Um alle Operflags zu entfernen, nutze einfach ein 
 	"-" ohne Operflags.
@@ -5661,7 +5661,6 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK Nickname Neuer-Nickname
 	
 	Erzwingt die Änderung des Nicknamens eines User zu dem neuen Nicknamen.
-	Limited to Super Admins.
 
 OPER_HELP_AKILL
 	Syntax: AKILL ADD [+Zeit] Maske Grund

@@ -5621,15 +5621,13 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntaxe: UMODE pseudo modes
 	
-	Permet aux Super Admins de changer un mode d'un utilisateur.
+	Permet aux Services Operators de changer un mode d'un utilisateur.
 
 OPER_HELP_OLINE
 	Syntaxe: OLINE pseudo flags
 	
 	Permet de mettre un OperFlag à un utilisateur.
 	Préfixes: "+" et "-". Pour tout supprimer, spécifiez "-"
-
-	Limité aux Super Admins.
 
 OPER_HELP_CLEARMODES
 	Syntaxe: CLEARMODES canal [ALL]
@@ -5656,7 +5654,6 @@ OPER_HELP_SVSNICK
 	Syntaxe: SVSNICK pseudo nouveau-pseudo
 	
 	Force le changement de pseudo d'un pseudo.
-	Limité aux Super Admins.
 
 OPER_HELP_AKILL
 	Syntaxe: AKILL ADD [+échéance] masque raison

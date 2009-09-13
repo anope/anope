@@ -5432,8 +5432,6 @@ OPER_HELP_UMODE
 	Megengedi a szervíz adminoknak, hogy egy user felhasználói
 	módjait megváltoztassa. Parameterek ugyanazok mint a
 	szabvány /MODE parancsnál.
-		
-	Korlátozva Szuper adminnak.
 	
 OPER_HELP_OLINE
 	Syntax: OLINE user flagek
@@ -5441,8 +5439,6 @@ OPER_HELP_OLINE
 	Lehetõséget ad a szervíz adminnak, hogy egy usernek 
 	operflaget adjon. Elõjelként "+" vagy "-" adható meg.
 	Ha csak a "-" paraméter adod meg akkor mindent eltávolít.
-	
-	Korlátozva Szuper adminnak.
 	
 OPER_HELP_CLEARMODES
 	Syntax: CLEARMODES szoba [ALL]
@@ -5469,7 +5465,6 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick újnick
 	
 	Erõszakkal meváltóztatja a user nickevét újnicknévre.
-	Limited to Super Admins.
 	
 OPER_HELP_AKILL
 	Syntax: AKILL  ADD [ +lejárat] maszk indok

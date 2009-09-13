@@ -5380,14 +5380,14 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Sintaxe: UMODE usuário modos
 	
-	Permite aos Super Admins ajustar os
+	Permite aos Services Operators ajustar os
 	modos de usuário para qualquer usuário. Os parâmetros
 	são os mesmos do comando /MODE padrão.
 
 OPER_HELP_OLINE
 	Sintaxe: OLINE usuário flags
 	
-	Permite aos Super Admins dar flags de Oper
+	Permite aos Services Operators dar flags de Oper
 	a qualquer usuário. Flags devem ser prefixadas com "+" ou
 	"-". Para remover todas as flags apenas digite um "-" em
 	vez de usar alguma flag.
@@ -5413,7 +5413,6 @@ OPER_HELP_SVSNICK
 	Sintaxe: SVSNICK nick novo-nick
 	
 	Força a mudança do nick de um usuário, de nick a novo-nick.
-	Limitado aos Super-Admins.
 
 OPER_HELP_AKILL
 	Sintaxe: AKILL ADD [+tempo] máscara motivo

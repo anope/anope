@@ -18,7 +18,7 @@
 class CommandOSSVSNick : public Command
 {
  public:
-	CommandOSSVSNick() : Command("SVSNICK", 2, 2)
+	CommandOSSVSNick() : Command("SVSNICK", 2, 2, "operserv/svsnick")
 	{
 	}
 
@@ -29,13 +29,6 @@ class CommandOSSVSNick : public Command
 
 		NickAlias *na;
 		const char *c;
-
-		/* Only allow this if SuperAdmin is enabled */
-		if (!u->isSuperAdmin)
-		{
-			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
-			return MOD_CONT;
-		}
 
 		/* Truncate long nicknames to NICKMAX-2 characters */
 		if (strlen(newnick) > NICKMAX - 2)

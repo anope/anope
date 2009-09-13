@@ -18,7 +18,7 @@
 class CommandOSUMode : public Command
 {
  public:
-	CommandOSUMode() : Command("UMODE", 2, 2)
+	CommandOSUMode() : Command("UMODE", 2, 2, "operserv/umode")
 	{
 	}
 
@@ -28,13 +28,6 @@ class CommandOSUMode : public Command
 		const char *modes = params[1].c_str();
 
 		User *u2;
-
-		/* Only allow this if SuperAdmin is enabled */
-		if (!u->isSuperAdmin)
-		{
-			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
-			return MOD_CONT;
-		}
 
 		/**
 		 * Only accept a +/- mode string

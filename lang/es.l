@@ -5552,14 +5552,14 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Sintaxis: UMODE usuario modos
 	
-	Permite a Super Admins a setear modos de
+	Permite a Services Operators a setear modos de
 	usuarios para cualquier usuario. Los parametros son los
 	mismos que para el comando /MODE.
 
 OPER_HELP_OLINE
 	Sintaxis: OLINE usuario opciones
 	
-	Permite a Super Admins a dar permisos de
+	Permite a Services Operators a dar permisos de
 	operador a cualquier usuario. Las opciones deben estar
 	antepuestas con un "+" o un "-". Para remover todas las
 	opciones simplemente tipear un "-" en vez de cualquier
@@ -5590,7 +5590,6 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick nuevonick
 	
 	Cambia, a la fuerza, el nick del usuario from nick a nuevonick.
-	Limitado a Super Admins.
 
 OPER_HELP_AKILL
 	Sintaxis: AKILL ADD [+expiracion] mascara razon

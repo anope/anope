@@ -6544,14 +6544,14 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Sk³adnia: UMODE u¿ytkownik flagi
 	
-	Pozwala super-administratorom zmieniaæ flagi
+	Pozwala Services Operators zmieniaæ flagi
 	innym u¿ytkownikom. Parametry s± identyczne jak
 	dla komendy /MODE.
 
 OPER_HELP_OLINE
 	Sk³adnia: OLINE nick flagi
 	
-	Pozwala super-administratorom na nadanie wskazanemu
+	Pozwala Services Operators na nadanie wskazanemu
 	u¿ytkownikowi uprawnieñ irc operatora z okre¶lonymi
 	flagami. Flagi powinny byæ poprzedzone znakami "+" lub "-". 
 	Aby usun±æ wszystkie flagi wystarczy podaæ "-".

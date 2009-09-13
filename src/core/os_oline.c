@@ -18,7 +18,7 @@
 class CommandOSOLine : public Command
 {
  public:
-	CommandOSOLine() : Command("OLINE", 2, 2)
+	CommandOSOLine() : Command("OLINE", 2, 2, "operserv/oline")
 	{
 	}
 
@@ -27,13 +27,6 @@ class CommandOSOLine : public Command
 		const char *nick = params[0].c_str();
 		const char *flag = params[1].c_str();
 		User *u2 = NULL;
-
-		/* Only allow this if SuperAdmin is enabled */
-		if (!u->isSuperAdmin)
-		{
-			notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
-			return MOD_CONT;
-		}
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))

@@ -5503,14 +5503,14 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Gebruik: UMODE gebruiker modes
 	
-	Stelt Super Admins in staat gebruikersmodes van
+	Stelt Services Operators in staat gebruikersmodes van
 	elke willekeurige gebruiker in te stellen. De paramenters
 	zijn hetzelfde als van een standaard /MODE commando.
 
 OPER_HELP_OLINE
 	Gebruik: OLINE gebruiker flags
 	
-	Stelt Super Admins in staat om Operflags te geven
+	Stelt Services Operators in staat om Operflags te geven
 	aan elke willekeurig gebruiker. Flags moeten worden vooraf
 	gegeaan door een "+" of een "-". Om alle flags te verwijderen
 	kun je simpelweg een "-" typen in plaats van de flags.
@@ -5537,7 +5537,6 @@ OPER_HELP_SVSNICK
 	Gebruik: SVSNICK nick nieuwe nick
 
 	Veranderd een gebruiker's nick van nick naar nieuwe nick.
-	Gelimiteerd tot Super Admins.
 
 OPER_HELP_AKILL
 	Gebruik: AKILL ADD [+verlooptijd] mask reden

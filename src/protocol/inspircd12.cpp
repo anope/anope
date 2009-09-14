@@ -621,7 +621,7 @@ class InspIRCdProto : public IRCDProto
 		inspircd_cmd_pass(uplink_server->password);
 		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
 		SendServer(me_server);
-		send_cmd(NULL, "BURST");
+		send_cmd(NULL, ":%s BURST", TS6SID);
 		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
 	}
 

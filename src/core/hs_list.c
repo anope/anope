@@ -151,7 +151,7 @@ class HSList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSList(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSList());
 	}
 	void HostServHelp(User *u)
 	{

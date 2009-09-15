@@ -101,7 +101,7 @@ class CSKick : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSKick(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSKick());
 	}
 	void ChanServHelp(User *u)
 	{

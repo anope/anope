@@ -72,7 +72,7 @@ class MSSendAll : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSSendAll(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSSendAll());
 	}
 	void MemoServHelp(User *u)
 	{

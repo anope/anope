@@ -64,7 +64,7 @@ class OSModLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OPERSERV, new CommandOSModLoad(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSModLoad());
 	}
 	void OperServHelp(User *u)
 	{

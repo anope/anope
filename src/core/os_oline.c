@@ -71,7 +71,7 @@ class OSOLine : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSOLine(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSOLine());
 
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");

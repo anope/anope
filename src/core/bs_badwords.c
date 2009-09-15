@@ -295,7 +295,7 @@ class BSBadwords : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSBadwords, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSBadwords);
 	}
 	void BotServHelp(User *u)
 	{

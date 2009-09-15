@@ -116,7 +116,7 @@ class MSList : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSList(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSList());
 	}
 	void MemoServHelp(User *u)
 	{

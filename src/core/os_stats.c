@@ -321,7 +321,7 @@ class OSStats : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSStats(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSStats());
 	}
 	void OperServHelp(User *u)
 	{

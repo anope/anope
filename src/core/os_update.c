@@ -45,7 +45,7 @@ class OSUpdate : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSUpdate(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSUpdate());
 	}
 	void OperServHelp(User *u)
 	{

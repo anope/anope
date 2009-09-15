@@ -55,7 +55,7 @@ class OSReload : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSReload(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSReload());
 	}
 	void OperServHelp(User *u)
 	{

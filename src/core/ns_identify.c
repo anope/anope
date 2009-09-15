@@ -129,8 +129,8 @@ class NSIdentify : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSIdentify("IDENTIFY"), MOD_UNIQUE);
-		this->AddCommand(NICKSERV, new CommandNSIdentify("ID"), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSIdentify("IDENTIFY"));
+		this->AddCommand(NICKSERV, new CommandNSIdentify("ID"));
 	}
 	void NickServHelp(User *u)
 	{

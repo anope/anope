@@ -70,7 +70,7 @@ class NSStatus : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSStatus(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSStatus());
 	}
 	void NickServHelp(User *u)
 	{

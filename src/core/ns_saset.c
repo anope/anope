@@ -583,7 +583,7 @@ public:
 		this->SetVersion("$Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSASet(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSSASet());
 	}
 	void NickServHelp(User *u)
 	{

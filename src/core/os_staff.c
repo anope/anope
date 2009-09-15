@@ -83,7 +83,7 @@ class OSStaff : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSStaff(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSStaff());
 	}
 	void OperServHelp(User *u)
 	{

@@ -113,7 +113,7 @@ class NSLogout : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSLogout(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSLogout());
 	}
 	void NickServHelp(User *u)
 	{

@@ -313,7 +313,7 @@ class OSSZLine : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSZLine(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSSZLine());
 
 		if (!ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");

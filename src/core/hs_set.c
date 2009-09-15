@@ -160,7 +160,7 @@ class HSSet : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSSet(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSSet());
 	}
 	void HostServHelp(User *u)
 	{

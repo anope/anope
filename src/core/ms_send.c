@@ -51,7 +51,7 @@ class MSSend : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSSend(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSSend());
 	}
 	void MemoServHelp(User *u)
 	{

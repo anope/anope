@@ -177,7 +177,7 @@ class OSModList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSModList(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSModList());
 	}
 	void OperServHelp(User *u)
 	{

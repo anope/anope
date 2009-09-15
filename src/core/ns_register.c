@@ -385,9 +385,9 @@ class NSRegister : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSRegister(), MOD_UNIQUE);
-		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 0, 1), MOD_UNIQUE);
-		this->AddCommand(NICKSERV, new CommandNSResend(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSRegister());
+		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 0, 1));
+		this->AddCommand(NICKSERV, new CommandNSResend());
 	}
 	void NickServHelp(User *u)
 	{

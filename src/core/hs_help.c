@@ -45,7 +45,7 @@ class HSHelp : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSHelp(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSHelp());
 	}
 };
 

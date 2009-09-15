@@ -79,7 +79,7 @@ class MSCancel : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSCancel(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSCancel());
 	}
 	void MemoServHelp(User *u)
 	{

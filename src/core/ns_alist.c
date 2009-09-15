@@ -148,7 +148,7 @@ class NSAList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSAList(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSAList());
 	}
 	void NickServHelp(User *u)
 	{

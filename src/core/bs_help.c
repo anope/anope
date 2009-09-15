@@ -47,7 +47,7 @@ class BSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSHelp(), MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSHelp());
 	}
 };
 

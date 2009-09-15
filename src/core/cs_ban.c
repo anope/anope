@@ -167,8 +167,8 @@ class CSBan : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSBan(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSUnban(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSBan());
+		this->AddCommand(CHANSERV, new CommandCSUnban());
 	}
 	void ChanServHelp(User *u)
 	{

@@ -57,7 +57,7 @@ class OSShutdown : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSShutdown(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSShutdown());
 	}
 	void OperServHelp(User *u)
 	{

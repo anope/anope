@@ -256,7 +256,7 @@ class BSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSInfo(), MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSInfo());
 	}
 	void BotServHelp(User *u)
 	{

@@ -82,7 +82,7 @@ class BSSay : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSSay(), MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSSay());
 	}
 	void BotServHelp(User *u)
 	{

@@ -540,7 +540,7 @@ class NSSet : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSet(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSSet());
 	}
 	void NickServHelp(User *u)
 	{

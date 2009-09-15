@@ -260,7 +260,7 @@ class MSSet : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(MEMOSERV, new CommandMSSet(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSSet());
 	}
 	void MemoServHelp(User *u)
 	{

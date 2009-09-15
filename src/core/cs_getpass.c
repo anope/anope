@@ -66,7 +66,7 @@ class CSGetPass : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSGetPass(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSGetPass());
 
 		char tmp_pass[PASSMAX];
 		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))

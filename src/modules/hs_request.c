@@ -405,10 +405,10 @@ class HSRequest : public Module
 	{
 		me = this;
 
-		this->AddCommand(HOSTSERV, new CommandHSRequest(), MOD_HEAD);
-		this->AddCommand(HOSTSERV, new CommandHSActivate(), MOD_HEAD);
-		this->AddCommand(HOSTSERV, new CommandHSReject(), MOD_HEAD);
-		this->AddCommand(HOSTSERV, new CommandHSWaiting(), MOD_HEAD);
+		this->AddCommand(HOSTSERV, new CommandHSRequest());
+		this->AddCommand(HOSTSERV, new CommandHSActivate());
+		this->AddCommand(HOSTSERV, new CommandHSReject());
+		this->AddCommand(HOSTSERV, new CommandHSWaiting());
 
 		ModuleManager::Attach(I_OnPreCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);

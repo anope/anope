@@ -185,7 +185,7 @@ public:
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSList(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSList());
 	}
 	void ChanServHelp(User *u)
 	{

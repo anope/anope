@@ -91,7 +91,7 @@ class CSSendPass : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSSendPass(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSSendPass());
 
 		if (!UseMail)
 			throw ModuleException("sendpass may not be loaded if UseMail is loaded");

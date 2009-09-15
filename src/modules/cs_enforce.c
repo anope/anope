@@ -259,7 +259,7 @@ class CSEnforce : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(CHANSERV, new CommandCSEnforce(), MOD_HEAD);
+		this->AddCommand(CHANSERV, new CommandCSEnforce());
 
 		/* English (US) */
 		const char* langtable_en_us[] = {

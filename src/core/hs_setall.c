@@ -161,7 +161,7 @@ class HSSetAll : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSSetAll(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSSetAll());
 	}
 	void HostServHelp(User *u)
 	{

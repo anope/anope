@@ -67,7 +67,7 @@ class OSJupe : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSJupe(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSJupe());
 	}
 	void OperServHelp(User *u)
 	{

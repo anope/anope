@@ -182,8 +182,8 @@ class NSSuspend : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSuspend(), MOD_UNIQUE);
-		this->AddCommand(NICKSERV, new CommandNSUnSuspend(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSSuspend());
+		this->AddCommand(NICKSERV, new CommandNSUnSuspend());
 	}
 	void NickServHelp(User *u)
 	{

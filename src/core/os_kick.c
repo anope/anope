@@ -72,7 +72,7 @@ class OSKick : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSKick(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSKick());
 	}
 	void OperServHelp(User *u)
 	{

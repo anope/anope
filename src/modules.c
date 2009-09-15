@@ -177,10 +177,9 @@ Module *findModule(const char *name)
  * at the tail, pos = 2
  * @param cmdTable the table to add the command to
  * @param c the command to add
- * @param pos the position in the cmd call stack to add the command
  * @return MOD_ERR_OK will be returned on success.
  */
-static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c, int pos)
+static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c)
 {
 	/* We can assume both param's have been checked by this point.. */
 	int index = 0;
@@ -188,7 +187,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 	CommandHash *newHash = NULL;
 	CommandHash *lastHash = NULL;
 
-	if (!cmdTable || !c || (pos < 0 || pos > 2)) {
+	if (!cmdTable || !c) {
 		return MOD_ERR_PARAMS;
 	}
 
@@ -220,7 +219,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 	return MOD_ERR_OK;
 }
 
-int Module::AddCommand(CommandHash * cmdTable[], Command * c, int pos)
+int Module::AddCommand(CommandHash * cmdTable[], Command * c)
 {
 	int status;
 
@@ -272,7 +271,7 @@ int Module::AddCommand(CommandHash * cmdTable[], Command * c, int pos)
 	} else
 		c->service = sstrdup("Unknown");
 
-	status = internal_addCommand(this, cmdTable, c, pos);
+	status = internal_addCommand(this, cmdTable, c);
 	if (status != MOD_ERR_OK)
 	{
 		alog("ERROR! [%d]", status);

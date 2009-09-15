@@ -490,8 +490,8 @@ class CSAccess : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSAccess(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSLevels(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSAccess());
+		this->AddCommand(CHANSERV, new CommandCSLevels());
 	}
 	void ChanServHelp(User *u)
 	{

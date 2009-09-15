@@ -91,7 +91,7 @@ class OSUserList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSUserList(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSUserList());
 	}
 	void OperServHelp(User *u)
 	{

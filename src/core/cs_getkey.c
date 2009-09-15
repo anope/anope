@@ -66,7 +66,7 @@ class CSGetKey : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSGetKey(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSGetKey());
 	}
 	void ChanServHelp(User *u)
 	{

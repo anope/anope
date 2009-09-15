@@ -95,7 +95,7 @@ class NSGhost : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGhost(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSGhost());
 	}
 	void NickServHelp(User *u)
 	{

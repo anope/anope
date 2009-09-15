@@ -165,7 +165,7 @@ class CSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSInfo(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSInfo());
 	}
 	void ChanServHelp(User *u)
 	{

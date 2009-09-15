@@ -76,7 +76,7 @@ class OSUMode : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSUMode(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSUMode());
 
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");

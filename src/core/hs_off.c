@@ -56,7 +56,7 @@ class HSOff : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSOff(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSOff());
 	}
 	void HostServHelp(User *u)
 	{

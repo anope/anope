@@ -152,7 +152,7 @@ class MSDel : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSDel(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSDel());
 	}
 	void MemoServHelp(User *u)
 	{

@@ -92,7 +92,7 @@ class NSSendPass : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSendPass(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSSendPass());
 
 		if (!UseMail)
 			throw ModuleException("Not using mail, whut.");

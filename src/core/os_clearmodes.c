@@ -251,7 +251,7 @@ class OSClearModes : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSClearModes(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSClearModes());
 	}
 	void OperServHelp(User *u)
 	{

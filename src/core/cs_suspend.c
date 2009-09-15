@@ -187,8 +187,8 @@ class CSSuspend : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSSuspend(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSUnSuspend(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSSuspend());
+		this->AddCommand(CHANSERV, new CommandCSUnSuspend());
 	}
 	void ChanServHelp(User *u)
 	{

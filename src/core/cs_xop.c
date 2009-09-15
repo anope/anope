@@ -497,11 +497,11 @@ class CSXOP : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSAOP(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSAOP());
 		if (ircd->halfop)
-			this->AddCommand(CHANSERV, new CommandCSHOP(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSSOP(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSVOP(), MOD_UNIQUE);
+			this->AddCommand(CHANSERV, new CommandCSHOP());
+		this->AddCommand(CHANSERV, new CommandCSSOP());
+		this->AddCommand(CHANSERV, new CommandCSVOP());
 	}
 	void ChanServHelp(User *u)
 	{

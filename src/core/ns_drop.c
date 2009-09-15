@@ -116,7 +116,7 @@ class NSDrop : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSDrop(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSDrop());
 	}
 	void NickServHelp(User *u)
 	{

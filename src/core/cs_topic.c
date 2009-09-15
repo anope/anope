@@ -89,7 +89,7 @@ class CSTopic : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSTopic(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSTopic());
 	}
 	void ChanServHelp(User *u)
 	{

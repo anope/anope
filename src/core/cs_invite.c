@@ -72,7 +72,7 @@ class CSInvite : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSInvite(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSInvite());
 	}
 	void ChanServHelp(User *u)
 	{

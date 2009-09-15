@@ -66,7 +66,7 @@ class OSModUnLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OPERSERV, new CommandOSModUnLoad(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSModUnLoad());
 	}
 	void OperServHelp(User *u)
 	{

@@ -440,11 +440,9 @@ class CoreExport Module
 	 * e.g. AddCommand(NICKSERV,c,MOD_HEAD);
 	 * @param cmdTable the services to add the command to
 	 * @param c the command to add
-	 * @param pos the position to add to, MOD_HEAD, MOD_TAIL, MOD_UNIQUE
-	 * @see createCommand
 	 * @return MOD_ERR_OK on successfully adding the command
 	 */
-	int AddCommand(CommandHash *cmdTable[], Command * c, int pos);
+	int AddCommand(CommandHash *cmdTable[], Command * c);
 
 	/**
 	 * Delete a command from the service given.

@@ -68,7 +68,7 @@ class OSMode : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSMode(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSMode());
 	}
 	void OperServHelp(User *u)
 	{

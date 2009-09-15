@@ -81,7 +81,7 @@ class NSGetPass : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGetPass(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSGetPass());
 
 		char tmp_pass[PASSMAX];
 		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))

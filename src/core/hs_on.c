@@ -71,7 +71,7 @@ class HSOn : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSOn(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSOn());
 	}
 	void HostServHelp(User *u)
 	{

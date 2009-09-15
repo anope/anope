@@ -348,33 +348,33 @@ class CSModes : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSOp(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSDeOp(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSVoice(), MOD_UNIQUE);
-		this->AddCommand(CHANSERV, new CommandCSDeVoice(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSOp());
+		this->AddCommand(CHANSERV, new CommandCSDeOp());
+		this->AddCommand(CHANSERV, new CommandCSVoice());
+		this->AddCommand(CHANSERV, new CommandCSDeVoice());
 
 		if (ircd->halfop)
 		{
-			this->AddCommand(CHANSERV, new CommandCSHalfOp(), MOD_UNIQUE);
-			this->AddCommand(CHANSERV, new CommandCSDeHalfOp(), MOD_UNIQUE);
+			this->AddCommand(CHANSERV, new CommandCSHalfOp());
+			this->AddCommand(CHANSERV, new CommandCSDeHalfOp());
 		}
 
 		if (ircd->protect)
 		{
-			this->AddCommand(CHANSERV, new CommandCSProtect(), MOD_UNIQUE);
-			this->AddCommand(CHANSERV, new CommandCSDeProtect(), MOD_UNIQUE);
+			this->AddCommand(CHANSERV, new CommandCSProtect());
+			this->AddCommand(CHANSERV, new CommandCSDeProtect());
 		}
 
 		if (ircd->admin)
 		{
-			this->AddCommand(CHANSERV, new CommandCSProtect(), MOD_UNIQUE);
-			this->AddCommand(CHANSERV, new CommandCSDeProtect(), MOD_UNIQUE);
+			this->AddCommand(CHANSERV, new CommandCSProtect());
+			this->AddCommand(CHANSERV, new CommandCSDeProtect());
 		}
 
 		if (ircd->owner)
 		{
-			this->AddCommand(CHANSERV, new CommandCSOwner(), MOD_UNIQUE);
-			this->AddCommand(CHANSERV, new CommandCSDeOwner(), MOD_UNIQUE);
+			this->AddCommand(CHANSERV, new CommandCSOwner());
+			this->AddCommand(CHANSERV, new CommandCSDeOwner());
 		}
 	}
 	void ChanServHelp(User *u)

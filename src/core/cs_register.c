@@ -147,7 +147,7 @@ class CSRegister : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSRegister(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSRegister());
 	}
 	void ChanServHelp(User *u)
 	{

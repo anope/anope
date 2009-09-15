@@ -63,7 +63,7 @@ class HSDel : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSDel(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSDel());
 	}
 	void HostServHelp(User *u)
 	{

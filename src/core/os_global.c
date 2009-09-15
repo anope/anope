@@ -53,7 +53,7 @@ class OSGlobal : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSGlobal(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSGlobal());
 	}
 	void OperServHelp(User *u)
 	{

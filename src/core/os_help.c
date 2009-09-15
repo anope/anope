@@ -44,7 +44,7 @@ class OSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSHelp(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSHelp());
 	}
 };
 

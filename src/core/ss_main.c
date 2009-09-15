@@ -41,7 +41,7 @@ class SSMain : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(cmdTable, new CommandSSHelp(), MOD_HEAD);
+		this->AddCommand(cmdTable, new CommandSSHelp());
 		ModuleManager::Attach(I_OnBotPreLoad, this);
 
 		statserv = findbot("StatServ");

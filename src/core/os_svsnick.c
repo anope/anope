@@ -90,7 +90,7 @@ class OSSVSNick : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSVSNick(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSSVSNick());
 
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");

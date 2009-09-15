@@ -77,7 +77,7 @@ class NSGetEMail : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGetEMail(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSGetEMail());
 	}
 	void NickServHelp(User *u)
 	{

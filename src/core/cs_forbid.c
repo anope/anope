@@ -126,7 +126,7 @@ class CSForbid : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSForbid(), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSForbid());
 	}
 	void ChanServHelp(User *u)
 	{

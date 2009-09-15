@@ -70,7 +70,7 @@ class HSDelAll : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSDelAll(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSDelAll());
 	}
 	void HostServHelp(User *u)
 	{

@@ -224,8 +224,8 @@ class NSGroup : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGroup(), MOD_UNIQUE);
-		this->AddCommand(NICKSERV, new CommandNSGList(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSGroup());
+		this->AddCommand(NICKSERV, new CommandNSGList());
 	}
 	void NickServHelp(User *u)
 	{

@@ -329,7 +329,7 @@ class OSAKill : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSAKill(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSAKill());
 	}
 	void OperServHelp(User *u)
 	{

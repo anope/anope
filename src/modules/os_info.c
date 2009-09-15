@@ -229,8 +229,8 @@ class OSInfo : public Module
 		if (mLoadConfig())
 			throw ModuleException("Unable to load config");
 
-		this->AddCommand(NICKSERV, new CommandNSOInfo(), MOD_HEAD);
-		this->AddCommand(CHANSERV, new CommandCSOInfo(), MOD_HEAD);
+		this->AddCommand(NICKSERV, new CommandNSOInfo());
+		this->AddCommand(CHANSERV, new CommandCSOInfo());
 
 		ModuleManager::Attach(I_OnPostCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);

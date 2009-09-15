@@ -314,7 +314,7 @@ class OSSQLine : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSQLine(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSSQLine());
 
 		if (!ircd->sqline)
 			throw ModuleException("Your IRCd does not support QLines.");

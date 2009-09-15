@@ -80,7 +80,7 @@ class OSNOOP : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSNOOP(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSNOOP());
 	}
 	void OperServHelp(User *u)
 	{

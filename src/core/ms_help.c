@@ -45,7 +45,7 @@ class MSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSHelp(), MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, new CommandMSHelp());
 	}
 };
 

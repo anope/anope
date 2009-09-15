@@ -62,7 +62,7 @@ class BSUnassign : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSUnassign, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSUnassign);
 	}
 	void BotServHelp(User *u)
 	{

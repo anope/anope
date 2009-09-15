@@ -86,7 +86,7 @@ class OSChanList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSChanList(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSChanList());
 	}
 	void OperServHelp(User *u)
 	{

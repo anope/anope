@@ -78,7 +78,7 @@ class BSBotList : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSBotList(), MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSBotList());
 	}
 	void BotServHelp(User *u)
 	{

@@ -96,7 +96,7 @@ class NSRelease : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSRelease(), MOD_UNIQUE);
+		this->AddCommand(NICKSERV, new CommandNSRelease());
 	}
 	void NickServHelp(User *u)
 	{

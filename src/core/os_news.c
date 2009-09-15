@@ -355,10 +355,10 @@ class OSNews : public Module
 		this->SetType(CORE);
 
 		OSLogonNews = new CommandOSLogonNews();
-		this->AddCommand(OPERSERV, OSLogonNews, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, OSLogonNews);
 		OSOperNews = new CommandOSOperNews();
-		this->AddCommand(OPERSERV, OSOperNews, MOD_UNIQUE);
-		this->AddCommand(OPERSERV, new CommandOSRandomNews(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, OSOperNews);
+		this->AddCommand(OPERSERV, new CommandOSRandomNews());
 		ModuleManager::Attach(I_OnReload, this);
 	}
 

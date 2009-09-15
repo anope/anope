@@ -299,7 +299,7 @@ class OSSet : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSet(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSSet());
 	}
 	void OperServHelp(User *u)
 	{

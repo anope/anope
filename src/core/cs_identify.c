@@ -92,9 +92,9 @@ class CSIdentify : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSIdentify("IDENTIFY"), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSIdentify("IDENTIFY"));
 		// XXX: we need aliases.
-		this->AddCommand(CHANSERV, new CommandCSIdentify("ID"), MOD_UNIQUE);
+		this->AddCommand(CHANSERV, new CommandCSIdentify("ID"));
 	}
 	void ChanServHelp(User *u)
 	{

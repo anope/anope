@@ -82,7 +82,7 @@ class HSGroup : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSGroup(), MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, new CommandHSGroup());
 	}
 	void HostServHelp(User *u)
 	{

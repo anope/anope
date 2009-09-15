@@ -186,7 +186,7 @@ class BSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSSet(), MOD_UNIQUE);
+		this->AddCommand(BOTSERV, new CommandBSSet());
 	}
 	void BotServHelp(User *u)
 	{

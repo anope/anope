@@ -109,7 +109,7 @@ class OSChanKill : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSChanKill(), MOD_UNIQUE);
+		this->AddCommand(OPERSERV, new CommandOSChanKill());
 	}
 	void OperServHelp(User *u)
 	{

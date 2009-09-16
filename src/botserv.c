@@ -453,9 +453,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						chanserv(u, const_cast<char *>(bbuf.c_str())); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 					}
 				}
-				else
-					notice_lang(s_ChanServ, u, UNKNOWN_COMMAND_HELP, cmd, s_ChanServ);
-
 				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(cmd, u, ci, params));
 			}
 			else

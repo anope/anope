@@ -18,7 +18,7 @@
 class CommandCSInvite : public Command
 {
  public:
-	CommandCSInvite() : Command("INVITE", 1, 1)
+	CommandCSInvite() : Command("INVITE", 1, 3)
 	{
 	}
 
@@ -27,6 +27,7 @@ class CommandCSInvite : public Command
 		const char *chan = params[0].c_str();
 		Channel *c;
 		ChannelInfo *ci;
+		User *u2;
 
 		if (!(c = findchan(chan)))
 		{
@@ -42,11 +43,22 @@ class CommandCSInvite : public Command
 			return MOD_CONT;
 		}
 
-		if (is_on_chan(c, u))
+		if (params.size() == 1)
+			u2 = u;
+		else
+		{
+			if (!(u2 = finduser(params[1].c_str())))
+			{
+				notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, params[1].c_str());
+				return MOD_CONT;
+			}
+		}
+
+		if (is_on_chan(c, u2))
 			notice_lang(s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name);
 		else
 		{
-			ircdproto->SendInvite(whosends(ci), chan, u->nick);
+			ircdproto->SendInvite(whosends(ci), chan, u2->nick);
 			notice_lang(s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name);
 		}
 		return MOD_CONT;

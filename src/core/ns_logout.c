@@ -121,4 +121,4 @@ class NSLogout : public Module
 	}
 };
 
-MODULE_INIT("ns_logout", NSLogout)
+MODULE_INIT(NSLogout)

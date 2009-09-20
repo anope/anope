@@ -268,4 +268,4 @@ class MSSet : public Module
 	}
 };
 
-MODULE_INIT("ms_set", MSSet)
+MODULE_INIT(MSSet)

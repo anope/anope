@@ -397,4 +397,4 @@ int sgline_list_callback(SList *slist, int number, void *item, va_list args)
 	return sgline_list(number, static_cast<SXLine *>(item), u, sent_header);
 }
 
-MODULE_INIT("os_sgline", OSSGLine)
+MODULE_INIT(OSSGLine)

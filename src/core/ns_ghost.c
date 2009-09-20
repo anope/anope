@@ -103,4 +103,4 @@ class NSGhost : public Module
 	}
 };
 
-MODULE_INIT("ns_ghost", NSGhost)
+MODULE_INIT(NSGhost)

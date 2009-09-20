@@ -188,4 +188,4 @@ class NSAccess : public Module
 	}
 };
 
-MODULE_INIT("ns_access", NSAccess)
+MODULE_INIT(NSAccess)

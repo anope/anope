@@ -264,4 +264,4 @@ class BSInfo : public Module
 	}
 };
 
-MODULE_INIT("bs_info", BSInfo)
+MODULE_INIT(BSInfo)

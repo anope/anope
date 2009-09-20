@@ -487,4 +487,4 @@ void fill_db_ptr(DBFile *dbptr, int version, int core_version,
 	return;
 }
 
-MODULE_INIT("os_ignore_db", OSIgnoreDB)
+MODULE_INIT(OSIgnoreDB)

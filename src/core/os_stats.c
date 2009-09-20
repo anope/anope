@@ -403,4 +403,4 @@ void get_operserv_stats(long *nrec, long *memuse)
 	*memuse = mem;
 }
 
-MODULE_INIT("os_stats", OSStats)
+MODULE_INIT(OSStats)

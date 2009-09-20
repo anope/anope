@@ -707,4 +707,4 @@ int mLoadConfig()
 
 /*************************************************************************/
 
-MODULE_INIT("os_info", OSInfo)
+MODULE_INIT(OSInfo)

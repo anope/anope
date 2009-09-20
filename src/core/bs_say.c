@@ -90,4 +90,4 @@ class BSSay : public Module
 	}
 };
 
-MODULE_INIT("bs_say", BSSay)
+MODULE_INIT(BSSay)

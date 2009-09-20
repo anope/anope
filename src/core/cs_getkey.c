@@ -74,4 +74,4 @@ class CSGetKey : public Module
 	}
 };
 
-MODULE_INIT("cs_getkey", CSGetKey)
+MODULE_INIT(CSGetKey)

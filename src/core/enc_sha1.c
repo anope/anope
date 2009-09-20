@@ -274,4 +274,4 @@ class ESHA1 : public Module
 };
 
 
-MODULE_INIT("enc_sha1", ESHA1)
+MODULE_INIT(ESHA1)

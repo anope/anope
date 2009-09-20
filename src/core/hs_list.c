@@ -159,4 +159,4 @@ class HSList : public Module
 	}
 };
 
-MODULE_INIT("hs_list", HSList)
+MODULE_INIT(HSList)

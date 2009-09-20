@@ -126,4 +126,4 @@ class CSLogout : public Module
 	}
 };
 
-MODULE_INIT("cs_logout", CSLogout)
+MODULE_INIT(CSLogout)

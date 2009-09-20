@@ -61,4 +61,4 @@ class OSGlobal : public Module
 	}
 };
 
-MODULE_INIT("os_global", OSGlobal)
+MODULE_INIT(OSGlobal)

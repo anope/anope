@@ -124,4 +124,4 @@ class CSDrop : public Module
 	}
 };
 
-MODULE_INIT("cs_drop", CSDrop)
+MODULE_INIT(CSDrop)

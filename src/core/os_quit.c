@@ -64,4 +64,4 @@ class OSQuit : public Module
 	}
 };
 
-MODULE_INIT("os_quit", OSQuit)
+MODULE_INIT(OSQuit)

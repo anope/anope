@@ -124,4 +124,4 @@ class NSDrop : public Module
 	}
 };
 
-MODULE_INIT("ns_drop", NSDrop)
+MODULE_INIT(NSDrop)

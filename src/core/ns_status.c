@@ -78,4 +78,4 @@ class NSStatus : public Module
 	}
 };
 
-MODULE_INIT("ns_status", NSStatus)
+MODULE_INIT(NSStatus)

@@ -733,4 +733,4 @@ class CSSet : public Module
 	}
 };
 
-MODULE_INIT("cs_set", CSSet)
+MODULE_INIT(CSSet)

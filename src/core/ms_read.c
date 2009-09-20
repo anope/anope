@@ -189,4 +189,4 @@ int read_memo(User *u, int index, MemoInfo *mi, const char *chan)
 	return 1;
 }
 
-MODULE_INIT("ms_read", MSRead)
+MODULE_INIT(MSRead)

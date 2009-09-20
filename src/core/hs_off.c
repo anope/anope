@@ -64,4 +64,4 @@ class HSOff : public Module
 	}
 };
 
-MODULE_INIT("hs_off", HSOff)
+MODULE_INIT(HSOff)

@@ -88,4 +88,4 @@ class OSNOOP : public Module
 	}
 };
 
-MODULE_INIT("os_noop", OSNOOP)
+MODULE_INIT(OSNOOP)

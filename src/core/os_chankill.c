@@ -117,4 +117,4 @@ class OSChanKill : public Module
 	}
 };
 
-MODULE_INIT("os_chankill", OSChanKill)
+MODULE_INIT(OSChanKill)

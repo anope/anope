@@ -168,4 +168,4 @@ class HSSet : public Module
 	}
 };
 
-MODULE_INIT("hs_set", HSSet)
+MODULE_INIT(HSSet)

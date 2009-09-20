@@ -591,4 +591,4 @@ public:
 	}
 };
 
-MODULE_INIT("ns_saset", NSSASet)
+MODULE_INIT(NSSASet)

@@ -65,4 +65,4 @@ class OSShutdown : public Module
 	}
 };
 
-MODULE_INIT("os_shutdown", OSShutdown)
+MODULE_INIT(OSShutdown)

@@ -475,4 +475,4 @@ class CSEnforce : public Module
 	}
 };
 
-MODULE_INIT("cs_enforce", CSEnforce)
+MODULE_INIT(CSEnforce)

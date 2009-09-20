@@ -137,7 +137,7 @@ TYPE function_cast(ano_module_t symbol)
 int ModuleManager::LoadModule(const std::string &modname, User * u)
 {
 	const char *err;
-	Module *(*func)(const std::string &);
+	Module *(*func)(const std::string &, const std::string &);
 	int ret = 0;
 
 	if (modname.empty())
@@ -181,7 +181,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 
 	ano_modclearerr();
-	func = function_cast<Module *(*)(const std::string &)>(dlsym(handle, "init_module"));
+	func = function_cast<Module *(*)(const std::string &, const std::string &)>(dlsym(handle, "init_module"));
 	if (func == NULL && (err = dlerror()) != NULL)
 	{
 		alog("No magical init function found, not an Anope module");
@@ -205,7 +205,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	try
 	{
-		m = func(nick);
+		m = func(modname, nick);
 	}
 	catch (ModuleException &ex)
 	{

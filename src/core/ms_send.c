@@ -59,4 +59,4 @@ class MSSend : public Module
 	}
 };
 
-MODULE_INIT("ms_send", MSSend)
+MODULE_INIT(MSSend)

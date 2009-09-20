@@ -192,4 +192,4 @@ class NSSuspend : public Module
 	}
 };
 
-MODULE_INIT("ns_suspend", NSSuspend)
+MODULE_INIT(NSSuspend)

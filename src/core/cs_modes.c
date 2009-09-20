@@ -403,4 +403,4 @@ class CSModes : public Module
 };
 
 
-MODULE_INIT("cs_modes", CSModes)
+MODULE_INIT(CSModes)

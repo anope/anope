@@ -80,4 +80,4 @@ class MSSendAll : public Module
 	}
 };
 
-MODULE_INIT("ms_sendall", MSSendAll)
+MODULE_INIT(MSSendAll)

@@ -1087,4 +1087,4 @@ class ProtoBahamut : public Module
 
 };
 
-MODULE_INIT("bahamut", ProtoBahamut)
+MODULE_INIT(ProtoBahamut)

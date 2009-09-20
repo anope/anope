@@ -1562,4 +1562,4 @@ class ProtoUnreal : public Module
 
 };
 
-MODULE_INIT("unreal32", ProtoUnreal)
+MODULE_INIT(ProtoUnreal)

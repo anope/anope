@@ -63,4 +63,4 @@ class OSReload : public Module
 	}
 };
 
-MODULE_INIT("os_reload", OSReload)
+MODULE_INIT(OSReload)

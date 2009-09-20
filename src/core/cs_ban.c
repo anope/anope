@@ -178,4 +178,4 @@ class CSBan : public Module
 };
 
 
-MODULE_INIT("cs_ban", CSBan)
+MODULE_INIT(CSBan)

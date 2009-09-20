@@ -673,4 +673,4 @@ class CSAKick : public Module
 	}
 };
 
-MODULE_INIT("cs_akick", CSAKick)
+MODULE_INIT(CSAKick)

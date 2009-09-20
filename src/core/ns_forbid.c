@@ -138,4 +138,4 @@ NickAlias *makenick(const char *nick)
 	return na;
 }
 
-MODULE_INIT("ns_forbid", NSForbid)
+MODULE_INIT(NSForbid)

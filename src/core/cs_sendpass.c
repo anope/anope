@@ -106,4 +106,4 @@ class CSSendPass : public Module
 	}
 };
 
-MODULE_INIT("cs_sendpass", CSSendPass)
+MODULE_INIT(CSSendPass)

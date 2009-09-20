@@ -80,4 +80,4 @@ class OSKick : public Module
 	}
 };
 
-MODULE_INIT("os_kick", OSKick)
+MODULE_INIT(OSKick)

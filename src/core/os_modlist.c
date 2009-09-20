@@ -185,4 +185,4 @@ class OSModList : public Module
 	}
 };
 
-MODULE_INIT("os_modlist", OSModList)
+MODULE_INIT(OSModList)

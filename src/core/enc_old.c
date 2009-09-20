@@ -421,4 +421,4 @@ class EOld : public Module
 /*************************************************************************/
 
 
-MODULE_INIT("enc_old", EOld)
+MODULE_INIT(EOld)

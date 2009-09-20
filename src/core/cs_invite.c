@@ -92,4 +92,4 @@ class CSInvite : public Module
 	}
 };
 
-MODULE_INIT("cs_invite", CSInvite)
+MODULE_INIT(CSInvite)

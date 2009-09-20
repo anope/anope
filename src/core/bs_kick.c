@@ -356,4 +356,4 @@ class BSKick : public Module
 	}
 };
 
-MODULE_INIT("bs_kick", BSKick)
+MODULE_INIT(BSKick)

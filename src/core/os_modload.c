@@ -72,4 +72,4 @@ class OSModLoad : public Module
 	}
 };
 
-MODULE_INIT("os_modload", OSModLoad)
+MODULE_INIT(OSModLoad)

@@ -307,4 +307,4 @@ class OSSet : public Module
 	}
 };
 
-MODULE_INIT("os_set", OSSet)
+MODULE_INIT(OSSet)

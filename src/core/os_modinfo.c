@@ -101,4 +101,4 @@ int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u)
 	return display;
 }
 
-MODULE_INIT("os_modinfo", OSModInfo)
+MODULE_INIT(OSModInfo)

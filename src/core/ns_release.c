@@ -104,4 +104,4 @@ class NSRelease : public Module
 	}
 };
 
-MODULE_INIT("ns_release", NSRelease)
+MODULE_INIT(NSRelease)

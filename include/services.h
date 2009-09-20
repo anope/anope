@@ -192,11 +192,11 @@ extern int strncasecmp(const char *, const char *, size_t);
  * It defines the class factory and external init_module function.
  */
 #ifdef _WIN32
-	#define MODULE_INIT(x, y) \
+	#define MODULE_INIT(x) \
 		extern "C" DllExport Module *init_module(const std::string &, const std::string &); \
-		extern "C" Module *init_module(const std::string &, const std::string &creator) \
+		extern "C" Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
-			return new y(x, creator); \
+			return new x(modname, creator); \
 		} \
 		BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
 		{ \
@@ -208,19 +208,19 @@ extern int strncasecmp(const char *, const char *, size_t);
 			} \
 			return TRUE; \
 		} \
-		extern "C" DllExport void destroy_module(y *); \
-		extern "C" void destroy_module(y *m) \
+		extern "C" DllExport void destroy_module(x *); \
+		extern "C" void destroy_module(x *m) \
 		{ \
 			delete m; \
 		}
 
 #else
-	#define MODULE_INIT(x, y) \
-		extern "C" DllExport Module *init_module(const std::string &, const std::string &creator) \
+	#define MODULE_INIT(x) \
+		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
-			return new y(x, creator); \
+			return new x(modname, creator); \
 		} \
-		extern "C" DllExport void destroy_module(y *m) \
+		extern "C" DllExport void destroy_module(x *m) \
 		{ \
 			delete m; \
 		}

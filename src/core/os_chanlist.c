@@ -94,4 +94,4 @@ class OSChanList : public Module
 	}
 };
 
-MODULE_INIT("os_chanlist", OSChanList)
+MODULE_INIT(OSChanList)

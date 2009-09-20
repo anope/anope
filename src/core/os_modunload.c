@@ -74,4 +74,4 @@ class OSModUnLoad : public Module
 	}
 };
 
-MODULE_INIT("os_modunload", OSModUnLoad)
+MODULE_INIT(OSModUnLoad)

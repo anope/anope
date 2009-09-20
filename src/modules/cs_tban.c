@@ -224,4 +224,4 @@ int canBanUser(Channel * c, User * u, User * u2)
 	return ok;
 }
 
-MODULE_INIT("cs_tban", CSTBan)
+MODULE_INIT(CSTBan)

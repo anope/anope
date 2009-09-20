@@ -76,4 +76,4 @@ class OSMode : public Module
 	}
 };
 
-MODULE_INIT("os_mode", OSMode)
+MODULE_INIT(OSMode)

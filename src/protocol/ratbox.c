@@ -1217,4 +1217,4 @@ class ProtoRatbox : public Module
 
 };
 
-MODULE_INIT("ratbox", ProtoRatbox)
+MODULE_INIT(ProtoRatbox)

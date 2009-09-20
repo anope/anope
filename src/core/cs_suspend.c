@@ -197,4 +197,4 @@ class CSSuspend : public Module
 	}
 };
 
-MODULE_INIT("cs_suspend", CSSuspend)
+MODULE_INIT(CSSuspend)

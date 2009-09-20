@@ -501,4 +501,4 @@ class CSAccess : public Module
 };
 
 
-MODULE_INIT("cs_access", CSAccess)
+MODULE_INIT(CSAccess)

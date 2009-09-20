@@ -65,4 +65,4 @@ class NSHelp : public Module
 	}
 };
 
-MODULE_INIT("ns_help", NSHelp)
+MODULE_INIT(NSHelp)

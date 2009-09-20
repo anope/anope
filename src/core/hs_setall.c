@@ -169,4 +169,4 @@ class HSSetAll : public Module
 	}
 };
 
-MODULE_INIT("hs_setall", HSSetAll)
+MODULE_INIT(HSSetAll)

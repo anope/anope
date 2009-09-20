@@ -469,4 +469,4 @@ class OSSession : public Module
 	}
 };
 
-MODULE_INIT("os_session", OSSession)
+MODULE_INIT(OSSession)

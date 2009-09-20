@@ -97,4 +97,4 @@ class MSRSend : public Module
 	}
 };
 
-MODULE_INIT("ms_rsend", MSRSend)
+MODULE_INIT(MSRSend)

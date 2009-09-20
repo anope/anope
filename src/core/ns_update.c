@@ -66,4 +66,4 @@ class NSUpdate : public Module
 	}
 };
 
-MODULE_INIT("ns_update", NSUpdate)
+MODULE_INIT(NSUpdate)

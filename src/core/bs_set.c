@@ -194,4 +194,4 @@ class BSSet : public Module
 	}
 };
 
-MODULE_INIT("bs_set", BSSet)
+MODULE_INIT(BSSet)

@@ -53,4 +53,4 @@ class BSHelp : public Module
 
 
 
-MODULE_INIT("bs_help", BSHelp)
+MODULE_INIT(BSHelp)

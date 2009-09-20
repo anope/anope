@@ -60,4 +60,4 @@ class OSRestart : public Module
 	}
 };
 
-MODULE_INIT("os_restart", OSRestart)
+MODULE_INIT(OSRestart)

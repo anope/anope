@@ -231,4 +231,4 @@ class CSAppendTopic : public Module
 	}
 };
 
-MODULE_INIT("cs_appendtopic", CSAppendTopic)
+MODULE_INIT(CSAppendTopic)

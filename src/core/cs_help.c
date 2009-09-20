@@ -76,4 +76,4 @@ class CSHelp : public Module
 	}
 };
 
-MODULE_INIT("cs_help", CSHelp)
+MODULE_INIT(CSHelp)

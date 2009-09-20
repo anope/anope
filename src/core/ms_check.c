@@ -104,4 +104,4 @@ class MSCheck : public Module
 	}
 };
 
-MODULE_INIT("ms_check", MSCheck)
+MODULE_INIT(MSCheck)

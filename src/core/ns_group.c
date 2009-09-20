@@ -248,4 +248,4 @@ NickAlias *makealias(const char *nick, NickCore *nc)
 	return na;
 }
 
-MODULE_INIT("ns_group", NSGroup)
+MODULE_INIT(NSGroup)

@@ -91,4 +91,4 @@ class OSStaff : public Module
 	}
 };
 
-MODULE_INIT("os_staff", OSStaff)
+MODULE_INIT(OSStaff)

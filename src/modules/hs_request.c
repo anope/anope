@@ -953,4 +953,4 @@ void my_load_config()
 		alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);
 }
 
-MODULE_INIT("hs_request", HSRequest)
+MODULE_INIT(HSRequest)

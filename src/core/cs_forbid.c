@@ -134,4 +134,4 @@ class CSForbid : public Module
 	}
 };
 
-MODULE_INIT("cs_forbid", CSForbid)
+MODULE_INIT(CSForbid)

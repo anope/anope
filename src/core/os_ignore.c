@@ -146,4 +146,4 @@ class OSIgnore : public Module
 	}
 };
 
-MODULE_INIT("os_ignore", OSIgnore)
+MODULE_INIT(OSIgnore)

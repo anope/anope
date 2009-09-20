@@ -70,4 +70,4 @@ class ENone : public Module
 /* EOF */
 
 
-MODULE_INIT("enc_none", ENone)
+MODULE_INIT(ENone)

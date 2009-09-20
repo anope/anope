@@ -84,4 +84,4 @@ class SSMain : public Module
 	}
 };
 
-MODULE_INIT("ss_main", SSMain)
+MODULE_INIT(SSMain)

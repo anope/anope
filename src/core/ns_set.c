@@ -548,4 +548,4 @@ class NSSet : public Module
 	}
 };
 
-MODULE_INIT("ns_set", NSSet)
+MODULE_INIT(NSSet)

@@ -414,4 +414,4 @@ class EMD5 : public Module
 /*************************************************************************/
 
 
-MODULE_INIT("enc_md5", EMD5)
+MODULE_INIT(EMD5)

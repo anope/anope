@@ -107,4 +107,4 @@ class NSSendPass : public Module
 	}
 };
 
-MODULE_INIT("ns_sendpass", NSSendPass)
+MODULE_INIT(NSSendPass)

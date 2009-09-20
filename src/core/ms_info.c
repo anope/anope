@@ -217,4 +217,4 @@ class MSInfo : public Module
 	}
 };
 
-MODULE_INIT("ms_info", MSInfo)
+MODULE_INIT(MSInfo)

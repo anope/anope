@@ -94,4 +94,4 @@ class BSAssign : public Module
 	}
 };
 
-MODULE_INIT("bs_assign", BSAssign)
+MODULE_INIT(BSAssign)

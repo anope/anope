@@ -83,4 +83,4 @@ class BSAct : public Module
 	}
 };
 
-MODULE_INIT("bs_act", BSAct)
+MODULE_INIT(BSAct)

@@ -75,4 +75,4 @@ class OSJupe : public Module
 	}
 };
 
-MODULE_INIT("os_jupe", OSJupe)
+MODULE_INIT(OSJupe)

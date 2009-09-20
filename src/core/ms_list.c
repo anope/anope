@@ -182,4 +182,4 @@ int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, cons
 	return 1;
 }
 
-MODULE_INIT("ms_list", MSList)
+MODULE_INIT(MSList)

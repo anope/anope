@@ -75,4 +75,4 @@ class CSStatus : public Module
 	}
 };
 
-MODULE_INIT("cs_status", CSStatus)
+MODULE_INIT(CSStatus)

@@ -87,4 +87,4 @@ class OSUMode : public Module
 	}
 };
 
-MODULE_INIT("os_umode", OSUMode)
+MODULE_INIT(OSUMode)

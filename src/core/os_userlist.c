@@ -99,4 +99,4 @@ class OSUserList : public Module
 	}
 };
 
-MODULE_INIT("os_userlist", OSUserList)
+MODULE_INIT(OSUserList)

@@ -85,4 +85,4 @@ class NSGetEMail : public Module
 	}
 };
 
-MODULE_INIT("ns_getemail", NSGetEMail)
+MODULE_INIT(NSGetEMail)

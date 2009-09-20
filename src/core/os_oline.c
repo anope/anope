@@ -82,4 +82,4 @@ class OSOLine : public Module
 	}
 };
 
-MODULE_INIT("os_oline", OSOLine)
+MODULE_INIT(OSOLine)

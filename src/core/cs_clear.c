@@ -354,4 +354,4 @@ class CSClear : public Module
 	}
 };
 
-MODULE_INIT("cs_clear", CSClear)
+MODULE_INIT(CSClear)

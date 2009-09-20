@@ -48,4 +48,4 @@ class OSHelp : public Module
 	}
 };
 
-MODULE_INIT("os_help", OSHelp)
+MODULE_INIT(OSHelp)

@@ -53,4 +53,4 @@ class OSUpdate : public Module
 	}
 };
 
-MODULE_INIT("os_update", OSUpdate)
+MODULE_INIT(OSUpdate)

@@ -196,4 +196,4 @@ public:
 	}
 };
 
-MODULE_INIT("cs_list", CSList)
+MODULE_INIT(CSList)

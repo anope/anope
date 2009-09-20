@@ -462,4 +462,4 @@ int do_sendregmail(User *u, NickRequest *nr)
 	return 0;
 }
 
-MODULE_INIT("ns_register", NSRegister)
+MODULE_INIT(NSRegister)

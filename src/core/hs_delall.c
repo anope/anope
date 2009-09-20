@@ -78,4 +78,4 @@ class HSDelAll : public Module
 	}
 };
 
-MODULE_INIT("hs_delall", HSDelAll)
+MODULE_INIT(HSDelAll)

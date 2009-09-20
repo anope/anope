@@ -86,4 +86,4 @@ class BSBotList : public Module
 	}
 };
 
-MODULE_INIT("bs_botlist", BSBotList)
+MODULE_INIT(BSBotList)

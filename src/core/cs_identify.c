@@ -102,4 +102,4 @@ class CSIdentify : public Module
 	}
 };
 
-MODULE_INIT("cs_identify", CSIdentify)
+MODULE_INIT(CSIdentify)

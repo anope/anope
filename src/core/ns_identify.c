@@ -138,4 +138,4 @@ class NSIdentify : public Module
 	}
 };
 
-MODULE_INIT("ns_identify", NSIdentify)
+MODULE_INIT(NSIdentify)

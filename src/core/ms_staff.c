@@ -78,4 +78,4 @@ class MSStaff : public Module
 	}
 };
 
-MODULE_INIT("ms_staff", MSStaff)
+MODULE_INIT(MSStaff)

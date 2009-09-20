@@ -101,4 +101,4 @@ class OSSVSNick : public Module
 	}
 };
 
-MODULE_INIT("os_svsnick", OSSVSNick)
+MODULE_INIT(OSSVSNick)

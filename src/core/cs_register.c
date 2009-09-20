@@ -155,4 +155,4 @@ class CSRegister : public Module
 	}
 };
 
-MODULE_INIT("cs_register", CSRegister)
+MODULE_INIT(CSRegister)

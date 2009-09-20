@@ -49,4 +49,4 @@ class MSHelp : public Module
 	}
 };
 
-MODULE_INIT("ms_help", MSHelp)
+MODULE_INIT(MSHelp)

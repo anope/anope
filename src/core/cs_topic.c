@@ -97,4 +97,4 @@ class CSTopic : public Module
 	}
 };
 
-MODULE_INIT("cs_topic", CSTopic)
+MODULE_INIT(CSTopic)

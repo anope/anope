@@ -225,4 +225,4 @@ class NSInfo : public Module
 	}
 };
 
-MODULE_INIT("ns_info", NSInfo)
+MODULE_INIT(NSInfo)

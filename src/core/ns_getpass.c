@@ -93,4 +93,4 @@ class NSGetPass : public Module
 	}
 };
 
-MODULE_INIT("ns_getpass", NSGetPass)
+MODULE_INIT(NSGetPass)

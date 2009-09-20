@@ -87,4 +87,4 @@ class MSCancel : public Module
 	}
 };
 
-MODULE_INIT("ms_cancel", MSCancel)
+MODULE_INIT(MSCancel)

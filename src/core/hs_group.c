@@ -90,4 +90,4 @@ class HSGroup : public Module
 	}
 };
 
-MODULE_INIT("hs_group", HSGroup)
+MODULE_INIT(HSGroup)

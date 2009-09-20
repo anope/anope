@@ -376,4 +376,4 @@ class OSNews : public Module
 	}
 };
 
-MODULE_INIT("os_news", OSNews)
+MODULE_INIT(OSNews)

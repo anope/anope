@@ -173,4 +173,4 @@ class CSInfo : public Module
 	}
 };
 
-MODULE_INIT("cs_info", CSInfo)
+MODULE_INIT(CSInfo)

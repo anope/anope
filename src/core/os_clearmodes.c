@@ -259,4 +259,4 @@ class OSClearModes : public Module
 	}
 };
 
-MODULE_INIT("os_clearmodes", OSClearModes)
+MODULE_INIT(OSClearModes)

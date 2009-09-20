@@ -228,4 +228,4 @@ class NSList : public Module
 	}
 };
 
-MODULE_INIT("ns_list", NSList)
+MODULE_INIT(NSList)

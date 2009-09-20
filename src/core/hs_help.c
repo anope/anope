@@ -49,4 +49,4 @@ class HSHelp : public Module
 	}
 };
 
-MODULE_INIT("hs_help", HSHelp)
+MODULE_INIT(HSHelp)

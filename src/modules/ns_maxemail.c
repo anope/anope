@@ -171,4 +171,4 @@ void my_load_config()
 		alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);
 }
 
-MODULE_INIT("ns_maxemail", NSMaxEmail)
+MODULE_INIT(NSMaxEmail)

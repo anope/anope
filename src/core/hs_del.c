@@ -71,4 +71,4 @@ class HSDel : public Module
 	}
 };
 
-MODULE_INIT("hs_del", HSDel)
+MODULE_INIT(HSDel)

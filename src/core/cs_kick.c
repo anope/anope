@@ -109,4 +109,4 @@ class CSKick : public Module
 	}
 };
 
-MODULE_INIT("cs_kick", CSKick)
+MODULE_INIT(CSKick)

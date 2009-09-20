@@ -441,4 +441,4 @@ class BSBot : public Module
 	}
 };
 
-MODULE_INIT("bs_bot", BSBot)
+MODULE_INIT(BSBot)

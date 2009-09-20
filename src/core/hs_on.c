@@ -79,4 +79,4 @@ class HSOn : public Module
 	}
 };
 
-MODULE_INIT("hs_on", HSOn)
+MODULE_INIT(HSOn)

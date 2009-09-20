@@ -78,4 +78,4 @@ class CSGetPass : public Module
 	}
 };
 
-MODULE_INIT("cs_getpass", CSGetPass)
+MODULE_INIT(CSGetPass)

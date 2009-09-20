@@ -580,4 +580,4 @@ int xop_list_callback(User *u, int num, va_list args)
 	return xop_list(u, num - 1, ci, sent_header, xlev, xmsg);
 }
 
-MODULE_INIT("cs_xop", CSXOP)
+MODULE_INIT(CSXOP)

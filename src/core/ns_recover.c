@@ -122,4 +122,4 @@ class NSRecover : public Module
 	}
 };
 
-MODULE_INIT("ns_recover", NSRecover)
+MODULE_INIT(NSRecover)

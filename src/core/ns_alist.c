@@ -156,4 +156,4 @@ class NSAList : public Module
 	}
 };
 
-MODULE_INIT("ns_alist", NSAList)
+MODULE_INIT(NSAList)

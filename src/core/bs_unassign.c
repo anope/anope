@@ -70,4 +70,4 @@ class BSUnassign : public Module
 	}
 };
 
-MODULE_INIT("bs_unassign", BSUnassign)
+MODULE_INIT(BSUnassign)

@@ -132,4 +132,4 @@ void defcon_sendlvls(User *u)
 		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_MEMOS);
 }
 
-MODULE_INIT("os_defcon", OSDEFCON)
+MODULE_INIT(OSDEFCON)

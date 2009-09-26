@@ -366,6 +366,24 @@ void User::CheckAuthenticationToken(const char *svid)
 	}
 }
 
+/** Auto identify the user to the given accountname.
+ * @param account Display nick of account
+ */
+void User::AutoID(const char *account)
+{
+	NickCore *tnc;
+	NickAlias *na;
+	
+	if ((tnc = findcore(account)))	
+	{
+		this->nc = tnc;
+		if ((na = findnick(this->nick)) && na->nc == tnc)
+		{				
+			na->status |= NS_IDENTIFIED;
+			check_memos(this);
+		}	
+	}
+}
 
 /*************************************************************************/
 /*************************************************************************/
@@ -777,37 +795,43 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 	}						   /* if (!*source) */
 
-	NickAlias *ntmp = findnick(user->nick);
-	if (ntmp && user->nc == ntmp->nc)
+	/* Do not attempt to validate the user if their server is syncing and this
+	 * ircd has delayed auth - Adam
+	 */
+	if (!(ircd->b_delay_auth && user->server->sync == SSYNC_IN_PROGRESS))
 	{
-		ntmp->status |= NS_IDENTIFIED;
-		nc_changed = 0;
-	}
-
-	if (!ntmp || ntmp->nc != user->nc || nc_changed)
-	{
-		if (validate_user(user))
-			check_memos(user);
-	}
-	else
-	{
-		ntmp->last_seen = time(NULL);
-
-		if (ntmp->last_usermask)
-			delete [] ntmp->last_usermask;
-		ntmp->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
-		sprintf(ntmp->last_usermask, "%s@%s",
-				user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
-		ircdproto->SetAutoIdentificationToken(user);
-		alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
-	}
-
-	/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
-	if (ircd->check_nick_id)
-	{
-		if (nick_identified(user))
+		NickAlias *ntmp = findnick(user->nick);
+		if (ntmp && user->nc == ntmp->nc)
 		{
+			ntmp->status |= NS_IDENTIFIED;
+			nc_changed = 0;
+		}
+
+		if (!ntmp || ntmp->nc != user->nc || nc_changed)
+		{
+			if (validate_user(user))
+				check_memos(user);
+		}
+		else
+		{
+			ntmp->last_seen = time(NULL);
+
+			if (ntmp->last_usermask)
+				delete [] ntmp->last_usermask;
+			ntmp->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
+			sprintf(ntmp->last_usermask, "%s@%s",
+					user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
 			ircdproto->SetAutoIdentificationToken(user);
+			alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
+		}
+
+		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
+		if (ircd->check_nick_id)
+		{
+			if (nick_identified(user))
+			{
+				ircdproto->SetAutoIdentificationToken(user);
+			}
 		}
 	}
 

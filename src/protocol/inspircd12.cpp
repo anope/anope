@@ -138,6 +138,7 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* character set */
 	 1,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
+	 true,					/* Auth for users is sent after the initial NICK/UID command */
 	 }
 	,
 	{NULL}
@@ -402,6 +403,9 @@ static int has_banexceptionmod = 0;
 static int has_inviteexceptionmod = 0;
 static int has_hidechansmod = 0;
 
+/* Previously introduced user during burst */
+static User *prev_u_intro;
+
 
 /* CHGHOST */
 void inspircd_cmd_chghost(const char *nick, const char *vhost)
@@ -465,6 +469,11 @@ class InspIRCdProto : public IRCDProto
 					else --opcnt;
 					break;
 				case 'r':
+					/* The users server is syncing, do not
+					 * set them -r yet - Adam
+					 */
+					if (user->server->sync == SSYNC_IN_PROGRESS)
+						break;
 					if (add && !nick_identified(user)) {
 						common_svsmode(user, "-r", NULL);
 						user->mode &= ~UMODE_r;
@@ -1163,6 +1172,16 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	Server *s = findserver_uid(servlist, source);
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 	int ts = strtoul(av[1], NULL, 10);
+	
+	/* Previously introduced user is still in buffer, so should be marked UNID'd */
+	user = prev_u_intro;
+	prev_u_intro = NULL;
+	if (user && user->server->sync == SSYNC_IN_PROGRESS && !user->nc)
+	{
+		validate_user(user);
+		common_svsmode(user, "-r", NULL);
+	}
+	user = NULL;
 
 	inet_aton(av[6], &addy);
 	user = do_nick("", av[2],   /* nick */
@@ -1173,6 +1192,10 @@ int anope_event_uid(const char *source, int ac, const char **av)
 			ts, htonl(*ad), av[4], av[0]);
 	if (user)
 	{
+		if (user->server->sync == SSYNC_IN_PROGRESS)
+		{
+			prev_u_intro = user;
+		}
 		ircdproto->ProcessUsermodes(user, 1, &av[8]);
 		user->SetCloakedHost(av[4]);
 	}
@@ -1249,11 +1272,8 @@ int anope_event_metadata(const char *source, int ac, const char **av)
 	{
 		if ((u = find_byuid(av[0])))
 		{
-			/* Check to see if the account name is the same
-			 * as the one saved for this nick, if so identify
-			 * them - Adam
-			 */
-			u->CheckAuthenticationToken(av[2]);
+			/* Identify the user for this account - Adam */
+			u->AutoID(av[2]);
 		}
 	}
 

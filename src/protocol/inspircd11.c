@@ -138,6 +138,7 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* character set */
 	 1,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
+	 false,					/* Auth for users is sent after the initial NICK/UID command */
 	 }
 	,
 	{NULL}

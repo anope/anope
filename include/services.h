@@ -525,6 +525,7 @@ struct ircdvars_ {
 							 * 0 for no support, 1 for strict cidr support, anything else
 							 * for ircd specific support (nefarious only cares about first /mask) */
 	const char *globaltldprefix;		/* TLD prefix used for Global */
+	bool b_delay_auth;			/* Auth for users is sent after the initial NICK/UID command */
 };
 
 struct ircdcapab_ {

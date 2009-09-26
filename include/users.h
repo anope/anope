@@ -145,5 +145,10 @@ public: // XXX: exposing a tiny bit too much
 	 * @param svid Services id
 	 */
 	void CheckAuthenticationToken(const char *svid);
+
+	/** Auto identify the user to the given accountname.
+	 * @param account Display nick of account
+	 */
+	void AutoID(const char *acc);
 };
 

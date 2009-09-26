@@ -1168,15 +1168,17 @@ int anope_event_nick(const char *source, int ac, const char **av)
 int anope_event_uid(const char *source, int ac, const char **av)
 {
 	User *user;
+	NickAlias *na;
 	struct in_addr addy;
 	Server *s = findserver_uid(servlist, source);
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 	int ts = strtoul(av[1], NULL, 10);
 	
-	/* Previously introduced user is still in buffer, so should be marked UNID'd */
+	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
+	 * If not, validate the user.  ~ Viper*/
 	user = prev_u_intro;
 	prev_u_intro = NULL;
-	if (user && user->server->sync == SSYNC_IN_PROGRESS && !user->nc)
+	if (user && user->server->sync == SSYNC_IN_PROGRESS && (na = findnick(user->nick)) && na->nc != user->nc)
 	{
 		validate_user(user);
 		common_svsmode(user, "-r", NULL);
@@ -1413,6 +1415,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 
 int anope_event_endburst(const char *source, int ac, const char **av)
 {
+	NickAlias *na;
 	User *u = prev_u_intro;
 	Server *s = findserver_uid(servlist, source);
 	if (!s)
@@ -1420,9 +1423,11 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 		throw new CoreException("Got ENDBURST without a source");
 	}
 
-	/* Don't forget to mark the last user that was introduced as unregged, if applicable. ~ Viper */
+	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
+	 * If not, validate the user. ~ Viper*/
 	prev_u_intro = NULL;
-	if (u && u->server->sync == SSYNC_IN_PROGRESS && !u->nc) {
+	if (u && u->server->sync == SSYNC_IN_PROGRESS && (na = findnick(u->nick)) && na->nc != u->nc)
+	{
 		common_svsmode(u, "-r", NULL);
 		validate_user(u);
 	}

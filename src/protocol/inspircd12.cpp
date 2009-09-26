@@ -751,14 +751,6 @@ class InspIRCdProto : public IRCDProto
 		if (!u->nc)
 			return;
 
-		if (u->nc->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			u->nc->Shrink("authenticationtoken");
-		}
-
-		u->nc->Extend("authenticationtoken", sstrdup(u->nc->display));
-
 		common_svsmode(u, "+r", NULL);
 	}
 
@@ -1430,8 +1422,8 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	if (u) na = findnick(u->nick);
 	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->nc))
 	{
-		common_svsmode(u, "-r", NULL);
 		validate_user(u);
+		common_svsmode(u, "-r", NULL);
 	}
 
 	alog("Processed ENDBURST for %s", s->name);
@@ -1523,17 +1515,6 @@ class ProtoInspIRCd : public Module
 	~ProtoInspIRCd()
 	{
 		delete [] TS6SID;
-	}
-
-	void OnDelCore(NickCore *nc)
-	{
-		char *c;
-
-		if (nc->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			nc->Shrink("authenticationtoken");
-		}
 	}
 };
 

@@ -348,23 +348,19 @@ void User::SendMessage(const char *source, const std::string &msg)
  */
 void User::CheckAuthenticationToken(const char *svid)
 {
-	NickCore *tnc;
 	const char *c;
 	NickAlias *na;
 
-	if ((tnc = findcore(this->nick)))
+	if ((na = findnick(this->nick)))
 	{
-		if (tnc->GetExt("authenticationtoken", c))
+		if (na->nc && na->nc->GetExt("authenticationtoken", c))
 		{
 			if (svid && c && !strcmp(svid, c))
 			{
 				/* Users authentication token matches so they should become identified */
-				if ((na = findnick(this->nick)))
-				{
-					na->status |= NS_IDENTIFIED;
-					check_memos(this);
-					this->nc = tnc;
-				}
+				na->status |= NS_IDENTIFIED;
+				check_memos(this);
+				this->nc = na->nc;
 			}
 		}
 	}

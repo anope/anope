@@ -1178,7 +1178,8 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	 * If not, validate the user.  ~ Viper*/
 	user = prev_u_intro;
 	prev_u_intro = NULL;
-	if (user && user->server->sync == SSYNC_IN_PROGRESS && (na = findnick(user->nick)) && na->nc != user->nc)
+	if (user) na = findnick(user->nick);
+	if (user && user->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != user->nc))
 	{
 		validate_user(user);
 		common_svsmode(user, "-r", NULL);
@@ -1426,7 +1427,8 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
 	 * If not, validate the user. ~ Viper*/
 	prev_u_intro = NULL;
-	if (u && u->server->sync == SSYNC_IN_PROGRESS && (na = findnick(u->nick)) && na->nc != u->nc)
+	if (u) na = findnick(u->nick);
+	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->nc))
 	{
 		common_svsmode(u, "-r", NULL);
 		validate_user(u);

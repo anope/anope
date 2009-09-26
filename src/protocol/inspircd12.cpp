@@ -746,8 +746,6 @@ class InspIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		char *c;
-
 		if (!u->nc)
 			return;
 
@@ -1508,8 +1506,6 @@ class ProtoInspIRCd : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
-
-		ModuleManager::Attach(I_OnDelCore, this);
 	}
 
 	~ProtoInspIRCd()

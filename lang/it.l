@@ -698,14 +698,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	La lista d'accesso per %s è vuota.
 
 # Status messages
-NICK_STATUS_0
-	STATO %s 0
-NICK_STATUS_1
-	STATO %s 1
-NICK_STATUS_2
-	STATO %s 2
-NICK_STATUS_3
-	STATO %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3855,10 +3849,11 @@ NICK_HELP_STATUS
 	Indica se l'utente che usa il nick specificato è riconosciuto
 	come proprietario del nick. La risposta ha questo formato:
 	
-	    nick codice-di-stato
+	    nick codice-di-stato account
 	
-	dove nick è il nick inviato con il comando, e codice-di-stato
-	può essere:
+	where nick is the nickname sent with the command,
+	codice-di-stato is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - l'utente non è online o il nick non è registrato
 	    1 - l'utente non è riconosciuto come proprietario del nick

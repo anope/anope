@@ -696,14 +696,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Access list for %s is empty.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3844,10 +3838,11 @@ NICK_HELP_STATUS
 	recognized as the owner of the nickname.  The response has
 	this format:
 	
-	    nickname status-code
+	    nickname status-code account
 	
-	where nickname is the nickname sent with the command, and
-	status-code is one of the following:
+	where nickname is the nickname sent with the command,
+	status-code is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - no such user online or nickname not registered
 	    1 - user not recognized as nickname's owner

@@ -709,14 +709,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Access list for %s is empty.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3981,11 +3975,11 @@ NICK_HELP_STATUS
 	ψευδώνυμο που δώσατε, έχει αναγνωριστεί σαν κάτοχός του.
 	Το αποτέλεσμα της εντολής έχει τη μορφή:
 	
-	    ψευδώνυμο κωδικός-κατάστασης
+	    ψευδώνυμο κωδικός-κατάστασης account
 	
-	όπου ψευδώνυμο είναι το ψευδώνυμο για το οποίο θέλετε να,μάθετε
-	την κατάστασή του και όπου κωδικός-κατάστασης είναι ένας
-	από τους παρακάτω:
+	where ψευδώνυμο is the nickname sent with the command,
+	κωδικός-κατάστασης is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - δεν υπάρχει τέτοιος χρήστης συνδεδεμένος ή το ψευδώνυμο είναι μη κατοχυρωμένο
 	    1 - ο χρήστης δεν αναγνωρίστηκε σαν κάτοχος του ψευδωνύμου

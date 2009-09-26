@@ -706,14 +706,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Access list for %s is empty.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO Válaszok
 NICK_INFO_SYNTAX
@@ -3887,10 +3881,11 @@ NICK_HELP_STATUS
 	használ azonosította magát, mint tulajdonos. 
 	Az eredmény formája a következõ:
 	
-		nicknév státusz-kód
+		nicknév státusz-kód account
 	
-	ahol a nicknévaz a nicknév amit küldtél a parancsban, és
-	a státusz-kóda következõ lehet:
+	where nickname is the nickname sent with the command,
+	status-code is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - Nincs ilyen user online vagy a nick nem regisztrált
 	    1 - A felhasználó nem azonosított be, mint a nick tulajdonosa

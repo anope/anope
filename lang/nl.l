@@ -713,14 +713,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Access list for %s is empty.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3923,10 +3917,11 @@ NICK_HELP_STATUS
 	Geef terug of de gebruiker van de gegeven nick wordt herkend
 	als de eigenaar van die nick. Het antwoord is in dit formaat:
 	
-	    nick status-code
+	    nick status-code account
 	
-	waar nick de nick is die verstuurd is met he commando, en
-	status-code een van de volgende mogelijkheden is:
+	where nick is the nickname sent with the command,
+	status-code is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - gebruiker niet online of nick niet geregistreerd
 	    1 - gebruiker wordt niet herkend als de eigenaar van de nick

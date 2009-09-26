@@ -37,16 +37,21 @@ class CommandNSStatus : public Command
 
 		while (nick && i++ < 16)
 		{
+			na = findnick(nick);
+
 			if (!(u2 = finduser(nick))) /* Nick is not online */
-				notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
-			else if (nick_identified(u2)) /* Nick is identified */
-				notice_lang(s_NickServ, u, NICK_STATUS_3, nick);
+				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
+			else if (nick_identified(u2) && na && na->nc == u2->nc) /* Nick is identified */
+				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 3, u2->nc->display);
 			else if (nick_recognized(u2)) /* Nick is recognised, but NOT identified */
-				notice_lang(s_NickServ, u, NICK_STATUS_2, nick);
-			else if (!(na = findnick(nick))) /* Nick is online, but NOT a registered */
-				notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
+				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 2, (u2->nc ? u2->nc->display : ""));
+			else if (!na) /* Nick is online, but NOT a registered */
+				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
 			else
-				notice_lang(s_NickServ, u, NICK_STATUS_1, nick);
+				/* Nick is not identified for the nick, but they could be logged into an account,
+				 * so we tell the user about it
+				 */
+				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 1, (u2->nc ? u2->nc->display : ""));
 
 			/* Get the next nickname */
 			nick = params.size() > i ? params[i].c_str() : NULL;

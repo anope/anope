@@ -728,14 +728,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Die Access-Liste für %s leer.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -4005,10 +3999,11 @@ NICK_HELP_STATUS
 	Nutzer des Nicknamens der identifizierte Eigentümer ist, oder 
 	nicht.Die Antwort hat das Format:
 	
-	    Nickname Status-Code
+	    Nickname Status-Code Account
 	
-	wobei Nickname der Nickname ist, der mit dem Befehl angefragt
-	wurde und Status-Code eine der folgenden Werte:
+	where Nickname is the nickname sent with the command,
+	Status-Code is one of the following, and Account
+	is the account they are logged in as.
 	
 	    0 - User ist nicht online oder Nickname ist nicht registriert
 	    1 - User wird nicht als Eigentümer erkannt

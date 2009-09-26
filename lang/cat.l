@@ -711,14 +711,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Access list for %s is empty.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3977,10 +3971,11 @@ NICK_HELP_STATUS
 	ha estat reconegut com el propietari del nickname.
 	La resposta te el següent format:
 	
-	    nickname codi-del-status
+	    nickname codi-del-status account
 	
-	A on nickname es el nickname enviat amb la comanda, i
-	codi-del-status es un dels següents:
+	where nickname is the nickname sent with the command,
+	codi-del-status is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - Usuari no esta en linea o el nick no esta registrat.
 	    1 - Usuari no reconegut com el propietari del nick.

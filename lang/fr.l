@@ -721,14 +721,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	La liste d'accès de %s est vide.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -4006,10 +4000,11 @@ NICK_HELP_STATUS
 	Retourne si l'utilisateur utilisant le pseudo donné est reconnu
 	en tant que propriétaire du pseudo. La réponse a ce format:
 	
-	    pseudo code-status
+	    pseudo code-status account
 	
-	où pseudo est le pseudo envoyé avec la commande, et
-	code-status peut être l'un des suivants:
+	where pseudo is the nickname sent with the command,
+	code-status is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - cet utilisateur n'est pas online ou le pseudo n'est pas 
 	        enregistré

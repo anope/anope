@@ -713,14 +713,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	La lista de acceso para %s esta vacia.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3949,10 +3943,11 @@ NICK_HELP_STATUS
 	ha sido reconocido como el propietario del nickname.
 	La respuesta tiene el siguiente formato:
 	
-	    nickname codigo-del-status
+	    nickname codigo-del-status account
 	
-	Donde nickname es el nickname enviado con el comando, y
-	codigo-del-status es uno de los siguientes:
+	Donde nickname es el nickname enviado con el comando,
+	codigo-del-status es uno de los siguientes, and
+	account is the account they are logged in as.
 	
 	    0 - Usuario no esta en linea o el nick no esta registrado.
 	    1 - Usuario no reconocido como el propietario del nick.

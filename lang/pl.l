@@ -888,17 +888,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Lista dostêpu dla %s jest pusta.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0 (nie ma lub nie zarejestrowany)
-
-NICK_STATUS_1
-	STATUS %s 1 (nie jest zidentyfikowany)
-
-NICK_STATUS_2
-	STATUS %s 2 (identyfikacja list± dostêpu)
-
-NICK_STATUS_3
-	STATUS %s 3 (identyfikacja has³em)
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -4935,10 +4926,11 @@ NICK_HELP_STATUS
 	rozpoznawani jako w³a¶ciciele nicka).
 	Odpowied¼ ma nastêpuj±cy format:
 	
-	    nick kod
+	    nick kod account
 	
-	Gdzie nick jest tym nickiem wys³anym w 
-	komendzie, a kod mo¿e oznaczaæ:
+	where nick is the nickname sent with the command,
+	kod is one of the following, and account
+	is the account they are logged in as.
 	
 	0 - u¿ytkownik jest offline lub nick niezarejestrowany
 	1 - u¿ytkownik nie zidentyfikowa³ siê jako w³a¶ciciel nicka

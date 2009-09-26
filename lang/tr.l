@@ -716,14 +716,8 @@ NICK_ACCESS_LIST_X_EMPTY
 	Access list for %s is empty.
 
 # Status messages
-NICK_STATUS_0
-	STATUS %s 0
-NICK_STATUS_1
-	STATUS %s 1
-NICK_STATUS_2
-	STATUS %s 2
-NICK_STATUS_3
-	STATUS %s 3
+NICK_STATUS_REPLY
+	STATUS %s %d %s
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -3969,10 +3963,11 @@ NICK_HELP_STATUS
 	Nickin kullanýcý tarafýndan nickin sahibi olarak tanýtýlýp 
 	tanýtýlmadýðýný gösterir. Cevap þu formattadýr:
 	
-	    nick durum-kodu
+	    nick durum-kodu account
 	
-	nick komutta yazýlan nick, ve durum-kodu da
-	aþaðýdakilerden biridir:
+	where nick is the nickname sent with the command,
+	durum-kodu is one of the following, and account
+	is the account they are logged in as.
 	
 	    0 - Böyle bir kullanýcý baðlý deðil veya nick 
 	           kayýtlý deðil

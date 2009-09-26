@@ -1413,10 +1413,18 @@ int anope_event_capab(const char *source, int ac, const char **av)
 
 int anope_event_endburst(const char *source, int ac, const char **av)
 {
+	User *u = prev_u_intro;
 	Server *s = findserver_uid(servlist, source);
 	if (!s)
 	{
 		throw new CoreException("Got ENDBURST without a source");
+	}
+
+	/* Don't forget to mark the last user that was introduced as unregged, if applicable. ~ Viper */
+	prev_u_intro = NULL;
+	if (u && u->server->sync == SSYNC_IN_PROGRESS && !u->nc) {
+		common_svsmode(u, "-r", NULL);
+		validate_user(u);
 	}
 
 	alog("Processed ENDBURST for %s", s->name);

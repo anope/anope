@@ -29,7 +29,7 @@ all: services
 distclean: spotless
 distclean_modules: clean_modules spotless
 
-services:  $(OBJS) mod_version
+services:  $(OBJS) 
 	$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
@@ -76,9 +76,6 @@ opertype.o:   opertype.cpp  $(INCLUDES)
 users.o:        users.c     $(INCLUDES)
 vsnprintf.o:    vsnprintf.c $(INCLUDES)
 wildcard.o:     wildcard.cpp $(INCLUDES)
-
-mod_version:	mod_version.c	$(INCLUDES)
-	$(MAKEBIN) $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
 
 modules: DUMMY
 	@modules/configure modules

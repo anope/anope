@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include "timers.h"
 #include "hashcomp.h"
+#include "version.h"
 
 /* Cross OS compatibility macros */
 #ifdef _WIN32
@@ -295,6 +296,42 @@ class CoreExport Command
 	char *service;	/* Service we provide this command for */
 	Command *next;
 };
+
+class CoreExport Version
+{
+  private:
+	  unsigned Major;
+	  unsigned Minor;
+	  unsigned Build;
+
+  public:
+	/** Constructor
+	 * @param vMajor The major version numbber
+	 * @param vMinor The minor version numbber
+	 * @param vBuild The build version numbber
+	 */
+	Version(unsigned vMajor, unsigned vMinor, unsigned vBuild);
+
+	/** Destructor
+	 */
+	virtual ~Version();
+
+	/** Get the major version of Anope this was built against
+	 * @return The major version
+	 */
+	const unsigned GetMajor();
+
+	/** Get the minor version of Anope this was built against
+	 * @return The minor version
+	 */
+	const unsigned GetMinor();
+
+	/** Get the build version this was built against
+	 * @return The build version
+	 */
+	const unsigned GetBuild();
+};
+
 /** Every module in Anope is actually a class.
  */
 class CoreExport Module
@@ -361,6 +398,12 @@ class CoreExport Module
 	 * @param author the author of the module
 	 */
 	void SetAuthor(const std::string &author);
+
+	/** Get the version of Anope this module was
+	 * compiled against
+	 * @return The version
+	 */
+	virtual Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
 
 	/** Add output to NickServ Help.
 	 * When doing /msg NickServ HELP, this function will be calloed to allow it to send out

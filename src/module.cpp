@@ -166,3 +166,26 @@ void Module::SetAuthor(const std::string &nauthor)
 {
 	this->author = nauthor;
 }
+
+Version::Version(unsigned vMajor, unsigned vMinor, unsigned vBuild) : Major(vMajor), Minor(vMinor), Build(vBuild)
+{
+}
+
+Version::~Version()
+{
+}
+
+const unsigned Version::GetMajor()
+{
+	return Major;
+}
+
+const unsigned Version::GetMinor()
+{
+	return Minor;
+}
+
+const unsigned Version::GetBuild()
+{
+	return Build;
+}

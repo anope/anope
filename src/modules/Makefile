@@ -8,14 +8,13 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'\
 	   'MAKEBIN=${MAKEBIN}'
 
-OBJECTS= $(SRCS:.c=.o)
-OBJECTS+= $(SRCS:.cpp=.o)
-SO_FILES=$(OBJECTS:.o=.s)
+OBJECTS= $(SRCS:.c=.so)
+OBJECTS+= $(SRCS:.cpp=.so)
 CDEFS= -rdynamic -Wall
 
 all: modules subs
 
-modules: $(OBJECTS) $(SO_FILES)
+modules: $(OBJECTS)
 
 install:
 	$(CP) ./*.so $(INSTDIR)/data/modules
@@ -25,15 +24,11 @@ install:
 
 distclean: spotless
 
-.c.o:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
+%.so: %.c
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $*.so $*.c
 
-.cpp.o:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
-
-.o.s:
-	$(MAKEBIN) $(CC) ${SHARED} ../mod_version.o $< -o $*.so  ${PROFILE}
-	@$(TOUCH) $*.s
+%.so: %.cpp
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $*.so $*.cpp
 
 subs:
 	@for i in $(SUBS); do \
@@ -46,8 +41,8 @@ subs_clean:
 	(cd $$i; $(MAKE) $(MAKEARGS) clean); done
 
 clean: subs_clean
-	rm -f *.o *.s *.so *.c~ core
+	rm -f *.so~ core
 
 spotless:
-	rm -f *.o *.s *.so *.c~ core *.so Makefile.inc
+	rm -f *.so~ core *.so Makefile.inc
 

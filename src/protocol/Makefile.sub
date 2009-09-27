@@ -5,8 +5,8 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
    	   'RUNGROUP=${RUNGROUP}' \
 	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
 
-OBJECTS= $(SRCS:.c=.o)
-SO_FILES=$(OBJECTS:.o=.s)
+OBJECTS= $(SRCS:.c=.so)
+OBJECTS+=$(SRCS:.cpp=.so)
 CDEFS= -rdynamic -Wall
 
 all: module
@@ -15,14 +15,11 @@ module: $(OBJECTS) so
 
 distclean: spotless
 
-.c.o:
-	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
+%.so: %.c
+	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -o $*.so $*.c
 
-.cpp.o:
-	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
-
-so:
-	$(CC) ${SHARED} $(OBJECTS) -o ../$(TARGET).so ${PROFILE}
+%.so: %.cpp
+	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -o $*.so $*.cpp
 
 clean:
 	rm -f *.o *.so *.c~ core

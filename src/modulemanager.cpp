@@ -216,6 +216,33 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	m->filename = pbuf;
 	m->handle = handle;
 
+	Version v = m->GetVersion();
+	if (v.GetMajor() < VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() < VERSION_MINOR))
+	{
+		alog("Module %s is compiled against an older version of Anope %d.%d, this is %d.%d", modname.c_str(), v.GetMajor(), v.GetMinor(), VERSION_MAJOR, VERSION_MINOR);
+		DeleteModule(m);
+		return MOD_STOP;
+	}
+	else if (v.GetMajor() > VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() > VERSION_MINOR))
+	{
+		alog("Module %s is compiled against a newer version of Anope %d.%d, this is %d.%d", modname.c_str(), v.GetMajor(), v.GetMinor(), VERSION_MAJOR, VERSION_MINOR);
+		DeleteModule(m);
+		return MOD_STOP;
+	}
+	else if (v.GetBuild() < VERSION_BUILD)
+	{
+		alog("Module %s is compiled against an older revision of Anope %d, this is %d", modname.c_str(), v.GetBuild(), VERSION_BUILD);
+	}
+	else if (v.GetBuild() > VERSION_BUILD)
+	{
+		alog("Module %s is compiled against a newer revision of Anope %d, this is %d", modname.c_str(), v.GetBuild(), VERSION_BUILD);
+	}
+	else if (v.GetBuild() == VERSION_BUILD)
+	{
+		alog("Module %s compiled against current version of Anope %d", modname.c_str(), v.GetBuild());
+	}
+
+
 	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))
 	{
 		DeleteModule(m);

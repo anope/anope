@@ -125,9 +125,6 @@ class CommandNSOInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (!is_oper(u))
-			return false;
-
 		me->NoticeLang(s_NickServ, u, OINFO_HELP);
 		return true;
 	}
@@ -202,9 +199,6 @@ class CommandCSOInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (!is_oper(u))
-			return false;
-
 		me->NoticeLang(s_ChanServ, u, OCINFO_HELP);
 		return true;
 	}
@@ -611,14 +605,12 @@ class OSInfo : public Module
 
 	void NickServHelp(User *u)
 	{
-		if (is_oper(u))
-			this->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
+		this->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
 	}
 
 	void ChanServHelp(User *u)
 	{
-		if (is_oper(u))
-			this->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
+		this->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
 	}
 };
 

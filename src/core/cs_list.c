@@ -189,10 +189,7 @@ public:
 	}
 	void ChanServHelp(User *u)
 	{
-		if (!CSListOpersOnly || (is_oper(u)))
-		{
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
-		}
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
 	}
 };
 

@@ -223,8 +223,7 @@ class NSList : public Module
 	}
 	void NickServHelp(User *u)
 	{
-		if (!NSListOpersOnly || is_oper(u))
-			notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
 	}
 };
 

@@ -22,8 +22,8 @@ so:
 	$(CC) ${SHARED} $(OBJECTS) -o ../$(TARGET).so ${PROFILE}
 
 clean:
-	rm -f *.o *.so *.c~ core
+	rm -f *.so
 
 spotless: clean
-	rm -f *~ *.o *.so *.c~ core
+	rm -f *.so
 

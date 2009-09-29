@@ -22,8 +22,8 @@ distclean: spotless
 	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -o $*.so $*.cpp
 
 clean:
-	rm -f *.o *.so *.c~ core
+	rm -f *.so
 
 spotless: clean
-	rm -f *~ *.o *.so *.c~ core
+	rm -f *.so
 

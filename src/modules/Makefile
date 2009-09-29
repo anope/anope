@@ -41,8 +41,8 @@ subs_clean:
 	(cd $$i; $(MAKE) $(MAKEARGS) clean); done
 
 clean: subs_clean
-	rm -f *.so~ core
+	rm -f *.so
 
 spotless:
-	rm -f *.so~ core *.so Makefile.inc
+	rm -f *.so Makefile.inc
 

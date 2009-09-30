@@ -716,7 +716,6 @@ E void save_ns_req_dbase();
 E int validate_user(User * u);
 E void cancel_user(User * u);
 E int nick_identified(User * u);
-E int nick_recognized(User * u);
 E void expire_nicks();
 E void expire_requests();
 EI int ns_do_register(User * u);
@@ -724,7 +723,7 @@ E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
 E NickCore  *findcore(const char *nick);
-E int is_on_access(User * u, NickCore * nc);
+E bool is_on_access(User *u, NickCore *nc);
 
 /** Set the correct oper type for a nickcore
  * @param nc The nick core
@@ -904,8 +903,6 @@ E User *next_uid();
 E Server *findserver_uid(Server * s, const char *name);
 E char *TS6SID;
 E char *TS6UPLINK;
-
-E void update_host(User * user);
 
 E User *do_nick(const char *source, const char *nick, const char *username, const char *host,
 			  const char *server, const char *realname, time_t ts, uint32 ip, const char *vhost, const char *uid);

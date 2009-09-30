@@ -31,7 +31,7 @@ class CommandMSCheck : public Command
 		struct tm *tm;
 		char timebuf[64];
 
-		if (!nick_recognized(u))
+		if (!u->IsRecognized())
 		{
 			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 			return MOD_CONT;

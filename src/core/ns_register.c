@@ -37,7 +37,6 @@ class CommandNSConfirm : public Command
 		char tmp_pass[PASSMAX];
 
 		memcpy(na->nc->pass, nr->password, PASSMAX);
-		na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
 
 		na->nc->flags |= NSDefFlags;
 
@@ -430,6 +429,7 @@ NickAlias *makenick(const char *nick)
 	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
+	na->status = 0;
 	slist_add(&nc->aliases, na);
 	alpha_insert_alias(na);
 	return na;

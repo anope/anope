@@ -485,7 +485,7 @@ class InspIRCdProto : public IRCDProto
 							delete [] user->vhost;
 						user->vhost = NULL;
 					}
-					update_host(user);
+					user->UpdateHost();
 			}
 		}
 	}

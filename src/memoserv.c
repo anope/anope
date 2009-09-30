@@ -90,7 +90,7 @@ void check_memos(User * u)
 		return;
 	}
 
-	if (!(nc = u->nc) || !nick_recognized(u) ||
+	if (!(nc = u->nc) || !u->IsRecognized() ||
 		!(nc->flags & NI_MEMO_SIGNON)) {
 		return;
 	}
@@ -211,7 +211,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (z == 3)
 			syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 
-	} else if (!nick_recognized(u)) {
+	} else if (!u->IsRecognized()) {
 		if (z == 0 || z == 3)
 			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 

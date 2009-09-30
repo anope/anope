@@ -26,7 +26,9 @@ class CoreExport User : public Extensible
 	std::string vident;
 	std::string ident;
 	std::string uid;
-public: // XXX: exposing a tiny bit too much
+	bool OnAccess;	/* If the user is on the access list of the nick theyre on */
+
+ public: // XXX: exposing a tiny bit too much
 	User *next, *prev;
 
 	char nick[NICKMAX];
@@ -150,5 +152,14 @@ public: // XXX: exposing a tiny bit too much
 	 * @param account Display nick of account
 	 */
 	void AutoID(const char *acc);
+
+	/** Check if the user is recognized for their nick (on the nicks access list)
+	 * @return true or false
+	 */
+	const bool IsRecognized() const;
+
+	/** Update the last usermask stored for a user, and check to see if they are recognized
+	 */
+	void UpdateHost();
 };
 

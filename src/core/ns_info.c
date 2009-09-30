@@ -85,7 +85,7 @@ class CommandNSInfo : public Command
 			time_t expt;
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
-			if (na->status & (NS_RECOGNIZED | NS_IDENTIFIED))
+			if (finduser(na->nick))
 				nick_online = 1;
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL
@@ -95,7 +95,6 @@ class CommandNSInfo : public Command
 
 			notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
 
-			// XXX: we should perhaps show their opertype here.
 			if (na->nc->IsServicesOper())
 			{
 				if (show_hidden || (!(na->nc->flags & NI_HIDE_STATUS)))

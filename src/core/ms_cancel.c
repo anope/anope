@@ -31,7 +31,7 @@ class CommandMSCancel : public Command
 		const char *name = params[0].c_str();
 		MemoInfo *mi;
 
-		if (!nick_recognized(u))
+		if (!u->IsRecognized())
 			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (!(mi = getmemoinfo(name, &ischan, &isforbid)))
 		{

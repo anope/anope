@@ -35,7 +35,6 @@ class CommandNSUpdate : public Command
 		if (na->last_realname)
 			delete [] na->last_realname;
 		na->last_realname = sstrdup(u->realname);
-		na->status |= NS_IDENTIFIED;
 		na->last_seen = time(NULL);
 		if (ircd->vhost)
 			do_on_id(u);

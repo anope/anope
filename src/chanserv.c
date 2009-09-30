@@ -1169,7 +1169,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 		goto kick;
 	}
 
-	if (nick_recognized(user))
+	if (user->IsRecognized())
 		nc = user->nc;
 	else
 		nc = NULL;
@@ -1869,7 +1869,7 @@ int is_founder(User * user, ChannelInfo * ci)
 
 	if (user->nc && user->nc == ci->founder) {
 		if ((nick_identified(user)
-			 || (nick_recognized(user) && !(ci->flags & CI_SECURE))))
+			 || (user->IsRecognized() && !(ci->flags & CI_SECURE))))
 			return 1;
 	}
 	if (is_identified(user, ci))
@@ -1887,7 +1887,7 @@ int is_real_founder(User * user, ChannelInfo * ci)
 
 	if (user->nc && user->nc == ci->founder) {
 		if ((nick_identified(user)
-			 || (nick_recognized(user) && !(ci->flags & CI_SECURE))))
+			 || (user->IsRecognized() && !(ci->flags & CI_SECURE))))
 			return 1;
 	}
 	return 0;
@@ -1932,7 +1932,7 @@ int get_access(User * user, ChannelInfo * ci)
 		return 0;
 
 	if (nick_identified(user)
-		|| (nick_recognized(user) && !(ci->flags & CI_SECURE)))
+		|| (user->IsRecognized() && !(ci->flags & CI_SECURE)))
 		if ((access = ci->GetAccess(user->nc)))
 			return access->level;
 
@@ -1952,7 +1952,7 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 		return;
 
 	if (is_founder(user, ci) || nick_identified(user)
-		|| (nick_recognized(user) && !(ci->flags & CI_SECURE)))
+		|| (user->IsRecognized() && !(ci->flags & CI_SECURE)))
 		if ((access = ci->GetAccess(user->nc)))
 			access->last_seen = time(NULL);
 }

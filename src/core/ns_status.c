@@ -43,7 +43,7 @@ class CommandNSStatus : public Command
 				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
 			else if (nick_identified(u2) && na && na->nc == u2->nc) /* Nick is identified */
 				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 3, u2->nc->display);
-			else if (nick_recognized(u2)) /* Nick is recognised, but NOT identified */
+			else if (u2->IsRecognized()) /* Nick is recognised, but NOT identified */
 				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 2, (u2->nc ? u2->nc->display : ""));
 			else if (!na) /* Nick is online, but NOT a registered */
 				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");

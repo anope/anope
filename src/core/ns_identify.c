@@ -65,18 +65,10 @@ class CommandNSIdentify : public Command
 				alog("%s: %s!%s@%s logged out of account %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nc->display);
 			}
 
-			if (!(na->status & NS_IDENTIFIED) && !(na->status & NS_RECOGNIZED))
-			{
-				if (na->last_usermask)
-					delete [] na->last_usermask;
-				na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-				sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
-				if (na->last_realname)
-					delete [] na->last_realname;
-				na->last_realname = sstrdup(u->realname);
-			}
-
-			na->status |= NS_IDENTIFIED;
+			u->UpdateHost();
+			if (na->last_realname)
+				delete [] na->last_realname;
+			na->last_realname = sstrdup(u->realname);
 			na->last_seen = time(NULL);
 			u->nc = na->nc;
 
@@ -98,7 +90,7 @@ class CommandNSIdentify : public Command
 				notice_help(s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
 			}
 
-			if (!(na->status & NS_RECOGNIZED))
+			if (nick_identified(u))
 				check_memos(u);
 
 			/* Clear any timers */

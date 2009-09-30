@@ -65,7 +65,6 @@ class CommandNSSuspend : public Command
 				na2 = static_cast<NickAlias *>(na->nc->aliases.list[i]);
 				if (na2->nc == na->nc)
 				{
-					na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
 					if (na2->last_quit)
 						delete [] na2->last_quit;
 					na2->last_quit = sstrdup(reason);

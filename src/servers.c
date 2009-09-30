@@ -219,7 +219,7 @@ static void delete_server(Server * serv, const char *quitreason)
 				{
 					if ((na = findnick(u->nick)) && !(na->status & NS_FORBIDDEN)
 						&& (!(na->nc->flags & NI_SUSPENDED))
-						&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
+						&& (u->IsRecognized() || nick_identified(u))) {
 						na->last_seen = time(NULL);
 						if (na->last_quit)
 							delete [] na->last_quit;

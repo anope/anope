@@ -30,7 +30,7 @@ time_t maxusertime;
 User::User(const std::string &snick, const std::string &suid)
 {
 	User **list;
-	// XXX: we could do well to steal CoreException from insp
+	
 	if (snick.empty())
 		throw "what the craq, empty nick passed to constructor";
 
@@ -45,6 +45,7 @@ User::User(const std::string &snick, const std::string &suid)
 	chans = NULL;
 	founder_chans = NULL;
 	invalid_pw_count = timestamp = my_signon = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
+	OnAccess = false;
 
 	strscpy(this->nick, snick.c_str(), NICKMAX);
 	this->uid = suid;
@@ -100,6 +101,11 @@ void User::SetNewNick(const std::string &newnick)
 	if (*list)
 		(*list)->prev = this;
 	*list = this;
+	
+	OnAccess = false;
+	NickAlias *na = findnick(this->nick);
+	if (na)
+		OnAccess = is_on_access(this, na->nc);
 }
 
 void User::SetDisplayedHost(const std::string &shost)
@@ -114,7 +120,7 @@ void User::SetDisplayedHost(const std::string &shost)
 	if (debug)
 		alog("debug: %s changed vhost to %s", this->nick, shost.c_str());
 
-	update_host(this);
+	this->UpdateHost();
 }
 
 /** Get the displayed vhost of a user record.
@@ -143,7 +149,7 @@ void User::SetCloakedHost(const std::string &newhost)
 	if (debug)
 		alog("debug: %s changed cloaked host to %s", this->nick, newhost.c_str());
 	
-	update_host(this);
+	this->UpdateHost();
 }
 
 /** Get the cloaked host of a user
@@ -167,7 +173,7 @@ void User::SetVIdent(const std::string &sident)
 	if (debug)
 		alog("debug: %s changed ident to %s", this->nick, sident.c_str());
 
-	update_host(this);
+	this->UpdateHost();
 }
 
 const std::string &User::GetVIdent() const
@@ -187,7 +193,7 @@ void User::SetIdent(const std::string &sident)
 	if (debug)
 		alog("debug: %s changed real ident to %s", this->nick, sident.c_str());
 
-	update_host(this);
+	this->UpdateHost();
 }
 
 const std::string &User::GetIdent() const
@@ -206,7 +212,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (nick_identified(this) || (!this->nc || (this->nc && !(this->nc->flags & NI_SECURE) && nick_recognized(this)))))
+	if (na && (nick_identified(this) || (!this->nc || (this->nc && !(this->nc->flags & NI_SECURE) && IsRecognized()))))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;
@@ -358,7 +364,6 @@ void User::CheckAuthenticationToken(const char *svid)
 			if (svid && c && !strcmp(svid, c))
 			{
 				/* Users authentication token matches so they should become identified */
-				na->status |= NS_IDENTIFIED;
 				check_memos(this);
 				this->nc = na->nc;
 			}
@@ -379,37 +384,39 @@ void User::AutoID(const char *account)
 		this->nc = tnc;
 		if ((na = findnick(this->nick)) && na->nc == tnc)
 		{				
-			na->status |= NS_IDENTIFIED;
 			check_memos(this);
 		}	
 	}
 }
 
-/*************************************************************************/
-/*************************************************************************/
-
-/*
- * XXX: I don't like how this "smells". I think it belongs in NickAlias/NickCore.
- * -- w00t
+/** Check if the user is recognized for their nick (on the nicks access list)
+ * @return true or false
  */
-void update_host(User * user)
+const bool User::IsRecognized() const
 {
-	NickCore *nc = findcore(user->nick);
-	if (nick_identified(user) || (nc && !(nc->flags & NI_SECURE) && nick_recognized(user)))
-	{
-		NickAlias *na = findnick(user->nick);
+	return OnAccess;
+}
 
+/** Update the last usermask stored for a user, and check to see if they are recognized
+ */
+void User::UpdateHost()
+{
+	NickAlias *na = findnick(this->nick);
+
+	if (nick_identified(this) || (na && !(na->nc->flags & NI_SECURE) && IsRecognized()))
+	{
 		if (na->last_usermask)
 			delete [] na->last_usermask;
 
-		na->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
-		sprintf(na->last_usermask, "%s@%s", user->GetIdent().c_str(),
-				user->GetDisplayedHost().c_str());
+		na->last_usermask = new char[this->GetIdent().length() + this->GetDisplayedHost().length() + 2];
+		sprintf(na->last_usermask, "%s@%s", this->GetIdent().c_str(),  this->GetDisplayedHost().c_str());
 	}
+
+	OnAccess = false;
+	if (na && this->host)
+		OnAccess = is_on_access(this, na->nc);
 }
 
-/*************************************************************************/
-/*************************************************************************/
 /*************************************************************************/
 
 /* Return statistics.  Pointers are assumed to be valid. */
@@ -753,7 +760,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 			old_na = findnick(user->nick);
 			if (old_na) {
-				if (nick_recognized(user))
+				if (user->IsRecognized())
 					old_na->last_seen = time(NULL);
 				status = old_na->status & NS_TRANSGROUP;
 				cancel_user(user);
@@ -780,7 +787,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 			else
 			{
-				if (!nick_identified(user) || !nick_recognized(user))
+				if (!nick_identified(user) || !user->IsRecognized())
 				{
 					ircdproto->SendUnregisteredNick(user);
 				}
@@ -803,7 +810,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		NickAlias *ntmp = findnick(user->nick);
 		if (ntmp && user->nc == ntmp->nc)
 		{
-			ntmp->status |= NS_IDENTIFIED;
 			nc_changed = 0;
 		}
 
@@ -880,8 +886,7 @@ void do_quit(const char *source, int ac, const char **av)
 		alog("debug: %s quits", source);
 	}
 	if ((na = findnick(user->nick)) && (!(na->status & NS_FORBIDDEN))
-		&& (!(na->nc->flags & NI_SUSPENDED))
-		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
+		&& (!(na->nc->flags & NI_SUSPENDED)) && (user->IsRecognized() || nick_identified(user))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;
@@ -916,8 +921,7 @@ void do_kill(const char *nick, const char *msg)
 		alog("debug: %s killed", nick);
 	}
 	if ((na = findnick(user->nick)) && (!(na->status & NS_FORBIDDEN))
-		&& (!(na->nc->flags & NI_SUSPENDED))
-		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
+		&& (!(na->nc->flags & NI_SUSPENDED)) && (user->IsRecognized() || nick_identified(user))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;

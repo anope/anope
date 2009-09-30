@@ -500,8 +500,7 @@ User *nc_on_chan(Channel * c, NickCore * nc)
 		return NULL;
 
 	for (u = c->users; u; u = u->next) {
-		if (u->user->nc == nc
-			&& nick_recognized(u->user))
+		if (u->user->nc == nc)
 			return u->user;
 	}
 	return NULL;

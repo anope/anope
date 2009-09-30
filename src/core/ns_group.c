@@ -121,7 +121,6 @@ class CommandNSGroup : public Command
 				sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
 				na->last_realname = sstrdup(u->realname);
 				na->time_registered = na->last_seen = time(NULL);
-				na->status = static_cast<int16>(NS_IDENTIFIED | NS_RECOGNIZED);
 
 				u->nc = na->nc;
 
@@ -243,6 +242,7 @@ NickAlias *makealias(const char *nick, NickCore *nc)
 	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
+	na->status = 0;
 	slist_add(&nc->aliases, na);
 	alpha_insert_alias(na);
 	return na;

@@ -56,9 +56,10 @@ class NickServCollide : public Timer
 	void Tick(time_t ctime)
 	{
 		/* If they identified or don't exist anymore, don't kill them. */
-		if ((na->status & NS_IDENTIFIED) || !finduser(na->nick)
-				|| finduser(na->nick)->my_signon > this->GetSetTime())
+		User *u = finduser(na->nick);
+		if (!u || !nick_identified(u) || u->my_signon > this->GetSetTime())
 			return;
+
 		/* The RELEASE timeout will always add to the beginning of the
 		 * list, so we won't see it.  Which is fine because it can't be
 		 * triggered yet anyway. */
@@ -622,8 +623,6 @@ int validate_user(User * u)
 	NickRequest *nr;
 	NickServCollide *t;
 
-	int on_access;
-
 	if ((nr = findrequestnick(u->nick)))
 	{
 		notice_lang(s_NickServ, u, NICK_IS_PREREG);
@@ -646,13 +645,8 @@ int validate_user(User * u)
 		return 0;
 	}
 
-	on_access = is_on_access(u, na->nc);
-	if (on_access)
-		na->status |= NS_ON_ACCESS;
-
-	if (!(na->nc->flags & NI_SECURE) && on_access)
+	if (!(na->nc->flags & NI_SECURE) && u->IsRecognized())
 	{
-		na->status |= NS_RECOGNIZED;
 		na->last_seen = time(NULL);
 		if (na->last_usermask)
 			delete [] na->last_usermask;
@@ -665,7 +659,7 @@ int validate_user(User * u)
 		return 1;
 	}
 
-	if (on_access || !(na->nc->flags & NI_KILL_IMMED))
+	if (u->IsRecognized() || !(na->nc->flags & NI_KILL_IMMED))
 	{
 		if (na->nc->flags & NI_SECURE)
 			notice_lang(s_NickServ, u, NICK_IS_SECURE, s_NickServ);
@@ -673,7 +667,7 @@ int validate_user(User * u)
 			notice_lang(s_NickServ, u, NICK_IS_REGISTERED, s_NickServ);
 	}
 
-	if ((na->nc->flags & NI_KILLPROTECT) && !on_access)
+	if ((na->nc->flags & NI_KILLPROTECT) && !u->IsRecognized())
 	{
 		if (na->nc->flags & NI_KILL_IMMED)
 		{
@@ -753,34 +747,6 @@ int nick_identified(User * u)
 
 /*************************************************************************/
 
-/* Return whether a user is recognized for their nickname. */
-
-int nick_recognized(User * u)
-{
-	if (u)
-	{
-		NickAlias *na = findnick(u->nick);
-		if (na)
-		{
-			if (na->status)
-			{
-				return (na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
-			}
-			else
-			{
-				return 0;
-			}
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	return 0;
-}
-
-/*************************************************************************/
-
 /* Remove all nicks which have expired.  Also update last-seen time for all
  * nicks.
  */
@@ -799,8 +765,7 @@ void expire_nicks()
 			next = na->next;
 
 			User *u = finduser(na->nick);
-			if (u
-			        && ((na->nc->flags & NI_SECURE) ? nick_identified(u) : nick_recognized(u)))
+			if (u && ((na->nc->flags & NI_SECURE) ? nick_identified(u) : u->IsRecognized()))
 			{
 				if (debug >= 2)
 					alog("debug: NickServ: updating last seen time for %s",
@@ -941,18 +906,20 @@ NickCore *findcore(const char *nick)
 /*********************** NickServ private routines ***********************/
 /*************************************************************************/
 
-/* Is the given user's address on the given nick's access list?  Return 1
- * if so, 0 if not. */
-
-int is_on_access(User * u, NickCore * nc)
+/** Is the user's address on the nickcores access list?
+ * @param u The user
+ * @param nc The nickcore
+ * @return true or false
+ */
+bool is_on_access(User *u, NickCore *nc)
 {
 	unsigned i;
 	char *buf;
 	char *buf2 = NULL;
 	char *buf3 = NULL;
 
-	if (nc->access.empty())
-		return 0;
+	if (!u || !nc || nc->access.empty())
+		return false;
 
 	buf = new char[u->GetIdent().length() + strlen(u->host) + 2];
 	sprintf(buf, "%s@%s", u->GetIdent().c_str(), u->host);
@@ -987,7 +954,7 @@ int is_on_access(User * u, NickCore * nc)
 					delete [] buf3;
 				}
 			}
-			return 1;
+			return true;
 		}
 	}
 	delete [] buf;
@@ -996,7 +963,7 @@ int is_on_access(User * u, NickCore * nc)
 		delete [] buf2;
 		delete [] buf3;
 	}
-	return 0;
+	return false;
 }
 
 /*************************************************************************/

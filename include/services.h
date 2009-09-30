@@ -1102,9 +1102,9 @@ typedef struct ircd_modes_ {
 /* Nickname status flags: */
 #define NS_FORBIDDEN	0x0002	  /* Nick may not be registered or used */
 #define NS_NO_EXPIRE	0x0004	  /* Nick never expires */
-#define NS_IDENTIFIED	0x8000	  /* User has IDENTIFY'd */
-#define NS_RECOGNIZED	0x4000	  /* ON_ACCESS true && SECURE flag not set */
-#define NS_ON_ACCESS	0x2000	  /* User comes from a known address */
+//#define NS_IDENTIFIED	0x8000	  /* User has IDENTIFY'd */
+//#define NS_RECOGNIZED	0x4000	  /* ON_ACCESS true && SECURE flag not set */
+//#define NS_ON_ACCESS	0x2000	  /* User comes from a known address */
 #define NS_KILL_HELD	0x1000	  /* Nick is being held after a kill */
 #define NS_GUESTED	0x0100		/* SVSNICK has been sent but nick has not
 					 				 * yet changed. An enforcer will be

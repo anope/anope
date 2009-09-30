@@ -48,10 +48,6 @@ class CommandNSLogout : public Command
 				cancel_user(u2);
 				validate_user(u2);
 			}
-			else if (na)
-			{
-				na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
-			}
 
 			if (ircd->modeonunreg)
 				common_svsmode(u2, ircd->modeonunreg, "1");

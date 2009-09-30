@@ -600,7 +600,7 @@ class UnrealIRCdProto : public IRCDProto
 							delete [] user->vhost;
 						user->vhost = NULL;
 					}
-					update_host(user);
+					user->UpdateHost();
 					break;
 				default:
 					break;
@@ -1426,7 +1426,6 @@ int anope_event_userhost(const char *source, int ac, const char **av)
 	if (u)
 	{
 		u->SetCloakedHost(host);
-		update_host(u);
 	}
 
 	return MOD_CONT;

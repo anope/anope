@@ -625,6 +625,19 @@ int destroyMessage(Message * m)
  */
 void Module::AddCallBack(Timer *t)
 {
+	/* Remove no longer valid Timers from the modules internal list */
+	std::list<Timer *>::iterator it, it2;
+	for (it = this->CallBacks.begin(); it != this->CallBacks.end(); it = it2)
+	{
+		it2 = it;
+		++it2;
+		
+		if (!TimerManager::IsTimer(*it))
+		{
+			this->CallBacks.erase(it);
+		}
+	}
+
 	this->CallBacks.push_back(t);
 }
 
@@ -634,19 +647,13 @@ void Module::AddCallBack(Timer *t)
  */
 bool Module::DelCallBack(Timer *t)
 {
-	std::list<Timer *>::iterator it;
-	Timer *t2;
+	std::list<Timer *>::iterator it = std::find(this->CallBacks.begin(), this->CallBacks.end(), t);
 
-	for (it = this->CallBacks.begin(); it != this->CallBacks.end(); ++it)
+	if (it != this->CallBacks.end())
 	{
-		t2 = *it;
-
-		if (t == t2)
-		{
-			TimerManager::DelTimer(t2);
-			this->CallBacks.erase(it);
-			return true;
-		}
+		TimerManager::DelTimer(*it);
+		this->CallBacks.erase(it);
+		return true;
 	}
 
 	return false;

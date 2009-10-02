@@ -99,8 +99,24 @@ void TimerManager::DelTimer(Timer *T)
 	}
 }
 
+/** Check if something is a timer
+ * @param T A pointer
+ * @return true or false
+ */
+bool TimerManager::IsTimer(Timer *T)
+{
+	std::vector<Timer *>::iterator i = std::find(Timers.begin(), Timers.end(), T);
+
+	if (i != Timers.end())
+	{
+		return true;
+	}
+	
+	return false;
+}
+
 /** Tick all pending timers
- * @param time The current time
+ * @param ctime The current time
  */
 void TimerManager::TickTimers(time_t ctime)
 {
@@ -110,20 +126,17 @@ void TimerManager::TickTimers(time_t ctime)
 	while ((Timers.size()) && (ctime > (*Timers.begin())->GetTimer()))
 	{
 		i = Timers.begin();
-		
 		t = *i;
 
 		t->Tick(ctime);
 		
-		Timers.erase(i);
-		
 		if (t->GetRepeat())
 		{
 			t->SetTimer(ctime + t->GetSecs());
-			AddTimer(t);
+			sort(Timers.begin(), Timers.end(), TimerManager::TimerComparison);
 		}
 		else
-			delete t;
+			TimerManager::DelTimer(t);
 	}
 }
 

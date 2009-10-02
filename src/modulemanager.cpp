@@ -479,14 +479,10 @@ bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Modul
 void ModuleManager::ClearTimers(Module *m)
 {
 	std::list<Timer *>::iterator it;
-	Timer *t2;
 
 	for (it = m->CallBacks.begin(); it != m->CallBacks.end(); ++it)
 	{
-		t2 = *it;
-
-		TimerManager::DelTimer(t2);
+		TimerManager::DelTimer(*it);
 	}
-
 	m->CallBacks.clear();
 }

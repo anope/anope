@@ -99,11 +99,18 @@ class CoreExport TimerManager : public Extensible
 		static void AddTimer(Timer *T);
 		
 		/** Deletes a timer
-		 * @param T A Timer derived class to delete		 */
+		 * @param T A Timer derived class to delete
+		 */
 		static void DelTimer(Timer *T);
 		
+		/** Check if something is a timer
+		 * @param T A pointer
+		 * @return true or false
+		 */
+		static bool IsTimer(Timer *T);
+		
 		/** Tick all pending timers
-		 * @param time The current time
+		 * @param ctime The current time
 		 */
 		static void TickTimers(time_t ctime = time(NULL));
 		

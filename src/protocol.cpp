@@ -160,9 +160,19 @@ void IRCDProto::SendQuit(BotInfo *bi, const char *fmt, ...)
 	va_end(args);
 	SendQuitInternal(bi, buf);
 }
+
+/**
+ * Send a PONG reply to a received PING.
+ * servname should be left NULL to send a one param reply.
+ * @param servname Daemon or client that is responding to the PING.
+ * @param who Origin of the PING and destination of the PONG message.
+ **/
 void IRCDProto::SendPong(const char *servname, const char *who)
 {
-	send_cmd(servname, "PONG %s", who);
+	if (!servname)
+		send_cmd(ircd->ts6 ? TS6SID : ServerName, "PONG %s", who);
+	else 
+		send_cmd(ircd->ts6 ? TS6SID : ServerName, "PONG %s %s", servname, who);
 }
 
 void IRCDProto::SendInvite(BotInfo *bi, const char *chan, const char *nick)

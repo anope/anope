@@ -951,7 +951,12 @@ endnick:
 /* Events */
 int anope_event_ping(const char *source, int ac, const char **av)
 {
-	ircdproto->SendPong(TS6SID, av[0]);
+	if (ac == 1)
+		ircdproto->SendPong(NULL, av[0]);
+
+	if (ac == 2)
+		ircdproto->SendPong(av[1], av[0]);
+
 	return MOD_CONT;
 }
 

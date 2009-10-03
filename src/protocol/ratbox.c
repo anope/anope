@@ -648,12 +648,6 @@ class RatboxProto : public IRCDTS6Proto
 		else send_cmd(bi->uid, "QUIT");
 	}
 
-	/* PONG */
-	void SendPong(const char *servname, const char *who)
-	{
-		send_cmd(TS6SID, "PONG %s", who);
-	}
-
 	/* INVITE */
 	void SendInvite(BotInfo *source, const char *chan, const char *nick)
 	{

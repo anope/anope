@@ -68,11 +68,11 @@ void myChanServHelp(User * u)
  **/
 int do_forbid(User * u)
 {
+    Channel *c;
     ChannelInfo *ci;
     char *chan = strtok(NULL, " ");
     char *reason = strtok(NULL, "");
-
-    Channel *c;
+    Entry *cur, *enext;
 
     /* Assumes that permission checking has already been done. */
     if (!chan || (ForceForbidReason && !reason)) {
@@ -102,6 +102,31 @@ int do_forbid(User * u)
         if ((c = findchan(ci->name))) {
             struct c_userlist *cu, *next;
             char *av[3];
+
+            /* Before banning everyone, it might be prudent to clear +e and +I lists.. 
+             * to prevent ppl from rejoining.. ~ Viper */
+            if (ircd->except && c->excepts && c->excepts->count) {
+                av[0] = sstrdup("-e");
+                for (cur = c->excepts->entries; cur; cur = enext) {
+                    enext = cur->next;
+                    av[1] = sstrdup(cur->mask);
+                    anope_cmd_mode(whosends(ci), chan, "-e %s", cur->mask);
+                    chan_set_modes(whosends(ci), c, 2, av, 0);
+                    free(av[1]);
+                }
+                free(av[0]);
+            }
+            if (ircd->invitemode && c->invites && c->invites->count) {
+                av[0] = sstrdup("-I");
+                for (cur = c->invites->entries; cur; cur = enext) {
+                    enext = cur->next;
+                    av[1] = sstrdup(cur->mask);
+                    anope_cmd_mode(whosends(ci), chan, "-I %s", cur->mask);
+                    chan_set_modes(whosends(ci), c, 2, av, 0);
+                    free(av[1]);
+                }
+                free(av[0]);
+            }
 
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;

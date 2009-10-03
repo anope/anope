@@ -16,6 +16,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 08/29 F Fixed defcon failing to set and remove modes.                    [#1101]
 08/30 F Fixed MLOCK superseding DEFCON mode lock.                        [  #00]
 09/09 F Fixed number of TS6 compatibility issues.                        [#1096]
+10/03 F Fixed CS FORBID not clearing excepts & invites.                  [#1097]
 
 Provided by Han` <Han@mefalcon.org> - 2009
 07/28 F Updated german language file.                                    [  #00]

@@ -57,7 +57,7 @@ class NickServCollide : public Timer
 	{
 		/* If they identified or don't exist anymore, don't kill them. */
 		User *u = finduser(na->nick);
-		if (!u || !nick_identified(u) || u->my_signon > this->GetSetTime())
+		if (!u || nick_identified(u) || u->my_signon > this->GetSetTime())
 			return;
 
 		/* The RELEASE timeout will always add to the beginning of the

@@ -955,6 +955,18 @@ int anope_event_ping(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
+int anope_event_time(const char *source, int ac, const char **av)
+{
+	if (ac !=2)
+		return MOD_CONT;
+
+	send_cmd(TS6SID, "TIME %s %s %ld", source, av[1], static_cast<long>(time(NULL)));
+
+	/* We handled it, don't pass it on to the core..
+	 * The core doesn't understand our syntax anyways.. ~ Viper */
+	return MOD_STOP;
+}
+
 int anope_event_436(const char *source, int ac, const char **av)
 {
 	m_nickcoll(av[0]);
@@ -1449,6 +1461,7 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("CAPAB",	 anope_event_capab); addCoreMessage(IRCD,m);
 	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
 	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
+	m = createMessage("TIME",	  anope_event_time); addCoreMessage(IRCD,m);
 	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
 	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
 	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);

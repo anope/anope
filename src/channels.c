@@ -783,10 +783,20 @@ void do_sjoin(const char *source, int ac, const char **av)
 				modes[2] = cu->user->nick;
 				chan_set_modes(source, c, 3, modes, 2);
 			}
-			if (c->ci && c->ci->bi) {
-				/* This is ugly, but it always works */
-				ircdproto->SendPart(c->ci->bi, c->name, "TS reop");
-				bot_join(c->ci);
+			if (c->ci)
+			{
+				if (c->ci->bi)
+				{
+					/* This is ugly, but it always works */
+					ircdproto->SendPart(c->ci->bi, c->name, "TS reop");
+					bot_join(c->ci);
+				}
+				/* Make sure +r is set */
+				if (ircd->chanreg && ircd->regmode)
+				{
+					c->mode |= ircd->regmode;
+					ircdproto->SendMode(whosends(c->ci), c->name, "+r");
+				}
 			}
 			/* XXX simple modes and bans */
 		} else if (c->creation_time < ts)
@@ -1819,11 +1829,20 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 				modes[2] = cu->user->nick;
 				chan_set_modes(s_OperServ, chan, 3, modes, 2);
 			}
-			if (chan->ci && chan->ci->bi)
+			if (chan->ci)
 			{
-				/* This is ugly, but it always works */
-				ircdproto->SendPart(chan->ci->bi, chan->name, "TS reop");
-				bot_join(chan->ci);
+				if (chan->ci->bi)
+				{
+					/* This is ugly, but it always works */
+					ircdproto->SendPart(chan->ci->bi, chan->name, "TS reop");
+					bot_join(chan->ci);
+				}
+				/* Make sure +r is set */
+				if (ircd->chanreg && ircd->regmode)
+				{
+					chan->mode |= ircd->regmode;
+					ircdproto->SendMode(whosends(chan->ci), chan->name, "+r");
+				}
 			}
 			/* XXX simple modes and bans */
 		}

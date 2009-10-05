@@ -690,7 +690,7 @@ class CommandCSSet : public Command
 		else if (subcommand == "RESTRICTED")
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_RESTRICTED);
 		else if (subcommand == "SECURE")
-			notice_help(s_ChanServ, u, CHAN_HELP_SET_SECURE);
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_SECURE, s_NickServ);
 		else if (subcommand == "SECUREOPS")
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_SECUREOPS);
 		else if (subcommand == "SECUREFOUNDER")

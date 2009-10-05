@@ -820,10 +820,20 @@ void do_sjoin(const char *source, int ac, char **av)
                 cumodes[2] = cu->user->nick;
                 chan_set_modes(source, c, 3, cumodes, 2);
             }
-            if (c->ci && c->ci->bi) {
-                /* This is ugly, but it always works */
-                anope_cmd_part(c->ci->bi->nick, c->name, "TS reop");
-                bot_join(c->ci);
+            if (c->ci)
+            {
+                if (c->ci->bi)
+                {
+                    /* This is ugly, but it always works */
+                    anope_cmd_part(c->ci->bi->nick, c->name, "TS reop");
+                    bot_join(c->ci);
+                }
+                /* Make sure +r is set */
+                if (ircd->chanreg && ircd->regmode)
+                {
+                    c->mode |= ircd->regmode;
+                    anope_cmd_mode(whosends(c->ci), c->name, "+r");
+                }
             }
             /* XXX simple modes and bans */
         } else if (c->creation_time < ts)
@@ -1864,11 +1874,20 @@ Channel *join_user_update(User * user, Channel * chan, char *name,
 				modes[2] = cu->user->nick;
 				chan_set_modes(s_OperServ, chan, 3, modes, 2);
 			}
-			if (chan->ci && chan->ci->bi)
+			if (chan->ci)
 			{
-				/* This is ugly, but it always works */
-				anope_cmd_part(chan->ci->bi->nick, chan->name, "TS reop");
-				bot_join(chan->ci);
+				if (chan->ci->bi)
+				{
+					/* This is ugly, but it always works */
+					anope_cmd_part(chan->ci->bi->nick, chan->name, "TS reop");
+					bot_join(chan->ci);
+				}
+				/* Make sure +r is set */
+				if (ircd->chanreg && ircd->regmode)
+				{
+					chan->mode |= ircd->regmode;
+					anope_cmd_mode(whosends(chan->ci), chan->name, "+r");
+				}
 			}
 			/* XXX simple modes and bans */
 		}

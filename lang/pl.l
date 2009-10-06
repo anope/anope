@@ -4266,7 +4266,7 @@ NEWS_HELP_LOGON
 	
 	Edytuje lub wy¶wietla listê wiadomo¶ci wysy³anych po
 	przy³±czeniu u¿ytkownika do sieci. Je¶li zdefniowanych
-	wiadomo¶ci jest wiêcej tylko najnowsze %s zostanie
+	wiadomo¶ci jest wiêcej tylko najnowsze %d zostanie
 	wys³anych (aby zapobiec floodowaniu). Warto¶æ NewsCount
 	mo¿e zostaæ zmieniona w pliku konfiguracyjym serwisów.
 	
@@ -4279,7 +4279,7 @@ NEWS_HELP_OPER
 	
 	Edytuje lub wy¶wietla listê wiadomo¶ci wysy³anych po
 	wykonaniu polecenia /OPER. Je¶li zdefiniowanych
-	wiadomo¶ci jest wiêcej tylko najnowsze %s zostanie
+	wiadomo¶ci jest wiêcej tylko najnowsze %d zostanie
 	wys³anych (aby zapobiec floodowaniu). Warto¶æ NewsCount
 	mo¿e zostaæ zmieniona w pliku konfiguracyjym serwisów.
 	

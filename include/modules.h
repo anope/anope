@@ -285,11 +285,6 @@ class CoreExport Command
 	 */
 	void SetPermission(const std::string &reststr);
 
-	char *help_param1;
-	char *help_param2;
-	char *help_param3;
-	char *help_param4;
-
 	/* Module related stuff */
 	int core;		   /* Can this command be deleted? */
 	char *mod_name;	/* Name of the module who owns us, NULL for core's  */

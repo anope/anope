@@ -14,10 +14,6 @@
 Command::Command(const std::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
 	this->flags = 0;
-	this->help_param1 = NULL;
-	this->help_param2 = NULL;
-	this->help_param3 = NULL;
-	this->help_param4 = NULL;
 	this->core = 0;
 	this->mod_name = NULL;
 	this->service = NULL;

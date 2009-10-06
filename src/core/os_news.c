@@ -240,14 +240,6 @@ class CommandOSLogonNews : public NewsBase
  public:
 	CommandOSLogonNews() : NewsBase("LOGONNEWS")
 	{
-		this->help_param1 = NULL;
-
-		this->UpdateHelpParam();
-	}
-
-	~CommandOSLogonNews()
-	{
-		delete [] this->help_param1;
 	}
 
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
@@ -257,7 +249,7 @@ class CommandOSLogonNews : public NewsBase
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, NEWS_HELP_LOGON, this->help_param1);
+		notice_help(s_OperServ, u, NEWS_HELP_LOGON, NewsCount);
 		return true;
 	}
 
@@ -265,32 +257,13 @@ class CommandOSLogonNews : public NewsBase
 	{
 		syntax_error(s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
-
-	void UpdateHelpParam()
-	{
-		if (this->help_param1)
-			delete [] this->help_param1;
-
-		char buf[BUFSIZE];
-
-		snprintf(buf, BUFSIZE, "%d", NewsCount),
-		this->help_param1 = sstrdup(buf);
-	}
-} *OSLogonNews = NULL;
+};
 
 class CommandOSOperNews : public NewsBase
 {
  public:
 	CommandOSOperNews() : NewsBase("OPERNEWS")
 	{
-		this->help_param1 = NULL;
-
-		this->UpdateHelpParam();
-	}
-
-	~CommandOSOperNews()
-	{
-		delete [] this->help_param1;
 	}
 
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
@@ -300,7 +273,7 @@ class CommandOSOperNews : public NewsBase
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, NEWS_HELP_OPER, this->help_param1);
+		notice_help(s_OperServ, u, NEWS_HELP_OPER, NewsCount);
 		return true;
 	}
 
@@ -308,18 +281,7 @@ class CommandOSOperNews : public NewsBase
 	{
 		syntax_error(s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
 	}
-
-	void UpdateHelpParam()
-	{
-		if (this->help_param1)
-			delete [] this->help_param1;
-
-		char buf[BUFSIZE];
-
-		snprintf(buf, BUFSIZE, "%d", NewsCount),
-		this->help_param1 = sstrdup(buf);
-	}
-} *OSOperNews = NULL;
+};
 
 class CommandOSRandomNews : public NewsBase
 {
@@ -354,12 +316,9 @@ class OSNews : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		OSLogonNews = new CommandOSLogonNews();
-		this->AddCommand(OPERSERV, OSLogonNews);
-		OSOperNews = new CommandOSOperNews();
-		this->AddCommand(OPERSERV, OSOperNews);
+		this->AddCommand(OPERSERV, new CommandOSLogonNews());
+		this->AddCommand(OPERSERV, new CommandOSOperNews());
 		this->AddCommand(OPERSERV, new CommandOSRandomNews());
-		ModuleManager::Attach(I_OnReload, this);
 	}
 
 	void OperServHelp(User *u)
@@ -367,12 +326,6 @@ class OSNews : public Module
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
-	}
-
-	void OnReload(bool starting)
-	{
-		OSLogonNews->UpdateHelpParam();
-		OSOperNews->UpdateHelpParam();
 	}
 };
 

@@ -483,7 +483,19 @@ Uid *find_nickuid(const char *uid)
 /*************************************************************************/
 
 /* Handle a server NICK command. */
-
+/**
+ * Adds a new user to anopes internal userlist.
+ *
+ * If the SVID passed is 2, the user will not be marked registered or requested to ID.
+ * This is an addition to accomodate IRCds where we cannot determine this based on the NICK 
+ * or UID command. Some IRCd's keep +r on when changing nicks and do not use SVID (ex. InspIRCd 1.2).
+ * Instead we get a METADATA command containing the accountname the user was last identified to.
+ * Since this is received after the user is introduced to us we should not yet mark the user
+ * as identified or ask him to identify. We will mark him as recognized for the time being and let
+ * him keep his +r if he has it.
+ * It is the responsibility of the protocol module to make sure that this is either invalidated,
+ * or changed to identified. ~ Viper
+ **/
 User *do_nick(const char *source, char *nick, char *username, char *host,
               char *server, char *realname, time_t ts, uint32 svid,
               uint32 ip, char *vhost, char *uid)
@@ -523,8 +535,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
         if (LogUsers) {
         /**
-	 * Ugly swap routine for Flop's bug :)
- 	 **/
+         * Ugly swap routine for Flop's bug :)
+         **/
             if (realname) {
                 tmp = strchr(realname, '%');
                 while (tmp) {
@@ -535,8 +547,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             logrealname = normalizeBuffer(realname);
 
         /**
-	 * End of ugly swap
-	 **/
+         * End of ugly swap
+         **/
 
             if (ircd->nickvhost) {
                 if (ircd->nickip) {
@@ -641,7 +653,17 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             display_news(user, NEWS_RANDOM);
         }
 
-        if (svid == ts && user->na) {
+        if (svid == 2 && user->na) {
+            /* We do not yet know if the user should be identified or not.
+             * mark him as recognized for now. 
+             * It s up to the protocol module to make sure this either becomes ID'd or
+             * is invalidated. ~ Viper */
+            if (debug) 
+                alog("debug: Marking %s as recognized..", user->nick);
+            user->svid = 1;
+            user->na->status |= NS_RECOGNIZED;
+            nc_changed = 0;
+        } else if (svid == ts && user->na) {
             /* Timestamp and svid match, and nick is registered; automagically identify the nick */
             user->svid = svid;
             user->na->status |= NS_IDENTIFIED;

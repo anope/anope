@@ -9,9 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2525"
+VERSION_BUILD="2534"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2534 - Added ability to mark users as either ID'd or UNID'd after user introduction. This is the responsibility of the protocol module!(Required for Insp 1.2)
+#Revision 2533 - Backport of r2531, reset +r on registered channels after a netmerge when our creation time is newer than what we recieved.
 #Revision 2525 - Fix bug #1097. CS FORBID now clears excepts & invites before banning everyone to avoid rejoin floods.
 #Revision 2511 - Updated French language file, patch from Saka
 #Revision 2495 - Fixed a number of TS6 issues, mainly related to nicks instead of IDs being given to anope_cmd_mode() in combination with a status change (Bug #1096). Also Fixed a small bug in os_oline.

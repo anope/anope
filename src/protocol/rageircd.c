@@ -108,7 +108,8 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
-     }
+     0,                         /* Use delayed client introduction. */
+    }
     ,
     {NULL}
 };
@@ -783,6 +784,11 @@ void rageircd_cmd_connect(int servernum)
     rageircd_cmd_server(ServerName, 1, ServerDesc);
     rageircd_cmd_svinfo();
     rageircd_cmd_burst();
+}
+
+void rageircd_cmd_bob()
+{
+    /* Not used */
 }
 
 void rageircd_set_umode(User * user, int ac, char **av)
@@ -1616,6 +1622,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(rageircd_cmd_svsnick);
     pmodule_cmd_vhost_on(rageircd_cmd_vhost_on);
     pmodule_cmd_connect(rageircd_cmd_connect);
+    pmodule_cmd_bob(rageircd_cmd_bob);
     pmodule_cmd_svshold(rageircd_cmd_svshold);
     pmodule_cmd_release_svshold(rageircd_cmd_release_svshold);
     pmodule_cmd_unsgline(rageircd_cmd_unsgline);

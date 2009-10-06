@@ -99,6 +99,7 @@ void ultimate2_cmd_chg_nick(char *oldnick, char *newnick);
 void ultimate2_cmd_svsnick(char *source, char *guest, time_t when);
 void ultimate2_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void ultimate2_cmd_connect(int servernum);
+void ultimate2_cmd_bob();
 void ultimate2_cmd_svshold(char *nick);
 void ultimate2_cmd_release_svshold(char *nick);
 void ultimate2_cmd_unsgline(char *mask);

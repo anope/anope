@@ -363,10 +363,11 @@ struct ircdvars_ {
 	char *nickchars;			/* character set */
 	int sync;					/* reports sync state */
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
-							 * 0 for no support, 1 for strict cidr support, anything else
-							 * for ircd specific support (nefarious only cares about first /mask) */
-	int jmode;				/* +j join throttle */
-	uint32 chan_jmode;		/* Mode */
+								* 0 for no support, 1 for strict cidr support, anything else
+								* for ircd specific support (nefarious only cares about first /mask) */
+	int jmode;					/* +j join throttle */
+	uint32 chan_jmode;			/* Mode */
+	int delay_cl_intro;			/*Delay client introduction till after receiving CAPAB. */
 };
 
 struct ircdcapab_ {
@@ -1195,6 +1196,7 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_svsnick)(char *source, char *guest, time_t when);
     void (*ircd_cmd_vhost_on)(char *nick, char *vIdent, char *vhost);
     void (*ircd_cmd_connect)(int servernum);
+    void (*ircd_cmd_bob)();
     void (*ircd_cmd_svshold)(char *nick);
     void (*ircd_cmd_release_svshold)(char *nick);
     void (*ircd_cmd_unsgline)(char *mask);

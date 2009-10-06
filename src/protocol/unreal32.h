@@ -134,6 +134,7 @@ void unreal_cmd_chg_nick(char *oldnick, char *newnick);
 void unreal_cmd_svsnick(char *source, char *guest, time_t when);
 void unreal_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void unreal_cmd_connect(int servernum);
+void unreal_cmd_bob();
 void unreal_cmd_svshold(char *nick);
 void unreal_cmd_release_svshold(char *nick);
 void unreal_cmd_unsgline(char *mask);

@@ -108,8 +108,9 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      1,                         /* reports sync state */
      0,                         /* CIDR channelbans */
-	 0,                         /* +j */
-	 0,                         /* +j mode */
+     0,                         /* +j */
+     0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -909,8 +910,10 @@ void bahamut_cmd_connect(int servernum)
     bahamut_cmd_burst();
 }
 
-
-
+void bahamut_cmd_bob()
+{
+    /* Not used */
+}
 
 
 /* EVENT : SERVER */
@@ -1619,6 +1622,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(bahamut_cmd_svsnick);
     pmodule_cmd_vhost_on(bahamut_cmd_vhost_on);
     pmodule_cmd_connect(bahamut_cmd_connect);
+    pmodule_cmd_bob(bahamut_cmd_bob);
     pmodule_cmd_svshold(bahamut_cmd_svshold);
     pmodule_cmd_release_svshold(bahamut_cmd_release_svshold);
     pmodule_cmd_unsgline(bahamut_cmd_unsgline);

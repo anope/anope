@@ -108,6 +108,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -881,6 +882,10 @@ void ptlink_cmd_connect(int servernum)
     ptlink_cmd_svsinfo();
 }
 
+void ptlink_cmd_bob()
+{
+    /* Not used */
+}
 
 
 int anope_event_privmsg(char *source, int ac, char **av)
@@ -1736,6 +1741,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(ptlink_cmd_svsnick);
     pmodule_cmd_vhost_on(ptlink_cmd_vhost_on);
     pmodule_cmd_connect(ptlink_cmd_connect);
+    pmodule_cmd_bob(ptlink_cmd_bob);
     pmodule_cmd_svshold(ptlink_cmd_svshold);
     pmodule_cmd_release_svshold(ptlink_cmd_release_svshold);
     pmodule_cmd_unsgline(ptlink_cmd_unsgline);

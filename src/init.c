@@ -765,6 +765,20 @@ int init_secondary(int ac, char **av)
                          strerror(openlog_errno));
     }
 
+    if (!ircd->delay_cl_intro)
+        init_tertiary();
+
+    /* Success! */
+    return 0;
+}
+
+/*************************************************************************/
+
+void init_tertiary()
+{
+    /* Begin our burst..*/
+    anope_cmd_bob();
+
     /* Bring in our pseudo-clients */
     introduce_user(NULL);
 
@@ -774,16 +788,14 @@ int init_secondary(int ac, char **av)
         anope_cmd_join(s_GlobalNoticer, LogChannel, time(NULL));
     }
 
+    /* End our burst.. */
     anope_cmd_eob();
 
     /**
-      * Load our delayed modeles - modules that are planing on making clients need to wait till now
-      * where as modules wanting to modify our ircd connection messages need to load eariler :|
-      **/
+     * Load our delayed modeles - modules that are planing on making clients need to wait till now
+     * where as modules wanting to modify our ircd connection messages need to load eariler :|
+     **/
     modules_delayed_init();
-
-    /* Success! */
-    return 0;
 }
 
 /*************************************************************************/

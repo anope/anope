@@ -108,6 +108,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -1467,6 +1468,11 @@ void ultimate3_cmd_connect(int servernum)
     ultimate3_cmd_burst();
 }
 
+void ultimate3_cmd_bob()
+{
+    /* Not used */
+}
+
 /* SVSHOLD - set */
 void ultimate3_cmd_svshold(char *nick)
 {
@@ -1757,6 +1763,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(ultimate3_cmd_svsnick);
     pmodule_cmd_vhost_on(ultimate3_cmd_vhost_on);
     pmodule_cmd_connect(ultimate3_cmd_connect);
+    pmodule_cmd_bob(ultimate3_cmd_bob);
     pmodule_cmd_svshold(ultimate3_cmd_svshold);
     pmodule_cmd_release_svshold(ultimate3_cmd_release_svshold);
     pmodule_cmd_unsgline(ultimate3_cmd_unsgline);

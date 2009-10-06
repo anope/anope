@@ -451,6 +451,10 @@ How To Add IRCd Support
 
     89) CMode j: CMODE_ that defines throttle mode. Use 0 for no support.
 
+    90) Delayed client introduction: Delay the introduction of services pseudo-
+                                     client till after we have received the uplinks
+                                     CAPAB.
+
     So we've had this long list. Now there's a second struct to fill. This
     struct isn't as long as the previous one though, so we'll handle it quite
     quick compared to the previous one.

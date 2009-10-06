@@ -109,6 +109,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -989,6 +990,11 @@ void shadowircd_cmd_connect(int servernum)
     shadowircd_cmd_svinfo();
 }
 
+void shadowircd_cmd_bob()
+{
+    /* Not used */
+}
+
 void shadowircd_cmd_bot_nick(char *nick, char *user, char *host,
                              char *real, char *modes)
 {
@@ -1773,6 +1779,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(shadowircd_cmd_svsnick);
     pmodule_cmd_vhost_on(shadowircd_cmd_vhost_on);
     pmodule_cmd_connect(shadowircd_cmd_connect);
+    pmodule_cmd_bob(shadowircd_cmd_bob);
     pmodule_cmd_svshold(shadowircd_cmd_svshold);
     pmodule_cmd_release_svshold(shadowircd_cmd_release_svshold);
     pmodule_cmd_unsgline(shadowircd_cmd_unsgline);

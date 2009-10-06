@@ -108,6 +108,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -637,6 +638,11 @@ void dreamforge_cmd_connect(int servernum)
     if (servernum == 3)
         dreamforge_cmd_pass(RemotePassword3);
     dreamforge_cmd_server(ServerName, 1, ServerDesc);
+}
+
+void dreamforge_cmd_bob()
+{
+    /* Not used */
 }
 
 void dreamforge_cmd_bot_chan_mode(char *nick, char *chan)
@@ -1324,6 +1330,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(dreamforge_cmd_svsnick);
     pmodule_cmd_vhost_on(dreamforge_cmd_vhost_on);
     pmodule_cmd_connect(dreamforge_cmd_connect);
+    pmodule_cmd_bob(dreamforge_cmd_bob);
     pmodule_cmd_svshold(dreamforge_cmd_svshold);
     pmodule_cmd_release_svshold(dreamforge_cmd_release_svshold);
     pmodule_cmd_unsgline(dreamforge_cmd_unsgline);

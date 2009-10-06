@@ -113,6 +113,7 @@ void viagra_cmd_chg_nick(char *oldnick, char *newnick);
 void viagra_cmd_svsnick(char *source, char *guest, time_t when);
 void viagra_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void viagra_cmd_connect(int servernum);
+void viagra_cmd_bob();
 void viagra_cmd_svshold(char *nick);
 void viagra_cmd_release_svshold(char *nick);
 void viagra_cmd_unsgline(char *mask);

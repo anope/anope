@@ -109,6 +109,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -983,6 +984,11 @@ void viagra_cmd_connect(int servernum)
     viagra_cmd_burst();
 }
 
+void viagra_cmd_bob()
+{
+    /* Not used */
+}
+
 /* EVENT : OS */
 int anope_event_os(char *source, int ac, char **av)
 {
@@ -1656,6 +1662,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(viagra_cmd_svsnick);
     pmodule_cmd_vhost_on(viagra_cmd_vhost_on);
     pmodule_cmd_connect(viagra_cmd_connect);
+    pmodule_cmd_bob(viagra_cmd_bob);
     pmodule_cmd_svshold(viagra_cmd_svshold);
     pmodule_cmd_release_svshold(viagra_cmd_release_svshold);
     pmodule_cmd_unsgline(viagra_cmd_unsgline);

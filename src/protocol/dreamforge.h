@@ -91,6 +91,7 @@ void dreamforge_cmd_chg_nick(char *oldnick, char *newnick);
 void dreamforge_cmd_svsnick(char *source, char *guest, time_t when);
 void dreamforge_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void dreamforge_cmd_connect(int servernum);
+void dreamforge_cmd_bob();
 void dreamforge_cmd_svshold(char *nick);
 void dreamforge_cmd_release_svshold(char *nick);
 void dreamforge_cmd_unsgline(char *mask);

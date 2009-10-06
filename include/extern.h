@@ -611,6 +611,7 @@ E void set_lastmask(User * u);
 E void introduce_user(const char *user);
 E int init_primary(int ac, char **av);
 E int init_secondary(int ac, char **av);
+E void init_tertiary();
 E int servernum;
 
 /**** ircd.c ****/
@@ -667,6 +668,7 @@ E void pmodule_cmd_chg_nick(void (*func) (char *oldnick, char *newnick));
 E void pmodule_cmd_svsnick(void (*func) (char *source, char *guest, time_t when));
 E void pmodule_cmd_vhost_on(void (*func) (char *nick, char *vIdent, char *vhost));
 E void pmodule_cmd_connect(void (*func) (int servernum));
+E void pmodule_cmd_bob(void (*func) ());
 E void pmodule_cmd_svshold(void (*func) (char *nick));
 E void pmodule_cmd_release_svshold(void (*func) (char *nick));
 E void pmodule_cmd_unsgline(void (*func) (char *mask));
@@ -1245,6 +1247,7 @@ E void anope_cmd_chgident(char *nick, char *vIdent);                 			  /* CHG
 E void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost);    			  /* CHGHOST + CHGIDENT */
 E void anope_cmd_vhost_off(User *u);
 E void anope_cmd_connect(int servernum);                             	           	  /* Connect */
+E void anope_cmd_bob();
 E void anope_cmd_ea();									  /* EA      */
 E void anope_cmd_global(char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
 E void anope_cmd_invite(char *source, char *chan, char *nick);       	  		  /* INVITE */

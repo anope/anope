@@ -110,6 +110,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -989,6 +990,11 @@ void unreal_cmd_connect(int servernum)
     unreal_cmd_server(ServerName, 1, ServerDesc);
 }
 
+void unreal_cmd_bob()
+{
+    /* Not used */
+}
+
 /* Events */
 
 int anope_event_ping(char *source, int ac, char **av)
@@ -1532,6 +1538,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(unreal_cmd_svsnick);
     pmodule_cmd_vhost_on(unreal_cmd_vhost_on);
     pmodule_cmd_connect(unreal_cmd_connect);
+    pmodule_cmd_bob(unreal_cmd_bob);
     pmodule_cmd_svshold(unreal_cmd_svshold);
     pmodule_cmd_release_svshold(unreal_cmd_release_svshold);
     pmodule_cmd_unsgline(unreal_cmd_unsgline);

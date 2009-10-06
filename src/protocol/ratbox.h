@@ -98,6 +98,7 @@ void ratbox_cmd_chg_nick(char *oldnick, char *newnick);
 void ratbox_cmd_svsnick(char *source, char *guest, time_t when);
 void ratbox_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void ratbox_cmd_connect(int servernum);
+void ratbox_cmd_bob();
 void ratbox_cmd_svshold(char *nick);
 void ratbox_cmd_release_svshold(char *nick);
 void ratbox_cmd_unsgline(char *mask);

@@ -108,8 +108,9 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      1,                         /* reports sync state */
      0,                         /* CIDR channelbans */
-	 0,                         /* +j */
-	 0,                         /* +j mode */
+     0,                         /* +j */
+     0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -1649,6 +1650,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(solidircd_cmd_svsnick);
     pmodule_cmd_vhost_on(solidircd_cmd_vhost_on);
     pmodule_cmd_connect(solidircd_cmd_connect);
+    pmodule_cmd_bob(solidircd_cmd_burst);
     pmodule_cmd_svshold(solidircd_cmd_svshold);
     pmodule_cmd_release_svshold(solidircd_cmd_release_svshold);
     pmodule_cmd_unsgline(solidircd_cmd_unsgline);

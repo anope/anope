@@ -106,6 +106,7 @@ IRCDVar myIrcd[] = {
    0,               /* CIDR channelbans */
    0,               /* +j */
    0,               /* +j mode */
+   0,               /* Use delayed client introduction. */
    }
   ,
   {NULL}
@@ -966,6 +967,12 @@ plexus_cmd_connect (int servernum)
 }
 
 void
+plexus_cmd_bob()
+{
+  /* not used */
+}
+
+void
 plexus_cmd_svsinfo ()
 {
   /* not used */
@@ -1794,6 +1801,7 @@ moduleAddAnopeCmds ()
   pmodule_cmd_svsnick (plexus_cmd_svsnick);
   pmodule_cmd_vhost_on (plexus_cmd_vhost_on);
   pmodule_cmd_connect (plexus_cmd_connect);
+  pmodule_cmd_bob(plexus_cmd_bob);
   pmodule_cmd_svshold (plexus_cmd_svshold);
   pmodule_cmd_release_svshold (plexus_cmd_release_svshold);
   pmodule_cmd_unsgline (plexus_cmd_unsgline);

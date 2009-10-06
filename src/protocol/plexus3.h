@@ -92,6 +92,7 @@ void plexus_cmd_chg_nick(char *oldnick, char *newnick);
 void plexus_cmd_svsnick(char *source, char *guest, time_t when);
 void plexus_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void plexus_cmd_connect(int servernum);
+void plexus_cmd_bob();
 void plexus_cmd_svshold(char *nick);
 void plexus_cmd_release_svshold(char *nick);
 void plexus_cmd_unsgline(char *mask);

@@ -127,6 +127,7 @@ IRCDVar myIrcd[] = {
      1,                         /* CIDR channelbans */
      1,                         /* +j */
      CMODE_j,                   /* +j Mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -1174,6 +1175,11 @@ void inspircd_cmd_connect(int servernum)
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 }
 
+void inspircd_cmd_bob()
+{
+    /* Not used */
+}
+
 /* Events */
 
 int anope_event_ping(char *source, int ac, char **av)
@@ -1895,6 +1901,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(inspircd_cmd_svsnick);
     pmodule_cmd_vhost_on(inspircd_cmd_vhost_on);
     pmodule_cmd_connect(inspircd_cmd_connect);
+    pmodule_cmd_bob(inspircd_cmd_bob);
     pmodule_cmd_svshold(inspircd_cmd_svshold);
     pmodule_cmd_release_svshold(inspircd_cmd_release_svshold);
     pmodule_cmd_unsgline(inspircd_cmd_unsqline);

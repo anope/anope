@@ -108,6 +108,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -895,6 +896,11 @@ void ultimate2_cmd_connect(int servernum)
     ultimate2_cmd_server(ServerName, 1, ServerDesc);
 }
 
+void ultimate2_cmd_bob()
+{
+    /* Not used */
+}
+
 /* CHGHOST */
 void ultimate2_cmd_chghost(char *nick, char *vhost)
 {
@@ -1674,6 +1680,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(ultimate2_cmd_svsnick);
     pmodule_cmd_vhost_on(ultimate2_cmd_vhost_on);
     pmodule_cmd_connect(ultimate2_cmd_connect);
+    pmodule_cmd_bob(ultimate2_cmd_bob);
     pmodule_cmd_svshold(ultimate2_cmd_svshold);
     pmodule_cmd_release_svshold(ultimate2_cmd_release_svshold);
     pmodule_cmd_unsgline(ultimate2_cmd_unsgline);

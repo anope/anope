@@ -107,6 +107,7 @@ IRCDVar myIrcd[] = {
      1,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j Mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -1044,6 +1045,11 @@ void charybdis_cmd_connect(int servernum)
     charybdis_cmd_svinfo();
 }
 
+void charybdis_cmd_bob()
+{
+    /* Not used */
+}
+
 void charybdis_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                          char *modes)
 {
@@ -1927,6 +1933,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(charybdis_cmd_svsnick);
     pmodule_cmd_vhost_on(charybdis_cmd_vhost_on);
     pmodule_cmd_connect(charybdis_cmd_connect);
+    pmodule_cmd_bob(charybdis_cmd_bob);
     pmodule_cmd_svshold(charybdis_cmd_svshold);
     pmodule_cmd_release_svshold(charybdis_cmd_release_svshold);
     pmodule_cmd_unsgline(charybdis_cmd_unsgline);

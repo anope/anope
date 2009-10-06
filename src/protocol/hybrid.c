@@ -108,6 +108,7 @@ IRCDVar myIrcd[] = {
      0,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
+     0,                         /* Use delayed client introduction. */
      }
     ,
     {NULL}
@@ -840,6 +841,11 @@ void hybrid_cmd_connect(int servernum)
     hybrid_cmd_svinfo();
 }
 
+void hybrid_cmd_bob()
+{
+    /* Not used */
+}
+
 void hybrid_cmd_svsinfo()
 {
     /* not used */
@@ -1513,6 +1519,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_svsnick(hybrid_cmd_svsnick);
     pmodule_cmd_vhost_on(hybrid_cmd_vhost_on);
     pmodule_cmd_connect(hybrid_cmd_connect);
+    pmodule_cmd_bob(hybrid_cmd_bob);
     pmodule_cmd_svshold(hybrid_cmd_svshold);
     pmodule_cmd_release_svshold(hybrid_cmd_release_svshold);
     pmodule_cmd_unsgline(hybrid_cmd_unsgline);

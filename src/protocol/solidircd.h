@@ -118,6 +118,7 @@ void solidircd_cmd_chg_nick(char *oldnick, char *newnick);
 void solidircd_cmd_svsnick(char *source, char *guest, time_t when);
 void solidircd_cmd_vhost_on(char *nick, char *vIdent, char *vhost);
 void solidircd_cmd_connect(int servernum);
+void solidircd_cmd_bob();
 void solidircd_cmd_svshold(char *nick);
 void solidircd_cmd_release_svshold(char *nick);
 void solidircd_cmd_unsgline(char *mask);

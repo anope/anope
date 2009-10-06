@@ -1,6 +1,7 @@
 Anope Version 1.8 SVN
 -------------------
 Provided by Anope Dev. <team@anope.org> - 2009
+10/05 A Added InspIRCd 1.2 support.                                      [  #00]
 07/31 F Fixed anope sending umode change using channels' syntax.         [  #00]
 07/31 F Fixed TS6 UUID issue while parsing modechanges.                  [  #00]
 08/01 F Fixed several memory leaks in HostServ.                          [  #00]
@@ -16,7 +17,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 08/29 F Fixed defcon failing to set and remove modes.                    [#1101]
 08/30 F Fixed MLOCK superseding DEFCON mode lock.                        [  #00]
 09/09 F Fixed number of TS6 compatibility issues.                        [#1096]
-10/03 F Fixed CS FORBID not clearing excepts & invites.                  [#1097]
+10/06 F Fixed CS FORBID not clearing excepts & invites.                  [#1097]
 
 Provided by Han` <Han@mefalcon.org> - 2009
 07/28 F Updated german language file.                                    [  #00]

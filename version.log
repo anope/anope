@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2535"
+VERSION_BUILD="2536"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2536 - Added InspIRCd 1.2 protocol module.
 #Revision 2535 - Added option for delayed pseudo-client introduction. (Required for Insp 1.2)
 #Revision 2534 - Added ability to mark users as either ID'd or UNID'd after user introduction. This is the responsibility of the protocol module! (Required for Insp 1.2)
 #Revision 2533 - Backport of r2531, reset +r on registered channels after a netmerge when our creation time is newer than what we recieved.

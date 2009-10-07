@@ -577,6 +577,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	int status = 0;			 /* Status to apply */
 	char mask[USERMAX + HOSTMAX + 2];
 	char *logrealname;
+	std::string oldnick;		/* stores the old nick of the user, so we can pass it to OnUserNickChange */
 
 	if (!*source) {
 		char ipbuf[16];
@@ -766,8 +767,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 				cancel_user(user);
 			}
 
+			oldnick = user->nick;
 			user->SetNewNick(nick);
-			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, source));
+			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick.c_str()));
 
 			if ((old_na ? old_na->nc : NULL) == user->nc)
 				nc_changed = 0;
@@ -895,6 +897,7 @@ void do_quit(const char *source, int ac, const char **av)
 	if (LimitSessions && !is_ulined(user->server->name)) {
 		del_session(user->host);
 	}
+	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
 	delete user;
 }
 

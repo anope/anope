@@ -507,10 +507,10 @@ class CoreExport Module
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
 	 * @param target The user that has been kicked.
+	 * @param source The nick of the sender.
 	 * @param kickmsg The reason for the kick.
-	 * NOTE: We may want to add a second User arg for sender in the future.
 	 */
-	virtual void OnUserKicked(Channel *c, User *target, const std::string &kickmsg) { }
+	virtual void OnUserKicked(Channel *c, User *target, const std::string &source, const std::string &kickmsg) { }
 
 	/** Called when Services' configuration has been loaded.
 	 * @param startup True if Services is starting for the first time, false otherwise.
@@ -625,7 +625,7 @@ class CoreExport Module
 	 * @param ci The channel
 	 * @param reason The reason
 	 */
-	virtual void OnBotKick(User *u, ChannelInfo *ci, const char *reason) { }
+	virtual void OnBotKick(User *u, ChannelInfo *ci, const std::string &reason) { }
 
 	/** Called before a user parts a channel
 	 * @param u The user
@@ -637,7 +637,7 @@ class CoreExport Module
 	 * @param u The user
 	 * @param c The channel
 	 */
-	virtual void OnPartChannel(User *u, Channel *c) { }
+	virtual void OnPartChannel(User *u, Channel *c, const std::string &msg) { }
 
 	/** Called before a user joins a channel
 	 * @param u The user
@@ -716,8 +716,14 @@ class CoreExport Module
 	 */
 	virtual void OnServerQuit(Server *server) { }
 
+	/** Called on a QUIT 
+	 * @param u The user
+	 * @param msg The quit message
+	 */
+	virtual void OnUserQuit(User *u, const std::string &msg) { }
+
 	/** Called when a user disconnects
-	 * @param nick The name of the user
+	 * @param u The user
 	 */
 	virtual void OnUserLogoff(User *u) { }
 
@@ -938,7 +944,7 @@ enum Implementation
 		I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,
 
 		/* Users */
-		I_OnUserConnect, I_OnUserNickChange, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel,
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel,
 		I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */

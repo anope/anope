@@ -551,7 +551,7 @@ void do_join(const char *source, int ac, const char **av)
 				channame = sstrdup(c->chan->name);
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 				chan_deluser(user, c->chan);
-				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan));
+				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan, ""));
 				delete [] channame;
 				delete c;
 				c = nextc;
@@ -640,7 +640,7 @@ void do_kick(const char *source, int ac, const char **av)
 			 c = c->next);
 		if (c)
 		{
-			FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, merge_args(ac - 2, av + 2)));
+			FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, source, merge_args(ac - 2, av + 2)));
 			chan_deluser(user, c->chan);
 			if (c->next)
 				c->next->prev = c->prev;
@@ -698,7 +698,7 @@ void do_part(const char *source, int ac, const char **av)
 
 			chan_deluser(user, c->chan);
 
-			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan));
+			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan, av[1] ? av[1] : ""));
 
 			if (c->next)
 				c->next->prev = c->prev;

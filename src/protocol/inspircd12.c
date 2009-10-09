@@ -682,10 +682,14 @@ int anope_event_version(char *source, int ac, char **av)
 
 int anope_event_idle(char *source, int ac, char **av)
 {
-    Uid *ud = NULL;
+    Uid *ud;
+    BotInfo *bi;
     if (ac == 1) {
-        if (av[0]) ud = find_uid(av[0]);
-        send_cmd(ud ? ud->uid : source, "IDLE %s %ld 0", source, (long int) time(NULL));
+        ud = find_nickuid(av[0]);
+        if (ud) {
+            bi = findbot(ud->nick);
+            send_cmd(ud->uid, "IDLE %s %ld %ld", source, start_time, bi ? time(NULL) - bi->lastmsg : 0);
+        }
     }
     return MOD_CONT;
 }

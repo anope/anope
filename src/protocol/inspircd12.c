@@ -980,10 +980,10 @@ void inspircd_cmd_pass(char *pass)
 }
 
 /* SERVER services-dev.chatspike.net password 0 :Description here */
-void inspircd_cmd_server(char *servname, int hop, char *descript)
+void inspircd_cmd_server(char *servname, int hop, char *descript, char *sid)
 {
     send_cmd(NULL, "SERVER %s %s %d %s :%s", servname, currentpass, hop,
-            TS6SID, descript);
+            sid ? sid : TS6SID, descript);
 }
 
 /* PONG */
@@ -1336,7 +1336,7 @@ void inspircd_cmd_connect(int servernum)
     if (servernum == 3) {
         inspircd_cmd_pass(RemotePassword3);
     }
-    inspircd_cmd_server(ServerName, 0, ServerDesc);
+    inspircd_cmd_server(ServerName, 0, ServerDesc, TS6SID);
     me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
 }
 
@@ -2243,14 +2243,16 @@ int inspircd_flood_mode_check(char *value)
 void inspircd_cmd_jupe(char *jserver, char *who, char *reason)
 {
     char rbuf[256];
+    char *sid;
 
     snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
         inspircd_cmd_squit(jserver, rbuf);
-    inspircd_cmd_server(jserver, 1, rbuf);
-    new_server(me_server, jserver, rbuf, SERVER_JUPED, ts6_sid_retrieve());
+    for (sid = ts6_sid_retrieve(); findserver_uid(servlist, sid); sid = ts6_sid_retrieve());
+    inspircd_cmd_server(jserver, 1, rbuf, sid);
+    new_server(me_server, jserver, rbuf, SERVER_JUPED, sid);
 }
 
 /* GLOBOPS - to handle old WALLOPS */

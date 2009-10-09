@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2543"
+VERSION_BUILD="2544"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2544 - Fixed the NICK command syntax on InspIRCd 1.2 to work when changing clients nicknames
 #Revision 2543 - Fixed crash when juping servers on InspIRCd 1.2
 #Revision 2542 - Fixed remote whoises on services clients on InspIRCd 1.2
 #Revision 2537 - Added InspIRCd 1.2 protocol module into Windows makefiles and installer scripts

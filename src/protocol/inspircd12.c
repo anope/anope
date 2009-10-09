@@ -1293,10 +1293,14 @@ void inspircd_cmd_svso(char *source, char *nick, char *flag)
 /* NICK <newnick>  */
 void inspircd_cmd_chg_nick(char *oldnick, char *newnick)
 {
+    Uid *ud;
     if (!oldnick || !newnick)
         return;
+    ud = find_uid(oldnick);
+    if (!ud)
+        ud = find_uid(newnick);
 
-    send_cmd(oldnick, "NICK %s", newnick);
+    send_cmd(ud ? ud->uid : oldnick, "NICK %s %ld", newnick, time(NULL));
 }
 
 /* SVSNICK */

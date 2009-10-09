@@ -276,6 +276,12 @@ int do_bot(User * u)
                 EnforceQlinedNick(nick, s_BotServ);
             }
 
+            /* Send the QUIT before changing the bot internally, so proto mods (InspIRCD 1.2)
+             * can get the uid if needed (or other things )and send that - Adam
+             */
+            if (user)
+                anope_cmd_quit(bi->nick, "Quit: Be right back");
+
             if (strcmp(nick, bi->nick))
                 change_bot_nick(bi, nick);
 
@@ -299,8 +305,6 @@ int do_bot(User * u)
                 anope_cmd_chg_nick(oldnick, bi->nick);
 				anope_cmd_sqline(bi->nick, "Reserved for services");
             } else {
-                anope_cmd_quit(oldnick, "Quit: Be right back");
-
                 anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
                                    ircd->botserv_bot_mode);
                 bot_rejoin_all(bi);

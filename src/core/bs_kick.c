@@ -47,6 +47,7 @@ class CommandBSKick : public Command
 			if (option == "BADWORDS") {
 				if (value == "ON") {
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_BADWORDS] =
 							strtol(ttb, NULL, 10);
 						/* Only error if errno returns ERANGE or EINVAL or we are less then 0 - TSL */
@@ -77,6 +78,7 @@ class CommandBSKick : public Command
 			} else if (option == "BOLDS") {
 				if (value == "ON") {
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_BOLDS] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
 							|| ci->ttb[TTB_BOLDS] < 0) {
@@ -105,6 +107,7 @@ class CommandBSKick : public Command
 					char *percent = strtok(NULL, " ");
 
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_CAPS] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
 							|| ci->ttb[TTB_CAPS] < 0) {
@@ -147,6 +150,7 @@ class CommandBSKick : public Command
 			} else if (option == "COLORS") {
 				if (value == "ON") {
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_COLORS] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
 							|| ci->ttb[TTB_COLORS] < 0) {
@@ -175,6 +179,7 @@ class CommandBSKick : public Command
 					char *secs = strtok(NULL, " ");
 
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_FLOOD] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
 							|| ci->ttb[TTB_FLOOD] < 0) {
@@ -219,6 +224,7 @@ class CommandBSKick : public Command
 					char *times = strtok(NULL, " ");
 
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_REPEAT] = strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
 							|| ci->ttb[TTB_REPEAT] < 0) {
@@ -253,6 +259,7 @@ class CommandBSKick : public Command
 			} else if (option == "REVERSES") {
 				if (value == "ON") {
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_REVERSES] =
 							strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL
@@ -279,6 +286,7 @@ class CommandBSKick : public Command
 			} else if (option == "UNDERLINES") {
 				if (value == "ON") {
 					if (ttb) {
+						errno = 0;
 						ci->ttb[TTB_UNDERLINES] =
 							strtol(ttb, NULL, 10);
 						if (errno == ERANGE || errno == EINVAL

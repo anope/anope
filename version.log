@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2545"
+VERSION_BUILD="2546"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2546 - Reset errno before calling strtol in bs_kick, it would sometimes not allow valid kick settings to work
 #Revision 2545 - Now send the QUIT command before changing bots internally for /botserv bot change, so InspIRCd 1.2 (and possibly others) can get the UID and other info from the bot
 #Revision 2544 - Fixed the NICK command syntax on InspIRCd 1.2 to work when changing clients nicknames
 #Revision 2543 - Fixed crash when juping servers on InspIRCd 1.2

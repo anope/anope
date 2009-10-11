@@ -565,6 +565,11 @@ class CoreExport Module
 	 */
 	virtual void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { }
 
+	/** Called after the core has finished loading the databases, but before
+	 * we connect to the server
+	 */
+	virtual void OnPostLoadDatabases() { }
+
 	/** Called when anope saves databases.
 	 * NOTE: This event is deprecated pending new database handling.
 	 * XXX.
@@ -951,7 +956,7 @@ enum Implementation
 		I_OnDefconLevel,
 
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnSaveDatabase, I_OnBackupDatabase,
+		I_OnReload, I_OnPreServerConnect, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
 		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,

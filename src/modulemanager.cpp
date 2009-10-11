@@ -260,6 +260,11 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	{
 		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
 		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
+
+		/* If a user is loading this module, then the core databases have already been loaded
+		 * so trigger the event manually
+		 */
+		m->OnPostLoadDatabases();
 	}
 
 	return MOD_ERR_OK;

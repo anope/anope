@@ -606,6 +606,7 @@ int init_secondary(int ac, char **av)
 			bi = new BotInfo(s_GlobalNoticer, ServiceUser, ServiceHost, desc_GlobalNoticer);
 	}
 
+	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
 	/* Save the databases back to file/mysql to reflect any changes */
 		alog("Info: Reflecting database records.");
 		save_databases();

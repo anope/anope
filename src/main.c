@@ -326,7 +326,7 @@ std::string GetFullProgDir(char *argv0)
 	if (GetModuleFileName(NULL, buffer, PATH_MAX))
 	{
 		std::string fullpath = buffer;
-		services_dir = fullpath.substr(orig_cwd.size() + 1);
+		services_bin = fullpath.substr(orig_cwd.size() + 1);
 		std::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
 		return std::string(fullpath, 0, n);
 	}

@@ -1335,6 +1335,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		if (strstr(av[1], "m_hidechans.so")) {
 			has_hidechansmod = 1;
 		}
+		if (strstr(av[1], "m_servprotect.so")) {
+			ircd->pseudoclient_mode = "+Ik";
+		}
 	} else if (strcasecmp(av[0], "END") == 0) {
 		if (!has_globopsmod) {
 			send_cmd(NULL, "ERROR :m_globops is not loaded. This is required by Anope");

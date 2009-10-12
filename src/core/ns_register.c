@@ -71,11 +71,10 @@ class CommandNSConfirm : public Command
 				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->GetAccess(0).c_str());
 			else
 				notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
+			delnickrequest(nr);
 
 			ircdproto->SendAccountLogin(u, u->nc);
 			ircdproto->SetAutoIdentificationToken(u);
-
-			FOREACH_MOD(I_OnNickRegister, OnNickRegister(u));
 
 			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)
 				notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
@@ -83,9 +82,19 @@ class CommandNSConfirm : public Command
 			u->lastnickreg = time(NULL);
 		}
 		else
-			notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
-		delnickrequest(nr); /* remove the nick request */
+		{
+			alog("%s: '%s' confirmed by %s!%s@%s (email: %s)", s_NickServ, nr->nick, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
 
+			notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
+
+			User *user = finduser(nr->nick);
+			/* Delrequest must be called before validate_user */
+			delnickrequest(nr);
+			if (user)
+			{
+				validate_user(user);
+			}
+		}
 		return MOD_CONT;
 
 	}
@@ -107,38 +116,20 @@ class CommandNSConfirm : public Command
 
 			if (!nr)
 			{
-				if (u->nc && u->nc->IsServicesOper())
+				if (u->nc && u->nc->HasCommand("nickserv/confirm"))
 				{
 					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
 					   of the user they are trying to validate, and push that user through regardless of passcode */
 					nr = findrequestnick(passcode);
 					if (nr)
 					{
-						User *utmp = finduser(passcode);
-						if (utmp)
-						{
-							ActuallyConfirmNick(utmp, nr, false);
-							notice_lang(s_NickServ, u, NICK_FORCE_REG, utmp->nick);
-							return MOD_CONT;
-						}
-						else
-						{
-							passcode = nr->passcode;
-							ActuallyConfirmNick(u, nr, true);
-							return MOD_CONT;
-						}
-					}
-					else
-					{
-						notice_lang(s_NickServ, u, NICK_CONFIRM_NOT_FOUND, s_NickServ);
+						ActuallyConfirmNick(u, nr, true);
 						return MOD_CONT;
 					}
 				}
-				else
-				{
-					notice_lang(s_NickServ, u, NICK_CONFIRM_NOT_FOUND, s_NickServ);
-					return MOD_CONT;
-				}
+				notice_lang(s_NickServ, u, NICK_CONFIRM_NOT_FOUND, s_NickServ);
+
+				return MOD_CONT;
 			}
 
 			if (stricmp(nr->passcode, passcode))

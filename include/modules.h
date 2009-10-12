@@ -833,9 +833,9 @@ class CoreExport Module
 	virtual void OnNickLogout(User *u) { }
 
 	/** Called when a nick is registered
-	 * @param The user
+	 * @param The nick
 	 */
-	virtual void OnNickRegister(User *u) { }
+	virtual void OnNickRegister(NickAlias *na) { }
 
 	/** Called when a nick is suspended
 	 * @param na The nick alias

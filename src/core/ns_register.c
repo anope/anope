@@ -52,13 +52,11 @@ class CommandNSConfirm : public Command
 			na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
 			sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
 			na->last_realname = sstrdup(u->realname);
+			if (NSAddAccessOnReg)
+				na->nc->AddAccess(create_mask(u));
 		}
 
 		na->time_registered = na->last_seen = time(NULL);
-
-		if (NSAddAccessOnReg)
-			na->nc->AddAccess(create_mask(u));
-
 		na->nc->language = NSDefLanguage;
 		if (nr->email)
 			na->nc->email = sstrdup(nr->email);
@@ -119,14 +117,15 @@ class CommandNSConfirm : public Command
 						User *utmp = finduser(passcode);
 						if (utmp)
 						{
-							ActuallyConfirmNick(u, nr, false);
-							notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
+							ActuallyConfirmNick(utmp, nr, false);
+							notice_lang(s_NickServ, u, NICK_FORCE_REG, utmp->nick);
 							return MOD_CONT;
 						}
 						else
 						{
 							passcode = nr->passcode;
 							ActuallyConfirmNick(u, nr, true);
+							return MOD_CONT;
 						}
 					}
 					else

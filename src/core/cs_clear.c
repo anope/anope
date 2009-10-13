@@ -29,6 +29,11 @@ class CommandCSClear : public Command
 		ci::string what = params[1];
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
+		ChannelMode *owner, *admin;
+		std::string modebuf;
+
+		owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
+		admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (c)
 			ci = c->ci;
@@ -38,90 +43,22 @@ class CommandCSClear : public Command
 		} else if (!u || !check_access(u, ci, CA_CLEAR)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (what == "bans") {
-			const char *av[2];
-			Entry *ban, *bnext;
-
-			if (c->bans && c->bans->count) {
-				for (ban = c->bans->entries; ban; ban = bnext) {
-					bnext = ban->next;
-					av[0] = "-b";
-					av[1] = ban->mask;
-					ircdproto->SendMode(whosends(ci), chan, "-b %s", ban->mask);
-					chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
-				}
-			}
+			c->ClearBans();
 
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
-		} else if (ircd->except && what == "excepts") {
-			const char *av[2];
-			Entry *except, *bnext;
+		} else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what == "excepts") {
+			c->ClearExcepts();
 
-			if (c->excepts && c->excepts->count) {
-				for (except = c->excepts->entries; except; except = bnext) {
-					bnext = except->next;
-					av[0] = "-e";
-					av[1] = except->mask;
-					ircdproto->SendMode(whosends(ci), chan, "-e %s", except->mask);
-					chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
-				}
-			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
 
-		} else if (ircd->invitemode && what == "invites") {
-			const char *av[2];
-			Entry *invite, *bnext;
+		} else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what == "invites") {
+			c->ClearInvites();
 
-			if (c->invites && c->invites->count) {
-				for (invite = c->invites->entries; invite; invite = bnext) {
-					bnext = invite->next;
-					av[0] = "-I";
-					av[1] = invite->mask;
-					ircdproto->SendMode(whosends(ci), chan, "-I %s", invite->mask);
-					chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
-				}
-			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
 
 		} else if (what == "modes") {
-			const char *argv[2];
-
-			if (c->mode) {
-				/* Clear modes the bulk of the modes */
-				ircdproto->SendMode(whosends(ci), c->name, "%s",
-							   ircd->modestoremove);
-				argv[0] = ircd->modestoremove;
-				chan_set_modes(whosends(ci)->nick, c, 1, argv, 0);
-
-				/* to prevent the internals from complaining send -k, -L, -f by themselves if we need
-				   to send them - TSL */
-				if (c->key) {
-					ircdproto->SendMode(whosends(ci), c->name, "-k %s", c->key);
-					argv[0] = "-k";
-					argv[1] = c->key;
-					chan_set_modes(whosends(ci)->nick, c, 2, argv, 0);
-				}
-				if (ircd->Lmode && c->redirect) {
-					ircdproto->SendMode(whosends(ci), c->name, "-L %s",
-								   c->redirect);
-					argv[0] = "-L";
-					argv[1] = c->redirect;
-					chan_set_modes(whosends(ci)->nick, c, 2, argv, 0);
-				}
-				if (ircd->fmode && c->flood) {
-					if (flood_mode_char_remove) {
-						ircdproto->SendMode(whosends(ci), c->name, "%s %s",
-									   flood_mode_char_remove, c->flood);
-						argv[0] = flood_mode_char_remove;
-						argv[1] = c->flood;
-						chan_set_modes(whosends(ci)->nick, c, 2, argv, 0);
-					} else {
-						if (debug) {
-							alog("debug: flood_mode_char_remove was not set unable to remove flood/throttle modes");
-						}
-					}
-				}
-				check_modes(c);
-			}
+			c->ClearModes();
+			check_modes(c);
 
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
 		} else if (what == "ops") {
@@ -133,11 +70,17 @@ class CommandCSClear : public Command
 			if (ircd->svsmode_ucmode) {
 				av[0] = chan;
 				ircdproto->SendSVSModeChan(av[0], "-o", NULL);
-				if (ircd->owner) {
-					ircdproto->SendSVSModeChan(av[0], ircd->ownerunset, NULL);
+				if (owner) {
+					modebuf = '-';
+					modebuf += owner->ModeChar;
+
+					ircdproto->SendSVSModeChan(av[0], modebuf.c_str(), NULL);
 				}
-				if (ircd->protect || ircd->admin) {
-					ircdproto->SendSVSModeChan(av[0], ircd->adminunset, NULL);
+				if (admin) {
+					modebuf = '-';
+					modebuf += admin->ModeChar;
+
+					ircdproto->SendSVSModeChan(av[0], modebuf.c_str(), NULL);
 				}
 				for (cu = c->users; cu; cu = bnext) {
 					bnext = cu->next;
@@ -150,7 +93,7 @@ class CommandCSClear : public Command
 						continue;
 
 					snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
-							ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
+							&admin->ModeChar : ""), (isown ? &owner->ModeChar : ""));
 
 					if (ircdcap->tsmode) {
 						snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
@@ -183,7 +126,7 @@ class CommandCSClear : public Command
 						continue;
 
 					snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
-							ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
+							&admin->ModeChar : ""), (isown ? &owner->ModeChar : ""));
 					/* We need to send the IRCd a nick for every mode.. - Viper */
 					snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""),
 							(isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
@@ -212,7 +155,7 @@ class CommandCSClear : public Command
 				}
 			}
 			notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
-		} else if (ircd->halfop && what == "hops") {
+		} else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && what == "hops") {
 			const char *av[4];
 			int ac;
 			char buf[BUFSIZE];

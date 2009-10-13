@@ -47,6 +47,7 @@ class CommandCSInfo : public Command
 		bool has_auspex = u->nc && u->nc->HasPriv("chanserv/auspex");
 		int show_all = 0;
 		time_t expt;
+		ChannelMode *cm;
 
 		ci = cs_findchan(chan);
 
@@ -80,10 +81,12 @@ class CommandCSInfo : public Command
 		tm = localtime(&ci->last_used);
 		strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 		notice_lang(s_ChanServ, u, CHAN_INFO_LAST_USED, buf);
+
+		cm = ModeManager::FindChannelModeByName(CMODE_SECRET);
 		// XXX: yuck.
 		if (ci->last_topic &&
-				(show_all || (!(ci->mlock_on & anope_get_secret_mode())
-											&& (!ci->c || !(ci->c->mode & anope_get_secret_mode())))))
+				(show_all || (!ci->HasMLock(cm->Name, true))
+											&& (!ci->c || !(ci->c->HasMode(CMODE_SECRET)))))
 		{
 			notice_lang(s_ChanServ, u, CHAN_INFO_LAST_TOPIC, ci->last_topic);
 			notice_lang(s_ChanServ, u, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter);

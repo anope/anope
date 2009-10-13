@@ -26,6 +26,7 @@ class CommandCSGetKey : public Command
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci;
+		std::string key;
 
 		ci = cs_findchan(chan);
 
@@ -35,13 +36,13 @@ class CommandCSGetKey : public Command
 			return MOD_CONT;
 		}
 
-		if (!ci->c || !ci->c->key)
+		if (!ci->c || !ci->c->GetParam(CMODE_KEY, &key))
 		{
 			notice_lang(s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_ChanServ, u, CHAN_GETKEY_KEY, chan, ci->c->key);
+		notice_lang(s_ChanServ, u, CHAN_GETKEY_KEY, chan, key.c_str());
 		return MOD_CONT;
 	}
 

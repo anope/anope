@@ -8,6 +8,7 @@
  * $Id$
  *
  */
+
 struct u_chanlist {
 	struct u_chanlist *next, *prev;
 	Channel *chan;
@@ -41,7 +42,7 @@ class CoreExport User : public Extensible
 	Server *server;		/* Server user is connected to  */
 	time_t timestamp;	/* Timestamp of the nick 	*/
 	time_t my_signon;	/* When did _we_ see the user?  */
-	uint32 mode;		/* See below 			*/
+	std::bitset<128> modes;
 
 	NickCore *nc;
 
@@ -161,5 +162,31 @@ class CoreExport User : public Extensible
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */
 	void UpdateHost();
+       
+       /** Check if the user has a mode
+        * @param Name Mode name
+        * @return true or false
+        */
+       const bool HasMode(UserModeName Name) const;
+ 
+       /** Set a mode on the user
+        * @param Name The mode name
+        */
+       void SetMode(UserModeName Name);
+ 
+       /* Set a mode on the user
+        * @param ModeChar The mode char
+        */
+       void SetMode(char ModeChar);
+ 
+       /** Remove a mode from the user
+        * @param Name The mode name
+        */
+       void RemoveMode(UserModeName Name);
+
+	/** Remove a mode from the user
+        * @param ModeChar The mode char
+        */
+       void RemoveMode(char ModeChar);
 };
 

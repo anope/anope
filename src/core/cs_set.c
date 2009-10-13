@@ -190,27 +190,20 @@ class CommandCSSet : public Command
 	{
 		int add = -1;			   /* 1 if adding, 0 if deleting, -1 if neither */
 		unsigned char mode;
-		CBMode *cbm;
+		ChannelMode *cm;
+		ChannelModeParam *cmp;
 
 		if (checkDefCon(DEFCON_NO_MLOCK_CHANGE)) {
 			notice_lang(s_ChanServ, u, OPER_DEFCON_DENIED);
 			return MOD_CONT;
 		}
 
-		/* Reinitialize everything */
-		if (ircd->chanreg) {
-			ci->mlock_on = ircd->regmode;
-		} else {
-			ci->mlock_on = 0;
-		}
-		ci->mlock_off = ci->mlock_limit = 0;
-		ci->mlock_key = NULL;
-		if (ircd->fmode) {
-			ci->mlock_flood = NULL;
-		}
-		if (ircd->Lmode) {
-			ci->mlock_redirect = NULL;
-		}
+		ci->ClearMLock();
+
+		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
+			ci->SetMLock(CMODE_REGISTERED, true);
+
+		ci->ClearParams();
 
 		std::string params(modes ? modes : ""), param;
 		unsigned space = params.find(' ');
@@ -235,48 +228,67 @@ class CommandCSSet : public Command
 					continue;
 			}
 
-			if (static_cast<int>(mode) < 128 && (cbm = &cbmodes[static_cast<int>(mode)])->flag != 0) {
-				if ((cbm->flags & CBM_NO_MLOCK)
-					|| ((cbm->flags & CBM_NO_USER_MLOCK) && !is_oper(u))) {
-					notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR,
-								mode);
-				} else if (add) {
-					ci->mlock_on |= cbm->flag;
-					ci->mlock_off &= ~cbm->flag;
-					if (cbm->cssetvalue)
+			if ((cm = ModeManager::FindChannelModeByChar(mode)))
+			{
+				if (!cm->CanSet(u))
+				{
+					notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR, mode);
+				}
+				else if (add)
+				{
+					if (cm->Type == MODE_PARAM)
 					{
-						modeparams.GetToken(param);
-						cbm->cssetvalue(ci, param.c_str());
+						cmp = static_cast<ChannelModeParam *>(cm);
+
+						if (!modeparams.GetToken(param))
+							continue;
+
+						if (!cmp->IsValid(param.c_str()))
+							continue;
+
+						ci->SetParam(cmp->Name, param);
 					}
-				} else {
-					ci->mlock_off |= cbm->flag;
-					if (ci->mlock_on & cbm->flag) {
-						ci->mlock_on &= ~cbm->flag;
-						if (cbm->cssetvalue)
-							cbm->cssetvalue(ci, NULL);
+
+					ci->SetMLock(cm->Name, true);
+					ci->RemoveMLock(cm->Name, false);
+				}
+				else
+				{
+					ci->SetMLock(cm->Name, false);
+
+					if (ci->HasMLock(cm->Name, true))
+					{
+						ci->RemoveMLock(cm->Name, true);
+
+						if (cm->Type == MODE_PARAM)
+						{
+							cmp = static_cast<ChannelModeParam *>(cm);
+
+							ci->UnsetParam(cmp->Name);
+						}
 					}
 				}
-			} else {
-				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_UNKNOWN_CHAR, mode);
 			}
+			else
+				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_UNKNOWN_CHAR, mode);
 		}						   /* while (*modes) */
 
-		if (ircd->Lmode) {
+		if (ModeManager::FindChannelModeByName(CMODE_REDIRECT)) {
 			/* We can't mlock +L if +l is not mlocked as well. */
-			if ((ci->mlock_on & ircd->chan_lmode)
-				&& !(ci->mlock_on & anope_get_limit_mode())) {
-				ci->mlock_on &= ~ircd->chan_lmode;
-				delete [] ci->mlock_redirect;
+			if (ci->HasMLock(CMODE_REDIRECT, true) && !ci->HasMLock(CMODE_LIMIT, true))
+			{
+				ci->RemoveMLock(CMODE_REDIRECT, true);
+				ci->UnsetParam(CMODE_REDIRECT);
 				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_L_REQUIRED);
 			}
 		}
 
 		/* Some ircd we can't set NOKNOCK without INVITE */
 		/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
-		if (ircd->noknock && ircd->knock_needs_i) {
-			if ((ci->mlock_on & ircd->noknock)
-				&& !(ci->mlock_on & anope_get_invite_mode())) {
-				ci->mlock_on &= ~ircd->noknock;
+		if (ModeManager::FindChannelModeByName(CMODE_NOKNOCK) && ircd->knock_needs_i) {
+			if (ci->HasMLock(CMODE_NOKNOCK, true) && !ci->HasMLock(CMODE_INVITE, true))
+			{
+				ci->RemoveMLock(CMODE_NOKNOCK, true);
 				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_K_REQUIRED);
 			}
 		}
@@ -474,7 +486,7 @@ class CommandCSSet : public Command
 					} else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP)
 							   || CHECKLEV(CA_OPDEOPME)) {
 						access->level = ACCESS_AOP;
-					} else if (ircd->halfop) {
+					} else if (ModeManager::FindChannelModeByName(CMODE_HALFOP)) {
 						if (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP)
 							|| CHECKLEV(CA_HALFOPME)) {
 							access->level = ACCESS_HOP;

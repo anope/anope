@@ -237,6 +237,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include <list>
 #include <vector>
 #include <deque>
+#include <bitset>
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
@@ -422,10 +423,9 @@ class CoreExport Extensible
 /* forward declarations, mostly used by older code */
 class User;
 class ChannelInfo;
-
+class Channel;
 
 typedef struct server_ Server;
-typedef struct channel_ Channel;
 typedef struct c_elist EList;
 typedef struct c_elist_entry Entry;
 typedef struct memo_ Memo;
@@ -438,13 +438,42 @@ typedef struct sxline_ SXLine;
 typedef struct hostcore_ HostCore;
 typedef struct newsitem_ NewsItem;
 typedef struct exception_ Exception;
-typedef struct cbmode_ CBMode;
-typedef struct cbmodeinfo_ CBModeInfo;
-typedef struct cmmode_ CMMode;
-typedef struct csmode_ CSMode;
-typedef struct cumode_ CUMode;
-typedef struct csmodeutil_ CSModeUtil;
 typedef struct session_ Session;
+
+enum UserModeName
+{
+	UMODE_BEGIN,
+
+	/* Usermodes */
+	UMODE_SERV_ADMIN, UMODE_BOT, UMODE_CO_ADMIN, UMODE_FILTER, UMODE_HIDEOPER, UMODE_NETADMIN,
+	UMODE_REGPRIV, UMODE_PROTECTED, UMODE_NO_CTCP, UMODE_WEBTV, UMODE_WHOIS, UMODE_ADMIN, UMODE_DEAF,
+	UMODE_GLOBOPS, UMODE_HELPOP, UMODE_INVIS, UMODE_OPER, UMODE_PRIV, UMODE_GOD, UMODE_REGISTERED,
+	UMODE_SNOMASK, UMODE_VHOST, UMODE_WALLOPS, UMODE_CLOAK, UMODE_SSL, UMODE_CALLERID,
+
+	UMODE_END
+};
+
+enum ChannelModeName
+{
+	CMODE_BEGIN,
+
+	/* Channel modes */
+	CMODE_BLOCKCOLOR, CMODE_FLOOD, CMODE_INVITE, CMODE_KEY, CMODE_LIMIT, CMODE_MODERATED, CMODE_NOEXTERNAL,
+	CMODE_PRIVATE, CMODE_REGISTERED, CMODE_SECRET, CMODE_TOPIC, CMODE_AUDITORIUM, CMODE_SSL, CMODE_ADMINONLY,
+	CMODE_NOCTCP, CMODE_FILTER, CMODE_NOKNOCK, CMODE_REDIRECT, CMODE_REGMODERATED, CMODE_NONICK, CMODE_OPERONLY,
+	CMODE_NOKICK, CMODE_REGISTEREDONLY, CMODE_STRIPCOLOR, CMODE_NONOTICE, CMODE_NOINVITE, CMODE_ALLINVITE,
+	CMODE_BLOCKCAPS, CMODE_PERM,
+	
+	/* b/e/I */
+	CMODE_BAN, CMODE_EXCEPT,
+	CMODE_INVITEOVERRIDE,
+
+	/* v/h/o/a/q */
+	CMODE_VOICE, CMODE_HALFOP, CMODE_OP,
+	CMODE_PROTECT, CMODE_OWNER,
+
+	CMODE_END
+};
 
 #include "bots.h"
 #include "opertype.h"
@@ -460,35 +489,22 @@ struct ircdvars_ {
 	const char *name;				/* Name of the IRCd command */
 	const char *pseudoclient_mode;			/* Mode used by BotServ Bots	*/
 	int max_symbols;			/* Chan Max Symbols		*/
-	const char *modestoremove;			/* Channel Modes to remove	*/
 	const char *botchanumode;			/* Modes set when botserv joins a channel */
 	int svsnick;				/* Supports SVSNICK		*/
 	int vhost;				/* Supports vhost		*/
-	int owner;				/* Supports Owner		*/
-	const char *ownerset;				/* Mode to set for owner	*/
-	const char *ownerunset;			/* Mode to unset for a owner	*/
-	const char *adminset;				/* Mode to set for admin	*/
-	const char *adminunset;			/* Mode to unset for admin	*/
 	const char *modeonunreg;			/* Mode on Unregister		*/
 	int sgline;				/* Supports SGline		*/
 	int sqline;				/* Supports SQline		*/
 	int szline;				/* Supports SZline		*/
-	int halfop;				/* Supports HalfOp		*/
 	int numservargs;			/* Number of Server Args	*/
 	int join2set;				/* Join 2 Set Modes		*/
 	int join2msg;				/* Join 2 Message		*/
-	int except;				/* exception +e			*/
 	int topictsforward;			/* TS on Topics Forward		*/
 	int topictsbackward;			/* TS on Topics Backward	*/
-	uint32 protectedumode;			/* What is the Protected Umode	*/
-	int admin;				/* Has Admin 			*/
 	int chansqline;				/* Supports Channel Sqlines	*/
 	int quitonkill;				/* IRCD sends QUIT when kill	*/
 	int svsmode_unban;			/* svsmode can be used to unban	*/
-	int protect;				/* Has protect modes		*/
 	int reversekickcheck;			/* Can reverse ban check	*/
-	int chanreg;				/* channel mode +r for register	*/
-	uint32 regmode;				/* Mode to use for +r 		*/
 	int vident;				/* Supports vidents		*/
 	int svshold;				/* Supports svshold		*/
 	int tsonmode;				/* Timestamp on mode changes	*/
@@ -497,28 +513,18 @@ struct ircdvars_ {
 	int umode;					/* change user modes		*/
 	int nickvhost;				/* Users vhost sent during NICK */
 	int chgreal;				/* Change RealName		*/
-	uint32 noknock;				/* Channel Mode for no knock	*/
-	uint32 adminmode;			/* Admin Only Channel Mode	*/
-	uint32 defmlock;			/* Default mlock modes		*/
-	uint32 vhostmode;			/* Vhost mode			*/
-	int fmode;					/* +f				*/
-	int Lmode;					/* +L				*/
-	uint32 chan_fmode;			/* Mode 			*/
-	uint32 chan_lmode;			/* Mode				*/
+	std::bitset<128> DefMLock;   /* Default mlock modes		*/
 	int check_nick_id;			/* On nick change check if they could be identified */
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
 	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
 	int token;					/* Does Anope support the tokens for the ircd */
 	int sjb64;					/* Base 64 encode TIMESTAMP */
-	int invitemode;				/* +I  */
 	int sjoinbanchar;			/* use single quotes to define it */
 	int sjoinexchar;			/* use single quotes to define it */
 	int sjoininvchar;			/* use single quotes to define it */
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
-	const char *vhostchar;			/* char used for vhosting */
 	int ts6;					/* ircd is TS6 */
-	int supporthelper;			/* +h helper umodes */
 	int p10;					/* ircd is P10  */
 	char *nickchars;			/* character set */
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
@@ -593,7 +599,6 @@ typedef struct {
 	int16 memomax;
 	std::vector<Memo *> memos;
 } MemoInfo;
-
 
 
 /*************************************************************************/
@@ -784,17 +789,6 @@ struct badword_ {
 
 /*************************************************************************/
 
-/* ChanServ mode utilities commands */
-
-struct csmodeutil_ {
-	const char *name;			/* Name of the ChanServ command */
-	const char *bsname;			/* Name of the BotServ fantasy command */
-	const char *mode;			/* Mode (ie. +o) */
-	int32 notice;			/* Notice flag (for the damn OPNOTICE) */
-	int level;			/* Level required to use the command */
-	int levelself;			/* Level required to use the command for himself */
-};
-
 typedef struct {
 	int what;
 	const char *name;
@@ -830,47 +824,17 @@ struct server_ {
 #define SERVER_ISUPLINK	0x0004
 
 /*************************************************************************/
+
+#define CUS_OP			0x0001
+#define CUS_VOICE		0x0002
+#define CUS_HALFOP		0x0004		/* Halfop (+h) */
+#define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
+#define CUS_PROTECT		0x0010		/* Protected users (+a) */
+/* #define CUS_DEOPPED		0x0080	*/	/* Removed due to IRCd checking it */
+
+/*************************************************************************/
+
 #include "users.h"
-
-
-struct cbmode_ {
-	uint32 flag;			/* Long value that represents the mode */
-	uint16 flags;			/* Flags applying to this mode (CBM_* below) */
-
-	/* Function to associate a value with the mode */
-	void (*setvalue)	(Channel *chan, const char *value);
-	void (*cssetvalue)	(ChannelInfo *ci, const char *value);
-};
-
-#define CBM_MINUS_NO_ARG 	0x0001		/* No argument for unset */
-#define CBM_NO_MLOCK		0x0002		/* Can't be MLOCKed */
-#define CBM_NO_USER_MLOCK   	0x0004	  	/* Can't be MLOCKed by non-opers */
-
-struct cbmodeinfo_ {
-	char mode;				/* The mode */
-	uint32 flag;			/* Long value that represents the mode */
-	uint16 flags;			/* CBM_* above */
-
-	/* Function to retrieve the value associated to the mode (optional) */
-	char * (*getvalue) 		(Channel *chan);
-	char * (*csgetvalue) 	(ChannelInfo *ci);
-};
-
-struct cmmode_ {
-	void (*addmask) (Channel *chan, const char *mask);
-	void (*delmask) (Channel *chan, const char *mask);
-};
-
-struct cumode_ {
-	int16 status;			/* CUS_* below */
-	int16 flags;			/* CUF_* below */
-
-	int (*is_valid) (User *user, Channel *chan, int servermode);
-};
-
-/* Channel user mode flags */
-
-#define CUF_PROTECT_BOTSERV 	0x0001
 
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
@@ -918,7 +882,21 @@ struct c_userlist {
 	UserData *ud;
 };
 
-struct channel_ {
+class CoreExport Channel
+{
+  private:
+	  /** A map of channel modes with their parameters set on this channel
+	   */
+	  std::map<ChannelModeName, std::string> Params;
+
+  public:
+	Channel() { }
+
+	~Channel()
+	{
+		Params.clear();
+	}
+
 	Channel *next, *prev;
 	char name[CHANMAX];
 	ChannelInfo *ci;			/* Corresponding ChannelInfo */
@@ -926,11 +904,8 @@ struct channel_ {
 	char *topic;
 	char topic_setter[NICKMAX];		/* Who set the topic */
 	time_t topic_time;			/* When topic was set */
-	uint32 mode;			/* Binary modes only */
-	uint32 limit;			/* 0 if none */
-	char *key;				/* NULL if none */
-	char *redirect;			/* +L; NULL if none */
-	char *flood;			/* +f; NULL if none */
+	std::bitset<128> modes;
+
 	EList *bans;
 	EList *excepts;
 	EList *invites;
@@ -946,6 +921,81 @@ struct channel_ {
 	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16 bouncy_modes;			/* Did we fail to set modes here? */
 	int16 topic_sync;		   /* Is the topic in sync? */
+
+	/**
+	 * See if a channel has a mode
+	 * @param Name The mode name
+	 * @return true or false
+	 */
+	bool HasMode(ChannelModeName Name);
+
+	/**
+	 * Set a mode on a channel
+	 * @param Name The mode name
+	 */
+	void SetMode(ChannelModeName Name);
+
+	/**
+	 * Set a mode on a channel
+	 * @param Mode The mode
+	 */
+	void SetMode(char Mode);
+
+	/**
+	 * Remove a mode from a channel
+	 * @param Name The mode name
+	 */
+	void RemoveMode(ChannelModeName Name);
+
+	/**
+	 * Remove a mode from a channel
+	 * @param Mode The mode
+	 */
+	void RemoveMode(char Mode);
+
+	/** Clear all the modes from the channel
+	 * @param client The client unsetting the modes
+	 */
+	void ClearModes(char *client = NULL);
+
+	/** Clear all the bans from the channel
+	 * @param client The client unsetting the modes
+	 */
+	void ClearBans(char *client = NULL);
+
+	/** Clear all the excepts from the channel
+	 * @param client The client unsetting the modes
+	 */
+	void ClearExcepts(char *client = NULL);
+
+	/** Clear all the invites from the channel
+	 * @param client The client unsetting the modes
+	 */
+	void ClearInvites(char *client = NULL);
+
+	/** Set a channel mode param on the channel
+	 * @param Name The mode
+	 * @param param The param
+	 * @param true on success
+	 */
+	bool SetParam(ChannelModeName Name, std::string &param);
+
+	/** Unset a param from the channel
+	 * @param Name The mode
+	 */
+	void UnsetParam(ChannelModeName Name);
+
+	/** Get a param from the channel
+	 * @param Name The mode
+	 * @param Target a string to put the param into
+	 * @return true on success
+	 */
+	const bool GetParam(ChannelModeName Name, std::string *Target);
+
+	/** Check if a mode is set and has a param
+	 * @param Name The mode
+	 */
+	const bool HasParam(ChannelModeName Name);
 };
 
 struct c_elist {
@@ -1057,25 +1107,341 @@ struct exception_ {
 
 /*************************************************************************/
 
+/** The different types of modes
+*/
+enum ModeType
+{
+	/* Regular mode */
+	MODE_REGULAR,
+	/* b/e/I */
+	MODE_LIST,
+	/* k/l etc */
+	MODE_PARAM,
+	/* v/h/o/a/q */
+	MODE_STATUS
+};
+
+/** This class is a user mode, all user modes use this/inherit from this
+ */
+class UserMode
+{
+  public:
+
+	/* Mode name */
+	UserModeName Name;
+	/* The mode char */
+	char ModeChar;
+
+	/** Default constructor
+	 * @param nName The mode name
+	 * @param mMode A value representing the mode
+	 */
+	UserMode(UserModeName mName)
+	{
+		this->Name = mName;
+	}
+
+	/** Default destructor
+	 */
+	virtual ~UserMode() { }
+};
+
+/** This class is a channel mode, all channel modes use this/inherit from this
+ */
+class ChannelMode
+{
+  public:
+
+	/* Mode name */
+	ChannelModeName Name;
+	/* Type of mode this is */
+	ModeType Type;
+	/* The mode char */
+	char ModeChar;
+
+	/** Default constructor
+	 * @param mName The mode name
+	 * @param mMode A value representing the mode
+	 */
+	ChannelMode(ChannelModeName mName)
+	{
+		this->Name = mName;
+		this->Type = MODE_REGULAR;
+	}
+
+	/** Default destructor
+	 */
+	virtual ~ChannelMode() { }
+
+	/** Can a user set this mode, used for mlock
+	 * NOTE: User CAN be NULL, this is for checking if it can be locked with defcon
+	 * @param u The user, or NULL
+	 */
+	virtual bool CanSet(User *u) { return true; }
+};
+
+/** This is a mode for lists, eg b/e/I. These modes should inherit from this
+ */
+class ChannelModeList : public ChannelMode
+{
+  public:
+
+	/** Default constructor
+	 * @param mName The mode name
+	 */
+	ChannelModeList(ChannelModeName mName) : ChannelMode(mName)
+	{
+		this->Type = MODE_LIST;
+	}
+
+	/** Default destructor
+	 */
+	virtual ~ChannelModeList() { }
+
+	/** Is the mask valid
+	 * @param mask The mask
+	 * @return true for yes, false for no
+	 */
+	virtual bool IsValid(const char *mask) { return true; }
+
+	/** Add the mask to the channel, this should be overridden
+	 * @param chan The channel
+	 * @param mask The mask
+	 */
+	virtual void AddMask(Channel *chan, const char *mask) { }
+
+	/** Delete the mask from the channel, this should be overridden
+	 * @param chan The channel
+	 * @param mask The mask
+	 */
+	virtual void DelMask(Channel *chan, const char *mask) { }
+
+};
+
+/** This is a mode with a paramater, eg +k/l. These modes should use/inherit from this
+*/
+class ChannelModeParam : public ChannelMode
+{
+  public:
+
+	/** Default constructor
+	 * @param mName The mode name
+	 * @param mMode A value representing the mode
+	 */
+	ChannelModeParam(ChannelModeName mName) : ChannelMode(mName)
+	{
+		this->Type = MODE_PARAM;
+		MinusNoArg = false;
+	}
+
+	/** Default destructor
+	 */
+	virtual ~ChannelModeParam() { }
+
+	/* Should we send an arg when unsetting this mode? */
+	bool MinusNoArg;
+
+	/** Is the param valid
+	 * @param value The param
+	 * @return true for yes, false for no
+	 */
+	virtual bool IsValid(const char *value) { return true; }
+};
+
+/** This is a mode that is a channel status, eg +v/h/o/a/q.
+*/
+class ChannelModeStatus : public ChannelMode
+{
+  public:
+	/** CUS_ values, see below 
+	*/
+	int16 Status;
+	/* The symbol, eg @ % + */
+	char Symbol;
+
+	/** Default constructor
+	 * @param mName The mode name
+	 * @param mStatus A CUS_ value
+	 */
+	ChannelModeStatus(ChannelModeName mName, int16 mStatus, char mSymbol, bool mProtectBotServ = false) : ChannelMode(mName)
+	{
+		this->Type = MODE_STATUS;
+		this->Status = mStatus;
+		this->Symbol = mSymbol;
+		this->ProtectBotServ = mProtectBotServ;
+	}
+
+	/** Default destructor
+	 */
+	virtual ~ChannelModeStatus() { }
+
+	/* Should botserv protect itself with this mode? eg if someone -o's botserv it will +o */
+	bool ProtectBotServ;
+};
+
+/** This class manages modes, and has the ability to add channel and
+ * user modes to Anope to track internally
+ */
+class CoreExport ModeManager
+{
+  public:
+	/* User modes */
+	static std::map<char, UserMode *> UserModesByChar;
+	static std::map<UserModeName, UserMode *> UserModesByName;
+	/* Channel modes */
+	static std::map<char, ChannelMode *> ChannelModesByChar;
+	static std::map<ChannelModeName, ChannelMode *> ChannelModesByName;
+	/* Although there are two different maps for UserModes and ChannelModes
+	 * the pointers in each are the same. This is used to increase
+	 * efficiency.
+	 */
+
+	/** Add a user mode to Anope
+	 * @param Mode The mode
+	 * @param um A UserMode or UserMode derived class
+	 * @return true on success, false on error
+	 */
+	static bool AddUserMode(char Mode, UserMode *um);
+
+	/** Add a channel mode to Anope
+	 * @param Mode The mode
+	 * @param cm A ChannelMode or ChannelMode derived class
+	 * @return true on success, false on error
+	 */
+	static bool AddChannelMode(char Mode, ChannelMode *cm);
+
+	/** Find a channel mode
+	 * @param Mode The mode
+	 * @return The mode class
+	 */
+	static ChannelMode *FindChannelModeByChar(char Mode);
+
+	/** Find a user mode
+	 * @param Mode The mode
+	 * @return The mode class
+	 */
+	static UserMode *FindUserModeByChar(char Mode);
+
+	/** Find a channel mode
+	 * @param Mode The modename
+	 * @return The mode class
+	 */
+	static ChannelMode *FindChannelModeByName(ChannelModeName Name);
+
+	/** Find a user mode
+	 * @param Mode The modename
+	 * @return The mode class
+	 */
+	static UserMode *FindUserModeByName(UserModeName Name);
+
+	/** Gets the channel mode char for a symbol (eg + returns v)
+	 * @param Value The symbol
+	 * @return The char
+	 */
+	static char GetStatusChar(char Value);
+};
+
+/** Channel mode +b
+ */
+class ChannelModeBan : public ChannelModeList
+{
+  public:
+	ChannelModeBan() : ChannelModeList(CMODE_BAN) { }
+
+	void AddMask(Channel *chan, const char *mask);
+
+	void DelMask(Channel *chan, const char *mask);
+};
+
+/** Channel mode +e
+ */
+class ChannelModeExcept : public ChannelModeList
+{
+  public:
+	ChannelModeExcept() : ChannelModeList(CMODE_EXCEPT) { }
+
+	void AddMask(Channel *chan, const char *mask);
+
+	void DelMask(Channel *chan, const char *mask);
+};
+
+/** Channel mode +I
+ */
+class ChannelModeInvite : public ChannelModeList
+{
+  public:
+	ChannelModeInvite() : ChannelModeList(CMODE_INVITEOVERRIDE) { }
+
+	void AddMask(Channel *chan, const char *mask);
+
+	void DelMask(Channel *chan, const char *mask);
+};
+
+/** Channel mode +k (key)
+ */
+class ChannelModeKey : public ChannelModeParam
+{
+  public:
+	ChannelModeKey() : ChannelModeParam(CMODE_KEY) { }
+
+	bool IsValid(const char *value);
+};
+
+/** Channel mode +f (flood)
+ */
+class ChannelModeFlood : public ChannelModeParam
+{
+  public:
+	ChannelModeFlood() : ChannelModeParam(CMODE_FLOOD) { }
+
+	bool IsValid(const char *value);
+};
+
+/** This class is used for channel mode +A (Admin only)
+ * Only opers can mlock it
+ */
+class ChannelModeAdmin : public ChannelMode
+{
+  public:
+	ChannelModeAdmin() : ChannelMode(CMODE_ADMINONLY) { }
+	
+	/* Opers only */
+	bool CanSet(User *u);
+};
+
+/** This class is used for channel mode +O (Opers only)
+ * Only opers can mlock it
+ */
+class ChannelModeOper : public ChannelMode
+{
+  public:
+	ChannelModeOper() : ChannelMode(CMODE_OPERONLY) { }
+	
+	/* Opers only */
+	bool CanSet(User *u);
+};
+
+/** This class is used for channel mode +r (registered channel)
+ * No one may mlock r
+ */
+class ChannelModeRegistered : public ChannelMode
+{
+  public:
+	ChannelModeRegistered() : ChannelMode(CMODE_REGISTERED) { }
+	
+	/* No one mlocks +r */
+	bool CanSet(User *u);
+};
+
+
+/*************************************************************************/
+
 struct session_ {
 	Session *prev, *next;
 	char *host;
 	int count;				  /* Number of clients with this host */
 	int hits;				   /* Number of subsequent kills for a host */
 };
-
-/*************************************************************************/
-typedef struct ircd_modes_ {
-		int user_invis;
-		int user_oper;
-		int chan_invite;
-		int chan_secret;
-		int chan_private;
-		int chan_key;
-		int chan_limit;
-} IRCDModes;
-
-
 
 /*************************************************************************/
 /**
@@ -1181,24 +1547,6 @@ typedef struct ircd_modes_ {
 #define BI_MEMOSERV		0x0020
 #define BI_NICKSERV		0x0040
 #define BI_GLOBAL		0x0080
-
-#define CUS_OP			0x0001
-#define CUS_VOICE		0x0002
-#define CUS_HALFOP		0x0004		/* Halfop (+h) */
-#define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
-#define CUS_PROTECT		0x0010		/* Protected users (+a) */
-/* #define CUS_DEOPPED		0x0080	*/	/* Removed due to IRCd checking it */
-
-#define MUT_DEOP   		0
-#define MUT_OP			1
-#define MUT_DEVOICE		2
-#define MUT_VOICE		3
-#define MUT_DEHALFOP		4
-#define MUT_HALFOP		5
-#define MUT_DEPROTECT   	6
-#define MUT_PROTECT	 	7
-#define MUT_DEOWNER		8
-#define MUT_OWNER		9
 
 /*************************************************************************/
 /* CAPAB stuffs */
@@ -1338,7 +1686,6 @@ class CoreExport IRCDProto
 		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int IsNickValid(const char *) { return 1; }
 		virtual int IsChannelValid(const char *);
-		virtual int IsFloodModeParamValid(const char *) { return 0; }
 		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...);
 
 		/** Sends a message logging a user into an account, where ircds support such a feature.

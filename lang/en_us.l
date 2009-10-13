@@ -4075,10 +4075,6 @@ CHAN_HELP_CMD_OWNER
 	    OWNER      Gives you owner status on channel
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Protects a selected nick on a channel
-CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protects a selected nick on a channel
-CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Deprotects a selected nick on a channel
 CHAN_HELP_CMD_DEOP
 	    DEOP       Deops a selected nick on a channel
 

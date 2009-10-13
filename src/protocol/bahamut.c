@@ -16,85 +16,26 @@
 #include "services.h"
 #include "pseudo.h"
 
-#define UMODE_a 0x00000001  /* umode +a - Services Admin */
-#define UMODE_h 0x00000002  /* umode +h - Helper */
-#define UMODE_i 0x00000004  /* umode +i - Invisible */
-#define UMODE_o 0x00000008  /* umode +o - Oper */
-#define UMODE_r 0x00000010  /* umode +r - registered nick */
-#define UMODE_w 0x00000020  /* umode +w - Get wallops */
-#define UMODE_A 0x00000040  /* umode +A - Server Admin */
-#define UMODE_x 0x00000080  /* umode +x - Squelch with notice */
-#define UMODE_X 0x00000100  /* umode +X - Squelch without notice */
-#define UMODE_F 0x00000200  /* umode +F - no cptr->since message rate throttle */
-#define UMODE_j 0x00000400  /* umode +j - client rejection notices */
-#define UMODE_K 0x00000800  /* umode +K - U: lined server kill messages */
-#define UMODE_O 0x00001000  /* umode +O - Local Oper */
-#define UMODE_s 0x00002000  /* umode +s - Server notices */
-#define UMODE_c 0x00004000  /* umode +c - Client connections/exits */
-#define UMODE_k 0x00008000  /* umode +k - Server kill messages */
-#define UMODE_f 0x00010000  /* umode +f - Server flood messages */
-#define UMODE_y 0x00020000  /* umode +y - Stats/links */
-#define UMODE_d 0x00040000  /* umode +d - Debug info */
-#define UMODE_g 0x00080000  /* umode +g - Globops */
-#define UMODE_b 0x00100000  /* umode +b - Chatops */
-#define UMODE_n 0x00200000  /* umode +n - Routing Notices */
-#define UMODE_m 0x00400000  /* umode +m - spambot notices */
-#define UMODE_e 0x00800000  /* umode +e - oper notices for the above +D */
-#define UMODE_D 0x01000000  /* umode +D - Hidden dccallow umode */
-#define UMODE_I 0x02000000  /* umode +I - invisible oper (masked) */
-#define UMODE_R 0x80000000  /* unmode +R - No non registered msgs */
-
-#define CMODE_i 0x00000001
-#define CMODE_m 0x00000002
-#define CMODE_n 0x00000004
-#define CMODE_p 0x00000008
-#define CMODE_s 0x00000010
-#define CMODE_t 0x00000020
-#define CMODE_k 0x00000040	/* These two used only by ChanServ */
-#define CMODE_l 0x00000080
-#define CMODE_R 0x00000100	/* Only identified users can join */
-#define CMODE_r 0x00000200	/* Set for all registered channels */
-#define CMODE_c 0x00000400	/* Colors can't be used */
-#define CMODE_M 0x00000800	  /* Non-regged nicks can't send messages */
-#define CMODE_j 0x00001000	  /* join throttle */
-#define CMODE_O 0x00008000	/* Only opers can join */
-
-#define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
-
-
 IRCDVar myIrcd[] = {
 	{"Bahamut 1.8.x", /* ircd name */
 	 "+",					   /* Modes used by pseudoclients */
 	 2,						 /* Chan Max Symbols	 */
-	 "-cilmnpstOR",			 /* Modes to Remove */
 	 "+o",					  /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 0,						 /* Vhost  */
-	 0,						 /* Has Owner */
-	 NULL,					  /* Mode to set for an owner */
-	 NULL,					  /* Mode to unset for an owner */
-	 NULL,					  /* Mode to set for channel admin */
-	 NULL,					  /* Mode to unset for channel admin */
 	 "-r+d",					/* Mode on UnReg        */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
-	 0,						 /* Supports Halfop +h   */
 	 3,						 /* Number of server args */
 	 0,						 /* Join 2 Set		   */
 	 0,						 /* Join 2 Message	   */
-	 1,						 /* Has exceptions +e	*/
 	 0,						 /* TS Topic Forward	 */
 	 0,						 /* TS Topci Backward	*/
-	 0,						 /* Protected Umode	  */
-	 0,						 /* Has Admin			*/
 	 1,						 /* Chan SQlines		 */
 	 1,						 /* Quit on Kill		 */
 	 1,						 /* SVSMODE unban		*/
-	 0,						 /* Has Protect		  */
 	 0,						 /* Reverse			  */
-	 1,						 /* Chan Reg			 */
-	 CMODE_r,				   /* Channel Mode		 */
 	 0,						 /* vidents			  */
 	 1,						 /* svshold			  */
 	 1,						 /* time stamp on mode   */
@@ -103,28 +44,18 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 0,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 0,						 /* No Knock			 */
-	 0,						 /* Admin Only		   */
-	 DEFAULT_MLOCK,			 /* Default MLOCK	   */
-	 0,						 /* Vhost Mode		   */
-	 1,						 /* +f				   */
-	 0,						 /* +L				   */
-	 CMODE_j,				   /* Mode */
-	 0,						 /* Mode */
+	 0,
 	 1,
 	 1,						 /* No Knock requires +i */
 	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
-	 1,						 /* +I support */
 	 0,						 /* SJOIN ban char */
 	 0,						 /* SJOIN except char */
 	 0,						 /* SJOIN invite char */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
-	 NULL,					  /* vhost char */
 	 0,						 /* ts6 */
-	 1,						 /* support helper umode */
 	 0,						 /* p10 */
 	 NULL,					  /* character set */
 	 0,						 /* CIDR channelbans */
@@ -166,258 +97,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 CAPAB_DOZIP,			   /* DOZIP		*/
 	 0, 0, 0}
 };
-
-
-unsigned long umodes[128] = {
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused, Unused, Horzontal Tab */
-	0, 0, 0,					/* Line Feed, Unused, Unused */
-	0, 0, 0,					/* Carriage Return, Unused, Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused, Unused, Space */
-	0, 0, 0,					/* ! " #  */
-	0, 0, 0,					/* $ % &  */
-	0, 0, 0,					/* ! ( )  */
-	0, 0, 0,					/* * + ,  */
-	0, 0, 0,					/* - . /  */
-	0, 0,					   /* 0 1 */
-	0, 0,					   /* 2 3 */
-	0, 0,					   /* 4 5 */
-	0, 0,					   /* 6 7 */
-	0, 0,					   /* 8 9 */
-	0, 0,					   /* : ; */
-	0, 0, 0,					/* < = > */
-	0, 0,					   /* ? @ */
-	UMODE_A, 0, 0,			  /* A B C */
-	UMODE_D, 0, UMODE_F,		/* D E F */
-	0, 0, UMODE_I,			  /* G H I */
-	0, UMODE_K, 0,			  /* J K L */
-	0, 0, UMODE_O,			  /* M N O */
-	0, 0, UMODE_R,			  /* P Q R */
-	0, 0, 0,					/* S T U */
-	0, 0, UMODE_X,			  /* V W X */
-	0,						  /* Y */
-	0,						  /* Z */
-	0, 0, 0,					/* [ \ ] */
-	0, 0, 0,					/* ^ _ ` */
-	UMODE_a, UMODE_b, UMODE_c,  /* a b c */
-	UMODE_d, UMODE_e, UMODE_f,  /* d e f */
-	UMODE_g, UMODE_h, UMODE_i,  /* g h i */
-	UMODE_j, UMODE_k, 0,		/* j k l */
-	UMODE_m, UMODE_n, UMODE_o,  /* m n o */
-	0, 0, UMODE_r,			  /* p q r */
-	UMODE_s, 0, 0,			  /* s t u */
-	0, UMODE_w, UMODE_x,		/* v w x */
-	UMODE_y,					/* y */
-	0,						  /* z */
-	0, 0, 0,					/* { | } */
-	0, 0						/* ~ � */
-};
-
-char myCsmodes[128] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	0,
-	0,
-	0, 0, 0,
-	0,
-	0, 0, 0, 0,
-	0,
-
-	'v', 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	'o', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
-
-CMMode myCmmodes[128] = {
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},	 /* BCD */
-	{NULL}, {NULL}, {NULL},	 /* EFG */
-	{NULL},					 /* H */
-	{add_invite, del_invite},   /* I */
-	{NULL},					 /* J */
-	{NULL}, {NULL}, {NULL},	 /* KLM */
-	{NULL}, {NULL}, {NULL},	 /* NOP */
-	{NULL}, {NULL}, {NULL},	 /* QRS */
-	{NULL}, {NULL}, {NULL},	 /* TUV */
-	{NULL}, {NULL}, {NULL},	 /* WXY */
-	{NULL},					 /* Z */
-	{NULL}, {NULL},			 /* (char 91 - 92) */
-	{NULL}, {NULL}, {NULL},	 /* (char 93 - 95) */
-	{NULL},					 /* ` (char 96) */
-	{NULL},					 /* a (char 97) */
-	{add_ban, del_ban},		 /* b */
-	{NULL}, {NULL},			 /* cd */
-	{add_exception, del_exception},
-	{NULL}, {NULL},
-	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}
-};
-
-CBMode myCbmodes[128] = {
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0},
-	{0},						/* A */
-	{0},						/* B */
-	{0},						/* C */
-	{0},						/* D */
-	{0},						/* E */
-	{0},						/* F */
-	{0},						/* G */
-	{0},						/* H */
-	{0},						/* I */
-	{0},						/* J */
-	{0},						/* K */
-	{0},						/* L */
-	{CMODE_M, 0, NULL, NULL},   /* M */
-	{0},						/* N */
-	{CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
-	{0},						/* P */
-	{0},						/* Q */
-	{CMODE_R, 0, NULL, NULL},   /* R */
-	{0},						/* S */
-	{0},						/* T */
-	{0},						/* U */
-	{0},						/* V */
-	{0},						/* W */
-	{0},						/* X */
-	{0},						/* Y */
-	{0},						/* Z */
-	{0}, {0}, {0}, {0}, {0}, {0},
-	{0},						/* a */
-	{0},						/* b */
-	{CMODE_c, 0, NULL, NULL},
-	{0},						/* d */
-	{0},						/* e */
-	{0},						/* f */
-	{0},						/* g */
-	{0},						/* h */
-	{CMODE_i, 0, NULL, NULL},
-	{CMODE_j, 0, set_flood, cs_set_flood},	  /* j */
-	{CMODE_k, 0, chan_set_key, cs_set_key},
-	{CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
-	{CMODE_m, 0, NULL, NULL},
-	{CMODE_n, 0, NULL, NULL},
-	{0},						/* o */
-	{CMODE_p, 0, NULL, NULL},
-	{0},						/* q */
-	{CMODE_r, CBM_NO_MLOCK, NULL, NULL},
-	{CMODE_s, 0, NULL, NULL},
-	{CMODE_t, 0, NULL, NULL},
-	{0},
-	{0},						/* v */
-	{0},						/* w */
-	{0},						/* x */
-	{0},						/* y */
-	{0},						/* z */
-	{0}, {0}, {0}, {0}
-};
-
-CBModeInfo myCbmodeinfos[] = {
-	{'c', CMODE_c, 0, NULL, NULL},
-	{'i', CMODE_i, 0, NULL, NULL},
-	{'j', CMODE_j, 0, get_flood, cs_get_flood},
-	{'k', CMODE_k, 0, get_key, cs_get_key},
-	{'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
-	{'m', CMODE_m, 0, NULL, NULL},
-	{'n', CMODE_n, 0, NULL, NULL},
-	{'p', CMODE_p, 0, NULL, NULL},
-	{'r', CMODE_r, 0, NULL, NULL},
-	{'s', CMODE_s, 0, NULL, NULL},
-	{'t', CMODE_t, 0, NULL, NULL},
-	{'M', CMODE_M, 0, NULL, NULL},
-	{'O', CMODE_O, 0, NULL, NULL},
-	{'R', CMODE_R, 0, NULL, NULL},
-	{0}
-};
-
-CUMode myCumodes[128] = {
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-
-	{0},
-	{0},						/* a */
-	{0},						/* b */
-	{0},						/* c */
-	{0},						/* d */
-	{0},						/* e */
-	{0},						/* f */
-	{0},						/* g */
-	{0},						/* h */
-	{0},						/* i */
-	{0},						/* j */
-	{0},						/* k */
-	{0},						/* l */
-	{0},						/* m */
-	{0},						/* n */
-	{CUS_OP, CUF_PROTECT_BOTSERV, check_valid_op},
-	{0},						/* p */
-	{0},						/* q */
-	{0},						/* r */
-	{0},						/* s */
-	{0},						/* t */
-	{0},						/* u */
-	{CUS_VOICE, 0, NULL},
-	{0},						/* w */
-	{0},						/* x */
-	{0},						/* y */
-	{0},						/* z */
-	{0}, {0}, {0}, {0}, {0}
-};
-
 
 
 void bahamut_cmd_burst()
@@ -471,10 +150,11 @@ class BahamutIRCdProto : public IRCDProto
 		--ac;
 		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
 		while (*modes) {
-			/* This looks better, much better than "add ? (do_add) : (do_remove)".
-			 * At least this is readable without paying much attention :) -GD */
-			if (add) user->mode |= umodes[static_cast<int>(*modes)];
-			else user->mode &= ~umodes[static_cast<int>(*modes)];
+			if (add)
+				user->SetMode(*modes);
+			else
+				user->RemoveMode(*modes);
+
 			switch (*modes++) {
 				case '+':
 					add = 1;
@@ -501,7 +181,7 @@ class BahamutIRCdProto : public IRCDProto
 				case 'r':
 					if (add && !nick_identified(user)) {
 						common_svsmode(user, "-r", NULL);
-						user->mode &= ~UMODE_r;
+						user->RemoveMode(CMODE_REGISTERED);
 					}
 			}
 		}
@@ -683,13 +363,6 @@ class BahamutIRCdProto : public IRCDProto
 	void SendUnregisteredNick(User *u)
 	{
 		common_svsmode(u, "+d", "1");
-	}
-
-	int IsFloodModeParamValid(const char *value)
-	{
-		char *dp, *end;
-		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-		else return 0;
 	}
 
 	/* SERVER */
@@ -999,14 +672,18 @@ int anope_event_burst(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
+bool ChannelModeFlood::IsValid(const char *value)
+{
+	char *dp, *end;
 
-/* *INDENT-OFF* */
+	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end)
+		return true;
+
+	return false;
+}
+
 void moduleAddIRCDMsgs() {
 	Message *m;
-
-
-	/* first update the cs protect info about this ircd */
-	updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
 
 	/* now add the commands */
 	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
@@ -1037,7 +714,41 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("BURST",	 anope_event_burst); addCoreMessage(IRCD,m);
 }
 
-/* *INDENT-ON* */
+void moduleAddModes()
+{
+	/* Add user modes */
+	ModeManager::AddUserMode('A', new UserMode(UMODE_SERV_ADMIN));
+	ModeManager::AddUserMode('R', new UserMode(UMODE_REGPRIV));
+	ModeManager::AddUserMode('a', new UserMode(UMODE_ADMIN));
+	ModeManager::AddUserMode('i', new UserMode(UMODE_INVIS));
+	ModeManager::AddUserMode('o', new UserMode(UMODE_OPER));
+	ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
+	ModeManager::AddUserMode('s', new UserMode(UMODE_SNOMASK));
+	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
+
+	/* b/e/I */
+	ModeManager::AddChannelMode('b', new ChannelModeBan());
+
+	/* v/h/o/a/q */
+	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, CUS_VOICE, '+'));
+	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, CUS_OP, '@', true));
+
+	/* Add channel modes */
+	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
+	ModeManager::AddChannelMode('j', new ChannelModeFlood());
+	ModeManager::AddChannelMode('k', new ChannelModeKey());
+	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
+	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
+	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
+	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
+	ModeManager::AddChannelMode('r', new ChannelModeRegistered());
+	ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
+	ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
+	ModeManager::AddChannelMode('M', new ChannelMode(CMODE_REGMODERATED));
+	ModeManager::AddChannelMode('O', new ChannelModeOper());
+	ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
+}
 
 class ProtoBahamut : public Module
 {
@@ -1051,23 +762,13 @@ class ProtoBahamut : public Module
 		pmodule_ircd_version("BahamutIRCd 1.4.*/1.8.*");
 		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
-		pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-		pmodule_ircd_cumodes(myCumodes);
-		pmodule_ircd_flood_mode_char_set("+j");
-		pmodule_ircd_flood_mode_char_remove("-j");
-		pmodule_ircd_cbmodes(myCbmodes);
-		pmodule_ircd_cmmodes(myCmmodes);
-		pmodule_ircd_csmodes(myCsmodes);
 		pmodule_ircd_useTSMode(0);
 
-		/** Deal with modes anope _needs_ to know **/
-		pmodule_invis_umode(UMODE_i);
-		pmodule_oper_umode(UMODE_o);
-		pmodule_invite_cmode(CMODE_i);
-		pmodule_secret_cmode(CMODE_s);
-		pmodule_private_cmode(CMODE_p);
-		pmodule_key_mode(CMODE_k);
-		pmodule_limit_mode(CMODE_l);
+		moduleAddModes();
+
+		ircd->DefMLock[(size_t)CMODE_NOEXTERNAL] = true;
+		ircd->DefMLock[(size_t)CMODE_TOPIC] = true;
+		ircd->DefMLock[(size_t)CMODE_REGISTERED] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

@@ -732,64 +732,6 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	return ret;
 }
 
-/**
- * Allow ircd protocol files to update the protect level info tables.
- **/
-void updateProtectDetails(const char *level_info_protect_word,
-						  const char *level_info_protectme_word,
-						  const char *fant_protect_add, const char *fant_protect_del,
-						  const char *level_protect_word, const char *protect_set_mode,
-						  const char *protect_unset_mode)
-{
-	int i = 0;
-	CSModeUtil ptr;
-	LevelInfo l_ptr;
-
-	ptr = csmodeutils[i];
-	while (ptr.name) {
-		if (strcmp(ptr.name, "PROTECT") == 0) {
-			csmodeutils[i].bsname = sstrdup(fant_protect_add);
-			csmodeutils[i].mode = sstrdup(protect_set_mode);
-		} else if (strcmp(ptr.name, "DEPROTECT") == 0) {
-			csmodeutils[i].bsname = sstrdup(fant_protect_del);
-			csmodeutils[i].mode = sstrdup(protect_unset_mode);
-		}
-		ptr = csmodeutils[++i];
-	}
-
-	i = 0;
-	l_ptr = levelinfo[i];
-	while (l_ptr.what != -1) {
-		if (l_ptr.what == CA_PROTECT) {
-			levelinfo[i].name = sstrdup(level_info_protect_word);
-		} else if (l_ptr.what == CA_PROTECTME) {
-			levelinfo[i].name = sstrdup(level_info_protectme_word);
-		} else if (l_ptr.what == CA_AUTOPROTECT) {
-			levelinfo[i].name = sstrdup(level_protect_word);
-		}
-		l_ptr = levelinfo[++i];
-	}
-}
-
-void updateOwnerDetails(const char *fant_owner_add, const char *fant_owner_del, const char *owner_set_mode, const char *owner_del_mode)
-{
-	CSModeUtil ptr;
-	int i = 0;
-
-	ptr = csmodeutils[i];
-	while (ptr.name) {
-		if (!strcmp(ptr.name, "OWNER")) {
-			csmodeutils[i].bsname = sstrdup(fant_owner_add);
-			csmodeutils[i].mode = sstrdup(owner_set_mode);
-		}
-		else if (!strcmp(ptr.name, "DEOWNER")) {
-			csmodeutils[i].bsname = sstrdup(fant_owner_del);
-			csmodeutils[i].mode = sstrdup(owner_del_mode);
-		}
-		ptr = csmodeutils[++i];
-	}
-}
-
 void Module::NoticeLang(char *source, User * u, int number, ...)
 {
 	va_list va;

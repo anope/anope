@@ -29,15 +29,7 @@ E char *uplink;
 
 E IRCDVar *ircd;
 E IRCDCAPAB *ircdcap;
-E char *flood_mode_char_set;
-E char *flood_mode_char_remove;
 E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
-EI unsigned long umodes[128];
-E char csmodes[128];
-E CMMode cmmodes[128];
-E CBMode cbmodes[128];
-E CBModeInfo *cbmodeinfos;
-E CUMode cumodes[128];
 E char *IRCDModule;
 E IRCDProto *ircdproto;
 
@@ -79,26 +71,10 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *
 
 E Channel *chanlist[1024];
 
-E void add_ban(Channel * chan, const char *mask);
 E void chan_adduser2(User * user, Channel * c);
-E void add_invite(Channel * chan, const char *mask);
 E void chan_delete(Channel * c);
-E void del_ban(Channel * chan, const char *mask);
-E void chan_set_key(Channel * chan, const char *value);
-E void set_limit(Channel * chan, const char *value);
-E void del_invite(Channel * chan, const char *mask);
-E char *get_key(Channel * chan);
-E char *get_limit(Channel * chan);
 E Channel *chan_create(const char *chan, time_t ts);
 E Channel *join_user_update(User * user, Channel * chan, const char *name, time_t chants);
-
-E void add_exception(Channel * chan, const char *mask);
-E void del_exception(Channel * chan, const char *mask);
-E char *get_flood(Channel * chan);
-E void set_flood(Channel * chan, const char *value);
-E char *get_redirect(Channel * chan);
-E void set_redirect(Channel * chan, const char *value);
-
 
 E void get_channel_stats(long *nrec, long *memuse);
 E Channel *findchan(const char *chan);
@@ -151,7 +127,6 @@ E long get_memuse(EList *list);
 /**** chanserv.c ****/
 
 E ChannelInfo *chanlists[256];
-E CSModeUtil csmodeutils[];
 E LevelInfo levelinfo[];
 
 E void get_chanserv_stats(long *nrec, long *memuse);
@@ -190,14 +165,6 @@ E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
 E AutoKick *is_stuck(ChannelInfo * ci, const char *mask);
 E void stick_mask(ChannelInfo * ci, AutoKick * akick);
 E void stick_all(ChannelInfo * ci);
-E char *cs_get_flood(ChannelInfo * ci);
-E void cs_set_flood(ChannelInfo * ci, const char *value);
-E char *cs_get_key(ChannelInfo * ci);
-E void cs_set_key(ChannelInfo * ci, const char *value);
-E char *cs_get_limit(ChannelInfo * ci);
-E void cs_set_limit(ChannelInfo * ci, const char *value);
-E char *cs_get_redirect(ChannelInfo * ci);
-E void cs_set_redirect(ChannelInfo * ci, const char *value);
 
 E int levelinfo_maxwidth;
 E ChannelInfo *makechan(const char *chan);
@@ -481,29 +448,7 @@ E void pmodule_ircd_proto(IRCDProto *);
 E void pmodule_ircd_var(IRCDVar * ircdvar);
 E void pmodule_ircd_cap(IRCDCAPAB * cap);
 E void pmodule_ircd_version(const char *version);
-E void pmodule_ircd_cbmodeinfos(CBModeInfo * modeinfos);
-E void pmodule_ircd_cumodes(CUMode modes[128]);
-E void pmodule_ircd_flood_mode_char_set(const char *mode);
-E void pmodule_ircd_flood_mode_char_remove(const char *mode);
-E void pmodule_ircd_cbmodes(CBMode modes[128]);
-E void pmodule_ircd_cmmodes(CMMode modes[128]);
-E void pmodule_ircd_csmodes(char mode[128]);
 E void pmodule_ircd_useTSMode(int use);
-E void pmodule_invis_umode(int mode);
-E void pmodule_oper_umode(int mode);
-E void pmodule_invite_cmode(int mode);
-E void pmodule_secret_cmode(int mode);
-E void pmodule_private_cmode(int mode);
-E void pmodule_key_mode(int mode);
-E void pmodule_limit_mode(int mode);
-
-E int anope_get_secret_mode();
-E int anope_get_invite_mode();
-E int anope_get_key_mode();
-E int anope_get_limit_mode();
-E int anope_get_private_mode();
-E int anope_get_invis_mode();
-E int anope_get_oper_mode();
 
 /**** language.c ****/
 
@@ -735,8 +680,6 @@ E void SetOperType(NickCore *nc);
 E SList akills, sglines, sqlines, szlines;
 
 E int DefConModesSet;
-E uint32 DefConModesOn;
-E uint32 DefConModesOff;
 E ChannelInfo DefConModesCI;
 
 E void operserv(User *u, char *buf);

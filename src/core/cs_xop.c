@@ -498,7 +498,7 @@ class CSXOP : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(CHANSERV, new CommandCSAOP());
-		if (ircd->halfop)
+		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 			this->AddCommand(CHANSERV, new CommandCSHOP());
 		this->AddCommand(CHANSERV, new CommandCSSOP());
 		this->AddCommand(CHANSERV, new CommandCSVOP());
@@ -507,7 +507,7 @@ class CSXOP : public Module
 	{
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
-		if (ircd->halfop)
+		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HOP);
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOP);
 	}

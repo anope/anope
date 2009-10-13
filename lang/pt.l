@@ -4096,10 +4096,6 @@ CHAN_HELP_CMD_OWNER
 	    OWNER      Concede-lhe status de Owner no canal
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Protege um determinado nick no canal
-CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protege um determinado nick no canal
-CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Desprotege um determinado nick no canal
 CHAN_HELP_CMD_DEOP
 	    DEOP       Retira o status de OP de um nick no canal
 

@@ -29,7 +29,6 @@ class CommandCSForbid : public Command
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		Channel *c;
-		Entry *cur, *enext;
 
 		if (ForceForbidReason && !reason)
 		{
@@ -78,24 +77,8 @@ class CommandCSForbid : public Command
 
 			/* Before banning everyone, it might be prudent to clear +e and +I lists.. 
 			 * to prevent ppl from rejoining.. ~ Viper */
-			if (ircd->except && c->excepts && c->excepts->count) {
-				for (cur = c->excepts->entries; cur; cur = enext) {
-					enext = cur->next;
-					av[0] = "-e";
-					av[1] = cur->mask;
-					ircdproto->SendMode(whosends(ci), chan, "-e %s", cur->mask);
-					chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
-				}
-			}
-			if (ircd->invitemode && c->invites && c->invites->count) {
-				for (cur = c->invites->entries; cur; cur = enext) {
-					enext = cur->next;
-					av[0] = "-I";
-					av[1] = cur->mask;
-					ircdproto->SendMode(whosends(ci), chan, "-I %s", cur->mask);
-					chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
-				}
-			}
+			c->ClearExcepts();
+			c->ClearInvites();
 
 			for (cu = c->users; cu; cu = nextu)
 			{

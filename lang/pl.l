@@ -5199,12 +5199,6 @@ CHAN_HELP_CMD_OWNER
 CHAN_HELP_CMD_PROTECT
 	    PROTECT     Chroni wskazan± osobê
 
-CHAN_HELP_CMD_ADMIN
-	    ADMIN       Chroni wskazan± osobê
-
-CHAN_HELP_CMD_DEADMIN
-	    DEADMIN     Wy³±cza ochronê wskazanej osoby
-
 CHAN_HELP_CMD_DEOP
 	    DEOP        Odbiera wskazanej osobie uprawnienia operatora
 

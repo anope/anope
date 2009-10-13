@@ -1112,13 +1112,6 @@ int destroyMessage(Message *m);					/* destroy a Message*/
 
 MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
 
-/*************************************************************************/
-/* Some IRCD protocol module support functions */
-
-/** Update the protect deatials, could be either protect or admin etc.. */
-MDE void updateProtectDetails(const char *level_info_protect_word, const char *level_info_protectme_word, const char *fant_protect_add, const char *fant_protect_del, const char *level_protect_word, const char *protect_set_mode, const char *protect_unset_mode);
-MDE void updateOwnerDetails(const char *fant_owner_add, const char *fant_owner_del, const char *owner_set_mode, const char *owner_del_mode);
-
 /************************************************************************/
 
 #endif

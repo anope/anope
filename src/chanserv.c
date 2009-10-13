@@ -104,21 +104,6 @@ LevelInfo levelinfo[] = {
 };
 int levelinfo_maxwidth = 0;
 
-CSModeUtil csmodeutils[] = {
-	{ "DEOP",	  "deop",	 "-o", CI_OPNOTICE, CA_OPDEOP,  CA_OPDEOPME },
-	{ "OP",		"op",	   "+o", CI_OPNOTICE, CA_OPDEOP,  CA_OPDEOPME },
-	{ "DEVOICE",   "devoice",  "-v", 0,		   CA_VOICE,   CA_VOICEME  },
-	{ "VOICE",	 "voice",	"+v", 0,		   CA_VOICE,   CA_VOICEME  },
-	{ "DEHALFOP",  "dehalfop", "-h", 0,		   CA_HALFOP,  CA_HALFOPME },
-	{ "HALFOP",	"halfop",   "+h", 0,		   CA_HALFOP,  CA_HALFOPME },
-	/* These get set later */
-	{ "DEPROTECT", "",		 "",   0,		   CA_PROTECT, CA_PROTECTME },
-	{ "PROTECT",   "",		 "",   0,		   CA_PROTECT, CA_PROTECTME },
-	{ "DEOWNER",	"",		"",		0,		ACCESS_FOUNDER,		ACCESS_FOUNDER},
-	{ "OWNER",		"",		"",		0,		ACCESS_FOUNDER,		ACCESS_FOUNDER},
-	{ NULL }
-};
-
 /*************************************************************************/
 
 void moduleAddChanServCmds() {
@@ -156,53 +141,67 @@ class ChanServTimer : public Timer
 char *get_mlock_modes(ChannelInfo * ci, int complete)
 {
 	static char res[BUFSIZE];
+	char *end, *value;
+	ChannelMode *cm;
+	ChannelModeParam *cmp;
+	std::map<char, ChannelMode *>::iterator it;
+	std::string param;
 
-	char *end = res;
+	memset(&res, '\0', sizeof(res));
+	end = res;
 
-	if (ci->mlock_on || ci->mlock_off) {
-		unsigned int n = 0;
-		CBModeInfo *cbmi = cbmodeinfos;
-
-		if (ci->mlock_on) {
+	if (ci->mlock_on.count() || ci->mlock_off.count())
+	{
+		if (ci->mlock_on.count())
+		{
 			*end++ = '+';
-			n++;
 
-			do {
-				if (ci->mlock_on & cbmi->flag)
-					*end++ = cbmi->mode;
-			} while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+			{
+				cm = it->second;
 
-			cbmi = cbmodeinfos;
+				if (ci->HasMLock(cm->Name, true))
+					*end++ = it->first;
+			}
 		}
 
-		if (ci->mlock_off) {
+		if (ci->mlock_off.count())
+		{
 			*end++ = '-';
-			n++;
 
-			do {
-				if (ci->mlock_off & cbmi->flag)
-					*end++ = cbmi->mode;
-			} while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+			{
+				cm = it->second;
 
-			cbmi = cbmodeinfos;
+				if (ci->HasMLock(cm->Name, false))
+					*end++ = it->first;
+			}
 		}
 
-		if (ci->mlock_on && complete) {
-			do {
-				if (cbmi->csgetvalue && (ci->mlock_on & cbmi->flag)) {
-					char *value = cbmi->csgetvalue(ci);
+		if (ci->mlock_on.count() && complete)
+		{
+			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+			{
+				cm = it->second;
 
-					if (value) {
+				if (cm->Type == MODE_PARAM)
+				{
+					cmp = static_cast<ChannelModeParam *>(cm);
+
+					ci->GetParam(cmp->Name, &param);
+
+					if (!param.empty())
+					{
+						value = const_cast<char *>(param.c_str());
+
 						*end++ = ' ';
 						while (*value)
 							*end++ = *value++;
 					}
 				}
-			} while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+			}
 		}
 	}
-
-	*end = 0;
 
 	return res;
 }
@@ -216,6 +215,7 @@ void get_chanserv_stats(long *nrec, long *memuse)
 	long count = 0, mem = 0;
 	unsigned i, j;
 	ChannelInfo *ci;
+	std::string param;
 
 	for (i = 0; i < 256; i++) {
 		for (ci = chanlists[i]; ci; ci = ci->next) {
@@ -239,16 +239,16 @@ void get_chanserv_stats(long *nrec, long *memuse)
 				if (ci->akick[j].creator)
 					mem += strlen(ci->akick[j].creator) + 1;
 			}
-			if (ci->mlock_key)
-				mem += strlen(ci->mlock_key) + 1;
-			if (ircd->fmode) {
-				if (ci->mlock_flood)
-					mem += strlen(ci->mlock_flood) + 1;
-			}
-			if (ircd->Lmode) {
-				if (ci->mlock_redirect)
-					mem += strlen(ci->mlock_redirect) + 1;
-			}
+
+			if (ci->GetParam(CMODE_KEY, &param))
+				mem += param.length() + 1;
+
+			if (ci->GetParam(CMODE_FLOOD, &param))
+				mem += param.length() + 1;
+
+			if (ci->GetParam(CMODE_REDIRECT, &param))
+				mem += param.length() + 1;
+
 			if (ci->last_topic)
 				mem += strlen(ci->last_topic) + 1;
 			if (ci->entry_message)
@@ -477,12 +477,40 @@ void load_cs_dbase()
 				ci->akick = NULL;
 			}
 
-			SAFE(read_int32(&ci->mlock_on, f));
-			SAFE(read_int32(&ci->mlock_off, f));
-			SAFE(read_int32(&ci->mlock_limit, f));
-			SAFE(read_string(&ci->mlock_key, f));
-			SAFE(read_string(&ci->mlock_flood, f));
-			SAFE(read_string(&ci->mlock_redirect, f));
+			//SAFE(read_int32(&ci->mlock_on, f));
+			//SAFE(read_int32(&ci->mlock_off, f));
+			// Clearly this doesn't work
+			SAFE(read_int32(&tmp32, f));
+			SAFE(read_int32(&tmp32, f));
+
+			SAFE(read_int32(&tmp32, f));
+			if (tmp32)
+			{
+				std::ostringstream limit;
+				limit << tmp32;
+				ci->SetParam(CMODE_LIMIT, limit.str());
+			}
+
+			SAFE(read_string(&s, f));
+			if (s)
+			{
+				ci->SetParam(CMODE_KEY, std::string(s));
+				delete [] s;
+			}
+
+			SAFE(read_string(&s, f));
+			if (s)
+			{
+				ci->SetParam(CMODE_FLOOD, std::string(s));
+				delete [] s;
+			}
+
+			SAFE(read_string(&s, f));
+			if (s)
+			{
+				ci->SetParam(CMODE_REDIRECT, std::string(s));
+				delete [] s;
+			}
 
 			SAFE(read_int16(&tmp16, f));
 			if (tmp16) ci->memos.memos.resize(tmp16);
@@ -598,6 +626,7 @@ void save_cs_dbase()
 	unsigned i, j;
 	ChannelInfo *ci;
 	static time_t lastwarn = 0;
+	std::string param;
 
 	if (!(f = open_db(s_ChanServ, ChanDBName, "w", CHAN_VERSION)))
 		return;
@@ -661,12 +690,24 @@ void save_cs_dbase()
 				}
 			}
 
-			SAFE(write_int32(ci->mlock_on, f));
-			SAFE(write_int32(ci->mlock_off, f));
-			SAFE(write_int32(ci->mlock_limit, f));
-			SAFE(write_string(ci->mlock_key, f));
-			SAFE(write_string(ci->mlock_flood, f));
-			SAFE(write_string(ci->mlock_redirect, f));
+			//SAFE(write_int32(ci->mlock_on, f));
+			//SAFE(write_int32(ci->mlock_off, f));
+			// Clearly this doesnt work
+			SAFE(write_int32(NULL, f));
+			SAFE(write_int32(NULL, f));
+
+			ci->GetParam(CMODE_LIMIT, &param);
+			SAFE(write_int32(param.empty() ? NULL : atoi(param.c_str()), f));
+
+			ci->GetParam(CMODE_KEY, &param);
+			SAFE(write_string(param.empty() ? NULL : param.c_str(), f));
+
+			ci->GetParam(CMODE_FLOOD, &param);
+			SAFE(write_string(param.empty() ? NULL : param.c_str(), f));
+
+			ci->GetParam(CMODE_REDIRECT, &param);
+			SAFE(write_string(param.empty() ? NULL : param.c_str(), f));
+
 			SAFE(write_int16(ci->memos.memos.size(), f));
 			SAFE(write_int16(ci->memos.memomax, f));
 			for (j = 0; j < ci->memos.memos.size(); j++) {
@@ -730,16 +771,18 @@ void save_cs_dbase()
 
 void check_modes(Channel * c)
 {
-	char modebuf[64], argbuf[BUFSIZE], *end = modebuf, *end2 = argbuf;
-	uint32 modes = 0;
+	time_t t = time(NULL);
 	ChannelInfo *ci;
-	CBModeInfo *cbmi;
-	CBMode *cbm;
+	ChannelMode *cm;
+	ChannelModeParam *cmp;
+	char modebuf[64], argbuf[BUFSIZE], *end = modebuf, *end2 = argbuf, *value, *csvalue;
+	std::map<char, ChannelMode *>::iterator it;
+	std::string param, ciparam;
 
-	if (!c) {
-		if (debug) {
+	if (!c)
+	{
+		if (debug)
 			alog("debug: check_modes called with NULL values");
-		}
 		return;
 	}
 
@@ -747,147 +790,135 @@ void check_modes(Channel * c)
 		return;
 
 	/* Check for mode bouncing */
-	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3) {
-		ircdproto->SendGlobops(NULL,
-						 "Warning: unable to set modes on channel %s.  "
-						 "Are your servers' U:lines configured correctly?",
-						 c->name);
+	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
+	{
+		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name);
 		alog("%s: Bouncy modes on channel %s", s_ChanServ, c->name);
 		c->bouncy_modes = 1;
 		return;
 	}
 
-	if (c->chanserv_modetime != time(NULL)) {
+	if (c->chanserv_modetime != time(NULL))
+	{
 		c->chanserv_modecount = 0;
-		c->chanserv_modetime = time(NULL);
+		c->chanserv_modetime = t;
 	}
 	c->chanserv_modecount++;
 
 	/* Check if the channel is registered; if not remove mode -r */
-	if (!(ci = c->ci)) {
-		if (ircd->regmode) {
-			if (c->mode & ircd->regmode) {
-				c->mode &= ~ircd->regmode;
-				ircdproto->SendMode(whosends(ci), c->name, "-r");
-			}
+	if (!(ci = c->ci))
+	{
+		if (c->HasMode(CMODE_REGISTERED))
+		{
+			c->RemoveMode(CMODE_REGISTERED);
+			ircdproto->SendMode(whosends(ci), c->name, "-r");
 		}
 		/* Channels that are not regged also need the defcon modes.. ~ Viper */
 		/* return; */
 	}
 
-	/* Initialize the modes-var to set all modes not set yet but which should
-	 * be set as by mlock and defcon.
-	 */
-	if (ci)
-		modes = ~c->mode & ci->mlock_on;
-	if (DefConModesSet)
-		modes |= (~c->mode & DefConModesOn);
-
-	/* Initialize the buffers */
 	*end++ = '+';
-	cbmi = cbmodeinfos;
 
-	do {
-		if (modes & cbmi->flag) {
-			*end++ = cbmi->mode;
-			c->mode |= cbmi->flag;
+	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+	{
+		cm = it->second;
+
+		/* If this channel does not have the mode and the mode is mlocked/defcon'd */
+		if (!c->HasMode(cm->Name) && (ci && ci->HasMLock(cm->Name, true)) || (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true)))
+		{
+			*end++ = it->first;
+			c->SetMode(cm->Name);
 
 			/* Add the eventual parameter and modify the Channel structure */
-			if (cbmi->getvalue && cbmi->csgetvalue) {
-				char *value;
-				/* Check if it's a defcon or mlock mode */
-				if (DefConModesOn & cbmi->flag)
-					value = cbmi->csgetvalue(&DefConModesCI);
+			if (cm->Type == MODE_PARAM)
+			{
+				cmp = static_cast<ChannelModeParam *>(cm);
+
+				param.clear();
+				if (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true))
+					DefConModesCI.GetParam(cmp->Name, &param);
 				else if (ci)
-					value = cbmi->csgetvalue(ci);
-				else {
-					value = NULL;
-					if (debug)
-						alog ("Warning: setting modes with unknown origin.");
-				}
+					ci->GetParam(cmp->Name, &param);
+				else
+					alog("Warning: Got no param for mode %c on channel %s but was expecting one", cmp->ModeChar, c->name);
 
-				cbm = &cbmodes[static_cast<int>(cbmi->mode)];
-				cbm->setvalue(c, value);
+				if (!param.empty())
+				{
+					value = const_cast<char *>(param.c_str());
 
-				if (value) {
 					*end2++ = ' ';
 					while (*value)
 						*end2++ = *value++;
 				}
 			}
-		} else if (cbmi->getvalue && cbmi->csgetvalue
-					&& ((ci && (ci->mlock_on & cbmi->flag))
-						|| (DefConModesOn & cbmi->flag))
-					&& (c->mode & cbmi->flag)) {
-			char *value = cbmi->getvalue(c);
-			char *csvalue;
+		}
+		/* If this is a param mode and its mlocked or defcon has it set negative */
+		else if (cm->Type == MODE_PARAM && c->HasMode(cm->Name) && (ci && ci->HasMLock(cm->Name, true) || (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true))))
+		{
+			cmp = static_cast<ChannelModeParam *>(cm);
 
-			/* Check if it's a defcon or mlock mode */
-			if (DefConModesOn & cbmi->flag)
-				csvalue = cbmi->csgetvalue(&DefConModesCI);
+			c->GetParam(cmp->Name, &param);
+
+			if (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true))
+				DefConModesCI.GetParam(cmp->Name, &ciparam);
 			else if (ci)
-				csvalue = cbmi->csgetvalue(ci);
-			else {
-				csvalue = NULL;
-				if (debug)
-					alog ("Warning: setting modes with unknown origin.");
-			}
+				ci->GetParam(cmp->Name, &ciparam);
+			else
+				alog("Warning: Got no param for mode %c on channel %s but was expecting one", cmp->ModeChar, c->name);
 
-			/* Lock and actual values don't match, so fix the mode */
-			if (value && csvalue && strcmp(value, csvalue)) {
-				*end++ = cbmi->mode;
+			if (!param.empty() && !ciparam.empty() && param != ciparam)
+			{
+				value = const_cast<char *>(param.c_str());
+				csvalue = const_cast<char *>(ciparam.c_str());
 
-				cbm = &cbmodes[static_cast<int>(cbmi->mode)];
-				cbm->setvalue(c, csvalue);
+				*end++ = it->first;
+
+				c->SetParam(cmp->Name, ciparam);
 
 				*end2++ = ' ';
 				while (*csvalue)
 					*end2++ = *csvalue++;
 			}
 		}
-	} while ((++cbmi)->flag != 0);
-
-	if (*(end - 1) == '+')
-		end--;
-
-	modes = 0;
-	if (ci) {
-		modes = c->mode & ci->mlock_off;
-		/* Make sure we don't remove a mode just set by defcon.. ~ Viper */
-		if (DefConModesSet)
-			modes &= ~(modes & DefConModesOn);
 	}
-	if (DefConModesSet)
-		modes |= c->mode & DefConModesOff;
 
-	if (modes) {
-		*end++ = '-';
-		cbmi = cbmodeinfos;
+	*end++ = '-';
 
-		do {
-			if (modes & cbmi->flag) {
-				*end++ = cbmi->mode;
-				c->mode &= ~cbmi->flag;
+	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+	{
+		cm = it->second;
 
-				/* Add the eventual parameter and clean up the Channel structure */
-				if (cbmi->getvalue) {
-					cbm = &cbmodes[static_cast<int>(cbmi->mode)];
+		/* If the channel has the mode */
+		if (c->HasMode(cm->Name) && (ci && ci->HasMLock(cm->Name, false)) || (DefConModesSet && DefConModesCI.HasMLock(cm->Name, false)))
+		{
+			*end++ = it->first;
+			c->RemoveMode(cm->Name);
 
-					if (!(cbm->flags & CBM_MINUS_NO_ARG)) {
-						char *value = cbmi->getvalue(c);
+			/* Add the eventual parameter */
+			if (cm->Type == MODE_PARAM)
+			{
+				cmp = static_cast<ChannelModeParam *>(cm);
 
-						if (value) {
-							*end2++ = ' ';
-							while (*value)
-								*end2++ = *value++;
-						}
+				if (!cmp->MinusNoArg)
+				{
+					c->GetParam(cmp->Name, &param);
+
+					if (!param.empty())
+					{
+						value = const_cast<char *>(param.c_str());
+
+						*end2++ = ' ';
+
+						while (*value)
+							*end++ = *value++;
 					}
-
-					cbm->setvalue(c, NULL);
 				}
 			}
-		} while ((++cbmi)->flag != 0);
+		}
 	}
+
+	if (*(end - 1) == '-')
+		end--;
 
 	if (end == modebuf)
 		return;
@@ -903,12 +934,13 @@ void check_modes(Channel * c)
 
 int check_valid_admin(User * user, Channel * chan, int servermode)
 {
+	ChannelMode *cm;
+
 	if (!chan || !chan->ci)
 		return 1;
 
-	if (!ircd->admin) {
+	if (!(cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
 		return 0;
-	}
 
 	/* They will be kicked; no need to deop, no need to update our internal struct too */
 	if (chan->ci->flags & CI_FORBIDDEN)
@@ -916,14 +948,14 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
 		notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
-		ircdproto->SendMode(whosends(chan->ci), chan->name, "%s %s",
-					   ircd->adminunset, user->nick);
+		ircdproto->SendMode(whosends(chan->ci), chan->name, "-%s %s",
+					   cm->ModeChar, user->nick);
 		return 0;
 	}
 
 	if (check_access(user, chan->ci, CA_AUTODEOP)) {
-		ircdproto->SendMode(whosends(chan->ci), chan->name, "%s %s",
-					   ircd->adminunset, user->nick);
+		ircdproto->SendMode(whosends(chan->ci), chan->name, "-%s %s",
+					   cm->ModeChar, user->nick);
 		return 0;
 	}
 
@@ -938,7 +970,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
 int check_valid_op(User * user, Channel * chan, int servermode)
 {
-	char *tmp;
+	ChannelMode *owner, *protect, *halfop;
 	if (!chan || !chan->ci)
 		return 1;
 
@@ -946,34 +978,37 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 	if (chan->ci->flags & CI_FORBIDDEN)
 		return 0;
 
+	owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
+	protect = ModeManager::FindChannelModeByName(CMODE_PROTECT);
+	halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
+
 	if (servermode && !check_access(user, chan->ci, CA_AUTOOP)) {
 		notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
-		if (ircd->halfop) {
-			if (ircd->owner && ircd->protect) {
+		if (halfop)
+		{
+			if (owner && protect)
+			{
 				if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-					tmp = stripModePrefix(ircd->ownerunset);
 					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "%so%s %s %s %s", ircd->adminunset,
-								   tmp, user->nick,
+								   "-%so%s %s %s %s", protect->ModeChar,
+								   owner->ModeChar, user->nick,
 								   user->nick, user->nick);
-					delete [] tmp;
 				} else {
-					tmp = stripModePrefix(ircd->ownerunset);
 					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "%sho%s %s %s %s %s",
-								   ircd->adminunset, tmp,
+								   "-%sho%s %s %s %s %s",
+								   protect->ModeChar,
+								   owner->ModeChar,
 								   user->nick, user->nick, user->nick,
 								   user->nick);
-					delete [] tmp;
 				}
-			} else if (!ircd->owner && ircd->protect) {
+			} else if (!owner && protect) {
 				if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
 					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "%so %s %s", ircd->adminunset,
+								   "-%so %s %s", protect->ModeChar,
 								   user->nick, user->nick);
 				} else {
 					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "%soh %s %s %s", ircd->adminunset,
+								   "-%soh %s %s %s", protect->ModeChar,
 								   user->nick, user->nick, user->nick);
 				}
 			} else {
@@ -993,14 +1028,12 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 	}
 
 	if (check_access(user, chan->ci, CA_AUTODEOP)) {
-		if (ircd->halfop) {
-			if (ircd->owner && ircd->protect) {
-				tmp = stripModePrefix(ircd->ownerunset);
+		if (halfop) {
+			if (owner && protect) {
 				ircdproto->SendMode(whosends(chan->ci), chan->name,
-							   "%sho%s %s %s %s %s", ircd->adminunset,
-							   tmp, user->nick, user->nick,
+							   "-%sho%s %s %s %s %s", protect->ModeChar,
+							   owner->ModeChar, user->nick, user->nick,
 							   user->nick, user->nick);
-				delete [] tmp;
 			} else {
 				ircdproto->SendMode(whosends(chan->ci), chan->name, "-ho %s %s",
 							   user->nick, user->nick);
@@ -1083,18 +1116,16 @@ int check_should_halfop(User * user, char *chan)
 
 int check_should_owner(User * user, char *chan)
 {
-	char *tmp;
 	ChannelInfo *ci = cs_findchan(chan);
+	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
 		|| (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))) {
-		tmp = stripModePrefix(ircd->ownerset);
-		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
+		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", cm->ModeChar, user->nick,
 					   user->nick);
-		delete [] tmp;
 		return 1;
 	}
 
@@ -1105,17 +1136,15 @@ int check_should_owner(User * user, char *chan)
 
 int check_should_protect(User * user, char *chan)
 {
-	char *tmp;
 	ChannelInfo *ci = cs_findchan(chan);
+	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOPROTECT)) {
-		tmp = stripModePrefix(ircd->adminset);
-		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
+		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", cm->ModeChar, user->nick,
 					   user->nick);
-		delete [] tmp;
 		return 1;
 	}
 
@@ -1181,7 +1210,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	 *
 	 * UltimateIRCd 3.x at least informs channel staff when a joining user is matching an exempt.
 	 */
-	if (ircd->except && is_excepted(ci, user) == 1) {
+	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, user) == 1) {
 		return 0;
 	}
 
@@ -1460,10 +1489,13 @@ void cs_remove_nick(const NickCore * nc)
 					}
 				} else {
 					alog("%s: Deleting channel %s owned by deleted nick %s", s_ChanServ, ci->name, nc->display);
-					if (ircd->regmode) {
+
+					if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
+					{
 						/* Maybe move this to delchan() ? */
-						if ((ci->c) && (ci->c->mode & ircd->regmode)) {
-							ci->c->mode &= ~ircd->regmode;
+						if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
+						{
+							ci->c->RemoveMode(CMODE_REGISTERED);
 							ircdproto->SendMode(whosends(ci), ci->name, "-r");
 						}
 					}
@@ -1752,16 +1784,6 @@ int delchan(ChannelInfo * ci)
 	if (ci->entry_message)
 		delete [] ci->entry_message;
 
-	if (ci->mlock_key)
-		delete [] ci->mlock_key;
-	if (ircd->fmode) {
-		if (ci->mlock_flood)
-			delete [] ci->mlock_flood;
-	}
-	if (ircd->Lmode) {
-		if (ci->mlock_redirect)
-			delete [] ci->mlock_redirect;
-	}
 	if (ci->last_topic)
 		delete [] ci->last_topic;
 	if (ci->forbidby)
@@ -1999,136 +2021,8 @@ int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen)
 	}
 }
 
-/*************************************************************************/
-
-char *cs_get_flood(ChannelInfo * ci)
-{
-	if (!ci) {
-		return NULL;
-	} else {
-		if (ircd->fmode)
-			return ci->mlock_flood;
-		else
-			return NULL;
-	}
-}
 
 /*************************************************************************/
-
-char *cs_get_key(ChannelInfo * ci)
-{
-	if (!ci) {
-		return NULL;
-	} else {
-		return ci->mlock_key;
-	}
-}
-
-/*************************************************************************/
-
-char *cs_get_limit(ChannelInfo * ci)
-{
-	static char limit[16];
-
-	if (!ci) {
-		return NULL;
-	}
-
-	if (ci->mlock_limit == 0)
-		return NULL;
-
-	snprintf(limit, sizeof(limit), "%lu",
-			 static_cast<unsigned long>(ci->mlock_limit));
-	return limit;
-}
-
-/*************************************************************************/
-
-char *cs_get_redirect(ChannelInfo * ci)
-{
-	if (!ci) {
-		return NULL;
-	} else {
-		if (ircd->Lmode)
-			return ci->mlock_redirect;
-		else
-			return NULL;
-	}
-}
-
-/*************************************************************************/
-
-void cs_set_flood(ChannelInfo * ci, const char *value)
-{
-	if (!ci) {
-		return;
-	}
-
-	if (ci->mlock_flood)
-		delete [] ci->mlock_flood;
-
-	/* This looks ugly, but it works ;) */
-	if (ircdproto->IsFloodModeParamValid(value)) {
-		ci->mlock_flood = sstrdup(value);
-	} else {
-		ci->mlock_on &= ~ircd->chan_fmode;
-		ci->mlock_flood = NULL;
-	}
-}
-
-/*************************************************************************/
-
-void cs_set_key(ChannelInfo * ci, const char *value)
-{
-	if (!ci) {
-		return;
-	}
-
-	if (ci->mlock_key)
-		delete [] ci->mlock_key;
-
-	/* Don't allow keys with a coma */
-	if (value && *value != ':' && !strchr(value, ',')) {
-		ci->mlock_key = sstrdup(value);
-	} else {
-		ci->mlock_on &= ~anope_get_key_mode();
-		ci->mlock_key = NULL;
-	}
-}
-
-/*************************************************************************/
-
-void cs_set_limit(ChannelInfo * ci, const char *value)
-{
-	if (!ci) {
-		return;
-	}
-
-	ci->mlock_limit = value ? strtoul(value, NULL, 10) : 0;
-
-	if (ci->mlock_limit <= 0)
-		ci->mlock_on &= ~anope_get_limit_mode();
-}
-
-/*************************************************************************/
-
-void cs_set_redirect(ChannelInfo * ci, const char *value)
-{
-	if (!ci) {
-		return;
-	}
-
-	if (ci->mlock_redirect)
-		delete [] ci->mlock_redirect;
-
-	/* Don't allow keys with a coma */
-	if (value && *value == '#') {
-		ci->mlock_redirect = sstrdup(value);
-	} else {
-		ci->mlock_on &= ~ircd->chan_lmode;
-		ci->mlock_redirect = NULL;
-	}
-}
 
 int get_access_level(ChannelInfo * ci, NickAlias * na)
 {
@@ -2150,13 +2044,15 @@ int get_access_level(ChannelInfo * ci, NickAlias * na)
 
 const char *get_xop_level(int level)
 {
+	ChannelMode *halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
+
 	if (level < ACCESS_VOP) {
 		return "Err";
-	} else if (ircd->halfop && level < ACCESS_HOP) {
+	} else if (halfop && level < ACCESS_HOP) {
 		return "VOP";
-	} else if (!ircd->halfop && level < ACCESS_AOP) {
+	} else if (!halfop && level < ACCESS_AOP) {
 		return "VOP";
-	} else if (ircd->halfop && level < ACCESS_AOP) {
+	} else if (halfop && level < ACCESS_AOP) {
 		return "HOP";
 	} else if (level < ACCESS_SOP) {
 		return "AOP";

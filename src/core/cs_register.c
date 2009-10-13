@@ -33,6 +33,7 @@ class CommandCSRegister : public Command
 		struct u_chaninfolist *uc;
 		char founderpass[PASSMAX];
 		char tmp_pass[PASSMAX];
+		ChannelMode *cm;
 
 		if (readonly)
 		{
@@ -83,7 +84,7 @@ class CommandCSRegister : public Command
 			ci->c = c;
 			ci->bantype = CSDefBantype;
 			ci->flags = CSDefFlags;
-			ci->mlock_on = ircd->defmlock;
+			ci->mlock_on = ircd->DefMLock;
 			ci->memos.memomax = MSMaxMemos;
 			ci->last_used = ci->time_registered;
 			ci->founder = u->nc;
@@ -116,10 +117,10 @@ class CommandCSRegister : public Command
 			/* Implement new mode lock */
 			check_modes(c);
 			/* On most ircds you do not receive the admin/owner mode till its registered */
-			if (ircd->admin)
-				ircdproto->SendMode(findbot(s_ChanServ), chan, "%s %s", ircd->adminset, u->nick);
-			if (ircd->owner && ircd->ownerset)
-				ircdproto->SendMode(findbot(s_ChanServ), chan, "%s %s", ircd->ownerset, u->nick);
+			if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
+				ircdproto->SendMode(findbot(s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
+			else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
+				ircdproto->SendMode(findbot(s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
 		}

@@ -4091,10 +4091,6 @@ CHAN_HELP_CMD_OWNER
 	    OWNER      Assegna lo stato di owner a un utente (+q)
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Assegna lo stato di protezione a un utente (+a)
-CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protegge un nick su un canale
-CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Sprotegge un nick su un canale
 CHAN_HELP_CMD_DEOP
 	    DEOP       Toglie lo stato di operatore a un utente (-o)
 

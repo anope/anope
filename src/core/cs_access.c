@@ -112,7 +112,7 @@ class CommandCSAccess : public Command
 		/* We still allow LIST in xOP mode, but not others */
 		else if ((ci->flags & CI_XOP) && !is_list)
 		{
-			if (ircd->halfop)
+			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
 			else
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP, s_ChanServ);

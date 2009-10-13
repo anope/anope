@@ -9,8 +9,13 @@
  *
  */
 
+#include "services.h"
+
 class CoreExport ChannelInfo : public Extensible
 {
+ private:
+	 std::map<ChannelModeName, std::string> Params;
+
  public:
 	ChannelInfo()
 	{
@@ -23,8 +28,7 @@ class CoreExport ChannelInfo : public Extensible
 		bantype = akickcount = 0;
 		levels = NULL;
 		akick = NULL;
-		mlock_on = mlock_off = mlock_limit = 0;
-		mlock_key = mlock_flood = mlock_redirect = entry_message = NULL;
+		entry_message = NULL;
 		c = NULL;
 		bi = NULL;
 		botflags = 0;
@@ -63,17 +67,14 @@ class CoreExport ChannelInfo : public Extensible
 	uint16 akickcount;
 	AutoKick *akick;			/* List of users to kickban */
 
-	uint32 mlock_on, mlock_off;		/* See channel modes below */
-	uint32 mlock_limit;			/* 0 if no limit */
-	char *mlock_key;			/* NULL if no key */
-	char *mlock_flood;			/* NULL if no +f */
-	char *mlock_redirect;		/* NULL if no +L */
+	std::bitset<128> mlock_on;
+	std::bitset<128> mlock_off;
 
 	char *entry_message;		/* Notice sent on entering channel */
 
 	MemoInfo memos;
 
-	struct channel_ *c;			/* Pointer to channel record (if   *
+	Channel *c;			/* Pointer to channel record (if   *
 					 			 *	channel is currently in use) */
 
 	/* For BotServ */
@@ -174,5 +175,119 @@ class CoreExport ChannelInfo : public Extensible
 	{
 		while (access.begin() != access.end())
 			EraseAccess(0);
+	}
+
+	/** Check if a mode is mlocked
+	 * @param Name The mode
+	 * @param status True to check mlock on, false for mlock off
+	 * @return true on success, false on fail
+	 */
+	const bool HasMLock(ChannelModeName Name, bool status)
+	{
+		if (status)
+			return mlock_on[(size_t)Name];
+		else
+			return mlock_off[(size_t)Name];
+	}
+
+	/** Set a mlock
+	 * @param Name The mode
+	 * @param status True for mlock on, false for mlock off
+	 */
+	void SetMLock(ChannelModeName Name, bool status)
+	{
+		size_t value = (size_t)Name;
+
+		if (status)
+			mlock_on[value] = true;
+		else
+			mlock_off[value] = true;
+	}
+
+	/** Remove a mlock
+	 * @param Name The mode
+	 * @param status True for mlock on, false for mlock off
+	 */
+	void RemoveMLock(ChannelModeName Name, bool status)
+	{
+		size_t value = (size_t)Name;
+
+		if (status)
+			mlock_on[value] = false;
+		else
+			mlock_off[value] = false;
+	}
+
+	/** Clear all mlocks on the channel
+	 */
+	void ClearMLock()
+	{
+		mlock_on.reset();
+		mlock_off.reset();
+	}
+
+	/** Set a channel mode param on the channel
+	 * @param Name The mode
+	 * @param param The param
+	 * @param true on success
+	 */
+	bool SetParam(ChannelModeName Name, std::string Value)
+	{
+		return Params.insert(std::make_pair(Name, Value)).second;
+	}
+
+	/** Unset a param from the channel
+	 * @param Name The mode
+	 */
+	void UnsetParam(ChannelModeName Name)
+	{
+		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+
+		if (it != Params.end())
+		{
+			Params.erase(it);
+		}
+	}
+
+	/** Get a param from the channel
+	 * @param Name The mode
+	 * @param Target a string to put the param into
+	 * @return true on success
+	 */
+	const bool GetParam(ChannelModeName Name, std::string *Target)
+	{
+		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+
+		(*Target).clear();
+
+		if (it != Params.end())
+		{
+			*Target = it->second;
+			return true;
+		}
+
+		return false;
+	}
+
+	/** Check if a mode is set and has a param
+	 * @param Name The mode
+	 */
+	const bool HasParam(ChannelModeName Name)
+	{
+		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+
+		if (it != Params.end())
+		{
+			return true;
+		}
+		
+		return false;
+	}
+
+	/** Clear all the params from the channel
+	 */
+	void ClearParams()
+	{
+		Params.clear();
 	}
 };

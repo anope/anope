@@ -4259,10 +4259,6 @@ CHAN_HELP_CMD_OWNER
 	    OWNER      Vous donne votre accès owner sur un canal
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Protège le pseudo spécifié sur un canal
-CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protège le pseudo spécifié sur un canal
-CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Deprotège le pseudo donné sur un canal
 CHAN_HELP_CMD_DEOP
 	    DEOP       Deop le pseudo spécifié sur un canal
 

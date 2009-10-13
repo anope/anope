@@ -47,9 +47,7 @@ class CommandCSEnforce : public Command
 
 	void DoModes(Channel *c)
 	{
-		CBMode *cbm;
-
-		if ((cbm = &cbmodes[static_cast<int>('R')])->flag && (c->mode & cbm->flag))
+		if (c->HasMode(CMODE_REGISTEREDONLY))
 			this->DoCModeR(c);
 	}
 
@@ -140,7 +138,6 @@ class CommandCSEnforce : public Command
 		const char *reason;
 		const char *av[3];
 		User *u;
-		CBMode *cbm;
 
 		if (!(ci = c->ci))
 			return;
@@ -159,7 +156,7 @@ class CommandCSEnforce : public Command
 				get_idealban(ci, u, mask, sizeof(mask));
 				av[1] = mask;
 				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
-				if (!(cbm = &cbmodes[static_cast<int>('R')])->flag || !(c->mode & cbm->flag))
+				if (!c->HasMode(CMODE_REGISTERED))
 				{
 					ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask, time(NULL));
 					chan_set_modes(s_ChanServ, c, 2, av, 1);
@@ -234,7 +231,7 @@ class CommandCSEnforce : public Command
 		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
 		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
 		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-		if (cbmodes[static_cast<int>('R')].flag)
+		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
 		else
 			me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);

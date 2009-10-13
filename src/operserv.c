@@ -1275,17 +1275,14 @@ int defconParseModeString(const char *str)
 {
 	int add = -1;			   /* 1 if adding, 0 if deleting, -1 if neither */
 	unsigned char mode;
-	CBMode *cbm;
+	ChannelMode *cm;
+	ChannelModeParam *cmp;
 	char *str_copy = sstrdup(str);	  /* We need this copy as str is const -GD */
 	char *param;				/* Store parameters during mode parsing */
 
 	/* Reinitialize everything */
 	DefConModesOn = 0;
 	DefConModesOff = 0;
-	DefConModesCI.mlock_limit = 0;
-	DefConModesCI.mlock_key = NULL;
-	DefConModesCI.mlock_flood = NULL;
-	DefConModesCI.mlock_redirect = NULL;
 
 	/* Initialize strtok() internal buffer */
 	strtok(str_copy, " ");
@@ -1304,32 +1301,55 @@ int defconParseModeString(const char *str)
 				continue;
 		}
 
-		if (static_cast<int>(mode) < 128 && (cbm = &cbmodes[static_cast<int>(mode)])->flag != 0) {
-			if (cbm->flags & CBM_NO_MLOCK) {
-				alog("DefConChanModes mode character '%c' cannot be locked", mode);
+		if ((cm = ModeManager::FindChannelModeByChar(mode)))
+		{
+			if (!cm->CanSet(NULL))
+			{
+				alog("DefConCHanModes mode character '%c' cannot be locked", mode);
 				delete [] str_copy;
 				return 0;
-			} else if (add) {
-				DefConModesOn |= cbm->flag;
-				DefConModesOff &= ~cbm->flag;
-				if (cbm->cssetvalue) {
-					if (!(param = strtok(NULL, " "))) {
+			}
+			else if (add)
+			{
+				DefConModesCI.SetMLock(cm->Name, true);
+				DefConModesCI.RemoveMLock(cm->Name, false);
+
+				if (cm->Type == MODE_PARAM)
+				{
+					cmp = static_cast<ChannelModeParam *>(cm);
+
+					if (!(param = strtok(NULL, " ")))
+					{
 						alog("DefConChanModes mode character '%c' has no parameter while one is expected", mode);
 						delete [] str_copy;
 						return 0;
 					}
-					cbm->cssetvalue(&DefConModesCI, param);
+
+					if (!cmp->IsValid(param))
+						continue;
+
+					DefConModesCI.SetParam(cmp->Name, param);
 				}
-			} else {
-				DefConModesOff |= cbm->flag;
-				if (DefConModesOn & cbm->flag) {
-					DefConModesOn &= ~cbm->flag;
-					if (cbm->cssetvalue) {
-						cbm->cssetvalue(&DefConModesCI, NULL);
+			}
+			else
+			{
+				DefConModesCI.RemoveMLock(cm->Name, true);
+				
+				if (DefConModesCI.HasMLock(cm->Name, true))
+				{
+					DefConModesCI.RemoveMLock(cm->Name, true);
+
+					if (cm->Type == MODE_PARAM)
+					{
+						cmp = static_cast<ChannelModeParam *>(cm);
+
+						DefConModesCI.UnsetParam(cmp->Name);
 					}
 				}
 			}
-		} else {
+		}
+		else
+		{
 			alog("DefConChanModes unknown mode character '%c'", mode);
 			delete [] str_copy;
 			return 0;
@@ -1338,13 +1358,13 @@ int defconParseModeString(const char *str)
 
 	delete [] str_copy;
 
-	if (ircd->Lmode) {
+	if ((cm = ModeManager::FindChannelModeByName(CMODE_REDIRECT)))
+	{
 		/* We can't mlock +L if +l is not mlocked as well. */
-		if ((DefConModesOn & ircd->chan_lmode)
-			&& !(DefConModesOn & anope_get_limit_mode())) {
-			DefConModesOn &= ~ircd->chan_lmode;
-			delete [] DefConModesCI.mlock_redirect;
-			DefConModesCI.mlock_redirect = NULL;
+		if (DefConModesCI.HasMLock(cm->Name, true) && !DefConModesCI.HasMLock(CMODE_LIMIT, true))
+		{
+			DefConModesCI.RemoveMLock(CMODE_REDIRECT, true);
+			DefConModesCI.UnsetParam(CMODE_REDIRECT);
 			alog("DefConChanModes must lock mode +l as well to lock mode +L");
 			return 0;
 		}
@@ -1352,10 +1372,11 @@ int defconParseModeString(const char *str)
 
 	/* Some ircd we can't set NOKNOCK without INVITE */
 	/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
-	if (ircd->noknock && ircd->knock_needs_i) {
-		if ((DefConModesOn & ircd->noknock)
-			&& !(DefConModesOn & anope_get_invite_mode())) {
-			DefConModesOn &= ~ircd->noknock;
+	if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)))
+	{
+		if (DefConModesCI.HasMLock(cm->Name, true) && !DefConModesCI.HasMLock(CMODE_INVITE, true))
+		{
+			DefConModesCI.RemoveMLock(CMODE_NOKNOCK, true);
 			alog("DefConChanModes must lock mode +i as well to lock mode +K");
 			return 0;
 		}

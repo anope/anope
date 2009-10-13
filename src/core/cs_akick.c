@@ -229,7 +229,8 @@ class CommandCSAKick : public Command
 			}
 
 			/* Check excepts BEFORE we get this far */
-			if (ircd->except) {
+			if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
+			{
 				if (is_excepted_mask(ci, mask) == 1) {
 					notice_lang(s_ChanServ, u, CHAN_EXCEPTED, mask, chan);
 					if (freemask)

@@ -772,12 +772,19 @@ void bot_join(ChannelInfo * ci)
 			}
 		}
 
+		std::string Limit;
+		int limit = 0;
+		if (ci->c->GetParam(CMODE_LIMIT, &Limit))
+		{
+			limit = atoi(Limit.c_str());
+		}
+
 		/* Should we be invited? */
-		if ((ci->c->mode & anope_get_invite_mode())
-			|| (ci->c->limit && ci->c->usercount >= ci->c->limit))
+		if (ci->c->HasMode(CMODE_INVITE)
+			|| (limit && ci->c->usercount >= limit))
 			ircdproto->SendNoticeChanops(NULL, ci->c->name,
-								 "%s invited %s into the channel.",
-								 ci->bi->nick, ci->bi->nick);
+				 "%s invited %s into the channel.",
+				 ci->bi->nick, ci->bi->nick);
 	}
 	ircdproto->SendJoin(ci->bi, ci->c->name, ci->c->creation_time);
 	ircdproto->SendBotOp(ci->bi->nick, ci->c->name);
@@ -877,7 +884,8 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	if (!u)
 		return;
 
-	if (ircd->protectedumode) {
+	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
+	{
 		if (is_protected(u) && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
 							  getstring(ACCESS_DENIED));
@@ -889,7 +897,8 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 		&& (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
-	if (ircd->except) {
+	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
+	{
 		if (is_excepted(ci, u) == 1) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
 							  getstring(BOT_EXCEPT));
@@ -953,7 +962,8 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	if (!u || !is_on_chan(ci->c, u))
 		return;
 
-	if (ircd->protectedumode) {
+	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
+	{
 		if (is_protected(u) && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
 							  getstring(ACCESS_DENIED));
@@ -1007,7 +1017,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 
 	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 
-	if (ircd->protectedumode) {
+	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED))) {
 		if (is_protected(u) && *mode == '-' && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
 							  getstring(ACCESS_DENIED));

@@ -4262,11 +4262,6 @@ CHAN_HELP_CMD_OWNER
 	    OWNER      Gibt dir Gründer Staus in einen Channel
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Schützt den angegebenen Nicknamen in einen Channel
-CHAN_HELP_CMD_ADMIN
-	    ADMIN      Schützt den angegebenen Nicknamen in einen Channel
-CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Entfernt den Schutz des angegebenen Nicknamens 
-	               in einen Channel
 CHAN_HELP_CMD_DEOP
 	    DEOP       Enfernt den OP-Status des angegebenen Nicknamens
 	               in einen Channel

@@ -26,12 +26,14 @@ class CommandOSChanList : public Command
 	{
 		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
 		ci::string opt = params.size() > 1 ? params[1] : "";
-
-		int modes = 0;
+		std::list<ChannelModeName> Modes;
 		User *u2;
 
 		if (!opt.empty() && opt == "SECRET")
-			modes |= (anope_get_secret_mode() | anope_get_private_mode());
+		{
+			Modes.push_back(CMODE_SECRET);
+			Modes.push_back(CMODE_PRIVATE);
+		}
 
 		if (pattern && (u2 = finduser(pattern)))
 		{
@@ -41,8 +43,15 @@ class CommandOSChanList : public Command
 
 			for (uc = u2->chans; uc; uc = uc->next)
 			{
-				if (modes && !(uc->chan->mode & modes))
-					continue;
+				if (!Modes.empty())
+				{
+					for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
+					{
+						if (!uc->chan->HasMode(*it))
+							continue;
+					}
+				}
+
 				notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, uc->chan->name, uc->chan->usercount, chan_get_modes(uc->chan, 1, 1), uc->chan->topic ? uc->chan->topic : "");
 			}
 		}
@@ -59,8 +68,14 @@ class CommandOSChanList : public Command
 				{
 					if (pattern && !Anope::Match(c->name, pattern, false))
 						continue;
-					if (modes && !(c->mode & modes))
-						continue;
+					if (!Modes.empty())
+					{
+						for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
+						{
+							if (!c->HasMode(*it))
+								continue;
+						}
+					}
 					notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, c->name, c->usercount, chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
 				}
 			}

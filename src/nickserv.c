@@ -1408,7 +1408,7 @@ int should_mode_change(int16 status, int16 mode)
 			return 1;
 			break;
 		case CUS_OWNER:
-			if (ircd->owner)
+			if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 			{
 				if (status & CUS_OWNER)
 				{
@@ -1417,7 +1417,7 @@ int should_mode_change(int16 status, int16 mode)
 			}
 			break;
 		case CUS_PROTECT:
-			if (ircd->protect)
+			if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
 			{
 				if (status & CUS_PROTECT)
 				{

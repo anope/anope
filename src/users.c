@@ -44,9 +44,9 @@ User::User(const std::string &snick, const std::string &suid)
 	nc = NULL;
 	chans = NULL;
 	founder_chans = NULL;
-	invalid_pw_count = timestamp = my_signon = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
+	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
-
+	
 	strscpy(this->nick, snick.c_str(), NICKMAX);
 	this->uid = suid;
 	list = &userlist[HASH(this->nick)];
@@ -130,7 +130,7 @@ const std::string User::GetDisplayedHost() const
 {
 	if (ircd->vhost && this->vhost)
 		return this->vhost;
-	else if (ircd->vhostmode && (this->mode & ircd->vhostmode) && !this->GetCloakedHost().empty())
+	else if (this->HasMode(UMODE_CLOAK) && !this->GetCloakedHost().empty())
 		return this->GetCloakedHost();
 	else
 		return this->host;
@@ -178,7 +178,7 @@ void User::SetVIdent(const std::string &sident)
 
 const std::string &User::GetVIdent() const
 {
-	if (ircd->vhostmode && (this->mode & ircd->vhostmode))
+	if (this->HasMode(UMODE_CLOAK))
 		return this->vident;
 	else if (ircd->vident && !this->vident.empty())
 		return this->vident;
@@ -200,7 +200,6 @@ const std::string &User::GetIdent() const
 {
 	return this->ident;
 }
-
 
 void User::SetRealname(const std::string &srealname)
 {
@@ -474,6 +473,57 @@ User *finduser(const char *nick)
 		alog("debug: finduser(%s) -> 0x%p", nick, static_cast<void *>(user));
 	FOREACH_MOD(I_OnFindUser, OnFindUser(user));
 	return user;
+}
+
+/** Check if the user has a mode
+ * @param Name Mode name
+ * @return true or false
+ */
+const bool User::HasMode(UserModeName Name) const
+{
+	return modes[(size_t)Name];
+}
+
+/** Set a mode on the user
+ * @param Name The mode name
+ */
+void User::SetMode(UserModeName Name)
+{
+	modes[(size_t)Name] = true;
+}
+
+/* Set a mode on the user
+ * @param ModeChar The mode char
+ */
+void User::SetMode(char ModeChar)
+{
+	UserMode *um;
+
+	if ((um = ModeManager::FindUserModeByChar(ModeChar)))
+	{
+		SetMode(um->Name);
+	}
+}
+
+/** Remove a mode from the user
+ * @param Name The mode name
+ */
+void User::RemoveMode(UserModeName Name)
+{
+	modes[(size_t)Name] = false;
+}
+
+/** Remove a mode from the user
+ * @param ModeChar The mode char
+ */
+void User::RemoveMode(char ModeChar)
+{
+	UserMode *um;
+
+	if ((um = ModeManager::FindUserModeByChar(ModeChar)))
+	{
+		RemoveMode(um->Name);
+	}
 }
 
 
@@ -944,11 +994,10 @@ void do_kill(const char *nick, const char *msg)
 
 int is_protected(User * user)
 {
-	if (ircd->protectedumode) {
-		return (user->mode & ircd->protectedumode);
-	} else {
-		return 0;
-	}
+	if (user && user->HasMode(UMODE_PROTECTED))
+		return 1;
+
+	return 0;
 }
 
 /*************************************************************************/
@@ -957,11 +1006,10 @@ int is_protected(User * user)
 
 int is_oper(User * user)
 {
-	if (user) {
-		return (user->mode & anope_get_oper_mode());
-	} else {
-		return 0;
-	}
+	if (user && user->HasMode(UMODE_OPER))
+		return 1;
+
+	return 0;
 }
 
 /*************************************************************************/
@@ -970,7 +1018,7 @@ int is_oper(User * user)
 /* Is the given user ban-excepted? */
 int is_excepted(ChannelInfo * ci, User * user)
 {
-	if (!ci->c || !ircd->except)
+	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 		return 0;
 
 	if (elist_match_user(ci->c->excepts, user))
@@ -984,7 +1032,7 @@ int is_excepted(ChannelInfo * ci, User * user)
 /* Is the given MASK ban-excepted? */
 int is_excepted_mask(ChannelInfo * ci, const char *mask)
 {
-	if (!ci->c || !ircd->except)
+	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 		return 0;
 
 	if (elist_match_mask(ci->c->excepts, mask, 0))

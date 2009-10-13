@@ -16,107 +16,26 @@
 #include "services.h"
 #include "pseudo.h"
 
-
-/* User Modes */
-#define UMODE_a 0x00000001  /* a Services Admin */
-#define UMODE_h 0x00000002  /* h Available for help (HelpOp) */
-#define UMODE_i 0x00000004  /* i Invisible (not shown in /who) */
-#define UMODE_o 0x00000008  /* o Global IRC Operator */
-#define UMODE_r 0x00000010  /* r Identifies the nick as being registered  */
-#define UMODE_w 0x00000020  /* w Can listen to wallop messages */
-#define UMODE_A 0x00000040  /* A Server Admin */
-#define UMODE_N 0x00000080  /* N Network Administrator */
-#define UMODE_O 0x00000100  /* O Local IRC Operator */
-#define UMODE_C 0x00000200  /* C Co-Admin */
-#define UMODE_d 0x00000400  /* d Makes it so you can not receive channel PRIVMSGs */
-#define UMODE_p 0x00000800  /* Hides the channels you are in in a /whois reply  */
-#define UMODE_q 0x00001000  /* q Only U:Lines can kick you (Services Admins Only) */
-#define UMODE_s 0x00002000  /* s Can listen to server notices  */
-#define UMODE_t 0x00004000  /* t Says you are using a /vhost  */
-#define UMODE_v 0x00008000  /* v Receives infected DCC Send Rejection notices */
-#define UMODE_z 0x00010000  /* z Indicates that you are an SSL client */
-#define UMODE_B 0x00020000  /* B Marks you as being a Bot */
-#define UMODE_G 0x00040000  /* G Filters out all the bad words per configuration */
-#define UMODE_H 0x00080000  /* H Hide IRCop Status (IRCop Only) */
-#define UMODE_S 0x00100000  /* S services client */
-#define UMODE_V 0x00200000  /* V Marks you as a WebTV user */
-#define UMODE_W 0x00400000  /* W Lets you see when people do a /whois on you */
-#define UMODE_T 0x00800000  /* T Prevents you from receiving CTCPs  */
-#define UMODE_g 0x20000000  /* g Can send & read globops and locops */
-#define UMODE_x 0x40000000  /* x Gives user a hidden hostname */
-#define UMODE_R 0x80000000  /* Allows you to only receive PRIVMSGs/NOTICEs from registered (+r) users */
-
-
-/*************************************************************************/
-
-/* Channel Modes */
-
-#define CMODE_i 0x00000001
-#define CMODE_m 0x00000002
-#define CMODE_n 0x00000004
-#define CMODE_p 0x00000008
-#define CMODE_s 0x00000010
-#define CMODE_t 0x00000020
-#define CMODE_k 0x00000040		/* These two used only by ChanServ */
-#define CMODE_l 0x00000080
-#define CMODE_R 0x00000100		/* Only identified users can join */
-#define CMODE_r 0x00000200		/* Set for all registered channels */
-#define CMODE_c 0x00000400
-#define CMODE_A 0x00000800
-/* #define CMODE_H 0x00001000   Was now +I may not join, but Unreal Removed it and it will not set in 3.2 */
-#define CMODE_K 0x00002000
-#define CMODE_L 0x00004000
-#define CMODE_O 0x00008000
-#define CMODE_Q 0x00010000
-#define CMODE_S 0x00020000
-#define CMODE_V 0x00040000
-#define CMODE_f 0x00080000
-#define CMODE_G 0x00100000
-#define CMODE_C 0x00200000
-#define CMODE_u 0x00400000
-#define CMODE_z 0x00800000
-#define CMODE_N 0x01000000
-#define CMODE_T 0x02000000
-#define CMODE_M 0x04000000
-
-
-/* Default Modes with MLOCK */
-
-#define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
-
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",		/* ircd name */
 	 "+Soi",					/* Modes used by pseudoclients */
 	 5,						 /* Chan Max Symbols	 */
-	 "-cilmnpstuzACGHKMNOQRSTV",		/* Modes to Remove */
 	 "+ao",					 /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 1,						 /* Vhost  */
-	 1,						 /* Has Owner */
-	 "+q",					  /* Mode to set for an owner */
-	 "-q",					  /* Mode to unset for an owner */
-	 "+a",					  /* Mode to set for channel admin */
-	 "-a",					  /* Mode to unset for channel admin */
 	 "-r+d",				 /* Mode on UnReg */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
-	 1,						 /* Supports Halfop +h   */
 	 3,						 /* Number of server args */
 	 0,						 /* Join 2 Set		   */
 	 0,						 /* Join 2 Message	   */
-	 1,						 /* Has exceptions +e	*/
 	 1,						 /* TS Topic Forward	 */
 	 0,						 /* TS Topci Backward	*/
-	 UMODE_S,				   /* Protected Umode	  */
-	 0,						 /* Has Admin			*/
 	 0,						 /* Chan SQlines		 */
 	 0,						 /* Quit on Kill		 */
 	 1,						 /* SVSMODE unban		*/
-	 1,						 /* Has Protect		  */
 	 1,						 /* Reverse			  */
-	 1,						 /* Chan Reg			 */
-	 CMODE_r,				   /* Channel Mode		 */
 	 1,						 /* vidents			  */
 	 1,						 /* svshold			  */
 	 1,						 /* time stamp on mode   */
@@ -125,28 +44,18 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 1,						 /* VHOST ON NICK		*/
 	 1,						 /* Change RealName	  */
-	 CMODE_K,				   /* No Knock			 */
-	 CMODE_A,				   /* Admin Only		   */
-	 DEFAULT_MLOCK,			 /* Default MLOCK	   */
-	 UMODE_x,				   /* Vhost Mode		   */
-	 1,						 /* +f				   */
-	 1,						 /* +L				   */
-	 CMODE_f,				   /* +f Mode						  */
-	 CMODE_L,				   /* +L Mode						  */
+	 0,
 	 0,						 /* On nick change check if they could be identified */
 	 1,						 /* No Knock requires +i */
 	 NULL,					  /* CAPAB Chan Modes			 */
 	 1,						 /* We support Unreal TOKENS */
 	 1,						 /* TIME STAMPS are BASE64 */
-	 1,						 /* +I support */
 	 '&',					   /* SJOIN ban char */
 	 '\"',					  /* SJOIN except char */
 	 '\'',					  /* SJOIN invite char */
 	 1,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
-	 "x",					   /* vhost char */
 	 0,						 /* ts6 */
-	 1,						 /* support helper umode */
 	 0,						 /* p10 */
 	 NULL,					  /* character set */
 	 0,						 /* CIDR channelbans */
@@ -191,271 +100,6 @@ IRCDCAPAB myIrcdcap[] = {
 	 CAPAB_NICKCHARS,
 	 }
 };
-
-
-unsigned long umodes[128] = {
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused, Unused, Horzontal Tab */
-	0, 0, 0,					/* Line Feed, Unused, Unused */
-	0, 0, 0,					/* Carriage Return, Unused, Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused */
-	0, 0, 0,					/* Unused, Unused, Space */
-	0, 0, 0,					/* ! " #  */
-	0, 0, 0,					/* $ % &  */
-	0, 0, 0,					/* ! ( )  */
-	0, 0, 0,					/* * + ,  */
-	0, 0, 0,					/* - . /  */
-	0, 0,					   /* 0 1 */
-	0, 0,					   /* 2 3 */
-	0, 0,					   /* 4 5 */
-	0, 0,					   /* 6 7 */
-	0, 0,					   /* 8 9 */
-	0, 0,					   /* : ; */
-	0, 0, 0,					/* < = > */
-	0, 0,					   /* ? @ */
-	UMODE_A, UMODE_B, UMODE_C,  /* A B C */
-	0, 0, 0,					/* D E F */
-	UMODE_G, UMODE_H, 0,		/* G H I */
-	0, 0, 0,					/* J K L */
-	0, UMODE_N, UMODE_O,		/* M N O */
-	0, 0, UMODE_R,			  /* P Q R */
-	UMODE_S, UMODE_T, 0,		/* S T U */
-	UMODE_V, UMODE_W, 0,		/* V W X */
-	0,						  /* Y */
-	0,						  /* Z */
-	0, 0, 0,					/* [ \ ] */
-	0, 0, 0,					/* ^ _ ` */
-	UMODE_a, 0, 0,			  /* a b c */
-	UMODE_d, 0, 0,			  /* d e f */
-	UMODE_g, UMODE_h, UMODE_i,  /* g h i */
-	0, 0, 0,					/* j k l */
-	0, 0, UMODE_o,			  /* m n o */
-	UMODE_p, UMODE_q, UMODE_r,  /* p q r */
-	UMODE_s, UMODE_t, 0,		/* s t u */
-	UMODE_v, UMODE_w, UMODE_x,  /* v w x */
-	0,						  /* y */
-	UMODE_z,					/* z */
-	0, 0, 0,					/* { | } */
-	0, 0						/* ~ � */
-};
-
-char myCsmodes[128] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	0,
-	0,
-	0, 0, 0,
-	'h',						/* (37) % Channel halfops */
-	'b',						/* (38) & bans */
-	0, 0, 0,
-	'q',
-
-	'v', 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	'o', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'a', 0
-};
-
-CMMode myCmmodes[128] = {
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL},	 /* BCD */
-	{NULL}, {NULL}, {NULL},	 /* EFG */
-	{NULL},					 /* H */
-	{add_invite, del_invite},   /* I */
-	{NULL},					 /* J */
-	{NULL}, {NULL}, {NULL},	 /* KLM */
-	{NULL}, {NULL}, {NULL},	 /* NOP */
-	{NULL}, {NULL}, {NULL},	 /* QRS */
-	{NULL}, {NULL}, {NULL},	 /* TUV */
-	{NULL}, {NULL}, {NULL},	 /* WXY */
-	{NULL},					 /* Z */
-	{NULL}, {NULL},			 /* (char 91 - 92) */
-	{NULL}, {NULL}, {NULL},	 /* (char 93 - 95) */
-	{NULL},					 /* ` (char 96) */
-	{NULL},					 /* a (char 97) */
-	{add_ban, del_ban},		 /* b */
-	{NULL}, {NULL},			 /* cd */
-	{add_exception, del_exception},
-	{NULL}, {NULL},
-	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}
-};
-
-CBMode myCbmodes[128] = {
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0},
-	{CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL},
-	{0},						/* B */
-	{CMODE_C, 0, NULL, NULL},   /* C */
-	{0},						/* D */
-	{0},						/* E */
-	{0},						/* F */
-	{CMODE_G, 0, NULL, NULL},   /* G */
-	{0},						/* H */
-	{0},						/* I */
-	{0},						/* J */
-	{CMODE_K, 0, NULL, NULL},   /* K */
-	{CMODE_L, 0, set_redirect, cs_set_redirect},
-	{CMODE_M, 0, NULL, NULL},   /* M */
-	{CMODE_N, 0, NULL, NULL},   /* N */
-	{CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
-	{0},						/* P */
-	{CMODE_Q, 0, NULL, NULL},   /* Q */
-	{CMODE_R, 0, NULL, NULL},   /* R */
-	{CMODE_S, 0, NULL, NULL},   /* S */
-	{CMODE_T, 0, NULL, NULL},   /* T */
-	{0},						/* U */
-	{CMODE_V, 0, NULL, NULL},   /* V */
-	{0},						/* W */
-	{0},						/* X */
-	{0},						/* Y */
-	{0},						/* Z */
-	{0}, {0}, {0}, {0}, {0}, {0},
-	{0},						/* a */
-	{0},						/* b */
-	{CMODE_c, 0, NULL, NULL},
-	{0},						/* d */
-	{0},						/* e */
-	{CMODE_f, 0, set_flood, cs_set_flood},
-	{0},						/* g */
-	{0},						/* h */
-	{CMODE_i, 0, NULL, NULL},
-	{0},						/* j */
-	{CMODE_k, 0, chan_set_key, cs_set_key},
-	{CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
-	{CMODE_m, 0, NULL, NULL},
-	{CMODE_n, 0, NULL, NULL},
-	{0},						/* o */
-	{CMODE_p, 0, NULL, NULL},
-	{0},						/* q */
-	{CMODE_r, CBM_NO_MLOCK, NULL, NULL},
-	{CMODE_s, 0, NULL, NULL},
-	{CMODE_t, 0, NULL, NULL},
-	{CMODE_u, 0, NULL, NULL},
-	{0},						/* v */
-	{0},						/* w */
-	{0},						/* x */
-	{0},						/* y */
-	{CMODE_z, 0, NULL, NULL},
-	{0}, {0}, {0}, {0}
-};
-
-CBModeInfo myCbmodeinfos[] = {
-	{'c', CMODE_c, 0, NULL, NULL},
-	{'f', CMODE_f, 0, get_flood, cs_get_flood},
-	{'i', CMODE_i, 0, NULL, NULL},
-	{'k', CMODE_k, 0, get_key, cs_get_key},
-	{'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
-	{'m', CMODE_m, 0, NULL, NULL},
-	{'n', CMODE_n, 0, NULL, NULL},
-	{'p', CMODE_p, 0, NULL, NULL},
-	{'r', CMODE_r, 0, NULL, NULL},
-	{'s', CMODE_s, 0, NULL, NULL},
-	{'t', CMODE_t, 0, NULL, NULL},
-	{'u', CMODE_u, 0, NULL, NULL},
-	{'z', CMODE_z, 0, NULL, NULL},
-	{'A', CMODE_A, 0, NULL, NULL},
-	{'C', CMODE_C, 0, NULL, NULL},
-	{'G', CMODE_G, 0, NULL, NULL},
-	{'K', CMODE_K, 0, NULL, NULL},
-	{'L', CMODE_L, 0, get_redirect, cs_get_redirect},
-	{'M', CMODE_M, 0, NULL, NULL},
-	{'N', CMODE_N, 0, NULL, NULL},
-	{'O', CMODE_O, 0, NULL, NULL},
-	{'Q', CMODE_Q, 0, NULL, NULL},
-	{'R', CMODE_R, 0, NULL, NULL},
-	{'S', CMODE_S, 0, NULL, NULL},
-	{'T', CMODE_T, 0, NULL, NULL},
-	{'V', CMODE_V, 0, NULL, NULL},
-	{0}
-};
-
-CUMode myCumodes[128] = {
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-
-	{0},
-
-	{CUS_PROTECT, CUF_PROTECT_BOTSERV, check_valid_op},
-	{0},						/* b */
-	{0},						/* c */
-	{0},						/* d */
-	{0},						/* e */
-	{0},						/* f */
-	{0},						/* g */
-	{CUS_HALFOP, 0, check_valid_op},
-	{0},						/* i */
-	{0},						/* j */
-	{0},						/* k */
-	{0},						/* l */
-	{0},						/* m */
-	{0},						/* n */
-	{CUS_OP, CUF_PROTECT_BOTSERV, check_valid_op},
-	{0},						/* p */
-	{CUS_OWNER, 0, check_valid_op},
-	{0},						/* r */
-	{0},						/* s */
-	{0},						/* t */
-	{0},						/* u */
-	{CUS_VOICE, 0, NULL},
-	{0},						/* w */
-	{0},						/* x */
-	{0},						/* y */
-	{0},						/* z */
-	{0}, {0}, {0}, {0}, {0}
-};
-
 
 /* svswatch
  * parv[0] - sender
@@ -535,14 +179,10 @@ class UnrealIRCdProto : public IRCDProto
 		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
 
 		while (*modes) {
-			uint32 backup = user->mode;
-
-			/* This looks better, much better than "add ? (do_add) : (do_remove)".
-			 * At least this is readable without paying much attention :) -GD */
 			if (add)
-				user->mode |= umodes[static_cast<int>(*modes)];
+				user->SetMode(*modes);
 			else
-				user->mode &= ~umodes[static_cast<int>(*modes)];
+				user->RemoveMode(*modes);
 
 			switch (*modes++)
 			{
@@ -557,9 +197,11 @@ class UnrealIRCdProto : public IRCDProto
 						break;
 					if (isdigit(*av[1]))
 					{
-						//user->svid = strtoul(av[1], NULL, 0);
-						user->mode = backup;  /* Ugly fix, but should do the job ~ Viper */
-						continue; // +d was setting a service stamp, ignore the usermode +-d.
+						/* +d was setting a service stamp, ignore the usermode +d */
+						if (add)
+							user->RemoveMode('d');
+						else
+							user->SetMode('d');
 					}
 					break;
 				case 'o':
@@ -573,7 +215,7 @@ class UnrealIRCdProto : public IRCDProto
 				case 'r':
 					if (add && !nick_identified(user)) {
 						common_svsmode(user, "-r", NULL);
-						user->mode &= ~UMODE_r;
+						user->RemoveMode('r');
 					}
 					break;
 				case 't':
@@ -872,38 +514,6 @@ class UnrealIRCdProto : public IRCDProto
 	void SendEOB()
 	{
 		send_cmd(ServerName, "ES");
-	}
-
-
-	/* check if +f mode is valid for the ircd */
-	/* borrowed part of the new check from channels.c in Unreal */
-	int IsFloodModeParamValid(const char *value)
-	{
-		char *dp, *end;
-		/* NEW +F */
-		char xbuf[256], *p, *p2, *x = xbuf + 1;
-		int v;
-		if (!value) return 0;
-		if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-		else {
-			/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
-			strncpy(xbuf, value, sizeof(xbuf));
-			p2 = strchr(xbuf + 1, ']');
-			if (!p2) return 0;
-			*p2 = '\0';
-			if (*(p2 + 1) != ':') return 0;
-			for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
-				/* <number><1 letter>[optional: '#'+1 letter] */
-				p = x;
-				while (isdigit(*p)) ++p;
-				if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't')) continue; /* continue instead of break for forward compatability. */
-				*p = '\0';
-				v = atoi(x);
-				if (v < 1 || v > 999) return 0;
-				++p;
-			}
-			return 1;
-		}
 	}
 
 	/*
@@ -1216,7 +826,7 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 	 * to the sethost value (which really is their vhost) and clear the chost.
 	 * The chost will be request later (if needed) - Adam
 	 */
-	if (u->mode & UMODE_t)
+	if (u->HasMode(UMODE_VHOST))
 	{
 		u->SetDisplayedHost(av[0]);
 		u->chost.clear();
@@ -1440,9 +1050,6 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 void moduleAddIRCDMsgs() {
 	Message *m;
 
-	updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
-	updateOwnerDetails("OWNER", "DEOWNER", ircd->ownerset, ircd->ownerunset);
-
 	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
 	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
 	m = createMessage("6",		anope_event_away); addCoreMessage(IRCD,m);
@@ -1512,6 +1119,106 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("+",		 m_version); addCoreMessage(IRCD,m);
 }
 
+/* Borrowed part of this check from UnrealIRCd */
+bool ChannelModeFlood::IsValid(const char *value)
+{
+	char *dp, *end;
+	/* NEW +F */
+	char xbuf[256], *p, *p2, *x = xbuf + 1;
+	int v;
+	if (!value) return 0;
+	if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+	else {
+		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
+		strncpy(xbuf, value, sizeof(xbuf));
+		p2 = strchr(xbuf + 1, ']');
+		if (!p2) return 0;
+		*p2 = '\0';
+		if (*(p2 + 1) != ':') return 0;
+		for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
+			/* <number><1 letter>[optional: '#'+1 letter] */
+			p = x;
+			while (isdigit(*p)) ++p;
+			if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't')) continue; /* continue instead of break for forward compatability. */
+			*p = '\0';
+			v = atoi(x);
+			if (v < 1 || v > 999) return 0;
+			++p;
+		}
+		return 1;
+	}
+}
+
+void moduleAddModes()
+{
+	/* Add user modes */
+	ModeManager::AddUserMode('A', new UserMode(UMODE_SERV_ADMIN));
+	ModeManager::AddUserMode('B', new UserMode(UMODE_BOT));
+	ModeManager::AddUserMode('C', new UserMode(UMODE_CO_ADMIN));
+	ModeManager::AddUserMode('G', new UserMode(UMODE_FILTER));
+	ModeManager::AddUserMode('H', new UserMode(UMODE_HIDEOPER));
+	ModeManager::AddUserMode('N', new UserMode(UMODE_NETADMIN));
+	ModeManager::AddUserMode('R', new UserMode(UMODE_REGPRIV));
+	ModeManager::AddUserMode('S', new UserMode(UMODE_PROTECTED));
+	ModeManager::AddUserMode('T', new UserMode(UMODE_NO_CTCP));
+	ModeManager::AddUserMode('V', new UserMode(UMODE_WEBTV));
+	ModeManager::AddUserMode('W', new UserMode(UMODE_WHOIS));
+	ModeManager::AddUserMode('a', new UserMode(UMODE_ADMIN));
+	ModeManager::AddUserMode('d', new UserMode(UMODE_DEAF));
+	ModeManager::AddUserMode('g', new UserMode(UMODE_GLOBOPS));
+	ModeManager::AddUserMode('h', new UserMode(UMODE_HELPOP));
+	ModeManager::AddUserMode('i', new UserMode(UMODE_INVIS));
+	ModeManager::AddUserMode('o', new UserMode(UMODE_OPER));
+	ModeManager::AddUserMode('p', new UserMode(UMODE_PRIV));
+	ModeManager::AddUserMode('q', new UserMode(UMODE_GOD));
+	ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
+	ModeManager::AddUserMode('s', new UserMode(UMODE_SNOMASK));
+	ModeManager::AddUserMode('t', new UserMode(UMODE_VHOST));
+	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
+	ModeManager::AddUserMode('x', new UserMode(UMODE_CLOAK));
+	ModeManager::AddUserMode('z', new UserMode(UMODE_SSL));
+
+	/* b/e/I */
+	ModeManager::AddChannelMode('b', new ChannelModeBan());
+	ModeManager::AddChannelMode('e', new ChannelModeExcept());
+	ModeManager::AddChannelMode('I', new ChannelModeInvite());
+
+	/* v/h/o/a/q */
+	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, CUS_VOICE, '+'));
+	ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, CUS_HALFOP, '%'));
+	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, CUS_OP, '@', true));
+	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, CUS_PROTECT, '&', true));
+	/* Unreal sends +q as * */
+	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, CUS_OWNER, '*'));
+
+	/* Add channel modes */
+	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+	ModeManager::AddChannelMode('f', new ChannelModeFlood());
+	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
+	ModeManager::AddChannelMode('k', new ChannelModeKey());
+	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
+	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
+	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
+	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
+	ModeManager::AddChannelMode('r', new ChannelModeRegistered());
+	ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
+	ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
+	ModeManager::AddChannelMode('u', new ChannelMode(CMODE_AUDITORIUM));
+	ModeManager::AddChannelMode('z', new ChannelMode(CMODE_SSL));
+	ModeManager::AddChannelMode('A', new ChannelModeAdmin());
+	ModeManager::AddChannelMode('C', new ChannelMode(CMODE_NOCTCP));
+	ModeManager::AddChannelMode('G', new ChannelMode(CMODE_FILTER));
+	ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
+	ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT));
+	ModeManager::AddChannelMode('M', new ChannelMode(CMODE_REGMODERATED));
+	ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
+	ModeManager::AddChannelMode('O', new ChannelModeOper());
+	ModeManager::AddChannelMode('Q', new ChannelMode(CMODE_NOKICK));
+	ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
+	ModeManager::AddChannelMode('S', new ChannelMode(CMODE_STRIPCOLOR));
+	ModeManager::AddChannelMode('T', new ChannelMode(CMODE_NONOTICE));
+	ModeManager::AddChannelMode('V', new ChannelMode(CMODE_NOINVITE));
+}
 
 class ProtoUnreal : public Module
 {
@@ -1525,23 +1232,13 @@ class ProtoUnreal : public Module
 		pmodule_ircd_version("UnrealIRCd 3.2+");
 		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
-		pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-		pmodule_ircd_cumodes(myCumodes);
-		pmodule_ircd_flood_mode_char_set("+f");
-		pmodule_ircd_flood_mode_char_remove("-f");
-		pmodule_ircd_cbmodes(myCbmodes);
-		pmodule_ircd_cmmodes(myCmmodes);
-		pmodule_ircd_csmodes(myCsmodes);
 		pmodule_ircd_useTSMode(0);
 
-		/** Deal with modes anope _needs_ to know **/
-		pmodule_invis_umode(UMODE_i);
-		pmodule_oper_umode(UMODE_o);
-		pmodule_invite_cmode(CMODE_i);
-		pmodule_secret_cmode(CMODE_s);
-		pmodule_private_cmode(CMODE_p);
-		pmodule_key_mode(CMODE_k);
-		pmodule_limit_mode(CMODE_l);
+		moduleAddModes();
+
+		ircd->DefMLock[(size_t)CMODE_NOEXTERNAL] = true;
+		ircd->DefMLock[(size_t)CMODE_TOPIC] = true;
+		ircd->DefMLock[(size_t)CMODE_REGISTERED] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

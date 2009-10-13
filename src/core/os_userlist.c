@@ -26,12 +26,13 @@ class CommandOSUserList : public Command
 	{
 		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
 		ci::string opt = params.size() > 1 ? params[1] : "";
-
 		Channel *c;
-		int modes = 0;
+		std::list<UserModeName> Modes;
 
 		if (!opt.empty() && opt == "INVISIBLE")
-			modes |= anope_get_invis_mode();
+		{
+			Modes.push_back(UMODE_INVIS);
+		}
 
 		if (pattern && (c = findchan(pattern)))
 		{
@@ -41,8 +42,14 @@ class CommandOSUserList : public Command
 
 			for (cu = c->users; cu; cu = cu->next)
 			{
-				if (modes && !(cu->user->mode & modes))
-					continue;
+				if (!Modes.empty())
+				{
+					for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
+					{
+						if (!cu->user->HasMode(*it))
+							continue;
+					}
+				}
 				notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick, cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
 			}
 		}
@@ -63,8 +70,14 @@ class CommandOSUserList : public Command
 						snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 						if (!Anope::Match(mask, pattern, false))
 							continue;
-						if (modes && !(u2->mode & modes))
-							continue;
+						if (!Modes.empty())
+						{
+							for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
+							{
+								if (!u2->HasMode(*it))
+									continue;
+							}
+						}
 					}
 					notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 				}

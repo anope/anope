@@ -9,8 +9,6 @@
  *
  */
 
-#include "services.h"
-
 class CoreExport ChannelInfo : public Extensible
 {
  private:
@@ -280,7 +278,7 @@ class CoreExport ChannelInfo : public Extensible
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 

@@ -21,7 +21,7 @@ ConfigReader::~ConfigReader()
 {
 	if (this->errorlog)
 		delete this->errorlog;
-	if(this->privatehash)
+	if (this->privatehash)
 		delete this->data;
 }
 
@@ -34,7 +34,10 @@ std::string ConfigReader::ReadValue(const std::string &tag, const std::string &n
 {
 	/* Don't need to strlcpy() tag and name anymore, ReadConf() takes const char* */
 	std::string result;
-	if (!serverConfig.ConfValue(*this->data, tag, name, default_value, index, result, allow_linefeeds)) this->error = CONF_VALUE_NOT_FOUND;
+
+	if (!serverConfig.ConfValue(*this->data, tag, name, default_value, index, result, allow_linefeeds))
+		this->error = CONF_VALUE_NOT_FOUND;
+
 	return result;
 }
 
@@ -56,14 +59,19 @@ bool ConfigReader::ReadFlag(const std::string &tag, const std::string &name, int
 int ConfigReader::ReadInteger(const std::string &tag, const std::string &name, const std::string &default_value, int index, bool need_positive)
 {
 	int result;
-	if (!serverConfig.ConfValueInteger(*this->data, tag, name, default_value, index, result)) {
+
+	if (!serverConfig.ConfValueInteger(*this->data, tag, name, default_value, index, result))
+	{
 		this->error = CONF_VALUE_NOT_FOUND;
 		return 0;
 	}
-	if (need_positive && result < 0) {
+
+	if (need_positive && result < 0)
+	{
 		this->error = CONF_INT_NEGATIVE;
 		return 0;
 	}
+
 	return result;
 }
 

@@ -276,12 +276,10 @@ void ServerConfig::ClearStack()
 bool ServerConfig::CheckOnce(const char *tag)
 {
 	int count = ConfValueEnum(config_data, tag);
-	if (count > 1) {
-		throw ConfigException(static_cast<std::string>("You have more than one <") + tag + "> tag, this is not permitted.");
-	}
-	if (count < 1) {
-		throw ConfigException(static_cast<std::string>("You have not defined a <") + tag + "> tag, this is required.");
-	}
+	if (count > 1)
+		throw ConfigException(std::string("You have more than one <") + tag + "> tag, this is not permitted.");
+	if (count < 1)
+		throw ConfigException(std::string("You have not defined a <") + tag + "> tag, this is required.");
 	return true;
 }
 
@@ -297,8 +295,9 @@ bool DoneConfItem(ServerConfig *, const char *)
 
 void ServerConfig::ValidateNoSpaces(const char *p, const std::string &tag, const std::string &val)
 {
-	for (const char *ptr = p; *ptr; ++ptr) if (*ptr == ' ') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-		"> cannot contain spaces");
+	for (const char *ptr = p; *ptr; ++ptr)
+		if (*ptr == ' ')
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> cannot contain spaces");
 }
 
 /* NOTE: Before anyone asks why we're not using inet_pton for this, it is because inet_pton and friends do not return so much detail,
@@ -309,19 +308,30 @@ void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::
 {
 	int num_dots = 0, num_seps = 0;
 	bool not_numbers = false, not_hex = false;
-	if (*p) {
-		if (*p == '.') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not an IP address");
-		for (const char *ptr = p; *ptr; ++ptr) {
-			if (wild && (*ptr == '*' || *ptr == '?' || *ptr == '/')) continue;
-			if (*ptr != ':' && *ptr != '.') {
-				if (*ptr < '0' || *ptr > '9') {
+
+	if (*p)
+	{
+		if (*p == '.')
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not an IP address");
+
+		for (const char *ptr = p; *ptr; ++ptr)
+		{
+			if (wild && (*ptr == '*' || *ptr == '?' || *ptr == '/'))
+				continue;
+
+			if (*ptr != ':' && *ptr != '.')
+			{
+				if (*ptr < '0' || *ptr > '9')
+				{
 					not_numbers = true;
-					if (toupper(*ptr) < 'A' || toupper(*ptr) > 'F') not_hex = true;
+					if (toupper(*ptr) < 'A' || toupper(*ptr) > 'F')
+						not_hex = true;
 				}
 			}
-			switch (*ptr) {
+			switch (*ptr)
+			{
 				case ' ':
-					throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not an IP address");
+					throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not an IP address");
 				case '.':
 					++num_dots;
 					break;
@@ -329,71 +339,83 @@ void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::
 					++num_seps;
 			}
 		}
-		if (num_dots > 3) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-			"> is an IPv4 address with too many fields!");
-		if (num_seps > 8) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-			"> is an IPv6 address with too many fields!");
-		if (!num_seps && num_dots < 3 && !wild) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-			"> looks to be a malformed IPv4 address");
-		if (!num_seps && num_dots == 3 && not_numbers) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-			"> contains non-numeric characters in an IPv4 address");
-		if (num_seps && not_hex) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-			"> contains non-hexdecimal characters in an IPv6 address");
-		if (num_seps && num_dots != 3 && num_dots && !wild) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
-			"> is a malformed IPv6 4in6 address");
+		if (num_dots > 3)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is an IPv4 address with too many fields!");
+
+		if (num_seps > 8)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is an IPv6 address with too many fields!");
+
+		if (!num_seps && num_dots < 3 && !wild)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> looks to be a malformed IPv4 address");
+
+		if (!num_seps && num_dots == 3 && not_numbers)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> contains non-numeric characters in an IPv4 address");
+
+		if (num_seps && not_hex)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> contains non-hexdecimal characters in an IPv6 address");
+
+		if (num_seps && num_dots != 3 && num_dots && !wild)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is a malformed IPv6 4in6 address");
 	}
 }
 
 void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const std::string &val)
 {
-	if (!strcasecmp(p, "localhost")) return;
+	if (!strcasecmp(p, "localhost"))
+		return;
+
 	int num_dots = 0;
-	if (*p) {
-		if (*p == '.') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");
-		for (const char *ptr = p; *ptr; ++ptr) {
-			switch (*ptr) {
+	if (*p)
+	{
+		if (*p == '.')
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
+		for (const char *ptr = p; *ptr; ++ptr)
+		{
+			switch (*ptr)
+			{
 				case ' ':
-					throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");
+					throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 				case '.':
 					++num_dots;
 			}
 		}
-		if (!num_dots) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");
+		if (!num_dots)
+			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 	}
-}
-
-bool ValidateMaxTargets(ServerConfig *, const char *, const char *, ValueItem &data)
-{
-	if (data.GetInteger() < 0 || data.GetInteger() > 31) {
-		alog("WARNING: <options:maxtargets> value is greater than 31 or less than 0, set to 20.");
-		data.Set(20);
-	}
-	return true;
 }
 
 bool ValidateNotEmpty(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty!");
+	if (data.GetValue().empty())
+		throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty!");
 	return true;
 }
 
 bool ValidateNotZero(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero!");
+	if (!data.GetInteger())
+		throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero!");
 	return true;
 }
 
 bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (NSEmailReg) {
-		if (static_cast<std::string>(value) == "prenickdatabase") {
-			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail registrations are enabled!");
+	if (NSEmailReg)
+	{
+		if (std::string(value) == "prenickdatabase")
+		{
+			if (data.GetValue().empty())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when e-mail registrations are enabled!");
 		}
-		else if (static_cast<std::string>(value) == "preregexpire") {
-			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
+		else if (std::string(value) == "preregexpire")
+		{
+			if (!data.GetInteger())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
 		}
-		else {
-			if (!data.GetBool()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be set to yes when e-mail registrations are enabled!");
+		else
+		{
+			if (!data.GetBool())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be set to yes when e-mail registrations are enabled!");
 		}
 	}
 	return true;
@@ -402,9 +424,10 @@ bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueI
 bool ValidatePort(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
 	int port = data.GetInteger();
-	if (!port) return true;
-	if (port < 1 || port > 65535) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value +
-		"> is not a value port, it must be between 1 and 65535!");
+	if (!port)
+		return true;
+	if (port < 1 || port > 65535)
+		throw ConfigException(std::string("The value for <") + tag + ":" + value + "> is not a value port, it must be between 1 and 65535!");
 	return true;
 }
 
@@ -413,7 +436,8 @@ bool ValidateLanguage(ServerConfig *, const char *, const char *, ValueItem &dat
 	int language = data.GetInteger();
 	char maxlang[3];
 	snprintf(maxlang, 3, "%d", USED_LANGS);
-	if (language < 1 || language > USED_LANGS) throw ConfigException(static_cast<std::string>("The value for <nickserv:defaultlanguage> must be between 1 and ") + maxlang + "!");
+	if (language < 1 || language > USED_LANGS)
+		throw ConfigException(std::string("The value for <nickserv:defaultlanguage> must be between 1 and ") + maxlang + "!");
 	data.Set(--language);
 	return true;
 }
@@ -421,25 +445,32 @@ bool ValidateLanguage(ServerConfig *, const char *, const char *, ValueItem &dat
 bool ValidateGuestPrefix(ServerConfig *conf, const char *tag, const char *value, ValueItem &data)
 {
 	ValidateNotEmpty(conf, tag, value, data);
-	if (strlen(data.GetString()) > 21) throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
+	if (data.GetValue().size() > 21)
+		throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
 	return true;
 }
 
 bool ValidateBantype(ServerConfig *, const char *, const char *, ValueItem &data)
 {
 	int bantype = data.GetInteger();
-	if (bantype < 0 || bantype > 3) throw ConfigException("The value for <chanserv:defbantype> must be between 0 and 3!");
+	if (bantype < 0 || bantype > 3)
+		throw ConfigException("The value for <chanserv:defbantype> must be between 0 and 3!");
 	return true;
 }
 
 bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (s_BotServ) {
-		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
-			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
+	if (s_BotServ)
+	{
+		if (std::string(value) == "description" || std::string(value) == "database")
+		{
+			if (data.GetValue().empty())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
-		else if (static_cast<std::string>(value) == "minusers" || static_cast<std::string>(value) == "badwordsmax" || static_cast<std::string>(value) == "keepdata") {
-			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
+		else if (std::string(value) == "minusers" || std::string(value) == "badwordsmax" || std::string(value) == "keepdata")
+		{
+			if (!data.GetInteger())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
 		}
 	}
 	return true;
@@ -447,9 +478,12 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 
 bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (s_HostServ) {
-		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
-			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
+	if (s_HostServ)
+	{
+		if (std::string(value) == "description" || std::string(value) == "database")
+		{
+			if (data.GetValue().empty())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
 		}
 	}
 	return true;
@@ -457,9 +491,12 @@ bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueI
 
 bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (LimitSessions) {
-		if (static_cast<std::string>(value) == "maxsessionlimit" || static_cast<std::string>(value) == "exceptionexpiry") {
-			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
+	if (LimitSessions)
+	{
+		if (std::string(value) == "maxsessionlimit" || std::string(value) == "exceptionexpiry")
+		{
+			if (!data.GetInteger())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
 		}
 	}
 	return true;
@@ -467,20 +504,30 @@ bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, V
 
 bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (static_cast<std::string>(value) == "defaultlevel") {
+	if (std::string(value) == "defaultlevel")
+	{
 		int level = data.GetInteger();
-		if (!level) return true;
-		if (level > 5) throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
+		if (!level)
+			return true;
+		if (level > 5)
+			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
 	}
-	else if (DefConLevel) {
-		if ((static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) || static_cast<std::string>(value) == "chanmodes" || static_cast<std::string>(value) == "akillreason") {
-			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
+	else if (DefConLevel)
+	{
+		if ((std::string(value).substr(0, 5) == "level" && isdigit(value[5])) || std::string(value) == "chanmodes" || std::string(value) == "akillreason")
+		{
+			if (data.GetValue().empty())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
-		else if (static_cast<std::string>(value) == "message" && GlobalOnDefconMore) {
-			if (!*data.GetString()) throw ConfigException("The value for <defcon:message> cannot be empty when globalondefconmore is enabled!");
+		else if (std::string(value) == "message" && GlobalOnDefconMore)
+		{
+			if (data.GetValue().empty())
+				throw ConfigException("The value for <defcon:message> cannot be empty when globalondefconmore is enabled!");
 		}
-		else if (static_cast<std::string>(value) == "sessionlimit" || static_cast<std::string>(value) == "akillexpire") {
-			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when DefCon is enabled!");
+		else if (std::string(value) == "sessionlimit" || std::string(value) == "akillexpire")
+		{
+			if (!data.GetInteger())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when DefCon is enabled!");
 		}
 	}
 	return true;
@@ -489,12 +536,14 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data)
 {
 	int nicklen = data.GetInteger();
-	if (!nicklen) {
+	if (!nicklen)
+	{
 		alog("You have not defined the <networkinfo:nicklen> directive. It is strongly");
 		alog("adviced that you do configure this correctly in your services.conf");
 		data.Set(NICKMAX - 1);
 	}
-	else if (nicklen < 1 || nicklen >= NICKMAX) {
+	else if (nicklen < 1 || nicklen >= NICKMAX)
+	{
 		alog("<networkinfo:nicklen> has an invalid value; setting to %d", NICKMAX - 1);
 		data.Set(NICKMAX - 1);
 	}
@@ -503,9 +552,12 @@ bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data
 
 bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (UseMail) {
-		if (static_cast<std::string>(value) == "sendmailpath" || static_cast<std::string>(value) == "sendfrom") {
-			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
+	if (UseMail)
+	{
+		if (std::string(value) == "sendmailpath" || std::string(value) == "sendfrom")
+		{
+			if (data.GetValue().empty())
+				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
 		}
 	}
 	return true;
@@ -513,8 +565,10 @@ bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem 
 
 bool ValidateGlobalOnCycle(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (GlobalOnCycle) {
-		if (!*data.GetString()) {
+	if (GlobalOnCycle)
+	{
+		if (data.GetValue().empty())
+		{
 			alog("<%s:%s> was undefined, disabling <options:globaloncycle>", tag, value);
 			GlobalOnCycle = false;
 		}
@@ -525,7 +579,8 @@ bool ValidateGlobalOnCycle(ServerConfig *, const char *tag, const char *value, V
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
-	if (bail) {
+	if (bail)
+	{
 		// TODO -- Need a way to stop loading in a safe way -- CyberBotX
 		//ServerInstance->Exit(EXIT_STATUS_CONFIG);
 	}
@@ -534,10 +589,13 @@ void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 bool InitUplinks(ServerConfig *, const char *, bool bail)
 {
 	// If bail is false, we were reloading, don't clear anything
-	if (!bail) return true;
-	if (!Uplinks.empty()) {
+	if (!bail)
+		return true;
+	if (!Uplinks.empty())
+	{
 		std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
-		for (; curr_uplink != end_uplink; ++curr_uplink) delete *curr_uplink;
+		for (; curr_uplink != end_uplink; ++curr_uplink)
+			delete *curr_uplink;
 	}
 	Uplinks.clear();
 	return true;
@@ -546,7 +604,8 @@ bool InitUplinks(ServerConfig *, const char *, bool bail)
 bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values, int *, bool bail)
 {
 	// If bail is false, we were reloading, don't even try to add another uplink
-	if (!bail) return true;
+	if (!bail)
+		return true;
 	// Validation variables
 	const char *host = values[0].GetString(), *password = values[2].GetString();
 	int port = values[1].GetInteger();
@@ -568,17 +627,17 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 bool DoneUplinks(ServerConfig *, const char *, bool bail)
 {
 	// If bail is false, we were reloading, ignore this check
-	if (!bail) return true;
-	if (Uplinks.empty()) throw ConfigException("You must define at least one uplink block!");
+	if (!bail)
+		return true;
+	if (Uplinks.empty())
+		throw ConfigException("You must define at least one uplink block!");
 	return true;
 }
 
 static bool InitOperTypes(ServerConfig *, const char *, bool)
 {
-	for (std::list<OperType *>::iterator it = MyOperTypes.begin(); it != MyOperTypes.end(); it++)
-	{
-		delete *(it);
-	}
+	for (std::list<OperType *>::iterator it = MyOperTypes.begin(); it != MyOperTypes.end(); ++it)
+		delete *it;
 
 	MyOperTypes.clear();
 	return true;
@@ -599,15 +658,11 @@ static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueLis
 	std::string tok;
 	spacesepstream cmdstr(commands);
 	while (cmdstr.GetToken(tok))
-	{
 		ot->AddCommand(tok);
-	}
 
 	spacesepstream privstr(privs);
 	while (privstr.GetToken(tok))
-	{
 		ot->AddPriv(tok);
-	}
 
 	MyOperTypes.push_back(ot);
 	return true;
@@ -618,7 +673,6 @@ static bool DoneOperTypes(ServerConfig *, const char *, bool)
 	return true;
 }
 
-
 /*************************************************************************/
 
 static bool InitOpers(ServerConfig *, const char *, bool)
@@ -626,13 +680,9 @@ static bool InitOpers(ServerConfig *, const char *, bool)
 	int i;
 	NickCore *nc;
 
-	for (i = 0; i < 1024; i++)
-	{
+	for (i = 0; i < 1024; ++i)
 		for (nc = nclists[i]; nc; nc = nc->next)
-		{
 			nc->ot = NULL;
-		}
-	}
 
 	return true;
 }
@@ -657,25 +707,20 @@ static bool DoOper(ServerConfig *conf, const char *, const char **, ValueList &v
 static bool DoneOpers(ServerConfig *, const char *, bool)
 {
 	// XXX: this is duplicated in config.c
-	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
 	{
-		std::string nick = it->first;
-		std::string type = it->second;
+		std::string nick = it->first, type = it->second;
 
 		NickAlias *na = findnick(nick);
 		if (!na)
-		{
 			// Nonexistant nick
 			continue;
-		}
 
 		if (!na->nc)
-		{
 			// Nick with no core (wtf?)
 			abort();
-		}
 
-		for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); tit++)
+		for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); ++tit)
 		{
 			OperType *ot = *tit;
 			if (ot->GetName() == type)
@@ -704,7 +749,8 @@ bool DoModule(ServerConfig *conf, const char *, const char **, ValueList &values
 	if (!ValidateNotEmpty(conf, "module", "name", vi))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// If the string isn't empty, add a space before we add the module name
-	if (!Modules.empty()) Modules += " ";
+	if (!Modules.empty())
+		Modules += " ";
 	// Add the module name to the string
 	Modules += values[0].GetString();
 	return true;
@@ -964,11 +1010,11 @@ int ServerConfig::Read(bool bail)
 	// Load and parse the config file, if there are any errors then explode
 	// Make a copy here so if it fails then we can carry on running with an unaffected config
 	newconfig.clear();
-	if (LoadConf(newconfig, SERVICES_CONF, errstr)) {
+	if (LoadConf(newconfig, SERVICES_CONF, errstr))
 		// If we succeeded, set the config to the new one
 		config_data = newconfig;
-	}
-	else {
+	else
+	{
 		ReportConfigError(errstr.str(), bail);
 		return 0;
 	}
@@ -976,9 +1022,11 @@ int ServerConfig::Read(bool bail)
 	 * to do so inside the catch block to clean up the new'd values from the array. */
 	bool CheckedAllValues = false;
 	// The stuff in here may throw ConfigException, be sure we're in a position to catch it.
-	try {
+	try
+	{
 		// Read the values of all the tags which occur once or not at all, and call their callbacks.
-		for (int Index = 0; Values[Index].tag; ++Index) {
+		for (int Index = 0; Values[Index].tag; ++Index)
+		{
 			char item[BUFSIZE];
 			int dt = Values[Index].datatype;
 			bool allow_newlines = dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
@@ -992,70 +1040,84 @@ int ServerConfig::Read(bool bail)
 				Values[Index].val = NULL;
 				continue;
 			}
+
 			ConfValue(config_data, Values[Index].tag, Values[Index].value, Values[Index].default_value, 0, item, BUFSIZE, allow_newlines);
 			ValueItem vi(item);
+
 			if (!Values[Index].validation_function(this, Values[Index].tag, Values[Index].value, vi))
 				throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
-			switch (dt) {
-				case DT_NOSPACES: {
-					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
-					ValidateNoSpaces(vi.GetString(), Values[Index].tag, Values[Index].value);
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
-				}
-				break;
-				case DT_HOSTNAME: {
-					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
-					ValidateHostname(vi.GetString(), Values[Index].tag, Values[Index].value);
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
-				}
-				break;
-				case DT_IPADDRESS: {
-					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
-					ValidateIP(vi.GetString(), Values[Index].tag, Values[Index].value, allow_wild);
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
-				}
-				break;
-				case DT_CHARPTR: {
-					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
-					// Make sure we also copy the null terminator
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
-				}
-				break;
-				case DT_STRING: {
-					ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
-					vcs->Set(vi.GetString());
-				}
-				break;
-				case DT_INTEGER: {
-					int val = vi.GetInteger();
-					ValueContainerInt *vci = dynamic_cast<ValueContainerInt *>(Values[Index].val);
-					vci->Set(&val, sizeof(int));
-				}
-				break;
-				case DT_UINTEGER: {
-					unsigned val = vi.GetInteger();
-					ValueContainerUInt *vci = dynamic_cast<ValueContainerUInt *>(Values[Index].val);
-					vci->Set(&val, sizeof(unsigned));
-				}
-				break;
-				case DT_LUINTEGER: {
-					long unsigned val = vi.GetInteger();
-					ValueContainerLUInt *vci = dynamic_cast<ValueContainerLUInt *>(Values[Index].val);
-					vci->Set(&val, sizeof(long unsigned));
-				}
-				break;
-				case DT_TIME: {
-					time_t time = dotime(vi.GetString());
-					ValueContainerTime *vci = dynamic_cast<ValueContainerTime *>(Values[Index].val);
-					vci->Set(&time, sizeof(time_t));
-				}
-				break;
-				case DT_BOOLEAN: {
-					bool val = vi.GetBool();
-					ValueContainerBool *vcb = dynamic_cast<ValueContainerBool *>(Values[Index].val);
-					vcb->Set(&val, sizeof(bool));
-				}
-				break;
+
+			switch (dt)
+			{
+				case DT_NOSPACES:
+					{
+						ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+						ValidateNoSpaces(vi.GetString(), Values[Index].tag, Values[Index].value);
+						vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					}
+					break;
+				case DT_HOSTNAME:
+					{
+						ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+						ValidateHostname(vi.GetString(), Values[Index].tag, Values[Index].value);
+						vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					}
+					break;
+				case DT_IPADDRESS:
+					{
+						ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+						ValidateIP(vi.GetString(), Values[Index].tag, Values[Index].value, allow_wild);
+						vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					}
+					break;
+				case DT_CHARPTR:
+					{
+						ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+						// Make sure we also copy the null terminator
+						vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					}
+					break;
+				case DT_STRING:
+					{
+						ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
+						vcs->Set(vi.GetValue());
+					}
+					break;
+				case DT_INTEGER:
+					{
+						int val = vi.GetInteger();
+						ValueContainerInt *vci = dynamic_cast<ValueContainerInt *>(Values[Index].val);
+						vci->Set(&val, sizeof(int));
+					}
+					break;
+				case DT_UINTEGER:
+					{
+						unsigned val = vi.GetInteger();
+						ValueContainerUInt *vci = dynamic_cast<ValueContainerUInt *>(Values[Index].val);
+						vci->Set(&val, sizeof(unsigned));
+					}
+					break;
+				case DT_LUINTEGER:
+					{
+						unsigned long val = vi.GetInteger();
+						ValueContainerLUInt *vci = dynamic_cast<ValueContainerLUInt *>(Values[Index].val);
+						vci->Set(&val, sizeof(unsigned long));
+					}
+					break;
+				case DT_TIME:
+					{
+						time_t time = dotime(vi.GetString());
+						ValueContainerTime *vci = dynamic_cast<ValueContainerTime *>(Values[Index].val);
+						vci->Set(&time, sizeof(time_t));
+					}
+					break;
+				case DT_BOOLEAN:
+					{
+						bool val = vi.GetBool();
+						ValueContainerBool *vcb = dynamic_cast<ValueContainerBool *>(Values[Index].val);
+						vcb->Set(&val, sizeof(bool));
+					}
+					break;
 				default:
 					break;
 			}
@@ -1067,13 +1129,16 @@ int ServerConfig::Read(bool bail)
 		/* Read the multiple-tag items (class tags, connect tags, etc)
 		 * and call the callbacks associated with them. We have three
 		 * callbacks for these, a 'start', 'item' and 'end' callback. */
-		for (int Index = 0; MultiValues[Index].tag; ++Index) {
+		for (int Index = 0; MultiValues[Index].tag; ++Index)
+		{
 			MultiValues[Index].init_function(this, MultiValues[Index].tag, bail);
 			int number_of_tags = ConfValueEnum(config_data, MultiValues[Index].tag);
-			for (int tagnum = 0; tagnum < number_of_tags; ++tagnum) {
+			for (int tagnum = 0; tagnum < number_of_tags; ++tagnum)
+			{
 				ValueList vl;
 				vl.clear();
-				for (int valuenum = 0; MultiValues[Index].items[valuenum]; ++valuenum) {
+				for (int valuenum = 0; MultiValues[Index].items[valuenum]; ++valuenum)
+				{
 					int dt = MultiValues[Index].datatype[valuenum];
 					bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
 					dt &= ~DT_ALLOW_NEWLINE;
@@ -1082,105 +1147,113 @@ int ServerConfig::Read(bool bail)
 					// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
 					if (noreload && !bail)
 						continue;
-					switch (dt) {
-						case DT_NOSPACES: {
-							char item[BUFSIZE];
-							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
-								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
-								vl.push_back(ValueItem(item));
+					switch (dt)
+					{
+						case DT_NOSPACES:
+							{
+								char item[BUFSIZE];
+								if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum], MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(""));
+								ValidateNoSpaces(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum]);
 							}
-							else vl.push_back(ValueItem(""));
-							ValidateNoSpaces(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum]);
-						}
-						break;
-						case DT_HOSTNAME: {
-							char item[BUFSIZE];
-							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
-								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
-								vl.push_back(ValueItem(item));
+							break;
+						case DT_HOSTNAME:
+							{
+								char item[BUFSIZE];
+								if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum], MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(""));
+								ValidateHostname(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum]);
 							}
-							else vl.push_back(ValueItem(""));
-							ValidateHostname(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum]);
-						}
-						break;
-						case DT_IPADDRESS: {
-							char item[BUFSIZE];
-							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
-								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
-								vl.push_back(ValueItem(item));
+							break;
+						case DT_IPADDRESS:
+							{
+								char item[BUFSIZE];
+								if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum], MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(""));
+								ValidateIP(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum], allow_wild);
 							}
-							else vl.push_back(ValueItem(""));
-							ValidateIP(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum], allow_wild);
-						}
-						break;
-						case DT_CHARPTR: {
-							char item[BUFSIZE];
-							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
-								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
-								vl.push_back(ValueItem(item));
+							break;
+						case DT_CHARPTR:
+							{
+								char item[BUFSIZE];
+								if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum], MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(""));
 							}
-							else vl.push_back(ValueItem(""));
-						}
-						break;
-						case DT_STRING: {
-							std::string item;
-							if (ConfValue(config_data, static_cast<std::string>(MultiValues[Index].tag),
-								static_cast<std::string>(MultiValues[Index].items[valuenum]),
-								static_cast<std::string>(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines)) {
-								vl.push_back(ValueItem(item));
+							break;
+						case DT_STRING:
+							{
+								std::string item;
+								if (ConfValue(config_data, std::string(MultiValues[Index].tag), std::string(MultiValues[Index].items[valuenum]), std::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(""));
 							}
-							else vl.push_back(ValueItem(""));
-						}
-						break;
+							break;
 						case DT_INTEGER:
 						case DT_UINTEGER:
-						case DT_LUINTEGER: {
-							int item = 0;
-							if (ConfValueInteger(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
-								MultiValues[Index].items_default[valuenum], tagnum, item)) vl.push_back(ValueItem(item));
-							else vl.push_back(ValueItem(0));
-						}
-						break;
-						case DT_TIME: {
-							std::string item;
-							if (ConfValue(config_data, static_cast<std::string>(MultiValues[Index].tag),
-								static_cast<std::string>(MultiValues[Index].items[valuenum]),
-								static_cast<std::string>(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines)) {
-#ifdef _WIN32
-								long time = static_cast<long>(dotime(item.c_str()));
-#else
-								time_t time = dotime(item.c_str());
-#endif
-								vl.push_back(ValueItem(time));
+						case DT_LUINTEGER:
+							{
+								int item = 0;
+								if (ConfValueInteger(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum], MultiValues[Index].items_default[valuenum], tagnum, item))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(0));
 							}
-							else vl.push_back(ValueItem(0));
-						}
-						break;
-						case DT_BOOLEAN: {
-							bool item = ConfValueBool(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
-								MultiValues[Index].items_default[valuenum], tagnum);
-							vl.push_back(ValueItem(item));
-						}
+							break;
+						case DT_TIME:
+							{
+								std::string item;
+								if (ConfValue(config_data, std::string(MultiValues[Index].tag), std::string(MultiValues[Index].items[valuenum]), std::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
+								{
+#ifdef _WIN32
+									long time = static_cast<long>(dotime(item.c_str()));
+#else
+									time_t time = dotime(item.c_str());
+#endif
+									vl.push_back(ValueItem(time));
+								}
+								else
+									vl.push_back(ValueItem(0));
+							}
+							break;
+						case DT_BOOLEAN:
+							{
+								bool item = ConfValueBool(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum], MultiValues[Index].items_default[valuenum], tagnum);
+								vl.push_back(ValueItem(item));
+							}
 					}
 				}
-				MultiValues[Index].validation_function(this, MultiValues[Index].tag, static_cast<const char **>(MultiValues[Index].items), vl,
-					MultiValues[Index].datatype, bail);
+				MultiValues[Index].validation_function(this, MultiValues[Index].tag, static_cast<const char **>(MultiValues[Index].items), vl, MultiValues[Index].datatype, bail);
 			}
 			MultiValues[Index].finish_function(this, MultiValues[Index].tag, bail);
 		}
 	}
-	catch (ConfigException &ce) {
+	catch (ConfigException &ce)
+	{
 		ReportConfigError(ce.GetReason(), bail);
-		if (!CheckedAllValues) {
-			for (int Index = 0; Values[Index].tag; ++Index) {
+		if (!CheckedAllValues)
+		{
+			for (int Index = 0; Values[Index].tag; ++Index)
+			{
 				if (Values[Index].val)
 					delete Values[Index].val;
 			}
 		}
 		return 0;
 	}
-	if (debug) alog("End config");
-	for (int Index = 0; Once[Index]; ++Index) if (!CheckOnce(Once[Index])) return 0;
+	if (debug)
+		alog("End config");
+	for (int Index = 0; Once[Index]; ++Index)
+		if (!CheckOnce(Once[Index]))
+			return 0;
 	alog("Done reading configuration file.");
 	return 1;
 }
@@ -1192,92 +1265,118 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 	int linenumber = 0;
 	bool in_word = false, in_quote = false, in_ml_comment = false;
 	KeyValList sectiondata;
-	if (conf.fail()) {
+	if (conf.fail())
+	{
 		errorstream << "File " << filename << " could not be opened." << std::endl;
 		return false;
 	}
-	if (debug) alog("Start to read conf %s", filename);
+	if (debug)
+		alog("Start to read conf %s", filename);
 	// Start reading characters...
-	while (getline(conf, line)) {
+	while (getline(conf, line))
+	{
 		++linenumber;
 		unsigned c = 0, len = line.size();
-		for (; c < len; ++c) {
+		for (; c < len; ++c)
+		{
 			char ch = line[c];
-			if (in_quote) {
-				if (ch == '"') {
+			if (in_quote)
+			{
+				if (ch == '"')
+				{
 					in_quote = in_word = false;
 					continue;
 				}
 				wordbuffer += ch;
 				continue;
 			}
-			if (in_ml_comment) {
-				if (ch == '*' && c + 1 < len && line[c + 1] == '/') {
+			if (in_ml_comment)
+			{
+				if (ch == '*' && c + 1 < len && line[c + 1] == '/')
+				{
 					in_ml_comment = false;
 					++c;
 				}
 				continue;
 			}
-			if (ch == '#' || (ch == '/' && c + 1 < len && line[c + 1] == '/')) break; // Line comment, ignore the rest of the line (much like this one!)
-			else if (ch == '/' && c + 1 < len && line[c + 1] == '*') {
+			if (ch == '#' || (ch == '/' && c + 1 < len && line[c + 1] == '/'))
+				break; // Line comment, ignore the rest of the line (much like this one!)
+			else if (ch == '/' && c + 1 < len && line[c + 1] == '*')
+			{
 				// Multiline (or less than one line) comment
 				in_ml_comment = true;
 				++c;
 				continue;
 			}
-			else if (ch == '"') {
+			else if (ch == '"')
+			{
 				// Quotes are valid only in the value position
-				if (section.empty() || itemname.empty()) {
+				if (section.empty() || itemname.empty())
+				{
 					errorstream << "Unexpected quoted string: " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
-				if (in_word || !wordbuffer.empty()) {
+				if (in_word || !wordbuffer.empty())
+				{
 					errorstream << "Unexpected quoted string (prior unhandled words): " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
 				in_quote = in_word = true;
 				continue;
 			}
-			else if (ch == '=') {
-				if (section.empty()) {
+			else if (ch == '=')
+			{
+				if (section.empty())
+				{
 					errorstream << "Config item outside of section (or stray '='): " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
-				if (!itemname.empty()) {
+				if (!itemname.empty())
+				{
 					errorstream << "Stray '=' sign or item without value: " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
-				if (in_word) in_word = false;
+				if (in_word)
+					in_word = false;
 				itemname = wordbuffer;
 				wordbuffer.clear();
 			}
-			else if (ch == '{') {
-				if (!section.empty()) {
+			else if (ch == '{')
+			{
+				if (!section.empty())
+				{
 					errorstream << "Section inside another section: " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
-				if (wordbuffer.empty()) {
+				if (wordbuffer.empty())
+				{
 					errorstream << "Section without a name or unexpected '{': " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
-				if (in_word) in_word = false;
+				if (in_word)
+					in_word = false;
 				section = wordbuffer;
 				wordbuffer.clear();
 			}
-			else if (ch == '}') {
-				if (section.empty()) {
+			else if (ch == '}')
+			{
+				if (section.empty())
+				{
 					errorstream << "Stray '}': " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
-				if (!wordbuffer.empty() || !itemname.empty()) {
+				if (!wordbuffer.empty() || !itemname.empty())
+				{
 					// this will allow for the construct:  section { key = value }
 					// but will not allow for anything else, such as:  section { key = value; key = value }
-					if (!sectiondata.empty()) {
+					if (!sectiondata.empty())
+					{
 						errorstream << "Unexpected end of section: " << filename << ":" << linenumber << std::endl;
 						return false;
 					}
 					// this is the same as the below section for testing if itemname is non-empty after the loop, but done inside it to allow the above construct
-					if (debug) alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
+					if (debug)
+						alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
 					sectiondata.push_back(KeyVal(itemname, wordbuffer));
 					wordbuffer.clear();
 					itemname.clear();
@@ -1286,13 +1385,18 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 				section.clear();
 				sectiondata.clear();
 			}
-			else if (ch == ';' || ch == '\r') continue; // Ignore
-			else if (ch == ' ' || ch == '\t') {
+			else if (ch == ';' || ch == '\r')
+				continue; // Ignore
+			else if (ch == ' ' || ch == '\t')
+			{
 				// Terminate word
-				if (in_word) in_word = false;
+				if (in_word)
+					in_word = false;
 			}
-			else {
-				if (!in_word && !wordbuffer.empty()) {
+			else
+			{
+				if (!in_word && !wordbuffer.empty())
+				{
 					errorstream << "Unexpected word: " << filename << ":" << linenumber << std::endl;
 					return false;
 				}
@@ -1300,36 +1404,44 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 				in_word = true;
 			}
 		}
-		if (in_quote) {
+		if (in_quote)
+		{
 			// Quotes can span multiple lines; all we need to do is go to the next line without clearing things
 			wordbuffer += "\n";
 			continue;
 		}
 		in_word = false;
-		if (!itemname.empty()) {
-			if (wordbuffer.empty()) {
+		if (!itemname.empty())
+		{
+			if (wordbuffer.empty())
+			{
 				errorstream << "Item without value: " << filename << ":" << linenumber << std::endl;
 				return false;
 			}
-			if (debug) alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
+			if (debug)
+				alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
 			sectiondata.push_back(KeyVal(itemname, wordbuffer));
 			wordbuffer.clear();
 			itemname.clear();
 		}
 	}
-	if (in_ml_comment) {
+	if (in_ml_comment)
+	{
 		errorstream << "Unterminated multiline comment at end of file: " << filename << std::endl;
 		return false;
 	}
-	if (in_quote) {
+	if (in_quote)
+	{
 		errorstream << "Unterminated quote at end of file: " << filename << std::endl;
 		return false;
 	}
-	if (!itemname.empty() || !wordbuffer.empty()) {
+	if (!itemname.empty() || !wordbuffer.empty())
+	{
 		errorstream << "Unexpected garbage at end of file: " << filename << std::endl;
 		return false;
 	}
-	if (!section.empty()) {
+	if (!section.empty())
+	{
 		errorstream << "Unterminated section at end of file: " << filename << std::endl;
 		return false;
 	}
@@ -1346,50 +1458,59 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char
 	return ConfValue(target, tag, var, "", index, result, length, allow_linefeeds);
 }
 
-bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, char *result,
-	int length, bool allow_linefeeds)
+bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, char *result, int length, bool allow_linefeeds)
 {
 	std::string value;
-	bool r = ConfValue(target, static_cast<std::string>(tag), static_cast<std::string>(var), static_cast<std::string>(default_value), index, value,
-		allow_linefeeds);
+	bool r = ConfValue(target, std::string(tag), std::string(var), std::string(default_value), index, value, allow_linefeeds);
 	strlcpy(result, value.c_str(), length);
 	return r;
 }
 
-bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, std::string &result,
-	bool allow_linefeeds)
+bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, std::string &result, bool allow_linefeeds)
 {
 	return ConfValue(target, tag, var, "", index, result, allow_linefeeds);
 }
 
-bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index,
-	std::string &result, bool allow_linefeeds)
+bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index, std::string &result, bool allow_linefeeds)
 {
 	ConfigDataHash::size_type pos = index;
-	if (pos < target.count(tag)) {
+	if (pos < target.count(tag))
+	{
 		ConfigDataHash::iterator iter = target.find(tag);
-		for (int i = 0; i < index; ++i) ++iter;
+
+		for (int i = 0; i < index; ++i)
+			++iter;
+
 		KeyValList::iterator j = iter->second.begin(), jend = iter->second.end();
-		for (; j != jend; ++j) {
-			if (j->first == var) {
-				if (!allow_linefeeds && j->second.find('\n') != std::string::npos) {
+		for (; j != jend; ++j)
+		{
+			if (j->first == var)
+			{
+				if (!allow_linefeeds && j->second.find('\n') != std::string::npos)
+				{
 					alog("Value of <%s:%s> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.", tag.c_str(), var.c_str());
 					std::string::iterator n = j->second.begin(), nend = j->second.end();
-					for (; n != nend; ++n) if (*n == '\n') *n = ' ';
+					for (; n != nend; ++n)
+						if (*n == '\n')
+							*n = ' ';
 				}
-				else {
+				else
+				{
 					result = j->second;
 					return true;
 				}
 			}
 		}
-		if (!default_value.empty()) {
+		if (!default_value.empty())
+		{
 			result = default_value;
 			return true;
 		}
 	}
-	else if (!pos) {
-		if (!default_value.empty()) {
+	else if (!pos)
+	{
+		if (!default_value.empty())
+		{
 			result = default_value;
 			return true;
 		}
@@ -1399,13 +1520,12 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, con
 
 bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const char *tag, const char *var, int index, int &result)
 {
-	return ConfValueInteger(target, static_cast<std::string>(tag), static_cast<std::string>(var), "", index, result);
+	return ConfValueInteger(target, std::string(tag), std::string(var), "", index, result);
 }
 
 bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, int &result)
 {
-	return ConfValueInteger(target, static_cast<std::string>(tag), static_cast<std::string>(var), static_cast<std::string>(default_value), index,
-		result);
+	return ConfValueInteger(target, std::string(tag), std::string(var), std::string(default_value), index, result);
 }
 
 bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, int &result)
@@ -1419,19 +1539,28 @@ bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &t
 	std::istringstream stream;
 	bool r = ConfValue(target, tag, var, default_value, index, value);
 	stream.str(value);
-	if (!(stream >> result)) return false;
-	else {
-		if (!value.empty()) {
-			if (value.substr(0, 2) == "0x") {
+	if (!(stream >> result))
+		return false;
+	else
+	{
+		if (!value.empty())
+		{
+			if (value.substr(0, 2) == "0x")
+			{
 				char *endptr;
+
 				value.erase(0, 2);
 				result = strtol(value.c_str(), &endptr, 16);
+
 				/* No digits found */
-				if (endptr == value.c_str()) return false;
+				if (endptr == value.c_str())
+					return false;
 			}
-			else {
+			else
+			{
 				char denominator = *(value.end() - 1);
-				switch (toupper(denominator)) {
+				switch (toupper(denominator))
+				{
 					case 'K':
 						// Kilobytes -> bytes
 						result = result * 1024;
@@ -1443,7 +1572,6 @@ bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &t
 					case 'G':
 						// Gigabytes -> bytes
 						result = result * 1073741824;
-						break;
 				}
 			}
 		}
@@ -1453,12 +1581,12 @@ bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &t
 
 bool ServerConfig::ConfValueBool(ConfigDataHash &target, const char *tag, const char *var, int index)
 {
-	return ConfValueBool(target, static_cast<std::string>(tag), static_cast<std::string>(var), "", index);
+	return ConfValueBool(target, std::string(tag), std::string(var), "", index);
 }
 
 bool ServerConfig::ConfValueBool(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index)
 {
-	return ConfValueBool(target, static_cast<std::string>(tag), static_cast<std::string>(var), static_cast<std::string>(default_value), index);
+	return ConfValueBool(target, std::string(tag), std::string(var), std::string(default_value), index);
 }
 
 bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag, const std::string &var, int index)
@@ -1469,7 +1597,9 @@ bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag,
 bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index)
 {
 	std::string result;
-	if (!ConfValue(target, tag, var, default_value, index, result)) return false;
+	if (!ConfValue(target, tag, var, default_value, index, result))
+		return false;
+
 	return result == "yes" || result == "true" || result == "1";
 }
 
@@ -1485,17 +1615,23 @@ int ServerConfig::ConfValueEnum(ConfigDataHash &target, const std::string &tag)
 
 int ServerConfig::ConfVarEnum(ConfigDataHash &target, const char *tag, int index)
 {
-	return ConfVarEnum(target, static_cast<std::string>(tag), index);
+	return ConfVarEnum(target, std::string(tag), index);
 }
 
 int ServerConfig::ConfVarEnum(ConfigDataHash &target, const std::string &tag, int index)
 {
 	ConfigDataHash::size_type pos = index;
-	if (pos < target.count(tag)) {
+
+	if (pos < target.count(tag))
+	{
 		ConfigDataHash::const_iterator iter = target.find(tag);
-		for (int i = 0; i < index; ++i) ++iter;
+
+		for (int i = 0; i < index; ++i)
+			++iter;
+
 		return iter->second.size();
 	}
+
 	return 0;
 }
 
@@ -1547,9 +1683,9 @@ int ValueItem::GetInteger()
 	return atoi(v.c_str());
 }
 
-char *ValueItem::GetString()
+const char *ValueItem::GetString() const
 {
-	return const_cast<char *>(v.c_str());
+	return v.c_str();
 }
 
 bool ValueItem::GetBool()

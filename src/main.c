@@ -347,7 +347,7 @@ std::string GetFullProgDir(char *argv0)
 		services_bin = remainder;
 		if (services_bin.substr(0, 2) == "./")
 			services_bin = services_bin.substr(2);
-		std::string fullpath = static_cast<std::string>(buffer) + "/" + remainder;
+		std::string fullpath = std::string(buffer) + "/" + remainder;
 		std::string::size_type n = fullpath.rfind("/" SERVICES_BIN);
 		return std::string(fullpath, 0, n);
 	}

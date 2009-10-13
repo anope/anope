@@ -74,7 +74,9 @@ class ValueItem
 		/** Get value as an int */
 		int GetInteger();
 		/** Get value as a string */
-		char *GetString();
+		const char *GetString() const;
+		/** Get value as a string */
+		inline const std::string &GetValue() const { return v; }
 		/** Get value as a bool */
 		bool GetBool();
 };
@@ -437,7 +439,7 @@ class CoreExport ConfigReader
 		/** Overloaded constructor.
 		 * This constructor initialises the ConfigReader class to read a user-specified config file
 		 */
-		 ConfigReader(const std::string &);
+		ConfigReader(const std::string &);
 		/** Default destructor.
 		 * This method destroys the ConfigReader class.
 		 */

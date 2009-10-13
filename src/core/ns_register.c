@@ -251,7 +251,7 @@ class CommandNSRegister : public CommandNSConfirm
 		if (NSForceEmail && !email)
 			this->OnSyntaxError(u);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
-			notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, NSRegDelay);
+			notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + NSRegDelay) - time(NULL));
 		else if ((na = findnick(u->nick)))
 		{
 			/* i.e. there's already such a nick regged */

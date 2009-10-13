@@ -72,7 +72,7 @@ class CommandNSGroup : public Command
 		if (!(target = findnick(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
-			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, NSRegDelay);
+			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (NSRegDelay + u->lastnickreg) - time(NULL));
 		else if (u->nc && (u->nc->flags & NI_SUSPENDED))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);

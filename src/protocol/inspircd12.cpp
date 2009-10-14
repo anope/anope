@@ -435,13 +435,6 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "ENDBURST");
 	}
 
-	int IsFloodModeParamValid(const char *value)
-	{
-		char *dp, *end;
-		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-		else return 0;
-	}
-
 	void SendGlobopsInternal(const char *source, const char *buf)
 	{
 		BotInfo *bi = findbot(source);
@@ -1178,6 +1171,13 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("OPERTYPE",  anope_event_opertype); addCoreMessage(IRCD,m);
 	m = createMessage("IDLE",	  anope_event_idle); addCoreMessage(IRCD,m);
 	m = createMessage("METADATA", anope_event_metadata); addCoreMessage(IRCD,m);
+}
+
+bool ChannelModeFlood::IsValid(const char *value)
+{
+	char *dp, *end;
+	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+	else return 0;
 }
 
 void moduleAddModes()

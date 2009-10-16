@@ -41,16 +41,19 @@ class NickServCollide : public Timer
 {
   public:
 	NickAlias *na;
-	std::map<NickAlias *, NickServCollide *>::iterator nit;
+	std::pair<std::map<NickAlias *, NickServCollide *>::iterator, bool> it;
 
 	NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 	{
-		nit = NickServCollides.insert(std::make_pair(nickalias, this)).first;
+		it = NickServCollides.insert(std::make_pair(nickalias, this));
 	}
 
 	~NickServCollide()
 	{
-		NickServCollides.erase(nit);
+		if (it.second)
+		{
+			NickServCollides.erase(it.first);
+		}
 	}
 
 	void Tick(time_t ctime)
@@ -85,16 +88,19 @@ class NickServRelease : public Timer
   public:
 	NickAlias *na;
 	std::string uid;
-	std::map<NickAlias *, NickServRelease *>::iterator nit;
+	std::pair<std::map<NickAlias *, NickServRelease *>::iterator, bool> it;
 
 	NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 	{
-		nit = NickServReleases.insert(std::make_pair(nickalias, this)).first;
+		it = NickServReleases.insert(std::make_pair(nickalias, this));
 	}
 
 	~NickServRelease()
 	{
-		NickServReleases.erase(nit);
+		if (it.second)
+		{
+			NickServReleases.erase(it.first);
+		}
 	}
 
 	void Tick(time_t ctime)

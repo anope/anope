@@ -45,6 +45,13 @@ class NickServCollide : public Timer
 
 	NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 	{
+		/* Erase the current collide and use the new one */
+		std::map<NickAlias *, NickServCollide *>::iterator nit = NickServCollides.find(nickalias);
+		if (nit != NickServCollides.end())
+		{
+			NickServCollides.erase(nit);
+		}
+
 		it = NickServCollides.insert(std::make_pair(nickalias, this));
 	}
 
@@ -92,6 +99,13 @@ class NickServRelease : public Timer
 
 	NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 	{
+		/* Erase the current release timer and use the new one */
+		std::map<NickAlias *, NickServRelease *>::iterator nit = NickServReleases.find(nickalias);
+		if (nit != NickServReleases.end())
+		{
+			NickServReleases.erase(nit);
+		}
+
 		it = NickServReleases.insert(std::make_pair(nickalias, this));
 	}
 

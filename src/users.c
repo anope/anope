@@ -761,14 +761,14 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (ircd->szline && ircd->nickip)
 			check_szline(nick, ipbuf);
 
-		/* Now check for session limits */
-		if (LimitSessions && !is_ulined(server))
-			add_session(nick, host, ipbuf);
+		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
 
 		display_news(user, NEWS_LOGON);
 		display_news(user, NEWS_RANDOM);
 
-		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
+		/* Now check for session limits */
+		if (LimitSessions && !is_ulined(server))
+			add_session(nick, host, ipbuf);
 	} else {
 		/* An old user changing nicks. */
 		if (ircd->ts6)

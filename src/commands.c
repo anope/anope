@@ -52,7 +52,7 @@ Command *lookup_cmd(Command * list, char *cmd)
 void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *cmd)
 {
 	Command *c = findCommand(cmdTable, cmd);
-	int retVal = 0;
+	int retVal = MOD_CONT;
 	ChannelInfo *ci;
 
 	if (!c)
@@ -174,7 +174,10 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 
 	retVal = c->Execute(u, params);
 
-	FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name.c_str(), params));
+	if (retVal == MOD_CONT)
+	{
+		FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name.c_str(), params));
+	}
 }
 
 /*************************************************************************/

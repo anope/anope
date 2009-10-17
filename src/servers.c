@@ -420,7 +420,7 @@ void do_server(const char *source, const char *servername, const char *hops,
 		notice_server(s_GlobalNoticer, newserver, "%s", GlobalOnCycleUP);
 
 	/* Let modules know about the connection */
-	FOREACH_MOD(I_OnServerConnect, OnServerConnect(newserver));
+	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));
 }
 
 /*************************************************************************/

@@ -540,7 +540,7 @@ class CoreExport Module
 	/** Called when a new server connects to the network.
 	 * @param s The server that has connected to the network
 	 */
-	virtual void OnServerConnect(Server *s) { }
+	virtual void OnNewServer(Server *s) { }
 
 	/** Called after a user changed the nick
 	 * @param u The user.
@@ -956,7 +956,7 @@ enum Implementation
 		I_OnDefconLevel,
 
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
+		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
 		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,

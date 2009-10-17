@@ -30,7 +30,7 @@ class CommandOSModUnLoad : public Command
 		Module *m = findModule(name);
 		if (!m)
 		{
-			this->OnSyntaxError(u);
+			notice_lang(s_OperServ, u, OPER_MODULE_ISNT_LOADED, name);
 			return MOD_CONT;
 		}
 

@@ -2978,6 +2978,10 @@ OPER_MODULE_REMOVE_FAIL
 	Imposible quitar modulo %s
 OPER_MODULE_NO_UNLOAD
 	This module can not be unloaded.
+OPER_MODULE_ALREADY_LOADED
+	Module %s is already loaded.
+OPER_MODULE_ISNT_LOADED
+	Module %s isn't loaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD NombreArchivo
 OPER_MODULE_UNLOAD_SYNTAX

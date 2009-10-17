@@ -2896,6 +2896,10 @@ OPER_MODULE_REMOVE_FAIL
 	Невозможно выгрузить модуль %s
 OPER_MODULE_NO_UNLOAD
 	Этот модуль не может быть выгружен.
+OPER_MODULE_ALREADY_LOADED
+	Module %s is already loaded.
+OPER_MODULE_ISNT_LOADED
+	Module %s isn't loaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD имя_файла
 OPER_MODULE_UNLOAD_SYNTAX

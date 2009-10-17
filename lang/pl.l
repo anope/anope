@@ -3889,6 +3889,12 @@ OPER_MODULE_REMOVE_FAIL
 OPER_MODULE_NO_UNLOAD
 	Ten modu³ nie mo¿e zostaæ wy³adowany.
 
+OPER_MODULE_ALREADY_LOADED
+	Module %s is already loaded.
+
+OPER_MODULE_ISNT_LOADED
+	Module %s isn't loaded.
+
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD nazwa-pliku
 

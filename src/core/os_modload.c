@@ -29,7 +29,7 @@ class CommandOSModLoad : public Command
 		Module *m = findModule(name);
 		if (m)
 		{
-			notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
+			notice_lang(s_OperServ, u, OPER_MODULE_ALREADY_LOADED, name);
 			return MOD_CONT;
 		}
 

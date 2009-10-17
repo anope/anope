@@ -2950,6 +2950,10 @@ OPER_MODULE_REMOVE_FAIL
 	Nem sikerült eltávolítani a %s modult
 OPER_MODULE_NO_UNLOAD
 	This module can not be unloaded.
+OPER_MODULE_ALREADY_LOADED
+	Module %s is already loaded.
+OPER_MODULE_ISNT_LOADED
+	Module %s isn't loaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD Fájlnév
 OPER_MODULE_UNLOAD_SYNTAX

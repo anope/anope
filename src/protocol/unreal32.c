@@ -1022,7 +1022,7 @@ int anope_event_userhost(const char *source, int ac, const char **av)
 	 * This is the USERHOST reply, we only send a request if we do not know the users cloaked host
 	 * (they got introducted using a vhost) - Adam
 	 */
-	if (ac < 2)
+	if (ac < 2 || !av[1] || !*av[1])
 		return MOD_CONT;
 	
 	std::string reply = av[1];

@@ -471,7 +471,7 @@ class CoreExport Module
 	 * @param number The message number
 	 * @param ... The argument list
 	 **/
-	void NoticeLang(char *source, User * u, int number, ...);
+	void NoticeLang(const char *source, User * u, int number, ...);
 
 	/**
 	 * Add a module provided command to the given service.
@@ -721,7 +721,7 @@ class CoreExport Module
 	 */
 	virtual void OnServerQuit(Server *server) { }
 
-	/** Called on a QUIT 
+	/** Called on a QUIT
 	 * @param u The user
 	 * @param msg The quit message
 	 */
@@ -866,7 +866,7 @@ class CoreExport Module
 	 */
 	virtual void OnDelNick(NickAlias *na) { }
 
-	/* Called on findcore()
+	/** Called on findcore()
 	 * @param nick nickname to be searched for (nc->display)
 	 */
 	virtual void OnFindCore(const std::string &nick) { }
@@ -908,7 +908,7 @@ class CoreExport Module
 	 */
 	virtual void OnNickEraseAccess(NickCore *nc, const std::string &entry) { }
 
-	/** called when a HostCore is deleted 
+	/** called when a HostCore is deleted
 	 * @param hc pointer to the HostCore
 	 */
 	virtual void OnDeleteHostCore(HostCore *hc) { }

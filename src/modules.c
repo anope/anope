@@ -631,7 +631,7 @@ void Module::AddCallBack(Timer *t)
 	{
 		it2 = it;
 		++it2;
-		
+
 		if (!TimerManager::IsTimer(*it))
 		{
 			this->CallBacks.erase(it);
@@ -732,7 +732,7 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	return ret;
 }
 
-void Module::NoticeLang(char *source, User * u, int number, ...)
+void Module::NoticeLang(const char *source, User * u, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];

@@ -463,7 +463,7 @@ enum ChannelModeName
 	CMODE_NOCTCP, CMODE_FILTER, CMODE_NOKNOCK, CMODE_REDIRECT, CMODE_REGMODERATED, CMODE_NONICK, CMODE_OPERONLY,
 	CMODE_NOKICK, CMODE_REGISTEREDONLY, CMODE_STRIPCOLOR, CMODE_NONOTICE, CMODE_NOINVITE, CMODE_ALLINVITE,
 	CMODE_BLOCKCAPS, CMODE_PERM,
-	
+
 	/* b/e/I */
 	CMODE_BAN, CMODE_EXCEPT,
 	CMODE_INVITEOVERRIDE,
@@ -882,7 +882,7 @@ struct c_userlist {
 	UserData *ud;
 };
 
-class CoreExport Channel
+class CoreExport Channel : public Extensible
 {
   private:
 	  /** A map of channel modes with their parameters set on this channel
@@ -1253,7 +1253,7 @@ class ChannelModeParam : public ChannelMode
 class ChannelModeStatus : public ChannelMode
 {
   public:
-	/** CUS_ values, see below 
+	/** CUS_ values, see below
 	*/
 	int16 Status;
 	/* The symbol, eg @ % + */
@@ -1404,7 +1404,7 @@ class ChannelModeAdmin : public ChannelMode
 {
   public:
 	ChannelModeAdmin() : ChannelMode(CMODE_ADMINONLY) { }
-	
+
 	/* Opers only */
 	bool CanSet(User *u);
 };
@@ -1416,7 +1416,7 @@ class ChannelModeOper : public ChannelMode
 {
   public:
 	ChannelModeOper() : ChannelMode(CMODE_OPERONLY) { }
-	
+
 	/* Opers only */
 	bool CanSet(User *u);
 };
@@ -1428,7 +1428,7 @@ class ChannelModeRegistered : public ChannelMode
 {
   public:
 	ChannelModeRegistered() : ChannelMode(CMODE_REGISTERED) { }
-	
+
 	/* No one mlocks +r */
 	bool CanSet(User *u);
 };

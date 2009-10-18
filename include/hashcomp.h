@@ -425,6 +425,8 @@ class CoreExport sepstream
 	/** Create a sepstream and fill it with the provided data
 	 */
 	sepstream(const std::string &source, char seperator);
+	sepstream(const ci::string &source, char seperator);
+	sepstream(const char *source, char seperator);
 	virtual ~sepstream() { }
 
 	/** Fetch the next token from the stream
@@ -432,6 +434,7 @@ class CoreExport sepstream
 	 * @return True if tokens still remain, false if there are none left
 	 */
 	virtual bool GetToken(std::string &token);
+	virtual bool GetToken(ci::string &token);
 
 	/** Fetch the entire remaining stream, without tokenizing
 	 * @return The remaining part of the stream
@@ -452,6 +455,8 @@ class CoreExport commasepstream : public sepstream
 	/** Initialize with comma seperator
 	 */
 	commasepstream(const std::string &source) : sepstream(source, ',') { }
+	commasepstream(const ci::string &source) : sepstream(source, ',') { }
+	commasepstream(const char *source) : sepstream(source, ',') { }
 };
 
 /** A derived form of sepstream, which seperates on spaces
@@ -462,6 +467,8 @@ class CoreExport spacesepstream : public sepstream
 	/** Initialize with space seperator
 	 */
 	spacesepstream(const std::string &source) : sepstream(source, ' ') { }
+	spacesepstream(const ci::string &source) : sepstream(source, ' ') { }
+	spacesepstream(const char *source) : sepstream(source, ' ') { }
 };
 
 #endif

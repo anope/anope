@@ -112,6 +112,16 @@ sepstream::sepstream(const std::string &source, char seperator) : tokens(source)
 	last_starting_position = n = tokens.begin();
 }
 
+sepstream::sepstream(const ci::string &source, char seperator) : tokens(source.c_str()), sep(seperator)
+{
+	last_starting_position = n = tokens.begin();
+}
+
+sepstream::sepstream(const char *source, char seperator) : tokens(source), sep(seperator)
+{
+	last_starting_position = n = tokens.begin();
+}
+
 bool sepstream::GetToken(std::string &token)
 {
 	std::string::iterator lsp = last_starting_position;
@@ -136,6 +146,14 @@ bool sepstream::GetToken(std::string &token)
 
 	token = "";
 	return false;
+}
+
+bool sepstream::GetToken(ci::string &token)
+{
+	std::string tmp_token;
+	bool result = GetToken(tmp_token);
+	token = tmp_token.c_str();
+	return result;
 }
 
 const std::string sepstream::GetRemaining()

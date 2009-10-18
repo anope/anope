@@ -12,7 +12,7 @@
 class CoreExport ChannelInfo : public Extensible
 {
  private:
-	 std::map<ChannelModeName, std::string> Params;
+	std::map<ChannelModeName, std::string> Params;
 
  public:
 	ChannelInfo()

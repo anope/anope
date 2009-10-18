@@ -1653,7 +1653,7 @@ CHAN_INVITE_SYNTAX
 CHAN_UNBAN_SYNTAX
 	UNBAN kanaal
 CHAN_UNBANNED
-	Bans met betrekking to jou op %s zijn opgeheven.
+	Bans met betrekking tot jou op %s zijn opgeheven.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX

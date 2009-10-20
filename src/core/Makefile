@@ -8,8 +8,8 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' \
 	   'MODULEFLAGS=${MODULEFLAGS}' 'MAKEBIN=${MAKEBIN}'
 
-OBJECTS= $(SRCS:.c=.o)
-OBJECTS+= $(SRCS:.cpp=.o)
+OBJECTS= $(SRCS:.c=.so)
+OBJECTS+= $(SRCS:.cpp=.so)
 CDEFS= -rdynamic -Wall
 
 all: modules subs
@@ -21,11 +21,13 @@ install:
 
 distclean: spotless
 
-.c.o:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $*.so $<
+.SUFFIXES: .c .cpp .so
 
-.cpp.o:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $*.so $<
+.c.so:
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $@ $<
+
+.cpp.so:
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $@ $<
 
 subs:
 	@for i in $(SUBS); do \

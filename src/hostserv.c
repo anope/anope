@@ -145,16 +145,16 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 							 "Unable to allocate memory to create the vHost LL, problems i sense..");
 			return NULL;
 		}
-		strcpy(next->nick, nick);
-		strcpy(next->vHost, vHost);
-		strcpy(next->creator, creator);
+		strlcpy(next->nick, nick, strlen(nick) + 1);
+		strlcpy(next->vHost, vHost, strlen(vHost) + 1);
+		strlcpy(next->creator, creator, strlen(creator) + 1);
 		if (vIdent) {
 			if ((next->vIdent == NULL)) {
 				ircdproto->SendGlobops(s_HostServ,
 								 "Unable to allocate memory to create the vHost LL, problems i sense..");
 				return NULL;
 			}
-			strcpy(next->vIdent, vIdent);
+			strlcpy(next->vIdent, vIdent, strlen(vIdent) + 1);
 		} else {
 			next->vIdent = NULL;
 		}
@@ -234,16 +234,16 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 							 "Unable to allocate memory to create the vHost LL, problems i sense..");
 			return NULL;
 		}
-		strcpy(newCore->nick, nick);
-		strcpy(newCore->vHost, vHost);
-		strcpy(newCore->creator, creator);
+		strlcpy(newCore->nick, nick, strlen(nick) + 1);
+		strlcpy(newCore->vHost, vHost, strlen(vHost) + 1);
+		strlcpy(newCore->creator, creator, strlen(creator) + 1);
 		if (vIdent) {
 			if ((newCore->vIdent == NULL)) {
 				ircdproto->SendGlobops(s_HostServ,
 								 "Unable to allocate memory to create the vHost LL, problems i sense..");
 				return NULL;
 			}
-			strcpy(newCore->vIdent, vIdent);
+			strlcpy(newCore->vIdent, vIdent, strlen(vIdent) + 1);
 		} else {
 			newCore->vIdent = NULL;
 		}
@@ -529,6 +529,6 @@ void set_lastmask(User * u)
 	if (na->last_usermask)
 		delete [] na->last_usermask;
 
-	na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-	sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
+	std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+	na->last_usermask = sstrdup(last_usermask.c_str());
 }

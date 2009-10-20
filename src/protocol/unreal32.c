@@ -822,7 +822,7 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 
 	/* If a user has a custom host and a server splits and reconnects
 	 * Unreal does not send the users cloaked host to Anope.. so we do not know it.
-	 * However, they will be +t if this is the case, so we will set their vhost 
+	 * However, they will be +t if this is the case, so we will set their vhost
 	 * to the sethost value (which really is their vhost) and clear the chost.
 	 * The chost will be request later (if needed) - Adam
 	 */
@@ -1024,7 +1024,7 @@ int anope_event_userhost(const char *source, int ac, const char **av)
 	 */
 	if (ac < 2 || !av[1] || !*av[1])
 		return MOD_CONT;
-	
+
 	std::string reply = av[1];
 	std::string user = std::string(reply.begin(), std::find(reply.begin(), reply.end(), '='));
 	if (user[user.length() - 1] == '*')
@@ -1130,7 +1130,7 @@ bool ChannelModeFlood::IsValid(const char *value)
 	if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
 	else {
 		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
-		strncpy(xbuf, value, sizeof(xbuf));
+		strlcpy(xbuf, value, sizeof(xbuf));
 		p2 = strchr(xbuf + 1, ']');
 		if (!p2) return 0;
 		*p2 = '\0';

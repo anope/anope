@@ -213,10 +213,9 @@ class CommandCSAKick : public Command
 
 			if (!na) {
 				split_usermask(mask, &nick, &user, &host);
-				char *smask = new char[strlen(nick) + strlen(user) + strlen(host) + 3];
+				std::string smask = std::string(nick) + "!" + user + "@" + host;
 				freemask = 1;
-				sprintf(smask, "%s!%s@%s", nick, user, host);
-				mask = smask;
+				mask = sstrdup(smask.c_str());
 				delete [] nick;
 				delete [] user;
 				delete [] host;

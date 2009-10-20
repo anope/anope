@@ -242,7 +242,7 @@ int MailValidate(const char *email)
 
 	if (!email)
 		return 0;
-	strcpy(copy, email);
+	strlcpy(copy, email, sizeof(copy));
 
 	domain = strchr(copy, '@');
 	if (!domain)

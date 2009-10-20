@@ -408,10 +408,10 @@ void rsend_notify(User * u, Memo * m, const char *chan)
 		   nick or channel */
 		if (chan) {
 			fmt = getstring(na, MEMO_RSEND_CHAN_MEMO_TEXT);
-			sprintf(text, fmt, chan);
+			snprintf(text, sizeof(text), fmt, chan);
 		} else {
 			fmt = getstring(na, MEMO_RSEND_NICK_MEMO_TEXT);
-			sprintf(text, "%s", fmt);
+			snprintf(text, sizeof(text), "%s", fmt);
 		}
 
 		/* Send notification */

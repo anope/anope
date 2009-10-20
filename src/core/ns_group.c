@@ -117,8 +117,8 @@ class CommandNSGroup : public Command
 
 			if (na)
 			{
-				na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-				sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
+				std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+				na->last_usermask = sstrdup(last_usermask.c_str());
 				na->last_realname = sstrdup(u->realname);
 				na->time_registered = na->last_seen = time(NULL);
 

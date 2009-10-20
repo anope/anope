@@ -159,7 +159,7 @@ static char currentpass[1024];
 /* PASS */
 void inspircd_cmd_pass(const char *pass)
 {
-	strncpy(currentpass, pass, 1024);
+	strlcpy(currentpass, pass, sizeof(currentpass));
 }
 
 
@@ -645,8 +645,8 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 
 // Much as I hate goto.. I can't `break 2' to get here.. XXX ugly
 endnick:
-		strncat(nicklist, prefixandnick, 513);
-		strncat(nicklist, " ", 513);
+		strlcat(nicklist, prefixandnick, sizeof(nicklist));
+		strlcat(nicklist, " ", sizeof(nicklist));
 		delete [] curnick_real;
 		nlen = 0;
 	}
@@ -901,7 +901,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	Server *s = findserver_uid(servlist, source);
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 	int ts = strtoul(av[1], NULL, 10);
-	
+
 	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
 	 * If not, validate the user.  ~ Viper*/
 	user = prev_u_intro;

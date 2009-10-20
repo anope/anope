@@ -74,8 +74,8 @@ class CommandOSChanKill : public Command
 					cunext = cu->next;
 					if (is_oper(cu->user))
 						continue;
-					strncpy(mask, "*@", 3); /* Use *@" for the akill's, */
-					strncat(mask, cu->user->host, HOSTMAX);
+					strlcpy(mask, "*@", sizeof(mask)); /* Use *@" for the akill's, */
+					strlcat(mask, cu->user->host, sizeof(mask));
 					add_akill(NULL, mask, s_OperServ, expires, realreason);
 					check_akill(cu->user->nick, cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
 				}

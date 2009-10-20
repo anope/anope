@@ -154,7 +154,7 @@ static char currentpass[1024];
 /* PASS */
 void inspircd_cmd_pass(const char *pass)
 {
-	strncpy(currentpass, pass, 1024);
+	strlcpy(currentpass, pass, sizeof(currentpass));
 }
 
 
@@ -568,8 +568,8 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 				}
 			}
 		}
-		strncat(nicklist, prefixandnick, 513);
-		strncat(nicklist, " ", 513);
+		strlcat(nicklist, prefixandnick, sizeof(nicklist));
+		strlcat(nicklist, " ", sizeof(nicklist));
 		delete [] curnick_real;
 		nlen = 0;
 	}

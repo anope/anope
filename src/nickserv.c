@@ -670,9 +670,8 @@ int validate_user(User * u)
 		na->last_seen = time(NULL);
 		if (na->last_usermask)
 			delete [] na->last_usermask;
-		na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-		sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(),
-		        u->GetDisplayedHost().c_str());
+		std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+		na->last_usermask = sstrdup(last_usermask.c_str());
 		if (na->last_realname)
 			delete [] na->last_realname;
 		na->last_realname = sstrdup(u->realname);
@@ -937,23 +936,24 @@ bool is_on_access(User *u, NickCore *nc)
 	char *buf;
 	char *buf2 = NULL;
 	char *buf3 = NULL;
+	std::string tmp_buf;
 
 	if (!u || !nc || nc->access.empty())
 		return false;
 
-	buf = new char[u->GetIdent().length() + strlen(u->host) + 2];
-	sprintf(buf, "%s@%s", u->GetIdent().c_str(), u->host);
+	tmp_buf = u->GetIdent() + "@" + u->host;
+	buf = sstrdup(tmp_buf.c_str());
 	if (ircd->vhost)
 	{
 		if (u->vhost)
 		{
-			buf2 = new char[u->GetIdent().length() + strlen(u->vhost) + 2];
-			sprintf(buf2, "%s@%s", u->GetIdent().c_str(), u->vhost);
+			tmp_buf = u->GetIdent() + "@" + u->vhost;
+			buf2 = sstrdup(tmp_buf.c_str());
 		}
 		if (!u->GetCloakedHost().empty())
 		{
-			buf3 = new char[u->GetIdent().length() + u->GetCloakedHost().length() + 2];
-			sprintf(buf3, "%s@%s", u->GetIdent().c_str(), u->GetCloakedHost().c_str());
+			tmp_buf = u->GetIdent() + "@" + u->GetCloakedHost();
+			buf3 = sstrdup(tmp_buf.c_str());
 		}
 	}
 
@@ -980,8 +980,10 @@ bool is_on_access(User *u, NickCore *nc)
 	delete [] buf;
 	if (ircd->vhost)
 	{
-		delete [] buf2;
-		delete [] buf3;
+		if (buf2)
+			delete [] buf2;
+		if (buf3)
+			delete [] buf3;
 	}
 	return false;
 }

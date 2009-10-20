@@ -413,9 +413,9 @@ const char *expire_left(NickCore *nc, char *buf, int len, time_t expires)
 	time_t now = time(NULL);
 
 	if (!expires) {
-		strncpy(buf, getstring(nc, NO_EXPIRE), len);
+		strlcpy(buf, getstring(nc, NO_EXPIRE), len);
 	} else if (expires <= now) {
-		strncpy(buf, getstring(nc, EXPIRES_SOON), len);
+		strlcpy(buf, getstring(nc, EXPIRES_SOON), len);
 	} else {
 		time_t diff = expires - now + 59;
 

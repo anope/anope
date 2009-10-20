@@ -213,7 +213,7 @@ int main(int ac, char **av)
 					fprintf(stderr, "%s:%d: Out of memory!\n", filename, linenum);
 					return 2;
 				}
-				sprintf(strings[curstring] + i, "%s\n", line);
+				snprintf(strings[curstring] + i, strlen(line) + 2, "%s\n", line);
 			}
 		} else {
 			if ((curstring = stringnum(line)) < 0) {

@@ -30,7 +30,7 @@ time_t maxusertime;
 User::User(const std::string &snick, const std::string &suid)
 {
 	User **list;
-	
+
 	if (snick.empty())
 		throw "what the craq, empty nick passed to constructor";
 
@@ -46,7 +46,7 @@ User::User(const std::string &snick, const std::string &suid)
 	founder_chans = NULL;
 	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
-	
+
 	strscpy(this->nick, snick.c_str(), NICKMAX);
 	this->uid = suid;
 	list = &userlist[HASH(this->nick)];
@@ -101,7 +101,7 @@ void User::SetNewNick(const std::string &newnick)
 	if (*list)
 		(*list)->prev = this;
 	*list = this;
-	
+
 	OnAccess = false;
 	NickAlias *na = findnick(this->nick);
 	if (na)
@@ -143,12 +143,12 @@ void User::SetCloakedHost(const std::string &newhost)
 {
 	if (newhost.empty())
 		throw "empty host in User::SetCloakedHost";
-	
+
 	chost = newhost;
 
 	if (debug)
 		alog("debug: %s changed cloaked host to %s", this->nick, newhost.c_str());
-	
+
 	this->UpdateHost();
 }
 
@@ -260,9 +260,9 @@ User::~User()
 
 	if (debug >= 2)
 		alog("debug: User::~User(): free user data");
-	
+
 	delete [] this->host;
-	
+
 	if (this->vhost)
 		delete [] this->vhost;
 
@@ -377,14 +377,14 @@ void User::AutoID(const char *account)
 {
 	NickCore *tnc;
 	NickAlias *na;
-	
-	if ((tnc = findcore(account)))	
+
+	if ((tnc = findcore(account)))
 	{
 		this->nc = tnc;
 		if ((na = findnick(this->nick)) && na->nc == tnc)
-		{				
+		{
 			check_memos(this);
-		}	
+		}
 	}
 }
 
@@ -407,8 +407,8 @@ void User::UpdateHost()
 		if (na->last_usermask)
 			delete [] na->last_usermask;
 
-		na->last_usermask = new char[this->GetIdent().length() + this->GetDisplayedHost().length() + 2];
-		sprintf(na->last_usermask, "%s@%s", this->GetIdent().c_str(),  this->GetDisplayedHost().c_str());
+		std::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
+		na->last_usermask = sstrdup(last_usermask.c_str());
 	}
 
 	OnAccess = false;
@@ -739,8 +739,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		 */
 		if (is_sync(findserver(servlist, server)) && checkDefCon(DEFCON_AKILL_NEW_CLIENTS) && !is_ulined(server))
 		{
-			strncpy(mask, "*@", 3);
-			strncat(mask, host, HOSTMAX);
+			strlcpy(mask, "*@", sizeof(mask));
+			strlcat(mask, host, sizeof(mask));
 			alog("DEFCON: adding akill for %s", mask);
 			add_akill(NULL, mask, s_OperServ,
 					  time(NULL) + DefConAKILL,
@@ -876,9 +876,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 			if (ntmp->last_usermask)
 				delete [] ntmp->last_usermask;
-			ntmp->last_usermask = new char[user->GetIdent().length() + user->GetDisplayedHost().length() + 2];
-			sprintf(ntmp->last_usermask, "%s@%s",
-					user->GetIdent().c_str(), user->GetDisplayedHost().c_str());
+			std::string last_usermask = user->GetIdent() + "@" + user->GetDisplayedHost();
+			ntmp->last_usermask = sstrdup(last_usermask.c_str());
 			ircdproto->SetAutoIdentificationToken(user);
 			alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
 		}

@@ -49,8 +49,8 @@ class CommandNSConfirm : public Command
 		}
 		else
 		{
-			na->last_usermask = new char[u->GetIdent().length() + u->GetDisplayedHost().length() + 2];
-			sprintf(na->last_usermask, "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
+			std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_usermask = sstrdup(last_usermask.c_str());
 			na->last_realname = sstrdup(u->realname);
 			if (NSAddAccessOnReg)
 				na->nc->AddAccess(create_mask(u));

@@ -25,26 +25,25 @@ class ENone : public Module
 		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
 
-	EventReturn OnEncrypt(const char *src,int len,char *dest,int size) 
+	EventReturn OnEncrypt(const char *src,int len,char *dest,int size)
 	{
-		if(size>=len) 
+		if(size>=len)
 		{
 			memset(dest,0,size);
-			strncpy(dest,src,len);
-			dest[len] = '\0';
-			return EVENT_ALLOW; 
+			strlcpy(dest,src,len);
+			return EVENT_ALLOW;
 		}
 		return EVENT_STOP;
 	}
 
-	EventReturn OnEncryptInPlace(char *buf, int size) 
+	EventReturn OnEncryptInPlace(char *buf, int size)
 	{
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnEncryptCheckLen(int passlen, int bufsize) 
+	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
 	{
-		if(bufsize>=passlen) 
+		if(bufsize>=passlen)
 		{
 			return EVENT_ALLOW;
 		}
@@ -53,13 +52,12 @@ class ENone : public Module
 
 	EventReturn OnDecrypt(const char *src, char *dest, int size) {
 		memset(dest,0,size);
-		strncpy(dest,src,size);
-		dest[size] = '\0';
+		strlcpy(dest,src,size);
 		return EVENT_ALLOW;
 	}
 
 	EventReturn OnCheckPassword(const char *plaintext, const char *password) {
-		if(strcmp(plaintext,password)==0) 
+		if(strcmp(plaintext,password)==0)
 		{
 			return EVENT_ALLOW;
 		}

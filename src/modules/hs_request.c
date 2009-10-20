@@ -826,9 +826,9 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 		return;
 
 	if (vIdent)
-		sprintf(host, "%s@%s", vIdent, vHost);
+		snprintf(host, sizeof(host), "%s@%s", vIdent, vHost);
 	else
-		sprintf(host, "%s", vHost);
+		snprintf(host, sizeof(host), "%s", vHost);
 
 	if (HSRequestMemoOper == 1)
 	{

@@ -45,15 +45,11 @@ static int moduleCopyFile(const char *name, const char *output)
 	int srcfp;
 #endif
 	char input[4096];
-	int len;
 
-	strncpy(input, services_dir.c_str(), 4095);
-	len = strlen(input);
-	strncat(input, "/modules/", 4095 - len);  /* Get full path with module extension */
-	len = strlen(input);
-	strncat(input, name, 4095 - len);
-	len = strlen(output);
-	strncat(input, MODULE_EXT, 4095 - len);
+	strlcpy(input, services_dir.c_str(), sizeof(input));
+	strlcat(input, "/modules/", sizeof(input));  /* Get full path with module extension */
+	strlcat(input, name, sizeof(input));
+	strlcat(input, MODULE_EXT, sizeof(input));
 
 #ifndef _WIN32
 	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)

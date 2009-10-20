@@ -202,34 +202,26 @@ class CommandOSStats : public Command
 
 	CommandReturn DoStatsUplink(User *u)
 	{
-		char buf[512];
-		int buflen, i;
-		buf[0] = '\0';
-		buflen = 511; /* How confusing, this is the amount of space left! */
+		char buf[512] = "";
+		int i;
 		for (i = 0; capab_info[i].token; ++i)
 		{
 			if (uplink_capab & capab_info[i].flag)
 			{
-				strncat(buf, " ", buflen);
-				--buflen;
-				strncat(buf, capab_info[i].token, buflen);
-				buflen -= strlen(capab_info[i].token);
+				strlcat(buf, " ", sizeof(buf));
+				strlcat(buf, capab_info[i].token, sizeof(buf));
 				/* Special cases */
 				if (capab_info[i].flag == CAPAB_CHANMODE)
 				{
-					strncat(buf, "=", buflen);
-					--buflen;
-					strncat(buf, ircd->chanmodes, buflen);
-					buflen -= strlen(ircd->chanmodes);
+					strlcat(buf, "=", sizeof(buf));
+					strlcat(buf, ircd->chanmodes, sizeof(buf));
 				}
 				if (capab_info[i].flag == CAPAB_NICKCHARS)
 				{
-					strncat(buf, "=", buflen);
-					--buflen;
+					strlcat(buf, "=", sizeof(buf));
 					if (ircd->nickchars)
 					{
-						strncat(buf, ircd->nickchars, buflen);
-						buflen -= strlen(ircd->nickchars);
+						strlcat(buf, ircd->nickchars, sizeof(buf));
 					} /* leave blank if it was null */
 				}
 			}

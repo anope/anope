@@ -478,12 +478,12 @@ void fill_db_ptr(DBFile *dbptr, int version, int core_version,
 	dbptr->db_version = version;
 	dbptr->core_db_version = core_version;
 	if (!service)
-		strcpy(dbptr->service, service);
+		strlcpy(dbptr->service, service, sizeof(dbptr->service));
 	else
-		strcpy(dbptr->service, "");
+		strlcpy(dbptr->service, "", sizeof(dbptr->service));
 
-	strcpy(dbptr->filename, filename);
-	snprintf(dbptr->temp_name, 261, "%s.temp", filename);
+	strlcpy(dbptr->filename, filename, sizeof(dbptr->filename));
+	snprintf(dbptr->temp_name, sizeof(dbptr->temp_name), "%s.temp", filename);
 	return;
 }
 

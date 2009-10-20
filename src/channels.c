@@ -364,7 +364,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 						if (plus || !cmp->MinusNoArg)
 						{
 							chan->GetParam(cmp->Name, &param);
-							
+
 							if (!param.empty())
 							{
 								value = const_cast<char *>(param.c_str());
@@ -527,7 +527,7 @@ void chan_set_modes(const char *source, Channel *chan, int ac, const char **av, 
 					alog("debug: Setting %c%c on %s for %s", (add ? '+' : '-'),
 						 mode, chan->name, user->nick);
 
-				if (add) 
+				if (add)
 					chan_set_user_status(chan, user, cms->Status);
 					/* If this does +o, remove any DEOPPED flag */
 				else
@@ -565,7 +565,7 @@ void chan_set_modes(const char *source, Channel *chan, int ac, const char **av, 
 				if (cm->Type == MODE_PARAM)
 				{
 					cmp = static_cast<ChannelModeParam *>(cm);
-					
+
 					if (add || !cmp->MinusNoArg)
 					{
 						if (ac == 0)
@@ -1688,67 +1688,67 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	/* No need for strn* functions for modebuf, as every possible string
 	 * will always fit in. -GD
 	 */
-	strcpy(modebuf, "");
-	strcpy(userbuf, "");
+	strlcpy(modebuf, "", sizeof(modebuf));
+	strlcpy(userbuf, "", sizeof(userbuf));
 	if (add_modes > 0) {
 		strcat(modebuf, "+");
 		if ((add_modes & CUS_OWNER) && !(status & CUS_OWNER)) {
-			strcat(modebuf, &owner->ModeChar);
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, &owner->ModeChar, sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		} else {
 			add_modes &= ~CUS_OWNER;
 		}
 		if ((add_modes & CUS_PROTECT) && !(status & CUS_PROTECT)) {
-			strcat(modebuf, &admin->ModeChar);
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, &admin->ModeChar, sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		} else {
 			add_modes &= ~CUS_PROTECT;
 		}
 		if ((add_modes & CUS_OP) && !(status & CUS_OP)) {
-			strcat(modebuf, "o");
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, "o", sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		} else {
 			add_modes &= ~CUS_OP;
 		}
 		if ((add_modes & CUS_HALFOP) && !(status & CUS_HALFOP)) {
-			strcat(modebuf, "h");
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, "h", sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		} else {
 			add_modes &= ~CUS_HALFOP;
 		}
 		if ((add_modes & CUS_VOICE) && !(status & CUS_VOICE)) {
-			strcat(modebuf, "v");
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, "v", sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		} else {
 			add_modes &= ~CUS_VOICE;
 		}
 	}
 	if (rem_modes > 0) {
-		strcat(modebuf, "-");
+		strlcat(modebuf, "-", sizeof(modebuf));
 		if (rem_modes & CUS_OWNER) {
-			strcat(modebuf, &owner->ModeChar);
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, &owner->ModeChar, sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		}
 		if (rem_modes & CUS_PROTECT) {
-			strcat(modebuf, &admin->ModeChar);
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, &admin->ModeChar, sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		}
 		if (rem_modes & CUS_OP) {
-			strcat(modebuf, "o");
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, "o", sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		}
 		if (rem_modes & CUS_HALFOP) {
-			strcat(modebuf, "h");
-			strcat(userbuf, " ");
-			strcat(userbuf, user->nick);
+			strlcat(modebuf, "h", sizeof(modebuf));
+			strlcat(userbuf, " ", sizeof(userbuf));
+			strlcat(userbuf, user->nick, sizeof(userbuf));
 		}
 	}
 

@@ -754,7 +754,7 @@ class HSRequest : public Module
 		fclose(fp);
 
 		if (debug)
-			alog("[hs_request] Succesfully saved database");
+			alog("[hs_request] Successfully saved database");
 	}
 
 	void OnBackupDatabase()
@@ -934,7 +934,7 @@ void hsreq_load_db()
 	fclose(fp);
 
 	if (debug)
-		alog("[hs_request] Succesfully loaded database");
+		alog("[hs_request] Successfully loaded database");
 }
 
 void my_load_config()

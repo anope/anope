@@ -5,7 +5,15 @@ Anope Version 1.9.2
 Anope Version 1.9.1
 --------------------
 F Don't enforce akick/forbidden/etc.-restrictions on clients on ulined servers.
-
+F Remove modules_unload_all fini + hack that goes with it.
+F Signal handling cleanup.
+A Seamless fantasy support on all ChanServ commands, instead of requiring bs_fantasy_*.
+F Allow fantasy to be disabled on some commands (e.g. FORBID).
+F Some commands (e.g. !help) need to strip the pre-provided channelname from them.
+D HelpServ removed
+F Command parser cleanup: mod_current_buffer removed and replaced with proper parser. Commands now indicate how they want the buffer split.
+F Make NS ENFORCE/RELEASE stuff more sane, redo timers.
+A Opertypes (similar to InspIRCd's opertypes)
 
 Provided by Ankit <ankit@nevitus.com> - 2009
 F Segfault on shutdown
@@ -32,6 +40,8 @@ F Fix two segfaults, noted by DukePyrolator. Thanks!
 F Fix part one of #1010, reported by DukePyrolator. (Language settings are not respected in message sending.) Thanks!
 F Memory leak on +beI modes.
 
+Provided by Liber <Liber@jasonirc.net> - 2009
+F Support operoverride and such things (stop reversing changes from nonopped people where unnecessary)
 
 Anope Version 1.9.0
 --------------------

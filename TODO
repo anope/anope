@@ -3,23 +3,6 @@ Legend:
 	? = unsure
 	+ = in progress
 
-1.9.1
------
-[x] Remove modules_unload_all fini + hack that goes with it
-  [x] signal handling cleanup
-[x] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
-  Remaining issues:
-    [x] Allow fantasy to be disabled from some commands (e.g. FORBID?) seems unnecessary, really.
-    [x] (think on this carefully): some commands (e.g. !help) need to strip the pre-provided channelname from them.
-[x] HelpServ must die
-[x] Command parser cleanup: mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
-[x] Make NS ENFORCE/RELEASE stuff more sane, redo timers
-[x] Support operoverride and such things (stop reversing mode changes from nonopped people where unnecessary) - done by Liber
-[x] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
-
-Outstanding issues:
-- Add some events that were not present before but useful for future versions
-
 1.9.2
 -----
 [ ] Redo database insanity.
@@ -29,12 +12,20 @@ Outstanding issues:
     [ ] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
     [ ] Salted SHA256 (contact Special for this)
   [ ] New database format (text, not binary - works very well for merging and so on)
+[ ] generic database routines modules can use to create their own database
 [ ] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
 [ ] Socket subsystem needs some serious loving
   [ ] Multiple sockets
   [ ] Asynchronous, using select() (multiple engines? not really needed..)
   [ ] Callbacks, event style, see also inspircd
   [ ] Asynchronous DNS?
+[x] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
+[?] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
+    the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
+[ ] Last used time on AKICK/access entries
+[ ] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
+[ ] General options block, ability to turn LOGCHAN on from the config file..
+[ ] Docs directory cleanup
 
 Future
 ------
@@ -47,10 +38,6 @@ Future
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
   [ ] burn do_sjoin with fire
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
-[ ] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
-    the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
-[ ] generic database routines modules can use to create their own database
-[ ] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] add overridden form of SendGlobops accepting BotInfo
 [ ] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
@@ -62,9 +49,8 @@ Future
 [?] Update help to reflect the fact /msg memoserv set notify mail - works just fine ;)
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN
-[ ] Last used time on AKICK/access entries
 [ ] Channel access additions
-  [ ] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
+  [x] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
   [ ] Setter
   [ ] Time added
   [ ] Time modified
@@ -74,7 +60,6 @@ Future
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
   XXX: is SUSPEND overlapping with OS IGNORE functionality?
 [ ] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
-[?] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
 [?] Don't allow soper accounts to expire
 [?] Reason for CS SET RESTRICTED
 [ ] NS IDENTIFY changes
@@ -89,7 +74,6 @@ Future
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
 [ ] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK?
-[ ] General options block, ability to turn LOGCHAN on from the config file..
 [ ] Method to list suspended/forbidden nicks/channels?
 [?] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
 [?] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")

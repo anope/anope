@@ -184,6 +184,9 @@ void do_restart_services()
 		log_perror("Restart failed");
 		close_log();
 	}
+
+	FOREACH_MOD(I_OnRestart, OnRestart());
+
 	exit(1);
 }
 

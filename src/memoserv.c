@@ -211,7 +211,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (z == 3)
 			syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 
-	} else if (!u->IsRecognized()) {
+	} else if (!nick_identified(u) && !u->IsRecognized()) {
 		if (z == 0 || z == 3)
 			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 

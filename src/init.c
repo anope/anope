@@ -508,43 +508,39 @@ int init_secondary(int ac, char **av)
 	load_ns_dbase();
 	if (debug)
 		alog("debug: Loaded %s database (1/%d)", s_NickServ,
-		 (PreNickDBName ? 8 : 7));
+		 (PreNickDBName ? 7 : 6));
 	if (s_HostServ) {
 		load_hs_dbase();
 		if (debug)
 		alog("debug: Loaded %s database (2/%d)", s_HostServ,
-			 (PreNickDBName ? 8 : 7));
+			 (PreNickDBName ? 7 : 6));
 	} else if (debug) {
-		alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 8 : 7));
+		alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 7 : 6));
 	}
 	if (s_BotServ) {
 		load_bs_dbase();
 		if (debug)
 		alog("debug: Loaded %s database (3/%d)", s_BotServ,
-			 (PreNickDBName ? 8 : 7));
+			 (PreNickDBName ? 7 : 6));
 	} else if (debug) {
-		alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
+		alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 7 : 6));
 	}
 	load_cs_dbase();
 	if (debug)
 		alog("debug: Loaded %s database (4/%d)", s_ChanServ,
-		 (PreNickDBName ? 8 : 7));
+		 (PreNickDBName ? 7 : 6));
 	load_os_dbase();
 	if (debug)
 		alog("debug: Loaded %s database (5/%d)", s_OperServ,
-		 (PreNickDBName ? 8 : 7));
-	load_news();
-	if (debug)
-		alog("debug: Loaded news database (6/%d)",
-		 (PreNickDBName ? 8 : 7));
+		 (PreNickDBName ? 7 : 6));
 	load_exceptions();
 	if (debug)
-		alog("debug: Loaded exception database (7/%d)",
-		 (PreNickDBName ? 8 : 7));
+		alog("debug: Loaded exception database (6/%d)",
+		 (PreNickDBName ? 7 : 6));
 	if (PreNickDBName) {
 		load_ns_req_db();
 		if (debug)
-		alog("debug: Loaded PreNick database (8/8)");
+		alog("debug: Loaded PreNick database (7/7)");
 	}
 	alog("Databases loaded");
 

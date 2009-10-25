@@ -436,7 +436,6 @@ typedef struct mailinfo_ MailInfo;
 typedef struct akill_ Akill;
 typedef struct sxline_ SXLine;
 typedef struct hostcore_ HostCore;
-typedef struct newsitem_ NewsItem;
 typedef struct exception_ Exception;
 typedef struct session_ Session;
 
@@ -1013,14 +1012,6 @@ struct c_elist_entry {
 
 /*************************************************************************/
 
-/* Constants for news types. */
-
-#define NEWS_LOGON		0
-#define NEWS_OPER		1
-#define NEWS_RANDOM 		2
-
-/*************************************************************************/
-
 /* Ignorance list data. */
 
 typedef struct ignore_data {
@@ -1077,16 +1068,6 @@ struct hostcore_ {
 	char *vHost;			/* Vhost for this user */
 	char *creator;			/* Oper Nick of the oper who set the vhost */
 	time_t time;			/* Date/Time vHost was set */
-};
-
-/*************************************************************************/
-
-struct newsitem_ {
-	uint16 type;
-	uint32 num;				  /* Numbering is separate for login and oper news */
-	char *text;
-	char who[NICKMAX];
-	time_t time;
 };
 
 /*************************************************************************/

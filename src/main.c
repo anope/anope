@@ -152,7 +152,6 @@ void save_databases()
 		save_hs_dbase();
 	}
 	save_os_dbase();
-	save_news();
 	save_exceptions();
 }
 

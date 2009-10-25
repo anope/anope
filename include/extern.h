@@ -615,22 +615,6 @@ E void modules_unload_all(bool unload_proto);	/* Read warnings near function sou
 E void ModuleDatabaseBackup(const char *dbname);
 E void ModuleRemoveBackups(const char *dbname);
 
-/**** news.c ****/
-
-/* Add news items. */
-E int add_newsitem(User * u, const char *text, int16 type);
-/* Delete news items. */
-E int del_newsitem(int num, int16 type);
-E int32 nnews, news_size;
-E NewsItem *news;
-E void get_news_stats(long *nrec, long *memuse);
-E void load_news();
-E void save_news();
-E void display_news(User * u, int16 type);
-E int do_logonnews(User * u);
-E int do_opernews(User * u);
-E int do_randomnews(User * u);
-
 /**** nickserv.c ****/
 
 E NickAlias *nalists[1024];

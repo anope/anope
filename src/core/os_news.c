@@ -14,6 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "pseudo.h" // Remove once new dbs are added
 
 /* List of messages for each news type.  This simplifies message sending. */
 
@@ -31,11 +32,29 @@
 #define MSG_DELETED_ALL	11
 #define MSG_MAX		11
 
+enum NewsType
+{
+	NEWS_LOGON,
+	NEWS_RANDOM,
+	NEWS_OPER
+};
+
 struct newsmsgs {
-	int16 type;
+	NewsType type;
 	const char *name;
 	int msgs[MSG_MAX + 1];
 };
+
+struct NewsItem
+{
+	NewsType type;
+	uint32 num;
+	std::string Text;
+	char who[NICKMAX];
+	time_t time;
+};
+
+std::vector<NewsItem *> News;
 
 struct newsmsgs msgarray[] = {
 	{NEWS_LOGON, "LOGON",
@@ -82,7 +101,188 @@ struct newsmsgs msgarray[] = {
 	 }
 };
 
-static int *findmsgs(int16 type, const char **type_name)
+#define SAFE(x) do {					\
+	if ((x) < 0) {					\
+	if (!forceload)					\
+		fatal("Read error on %s", NewsDBName);	\
+	break;						\
+	}							\
+} while (0)
+
+void load_news()
+{
+	dbFILE *f;
+	int i;
+	uint16 n, type;
+	uint32 tmp32;
+	NewsItem *news;
+	char *text;
+
+	if (!(f = open_db(s_OperServ, NewsDBName, "r", NEWS_VERSION)))
+		return;
+	switch (i = get_file_version(f)) {
+	case 9:
+	case 8:
+	case 7:
+		SAFE(read_int16(&n, f));
+		if (!n) {
+			close_db(f);
+			return;
+		}
+		for (i = 0; i < n; i++) {
+			news = new NewsItem;
+
+			SAFE(read_int16(&type, f));
+			news->type = (NewsType)type;
+			SAFE(read_int32(&news->num, f));
+			SAFE(read_string(&text, f));
+			news->Text = text;
+			delete [] text;
+			SAFE(read_buffer(news->who, f));
+			SAFE(read_int32(&tmp32, f));
+			news->time = tmp32;
+
+			News.push_back(news);
+		}
+		break;
+
+	default:
+		fatal("Unsupported version (%d) on %s", i, NewsDBName);
+	}						   /* switch (ver) */
+
+	close_db(f);
+}
+
+#undef SAFE
+
+#define SAFE(x) do {						\
+	if ((x) < 0) {						\
+	restore_db(f);						\
+	log_perror("Write error on %s", NewsDBName);		\
+	if (time(NULL) - lastwarn > WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
+			strerror(errno));			\
+		lastwarn = time(NULL);				\
+	}							\
+	return;							\
+	}								\
+} while (0)
+
+void save_news()
+{
+	dbFILE *f;
+	static time_t lastwarn = 0;
+
+	if (!(f = open_db(s_OperServ, NewsDBName, "w", NEWS_VERSION)))
+		return;
+	SAFE(write_int16(News.size(), f));
+	for (unsigned i = 0; i < News.size(); i++) {
+		SAFE(write_int16(News[i]->type, f));
+		SAFE(write_int32(News[i]->num, f));
+		SAFE(write_string(News[i]->Text.c_str(), f));
+		SAFE(write_buffer(News[i]->who, f));
+		SAFE(write_int32(News[i]->time, f));
+	}
+	close_db(f);
+}
+
+#undef SAFE
+
+static void DisplayNews(User *u, NewsType Type)
+{
+	int msg;
+	static unsigned current_news = 0;
+
+	if (Type == NEWS_LOGON)
+		msg = NEWS_LOGON_TEXT;
+	else if (Type == NEWS_OPER)
+		msg = NEWS_OPER_TEXT;
+	else if (Type == NEWS_RANDOM)
+		msg = NEWS_RANDOM_TEXT;
+	else
+	{
+		alog("news: Invalid type (%d) to display_news()", Type);
+		return;
+	}
+
+	unsigned displayed = 0;
+	bool NewsExists = false;
+	for (unsigned i = 0; i < News.size(); ++i)
+	{
+		if (News[i]->type == Type)
+		{
+			tm *tm;
+			char timebuf[64];
+
+			NewsExists = true;
+
+			if (Type == NEWS_RANDOM && i == current_news)
+				continue;
+
+			tm = localtime(&News[i]->time);
+			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, tm);
+			notice_lang(s_GlobalNoticer, u, msg, timebuf, News[i]->Text.c_str());
+
+			++displayed;
+
+			if (Type == NEWS_RANDOM)
+			{
+				current_news = i;
+				return;
+			}
+			else if (displayed >= NewsCount)
+				return;
+		}
+
+		/* Reset to head of list to get first random news value */
+		if (i + 1 == News.size() && Type == NEWS_RANDOM && NewsExists)
+			i = 0;
+	}
+}
+
+static int add_newsitem(User * u, const char *text, NewsType type)
+{
+	int num = 0;
+	
+	for (unsigned i = News.size(); i > 0; --i)
+	{
+		if (News[i - 1]->type == type)
+		{
+			num = News[i - 1]->num;
+			break;
+		}
+	}
+	
+	NewsItem *news = new NewsItem;
+	news->type = type;
+	news->num = num + 1;
+	news->Text = text;
+	news->time = time(NULL);
+	strscpy(news->who, u->nick, NICKMAX);
+
+	News.push_back(news);
+
+	return num + 1;
+}
+
+static int del_newsitem(unsigned num, NewsType type)
+{
+	int count = 0;
+
+	for (unsigned i = News.size(); i > 0; --i)
+	{
+		if (News[i - 1]->type == type && (num == 0 || News[i - 1]->num == num))
+		{
+			delete News[i - 1];
+			News.erase(News.begin() + i - 1);
+			++count;
+		}
+	}
+
+	return count;
+}
+
+static int *findmsgs(NewsType type, const char **type_name)
 {
 	for (unsigned i = 0; i < lenof(msgarray); i++) {
 		if (msgarray[i].type == type) {
@@ -97,21 +297,21 @@ static int *findmsgs(int16 type, const char **type_name)
 class NewsBase : public Command
 {
  protected:
-	CommandReturn DoList(User *u, short type, int *msgs)
+	CommandReturn DoList(User *u, NewsType type, int *msgs)
 	{
-		int i, count = 0;
+		int count = 0;
 		char timebuf[64];
 		struct tm *tm;
 
-		for (i = 0; i < nnews; ++i)
+		for (unsigned i = 0; i < News.size(); ++i)
 		{
-			if (news[i].type == type)
+			if (News[i]->type == type)
 			{
 				if (!count)
 					notice_lang(s_OperServ, u, msgs[MSG_LIST_HEADER]);
-				tm = localtime(&news[i].time);
+				tm = localtime(&News[i]->time);
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-				notice_lang(s_OperServ, u, msgs[MSG_LIST_ENTRY], news[i].num, timebuf, *news[i].who ? news[i].who : "<unknown>", news[i].text);
+				notice_lang(s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, *News[i]->who ? News[i]->who : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
 		}
@@ -123,7 +323,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params, short type, int *msgs)
+	CommandReturn DoAdd(User *u, std::vector<ci::string> &params, NewsType type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
 		int n;
@@ -147,10 +347,10 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params, short type, int *msgs)
+	CommandReturn DoDel(User *u, std::vector<ci::string> &params, NewsType type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
-		int num;
+		unsigned num;
 
 		if (!text)
 			this->OnSyntaxError(u);
@@ -167,11 +367,10 @@ class NewsBase : public Command
 				if (num > 0 && del_newsitem(num, type))
 				{
 					notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
-					/* Reset the order - #0000397 */
-					for (int i = 0; i < nnews; ++i)
+					for (unsigned i = 0; i < News.size(); ++i)
 					{
-						if (news[i].type == type && news[i].num > num)
-							--news[i].num;
+						if (News[i]->type == type && News[i]->num > num)
+							--News[i]->num;
 					}
 				}
 				else
@@ -189,17 +388,11 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoNews(User *u, std::vector<ci::string> &params, short type)
+	CommandReturn DoNews(User *u, std::vector<ci::string> &params, NewsType type)
 	{
 		ci::string cmd = params[0];
 		const char *type_name;
 		int *msgs;
-
-		if (!u->nc->HasCommand("operserv/news"))
-		{
-			notice_lang(s_OperServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
 
 		msgs = findmsgs(type, &type_name);
 		if (!msgs)
@@ -319,6 +512,14 @@ class OSNews : public Module
 		this->AddCommand(OPERSERV, new CommandOSLogonNews());
 		this->AddCommand(OPERSERV, new CommandOSOperNews());
 		this->AddCommand(OPERSERV, new CommandOSRandomNews());
+
+		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnSaveDatabase, I_OnPostLoadDatabases };
+		ModuleManager::Attach(i, this, 4);
+	}
+
+	~OSNews()
+	{
+		save_news();
 	}
 
 	void OperServHelp(User *u)
@@ -326,6 +527,32 @@ class OSNews : public Module
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
+	}
+
+	void OnUserModeSet(User *u, UserModeName Name)
+	{
+		if (Name == UMODE_OPER)
+		{
+			DisplayNews(u, NEWS_OPER);
+		}
+	}
+
+	void OnUserConnect(User *u)
+	{
+		DisplayNews(u, NEWS_LOGON);
+		DisplayNews(u, NEWS_RANDOM);
+	}
+
+	void OnSaveDatabase()
+	{
+		/* This needs to be destroyed when new dbs are added... */
+		save_news();
+	}
+
+	void OnPostLoadDatabases()
+	{
+		/* This needs to be destroyed when new dbs are added... */
+		load_news();
 	}
 };
 

@@ -1,6 +1,6 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
 		config.o datafiles.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
-		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
+		memory.o memoserv.o messages.o misc.o modules.o nickserv.o operserv.o \
 		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o users.o module.o modulemanager.o configreader.o \
 		wildcard.o nickcore.o nickalias.o timers.o modes.o
 
@@ -63,7 +63,6 @@ modules.o:      modules.c   $(INCLUDES)
 module.o:       module.cpp   $(INCLUDES)
 modulemanager.o:      modulemanager.cpp   $(INCLUDES)
 misc.o:         misc.c      $(INCLUDES)
-news.o:         news.c      $(INCLUDES)
 nickserv.o:     nickserv.c  $(INCLUDES)
 operserv.o:     operserv.c  $(INCLUDES)
 process.o:      process.c   $(INCLUDES)

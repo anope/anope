@@ -765,9 +765,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
 
-		display_news(user, NEWS_LOGON);
-		display_news(user, NEWS_RANDOM);
-
 		/* Now check for session limits */
 		if (LimitSessions && !is_ulined(server))
 			add_session(nick, host, ipbuf);

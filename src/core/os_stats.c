@@ -384,9 +384,6 @@ void get_operserv_stats(long *nrec, long *memuse)
 		}
 	}
 
-	get_news_stats(&count2, &mem2);
-	count += count2;
-	mem += mem2;
 	get_exception_stats(&count2, &mem2);
 	count += count2;
 	mem += mem2;

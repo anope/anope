@@ -208,7 +208,6 @@ class UnrealIRCdProto : public IRCDProto
 					if (add) {
 						++opcnt;
 						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-						display_news(user, NEWS_OPER);
 					}
 					else --opcnt;
 					break;

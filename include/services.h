@@ -1116,7 +1116,6 @@ class UserMode
 
 	/** Default constructor
 	 * @param nName The mode name
-	 * @param mMode A value representing the mode
 	 */
 	UserMode(UserModeName mName)
 	{
@@ -1143,7 +1142,6 @@ class ChannelMode
 
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mMode A value representing the mode
 	 */
 	ChannelMode(ChannelModeName mName)
 	{
@@ -1208,12 +1206,12 @@ class ChannelModeParam : public ChannelMode
 
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mMode A value representing the mode
+	 * @param MinusArg true if this mode sends no arg when unsetting
 	 */
-	ChannelModeParam(ChannelModeName mName) : ChannelMode(mName)
+	ChannelModeParam(ChannelModeName mName, bool MinusArg = false) : ChannelMode(mName)
 	{
 		this->Type = MODE_PARAM;
-		MinusNoArg = false;
+		MinusNoArg = MinusArg;
 	}
 
 	/** Default destructor
@@ -1244,6 +1242,8 @@ class ChannelModeStatus : public ChannelMode
 	/** Default constructor
 	 * @param mName The mode name
 	 * @param mStatus A CUS_ value
+	 * @param mSymbol The symbol for the mode, eg @ % +
+	 * @param mProtectBotServ Should botserv clients reset this on themself if it gets unset>
 	 */
 	ChannelModeStatus(ChannelModeName mName, int16 mStatus, char mSymbol, bool mProtectBotServ = false) : ChannelMode(mName)
 	{

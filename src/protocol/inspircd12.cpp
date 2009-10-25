@@ -1099,11 +1099,11 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		if (strstr(av[1], "m_blockcaps.so"))
 			ModeManager::AddChannelMode('B', new ChannelMode(CMODE_BLOCKCAPS));
 		if (strstr(av[1], "m_nickflood.so"))
-			ModeManager::AddChannelMode('F', new ChannelModeParam(CMODE_NICKFLOOD));
+			ModeManager::AddChannelMode('F', new ChannelModeParam(CMODE_NICKFLOOD, true));
 		if (strstr(av[1], "m_messageflood.so"))
-			ModeManager::AddChannelMode('f', new ChannelModeParam(CMODE_FLOOD));
+			ModeManager::AddChannelMode('f', new ChannelModeParam(CMODE_FLOOD, true));
 		if (strstr(av[1], "m_joinflood.so"))
-			ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD));
+			ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD, true));
 		if (strstr(av[1], "m_permchannels.so"))
 			ModeManager::AddChannelMode('P', new ChannelMode(CMODE_PERM));
 		if (strstr(av[1], "m_nonotice.so"))

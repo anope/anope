@@ -923,6 +923,30 @@ class CoreExport Module
 	 */
 	virtual void OnInsertHostCore(HostCore *hc) { }
 
+	/** Called when a mode is set on a channel
+	 * @param c The channel
+	 * @param Name The mode name
+	 */
+	virtual void OnChannelModeSet(Channel *c, ChannelModeName Name) { }
+
+	/** Called when a mode is unset on a channel
+	 * @param c The channel
+	 * @param Name The mode name
+	 */
+	virtual void OnChannelModeUnset(Channel *c, ChannelModeName Name) { }
+
+	/** Called when a mode is set on a user
+	 * @param u The user
+	 * @param Name The mode name
+	 */
+	virtual void OnUserModeSet(User *u, UserModeName Name) { }
+
+	/** Called when a mode is unset from a user
+	 * @param u The user
+	 * @param Name The mode name
+	 */
+	virtual void OnUserModeUnset(User *u, UserModeName Name) { }
+
 };
 
 
@@ -960,6 +984,7 @@ enum Implementation
 		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
+		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset,
 	I_END
 };
 

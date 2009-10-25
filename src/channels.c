@@ -39,6 +39,7 @@ bool Channel::HasMode(ChannelModeName Name)
 void Channel::SetMode(ChannelModeName Name)
 {
 	modes[(size_t)Name] = true;
+	FOREACH_MOD(I_OnChannelModeSet, OnChannelModeSet(this, Name));
 }
 
 /**
@@ -62,6 +63,7 @@ void Channel::SetMode(char Mode)
 void Channel::RemoveMode(ChannelModeName Name)
 {
 	modes[(size_t)Name] = false;
+	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, Name));
 }
 
 /**

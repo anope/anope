@@ -490,6 +490,7 @@ const bool User::HasMode(UserModeName Name) const
 void User::SetMode(UserModeName Name)
 {
 	modes[(size_t)Name] = true;
+	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, Name));
 }
 
 /* Set a mode on the user
@@ -511,6 +512,7 @@ void User::SetMode(char ModeChar)
 void User::RemoveMode(UserModeName Name)
 {
 	modes[(size_t)Name] = false;
+	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, Name));
 }
 
 /** Remove a mode from the user

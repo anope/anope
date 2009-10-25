@@ -1194,6 +1194,7 @@ void moduleAddModes()
 	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
 	ModeManager::AddChannelMode('f', new ChannelModeFlood());
 	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
+	ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD));
 	ModeManager::AddChannelMode('k', new ChannelModeKey());
 	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
 	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));

@@ -1032,6 +1032,11 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		}
 		if (strstr(av[1], "m_services_account.so")) {
 			has_servicesmod = 1;
+			ModeManager::AddChannelMode('r', new ChannelModeRegistered());
+			ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
+			ModeManager::AddChannelMode('M', new ChannelMode(CMODE_REGMODERATED));
+			ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
+			ModeManager::AddUserMode('R', new UserMode(UMODE_REGPRIV));
 		}
 		if (strstr(av[1], "m_svshold.so")) {
 			has_svsholdmod = 1;
@@ -1053,10 +1058,75 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		}
 		if (strstr(av[1], "m_hidechans.so")) {
 			has_hidechansmod = 1;
+			ModeManager::AddUserMode('I', new UserMode(UMODE_PRIV));
 		}
 		if (strstr(av[1], "m_servprotect.so")) {
 			ircd->pseudoclient_mode = "+Ik";
+			ModeManager::AddUserMode('k', new UserMode(UMODE_PROTECTED));
 		}
+
+		/* Add channel modes to Anope, but only if theyre supported by the IRCd */
+		if (strstr(av[1], "m_blockcolor.so"))
+			ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+		if (strstr(av[1], "m_auditorium.so"))
+			ModeManager::AddChannelMode('u', new ChannelMode(CMODE_AUDITORIUM));
+		if (strstr(av[1], "m_sslmodes.so"))
+			ModeManager::AddChannelMode('z', new ChannelMode(CMODE_SSL));
+		if (strstr(av[1], "m_allowinvite.so"))
+			ModeManager::AddChannelMode('A', new ChannelMode(CMODE_ALLINVITE));
+		if (strstr(av[1], "m_noctcp.so"))
+			ModeManager::AddChannelMode('C', new ChannelMode(CMODE_NOCTCP));
+		if (strstr(av[1], "m_censor.so"))
+			ModeManager::AddChannelMode('G', new ChannelMode(CMODE_FILTER));
+		if (strstr(av[1], "m_knock.so"))
+			ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
+		if (strstr(av[1], "m_redirect.so"))
+			ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT));
+		if (strstr(av[1], "m_nonicks.so"))
+			ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
+		if (strstr(av[1], "m_operchans.so"))
+			ModeManager::AddChannelMode('O', new ChannelModeOper());
+		if (strstr(av[1], "m_nokicks.so"))
+			ModeManager::AddChannelMode('Q', new ChannelMode(CMODE_NOKICK));
+		if (strstr(av[1], "m_stripcolor.so"))
+			ModeManager::AddChannelMode('S', new ChannelMode(CMODE_STRIPCOLOR));
+		if (strstr(av[1], "m_callerid.so"))
+			ModeManager::AddUserMode('g', new UserMode(UMODE_CALLERID));
+		if (strstr(av[1], "m_helpop.so"))
+			ModeManager::AddUserMode('h', new UserMode(UMODE_HELPOP));
+		if (strstr(av[1], "m_cloaking.so"))
+			ModeManager::AddUserMode('x', new UserMode(UMODE_CLOAK));
+		if (strstr(av[1], "m_blockcaps.so"))
+			ModeManager::AddChannelMode('B', new ChannelMode(CMODE_BLOCKCAPS));
+		if (strstr(av[1], "m_nickflood.so"))
+			ModeManager::AddChannelMode('F', new ChannelModeParam(CMODE_NICKFLOOD));
+		if (strstr(av[1], "m_messageflood.so"))
+			ModeManager::AddChannelMode('f', new ChannelModeParam(CMODE_FLOOD));
+		if (strstr(av[1], "m_joinflood.so"))
+			ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD));
+		if (strstr(av[1], "m_permchannels.so"))
+			ModeManager::AddChannelMode('P', new ChannelMode(CMODE_PERM));
+		if (strstr(av[1], "m_nonotice.so"))
+			ModeManager::AddChannelMode('T', new ChannelMode(CMODE_NONOTICE));
+
+		/* User modes */
+		if (strstr(av[1], "m_botmode.so"))
+			ModeManager::AddUserMode('B', new UserMode(UMODE_BOT));
+		if (strstr(av[1], "m_commonchans.so"))
+			ModeManager::AddUserMode('c', new UserMode(UMODE_COMMONCHANS));
+		if (strstr(av[1], "m_deaf.so"))
+			ModeManager::AddUserMode('d', new UserMode(UMODE_DEAF));
+		if (strstr(av[1], "m_censor.so"))
+			ModeManager::AddUserMode('G', new UserMode(UMODE_FILTER));
+		if (strstr(av[1], "m_hideoper.so"))
+			ModeManager::AddUserMode('H', new UserMode(UMODE_HIDEOPER));
+		if (strstr(av[1], "m_invisible.so"))
+			ModeManager::AddUserMode('Q', new UserMode(UMODE_HIDDEN));
+		if (strstr(av[1], "m_stripcolor.so"))
+			ModeManager::AddUserMode('S', new UserMode(UMODE_STRIPCOLOR));
+		if (strstr(av[1], "m_showwhois.so"))
+			ModeManager::AddUserMode('W', new UserMode(UMODE_WHOIS));
+
 	} else if (strcasecmp(av[0], "END") == 0) {
 		if (!has_globopsmod) {
 			send_cmd(NULL, "ERROR :m_globops is not loaded. This is required by Anope");
@@ -1182,13 +1252,9 @@ bool ChannelModeFlood::IsValid(const char *value)
 void moduleAddModes()
 {
 	/* Add user modes */
-	ModeManager::AddUserMode('g', new UserMode(UMODE_CALLERID));
-	ModeManager::AddUserMode('h', new UserMode(UMODE_HELPOP));
 	ModeManager::AddUserMode('i', new UserMode(UMODE_INVIS));
 	ModeManager::AddUserMode('o', new UserMode(UMODE_OPER));
-	ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
 	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
-	ModeManager::AddUserMode('x', new UserMode(UMODE_CLOAK));
 
 	/* b/e/I */
 	ModeManager::AddChannelMode('b', new ChannelModeBan());
@@ -1201,28 +1267,14 @@ void moduleAddModes()
 	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, CUS_OWNER, '~'));
 
 	/* Add channel modes */
-	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
 	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
 	ModeManager::AddChannelMode('k', new ChannelModeKey());
 	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
 	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
 	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
 	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
-	ModeManager::AddChannelMode('r', new ChannelModeRegistered());
 	ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
 	ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
-	ModeManager::AddChannelMode('u', new ChannelMode(CMODE_AUDITORIUM));
-	ModeManager::AddChannelMode('z', new ChannelMode(CMODE_SSL));
-	ModeManager::AddChannelMode('A', new ChannelMode(CMODE_ALLINVITE));
-	ModeManager::AddChannelMode('C', new ChannelMode(CMODE_NOCTCP));
-	ModeManager::AddChannelMode('G', new ChannelMode(CMODE_FILTER));
-	ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
-	ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT));
-	ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
-	ModeManager::AddChannelMode('O', new ChannelModeOper());
-	ModeManager::AddChannelMode('Q', new ChannelMode(CMODE_NOKICK));
-	ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
-	ModeManager::AddChannelMode('S', new ChannelMode(CMODE_STRIPCOLOR));
 }
 
 class ProtoInspIRCd : public Module

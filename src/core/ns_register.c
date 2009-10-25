@@ -162,6 +162,8 @@ class CommandNSConfirm : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP_CONFIRM);
+		if (u->nc && u->nc->HasCommand("nickserv/confirm"))
+			notice_help(s_NickServ, u, NICK_HELP_CONFIRM_OPER);
 		return true;
 	}
 };

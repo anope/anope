@@ -4041,6 +4041,11 @@ NICK_HELP_CONFIRM
 	registration process. For more information about the first
 	stage of the registration process, type: %R%S HELP REGISTER
 
+NICK_HELP_CONFIRM_OPER
+	
+	Additionally, Services Operators with the nickserv/confirm permission can
+	replace passcode with a users nick to force validate them.
+
 NICK_HELP_RESEND
 	Syntax: RESEND
 	

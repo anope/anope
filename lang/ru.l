@@ -3951,6 +3951,11 @@ NICK_HELP_CONFIRM
 	на ваш e-mail в первой части процесса регистрации ника. Для более
 	подробной информации см. %R%S HELP REGISTER
 
+NICK_HELP_CONFIRM_OPER
+	
+	Additionally, Services Operators with the nickserv/confirm permission can
+	replace passcode with a users nick to force validate them.
+
 NICK_HELP_RESEND
 	Синтаксис: RESEND
 	

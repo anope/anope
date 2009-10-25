@@ -57,7 +57,7 @@ class CommandBSSay : public Command
 
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text);
 		ci->bi->lastmsg = time(NULL);
-		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
+		if (LogBot && LogChannel && LogChan && !debug && findchan(LogChannel))
 			ircdproto->SendPrivmsg(ci->bi, LogChannel, "SAY %s %s %s", u->nick, ci->name, text);
 		return MOD_CONT;
 	}

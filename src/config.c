@@ -861,6 +861,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "restrictopernicks", "no", new ValueContainerBool(&RestrictOperNicks), DT_BOOLEAN, NoValidation},
 		{"options", "newscount", "3", new ValueContainerUInt(&NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerChar(&UlineServers), DT_CHARPTR, NoValidation},
+		{"options", "enablelogchannel", "no", new ValueContainerBool(&LogChan), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},

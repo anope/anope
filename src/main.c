@@ -48,7 +48,7 @@ std::string orig_cwd;		/* Original current working directory */
 const char *log_filename = LOG_FILENAME;	  /* -log filename */
 int debug = 0;				  /* -debug */
 int readonly = 0;			   /* -readonly */
-int logchan = 0;				/* -logchan */
+bool LogChan = false;				/* -logchan */
 int nofork = 0;				 /* -nofork */
 int forceload = 0;			  /* -forceload */
 int nothird = 0;				/* -nothrid */

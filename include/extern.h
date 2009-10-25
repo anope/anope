@@ -495,7 +495,7 @@ E std::string services_dir;
 E const char *log_filename;
 E int   debug;
 E int   readonly;
-E int   logchan;
+E bool LogChan;
 E int   nofork;
 E int   forceload;
 E int   nothird;

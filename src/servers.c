@@ -166,7 +166,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 			introduce_user(NULL);
 
 			/* And hybrid needs Global joined in the logchan */
-			if (logchan && ircd->join2msg) {
+			if (LogChan && ircd->join2msg) {
 				/* XXX might desync */
 				ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
 			}

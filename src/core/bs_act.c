@@ -50,7 +50,7 @@ class CommandBSAct : public Command
 
 		ircdproto->SendAction(ci->bi, ci->name, "%s", params[1].c_str());
 		ci->bi->lastmsg = time(NULL);
-		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
+		if (LogBot && LogChannel && LogChan && !debug && findchan(LogChannel))
 			ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s", u->nick, ci->name, params[1].c_str());
 		return MOD_CONT;
 	}

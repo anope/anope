@@ -24,7 +24,7 @@ Legend:
     the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
 [ ] Last used time on AKICK/access entries
 [ ] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
-[ ] General options block, ability to turn LOGCHAN on from the config file..
+[+] General options block, ability to turn LOGCHAN on from the config file..
 [ ] Docs directory cleanup
 
 Future

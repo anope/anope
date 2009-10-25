@@ -176,7 +176,7 @@ void alog(const char *fmt, ...)
 	if (nofork) {
 		fprintf(stderr, "%s %s\n", buf, str);
 	}
-	if (LogChannel && logchan && !debug && findchan(LogChannel)) {
+	if (LogChannel && LogChan && !debug && findchan(LogChannel)) {
 		ircdproto->SendPrivmsg(findbot(s_GlobalNoticer), LogChannel, "%s", str);
 	}
 	errno = errno_save;

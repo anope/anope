@@ -26,7 +26,7 @@ class CommandOSSet : public Command
 		notice_lang(s_OperServ, u, index, "IGNORE");
 		index = readonly ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
 		notice_lang(s_OperServ, u, index, "READONLY");
-		index = logchan ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
+		index = LogChan ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
 		notice_lang(s_OperServ, u, index, "LOGCHAN");
 		index = debug ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
 		notice_lang(s_OperServ, u, index, "DEBUG");
@@ -116,7 +116,7 @@ class CommandOSSet : public Command
 				c = findchan(LogChannel);
 				ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, c ? c->creation_time : time(NULL));
 			}
-			logchan = 1;
+			LogChan = true;
 			alog("Now sending log messages to %s", LogChannel);
 			notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_ON, LogChannel);
 		}
@@ -125,7 +125,7 @@ class CommandOSSet : public Command
 			alog("No longer sending log messages to a channel");
 			if (ircd->join2msg)
 				ircdproto->SendPart(findbot(s_GlobalNoticer), LogChannel, NULL);
-			logchan = 0;
+			LogChan = false;
 			notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_OFF);
 		}
 		else

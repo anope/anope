@@ -245,7 +245,7 @@ static int parse_options(int ac, char **av)
 							"-logchan: LogChannel must be defined in services.conf\n");
 				} else {		/* LogChannel */
 
-					logchan = 1;
+					LogChan = true;
 				}
 			} else if (strcmp(s, "forceload") == 0) {
 				forceload = 1;
@@ -376,6 +376,10 @@ int init_primary(int ac, char **av)
 	if (!read_config(0)) {
 		return -1;
 	}
+
+	/* Disable the log channel if its defined in the conf, but not enabled */
+	if (!LogChannel && LogChan)
+		LogChan = false;
 
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init()) {

@@ -640,9 +640,11 @@ class CoreExport Module
 
 	/** Called when a user parts a channel
 	 * @param u The user
-	 * @param c The channel
+	 * @param c The channel, may be NULL if the channel no longer exists
+	 * @param channel The channel name
+	 * @param msg The part reason
 	 */
-	virtual void OnPartChannel(User *u, Channel *c, const std::string &msg) { }
+	virtual void OnPartChannel(User *u, Channel *c, const std::string &channel, const std::string &msg) { }
 
 	/** Called before a user joins a channel
 	 * @param u The user

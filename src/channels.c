@@ -873,7 +873,7 @@ void do_join(const char *source, int ac, const char **av)
 				channame = sstrdup(c->chan->name);
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 				chan_deluser(user, c->chan);
-				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan, ""));
+				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame), channame, ""));
 				delete [] channame;
 				delete c;
 				c = nextc;
@@ -1017,10 +1017,11 @@ void do_part(const char *source, int ac, const char **av)
 				return;
 			}
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
+			std::string ChannelName = c->chan->name;
 
 			chan_deluser(user, c->chan);
 
-			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, c->chan, av[1] ? av[1] : ""));
+			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName.c_str()), ChannelName, av[1] ? av[1] : ""));
 
 			if (c->next)
 				c->next->prev = c->prev;

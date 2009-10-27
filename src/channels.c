@@ -1619,16 +1619,18 @@ void do_topic(const char *source, int ac, const char **av)
  **/
 void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 {
-	char modebuf[BUFSIZE];
-	char userbuf[BUFSIZE];
+	std::string modebuf, userbuf;
 	int status;
 	int add_modes = 0;
 	int rem_modes = 0;
 	ChannelInfo *ci;
-	ChannelMode *owner, *admin;
+	ChannelMode *owner, *admin, *op, *halfop, *voice;
 
 	owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
 	admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
+	op = ModeManager::FindChannelModeByName(CMODE_OP);
+	halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
+	voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 	if (!c || !(ci = c->ci))
 		return;
@@ -1688,70 +1690,73 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!add_modes && !rem_modes)
 		return;
 
-	/* No need for strn* functions for modebuf, as every possible string
-	 * will always fit in. -GD
-	 */
-	strlcpy(modebuf, "", sizeof(modebuf));
-	strlcpy(userbuf, "", sizeof(userbuf));
-	if (add_modes > 0) {
-		strcat(modebuf, "+");
-		if ((add_modes & CUS_OWNER) && !(status & CUS_OWNER)) {
-			strlcat(modebuf, &owner->ModeChar, sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
-		} else {
+	if (add_modes > 0)
+	{
+		modebuf += "+";
+
+		if (owner && (add_modes & CUS_OWNER) && !(status & CUS_OWNER))
+		{
+			modebuf += owner->ModeChar;
+			userbuf += " " + std::string(user->nick);
+		}
+		else
 			add_modes &= ~CUS_OWNER;
+
+		if (admin && (add_modes & CUS_PROTECT) && !(status & CUS_PROTECT))
+		{
+			modebuf += admin->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
-		if ((add_modes & CUS_PROTECT) && !(status & CUS_PROTECT)) {
-			strlcat(modebuf, &admin->ModeChar, sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
-		} else {
+		else
 			add_modes &= ~CUS_PROTECT;
+
+		if (op && (add_modes & CUS_OP) && !(status & CUS_OP)) {
+			modebuf += op->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
-		if ((add_modes & CUS_OP) && !(status & CUS_OP)) {
-			strlcat(modebuf, "o", sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
-		} else {
+		else
 			add_modes &= ~CUS_OP;
+
+		if (halfop && (add_modes & CUS_HALFOP) && !(status & CUS_HALFOP)) {
+			modebuf += halfop->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
-		if ((add_modes & CUS_HALFOP) && !(status & CUS_HALFOP)) {
-			strlcat(modebuf, "h", sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
-		} else {
+		else
 			add_modes &= ~CUS_HALFOP;
-		}
+
 		if ((add_modes & CUS_VOICE) && !(status & CUS_VOICE)) {
-			strlcat(modebuf, "v", sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
-		} else {
+			modebuf += voice->ModeChar;
+			userbuf += " " + std::string(user->nick);
+		}
+		else
 			add_modes &= ~CUS_VOICE;
-		}
 	}
-	if (rem_modes > 0) {
-		strlcat(modebuf, "-", sizeof(modebuf));
-		if (rem_modes & CUS_OWNER) {
-			strlcat(modebuf, &owner->ModeChar, sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
+	if (rem_modes > 0)
+	{
+		modebuf += "-";
+
+		if (owner && rem_modes & CUS_OWNER)
+		{
+			modebuf += owner->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
-		if (rem_modes & CUS_PROTECT) {
-			strlcat(modebuf, &admin->ModeChar, sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
+
+		if (rem_modes & CUS_PROTECT)
+		{
+			modebuf += admin->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
-		if (rem_modes & CUS_OP) {
-			strlcat(modebuf, "o", sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
+
+		if (rem_modes & CUS_OP)
+		{
+			modebuf += op->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
-		if (rem_modes & CUS_HALFOP) {
-			strlcat(modebuf, "h", sizeof(modebuf));
-			strlcat(userbuf, " ", sizeof(userbuf));
-			strlcat(userbuf, user->nick, sizeof(userbuf));
+
+		if (rem_modes & CUS_HALFOP)
+		{
+			modebuf += halfop->ModeChar;
+			userbuf += " " + std::string(user->nick);
 		}
 	}
 
@@ -1761,7 +1766,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!add_modes && !rem_modes)
 		return;
 
-	ircdproto->SendMode(whosends(ci), c->name, "%s%s", modebuf, userbuf);
+	ircdproto->SendMode(whosends(ci), c->name, "%s%s", modebuf.c_str(), userbuf.c_str());
 	if (add_modes > 0)
 		chan_set_user_status(c, user, add_modes);
 	if (rem_modes > 0)

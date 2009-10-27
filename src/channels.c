@@ -1710,21 +1710,24 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 		else
 			add_modes &= ~CUS_PROTECT;
 
-		if (op && (add_modes & CUS_OP) && !(status & CUS_OP)) {
+		if (op && (add_modes & CUS_OP) && !(status & CUS_OP))
+		{
 			modebuf += op->ModeChar;
 			userbuf += " " + std::string(user->nick);
 		}
 		else
 			add_modes &= ~CUS_OP;
 
-		if (halfop && (add_modes & CUS_HALFOP) && !(status & CUS_HALFOP)) {
+		if (halfop && (add_modes & CUS_HALFOP) && !(status & CUS_HALFOP))
+		{
 			modebuf += halfop->ModeChar;
 			userbuf += " " + std::string(user->nick);
 		}
 		else
 			add_modes &= ~CUS_HALFOP;
 
-		if ((add_modes & CUS_VOICE) && !(status & CUS_VOICE)) {
+		if (voice && (add_modes & CUS_VOICE) && !(status & CUS_VOICE))
+		{
 			modebuf += voice->ModeChar;
 			userbuf += " " + std::string(user->nick);
 		}
@@ -1741,19 +1744,19 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 			userbuf += " " + std::string(user->nick);
 		}
 
-		if (rem_modes & CUS_PROTECT)
+		if (admin && rem_modes & CUS_PROTECT)
 		{
 			modebuf += admin->ModeChar;
 			userbuf += " " + std::string(user->nick);
 		}
 
-		if (rem_modes & CUS_OP)
+		if (op && rem_modes & CUS_OP)
 		{
 			modebuf += op->ModeChar;
 			userbuf += " " + std::string(user->nick);
 		}
 
-		if (rem_modes & CUS_HALFOP)
+		if (halfop && rem_modes & CUS_HALFOP)
 		{
 			modebuf += halfop->ModeChar;
 			userbuf += " " + std::string(user->nick);

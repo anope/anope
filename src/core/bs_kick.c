@@ -20,7 +20,7 @@ int do_kickcmd(User * u);
 class CommandBSKick : public Command
 {
  public:
-	CommandBSKick() : Command("KICK", 3, 4)
+	CommandBSKick() : Command("KICK", 3, 6)
 	{
 	}
 
@@ -103,8 +103,8 @@ class CommandBSKick : public Command
 				}
 			} else if (option == "CAPS") {
 				if (value == "ON") {
-					char *min = strtok(NULL, " ");
-					char *percent = strtok(NULL, " ");
+					const char *min = params.size() > 4 ? params[4].c_str() : NULL;
+					const char *percent = params.size() > 5 ? params[5].c_str() : NULL;
 
 					if (ttb) {
 						errno = 0;
@@ -175,8 +175,8 @@ class CommandBSKick : public Command
 				}
 			} else if (option == "FLOOD") {
 				if (value == "ON") {
-					char *lines = strtok(NULL, " ");
-					char *secs = strtok(NULL, " ");
+					const char *lines = params.size() > 4 ? params[4].c_str() : NULL;
+					const char *secs = params.size() > 5 ? params[5].c_str() : NULL;
 
 					if (ttb) {
 						errno = 0;
@@ -221,7 +221,7 @@ class CommandBSKick : public Command
 				}
 			} else if (option == "REPEAT") {
 				if (value == "ON") {
-					char *times = strtok(NULL, " ");
+					const char *times = params.size() > 4 ? params[4].c_str() : NULL;
 
 					if (ttb) {
 						errno = 0;

@@ -49,7 +49,7 @@ class NickServCollide : public Timer
 		std::map<NickAlias *, NickServCollide *>::iterator nit = NickServCollides.find(nickalias);
 		if (nit != NickServCollides.end())
 		{
-			NickServCollides.erase(nit);
+			TimerManager::DelTimer(nit->second);
 		}
 
 		it = NickServCollides.insert(std::make_pair(nickalias, this));
@@ -103,7 +103,7 @@ class NickServRelease : public Timer
 		std::map<NickAlias *, NickServRelease *>::iterator nit = NickServReleases.find(nickalias);
 		if (nit != NickServReleases.end())
 		{
-			NickServReleases.erase(nit);
+			TimerManager::DelTimer(nit->second);
 		}
 
 		it = NickServReleases.insert(std::make_pair(nickalias, this));

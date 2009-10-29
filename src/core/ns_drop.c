@@ -60,7 +60,7 @@ class CommandNSDrop : public Command
 		if (is_mine && !nick)
 			my_nick = sstrdup(na->nick);
 
-		if (!is_mine && !u->nc->IsServicesOper())
+		if (!is_mine && !u->nc->HasPriv("nickserv/drop"))
 			notice_lang(s_NickServ, u, ACCESS_DENIED);
 		else if (NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, ACCESS_DENIED);
@@ -98,7 +98,7 @@ class CommandNSDrop : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->nc && u->nc->HasPriv("nickserv/drop"))
 			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
 		else
 			notice_help(s_NickServ, u, NICK_HELP_DROP);

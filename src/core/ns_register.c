@@ -116,7 +116,7 @@ class CommandNSConfirm : public Command
 
 			if (!nr)
 			{
-				if (u->nc && u->nc->HasCommand("nickserv/confirm"))
+				if (u->nc && u->nc->HasPriv("nickserv/confirm"))
 				{
 					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
 					   of the user they are trying to validate, and push that user through regardless of passcode */
@@ -162,7 +162,7 @@ class CommandNSConfirm : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP_CONFIRM);
-		if (u->nc && u->nc->HasCommand("nickserv/confirm"))
+		if (u->nc && u->nc->HasPriv("nickserv/confirm"))
 			notice_help(s_NickServ, u, NICK_HELP_CONFIRM_OPER);
 		return true;
 	}

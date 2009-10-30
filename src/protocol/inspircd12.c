@@ -177,21 +177,20 @@ unsigned long umodes[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, UMODE_A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0,
-    0,
-    0,
-    0, 0, 0, 0, 0, 0, 0,
-    0,
-    0, 0, 0, 0, 0,
-    0, UMODE_a, 0, 0, 0, 0, 0,
-    UMODE_g,
-    UMODE_h, UMODE_i, 0, 0, 0, 0, 0, UMODE_o,
-    0,
-    0, UMODE_r, 0, 0, 0, 0, UMODE_w,
-    UMODE_x,
-    0,
-    0,
+    0, 
+    0, UMODE_B, 0, 0, 0,               /* A - E */
+    0, UMODE_G, UMODE_H, UMODE_I, 0,   /* F - J */
+    0, 0, 0, 0, 0,                     /* K - O */
+    0, UMODE_Q, UMODE_R, UMODE_S, 0,   /* P - T */
+    0, 0, UMODE_W, 0, 0,               /* U - Y */
+    0,                                 /* Z */
+    0, 0, 0, 0, 0, 0,
+    0, 0, UMODE_c, UMODE_d, 0,         /* a - e */
+    0, UMODE_g, UMODE_h, UMODE_i, 0,   /* f - j */
+    UMODE_k, 0, 0, 0, UMODE_o,         /* k - o */
+    0, 0, UMODE_r, UMODE_s, 0,         /* p - t */
+    0, 0, UMODE_w, UMODE_x, 0,         /* u - y */
+    0,                                 /* z */
     0, 0, 0, 0, 0
 };
 
@@ -465,15 +464,6 @@ void inspircd_set_umode(User *user, int ac, char **av)
                 display_news(user, NEWS_OPER);
             } else {
                 opcnt--;
-            }
-            break;
-        case 'a':
-            if (UnRestrictSAdmin) {
-                break;
-            }
-            if (add && !is_services_admin(user)) {
-                common_svsmode(user, "-a", NULL);
-                user->mode &= ~UMODE_a;
             }
             break;
         case 'r':

@@ -2849,8 +2849,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	На данный момент сервисы работают в DEFCON-режиме. Повторите свой запрос позже.
-OPER_DEFCON_NO_CONF
-	Активирование DEFCON-режима невозможно, так как он не включен в конфиге сервисов.
 OPER_DEFCON_CHANGED
 	DEFCON-режим активирован, уровень защиты: %d
 OPER_DEFCON_WALL

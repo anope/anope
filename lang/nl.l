@@ -2918,8 +2918,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Services zijn in Defcon modus. Probeer later opnieuw.
-OPER_DEFCON_NO_CONF
-	Het Defcon systeem moet worden ingeschakeld via services.conf
 OPER_DEFCON_CHANGED
 	Services zijn nu in DEFCON %d
 OPER_DEFCON_WALL

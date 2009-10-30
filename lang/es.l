@@ -2931,8 +2931,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Los servicios estan deshabilitados temporalmente, por favor intenta mas tarde 
-OPER_DEFCON_NO_CONF
-	El sistema Defcon debe ser habilitado en el archivo services.conf
 OPER_DEFCON_CHANGED
 	Servicios estan ahora en DEFCON %d
 OPER_DEFCON_WALL

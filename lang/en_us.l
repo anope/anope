@@ -2852,8 +2852,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Services are in Defcon mode, Please try again later.
-OPER_DEFCON_NO_CONF
-	The Defcon system must be enabled in the services.conf file
 OPER_DEFCON_CHANGED
 	Services are now at DEFCON %d
 OPER_DEFCON_WALL

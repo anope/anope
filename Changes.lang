@@ -61,6 +61,7 @@ Anope Version 1.9.2
     CHAN_HELP_SENDPASS
     CHAN_SENDPASS_SYNTAX
     CHAN_HELP_CMD_SENDPASS
+    OPER_DEFCON_NO_CONF
 
 Anope Version 1.9.1
 --------------------

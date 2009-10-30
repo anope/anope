@@ -2914,8 +2914,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Dieser Service ist derzeit deaktiviert, bitte versuche es später nochmal
-OPER_DEFCON_NO_CONF
-	Das Defcon-System muss in der services.conf aktiviert worden sein
 OPER_DEFCON_CHANGED
 	Services sind jetzt beim DEFCON %d
 OPER_DEFCON_WALL

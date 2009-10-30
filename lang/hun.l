@@ -2904,8 +2904,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Szervíz Defcon módban fut, próbáld késõbb.
-OPER_DEFCON_NO_CONF
-	A Defcon rendszert engedélyezni kell a services.conf-ban
 OPER_DEFCON_CHANGED
 	Szervíz új DEFCON szintje %d
 OPER_DEFCON_WALL

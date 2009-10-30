@@ -693,7 +693,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
 		if (MOD_RESULT == EVENT_STOP)
-			return NULL;
+			return finduser(nick);
 
 		check_akill(nick, username, host, vhost, ipbuf);
 

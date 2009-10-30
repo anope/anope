@@ -2880,8 +2880,6 @@ OPER_DEFCON_SYNTAX
 	DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
 	Este serviço está temporariamente desabilitado, por favor tente novamente mais tarde
-OPER_DEFCON_NO_CONF
-	O sistema Defcon deve estar habilitado no arquivo services.conf
 OPER_DEFCON_CHANGED
 	Services estão agora em DEFCON %d
 OPER_DEFCON_WALL

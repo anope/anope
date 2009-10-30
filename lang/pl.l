@@ -3820,9 +3820,6 @@ OPER_DEFCON_SYNTAX
 OPER_DEFCON_DENIED
 	Serwisy s± w trybie defcon, spróbuj ponownie pó¼niej.
 
-OPER_DEFCON_NO_CONF
-	System defcon musi byæ w³±czony w pliku konfiguracyjnym.
-
 OPER_DEFCON_CHANGED
 	Serwisy s± teraz w systemie DEFCON %d
 

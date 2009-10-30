@@ -2487,6 +2487,15 @@ char *cs_get_redirect(ChannelInfo * ci)
 
 /*************************************************************************/
 
+/* This is a dummy function part of making anope accept modes
+ * it does actively parse.. ~ Viper */
+char *cs_get_unkwn(ChannelInfo * ci)
+{
+    return NULL;
+}
+
+/*************************************************************************/
+
 void cs_set_flood(ChannelInfo * ci, char *value)
 {
     if (!ci) {
@@ -2576,6 +2585,17 @@ void cs_set_redirect(ChannelInfo * ci, char *value)
         ci->mlock_redirect = NULL;
     }
 }
+
+/*************************************************************************/
+
+/* This is a dummy function to make anope parse a param for a mode,
+ * yet we don't use that param internally.. ~ Viper */
+void cs_set_unkwn(ChannelInfo * ci, char *value)
+{
+    /* Do nothing.. */
+}
+
+/*************************************************************************/
 
 int get_access_level(ChannelInfo * ci, NickAlias * na)
 {

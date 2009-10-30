@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2571"
+VERSION_BUILD="2598"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2598 - More dynamic detection of channel modes on InspIRCd 1.2. Also fixes params being linked to the wrong mode.
 #Revision 2571 - Fixed small typo in dutch translation.
 #Revision 2550 - Removed proxy server from ulined servers in example config as more people use a client proxy scanner and this should reduce occurences of user servers being listed.
 #Revision 2546 - Reset errno before calling strtol in bs_kick, it would sometimes not allow valid kick settings to work

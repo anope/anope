@@ -255,28 +255,28 @@ CBMode myCbmodes[128] = {
     {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
     {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
     {0},
-    {CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL},
+    {0},                        /* A */
     {0},                        /* B */
-    {CMODE_C, 0, NULL, NULL},   /* C */
+    {0},                        /* C */
     {0},                        /* D */
     {0},                        /* E */
     {0},                        /* F */
-    {CMODE_G, 0, NULL, NULL},   /* G */
-    {CMODE_H, CBM_NO_USER_MLOCK, NULL, NULL},
+    {0},                        /* G */
+    {0},                        /* H */
     {0},                        /* I */
     {0},                        /* J */
-    {CMODE_K, 0, NULL, NULL},   /* K */
+    {0},                        /* K */
     {0},                        /* L */
-    {0},                        /* M */
-    {CMODE_N, 0, NULL, NULL},   /* N */
-    {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
+    {CMODE_M, 0, NULL, NULL},   /* M */
+    {0},                        /* N */
+    {0},                        /* O */
     {0},                        /* P */
-    {CMODE_Q, 0, NULL, NULL},   /* Q */
+    {0},                        /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},   /* S */
+    {0},                        /* S */
     {0},                        /* T */
     {0},                        /* U */
-    {CMODE_V, 0, NULL, NULL},   /* V */
+    {0},                        /* V */
     {0},                        /* W */
     {0},                        /* X */
     {0},                        /* Y */
@@ -284,7 +284,7 @@ CBMode myCbmodes[128] = {
     {0}, {0}, {0}, {0}, {0}, {0},
     {0},                        /* a */
     {0},                        /* b */
-    {CMODE_c, 0, NULL, NULL},
+    {0},                        /* c */
     {0},                        /* d */
     {0},                        /* e */
     {0},                        /* f */
@@ -302,12 +302,12 @@ CBMode myCbmodes[128] = {
     {CMODE_r, CBM_NO_MLOCK, NULL, NULL},
     {CMODE_s, 0, NULL, NULL},
     {CMODE_t, 0, NULL, NULL},
-    {CMODE_u, 0, NULL, NULL},
+    {0},
     {0},                        /* v */
     {0},                        /* w */
     {0},                        /* x */
     {0},                        /* y */
-    {CMODE_z, 0, NULL, NULL},
+    {0},
     {0}, {0}, {0}, {0}
 };
 
@@ -328,16 +328,19 @@ CBModeInfo myCbmodeinfos[] = {
     {'z', CMODE_z, 0, NULL, NULL},
     {'A', CMODE_A, 0, NULL, NULL},
     {'C', CMODE_C, 0, NULL, NULL},
+    {'F', CMODE_F, 0, NULL, NULL},
     {'G', CMODE_G, 0, NULL, NULL},
-    {'H', CMODE_H, 0, NULL, NULL},
+    {'J', CMODE_J, 0, NULL, NULL},
     {'K', CMODE_K, 0, NULL, NULL},
     {'L', CMODE_L, 0, NULL, NULL},
+    {'M', CMODE_M, 0, NULL, NULL},
     {'N', CMODE_N, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
+    {'P', CMODE_P, 0, NULL, NULL},
     {'Q', CMODE_Q, 0, NULL, NULL},
     {'R', CMODE_R, 0, NULL, NULL},
     {'S', CMODE_S, 0, NULL, NULL},
-    {'V', CMODE_V, 0, NULL, NULL},
+    {'T', CMODE_T, 0, NULL, NULL},
     {0}
 };
 
@@ -404,10 +407,26 @@ static int has_inviteexceptionmod = 0;
 static int has_joinfloodmod = 0;
 static int has_hidechansmod = 0;
 static int has_chanprotectmod = 0;
-static int has_knockmod = 0;
 static int has_halfop = 0;
 static int has_redirectmod = 0;
 static int has_servprotectmod = 0;
+static int has_permchannels = 0;
+static int has_nokicks = 0;
+static int has_stripcolor = 0;
+static int has_nonotice = 0;
+static int has_auditorium = 0;
+static int has_sslmodes = 0;
+static int has_blockcolor = 0;
+static int has_operchans = 0;
+static int has_nonicks = 0;
+static int has_knock = 0;
+static int has_censor = 0;
+static int has_noctcp = 0;
+static int has_allowinvite = 0;
+static int has_blockcaps = 0;
+static int has_nickflood = 0;
+static int has_chanfilter = 0;
+static int has_kicknorejoin = 0;
 
 void inspircd_set_umode(User *user, int ac, char **av)
 {
@@ -1911,14 +1930,62 @@ int anope_event_capab(char *source, int ac, char **av)
         if (strstr(av[1], "m_chanprotect.so")) {
             has_chanprotectmod = 1;
         }
-        if (strstr(av[1], "m_knock.so")) {
-            has_knockmod = 1;
-        }
         if (strstr(av[1], "m_redirect.so")) {
             has_redirectmod = 1;
         }
         if (strstr(av[1], "m_servprotect.so")) {
             has_servprotectmod = 1;
+        }
+        if (strstr(av[1], "m_permchannels.so")) {
+            has_permchannels = 1;
+        }
+        if (strstr(av[1], "m_nokicks.so")) {
+            has_nokicks = 1;
+        }
+        if (strstr(av[1], "m_stripcolor.so")) {
+            has_stripcolor = 1;
+        }
+        if (strstr(av[1], "m_nonotice.so")) {
+            has_nonotice = 1;
+        }
+        if (strstr(av[1], "m_auditorium.so")) {
+            has_auditorium = 1;
+        }
+        if (strstr(av[1], "m_sslmodes.so")) {
+            has_sslmodes = 1;
+        }
+        if (strstr(av[1], "m_blockcolor.so")) {
+            has_blockcolor = 1;
+        }
+        if (strstr(av[1], "m_operchans.so")) {
+            has_operchans = 1;
+        }
+        if (strstr(av[1], "m_nonicks.so")) {
+            has_nonicks = 1;
+        }
+        if (strstr(av[1], "m_knock.so")) {
+            has_knock = 1;
+        }
+        if (strstr(av[1], "m_censor.so")) {
+            has_censor = 1;
+        }
+        if (strstr(av[1], "m_noctcp.so")) {
+            has_noctcp = 1;
+        }
+        if (strstr(av[1], "m_allowinvite.so")) {
+            has_allowinvite = 1;
+        }
+        if (strstr(av[1], "m_blockcaps.so")) {
+            has_blockcaps = 1;
+        }
+        if (strstr(av[1], "m_nickflood.so")) {
+            has_nickflood = 1;
+        }
+        if (strstr(av[1], "m_chanfilter.so")) {
+            has_chanfilter = 1;
+        }
+        if (strstr(av[1], "m_kicknorejoin.so")) {
+            has_kicknorejoin = 1;
         }
     } else if (strcasecmp(av[0], "END") == 0) {
         if (!has_globopsmod) {
@@ -1963,19 +2030,13 @@ int anope_event_capab(char *source, int ac, char **av)
                 cbmi->csgetvalue = cs_get_flood;
 
                 myCbmodes['f'].flag = CMODE_f;
-                myCbmodes['f'].flags = 0;
+                myCbmodes['f'].flags = CBM_MINUS_NO_ARG;
                 myCbmodes['f'].setvalue = set_flood;
                 myCbmodes['f'].cssetvalue = cs_set_flood;
-
-                pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-                pmodule_ircd_cbmodes(myCbmodes);
 
                 ircd->fmode = 1;
             } else {
                 alog("Support for channelmode +f can not be enabled");
-                if (debug) {
-                    alog("debug: 'f' missing from myCbmodeinfos");
-                }
             }
         }
 
@@ -1989,10 +2050,10 @@ int anope_event_capab(char *source, int ac, char **av)
             myCmmodes['I'].delmask = del_invite;
             ircd->invitemode = 1;
         }
-        ircd->svshold = has_svsholdmod;
         if (has_banexceptionmod || has_inviteexceptionmod) {
             pmodule_ircd_cmmodes(myCmmodes);
         }
+        ircd->svshold = has_svsholdmod;
 
         if (has_joinfloodmod) {
             cbmi = myCbmodeinfos;
@@ -2009,14 +2070,9 @@ int anope_event_capab(char *source, int ac, char **av)
                 myCbmodes['j'].setvalue = chan_set_throttle;
                 myCbmodes['j'].cssetvalue = cs_set_throttle;
 
-                pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-                pmodule_ircd_cbmodes(myCbmodes);
-
                 ircd->jmode = 1;
             } else {
                 alog("Support for channelmode +j can not be enabled");
-                if (debug)
-                    alog("debug: 'j' missing from myCbmodeinfos");
             }
         }
         if (!has_chanprotectmod) {
@@ -2026,10 +2082,7 @@ int anope_event_capab(char *source, int ac, char **av)
             alog("Support for admin and owner channelmodes disabled.");
         } else
             ircd->botchanumode = "+oa";
-        if (has_knockmod) {
-            ircd->noknock = CMODE_K;
-            alog("Support for channelmode +K enabled.");
-        }
+
         if (!has_halfop) {
             ircd->halfop = 0;
             alog("Support for halfops disabled.");
@@ -2046,18 +2099,13 @@ int anope_event_capab(char *source, int ac, char **av)
                 cbmi->csgetvalue = cs_get_redirect;
 
                 myCbmodes['L'].flag = CMODE_L;
-                myCbmodes['L'].flags = 0;
+                myCbmodes['L'].flags = CBM_MINUS_NO_ARG;
                 myCbmodes['L'].setvalue = set_redirect;
                 myCbmodes['L'].cssetvalue = cs_set_redirect;
-
-                pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-                pmodule_ircd_cbmodes(myCbmodes);
 
                 ircd->Lmode = 1;
             } else {
                 alog("Support for channelmode +L can not be enabled");
-                if (debug)
-                    alog("debug: 'L' missing from myCbmodeinfos");
             }
         }
 
@@ -2085,6 +2133,105 @@ int anope_event_capab(char *source, int ac, char **av)
             ircd->botserv_bot_mode = "+Ik";
             alog("Support for usermode +k enabled. Pseudo-clients will be gods.");
         }
+
+        if (has_permchannels) {
+            myCbmodes['P'].flag = CMODE_P;
+            myCbmodes['P'].flags = CBM_NO_USER_MLOCK;
+        }
+        if (has_nokicks) {
+            myCbmodes['Q'].flag = CMODE_Q;
+            myCbmodes['Q'].flags = 0;
+        }
+        if (has_stripcolor) {
+            myCbmodes['S'].flag = CMODE_S;
+            myCbmodes['S'].flags = 0;
+        }
+        if (has_nonotice) {
+            myCbmodes['T'].flag = CMODE_T;
+            myCbmodes['T'].flags = 0;
+        }
+        if (has_auditorium) {
+            myCbmodes['u'].flag = CMODE_u;
+            myCbmodes['u'].flags = 0;
+        }
+        if (has_sslmodes) {
+            myCbmodes['z'].flag = CMODE_z;
+            myCbmodes['z'].flags = 0;
+        }
+        if (has_blockcolor) {
+            myCbmodes['c'].flag = CMODE_c;
+            myCbmodes['c'].flags = 0;
+        }
+        if (has_operchans) {
+            myCbmodes['O'].flag = CMODE_O;
+            myCbmodes['O'].flags = CBM_NO_USER_MLOCK;
+        }
+        if (has_nonicks) {
+            myCbmodes['N'].flag = CMODE_N;
+            myCbmodes['N'].flags = 0;
+        }
+        if (has_knock) {
+            ircd->noknock = CMODE_K;
+            myCbmodes['K'].flag = CMODE_K;
+            myCbmodes['K'].flags = 0;
+        }
+        if (has_censor) {
+            myCbmodes['G'].flag = CMODE_G;
+            myCbmodes['G'].flags = 0;
+        }
+        if (has_noctcp) {
+            myCbmodes['C'].flag = CMODE_C;
+            myCbmodes['C'].flags = 0;
+        }
+        if (has_allowinvite) {
+            myCbmodes['A'].flag = CMODE_A;
+            myCbmodes['A'].flags = 0;
+        }
+        if (has_blockcaps) {
+            myCbmodes['B'].flag = CMODE_B;
+            myCbmodes['B'].flags = 0;
+        }
+        if (has_nickflood) {
+            cbmi = myCbmodeinfos;
+
+            while ((cbmi->mode != 'F'))
+                cbmi++;
+            if (cbmi) {
+                cbmi->getvalue = get_unkwn;
+                cbmi->csgetvalue = cs_get_unkwn;
+
+                myCbmodes['F'].flag = CMODE_F;
+                myCbmodes['F'].flags = CBM_NO_MLOCK | CBM_MINUS_NO_ARG;
+                myCbmodes['F'].setvalue = set_unkwn;
+                myCbmodes['F'].cssetvalue = cs_set_unkwn;
+            } else {
+                alog("Support for channelmode +F can not be enabled");
+            }
+        }
+        if (has_chanfilter) {
+            myCbmodes['g'].flag = CMODE_g;
+            myCbmodes['g'].flags = CBM_NO_MLOCK;
+        }
+        if (has_kicknorejoin) {
+            cbmi = myCbmodeinfos;
+
+            while ((cbmi->mode != 'J'))
+                cbmi++;
+            if (cbmi) {
+                cbmi->getvalue = get_unkwn;
+                cbmi->csgetvalue = cs_get_unkwn;
+
+                myCbmodes['J'].flag = CMODE_J;
+                myCbmodes['J'].flags = CBM_NO_MLOCK | CBM_MINUS_NO_ARG;
+                myCbmodes['J'].setvalue = set_unkwn;
+                myCbmodes['J'].cssetvalue = cs_set_unkwn;
+            } else {
+                alog("Support for channelmode +J can not be enabled");
+            }
+        }
+
+        pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+        pmodule_ircd_cbmodes(myCbmodes); /* Commit all changes we made to the modes list.. */
 
         /* Generate a fake capabs parsing call so things like NOQUIT work
          * fine. It's ugly, but it works....

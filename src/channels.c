@@ -1849,6 +1849,15 @@ char *get_redirect(Channel * chan)
 
 /*************************************************************************/
 
+/* This is a dummy function part of making anope accept modes
+ * it does actively parse.. ~ Viper */
+char *get_unkwn(Channel * chan)
+{
+    return NULL;
+}
+
+/*************************************************************************/
+
 Channel *join_user_update(User * user, Channel * chan, char *name,
                           time_t chants)
 {
@@ -1971,6 +1980,17 @@ void set_redirect(Channel * chan, char *value)
         alog("debug: Redirect of channel %s set to %s", chan->name,
              chan->redirect ? chan->redirect : "no redirect");
 }
+
+/*************************************************************************/
+
+/* This is a dummy function to make anope parse a param for a mode,
+ * yet we don't use that param internally.. ~ Viper */
+void set_unkwn(Channel *chan, char *value)
+{
+    /* Do nothing.. */
+}
+
+/*************************************************************************/
 
 void do_mass_mode(char *modes)
 {

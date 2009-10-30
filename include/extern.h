@@ -109,6 +109,8 @@ E char *get_throttle(Channel * chan);
 E void set_throttle(Channel * chan, char *value);
 E char *get_redirect(Channel * chan);
 E void set_redirect(Channel * chan, char *value);
+E char *get_unkwn(Channel * chan);
+E void set_unkwn(Channel *chan, char *value);
 
 
 E void get_channel_stats(long *nrec, long *memuse);
@@ -215,6 +217,8 @@ E char *cs_get_limit(ChannelInfo * ci);
 E void cs_set_limit(ChannelInfo * ci, char *value);
 E char *cs_get_redirect(ChannelInfo * ci);
 E void cs_set_redirect(ChannelInfo * ci, char *value);
+E char *cs_get_unkwn(ChannelInfo * ci);
+E void cs_set_unkwn(ChannelInfo * ci, char *value);
 
 E int levelinfo_maxwidth;
 E ChannelInfo *makechan(const char *chan);

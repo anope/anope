@@ -253,7 +253,7 @@ class CommandCSAKick : public Command
 				 * higher access. - Viper */
 				for (i = 0; i < 1024; i++) {
 					for (u2 = userlist[i]; u2; u2 = u2->next) {
-						if (is_founder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci))) {
+						if (IsFounder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci))) {
 							if (match_usermask(mask, u2)) {
 								notice_lang(s_ChanServ, u, ACCESS_DENIED);
 								delete [] mask;

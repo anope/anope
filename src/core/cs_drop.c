@@ -49,7 +49,7 @@ class CommandCSDrop : public Command
 			return MOD_CONT;
 		}
 
-		if ((ci->flags & CI_SECUREFOUNDER ? !is_real_founder(u, ci) : !is_founder(u, ci)) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->flags & CI_SECUREFOUNDER ? !IsRealFounder(u, ci) : !IsFounder(u, ci)) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -81,7 +81,7 @@ class CommandCSDrop : public Command
 		 * drop the channel before issuing the wallops.
 		 */
 		if (WallDrop) {
-			if ((level < ACCESS_FOUNDER) || (!is_real_founder(u, ci) && ci->flags & CI_SECUREFOUNDER))
+			if ((level < ACCESS_FOUNDER) || (!IsRealFounder(u, ci) && ci->flags & CI_SECUREFOUNDER))
 				ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
 		}
 

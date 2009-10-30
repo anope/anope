@@ -1023,6 +1023,12 @@ CHAN_LEVEL_KICK
 	KICK-Befehl erlaubt
 CHAN_LEVEL_SIGNKICK
 	Kein signierter Kick wenn SIGNKICK LEVEL genutzt wird
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_LEVEL_BANME
@@ -1050,7 +1056,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER Channel Passwort Beschreibung
+	REGISTER Channel Beschreibung
 CHAN_REGISTER_DISABLED
 	Die Registrierung von Channels ist derzeit deaktiviert.
 CHAN_REGISTER_NOT_LOCAL
@@ -1069,33 +1075,11 @@ CHAN_REGISTRATION_FAILED
 	Registrierung fehlgeschlagen.
 CHAN_REGISTERED
 	Der Channel %s ist registriert unter deinem Nicknamen: %s
-CHAN_PASSWORD_IS
-	Dein Channel-Passwort ist %s - behalte es für spätere Benutzung.
 CHAN_REGISTER_NONE_CHANNEL
 	Du hast versucht ein nicht existierender Channel %s zu registrieren.
 CHAN_SYMBOL_REQUIRED
 	Verwende bitte nur das Symbol # wenn du versuchst ein
 	Channel zu registrieren.
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY Channel Passwort
-CHAN_IDENTIFY_FAILED
-	Identifizierung ist fehlgeschlagen.
-CHAN_IDENTIFY_SUCCEEDED
-	Passwort akzeptiert - du hast jetzt Founderlevel-Zugriff auf %s.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT Channel Nickname
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT Channel [Nickname]
-CHAN_LOGOUT_SUCCEEDED
-	Der User %s wurde vom Channel %s ausgeloggt.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Alle identifizierten User wurden vom Channel ausgeloggt %s (except the channel founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1126,14 +1110,6 @@ CHAN_SUCCESSOR_UNSET
 	Der Eintrag des Vertreters für %s wurde entfernt.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s kann nicht gleichzeitig Gründer und Vertreter im Channel %s sein.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Konnte das Passwort nicht ändern.
-CHAN_PASSWORD_CHANGED
-	%s Passwort wurde geändert.
-CHAN_PASSWORD_CHANGED_TO
-	%s Passwort wurde geändert zu %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1284,6 +1260,37 @@ CHAN_XOP_ACCESS
 	Tippe %R%s HELP ACCESS für weitere Informationen.
 CHAN_XOP_NOT_AVAILABLE
 	XOP System ist nicht verfügbar.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1655,44 +1662,14 @@ CHAN_CLEARED_USERS
 	Alle User wurden aus Channel %s gekicked.
 CHAN_CLEARED_INVITES
 	Alle Invites wurden im Channel %s entfernt.
-
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS Channel
-CHAN_GETPASS_UNAVAILABLE
-	GETPASS Befehl nicht verfügbar, da die Datenbank verschlüsselt ist.
-CHAN_GETPASS_PASSWORD_IS
-	Passwort für Channel %s ist %s.
 	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY Channel
 CHAN_GETKEY_NOKEY
 	Der Channel %s hat keinen Schlüßel.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS Channel
-CHAN_SENDPASS_UNAVAILABLE
-	SENDPASS Befehl nicht verfügbar, da die Datenbank verschlüsselt ist.
-CHAN_SENDPASS_SUBJECT
-	Channel-Passwort (%s)
-CHAN_SENDPASS_HEAD
-	Hi,
-CHAN_SENDPASS_LINE_1
-	Du hast das Passwortes für deinen Channel %s angefordert.
-CHAN_SENDPASS_LINE_2
-	Das Passwort ist %s. Aus Sicherheitsgründen solltest du das Passwort bei Erhalt dieser Nachricht ändern.
-CHAN_SENDPASS_LINE_3
-	Wenn du nicht weisst, warum du diese Mail empfangen hast, ignoriere Sie bitte.
-CHAN_SENDPASS_LINE_4
-	AUF DIESE MAIL BITTE NICHT ANTWORTEN!
-CHAN_SENDPASS_LINE_5
-	%s, die Administration.
-CHAN_SENDPASS_OK
-	Passwort von %s wurde per eMail versandt.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4204,12 +4181,11 @@ CHAN_HELP_CMD_STATUS
 	               in dem Channel
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Einen Channel registrieren
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Sich mit Passwort als Founder (z.B.)
-	               des Channels identifizieren
 CHAN_HELP_CMD_SET
 	    SET        Bestimmte Channel-Optionen und
 	               Informationen einstellen
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        Verwaltet die AOP-Liste von einen Channel
 CHAN_HELP_CMD_SOP
@@ -4224,8 +4200,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Die Autokick-Liste bearbeiten
 CHAN_HELP_CMD_DROP
 	    DROP       Registrierung eines Channels aufheben
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Hilft bei vergessenen Passwörtern
 CHAN_HELP_CMD_BAN
 	    BAN        Bant den angegebenen Nicknamen aus einen Channel
 CHAN_HELP_CMD_CLEAR
@@ -4243,8 +4217,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kickt den angegebenen Nicknamen aus einen Channel
 CHAN_HELP_CMD_LIST
 	    LIST       Listet alle registrieten Channels des angegebene Muster
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     Das Befehl wir den angegegenen Nickname abmelden
 CHAN_HELP_CMD_OP
 	    OP         Gibt den angegebenen Nicknamen Op-Status in einen Channel
 CHAN_HELP_CMD_TOPIC
@@ -4317,25 +4289,6 @@ CHAN_HELP_REGISTER
 	Hast du dies noch nicht getan, tippe %R%s HELP REGISTER 
 	um weitere Informationen darüber zu erhalten.
 
-CHAN_HELP_IDENTIFY
-	Syntax: IDENTIFY Channel Passwort
-	
-	Identifiziert ein Nickname gegenüber %S als 
-	Gründer (Founder) des angegebenen Channels. 
-	Das Passwort muss dasselbe wie bei der 
-	registrierung des angegebenen Channels sein
-	und ist in der Regel von den Real-Founder des
-	Channels zu erhalten.
-	
-CHAN_HELP_LOGOUT
-	Syntax: LOGOUT Channel Nickname
-	
-	Hebt die Identifizierung als Channel-Founder für
-	den angegebenen Channel wieder auf.
-	
-	Wenn du der Channel-Founder bist, kannst du jeden
-	ausloggen, jeder andere nur sich selbst.
-
 CHAN_HELP_DROP
 	Syntax: DROP Channel
 	
@@ -4352,7 +4305,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Stellt den Gründer des Channels ein
 	    SUCCESSOR     Stellt den Vertreter des Founders ein
-	    PASSWORD      Ändert das Passwort des Channel-Founders
 	    DESC          Ändert die Channel-Beschreibung
 	    URL           Verbindet eine URL mit dem Channel
 	    EMAIL         Verbindet eine eMail-Adresse mit dem
@@ -4397,12 +4349,6 @@ CHAN_HELP_SET_SUCCESSOR
 	(max %d), wird der Channel gedropped.
 	
 	Der Nickname des Vertreters muss registriert sein.
-
-CHAN_HELP_SET_PASSWORD
-	Syntax: SET Channel PASSWORD Passwort
-	
-	Ändert das Passwort, dass dich als Founder (Gründer)
-	des Channels identifiziert.
 
 CHAN_HELP_SET_DESC
 	Syntax: SET Channel DESC Beschreibung
@@ -4597,6 +4543,45 @@ CHAN_HELP_SET_OPNOTICE
 	Wird Op-Notice eingeschaltet, sendet %S eine
 	Notice an den Channel wenn OP oder DEOP Befehle
 	benutzt werden.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Syntax: AOP Channel ADD Nickname
@@ -5101,39 +5086,12 @@ CHAN_HELP_GETKEY
 	Syntax: GETKEY Channel
 	
 	Liefert den Key des angegebenen Channels zurück.
-	
-CHAN_HELP_SENDPASS
-	Syntax: SENDPASS Channel
-	
-	Sendet das Passwort des angegebenen Channels an die
-	eMail-Adresse, die dem Founder in der Datenbank
-	assoziiert ist. Dieser Befehl ist sehr nützlich,
-	wenn man mit dem Problem des vergessenen Passwortes
-	konfrontiert wird.
-	
-	Kann in einigen Netzen auf IRC Operatoren beschränkt
-	sein.
 
 CHAN_SERVADMIN_HELP
 	
 	Services Administratoren können weiterhin beliebige Channels
 	DROPEN (löschen), Zugriffslisten oder Channel-Einstellungen
 	ansehen ohne sich vorher für den Channel identifizieren zu müssen.
-	
-CHAN_SERVADMIN_HELP_LOGOUT
-	Syntax: LOGOUT Channel [Nickname]
-	
-	Durch dieser Befehl wird dich ChanServ nicht mehr als
-	identifiziert für den angegebenen Channel betrachten.
-	
-	Wenn du der Founder (Gründer) dieses Channels bist, kannst
-	du jeden ausloggen, ansonsten nur dich selbst.
-	
-	Bist du ein Services Administrator, kannst du jeden des
-	angegebenen Channels ausloggen, ohne Founder-Rechte
-	des Channels zu besitzen. Weiterhin musst du den
-	Parameter Nickname nicht unbedingt angeben, dies hat zur
-	Folge, dass jeder Nickname aus dem Channel ausgeloggt wird.
 
 CHAN_SERVADMIN_HELP_DROP
 	Syntax: DROP Channel

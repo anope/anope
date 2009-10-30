@@ -141,8 +141,6 @@ E void save_cs_dbase();
 E void expire_chans();
 E void cs_remove_nick(const NickCore * nc);
 
-E int is_real_founder(User * user, ChannelInfo * ci);
-
 E void check_modes(Channel * c);
 E int check_valid_admin(User * user, Channel * chan, int servermode);
 E int check_valid_op(User * user, Channel * chan, int servermode);
@@ -158,8 +156,9 @@ E int check_topiclock(Channel * c, time_t topic_time);
 
 E ChannelInfo *cs_findchan(const char *chan);
 E int check_access(User * user, ChannelInfo * ci, int what);
-E int is_founder(User * user, ChannelInfo * ci);
-E int get_access(User * user, ChannelInfo * ci);
+E bool IsFounder(User *user, ChannelInfo *ci);
+E bool IsRealFounder(User *user, ChannelInfo *ci);
+E int get_access(User *user, ChannelInfo *ci);
 E void update_cs_lastseen(User * user, ChannelInfo * ci);
 E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
 E AutoKick *is_stuck(ChannelInfo * ci, const char *mask);
@@ -168,7 +167,6 @@ E void stick_all(ChannelInfo * ci);
 
 E int levelinfo_maxwidth;
 E ChannelInfo *makechan(const char *chan);
-E int is_identified(User * user, ChannelInfo * ci);
 E char *get_mlock_modes(ChannelInfo * ci, int complete);
 
 /**** compat.c ****/

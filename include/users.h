@@ -15,11 +15,6 @@ struct u_chanlist {
 	int16 status;		/* Associated flags; see CSTATUS_* below. */
 };
 
-struct u_chaninfolist {
-	struct u_chaninfolist *next, *prev;
-	ChannelInfo *chan;
-};
-
 /* Online user and channel data. */
 class CoreExport User : public Extensible
 {
@@ -49,7 +44,6 @@ class CoreExport User : public Extensible
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 
 	struct u_chanlist *chans;	/* Channels user has joined */
-	struct u_chaninfolist *founder_chans;	/* Channels user has identified for */
 
 	unsigned short invalid_pw_count;	/* # of invalid password attempts */
 	time_t invalid_pw_time;	/* Time of last invalid password */

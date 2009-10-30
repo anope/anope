@@ -1650,15 +1650,15 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	 */
 	if (give_modes && (get_ignore(user->nick) == NULL)
 		&& (!user->nc || !(user->nc->flags & NI_AUTOOP))) {
-		if (owner && is_founder(user, ci))
+		if (owner && (IsFounder(user, ci) || check_access(user, ci, CA_AUTOOWNER)))
 			add_modes |= CUS_OWNER;
 		else if (admin && check_access(user, ci, CA_AUTOPROTECT))
 			add_modes |= CUS_PROTECT;
-		if (check_access(user, ci, CA_AUTOOP))
+		if (op && check_access(user, ci, CA_AUTOOP))
 			add_modes |= CUS_OP;
-		else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && check_access(user, ci, CA_AUTOHALFOP))
+		else if (halfop && check_access(user, ci, CA_AUTOHALFOP))
 			add_modes |= CUS_HALFOP;
-		else if (check_access(user, ci, CA_AUTOVOICE))
+		else if (voice && check_access(user, ci, CA_AUTOVOICE))
 			add_modes |= CUS_VOICE;
 	}
 
@@ -1671,16 +1671,16 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (((ci->flags & CI_SECUREOPS) || (c->usercount == 1)
 		 || check_access(user, ci, CA_AUTODEOP))
 		&& !is_ulined(user->server->name)) {
-		if (owner && (status & CUS_OWNER) && !is_founder(user, ci))
+		if (owner && (status & CUS_OWNER) && !IsFounder(user, ci))
 			rem_modes |= CUS_OWNER;
 		if (admin && (status & CUS_PROTECT)
 			&& !check_access(user, ci, CA_AUTOPROTECT)
 			&& !check_access(user, ci, CA_PROTECTME))
 			rem_modes |= CUS_PROTECT;
-		if ((status & CUS_OP) && !check_access(user, ci, CA_AUTOOP)
+		if (op && (status & CUS_OP) && !check_access(user, ci, CA_AUTOOP)
 			&& !check_access(user, ci, CA_OPDEOPME))
 			rem_modes |= CUS_OP;
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && (status & CUS_HALFOP)
+		if (halfop && (status & CUS_HALFOP)
 			&& !check_access(user, ci, CA_AUTOHALFOP)
 			&& !check_access(user, ci, CA_HALFOPME))
 			rem_modes |= CUS_HALFOP;

@@ -315,7 +315,7 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
+			if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 			{
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
@@ -376,7 +376,7 @@ class CommandCSLevels : public Command
 			this->OnSyntaxError(u);
 		else if (ci->flags & CI_XOP)
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
-		else if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
+		else if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "SET") {
 			level = strtol(s, &error, 10);

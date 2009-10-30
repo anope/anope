@@ -96,44 +96,6 @@ class CommandCSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPassword(User * u, ChannelInfo * ci, const char *param)
-	{
-		int len = strlen(param);
-
-		if (stricmp(u->nick, param) == 0 || (StrictPasswords && len < 5)) {
-			notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
-			return MOD_CONT;
-		}
-
-		if (enc_encrypt_check_len(len ,PASSMAX - 1)) {
-			notice_lang(s_ChanServ, u, PASSWORD_TOO_LONG);
-			return MOD_CONT;
-		}
-
-		if (enc_encrypt(param, len, ci->founderpass, PASSMAX -1) < 0) {
-			alog("%s: Failed to encrypt password for %s (set)", s_ChanServ,
-				 ci->name);
-			notice_lang(s_ChanServ, u, CHAN_SET_PASSWORD_FAILED);
-			return MOD_CONT;
-		}
-
-		notice_lang(s_ChanServ, u, CHAN_PASSWORD_CHANGED, ci->name);
-
-		if (get_access(u, ci) < ACCESS_FOUNDER) {
-			alog("%s: %s!%s@%s set password as Services admin for %s",
-				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ci->name);
-			if (WallSetpass)
-				ircdproto->SendGlobops(s_ChanServ,
-								 "\2%s\2 set password as Services admin for channel \2%s\2",
-								 u->nick, ci->name);
-		} else {
-			alog("%s: %s!%s@%s changed password of %s (founder: %s)",
-				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
-				 ci->name, ci->founder->display);
-		}
-		return MOD_CONT;
-	}
-
 	CommandReturn DoSetDesc(User * u, ChannelInfo * ci, const char *param)
 	{
 		if (ci->desc)
@@ -476,7 +438,9 @@ class CommandCSSet : public Command
 					/* This will probably cause wrong levels to be set, but hey,
 					 * it's better than losing it altogether.
 					 */
-					if (CHECKLEV(CA_AKICK) || CHECKLEV(CA_SET)) {
+					if (access->level == ACCESS_QOP) {
+						access->level = ACCESS_QOP;
+					} else if (CHECKLEV(CA_AKICK) || CHECKLEV(CA_SET)) {
 						access->level = ACCESS_SOP;
 					} else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP)
 							   || CHECKLEV(CA_OPDEOPME)) {
@@ -578,9 +542,9 @@ class CommandCSSet : public Command
 		else if (cmd == "FOUNDER") {
 			if (!is_servadmin
 				&& (ci->
-					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
+					flags & CI_SECUREFOUNDER ? !IsRealFounder(u,
 																ci) :
-					!is_founder(u, ci))) {
+					!IsFounder(u, ci))) {
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			} else {
 				DoSetFounder(u, ci, param);
@@ -588,22 +552,12 @@ class CommandCSSet : public Command
 		} else if (cmd == "SUCCESSOR") {
 			if (!is_servadmin
 				&& (ci->
-					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
+					flags & CI_SECUREFOUNDER ? !IsRealFounder(u,
 																ci) :
-					!is_founder(u, ci))) {
+					!IsFounder(u, ci))) {
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			} else {
 				DoSetSuccessor(u, ci, param);
-			}
-		} else if (cmd == "PASSWORD") {
-			if (!is_servadmin
-				&& (ci->
-					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
-																ci) :
-					!is_founder(u, ci))) {
-				notice_lang(s_ChanServ, u, ACCESS_DENIED);
-			} else {
-				DoSetPassword(u, ci, param);
 			}
 		} else if (cmd == "DESC") {
 			DoSetDesc(u, ci, param);
@@ -630,9 +584,9 @@ class CommandCSSet : public Command
 		} else if (cmd == "SECUREFOUNDER") {
 			if (!is_servadmin
 				&& (ci->
-					flags & CI_SECUREFOUNDER ? !is_real_founder(u,
+					flags & CI_SECUREFOUNDER ? !IsRealFounder(u,
 																ci) :
-					!is_founder(u, ci))) {
+					!IsFounder(u, ci))) {
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			} else {
 				DoSetSecureFounder(u, ci, param);
@@ -674,8 +628,6 @@ class CommandCSSet : public Command
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_FOUNDER);
 		else if (subcommand == "SUCCESSOR")
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR);
-		else if (subcommand == "PASSWORD")
-			notice_help(s_ChanServ, u, CHAN_HELP_SET_PASSWORD);
 		else if (subcommand == "DESC")
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_DESC);
 		else if (subcommand == "URL")

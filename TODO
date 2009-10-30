@@ -23,7 +23,7 @@ Legend:
 [?] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
     the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
 [ ] Last used time on AKICK/access entries
-[ ] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
+[x] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
 [+] General options block, ability to turn LOGCHAN on from the config file..
 [ ] Docs directory cleanup
 

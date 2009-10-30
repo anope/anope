@@ -1030,6 +1030,12 @@ CHAN_LEVEL_TOPIC
 	Autorisé à utiliser la commande TOPIC
 CHAN_LEVEL_INFO
 	Autorisé à utiliser la commande INFO avec l'option ALL
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1047,7 +1053,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER canal motdepasse description
+	REGISTER canal description
 CHAN_REGISTER_DISABLED
 	Désolés, l'enregistrement des cannaux est temporairement désactivé.
 CHAN_REGISTER_NOT_LOCAL
@@ -1066,36 +1072,11 @@ CHAN_REGISTRATION_FAILED
 	Désolés, l'enregistrement a échoué.
 CHAN_REGISTERED
 	Le canal %s a été enregistré sous votre pseudo: %s
-CHAN_PASSWORD_IS
-	Le mot de passe du canal est %s - notez le pour une utilisation ultérieure.
 CHAN_REGISTER_NONE_CHANNEL
 	Vous avez essayé d'enregistrer le canal %s qui n'éxiste pas.
 CHAN_SYMBOL_REQUIRED
 	Veuillez utiliser les symbole # quand vous voulez enregistrer
 	un canal.
-	
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY canal motdepasse
-CHAN_IDENTIFY_FAILED
-	Désolés, l'identification a échoué.
-CHAN_IDENTIFY_SUCCEEDED
-	Password accepté - vous avez maintenant un level d'accès sur %s équivalent 
-	à celui de son propriétaire.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT canal pseudo
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT canal [pseudo]
-CHAN_LOGOUT_SUCCEEDED
-	L'utilisateur %s n'est plus identifié pour le canal %s.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Tous les utilisateurs identifiés au canal %s ne le sont plus (except the channel founder).
-CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1126,14 +1107,6 @@ CHAN_SUCCESSOR_UNSET
 	Il n'y a plus de successeur sur %s.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s ne peut être successeur et propriétaire du canal %s.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Impossible de changer le mot de passe.
-CHAN_PASSWORD_CHANGED
-	Le mot de passe de %s a été changé.
-CHAN_PASSWORD_CHANGED_TO
-	Le mot de passe de %s est maintenant %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1286,6 +1259,37 @@ CHAN_XOP_ACCESS
 	Tapez %R%s HELP ACCESS pour plus d'informations.
 CHAN_XOP_NOT_AVAILABLE
 	xOP system is not available.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1661,44 +1665,14 @@ CHAN_CLEARED_USERS
 	Tous les utilisateurs du canal %s ont été kickés.
 CHAN_CLEARED_INVITES
 	Toutes les invites du canal %s ont été enlevés.
-
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS canal
-CHAN_GETPASS_UNAVAILABLE
-	La commande GETPASS est indisponible car l'encryption est utilisée.
-CHAN_GETPASS_PASSWORD_IS
-	Le mot de passe du canal %s est %s.
 	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY canal
 CHAN_GETKEY_NOKEY
 	Le canal %s n'a pas de clé.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS canal
-CHAN_SENDPASS_UNAVAILABLE
-	La commande SENDPASS est indisponible car l'encryption est utilisée.
-CHAN_SENDPASS_SUBJECT
-	Mot de passe du canal %s
-CHAN_SENDPASS_HEAD
-	Bonjour,
-CHAN_SENDPASS_LINE_1
-	Vous avez demandé à recevoir le mot de passe du canal %s par e-mail.
-CHAN_SENDPASS_LINE_2
-	Le mot de passe est %s. Pour des raisons de sécurité, vous devriez le changer dès que vous lisez ce mail.
-CHAN_SENDPASS_LINE_3
-	Si vous ne savez pas de quoi il retourne dans cet e-mail, il s'agit probablement d'une erreur; nous vous prions de nous excuser et vous demandons d'ignorer cet e-mail.
-CHAN_SENDPASS_LINE_4
-	NE REPONDEZ PAS A CE MAIL!
-CHAN_SENDPASS_LINE_5
-	Les administrateurs de %s.
-CHAN_SENDPASS_OK
-	Le mot de passe de %s a été envoyé.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4206,11 +4180,11 @@ CHAN_HELP_CMD_STATUS
 	               utilisateur sur un channel
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Enregistre un channel
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Vous identifie avec votre mot de passe
 CHAN_HELP_CMD_SET
 	    SET        Configure les options et informations du 
 	               channel
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        Modifie la liste des utilisateurs AOPs
 CHAN_HELP_CMD_SOP
@@ -4223,8 +4197,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Gère la liste des kicks automatiques
 CHAN_HELP_CMD_DROP
 	    DROP       Annule l'enregistrement d'un channel
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Aide à retrouver les mots de passe égarés
 CHAN_HELP_CMD_BAN
 	    BAN        Ban un pseudo spécifié dans un canal
 CHAN_HELP_CMD_CLEAR
@@ -4242,8 +4214,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kick le pseudo spécifié d'un canal
 CHAN_HELP_CMD_LIST
 	    LIST       Liste tout les canaux enregistré en rapport avec la recherche
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     Cette commande inverse la commande IDENTIFY
 CHAN_HELP_CMD_OP
 	    OP         Donne l'Op au pseudo spécifié sur un canal
 CHAN_HELP_CMD_TOPIC
@@ -4314,25 +4284,6 @@ CHAN_HELP_REGISTER
 	d'abord enregistrer votre pseudo. Si ce n'est pas déjà fait,
 	tapez %R%s HELP pour savoir comment faire.
 
-CHAN_HELP_IDENTIFY
-	Syntaxe: IDENTIFY canal motdepasse
-	
-	Certifie à %S que vous êtes autorisé à modifier le canal donné.
-	Beaucoup de commandes demandent que vous utilisiez cette
-	commande avant de les utiliser si vous n'êtes pas le propriétaire. 
-	Le mot de passe est le même que celui que vous avez envoyé avec la
-	commande REGISTER.
-	
-CHAN_HELP_LOGOUT
-	Syntaxe: LOGOUT canal pseudo
-	
-	Cette commande supprime l'identification du pseudo sélectionné
-	pour le canal donné.
-	
-	Si vous êtes le propriétaire du canal, vous pouvez utiliser
-	la commande sur n'importe qui, sinon vous ne pouvez que
-	l'utiliser sur vous même.
-
 CHAN_HELP_DROP
 	Syntaxe: DROP canal
 	
@@ -4350,7 +4301,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Définit le propriétaire d'un canal
 	    SUCCESSOR     Définit le successeur d'un canal
-	    PASSWORD      Définit le mot de passe du canal
 	    DESC          Définit la description du canal
 	    URL           Associe un site avec un canal
 	    EMAIL         Associe un E-mail avec le canal
@@ -4394,12 +4344,6 @@ CHAN_HELP_SET_SUCCESSOR
 	enregistrés (%d), le canal sera tout de même effacé, comme
 	si aucun successeur n'avait été nommé. Le nouveau pseudo
 	doit être enregistré.
-
-CHAN_HELP_SET_PASSWORD
-	Syntaxe: SET canal PASSWORD motdepasse
-	
-	Définit le mot de passe utilisé pour s'identifier en tant
-	que propriétaire du canal.
 
 CHAN_HELP_SET_DESC
 	Syntaxe: SET canal DESC description
@@ -4591,6 +4535,45 @@ CHAN_HELP_SET_OPNOTICE
 	Lorsque notice sur OP/DEOP est défini, %S enverra un notice au
 	canal à chaque fois que les commandes OP ou DEOP sont
 	utilisées par un utilisateur sur le canal.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Syntaxe: AOP canal ADD pseudo
@@ -5094,40 +5077,12 @@ CHAN_HELP_GETKEY
 	Syntaxe: GETKEY canal
 	
 	Retourne la clef du canal donné.
-	
-CHAN_HELP_SENDPASS
-	Syntaxe: SENDPASS canal
-	
-	Envoie le mot de passe du canal donné à l'adresse e-mail 
-	qui a été définie pour le propriétaire de ce canal. Cette 
-	commande est très utile pour régler les problèmes de mots 
-	de passe perdus.
-	
-	Peut être limitée aux IRC operators sur certains
-	réseaux.
 
 CHAN_SERVADMIN_HELP
 	
 	Les Services operators peuvent aussi effacer tout canal sans
 	avoir besoin de s'identifier avec un mot de pass, et peuvent
 	voir l'access, AKICK, et level lists de tout canaux.
-
-CHAN_SERVADMIN_HELP_LOGOUT
-	Syntaxe: LOGOUT canal [pseudo]
-	
-	Cette commande supprime l'identification du pseudo sélectionné
-	pour le canal donné.
-	
-	Si vous êtes le propriétaire du canal, vous pouvez utiliser
-	la commande sur n'importe qui, sinon vous ne pouvez que
-	l'utiliser sur vous même.
-	
-	Si vous êtes un Services operaror, vous pouvez utiliser
-	cette commande sur n'importe qui pour n'importe quel 
-	canal sans avoir besoin d'être le propriétaire du canal.
-	Vous pouvez également omettre le paramètre pseudo, cela aura
-	pour effet de supprimer l'identification pour tous les 
-	utilisateurs identifiés au canal.
 
 CHAN_SERVADMIN_HELP_DROP
 	Syntaxe: DROP canal

@@ -43,7 +43,6 @@ User::User(const std::string &snick, const std::string &suid)
 	server = NULL;
 	nc = NULL;
 	chans = NULL;
-	founder_chans = NULL;
 	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
 
@@ -225,7 +224,6 @@ void User::SetRealname(const std::string &srealname)
 User::~User()
 {
 	struct u_chanlist *c, *c2;
-	struct u_chaninfolist *ci, *ci2;
 	char *srealname;
 
 	if (LogUsers)
@@ -286,16 +284,6 @@ User::~User()
 
 	/* Cancel pending nickname enforcers, etc */
 	cancel_user(this);
-
-	if (debug >= 2)
-		alog("debug: User::~User(): free founder data");
-	ci = this->founder_chans;
-	while (ci)
-	{
-		ci2 = ci->next;
-		delete ci;
-		ci = ci2;
-	}
 
 	if (debug >= 2)
 		alog("debug: User::~User(): delete from list");
@@ -426,7 +414,6 @@ void get_user_stats(long *nusers, long *memuse)
 	int i;
 	User *user;
 	struct u_chanlist *uc;
-	struct u_chaninfolist *uci;
 
 	for (i = 0; i < 1024; i++) {
 		for (user = userlist[i]; user; user = user->next) {
@@ -444,8 +431,6 @@ void get_user_stats(long *nusers, long *memuse)
 				mem += strlen(user->server->name) + 1;
 			for (uc = user->chans; uc; uc = uc->next)
 				mem += sizeof(*uc);
-			for (uci = user->founder_chans; uci; uci = uci->next)
-				mem += sizeof(*uci);
 		}
 	}
 	*nusers = count;

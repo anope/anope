@@ -1017,6 +1017,12 @@ CHAN_LEVEL_TOPIC
 	Permitido o uso do comando TOPIC
 CHAN_LEVEL_INFO
 	Permitido o uso do comando INFO com a opção ALL
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1034,7 +1040,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER canal senha descrição
+	REGISTER canal descrição
 CHAN_REGISTER_DISABLED
 	Desculpe, o registro de canais está temporariamente desativado.
 CHAN_REGISTER_NOT_LOCAL
@@ -1053,34 +1059,10 @@ CHAN_REGISTRATION_FAILED
 	Desculpe, o registro falhou.
 CHAN_REGISTERED
 	O canal %s está registrado sob seu nick: %s
-CHAN_PASSWORD_IS
-	A senha do seu canal é %s - guarde ela para uso posterior.
 CHAN_REGISTER_NONE_CHANNEL
 	Você tentou registrar um canal não existente: %s
 CHAN_SYMBOL_REQUIRED
 	Por favor use o símbolo # quando tentar registrar
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY canal senha
-CHAN_IDENTIFY_FAILED
-	Desculpe, a identificação falhou.
-CHAN_IDENTIFY_SUCCEEDED
-	Senha aceita - você está sendo reconhecido agora como dono do %s.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT canal nick
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT canal [nick]
-CHAN_LOGOUT_SUCCEEDED
-	Usuário %s foi desconectado do canal %s.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Todos os usuários registrados foram desconectados do canal %s (except the channel founder).
-CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1111,14 +1093,6 @@ CHAN_SUCCESSOR_UNSET
 	Successor do canal %s removido.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s não pode ser o successor do canal %s porque ele é o founder.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Desculpe, a mudança de senha falhou.
-CHAN_PASSWORD_CHANGED
-	A senha do %s foi alterada.
-CHAN_PASSWORD_CHANGED_TO
-	A senha do %s foi alterada para %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1269,6 +1243,37 @@ CHAN_XOP_ACCESS
 	Digite %R%s HELP ACCESS para mais informação.
 CHAN_XOP_NOT_AVAILABLE
 	xOP system is not available.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1641,14 +1646,6 @@ CHAN_CLEARED_USERS
 CHAN_CLEARED_INVITES
 	Todos os Invites do canal %s foram removidos.
 
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS canal
-CHAN_GETPASS_UNAVAILABLE
-	Comando GETPASS indisponível: modo de encriptação em uso.
-CHAN_GETPASS_PASSWORD_IS
-	Senha do canal %s é %s.
-	
 # GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY canal
@@ -1656,28 +1653,6 @@ CHAN_GETKEY_NOKEY
 	O canal %s não tem key.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS canal
-CHAN_SENDPASS_UNAVAILABLE
-	Comando SENDPASS indisponível: modo de encriptação em uso.
-CHAN_SENDPASS_SUBJECT
-	Senha do canal (%s)
-CHAN_SENDPASS_HEAD
-	Olá,
-CHAN_SENDPASS_LINE_1
-	Você pediu para receber a senha do canal %s por e-mail.
-CHAN_SENDPASS_LINE_2
-	A senha é %s. Por motivos de segurança, recomendamos que você mude a senha assim que receber este e-mail.
-CHAN_SENDPASS_LINE_3
-	Se você não sabe porque este e-mail lhe foi enviado, por favor ignore-o.
-CHAN_SENDPASS_LINE_4
-	POR FAVOR NÃO RESPONDA ESTE E-MAIL!
-CHAN_SENDPASS_LINE_5
-	Administradores do %s.
-CHAN_SENDPASS_OK
-	Senha do canal %s foi enviada.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4045,10 +4020,10 @@ CHAN_HELP_CMD_STATUS
 	    STATUS     Fornece o atual nível de acesso de um usuário em um canal
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registra um canal
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Identifica seu nick
 CHAN_HELP_CMD_SET
 	    SET        Ajusta as opções e informações do canal
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        Modifica a lista de AOP (AutoOP) de um canal
 CHAN_HELP_CMD_SOP
@@ -4061,8 +4036,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Faz a manutenção da Lista de Autokick
 CHAN_HELP_CMD_DROP
 	    DROP       Cancela o registro de um canal
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Ajuda para recuperar senhas
 CHAN_HELP_CMD_BAN
 	    BAN        Bane o nick selecionado em um canal
 CHAN_HELP_CMD_CLEAR
@@ -4079,8 +4052,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kicka (expulsa) um nick de um canal
 CHAN_HELP_CMD_LIST
 	    LIST       Lista todos os canais registrados que combinam com o padrão fornecido
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     Desconecta um determinado nick
 CHAN_HELP_CMD_OP
 	    OP         Atribui status de OP a um nick no canal
 CHAN_HELP_CMD_TOPIC
@@ -4149,24 +4120,6 @@ CHAN_HELP_REGISTER
 	registrado seu nick. Se ainda não tiver seu nick registrado,
 	digite %R%s HELP para mais informações de como fazê-lo.
 
-CHAN_HELP_IDENTIFY
-	Sintaxe: IDENTIFY canal senha
-	
-	Identifica você no %S como fundador do canal fornecido.
-	Muitos comandos exigem que você use este comando antes
-	de usá-los. A senha deverá ser a mesma usada por você
-	no comando REGISTER.
-	
-CHAN_HELP_LOGOUT
-	Sintaxe: LOGOUT canal nick
-	
-	Este comando faz com que um determinado nick seja des-identificado
-	do canal, fazendo com que seja necessário ele se identificar
-	novamente para recuperar seu acesso.
-	
-	Se você for o Founder do canal, pode usar este comando em
-	qualquer usuário e em si mesmo.
-
 CHAN_HELP_DROP
 	Sintaxe: DROP canal
 	
@@ -4184,7 +4137,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Ajusta o fundador do canal
 	    SUCCESSOR     Ajusta o sucessor do canal
-	    PASSWORD      Ajusta a senha do founder
 	    DESC          Ajusta a descrição do canal
 	    URL           Associa uma URL a um canal
 	    EMAIL         Associa um E-mail a um canal
@@ -4222,12 +4174,6 @@ CHAN_HELP_SET_SUCCESSOR
 	No entanto, se o sucessor possuir muitos canais registrados
 	(%d), o canal será dropado, como se nenhum sucessor tivesse
 	sido ajustado. O novo nick deverá estar registrado.
-
-CHAN_HELP_SET_PASSWORD
-	Sintaxe: SET canal PASSWORD senha
-	
-	Ajusta a senha utilizada para identificação do
-	fundador do canal.
 
 CHAN_HELP_SET_DESC
 	Sintaxe: SET canal DESC descrição
@@ -4415,6 +4361,45 @@ CHAN_HELP_SET_OPNOTICE
 	Op-notice estiver ativado, o %S enviará uma notice para
 	o canal sempre que os comandos OP ou DEOP forem usados em um
 	usuário no canal.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Sintaxe: AOP canal ADD nick
@@ -4902,17 +4887,6 @@ CHAN_HELP_GETKEY
 	Sintaxe: GETKEY canal
 	
 	Retorna a key (do modo +k) de um determinado canal.
-	
-CHAN_HELP_SENDPASS
-	Sintaxe: SENDPASS canal
-	
-	Envia a senha de um determinado canal para o fundador
-	do mesmo, usando o e-mail gravado no nick dele. Este
-	comando é realmente útil quando se trata de senhas
-	perdidas.
-	
-	Pode estar limitado aos Operadores de IRC em
-	algumas Redes.
 
 CHAN_SERVADMIN_HELP
 	
@@ -4920,22 +4894,6 @@ CHAN_SERVADMIN_HELP
 	DROP mesmo sem se identificarem como donos do canal, e podem
 	também ver as listas de acesso, AKICK, e níveis de qualquer
 	canal.
-	
-CHAN_SERVADMIN_HELP_LOGOUT
-	Sintaxe: LOGOUT canal [nick]
-	
-	Este comando faz com que um determinado nick seja des-identificado
-	do canal, fazendo com que seja necessário ele se identificar
-	novamente para recuperar seu acesso.
-	
-	Se você for o Founder do canal, pode usar este comando em
-	qualquer usuário e em si mesmo.
-	
-	Se você for um Administrador dos Services, poderá
-	desconectar qualquer um de qualquer canal sem precisar
-	ser o Founder dos mesmos. Além disso, você pode omitir
-	o parâmetro nick; com isso, irá des-identificar todos
-	os usuários registrados do canal.
 
 CHAN_SERVADMIN_HELP_DROP
 	Sintaxe: DROP canal

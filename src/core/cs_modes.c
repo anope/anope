@@ -76,8 +76,6 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 	return MOD_CONT;
 }
 
-// XXX: Future enhancement. Default these to the sender, with an optional target arg.
-
 class CommandCSOp : public Command
 {
  public:
@@ -329,7 +327,7 @@ class CommandCSOwner : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), NULL, true, ACCESS_FOUNDER, ACCESS_FOUNDER, "OWNER", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_OWNER, CA_OWNERME, "OWNER", 0);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -360,7 +358,7 @@ class CommandCSDeOwner : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), NULL, false, ACCESS_FOUNDER, ACCESS_FOUNDER, "OWNER", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_OWNER, CA_OWNERME, "DEOWNER", 0);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)

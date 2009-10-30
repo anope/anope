@@ -18,7 +18,7 @@ class CoreExport ChannelInfo : public Extensible
 	ChannelInfo()
 	{
 		next = prev = NULL;
-		founderpass[0] = name[0] = last_topic_setter[0] = '\0';
+		name[0] = last_topic_setter[0] = '\0';
 		founder = successor = NULL;
 		desc = url = email = last_topic = forbidby = forbidreason = NULL;
 		time_registered = last_used = last_topic_time = 0;
@@ -43,7 +43,6 @@ class CoreExport ChannelInfo : public Extensible
 	NickCore *founder;
 	NickCore *successor;		/* Who gets the channel if the founder
 					 			 * nick is dropped or expires */
-	char founderpass[PASSMAX];
 	char *desc;
 	char *url;
 	char *email;

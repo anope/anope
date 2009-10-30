@@ -1015,6 +1015,12 @@ CHAN_LEVEL_TOPIC
 	Toegestaan om TOPIC te gebruiken
 CHAN_LEVEL_INFO
 	Toegestaan om INFO met de ALL optie te gebruiken
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1032,7 +1038,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER kanaal wachtwoord beschrijving
+	REGISTER kanaal beschrijving
 CHAN_REGISTER_DISABLED
 	Sorry, kanaal registratie is tijdelijk uitgeschakeld.
 CHAN_REGISTER_NOT_LOCAL
@@ -1051,35 +1057,10 @@ CHAN_REGISTRATION_FAILED
 	Sorry, registratie gefaald.
 CHAN_REGISTERED
 	Kanaal %s is geregistreerd onder jouw nickname: %s
-CHAN_PASSWORD_IS
-	Het wachtwoord van je kanaal is %s - onthoudt dit voor later gebruik.
 CHAN_REGISTER_NONE_CHANNEL
 	Je hebt geprobeerd om niet-bestaand kanaal %s te registeren.
 CHAN_SYMBOL_REQUIRED
 	Gebruik het # symbool wanner je probeert een kanaal te registeren.
-
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY kanaal wachtwoord
-CHAN_IDENTIFY_FAILED
-	Sorry, identificatie gefaald.
-CHAN_IDENTIFY_SUCCEEDED
-	Wachtwoord goedgekeurd - je hebt nu stichter-niveau toegang to %s.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT kanaal nickname
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT kanaal [nickname]
-CHAN_LOGOUT_SUCCEEDED
-	Gebruiker %s is uitgelogd van kanaal %s.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Alle geidentificeerde gebruikers zijn uitgelogd van kanaal %s (except the channel founder).
-CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1110,14 +1091,6 @@ CHAN_SUCCESSOR_UNSET
 	Opvolger voor %s verwijderd.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s kan de opvolger niet zijn op kanaal %s omdat hij/zij founder is.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Sorry, kan wachtwoord niet zetten.
-CHAN_PASSWORD_CHANGED
-	%s wachtwoord veranderd.
-CHAN_PASSWORD_CHANGED_TO
-	%s wachtwoord veranderd in %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1269,6 +1242,37 @@ CHAN_XOP_ACCESS
 	Type %R%s HELP ACCESS voor meer informatie.
 CHAN_XOP_NOT_AVAILABLE
 	xOP system is not available.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1641,43 +1645,13 @@ CHAN_CLEARED_USERS
 CHAN_CLEARED_INVITES
 	All invites on channel %s have been removed.
 
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS kanaal
-CHAN_GETPASS_UNAVAILABLE
-	GETPASS commando onbeschikbaar wegens encryptie van de gegevens.
-CHAN_GETPASS_PASSWORD_IS
-	Wachtwoord voor kanaal %s is %s.
-	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY channel
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS kanaal
-CHAN_SENDPASS_UNAVAILABLE
-	SENDPASS commando onbeschikbaar wegens encryptie van de gegevens.
-CHAN_SENDPASS_SUBJECT
-	Kanaal wachtwoord (%s)
-CHAN_SENDPASS_HEAD
-	Hallo,
-CHAN_SENDPASS_LINE_1
-	Je hebt het wachtwoord aangevraag van kanaal %s via e-mail.
-CHAN_SENDPASS_LINE_2
-	Het wachtwoord is %s. Wegens veiligheidsredenen zou je deze zo snel mogelijk moeten veranderen.
-CHAN_SENDPASS_LINE_3
-	Als je niet weet waarom deze e-mail verstuurd is, negeer deze dan.
-CHAN_SENDPASS_LINE_4
-	ANTWOORD NIET OP DEZE MAIL!
-CHAN_SENDPASS_LINE_5
-	%s beheerders.
-CHAN_SENDPASS_OK
-	Wachtwoord %s is verstuurd.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4125,10 +4099,10 @@ CHAN_HELP_CMD_STATUS
 	               op een kanaal weer
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registreer een kanaal
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Identificeer jezelf met je wachtwoord
 CHAN_HELP_CMD_SET
 	    SET        Stel kanaal opties en informatie in
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        Wijzig de lijst van AOP's
 CHAN_HELP_CMD_SOP
@@ -4141,8 +4115,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Beheer de AutoKick lijst
 CHAN_HELP_CMD_DROP
 	    DROP       Annuleer een kanaalregistratie
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Wachtwoord vergeten?
 CHAN_HELP_CMD_BAN
 	    BAN        Bans a selected nick on a channel
 CHAN_HELP_CMD_CLEAR
@@ -4159,8 +4131,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kicks a selected nick from a channel
 CHAN_HELP_CMD_LIST
 	    LIST       Lists all registered channels matching the given pattern
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
 CHAN_HELP_CMD_OP
 	    OP         Gives Op status to a selected nick on a channel
 CHAN_HELP_CMD_TOPIC
@@ -4227,24 +4197,6 @@ CHAN_HELP_REGISTER
 	bekijk dan %R%s HELP voor informatie over hoe je
 	dit kunt doen.
 
-CHAN_HELP_IDENTIFY
-	Gebruik: IDENTIFY kanaal wachtwoord
-	
-	Identificeert je bij %S als de stichter van het gegeven
-	kanaal. Veel commando's verplichten je dit commando te
-	gebruiken voordat je ze gebruikt. Het wachtwoord moet
-	identiek zijn aan degene verstuurd met het REGISTER
-	commando.
-
-CHAN_HELP_LOGOUT
-	Gebruik: LOGOUT kanaal nick
-	
-	Dit commando zorgt ervoor dat de opgegeven nick niet meer
-	geidentificeerd is voor het opgegeven kanaal
-	
-	Als je de stichter van het kanaal bent kan je iedereen
-	uitloggen, anders alleen jezelf.
-
 CHAN_HELP_DROP
 	Gebruik: DROP kanaal
 	
@@ -4262,7 +4214,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Stelt de stichter van het kanaal in
 	    SUCCESSOR     Stelt de opvolger van het kanaal in
-	    PASSWORD      Stelt het stichterwachtwoord in
 	    DESC          Stelt de kanaalbeschrijving in
 	    URL           Associeer een URL met het kanaal
 	    EMAIL         Associate een E-mail adres met het kanaal
@@ -4305,12 +4256,6 @@ CHAN_HELP_SET_SUCCESSOR
 	registratie van het kanaal geannuleerd, wat ook gebeurt als
 	er geen opvolger is ingesteld. De nieuwe nick moet een
 	geregistreerde nick zijn.
-
-CHAN_HELP_SET_PASSWORD
-	Gebruik: SET kanaal PASSWORD wachtwoord
-	
-	Stelt het wachtwoord in dat gebruikt wordt om de stichter
-	van het kanaal te identificeren.
 
 CHAN_HELP_SET_DESC
 	Gebruik: SET kanaal DESC beschrijving
@@ -4501,6 +4446,45 @@ CHAN_HELP_SET_OPNOTICE
 	Wanneer op-notificatie aan staat  zal %S een notice naar
 	het kanaal sturen wanneer de OP of DEOP commando's worden
 	gebruikt voor een gebruiker in het kanaal.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Gebruik: AOP kanaal ADD nick
@@ -5001,36 +4985,12 @@ CHAN_HELP_GETKEY
 	Gebruik: GETKEY kanaal
 	
 	Geef de key van het gegeven kanaal terug.
-	
-CHAN_HELP_SENDPASS
-	Gebruik: SENDPASS kanaal
-	
-	Stuur het wachtwoord van het gegeven kanaal naar het email
-	adres gespecificeerd in NickServ voor de stichter van het
-	kanaal. Dit commando is erg bruikbaar om verloren wacht-
-	woorden terug te halen.
-	
-	Kan gelimiteerd zijn tot IRC operators op sommige netwerken.
 
 CHAN_SERVADMIN_HELP
 	
 	Services Operators kunnen ook elk kanaal dropped zonder dat
 	ze hoeven te indentificeren via een wachtwoord, en kunnen de
 	toegangs-, AKICK-, en niveau-lijsten bekijken voor elk kanaal.
-
-CHAN_SERVADMIN_HELP_LOGOUT
-	Gebruik: LOGOUT kanaal [nick]
-	
-	Dit kanaal zorgt ervoor dat de gegeven nick niet meer
-	geidentificeerd is voor het gegeven kanaal.
-	
-	Als je de stichter van het kanaal bent kun je iedereen
-	uitloggen, anders kun je alleen jezelf uitloggen.
-	
-	Als je een Services Operatorstrator bent kun je iedereen
-	uitloggen van elke kanaal zonder daar stichter-rechten te
-	hebben. Je kan ook het nick-paramenter weglaten: dit
-	zorgt ervoor dat iedereen uitgelogd zal worden.
 
 CHAN_SERVADMIN_HELP_DROP
 	Gebruik: DROP kanaal

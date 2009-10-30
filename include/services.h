@@ -615,18 +615,19 @@ enum AccessLevel
 	 * than any valid access level, and ACCESS_INVALID may be assumed to be
 	 * strictly less than any valid access level. Also read below.
 	 */
-	ACCESS_FOUNDER = 10000, /* Numeric level indicating founder access */
+	ACCESS_FOUNDER = 10001, /* Numeric level indicating founder access */
 	ACCESS_INVALID = -10000, /* Used in levels[] for disabled settings */
 	/* There is one exception to the above access levels: SuperAdmins will have
 	 * access level 10001. This level is never stored, however; it is only used
 	 * in comparison and to let SuperAdmins win from founders where needed
 	 */
-	ACCESS_SUPERADMIN = 10001,
+	ACCESS_SUPERADMIN = 10002,
 	/* Levels for xOP */
 	ACCESS_VOP = 3,
 	ACCESS_HOP = 4,
 	ACCESS_AOP = 5,
-	ACCESS_SOP = 10
+	ACCESS_SOP = 10,
+	ACCESS_QOP = 10000
 };
 
 /* Channel info structures.  Stored similarly to the nicks, except that
@@ -747,16 +748,15 @@ struct badword_ {
 #define CA_KICKME		   		29
 #define CA_KICK			 		30
 #define CA_SIGNKICK			31
-/* #define CA_AUTOADMIN				32
-#define CA_ADMINME		  		33
-#define CA_ADMIN					34 */
-	/* Why are these commented out and not removed? -GD */
 #define CA_BANME					32
 #define CA_BAN			  		33
 #define CA_TOPIC					34
 #define CA_INFO			 		35
+#define CA_AUTOOWNER			36
+#define CA_OWNER			37
+#define CA_OWNERME			38
 
-#define CA_SIZE		36
+#define CA_SIZE		39
 
 /* BotServ SET flags */
 #define BS_DONTKICKOPS	  	0x00000001

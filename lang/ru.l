@@ -999,6 +999,12 @@ CHAN_LEVEL_TOPIC
 	Уровень доступа к команде TOPIC
 CHAN_LEVEL_INFO
 	Уровень доступа к команде INFO с параметром ALL
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1014,7 +1020,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER #канал пароль описание
+	REGISTER #канал описание
 CHAN_REGISTER_DISABLED
 	Извините, регистрация каналов временно приостановлена.
 CHAN_REGISTER_NOT_LOCAL
@@ -1033,35 +1039,10 @@ CHAN_REGISTRATION_FAILED
 	Извините, но зарегистрировать канал неудалось.
 CHAN_REGISTERED
 	Канал %s успешно зарегистрирован на ник %s
-CHAN_PASSWORD_IS
-	Пароль от вашего канала -  %s - запомните его для дальнейшего использования.
 CHAN_REGISTER_NONE_CHANNEL
 	Вы пытаетесь зарегистрировать несуществующий канал %s
 CHAN_SYMBOL_REQUIRED
 	Вы должны указать символ # перед названием канала.
-
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY #канал пароль
-CHAN_IDENTIFY_FAILED
-	Извините, но произвести идентификацию неудалось.
-CHAN_IDENTIFY_SUCCEEDED
-	Пароль принят, теперь ваш уровень доступа на канале %s - владелец.
-CHAN_LOGOUT_FOUNDER_FAILED
-	Вы не можете деидентифицировать себя отностительно канала %s т.к. вы его реальный владелец.
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT #канал ник
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT #канал [ник]
-CHAN_LOGOUT_SUCCEEDED
-	Пользователь %s успешно деидентифицирован от канала %s.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Все пользователи, идентифицированные к каналу %s, успешно деидентифицированы.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1092,14 +1073,6 @@ CHAN_SUCCESSOR_UNSET
 	Наследник канал %s удален.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s не может быть наследником канала %s так как он его владелец.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Извините, установить пароль неудалось.
-CHAN_PASSWORD_CHANGED
-	Пароль для канала %s успешно изменен.
-CHAN_PASSWORD_CHANGED_TO
-	Пароль для канала %s изменен на %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1250,6 +1223,37 @@ CHAN_XOP_ACCESS
 	Для более подробной информации см. %R%s HELP ACCESS
 CHAN_XOP_NOT_AVAILABLE
 	Система привелегий xOP недоступна.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1622,14 +1626,6 @@ CHAN_CLEARED_USERS
 CHAN_CLEARED_INVITES
 	Все исключения на приглашение канала %s удалены.
 
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS #канал
-CHAN_GETPASS_UNAVAILABLE
-	Команда GETPASS недоступна, так как используется шифрование паролей.
-CHAN_GETPASS_PASSWORD_IS
-	Пароль канала %s - %s.
-
 # GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY #канал
@@ -1637,28 +1633,6 @@ CHAN_GETKEY_NOKEY
 	Канал %s не имеет ключа (no key).
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS #канал
-CHAN_SENDPASS_UNAVAILABLE
-	Команда SENDPASS недоступна, так как используется шифрование паролей.
-CHAN_SENDPASS_SUBJECT
-	Пароль от канала %s
-CHAN_SENDPASS_HEAD
-	Доброго времени суток, многоуважаемый/ая!
-CHAN_SENDPASS_LINE_1
-	Был получен запрос на восстановление пароля от вашего канала %s
-CHAN_SENDPASS_LINE_2
-	Текущий пароль: %s * Для большей безопасности, рекомендуется изменить его как можно скорее.
-CHAN_SENDPASS_LINE_3
-	Если вы не запрашивали это письмо, просто проигнорируйте его.
-CHAN_SENDPASS_LINE_4
-	ПОЖАЛУЙСТА, НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
-CHAN_SENDPASS_LINE_5
-	Администрация сети %s.
-CHAN_SENDPASS_OK
-	Пароль от канала %s был выслан на email-адрес его владельца.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4107,10 +4081,10 @@ CHAN_HELP_CMD_STATUS
 	               пользователя на указанном канале
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Регистрация канала
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Идентифицикация к каналу в качестве владельца
 CHAN_HELP_CMD_SET
 	    SET        Настройка различных опций канала
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        Управление списком AOP'ов канала
 CHAN_HELP_CMD_SOP
@@ -4123,8 +4097,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Управление списком автокиков канала
 CHAN_HELP_CMD_DROP
 	    DROP       Удаление канала из базы данных сервисов
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Восстановление 'забытого' пароля от канала
 CHAN_HELP_CMD_BAN
 	    BAN        Установка бана на канале
 CHAN_HELP_CMD_CLEAR
@@ -4141,8 +4113,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Выкидывает указанного пользователя с канала
 CHAN_HELP_CMD_LIST
 	    LIST       Запрос списка всех зарегистрированных каналов
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     Деидентификация указанного пользователя от канала
 CHAN_HELP_CMD_OP
 	    OP         Установка статуса оператора (+o) указанному нику на канале
 CHAN_HELP_CMD_TOPIC
@@ -4214,26 +4184,6 @@ CHAN_HELP_REGISTER
 	должны сперва зарегистрировать свой ник. Более подробная информация
 	о том, как регистрировать ник, доступна по %R%s HELP
 
-CHAN_HELP_IDENTIFY
-	Синтаксис: IDENTIFY #канал пароль
-	
-	Позволяет идентифицироваться на %S в качестве владельца
-	указанного канала. Многие команды по управлению каналом недоступны
-	до тех пор, пока вы не идентифицируетесь к каналу. В качестве пароля
-	необходимо указывать тот самый пароль, который вы указывали при
-	регистрации вашего канала.
-	Примечание: вам необязательно идентифицироваться к каналу, если вы
-	его реальный владелец, достаточно просто идентифицироваться к нику.
-	
-CHAN_HELP_LOGOUT
-	Синтаксис: LOGOUT #канал ник
-	
-	Данная команда позволяет деидентифицировать любой ник, который
-	с помощью пароля идентифицировался к каналу в качестве владелеца.
-	
-	Если вы являетесь реальным владельцем канала, у вас есть возможность
-	деидентифицировать кого угодно, в ином случае - только себя.
-
 CHAN_HELP_DROP
 	Синтаксис: DROP #канал
 	
@@ -4249,7 +4199,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       смена владельца канала
 	    SUCCESSOR     установка наследника канала
-	    PASSWORD      смена пароля канала
 	    DESC          изменение описания канала
 	    URL           установка URL-адреса канала
 	    EMAIL         установка Email-адреса канала
@@ -4288,12 +4237,6 @@ CHAN_HELP_SET_SUCCESSOR
 	чересчур много каналов (более %d), он не получит прав на владение
 	каналом и тот будет удален. Ко всему прочему, ник наследника канала
 	должен быть зарегистрированным ником.
-
-CHAN_HELP_SET_PASSWORD
-	Синтаксис: SET #канал PASSWORD пароль
-	
-	Позволяет изменить текущий пароль канала, используемый для
-	идентификации к нему (каналу) в качестве владельца.
 
 CHAN_HELP_SET_DESC
 	Синтаксис: SET #канал DESC описание
@@ -4492,6 +4435,45 @@ CHAN_HELP_SET_OPNOTICE
 	Включает или выключает опцию OP-уведомления на вашем канале.
 	Когда оп-уведомление включено, %S будет посылать нотис
 	на канал каждый раз, когда кто-либо использует команды OP/DEOP.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Синтаксис: AOP #канал ADD ник
@@ -5012,34 +4994,11 @@ CHAN_HELP_GETKEY
 	
 	Позволяет запросить у сервисов ключ-пароль канала.
 
-CHAN_HELP_SENDPASS
-	Синтаксис: SENDPASS #канал
-	
-	Отправляет пароль от канала на email-адрес его  реального владельца,
-	прописанного в графе Founder (владелец).
-	
-	Примечание: в зависимости от настроек сети, доступ к данной команде
-	может быть ограничен до IRC-операторов.
-
 CHAN_SERVADMIN_HELP
 	
 	Администраторы сервисов могут удалить любой канал без идентификации
 	к  нему  в  качестве  владельца, могут просматривать списки доступа
 	каналов, а так же, списки акиков и установки уровней доступа каналов.
-	
-CHAN_SERVADMIN_HELP_LOGOUT
-	Синтаксис: LOGOUT #канал [ник]
-	
-	Деидентифицирует указанный ник от канала, снимая тем самым с него
-	статус владельца.  Если  вы  реальный  владелец канала, вы можете
-	деидентифицировать  любого,  в  противном  случае - только  себя.
-	Примечание: деидентифицируются только те пользователи,  которые
-	идентифицировались к каналу посредством команды IDENTIFY.
-	
-	Как Администратор сервисов, вы можете  деидентифицировать любого
-	пользователя  от  любого  канала,  без  какой-либо  дополнительной
-	идентификации к каналу. Если вы не укажете ник, то деидентифицрованы
-	будут все пользователи канала.
 
 CHAN_SERVADMIN_HELP_DROP
 	Синтаксис: DROP #канал

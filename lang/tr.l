@@ -1024,6 +1024,12 @@ CHAN_LEVEL_TOPIC
 	TOPIC komutunu kullanmaya yetkili
 CHAN_LEVEL_INFO
 	INFO komutunu ALL seçenegiyle kullanmaya yetkili
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1041,7 +1047,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER kanaladý þifre açýklama
+	REGISTER kanaladý açýklama
 CHAN_REGISTER_DISABLED
 	Kanal kaydý geçici olarak devre dýþýdýr.
 CHAN_REGISTER_NOT_LOCAL
@@ -1060,35 +1066,10 @@ CHAN_REGISTRATION_FAILED
 	Kanal kaydý baþarýsýz.
 CHAN_REGISTERED
 	%s kanalý bu nicke kayýt edildi: %s
-CHAN_PASSWORD_IS
-	Kanal þifreniz %s - ilerde kullanacaðýnýz için unutmayýnýz ve kimseye söylemeyiniz.
 CHAN_REGISTER_NONE_CHANNEL
 	You have attempted to register a nonexistent channel %s
 CHAN_SYMBOL_REQUIRED
 	Please use the symbol of # when attempting to register
-
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY kanaladý þifreniz
-CHAN_IDENTIFY_FAILED
-	Geçersiz þifre.
-CHAN_IDENTIFY_SUCCEEDED
-	Þifre kabul edildi - %s kanalýnda founder seviyesinde eriþim kazandýnýz.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT kanaladý nick
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT kanaladý [nick]
-CHAN_LOGOUT_SUCCEEDED
-	Kullanýcý %s artýk %s kanalý tarafýndan tanýnmýyor.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Tüm tanýmlý kullanýcýlar artýk %s kanalý tarafýndan tanýnmýyor (Except the channel founder).
-CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1119,14 +1100,6 @@ CHAN_SUCCESSOR_UNSET
 	%s için successor kaldýrýldý.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s %s kanalýnda successor olamaz çünkü zaten o kanalýn founderý.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Þifre deðiþimi baþarýsýz.
-CHAN_PASSWORD_CHANGED
-	%s kanalýnýn þifresi deðiþtirildi.
-CHAN_PASSWORD_CHANGED_TO
-	%s kanalýnýn þifresi %s olarak deðiþtirildi.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1277,6 +1250,37 @@ CHAN_XOP_ACCESS
 	Daha fazla bilgi için %R%s HELP ACCESS yazin.
 CHAN_XOP_NOT_AVAILABLE
 	xOP system is not available.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1649,43 +1653,13 @@ CHAN_CLEARED_USERS
 CHAN_CLEARED_INVITES
 	All invites on channel %s have been removed.
 
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS kanaladý
-CHAN_GETPASS_UNAVAILABLE
-	GETPASS komutu devre dýþý çünkü þifreleme(encryption) devrede.
-CHAN_GETPASS_PASSWORD_IS
-	%s kanalýnýn þifresi %s.
-	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY channel
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS kanaladý
-CHAN_SENDPASS_UNAVAILABLE
-	SENDPASS komutu devre dýþý çünkü þifreleme(encryption) devrede.
-CHAN_SENDPASS_SUBJECT
-	Kanal þifresi (%s)
-CHAN_SENDPASS_HEAD
-	Selam,
-CHAN_SENDPASS_LINE_1
-	%s kanalýnýzýn þifresinin e-mail adresinize gönderilmesini istemiþsiniz.
-CHAN_SENDPASS_LINE_2
-	Kanal Þifresi %s. Güvenlik nedenlerinden dolayý, þifrenizi bu maili aldýktan sonra deðiþtirirseniz iyi olur.
-CHAN_SENDPASS_LINE_3
-	Eðer bu mailin niye size gönderildiðini bilmiyorsanýz, lütfen ciddiye almayýn.
-CHAN_SENDPASS_LINE_4
-	LÜTFEN BU MAÝLE CEVAP VERMEYÝN!
-CHAN_SENDPASS_LINE_5
-	%s yönetimi.
-CHAN_SENDPASS_OK
-	%s kanalýnýn þifresi gönderildi.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4159,10 +4133,10 @@ CHAN_HELP_CMD_STATUS
 	    STATUS     Kullanýcýnýn kanaldaki access seviyesini söyler
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Kanalý kaydeder
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Þifreyle sizi kanalýn sahibi olarak tanýmlar
 CHAN_HELP_CMD_SET
 	    SET        Kanal özelliklerini ve bilgisini ayarlar
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        AOP listesini düzenler
 CHAN_HELP_CMD_SOP
@@ -4175,8 +4149,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Autokick listesini düzenler
 CHAN_HELP_CMD_DROP
 	    DROP       Kanal kaydýný siler
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Kayýp þifrelerinizi söyler
 CHAN_HELP_CMD_BAN
 	    BAN        Bans a selected nick on a channel
 CHAN_HELP_CMD_CLEAR
@@ -4193,8 +4165,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kicks a selected nick from a channel
 CHAN_HELP_CMD_LIST
 	    LIST       Lists all registered channels matching the given pattern
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
 CHAN_HELP_CMD_OP
 	    OP         Gives Op status to a selected nick on a channel
 CHAN_HELP_CMD_TOPIC
@@ -4259,23 +4229,6 @@ CHAN_HELP_REGISTER
 	Eðer kaydetmediyseniz %R%s HELP yazarak nasýl yapacaðýnýz
 	hakkýnda bilgi alabilirsiniz.
 
-CHAN_HELP_IDENTIFY
-	Kullanýmý: IDENTIFY kanaladý þifre
-	
-	%S tarafýndan kanalýn founderý olarak tanýnmanýzý saðlar.
-	Birçok komutu kullanabilmek için kendinizi kanalýn sahibi
-	(founder) olarak bu komutu kullanarak tanýtmanýz gerekir.
-	Þifre kanalý kaydederken  kullandýðýnýz þifreyle aynýdýr.
-
-CHAN_HELP_LOGOUT
-	Kullanýmý: LOGOUT kanaladý nick
-	
-	Bu komut belirtilen nickin artýk belirtilen kanal için
-	tanýmlanmamasýný saðlar.
-	
-	Eðer kanalýn founderý iseniz istediðiniz kiþi üzerinde,
-	deðilseniz kendi üzerinizde bu komutu kullanabilirsiniz.
-
 CHAN_HELP_DROP
 	Kullanýmý: DROP kanaladý
 	
@@ -4293,7 +4246,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Kanal founderýný belirler
 	    SUCCESSOR     Kanal successorýný belirler
-	    PASSWORD      Founder þifresini belirler
 	    DESC          Kanal açýklamasýný belirler
 	    URL           Kanala bir URL adresini iliþkilendirir
 	    EMAIL         Kanala bir E-mail adresini iliþkilendirir
@@ -4333,11 +4285,6 @@ CHAN_HELP_SET_SUCCESSOR
 	successorýnda çok fazla kayýtlý kanalý varsa(%d) veya kanal
 	için bir successor belirtilmemiþse kanalýn kaydý silinir(drop).
 	Komutta belirtilen nickin kayýtlý olmasý gereklidir.
-
-CHAN_HELP_SET_PASSWORD
-	Kullanýmý: SET kanaladý PASSWORD þifre
-	
-	Kanal founderýnýn þifresini deðiþtirir.
 
 CHAN_HELP_SET_DESC
 	Kullanýmý: SET kanaladý DESC açýklama
@@ -4518,6 +4465,45 @@ CHAN_HELP_SET_OPNOTICE
 	op-notu özelliði aktifse, %S kanala bir kullanýcý 
 	üzerinde OP veya DEOP komutlarýnýn kullanýldýðýný
 	belirten bir mesaj gönderir.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Kullanýmý: AOP kanaladi ADD nick
@@ -4976,34 +4962,10 @@ CHAN_HELP_GETKEY
 	
 	Belirtilen kanalýn anahtarýný söyler.
 
-CHAN_HELP_SENDPASS
-	Kullanýmý: SENDPASS kanaladý
-	
-	Kanalýn þifresini founderýn nick kayýtlarýnda belirtilen
-	e-mail adresine gönderir. Bu komut kanal þifresini 
-	unutanlarýn çok iþine yarayacaktýr.
-	
-	Bazý networklerde IRC operatörlerinin Kullanýmýyla 
-	sýnýrlandýrýlmýþ olabilir.
-
 CHAN_SERVADMIN_HELP
 	
 	Servis adminleri kanalýn kaydýný þifreyle tanýtmadan silebilir,
 	ve access, Akick ve seviye ayarlarýný görüntüleyebilirler.
-
-CHAN_SERVADMIN_HELP_LOGOUT
-	Kullanýmý: LOGOUT kanaladý [nick]
-	
-	Bu komut belirtilen nickin artýk belirtilen kanalda
-	tanýmlanmamasýný saðlar.
-	
-	Eðer kanal founderý iseniz, istediðiniz kiþide, deðilseniz
-	sadece kendinizde bu komutu kullanabilirsiniz.
-	
-	Eðer Servis admini iseniz, kanal founderý olmanýza gerek
-	olmadan istediðiniz kiþide bu komutu kullanabilirsiniz.
-	Hatta nick parametresini boþ býrakarak o kanalda kendini
-	kanala tanýtmýþ herkesi tanýmlanmamýþ yapabilirsiniz.
 
 CHAN_SERVADMIN_HELP_DROP
 	Kullanýmý: DROP kanaladý

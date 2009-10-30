@@ -1008,6 +1008,12 @@ CHAN_LEVEL_TOPIC
 	Használhatja a TOPIC parancsot
 CHAN_LEVEL_INFO
 	Használhatja az INFO parancsot az ALL opcióval
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatikus válaszok
 CHAN_IS_REGISTERED
@@ -1025,7 +1031,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER #szoba jelszó leírás
+	REGISTER #szoba leírás
 CHAN_REGISTER_DISABLED
 	Sajnálom,  a csatorna regisztráció jelenleg szünetel.
 CHAN_REGISTER_NOT_LOCAL
@@ -1044,35 +1050,10 @@ CHAN_REGISTRATION_FAILED
 	Sajnálom,  regisztráció sikertelen.
 CHAN_REGISTERED
 	Regisztráltam a %s csatornát a (%s) nickre.
-CHAN_PASSWORD_IS
-	Csatorna jelszava: %s - Jegyezd fel a késõbbi használathoz.
 CHAN_REGISTER_NONE_CHANNEL
 	You have attempted to register a nonexistent channel %s
 CHAN_SYMBOL_REQUIRED
 	Please use the symbol of # when attempting to register
-
-
-# IDENTIFY válaszok
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY   #szoba   jelszó
-CHAN_IDENTIFY_FAILED
-	Sajnálom,  azonosítás sikertelen.
-CHAN_IDENTIFY_SUCCEEDED
-	Jelszavad elfogadva - founder szintû a hozzáférésed a %s csatornán.
-
-# LOGOUT válaszok
-CHAN_LOGOUT_SYNTAX
-	LOGOUT #szoba nicknév
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT #szoba  [nicknév]
-CHAN_LOGOUT_SUCCEEDED
-	%s felhasználó kijelentkezett a %s csatornáról.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Minden felhasználó kijelentkezett a %s csatornáról (except the channel founder).
-CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP válaszok
 CHAN_DROP_SYNTAX
@@ -1103,14 +1084,6 @@ CHAN_SUCCESSOR_UNSET
 	A megadott csatorna %s successora törölve.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s nem lehet a %s csatorna successora, mert õ a founder is.
-
-# SET PASSWORD válaszok
-CHAN_SET_PASSWORD_FAILED
-	A jelszó beállítása sikertelen.
-CHAN_PASSWORD_CHANGED
-	%s csatorna jelszava megváltozott.
-CHAN_PASSWORD_CHANGED_TO
-	%s csatorna új jelszava: %s.
 
 # SET DESC válaszok
 CHAN_DESC_CHANGED
@@ -1261,6 +1234,37 @@ CHAN_XOP_ACCESS
 	Bõvebb információ: %R%s HELP ACCESS
 CHAN_XOP_NOT_AVAILABLE
 	xOP system is not available.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP üzenetek
 CHAN_AOP_SYNTAX
@@ -1648,43 +1652,13 @@ CHAN_CLEARED_USERS
 CHAN_CLEARED_INVITES
 	All invites on channel %s have been removed.
 
-# GETPASS válaszok
-CHAN_GETPASS_SYNTAX
-	GETPASS #szoba
-CHAN_GETPASS_UNAVAILABLE
-	GETPASS elérhetetlen, mig az encryption használatban van.
-CHAN_GETPASS_PASSWORD_IS
-	A (%s) csatorna  jelszava: %s.
-
-# SENDPASS válaszok
+# GETKEY válaszok
 CHAN_GETKEY_SYNTAX
 	GETKEY channel
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS #szoba
-CHAN_SENDPASS_UNAVAILABLE
-	SENDPASS elérhetetlen, amíg az encryption használatban van
-CHAN_SENDPASS_SUBJECT
-	Csatorna jelszava: (%s)
-CHAN_SENDPASS_HEAD
-	Hi,
-CHAN_SENDPASS_LINE_1
-	Kérted a szoba jelszavának megküldését %s címre.
-CHAN_SENDPASS_LINE_2
-	%s a szobajeszó.Biztonság kedvéért váltóztasd meg olvasás után
-CHAN_SENDPASS_LINE_3
-	Ha nem te kérted a levelet akkor töréld és feljts el
-CHAN_SENDPASS_LINE_4
-	KÉRLEN NE VÁLASZOLJ A LEVÉLRE!
-CHAN_SENDPASS_LINE_5
-	%s administrators.
-CHAN_SENDPASS_OK
-	Jelszó %s elküldve.
 	
 # FORBID válaszok
 CHAN_FORBID_SYNTAX
@@ -4088,10 +4062,10 @@ CHAN_HELP_CMD_STATUS
 	               szintjét a megadott csatornán
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Szoba regisztrálása
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Azonosíthatod magad a jelszavaddal
 CHAN_HELP_CMD_SET
 	    SET        Beállíthatod a csatornád opcióit
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        AutoOperátor lista beállítása
 CHAN_HELP_CMD_SOP
@@ -4104,8 +4078,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      AutoKirúgás listára teheted a "rossz" usereket
 CHAN_HELP_CMD_DROP
 	    DROP       Törölheted a csatornád regisztrációját
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Elveszett a jelszavad? Jelszó küldés.
 CHAN_HELP_CMD_BAN
 	    BAN        Bans a selected nick on a channel
 CHAN_HELP_CMD_CLEAR
@@ -4122,8 +4094,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kicks a selected nick from a channel
 CHAN_HELP_CMD_LIST
 	    LIST       Lists all registered channels matching the given pattern
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
 CHAN_HELP_CMD_OP
 	    OP         Gives Op status to a selected nick on a channel
 CHAN_HELP_CMD_TOPIC
@@ -4194,22 +4164,6 @@ CHAN_HELP_REGISTER
 	regisztrálnod kell a nickneved és azonosítanod kell
 	magad. (NickServ identify jelszó)
 	Ha még nem nézted meg, akkor lásd még: %R%s HELP.
-	
-CHAN_HELP_IDENTIFY
-	Syntax: IDENTIFY #szoba jelszó
-	
-	%S a parancs beírása után founder szintet ad a csatornán.
-	Több parancs kiadása elõtt szükséges, hogy használd ezt.
-	A jelszónak egyeznie kell a megadott jelszóval.
-	
-CHAN_HELP_LOGOUT
-	Syntax: LOGOUT #szoba nicknév
-	
-	Ez a parancs kijelentkezésre birja a nicket, vagyis újra
-	kell azonosítania, hogy újra megkapja a hozzáférést.
-	
-	Ha te vagy a szoba founderje, akkor bárkit ki tudsz
-	jelentkeztetni, vagy ki tudsz jelentkezni akár te is.
 
 CHAN_HELP_DROP
 	Syntax: DROP #szoba
@@ -4266,12 +4220,6 @@ CHAN_HELP_SET_SUCCESSOR
 	(%d), a csatornának megszûnik a regisztrációja, akkor
 	is ez történik, ha nem volt megadva successor.
 	A nicknek regisztrálnak kell lennie.
-
-CHAN_HELP_SET_PASSWORD
-	Syntax: SET #szoba PASSWORD  jelszó
-	
-	Beállítja a founder jelszót a csatornára, amivel
-	a founder azonosíthatja magát.
 
 CHAN_HELP_SET_DESC
 	Syntax: SET #szoba DESC leírás
@@ -4444,6 +4392,45 @@ CHAN_HELP_SET_OPNOTICE
 	fog küldeni a csatornára, amikor a felhasználók használják
 	az OP, VOICE, vagy a hozzájuk kapcsolódó parancsokat a
 	szoban.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 	
 CHAN_HELP_AOP
 	Syntax: AOP #szoba ADD nick
@@ -4945,35 +4932,12 @@ CHAN_HELP_GETKEY
 	Syntax: GETKEY #szoba 
 	
 	Megadja a szoba kulcsot.
-	
-CHAN_HELP_SENDPASS
-	Syntax: SENDPASS #szoba
-	
-	Elküldi E-mailben a csatornádra beállított jelszót. Neked
-	a szoba founderjének kell lenned, hogy használhasd ezt
-	a parancsot és elõször azonosítanod kell magadat.
-	
-	Lehet korlátozni IRC operatorok részére a hálózaton.
-	
+
 CHAN_SERVADMIN_HELP
 	
 	Szervíz adminok tudják droppolni a csatornákat anélkül, 
 	hogy a szoba jelszót használnának, és megnézhetika az
 	access, AKICK, és beállitási szint listát a csatornán.
-	
-CHAN_SERVADMIN_HELP_LOGOUT
-	Syntax: LOGOUT #szoba [nicknév]
-	
-	A parancs naplózza a kijelentekeztetést, neki ójra kell
-	azonosítani magukat,hogy visszakapják a hozzáféréseiket.	
-	
-	Ha ta  vagy a csatörna alpító, képes vagy kijelentkeztetni
-	mást, te képes vagy magad is.	
-	
-	Ha szervíz admin vagy akkor kijelentekeztethetsz valakit a 
-	csatornáról anélkül, hogy te lenneél a founder.Elhagyhatod
-	a nincnév paramétert, és akkor az összes bejelentkezett 
-	felhasználót kijelentkezteted a csatornáról.	
 
 CHAN_SERVADMIN_HELP_DROP
 	Syntax: DROP #szoba

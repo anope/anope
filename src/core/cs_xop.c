@@ -25,6 +25,7 @@ enum
 	XOP_SOP,
 	XOP_VOP,
 	XOP_HOP,
+	XOP_QOP,
 	XOP_TYPES
 };
 
@@ -98,7 +99,20 @@ int xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	 CHAN_HOP_DELETED_SEVERAL,
 	 CHAN_HOP_LIST_EMPTY,
 	 CHAN_HOP_LIST_HEADER,
-	 CHAN_HOP_CLEAR}
+	 CHAN_HOP_CLEAR},
+	 {CHAN_QOP_DISABLED,
+	 CHAN_QOP_NICKS_ONLY,
+	 CHAN_QOP_ADDED,
+	 CHAN_QOP_MOVED,
+	 CHAN_QOP_NO_SUCH_ENTRY,
+	 CHAN_QOP_NOT_FOUND,
+	 CHAN_QOP_NO_MATCH,
+	 CHAN_QOP_DELETED,
+	 CHAN_QOP_DELETED_ONE,
+	 CHAN_QOP_DELETED_SEVERAL,
+	 CHAN_QOP_LIST_EMPTY,
+	 CHAN_QOP_LIST_HEADER,
+	 CHAN_QOP_CLEAR}
 };
 
 class XOPBase : public Command
@@ -335,7 +349,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!is_founder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
+		if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -390,6 +404,30 @@ class XOPBase : public Command
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
 	virtual void OnSyntaxError(User *u) = 0;
+};
+
+class CommandCSQOP : public XOPBase
+{
+ public:
+	CommandCSQOP() : XOPBase("QOP")
+	{
+	}
+
+	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	{
+		return this->DoXop(u, params, ACCESS_QOP, xop_msgs[XOP_QOP]);
+	}
+
+	bool OnHelp(User *u, const ci::string &subcommand)
+	{
+		notice_help(s_ChanServ, u, CHAN_HELP_QOP);
+		return true;
+	}
+
+	void OnSyntaxError(User *u)
+	{
+		syntax_error(s_ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
+	}
 };
 
 class CommandCSAOP : public XOPBase
@@ -497,7 +535,10 @@ class CSXOP : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSAOP());
+		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
+			this->AddCommand(CHANSERV, new CommandCSQOP());
+		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
+			this->AddCommand(CHANSERV, new CommandCSAOP());
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 			this->AddCommand(CHANSERV, new CommandCSHOP());
 		this->AddCommand(CHANSERV, new CommandCSSOP());
@@ -505,7 +546,10 @@ class CSXOP : public Module
 	}
 	void ChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
+		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_QOP);
+		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
+			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HOP);

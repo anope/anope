@@ -1017,6 +1017,12 @@ CHAN_LEVEL_TOPIC
 	Επιτρέπεται να χρησιμοποιήσεις την TOPIC εντολή
 CHAN_LEVEL_INFO
 	Επιτρέπεται να χρησιμοποιήσεις την INFO εντολή με την ALL επιλογή
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1034,7 +1040,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER channel password description
+	REGISTER channel description
 CHAN_REGISTER_DISABLED
 	Συγνώμη, η υπηρεσία κατοχύρωσεις καναλιών δεν λειτουργεί για την ώρα.
 CHAN_REGISTER_NOT_LOCAL
@@ -1053,35 +1059,10 @@ CHAN_REGISTRATION_FAILED
 	Συγνώμη, η κατοχύρωση απέτυχε.
 CHAN_REGISTERED
 	Το κανάλι %s είναι κατοχυρωμένο από το ψευδώνυμό σου: %s
-CHAN_PASSWORD_IS
-	Ο κωδικός του καναλιού είναι %s - θυμήσου τον γιατί θα τον χρειαστείς μετά.
 CHAN_REGISTER_NONE_CHANNEL
 	You have attempted to register a nonexistent channel %s
 CHAN_SYMBOL_REQUIRED
 	Please use the symbol of # when attempting to register
-
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY channel password
-CHAN_IDENTIFY_FAILED
-	Συγνώμη, η αναγνώριση για το κανάλι απέτυχε.
-CHAN_IDENTIFY_SUCCEEDED
-	Ο κωδικός έγινε δεκτός - τώρα έχεις founder-level πρόσβαση στο %s.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT channel nickname
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT channel [nickname]
-CHAN_LOGOUT_SUCCEEDED
-	Ο χρήστης %s έγινε logged out από το κανάλι %s.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Όλοι οι χρήστες logged out από το κανάλι %s (except the channel founder).
-CHAN_LOGOUT_FOUNDER_FAILED
-	You may not log out of %s (you are founder).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	%s was not logged into %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1112,14 +1093,6 @@ CHAN_SUCCESSOR_UNSET
 	Ο Successor του %s δεν έχει οριστεί.
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s δεν μπορεί να είναι successor στο κανάλι %s γιατί είναι founder σε αυτό.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Συγνώμη, δεν μπόρεσε να γίνει δεκτός ο κωδικός.
-CHAN_PASSWORD_CHANGED
-	%s ο κωδικός άλλαξε.
-CHAN_PASSWORD_CHANGED_TO
-	%s ο κωδικός άλλαξε σε %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1270,6 +1243,37 @@ CHAN_XOP_ACCESS
 	Γράψε %R%s HELP ACCESS για περισσότερες πληροφορίες.
 CHAN_XOP_NOT_AVAILABLE
 	xOP system is not available.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1653,44 +1657,14 @@ CHAN_CLEARED_USERS
 	Όλοι οι χρήστες έγιναν kick από το κανάλι %s.
 CHAN_CLEARED_INVITES
 	All invites on channel %s have been removed.
-
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS κανάλι
-CHAN_GETPASS_UNAVAILABLE
-	Η εντολή GETPASS δεν είναι διαθέσιμη γιατί η κωδικοποίηση είναι σε λειτουργία.
-CHAN_GETPASS_PASSWORD_IS
-	Ο κωδικός για το κανάλι %s είναι %s.
 	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY channel
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
 	Key for channel %s is %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS κανάλι
-CHAN_SENDPASS_UNAVAILABLE
-	Η εντολή SENDPASS δεν είναι διαθέσιμη γιατί η κωδικοποίηση είναι σε λειτουργία.
-CHAN_SENDPASS_SUBJECT
-	Ο κωδικός του καναλιού (%s)
-CHAN_SENDPASS_HEAD
-	Γεια,
-CHAN_SENDPASS_LINE_1
-	Μας ειδοποίησες να σου στείλουμε τον κωδικό του καναλιού %s μέσω e-mail.
-CHAN_SENDPASS_LINE_2
-	Ο κωδικός είναι %s. Για περισσότερη ασφάλεια, θα πρέπει να το αλλάξεις το γρηγορόρτερο από τη στιγμή που έλαβες αυτό το e-mail.
-CHAN_SENDPASS_LINE_3
-	Αν δεν ξέρεις γιατί σου στάλθηκε αυτό το mail, παρακαλώ αγνοησέ το.
-CHAN_SENDPASS_LINE_4
-	ΠΑΡΑΚΑΛΩ ΜΗΝ ΑΠΑΝΤΗΣΕΙΣ ΣΕ ΑΥΤΟ ΤΟ MAIL!
-CHAN_SENDPASS_LINE_5
-	%s administrators.
-CHAN_SENDPASS_OK
-	Ο κωδικός του %s στάλθηκε επιτυχώς.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -4165,11 +4139,11 @@ CHAN_HELP_CMD_STATUS
 	               κανάλι
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Κατοχυρώνει ένα κανάλι
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY   Σας αναγνωρίζει με κωδικό
 CHAN_HELP_CMD_SET
 	    SET        Ρυθμίζει τις επιλογές και τις πληροφορίες
 	               του καναλιού	
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
 	    AOP        Αλλάζει την λίστα των AOP χρηστών
 CHAN_HELP_CMD_SOP
@@ -4182,8 +4156,6 @@ CHAN_HELP_CMD_AKICK
 	    AKICK      Συντηρεί τη λίστα αυτόματης απόρριψης
 CHAN_HELP_CMD_DROP
 	    DROP       Ακυρώνει την κατοχύρωση ενός καναλιού
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS   Στέλνει τον χαμένο κωδικό του καναλιού
 CHAN_HELP_CMD_BAN
 	    BAN        Bans a selected nick on a channel
 CHAN_HELP_CMD_CLEAR
@@ -4200,8 +4172,6 @@ CHAN_HELP_CMD_KICK
 	    KICK       Kicks a selected nick from a channel
 CHAN_HELP_CMD_LIST
 	    LIST       Lists all registered channels matching the given pattern
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
 CHAN_HELP_CMD_OP
 	    OP         Gives Op status to a selected nick on a channel
 CHAN_HELP_CMD_TOPIC
@@ -4270,23 +4240,6 @@ CHAN_HELP_REGISTER
 	πρώτα κατοχυρώσει το ψευδώνυμό σας.  Αν δεν το έχετε κάνει,
 	%R%s HELP για περισσότερες πληροφορίες σχετικά.
 
-CHAN_HELP_IDENTIFY
-	Σύνταξη: IDENTIFY κανάλι κωδικός
-	
-	Σε αναγνωρίζει ο %S ως founder του ζητούμενου καναλιού.
-	Πολλές επιλογές απαιτούν αυτή την εντολή πριν συνεχίσετε με τις
-	άλλες.  Ο κωδικός θα πρέπει να είναι ο ίδιος με αυτόν που κάνατε
-	την εντολή κατοχύρωσης.
-	
-CHAN_HELP_LOGOUT
-	Σύνταξη: LOGOUT κανάλι ψευδώνυμο
-	
-	Αυτή η εντολή είναι για ψευδώνυμα που δεν κάνουν εντολή αναγνώρισης
-	για το ζητούμενο κανάλι.
-	
-	Αν είσαι ο founder του καναλιού, μπορείς να κάνεις log out οποιοδήποτε,
-	εκτός και αν κάνεις μόνο log out τον εαυτό σου.
-
 CHAN_HELP_DROP
 	Σύνταξη: DROP κανάλι
 	
@@ -4303,7 +4256,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Αλλάζει τον founder του καναλιού
 	    SUCCESSOR     Αλλάζει τον successor του καναλιού
-	    PASSWORD      Αλλάζει τον κωδικό του founder
 	    DESC          Αλλάζει την περιγραφή του καναλιού
 	    URL           Συσχετίζει ένα URL με το κανάλι
 	    EMAIL         Συσχετίζει ένα E-mail με το κανάλι
@@ -4342,12 +4294,6 @@ CHAN_HELP_SET_SUCCESSOR
 	Αν όμως, ο successor έχει κατοχυρώσει πολλά κανάλια,
 	αν δηλ έχει (%d), το κανάλι θα σβηστεί,σαν να μην είχε οριστεί
 	successor.  Το νέο ψευδώνυμο θα πρέπει να είναι κατοχυρωμένο.
-	
-CHAN_HELP_SET_PASSWORD
-	Σύνταξη: SET κανάλι PASSWORD κωδικό
-	
-	Αλλάζετε τον κωδικό που κάνετε εντολή αναγνώρισης ως founder του
-	καναλιού.
 
 CHAN_HELP_SET_DESC
 	Σύνταξη: SET κανάλι DESC περιγραφή
@@ -4526,6 +4472,45 @@ CHAN_HELP_SET_OPNOTICE
 	Όταν ενεργοποιείται η ενημέρωση op, ο %S στέλνει ένα notice στους ops 
 	του καναλιού, κάθε φορά που χρησιμοποιούνται οι εντολές OP, DEOP, AKICK και 
 	ACCESS από κάποιο χρήστη για το κανάλι.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 	
 CHAN_HELP_AOP
 	Σύνταξη: AOP κανάλι ADD ψευδώνυμο
@@ -5005,36 +4990,12 @@ CHAN_HELP_GETKEY
 	Σύνταξη: GETKEY κανάλι
 	
 	Σας δείχνει το κλειδί του συγκεκριμένου καναλιού.
-	
-CHAN_HELP_SENDPASS
-	Σύνταξη: SENDPASS κανάλι
-	
-	Στέλνει τον κωδικό του ανάλογου καναλιού μέσω e-mail address
-	στον founder του. Αυτή η εντολή είναι χρήσιμη 
-	για όσους έχουν χάσει τον κωδικό.
-	
-	Χρησιμοποιείται μόνο από IRC operators σε συγκεκριμένα δίκτυα.
 
 CHAN_SERVADMIN_HELP
 	
 	Οι Services Operators μπορούν να διαγράψουν οποιοδήποτε κανάλι,  χωρίς να κάνουν
 	εντολή αναγνώρισης μέσω κωδικού, μπορούν να δούν την access, AKICK,
 	και τα level οποιουδήποτε καναλιού.
-	
-CHAN_SERVADMIN_HELP_LOGOUT
-	Σύνταξη: LOGOUT κανάλι [ψευδώνυμο]
-	
-	Με αυτή την εντολή, ένας founder ή κάποιος που έχει βαθμό founder κάνει το 
-	αντίθετο από την εντολή αναγνώρισης (no-identify).
-	    
-	Μπορεί ένας founder ενός καναλιού, να κάνει log out οποιοδήποτε,
-	ακόμα και τον εαυτό του.
-	
-	Αν είσαι Services Operator, μπορείς να κάνεις log out 
-	οποιοδήποε από το κανάλι χωρίς να είσαι ο founder ή να γίνεις ο founder
-	του καναλιού. Επίσης, μπορείς να χρησιμοποιήσεις αυτή την παράμετρο για
-	ψευδώνυμο; με αυτό θα κάνεις log out όλους τους αναγνωρισμένους (identified)
-	χρήστες του καναλιού.
 	
 CHAN_SERVADMIN_HELP_DROP
 	Σύνταξη: DROP κανάλι

@@ -1306,6 +1306,15 @@ CHAN_LEVEL_TOPIC
 CHAN_LEVEL_INFO
 	Pozwala u¿ywaæ opcji ALL w komendzie INFO
 
+CHAN_LEVEL_AUTOOWNER
+	Automatic mode +q
+
+CHAN_LEVEL_OWNER
+	Allowed to use OWNER command
+
+CHAN_LEVEL_OWNERME
+	Allowed to (de)owner him/herself
+
 # Automatic responses
 CHAN_IS_REGISTERED
 	Ten kana³ zosta³ zarejestrowany z %s.
@@ -1324,7 +1333,7 @@ CHAN_X_INVALID
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
-	REGISTER kana³ has³o opis
+	REGISTER kana³ opis
 
 CHAN_REGISTER_DISABLED
 	Rejestracja kana³ów jest tymczasowo wy³±czona.
@@ -1354,40 +1363,11 @@ CHAN_REGISTERED
 	Kana³ %s zosta³ teraz zarejestrowany.
 	Jako %s jeste¶ od teraz jego w³a¶cicielem.
 
-CHAN_PASSWORD_IS
-	Has³o do Twojego kana³u to %s
-
 CHAN_REGISTER_NONE_CHANNEL
 	Próbujesz rejestrowaæ nieistniej±cy kana³ %s
 
 CHAN_SYMBOL_REQUIRED
 	U¿yj symboli # lub & podczas rejestracji
-
-# IDENTIFY responses
-CHAN_IDENTIFY_SYNTAX
-	IDENTIFY kana³ has³o
-
-CHAN_IDENTIFY_FAILED
-	Identyfikacja nie powiod³a siê.
-
-CHAN_IDENTIFY_SUCCEEDED
-	Has³o przyjête - masz uprawnienia w³a¶ciciela kana³u %s.
-
-# LOGOUT responses
-CHAN_LOGOUT_SYNTAX
-	LOGOUT kana³ nick
-
-CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT kana³ [nick]
-
-CHAN_LOGOUT_SUCCEEDED
-	U¿ytkownik %s zosta³ wylogowany z kana³u %s.
-CHAN_LOGOUT_ALL_SUCCEEDED
-	Wylogowano zidentyfikowanych u¿ytkowników z kana³u %s (bez w³a¶ciciela).
-CHAN_LOGOUT_FOUNDER_FAILED
-	Nie mo¿esz siê wylogowaæ z %s (jeste¶ w³a¶cicielem).
-CHAN_LOGOUT_NOT_LOGGEDIN
-	U¿ytkownik %s nie by³ zalogowany na kanale %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1425,16 +1405,6 @@ CHAN_SUCCESSOR_UNSET
 
 CHAN_SUCCESSOR_IS_FOUNDER
 	%s nie mo¿e byæ zastêpc± na kanale %s, poniewa¿ jest jego w³a¶cicielem.
-
-# SET PASSWORD responses
-CHAN_SET_PASSWORD_FAILED
-	Zmiana has³a nie powiod³a siê.
-
-CHAN_PASSWORD_CHANGED
-	Has³o do kana³u %s zosta³o zmienione.
-
-CHAN_PASSWORD_CHANGED_TO
-	Has³o do kana³u %s zosta³o zmienione na %s.
 
 # SET DESC responses
 CHAN_DESC_CHANGED
@@ -1622,6 +1592,37 @@ CHAN_XOP_ACCESS
 
 CHAN_XOP_NOT_AVAILABLE
 	System xOP nie jest dostêpny.
+
+# QOP messages
+CHAN_QOP_SYNTAX
+	QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+CHAN_QOP_DISABLED
+	Sorry, channel QOP list modification is temporarily disabled.
+CHAN_QOP_NICKS_ONLY
+	Channel QOP lists may only contain registered nicknames.
+CHAN_QOP_ADDED
+	%s added to %s QOP list.
+CHAN_QOP_MOVED
+	%s moved to %s QOP list.
+CHAN_QOP_NO_SUCH_ENTRY
+	No such entry (#%d) on %s QOP list.
+CHAN_QOP_NOT_FOUND
+	%s not found on %s QOP list.
+CHAN_QOP_NO_MATCH
+	No matching entries on %s QOP list.
+CHAN_QOP_DELETED
+	%s deleted from %s QOP list.
+CHAN_QOP_DELETED_ONE
+	Deleted 1 entry from %s QOP list.
+CHAN_QOP_DELETED_SEVERAL
+	Deleted %d entries from %s QOP list.
+CHAN_QOP_LIST_EMPTY
+	%s QOP list is empty.
+CHAN_QOP_LIST_HEADER
+	QOP list for %s:
+	  Num  Nick
+CHAN_QOP_CLEAR
+	Channel %s QOP list has been cleared.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -2151,16 +2152,6 @@ CHAN_CLEARED_USERS
 CHAN_CLEARED_INVITES
 	Wszystkie zaproszenia z kana³u %s zosta³y usuniête.
 
-# GETPASS responses
-CHAN_GETPASS_SYNTAX
-	GETPASS kana³
-
-CHAN_GETPASS_UNAVAILABLE
-	Komenda GETPASS nie dzia³a, bo has³a s± szyfrowane.
-
-CHAN_GETPASS_PASSWORD_IS
-	Has³o kana³u %s to %s.
-
 # GETKEY responses
 CHAN_GETKEY_SYNTAX
 	GETKEY kana³
@@ -2170,38 +2161,6 @@ CHAN_GETKEY_NOKEY
 
 CHAN_GETKEY_KEY
 	Kluczem do kana³u %s jest %s.
-
-# SENDPASS responses
-CHAN_SENDPASS_SYNTAX
-	SENDPASS kana³
-
-CHAN_SENDPASS_UNAVAILABLE
-	Komenda SENDPASS nie dzia³a, bo has³a s± szyfrowane.
-
-CHAN_SENDPASS_SUBJECT
-	Has³o do kana³u %s
-
-CHAN_SENDPASS_HEAD
-	Witaj!
-
-CHAN_SENDPASS_LINE_1
-	Za¿±da³e¶(a¶) wys³ania has³a do kana³u %s na e-mail.
-
-CHAN_SENDPASS_LINE_2
-	Twoje has³o to: %s.
-	Dla w³asnego bezpieczeñstwa nale¿y to has³o natychmiast zmieniæ na inne.
-
-CHAN_SENDPASS_LINE_3
-	Je¶li nie wiesz dlaczego ta wiadomo¶æ dotar³a do Ciebie zignoruj j±. Je¶li ta sytuacja bêdzie siê powtarzaæ skontaktuj siê z administratorem sieci.
-
-CHAN_SENDPASS_LINE_4
-	PROSZÊ NIE ODPOWIADAÆ NA T¡ WIADOMO¦Æ!
-
-CHAN_SENDPASS_LINE_5
-	Administratorzy sieci %s.
-
-CHAN_SENDPASS_OK
-	Has³o do kana³u %s zosta³o wys³ane.
 
 # FORBID responses
 CHAN_FORBID_SYNTAX
@@ -5120,11 +5079,11 @@ CHAN_HELP_CMD_STATUS
 CHAN_HELP_CMD_REGISTER
 	    REGISTER    Rejestruje kana³
 
-CHAN_HELP_CMD_IDENTIFY
-	    IDENTIFY    Identyfikuje w³a¶ciciela kana³u
-
 CHAN_HELP_CMD_SET
 	    SET         Modyfikuje ustawienia kana³u
+
+CHAN_HELP_CMD_QOP
+	    QOP        Modify the list of QOP users
 
 CHAN_HELP_CMD_AOP
 	    AOP         Zarz±dza list± AOP (operatorów)
@@ -5143,9 +5102,6 @@ CHAN_HELP_CMD_AKICK
 
 CHAN_HELP_CMD_DROP
 	    DROP        Usuwa kana³
-
-CHAN_HELP_CMD_SENDPASS
-	    SENDPASS    Pomaga odzyskaæ utracone has³o
 
 CHAN_HELP_CMD_BAN
 	    BAN         Banuje wskazan± osobê na kanale
@@ -5170,9 +5126,6 @@ CHAN_HELP_CMD_KICK
 
 CHAN_HELP_CMD_LIST
 	    LIST        Listuje zarejestrowane kana³y pasuj±ce do wzorca
-
-CHAN_HELP_CMD_LOGOUT
-	    LOGOUT      Wyloguje wskazan± osobê
 
 CHAN_HELP_CMD_OP
 	    OP          Nadaje wskazanej osobie uprawnienia operatora
@@ -5252,24 +5205,6 @@ CHAN_HELP_REGISTER
 	zarejestrowany nick, aby uzyskaæ wiêcej informacji
 	na temat zarz±dzania nickiem wpisz: %R%s HELP
 
-CHAN_HELP_IDENTIFY
-	Sk³adnia: IDENTIFY kana³ has³o
-	
-	Autoryzuje u¿ytkownika w serwisie %S jako w³a¶ciciela
-	wskazanego kana³u. Wiele wa¿nych komend wymaga dokonania
-	identyfikacji przed ich u¿yciem. Has³em jest to samo
-	has³o, którego u¿yto przy komendzie REGISTER.
-
-CHAN_HELP_LOGOUT
-	Sk³adnia: LOGOUT kana³ nick
-	
-	Pozwala na wylogowanie wskazanego u¿ytkownika z kana³u.
-	W celu odzyskania uprawnieñ u¿ytkownik bêdzie musia³
-	ponownie siê zidentyfikowaæ.
-	
-	Ka¿dy mo¿e wylogowaæ siebie, natomiast w³a¶ciciel kana³u
-	mo¿e wylogowaæ ka¿dego.
-
 CHAN_HELP_DROP
 	Sk³adnia: DROP kana³
 	
@@ -5287,7 +5222,6 @@ CHAN_HELP_SET
 	
 	    FOUNDER       Ustawia nick w³a¶ciciela kana³u
 	    SUCCESSOR     Ustawia nick spadkobiercy kana³u
-	    PASSWORD      Ustawia has³o w³a¶ciciela
 	    DESC          Ustawia opis kana³u
 	    URL           Przypisuje adres www do kana³u
 	    EMAIL         Przypisuje adres e-mail do kana³u
@@ -5327,10 +5261,6 @@ CHAN_HELP_SET_SUCCESSOR
 	spadkobiercy, który staje siê nowym w³a¶cicielem.
 	Je¿eli spadkobierca jest w³a¶cicielem zbyt du¿ej
 	liczby kana³ów (%d) to kana³ zostanie odrejestrowany.
-CHAN_HELP_SET_PASSWORD
-	Sk³adnia: SET kana³ PASSWORD has³o
-	
-	Zmienia has³o w³a¶ciciela kana³u.
 
 CHAN_HELP_SET_DESC
 	Sk³adnia: SET kana³ DESC opis
@@ -5519,6 +5449,45 @@ CHAN_HELP_SET_OPNOTICE
 	Kiedy ta opcja jest w³±czona, %S bêdzie
 	informowa³ u¿ytkowników przebywaj±cych na kanale,
 	kiedy zostanie u¿yta komenda OP lub DEOP.
+
+CHAN_HELP_QOP
+	Syntax: QOP channel ADD nick
+	        QOP channel DEL {nick | entry-num | list}
+	        QOP channel LIST [mask | list]
+	        QOP channel CLEAR
+	
+	Maintains the QOP (AutoOwner) list for a channel. The QOP 
+	list gives users the right to be auto-owner on your channel,
+	which gives them almost (or potentially, total) access.
+	
+	The QOP ADD command adds the given nickname to the
+	QOP list.
+	
+	The QOP DEL command removes the given nick from the
+	QOP list.  If a list of entry numbers is given, those
+	entries are deleted.  (See the example for LIST below.)
+	
+	The QOP LIST command displays the QOP list.  If
+	a wildcard mask is given, only those entries matching the
+	mask are displayed.  If a list of entry numbers is given,
+	only those entries are shown; for example:
+
+	   QOP #channel LIST 2-5,7-9
+	      Lists AOP entries numbered 2 through 5 and
+	      7 through 9.
+	      
+	The QOP CLEAR command clears all entries of the
+	QOP list.
+	
+	The QOP commands are limited to
+	founders (unless SECUREOPS is off). However, any user on the
+	QOP list may use the QOP LIST command.
+	
+	This command may have been disabled for your channel, and
+	in that case you need to use the access list. See 
+	%R%S HELP ACCESS for information about the access list,
+	and %R%S HELP SET XOP to know how to toggle between 
+	the access list and xOP list systems.
 
 CHAN_HELP_AOP
 	Sk³adnia: AOP kana³ ADD nick
@@ -6034,36 +6003,12 @@ CHAN_HELP_GETKEY
 	
 	Zwraca has³o wstêpu do wskazanego kana³u.
 
-CHAN_HELP_SENDPASS
-	Sk³adnia: SENDPASS kana³
-	
-	Wysy³a has³o do podanego kana³u na adres e-mail
-	przypisany do nicka w³a¶ciciela kana³u. Ta komenda
-	pomaga odzyskaæ zapomniane has³o.
-	
-	Ta komenda w niektórych sieciach mo¿e byæ dostêpna
-	jedynie dla osób z uprawnieniami IRC operatora.
-
 CHAN_SERVADMIN_HELP
 	
 	Administratorzy serwisów mog± usun±æ ka¿dy kana³
 	bez potrzeby identyfikacji jako jego w³a¶ciciele.
 	Mog± przegl±daæ listê dostêpu ka¿dego kana³u,
 	listê AKICK, ustawienia poziomów dostêpu itd.
-
-CHAN_SERVADMIN_HELP_LOGOUT
-	Sk³adnia: LOGOUT kana³ nick
-	
-	Pozwala na wylogowanie wskazanego u¿ytkownika z kana³u.
-	W celu odzyskania uprawnieñ u¿ytkownik bêdzie musia³
-	ponownie siê zidentyfikowaæ.
-	
-	Ka¿dy mo¿e wylogowaæ siebie, natomiast w³a¶ciciel kana³u
-	mo¿e wylogowaæ ka¿dego.
-	
-	Administrator serwisów mo¿e wylogowaæ dowoln± osobê
-	z dowolnego kana³u. Pominiêcie nicka powoduje wylogowanie
-	wszystkich zidentyfikowanych osób.
 
 CHAN_SERVADMIN_HELP_DROP
 	Sk³adnia: DROP kana³

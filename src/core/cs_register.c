@@ -18,7 +18,7 @@
 class CommandCSRegister : public Command
 {
  public:
-	CommandCSRegister() : Command("REGISTER", 3, 3)
+	CommandCSRegister() : Command("REGISTER", 2, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
@@ -26,13 +26,9 @@ class CommandCSRegister : public Command
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		const char *pass = params[1].c_str();
-		const char *desc = params[2].c_str();
+		const char *desc = params[1].c_str();
 		Channel *c;
 		ChannelInfo *ci;
-		struct u_chaninfolist *uc;
-		char founderpass[PASSMAX];
-		char tmp_pass[PASSMAX];
 		ChannelMode *cm;
 
 		if (readonly)
@@ -57,20 +53,10 @@ class CommandCSRegister : public Command
 			notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 		else if (CSMaxReg && u->nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
 			notice_lang(s_ChanServ, u, u->nc->channelcount > CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
-		else if (!stricmp(u->nick, pass) || (StrictPasswords && strlen(pass) < 5))
-			notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
-		else if (enc_encrypt_check_len(strlen(pass), PASSMAX - 1))
-			notice_lang(s_ChanServ, u, PASSWORD_TOO_LONG);
 		else if (!(ci = makechan(chan)))
 		{
 			alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
 			notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
-		}
-		else if (strscpy(founderpass, pass, PASSMAX), enc_encrypt_in_place(founderpass, PASSMAX) < 0)
-		{
-			alog("%s: Couldn't encrypt password for %s (REGISTER)", s_ChanServ, chan);
-			notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
-			delchan(ci);
 		}
 		else
 		{
@@ -83,7 +69,6 @@ class CommandCSRegister : public Command
 			ci->last_used = ci->time_registered;
 			ci->founder = u->nc;
 
-			memcpy(ci->founderpass, founderpass, PASSMAX);
 			ci->desc = sstrdup(desc);
 			if (c->topic)
 			{
@@ -98,16 +83,6 @@ class CommandCSRegister : public Command
 			alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan, u->nick, u->GetIdent().c_str(), u->host);
 			notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
 
-			if (enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1) == 1)
-				notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, tmp_pass);
-
-			uc = new u_chaninfolist;
-			uc->next = u->founder_chans;
-			uc->prev = NULL;
-			if (u->founder_chans)
-				u->founder_chans->prev = uc;
-			u->founder_chans = uc;
-			uc->chan = ci;
 			/* Implement new mode lock */
 			check_modes(c);
 			/* On most ircds you do not receive the admin/owner mode till its registered */

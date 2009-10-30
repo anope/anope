@@ -84,7 +84,7 @@ class CommandBSInfo : public Command
 		}
 		else if ((ci = cs_findchan(query)))
 		{
-			if (!is_founder(u, ci) && !u->nc->HasPriv("botserv/administration"))
+			if (!IsFounder(u, ci) && !u->nc->HasPriv("botserv/administration"))
 			{
 				notice_lang(s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;

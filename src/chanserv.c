@@ -59,6 +59,9 @@ static int def_levels[][2] = {
 	{ CA_BAN,						5 },
 	{ CA_TOPIC,		 ACCESS_INVALID },
 	{ CA_INFO,		  ACCESS_INVALID },
+	{ CA_AUTOOWNER,		ACCESS_INVALID },
+	{ CA_OWNER,		ACCESS_INVALID },
+	{ CA_OWNERME,		ACCESS_INVALID },
 	{ -1 }
 };
 
@@ -67,7 +70,7 @@ LevelInfo levelinfo[] = {
 	{ CA_AUTODEOP,	  "AUTODEOP",	 CHAN_LEVEL_AUTODEOP },
 	{ CA_AUTOHALFOP,	"AUTOHALFOP",   CHAN_LEVEL_AUTOHALFOP },
 	{ CA_AUTOOP,		"AUTOOP",	   CHAN_LEVEL_AUTOOP },
-	{ CA_AUTOPROTECT,   "",  CHAN_LEVEL_AUTOPROTECT },
+	{ CA_AUTOPROTECT,   "AUTOPROTECT",  CHAN_LEVEL_AUTOPROTECT },
 	{ CA_AUTOVOICE,	 "AUTOVOICE",	CHAN_LEVEL_AUTOVOICE },
 	{ CA_NOJOIN,		"NOJOIN",	   CHAN_LEVEL_NOJOIN },
 	{ CA_SIGNKICK,	  "SIGNKICK",	 CHAN_LEVEL_SIGNKICK },
@@ -87,8 +90,8 @@ LevelInfo levelinfo[] = {
 	{ CA_INVITE,		"INVITE",	   CHAN_LEVEL_INVITE },
 	{ CA_OPDEOP,		"OPDEOP",	   CHAN_LEVEL_OPDEOP },
 	{ CA_OPDEOPME,	  "OPDEOPME",	 CHAN_LEVEL_OPDEOPME },
-	{ CA_PROTECT,	   "",	  CHAN_LEVEL_PROTECT },
-	{ CA_PROTECTME,	 "",	CHAN_LEVEL_PROTECTME },
+	{ CA_PROTECT,	   "PROTECT",	  CHAN_LEVEL_PROTECT },
+	{ CA_PROTECTME,	 "PROTECTME",	CHAN_LEVEL_PROTECTME },
 	{ CA_TOPIC,		 "TOPIC",		CHAN_LEVEL_TOPIC },
 	{ CA_UNBAN,		 "UNBAN",		CHAN_LEVEL_UNBAN },
 	{ CA_VOICE,		 "VOICE",		CHAN_LEVEL_VOICE },
@@ -100,6 +103,9 @@ LevelInfo levelinfo[] = {
 	{ CA_GREET,		"GREET",		CHAN_LEVEL_GREET },
 	{ CA_NOKICK,		"NOKICK",	   CHAN_LEVEL_NOKICK },
 	{ CA_SAY,		"SAY",		CHAN_LEVEL_SAY },
+	{ CA_AUTOOWNER,		"AUTOOWNER",	CHAN_LEVEL_AUTOOWNER },
+	{ CA_OWNER,		"OWNER",	CHAN_LEVEL_OWNER },
+	{ CA_OWNERME,		"OWNERME",	CHAN_LEVEL_OWNERME },
 		{ -1 }
 };
 int levelinfo_maxwidth = 0;
@@ -381,7 +387,10 @@ void load_cs_dbase()
 			} else {
 				ci->successor = NULL;
 			}
-			SAFE(read = read_buffer(ci->founderpass, f));
+
+			char nothing[PASSMAX];
+			SAFE(read = read_buffer(nothing, f)); // XXX founder pass was removed.. just here so it works
+
 			SAFE(read_string(&ci->desc, f));
 			if (!ci->desc)
 				ci->desc = sstrdup("");
@@ -646,7 +655,11 @@ void save_cs_dbase()
 				SAFE(write_string(ci->successor->display, f));
 			else
 				SAFE(write_string(NULL, f));
-			SAFE(written = write_buffer(ci->founderpass, f));
+
+			char nothing[PASSMAX]; /* founder passwords were removed! */
+			strcpy(nothing, "nothing\0");
+			SAFE(written = write_buffer(nothing, f));
+
 			SAFE(write_string(ci->desc, f));
 			SAFE(write_string(ci->url, f));
 			SAFE(write_string(ci->email, f));
@@ -1107,8 +1120,8 @@ int check_should_owner(User * user, char *chan)
 	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
-	if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
-		|| (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))) {
+	if (((ci->flags & CI_SECUREFOUNDER) && IsRealFounder(user, ci))
+		|| (!(ci->flags & CI_SECUREFOUNDER) && IsFounder(user, ci))) {
 		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", cm->ModeChar, user->nick,
 					   user->nick);
 		return 1;
@@ -1613,7 +1626,7 @@ int check_access(User * user, ChannelInfo * ci, int what)
 		ci->last_used = time(NULL);
 
 	if (what == ACCESS_FOUNDER)
-		return is_founder(user, ci);
+		return IsFounder(user, ci);
 	if (level >= ACCESS_FOUNDER)
 		return (what == CA_AUTODEOP || what == CA_NOJOIN) ? 0 : 1;
 	/* Hacks to make flags work */
@@ -1691,8 +1704,6 @@ int delchan(ChannelInfo * ci)
 {
 	unsigned i;
 	NickCore *nc;
-	User *u;
-	struct u_chaninfolist *cilist, *cilist_next;
 
 	if (!ci) {
 		if (debug) {
@@ -1724,34 +1735,6 @@ int delchan(ChannelInfo * ci)
 	}
 	if (debug >= 2) {
 		alog("debug: delchan() Bot has been removed moving on");
-	}
-
-	if (debug >= 2) {
-		alog("debug: delchan() founder cleanup");
-	}
-	for (i = 0; i < 1024; i++) {
-		for (u = userlist[i]; u; u = u->next) {
-			cilist = u->founder_chans;
-			while (cilist) {
-				cilist_next = cilist->next;
-				if (cilist->chan == ci) {
-					if (debug)
-						alog("debug: Dropping founder login of %s for %s",
-							 u->nick, ci->name);
-					if (cilist->next)
-						cilist->next->prev = cilist->prev;
-					if (cilist->prev)
-						cilist->prev->next = cilist->next;
-					else
-						u->founder_chans = cilist->next;
-					delete cilist;
-				}
-				cilist = cilist_next;
-			}
-		}
-	}
-	if (debug >= 2) {
-		alog("debug: delchan() founder cleanup done");
 	}
 
 	if (ci->next)
@@ -1862,68 +1845,67 @@ void reset_levels(ChannelInfo * ci)
 
 /*************************************************************************/
 
-/* Does the given user have founder access to the channel? */
-
-int is_founder(User * user, ChannelInfo * ci)
+/** Is the user a channel founder? (owner)
+ * @param user The user
+ * @param ci The channel
+ * @return true or false
+ */
+bool IsFounder(User *user, ChannelInfo *ci)
 {
-	if (!user || !ci) {
-		return 0;
-	}
+	ChanAccess *access = NULL;
 
-	if (user->isSuperAdmin) {
-		return 1;
-	}
+	if (!user || !ci)
+		return false;
 
-	if (user->nc && user->nc == ci->founder) {
-		if ((nick_identified(user)
-			 || (user->IsRecognized() && !(ci->flags & CI_SECURE))))
-			return 1;
+	if (IsRealFounder(user, ci))
+		return true;
+	
+	if (user->nc)
+		access = ci->GetAccess(user->nc);
+	else
+	{
+		NickAlias *na = findnick(user->nick);
+		if (na)
+			access = ci->GetAccess(na->nc);
 	}
-	if (is_identified(user, ci))
-		return 1;
-	return 0;
+	
+	/* If they're QOP+ and theyre identified or theyre recognized and the channel isn't secure */
+	if (access && access->level >= ACCESS_QOP && (user->nc || (user->IsRecognized() && !(ci->flags & CI_SECURE))))
+		return true;
+
+	return false;
 }
 
-/*************************************************************************/
-
-int is_real_founder(User * user, ChannelInfo * ci)
+/** Is the user the real founder?
+ * @param user The user
+ * @param ci The channel
+ * @return true or false
+ */
+bool IsRealFounder(User *user, ChannelInfo *ci)
 {
-	if (user->isSuperAdmin) {
-		return 1;
-	}
+	if (!user || !ci)
+		return false;
 
-	if (user->nc && user->nc == ci->founder) {
-		if ((nick_identified(user)
-			 || (user->IsRecognized() && !(ci->flags & CI_SECURE))))
-			return 1;
-	}
-	return 0;
+	if (user->isSuperAdmin)
+		return true;
+
+	if (user->nc && user->nc == ci->founder)
+		return true;
+
+	return false;
 }
 
-/*************************************************************************/
 
-/* Has the given user password-identified as founder for the channel? */
-
-int is_identified(User * user, ChannelInfo * ci)
+/** Return the access level for the user on the channel.
+ * If the channel doesn't exist, the user isn't on the access list, or the
+ * channel is CI_SECURE and the user isn't identified, return 0
+ * @param user The user
+ * @param ci The cahnnel
+ * @return The level, or 0
+ */
+int get_access(User *user, ChannelInfo *ci)
 {
-	struct u_chaninfolist *c;
-
-	for (c = user->founder_chans; c; c = c->next) {
-		if (c->chan == ci)
-			return 1;
-	}
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Return the access level the given user has on the channel.  If the
- * channel doesn't exist, the user isn't on the access list, or the channel
- * is CS_SECURE and the user hasn't IDENTIFY'd with NickServ, return 0. */
-
-int get_access(User * user, ChannelInfo * ci)
-{
-	ChanAccess *access;
+	ChanAccess *access = NULL;
 
 	if (!ci || !user)
 		return 0;
@@ -1931,20 +1913,24 @@ int get_access(User * user, ChannelInfo * ci)
 	/* SuperAdmin always has highest level */
 	if (user->isSuperAdmin)
 		return ACCESS_SUPERADMIN;
-
-	if (is_founder(user, ci))
+	
+	if (IsFounder(user, ci))
 		return ACCESS_FOUNDER;
-
-	if (!user->nc)
-		return 0;
-
-	if (nick_identified(user)
-		|| (user->IsRecognized() && !(ci->flags & CI_SECURE)))
-		if ((access = ci->GetAccess(user->nc)))
-			return access->level;
-
+	
 	if (nick_identified(user))
-		return 0;
+	{
+		access = ci->GetAccess(user->nc);
+		if (access)
+			return access->level;
+	}
+	else
+	{
+		NickAlias *na = findnick(user->nick);
+		if (na)
+			access = ci->GetAccess(na->nc);
+		if (access && user->IsRecognized() && !(ci->flags & CI_SECURE))
+			return access->level;
+	}
 
 	return 0;
 }
@@ -1958,7 +1944,7 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 	if (!ci || !user || !user->nc)
 		return;
 
-	if (is_founder(user, ci) || nick_identified(user)
+	if (IsFounder(user, ci) || nick_identified(user)
 		|| (user->IsRecognized() && !(ci->flags & CI_SECURE)))
 		if ((access = ci->GetAccess(user->nc)))
 			access->last_seen = time(NULL);
@@ -2031,22 +2017,22 @@ const char *get_xop_level(int level)
 {
 	ChannelMode *halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
-	if (level < ACCESS_VOP) {
+	if (level < ACCESS_VOP)
 		return "Err";
-	} else if (halfop && level < ACCESS_HOP) {
+	else if (halfop && level < ACCESS_HOP)
 		return "VOP";
-	} else if (!halfop && level < ACCESS_AOP) {
+	else if (!halfop && level < ACCESS_AOP)
 		return "VOP";
-	} else if (halfop && level < ACCESS_AOP) {
+	else if (halfop && level < ACCESS_AOP)
 		return "HOP";
-	} else if (level < ACCESS_SOP) {
+	else if (level < ACCESS_SOP)
 		return "AOP";
-	} else if (level < ACCESS_FOUNDER) {
+	else if (level < ACCESS_QOP)
 		return "SOP";
-	} else {
+	else if (level < ACCESS_FOUNDER)
+		return "QOP";
+	else
 		return "Founder";
-	}
-
 }
 
 /*************************************************************************/

@@ -822,9 +822,6 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 	char host[BUFSIZE];
 	std::list<std::pair<std::string, std::string> >::iterator it;
 
-	if (checkDefCon(DEFCON_NO_NEW_MEMOS))
-		return;
-
 	if (vIdent)
 		snprintf(host, sizeof(host), "%s@%s", vIdent, vHost);
 	else

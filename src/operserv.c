@@ -31,12 +31,8 @@ static void free_sqline_entry(SList * slist, void *item);
 static int is_szline_entry_equal(SList * slist, void *item1, void *item2);
 static void free_szline_entry(SList * slist, void *item);
 
-time_t DefContimer;
+std::vector<std::bitset<32> > DefCon;
 int DefConModesSet = 0;
-char *defconReverseModes(const char *modes);
-
-uint32 DefConModesOn;		   /* Modes to be enabled during DefCon */
-uint32 DefConModesOff;		  /* Modes to be disabled during DefCon */
 ChannelInfo DefConModesCI;	  /* ChannelInfo containg params for locked modes
 								 * during DefCon; I would've done this nicer if i
 								 * could, but all damn mode functions require a
@@ -494,14 +490,6 @@ int check_akill(const char *nick, const char *username, const char *host,
 {
 	int i;
 	Akill *ak;
-
-	/**
-	 * If DefCon is set to NO new users - kill the user ;).
-	 **/
-	if (checkDefCon(DEFCON_NO_NEW_CLIENTS)) {
-		kill_user(s_OperServ, nick, DefConAkillReason);
-		return 1;
-	}
 
 	if (akills.count == 0)
 		return 0;
@@ -1173,217 +1161,42 @@ static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 
 /*************************************************************************/
 
-/**
- * Returns 1 if the passed level is part of the CURRENT defcon, else 0 is returned
- **/
-int checkDefCon(int level)
-{
-	return DefCon[DefConLevel] & level;
-}
-
-/**
- * Automaticaly re-set the DefCon level if the time limit has expired.
- **/
-void resetDefCon(int level)
-{
-	char strLevel[5];
-	snprintf(strLevel, 4, "%d", level);
-	if (DefConLevel != level) {
-		if ((DefContimer)
-			&& (time(NULL) - DefContimer >= DefConTimeOut)) {
-			DefConLevel = level;
-			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(strLevel));
-			alog("Defcon level timeout, returning to lvl %d", level);
-			ircdproto->SendGlobops(s_OperServ,
-							 getstring(OPER_DEFCON_WALL),
-							 s_OperServ, level);
-			if (GlobalOnDefcon) {
-				if (DefConOffMessage) {
-					oper_global(NULL, "%s", DefConOffMessage);
-				} else {
-					oper_global(NULL, getstring(DEFCON_GLOBAL),
-								DefConLevel);
-				}
-			}
-			if (GlobalOnDefconMore && !DefConOffMessage) {
-				oper_global(NULL, "%s", DefconMessage);
-			}
-			runDefCon();
-		}
-	}
-}
-
-/**
- * Run DefCon level specific Functions.
- **/
-void runDefCon()
-{
-	char *newmodes;
-	if (checkDefCon(DEFCON_FORCE_CHAN_MODES)) {
-		if (DefConChanModes && !DefConModesSet) {
-			if (DefConChanModes[0] == '+' || DefConChanModes[0] == '-') {
-				alog("DEFCON: setting %s on all chan's", DefConChanModes);
-				DefConModesSet = 1;
-				do_mass_mode(DefConChanModes);
-			}
-		}
-	} else {
-		if (DefConChanModes && (DefConModesSet != 0)) {
-			if (DefConChanModes[0] == '+' || DefConChanModes[0] == '-') {
-				DefConModesSet = 0;
-				if ((newmodes = defconReverseModes(DefConChanModes))) {
-					alog("DEFCON: setting %s on all chan's", newmodes);
-					do_mass_mode(newmodes);
-					delete [] newmodes;
-				}
-			}
-		}
-	}
-}
-
-/**
- * Reverse the mode string, used for remove DEFCON chan modes.
- **/
-char *defconReverseModes(const char *modes)
-{
-	char *newmodes = NULL;
-	unsigned i = 0;
-	if (!modes) {
-		return NULL;
-	}
-	if (!(newmodes = new char[strlen(modes) + 1])) {
-		return NULL;
-	}
-	for (i = 0; i < strlen(modes); i++) {
-		if (modes[i] == '+')
-			newmodes[i] = '-';
-		else if (modes[i] == '-')
-			newmodes[i] = '+';
-		else
-			newmodes[i] = modes[i];
-	}
-	newmodes[i] = '\0';
-	return newmodes;
-}
-
-/* Parse the defcon mlock mode string and set the correct global vars.
- *
- * @param str mode string to parse
- * @return 1 if accepted, 0 if failed
+/** Check if a certain defcon option is currently in affect
+ * @param Level The level
+ * @return true and false
  */
-int defconParseModeString(const char *str)
+bool CheckDefCon(DefconLevel Level)
 {
-	int add = -1;			   /* 1 if adding, 0 if deleting, -1 if neither */
-	unsigned char mode;
-	ChannelMode *cm;
-	ChannelModeParam *cmp;
-	char *str_copy = sstrdup(str);	  /* We need this copy as str is const -GD */
-	char *param;				/* Store parameters during mode parsing */
-
-	/* Reinitialize everything */
-	DefConModesOn = 0;
-	DefConModesOff = 0;
-
-	/* Initialize strtok() internal buffer */
-	strtok(str_copy, " ");
-
-	/* Loop while there are modes to set */
-	while ((mode = *str++) && (mode != ' ')) {
-		switch (mode) {
-		case '+':
-			add = 1;
-			continue;
-		case '-':
-			add = 0;
-			continue;
-		default:
-			if (add < 0)
-				continue;
-		}
-
-		if ((cm = ModeManager::FindChannelModeByChar(mode)))
-		{
-			if (!cm->CanSet(NULL))
-			{
-				alog("DefConCHanModes mode character '%c' cannot be locked", mode);
-				delete [] str_copy;
-				return 0;
-			}
-			else if (add)
-			{
-				DefConModesCI.SetMLock(cm->Name, true);
-				DefConModesCI.RemoveMLock(cm->Name, false);
-
-				if (cm->Type == MODE_PARAM)
-				{
-					cmp = static_cast<ChannelModeParam *>(cm);
-
-					if (!(param = strtok(NULL, " ")))
-					{
-						alog("DefConChanModes mode character '%c' has no parameter while one is expected", mode);
-						delete [] str_copy;
-						return 0;
-					}
-
-					if (!cmp->IsValid(param))
-						continue;
-
-					DefConModesCI.SetParam(cmp->Name, param);
-				}
-			}
-			else
-			{
-				DefConModesCI.RemoveMLock(cm->Name, true);
-				
-				if (DefConModesCI.HasMLock(cm->Name, true))
-				{
-					DefConModesCI.RemoveMLock(cm->Name, true);
-
-					if (cm->Type == MODE_PARAM)
-					{
-						cmp = static_cast<ChannelModeParam *>(cm);
-
-						DefConModesCI.UnsetParam(cmp->Name);
-					}
-				}
-			}
-		}
-		else
-		{
-			alog("DefConChanModes unknown mode character '%c'", mode);
-			delete [] str_copy;
-			return 0;
-		}
-	}						   /* while (*param) */
-
-	delete [] str_copy;
-
-	if ((cm = ModeManager::FindChannelModeByName(CMODE_REDIRECT)))
-	{
-		/* We can't mlock +L if +l is not mlocked as well. */
-		if (DefConModesCI.HasMLock(cm->Name, true) && !DefConModesCI.HasMLock(CMODE_LIMIT, true))
-		{
-			DefConModesCI.RemoveMLock(CMODE_REDIRECT, true);
-			DefConModesCI.UnsetParam(CMODE_REDIRECT);
-			alog("DefConChanModes must lock mode +l as well to lock mode +L");
-			return 0;
-		}
-	}
-
-	/* Some ircd we can't set NOKNOCK without INVITE */
-	/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
-	if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)))
-	{
-		if (DefConModesCI.HasMLock(cm->Name, true) && !DefConModesCI.HasMLock(CMODE_INVITE, true))
-		{
-			DefConModesCI.RemoveMLock(CMODE_NOKNOCK, true);
-			alog("DefConChanModes must lock mode +i as well to lock mode +K");
-			return 0;
-		}
-	}
-
-	/* Everything is set fine, return 1 */
-	return 1;
+	if (DefConLevel)
+		return DefCon[DefConLevel][(size_t)Level];
+	return false;
 }
 
-/*************************************************************************/
+/** Check if a certain defcon option is in a certain defcon level
+ * @param level The defcon level
+ * @param Level The defcon level name
+ * @return true or false
+ */
+bool CheckDefCon(int level, DefconLevel Level)
+{
+	return DefCon[level][(size_t)Level];
+}
+
+/** Add a defcon level option to a defcon level
+ * @param level The defcon level
+ * @param Level The defcon level option
+ */
+void AddDefCon(int level, DefconLevel Level)
+{
+	DefCon[level][(size_t)Level] = true;
+}
+
+/** Remove a defcon level option from a defcon level
+ * @param level The defcon level
+ * @param Level The defcon level option
+ */
+void DelDefCon(int level, DefconLevel Level)
+{
+	DefCon[level][(size_t)Level] = false;
+}
+

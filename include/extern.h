@@ -389,9 +389,6 @@ E int NumUlines;
 E int read_config(int reload);
 
 E int DefConLevel;
-E int DefCon[6];
-E int checkDefCon(int level);
-E void resetDefCon(int level);
 E int DefConSessionLimit;
 E time_t DefConTimeOut;
 E time_t DefConAKILL;
@@ -692,10 +689,13 @@ E int check_szline(const char *nick, char *ip);
 
 E Server *server_global(Server * s, char *msg);
 
+E bool CheckDefCon(DefconLevel Level);
+E bool CheckDefCon(int level, DefconLevel Level);
+E void AddDefCon(int level, DefconLevel Level);
+E void DelDefCon(int level, DefconLevel Level);
+E std::vector<std::bitset<32> > DefCon;
+
 E bool OSOpersOnly;
-E time_t DefContimer;
-E void runDefCon();
-E int defconParseModeString(const char *str);
 
 /**** process.c ****/
 

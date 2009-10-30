@@ -193,11 +193,6 @@ class CommandCSSet : public Command
 		ChannelMode *cm;
 		ChannelModeParam *cmp;
 
-		if (checkDefCon(DEFCON_NO_MLOCK_CHANGE)) {
-			notice_lang(s_ChanServ, u, OPER_DEFCON_DENIED);
-			return MOD_CONT;
-		}
-
 		ci->ClearMLock();
 
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))

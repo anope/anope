@@ -406,14 +406,6 @@ int init_secondary(int ac, char **av)
 	/* Parse all remaining command-line options. */
 	parse_options(ac, av);
 
-	/* Parse the defcon mode string if needed */
-	if (DefConLevel) {
-		if (!defconParseModeString(DefConChanModes)) {
-			fprintf(stderr,
-					"services.conf: The given DefConChanModes mode string was incorrect (see log for exact errors)\n");
-			return -1;
-		}
-	}
 #ifndef _WIN32
 	if (!nofork) {
 		if ((i = fork()) < 0) {

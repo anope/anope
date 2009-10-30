@@ -10,6 +10,7 @@
  */
 
 #include "services.h"
+#include "modules.h"
 
 std::map<char, UserMode *> ModeManager::UserModesByChar;
 std::map<UserModeName, UserMode *> ModeManager::UserModesByName;

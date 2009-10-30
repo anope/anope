@@ -366,7 +366,6 @@ int main(int ac, char **av, char **envp)
 	time_t last_update;		/* When did we last update the databases? */
 	time_t last_expire;		/* When did we last expire nicks/channels? */
 	time_t last_check; /* When did we last check timeouts? */
-	time_t last_DefCon;		/* When was DefCon last checked? */
 
 	int i;
 	char *progname;
@@ -429,7 +428,6 @@ int main(int ac, char **av, char **envp)
 	last_update = time(NULL);
 	last_expire = time(NULL);
 	last_check = time(NULL);
-	last_DefCon = time(NULL);
 
 	started = 1;
 
@@ -479,11 +477,6 @@ int main(int ac, char **av, char **envp)
 
 			save_data = 0;
 			last_update = t;
-		}
-
-		if ((DefConTimeOut) && (t - last_DefCon >= DefConTimeOut)) {
-			resetDefCon(5);
-			last_DefCon = t;
 		}
 
 		if (delayed_quit)

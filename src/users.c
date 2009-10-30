@@ -627,7 +627,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	NickAlias *old_na;		  /* Old nick rec */
 	int nc_changed = 1;		 /* Did nick core change? */
 	int status = 0;			 /* Status to apply */
-	char mask[USERMAX + HOSTMAX + 2];
 	char *logrealname;
 	std::string oldnick;		/* stores the old nick of the user, so we can pass it to OnUserNickChange */
 
@@ -709,21 +708,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
 		if (MOD_RESULT == EVENT_STOP)
-			return;
+			return NULL;
 
 		check_akill(nick, username, host, vhost, ipbuf);
-
-		if (is_sync(findserver(servlist, server)) && checkDefCon(DEFCON_AKILL_NEW_CLIENTS) && !is_ulined(server))
-		{
-			strlcpy(mask, "*@", sizeof(mask));
-			strlcat(mask, host, sizeof(mask));
-			alog("DEFCON: adding akill for %s", mask);
-			add_akill(NULL, mask, s_OperServ,
-					  time(NULL) + DefConAKILL,
-					  DefConAkillReason ? DefConAkillReason :
-					  "DEFCON AKILL");
-			check_akill(nick, username, host, vhost, ipbuf);
-		}
 
 		if (ircd->sgline)
 			check_sgline(nick, realname);

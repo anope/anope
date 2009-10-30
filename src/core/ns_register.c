@@ -201,12 +201,6 @@ class CommandNSRegister : public CommandNSConfirm
 			return MOD_CONT;
 		}
 
-		if (checkDefCon(DEFCON_NO_NEW_NICKS))
-		{
-			notice_lang(s_NickServ, u, OPER_DEFCON_DENIED);
-			return MOD_CONT;
-		}
-
 		if (!is_oper(u) && NickRegDelay && time(NULL) - u->my_signon < NickRegDelay)
 		{
 			notice_lang(s_NickServ, u, NICK_REG_DELAY, NickRegDelay);

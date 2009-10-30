@@ -43,11 +43,6 @@ class CommandNSGroup : public Command
 			notice_lang(s_NickServ, u, NICK_GROUP_DISABLED);
 			return MOD_CONT;
 		}
-		if (checkDefCon(DEFCON_NO_NEW_NICKS))
-		{
-			notice_lang(s_NickServ, u, OPER_DEFCON_DENIED);
-			return MOD_CONT;
-		}
 
 		if (!ircdproto->IsNickValid(u->nick))
 		{

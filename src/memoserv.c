@@ -201,9 +201,6 @@ void memo_send(User * u, const char *name, const char *text, int z)
 
 	if (readonly) {
 		notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
-	} else if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
-		notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
-		return;
 	} else if (!text) {
 		if (z == 0)
 			syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
@@ -388,7 +385,8 @@ void rsend_notify(User * u, Memo * m, const char *chan)
 	const char *fmt;
 
 	/* Only send receipt if memos are allowed */
-	if ((!readonly) && (!checkDefCon(DEFCON_NO_NEW_MEMOS))) {
+	if ((!readonly))
+	{
 
 		/* Get nick alias for sender */
 		na = findnick(m->sender);

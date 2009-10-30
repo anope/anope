@@ -1426,19 +1426,22 @@ struct session_ {
 };
 
 /*************************************************************************/
-/**
- * DEFCON Defines
- **/
-#define DEFCON_NO_NEW_CHANNELS 		1	/* No New Channel Registrations */
-#define DEFCON_NO_NEW_NICKS 		2	/* No New Nick Registrations */
-#define DEFCON_NO_MLOCK_CHANGE		4	/* No MLOCK changes */
-#define DEFCON_FORCE_CHAN_MODES		8	/* Force Chan Mode */
-#define DEFCON_REDUCE_SESSION		16	/* Reduce Session Limit */
-#define DEFCON_NO_NEW_CLIENTS		32	/* Kill any NEW clients */
-#define DEFCON_OPER_ONLY		64	/* Restrict services to oper's only */
-#define DEFCON_SILENT_OPER_ONLY		128	/* Silently ignore non-opers */
-#define DEFCON_AKILL_NEW_CLIENTS	256	/* AKILL any new clients */
-#define DEFCON_NO_NEW_MEMOS		512	/* No New Memos Sent */
+
+/* Defcon */
+enum DefconLevel
+{
+	DEFCON_NO_NEW_CHANNELS,
+	DEFCON_NO_NEW_NICKS,
+	DEFCON_NO_MLOCK_CHANGE,
+	DEFCON_FORCE_CHAN_MODES,
+	DEFCON_REDUCE_SESSION,
+	DEFCON_NO_NEW_CLIENTS,
+	DEFCON_OPER_ONLY,
+	DEFCON_SILENT_OPER_ONLY,
+	DEFCON_AKILL_NEW_CLIENTS,
+	DEFCON_NO_NEW_MEMOS
+	
+};
 
 /*************************************************************************/
 

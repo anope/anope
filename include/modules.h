@@ -558,6 +558,15 @@ class CoreExport Module
 	 */
 	virtual void OnUserNickChange(User *u, const char *oldnick) { }
 
+	/** Called immediatly when a user tries to run a command
+	 * @param service The service
+	 * @param u The user
+	 * @param cmd The command
+	 * @param c The command class (if it exists)
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnPreCommandRun(const char *service, User *u, const char *cmd, Command *c) { return EVENT_CONTINUE; }
+
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
 	 * @param service The service the command is associated with
@@ -726,7 +735,7 @@ class CoreExport Module
 	/** Called when defcon level changes
 	 * @param level The level
 	 */
-	virtual void OnDefconLevel(const char *level) { }
+	virtual void OnDefconLevel(int level) { }
 
 	/** Called when a server quits
 	 * @param server The server
@@ -818,6 +827,16 @@ class CoreExport Module
 	 */
 	virtual void OnDelChan(ChannelInfo *ci) { }
 
+	/** Called when a new channel is created
+	 * @param c The channel
+	 */
+	virtual void OnChannelCreate(Channel *c) { }
+
+	/** Called when a channel is deleted
+	 * @param c The channel
+	 */
+	virtual void OnChannelDelete(Channel *c) { }
+
 	/** Called when a nick is dropped
 	 * @param nick The nick
 	 */
@@ -858,11 +877,6 @@ class CoreExport Module
 	 * @param na The nick alias
 	 */
 	virtual void OnNickUnsuspended(NickAlias *na) { }
-
-	/** Called when the defcon level is changed
-	 * @param level The level
-	 */
-	virtual void OnDefconLevel(int level) { }
 
 	/** Called on finduser()
 	 * @param u pointer to the user
@@ -985,7 +999,8 @@ enum Implementation
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
-		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan,
+		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
+		I_OnChannelDelete,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
@@ -1002,7 +1017,7 @@ enum Implementation
 		I_OnDefconLevel,
 
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
+		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreCommandRun, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
 		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,

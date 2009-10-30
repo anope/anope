@@ -1884,6 +1884,8 @@ Channel *chan_create(const char *chan, time_t ts)
 		restore_topic(chan);
 	}
 
+	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(c));
+
 	return c;
 }
 
@@ -1894,6 +1896,8 @@ Channel *chan_create(const char *chan, time_t ts)
 void chan_delete(Channel * c)
 {
 	BanData *bd, *next;
+
+	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(c));
 
 	if (debug)
 		alog("debug: Deleting channel %s", c->name);

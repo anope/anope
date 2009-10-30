@@ -33,11 +33,6 @@ class CommandMSStaff : public Command
 			notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
-		else if (checkDefCon(DEFCON_NO_NEW_MEMOS))
-		{
-			notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
-			return MOD_CONT;
-		}
 
 		for (i = 0; i < 1024; ++i)
 		{

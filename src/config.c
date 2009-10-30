@@ -235,7 +235,6 @@ static std::string DefCon1;
 static std::string DefCon2;
 static std::string DefCon3;
 static std::string DefCon4;
-int DefCon[6];
 time_t DefConTimeOut;
 int DefConSessionLimit;
 time_t DefConAKILL;
@@ -1952,8 +1951,9 @@ int read_config(int reload)
 	 **/
 	if (DefConLevel) {
 		/* Build DefCon's */
-		DefCon[0] = 0;
-		for (int level = 1; level < 5; ++level) {
+		DefCon.reserve(6);
+		DefCon[5].reset();
+		for (unsigned int level = 1; level < 5; ++level) {
 			DefCon[level] = 0;
 			std::string *levelDefinition = NULL;
 			switch (level) {
@@ -1972,28 +1972,33 @@ int read_config(int reload)
 			spacesepstream operations(*levelDefinition);
 			std::string operation;
 			while (operations.GetToken(operation)) {
-				if (operation == "nonewchannels") DefCon[level] |= DEFCON_NO_NEW_CHANNELS;
-				else if (operation == "nonewnicks") DefCon[level] |= DEFCON_NO_NEW_NICKS;
-				else if (operation == "nomlockchanges") DefCon[level] |= DEFCON_NO_MLOCK_CHANGE;
-				else if (operation == "forcechanmodes") DefCon[level] |= DEFCON_FORCE_CHAN_MODES;
-				else if (operation == "reducedsessions") DefCon[level] |= DEFCON_REDUCE_SESSION;
-				else if (operation == "nonewclients") DefCon[level] |= DEFCON_NO_NEW_CLIENTS;
-				else if (operation == "operonly") DefCon[level] |= DEFCON_OPER_ONLY;
-				else if (operation == "silentoperonly") DefCon[level] |= DEFCON_SILENT_OPER_ONLY;
-				else if (operation == "akillnewclients") DefCon[level] |= DEFCON_AKILL_NEW_CLIENTS;
-				else if (operation == "nonewmemos") DefCon[level] |= DEFCON_NO_NEW_MEMOS;
+				if (operation == "nonewchannels") AddDefCon(level, DEFCON_NO_NEW_CHANNELS);
+				else if (operation == "nonewnicks") AddDefCon(level, DEFCON_NO_NEW_NICKS);
+				else if (operation == "nomlockchanges") AddDefCon(level, DEFCON_NO_MLOCK_CHANGE); 
+				else if (operation == "forcechanmodes") AddDefCon(level, DEFCON_FORCE_CHAN_MODES);
+				else if (operation == "reducedsessions") AddDefCon(level, DEFCON_REDUCE_SESSION);
+				else if (operation == "nonewclients") AddDefCon(level, DEFCON_NO_NEW_CLIENTS);
+				else if (operation == "operonly") AddDefCon(level, DEFCON_OPER_ONLY);
+				else if (operation == "silentoperonly") AddDefCon(level, DEFCON_SILENT_OPER_ONLY);
+				else if (operation == "akillnewclients") AddDefCon(level, DEFCON_AKILL_NEW_CLIENTS);
+				else if (operation == "nonewmemos") AddDefCon(level, DEFCON_NO_NEW_MEMOS);
 			}
 		}
-		DefCon[5] = 0; /* DefCon level 5 is always normal operation */
-		for (defconCount = 1; defconCount <= 5; defconCount++) {		/* Check any defcon needed settings */
-			if (DefCon[defconCount] & DEFCON_REDUCE_SESSION) {
+
+		/* Check any defcon needed settings */
+		for (defconCount = 1; defconCount <= 5; defconCount++)
+		{
+			if (CheckDefCon(defconCount, DEFCON_REDUCE_SESSION))
+			{
 				CHECK(DefConSessionLimit);
 			}
-			if (DefCon[defconCount] & DEFCON_AKILL_NEW_CLIENTS) {
+			if (CheckDefCon(defconCount, DEFCON_AKILL_NEW_CLIENTS))
+			{
 				CHECK(DefConAKILL);
 				CHECK(DefConAkillReason);
 			}
-			if (DefCon[defconCount] & DEFCON_FORCE_CHAN_MODES) {
+			if (CheckDefCon(defconCount, DEFCON_FORCE_CHAN_MODES))
+			{
 				CHECK(DefConChanModes);
 			}
 		}

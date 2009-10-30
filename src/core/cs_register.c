@@ -41,12 +41,6 @@ class CommandCSRegister : public Command
 			return MOD_CONT;
 		}
 
-		if (checkDefCon(DEFCON_NO_NEW_CHANNELS))
-		{
-			notice_lang(s_ChanServ, u, OPER_DEFCON_DENIED);
-			return MOD_CONT;
-		}
-
 		if (*chan == '&')
 			notice_lang(s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
 		else if (*chan != '#')

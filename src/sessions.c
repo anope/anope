@@ -138,12 +138,7 @@ int add_session(const char *nick, const char *host, char *hostip)
 	if (session) {
 		exception = find_hostip_exception(host, hostip);
 
-		if (checkDefCon(DEFCON_REDUCE_SESSION)) {
-			sessionlimit =
-				exception ? exception->limit : DefConSessionLimit;
-		} else {
-			sessionlimit = exception ? exception->limit : DefSessionLimit;
-		}
+		sessionlimit = exception ? exception->limit : DefSessionLimit;
 
 		if (sessionlimit != 0 && session->count >= sessionlimit) {
 			if (SessionLimitExceeded)

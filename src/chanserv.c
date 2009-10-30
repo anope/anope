@@ -813,8 +813,7 @@ void check_modes(Channel * c)
 			c->RemoveMode(CMODE_REGISTERED);
 			ircdproto->SendMode(whosends(ci), c->name, "-r");
 		}
-		/* Channels that are not regged also need the defcon modes.. ~ Viper */
-		/* return; */
+		return;
 	}
 
 	*end++ = '+';
@@ -823,8 +822,8 @@ void check_modes(Channel * c)
 	{
 		cm = it->second;
 
-		/* If this channel does not have the mode and the mode is mlocked/defcon'd */
-		if (!c->HasMode(cm->Name) && (ci && ci->HasMLock(cm->Name, true)) || (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true)))
+		/* If this channel does not have the mode and the mode is mlocked */
+		if (!c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
 		{
 			*end++ = it->first;
 			c->SetMode(cm->Name);
@@ -833,14 +832,7 @@ void check_modes(Channel * c)
 			if (cm->Type == MODE_PARAM)
 			{
 				cmp = static_cast<ChannelModeParam *>(cm);
-
-				param.clear();
-				if (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true))
-					DefConModesCI.GetParam(cmp->Name, &param);
-				else if (ci)
-					ci->GetParam(cmp->Name, &param);
-				else
-					alog("Warning: Got no param for mode %c on channel %s but was expecting one", cmp->ModeChar, c->name);
+				ci->GetParam(cmp->Name, &param);
 
 				if (!param.empty())
 				{
@@ -852,19 +844,12 @@ void check_modes(Channel * c)
 				}
 			}
 		}
-		/* If this is a param mode and its mlocked or defcon has it set negative */
-		else if (cm->Type == MODE_PARAM && c->HasMode(cm->Name) && (ci && ci->HasMLock(cm->Name, true) || (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true))))
+		/* If this is a param mode and its mlocked and is set negative */
+		else if (cm->Type == MODE_PARAM && c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
 		{
 			cmp = static_cast<ChannelModeParam *>(cm);
-
 			c->GetParam(cmp->Name, &param);
-
-			if (DefConModesSet && DefConModesCI.HasMLock(cm->Name, true))
-				DefConModesCI.GetParam(cmp->Name, &ciparam);
-			else if (ci)
-				ci->GetParam(cmp->Name, &ciparam);
-			else
-				alog("Warning: Got no param for mode %c on channel %s but was expecting one", cmp->ModeChar, c->name);
+			ci->GetParam(cmp->Name, &ciparam);
 
 			if (!param.empty() && !ciparam.empty() && param != ciparam)
 			{
@@ -889,7 +874,7 @@ void check_modes(Channel * c)
 		cm = it->second;
 
 		/* If the channel has the mode */
-		if (c->HasMode(cm->Name) && (ci && ci->HasMLock(cm->Name, false)) || (DefConModesSet && DefConModesCI.HasMLock(cm->Name, false)))
+		if (c->HasMode(cm->Name) && ci->HasMLock(cm->Name, false))
 		{
 			*end++ = it->first;
 			c->RemoveMode(cm->Name);

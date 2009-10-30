@@ -54,23 +54,16 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	Command *c = findCommand(cmdTable, cmd);
 	int retVal = MOD_CONT;
 	ChannelInfo *ci;
+	EventReturn MOD_RESULT;
 
+	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(service, u, cmd, c));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
+	
 	if (!c)
 	{
-		if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u))
-		{
-			notice_lang(service, u, UNKNOWN_COMMAND_HELP, cmd, service);
-		}
+		notice_lang(service, u, UNKNOWN_COMMAND_HELP, cmd, service);
 		return;
-	}
-
-	if ((checkDefCon(DEFCON_OPER_ONLY) || checkDefCon(DEFCON_SILENT_OPER_ONLY)) && !is_oper(u))
-	{
-		if (!checkDefCon(DEFCON_SILENT_OPER_ONLY))
-		{
-			notice_lang(service, u, OPER_DEFCON_DENIED);
-			return;
-		}
 	}
 
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED))
@@ -120,7 +113,6 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		return;
 	}
 
-	EventReturn MOD_RESULT = EVENT_CONTINUE;
 	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name.c_str(), params));
 	if (MOD_RESULT == EVENT_STOP)
 		return;

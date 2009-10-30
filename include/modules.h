@@ -532,6 +532,16 @@ class CoreExport Module
 	 */
 	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) { return EVENT_CONTINUE; }
 
+	/** Called after a user has been introduced, but before any type
+	 * of checking has been done (akills, defcon, s*lines, etc)
+	 * return EVENT_STOP here to allow the user to get by untouched,
+	 * or kill them then return EVENT_STOP to tell Anope the user no
+	 * longer exists
+	 * @param u The user
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnPreUserConnect(User *u) { return EVENT_CONTINUE; }
+
 	/** Called when a new user connects to the network.
 	 * @param u The connecting user.
 	 */
@@ -949,6 +959,16 @@ class CoreExport Module
 	 */
 	virtual void OnUserModeUnset(User *u, UserModeName Name) { }
 
+	/** Called when a channel mode is introducted into Anope
+	 * @param cm The mode
+	 */
+	virtual void OnChannelModeAdd(ChannelMode *cm) { }
+
+	/** Called when a user mode is introducted into Anope
+	 * @param um The mode
+	 */
+	virtual void OnUserModeAdd(UserMode *um) { }
+
 };
 
 
@@ -975,8 +995,8 @@ enum Implementation
 		I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,
 
 		/* Users */
-		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel, I_OnJoinChannel,
-		I_OnPrePartChannel, I_OnPartChannel,
+		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
+		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */
 		I_OnDefconLevel,
@@ -986,7 +1006,7 @@ enum Implementation
 		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
-		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset,
+		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 	I_END
 };
 

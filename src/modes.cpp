@@ -32,6 +32,11 @@ bool ModeManager::AddUserMode(char Mode, UserMode *um)
 	bool ret = ModeManager::UserModesByChar.insert(std::make_pair(Mode, um)).second;
 	if (ret)
 		ret = ModeManager::UserModesByName.insert(std::make_pair(um->Name, um)).second;
+	
+	if (ret)
+	{
+		FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
+	}
 
 	return ret;
 }
@@ -47,6 +52,11 @@ bool ModeManager::AddChannelMode(char Mode, ChannelMode *cm)
 	bool ret = ModeManager::ChannelModesByChar.insert(std::make_pair(Mode, cm)).second;
 	if (ret)
 		ret = ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm)).second;
+	
+	if (ret)
+	{
+		FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
+	}
 
 	return ret;
 }

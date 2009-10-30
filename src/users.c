@@ -706,39 +706,13 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user->hostip = NULL;
 		}
 
-		/* Now we check for akills/s*lines/sessions after a user class has been created
-		 * this is because some ircds (like Unreal) do not send any type of message
-		 * to the servers once a (SVS)KILL has been done, which previously
-		 * resulted in memory leaks for users that did not exist, and possibly
-		 * multiple users on the same nick
-		 *
-		 * This also caused session limits to incorrectly be decremented if
-		 * a user connected two times in a row (the user class from the first
-		 * connect still existed) resulting in their limit to be decremented
-		 * incorrectly.
-		 *
-		 * Hopefully this will fix these problems - Adam
-		 */
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
 
-		/* We used to ignore the ~ which a lot of ircd's use to indicate no
-		 * identd response.  That caused channel bans to break, so now we
-		 * just take what the server gives us.  People are still encouraged
-		 * to read the RFCs and stop doing anything to usernames depending
-		 * on the result of an identd lookup.
-		 */
-
-		/* First check for AKILLs. */
-		/* DONT just return null if its an akill match anymore - yes its more efficent to, however, now that ircd's are
-		 * starting to use things like E/F lines, we cant be 100% sure the client will be removed from the network :/
-		 * as such, create a user_struct, and if the client is removed, we'll delete it again when the QUIT notice
-		 * comes in from the ircd.
-		 **/
 		check_akill(nick, username, host, vhost, ipbuf);
 
-		/**
-		 * DefCon AKILL system, if we want to akill all connecting user's here's where to do it
-		 * then force check_akill again on them...
-		 */
 		if (is_sync(findserver(servlist, server)) && checkDefCon(DEFCON_AKILL_NEW_CLIENTS) && !is_ulined(server))
 		{
 			strlcpy(mask, "*@", sizeof(mask));
@@ -751,9 +725,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			check_akill(nick, username, host, vhost, ipbuf);
 		}
 
-		/* As with akill checks earlier, we can't not add the user record, as the user may be exempt from bans.
-		 * Instead, we'll just wait for the IRCd to tell us they are gone.
-		 */
 		if (ircd->sgline)
 			check_sgline(nick, realname);
 
@@ -763,11 +734,14 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (ircd->szline && ircd->nickip)
 			check_szline(nick, ipbuf);
 
-		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
-
-		/* Now check for session limits */
 		if (LimitSessions && !is_ulined(server))
 			add_session(nick, host, ipbuf);
+
+		/* Only call I_OnUserConnect if the user still exists */
+		if (finduser(nick))
+		{
+			FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
+		}
 	} else {
 		/* An old user changing nicks. */
 		if (ircd->ts6)

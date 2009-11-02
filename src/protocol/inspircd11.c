@@ -188,10 +188,8 @@ class InspIRCdProto : public IRCDProto
 					else --opcnt;
 					break;
 				case 'r':
-					if (add && !nick_identified(user)) {
-						common_svsmode(user, "-r", NULL);
-						user->RemoveMode(UMODE_REGISTERED);
-					}
+					if (add && !nick_identified(user))
+						SendUnregisteredNick(user);
 					break;
 				case 'x':
 					if (add && user->vhost)
@@ -388,11 +386,11 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 	}
 
-	/* SVSMODE +d */
-	/* nc_change was = 1, and there is no na->status */
+	/* SVSMODE +- */
 	void SendUnregisteredNick(User *u)
 	{
-		common_svsmode(u, "-r", NULL);
+		if (u->HasMode(UMODE_REGISTERED))
+			common_svsmode(u, "-r", NULL);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)

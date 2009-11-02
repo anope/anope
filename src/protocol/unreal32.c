@@ -214,7 +214,6 @@ class UnrealIRCdProto : public IRCDProto
 				case 'r':
 					if (add && !nick_identified(user)) {
 						common_svsmode(user, "-r", NULL);
-						user->RemoveMode('r');
 					}
 					break;
 				case 't':

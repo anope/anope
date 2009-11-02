@@ -198,10 +198,8 @@ class InspIRCdProto : public IRCDProto
 					 */
 					if (user->server->sync == SSYNC_IN_PROGRESS)
 						break;
-					if (add && !nick_identified(user)) {
-						common_svsmode(user, "-r", NULL);
-						user->RemoveMode(UMODE_REGISTERED);
-					}
+					if (add && !nick_identified(user))
+						SendUnregisteredNick(user);
 					break;
 				case 'x':
 					if (add && user->vhost)
@@ -401,11 +399,11 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 	}
 
-	/* SVSMODE +d */
-	/* nc_change was = 1, and there is no na->status */
+	/* SVSMODE -r */
 	void SendUnregisteredNick(User *u)
 	{
-		common_svsmode(u, "-r", NULL);
+		if (u->HasMode(UMODE_REGISTERED))
+			common_svsmode(u, "-r", NULL);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -909,7 +907,8 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	if (user && user->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != user->nc))
 	{
 		validate_user(user);
-		common_svsmode(user, "-r", NULL);
+		if (user->HasMode(UMODE_REGISTERED))
+			common_svsmode(user, "-r", NULL);
 	}
 	user = NULL;
 
@@ -1194,7 +1193,8 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->nc))
 	{
 		validate_user(u);
-		common_svsmode(u, "-r", NULL);
+		if (u->HasMode(UMODE_REGISTERED))
+			common_svsmode(u, "-r", NULL);
 	}
 
 	alog("Processed ENDBURST for %s", s->name);

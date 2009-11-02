@@ -386,10 +386,8 @@ int init_primary(int ac, char **av)
 		return -1;
 	}
 
-	/* Add Encryption Module; exit if there are errors */
-	if (encryption_module_init()) {
-		return -1;
-	}
+	/* Add Encryption Modules */
+	ModuleManager::LoadModuleList(EncModulesNumber, EncModuleList);
 	return 0;
 }
 

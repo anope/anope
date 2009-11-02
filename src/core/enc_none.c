@@ -56,12 +56,20 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckPassword(const char *plaintext, const char *password) {
+	EventReturn OnCheckPassword(const char *plaintext, char *password) 
+	{
 		if(strcmp(plaintext,password)==0)
 		{
+			/* if we are NOT the first module in the list, 
+			 * we want to re-encrypt the pass with the new encryption
+			 */
+			if (stricmp(EncModuleList[0], this->name.c_str()))
+			{
+				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+			}
 			return EVENT_ALLOW;
 		}
-		return EVENT_STOP;
+		return EVENT_CONTINUE;
 	}
 
 };

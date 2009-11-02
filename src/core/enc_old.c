@@ -398,7 +398,7 @@ class EOld : public Module
 	/* Compare a plaintext string against an encrypted password.  Return 1 if
 	 * they match, 0 if not, and -1 if something went wrong. */
 
-	EventReturn OnCheckPassword(const char *plaintext, const char *password)
+	EventReturn OnCheckPassword(const char *plaintext, char *password)
 	{
 		char buf[BUFSIZE];
 
@@ -406,9 +406,16 @@ class EOld : public Module
 			return EVENT_STOP;
 		if (memcmp(buf, password, 16) == 0)
 		{
+			/* when we are NOT the first module in the list, 
+			 * we want to re-encrypt the pass with the new encryption
+			 */
+			if (stricmp(EncModuleList[0], this->name.c_str()))
+			{
+				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+			}
 			return EVENT_ALLOW; 
 		}
-		return EVENT_STOP;
+		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnDecrypt(const char *src, char *dest, int size)

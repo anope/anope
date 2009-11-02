@@ -607,7 +607,7 @@ class CoreExport Module
 	virtual EventReturn OnEncryptInPlace(char *buf, int size) { return EVENT_CONTINUE; }
 	virtual EventReturn OnEncryptCheckLen(int passlen, int bufsize) { return EVENT_CONTINUE; }
 	virtual EventReturn OnDecrypt(const char *src, char *dest, int size) { return EVENT_CONTINUE; }
-	virtual EventReturn OnCheckPassword(const char *plaintext, const char *password) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckPassword(const char *plaintext, char *password) { return EVENT_CONTINUE; }
 
 	/** Called on fantasy command
 	 * @param command The command
@@ -1151,7 +1151,6 @@ struct MessageHash_ {
 /* Module Managment Functions */
 MDE Module *findModule(const char *name);	/* Find a module */
 
-int encryption_module_init();	/* Load the encryption module */
 int protocol_module_init();	/* Load the IRCD Protocol Module up*/
 MDE void moduleDisplayHelp(const char *service, User *u);
 

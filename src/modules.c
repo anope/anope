@@ -54,19 +54,6 @@ char *ModuleGetErrStr(int status)
 /************************************************/
 
 /**
- *
- **/
-int encryption_module_init() {
-	int ret = 0;
-
-	alog("Loading Encryption Module: [%s]", EncModule);
-	ret = ModuleManager::LoadModule(EncModule, NULL);
-	if (ret == MOD_ERR_OK)
-		findModule(EncModule)->SetType(ENCRYPTION);
-	return ret;
-}
-
-/**
  * Load the ircd protocol module up
  **/
 int protocol_module_init()

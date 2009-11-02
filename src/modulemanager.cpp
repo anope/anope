@@ -245,12 +245,6 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		alog("You cannot load two protocol modules");
 		return MOD_STOP;
 	}
-	else if (m->type == ENCRYPTION && IsOneOfModuleTypeLoaded(ENCRYPTION))
-	{
-		DeleteModule(m);
-		alog("You cannot load two encryption modules");
-		return MOD_STOP;
-	}
 
 	if (u)
 	{

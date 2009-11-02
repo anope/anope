@@ -405,13 +405,14 @@ E long unsigned int UserKey3;
 E int convert_ircservices_44();
 
 /**** encrypt.c ****/
-E char *EncModule;
+E char **EncModuleList;
+E int EncModulesNumber;
 E void initEncryption();
 E int enc_encrypt(const char *src, int len, char *dest, int size);
 E int enc_encrypt_in_place(char *buf, int size);
 E int enc_encrypt_check_len(int passlen, int bufsize);
 E int enc_decrypt(const char *src, char *dest, int size);
-E int enc_check_password(const char *plaintext, const char *password);
+E int enc_check_password(const char *plaintext, char *password);
 E void encmodule_encrypt(int (*func)(const char *src, int len, char *dest, int size));
 E void encmodule_encrypt_in_place(int (*func)(char *buf, int size));
 E void encmodule_encrypt_check_len(int (*func)(int passlen, int bufsize));

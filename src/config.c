@@ -23,7 +23,6 @@ ServerConfig serverConfig;
 /* Configurable variables: */
 
 char *IRCDModule;
-char *EncModule;
 
 std::list<Uplink *> Uplinks;
 
@@ -206,6 +205,10 @@ int ModulesNumber;
 /**
  * Core Module Stuff
  **/
+char **EncModuleList;
+char *EncModules;
+int EncModulesNumber;
+
 static char *HostCoreModules;
 char **HostServCoreModules;
 int HostServCoreNumber;
@@ -831,7 +834,7 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
-		{"options", "encryption", "", new ValueContainerChar(&EncModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "encryption", "", new ValueContainerChar(&EncModules), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
@@ -1907,6 +1910,8 @@ int read_config(int reload)
 
 	/* Modules Autoload building... :P */
 	ModulesAutoload = buildStringList(Modules, &ModulesNumber);
+	EncModuleList =
+		buildStringList(EncModules ? EncModules : "", &EncModulesNumber);
 	HostServCoreModules =
 		buildStringList(HostCoreModules ? HostCoreModules : "", &HostServCoreNumber);
 	MemoServCoreModules =

@@ -84,7 +84,7 @@ int enc_decrypt(const char *src, char *dest, int size)
  *   0 if the password does not match
  *   0 if an error occurred while checking
  **/
-int enc_check_password(const char *plaintext, const char *password)
+int enc_check_password(const char *plaintext, char *password)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(plaintext, password));

@@ -259,16 +259,23 @@ class ESHA1 : public Module
 	}
 
 
-	EventReturn OnCheckPassword(const char *plaintext, const char *password)
+	EventReturn OnCheckPassword(const char *plaintext, char *password)
 	{
 		char buf[BUFSIZE];
 		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
 			return EVENT_STOP;
 		if (memcmp(buf, password, 20) == 0)
 		{
+			/* when we are NOT the first module in the list, 
+			 * we want to re-encrypt the pass with the new encryption
+			 */
+			if (stricmp(EncModuleList[0], this->name.c_str()))
+			{
+				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+			}
 			return EVENT_ALLOW;
 		}
-		return EVENT_STOP;
+		return EVENT_CONTINUE;
 	}
 
 };

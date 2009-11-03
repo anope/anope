@@ -797,6 +797,11 @@ void expire_nicks()
 			        && !(na->status & (NS_FORBIDDEN | NS_NO_EXPIRE))
 			        && !(na->nc->flags & (NI_SUSPENDED)))
 			{
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
+				if (MOD_RESULT == EVENT_STOP)
+					continue;
+
 				alog("Expiring nickname %s (group: %s) (e-mail: %s)",
 				     na->nick, na->nc->display,
 				     (na->nc->email ? na->nc->email : "none"));

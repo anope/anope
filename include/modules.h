@@ -683,6 +683,12 @@ class CoreExport Module
 	 */
 	virtual void OnTopicUpdated(Channel *c, const char *topic) { }
 
+	/** Called before a channel expires
+	 * @param ci The channel
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnPreChanExpire(ChannelInfo *ci) { return EVENT_CONTINUE; }
+
 	/** Called when a channel expires
 	 * @param chname The channel name
 	 */
@@ -726,6 +732,12 @@ class CoreExport Module
 	 * @param msg The quitmsg
 	 */
 	virtual void OnSignal(const char *msg) { }
+
+	/** Called before a nick expires
+	 * @param na The nick
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnPreNickExpire(NickAlias *na) { return EVENT_CONTINUE; }
 
 	/** Called when a nick drops
 	 * @param nick The nick
@@ -992,13 +1004,13 @@ enum Implementation
 {
 	I_BEGIN,
 		/* NickServ */
-		I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
+		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnFindUser, I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickEraseAccess,
 
 		/* ChanServ */
-		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
+		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete,
 

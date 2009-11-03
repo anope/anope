@@ -1449,10 +1449,17 @@ void expire_chans()
 				&& !(ci->
 					 flags & (CI_FORBIDDEN | CI_NO_EXPIRE | CI_SUSPENDED)))
 			{
-				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci->name));
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
+				if (MOD_RESULT == EVENT_STOP)
+					continue;
+
+				char *chname = sstrdup(ci->name);
 				alog("Expiring channel %s (founder: %s)", ci->name,
 					 (ci->founder ? ci->founder->display : "(none)"));
 				delchan(ci);
+				FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
+				delete [] chname;
 			}
 		}
 	}

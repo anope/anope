@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2598"
+VERSION_BUILD="2601"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2601 - All usermodes are now recognized and properly set internally on Insp 1.2.
 #Revision 2598 - More dynamic detection of channel modes on InspIRCd 1.2. Also fixes params being linked to the wrong mode.
 #Revision 2571 - Fixed small typo in dutch translation.
 #Revision 2550 - Removed proxy server from ulined servers in example config as more people use a client proxy scanner and this should reduce occurences of user servers being listed.

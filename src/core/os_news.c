@@ -32,30 +32,6 @@
 #define MSG_DELETED_ALL	11
 #define MSG_MAX		11
 
-enum NewsType
-{
-	NEWS_LOGON,
-	NEWS_RANDOM,
-	NEWS_OPER
-};
-
-struct newsmsgs {
-	NewsType type;
-	const char *name;
-	int msgs[MSG_MAX + 1];
-};
-
-struct NewsItem
-{
-	NewsType type;
-	uint32 num;
-	std::string Text;
-	char who[NICKMAX];
-	time_t time;
-};
-
-std::vector<NewsItem *> News;
-
 struct newsmsgs msgarray[] = {
 	{NEWS_LOGON, "LOGON",
 	 {NEWS_LOGON_SYNTAX,

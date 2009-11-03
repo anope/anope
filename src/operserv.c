@@ -31,6 +31,9 @@ static void free_sqline_entry(SList * slist, void *item);
 static int is_szline_entry_equal(SList * slist, void *item1, void *item2);
 static void free_szline_entry(SList * slist, void *item);
 
+/* News items */
+std::vector<NewsItem *> News;
+
 std::vector<std::bitset<32> > DefCon;
 int DefConModesSet = 0;
 ChannelInfo DefConModesCI;	  /* ChannelInfo containg params for locked modes

@@ -1023,6 +1023,35 @@ typedef struct ignore_data {
 
 /*************************************************************************/
 
+/* News stuff */
+
+#define MSG_MAX 11
+
+enum NewsType
+{
+	NEWS_LOGON,
+	NEWS_RANDOM,
+	NEWS_OPER
+};
+
+struct newsmsgs
+{
+	NewsType type;
+	const char *name;
+	int msgs[MSG_MAX + 1];
+};
+
+struct NewsItem
+{
+	NewsType type;
+	uint32 num;
+	std::string Text;
+	char who[NICKMAX];
+	time_t time;
+};
+
+/*************************************************************************/
+
 /* Mail data */
 
 struct mailinfo_ {

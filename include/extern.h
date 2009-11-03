@@ -688,6 +688,8 @@ E int check_szline(const char *nick, char *ip);
 
 E Server *server_global(Server * s, char *msg);
 
+E std::vector<NewsItem *> News;
+
 E bool CheckDefCon(DefconLevel Level);
 E bool CheckDefCon(int level, DefconLevel Level);
 E void AddDefCon(int level, DefconLevel Level);

@@ -788,7 +788,7 @@ void check_modes(Channel * c)
 	ChannelInfo *ci;
 	ChannelMode *cm;
 	ChannelModeParam *cmp;
-	char modebuf[64], argbuf[BUFSIZE], *end = modebuf, *end2 = argbuf, *value, *csvalue;
+	std::string modebuf, argbuf;
 	std::map<char, ChannelMode *>::iterator it;
 	std::string param, ciparam;
 
@@ -829,7 +829,7 @@ void check_modes(Channel * c)
 		return;
 	}
 
-	*end++ = '+';
+	modebuf = "+";
 
 	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
 	{
@@ -838,7 +838,7 @@ void check_modes(Channel * c)
 		/* If this channel does not have the mode and the mode is mlocked */
 		if (!c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
 		{
-			*end++ = it->first;
+			modebuf += it->first;
 			c->SetMode(cm->Name);
 
 			/* Add the eventual parameter and modify the Channel structure */
@@ -849,11 +849,7 @@ void check_modes(Channel * c)
 
 				if (!param.empty())
 				{
-					value = const_cast<char *>(param.c_str());
-
-					*end2++ = ' ';
-					while (*value)
-						*end2++ = *value++;
+					argbuf += " " + param;
 				}
 			}
 		}
@@ -866,21 +862,19 @@ void check_modes(Channel * c)
 
 			if (!param.empty() && !ciparam.empty() && param != ciparam)
 			{
-				value = const_cast<char *>(param.c_str());
-				csvalue = const_cast<char *>(ciparam.c_str());
-
-				*end++ = it->first;
+				modebuf += it->first;
 
 				c->SetParam(cmp->Name, ciparam);
 
-				*end2++ = ' ';
-				while (*csvalue)
-					*end2++ = *csvalue++;
+				argbuf += " " + ciparam;
 			}
 		}
 	}
 
-	*end++ = '-';
+	if (modebuf == "+")
+		modebuf.clear();
+
+	modebuf += "-";
 
 	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
 	{
@@ -889,7 +883,7 @@ void check_modes(Channel * c)
 		/* If the channel has the mode */
 		if (c->HasMode(cm->Name) && ci->HasMLock(cm->Name, false))
 		{
-			*end++ = it->first;
+			modebuf += it->first;
 			c->RemoveMode(cm->Name);
 
 			/* Add the eventual parameter */
@@ -903,29 +897,17 @@ void check_modes(Channel * c)
 
 					if (!param.empty())
 					{
-						value = const_cast<char *>(param.c_str());
-
-						*end2++ = ' ';
-
-						while (*value)
-							*end++ = *value++;
+						argbuf += " " + param;
 					}
 				}
 			}
 		}
 	}
 
-	if (*(end - 1) == '-')
-		end--;
-
-	if (end == modebuf)
+	if (modebuf == "-")
 		return;
 
-	*end = 0;
-	*end2 = 0;
-
-	ircdproto->SendMode((ci ? whosends(ci) : findbot(s_OperServ)), c->name, "%s%s", modebuf,
-				   (end2 == argbuf ? "" : argbuf));
+	ircdproto->SendMode((ci ? whosends(ci) : findbot(s_OperServ)), c->name, "%s%s", modebuf.c_str(), argbuf.empty() ? "" : argbuf.c_str());
 }
 
 /*************************************************************************/

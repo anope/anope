@@ -492,7 +492,8 @@ int init_secondary(int ac, char **av)
 	hostserv_init();
 
 	/* load any custom modules */
-	ModuleManager::LoadModuleList(ModulesNumber, ModulesAutoload);
+	if (!nothird)
+		ModuleManager::LoadModuleList(ModulesNumber, ModulesAutoload);
 
 	/* Initialize random number generator */
 	rand_init();

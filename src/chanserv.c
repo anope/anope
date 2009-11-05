@@ -906,6 +906,9 @@ void check_modes(Channel * c)
 
 	if (modebuf[modebuf.length() - 1] == '-')
 		modebuf.erase(modebuf.length() - 1);
+	
+	if (modebuf.empty())
+		return;
 
 	ircdproto->SendMode((ci ? whosends(ci) : findbot(s_OperServ)), c->name, "%s%s", modebuf.c_str(), argbuf.empty() ? "" : argbuf.c_str());
 }

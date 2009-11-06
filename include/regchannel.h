@@ -15,28 +15,7 @@ class CoreExport ChannelInfo : public Extensible
 	std::map<ChannelModeName, std::string> Params;
 
  public:
-	ChannelInfo()
-	{
-		next = prev = NULL;
-		name[0] = last_topic_setter[0] = '\0';
-		founder = successor = NULL;
-		desc = url = email = last_topic = forbidby = forbidreason = NULL;
-		time_registered = last_used = last_topic_time = 0;
-		flags = 0;
-		bantype = akickcount = 0;
-		levels = NULL;
-		akick = NULL;
-		entry_message = NULL;
-		c = NULL;
-		bi = NULL;
-		botflags = 0;
-		ttb = NULL;
-		bwcount = 0;
-		badwords = NULL;
-		capsmin = capspercent = 0;
-		floodlines = floodsecs = 0;
-		repeattimes = 0;
-	}
+	ChannelInfo();
 
 	ChannelInfo *next, *prev;
 	char name[CHANMAX];
@@ -95,20 +74,7 @@ class CoreExport ChannelInfo : public Extensible
 	 *
 	 * Creates a new access list entry and inserts it into the access list.
 	 */
-	void AddAccess(NickCore *nc, int16 level, const std::string &creator, int32 last_seen = 0)
-	{
-		ChanAccess *new_access = new ChanAccess();
-		new_access->in_use = 1;
-		new_access->nc = nc;
-		new_access->level = level;
-		new_access->last_seen = last_seen;
-		if (!creator.empty())
-			new_access->creator = creator;
-		else
-			new_access->creator = "Unknown";
-
-		access.push_back(new_access);
-	}
+	void AddAccess(NickCore *nc, int16 level, const std::string &creator, int32 last_seen = 0);
 
 	/** Get an entry from the channel access list by index
 	 *
@@ -117,13 +83,7 @@ class CoreExport ChannelInfo : public Extensible
 	 *
 	 * Retrieves an entry from the access list that matches the given index.
 	 */
-	ChanAccess *GetAccess(unsigned index)
-	{
-		if (access.empty() || index >= access.size())
-			return NULL;
-
-		return access[index];
-	}
+	ChanAccess *GetAccess(unsigned index);
 
 	/** Get an entry from the channel access list by NickCore
 	 *
@@ -133,17 +93,7 @@ class CoreExport ChannelInfo : public Extensible
 	 *
 	 * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
 	 */
-	ChanAccess *GetAccess(NickCore *nc, int16 level = 0)
-	{
-		if (access.empty())
-			return NULL;
-
-		for (unsigned i = 0; i < access.size(); i++)
-			if (access[i]->in_use && access[i]->nc == nc && (level ? access[i]->level == level : true))
-				return access[i];
-
-		return NULL;
-	}
+	ChanAccess *GetAccess(NickCore *nc, int16 level = 0);
 
 	/** Erase an entry from the channel access list
 	 *
@@ -151,146 +101,68 @@ class CoreExport ChannelInfo : public Extensible
 	 *
 	 * Clears the memory used by the given access entry and removes it from the vector.
 	 */
-	void EraseAccess(unsigned index)
-	{
-		if (access.empty() || index >= access.size())
-			return;
-		delete access[index];
-		access.erase(access.begin() + index);
-	}
+	void EraseAccess(unsigned index);
 
 	/** Cleans the channel access list
 	 *
 	 * Cleans up the access list so it no longer contains entries no longer in use.
 	 */
-	void CleanAccess()
-	{
-		for (unsigned j = access.size(); j > 0; --j)
-			if (!access[j - 1]->in_use)
-				EraseAccess(j - 1);
-	}
+	void CleanAccess();
 
 	/** Clear the entire channel access list
 	 *
 	 * Clears the entire access list by deleting every item and then clearing the vector.
 	 */
-	void ClearAccess()
-	{
-		while (access.begin() != access.end())
-			EraseAccess(0);
-	}
+	void ClearAccess();
 
 	/** Check if a mode is mlocked
 	 * @param Name The mode
 	 * @param status True to check mlock on, false for mlock off
 	 * @return true on success, false on fail
 	 */
-	const bool HasMLock(ChannelModeName Name, bool status)
-	{
-		if (status)
-			return mlock_on[(size_t)Name];
-		else
-			return mlock_off[(size_t)Name];
-	}
+	const bool HasMLock(ChannelModeName Name, bool status);
 
 	/** Set a mlock
 	 * @param Name The mode
 	 * @param status True for mlock on, false for mlock off
 	 */
-	void SetMLock(ChannelModeName Name, bool status)
-	{
-		size_t value = (size_t)Name;
-
-		if (status)
-			mlock_on[value] = true;
-		else
-			mlock_off[value] = true;
-	}
+	void SetMLock(ChannelModeName Name, bool status);
 
 	/** Remove a mlock
 	 * @param Name The mode
 	 * @param status True for mlock on, false for mlock off
 	 */
-	void RemoveMLock(ChannelModeName Name, bool status)
-	{
-		size_t value = (size_t)Name;
-
-		if (status)
-			mlock_on[value] = false;
-		else
-			mlock_off[value] = false;
-	}
+	void RemoveMLock(ChannelModeName Name, bool status);
 
 	/** Clear all mlocks on the channel
 	 */
-	void ClearMLock()
-	{
-		mlock_on.reset();
-		mlock_off.reset();
-	}
+	void ClearMLock();
 
 	/** Set a channel mode param on the channel
 	 * @param Name The mode
 	 * @param param The param
 	 * @param true on success
 	 */
-	bool SetParam(ChannelModeName Name, std::string Value)
-	{
-		return Params.insert(std::make_pair(Name, Value)).second;
-	}
+	bool SetParam(ChannelModeName Name, std::string Value);
 
 	/** Unset a param from the channel
 	 * @param Name The mode
 	 */
-	void UnsetParam(ChannelModeName Name)
-	{
-		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
-
-		if (it != Params.end())
-		{
-			Params.erase(it);
-		}
-	}
+	void UnsetParam(ChannelModeName Name);
 
 	/** Get a param from the channel
 	 * @param Name The mode
 	 * @param Target a string to put the param into
 	 * @return true on success
 	 */
-	const bool GetParam(ChannelModeName Name, std::string *Target)
-	{
-		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
-
-		(*Target).clear();
-
-		if (it != Params.end())
-		{
-			*Target = it->second;
-			return true;
-		}
-
-		return false;
-	}
+	const bool GetParam(ChannelModeName Name, std::string *Target);
 
 	/** Check if a mode is set and has a param
 	 * @param Name The mode
 	 */
-	const bool HasParam(ChannelModeName Name)
-	{
-		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
-
-		if (it != Params.end())
-		{
-			return true;
-		}
-
-		return false;
-	}
+	const bool HasParam(ChannelModeName Name);
 
 	/** Clear all the params from the channel
 	 */
-	void ClearParams()
-	{
-		Params.clear();
-	}
+	void ClearParams();
 };

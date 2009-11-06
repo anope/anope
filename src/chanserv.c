@@ -445,8 +445,13 @@ void load_cs_dbase()
 							nc = NULL;
 						uint32 last_seen;
 						SAFE(read_int32(&last_seen, f));
+						//SAFE(read_string(&s, f));
 						if (nc)
-							ci->AddAccess(nc, level, last_seen);
+						{
+							//std::string creator = s ? s : "";
+							std::string creator = "";
+							ci->AddAccess(nc, level, creator, last_seen);
+						}
 					}
 				}
 			}
@@ -687,6 +692,7 @@ void save_cs_dbase()
 				SAFE(write_int16(access->level, f));
 				SAFE(write_string(access->nc->display, f));
 				SAFE(write_int32(access->last_seen, f));
+				//SAFE(write_string(access->creator.c_str(), f));
 			}
 
 			SAFE(write_int16(ci->akickcount, f));

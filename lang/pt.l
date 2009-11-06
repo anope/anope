@@ -1401,7 +1401,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS canal {ADD|DEL|LIST|CLEAR} [nick [nível] | lista-entradas]
+	ACCESS canal {ADD|DEL|LIST|VIEW|CLEAR} [nick [nível] | lista-entradas]
 CHAN_ACCESS_XOP
 	Você não pode usar este comando.
 	Ao invés, use os comandos VOP, HOP, AOP e SOP.
@@ -1451,6 +1451,12 @@ CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
 	Lista de acesso do canal %s apagada.
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -4555,6 +4561,7 @@ CHAN_HELP_ACCESS
 	Sintaxe: ACCESS canal ADD nick nível
 	         ACCESS canal DEL {nick | entrada | lista-entradas}
 	         ACCESS canal LIST [máscara | lista-entradas]
+	         ACCESS canal VIEW [máscara | lista-entradas]
 	         ACCESS canal CLEAR
 	
 	Faz manutenção da lista de acesso de um canal. A lista
@@ -4587,6 +4594,9 @@ CHAN_HELP_ACCESS
 	
 	ACCESS #canal LIST 2-5,7-9
 	   Lista as entradas de acesso numeradas de 2 a 5 e de 7 a 9.
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
 	
 	O comando ACCESS CLEAR limpa todas as entradas da lista
 	de acesso.

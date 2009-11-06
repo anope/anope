@@ -1400,7 +1400,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS kanaal {ADD|DEL|LIST|CLEAR} [nick [niveau] | lijst]
+	ACCESS kanaal {ADD|DEL|LIST|VIEW|CLEAR} [nick [niveau] | lijst]
 CHAN_ACCESS_XOP
 	Je kan dit commando niet gebruiken. 
 	Gebruik de AOP, SOP en VOP commando's in plaats van deze.
@@ -1450,6 +1450,12 @@ CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
 	Kanaal %s toegangslijst is leeggemaakt.
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -4650,6 +4656,7 @@ CHAN_HELP_ACCESS
 	Gebruik: ACCESS kanaal ADD nick niveau
 	         ACCESS kanaal DEL {nick | entry-nr | lijst}
 	         ACCESS kanaal LIST [mask | lijst]
+	         ACCESS kanaal VIEW [mask | lijst]
 	         ACCESS kanaal CLEAR
 	
 	Onderhoud de toegangslijst voor een kanaal. De toegangs-
@@ -4683,7 +4690,10 @@ CHAN_HELP_ACCESS
 	   ACCESS #kanaal LIST 2-5,7-9
 	      Geeft gebruikers 2 t/m 5 en 7 t/m 9 van de
 	      toegangslijst weer.
-	      
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
+	
 	Het ACCESS CLEAR commando maakt de toegangslijst leeg.
 
 CHAN_HELP_ACCESS_LEVELS

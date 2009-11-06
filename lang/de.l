@@ -1029,6 +1029,12 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # Automatic responses
 CHAN_LEVEL_BANME
@@ -4738,6 +4744,7 @@ CHAN_HELP_ACCESS
 	Syntax: ACCESS Channel ADD Nickname Level
 	        ACCESS Channel DEL {Nickname | entry-num | Liste}
 	        ACCESS Channel LIST [Maske | Liste]
+	        ACCESS Channel VIEW [Maske | Liste]
 	        ACCESS Channel CLEAR
 	
 	Verwaltet die Zugriffsliste für einen Channel. Diese
@@ -4772,6 +4779,9 @@ CHAN_HELP_ACCESS
 	   ACCESS #channel LIST 2-5,7-9
 	      Zeigt Einträge mit den Nummern 2 bis 5 und 
 	      7 bis 9 an.
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
 	
 	Durch ACCESS CLEAR werden alle Einträge der
 	Zugriffsliste entfernt.

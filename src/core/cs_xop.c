@@ -178,11 +178,15 @@ class XOPBase : public Command
 		}
 
 		if (!change)
-			ci->AddAccess(nc, level);
+		{
+			std::string usernick = u->nick;
+			ci->AddAccess(nc, level, usernick);
+		}
 		else
 		{
 			access->level = level;
 			access->last_seen = 0;
+			access->creator = u->nick;
 		}
 
 		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", level, na->nick, nc->display, ci->name);

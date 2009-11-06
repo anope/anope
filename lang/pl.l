@@ -1802,7 +1802,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS kana³ {ADD|DEL|LIST|CLEAR} [nick [poziom] | pozycja]
+	ACCESS kana³ {ADD|DEL|LIST|VIEW|CLEAR} [nick [poziom] | pozycja]
 
 CHAN_ACCESS_XOP
 	Nie mo¿esz u¿yæ tej komendy.
@@ -1877,6 +1877,14 @@ CHAN_ACCESS_LIST_AXS_FORMAT
 
 CHAN_ACCESS_CLEAR
 	Lista dostêpu kana³u %s zosta³a wyczyszczona.
+
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -5649,6 +5657,7 @@ CHAN_HELP_ACCESS
 	Sk³adnia: ACCESS kana³ ADD nick level
 	          ACCESS kana³ DEL {nick | numer | list}
 	          ACCESS kana³ LIST [maska | list]
+	          ACCESS kana³ VIEW [maska | list]
 	          ACCESS kana³ CLEAR
 	
 	Polecenie pozwala na zarz±dzanie wpisami w kana³owej
@@ -5684,6 +5693,9 @@ CHAN_HELP_ACCESS
 	   ACCESS kana³ LIST 2-5,7-9
 	    Wy¶wietli wpisy na li¶cie od numeru 2 do 5, oraz
 	    od 7 do 9.
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
 	
 	Polecenie ACCESS CLEAR usuwa wszystkie wpisy z listy.
 

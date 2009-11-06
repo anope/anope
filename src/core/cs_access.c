@@ -80,6 +80,51 @@ static int access_list_callback(User * u, int num, va_list args)
 	return access_list(u, num - 1, ci, sent_header);
 }
 
+static int access_view(User *u, int index, ChannelInfo *ci, int *sent_header)
+{
+	ChanAccess *access = ci->GetAccess(index);
+	const char *xop;
+	char timebuf[64];
+	tm tm;
+
+	if (!access || !access->in_use)
+		return 0;
+	
+	if (!*sent_header)
+	{
+		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name);
+		*sent_header = 1;
+	}
+
+	memset(&timebuf, 0, sizeof(timebuf));
+	if (ci->c && u->nc && nc_on_chan(ci->c, u->nc))
+		sprintf(timebuf, "Now");
+	else if (access->last_seen == 0)
+		sprintf(timebuf, "Never");
+	else
+	{
+		tm = *localtime(&access->last_seen);
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
+	}
+
+	if (ci->flags & CI_XOP)
+	{
+		xop = get_xop_level(access->level);
+		notice_lang(s_ChanServ, u, CHAN_ACCESS_VIEW_XOP_FORMAT, index + 1, xop, access->nc->display, access->creator.c_str(), timebuf);
+	}
+	else
+		notice_lang(s_ChanServ, u, CHAN_ACCESS_VIEW_AXS_FORMAT, index + 1, access->level, access->nc->display, access->creator.c_str(), timebuf);
+
+	return 1;
+}
+
+static int access_view_callback(User *u, int num, va_list args)
+{
+	ChannelInfo *ci = va_arg(args, ChannelInfo *);
+	int *sent_header = va_arg(args, int *);
+		return 0;
+	return access_view(u, num - 1, ci, sent_header);
+}
 
 class CommandCSAccess : public Command
 {
@@ -102,7 +147,7 @@ class CommandCSAccess : public Command
 
 		unsigned i;
 		int level = 0, ulev;
-		bool is_list = cmd == "LIST";
+		bool is_list = cmd == "LIST" || cmd == "VIEW";
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
 		 * If DEL, we require a nick and no level.
@@ -193,7 +238,8 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			ci->AddAccess(nc, level);
+			std::string usernick = u->nick;
+			ci->AddAccess(nc, level, usernick);
 
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
 
@@ -300,6 +346,32 @@ class CommandCSAccess : public Command
 					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
 						continue;
 					access_list(u, i, ci, &sent_header);
+				}
+			}
+			if (!sent_header)
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
+			else
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
+		}
+		else if (cmd == "VIEW")
+		{
+			int sent_header = 0;
+
+			if (ci->access.empty())
+			{
+				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
+				return MOD_CONT;
+			}
+			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
+				process_numlist(nick, NULL, access_view_callback, u, ci, &sent_header);
+			else
+			{
+				for (i = 0; i < ci->access.size(); ++i)
+				{
+					access = ci->GetAccess(i);
+					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
+						continue;
+					access_view(u, i, ci, &sent_header);
 				}
 			}
 			if (!sent_header)

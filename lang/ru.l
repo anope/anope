@@ -1381,7 +1381,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS #канал {ADD|DEL|LIST|CLEAR} [ник [уровень] | номер_записи]
+	ACCESS #канал {ADD|DEL|LIST|VIEW|CLEAR} [ник [уровень] | номер_записи]
 CHAN_ACCESS_XOP
 	Вы не можете использовать эту команду так как включена система привилегий xOP.
 	Для модификации списка доступа используйте команды VOP, AOP и SOP.
@@ -1431,6 +1431,12 @@ CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
 	Список доступа канала %s был полностью очищен.
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -4648,6 +4654,7 @@ CHAN_HELP_ACCESS
 	Синтаксис: ACCESS #канал ADD ник уровень
 	           ACCESS #канал DEL {ник | номер_записи | список_записей}
 	           ACCESS #канал LIST [маска | список_записей]
+	           ACCESS #канал VIEW [маска | список_записей]
 	           ACCESS #канал CLEAR
 	
 	Позволяет  управлять  списком доступа  (ACCESS-списком)  канала.
@@ -4683,6 +4690,9 @@ CHAN_HELP_ACCESS
 	
 	   ACCESS #канал LIST 2-5,7-9
 	      отобразит все записи со 2-ой по 5-ую, и с 7-ой по 9-ю.
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
 	
 	Команда ACCESS CLEAR позволяет полностью очистить список доступа.
 

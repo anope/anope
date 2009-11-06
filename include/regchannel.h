@@ -90,17 +90,23 @@ class CoreExport ChannelInfo : public Extensible
 	 *
 	 * @param nc The NickCore of the user that the access entry should be tied to
 	 * @param level The channel access level the user has on the channel
+	 * @param creator The user who added the access
 	 * @param last_seen When the user was last seen within the channel
 	 *
 	 * Creates a new access list entry and inserts it into the access list.
 	 */
-	void AddAccess(NickCore *nc, int16 level, int32 last_seen = 0)
+	void AddAccess(NickCore *nc, int16 level, const std::string &creator, int32 last_seen = 0)
 	{
-		ChanAccess *new_access = new ChanAccess;
+		ChanAccess *new_access = new ChanAccess();
 		new_access->in_use = 1;
 		new_access->nc = nc;
 		new_access->level = level;
 		new_access->last_seen = last_seen;
+		if (!creator.empty())
+			new_access->creator = creator;
+		else
+			new_access->creator = "Unknown";
+
 		access.push_back(new_access);
 	}
 

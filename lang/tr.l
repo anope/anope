@@ -1408,7 +1408,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS kanaladý {ADD|DEL|LIST|CLEAR} [nick [seviye] | kayýt-listesi]
+	ACCESS kanaladý {ADD|DEL|LIST|VIEW|CLEAR} [nick [seviye] | kayýt-listesi]
 CHAN_ACCESS_XOP
 	Bu komutu kullanamazsiniz. 
 	Yerine AOP, SOP veya VOP komutlarini kullanin.
@@ -1458,6 +1458,12 @@ CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
 	Kanal %s access listesi temizlendi.
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -4651,6 +4657,7 @@ CHAN_HELP_ACCESS
 	Kullanýmý:  ACCESS kanaladý ADD nick seviye
 	            ACCESS kanaladý DEL {nick | kayýt-no | liste}
 	            ACCESS kanaladý LIST [mask | liste]
+	            ACCESS kanaladý VIEW [mask | liste]
 	            ACCESS kanaladý CLEAR
 	
 	Bir kanal için access listesi oluþturur. Access listesi
@@ -4679,7 +4686,10 @@ CHAN_HELP_ACCESS
 	   ACCESS #kanaladý LIST 2-5,7-9
 	      2'den 5'e ve 7'den 9'a kadar olan access kayýtlarý
 	      listelenir.
-	      
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
+	
 	ACCESS CLEAR komutu tüm access listesini temizler.
 
 CHAN_HELP_ACCESS_LEVELS

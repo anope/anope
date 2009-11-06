@@ -1409,7 +1409,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS channel {ADD|DEL|LIST|CLEAR} [nick [level] | entry-list]
+	ACCESS channel {ADD|DEL|LIST|VIEW|CLEAR} [nick [level] | entry-list]
 CHAN_ACCESS_XOP
 	Δεν μπορείς να χρησιμοποιήσεις αυτή την εντολή. 
 	Χρησιμοποίησε AOP, SOP και VOP εντολές αντί για την access.
@@ -1457,6 +1457,12 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 
 # AKICK responses
 CHAN_ACCESS_CLEAR
@@ -4671,9 +4677,10 @@ CHAN_HELP_VOP
 
 CHAN_HELP_ACCESS
 	Σύνταξη: ACCESS κανάλι ADD ψευδώνυμο βαθμός
-	    ACCESS κανάλι DEL {ψευδώνυμο | θέσεις-νου | list}	        
-	        ACCESS κανάλι LIST [μάσκα | list]
-	        ACCESS κανάλι CLEAR
+	         ACCESS κανάλι DEL {ψευδώνυμο | θέσεις-νου | list}	        
+	         ACCESS κανάλι LIST [μάσκα | list]
+	         ACCESS κανάλι VIEW [μάσκα | list]
+	         ACCESS κανάλι CLEAR
 	
 	Αλλάζει την access λίστα του καναλιού.  Η λίστα access
 	καθορίζει ποιοι χρήστες θα έχουν op στο κανάλι ή
@@ -4702,7 +4709,10 @@ CHAN_HELP_ACCESS
 	   ACCESS #κανάλι LIST 2-5,7-9
 	      Εμφανίζει από την λίστα access τις θέσεις με τα
 	      νούμερα 2 έως 5 και 7 έως 9.
-	      
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
+	
 	Η εντολή ACCESS CLEAR διαγράφει όλες τισ θέσεις της λίστας access.
 	
 CHAN_HELP_ACCESS_LEVELS

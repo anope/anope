@@ -1400,7 +1400,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS#szoba{ ADD | DEL | LIST | CLEAR } [ nick [ szint ] | sorszám ]
+	ACCESS #szoba { ADD | DEL | LIST | VIEW | CLEAR } [ nick [ szint ] | sorszám ]
 CHAN_ACCESS_XOP
 	Nem használhatod ezt a parancsot. 
 	Használd az AOP, SOP és VOP parancsokat helyette.
@@ -1449,6 +1449,12 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
+CHAN_ACCESS_VIEW_XOP_FORMAT
+	  %3d   %s   %s
+	    by %s, last seen %s
+CHAN_ACCESS_VIEW_AXS_FORMAT
+	  %3d  %4d  %s
+	    by %s, last seen %s
 	
 # AKICK válaszok
 CHAN_ACCESS_CLEAR
@@ -4608,6 +4614,7 @@ CHAN_HELP_ACCESS
 	Syntax:	ACCESS #szoba ADD nick szint
 			ACCESS #szoba DEL {nick | sorszám | lista}
 			ACCESS #szoba LIST [maszk | lista]
+			ACCESS #szoba VIEW [maszk | lista]
 			ACCESS #szoba CLEAR
 	
 	Access lista a csatornán. A hozzáférési lista (access)
@@ -4635,6 +4642,9 @@ CHAN_HELP_ACCESS
 	ACCESS #szoba LIST 2-5,7-9
 		Listázza azokat a usereket, akik 2 és 5 között illetve
 		7-tõl 9-ig szerepelnek a listán.
+	
+	The ACCESS VIEW command displays the access list similar
+	to ACCESS LIST but shows the creator and last used time.
 	
 	Az ACCESS CLEAR parancs töröl minden bejegyzés a szoba
 	hozzáférési listájáról.

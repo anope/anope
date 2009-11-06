@@ -641,6 +641,7 @@ struct ChanAccess {
 	int16 level;
 	NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
 	time_t last_seen;
+	std::string creator;
 };
 
 /* AutoKick data. */

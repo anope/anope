@@ -53,17 +53,17 @@ int akick_del_callback(User * u, int num, va_list args)
 
 	*last = num;
 
-	if (num < 1 || num > ci->akick.size())
+	if (num < 1 || num > ci->GetAkickCount())
 		return 0;
 
-	ci->EraseAkick(ci->akick[num - 1]);
+	ci->EraseAkick(ci->GetAkick(num - 1));
 	return 1;
 }
 
 
 int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
-	AutoKick *akick = ci->akick[index];
+	AutoKick *akick = ci->GetAkick(index);
 
 	if (!(akick->flags & AK_USED))
 		return 0;
@@ -84,14 +84,14 @@ int akick_list_callback(User * u, int num, va_list args)
 {
 	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 	int *sent_header = va_arg(args, int *);
-	if (num < 1 || num > ci->akick.size())
+	if (num < 1 || num > ci->GetAkickCount())
 		return 0;
 	return akick_list(u, num - 1, ci, sent_header);
 }
 
 int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
-	AutoKick *akick = ci->akick[index];
+	AutoKick *akick = ci->GetAkick(index);
 	char timebuf[64];
 	struct tm tm;
 
@@ -128,7 +128,7 @@ int akick_view_callback(User * u, int num, va_list args)
 {
 	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 	int *sent_header = va_arg(args, int *);
-	if (num < 1 || num > ci->akick.size())
+	if (num < 1 || num > ci->GetAkickCount())
 		return 0;
 	return akick_view(u, num - 1, ci, sent_header);
 }
@@ -239,9 +239,9 @@ class CommandCSAKick : public Command
 			 }
 		}
 
-		for (unsigned j = 0; j < ci->akick.size(); ++j)
+		for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
 		{
-			akick = ci->akick[j];
+			akick = ci->GetAkick(j);
 			if (!(akick->flags & AK_USED))
 				continue;
 			if ((akick->flags & AK_ISNICK) ? akick->nc == nc : akick->mask == mask)
@@ -254,7 +254,7 @@ class CommandCSAKick : public Command
 
 		/* All entries should be in use so we don't have to go over
 		* the entire list. We simply add new entries at the end. */
-		if (ci->akick.size() >= CSAutokickMax)
+		if (ci->GetAkickCount() >= CSAutokickMax)
 		{
 			 notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, CSAutokickMax);
 			 return;
@@ -278,7 +278,7 @@ class CommandCSAKick : public Command
 		unsigned i;
 		AutoKick *akick;
 
-		if (ci->akick.empty())
+		if (!ci->GetAkickCount())
 		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
@@ -287,9 +287,9 @@ class CommandCSAKick : public Command
 		na = findnick(mask.c_str());
 		nc = (na ? na->nc : NULL);
 
-		for (i = 0; i < ci->akick.size(); ++i)
+		for (i = 0; i < ci->GetAkickCount(); ++i)
 		{
-			akick = ci->akick[i];
+			akick = ci->GetAkick(i);
 
 		        if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK))
 		                continue;
@@ -297,7 +297,8 @@ class CommandCSAKick : public Command
 		                break;
 		}
 
-		if (i == ci->akick.size()) {
+		if (i == ci->GetAkickCount())
+		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
 		        return;
 		}
@@ -317,7 +318,7 @@ class CommandCSAKick : public Command
 		unsigned i;
 		ci::string mask = params[2];
 
-		if (ci->akick.empty())
+		if (!ci->GetAkickCount())
 		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
@@ -326,9 +327,9 @@ class CommandCSAKick : public Command
 		na = findnick(mask.c_str());
 		nc = (na ? na->nc : NULL);
 
-		for (i = 0; i < ci->akick.size(); ++i)
+		for (i = 0; i < ci->GetAkickCount(); ++i)
 		{
-			akick = ci->akick[i];
+			akick = ci->GetAkick(i);
 
 		        if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK))
 		                continue;
@@ -336,7 +337,7 @@ class CommandCSAKick : public Command
 		                break;
 		}
 
-		if (i == ci->akick.size())
+		if (i == ci->GetAkickCount())
 		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
 		        return;
@@ -352,7 +353,7 @@ class CommandCSAKick : public Command
 		AutoKick *akick;
 		unsigned i;
 
-		if (ci->akick.empty())
+		if (!ci->GetAkickCount())
 		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
@@ -382,9 +383,9 @@ class CommandCSAKick : public Command
 		        NickAlias *na = findnick(mask.c_str());
 		        NickCore *nc = (na ? na->nc : NULL);
 
-			for (i = 0; i < ci->akick.size(); ++i)
+			for (i = 0; i < ci->GetAkickCount(); ++i)
 			{
-				akick = ci->akick[i];
+				akick = ci->GetAkick(i);
 
 				if (!(akick->flags & AK_USED))
 					continue;
@@ -394,7 +395,7 @@ class CommandCSAKick : public Command
 					break;
 			}
 			
-			if (i == ci->akick.size())
+			if (i == ci->GetAkickCount())
 			{
 			                notice_lang(s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
 			                return;
@@ -413,7 +414,7 @@ class CommandCSAKick : public Command
 		unsigned i;
 		AutoKick *akick;
 
-		if (ci->akick.empty())
+		if (!ci->GetAkickCount())
 		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
@@ -423,9 +424,9 @@ class CommandCSAKick : public Command
 			process_numlist(mask.c_str(), NULL, akick_list_callback, u, ci, &sent_header);
 		else
 		{
-			for (i = 0; i < ci->akick.size(); ++i)
+			for (i = 0; i < ci->GetAkickCount(); ++i)
 			{
-				akick = ci->akick[i];
+				akick = ci->GetAkick(i);
 
 				if (!(akick->flags & AK_USED))
 					continue;
@@ -452,7 +453,7 @@ class CommandCSAKick : public Command
 		AutoKick *akick;
 		unsigned i;
 
-		if (ci->akick.empty())
+		if (!ci->GetAkickCount())
 		{
 		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
@@ -462,9 +463,9 @@ class CommandCSAKick : public Command
 		        process_numlist(mask.c_str(), NULL, akick_view_callback, u, ci, &sent_header);
 		else
 		{
-			for (i = 0; i < ci->akick.size(); ++i)
+			for (i = 0; i < ci->GetAkickCount(); ++i)
 			{
-				akick = ci->akick[i];
+				akick = ci->GetAkick(i);
 
 		                if (!(akick->flags & AK_USED))
 					continue;

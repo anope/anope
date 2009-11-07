@@ -40,7 +40,7 @@ static int access_del_callback(User * u, int num, va_list args)
 	int *last = va_arg(args, int *);
 	int *perm = va_arg(args, int *);
 	int uacc = va_arg(args, int);
-	if (num < 1 || num > ci->access.size())
+	if (num < 1 || num > ci->GetAccessCount())
 		return 0;
 	*last = num;
 	return access_del(u, ci, ci->GetAccess(num - 1), perm, uacc);
@@ -75,7 +75,7 @@ static int access_list_callback(User * u, int num, va_list args)
 {
 	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 	int *sent_header = va_arg(args, int *);
-	if (num < 1 || num > ci->access.size())
+	if (num < 1 || num > ci->GetAccessCount())
 		return 0;
 	return access_list(u, num - 1, ci, sent_header);
 }
@@ -232,7 +232,7 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (ci->access.size() >= CSAccessMax)
+			if (ci->GetAccessCount() >= CSAccessMax)
 			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT, CSAccessMax);
 				return MOD_CONT;
@@ -255,7 +255,7 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (ci->access.empty())
+			if (!ci->GetAccessCount())
 			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
@@ -331,7 +331,7 @@ class CommandCSAccess : public Command
 		{
 			int sent_header = 0;
 
-			if (ci->access.empty())
+			if (!ci->GetAccessCount())
 			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
@@ -340,7 +340,7 @@ class CommandCSAccess : public Command
 				process_numlist(nick, NULL, access_list_callback, u, ci, &sent_header);
 			else
 			{
-				for (i = 0; i < ci->access.size(); i++)
+				for (i = 0; i < ci->GetAccessCount(); i++)
 				{
 					access = ci->GetAccess(i);
 					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
@@ -357,7 +357,7 @@ class CommandCSAccess : public Command
 		{
 			int sent_header = 0;
 
-			if (ci->access.empty())
+			if (!ci->GetAccessCount())
 			{
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
@@ -366,7 +366,7 @@ class CommandCSAccess : public Command
 				process_numlist(nick, NULL, access_view_callback, u, ci, &sent_header);
 			else
 			{
-				for (i = 0; i < ci->access.size(); ++i)
+				for (i = 0; i < ci->GetAccessCount(); ++i)
 				{
 					access = ci->GetAccess(i);
 					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))

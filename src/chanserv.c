@@ -156,9 +156,9 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 	memset(&res, '\0', sizeof(res));
 	end = res;
 
-	if (ci->mlock_on.count() || ci->mlock_off.count())
+	if (ci->GetMLockCount(true) || ci->GetMLockCount(false))
 	{
-		if (ci->mlock_on.count())
+		if (ci->GetMLockCount(true))
 		{
 			*end++ = '+';
 
@@ -171,7 +171,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 			}
 		}
 
-		if (ci->mlock_off.count())
+		if (ci->GetMLockCount(false))
 		{
 			*end++ = '-';
 
@@ -184,7 +184,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 			}
 		}
 
-		if (ci->mlock_on.count() && complete)
+		if (ci->GetMLockCount(true) && complete)
 		{
 			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
 			{
@@ -233,10 +233,8 @@ void get_chanserv_stats(long *nrec, long *memuse)
 				mem += strlen(ci->url) + 1;
 			if (ci->email)
 				mem += strlen(ci->email) + 1;
-			if (!ci->access.empty())
-				mem += ci->access.size() * sizeof(ChanAccess);
-			if (!ci->akick.empty())
-				mem += ci->akick.size() * sizeof(AutoKick);
+			mem += ci->GetAccessCount() * sizeof(ChanAccess);
+			mem += ci->GetAkickCount() * sizeof(AutoKick);
 
 			if (ci->GetParam(CMODE_KEY, &param))
 				mem += param.length() + 1;
@@ -667,8 +665,8 @@ void save_cs_dbase()
 			for (j = 0; j < CA_SIZE; j++)
 				SAFE(write_int16(ci->levels[j], f));
 
-			SAFE(write_int16(ci->access.empty() ? 0 : ci->access.size(), f));
-			for (j = 0; j < ci->access.size(); j++) {
+			SAFE(write_int16(ci->GetAccessCount(), f));
+			for (j = 0; j < ci->GetAccessCount(); j++) {
 				ChanAccess *access = ci->GetAccess(j);
 				if (!access->in_use)
 					continue;
@@ -679,17 +677,18 @@ void save_cs_dbase()
 				//SAFE(write_string(access->creator.c_str(), f));
 			}
 
-			SAFE(write_int16(ci->akick.size(), f));
-			for (j = 0; j < ci->akick.size(); ++j)
+			SAFE(write_int16(ci->GetAkickCount(), f));
+			for (j = 0; j < ci->GetAkickCount(); ++j)
 			{
-				SAFE(write_int16(ci->akick[j]->flags, f));
-				if (ci->akick[j]->flags & AK_ISNICK)
-					SAFE(write_string(ci->akick[j]->nc->display, f));
+				AutoKick *akick = ci->GetAkick(j);
+				SAFE(write_int16(akick->flags, f));
+				if (akick->flags & AK_ISNICK)
+					SAFE(write_string(akick->nc->display, f));
 				else
-					SAFE(write_string(ci->akick[j]->mask.c_str(), f));
-				SAFE(write_string(ci->akick[j]->reason.c_str(), f));
-				SAFE(write_string(ci->akick[j]->creator.c_str(), f));
-				SAFE(write_int32(ci->akick[j]->addtime, f));
+					SAFE(write_string(akick->mask.c_str(), f));
+				SAFE(write_string(akick->reason.c_str(), f));
+				SAFE(write_string(akick->creator.c_str(), f));
+				SAFE(write_int32(akick->addtime, f));
 			}
 
 			//SAFE(write_int32(ci->mlock_on, f));
@@ -1185,9 +1184,9 @@ int check_kick(User * user, const char *chan, time_t chants)
 		return 0;
 	}
 
-	for (unsigned j = 0; j < ci->akick.size(); ++j)
+	for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
 	{
-		akick = ci->akick[j];
+		akick = ci->GetAkick(j);
 
 		if (!(akick->flags & AK_USED))
 			continue;
@@ -1490,7 +1489,7 @@ void cs_remove_nick(const NickCore * nc)
 			if (ci->successor == nc)
 				ci->successor = NULL;
 
-			for (j = ci->access.size(); j > 0; --j)
+			for (j = ci->GetAccessCount(); j > 0; --j)
 			{
 				ca = ci->GetAccess(j - 1);
 
@@ -1498,9 +1497,9 @@ void cs_remove_nick(const NickCore * nc)
 					ci->EraseAccess(j - 1);
 			}
 
-			for (j = ci->akick.size(); j > 0; --j)
+			for (j = ci->GetAkickCount(); j > 0; --j)
 			{
-				akick = ci->akick[j - 1];
+				akick = ci->GetAkick(j - 1);
 				if ((akick->flags & AK_USED) && (akick->flags & AK_ISNICK) && akick->nc == nc)
 					ci->EraseAkick(akick);
 			}
@@ -1974,9 +1973,9 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 	if (!ci)
 		return NULL;
 	
-	for (unsigned i = 0; i < ci->akick.size(); ++i)
+	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
-		AutoKick *akick = ci->akick[i];
+		AutoKick *akick = ci->GetAkick(i);
 
 		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK) || !(akick->flags & AK_STUCK))
 			continue;
@@ -2035,9 +2034,9 @@ void stick_all(ChannelInfo * ci)
 	if (!ci)
 		return;
 
-	for (unsigned i = 0; i < ci->akick.size(); ++i)
+	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
-		AutoKick *akick = ci->akick[i];
+		AutoKick *akick = ci->GetAkick(i);
 
 		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK)
 			|| !(akick->flags & AK_STUCK))

@@ -12,7 +12,11 @@
 class CoreExport ChannelInfo : public Extensible
 {
  private:
-	std::map<ChannelModeName, std::string> Params;
+	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name */
+	std::vector<ChanAccess *> access;                       /* List of authorized users */
+	std::vector<AutoKick *> akick;                          /* List of users to kickban */
+	std::bitset<128> mlock_on;				/* Modes mlocked on */
+	std::bitset<128> mlock_off;				/* Modes mlocked off */
 
  public:
 	ChannelInfo();
@@ -38,12 +42,6 @@ class CoreExport ChannelInfo : public Extensible
 
 	int16 bantype;
 	int16 *levels;				/* Access levels for commands */
-
-	std::vector<ChanAccess *> access;			/* List of authorized users */
-	std::vector<AutoKick *> akick;				/* List of users to kickban */
-
-	std::bitset<128> mlock_on;
-	std::bitset<128> mlock_off;
 
 	char *entry_message;		/* Notice sent on entering channel */
 
@@ -94,6 +92,11 @@ class CoreExport ChannelInfo : public Extensible
 	 */
 	ChanAccess *GetAccess(NickCore *nc, int16 level = 0);
 
+	/** Get the size of the accss vector for this channel
+	 * @return The access vector size
+	 */
+	const unsigned GetAccessCount() const;
+
 	/** Erase an entry from the channel access list
 	 *
 	 * @param index The index in the access list vector
@@ -130,6 +133,17 @@ class CoreExport ChannelInfo : public Extensible
 	 */
 	AutoKick *AddAkick(const std::string &user, const std::string &mask, const std::string &reason, time_t t = time(NULL));
 
+	/** Get an entry from the channel akick list
+	 * @param index The index in the akick vector
+	 * @return The akick structure, or NULL if not found
+	 */
+	AutoKick *GetAkick(unsigned index);
+
+	/** Get the size of the akick vector for this channel
+	 * @return The akick vector size
+	 */
+	const unsigned GetAkickCount() const;
+
 	/** Erase an entry from the channel akick list
 	 * @param akick The akick
 	 */
@@ -161,6 +175,12 @@ class CoreExport ChannelInfo : public Extensible
 	/** Clear all mlocks on the channel
 	 */
 	void ClearMLock();
+
+	/** Get the number of mlocked modes for this channel
+	 * @param status true for mlock on, false for mlock off
+	 * @return The number of mlocked modes
+	 */
+	const size_t GetMLockCount(bool status) const;
 
 	/** Set a channel mode param on the channel
 	 * @param Name The mode

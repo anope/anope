@@ -62,14 +62,9 @@ class CommandCSRegister : public Command
 		{
 			c->ci = ci;
 			ci->c = c;
-			ci->bantype = CSDefBantype;
-			ci->flags = CSDefFlags;
-			ci->mlock_on = ircd->DefMLock;
-			ci->memos.memomax = MSMaxMemos;
-			ci->last_used = ci->time_registered;
 			ci->founder = u->nc;
-
 			ci->desc = sstrdup(desc);
+
 			if (c->topic)
 			{
 				ci->last_topic = sstrdup(c->topic);
@@ -77,8 +72,8 @@ class CommandCSRegister : public Command
 				ci->last_topic_time = c->topic_time;
 			}
 			else strscpy(ci->last_topic_setter, s_ChanServ, NICKMAX); /* Set this to something, otherwise it will maliform the topic */
+
 			ci->bi = NULL;
-			ci->botflags = BSDefFlags;
 			++ci->founder->channelcount;
 			alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan, u->nick, u->GetIdent().c_str(), u->host);
 			notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);

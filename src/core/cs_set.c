@@ -431,7 +431,7 @@ class CommandCSSet : public Command
 			if (!(ci->flags & CI_XOP)) {
 				ChanAccess *access;
 
-				for (unsigned i = 0; i < ci->access.size(); i++) {
+				for (unsigned i = 0; i < ci->GetAccessCount(); i++) {
 					access = ci->GetAccess(i);
 					if (!access->in_use)
 						continue;

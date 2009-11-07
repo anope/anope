@@ -20,20 +20,26 @@ ChannelInfo::ChannelInfo()
 	name[0] = last_topic_setter[0] = '\0';
 	founder = successor = NULL;
 	desc = url = email = last_topic = forbidby = forbidreason = NULL;
-	time_registered = last_used = last_topic_time = 0;
-	flags = 0;
-	bantype = 0;
+	last_topic_time = 0;
 	levels = NULL;
 	entry_message = NULL;
 	c = NULL;
 	bi = NULL;
-	botflags = 0;
 	ttb = NULL;
 	bwcount = 0;
 	badwords = NULL;
 	capsmin = capspercent = 0;
 	floodlines = floodsecs = 0;
 	repeattimes = 0;
+
+	/* If ircd doesn't exist, this is from DB load and mlock is set later */
+	if (ircd)
+		mlock_on = ircd->DefMLock;
+	flags = CSDefFlags;
+	bantype = CSDefBantype;
+	memos.memomax = MSMaxMemos;
+	botflags = BSDefFlags;
+	last_used = time_registered = time(NULL);
 }
 
 /** Add an entry to the channel access list
@@ -96,6 +102,14 @@ ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
 			return access[i];
 
 	return NULL;
+}
+
+/** Get the size of the accss vector for this channel
+ * @return The access vector size
+ */
+const unsigned ChannelInfo::GetAccessCount() const
+{
+	return access.empty() ? 0 : access.size();
 }
 
 
@@ -177,6 +191,26 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 	return autokick;
 }
 
+/** Get an entry from the channel akick list
+ * @param index The index in the akick vector
+ * @return The akick structure, or NULL if not found
+ */
+AutoKick *ChannelInfo::GetAkick(unsigned index)
+{
+	if (akick.empty() || index >= akick.size())
+		return NULL;
+	
+	return akick[index];
+}
+
+/** Get the size of the akick vector for this channel
+ * @return The akick vector size
+ */
+const unsigned ChannelInfo::GetAkickCount() const
+{
+	return akick.empty() ? 0 : akick.size();
+}
+
 /** Erase an entry from the channel akick list
  * @param akick The akick
  */
@@ -250,6 +284,17 @@ void ChannelInfo::ClearMLock()
 	mlock_off.reset();
 }
 
+/** Get the number of mlocked modes for this channel
+ * @param status true for mlock on, false for mlock off
+ * @return The number of mlocked modes
+ */
+const size_t ChannelInfo::GetMLockCount(bool status) const
+{
+	if (status)
+		return mlock_on.count();
+	else
+		return mlock_off.count();
+}
 
 /** Set a channel mode param on the channel
  * @param Name The mode

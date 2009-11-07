@@ -40,8 +40,7 @@ class CoreExport ChannelInfo : public Extensible
 	int16 *levels;				/* Access levels for commands */
 
 	std::vector<ChanAccess *> access;			/* List of authorized users */
-	uint16 akickcount;
-	AutoKick *akick;			/* List of users to kickban */
+	std::vector<AutoKick *> akick;				/* List of users to kickban */
 
 	std::bitset<128> mlock_on;
 	std::bitset<128> mlock_off;
@@ -114,6 +113,31 @@ class CoreExport ChannelInfo : public Extensible
 	 * Clears the entire access list by deleting every item and then clearing the vector.
 	 */
 	void ClearAccess();
+
+	/** Add an akick entry to the channel by NickCore
+	 * @param user The user who added the akick
+	 * @param akicknc The nickcore being akicked
+	 * @param reason The reason for the akick
+	 * @param t The time the akick was added, defaults to now
+	 */
+	AutoKick *AddAkick(const std::string &user, NickCore *akicknc, const std::string &reason, time_t t = time(NULL));
+
+	/** Add an akick entry to the channel by reason
+	 * @param user The user who added the akick
+	 * @param mask The mask of the akick
+	 * @param reason The reason for the akick
+	 * @param t The time the akick was added, defaults to now
+	 */
+	AutoKick *AddAkick(const std::string &user, const std::string &mask, const std::string &reason, time_t t = time(NULL));
+
+	/** Erase an entry from the channel akick list
+	 * @param akick The akick
+	 */
+	void EraseAkick(AutoKick *akick);
+
+	/** Clear the whole akick list
+	 */
+	void ClearAkick();
 
 	/** Check if a mode is mlocked
 	 * @param Name The mode

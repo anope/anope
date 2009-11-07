@@ -22,9 +22,8 @@ ChannelInfo::ChannelInfo()
 	desc = url = email = last_topic = forbidby = forbidreason = NULL;
 	time_registered = last_used = last_topic_time = 0;
 	flags = 0;
-	bantype = akickcount = 0;
+	bantype = 0;
 	levels = NULL;
-	akick = NULL;
 	entry_message = NULL;
 	c = NULL;
 	bi = NULL;
@@ -135,6 +134,72 @@ void ChannelInfo::ClearAccess()
 		EraseAccess(0);
 }
 
+/** Add an akick entry to the channel by NickCore
+ * @param user The user who added the akick
+ * @param akicknc The nickcore being akicked
+ * @param reason The reason for the akick
+ * @param t The time the akick was added, defaults to now
+ * @return The AutoKick structure
+ */
+AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, const std::string &reason, time_t t)
+{
+	if (!akicknc)
+		return NULL;
+
+	AutoKick *autokick = new AutoKick();
+	autokick->flags = AK_USED | AK_ISNICK;
+	autokick->nc = akicknc;
+	autokick->reason = reason;
+	autokick->creator = user;
+	autokick->addtime = t;
+
+	akick.push_back(autokick);
+	return autokick;
+}
+
+/** Add an akick entry to the channel by reason
+ * @param user The user who added the akick
+ * @param mask The mask of the akick
+ * @param reason The reason for the akick
+ * @param t The time the akick was added, defaults to now
+ * @return The AutoKick structure
+ */
+AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask, const std::string &reason, time_t t)
+{
+	AutoKick *autokick = new AutoKick();
+	autokick->mask = mask;
+	autokick->flags = AK_USED;
+	autokick->reason = reason;
+	autokick->creator = user;
+	autokick->addtime = t;
+
+	akick.push_back(autokick);
+	return autokick;
+}
+
+/** Erase an entry from the channel akick list
+ * @param akick The akick
+ */
+void ChannelInfo::EraseAkick(AutoKick *autokick)
+{
+	std::vector<AutoKick *>::iterator it = std::find(akick.begin(), akick.end(), autokick);
+
+	if (it != akick.end())
+	{
+		delete *it;
+		akick.erase(it);
+	}
+}
+
+/** Clear the whole akick list
+ */
+void ChannelInfo::ClearAkick()
+{
+	for (unsigned i = akick.size(); i > 0; --i)
+	{
+		EraseAkick(akick[i - 1]);
+	}
+}
 
 /** Check if a mode is mlocked
  * @param Name The mode

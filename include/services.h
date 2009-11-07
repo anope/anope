@@ -645,19 +645,18 @@ struct ChanAccess {
 };
 
 /* AutoKick data. */
-typedef struct {
-	int16 in_use;   /* Always 0 if not in use */
-	int16 is_nick;	/* 1 if a regged nickname, 0 if a nick!user@host mask */
+struct AutoKick
+{
 	uint16 flags;
-	union {
-		char *mask;		/* Guaranteed to be non-NULL if in use, NULL if not */
-		NickCore *nc;	/* Same */
-	} u;
-	char *reason;
 
-	char *creator;
+	/* Only one of these can be in use */
+	std::string mask;
+	NickCore *nc;
+
+	std::string reason;
+	std::string creator;
 	time_t addtime;
-} AutoKick;
+};
 
 #define AK_USED		0x0001
 #define AK_ISNICK	0x0002

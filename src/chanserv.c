@@ -235,16 +235,8 @@ void get_chanserv_stats(long *nrec, long *memuse)
 				mem += strlen(ci->email) + 1;
 			if (!ci->access.empty())
 				mem += ci->access.size() * sizeof(ChanAccess);
-			mem += ci->akickcount * sizeof(AutoKick);
-			for (j = 0; j < ci->akickcount; j++) {
-				if (!(ci->akick[j].flags & AK_ISNICK)
-					&& ci->akick[j].u.mask)
-					mem += strlen(ci->akick[j].u.mask) + 1;
-				if (ci->akick[j].reason)
-					mem += strlen(ci->akick[j].reason) + 1;
-				if (ci->akick[j].creator)
-					mem += strlen(ci->akick[j].creator) + 1;
-			}
+			if (!ci->akick.empty())
+				mem += ci->akick.size() * sizeof(AutoKick);
 
 			if (ci->GetParam(CMODE_KEY, &param))
 				mem += param.length() + 1;
@@ -456,39 +448,31 @@ void load_cs_dbase()
 				}
 			}
 
-			SAFE(read_int16(&ci->akickcount, f));
-			if (ci->akickcount) {
-				ci->akick = static_cast<AutoKick *>(scalloc(ci->akickcount, sizeof(AutoKick)));
-				for (j = 0; j < ci->akickcount; j++) {
-					SAFE(read_int16(&ci->akick[j].flags, f));
-					if (ci->akick[j].flags & AK_USED) {
-						SAFE(read_string(&s, f));
-						if (ci->akick[j].flags & AK_ISNICK) {
-							ci->akick[j].u.nc = findcore(s);
-							if (!ci->akick[j].u.nc)
-								ci->akick[j].flags &= ~AK_USED;
-							delete [] s;
-						} else {
-							ci->akick[j].u.mask = s;
-						}
-						SAFE(read_string(&s, f));
-						if (ci->akick[j].flags & AK_USED)
-							ci->akick[j].reason = s;
-						else if (s)
-							delete [] s;
-						SAFE(read_string(&s, f));
-						if (ci->akick[j].flags & AK_USED) {
-							ci->akick[j].creator = s;
-						} else if (s) {
-							delete [] s;
-						}
-						SAFE(read_int32(&tmp32, f));
-						if (ci->akick[j].flags & AK_USED)
-							ci->akick[j].addtime = tmp32;
+			uint16 akickcount = 0;
+			NickCore *nc;
+			SAFE(read_int16(&akickcount, f));
+			if (akickcount) {
+				for (j = 0; j < akickcount; ++j)
+				{
+					uint16 flags;
+					SAFE(read_int16(&flags, f));
+					SAFE(read_string(&s, f));
+					char *akickreason;
+					SAFE(read_string(&akickreason, f));
+					char *akickcreator;
+					SAFE(read_string(&akickcreator, f));
+					SAFE(read_int32(&tmp32, f));
+
+					if (flags & AK_ISNICK)
+					{
+						nc = findcore(s);
+						if (!nc)
+							continue;
+						ci->AddAkick(akickcreator, nc, akickreason ? akickreason : "", tmp32);
 					}
+					else
+						ci->AddAkick(akickcreator, s, akickreason ? akickreason : "", tmp32);
 				}
-			} else {
-				ci->akick = NULL;
 			}
 
 			//SAFE(read_int32(&ci->mlock_on, f));
@@ -695,18 +679,17 @@ void save_cs_dbase()
 				//SAFE(write_string(access->creator.c_str(), f));
 			}
 
-			SAFE(write_int16(ci->akickcount, f));
-			for (j = 0; j < ci->akickcount; j++) {
-				SAFE(write_int16(ci->akick[j].flags, f));
-				if (ci->akick[j].flags & AK_USED) {
-					if (ci->akick[j].flags & AK_ISNICK)
-						SAFE(write_string(ci->akick[j].u.nc->display, f));
-					else
-						SAFE(write_string(ci->akick[j].u.mask, f));
-					SAFE(write_string(ci->akick[j].reason, f));
-					SAFE(write_string(ci->akick[j].creator, f));
-					SAFE(write_int32(ci->akick[j].addtime, f));
-				}
+			SAFE(write_int16(ci->akick.size(), f));
+			for (j = 0; j < ci->akick.size(); ++j)
+			{
+				SAFE(write_int16(ci->akick[j]->flags, f));
+				if (ci->akick[j]->flags & AK_ISNICK)
+					SAFE(write_string(ci->akick[j]->nc->display, f));
+				else
+					SAFE(write_string(ci->akick[j]->mask.c_str(), f));
+				SAFE(write_string(ci->akick[j]->reason.c_str(), f));
+				SAFE(write_string(ci->akick[j]->creator.c_str(), f));
+				SAFE(write_int32(ci->akick[j]->addtime, f));
 			}
 
 			//SAFE(write_int32(ci->mlock_on, f));
@@ -1154,7 +1137,6 @@ int check_kick(User * user, const char *chan, time_t chants)
 	ChannelInfo *ci = cs_findchan(chan);
 	Channel *c;
 	AutoKick *akick;
-	int i;
 	bool set_modes = false;
 	NickCore *nc;
 	const char *av[4];
@@ -1187,7 +1169,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 		goto kick;
 	}
 
-	if (user->IsRecognized())
+	if (user->nc || user->IsRecognized())
 		nc = user->nc;
 	else
 		nc = NULL;
@@ -1203,24 +1185,28 @@ int check_kick(User * user, const char *chan, time_t chants)
 		return 0;
 	}
 
-	for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
+	for (unsigned j = 0; j < ci->akick.size(); ++j)
+	{
+		akick = ci->akick[j];
+
 		if (!(akick->flags & AK_USED))
 			continue;
-		if ((akick->flags & AK_ISNICK && akick->u.nc == nc)
+
+		if ((akick->flags & AK_ISNICK && akick->nc == nc)
 			|| (!(akick->flags & AK_ISNICK)
-				&& match_usermask(akick->u.mask, user))) {
+			&& match_usermask(akick->mask.c_str(), user)))
+			{
 			if (debug >= 2)
-				alog("debug: %s matched akick %s", user->nick,
-					 (akick->flags & AK_ISNICK) ? akick->u.nc->
-					 display : akick->u.mask);
+				alog("debug: %s matched akick %s", user->nick, (akick->flags & AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
 			if (akick->flags & AK_ISNICK)
 				get_idealban(ci, user, mask, sizeof(mask));
 			else
-				strlcpy(mask, akick->u.mask, sizeof(mask));
-			reason = akick->reason ? akick->reason : CSAutokickReason;
+				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
+			reason = !akick->reason.empty() ? akick->reason.c_str() : CSAutokickReason;
 			goto kick;
-		}
+			}
 	}
+
 
 	if (check_access(user, ci, CA_NOJOIN)) {
 		get_idealban(ci, user, mask, sizeof(mask));
@@ -1462,7 +1448,7 @@ void expire_chans()
 
 void cs_remove_nick(const NickCore * nc)
 {
-	int i, j, k;
+	int i, j;
 	ChannelInfo *ci, *next;
 	ChanAccess *ca;
 	AutoKick *akick;
@@ -1512,65 +1498,12 @@ void cs_remove_nick(const NickCore * nc)
 					ci->EraseAccess(j - 1);
 			}
 
-			for (akick = ci->akick, j = 0; j < ci->akickcount; akick++, j++) {
-				if ((akick->flags & AK_USED) && (akick->flags & AK_ISNICK)
-					&& akick->u.nc == nc) {
-					if (akick->creator) {
-						delete [] akick->creator;
-						akick->creator = NULL;
-					}
-					if (akick->reason) {
-						delete [] akick->reason;
-						akick->reason = NULL;
-					}
-					akick->flags = 0;
-					akick->addtime = 0;
-					akick->u.nc = NULL;
-
-					/* Only one occurance can exist in every akick list.. ~ Viper */
-					break;
-				}
+			for (j = ci->akick.size(); j > 0; --j)
+			{
+				akick = ci->akick[j - 1];
+				if ((akick->flags & AK_USED) && (akick->flags & AK_ISNICK) && akick->nc == nc)
+					ci->EraseAkick(akick);
 			}
-
-			/* Are there any akicks behind us?
-			 * If so, move all following akicks.. ~ Viper */
-			if (j < ci->akickcount - 1) {
-				for (k = j + 1; k < ci->akickcount; j++, k++) {
-					if (ci->akick[k].flags & AK_USED) {
-						/* Move the akick one place ahead and clear the original */
-						if (ci->akick[k].flags & AK_ISNICK) {
-							ci->akick[j].u.nc = ci->akick[k].u.nc;
-							ci->akick[k].u.nc = NULL;
-						} else {
-							ci->akick[j].u.mask = sstrdup(ci->akick[k].u.mask);
-							delete [] ci->akick[k].u.mask;
-							ci->akick[k].u.mask = NULL;
-						}
-
-						if (ci->akick[k].reason) {
-							ci->akick[j].reason = sstrdup(ci->akick[k].reason);
-							delete [] ci->akick[k].reason;
-							ci->akick[k].reason = NULL;
-						} else
-							ci->akick[j].reason = NULL;
-
-						ci->akick[j].creator = sstrdup(ci->akick[k].creator);
-						delete [] ci->akick[k].creator;
-						ci->akick[k].creator = NULL;
-
-						ci->akick[j].flags = ci->akick[k].flags;
-						ci->akick[k].flags = 0;
-
-						ci->akick[j].addtime = ci->akick[k].addtime;
-						ci->akick[k].addtime = 0;
-					}
-				}
-			}
-
-			/* After moving only the last entry should still be empty.
-			 * Free the place no longer in use... ~ Viper */
-			ci->akickcount = j;
-			ci->akick = static_cast<AutoKick *>(srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount));
 		}
 	}
 }
@@ -1756,22 +1689,7 @@ int delchan(ChannelInfo * ci)
 		delete [] ci->forbidby;
 	if (ci->forbidreason)
 		delete [] ci->forbidreason;
-	if (debug >= 2) {
-		alog("debug: delchan() top of the akick list");
-	}
-	for (i = 0; i < ci->akickcount; i++) {
-		if (!(ci->akick[i].flags & AK_ISNICK) && ci->akick[i].u.mask)
-			delete [] ci->akick[i].u.mask;
-		if (ci->akick[i].reason)
-			delete [] ci->akick[i].reason;
-		if (ci->akick[i].creator)
-			delete [] ci->akick[i].creator;
-	}
-	if (debug >= 2) {
-		alog("debug: delchan() done with the akick list");
-	}
-	if (ci->akick)
-		free(ci->akick);
+	ci->ClearAkick();
 	if (ci->levels)
 		delete [] ci->levels;
 	if (debug >= 2) {
@@ -2053,25 +1971,22 @@ const char *get_xop_level(int level)
 
 AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 {
-	int i;
-	AutoKick *akick;
-
-	if (!ci) {
+	if (!ci)
 		return NULL;
-	}
+	
+	for (unsigned i = 0; i < ci->akick.size(); ++i)
+	{
+		AutoKick *akick = ci->akick[i];
 
-	for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
-		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK)
-			|| !(akick->flags & AK_STUCK))
+		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK) || !(akick->flags & AK_STUCK))
 			continue;
-		/* Example: mask = *!*@*.org and akick->u.mask = *!*@*.anope.org */
-		if (Anope::Match(akick->u.mask, mask, false))
+
+		if (Anope::Match(akick->mask, mask, false))
 			return akick;
-		if (ircd->reversekickcheck) {
-			/* Example: mask = *!*@irc.anope.org and akick->u.mask = *!*@*.anope.org */
-			if (Anope::Match(mask, akick->u.mask, false))
+
+		if (ircd->reversekickcheck)
+			if (Anope::Match(mask, akick->mask, false))
 				return akick;
-		}
 	}
 
 	return NULL;
@@ -2092,18 +2007,13 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 		for (ban = ci->c->bans->entries; ban; ban = ban->next) {
 			/* If akick is already covered by a wider ban.
 			   Example: c->bans[i] = *!*@*.org and akick->u.mask = *!*@*.epona.org */
-			char *mask = sstrdup(akick->u.mask);
-			if (entry_match_mask(ban, mask, 0))
-			{
-				delete [] mask;
+			if (entry_match_mask(ban, akick->mask.c_str(), 0))
 				return;
-			}
-			delete [] mask;
 
 			if (ircd->reversekickcheck) {
 				/* If akick is wider than a ban already in place.
 				   Example: c->bans[i] = *!*@irc.epona.org and akick->u.mask = *!*@*.epona.org */
-				if (Anope::Match(ban->mask, akick->u.mask, false))
+				if (Anope::Match(ban->mask, akick->mask.c_str(), false))
 					return;
 			}
 		}
@@ -2111,8 +2021,8 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 
 	/* Falling there means set the ban */
 	av[0] = "+b";
-	av[1] = akick->u.mask;
-	ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
+	av[1] = akick->mask.c_str();
+	ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->mask.c_str());
 	chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
 }
 
@@ -2120,22 +2030,22 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 
 void stick_all(ChannelInfo * ci)
 {
-	int i;
 	const char *av[2];
-	AutoKick *akick;
 
-	if (!ci) {
+	if (!ci)
 		return;
-	}
 
-	for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
+	for (unsigned i = 0; i < ci->akick.size(); ++i)
+	{
+		AutoKick *akick = ci->akick[i];
+
 		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK)
 			|| !(akick->flags & AK_STUCK))
 			continue;
 
 		av[0] = "+b";
-		av[1] = akick->u.mask;
-		ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
+		av[1] = akick->mask.c_str();
+		ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->mask.c_str());
 		chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
 	}
 }

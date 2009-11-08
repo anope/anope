@@ -154,7 +154,7 @@ class NickServRelease : public Timer
 /* *INDENT-OFF* */
 void moduleAddNickServCmds()
 {
-	ModuleManager::LoadModuleList(NickServCoreNumber, NickServCoreModules);
+	ModuleManager::LoadModuleList(NickServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/

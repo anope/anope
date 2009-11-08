@@ -1049,10 +1049,9 @@ class CoreExport ModuleManager
 	static std::vector<Module *> EventHandlers[I_END];
 
 	/** Load up a list of modules.
-	 * @param total_modules The number of modules to load
 	 * @param module_list The list of modules to load
 	 **/
-	static void LoadModuleList(int total_modules, char **module_list);
+	static void LoadModuleList(std::list<std::string> &ModList);
 
 	/** Loads a given module.
 	 * @param m the module to load

@@ -346,7 +346,7 @@ class InspIRCdProto : public IRCDProto
 		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 		SendServer(me_server);
 		send_cmd(NULL, "BURST");
-		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModuleList[0], version_build);
+		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModuleList.begin()->c_str(), version_build);
 	}
 
 	/* CHGIDENT */

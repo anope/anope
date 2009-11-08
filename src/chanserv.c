@@ -113,7 +113,7 @@ int levelinfo_maxwidth = 0;
 /*************************************************************************/
 
 void moduleAddChanServCmds() {
-	ModuleManager::LoadModuleList(ChanServCoreNumber, ChanServCoreModules);
+	ModuleManager::LoadModuleList(ChanServCoreModules);
 }
 
 /* *INDENT-ON* */

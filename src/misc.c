@@ -1031,6 +1031,36 @@ char *host_resolve(char *host)
 
 /*************************************************************************/
 
+/** Build a string list from a source string
+ * @param src The source string
+ * @return a list of strings
+ */
+std::list<std::string> BuildStringList(const std::string &src)
+{
+	spacesepstream tokens(src);
+	std::string token;
+	std::list<std::string> Ret;
+
+	while (tokens.GetToken(token))
+		Ret.push_back(token);
+	
+	return Ret;
+}
+
+std::list<ci::string> BuildStringList(const ci::string &src)
+{
+	spacesepstream tokens(src);
+	ci::string token;
+	std::list<ci::string> Ret;
+
+	while (tokens.GetToken(token))
+		Ret.push_back(token);
+
+	return Ret;
+}
+
+/*************************************************************************/
+
 /**
  * Change an unsigned string to a signed string, overwriting the original
  * string.
@@ -1072,27 +1102,6 @@ void ntoa(struct in_addr addr, char *ipaddr, int len)
 	unsigned char *bytes = reinterpret_cast<unsigned char *>(&addr.s_addr);
 	snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2],
 			 bytes[3]);
-}
-
-/**
- * Build a string list from a given source string.
- * This is usually used for parsing out values from the config file, but could
- * be used for other things.
- **/
-char **buildStringList(const std::string &src, int *number)
-{
-	int i = 0;
-	char **list = NULL;
-	spacesepstream tokens(src);
-	std::string token;
-
-	while (tokens.GetToken(token)) {
-		i++;
-		list = static_cast<char **>(realloc(list, sizeof(char *) * i));
-		list[i - 1] = sstrdup(token.c_str());
-	}
-	*number = i;				/* always zero it, even if we have no setters */
-	return list;
 }
 
 /*

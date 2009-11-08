@@ -19,6 +19,7 @@
 #define EI extern DllExport
 
 #include "slist.h"
+#include "hashcomp.h"
 
 E void ModuleRunTimeDirCleanUp();
 
@@ -348,28 +349,15 @@ E bool  AddAkiller;
 /**
  * Modules Stuff
  **/
-E char **ModulesAutoload;
-E int ModulesNumber;
-E char **ModulesDelayedAutoload;
-E int ModulesDelayedNumber;
+E std::list<std::string> ModulesAutoLoad;
 
-E char **HostServCoreModules;
-E int HostServCoreNumber;
-
-E char **MemoServCoreModules;
-E int MemoServCoreNumber;
-
-E char **BotServCoreModules;
-E int BotServCoreNumber;
-
-E char **OperServCoreModules;
-E int OperServCoreNumber;
-
-E char **NickServCoreModules;
-E int NickServCoreNumber;
-
-E char **ChanServCoreModules;
-E int ChanServCoreNumber;
+E std::list<std::string> EncModuleList;
+E std::list<std::string> HostServCoreModules;
+E std::list<std::string> MemoServCoreModules;
+E std::list<std::string> BotServCoreModules;
+E std::list<std::string> OperServCoreModules;
+E std::list<std::string> NickServCoreModules;
+E std::list<std::string> ChanServCoreModules;
 
 E bool  LimitSessions;
 E unsigned DefSessionLimit;
@@ -405,8 +393,6 @@ E long unsigned int UserKey3;
 E int convert_ircservices_44();
 
 /**** encrypt.c ****/
-E char **EncModuleList;
-E int EncModulesNumber;
 E void initEncryption();
 E int enc_encrypt(const char *src, int len, char *dest, int size);
 E int enc_encrypt_in_place(char *buf, int size);
@@ -593,7 +579,9 @@ E char *str_signed(unsigned char *str);
 
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
-E char **buildStringList(const std::string &src, int *number);
+E std::list<std::string> BuildStringList(const std::string &);
+E std::list<ci::string> BuildStringList(const ci::string &);
+
 E void binary_to_hex(unsigned char *bin, char *hex, int length);
 
 E uint32 cidr_to_netmask(uint16 cidr);

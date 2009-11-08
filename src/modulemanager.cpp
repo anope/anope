@@ -15,16 +15,13 @@
 
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
-void ModuleManager::LoadModuleList(int total_modules, char **module_list)
+void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
 {
-	int idx;
-	Module *m;
-	int status = 0;
-	for (idx = 0; idx < total_modules; idx++) {
-		m = findModule(module_list[idx]);
-		if (!m) {
-			status = ModuleManager::LoadModule(module_list[idx], NULL);
-		}
+	for (std::list<std::string>::iterator it = ModuleList.begin(); it != ModuleList.end(); ++it)
+	{
+		Module *m = findModule(it->c_str());
+		if (!m)
+			ModuleManager::LoadModule(*it, NULL);
 	}
 }
 

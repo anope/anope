@@ -277,7 +277,7 @@ int m_stats(const char *source, int ac, const char **av)
 int m_version(const char *source, int ac, const char **av)
 {
 	if (source) ircdproto->SendNumeric(ServerName, 351, source, "Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags,
-		EncModuleList[0], version_build);
+		EncModuleList.begin()->c_str(), version_build);
 	return MOD_CONT;
 }
 

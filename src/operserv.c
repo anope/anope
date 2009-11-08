@@ -57,7 +57,7 @@ SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddOperServCmds() {
-	ModuleManager::LoadModuleList(OperServCoreNumber, OperServCoreModules);
+	ModuleManager::LoadModuleList(OperServCoreModules);
 }
 
 /* *INDENT-ON* */

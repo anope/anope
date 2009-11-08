@@ -31,7 +31,7 @@ E void moduleAddHostServCmds();
 
 void moduleAddHostServCmds()
 {
-	ModuleManager::LoadModuleList(HostServCoreNumber, HostServCoreModules);
+	ModuleManager::LoadModuleList(HostServCoreModules);
 }
 
 /*************************************************************************/

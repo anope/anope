@@ -199,39 +199,31 @@ char *SessionLimitDetailsLoc;
 bool OSOpersOnly;
 
 static std::string Modules;
-char **ModulesAutoload;
-int ModulesNumber;
+std::list<std::string> ModulesAutoLoad;
 
 /**
  * Core Module Stuff
  **/
-char **EncModuleList;
-char *EncModules;
-int EncModulesNumber;
+static std::string EncModules;
+std::list<std::string> EncModuleList;
 
-static char *HostCoreModules;
-char **HostServCoreModules;
-int HostServCoreNumber;
+static std::string HostCoreModules;
+std::list<std::string> HostServCoreModules;
 
-static char *MemoCoreModules;
-char **MemoServCoreModules;
-int MemoServCoreNumber;
+static std::string MemoCoreModules;
+std::list<std::string> MemoServCoreModules;
 
-static char *BotCoreModules;
-char **BotServCoreModules;
-int BotServCoreNumber;
+static std::string BotCoreModules;
+std::list<std::string> BotServCoreModules;
 
-static char *OperCoreModules;
-char **OperServCoreModules;
-int OperServCoreNumber;
+static std::string OperCoreModules;
+std::list<std::string> OperServCoreModules;
 
-static char *NickCoreModules;
-char **NickServCoreModules;
-int NickServCoreNumber;
+static std::string NickCoreModules;
+std::list<std::string> NickServCoreModules;
 
-static char *ChanCoreModules;
-char **ChanServCoreModules;
-int ChanServCoreNumber;
+static std::string ChanCoreModules;
+std::list<std::string> ChanServCoreModules;
 
 int DefConLevel;
 static std::string DefCon1;
@@ -834,7 +826,7 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
-		{"options", "encryption", "", new ValueContainerChar(&EncModules), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
@@ -869,7 +861,7 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&NSEmailReg), DT_BOOLEAN, NoValidation},
 		{"nickserv", "prenickdatabase", "", new ValueContainerChar(&PreNickDBName), DT_CHARPTR, ValidateEmailReg},
-		{"nickserv", "modules", "", new ValueContainerChar(&NickCoreModules), DT_CHARPTR, NoValidation},
+		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
 		{"nickserv", "defaultlanguage", "0", new ValueContainerUInt(&NSDefLanguage), DT_UINTEGER, ValidateLanguage},
@@ -899,7 +891,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"chanserv", "modules", "", new ValueContainerChar(&ChanCoreModules), DT_CHARPTR, NoValidation},
+		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&CSMaxReg), DT_UINTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
@@ -913,7 +905,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"memoserv", "modules", "", new ValueContainerChar(&MemoCoreModules), DT_CHARPTR, NoValidation},
+		{"memoserv", "modules", "", new ValueContainerString(&MemoCoreModules), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
@@ -921,7 +913,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
-		{"botserv", "modules", "", new ValueContainerChar(&BotCoreModules), DT_CHARPTR, NoValidation},
+		{"botserv", "modules", "", new ValueContainerString(&BotCoreModules), DT_STRING, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerUInt(&BSMinUsers), DT_UINTEGER, ValidateBotServ},
 		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
@@ -933,7 +925,7 @@ int ServerConfig::Read(bool bail)
 		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
 		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
-		{"hostserv", "modules", "", new ValueContainerChar(&HostCoreModules), DT_CHARPTR, NoValidation},
+		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
 		{"operserv", "nick", "OperServ", new ValueContainerChar(&s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -941,7 +933,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"operserv", "modules", "", new ValueContainerChar(&OperCoreModules), DT_CHARPTR, NoValidation},
+		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&LogMaxUsers), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&AutokillExpiry), DT_TIME, ValidateNotZero},
@@ -1909,26 +1901,14 @@ int read_config(int reload)
 	}
 
 	/* Modules Autoload building... :P */
-	ModulesAutoload = buildStringList(Modules, &ModulesNumber);
-	EncModuleList =
-		buildStringList(EncModules ? EncModules : "", &EncModulesNumber);
-	HostServCoreModules =
-		buildStringList(HostCoreModules ? HostCoreModules : "", &HostServCoreNumber);
-	MemoServCoreModules =
-		buildStringList(MemoCoreModules ? MemoCoreModules : "", &MemoServCoreNumber);
-
-	BotServCoreModules =
-		buildStringList(BotCoreModules ? BotCoreModules : "", &BotServCoreNumber);
-
-	OperServCoreModules =
-		buildStringList(OperCoreModules ? OperCoreModules : "", &OperServCoreNumber);
-
-	ChanServCoreModules =
-		buildStringList(ChanCoreModules ? ChanCoreModules : "", &ChanServCoreNumber);
-
-	NickServCoreModules =
-		buildStringList(NickCoreModules ? NickCoreModules : "", &NickServCoreNumber);
-
+	ModulesAutoLoad = BuildStringList(!Modules.empty() ? Modules : "");
+	EncModuleList = BuildStringList(!EncModules.empty() ? EncModules : "");
+	HostServCoreModules = BuildStringList(!HostCoreModules.empty() ? HostCoreModules : "");
+	MemoServCoreModules = BuildStringList(!MemoCoreModules.empty() ? MemoCoreModules : "");
+	BotServCoreModules = BuildStringList(!BotCoreModules.empty() ? BotCoreModules : "");
+	OperServCoreModules = BuildStringList(!OperCoreModules.empty() ? OperCoreModules : "");
+	ChanServCoreModules = BuildStringList(!ChanCoreModules.empty() ? ChanCoreModules : "");
+	NickServCoreModules = BuildStringList(!NickCoreModules.empty() ? NickCoreModules : "");
 
 	if (LimitSessions) {
 		if (MaxSessionKill && !SessionAutoKillExpiry)

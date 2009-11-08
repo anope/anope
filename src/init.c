@@ -387,7 +387,7 @@ int init_primary(int ac, char **av)
 	}
 
 	/* Add Encryption Modules */
-	ModuleManager::LoadModuleList(EncModulesNumber, EncModuleList);
+	ModuleManager::LoadModuleList(EncModuleList);
 	return 0;
 }
 
@@ -493,7 +493,7 @@ int init_secondary(int ac, char **av)
 
 	/* load any custom modules */
 	if (!nothird)
-		ModuleManager::LoadModuleList(ModulesNumber, ModulesAutoload);
+		ModuleManager::LoadModuleList(ModulesAutoLoad);
 
 	/* Initialize random number generator */
 	rand_init();

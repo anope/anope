@@ -34,7 +34,7 @@ E void moduleAddBotServCmds();
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddBotServCmds() {
-	ModuleManager::LoadModuleList(BotServCoreNumber, BotServCoreModules);
+	ModuleManager::LoadModuleList(BotServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/

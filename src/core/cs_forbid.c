@@ -20,6 +20,7 @@ class CommandCSForbid : public Command
  public:
 	CommandCSForbid() : Command("FORBID", 1, 2, "chanserv/forbid")
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
 
 	CommandReturn Execute(User *u, std::vector<ci::string> &params)
@@ -39,12 +40,6 @@ class CommandCSForbid : public Command
 		if (*chan != '#')
 		{
 			notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
-			return MOD_CONT;
-		}
-
-		if (!ircdproto->IsChannelValid(chan))
-		{
-			notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
 			return MOD_CONT;
 		}
 

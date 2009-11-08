@@ -31,7 +31,7 @@ class CommandOSHelp : public Command
 	void OnSyntaxError(User *u)
 	{
 		notice_help(s_OperServ, u, OPER_HELP);
-		moduleDisplayHelp(s_OperServ, u);
+		FOREACH_MOD(I_OnOperServHelp, OnOperServHelp(u));
 		notice_help(s_OperServ, u, OPER_HELP_LOGGED);
 	}
 };

@@ -126,8 +126,10 @@ class MSRead : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSRead());
+
+		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}
-	void MemoServHelp(User *u)
+	void OnMemoServHelp(User *u)
 	{
 		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
 	}

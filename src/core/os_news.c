@@ -489,8 +489,8 @@ class OSNews : public Module
 		this->AddCommand(OPERSERV, new CommandOSOperNews());
 		this->AddCommand(OPERSERV, new CommandOSRandomNews());
 
-		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnSaveDatabase, I_OnPostLoadDatabases };
-		ModuleManager::Attach(i, this, 4);
+		Implementation i[] = { I_OnOperServHelp, I_OnUserModeSet, I_OnUserConnect, I_OnSaveDatabase, I_OnPostLoadDatabases };
+		ModuleManager::Attach(i, this, 5);
 	}
 
 	~OSNews()
@@ -498,7 +498,7 @@ class OSNews : public Module
 		save_news();
 	}
 
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);

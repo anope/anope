@@ -383,48 +383,6 @@ class CoreExport Module
 	 */
 	virtual Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
 
-	/** Add output to NickServ Help.
-	 * When doing /msg NickServ HELP, this function will be calloed to allow it to send out
-	 * a notice witht he code you wish to display
-	 * @Param u The user executing the command
-	 */
-	virtual void NickServHelp(User *u) { }
-
-	/** Add output to ChanServ Help.
-	 * When doing /msg ChanServ HELP, this function will be calloed to allow it to send out
-	 * a notice witht he code you wish to display
-	 * @Param u The user executing the command
-	 */
-	virtual void ChanServHelp(User *u) { }
-
-	/** Add output to MemoServ Help.
-	 * When doing /msg MemoServ HELP, this function will be calloed to allow it to send out
-	 * a notice witht he code you wish to display
-	 * @Param u The user executing the command
-	 */
-	virtual void MemoServHelp(User *u) { }
-
-	/** Add output to BotServ Help.
-	 * When doing /msg BotServ HELP, this function will be calloed to allow it to send out
-	 * a notice witht he code you wish to display
-	 * @Param u The user executing the command
-	 */
-	virtual void BotServHelp(User *u) { }
-
-	/** Add output to OperServ Help.
-	 * When doing /msg OperServ HELP, this function will be calloed to allow it to send out
-	 * a notice witht he code you wish to display
-	 * @Param u The user executing the command
-	 */
-	virtual void OperServHelp(User *u) { }
-
-	/** Add output to HostServ Help.
-	 * When doing /msg HostServ HELP, this function will be calloed to allow it to send out
-	 * a notice witht he code you wish to display
-	 * @Param u The user executing the command
-	 */
-	virtual void HostServHelp(User *u) { }
-
 	/**
 	 * Allow a module to add a set of language strings to anope
 	 * @param langNumber the language number for the strings
@@ -486,6 +444,36 @@ class CoreExport Module
 	 * @param t The timer
 	 */
 	bool DelCallBack(Timer *t);
+
+	/** Called on NickServ HELP
+	 * @param u The user requesting help
+	 */
+	virtual void OnNickServHelp(User *u) { }
+
+	/** Called on ChanServ HELP
+	 * @param u The user requesting help
+	 */
+	virtual void OnChanServHelp(User *u) { }
+
+	/** Called on Botserv HELP
+	 * @param u The user requesting help
+	 */
+	virtual void OnBotServHelp(User *u) { }
+
+	/** Called on HostServ HELP
+	 * @param u The user requesting help
+	 */
+	virtual void OnHostServHelp(User *u) { }
+
+	/** Called on OperServ HELP
+	 * @param u The user requesting help
+	 */
+	virtual void OnOperServHelp(User *u) { }
+
+	/** Called on MemoServ HELP
+	 * @param u The user requesting help
+	 */
+	virtual void OnMemoServHelp(User *u) { }
 
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
@@ -987,29 +975,32 @@ enum Implementation
 {
 	I_BEGIN,
 		/* NickServ */
-		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
+		I_OnNickServHelp, I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnFindUser, I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickEraseAccess,
 
 		/* ChanServ */
-		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
+		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete,
 
 		/* BotServ */
-		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
+		I_OnBotServHelp, I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBotPreLoad,
 
 		/* HostServ */
-		I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,
+		I_OnHostServHelp, I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,
+
+		/* MemoServ */
+		I_OnMemoServHelp,
 
 		/* Users */
 		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
 		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */
-		I_OnDefconLevel,
+		I_OnOperServHelp, I_OnDefconLevel,
 
 		/* Other */
 		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreCommandRun, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
@@ -1146,7 +1137,6 @@ struct MessageHash_ {
 MDE Module *findModule(const char *name);	/* Find a module */
 
 int protocol_module_init();	/* Load the IRCD Protocol Module up*/
-MDE void moduleDisplayHelp(const char *service, User *u);
 
 /*************************************************************************/
 /*************************************************************************/

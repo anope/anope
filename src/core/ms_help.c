@@ -32,7 +32,7 @@ class CommandMSHelp : public Command
 	void OnSyntaxError(User *u)
 	{
 		notice_help(s_MemoServ, u, MEMO_HELP_HEADER);
-		moduleDisplayHelp(s_MemoServ, u);
+		FOREACH_MOD(I_OnMemoServHelp, OnMemoServHelp(u));
 		notice_help(s_MemoServ, u, MEMO_HELP_FOOTER, s_ChanServ);
 	}
 };

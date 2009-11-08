@@ -646,39 +646,7 @@ bool Module::DelCallBack(Timer *t)
 	return false;
 }
 
-/**
- * Display any extra module help for the given service.
- * @param services which services is help being dispalyed for?
- * @param u which user is requesting the help
- **/
-void moduleDisplayHelp(const char *service, User * u)
-{
-	int idx;
-	ModuleHash *current = NULL;
-
-	if (!service)
-		return;
-
-	for (idx = 0; idx != MAX_CMD_HASH; idx++) {
-		for (current = MODULE_HASH[idx]; current; current = current->next) {
-			if (s_NickServ && !strcmp(s_NickServ, service))
-				current->m->NickServHelp(u);
-			else if (s_ChanServ && !strcmp(s_ChanServ, service))
-				current->m->ChanServHelp(u);
-			else if (s_MemoServ && !strcmp(s_MemoServ, service))
-				current->m->MemoServHelp(u);
-			else if (s_BotServ && !strcmp(s_BotServ, service))
-				current->m->BotServHelp(u);
-			else if (s_OperServ && !strcmp(s_OperServ, service))
-				current->m->OperServHelp(u);
-			else if (s_HostServ && !strcmp(s_HostServ, service))
-				current->m->HostServHelp(u);
-		}
-	}
-}
-
-/**
- * Check the current version of anope against a given version number
+ /* Check the current version of anope against a given version number
  * Specifiying -1 for minor,patch or build
  * @param major The major version of anope, the first part of the verison number
  * @param minor The minor version of anope, the second part of the version number

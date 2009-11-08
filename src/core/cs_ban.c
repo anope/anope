@@ -169,8 +169,10 @@ class CSBan : public Module
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSBan());
 		this->AddCommand(CHANSERV, new CommandCSUnban());
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_BAN);
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNBAN);

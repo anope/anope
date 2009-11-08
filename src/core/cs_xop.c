@@ -547,8 +547,10 @@ class CSXOP : public Module
 			this->AddCommand(CHANSERV, new CommandCSHOP());
 		this->AddCommand(CHANSERV, new CommandCSSOP());
 		this->AddCommand(CHANSERV, new CommandCSVOP());
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_QOP);

@@ -253,8 +253,10 @@ class BSInfo : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(BOTSERV, new CommandBSInfo());
+
+		ModuleManager::Attach(I_OnBotServHelp, this);
 	}
-	void BotServHelp(User *u)
+	void OnBotServHelp(User *u)
 	{
 		notice_lang(s_BotServ, u, BOT_HELP_CMD_INFO);
 	}

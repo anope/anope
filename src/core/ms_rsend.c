@@ -90,8 +90,10 @@ class MSRSend : public Module
 
 		if (!MSMemoReceipt)
 			throw ModuleException("Don't like memo reciepts, or something.");
+
+		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}
-	void MemoServHelp(User *u)
+	void OnMemoServHelp(User *u)
 	{
 		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_RSEND);
 	}

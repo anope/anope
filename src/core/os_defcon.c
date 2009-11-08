@@ -142,15 +142,15 @@ class OSDEFCON : public Module
 			throw ModuleException("Invalid configuration settings");
 		}
 
-		Implementation i[] = { I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
-		ModuleManager::Attach(i, this, 8);
+		Implementation i[] = { I_OnOperServHelp, I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
+		ModuleManager::Attach(i, this, 9);
 
 		this->AddCommand(OPERSERV, new CommandOSDEFCON());
 
 		defconParseModeString(DefConChanModes);
 	}
 
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_DEFCON);
 	}

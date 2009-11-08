@@ -317,8 +317,10 @@ class OSSZLine : public Module
 
 		if (!ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
 	}

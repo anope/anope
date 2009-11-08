@@ -67,8 +67,10 @@ class OSModUnLoad : public Module
 		this->SetPermanent(true);
 
 		this->AddCommand(OPERSERV, new CommandOSModUnLoad());
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
 	}

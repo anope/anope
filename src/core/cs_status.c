@@ -68,8 +68,10 @@ class CSStatus : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(CHANSERV, new CommandCSStatus());
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_STATUS);
 	}

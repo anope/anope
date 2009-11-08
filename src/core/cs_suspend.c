@@ -189,8 +189,10 @@ class CSSuspend : public Module
 
 		this->AddCommand(CHANSERV, new CommandCSSuspend());
 		this->AddCommand(CHANSERV, new CommandCSUnSuspend());
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);

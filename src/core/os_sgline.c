@@ -332,8 +332,10 @@ class OSSGLine : public Module
 
 		if (!ircd->sgline)
 			throw ModuleException("Your IRCd does not support SGLine");
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_SGLINE);
 	}

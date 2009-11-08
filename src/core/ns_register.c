@@ -371,8 +371,10 @@ class NSRegister : public Module
 		this->AddCommand(NICKSERV, new CommandNSRegister());
 		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 0, 1));
 		this->AddCommand(NICKSERV, new CommandNSResend());
+
+		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
-	void NickServHelp(User *u)
+	void OnNickServHelp(User *u)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_REGISTER);
 		if (NSEmailReg)

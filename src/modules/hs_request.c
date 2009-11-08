@@ -678,6 +678,8 @@ class HSRequest : public Module
 		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+
+		ModuleManager::Attach(I_OnHostServHelp, this);
 	}
 
 	~HSRequest()
@@ -765,7 +767,7 @@ class HSRequest : public Module
 			ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
 	}
 
-	void HostServHelp(User *u)
+	void OnHostServHelp(User *u)
 	{
 		this->NoticeLang(s_HostServ, u, LNG_HELP);
 		this->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);

@@ -123,8 +123,10 @@ class NSIdentify : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSIdentify("IDENTIFY"));
 		this->AddCommand(NICKSERV, new CommandNSIdentify("ID"));
+
+		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
-	void NickServHelp(User *u)
+	void OnNickServHelp(User *u)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
 	}

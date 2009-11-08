@@ -404,8 +404,10 @@ class CSModes : public Module
 			this->AddCommand(CHANSERV, new CommandCSOwner());
 			this->AddCommand(CHANSERV, new CommandCSDeOwner());
 		}
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{

@@ -187,8 +187,10 @@ class OSClearModes : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSClearModes());
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
 	}

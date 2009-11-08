@@ -461,8 +461,10 @@ class OSSession : public Module
 
 		this->AddCommand(OPERSERV, new CommandOSSession());
 		this->AddCommand(OPERSERV, new CommandOSException());
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_SESSION);
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_EXCEPTION);

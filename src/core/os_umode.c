@@ -80,8 +80,10 @@ class OSUMode : public Module
 
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_UMODE);
 	}

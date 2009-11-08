@@ -447,6 +447,9 @@ class OSInfo : public Module
 		this->InsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
 		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+
+		Implementation i[] = { I_OnNickServHelp, I_OnChanServHelp };
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	~OSInfo()
@@ -603,12 +606,12 @@ class OSInfo : public Module
 		}
 	}
 
-	void NickServHelp(User *u)
+	void OnNickServHelp(User *u)
 	{
 		this->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
 	}
 
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		this->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
 	}

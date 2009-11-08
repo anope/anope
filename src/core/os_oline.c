@@ -75,8 +75,10 @@ class OSOLine : public Module
 
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_OLINE);
 	}

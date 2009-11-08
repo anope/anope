@@ -290,8 +290,10 @@ class CSClear : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSClear());
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
 	}

@@ -154,8 +154,10 @@ class CSTBan : public Module
 		this->InsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
 		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		this->NoticeLang(s_ChanServ, u, TBAN_HELP);
 	}

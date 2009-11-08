@@ -564,8 +564,10 @@ class CSAccess : public Module
 
 		this->AddCommand(CHANSERV, new CommandCSAccess());
 		this->AddCommand(CHANSERV, new CommandCSLevels());
+
+		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
-	void ChanServHelp(User *u)
+	void OnChanServHelp(User *u)
 	{
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
 		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LEVELS);

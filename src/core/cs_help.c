@@ -55,7 +55,7 @@ class CommandCSHelp : public Command
 	void OnSyntaxError(User *u)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP);
-		moduleDisplayHelp(s_ChanServ, u);
+		FOREACH_MOD(I_OnChanServHelp, OnChanServHelp(u));
 		if (CSExpire >= 86400)
 			notice_help(s_ChanServ, u, CHAN_HELP_EXPIRES, CSExpire / 86400);
 		if (u->nc && u->nc->IsServicesOper())

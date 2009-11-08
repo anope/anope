@@ -34,7 +34,7 @@ class CommandBSHelp : public Command
 	{
 		// Abuse syntax error to display general list help.
 		notice_help(s_BotServ, u, BOT_HELP);
-		moduleDisplayHelp(s_BotServ, u);
+		FOREACH_MOD(I_OnBotServHelp, OnBotServHelp(u));
 		notice_help(s_BotServ, u, BOT_HELP_FOOTER, BSMinUsers);
 	}
 };

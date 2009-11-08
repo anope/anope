@@ -220,8 +220,10 @@ class NSGroup : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSGroup());
 		this->AddCommand(NICKSERV, new CommandNSGList());
+
+		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
-	void NickServHelp(User *u)
+	void OnNickServHelp(User *u)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_GROUP);
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_GLIST);

@@ -117,8 +117,10 @@ class NSDrop : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSDrop());
+
+		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
-	void NickServHelp(User *u)
+	void OnNickServHelp(User *u)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_DROP);
 	}

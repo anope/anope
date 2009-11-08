@@ -318,8 +318,10 @@ class OSSQLine : public Module
 
 		if (!ircd->sqline)
 			throw ModuleException("Your IRCd does not support QLines.");
+
+		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
-	void OperServHelp(User *u)
+	void OnOperServHelp(User *u)
 	{
 		notice_lang(s_OperServ, u, OPER_HELP_CMD_SQLINE);
 	}

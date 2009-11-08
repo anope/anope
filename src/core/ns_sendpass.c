@@ -100,8 +100,10 @@ class NSSendPass : public Module
 		char tmp_pass[PASSMAX];
 		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
 			throw ModuleException("Incompatible with the encryption module being used");
+
+		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
-	void NickServHelp(User *u)
+	void OnNickServHelp(User *u)
 	{
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_SENDPASS);
 	}

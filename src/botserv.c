@@ -168,44 +168,44 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 	 */
 
 	/* We first retrieve the user status on the channel if needed */
-	if (ci->botflags & (BS_DONTKICKOPS | BS_DONTKICKVOICES))
+	if (ci->botflags.HasFlag(BS_DONTKICKOPS) || ci->botflags.HasFlag(BS_DONTKICKVOICES))
 		cstatus = chan_get_user_status(ci->c, u);
 
 	if (buf && !check_access(u, ci, CA_NOKICK) &&
-		(!(ci->botflags & BS_DONTKICKOPS)
+		(!ci->botflags.HasFlag(BS_DONTKICKOPS)
 		 || !(cstatus & (CUS_HALFOP | CUS_OP | CUS_OWNER | CUS_PROTECT)))
+		&& (!ci->botflags.HasFlag(BS_DONTKICKVOICES) || !(cstatus & CUS_VOICE))) {
 
-		&& (!(ci->botflags & BS_DONTKICKVOICES) || !(cstatus & CUS_VOICE))) {
 		/* Bolds kicker */
-		if ((ci->botflags & BS_KICK_BOLDS) && strchr(buf, 2)) {
+		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && strchr(buf, 2)) {
 			check_ban(ci, u, TTB_BOLDS);
 			bot_kick(ci, u, BOT_REASON_BOLD);
 			return;
 		}
 
 		/* Color kicker */
-		if ((ci->botflags & BS_KICK_COLORS) && strchr(buf, 3)) {
+		if (ci->botflags.HasFlag(BS_KICK_COLORS) && strchr(buf, 3)) {
 			check_ban(ci, u, TTB_COLORS);
 			bot_kick(ci, u, BOT_REASON_COLOR);
 			return;
 		}
 
 		/* Reverses kicker */
-		if ((ci->botflags & BS_KICK_REVERSES) && strchr(buf, 22)) {
+		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && strchr(buf, 22)) {
 			check_ban(ci, u, TTB_REVERSES);
 			bot_kick(ci, u, BOT_REASON_REVERSE);
 			return;
 		}
 
 		/* Underlines kicker */
-		if ((ci->botflags & BS_KICK_UNDERLINES) && strchr(buf, 31)) {
+		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && strchr(buf, 31)) {
 			check_ban(ci, u, TTB_UNDERLINES);
 			bot_kick(ci, u, BOT_REASON_UNDERLINE);
 			return;
 		}
 
 		/* Caps kicker */
-		if ((ci->botflags & BS_KICK_CAPS)
+		if (ci->botflags.HasFlag(BS_KICK_CAPS)
 			&& ((c = strlen(buf)) >= ci->capsmin)) {
 			int i = 0;
 			int l = 0;
@@ -231,7 +231,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 
 		/* Bad words kicker */
-		if (ci->botflags & BS_KICK_BADWORDS) {
+		if (ci->botflags.HasFlag(BS_KICK_BADWORDS)) {
 			int i;
 			int mustkick = 0;
 			char *nbuf;
@@ -364,7 +364,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 
 		/* Flood kicker */
-		if (ci->botflags & BS_KICK_FLOOD) {
+		if (ci->botflags.HasFlag(BS_KICK_FLOOD)) {
 			time_t now = time(NULL);
 
 			ud = get_user_data(ci->c, u);
@@ -386,7 +386,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 
 		/* Repeat kicker */
-		if (ci->botflags & BS_KICK_REPEAT) {
+		if (ci->botflags.HasFlag(BS_KICK_REPEAT)) {
 			ud = get_user_data(ci->c, u);
 			if (!ud) {
 				return;
@@ -417,7 +417,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 	/* Fantaisist commands */
 
-	if (buf && (ci->botflags & BS_FANTASY) && *buf == *BSFantasyCharacter && !was_action) {
+	if (buf && ci->botflags.HasFlag(BS_FANTASY) && *buf == *BSFantasyCharacter && !was_action) {
 		cmd = strtok(buf, " ");
 
 		if (cmd && (cmd[0] == *BSFantasyCharacter)) {
@@ -454,8 +454,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(cmd, u, ci, params));
 			}
 			else
+			{
 				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(cmd, u, ci, params));
-
+			}
 		}
 	}
 }
@@ -502,7 +503,7 @@ void load_bs_dbase()
 		SAFE(read_string(&bi->real, f));
 		if (ver >= 10) {
 			SAFE(read_int16(&tmp16, f));
-			bi->flags |= tmp16;
+			//bi->flags |= tmp16;
 		}
 		SAFE(read_int32(&tmp32, f));
 		bi->created = tmp32;
@@ -513,19 +514,19 @@ void load_bs_dbase()
 		 * changed in the config and different from database
 		 * names
 		 */
-		if (s_ChanServ && bi->flags & BI_CHANSERV && strcmp(bi->nick, s_ChanServ))
+		if (s_ChanServ && bi->HasFlag(BI_CHANSERV) && strcmp(bi->nick, s_ChanServ))
 			bi->ChangeNick(s_ChanServ);
-		else if (s_BotServ && bi->flags & BI_BOTSERV && strcmp(bi->nick, s_BotServ))
+		else if (s_BotServ && bi->HasFlag(BI_BOTSERV) && strcmp(bi->nick, s_BotServ))
 			bi->ChangeNick(s_BotServ);
-		else if (s_HostServ && bi->flags & BI_HOSTSERV && strcmp(bi->nick, s_HostServ))
+		else if (s_HostServ && bi->HasFlag(BI_HOSTSERV) && strcmp(bi->nick, s_HostServ))
 			bi->ChangeNick(s_HostServ);
-		else if (s_OperServ && bi->flags & BI_OPERSERV && strcmp(bi->nick, s_OperServ))
+		else if (s_OperServ && bi->HasFlag(BI_OPERSERV) && strcmp(bi->nick, s_OperServ))
 			bi->ChangeNick(s_OperServ);
-		else if (s_MemoServ && bi->flags & BI_MEMOSERV && strcmp(bi->nick, s_MemoServ))
+		else if (s_MemoServ && bi->HasFlag(BI_MEMOSERV) && strcmp(bi->nick, s_MemoServ))
 			bi->ChangeNick(s_MemoServ);
-		else if (s_NickServ && bi->flags & BI_NICKSERV && strcmp(bi->nick, s_NickServ))
+		else if (s_NickServ && bi->HasFlag(BI_NICKSERV) && strcmp(bi->nick, s_NickServ))
 			bi->ChangeNick(s_NickServ);
-		else if (s_GlobalNoticer && bi->flags & BI_GLOBAL && strcmp(bi->nick, s_GlobalNoticer))
+		else if (s_GlobalNoticer && bi->HasFlag(BI_GLOBAL) && strcmp(bi->nick, s_GlobalNoticer))
 			bi->ChangeNick(s_GlobalNoticer);
 	}
 
@@ -566,7 +567,8 @@ void save_bs_dbase()
 			SAFE(write_string(bi->user, f));
 			SAFE(write_string(bi->host, f));
 			SAFE(write_string(bi->real, f));
-			SAFE(write_int16(bi->flags, f));
+			//SAFE(write_int16(bi->flags, f));
+			SAFE(write_int16(0, f));
 			SAFE(write_int32(bi->created, f));
 			SAFE(write_int16(bi->chancount, f));
 		}
@@ -893,8 +895,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 		}
 	}
 
-	if ((ci->flags & CI_PEACE) && stricmp(requester->nick, nick)
-		&& (get_access(u, ci) >= get_access(requester, ci)))
+	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick, nick) && (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
 	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
@@ -937,9 +938,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	}
 
 	/* Check if we need to do a signkick or not -GD */
-	if ((ci->flags & CI_SIGNKICK)
-		|| ((ci->flags & CI_SIGNKICK_LEVEL)
-			&& !check_access(requester, ci, CA_SIGNKICK)))
+	if ((ci->HasFlag(CI_SIGNKICK) || ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK))
 		ircdproto->SendKick(ci->bi, kav[0], kav[1], "%s (%s)", kav[2],
 					   requester->nick);
 	else
@@ -971,8 +970,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 		}
 	}
 
-	if ((ci->flags & CI_PEACE) && stricmp(requester->nick, nick)
-		&& (get_access(u, ci) >= get_access(requester, ci)))
+	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick, nick) && (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
 	av[0] = ci->name;
@@ -986,9 +984,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 		av[2] = reason;
 	}
 
-	if ((ci->flags & CI_SIGNKICK)
-		|| ((ci->flags & CI_SIGNKICK_LEVEL)
-			&& !check_access(requester, ci, CA_SIGNKICK)))
+	if (ci->HasFlag(CI_SIGNKICK) || ((ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK)))
 		ircdproto->SendKick(ci->bi, av[0], av[1], "%s (%s)", av[2],
 					   requester->nick);
 	else
@@ -1025,7 +1021,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 		}
 	}
 
-	if (*mode == '-' && (ci->flags & CI_PEACE)
+	if (*mode == '-' && ci->HasFlag(CI_PEACE)
 		&& stricmp(requester->nick, nick)
 		&& (get_access(u, ci) >= get_access(requester, ci)))
 		return;

@@ -72,7 +72,7 @@ class CommandMSRead : public Command
 				int readcount = 0;
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
-					if (mi->memos[i]->flags & MF_UNREAD)
+					if (mi->memos[i]->HasFlag(MF_UNREAD))
 					{
 						read_memo(u, i, mi, chan.c_str());
 						++readcount;
@@ -180,10 +180,10 @@ int read_memo(User *u, int index, MemoInfo *mi, const char *chan)
 	else
 		notice_lang(s_MemoServ, u, MEMO_HEADER, m->number, m->sender, timebuf, s_MemoServ, m->number);
 	notice_lang(s_MemoServ, u, MEMO_TEXT, m->text);
-	m->flags &= ~MF_UNREAD;
+	m->UnsetFlag(MF_UNREAD);
 
 	/* Check if a receipt notification was requested */
-	if (m->flags & MF_RECEIPT)
+	if (m->HasFlag(MF_RECEIPT))
 		rsend_notify(u, m, chan);
 
 	return 1;

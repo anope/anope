@@ -34,9 +34,9 @@ class CommandNSRecover : public Command
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (!(na = findnick(u2->nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (na->nc->flags & NI_SUSPENDED)
+		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (!stricmp(nick, u->nick))
 			notice_lang(s_NickServ, u, NICK_NO_RECOVER_SELF);
@@ -68,7 +68,7 @@ class CommandNSRecover : public Command
 		}
 		else
 		{
-			if (u->nc == na->nc || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->nc == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
 				char relstr[192];
 

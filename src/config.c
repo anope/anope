@@ -95,7 +95,7 @@ static std::string NSDefaults;
 char *NSGuestNickPrefix;
 bool NSAllowKillImmed;
 bool NSNoGroupChange;
-int NSDefFlags;
+Flags<NickCoreFlag> NSDefFlags;
 unsigned NSDefLanguage;
 time_t NSRegDelay;
 time_t NSResendDelay;
@@ -117,7 +117,7 @@ bool NSModeOnID;
 bool NSAddAccessOnReg;
 
 static std::string CSDefaults;
-int CSDefFlags;
+Flags<ChannelInfoFlag> CSDefFlags;
 unsigned CSMaxReg;
 time_t CSExpire;
 int CSDefBantype;
@@ -135,7 +135,7 @@ bool MSNotifyAll;
 unsigned MSMemoReceipt;
 
 static std::string BSDefaults;
-int BSDefFlags;
+Flags<BotServFlag> BSDefFlags;
 time_t BSKeepData;
 unsigned BSMinUsers;
 unsigned BSBadWordsMax;
@@ -1785,29 +1785,34 @@ int read_config(int reload)
 		}
 	}
 
-	NSDefFlags = 0;
-	if (NSDefaults.empty()) NSDefFlags = NI_SECURE | NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
+	if (NSDefaults.empty())
+	{
+		NSDefFlags.SetFlag(NI_SECURE);
+		NSDefFlags.SetFlag(NI_MEMO_SIGNON);
+		NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
+	}
 	else if (NSDefaults != "none") {
 		bool hadAutoop = false;
 		spacesepstream options(NSDefaults);
 		std::string option;
-		while (options.GetToken(option)) {
-			if (option == "kill") NSDefFlags |= NI_KILLPROTECT;
-			else if (option == "killquick") NSDefFlags |= NI_KILL_QUICK;
-			else if (option == "secure") NSDefFlags |= NI_SECURE;
-			else if (option == "private") NSDefFlags |= NI_PRIVATE;
+		while (options.GetToken(option))
+		{
+			if (option == "kill") NSDefFlags.SetFlag(NI_KILLPROTECT);
+			else if (option == "killquick") NSDefFlags.SetFlag(NI_KILL_QUICK);
+			else if (option == "secure") NSDefFlags.SetFlag(NI_SECURE);
+			else if (option == "private") NSDefFlags.SetFlag(NI_PRIVATE);
 			else if (option == "msg") {
 				if (!UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
-				else NSDefFlags |= NI_MSG;
+				else NSDefFlags.SetFlag(NI_MSG);
 			}
-			else if (option == "hideemail") NSDefFlags |= NI_HIDE_EMAIL;
-			else if (option == "hideusermask") NSDefFlags |= NI_HIDE_MASK;
-			else if (option == "hidequit") NSDefFlags |= NI_HIDE_QUIT;
-			else if (option == "memosignon") NSDefFlags |= NI_MEMO_SIGNON;
-			else if (option == "memoreceive") NSDefFlags |= NI_MEMO_RECEIVE;
+			else if (option == "hideemail") NSDefFlags.SetFlag(NI_HIDE_EMAIL);
+			else if (option == "hideusermask") NSDefFlags.SetFlag(NI_HIDE_MASK);
+			else if (option == "hidequit") NSDefFlags.SetFlag(NI_HIDE_QUIT);
+			else if (option == "memosignon") NSDefFlags.SetFlag(NI_MEMO_SIGNON);
+			else if (option == "memoreceive") NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
 			else if (option == "autoop") hadAutoop = true;
 		}
-		if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
+		if (!hadAutoop) NSDefFlags.SetFlag(NI_AUTOOP);
 	}
 
 	if (reload) {
@@ -1820,37 +1825,41 @@ int read_config(int reload)
 		retval = 0;
 	}
 
-	CSDefFlags = 0;
-	if (CSDefaults.empty()) CSDefFlags = CI_KEEPTOPIC | CI_SECURE | CI_SECUREFOUNDER | CI_SIGNKICK;
+	if (CSDefaults.empty())
+	{
+		CSDefFlags.SetFlag(CI_KEEPTOPIC);
+		CSDefFlags.SetFlag(CI_SECURE);
+		CSDefFlags.SetFlag(CI_SECUREFOUNDER);
+		CSDefFlags.SetFlag(CI_SIGNKICK);
+	}
 	else if (CSDefaults != "none") {
 		spacesepstream options(CSDefaults);
 		std::string option;
 		while (options.GetToken(option)) {
-			if (option == "keeptopic") CSDefFlags |= CI_KEEPTOPIC;
-			else if (option == "topiclock") CSDefFlags |= CI_TOPICLOCK;
-			else if (option == "private") CSDefFlags |= CI_PRIVATE;
-			else if (option == "restricted") CSDefFlags |= CI_RESTRICTED;
-			else if (option == "secure") CSDefFlags |= CI_SECURE;
-			else if (option == "secureops") CSDefFlags |= CI_SECUREOPS;
-			else if (option == "securefounder") CSDefFlags |= CI_SECUREFOUNDER;
-			else if (option == "signkick") CSDefFlags |= CI_SIGNKICK;
-			else if (option == "signkicklevel") CSDefFlags |= CI_SIGNKICK_LEVEL;
-			else if (option == "opnotice") CSDefFlags |= CI_OPNOTICE;
-			else if (option == "xop") CSDefFlags |= CI_XOP;
-			else if (option == "peace") CSDefFlags |= CI_PEACE;
+			if (option == "keeptopic") CSDefFlags.SetFlag(CI_KEEPTOPIC);
+			else if (option == "topiclock") CSDefFlags.SetFlag(CI_TOPICLOCK);
+			else if (option == "private") CSDefFlags.SetFlag(CI_PRIVATE);
+			else if (option == "restricted") CSDefFlags.SetFlag(CI_RESTRICTED);
+			else if (option == "secure") CSDefFlags.SetFlag(CI_SECURE);
+			else if (option == "secureops") CSDefFlags.SetFlag(CI_SECUREOPS);
+			else if (option == "securefounder") CSDefFlags.SetFlag(CI_SECUREFOUNDER);
+			else if (option == "signkick") CSDefFlags.SetFlag(CI_SIGNKICK);
+			else if (option == "signkicklevel") CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
+			else if (option == "opnotice") CSDefFlags.SetFlag(CI_OPNOTICE);
+			else if (option == "xop") CSDefFlags.SetFlag(CI_XOP);
+			else if (option == "peace") CSDefFlags.SetFlag(CI_PEACE);
 		}
 	}
 
-	BSDefFlags = 0;
 	if (!BSDefaults.empty()) {
 		spacesepstream options(BSDefaults);
 		std::string option;
 		while (options.GetToken(option)) {
-			if (option == "dontkickops") BSDefFlags |= BS_DONTKICKOPS;
-			else if (option == "dontkickvoices") BSDefFlags |= BS_DONTKICKVOICES;
-			else if (option == "greet") BSDefFlags |= BS_GREET;
-			else if (option == "fantasy") BSDefFlags |= BS_FANTASY;
-			else if (option == "symbiosis") BSDefFlags |= BS_SYMBIOSIS;
+			if (option == "dontkickops") BSDefFlags.SetFlag(BS_DONTKICKOPS);
+			else if (option == "dontkickvoices") BSDefFlags.SetFlag(BS_DONTKICKVOICES);
+			else if (option == "greet") BSDefFlags.SetFlag(BS_GREET);
+			else if (option == "fantasy") BSDefFlags.SetFlag(BS_FANTASY);
+			else if (option == "symbiosis") BSDefFlags.SetFlag(BS_SYMBIOSIS);
 		}
 	}
 

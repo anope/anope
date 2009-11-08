@@ -134,7 +134,7 @@ class ChanServTimer : public Timer
 			ChannelInfo *ci = cs_findchan(channel.c_str());
 
 			if (ci)
-				ci->flags &= ~CI_INHABIT;
+				ci->UnsetFlag(CI_INHABIT);
 
 			ircdproto->SendPart(findbot(s_ChanServ), channel.c_str(), NULL);
 		}
@@ -394,13 +394,14 @@ void load_cs_dbase()
 			SAFE(read = read_buffer(ci->last_topic_setter, f));
 			SAFE(read_int32(&tmp32, f));
 			ci->last_topic_time = tmp32;
-			SAFE(read_int32(&ci->flags, f));
+			//SAFE(read_int32(&ci->flags, f));
+			SAFE(read_int32(&tmp32, f));
 
 			/* Leaveops cleanup */
-			if (ver <= 13 && (ci->flags & 0x00000020))
-				ci->flags &= ~0x00000020;
+//			if (ver <= 13 && (ci->HasFlag()0x00000020))
+//				ci->UnsetFlag()0x00000020;
 			/* Temporary flags cleanup */
-			ci->flags &= ~CI_INHABIT;
+			ci->UnsetFlag(CI_INHABIT);
 
 			SAFE(read_string(&ci->forbidby, f));
 			SAFE(read_string(&ci->forbidreason, f));
@@ -517,7 +518,8 @@ void load_cs_dbase()
 					ci->memos.memos[j] = new Memo;
 					Memo *memo = ci->memos.memos[j];
 					SAFE(read_int32(&memo->number, f));
-					SAFE(read_int16(&memo->flags, f));
+					//SAFE(read_int16(&memo->flags, f));
+					SAFE(read_int16(&tmp16, f));
 					SAFE(read_int32(&tmp32, f));
 					memo->time = tmp32;
 					SAFE(read = read_buffer(memo->sender, f));
@@ -540,7 +542,7 @@ void load_cs_dbase()
 				ci->bi = NULL;
 
 			SAFE(read_int32(&tmp32, f));
-			ci->botflags = tmp32;
+			//ci->botflags = tmp32;
 			SAFE(read_int16(&tmp16, f));
 			n_ttb = tmp16;
 			ci->ttb = new int16[2 * TTB_SIZE];
@@ -569,7 +571,9 @@ void load_cs_dbase()
 					SAFE(read_int16(&ci->badwords[j].in_use, f));
 					if (ci->badwords[j].in_use) {
 						SAFE(read_string(&ci->badwords[j].word, f));
-						SAFE(read_int16(&ci->badwords[j].type, f));
+						//SAFE(read_int16(&ci->badwords[j].type, f));
+						SAFE(read_int16(&tmp16, f));
+						ci->badwords[j].type = BW_ANY; // for now
 					}
 				}
 			} else {
@@ -589,7 +593,7 @@ void load_cs_dbase()
 		ChannelInfo *next;
 		for (ci = chanlists[i]; ci; ci = next) {
 			next = ci->next;
-			if (!(ci->flags & CI_FORBIDDEN) && !ci->founder) {
+			if (!(ci->HasFlag(CI_FORBIDDEN)) && !ci->founder) {
 				alog("%s: database load: Deleting founderless channel %s",
 					 s_ChanServ, ci->name);
 				delchan(ci);
@@ -655,7 +659,8 @@ void save_cs_dbase()
 			SAFE(write_string(ci->last_topic, f));
 			SAFE(written = write_buffer(ci->last_topic_setter, f));
 			SAFE(write_int32(ci->last_topic_time, f));
-			SAFE(write_int32(ci->flags, f));
+			//SAFE(write_int32(ci->flags, f));
+			SAFE(write_int32(0, f));
 			SAFE(write_string(ci->forbidby, f));
 			SAFE(write_string(ci->forbidreason, f));
 			SAFE(write_int16(ci->bantype, f));
@@ -681,8 +686,9 @@ void save_cs_dbase()
 			for (j = 0; j < ci->GetAkickCount(); ++j)
 			{
 				AutoKick *akick = ci->GetAkick(j);
-				SAFE(write_int16(akick->flags, f));
-				if (akick->flags & AK_ISNICK)
+				//SAFE(write_int16(akick->flags, f));
+				SAFE(write_int16(0, f));
+				if (akick->HasFlag(AK_ISNICK))
 					SAFE(write_string(akick->nc->display, f));
 				else
 					SAFE(write_string(akick->mask.c_str(), f));
@@ -714,7 +720,8 @@ void save_cs_dbase()
 			for (j = 0; j < ci->memos.memos.size(); j++) {
 				Memo *memo = ci->memos.memos[j];
 				SAFE(write_int32(memo->number, f));
-				SAFE(write_int16(memo->flags, f));
+				SAFE(write_int16(0, f));
+				//SAFE(write_int16(memo->flags, f));
 				SAFE(write_int32(memo->time, f));
 				SAFE(written = write_buffer(memo->sender, f));
 				SAFE(write_string(memo->text, f));
@@ -727,7 +734,8 @@ void save_cs_dbase()
 			else
 				SAFE(write_string(NULL, f));
 
-			SAFE(write_int32(ci->botflags, f));
+			//SAFE(write_int32(ci->botflags, f));
+			SAFE(write_int32(0, f));
 
 			tmp16 = TTB_SIZE;
 			SAFE(write_int16(tmp16, f));
@@ -914,7 +922,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 		return 0;
 
 	/* They will be kicked; no need to deop, no need to update our internal struct too */
-	if (chan->ci->flags & CI_FORBIDDEN)
+	if (chan->ci->HasFlag(CI_FORBIDDEN))
 		return 0;
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
@@ -946,7 +954,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 		return 1;
 
 	/* They will be kicked; no need to deop, no need to update our internal struct too */
-	if (chan->ci->flags & CI_FORBIDDEN)
+	if (chan->ci->HasFlag(CI_FORBIDDEN))
 		return 0;
 
 	owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
@@ -1029,10 +1037,10 @@ int check_should_op(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
+	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
-	if ((ci->flags & CI_SECURE) && !nick_identified(user))
+	if ((ci->HasFlag(CI_SECURE)) && !nick_identified(user))
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOOP)) {
@@ -1052,10 +1060,10 @@ int check_should_voice(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
+	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
-	if ((ci->flags & CI_SECURE) && !nick_identified(user))
+	if ((ci->HasFlag(CI_SECURE)) && !nick_identified(user))
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOVOICE)) {
@@ -1072,7 +1080,7 @@ int check_should_halfop(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
 
-	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
+	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOHALFOP)) {
@@ -1090,11 +1098,11 @@ int check_should_owner(User * user, char *chan)
 	ChannelInfo *ci = cs_findchan(chan);
 	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
-	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
+	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
-	if (((ci->flags & CI_SECUREFOUNDER) && IsRealFounder(user, ci))
-		|| (!(ci->flags & CI_SECUREFOUNDER) && IsFounder(user, ci))) {
+	if (((ci->HasFlag(CI_SECUREFOUNDER)) && IsRealFounder(user, ci))
+		|| (!(ci->HasFlag(CI_SECUREFOUNDER)) && IsFounder(user, ci))) {
 		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", cm->ModeChar, user->nick,
 					   user->nick);
 		return 1;
@@ -1110,7 +1118,7 @@ int check_should_protect(User * user, char *chan)
 	ChannelInfo *ci = cs_findchan(chan);
 	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
-	if (!ci || (ci->flags & CI_FORBIDDEN) || *chan == '+')
+	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOPROTECT)) {
@@ -1157,7 +1165,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 		return 0;
 	}
 
-	if (ci->flags & CI_SUSPENDED || ci->flags & CI_FORBIDDEN)
+	if (ci->HasFlag(CI_SUSPENDED) || ci->HasFlag(CI_FORBIDDEN))
 	{
 		if (is_oper(user))
 			return 0;
@@ -1188,16 +1196,16 @@ int check_kick(User * user, const char *chan, time_t chants)
 	{
 		akick = ci->GetAkick(j);
 
-		if (!(akick->flags & AK_USED))
+		if (!akick->HasFlag(AK_USED))
 			continue;
 
-		if ((akick->flags & AK_ISNICK && akick->nc == nc)
-			|| (!(akick->flags & AK_ISNICK)
+		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+			|| (!akick->HasFlag(AK_ISNICK)
 			&& match_usermask(akick->mask.c_str(), user)))
 			{
 			if (debug >= 2)
-				alog("debug: %s matched akick %s", user->nick, (akick->flags & AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
-			if (akick->flags & AK_ISNICK)
+				alog("debug: %s matched akick %s", user->nick, akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
+			if (akick->HasFlag(AK_ISNICK))
 				get_idealban(ci, user, mask, sizeof(mask));
 			else
 				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
@@ -1226,7 +1234,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	 * JOIN would not). */
 	/* Don't check for CI_INHABIT before for the Channel record cos else
 	 * c may be NULL even if it exists */
-	if ((!(c = findchan(chan)) || c->usercount == 0) && !(ci->flags & CI_INHABIT))
+	if ((!(c = findchan(chan)) || c->usercount == 0) && !ci->HasFlag(CI_INHABIT))
 	{
 		ircdproto->SendJoin(findbot(s_ChanServ), chan, (c ? c->creation_time : chants));
 		/*
@@ -1238,7 +1246,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 		}
 
 		t = new ChanServTimer(CSInhabit, chan);
-		ci->flags |= CI_INHABIT;
+		ci->SetFlag(CI_INHABIT);
 	}
 
 	if (c) {
@@ -1306,7 +1314,7 @@ void restore_topic(const char *chan)
 		return;
 	/* We can be sure that the topic will be in sync when we return -GD */
 	c->topic_sync = 1;
-	if (!(ci->flags & CI_KEEPTOPIC)) {
+	if (!(ci->HasFlag(CI_KEEPTOPIC))) {
 		/* We need to reset the topic here, since it's currently empty and
 		 * should be updated with a TOPIC from the IRCd soon. -GD
 		 */
@@ -1356,7 +1364,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 		return 0;
 	}
 
-	if (!(ci = c->ci) || !(ci->flags & CI_TOPICLOCK))
+	if (!(ci = c->ci) || !(ci->HasFlag(CI_TOPICLOCK)))
 		return 0;
 
 	if (c->topic)
@@ -1421,9 +1429,7 @@ void expire_chans()
 	for (i = 0; i < 256; i++) {
 		for (ci = chanlists[i]; ci; ci = next) {
 			next = ci->next;
-			if (!ci->c && now - ci->last_used >= CSExpire
-				&& !(ci->
-					 flags & (CI_FORBIDDEN | CI_NO_EXPIRE | CI_SUSPENDED)))
+			if (!ci->c && now - ci->last_used >= CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
 			{
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
@@ -1500,7 +1506,7 @@ void cs_remove_nick(const NickCore * nc)
 			for (j = ci->GetAkickCount(); j > 0; --j)
 			{
 				akick = ci->GetAkick(j - 1);
-				if ((akick->flags & AK_USED) && (akick->flags & AK_ISNICK) && akick->nc == nc)
+				if (akick->HasFlag(AK_USED) && akick->HasFlag(AK_ISNICK) && akick->nc == nc)
 					ci->EraseAkick(akick);
 			}
 		}
@@ -1560,7 +1566,7 @@ int check_access(User * user, ChannelInfo * ci, int what)
 	if (level >= ACCESS_FOUNDER)
 		return (what == CA_AUTODEOP || what == CA_NOJOIN) ? 0 : 1;
 	/* Hacks to make flags work */
-	if (what == CA_AUTODEOP && (ci->flags & CI_SECUREOPS) && level == 0)
+	if (what == CA_AUTODEOP && (ci->HasFlag(CI_SECUREOPS)) && level == 0)
 		return 1;
 	if (limit == ACCESS_INVALID)
 		return 0;
@@ -1785,7 +1791,7 @@ bool IsFounder(User *user, ChannelInfo *ci)
 	}
 	
 	/* If they're QOP+ and theyre identified or theyre recognized and the channel isn't secure */
-	if (access && access->level >= ACCESS_QOP && (user->nc || (user->IsRecognized() && !(ci->flags & CI_SECURE))))
+	if (access && access->level >= ACCESS_QOP && (user->nc || (user->IsRecognized() && !(ci->HasFlag(CI_SECURE)))))
 		return true;
 
 	return false;
@@ -1843,7 +1849,7 @@ int get_access(User *user, ChannelInfo *ci)
 		NickAlias *na = findnick(user->nick);
 		if (na)
 			access = ci->GetAccess(na->nc);
-		if (access && user->IsRecognized() && !(ci->flags & CI_SECURE))
+		if (access && user->IsRecognized() && !(ci->HasFlag(CI_SECURE)))
 			return access->level;
 	}
 
@@ -1860,7 +1866,7 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 		return;
 
 	if (IsFounder(user, ci) || nick_identified(user)
-		|| (user->IsRecognized() && !(ci->flags & CI_SECURE)))
+		|| (user->IsRecognized() && !ci->HasFlag(CI_SECURE)))
 		if ((access = ci->GetAccess(user->nc)))
 			access->last_seen = time(NULL);
 }
@@ -1977,7 +1983,7 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
-		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK) || !(akick->flags & AK_STUCK))
+		if (!akick->HasFlag(AK_USED) || akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
 			continue;
 
 		if (Anope::Match(akick->mask, mask, false))
@@ -2038,8 +2044,7 @@ void stick_all(ChannelInfo * ci)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
-		if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK)
-			|| !(akick->flags & AK_STUCK))
+		if (!akick->HasFlag(AK_USED) || (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK)))
 			continue;
 
 		av[0] = "+b";

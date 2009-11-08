@@ -323,7 +323,7 @@ Server *server_global(Server * s, char *msg)
 
 	while (s) {
 		/* Do not send the notice to ourselves our juped servers */
-		if (!(s->flags & (SERVER_ISME | SERVER_JUPED)))
+		if (!s->HasFlag(SERVER_ISME) && !s->HasFlag(SERVER_JUPED))
 			notice_server(s_GlobalNoticer, s, "%s", msg);
 
 		if (s->links) {

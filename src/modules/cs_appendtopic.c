@@ -70,8 +70,6 @@ class CommandCSAppendTopic : public Command
 
 		if (!c)
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		else if (ci->flags & CI_FORBIDDEN)
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 		else if (!check_access(u, ci, CA_TOPIC))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else

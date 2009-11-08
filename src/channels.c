@@ -625,7 +625,7 @@ void chan_set_modes(const char *source, Channel *chan, int ac, const char **av, 
 				{
 					if (check < 2)
 						chan_set_correct_modes(user, chan, 0);
-					else if ((chan->ci->flags) && (chan->ci->flags & CI_SECUREOPS))
+					else if (chan->ci->HasFlag(CI_SECUREOPS))
 					{
 						/* Fixing bug #1006 oringinally caused by fixing #922
 						 * we must check for secureops here, not in chan_set_correct_modes
@@ -1509,7 +1509,7 @@ void do_cmode(const char *source, int ac, const char **av)
 	if (!chan) {
 		if (debug) {
 			ci = cs_findchan(av[0]);
-			if (!(ci && (ci->flags & CI_FORBIDDEN)))
+			if (!(ci && (ci->HasFlag(CI_FORBIDDEN))))
 				alog("debug: MODE %s for nonexistent channel %s",
 					 merge_args(ac - 1, av + 1), av[0]);
 		}
@@ -1635,7 +1635,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!c || !(ci = c->ci))
 		return;
 
-	if ((ci->flags & CI_FORBIDDEN) || (*(c->name) == '+'))
+	if ((ci->HasFlag(CI_FORBIDDEN)) || (*(c->name) == '+'))
 		return;
 
 	status = chan_get_user_status(c, user);
@@ -1649,7 +1649,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	 * to receive modes. I wonder who added that... *looks at Rob* ;) -GD
 	 */
 	if (give_modes && (get_ignore(user->nick) == NULL)
-		&& (!user->nc || !(user->nc->flags & NI_AUTOOP))) {
+		&& (!user->nc || !user->nc->HasFlag(NI_AUTOOP))) {
 		if (owner && (IsFounder(user, ci) || check_access(user, ci, CA_AUTOOWNER)))
 			add_modes |= CUS_OWNER;
 		else if (admin && check_access(user, ci, CA_AUTOPROTECT))
@@ -1668,7 +1668,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	 * Unless the channel has just been created. -heinz
 	 *	 Or the user matches CA_AUTODEOP... -GD
 	 */
-	if (((ci->flags & CI_SECUREOPS) || (c->usercount == 1)
+	if (((ci->HasFlag(CI_SECUREOPS)) || (c->usercount == 1)
 		 || check_access(user, ci, CA_AUTODEOP))
 		&& !is_ulined(user->server->name)) {
 		if (owner && (status & CUS_OWNER) && !IsFounder(user, ci))
@@ -1823,7 +1823,7 @@ void chan_adduser2(User * user, Channel * c)
 	if (s_BotServ && c->ci && c->ci->bi) {
 		if (c->usercount == BSMinUsers)
 			bot_join(c->ci);
-		if (c->usercount >= BSMinUsers && (c->ci->botflags & BS_GREET)
+		if (c->usercount >= BSMinUsers && (c->ci->botflags.HasFlag(BS_GREET))
 			&& user->nc && user->nc->greet
 			&& check_access(user, c->ci, CA_GREET)) {
 			/* Only display the greet if the main uplink we're connected
@@ -2071,7 +2071,7 @@ Entry *entry_create(char *mask)
 	uint32 ip, cidr;
 
 	entry = new Entry;
-	entry->type = ENTRYTYPE_NONE;
+	entry->SetFlag(ENTRYTYPE_NONE);
 	entry->prev = NULL;
 	entry->next = NULL;
 	entry->nick = NULL;
@@ -2113,18 +2113,18 @@ Entry *entry_create(char *mask)
 		entry->nick = sstrdup(nick);
 		/* Check if we have a wildcard user */
 		if (str_is_wildcard(nick))
-			entry->type |= ENTRYTYPE_NICK_WILD;
+			entry->SetFlag(ENTRYTYPE_NICK_WILD);
 		else
-			entry->type |= ENTRYTYPE_NICK;
+			entry->SetFlag(ENTRYTYPE_NICK);
 	}
 
 	if (user) {
 		entry->user = sstrdup(user);
 		/* Check if we have a wildcard user */
 		if (str_is_wildcard(user))
-			entry->type |= ENTRYTYPE_USER_WILD;
+			entry->SetFlag(ENTRYTYPE_USER_WILD);
 		else
-			entry->type |= ENTRYTYPE_USER;
+			entry->SetFlag(ENTRYTYPE_USER);
 	}
 
 	/* Only check the host if it's not a pure wildcard */
@@ -2132,7 +2132,7 @@ Entry *entry_create(char *mask)
 		if (ircd->cidrchanbei && str_is_cidr(host, &ip, &cidr, &cidrhost)) {
 			entry->cidr_ip = ip;
 			entry->cidr_mask = cidr;
-			entry->type |= ENTRYTYPE_CIDR4;
+			entry->SetFlag(ENTRYTYPE_CIDR4);
 			host = cidrhost;
 		} else if (ircd->cidrchanbei && strchr(host, '/')) {
 			/* Most IRCd's don't enforce sane bans therefore it is not
@@ -2143,13 +2143,14 @@ Entry *entry_create(char *mask)
 			 * str_is_cidr() as this expects a standard cidr.
 			 * Add it to the internal list (so it is included in for example clear)
 			 * but do not use if during matching.. ~ Viper */
-			entry->type = ENTRYTYPE_NONE;
+			entry->ClearFlags();
+			entry->SetFlag(ENTRYTYPE_NONE);
 		} else {
 			entry->host = sstrdup(host);
 			if (str_is_wildcard(host))
-				entry->type |= ENTRYTYPE_HOST_WILD;
+				entry->SetFlag(ENTRYTYPE_HOST_WILD);
 			else
-				entry->type |= ENTRYTYPE_HOST;
+				entry->SetFlag(ENTRYTYPE_HOST);
 		}
 	}
 	delete [] mask;
@@ -2246,28 +2247,28 @@ EList *list_create()
 int entry_match(Entry * e, const char *nick, const char *user, const char *host, uint32 ip)
 {
 	/* If we don't get an entry, or it s an invalid one, no match ~ Viper */
-	if (!e || e->type == ENTRYTYPE_NONE)
+	if (!e || !e->FlagCount())
 		return 0;
 
-	if (ircd->cidrchanbei && (e->type & ENTRYTYPE_CIDR4) &&
+	if (ircd->cidrchanbei && (e->HasFlag(ENTRYTYPE_CIDR4)) &&
 		(!ip || (ip && ((ip & e->cidr_mask) != e->cidr_ip))))
 		return 0;
-	if ((e->type & ENTRYTYPE_NICK)
+	if ((e->HasFlag(ENTRYTYPE_NICK))
 		&& (!nick || stricmp(e->nick, nick) != 0))
 		return 0;
-	if ((e->type & ENTRYTYPE_USER)
+	if ((e->HasFlag(ENTRYTYPE_USER))
 		&& (!user || stricmp(e->user, user) != 0))
 		return 0;
-	if ((e->type & ENTRYTYPE_HOST)
+	if ((e->HasFlag(ENTRYTYPE_HOST))
 		&& (!user || stricmp(e->host, host) != 0))
 		return 0;
-	if ((e->type & ENTRYTYPE_NICK_WILD)
+	if ((e->HasFlag(ENTRYTYPE_NICK_WILD))
 		&& !Anope::Match(nick, e->nick, false))
 		return 0;
-	if ((e->type & ENTRYTYPE_USER_WILD)
+	if ((e->HasFlag(ENTRYTYPE_USER_WILD))
 		&& !Anope::Match(user, e->user, false))
 		return 0;
-	if ((e->type & ENTRYTYPE_HOST_WILD)
+	if ((e->HasFlag(ENTRYTYPE_HOST_WILD))
 		&& !Anope::Match(host, e->host, false))
 		return 0;
 

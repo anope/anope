@@ -73,7 +73,7 @@ class CommandMSList : public Command
 				{
 					for (i = 0; i < mi->memos.size(); ++i)
 					{
-						if (mi->memos[i]->flags & MF_UNREAD)
+						if (mi->memos[i]->HasFlag(MF_UNREAD))
 							break;
 					}
 					if (i == mi->memos.size())
@@ -87,7 +87,7 @@ class CommandMSList : public Command
 				}
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
-					if (!param.empty() && !(mi->memos[i]->flags & MF_UNREAD))
+					if (!param.empty() && !(mi->memos[i]->HasFlag(MF_UNREAD)))
 						continue;
 					list_memo(u, i, mi, &sent_header, !param.empty(), chan.c_str());
 				}
@@ -178,7 +178,7 @@ int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, cons
 	tm = *localtime(&m->time);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 	timebuf[sizeof(timebuf) - 1] = 0;   /* just in case */
-	notice_lang(s_MemoServ, u, MEMO_LIST_FORMAT, (m->flags & MF_UNREAD) ? '*' : ' ', m->number, m->sender, timebuf);
+	notice_lang(s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender, timebuf);
 	return 1;
 }
 

@@ -150,7 +150,7 @@ class XOPBase : public Command
 			notice_lang(s_ChanServ, u, messages[XOP_NICKS_ONLY]);
 			return MOD_CONT;
 		}
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 		{
 			notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
@@ -380,7 +380,7 @@ class XOPBase : public Command
 
 		ChannelInfo *ci = cs_findchan(chan);
 
-		if (!(ci->flags & CI_XOP))
+		if (!(ci->HasFlag(CI_XOP)))
 			notice_lang(s_ChanServ, u, CHAN_XOP_ACCESS, s_ChanServ);
 		else if (cmd == "ADD")
 			return this->DoAdd(u, params, ci, level, messages);

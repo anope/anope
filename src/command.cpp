@@ -13,7 +13,6 @@
 
 Command::Command(const std::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
-	this->flags = 0;
 	this->core = 0;
 	this->mod_name = NULL;
 	this->service = NULL;
@@ -35,21 +34,6 @@ CommandReturn Command::Execute(User *u, std::vector<ci::string> &) { return MOD_
 bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
 
 void Command::OnSyntaxError(User *u) { }
-
-void Command::SetFlag(CommandFlags flag)
-{
-	this->flags |= flag;
-}
-
-void Command::UnsetFlag(CommandFlags flag)
-{
-	this->flags &= ~flag;
-}
-
-bool Command::HasFlag(CommandFlags flag) const
-{
-	return this->flags & flag;
-}
 
 void Command::SetPermission(const std::string &reststr)
 {

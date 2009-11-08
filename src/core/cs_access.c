@@ -61,7 +61,7 @@ static int access_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 		*sent_header = 1;
 	}
 
-	if (ci->flags & CI_XOP)
+	if (ci->HasFlag(CI_XOP))
 	{
 		xop = get_xop_level(access->level);
 		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, index + 1, xop, access->nc->display);
@@ -107,7 +107,7 @@ static int access_view(User *u, int index, ChannelInfo *ci, int *sent_header)
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 	}
 
-	if (ci->flags & CI_XOP)
+	if (ci->HasFlag(CI_XOP))
 	{
 		xop = get_xop_level(access->level);
 		notice_lang(s_ChanServ, u, CHAN_ACCESS_VIEW_XOP_FORMAT, index + 1, xop, access->nc->display, access->creator.c_str(), timebuf);
@@ -155,7 +155,7 @@ class CommandCSAccess : public Command
 		if (is_list || cmd == "CLEAR" ? 0 : (cmd == "DEL" ? (!nick || s) : !s))
 			this->OnSyntaxError(u);
 		/* We still allow LIST in xOP mode, but not others */
-		else if ((ci->flags & CI_XOP) && !is_list)
+		else if ((ci->HasFlag(CI_XOP)) && !is_list)
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
@@ -202,7 +202,7 @@ class CommandCSAccess : public Command
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
 				return MOD_CONT;
 			}
-			if (na->status & NS_FORBIDDEN)
+			if (na->HasFlag(NS_FORBIDDEN));
 			{
 				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
@@ -446,7 +446,7 @@ class CommandCSLevels : public Command
 		 */
 		if (cmd == "SET" ? !s : (cmd.substr(0, 3) == "DIS" ? (!what || s) : !!what))
 			this->OnSyntaxError(u);
-		else if (ci->flags & CI_XOP)
+		else if (ci->HasFlag(CI_XOP))
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
 		else if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);

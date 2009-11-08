@@ -7,9 +7,14 @@ NickCore::NickCore()
 	display = email = greet = url = NULL;
 	ot = NULL;
 	pass[0] = '\0';
-	icq = flags = 0;
+	icq = 0;
 	language = channelcount = 0;
 	lastmail = 0;
+
+	/* Set default nick core flags */
+	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
+		if (NSDefFlags.HasFlag((NickCoreFlag)t))
+			SetFlag((NickCoreFlag)t);
 }
 
 bool NickCore::HasCommand(const std::string &cmdstr) const

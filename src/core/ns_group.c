@@ -68,17 +68,17 @@ class CommandNSGroup : public Command
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (NSRegDelay + u->lastnickreg) - time(NULL));
-		else if (u->nc && (u->nc->flags & NI_SUSPENDED))
+		else if (u->nc && (u->nc->HasFlag(NI_SUSPENDED)))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		}
-		else if (target && (target->nc->flags & NI_SUSPENDED))
+		else if (target && (target->nc->HasFlag(NI_SUSPENDED)))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
-		else if (target->status & NS_FORBIDDEN)
+		else if (target->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
 		else if (u->nc && (target->nc == u->nc))
 			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
@@ -168,7 +168,7 @@ class CommandNSGList : public Command
 			notice_lang(s_NickServ, u, ACCESS_DENIED, s_NickServ);
 		else if (nick && (!findnick(nick) || !(nc = findnick(nick)->nc)))
 			notice_lang(s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
-/*		else if (na->status & NS_FORBIDDEN)
+/*		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);*/
 		else
 		{
@@ -183,7 +183,7 @@ class CommandNSGList : public Command
 				NickAlias *na2 = static_cast<NickAlias *>(nc->aliases.list[i]);
 				if (na2->nc == nc)
 				{
-					if (!(wont_expire = na2->status & NS_NO_EXPIRE))
+					if (!(wont_expire = na2->HasFlag(NS_NO_EXPIRE)))
 					{
 						expt = na2->last_seen + NSExpire;
 						tm = localtime(&expt);
@@ -237,7 +237,6 @@ NickAlias *makealias(const char *nick, NickCore *nc)
 	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
-	na->status = 0;
 	slist_add(&nc->aliases, na);
 	alpha_insert_alias(na);
 	return na;

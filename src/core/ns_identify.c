@@ -40,9 +40,9 @@ class CommandNSIdentify : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
 		}
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (na->nc->flags & NI_SUSPENDED)
+		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		/* You can now identify for other nicks without logging out first,
 		 * however you can not identify again for the group you're already
@@ -94,7 +94,7 @@ class CommandNSIdentify : public Command
 				check_memos(u);
 
 			/* Clear any timers */
-			if (na->nc->flags & NI_KILLPROTECT)
+			if (na->nc->HasFlag(NI_KILLPROTECT))
 				del_ns_timeout(na, TO_COLLIDE);
 		}
 		return MOD_CONT;

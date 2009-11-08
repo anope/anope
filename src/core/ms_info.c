@@ -38,13 +38,13 @@ class CommandMSInfo : public Command
 				notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
 				return MOD_CONT;
 			}
-			else if (na->status & NS_FORBIDDEN)
+			else if (na->HasFlag(NS_FORBIDDEN))
 			{
 				notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, name);
 				return MOD_CONT;
 			}
 			mi = &na->nc->memos;
-			hardmax = na->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;
+			hardmax = na->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}
 		else if (name && *name == '#')
 		{
@@ -59,7 +59,7 @@ class CommandMSInfo : public Command
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
-			hardmax = ci->flags & CI_MEMO_HARDMAX ? 1 : 0;
+			hardmax = ci->HasFlag(CI_MEMO_HARDMAX) ? 1 : 0;
 		}
 		else if (name) /* It's not a chan and we aren't services admin */
 		{
@@ -69,7 +69,7 @@ class CommandMSInfo : public Command
 		else
 		{
 			mi = &u->nc->memos;
-			hardmax = u->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;
+			hardmax = u->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}
 
 		if (name && (ci || na->nc != u->nc))
@@ -78,7 +78,7 @@ class CommandMSInfo : public Command
 				notice_lang(s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
 			else if (mi->memos.size() == 1)
 			{
-				if (mi->memos[0]->flags & MF_UNREAD)
+				if (mi->memos[0]->HasFlag(MF_UNREAD))
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMO_UNREAD, name);
 				else
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMO, name);
@@ -88,7 +88,7 @@ class CommandMSInfo : public Command
 				int count = 0, i;
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
-					if (mi->memos[i]->flags & MF_UNREAD)
+					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
 				}
 				if (count == mi->memos.size())
@@ -121,11 +121,11 @@ class CommandMSInfo : public Command
 			   to rewrite the whole thing (it pisses me off). */
 			if (na)
 			{
-				if ((na->nc->flags & NI_MEMO_RECEIVE) && (na->nc->flags & NI_MEMO_SIGNON))
+				if (na->nc->HasFlag(NI_MEMO_RECEIVE) && na->nc->HasFlag(NI_MEMO_SIGNON))
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_ON, name);
-				else if (na->nc->flags & NI_MEMO_RECEIVE)
+				else if (na->nc->HasFlag(NI_MEMO_RECEIVE))
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_RECEIVE, name);
-				else if (na->nc->flags & NI_MEMO_SIGNON)
+				else if (na->nc->HasFlag(NI_MEMO_SIGNON))
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_SIGNON, name);
 				else
 					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name);
@@ -137,7 +137,7 @@ class CommandMSInfo : public Command
 				notice_lang(s_MemoServ, u, MEMO_INFO_NO_MEMOS);
 			else if (mi->memos.size() == 1)
 			{
-				if (mi->memos[0]->flags & MF_UNREAD)
+				if (mi->memos[0]->HasFlag(MF_UNREAD))
 					notice_lang(s_MemoServ, u, MEMO_INFO_MEMO_UNREAD);
 				else
 					notice_lang(s_MemoServ, u, MEMO_INFO_MEMO);
@@ -147,7 +147,7 @@ class CommandMSInfo : public Command
 				int count = 0, i;
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
-					if (mi->memos[i]->flags & MF_UNREAD)
+					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
 				}
 				if (count == mi->memos.size())
@@ -178,11 +178,11 @@ class CommandMSInfo : public Command
 				notice_lang(s_MemoServ, u, MEMO_INFO_NO_LIMIT);
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
-			if ((u->nc->flags & NI_MEMO_RECEIVE) && (u->nc->flags & NI_MEMO_SIGNON))
+			if (u->nc->HasFlag(NI_MEMO_RECEIVE) && u->nc->HasFlag(NI_MEMO_SIGNON))
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_ON);
-			else if (u->nc->flags & NI_MEMO_RECEIVE)
+			else if (u->nc->HasFlag(NI_MEMO_RECEIVE))
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_RECEIVE);
-			else if (u->nc->flags & NI_MEMO_SIGNON)
+			else if (u->nc->HasFlag(NI_MEMO_SIGNON))
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_SIGNON);
 			else
 				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_OFF);

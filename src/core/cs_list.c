@@ -36,7 +36,9 @@ public:
 		int count = 0, from = 0, to = 0, tofree = 0;
 		char *tmp = NULL;
 		char *s = NULL;
-		int32 matchflags = 0;
+		bool forbidden, suspended, channoexpire;
+
+		forbidden = suspended = noexpire = false;
 
 		if (!(!CSListOpersOnly || (is_oper(u))))
 		{
@@ -98,11 +100,11 @@ public:
 			{
 				ci::string keyword_ci = keyword.c_str();
 				if (keyword_ci == "FORBIDDEN")
-					matchflags |= CI_FORBIDDEN;
+					forbidden = true;
 				if (keyword_ci == "SUSPENDED")
-					matchflags |= CI_SUSPENDED;
+					suspended = true;
 				if (keyword_ci == "NOEXPIRE")
-					matchflags |= CI_NO_EXPIRE;
+					channoexpire = true;
 
 			}
 		}
@@ -116,10 +118,14 @@ public:
 		{
 			for (ci = chanlists[i]; ci; ci = ci->next)
 			{
-				if (!is_servadmin && ((ci->flags & CI_PRIVATE)
-					|| (ci->flags & CI_FORBIDDEN) || (ci->flags & CI_SUSPENDED)))
+				if (!is_servadmin && ((ci->HasFlag(CI_PRIVATE))
+					|| (ci->HasFlag(CI_FORBIDDEN)) || (ci->HasFlag(CI_SUSPENDED))))
 					continue;
-				if ((matchflags != 0) && !(ci->flags & matchflags))
+				if (forbidden && !ci->HasFlag(CI_FORBIDDEN))
+					continue;
+				else if (suspended && !ci->HasFlag(CI_SUSPENDED))
+					continue;
+				else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
 					continue;
 
 				if ((stricmp(pattern, ci->name) == 0)
@@ -132,15 +138,15 @@ public:
 						  && (++nchans <= CSListMax))
 					{
 						char noexpire_char = ' ';
-						if (is_servadmin && (ci->flags & CI_NO_EXPIRE))
+						if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
 							noexpire_char = '!';
 
-						if (ci->flags & CI_FORBIDDEN)
+						if (ci->HasFlag(CI_FORBIDDEN))
 						{
 							snprintf(buf, sizeof(buf),
 								   "%-20s  [Forbidden]", ci->name);
 						}
-						else if (ci->flags & CI_SUSPENDED)
+						else if (ci->HasFlag(CI_SUSPENDED))
 						{
 							snprintf(buf, sizeof(buf),
 								   "%-20s  [Suspended]", ci->name);

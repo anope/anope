@@ -42,7 +42,7 @@ class CommandNSSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_FORBIDDEN)
+		if (na->HasFlag(NS_FORBIDDEN))
 		{
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
@@ -56,9 +56,11 @@ class CommandNSSuspend : public Command
 
 		if (na)
 		{
-			na->nc->flags |= NI_SUSPENDED;
-			na->nc->flags |= NI_SECURE;
-			na->nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
+			na->nc->SetFlag(NI_SUSPENDED);
+			na->nc->SetFlag(NI_SECURE);
+			na->nc->UnsetFlag(NI_KILLPROTECT);
+			na->nc->UnsetFlag(NI_KILL_QUICK);
+			na->nc->UnsetFlag(NI_KILL_IMMED);
 
 			for (i = 0; i < na->nc->aliases.count; ++i)
 			{
@@ -128,7 +130,7 @@ class CommandNSUnSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_FORBIDDEN)
+		if (na->HasFlag(NS_FORBIDDEN))
 		{
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
@@ -142,7 +144,7 @@ class CommandNSUnSuspend : public Command
 
 		if (na)
 		{
-			na->nc->flags &= ~NI_SUSPENDED;
+			na->nc->UnsetFlag(NI_SUSPENDED);
 
 			if (WallForbid)
 				ircdproto->SendGlobops(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick, nick);

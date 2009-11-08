@@ -91,23 +91,23 @@ void check_memos(User * u)
 	}
 
 	if (!(nc = u->nc) || !u->IsRecognized() ||
-		!(nc->flags & NI_MEMO_SIGNON)) {
+		!(nc->HasFlag(NI_MEMO_SIGNON))) {
 		return;
 	}
 
 	for (i = 0; i < nc->memos.memos.size(); i++) {
-		if (nc->memos.memos[i]->flags & MF_UNREAD)
+		if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 			newcnt++;
 	}
 	if (newcnt > 0) {
 		notice_lang(s_MemoServ, u,
 					newcnt == 1 ? MEMO_HAVE_NEW_MEMO : MEMO_HAVE_NEW_MEMOS,
 					newcnt);
-		if (newcnt == 1 && (nc->memos.memos[i - 1]->flags & MF_UNREAD)) {
+		if (newcnt == 1 && (nc->memos.memos[i - 1]->HasFlag(MF_UNREAD))) {
 			notice_lang(s_MemoServ, u, MEMO_TYPE_READ_LAST, s_MemoServ);
 		} else if (newcnt == 1) {
 			for (i = 0; i < nc->memos.memos.size(); i++) {
-				if (nc->memos.memos[i]->flags & MF_UNREAD)
+				if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 					break;
 			}
 			notice_lang(s_MemoServ, u, MEMO_TYPE_READ_NUM, s_MemoServ,
@@ -144,7 +144,7 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 			*ischan = 1;
 		ci = cs_findchan(name);
 		if (ci) {
-			if (!(ci->flags & CI_FORBIDDEN)) {
+			if (!(ci->HasFlag(CI_FORBIDDEN))) {
 				*isforbid = 0;
 				return &ci->memos;
 			} else {
@@ -161,7 +161,7 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 			*ischan = 0;
 		na = findnick(name);
 		if (na) {
-			if (!(na->status & NS_FORBIDDEN)) {
+			if (!na->HasFlag(NS_FORBIDDEN)) {
 				*isforbid = 0;
 				return &na->nc->memos;
 			} else {
@@ -261,14 +261,14 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		}
 		m->time = time(NULL);
 		m->text = sstrdup(text);
-		m->flags = MF_UNREAD;
+		m->SetFlag(MF_UNREAD);
 		/* Set notify sent flag - DrStein */
 		if (z == 2) {
-			m->flags |= MF_NOTIFYS;
+			m->SetFlag(MF_NOTIFYS);
 		}
 		/* Set receipt request flag */
 		if (z == 3)
-			m->flags |= MF_RECEIPT;
+			m->SetFlag(MF_RECEIPT);
 		if (z == 0 || z == 3)
 			notice_lang(s_MemoServ, u, MEMO_SENT, name);
 		if (!ischan) {
@@ -276,7 +276,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 			NickCore *nc = (findnick(name))->nc;
 
 			if (MSNotifyAll) {
-				if ((nc->flags & NI_MEMO_RECEIVE)
+				if ((nc->HasFlag(NI_MEMO_RECEIVE))
 					&& get_ignore(name) == NULL) {
 					int i;
 
@@ -289,14 +289,14 @@ void memo_send(User * u, const char *name, const char *text, int z)
 					}
 				} else {
 					if ((u = finduser(name)) && nick_identified(u)
-						&& (nc->flags & NI_MEMO_RECEIVE))
+						&& (nc->HasFlag(NI_MEMO_RECEIVE)))
 						notice_lang(s_MemoServ, u, MEMO_NEW_MEMO_ARRIVED,
 									source, s_MemoServ, m->number);
 				}			   /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
 			/* let's get out the mail if set in the nickcore - certus */
-			if (nc->flags & NI_MEMO_MAIL)
+			if (nc->HasFlag(NI_MEMO_MAIL))
 				new_memo_mail(nc, m);
 		} else {
 			struct c_userlist *cu, *next;
@@ -307,7 +307,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 					next = cu->next;
 					if (check_access(cu->user, c->ci, CA_MEMO)) {
 						if (cu->user->nc
-							&& (cu->user->nc->flags & NI_MEMO_RECEIVE)
+							&& (cu->user->nc->HasFlag(NI_MEMO_RECEIVE))
 							&& get_ignore(cu->user->nick) == NULL) {
 							notice_lang(s_MemoServ, cu->user,
 										MEMO_NEW_X_MEMO_ARRIVED,
@@ -422,7 +422,7 @@ void rsend_notify(User * u, Memo * m, const char *chan)
 	}
 
 	/* Remove receipt flag from the original memo */
-	m->flags &= ~MF_RECEIPT;
+	m->UnsetFlag(MF_RECEIPT);
 
 	return;
 }

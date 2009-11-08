@@ -9,10 +9,33 @@
  *
  */
 
+/** Flags settable on a bot
+ */
+enum BotFlag
+{
+	BI_BEGIN,
+
+	/* This bot can only be assigned by IRCops */
+	BI_PRIVATE,
+	/* The following flags are used to determin what bot really is what.
+	 * Since you *could* have ChanServ really named BotServ or something stupid,
+	 * this keeps track of them and allows them to be renamed in the config
+	 * at any time, even if they already exist in the database
+	 */
+	BI_CHANSERV,
+	BI_BOTSERV,
+	BI_HOSTSERV,
+	BI_OPERSERV,
+	BI_MEMOSERV,
+	BI_NICKSERV,
+	BI_GLOBAL,
+
+	BI_END
+};
 
 struct CommandHash;
 
-class CoreExport BotInfo
+class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 {
  public:
 	BotInfo *next, *prev;
@@ -22,7 +45,6 @@ class CoreExport BotInfo
 	char *user;				/* Its user name */
 	char *host;				/* Its hostname */
 	char *real;	 		/* Its real name */
-	int16 flags;			/* Bot flags -- see BI_* below */
 	time_t created; 		/* Birth date ;) */
 	int16 chancount;		/* Number of channels that use the bot. */
 	/* Dynamic data */

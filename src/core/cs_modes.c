@@ -26,7 +26,7 @@
  * @param name The name, eg "OP" or "HALFOP"
  * @param notice Flag required on a channel to send a notice
  */
-static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const char *nick, bool set, int level, int levelself, const std::string &name, int32 notice)
+static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const char *nick, bool set, int level, int levelself, const std::string &name, ChannelInfoFlag notice)
 {
 	const char *av[2];
 	Channel *c = findchan(chan);
@@ -36,9 +36,8 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 
 	int is_same;
 
-	if (!nick) {
+	if (!nick)
 		nick = u->nick;
-	}
 
 	is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick) == 0);
 
@@ -53,7 +52,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 		notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
-	else if (!set && !is_same && (ci->flags & CI_PEACE) && (get_access(u2, ci) >= get_access(u, ci)))
+	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && is_protected(u2) && !is_same)
 		notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -68,7 +67,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 
 		chan_set_modes(s_ChanServ, c, 2, av, 3);
 
-		if (notice && ci->flags & notice)
+		if (notice && ci->HasFlag(notice))
 			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",
 				   name.c_str(), u2->nick, u->nick);
 	}
@@ -141,7 +140,7 @@ class CommandCSVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_VOICE, CA_VOICEME, "VOICE", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -168,7 +167,7 @@ class CommandCSDeVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_VOICE, CA_VOICEME, "DEVOICE", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -200,7 +199,7 @@ class CommandCSHalfOp : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_HALFOP, CA_HALFOPME, "HALFOP", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -233,7 +232,7 @@ class CommandCSDeHalfOp : public Command
 
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -265,7 +264,7 @@ class CommandCSProtect : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_PROTECT, CA_PROTECTME, "PROTECT", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -296,7 +295,7 @@ class CommandCSDeProtect : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -327,7 +326,7 @@ class CommandCSOwner : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_OWNER, CA_OWNERME, "OWNER", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -358,7 +357,7 @@ class CommandCSDeOwner : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_OWNER, CA_OWNERME, "DEOWNER", 0);
+		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)

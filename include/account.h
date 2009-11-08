@@ -1,6 +1,69 @@
 
 /* NickServ nickname structures. */
 
+/** Flags set on NickAliases
+ */
+enum NickNameFlag
+{
+	NS_BEGIN,
+
+	/* Nick may not be registered or used */
+	NS_FORBIDDEN,
+	/* Nick never expires */
+	NS_NO_EXPIRE,
+	/* Nick is being held after a kill */
+	NS_KILL_HELD,
+	/* SVSNICK has been sent but nick has not yet changed.
+	 * An enforcer will be introduced when it does change. */
+	NS_GUESTED,
+
+	NS_END
+};
+
+/** Flags set on NickCores
+ */
+enum NickCoreFlag
+{
+	NI_BEGIN,
+
+	/* Kill others who take this nick */
+	NI_KILLPROTECT,
+	/* Dont recognize unless IDENTIFIED */
+	NI_SECURE,
+	/* Use PRIVMSG instead of NOTICE */
+	NI_MSG,
+	/* Don't allow user to change memo limit */
+	NI_MEMO_HARDMAX,
+	/* Notify of memos at signon and un-away */
+	NI_MEMO_SIGNON,
+	/* Notify of new memos when sent */
+	NI_MEMO_RECEIVE,
+	/* Don't show in LIST to non-servadmins */
+	NI_PRIVATE,
+	/* Don't show email in INFO */
+	NI_HIDE_EMAIL,
+	/* Don't show last seen address in INFO */
+	NI_HIDE_MASK,
+	/* Don't show last quit message in INFO */
+	NI_HIDE_QUIT,
+	/* Kill in 20 seconds instead of in 60 */
+	NI_KILL_QUICK,
+	/* Kill immediatly */
+	NI_KILL_IMMED,
+	/* User gets email on memo */
+	NI_MEMO_MAIL,
+	/* Don't show services access status */
+	NI_HIDE_STATUS,
+	/* Nickname is suspended */
+	NI_SUSPENDED,
+	/* Autoop nickname in channels */
+	NI_AUTOOP,
+	/* Nick won't expire */
+	NI_NOEXPIRE,
+
+	NI_END
+};
+
 /** XXX: this really needs to die with fire and be merged with metadata into NickCore or something.
  */
 class NickRequest
@@ -24,7 +87,7 @@ class NickRequest
 
 class NickCore;
 
-class CoreExport NickAlias : public Extensible
+class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 {
  public:
 	NickAlias();
@@ -36,11 +99,10 @@ class CoreExport NickAlias : public Extensible
 	char *last_usermask;			/* Last usermask */
 	time_t time_registered;			/* When the nick was registered */
 	time_t last_seen;			/* When it was seen online for the last time */
-	uint16 status;				/* See NS_* below */
 	NickCore *nc;				/* I'm an alias of this */
 };
 
-class CoreExport NickCore : public Extensible
+class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 {
  public:
 	NickCore();
@@ -53,7 +115,6 @@ class CoreExport NickCore : public Extensible
 	char *greet;				/* Greet associated to the nick */
 	uint32 icq;				/* ICQ # associated to the nick */
 	char *url;				/* URL associated to the nick */
-	uint32 flags;				/* See NI_* below */
 	uint16 language;			/* Language selected by nickname owner (LANG_*) */
 	std::vector<std::string> access; 	/* Access list, vector of strings */
 	MemoInfo memos;

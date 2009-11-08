@@ -60,7 +60,7 @@ class CommandCSForbid : public Command
 			return MOD_CONT;
 		}
 
-		ci->flags |= CI_FORBIDDEN;
+		ci->SetFlag(CI_FORBIDDEN);
 		ci->forbidby = sstrdup(u->nick);
 		if (reason)
 			ci->forbidreason = sstrdup(reason);

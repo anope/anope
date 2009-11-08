@@ -31,11 +31,11 @@ class CommandNSRelease : public Command
 
 		if (!(na = findnick(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (na->nc->flags & NI_SUSPENDED)
+		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!(na->status & NS_KILL_HELD))
+		else if (!(na->HasFlag(NS_KILL_HELD)))
 			notice_lang(s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
 		else if (pass)
 		{
@@ -57,7 +57,7 @@ class CommandNSRelease : public Command
 		}
 		else
 		{
-			if (u->nc == na->nc || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->nc == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
 				release(na, 0);
 				notice_lang(s_NickServ, u, NICK_RELEASED);

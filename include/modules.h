@@ -217,7 +217,7 @@ struct ModuleLang_ {
 	char **argv;
 };
 
-enum CommandFlags
+enum CommandFlag
 {
 	CFLAG_ALLOW_UNREGISTERED = 1,
 	CFLAG_ALLOW_FORBIDDEN = 2,
@@ -229,9 +229,8 @@ enum CommandFlags
 
 /** Every services command is a class, inheriting from Command.
  */
-class CoreExport Command
+class CoreExport Command : public Flags<CommandFlag>
 {
-	int flags;
  public:
 	size_t MaxParams;
 	size_t MinParams;
@@ -263,22 +262,6 @@ class CoreExport Command
 	 * @param u The user executing the command.
 	 */
 	virtual void OnSyntaxError(User *u);
-
-	/** Set a certain flag on this command.
-	 * @param flag The CommandFlag to set on this command.
-	 */
-	void SetFlag(CommandFlags flag);
-
-	/** Remove a certain flag from this command.
-	 * @param flag The CommandFlag to unset.
-	 */
-	void UnsetFlag(CommandFlags flag);
-
-	/** Check whether a certain flag is set on this command.
-	 * @param flag The CommandFlag to check.
-	 * @return bool True if the flag is set, false else.
-	 */
-	bool HasFlag(CommandFlags flag) const;
 
 	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
 	 * @param reststr The permission required to successfully execute this command

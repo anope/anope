@@ -9,7 +9,51 @@
  *
  */
 
-class CoreExport ChannelInfo : public Extensible
+/** Flags used for the ChannelInfo class
+ */
+enum ChannelInfoFlag
+{
+	CI_BEGIN,
+
+	/* ChanServ is currently holding the channel */
+	CI_INHABIT,
+	/* Retain the topic even after the channel is emptied */
+	CI_KEEPTOPIC,
+	/* Don't allow non-authorized users to be opped */
+	CI_SECUREOPS,
+	/* Hide channel from ChanServ LIST command */
+	CI_PRIVATE,
+	/* Topic can only be changed by SET TOPIC */
+	CI_TOPICLOCK,
+	/* Only users on the access list may join */
+	CI_RESTRICTED,
+	/* Don't allow ChanServ and BotServ commands to do bad things to users with higher access levels */
+	CI_PEACE,
+	/* Don't allow any privileges unless a user is IDENTIFIED with NickServ */
+	CI_SECURE,
+	/* Don't allow the channel to be registered or used */
+	CI_FORBIDDEN,
+	/* Channel does not expire */
+	CI_NO_EXPIRE,
+	/* Channel memo limit may not be changed */
+	CI_MEMO_HARDMAX,
+	/* Send notice to channel on use of OP/DEOP */
+	CI_OPNOTICE,
+	/* Stricter control of channel founder status */
+	CI_SECUREFOUNDER,
+	/* Sign kicks with the user who did the kick */
+	CI_SIGNKICK,
+	/* Sign kicks if level is < than the one defined by the SIGNKIGK level */
+	CI_SIGNKICK_LEVEL,
+	/* Uses XOP */
+	CI_XOP,
+	/* Channel is suspended */
+	CI_SUSPENDED,
+
+	CI_END
+};
+
+class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 {
  private:
 	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name */
@@ -36,7 +80,6 @@ class CoreExport ChannelInfo : public Extensible
 	char last_topic_setter[NICKMAX];	/* Who set the last topic */
 	time_t last_topic_time;		/* When the last topic was set */
 
-	uint32 flags;				/* See below */
 	char *forbidby;
 	char *forbidreason;
 
@@ -53,7 +96,7 @@ class CoreExport ChannelInfo : public Extensible
 	/* For BotServ */
 
 	BotInfo *bi;					/* Bot used on this channel */
-	uint32 botflags;				/* BS_* below */
+	Flags<BotServFlag> botflags;
 	int16 *ttb;						/* Times to ban for each kicker */
 
 	uint16 bwcount;

@@ -130,7 +130,7 @@ class NickServRelease : public Timer
 			else
 				ircdproto->SendQuit(na->nick, NULL);
 		}
-		na->status &= ~NS_KILL_HELD;
+		na->UnsetFlag(NS_KILL_HELD);
 	}
 
 	static void ClearTimers(NickAlias *na, bool dorelease = false)
@@ -381,9 +381,10 @@ void load_ns_dbase()
 			SAFE(read_int32(&nc->icq, f));
 			SAFE(read_string(&nc->url, f));
 
-			SAFE(read_int32(&nc->flags, f));
+			//SAFE(read_int32(&nc->flags, f));
+			SAFE(read_int32(&tmp32, f));
 			if (!NSAllowKillImmed)
-				nc->flags &= ~NI_KILL_IMMED;
+				nc->UnsetFlag(NI_KILL_IMMED);
 			SAFE(read_int16(&nc->language, f));
 
 			uint16 accesscount;
@@ -413,7 +414,8 @@ void load_ns_dbase()
 					nc->memos.memos[j] = new Memo;
 					Memo *memo = nc->memos.memos[j];
 					SAFE(read_int32(&memo->number, f));
-					SAFE(read_int16(&memo->flags, f));
+					//SAFE(read_int16(&memo->flags, f));
+					SAFE(read_int16(&tmp16, f));
 					SAFE(read_int32(&tmp32, f));
 					memo->time = tmp32;
 					SAFE(read_buffer(memo->sender, f));
@@ -448,8 +450,9 @@ void load_ns_dbase()
 			na->time_registered = tmp32;
 			SAFE(read_int32(&tmp32, f));
 			na->last_seen = tmp32;
-			SAFE(read_int16(&na->status, f));
-			na->status &= ~NS_TEMPORARY;
+			//SAFE(read_int16(&na->status, f));
+			SAFE(read_int16(&tmp16, f));
+			//na->UnsetFlag(NS_TEMPORARY);
 
 			SAFE(read_string(&s, f));
 			na->nc = findcore(s);
@@ -457,7 +460,7 @@ void load_ns_dbase()
 
 			slist_add(&na->nc->aliases, na);
 
-			if (!(na->status & NS_FORBIDDEN))
+			if (!na->HasFlag(NS_FORBIDDEN))
 			{
 				if (!na->last_usermask)
 					na->last_usermask = sstrdup("");
@@ -540,7 +543,8 @@ void save_ns_dbase()
 			SAFE(write_int32(nc->icq, f));
 			SAFE(write_string(nc->url, f));
 
-			SAFE(write_int32(nc->flags, f));
+			//SAFE(write_int32(nc->flags, f));
+			SAFE(write_int32(0, f));
 			SAFE(write_int16(nc->language, f));
 
 			SAFE(write_int16(nc->access.size(), f));
@@ -556,7 +560,8 @@ void save_ns_dbase()
 			{
 				Memo *memo = nc->memos.memos[j];
 				SAFE(write_int32(memo->number, f));
-				SAFE(write_int16(memo->flags, f));
+				//SAFE(write_int16(memo->flags, f));
+				SAFE(write_int16(0, f));
 				SAFE(write_int32(memo->time, f));
 				SAFE(write_buffer(memo->sender, f));
 				SAFE(write_string(memo->text, f));
@@ -586,7 +591,8 @@ void save_ns_dbase()
 			SAFE(write_int32(na->time_registered, f));
 			SAFE(write_int32(na->last_seen, f));
 
-			SAFE(write_int16(na->status, f));
+			//SAFE(write_int16(na->status, f));
+			SAFE(write_int16(0, f));
 
 			SAFE(write_string(na->nc->display, f));
 
@@ -651,21 +657,21 @@ int validate_user(User * u)
 	if (!(na = findnick(u->nick)))
 		return 0;
 
-	if (na->status & NS_FORBIDDEN)
+	if (na->HasFlag(NS_FORBIDDEN))
 	{
 		notice_lang(s_NickServ, u, NICK_MAY_NOT_BE_USED);
 		collide(na, 0);
 		return 0;
 	}
 
-	if (na->nc->flags & NI_SUSPENDED)
+	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
 		notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		collide(na, 0);
 		return 0;
 	}
 
-	if (!(na->nc->flags & NI_SECURE) && u->IsRecognized())
+	if (!na->nc->HasFlag(NI_SECURE) && u->IsRecognized())
 	{
 		na->last_seen = time(NULL);
 		if (na->last_usermask)
@@ -678,22 +684,22 @@ int validate_user(User * u)
 		return 1;
 	}
 
-	if (u->IsRecognized() || !(na->nc->flags & NI_KILL_IMMED))
+	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
-		if (na->nc->flags & NI_SECURE)
+		if (na->nc->HasFlag(NI_SECURE))
 			notice_lang(s_NickServ, u, NICK_IS_SECURE, s_NickServ);
 		else
 			notice_lang(s_NickServ, u, NICK_IS_REGISTERED, s_NickServ);
 	}
 
-	if ((na->nc->flags & NI_KILLPROTECT) && !u->IsRecognized())
+	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
 	{
-		if (na->nc->flags & NI_KILL_IMMED)
+		if (na->nc->HasFlag(NI_KILL_IMMED))
 		{
 			notice_lang(s_NickServ, u, FORCENICKCHANGE_NOW);
 			collide(na, 0);
 		}
-		else if (na->nc->flags & NI_KILL_QUICK)
+		else if (na->nc->HasFlag(NI_KILL_QUICK))
 		{
 			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
 			t = new NickServCollide(na, 20);
@@ -721,7 +727,7 @@ void cancel_user(User * u)
 
 	if (na)
 	{
-		if (na->status & NS_GUESTED)
+		if (na->HasFlag(NS_GUESTED))
 		{
 			if (ircd->svshold)
 			{
@@ -738,13 +744,11 @@ void cancel_user(User * u)
 			{
 				ircdproto->SendSVSKill(s_NickServ, u->nick, "Please do not use a registered nickname without identifying");
 			}
-			na->status &= ~NS_TEMPORARY;
-			na->status |= NS_KILL_HELD;
+			na->SetFlag(NS_KILL_HELD);
 		}
-		else
-		{
-			na->status &= ~NS_TEMPORARY;
-		}
+
+		na->UnsetFlag(NS_KILL_HELD);
+		na->UnsetFlag(NS_GUESTED);
 
 		NickServCollide::ClearTimers(na);
 	}
@@ -784,7 +788,7 @@ void expire_nicks()
 			next = na->next;
 
 			User *u = finduser(na->nick);
-			if (u && ((na->nc->flags & NI_SECURE) ? nick_identified(u) : u->IsRecognized()))
+			if (u && (na->nc->HasFlag(NI_SECURE) ? nick_identified(u) : u->IsRecognized()))
 			{
 				if (debug >= 2)
 					alog("debug: NickServ: updating last seen time for %s",
@@ -794,8 +798,8 @@ void expire_nicks()
 			}
 
 			if (NSExpire && now - na->last_seen >= NSExpire
-			        && !(na->status & (NS_FORBIDDEN | NS_NO_EXPIRE))
-			        && !(na->nc->flags & (NI_SUSPENDED)))
+			        && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE)
+			        && !na->nc->HasFlag(NI_SUSPENDED))
 			{
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
@@ -1320,7 +1324,7 @@ void collide(NickAlias * na, int from_timeout)
 		while (finduser(guestnick));
 		notice_lang(s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick);
 		ircdproto->SendForceNickChange(na->nick, guestnick, time(NULL));
-		na->status |= NS_GUESTED;
+		na->SetFlag(NS_GUESTED);
 	}
 	else
 	{
@@ -1345,7 +1349,7 @@ void release(NickAlias * na, int from_timeout)
 	{
 		ircdproto->SendQuit(na->nick, NULL);
 	}
-	na->status &= ~NS_KILL_HELD;
+	na->UnsetFlag(NS_KILL_HELD);
 }
 
 /*************************************************************************/

@@ -39,9 +39,9 @@ class CommandCSEnforce : public Command
 		if (!(ci = c->ci))
 			return;
 
-		if (ci->flags & CI_SECUREOPS)
+		if (ci->HasFlag(CI_SECUREOPS))
 			this->DoSecureOps(c);
-		if (ci->flags & CI_RESTRICTED)
+		if (ci->HasFlag(CI_RESTRICTED))
 			this->DoRestricted(c);
 	}
 
@@ -56,7 +56,7 @@ class CommandCSEnforce : public Command
 		struct c_userlist *user;
 		struct c_userlist *next;
 		ChannelInfo *ci;
-		uint32 flags;
+		bool hadsecureops = false;
 
 		if (!(ci = c->ci))
 			return;
@@ -69,8 +69,11 @@ class CommandCSEnforce : public Command
 		 * part of the code. This way we can enforce SECUREOPS even
 		 * if it's off.
 		 */
-		flags = ci->flags;
-		ci->flags |= CI_SECUREOPS;
+		if (!ci->HasFlag(CI_SECUREOPS))
+		{
+			ci->SetFlag(CI_SECUREOPS);
+			hadsecureops = true;
+		}
 
 		user = c->users;
 		do
@@ -80,7 +83,11 @@ class CommandCSEnforce : public Command
 			user = next;
 		} while (user);
 
-		ci->flags = flags;
+		if (hadsecureops)
+		{
+			ci->UnsetFlag(CI_SECUREOPS);
+		}
+
 	}
 
 	void DoRestricted(Channel *c)
@@ -187,8 +194,6 @@ class CommandCSEnforce : public Command
 
 		if (!c)
 			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		else if (ci->flags & CI_FORBIDDEN)
-			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
 		else if (!check_access(u, ci, CA_AKICK))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else

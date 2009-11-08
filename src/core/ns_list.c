@@ -44,14 +44,14 @@ class CommandNSList : public Command
 		unsigned nnicks, i;
 		char buf[BUFSIZE];
 		bool is_servadmin = u->nc->IsServicesOper();
-		int16 matchflags = 0;
 		NickRequest *nr = NULL;
-		int nronly = 0;
-		int susp_keyword = 0;
 		char noexpire_char = ' ';
 		int count = 0, from = 0, to = 0, tofree = 0;
 		char *tmp = NULL;
 		char *s = NULL;
+		bool suspended, nsnoexpire, forbidden, unconfirmed;
+
+		suspended = nsnoexpire = forbidden = unconfirmed = false;
 
 		if (NSListOpersOnly && !is_oper(u)) /* reverse the help logic */
 		{
@@ -109,52 +109,54 @@ class CommandNSList : public Command
 			{
 				ci::string keyword_ci = keyword.c_str();
 				if (keyword_ci == "FORBIDDEN")
-					matchflags |= NS_FORBIDDEN;
+					forbidden = true;
 				if (keyword_ci == "NOEXPIRE")
-					matchflags |= NS_NO_EXPIRE;
+					nsnoexpire = true;
 				if (keyword_ci == "SUSPENDED")
-					susp_keyword = 1;
+					suspended = true;
 				if (keyword_ci == "UNCONFIRMED")
-					nronly = 1;
+					unconfirmed = true;
 			}
 		}
 
 		mync = u->nc;
 
 		notice_lang(s_NickServ, u, NICK_LIST_HEADER, pattern);
-		if (!nronly)
+		if (!unconfirmed)
 		{
 			for (i = 0; i < 1024; ++i)
 			{
 				for (na = nalists[i]; na; na = na->next)
 				{
 					/* Don't show private and forbidden nicks to non-services admins. */
-					if ((na->status & NS_FORBIDDEN) && !is_servadmin)
+					if ((na->HasFlag(NS_FORBIDDEN)) && !is_servadmin)
 						continue;
-					if ((na->nc->flags & NI_PRIVATE) && !is_servadmin && na->nc != mync)
+					if ((na->nc->HasFlag(NI_PRIVATE)) && !is_servadmin && na->nc != mync)
 						continue;
-					if (matchflags && !(na->status & matchflags) && !susp_keyword)
+					if (forbidden && !na->HasFlag(NS_FORBIDDEN))
 						continue;
-					else if (susp_keyword && !(na->nc->flags & NI_SUSPENDED))
+					else if (nsnoexpire && !na->HasFlag(NS_NO_EXPIRE))
+						continue;
+					else if (suspended && !na->nc->HasFlag(NI_SUSPENDED))
 						continue;
 
 					/* We no longer compare the pattern against the output buffer.
 					 * Instead we build a nice nick!user@host buffer to compare.
 					 * The output is then generated separately. -TheShadow */
-					snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->status & NS_FORBIDDEN) ? na->last_usermask : "*@*");
+					snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->HasFlag(NS_FORBIDDEN)) ? na->last_usermask : "*@*");
 					if (!stricmp(pattern, na->nick) || Anope::Match(buf, pattern, false))
 					{
 						if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= NSListMax)
 						{
-							if (is_servadmin && (na->status & NS_NO_EXPIRE))
+							if (is_servadmin && (na->HasFlag(NS_NO_EXPIRE)))
 								noexpire_char = '!';
 							else
 								noexpire_char = ' ';
-							if ((na->nc->flags & NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
+							if ((na->nc->HasFlag(NI_HIDE_MASK)) && !is_servadmin && na->nc != mync)
 								snprintf(buf, sizeof(buf), "%-20s  [Hostname Hidden]", na->nick);
-							else if (na->status & NS_FORBIDDEN)
+							else if (na->HasFlag(NS_FORBIDDEN))
 								snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", na->nick);
-							else if (na->nc->flags & NI_SUSPENDED)
+							else if (na->nc->HasFlag(NI_SUSPENDED))
 								snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick);
 							else
 								snprintf(buf, sizeof(buf), "%-20s  %s", na->nick, na->last_usermask);
@@ -166,7 +168,7 @@ class CommandNSList : public Command
 			}
 		}
 
-		if (nronly || (is_servadmin && !matchflags))
+		if (unconfirmed || is_servadmin)
 		{
 			noexpire_char = ' ';
 			for (i = 0; i < 1024; ++i)

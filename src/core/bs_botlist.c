@@ -34,7 +34,7 @@ class CommandBSBotList : public Command
 
 		for (i = 0; i < 256; i++) {
 			for (bi = botlists[i]; bi; bi = bi->next) {
-				if (!(bi->flags & BI_PRIVATE)) {
+				if (!(bi->HasFlag(BI_PRIVATE))) {
 					if (!count)
 						notice_lang(s_BotServ, u, BOT_BOTLIST_HEADER);
 					count++;
@@ -48,7 +48,7 @@ class CommandBSBotList : public Command
 
 			for (i = 0; i < 256; i++) {
 				for (bi = botlists[i]; bi; bi = bi->next) {
-					if (bi->flags & BI_PRIVATE) {
+					if (bi->HasFlag(BI_PRIVATE)) {
 						u->SendMessage(s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
 						count++;
 					}

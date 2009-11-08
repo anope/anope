@@ -35,10 +35,20 @@ ChannelInfo::ChannelInfo()
 	/* If ircd doesn't exist, this is from DB load and mlock is set later */
 	if (ircd)
 		mlock_on = ircd->DefMLock;
-	flags = CSDefFlags;
+	
+	size_t t;
+	/* Set default channel flags */
+	for (t = CI_BEGIN + 1; t != CI_END - 1; ++t)
+		if (CSDefFlags.HasFlag((ChannelInfoFlag)t))
+			this->SetFlag((ChannelInfoFlag)t);
+
+	/* Set default bot flags */
+	for (t = BI_BEGIN + 1; t != BI_END; ++t)
+		if (BSDefFlags.HasFlag((BotServFlag)t))
+			this->botflags.SetFlag((BotServFlag)t);
+	
 	bantype = CSDefBantype;
 	memos.memomax = MSMaxMemos;
-	botflags = BSDefFlags;
 	last_used = time_registered = time(NULL);
 }
 
@@ -161,7 +171,8 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 		return NULL;
 
 	AutoKick *autokick = new AutoKick();
-	autokick->flags = AK_USED | AK_ISNICK;
+	autokick->SetFlag(AK_USED);
+	autokick->SetFlag(AK_ISNICK);
 	autokick->nc = akicknc;
 	autokick->reason = reason;
 	autokick->creator = user;
@@ -182,7 +193,7 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->mask = mask;
-	autokick->flags = AK_USED;
+	autokick->SetFlag(AK_USED);
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;

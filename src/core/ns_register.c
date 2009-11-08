@@ -38,8 +38,6 @@ class CommandNSConfirm : public Command
 
 		memcpy(na->nc->pass, nr->password, PASSMAX);
 
-		na->nc->flags |= NSDefFlags;
-
 		na->nc->memos.memomax = MSMaxMemos;
 
 		if (force)
@@ -251,7 +249,7 @@ class CommandNSRegister : public CommandNSConfirm
 		else if ((na = findnick(u->nick)))
 		{
 			/* i.e. there's already such a nick regged */
-			if (na->status & NS_FORBIDDEN)
+			if (na->HasFlag(NS_FORBIDDEN))
 			{
 				alog("%s: %s@%s tried to register FORBIDden nick %s", s_NickServ, u->GetIdent().c_str(), u->host, u->nick);
 				notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
@@ -415,7 +413,6 @@ NickAlias *makenick(const char *nick)
 	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
-	na->status = 0;
 	slist_add(&nc->aliases, na);
 	alpha_insert_alias(na);
 	return na;

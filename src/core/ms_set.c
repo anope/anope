@@ -24,26 +24,27 @@ class CommandMSSet : public Command
 
 		if (param == "ON")
 		{
-			u->nc->flags |= NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
+			u->nc->SetFlag(NI_MEMO_SIGNON);
+			u->nc->SetFlag(NI_MEMO_RECEIVE);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_ON, s_MemoServ);
 		}
 		else if (param == "LOGON")
 		{
-			u->nc->flags |= NI_MEMO_SIGNON;
-			u->nc->flags &= ~NI_MEMO_RECEIVE;
+			u->nc->SetFlag(NI_MEMO_SIGNON);
+			u->nc->UnsetFlag(NI_MEMO_RECEIVE);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, s_MemoServ);
 		}
 		else if (param == "NEW")
 		{
-			u->nc->flags &= ~NI_MEMO_SIGNON;
-			u->nc->flags |= NI_MEMO_RECEIVE;
+			u->nc->UnsetFlag(NI_MEMO_SIGNON);
+			u->nc->SetFlag(NI_MEMO_RECEIVE);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NEW, s_MemoServ);
 		}
 		else if (param == "MAIL")
 		{
 			if (u->nc->email)
 			{
-				u->nc->flags |= NI_MEMO_MAIL;
+				u->nc->SetFlag(NI_MEMO_MAIL);
 				notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
 			}
 			else
@@ -51,12 +52,14 @@ class CommandMSSet : public Command
 		}
 		else if (param == "NOMAIL")
 		{
-			u->nc->flags &= ~NI_MEMO_MAIL;
+			u->nc->UnsetFlag(NI_MEMO_MAIL);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
 		}
 		else if (param == "OFF")
 		{
-			u->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE | NI_MEMO_MAIL);
+			u->nc->UnsetFlag(NI_MEMO_SIGNON);
+			u->nc->UnsetFlag(NI_MEMO_RECEIVE);
+			u->nc->UnsetFlag(NI_MEMO_MAIL);
 			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
 		}
 		else
@@ -122,16 +125,16 @@ class CommandMSSet : public Command
 			if (!chan.empty())
 			{
 				if (!p2.empty())
-					ci->flags |= CI_MEMO_HARDMAX;
+					ci->SetFlag(CI_MEMO_HARDMAX);
 				else
-					ci->flags &= ~CI_MEMO_HARDMAX;
+					ci->UnsetFlag(CI_MEMO_HARDMAX);
 			}
 			else
 			{
 				if (!p2.empty())
-					nc->flags |= NI_MEMO_HARDMAX;
+					nc->SetFlag(NI_MEMO_HARDMAX);
 				else
-					nc->flags &= ~NI_MEMO_HARDMAX;
+					nc->UnsetFlag(NI_MEMO_HARDMAX);
 			}
 			limit = atoi(p1.c_str());
 			if (limit < 0 || limit > 32767)
@@ -148,12 +151,12 @@ class CommandMSSet : public Command
 				syntax_error(s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SYNTAX);
 				return MOD_CONT;
 			}
-			if (!chan.empty() && (ci->flags & CI_MEMO_HARDMAX))
+			if (!chan.empty() && (ci->HasFlag(CI_MEMO_HARDMAX)))
 			{
 				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_FORBIDDEN, chan.c_str());
 				return MOD_CONT;
 			}
-			else if (chan.empty() && (nc->flags & NI_MEMO_HARDMAX))
+			else if (chan.empty() && (nc->HasFlag(NI_MEMO_HARDMAX)))
 			{
 				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
 				return MOD_CONT;

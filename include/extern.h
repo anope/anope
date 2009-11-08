@@ -123,7 +123,7 @@ E Entry *elist_find_mask(EList *list, const char *mask);
 E long get_memuse(EList *list);
 
 
-#define whosends(ci) ((!(ci) || !((ci)->botflags & BS_SYMBIOSIS) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? findbot(s_ChanServ) : (ci)->bi)
+#define whosends(ci) ((!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? findbot(s_ChanServ) : (ci)->bi)
 
 /**** chanserv.c ****/
 
@@ -257,7 +257,7 @@ E bool  RestrictMail;
 E time_t MailDelay;
 E bool  DontQuoteAddresses;
 
-E int   NSDefFlags;
+E Flags<NickCoreFlag> NSDefFlags;
 E unsigned NSDefLanguage;
 E time_t NSRegDelay;
 E time_t NSResendDelay;
@@ -280,7 +280,7 @@ E bool  NSEmailReg;
 E bool  NSModeOnID;
 E bool  NSAddAccessOnReg;
 
-E int   CSDefFlags;
+E Flags<ChannelInfoFlag> CSDefFlags;
 E unsigned CSMaxReg;
 E time_t CSExpire;
 E int   CSDefBantype;
@@ -298,7 +298,7 @@ E time_t MSSendDelay;
 E bool  MSNotifyAll;
 E unsigned MSMemoReceipt;
 
-E int   BSDefFlags;
+E Flags<BotServFlag> BSDefFlags;
 E time_t BSKeepData;
 E unsigned BSMinUsers;
 E unsigned BSBadWordsMax;
@@ -720,14 +720,13 @@ E Server *serv_uplink;
 E uint32 uplink_capab;
 E CapabInfo capab_info[];
 
-E Server *first_server(int flags);
-E Server *next_server(int flags);
+E Server *first_server(ServerFlag flag);
+E Server *next_server(ServerFlag flag);
 
 E int is_ulined(const char *server);
 E int is_sync(Server *server);
 
-E Server *new_server(Server * uplink, const char *name, const char *desc,
-				   uint16 flags, const char *suid);
+E Server *new_server(Server * uplink, const char *name, const char *desc, ServerFlag flag, const char *suid);
 
 E Server *findserver(Server *s, const char *name);
 

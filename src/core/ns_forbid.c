@@ -55,7 +55,7 @@ class CommandNSForbid : public Command
 		na = makenick(nick);
 		if (na)
 		{
-			na->status |= NS_FORBIDDEN;
+			na->SetFlag(NS_FORBIDDEN);
 			na->last_usermask = sstrdup(u->nick);
 			if (reason)
 				na->last_realname = sstrdup(reason);

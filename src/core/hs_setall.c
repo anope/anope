@@ -109,7 +109,7 @@ class CommandHSSetAll : public Command
 
 		if ((na = findnick(nick)))
 		{
-			if (na->status & NS_FORBIDDEN)
+			if (na->HasFlag(NS_FORBIDDEN))
 			{
 				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				if (vIdent) {

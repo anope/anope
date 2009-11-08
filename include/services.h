@@ -418,18 +418,65 @@ class CoreExport Extensible
 
 };
 
+/** Class with the ability to keep flags on items, they should extend from this
+ * where T is an enum.
+ */
+template <class T>
+class CoreExport Flags
+{
+ protected:
+ 	std::bitset<128> Flag_Values;
+
+ public:
+ 	/** Add a flag to this item
+	 * @param Value The flag
+	 */
+	void SetFlag(T Value)
+	{
+		Flag_Values[(size_t)Value] = true;
+	}
+
+	/** Remove a flag from this item
+	 * @param Value The flag
+	 */
+	void UnsetFlag(T Value)
+	{
+		Flag_Values[(size_t)Value] = false;
+	}
+
+	/** Check if this item has a flag
+	 * @param Value The flag
+	 * @return true or false
+	 */
+	const bool HasFlag(T Value) const
+	{
+		return Flag_Values[(size_t)Value];
+	}
+
+	/** Check how many flags are set
+	 * @return The number of flags set
+	 */
+	const size_t FlagCount() const
+	{
+		return Flag_Values.count();
+	}
+
+	/** Unset all of the flags
+	 */
+	void ClearFlags()
+	{
+		Flag_Values.reset();
+	}
+};
+
 /*************************************************************************/
 
 /* forward declarations, mostly used by older code */
 class User;
 class ChannelInfo;
 class Channel;
+class EList;
 
-typedef struct server_ Server;
-typedef struct c_elist EList;
-typedef struct c_elist_entry Entry;
-typedef struct memo_ Memo;
-typedef struct badword_ BadWord;
 typedef struct bandata_ BanData;
 typedef struct userdata_ UserData;
 typedef struct mailinfo_ MailInfo;
@@ -584,12 +631,24 @@ struct ircdcapab_ {
 
 /*************************************************************************/
 
+/** Memo Flags
+ */
+enum MemoFlag
+{
+	/* Memo is unread */
+	MF_UNREAD,
+	/* SEnder requests a receipt */
+	MF_RECEIPT,
+	/* Memo is a notification of receipt */
+	MF_NOTIFYS
+};
+
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
-
-struct memo_ {
+class CoreExport Memo : public Flags<MemoFlag>
+{
+ public:
 	uint32 number;	/* Index number -- not necessarily array position! */
-	uint16 flags;
 	time_t time;	/* When it was sent */
 	char sender[NICKMAX];
 	char *text;
@@ -636,7 +695,8 @@ enum AccessLevel
  * wouldn't get very far. ;) ) */
 
 /* Access levels for users. */
-struct ChanAccess {
+struct ChanAccess
+{
 	uint16 in_use;	/* 1 if this entry is in use, else 0 */
 	int16 level;
 	NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
@@ -644,11 +704,22 @@ struct ChanAccess {
 	std::string creator;
 };
 
-/* AutoKick data. */
-struct AutoKick
+/** Flags for auto kick
+ */
+enum AutoKickFlag
 {
-	uint16 flags;
+	/* This auto kick entry is in use */
+	AK_USED,
+	/* Is by nick core, not mask */
+	AK_ISNICK,
+	/* This entry is stuck */
+	AK_STUCK
+};
 
+/* AutoKick data. */
+class CoreExport AutoKick : public Flags<AutoKickFlag>
+{
+ public:
 	/* Only one of these can be in use */
 	std::string mask;
 	NickCore *nc;
@@ -658,62 +729,27 @@ struct AutoKick
 	time_t addtime;
 };
 
-#define AK_USED		0x0001
-#define AK_ISNICK	0x0002
-#define AK_STUCK		0x0004
-
-/* Structure used to contain bad words. */
-
-struct badword_ {
-	uint16 in_use;
-	char *word;
-	uint16 type;		/* BW_* below */
+/** Flags for badwords
+ */
+enum BadWordType
+{
+	/* Always kicks if the word is said */
+	BW_ANY,
+	/* User must way the entire word */
+	BW_SINGLE,
+	/* The word has to start with the badword */
+	BW_START,
+	/* The word has to end with the badword */
+	BW_END
 };
 
-#define BW_ANY 		0
-#define BW_SINGLE 	1
-#define BW_START 	2
-#define BW_END 		3
-
-#include "regchannel.h"
-
-/* Retain topic even after last person leaves channel */
-#define CI_KEEPTOPIC	0x00000001
-/* Don't allow non-authorized users to be opped */
-#define CI_SECUREOPS	0x00000002
-/* Hide channel from ChanServ LIST command */
-#define CI_PRIVATE	0x00000004
-/* Topic can only be changed by SET TOPIC */
-#define CI_TOPICLOCK	0x00000008
-/* Those not allowed ops are kickbanned */
-#define CI_RESTRICTED	0x00000010
-/* Don't allow ChanServ and BotServ commands to do bad things to bigger levels */
-#define CI_PEACE  0x00000020
-/* Don't allow any privileges unless a user is IDENTIFY'd with NickServ */
-#define CI_SECURE	0x00000040
-/* Don't allow the channel to be registered or used */
-#define CI_FORBIDDEN	0x00000080
-/* Channel password is encrypted */
-#define CI_ENCRYPTEDPW	0x00000100
-/* Channel does not expire */
-#define CI_NO_EXPIRE	0x00000200
-/* Channel memo limit may not be changed */
-#define CI_MEMO_HARDMAX	0x00000400
-/* Send notice to channel on use of OP/DEOP */
-#define CI_OPNOTICE	0x00000800
-/* Stricter control of channel founder status */
-#define CI_SECUREFOUNDER 0x00001000
-/* Always sign kicks */
-#define CI_SIGNKICK 0x00002000
-/* Sign kicks if level is < than the one defined by the SIGNKICK level */
-#define CI_SIGNKICK_LEVEL 0x00004000
-/* Use the xOP lists */
-#define CI_XOP 0x00008000
-/* Channel is suspended */
-#define CI_SUSPENDED 0x00010000
-
-/* TEMPORARY - ChanServ is on the channel. */
-#define CI_INHABIT 0x80000000
+/* Structure used to contain bad words. */
+struct BadWord
+{
+	uint16 in_use;
+	char *word;
+	BadWordType type;
+};
 
 /* Indices for cmd_access[]: */
 #define CA_INVITE			0
@@ -759,22 +795,37 @@ struct badword_ {
 #define CA_SIZE		39
 
 /* BotServ SET flags */
-#define BS_DONTKICKOPS	  	0x00000001
-#define BS_DONTKICKVOICES   	0x00000002
-#define BS_FANTASY		  	0x00000004
-#define BS_SYMBIOSIS			0x00000008
-#define BS_GREET				0x00000010
-#define BS_NOBOT				0x00000020
-
-/* BotServ Kickers flags */
-#define BS_KICK_BOLDS 		0x80000000
-#define BS_KICK_COLORS 		0x40000000
-#define BS_KICK_REVERSES	0x20000000
-#define BS_KICK_UNDERLINES	0x10000000
-#define BS_KICK_BADWORDS	0x08000000
-#define BS_KICK_CAPS		0x04000000
-#define BS_KICK_FLOOD		0x02000000
-#define BS_KICK_REPEAT		0x01000000
+enum BotServFlag
+{
+	/* BotServ won't kick ops */
+	BS_DONTKICKOPS,
+	/* BotServ won't kick voices */
+	BS_DONTKICKVOICES,
+	/* BotServ bot accepts fantasy commands */
+	BS_FANTASY,
+	/* BotServ bot sets modes etc instead of ChanServ */
+	BS_SYMBIOSIS,
+	/* BotServ should show greets */
+	BS_GREET,
+	/* BotServ bots are not allowed to be in this channel */
+	BS_NOBOT,
+	/* BotServ kicks for bolds */
+	BS_KICK_BOLDS,
+	/* BotServ kicks for colors */
+	BS_KICK_COLORS,
+	/* BOtServ kicks for reverses */
+	BS_KICK_REVERSES,
+	/* BotServ kicks for underlines */
+	BS_KICK_UNDERLINES,
+	/* BotServ kicks for badwords */
+	BS_KICK_BADWORDS,
+	/* BotServ kicks for caps */
+	BS_KICK_CAPS,
+	/* BotServ kicks for flood */
+	BS_KICK_FLOOD,
+	/* BotServ kicks for repeating */
+	BS_KICK_REPEAT
+};
 
 /* Indices for TTB (Times To Ban) */
 #define TTB_BOLDS 		0
@@ -786,6 +837,8 @@ struct badword_ {
 #define TTB_FLOOD		6
 #define TTB_REPEAT		7
 #define TTB_SIZE 		8
+
+#include "regchannel.h"
 
 /*************************************************************************/
 
@@ -805,23 +858,36 @@ typedef enum {
 	SSYNC_DONE		  = 1		/* We're in sync				 */
 } SyncState;
 
-struct server_ {
+/** Flags set on servers
+ */
+enum ServerFlag
+{
+	SERVER_START,
+
+	/* This server is me */
+	SERVER_ISME,
+	/* This server was juped */
+	SERVER_JUPED,
+	/* This server is the current uplink */
+	SERVER_ISUPLINK,
+
+	SERVER_END
+};
+
+class CoreExport Server : public Flags<ServerFlag>
+{
+ public:
 	Server *next, *prev;
 
 	char *name;	 /* Server name						*/
 	uint16 hops;	/* Hops between services and server   */
 	char *desc;	 /* Server description				 */
-	uint16 flags;   /* Some info flags, as defined below  */
 	char *suid;	 /* Server Univeral ID				 */
 	SyncState sync; /* Server sync state (see above)	  */
 
 	Server *links;	/* Linked list head for linked servers 	  */
 	Server *uplink;	/* Server which pretends to be the uplink */
 };
-
-#define SERVER_ISME  0x0001
-#define SERVER_JUPED 0x0002
-#define SERVER_ISUPLINK	0x0004
 
 /*************************************************************************/
 
@@ -865,16 +931,6 @@ struct userdata_ {
 	char *lastline;
 	int16 times;
 };
-
-/* Channelban type flags */
-#define ENTRYTYPE_NONE		   0x00000000
-#define ENTRYTYPE_CIDR4		  0x00000001
-#define ENTRYTYPE_NICK_WILD	  0x00000004
-#define ENTRYTYPE_NICK		   0x00000008
-#define ENTRYTYPE_USER_WILD	  0x00000010
-#define ENTRYTYPE_USER		   0x00000020
-#define ENTRYTYPE_HOST_WILD	  0x00000040
-#define ENTRYTYPE_HOST		   0x00000080
 
 struct c_userlist {
 	struct c_userlist *next, *prev;
@@ -998,17 +1054,33 @@ class CoreExport Channel : public Extensible
 	const bool HasParam(ChannelModeName Name);
 };
 
-struct c_elist {
-	Entry *entries;
-	int32 count;
+/** Channelban type flags
+ */
+enum EntryType
+{
+	ENTRYTYPE_NONE,
+	ENTRYTYPE_CIDR4,
+	ENTRYTYPE_NICK_WILD,
+	ENTRYTYPE_NICK,
+	ENTRYTYPE_USER_WILD,
+	ENTRYTYPE_USER,
+	ENTRYTYPE_HOST_WILD,
+	ENTRYTYPE_HOST
 };
 
-struct c_elist_entry {
+class CoreExport Entry : public Flags<EntryType>
+{
+ public:
 	Entry *next, *prev;
-	uint32 type;
 	uint32 cidr_ip;			 /* IP mask for CIDR matching */
 	uint32 cidr_mask;		   /* Netmask for CIDR matching */
 	char *nick, *user, *host, *mask;
+};
+
+struct EList
+{
+	Entry *entries;
+	int32 count;
 };
 
 /*************************************************************************/
@@ -1469,61 +1541,9 @@ enum DefconLevel
 	DEFCON_SILENT_OPER_ONLY,
 	DEFCON_AKILL_NEW_CLIENTS,
 	DEFCON_NO_NEW_MEMOS
-	
 };
 
 /*************************************************************************/
-
-/* Memo Flags */
-#define MF_UNREAD	0x0001	/* Memo has not yet been read */
-#define MF_RECEIPT	0x0002	/* Sender requested receipt */
-#define MF_NOTIFYS	  0x0004  /* Memo is a notification of receitp */
-
-/* Nickname status flags: */
-#define NS_FORBIDDEN	0x0002	  /* Nick may not be registered or used */
-#define NS_NO_EXPIRE	0x0004	  /* Nick never expires */
-//#define NS_IDENTIFIED	0x8000	  /* User has IDENTIFY'd */
-//#define NS_RECOGNIZED	0x4000	  /* ON_ACCESS true && SECURE flag not set */
-//#define NS_ON_ACCESS	0x2000	  /* User comes from a known address */
-#define NS_KILL_HELD	0x1000	  /* Nick is being held after a kill */
-#define NS_GUESTED	0x0100		/* SVSNICK has been sent but nick has not
-					 				 * yet changed. An enforcer will be
-					 				 * introduced when it does change. */
-#define NS_MASTER	0x0200		/* Was a master nick; used to import old databases */
-#define NS_TRANSGROUP	0xC000		/* Status flags that can be passed to a nick of the
-									   same group during nick change */
-#define NS_TEMPORARY	0xFF00	  /* All temporary status flags */
-/* These two are not used anymore */
-#define NS_OLD_ENCRYPTEDPW	0x0001  /* Nickname password is encrypted */
-
-
-
-
-/* Nickname setting flags: */
-#define NI_KILLPROTECT		0x00000001  /* Kill others who take this nick */
-#define NI_SECURE		0x00000002  /* Don't recognize unless IDENTIFY'd */
-#define NI_MSG				  0x00000004  /* Use PRIVMSGs instead of NOTICEs */
-#define NI_MEMO_HARDMAX		0x00000008  /* Don't allow user to change memo limit */
-#define NI_MEMO_SIGNON		0x00000010  /* Notify of memos at signon and un-away */
-#define NI_MEMO_RECEIVE		0x00000020  /* Notify of new memos when sent */
-#define NI_PRIVATE		0x00000040  /* Don't show in LIST to non-servadmins */
-#define NI_HIDE_EMAIL		0x00000080  /* Don't show E-mail in INFO */
-#define NI_HIDE_MASK		0x00000100  /* Don't show last seen address in INFO */
-#define NI_HIDE_QUIT		0x00000200  /* Don't show last quit message in INFO */
-#define NI_KILL_QUICK		0x00000400  /* Kill in 20 seconds instead of 60 */
-#define NI_KILL_IMMED		0x00000800  /* Kill immediately instead of in 60 sec */
-//#define NI_SERVICES_OPER 	0x00001000  /* No longer used */
-//#define NI_SERVICES_ADMIN	0x00002000  /* No longer used */
-#define NI_ENCRYPTEDPW		0x00004000  /* Nickname password is encrypted */
-//#define NI_SERVICES_ROOT		0x00008000  /* No longer used */
-#define NI_MEMO_MAIL			0x00010000  /* User gets email on memo */
-#define NI_HIDE_STATUS		  0x00020000  /* Don't show services access status */
-#define NI_SUSPENDED		0x00040000  /* Nickname is suspended */
-#define NI_AUTOOP		0x00080000  /* Autoop nickname in channels */
-#define NI_NOEXPIRE		0x00100000 /* nicks in this group won't expire */
-
-// Old NS_FORBIDDEN, very fucking temporary.
-#define NI_FORBIDDEN	0x80000000
 
 /* Languages.  Never insert anything in the middle of this list, or
  * everybody will start getting the wrong language!  If you want to change
@@ -1553,54 +1573,54 @@ enum DefconLevel
 
 #define DEF_LANGUAGE	LANG_EN_US
 
-#define BI_PRIVATE		0x0001
-#define BI_CHANSERV		0x0002
-#define BI_BOTSERV		0x0004
-#define BI_HOSTSERV		0x0008
-#define BI_OPERSERV		0x0010
-#define BI_MEMOSERV		0x0020
-#define BI_NICKSERV		0x0040
-#define BI_GLOBAL		0x0080
-
 /*************************************************************************/
-/* CAPAB stuffs */
 
-typedef struct capabinfo_ CapabInfo;
-struct capabinfo_ {
-	const char *token;
-	uint32 flag;
+/* Types of capab
+ */
+enum CapabType
+{
+	CAPAB_BEGIN,
+
+	CAPAB_NOQUIT,
+	CAPAB_TSMODE,
+	CAPAB_UNCONNECT,
+	CAPAB_NICKIP,
+	CAPAB_NSJOIN,
+	CAPAB_ZIP,
+	CAPAB_BURST,
+	CAPAB_TS3,
+	CAPAB_TS5,
+	CAPAB_DKEY,
+	CAPAB_DOZIP,
+	CAPAB_DODKEY,
+	CAPAB_QS,
+	CAPAB_SCS,
+	CAPAB_PT4,
+	CAPAB_UID,
+	CAPAB_KNOCK,
+	CAPAB_CLIENT,
+	CAPAB_IPV6,
+	CAPAB_SSJ5,
+	CAPAB_SN2,
+	CAPAB_VHOST,
+	CAPAB_TOKEN,
+	CAPAB_SSJ3,
+	CAPAB_NICK2,
+	CAPAB_VL,
+	CAPAB_TLKEXT,
+	CAPAB_CHANMODE,
+	CAPAB_SJB64,
+	CAPAB_NICKCHARS,
+
+	CAPAB_END
 };
 
-#define CAPAB_NOQUIT	0x00000001
-#define CAPAB_TSMODE	0x00000002
-#define CAPAB_UNCONNECT 0x00000004
-#define CAPAB_NICKIP	0x00000008
-#define CAPAB_NSJOIN	0x00000010
-#define CAPAB_ZIP	   0x00000020
-#define CAPAB_BURST	 0x00000040
-#define CAPAB_TS3	   0x00000080
-#define CAPAB_TS5	   0x00000100
-#define CAPAB_DKEY	  0x00000200
-#define CAPAB_DOZIP	 0x00000400
-#define CAPAB_DODKEY	0x00000800
-#define CAPAB_QS		0x00001000
-#define CAPAB_SCS	   0x00002000
-#define CAPAB_PT4	   0x00004000
-#define CAPAB_UID	   0x00008000
-#define CAPAB_KNOCK	 0x00010000
-#define CAPAB_CLIENT	0x00020000
-#define CAPAB_IPV6	  0x00040000
-#define CAPAB_SSJ5	  0x00080000
-#define CAPAB_SN2	   0x00100000
-#define CAPAB_VHOST	 0x00200000
-#define CAPAB_TOKEN	 0x00400000
-#define CAPAB_SSJ3	  0x00800000
-#define CAPAB_NICK2	 0x01000000
-#define CAPAB_VL		0x02000000
-#define CAPAB_TLKEXT	0x04000000
-#define CAPAB_CHANMODE  0x08000000
-#define CAPAB_SJB64	 0x10000000
-#define CAPAB_NICKCHARS 0x20000000
+/* CAPAB stuffs */
+struct CapabInfo
+{
+	const char *token;
+	CapabType flag;
+};
 
 /*************************************************************************/
 

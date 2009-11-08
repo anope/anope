@@ -61,7 +61,7 @@ class CommandNSLogout : public Command
 				notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
 			/* Clear any timers again */
-			if (na && u->nc->flags & NI_KILLPROTECT)
+			if (na && u->nc->HasFlag(NI_KILLPROTECT))
 				del_ns_timeout(na, TO_COLLIDE);
 
 			ircdproto->SendAccountLogout(u2, u2->nc);

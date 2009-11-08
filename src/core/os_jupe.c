@@ -30,7 +30,7 @@ class CommandOSJupe : public Command
 
 		if (!isValidHost(jserver, 3))
 			notice_lang(s_OperServ, u, OPER_JUPE_HOST_ERROR);
-		else if (server && ((server->flags & SERVER_ISME) || (server->flags & SERVER_ISUPLINK)))
+		else if (server && (server->HasFlag(SERVER_ISME) || server->HasFlag(SERVER_ISUPLINK)))
 			notice_lang(s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else {
 			char rbuf[256];

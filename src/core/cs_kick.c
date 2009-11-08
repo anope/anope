@@ -58,7 +58,7 @@ class CommandCSKick : public Command
 		} else if (!is_same ? !check_access(u, ci, CA_KICK) :
 					 !check_access(u, ci, CA_KICKME)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (!is_same && (ci->flags & CI_PEACE)
+		} else if (!is_same && (ci->HasFlag(CI_PEACE))
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		} else if (is_protected(u2)) {
@@ -66,8 +66,8 @@ class CommandCSKick : public Command
 		} else {
 			const char *av[3];
 
-			if ((ci->flags & CI_SIGNKICK)
-				|| ((ci->flags & CI_SIGNKICK_LEVEL)
+			if ((ci->HasFlag(CI_SIGNKICK))
+				|| ((ci->HasFlag(CI_SIGNKICK_LEVEL))
 					&& !check_access(u, ci, CA_SIGNKICK)))
 				ircdproto->SendKick(whosends(ci), ci->name, target, "%s (%s)",
 								 reason, u->nick);

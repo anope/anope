@@ -219,22 +219,25 @@ private:
 
 		if (param == "ON")
 		{
-			nc->flags |= NI_KILLPROTECT;
-			nc->flags &= ~(NI_KILL_QUICK | NI_KILL_IMMED);
+			nc->SetFlag(NI_KILLPROTECT);
+			nc->UnsetFlag(NI_KILL_QUICK);
+			nc->UnsetFlag(NI_KILL_IMMED);
 			notice_lang(s_NickServ, u, NICK_SASET_KILL_ON, nc->display);
 		}
 		else if (param == "QUICK")
 		{
-			nc->flags |= NI_KILLPROTECT | NI_KILL_QUICK;
-			nc->flags &= ~NI_KILL_IMMED;
+			nc->SetFlag(NI_KILLPROTECT);
+			nc->SetFlag(NI_KILL_QUICK);
+			nc->UnsetFlag(NI_KILL_IMMED);
 			notice_lang(s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display);
 		}
 		else if (param == "IMMED")
 		{
 			if (NSAllowKillImmed)
 			{
-				nc->flags |= NI_KILLPROTECT | NI_KILL_IMMED;
-				nc->flags &= ~NI_KILL_QUICK;
+				nc->SetFlag(NI_KILLPROTECT);
+				nc->SetFlag(NI_KILL_IMMED);
+				nc->UnsetFlag(NI_KILL_QUICK);
 				notice_lang(s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display);
 			}
 			else
@@ -242,7 +245,9 @@ private:
 		}
 		else if (param == "OFF")
 		{
-			nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
+			nc->UnsetFlag(NI_KILLPROTECT);
+			nc->UnsetFlag(NI_KILL_QUICK);
+			nc->UnsetFlag(NI_KILL_IMMED);
 			notice_lang(s_NickServ, u, NICK_SASET_KILL_OFF, nc->display);
 		}
 		else
@@ -262,12 +267,12 @@ private:
 
 		if (param == "ON")
 		{
-			nc->flags |= NI_SECURE;
+			nc->SetFlag(NI_SECURE);
 			notice_lang(s_NickServ, u, NICK_SASET_SECURE_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
-			nc->flags &= ~NI_SECURE;
+			nc->UnsetFlag(NI_SECURE);
 			notice_lang(s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display);
 		}
 		else
@@ -287,12 +292,12 @@ private:
 
 		if (param == "ON")
 		{
-			nc->flags |= NI_PRIVATE;
+			nc->SetFlag(NI_PRIVATE);
 			notice_lang(s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
-			nc->flags &= ~NI_PRIVATE;
+			nc->UnsetFlag(NI_PRIVATE);
 			notice_lang(s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display);
 		}
 		else
@@ -318,12 +323,12 @@ private:
 
 		if (param == "ON")
 		{
-			nc->flags |= NI_MSG;
+			nc->SetFlag(NI_MSG);
 			notice_lang(s_NickServ, u, NICK_SASET_MSG_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
-			nc->flags &= ~NI_MSG;
+			nc->UnsetFlag(NI_MSG);
 			notice_lang(s_NickServ, u, NICK_SASET_MSG_OFF, nc->display);
 		}
 		else
@@ -341,7 +346,8 @@ private:
 			return MOD_CONT;
 		}
 
-		int flag, onmsg, offmsg;
+		int onmsg, offmsg;
+		NickCoreFlag flag;
 
 		if (param == "EMAIL")
 		{
@@ -378,12 +384,12 @@ private:
 			syntax_error(s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 		else if (param == "ON")
 		{
-			nc->flags |= flag;
+			nc->SetFlag(flag);
 			notice_lang(s_NickServ, u, onmsg, nc->display, s_NickServ);
 		}
 		else if (param == "OFF")
 		{
-			nc->flags &= ~flag;
+			nc->UnsetFlag(flag);
 			notice_lang(s_NickServ, u, offmsg, nc->display, s_NickServ);
 		}
 		else
@@ -403,12 +409,12 @@ private:
 
 		if (param == "ON")
 		{
-			na->status |= NS_NO_EXPIRE;
+			na->SetFlag(NS_NO_EXPIRE);
 			notice_lang(s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick);
 		}
 		else if (param == "OFF")
 		{
-			na->status &= ~NS_NO_EXPIRE;
+			na->UnsetFlag(NS_NO_EXPIRE);
 			notice_lang(s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick);
 		}
 		else
@@ -428,12 +434,12 @@ private:
 
 		if (param == "ON")
 		{
-			nc->flags &= ~NI_AUTOOP;
+			nc->UnsetFlag(NI_AUTOOP);
 			notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
-			nc->flags |= NI_AUTOOP;
+			nc->SetFlag(NI_AUTOOP);
 			notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
 		}
 		else
@@ -493,9 +499,9 @@ public:
 			return MOD_CONT;
 		}
 
-		if (na->status & NS_FORBIDDEN)
+		if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (na->nc->flags & NI_SUSPENDED)
+		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (cmd == "DISPLAY")
 			return this->DoSetDisplay(u, params, na->nc);

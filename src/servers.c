@@ -53,23 +53,22 @@ CapabInfo capab_info[] = {
 	{"SJB64", CAPAB_SJB64},
 	{"CHANMODES", CAPAB_CHANMODE},
 	{"NICKCHARS", CAPAB_NICKCHARS},
-	{NULL, 0}
+	{NULL, CAPAB_END}
 };
 
 /*************************************************************************/
 
 /**
  * Return the first server in the server struct
- * @param flags Server Flags, see services.h
+ * @param flag Server Flag, see services.h
  * @return Server Struct
  */
-Server *first_server(int flags)
+Server *first_server(ServerFlag flag)
 {
 	server_cur = servlist;
-	if (flags > -1) {
-		while (server_cur && (server_cur->flags != flags))
-			server_cur = next_server(flags);
-	}
+
+	while (server_cur && !server_cur->HasFlag(flag))
+		server_cur = next_server(flag);
 	return server_cur;
 }
 
@@ -80,7 +79,7 @@ Server *first_server(int flags)
  * @param flags Server Flags, see services.h
  * @return Server Struct
  */
-Server *next_server(int flags)
+Server *next_server(ServerFlag flag)
 {
 	if (!server_cur)
 		return NULL;
@@ -99,7 +98,7 @@ Server *next_server(int flags)
 				}
 			} while (server_cur);
 		}
-	} while (server_cur && ((flags > -1) && (server_cur->flags != flags)));
+	} while (server_cur && !server_cur->HasFlag(flag));
 
 	return server_cur;
 }
@@ -119,7 +118,7 @@ Server *next_server(int flags)
  * @return Server Struct
  */
 Server *new_server(Server * server_uplink, const char *name, const char *desc,
-				   uint16 flags, const char *suid)
+				   ServerFlag flag, const char *suid)
 {
 	Server *serv;
 
@@ -130,7 +129,8 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 		name = "";
 	serv->name = sstrdup(name);
 	serv->desc = sstrdup(desc);
-	serv->flags = flags;
+	if (flag != SERVER_START)
+		serv->SetFlag(flag);
 	serv->uplink = server_uplink;
 	if (suid) {
 		serv->suid = sstrdup(suid);
@@ -157,7 +157,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 	}
 
 	/* Check if this is our uplink server */
-	if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
+	if ((server_uplink == me_server) && flag != SERVER_JUPED)
 	{
 		// XXX: Apparantly we set ourselves as serv_uplink before we (really) set the uplink when we recieve SERVER. This is wrong and ugly.
 		if (serv_uplink != NULL)
@@ -172,7 +172,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 			}
 		}
 		serv_uplink = serv;
-		serv->flags |= SERVER_ISUPLINK;
+		serv->SetFlag(SERVER_ISUPLINK);
 	}
 
 	return serv;
@@ -217,8 +217,8 @@ static void delete_server(Server * serv, const char *quitreason)
 				unext = nextuser();
 				if (u->server == serv)
 				{
-					if ((na = findnick(u->nick)) && !(na->status & NS_FORBIDDEN)
-						&& (!(na->nc->flags & NI_SUSPENDED))
+					if ((na = findnick(u->nick)) && !na->HasFlag(NS_FORBIDDEN)
+						&& (!na->nc->HasFlag(NI_SUSPENDED))
 						&& (u->IsRecognized() || nick_identified(u))) {
 						na->last_seen = time(NULL);
 						if (na->last_quit)
@@ -413,7 +413,7 @@ void do_server(const char *source, const char *servername, const char *hops,
 		throw CoreException("Recieved a server from a nonexistant uplink?");
 
 	/* Create a server structure. */
-	newserver = new_server(s, servername, descript, 0, numeric);
+	newserver = new_server(s, servername, descript, SERVER_START, numeric);
 
 	/* Announce services being online. */
 	if (GlobalOnCycle && GlobalOnCycleUP)
@@ -454,7 +454,8 @@ void do_squit(const char *source, int ac, const char **av)
 	/* If this is a juped server, send a nice global to inform the online
 	 * opers that we received it.
 	 */
-	if (s->flags & SERVER_JUPED) {
+	if (s->HasFlag(SERVER_JUPED))
+	{
 		snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
 				 s->name);
 		ircdproto->SendGlobops(s_OperServ, buf);

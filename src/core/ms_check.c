@@ -42,7 +42,7 @@ class CommandMSCheck : public Command
 			return MOD_CONT;
 		}
 
-		if ((na->status & NS_FORBIDDEN))
+		if ((na->HasFlag(NS_FORBIDDEN)))
 		{
 			notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
 			return MOD_CONT;
@@ -62,7 +62,7 @@ class CommandMSCheck : public Command
 				tm = localtime(&mi->memos[i]->time);
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 
-				if (mi->memos[i]->flags & MF_UNREAD)
+				if (mi->memos[i]->HasFlag(MF_UNREAD))
 					notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick, timebuf);
 				else
 					notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick, timebuf);

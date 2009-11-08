@@ -55,7 +55,7 @@ class CommandCSBan : public Command
 		} else if (!is_same ? !check_access(u, ci, CA_BAN) :
 					 !check_access(u, ci, CA_BANME)) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		} else if (!is_same && (ci->flags & CI_PEACE)
+		} else if (!is_same && (ci->HasFlag(CI_PEACE))
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			/*
@@ -80,8 +80,8 @@ class CommandCSBan : public Command
 			if (!is_on_chan(c, u2))
 				return MOD_CONT;
 
-			if ((ci->flags & CI_SIGNKICK)
-				|| ((ci->flags & CI_SIGNKICK_LEVEL)
+			if ((ci->HasFlag(CI_SIGNKICK))
+				|| ((ci->HasFlag(CI_SIGNKICK_LEVEL))
 					&& !check_access(u, ci, CA_SIGNKICK)))
 				ircdproto->SendKick(whosends(ci), ci->name, target, "%s (%s)",
 								 reason, u->nick);

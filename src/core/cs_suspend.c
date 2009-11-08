@@ -44,7 +44,7 @@ class CommandCSSuspend : public Command
 		}
 
 		/* You should not SUSPEND a FORBIDEN channel */
-		if (ci->flags & CI_FORBIDDEN)
+		if (ci->HasFlag(CI_FORBIDDEN))
 		{
 			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 			return MOD_CONT;
@@ -55,7 +55,7 @@ class CommandCSSuspend : public Command
 
 		if (ci)
 		{
-			ci->flags |= CI_SUSPENDED;
+			ci->SetFlag(CI_SUSPENDED);
 			ci->forbidby = sstrdup(u->nick);
 			if (reason)
 				ci->forbidreason = sstrdup(reason);
@@ -130,7 +130,7 @@ class CommandCSUnSuspend : public Command
 			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
 
 		/* Only UNSUSPEND already suspended channels */
-		if (!(ci->flags & CI_SUSPENDED))
+		if (!(ci->HasFlag(CI_SUSPENDED)))
 		{
 			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
 			return MOD_CONT;
@@ -138,7 +138,7 @@ class CommandCSUnSuspend : public Command
 
 		if (ci)
 		{
-			ci->flags &= ~CI_SUSPENDED;
+			ci->UnsetFlag(CI_SUSPENDED);
 			if (ci->forbidreason)
 			{
 				delete [] ci->forbidreason;

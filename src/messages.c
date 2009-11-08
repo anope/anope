@@ -130,7 +130,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 	if (*receiver == '#') {
 		if (s_BotServ && (ci = cs_findchan(receiver))) {
 			/* Some paranoia checks */
-			if (!(ci->flags & CI_FORBIDDEN) && ci->c && ci->bi) {
+			if (!ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi) {
 				botchanmsgs(u, ci, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
 		}
@@ -313,8 +313,7 @@ int m_whois(const char *source, const char *who)
 			ircdproto->SendNumeric(ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick, time(NULL) - bi->lastmsg, start_time);
 			ircdproto->SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
 			return MOD_CONT;
-		} else if (!ircd->svshold && (na = findnick(who))
-				   && (na->status & NS_KILL_HELD)) {
+		} else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_KILL_HELD)) {
 			/* We have a nick enforcer client here that we need to respond to.
 			 * We can't just say it doesn't exist here, even tho it does for
 			 * other servers :) -GD

@@ -37,19 +37,19 @@ class CommandCSDrop : public Command
 
 		ci = cs_findchan(chan);
 
-		if ((ci->flags & CI_FORBIDDEN) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_FORBIDDEN)) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if ((ci->flags & CI_SUSPENDED) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SUSPENDED)) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if ((ci->flags & CI_SECUREFOUNDER ? !IsRealFounder(u, ci) : !IsFounder(u, ci)) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)) && !u->nc->HasCommand("chanserv/drop"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -66,7 +66,7 @@ class CommandCSDrop : public Command
 			}
 		}
 
-		if (ircd->chansqline && (ci->flags & CI_FORBIDDEN))
+		if (ircd->chansqline && (ci->HasFlag(CI_FORBIDDEN)))
 		{
 			ircdproto->SendSQLineDel(ci->name);
 		}
@@ -81,7 +81,7 @@ class CommandCSDrop : public Command
 		 * drop the channel before issuing the wallops.
 		 */
 		if (WallDrop) {
-			if ((level < ACCESS_FOUNDER) || (!IsRealFounder(u, ci) && ci->flags & CI_SECUREFOUNDER))
+			if ((level < ACCESS_FOUNDER) || (!IsRealFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER)))
 				ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
 		}
 

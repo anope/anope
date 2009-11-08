@@ -19,23 +19,22 @@ BotInfo::BotInfo(const char *nnick)
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
 	nbots++;
 	this->cmdTable = NULL;
-	this->flags = 0;
 	this->chancount = 0;
 
 	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
-		this->flags |= BI_CHANSERV;
+		this->SetFlag(BI_CHANSERV);
 	else if (s_BotServ && !stricmp(s_BotServ, nnick))
-		this->flags |= BI_BOTSERV;
+		this->SetFlag(BI_BOTSERV);
 	else if (s_HostServ && !stricmp(s_HostServ, nnick))
-		this->flags |= BI_HOSTSERV;
+		this->SetFlag(BI_HOSTSERV);
 	else if (s_OperServ && !stricmp(s_OperServ, nnick))
-		this->flags |= BI_OPERSERV;
+		this->SetFlag(BI_OPERSERV);
 	else if (s_MemoServ && !stricmp(s_MemoServ, nnick))
-		this->flags |= BI_MEMOSERV;
+		this->SetFlag(BI_MEMOSERV);
 	else if (s_NickServ && !stricmp(s_NickServ, nnick))
-		this->flags |= BI_NICKSERV;
+		this->SetFlag(BI_NICKSERV);
 	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
-		this->flags |= BI_GLOBAL;
+		this->SetFlag(BI_GLOBAL);
 	
 	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
 	
@@ -57,23 +56,22 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
 	nbots++;
 	this->cmdTable = NULL;
-	this->flags = 0;
 	this->chancount = 0;
 
 	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
-		this->flags |= BI_CHANSERV;
+		this->SetFlag(BI_CHANSERV);
 	else if (s_BotServ && !stricmp(s_BotServ, nnick))
-		this->flags |= BI_BOTSERV;
+		this->SetFlag(BI_BOTSERV);
 	else if (s_HostServ && !stricmp(s_HostServ, nnick))
-		this->flags |= BI_HOSTSERV;
+		this->SetFlag(BI_HOSTSERV);
 	else if (s_OperServ && !stricmp(s_OperServ, nnick))
-		this->flags |= BI_OPERSERV;
+		this->SetFlag(BI_OPERSERV);
 	else if (s_MemoServ && !stricmp(s_MemoServ, nnick))
-		this->flags |= BI_MEMOSERV;
+		this->SetFlag(BI_MEMOSERV);
 	else if (s_NickServ && !stricmp(s_NickServ, nnick))
-		this->flags |= BI_NICKSERV;
+		this->SetFlag(BI_NICKSERV);
 	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
-		this->flags |= BI_GLOBAL;
+		this->SetFlag(BI_GLOBAL);
 	
 	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
 	

@@ -210,7 +210,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (nick_identified(this) || (!this->nc || (this->nc && !(this->nc->flags & NI_SECURE) && IsRecognized()))))
+	if (na && (nick_identified(this) || !this->nc || !this->nc->HasFlag(NI_SECURE) && IsRecognized()))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;
@@ -325,7 +325,7 @@ void User::SendMessage(const char *source, const std::string &msg)
 	* - The user is registered and has set /ns set msg on
 	*/
 	if (UsePrivmsg &&
-		((!this->nc && NSDefFlags & NI_MSG) || (this->nc && this->nc->flags & NI_MSG)))
+		((!this->nc && NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
 	{
 		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
 	}
@@ -390,7 +390,7 @@ void User::UpdateHost()
 {
 	NickAlias *na = findnick(this->nick);
 
-	if (nick_identified(this) || (na && !(na->nc->flags & NI_SECURE) && IsRecognized()))
+	if (nick_identified(this) || (na && !na->nc->HasFlag(NI_SECURE) && IsRecognized()))
 	{
 		if (na->last_usermask)
 			delete [] na->last_usermask;
@@ -611,7 +611,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	char *tmp = NULL;
 	NickAlias *old_na;		  /* Old nick rec */
 	int nc_changed = 1;		 /* Did nick core change? */
-	int status = 0;			 /* Status to apply */
 	char *logrealname;
 	std::string oldnick;		/* stores the old nick of the user, so we can pass it to OnUserNickChange */
 
@@ -758,7 +757,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (old_na) {
 				if (user->IsRecognized())
 					old_na->last_seen = time(NULL);
-				status = old_na->status & NS_TRANSGROUP;
 				cancel_user(user);
 			}
 
@@ -772,9 +770,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (!nc_changed)
 			{
 				NickAlias *tmpcore = findnick(user->nick);
-
-				if (tmpcore)
-					tmpcore->status |= status;
 
 				/* If the new nick isnt registerd or its registerd and not yours */
 				if (!tmpcore || (old_na && tmpcore->nc != old_na->nc))
@@ -881,8 +876,8 @@ void do_quit(const char *source, int ac, const char **av)
 	if (debug) {
 		alog("debug: %s quits", source);
 	}
-	if ((na = findnick(user->nick)) && (!(na->status & NS_FORBIDDEN))
-		&& (!(na->nc->flags & NI_SUSPENDED)) && (user->IsRecognized() || nick_identified(user))) {
+	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN)
+		&& !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;
@@ -917,8 +912,7 @@ void do_kill(const char *nick, const char *msg)
 	if (debug) {
 		alog("debug: %s killed", nick);
 	}
-	if ((na = findnick(user->nick)) && (!(na->status & NS_FORBIDDEN))
-		&& (!(na->nc->flags & NI_SUSPENDED)) && (user->IsRecognized() || nick_identified(user))) {
+	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;

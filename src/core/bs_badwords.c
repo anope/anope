@@ -57,7 +57,7 @@ class CommandBSBadwords : public Command
 	CommandReturn DoAdd(User *u, ChannelInfo *ci, const char *word)
 	{
 		char *opt, *pos;
-		int type = BW_ANY;
+		BadWordType type = BW_ANY;
 		unsigned i = 0;
 		BadWord *bw;
 

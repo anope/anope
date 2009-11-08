@@ -30,14 +30,14 @@ class CommandNSAccess : public Command
 		}
 
 /* reinstate when forbidden is moved to a group flag
-		if (na->status & NS_FORBIDDEN)
+		if (na->HasFlag(NS_FORBIDDEN))
 		{
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
 		}
 */
 
-		if (nc->flags & NI_SUSPENDED)
+		if (nc->HasFlag(NI_SUSPENDED))
 		{
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, nc->display);
 			return MOD_CONT;
@@ -143,10 +143,10 @@ class CommandNSAccess : public Command
 
 		}
 		/*
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			*/
-		else if (u->nc->flags & NI_SUSPENDED)
+		else if (u->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
 		else if (cmd == "ADD")
 			return this->DoAdd(u, u->nc, mask);

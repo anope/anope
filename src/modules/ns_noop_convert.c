@@ -112,7 +112,7 @@ int mLoadData()
 				/* Take the \n from the end of the line */
 				name[len - 1] = '\0';
 				if ((na = findnick(name))) {
-				na->nc->flags |= NI_AUTOOP;
+				na->nc->SetFlag(NI_AUTOOP);
 				}
 				delete [] name;
 			}

@@ -2,7 +2,7 @@
 
 void IRCDProto::SendMessageInternal(BotInfo *bi, const char *dest, const char *buf)
 {
-	if (NSDefFlags & NI_MSG)
+	if (NSDefFlags.HasFlag(NI_MSG))
 		SendPrivmsgInternal(bi, dest, buf);
 	else
 		SendNoticeInternal(bi, dest, buf);

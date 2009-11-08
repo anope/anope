@@ -19,9 +19,9 @@ class CommandNSInfo : public Command
 {
  private:
 	// cannot be const, as it is modified
-	void CheckOptStr(std::string &buf, int opt, const std::string &str, NickCore *nc, bool reverse_logic = false)
+	void CheckOptStr(std::string &buf, NickCoreFlag opt, const std::string &str, NickCore *nc, bool reverse_logic = false)
 	{
-		if (reverse_logic ? !(nc->flags & opt) : (nc->flags & opt))
+		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{
 			const char *commastr = getstring(nc, COMMA_SPACE);
 			if (!buf.empty())
@@ -69,7 +69,7 @@ class CommandNSInfo : public Command
 			else
 				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		}
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 		{
 			if (is_oper(u) && na->last_usermask)
 				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u, NO_REASON));
@@ -97,7 +97,7 @@ class CommandNSInfo : public Command
 
 			if (na->nc->IsServicesOper())
 			{
-				if (show_hidden || (!(na->nc->flags & NI_HIDE_STATUS)))
+				if (show_hidden || (!(na->nc->HasFlag(NI_HIDE_STATUS))))
 				{
 					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
 
@@ -106,13 +106,13 @@ class CommandNSInfo : public Command
 
 			if (nick_online)
 			{
-				if (show_hidden || !(na->nc->flags & NI_HIDE_MASK))
+				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
 					notice_lang(s_NickServ, u, NICK_INFO_ADDRESS_ONLINE, na->last_usermask);
 				else
 					notice_lang(s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick);
 			}
 			else {
-				if (show_hidden || !(na->nc->flags & NI_HIDE_MASK))
+				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
 					notice_lang(s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask);
 			}
 
@@ -127,12 +127,12 @@ class CommandNSInfo : public Command
 				notice_lang(s_NickServ, u, NICK_INFO_LAST_SEEN, buf);
 			}
 
-			if (na->last_quit && (show_hidden || !(na->nc->flags & NI_HIDE_QUIT)))
+			if (na->last_quit && (show_hidden || !(na->nc->HasFlag(NI_HIDE_QUIT))))
 				notice_lang(s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit);
 
 			if (na->nc->url)
 				notice_lang(s_NickServ, u, NICK_INFO_URL, na->nc->url);
-			if (na->nc->email && (show_hidden || !(na->nc->flags & NI_HIDE_EMAIL)))
+			if (na->nc->email && (show_hidden || !(na->nc->HasFlag(NI_HIDE_EMAIL))))
 				notice_lang(s_NickServ, u, NICK_INFO_EMAIL, na->nc->email);
 			if (na->nc->icq)
 				notice_lang(s_NickServ, u, NICK_INFO_ICQ, na->nc->icq);
@@ -164,7 +164,7 @@ class CommandNSInfo : public Command
 
 				notice_lang(s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u, NICK_INFO_OPT_NONE) : optbuf.c_str());
 
-				if (na->nc->flags & NI_SUSPENDED)
+				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
 					if (na->last_quit)
 						notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED, na->last_quit);
@@ -172,7 +172,7 @@ class CommandNSInfo : public Command
 						notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED_NO_REASON);
 				}
 
-				if (na->status & NS_NO_EXPIRE)
+				if (na->HasFlag(NS_NO_EXPIRE))
 					notice_lang(s_NickServ, u, NICK_INFO_NO_EXPIRE);
 				else
 				{

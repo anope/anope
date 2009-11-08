@@ -65,7 +65,7 @@ int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
 	AutoKick *akick = ci->GetAkick(index);
 
-	if (!(akick->flags & AK_USED))
+	if (!(akick->HasFlag(AK_USED)))
 		return 0;
 	if (!*sent_header) {
 		notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
@@ -73,7 +73,7 @@ int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 	}
 
 	notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1,
-				((akick->flags & AK_ISNICK) ? akick->nc->
+				((akick->HasFlag(AK_ISNICK)) ? akick->nc->
 				 display : akick->mask.c_str()),
 				(!akick->reason.empty() ? akick->
 				 reason.c_str() : getstring(u, NO_REASON)));
@@ -95,7 +95,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 	char timebuf[64];
 	struct tm tm;
 
-	if (!(akick->flags & AK_USED))
+	if (!(akick->HasFlag(AK_USED)))
 		return 0;
 	if (!*sent_header) {
 		notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
@@ -110,17 +110,10 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 		snprintf(timebuf, sizeof(timebuf), "%s", getstring(u, UNKNOWN));
 	}
 
-	notice_lang(s_ChanServ, u,
-				((akick->
-				  flags & AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK :
-				 CHAN_AKICK_VIEW_FORMAT), index + 1,
-				((akick->flags & AK_ISNICK) ? akick->nc->
-				 display : akick->mask.c_str()),
-				!akick->creator.empty() ? akick->creator.c_str() : getstring(u,
-															UNKNOWN),
-				timebuf,
-				(!akick->reason.empty() ? akick->
-				 reason.c_str() : getstring(u, NO_REASON)));
+	notice_lang(s_ChanServ, u, (akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT), index + 1,
+				((akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str()),
+				!akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf,
+				(!akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON)));
 	return 1;
 }
 
@@ -167,7 +160,7 @@ class CommandCSAKick : public Command
 		}
 		else
 		{
-			 if (na->status & NS_FORBIDDEN)
+			 if (na->HasFlag(NS_FORBIDDEN))
 			 {
 				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, mask.c_str());
 				return;
@@ -188,7 +181,7 @@ class CommandCSAKick : public Command
 
 		/* Check whether target nick has equal/higher access
 		* or whether the mask matches a user with higher/equal access - Viper */
-		if ((ci->flags & CI_PEACE) && nc)
+		if ((ci->HasFlag(CI_PEACE)) && nc)
 		{
 			 if ((nc == ci->founder) || (get_access_nc(nc, ci) >= get_access(u, ci)))
 			 {
@@ -196,7 +189,7 @@ class CommandCSAKick : public Command
 				return;
 			 }
 		}
-		else if ((ci->flags & CI_PEACE))
+		else if ((ci->HasFlag(CI_PEACE)))
 		{
 			 char buf[BUFSIZE];
 			 /* Match against all currently online users with equal or
@@ -223,7 +216,7 @@ class CommandCSAKick : public Command
 			{
 				for (NickAlias *na2 = nalists[i]; na2; na2 = na2->next)
 				{
-					if (na2->status & NS_FORBIDDEN)
+					if (na2->HasFlag(NS_FORBIDDEN))
 						continue;
 
 					if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci) >= get_access(u, ci))))
@@ -242,11 +235,11 @@ class CommandCSAKick : public Command
 		for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
 		{
 			akick = ci->GetAkick(j);
-			if (!(akick->flags & AK_USED))
+			if (!(akick->HasFlag(AK_USED)))
 				continue;
-			if ((akick->flags & AK_ISNICK) ? akick->nc == nc : akick->mask == mask)
+			if ((akick->HasFlag(AK_ISNICK)) ? akick->nc == nc : akick->mask == mask)
 			{
-				notice_lang(s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, (akick->flags & AK_ISNICK) ? akick->nc->display : akick->mask.c_str(), ci->name);
+				notice_lang(s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, (akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str(), ci->name);
 				return;
 			}
 		}
@@ -291,7 +284,7 @@ class CommandCSAKick : public Command
 		{
 			akick = ci->GetAkick(i);
 
-		        if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK))
+		        if (!akick->HasFlag(AK_USED) || akick->HasFlag(AK_ISNICK))
 		                continue;
 			if (akick->mask == mask)
 		                break;
@@ -303,7 +296,7 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		akick->flags |= AK_STUCK;
+		akick->SetFlag(AK_STUCK);
 		notice_lang(s_ChanServ, u, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name);
 
 		if (ci->c)
@@ -331,7 +324,7 @@ class CommandCSAKick : public Command
 		{
 			akick = ci->GetAkick(i);
 
-		        if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK))
+		        if (!akick->HasFlag(AK_USED) || akick->HasFlag(AK_ISNICK))
 		                continue;
 			if (akick->mask == mask)
 		                break;
@@ -343,7 +336,7 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		akick->flags &= ~AK_STUCK;
+		akick->UnsetFlag(AK_STUCK);
 		notice_lang(s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name);
 	}
 
@@ -387,10 +380,10 @@ class CommandCSAKick : public Command
 			{
 				akick = ci->GetAkick(i);
 
-				if (!(akick->flags & AK_USED))
+				if (!(akick->HasFlag(AK_USED)))
 					continue;
-				if (((akick->flags & AK_ISNICK) && akick->nc == nc)
-					|| (!(akick->flags & AK_ISNICK)
+				if (((akick->HasFlag(AK_ISNICK)) && akick->nc == nc)
+					|| (!(akick->HasFlag(AK_ISNICK))
 					&& akick->mask == mask))
 					break;
 			}
@@ -428,13 +421,13 @@ class CommandCSAKick : public Command
 			{
 				akick = ci->GetAkick(i);
 
-				if (!(akick->flags & AK_USED))
+				if (!(akick->HasFlag(AK_USED)))
 					continue;
 		                if (!mask.empty())
 				{
-					if (!(akick->flags & AK_ISNICK) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
+					if (!(akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
 					        continue;
-					if ((akick->flags & AK_ISNICK) && !Anope::Match(akick->nc->display, mask.c_str(), false))
+					if ((akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->nc->display, mask.c_str(), false))
 			        		continue;
 	                	}
 				akick_list(u, i, ci, &sent_header);
@@ -467,13 +460,13 @@ class CommandCSAKick : public Command
 			{
 				akick = ci->GetAkick(i);
 
-		                if (!(akick->flags & AK_USED))
+		                if (!(akick->HasFlag(AK_USED)))
 					continue;
 		                if (!mask.empty())
 				{
-					if (!(akick->flags & AK_ISNICK) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
+					if (!(akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
 					        continue;
-					if ((akick->flags & AK_ISNICK) && !Anope::Match(akick->nc->display, mask.c_str(), false))
+					if ((akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->nc->display, mask.c_str(), false))
 					        continue;
 		                }
 		                akick_view(u, i, ci, &sent_header);

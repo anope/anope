@@ -83,7 +83,7 @@ class CommandNSAList : public Command
 
 		if (!na)
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-		else if (na->status & NS_FORBIDDEN)
+		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
 			notice_lang(s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
@@ -109,16 +109,16 @@ class CommandNSAList : public Command
 
 						++match_count;
 
-						if ((ci->flags & CI_XOP) || level == ACCESS_FOUNDER)
+						if ((ci->HasFlag(CI_XOP)) || level == ACCESS_FOUNDER)
 						{
 							const char *xop;
 
 							xop = get_xop_level(level);
 
-							notice_lang(s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->flags & CI_NO_EXPIRE ? '!' : ' ', ci->name, xop, ci->desc ? ci->desc : "");
+							notice_lang(s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, xop, ci->desc ? ci->desc : "");
 						}
 						else
-							notice_lang(s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->flags & CI_NO_EXPIRE ? '!' : ' ', ci->name, level, ci->desc ? ci->desc : "");
+							notice_lang(s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, level, ci->desc ? ci->desc : "");
 					}
 				}
 			}

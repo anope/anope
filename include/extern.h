@@ -642,7 +642,12 @@ E void SetOperType(NickCore *nc);
 E SList akills, sglines, sqlines, szlines;
 
 E int DefConModesSet;
-E ChannelInfo DefConModesCI;
+E Flags<ChannelModeName> DefConModesOn;
+E Flags<ChannelModeName> DefConModesOff;
+E std::map<ChannelModeName, std::string> DefConModesOnParams;
+E bool SetDefConParam(ChannelModeName, std::string &);
+E bool GetDefConParam(ChannelModeName, std::string *);
+E void UnsetDefConParam(ChannelModeName);
 
 E void operserv(User *u, char *buf);
 E void os_init();

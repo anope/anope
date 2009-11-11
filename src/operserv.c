@@ -36,12 +36,44 @@ std::vector<NewsItem *> News;
 
 std::vector<std::bitset<32> > DefCon;
 int DefConModesSet = 0;
-ChannelInfo DefConModesCI;	  /* ChannelInfo containg params for locked modes
-								 * during DefCon; I would've done this nicer if i
-								 * could, but all damn mode functions require a
-								 * ChannelInfo struct! --gdex
-								 */
+/* Defcon modes mlocked on */
+Flags<ChannelModeName> DefConModesOn;
+/* Defcon modes mlocked off */
+Flags<ChannelModeName> DefConModesOff;
+/* Map of Modesa and Params for DefCon */
+std::map<ChannelModeName, std::string> DefConModesOnParams;
 
+bool SetDefConParam(ChannelModeName Name, std::string &buf)
+{
+	return DefConModesOnParams.insert(std::make_pair(Name, buf)).second;
+}
+
+bool GetDefConParam(ChannelModeName Name, std::string *buf)
+{
+	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
+	
+	buf->clear();
+
+	if (it != DefConModesOnParams.end())
+	{
+		*buf = it->second;
+		return true;
+	}
+
+	return false;
+}
+
+void UnsetDefConParam(ChannelModeName Name)
+{
+	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
+
+	if (it != DefConModesOnParams.end())
+	{
+		DefConModesOnParams.erase(it);
+	}
+}
+
+/*************************************************************************/
 
 void moduleAddOperServCmds();
 /*************************************************************************/

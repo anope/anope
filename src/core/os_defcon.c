@@ -184,7 +184,7 @@ class OSDEFCON : public Module
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
-		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesCI.HasMLock(Name, false))
+		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOff.HasFlag(Name))
 		{
 			c->RemoveMode(Name);
 			ircdproto->SendMode(findbot(s_OperServ), c->name, "-%c", cm->ModeChar);
@@ -195,16 +195,19 @@ class OSDEFCON : public Module
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
-		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesCI.HasMLock(Name, true))
+		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOn.HasFlag(Name))
 		{
 			std::string param;
-			DefConModesCI.GetParam(Name, &param);
-
+			GetDefConParam(Name, &param);
+			
 			c->SetMode(Name);
 
 			std::string buf = "+" + std::string(&cm->ModeChar);
 			if (!param.empty())
+			{
 				buf += " " + param;
+				c->SetParam(Name, param);
+			}
 			ircdproto->SendMode(findbot(s_OperServ), c->name, buf.c_str());
 		}
 	}
@@ -421,7 +424,8 @@ void defconParseModeString(const char *str)
 
 	spacesepstream ss(str);
 
-	DefConModesCI.ClearMLock();
+	DefConModesOn.ClearFlags();
+	DefConModesOff.ClearFlags();
 	ss.GetToken(modes);
 
 	/* Loop while there are modes to set */
@@ -451,8 +455,8 @@ void defconParseModeString(const char *str)
 			}
 			else if (add)
 			{
-				DefConModesCI.SetMLock(cm->Name, true);
-				DefConModesCI.RemoveMLock(cm->Name, false);
+				DefConModesOn.SetFlag(cm->Name);
+				DefConModesOff.UnsetFlag(cm->Name);
 
 				if (cm->Type == MODE_PARAM)
 				{
@@ -467,22 +471,18 @@ void defconParseModeString(const char *str)
 					if (!cmp->IsValid(param.c_str()))
 						continue;
 
-					DefConModesCI.SetParam(cmp->Name, param);
+					SetDefConParam(cmp->Name, param);
 				}
 			}
 			else
 			{
-				DefConModesCI.RemoveMLock(cm->Name, true);
-
-				if (DefConModesCI.HasMLock(cm->Name, true))
+				if (DefConModesOn.HasFlag(cm->Name))
 				{
-					DefConModesCI.RemoveMLock(cm->Name, true);
+					DefConModesOn.UnsetFlag(cm->Name);
 
 					if (cm->Type == MODE_PARAM)
 					{
-						cmp = static_cast<ChannelModeParam *>(cm);
-
-						DefConModesCI.UnsetParam(cmp->Name);
+						UnsetDefConParam(cm->Name);
 					}
 				}
 			}
@@ -492,10 +492,11 @@ void defconParseModeString(const char *str)
 	if ((cm = ModeManager::FindChannelModeByName(CMODE_REDIRECT)))
 	{
 		/* We can't mlock +L if +l is not mlocked as well. */
-		if (DefConModesCI.HasMLock(cm->Name, true) && !DefConModesCI.HasMLock(CMODE_LIMIT, true))
+		if (DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_LIMIT))
 		{
-			DefConModesCI.RemoveMLock(CMODE_REDIRECT, true);
-			DefConModesCI.UnsetParam(CMODE_REDIRECT);
+			DefConModesOn.UnsetFlag(CMODE_REDIRECT);
+
+			//DefConModesCI.UnsetParam(CMODE_REDIRECT);
 			alog("DefConChanModes must lock mode +l as well to lock mode +L");
 		}
 	}
@@ -504,9 +505,9 @@ void defconParseModeString(const char *str)
 	/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
 	if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)))
 	{
-		if (DefConModesCI.HasMLock(cm->Name, true) && !DefConModesCI.HasMLock(CMODE_INVITE, true))
+		if (DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_INVITE))
 		{
-			DefConModesCI.RemoveMLock(CMODE_NOKNOCK, true);
+			DefConModesOn.UnsetFlag(CMODE_NOKNOCK);
 			alog("DefConChanModes must lock mode +i as well to lock mode +K");
 		}
 	}

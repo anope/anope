@@ -202,7 +202,7 @@ class CommandCSAccess : public Command
 				notice_lang(s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
 				return MOD_CONT;
 			}
-			if (na->HasFlag(NS_FORBIDDEN));
+			else if (na->HasFlag(NS_FORBIDDEN))
 			{
 				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;

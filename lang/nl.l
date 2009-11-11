@@ -4811,26 +4811,25 @@ CHAN_HELP_LEVELS
 	         LEVELS kanaal LIST
 	         LEVELS kanaal RESET
 	
-	Het LEVELS commando staat precieze controle toe over de
-	betekenis van de numerieke toegangsniveaus die worden
-	gebruikt voor kanalen. Met dit commando kan je de toegangs-
-	niveaus defineren die benodigd zijn voor de meeste functies
-	van %S. (De SET FOUNDER en SET PASSWORD commando's zijn,
-	evenals dit commando, altijd gelimiteerd tot de stichter.)
+	The LEVELS command allows fine control over the meaning of
+	the numeric access levels used for channels.  With this
+	command, you can define the access level required for most
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
-	LEVELS SET staat toe om de toegangsniveaus voor functies
-	of een groep functies te veranderen. LEVELS DISABLE (of
-	kortweg DIS) schakelt een automatische functie uit, of
-	staat gebruik van de functie niet toe door iemand anders
-	dan de stichter.
+	LEVELS SET allows the access level for a function or group of
+	functions to be changed.  LEVELS DISABLE (or DIS for short)
+	disables an automatic feature or disallows access to a
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
 	
-	LEVELS LIST geeft de huidige levels voor elke functie of
-	groep van functies weer. LEVELS RESET stelt de niveaus in
-	op de standaardwaarden van een nieuw kanaal (zie
-	HELP ACCESS LEVELS).
+	LEVELS LIST shows the current levels for each function or
+	group of functions.  LEVELS RESET resets the levels to the
+	default levels of a newly-created channel (see
+	HELP ACCESS LEVELS).
 	
-	Voor een list van de opties en functies waarvan de niveaus
-	kunnen worden aangepast, zie HELP LEVELS DESC.
+	For a list of the features and functions whose levels can be
+	set, see HELP LEVELS DESC.
 
 CHAN_HELP_LEVELS_DESC
 	De volgende optie-/functienamen worden begrepen. Let op dat

@@ -4800,23 +4800,25 @@ CHAN_HELP_LEVELS
 	            LEVELS kanaladý LIST
 	            LEVELS kanaladý RESET
 	
-	LEVELS komutu bir kanaldaki access seviyelerinin iyi
-	kontrolünü saðlar. Bu komutla, %S'ün birçok
-	fonksiyonu için gereken access seviyelerini
-	belirleyebilirsiniz. (SET FOUNDER ve SET PASSWORD
-	komutlarý ve bu komut sadece kanal founderý tarafýndan
-	kullanýlabilir.)
+	The LEVELS command allows fine control over the meaning of
+	the numeric access levels used for channels.  With this
+	command, you can define the access level required for most
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
-	LEVELS SET komutu bir fonksiyon yada fonksiyon gruplarý için
-	access seviyelerini deðiþtirmeye yarar. LEVELS DISABLE (veya
-	kýsaca DIS) otomatik bir özelliði kapatýr yada founderdan 
-	baþkasýnýn kullanmasýný engeller. LEVELS LIST komutu 
-	fonksiyonlar yada fonksiyon gruplarý için mevcut seviyeleri 
-	gösterir. LEVELS RESET komutu seviyeleri varsayýlan deðerlerine
-	geri çevirir. (HELP ACCESS LEVELS e bakýn).
+	LEVELS SET allows the access level for a function or group of
+	functions to be changed.  LEVELS DISABLE (or DIS for short)
+	disables an automatic feature or disallows access to a
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
 	
-	Seviyeleri ayarlanabilecek fonksiyonlar için, HELP LEVELS DESC e 
-	bakýn.
+	LEVELS LIST shows the current levels for each function or
+	group of functions.  LEVELS RESET resets the levels to the
+	default levels of a newly-created channel (see
+	HELP ACCESS LEVELS).
+	
+	For a list of the features and functions whose levels can be
+	set, see HELP LEVELS DESC.
 
 CHAN_HELP_LEVELS_DESC
 	Aþaðýda seviyeleri deðiþtirilebilecek  fonksiyonlar listelidir.

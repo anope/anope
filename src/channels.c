@@ -1771,7 +1771,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	 */
 	if (give_modes && (get_ignore(user->nick) == NULL)
 		&& (!user->nc || !user->nc->HasFlag(NI_AUTOOP))) {
-		if (owner && (IsFounder(user, ci) || check_access(user, ci, CA_AUTOOWNER)))
+		if (owner && check_access(user, ci, CA_AUTOOWNER))
 			add_modes |= CUS_OWNER;
 		else if (admin && check_access(user, ci, CA_AUTOPROTECT))
 			add_modes |= CUS_PROTECT;

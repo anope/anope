@@ -4761,28 +4761,26 @@ CHAN_HELP_LEVELS
 			LEVELS #szoba LIST
 			LEVELS #szoba RESET
 	
-	A LEVELS segítségével a számokkal definiált hozzáférési
-	szintek módosíthatók.
-	Ezzel a paranccsal,  definiálhatsz hozzáférési szinteket, 
-	melyek szükségesek a  %S funkcióihoz.
-	Ezt a parancsot csak a founder használhatja.
+	The LEVELS command allows fine control over the meaning of
+	the numeric access levels used for channels.  With this
+	command, you can define the access level required for most
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
-	LEVELS SET biztosítja, hogy megváltoztasd a hozzáférési
-	szintjét egy adott funkciónak vagy funkciók csoportjának.
+	LEVELS SET allows the access level for a function or group of
+	functions to be changed.  LEVELS DISABLE (or DIS for short)
+	disables an automatic feature or disallows access to a
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
 	
-	A LEVELS DISABLE (vagy DIS röviden) letiltja
-	az automatikus lehetõségeket, vagy megtiltja a hozzáférést
-	bizonyos funkciókhoz, ezeket csak a founder változtathatja
+	LEVELS LIST shows the current levels for each function or
+	group of functions.  LEVELS RESET resets the levels to the
+	default levels of a newly-created channel (see
+	HELP ACCESS LEVELS).
 	
-	LEVELS LIST kiírja a jelenlegi hozzáférési szintjeit
-	a különbözõ funkcióknak.
-	
-	LEVELS RESET visszaállítja az alapértelmezett értékeket.
-	Lásd még: HELP ACCESS LEVELS.
-	
-	Ha szeretnéd megnézni a funkciók és lehetõségek listáját.
-	akkor lesd meg a HELP LEVELS DESC leírást is.
-	
+	For a list of the features and functions whose levels can be
+	set, see HELP LEVELS DESC.
+
 CHAN_HELP_LEVELS_DESC
 	A következõ lehetõségek/funkciók elérthetõek.
 	Megjegyzés: az AUTODEOP és NOJOIN esetén maximum szintrõl

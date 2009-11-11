@@ -4696,14 +4696,15 @@ CHAN_HELP_LEVELS
 	The LEVELS command allows fine control over the meaning of
 	the numeric access levels used for channels.  With this
 	command, you can define the access level required for most
-	of %S's functions.  (The SET FOUNDER and SET PASSWORD
-	commands, as well as this command, are always restricted to
-	the channel founder.)
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
 	LEVELS SET allows the access level for a function or group of
 	functions to be changed.  LEVELS DISABLE (or DIS for short)
 	disables an automatic feature or disallows access to a
-	function by anyone other than the channel founder.
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
+	
 	LEVELS LIST shows the current levels for each function or
 	group of functions.  LEVELS RESET resets the levels to the
 	default levels of a newly-created channel (see

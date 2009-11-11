@@ -29,14 +29,14 @@ static int def_levels[][2] = {
 	{ CA_NOJOIN,					-2 },
 	{ CA_INVITE,					 5 },
 	{ CA_AKICK,					 10 },
-	{ CA_SET,	 		ACCESS_INVALID },
-	{ CA_CLEAR,   		ACCESS_INVALID },
+	{ CA_SET,	 		ACCESS_FOUNDER },
+	{ CA_CLEAR,   		ACCESS_FOUNDER },
 	{ CA_UNBAN,					  5 },
 	{ CA_OPDEOP,					 5 },
 	{ CA_ACCESS_LIST,				1 },
 	{ CA_ACCESS_CHANGE,			 10 },
 	{ CA_MEMO,					  10 },
-	{ CA_ASSIGN,  		ACCESS_INVALID },
+	{ CA_ASSIGN,  		ACCESS_FOUNDER },
 	{ CA_BADWORDS,				  10 },
 	{ CA_NOKICK,					 1 },
 	{ CA_FANTASIA,					 3 },
@@ -51,17 +51,17 @@ static int def_levels[][2] = {
 	{ CA_HALFOPME,				   4 },
 	{ CA_HALFOP,					 5 },
 	{ CA_PROTECTME,				 10 },
-	{ CA_PROTECT,  		ACCESS_INVALID },
+	{ CA_PROTECT,  		ACCESS_FOUNDER },
 	{ CA_KICKME,			   		 5 },
 	{ CA_KICK,					   5 },
-	{ CA_SIGNKICK, 		ACCESS_INVALID },
+	{ CA_SIGNKICK, 		ACCESS_FOUNDER },
 	{ CA_BANME,					  5 },
 	{ CA_BAN,						5 },
-	{ CA_TOPIC,		 ACCESS_INVALID },
-	{ CA_INFO,		  ACCESS_INVALID },
-	{ CA_AUTOOWNER,		ACCESS_INVALID },
-	{ CA_OWNER,		ACCESS_INVALID },
-	{ CA_OWNERME,		ACCESS_INVALID },
+	{ CA_TOPIC,		 ACCESS_FOUNDER },
+	{ CA_INFO,		  ACCESS_FOUNDER },
+	{ CA_AUTOOWNER,		ACCESS_FOUNDER },
+	{ CA_OWNER,		ACCESS_FOUNDER },
+	{ CA_OWNERME,		ACCESS_FOUNDER },
 	{ -1 }
 };
 
@@ -1562,6 +1562,8 @@ int check_access(User * user, ChannelInfo * ci, int what)
 	if (level > 0)
 		ci->last_used = time(NULL);
 
+	if (limit == ACCESS_INVALID)
+		return 0;
 	if (what == ACCESS_FOUNDER)
 		return IsFounder(user, ci);
 	if (level >= ACCESS_FOUNDER)
@@ -1569,8 +1571,6 @@ int check_access(User * user, ChannelInfo * ci, int what)
 	/* Hacks to make flags work */
 	if (what == CA_AUTODEOP && (ci->HasFlag(CI_SECUREOPS)) && level == 0)
 		return 1;
-	if (limit == ACCESS_INVALID)
-		return 0;
 	if (what == CA_AUTODEOP || what == CA_NOJOIN)
 		return level <= ci->levels[what];
 	else

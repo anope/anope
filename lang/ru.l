@@ -4811,25 +4811,25 @@ CHAN_HELP_LEVELS
 	           LEVELS #канал LIST
 	           LEVELS #канал RESET
 	
-	Команда  LEVELS  позволяет удобно управлять уровнями доступа,
-	используемыми для списков доступа.  С помощью этой эту команды,
-	вы можете определить уровень доступа, требуемый для большинства
-	функций %S'а (команды SET FOUNDER и  SET PASSWORD,
-	а также эту команду, может использовать только владелец канала).
+	The LEVELS command allows fine control over the meaning of
+	the numeric access levels used for channels.  With this
+	command, you can define the access level required for most
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
-	Команда  LEVELS SET  позволяет  установить  уровень  доступа для
-	функции или группы функций.
-	Команда  LEVELS DISABLE  (DIS - сокращенный аналог)  отключает
-	функцию или запрещает доступ к функции всем, кроме владельца канала.
+	LEVELS SET allows the access level for a function or group of
+	functions to be changed.  LEVELS DISABLE (or DIS for short)
+	disables an automatic feature or disallows access to a
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
 	
-	Команда  LEVELS LIST  покажет  текущие  уровни доступа для каждой
-	функции или группы функций.
+	LEVELS LIST shows the current levels for each function or
+	group of functions.  LEVELS RESET resets the levels to the
+	default levels of a newly-created channel (see
+	HELP ACCESS LEVELS).
 	
-	Команда  LEVELS RESET  сбросит  все  настройки уровней доступа на
-	значения по-умолчанию (прописаные в HELP ACCESS LEVELS).
-	
-	Чтобы посмотреть список функций, на которые можно определять уровни
-	доступа, см. справочную информацию по HELP LEVELS DESC.
+	For a list of the features and functions whose levels can be
+	set, see HELP LEVELS DESC.
 
 CHAN_HELP_LEVELS_DESC
 	Ниже представлен список всех доступных команд/функций и их описание.

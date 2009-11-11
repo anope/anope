@@ -4742,27 +4742,25 @@ CHAN_HELP_LEVELS
 	          LEVELS canale LIST
 	          LEVELS canale RESET
 	
-	Il comando LEVELS permette un controllo preciso dei
-	significati dei livelli di accesso numerici usati nei
-	canali. Con questo comando, è possibile definire il
-	livello di accesso richiesto per la maggior parte delle
-	funzioni di %S.
-	(I comandi SET FOUNDER e SET PASSWORD, nonché questo
-	comando, sono sempre riservati al fondatore del canale).
+	The LEVELS command allows fine control over the meaning of
+	the numeric access levels used for channels.  With this
+	command, you can define the access level required for most
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
-	LEVELS SET permette di definire il livello di accesso
-	necessario per una funzione o per un gruppo di funzioni.
-	LEVELS DISABLE (o, abbreviato, DIS) disattiva una
-	funzione automatica o non permette più l'accesso a una
-	funzione se non al fondatore del canale.
-	LEVELS LIST mostra i livelli di accesso attuali per
-	ogni funzione e per i gruppi di funzioni.
-	LEVELS RESET reimposta i livelli ai valori di default
-	di un canale appena creato (per maggiori informazioni,
-	digita HELP ACCESS LEVELS).
+	LEVELS SET allows the access level for a function or group of
+	functions to be changed.  LEVELS DISABLE (or DIS for short)
+	disables an automatic feature or disallows access to a
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
 	
-	Per una lista delle funzioni di cui puoi cambiare i
-	livelli, digita HELP LEVELS DESC.
+	LEVELS LIST shows the current levels for each function or
+	group of functions.  LEVELS RESET resets the levels to the
+	default levels of a newly-created channel (see
+	HELP ACCESS LEVELS).
+	
+	For a list of the features and functions whose levels can be
+	set, see HELP LEVELS DESC.
 
 CHAN_HELP_LEVELS_DESC
 	La seguente lista mostra le funzioni disponibile. Tieni

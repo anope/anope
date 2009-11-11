@@ -4827,24 +4827,25 @@ CHAN_HELP_LEVELS
 	    LEVELS κανάλι LIST
 	        LEVELS κανάλι RESET
 	
-	Η εντολή LEVELS επιτρέπει το καλό χειρισμό όσον αφορά
-	την ρύθμιση της access levels που χρησιμοποιείται στο κανάλι.
-	Με αυτή την εντολή, μπορείτε να χειρίζεστε την access level που
-	που εκτελεί ο %S.  (Τις εντολές SET FOUNDER και SET PASSWORD
-	τις χειρίζεται μόνο ο founder.)
-	    
-	Η εντολή LEVELS SET επιτρέπει την αλλαγή των access level (βαθμών).
-	Η εντολή LEVELS DISABLE (ή DIS για συντομία)
-	απενεργοποιεί αυτόματα μελλοντικά ή δεν δίνει δικαιώματα σε όσους έχουν access
-	εκτός του founder καναλιού αυτού.
-	Η εντολή αυτή LEVELS LIST δείχνει τα levels (βαθμούς) που έχει η κάθε 
-	εντολή.
-	Η εντολή LEVELS RESET σβήνει τα levels (βαθμούς) και επαναφέρει τα
-	default levels (βαθμούς), δηλ αυτά τα levels που έχει ένα νέο κανάλι (δες
-	την εντολή HELP ACCESS LEVELS).
+	The LEVELS command allows fine control over the meaning of
+	the numeric access levels used for channels.  With this
+	command, you can define the access level required for most
+	of %S's functions.  (The SET FOUNDER and this command
+	are always restricted to the channel founder.)
 	
-	Για να δείς την λίστα με τις εντολές που μπορείς να αλλάξεις τα levels, δες
-	την εντολή HELP LEVELS DESC.
+	LEVELS SET allows the access level for a function or group of
+	functions to be changed.  LEVELS DISABLE (or DIS for short)
+	disables an automatic feature or disallows access to a
+	function by anyone, INCLUDING the founder (although, the founder
+	can always reenable it).
+	
+	LEVELS LIST shows the current levels for each function or
+	group of functions.  LEVELS RESET resets the levels to the
+	default levels of a newly-created channel (see
+	HELP ACCESS LEVELS).
+	
+	For a list of the features and functions whose levels can be
+	set, see HELP LEVELS DESC.
 
 CHAN_HELP_LEVELS_DESC
 	Τα ακόλουθα feature/function καταλαβαίνονται.  Σημείωση,

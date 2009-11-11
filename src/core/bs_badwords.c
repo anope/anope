@@ -244,7 +244,7 @@ class CommandBSBadwords : public Command
 
 		if (need_args ? 0 : !word)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, cmd);
 			return MOD_CONT;
 		}
 
@@ -271,7 +271,8 @@ class CommandBSBadwords : public Command
 		else if (cmd == "CLEAR")
 			return this->DoClear(u, ci, word);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 
@@ -281,7 +282,7 @@ class CommandBSBadwords : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_BotServ, u, "BADWORDS", BOT_BADWORDS_SYNTAX);
 	}

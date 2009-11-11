@@ -48,7 +48,7 @@ class CommandOSModLoad : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
 	}

@@ -59,7 +59,7 @@ class CommandNSAccess : public Command
 	{
 		if (!mask)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
@@ -85,7 +85,7 @@ class CommandNSAccess : public Command
 	{
 		if (!mask)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
@@ -155,7 +155,7 @@ class CommandNSAccess : public Command
 		else if (cmd == "LIST")
 			return this->DoList(u, u->nc, mask);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -165,7 +165,7 @@ class CommandNSAccess : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
 	}

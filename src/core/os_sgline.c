@@ -59,14 +59,14 @@ class CommandOSSGLine : public Command
 
 		if (!param)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 		snprintf(rest, sizeof(rest), "%s%s%s", param, params.size() > last_param ? " " : "", params.size() > last_param ? params[last_param].c_str() : "");
 
 		if (std::string(rest).find(':') == std::string::npos)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
@@ -137,7 +137,7 @@ class CommandOSSGLine : public Command
 
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 
 		return MOD_CONT;
 	}
@@ -151,7 +151,7 @@ class CommandOSSGLine : public Command
 
 		if (!mask)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
@@ -302,7 +302,7 @@ class CommandOSSGLine : public Command
 		else if (cmd == "CLEAR")
 			return this->OnClear(u);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -312,7 +312,7 @@ class CommandOSSGLine : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "SGLINE", OPER_SGLINE_SYNTAX);
 	}

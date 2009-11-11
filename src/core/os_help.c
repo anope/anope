@@ -28,7 +28,7 @@ class CommandOSHelp : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_OperServ, u, OPER_HELP);
 		FOREACH_MOD(I_OnOperServHelp, OnOperServHelp(u));

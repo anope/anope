@@ -534,7 +534,7 @@ class CommandCSAKick : public Command
 		ChannelInfo *ci = cs_findchan(chan.c_str());
 
 		if (mask.empty() && (cmd == "ADD" || cmd == "STICK" || cmd == "UNSTICK" || cmd == "DEL"))
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/modify"))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd != "LIST" && cmd != "VIEW" && cmd != "ENFORCE" && readonly)
@@ -556,7 +556,7 @@ class CommandCSAKick : public Command
 		else if (cmd == "CLEAR")
 			this->DoClear(u, ci, params);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 
 		return MOD_CONT;
 	}
@@ -567,7 +567,7 @@ class CommandCSAKick : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
 	}

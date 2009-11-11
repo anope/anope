@@ -77,7 +77,7 @@ class CommandOSDEFCON : public Command
 		newLevel = atoi(lvl);
 		if (newLevel < 1 || newLevel > 5)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 		DefConLevel = newLevel;
@@ -122,7 +122,7 @@ class CommandOSDEFCON : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
 	}

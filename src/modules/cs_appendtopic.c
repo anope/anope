@@ -124,7 +124,7 @@ class CommandCSAppendTopic : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	}

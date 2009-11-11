@@ -72,14 +72,14 @@ class CommandCSTBan : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		this->OnSyntaxError(u);
+		this->OnSyntaxError(u, "");
 		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
 		me->NoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_ChanServ, u, TBAN_SYNTAX);
 	}

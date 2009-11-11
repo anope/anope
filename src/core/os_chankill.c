@@ -55,7 +55,7 @@ class CommandOSChanKill : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 		snprintf(reason, sizeof(reason), "%s%s", params[last_param].c_str(), (params.size() > last_param + 1 ? params[last_param + 1].c_str() : ""));
@@ -94,7 +94,7 @@ class CommandOSChanKill : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
 	}

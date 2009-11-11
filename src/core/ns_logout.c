@@ -33,7 +33,7 @@ class CommandNSLogout : public Command
 		NickAlias *na;
 
 		if (!u->nc->IsServicesOper() && nick)
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		else if (!(u2 = (nick ? finduser(nick) : u)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (nick && u2->nc && !u2->nc->IsServicesOper())
@@ -84,7 +84,7 @@ class CommandNSLogout : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
 	}

@@ -62,7 +62,7 @@ class CommandNSGetEMail : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
 	}

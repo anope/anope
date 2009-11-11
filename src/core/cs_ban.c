@@ -104,7 +104,7 @@ class CommandCSBan : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
 	}
@@ -151,7 +151,7 @@ class CommandCSUnban : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
 	}

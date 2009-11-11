@@ -26,7 +26,7 @@ class CommandOSIgnore : public Command
 
 		if (!time || !nick)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 		else
@@ -74,7 +74,7 @@ class CommandOSIgnore : public Command
 	{
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		if (!nick)
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 		else
 		{
 			if (delete_ignore(nick))
@@ -113,7 +113,7 @@ class CommandOSIgnore : public Command
 		else if (cmd == "CLEAR")
 			return this->DoClear(u);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 
 		return MOD_CONT;
 	}
@@ -124,7 +124,7 @@ class CommandOSIgnore : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
 	}

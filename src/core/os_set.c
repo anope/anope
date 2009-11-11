@@ -42,7 +42,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "IGNORE");
 			return MOD_CONT;
 		}
 
@@ -68,7 +68,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "READONLY");
 			return MOD_CONT;
 		}
 
@@ -99,7 +99,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "LOGCHAN");
 			return MOD_CONT;
 		}
 
@@ -140,7 +140,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "SUPERADMIN");
 			return MOD_CONT;
 		}
 
@@ -177,7 +177,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEBUG");
 			return MOD_CONT;
 		}
 
@@ -211,7 +211,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "NOEXPIRE");
 			return MOD_CONT;
 		}
 
@@ -284,7 +284,7 @@ class CommandOSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "SET", OPER_SET_SYNTAX);
 	}

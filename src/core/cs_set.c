@@ -308,7 +308,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET KEEPTOPIC", CHAN_SET_KEEPTOPIC_SYNTAX);
+			this->OnSyntaxError(u, "KEEPTOPIC");
 
 		return MOD_CONT;
 	}
@@ -326,7 +326,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET TOPICLOCK", CHAN_SET_TOPICLOCK_SYNTAX);
+			this->OnSyntaxError(u, "TOPICLOCK");
 
 		return MOD_CONT;
 	}
@@ -344,7 +344,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
+			this->OnSyntaxError(u, "PRIVATE");
 
 		return MOD_CONT;
 	}
@@ -362,7 +362,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET SECUREOPS", CHAN_SET_SECUREOPS_SYNTAX);
+			this->OnSyntaxError(u, "SECUREOPS");
 
 		return MOD_CONT;
 	}
@@ -380,7 +380,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
+			this->OnSyntaxError(u, "SECUREFOUNDER");
 
 		return MOD_CONT;
 	}
@@ -402,7 +402,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
+			this->OnSyntaxError(u, "RESTRICTED");
 
 		return MOD_CONT;
 	}
@@ -420,7 +420,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
+			this->OnSyntaxError(u, "SECURE");
 
 		return MOD_CONT;
 	}
@@ -446,7 +446,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET SIGNKICK", CHAN_SET_SIGNKICK_SYNTAX);
+			this->OnSyntaxError(u, "SIGNKICK");
 
 		return MOD_CONT;
 	}
@@ -464,7 +464,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET OPNOTICE", CHAN_SET_OPNOTICE_SYNTAX);
+			this->OnSyntaxError(u, "OPNOTICE");
 
 		return MOD_CONT;
 	}
@@ -525,7 +525,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
+			this->OnSyntaxError(u, "XOP");
 
 		return MOD_CONT;
 	}
@@ -545,7 +545,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
+			this->OnSyntaxError(u, "PEACE");
 
 		return MOD_CONT;
 	}
@@ -621,7 +621,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
+			this->OnSyntaxError(u, "PERSIST");
 
 		return MOD_CONT;
 	}
@@ -644,7 +644,7 @@ class CommandCSSet : public Command
 			notice_lang(s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name);
 		}
 		else
-			syntax_error(s_ChanServ, u, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
+			this->OnSyntaxError(u, "NOEXPIRE");
 
 		return MOD_CONT;
 	}
@@ -658,7 +658,7 @@ class CommandCSSet : public Command
 	{
 		const char *chan = params[0].c_str();
 		ci::string cmd = params[1];
-		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
+		ci::string param = params.size() > 2 ? params[2] : "";
 		ChannelInfo *ci = cs_findchan(chan);
 		bool is_servadmin = u->nc->HasPriv("chanserv/set");
 
@@ -667,8 +667,8 @@ class CommandCSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (!param && cmd != "SUCCESSOR" && cmd != "URL" && cmd != "EMAIL" && cmd != "ENTRYMSG" && cmd != "MLOCK")
-			syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		if (param.empty() && cmd != "SUCCESSOR" && cmd != "URL" && cmd != "EMAIL" && cmd != "ENTRYMSG" && cmd != "MLOCK")
+			this->OnSyntaxError(u, cmd);
 		else if (!is_servadmin && !check_access(u, ci, CA_SET))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "FOUNDER")
@@ -696,9 +696,9 @@ class CommandCSSet : public Command
 		else if (cmd == "TOPIC")
 			notice_lang(s_ChanServ, u, OBSOLETE_COMMAND, "TOPIC");
 		else if (cmd == "BANTYPE")
-			DoSetBanType(u, ci, param);
+			DoSetBanType(u, ci, param.c_str());
 		else if (cmd == "MLOCK")
-			DoSetMLock(u, ci, param);
+			DoSetMLock(u, ci, param.c_str());
 		else if (cmd == "KEEPTOPIC")
 			DoSetKeepTopic(u, ci, param);
 		else if (cmd == "TOPICLOCK")
@@ -800,9 +800,45 @@ class CommandCSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		int reply = CHAN_SET_SYNTAX;
+		ci::string command = "SET";
+
+		if (!subcommand.empty())
+		{
+			if (subcommand == "KEEPTOPIC")
+				reply = CHAN_SET_KEEPTOPIC_SYNTAX;
+			else if (subcommand == "TOPICLOCK")
+				reply = CHAN_SET_TOPICLOCK_SYNTAX;
+			else if (subcommand == "PRIVATE")
+				reply = CHAN_SET_PRIVATE_SYNTAX;
+			else if (subcommand == "SECUREOPS")
+				reply = CHAN_SET_SECUREOPS_SYNTAX;
+			else if (subcommand == "SECUREFOUNDER")
+				reply = CHAN_SET_SECUREFOUNDER_SYNTAX;
+			else if (subcommand == "RESTRICTED")
+				reply = CHAN_SET_RESTRICTED_SYNTAX;
+			else if (subcommand == "SECURE")
+				reply = CHAN_SET_SECURE_SYNTAX;
+			else if (subcommand == "SIGNKICK")
+				reply = CHAN_SET_SIGNKICK_SYNTAX;
+			else if (subcommand == "OPNOTICE")
+				reply = CHAN_SET_OPNOTICE_SYNTAX;
+			else if (subcommand == "XOP")
+				reply = CHAN_SET_XOP_SYNTAX;
+			else if (subcommand == "PEACE")
+				reply = CHAN_SET_PEACE_SYNTAX;
+			else if (subcommand == "PERSIST")
+				reply = CHAN_SET_PERSIST_SYNTAX;
+			else if (subcommand == "NOEXPIRE")
+				reply = CHAN_SET_NOEXPIRE_SYNTAX;
+
+			if (reply != CHAN_SET_SYNTAX)
+				command += " " + subcommand;
+		}
+
+		syntax_error(s_ChanServ, u, command.c_str(), reply);
 	}
 };
 

@@ -55,7 +55,7 @@ class CommandBSAct : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
 	}

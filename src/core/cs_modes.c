@@ -95,7 +95,7 @@ class CommandCSOp : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
 	}
@@ -122,7 +122,7 @@ class CommandCSDeOp : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
 	}
@@ -149,7 +149,7 @@ class CommandCSVoice : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
 	}
@@ -176,7 +176,7 @@ class CommandCSDeVoice : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
 	}
@@ -208,7 +208,7 @@ class CommandCSHalfOp : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
 	}
@@ -241,7 +241,7 @@ class CommandCSDeHalfOp : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
 	}
@@ -273,7 +273,7 @@ class CommandCSProtect : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
 	}
@@ -304,7 +304,7 @@ class CommandCSDeProtect : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
 	}
@@ -335,7 +335,7 @@ class CommandCSOwner : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
 	}
@@ -366,7 +366,7 @@ class CommandCSDeOwner : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
 	}

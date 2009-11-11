@@ -74,7 +74,7 @@ class CommandCSTopic : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
 	}

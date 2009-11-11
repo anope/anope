@@ -153,7 +153,7 @@ class CommandCSAccess : public Command
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
 		if (is_list || cmd == "CLEAR" ? 0 : (cmd == "DEL" ? (!nick || s) : !s))
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, cmd);
 		/* We still allow LIST in xOP mode, but not others */
 		else if ((ci->HasFlag(CI_XOP)) && !is_list)
 		{
@@ -404,7 +404,7 @@ class CommandCSAccess : public Command
 
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -415,7 +415,7 @@ class CommandCSAccess : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
 	}
@@ -445,7 +445,7 @@ class CommandCSLevels : public Command
 		 * one; else, we want none.
 		 */
 		if (cmd == "SET" ? !s : (cmd.substr(0, 3) == "DIS" ? (!what || s) : !!what))
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, cmd);
 		else if (ci->HasFlag(CI_XOP))
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
 		else if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
@@ -454,7 +454,7 @@ class CommandCSLevels : public Command
 			level = strtol(s, &error, 10);
 
 			if (*error != '\0') {
-				this->OnSyntaxError(u);
+				this->OnSyntaxError(u, "SET");
 				return MOD_CONT;
 			}
 
@@ -535,7 +535,7 @@ class CommandCSLevels : public Command
 				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_LEVELS_RESET, chan);
 		} else {
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		}
 		return MOD_CONT;
 	}
@@ -546,7 +546,7 @@ class CommandCSLevels : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
 	}

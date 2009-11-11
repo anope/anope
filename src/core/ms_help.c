@@ -29,7 +29,7 @@ class CommandMSHelp : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_MemoServ, u, MEMO_HELP_HEADER);
 		FOREACH_MOD(I_OnMemoServHelp, OnMemoServHelp(u));

@@ -51,7 +51,7 @@ class CommandBSSay : public Command
 
 		if (text[0] == '\001')
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 
@@ -68,7 +68,7 @@ class CommandBSSay : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
 	}

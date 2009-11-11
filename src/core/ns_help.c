@@ -40,7 +40,7 @@ class CommandNSHelp : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_NickServ, u, NICK_HELP);
 		FOREACH_MOD(I_OnNickServHelp, OnNickServHelp(u));

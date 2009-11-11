@@ -240,7 +240,7 @@ class CommandNSRegister : public CommandNSConfirm
 		}
 
 		if (NSForceEmail && !email)
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + NSRegDelay) - time(NULL));
 		else if ((na = findnick(u->nick)))
@@ -304,7 +304,7 @@ class CommandNSRegister : public CommandNSConfirm
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		if (NSForceEmail)
 			syntax_error(s_NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX_EMAIL);

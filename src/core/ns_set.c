@@ -24,7 +24,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DISPLAY");
 			return MOD_CONT;
 		}
 
@@ -59,7 +59,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "PASSWORD");
 			return MOD_CONT;
 		}
 
@@ -102,7 +102,7 @@ class CommandNSSet : public Command
 
 		if (!param)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "LANGUAGE");
 			return MOD_CONT;
 		}
 
@@ -231,7 +231,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "KILL");
 			return MOD_CONT;
 		}
 
@@ -279,7 +279,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "SECURE");
 			return MOD_CONT;
 		}
 
@@ -304,7 +304,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "PRIVATE");
 			return MOD_CONT;
 		}
 
@@ -329,7 +329,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "MSG");
 			return MOD_CONT;
 		}
 
@@ -360,7 +360,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "HIDE");
 			return MOD_CONT;
 		}
 
@@ -421,7 +421,7 @@ class CommandNSSet : public Command
 
 		if (param.empty())
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "AUTOOP");
 			return MOD_CONT;
 		}
 
@@ -531,7 +531,7 @@ class CommandNSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "SET", NICK_SET_SYNTAX);
 	}

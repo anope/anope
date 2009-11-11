@@ -260,8 +260,9 @@ class CoreExport Command : public Flags<CommandFlag>
 
 	/** Requested when the user provides bad syntax to this command (not enough params, etc).
 	 * @param u The user executing the command.
+	 * @param subcommand The subcommand the user tried to use
 	 */
-	virtual void OnSyntaxError(User *u);
+	virtual void OnSyntaxError(User *u, const ci::string &subcommand);
 
 	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
 	 * @param reststr The permission required to successfully execute this command

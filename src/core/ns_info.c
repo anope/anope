@@ -201,7 +201,7 @@ class CommandNSInfo : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
 	}

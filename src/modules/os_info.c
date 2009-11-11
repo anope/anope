@@ -61,7 +61,7 @@ class CommandNSOInfo : public Command
 
 		if (!info)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
@@ -119,7 +119,8 @@ class CommandNSOInfo : public Command
 		else if (cmd == "DEL")
 			return this->DoDel(u, params);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 
@@ -129,7 +130,7 @@ class CommandNSOInfo : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_NickServ, u, OINFO_SYNTAX);
 	}
@@ -147,7 +148,7 @@ class CommandCSOInfo : public Command
 
 		if (!info)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
@@ -193,7 +194,7 @@ class CommandCSOInfo : public Command
 		else if (cmd == "DEL")
 			return this->DoDel(u, params);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -203,7 +204,7 @@ class CommandCSOInfo : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
 	}

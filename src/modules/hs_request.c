@@ -193,7 +193,7 @@ class CommandHSRequest : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
 	}
@@ -258,7 +258,7 @@ class CommandHSActivate : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 	}
@@ -321,7 +321,7 @@ class CommandHSReject : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
 	}
@@ -370,7 +370,7 @@ class HSListBase : public Command
 	{
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		// no-op
 	}

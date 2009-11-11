@@ -76,10 +76,6 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 			return;
 		}
 	}
-	else
-	{
-		// Check whether or not access string is empty
-	}
 
 	std::vector<ci::string> params;
 	std::string curparam;
@@ -109,7 +105,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 
 	if (params.size() < c->MinParams)
 	{
-		c->OnSyntaxError(u);
+		c->OnSyntaxError(u, params.size() > 1 ? params[1].c_str() : "");
 		return;
 	}
 

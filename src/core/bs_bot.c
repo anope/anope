@@ -21,17 +21,11 @@ class CommandBSBot : public Command
 	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
-		const char *user = params.size() > 2 ? params[2].c_str() : NULL;
-		const char *host = params.size() > 3 ? params[3].c_str() : NULL;
-		const char *real = params.size() > 4 ? params[4].c_str() : NULL;
+		const char *user = params[2].c_str();
+		const char *host = params[3].c_str();
+		const char *real = params[4].c_str();
 		const char *ch = NULL;
 		BotInfo *bi;
-
-		if (!nick || !user || !host || !real)
-		{
-			this->OnSyntaxError(u);
-			return MOD_CONT;
-		}
 
 		if (findbot(nick))
 		{
@@ -135,7 +129,7 @@ class CommandBSBot : public Command
 
 		if (!oldnick || !nick)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "CHANGE");
 			return MOD_CONT;
 		}
 
@@ -310,7 +304,7 @@ class CommandBSBot : public Command
 
 		if (!nick)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
@@ -362,7 +356,7 @@ class CommandBSBot : public Command
 
 			if (params.size() < 5)
 			{
-				this->OnSyntaxError(u);
+				this->OnSyntaxError(u, "ADD");
 				return MOD_CONT;
 			}
 
@@ -384,7 +378,7 @@ class CommandBSBot : public Command
 
 			if (params.size() < 3)
 			{
-				this->OnSyntaxError(u);
+				this->OnSyntaxError(u, "CHANGE");
 				return MOD_CONT;
 			}
 
@@ -401,14 +395,14 @@ class CommandBSBot : public Command
 
 			if (params.size() < 1)
 			{
-				this->OnSyntaxError(u);
+				this->OnSyntaxError(u, "DEL");
 				return MOD_CONT;
 			}
 
 			return this->DoDel(u, params);
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 
 		return MOD_CONT;
 	}
@@ -419,7 +413,7 @@ class CommandBSBot : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 	}

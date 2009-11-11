@@ -54,7 +54,7 @@ class CommandMSList : public Command
 			mi = &u->nc->memos;
 		}
 		if (!param.empty() && !isdigit(param[0]) && param != "NEW")
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, param);
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
@@ -102,7 +102,7 @@ class CommandMSList : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
 	}

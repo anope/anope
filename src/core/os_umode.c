@@ -35,7 +35,7 @@ class CommandOSUMode : public Command
 		 **/
 		if (modes[0] != '+' && modes[0] != '-')
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 		if (!(u2 = finduser(nick)))
@@ -61,7 +61,7 @@ class CommandOSUMode : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
 	}

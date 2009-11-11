@@ -146,7 +146,7 @@ class CommandHSSetAll : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
 	}

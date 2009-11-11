@@ -305,7 +305,7 @@ class NewsBase : public Command
 		int n;
 
 		if (!text)
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 		else
 		{
 			if (readonly)
@@ -329,7 +329,7 @@ class NewsBase : public Command
 		unsigned num;
 
 		if (!text)
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 		else
 		{
 			if (readonly)
@@ -384,7 +384,7 @@ class NewsBase : public Command
 		else if (cmd == "DEL")
 			return this->DoDel(u, params, type, msgs);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 
 		return MOD_CONT;
 	}
@@ -401,7 +401,7 @@ class NewsBase : public Command
 
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
-	virtual void OnSyntaxError(User *u) = 0;
+	virtual void OnSyntaxError(User *u, const ci::string &subcommand) = 0;
 };
 
 class CommandOSLogonNews : public NewsBase
@@ -422,7 +422,7 @@ class CommandOSLogonNews : public NewsBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
@@ -446,7 +446,7 @@ class CommandOSOperNews : public NewsBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
 	}
@@ -470,7 +470,7 @@ class CommandOSRandomNews : public NewsBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
 	}

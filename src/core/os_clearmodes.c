@@ -49,7 +49,7 @@ class CommandOSClearModes : public Command
 				if (s == "ALL")
 					all = 1;
 				else {
-					this->OnSyntaxError(u);
+					this->OnSyntaxError(u, "");
 					return MOD_CONT;
 				}
 			}
@@ -171,7 +171,7 @@ class CommandOSClearModes : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
 	}

@@ -126,7 +126,7 @@ class XOPBase : public Command
 
 		if (!nick)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
@@ -214,7 +214,7 @@ class XOPBase : public Command
 
 		if (!nick)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
@@ -391,7 +391,7 @@ class XOPBase : public Command
 		else if (cmd == "CLEAR")
 			return this->DoClear(u, params, ci, level, messages);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
  public:
@@ -407,7 +407,7 @@ class XOPBase : public Command
 
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
-	virtual void OnSyntaxError(User *u) = 0;
+	virtual void OnSyntaxError(User *u, const ci::string &subcommand) = 0;
 };
 
 class CommandCSQOP : public XOPBase
@@ -428,7 +428,7 @@ class CommandCSQOP : public XOPBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
 	}
@@ -452,7 +452,7 @@ class CommandCSAOP : public XOPBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
 	}
@@ -476,7 +476,7 @@ class CommandCSHOP : public XOPBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
 	}
@@ -500,7 +500,7 @@ class CommandCSSOP : public XOPBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
 	}
@@ -524,7 +524,7 @@ class CommandCSVOP : public XOPBase
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
 	}

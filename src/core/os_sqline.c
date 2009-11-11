@@ -58,7 +58,7 @@ class CommandOSSQLine : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
@@ -123,7 +123,7 @@ class CommandOSSQLine : public Command
 
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 
 		return MOD_CONT;
 	}
@@ -137,7 +137,7 @@ class CommandOSSQLine : public Command
 
 		if (!mask)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
@@ -289,7 +289,7 @@ class CommandOSSQLine : public Command
 		else if (cmd == "CLEAR")
 			return this->DoClear(u);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -299,7 +299,7 @@ class CommandOSSQLine : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "SQLINE", OPER_SQLINE_SYNTAX);
 	}

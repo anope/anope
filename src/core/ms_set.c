@@ -248,7 +248,7 @@ class CommandMSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_MemoServ, u, "SET", MEMO_SET_SYNTAX);
 	}

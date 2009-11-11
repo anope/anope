@@ -30,7 +30,7 @@ class CommandBSHelp : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		// Abuse syntax error to display general list help.
 		notice_help(s_BotServ, u, BOT_HELP);

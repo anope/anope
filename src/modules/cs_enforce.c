@@ -224,7 +224,7 @@ class CommandCSEnforce : public Command
 				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else
-				this->OnSyntaxError(u);
+				this->OnSyntaxError(u, "");
 		}
 
 		return MOD_CONT;
@@ -244,7 +244,7 @@ class CommandCSEnforce : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	}

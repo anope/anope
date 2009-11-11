@@ -33,7 +33,7 @@ class CommandCSSuspend : public Command
 		/* Assumes that permission checking has already been done. */
 		if (ForceForbidReason && !reason)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 
@@ -102,7 +102,7 @@ class CommandCSSuspend : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "SUSPEND", ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
 	}
@@ -172,7 +172,7 @@ class CommandCSUnSuspend : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
 	}

@@ -77,7 +77,7 @@ class CommandOSSession : public Command
 		else if (cmd == "VIEW")
 			return this->DoView(u, params);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -87,7 +87,7 @@ class CommandOSSession : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
 	}
@@ -208,14 +208,14 @@ class CommandOSException : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 3 && params.size() > 4 ? " " : "", last_param == 3 && params.size() > 4 ? params[4].c_str() : "");
 
 		if (!*reason)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
@@ -262,7 +262,7 @@ class CommandOSException : public Command
 
 		if (!mask)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
@@ -323,7 +323,7 @@ class CommandOSException : public Command
 
 		if (!n2str)
 		{
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "MOVE");
 			return MOD_CONT;
 		}
 
@@ -360,7 +360,7 @@ class CommandOSException : public Command
 				notice_lang(s_OperServ, u, READ_ONLY_MODE);
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "MOVE");
 
 		return MOD_CONT;
 	}
@@ -434,7 +434,7 @@ class CommandOSException : public Command
 		else if (cmd == "VIEW")
 			return this->DoView(u, params);
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -444,7 +444,7 @@ class CommandOSException : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
 	}

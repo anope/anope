@@ -46,7 +46,7 @@ class CommandOSOLine : public Command
 			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -56,7 +56,7 @@ class CommandOSOLine : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
 	}

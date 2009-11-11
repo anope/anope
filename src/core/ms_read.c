@@ -56,7 +56,7 @@ class CommandMSRead : public Command
 		}
 		num = !numstr.empty() ? atoi(numstr.c_str()) : -1;
 		if (numstr.empty() || (numstr != "LAST" && numstr != "NEW" && num <= 0))
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, numstr);
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
@@ -111,7 +111,7 @@ class CommandMSRead : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 	}

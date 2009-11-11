@@ -55,7 +55,7 @@ class CommandOSNOOP : public Command
 			notice_lang(s_OperServ, u, OPER_NOOP_REVOKE, server);
 		}
 		else
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
@@ -65,7 +65,7 @@ class CommandOSNOOP : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
 	}

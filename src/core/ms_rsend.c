@@ -72,7 +72,7 @@ class CommandMSRSend : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 	}

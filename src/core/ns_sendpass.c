@@ -77,7 +77,7 @@ class CommandNSSendPass : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
 	}

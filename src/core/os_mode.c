@@ -53,7 +53,7 @@ class CommandOSMode : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "MODE", OPER_MODE_SYNTAX);
 	}

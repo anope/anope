@@ -33,7 +33,7 @@ CommandReturn Command::Execute(User *u, std::vector<ci::string> &) { return MOD_
 
 bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
 
-void Command::OnSyntaxError(User *u) { }
+void Command::OnSyntaxError(User *u, const ci::string &subcommand) { }
 
 void Command::SetPermission(const std::string &reststr)
 {

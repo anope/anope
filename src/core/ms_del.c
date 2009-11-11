@@ -60,7 +60,7 @@ class CommandMSDel : public Command
 			mi = &u->nc->memos;
 		}
 		if (numstr.empty() || (!isdigit(numstr[0]) && numstr != "ALL" && numstr != "LAST"))
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, numstr);
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
@@ -138,7 +138,7 @@ class CommandMSDel : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
 	}

@@ -75,7 +75,7 @@ class CommandOSSVSNick : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_OperServ, u, "SVSNICK", OPER_SVSNICK_SYNTAX);
 	}

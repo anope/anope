@@ -52,7 +52,7 @@ class CommandCSHelp : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(s_ChanServ, u, CHAN_HELP);
 		FOREACH_MOD(I_OnChanServHelp, OnChanServHelp(u));

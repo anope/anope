@@ -100,7 +100,7 @@ class CommandNSSuspend : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
 	}
@@ -168,7 +168,7 @@ class CommandNSUnSuspend : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
 	}

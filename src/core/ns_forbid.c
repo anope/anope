@@ -30,7 +30,7 @@ class CommandNSForbid : public Command
 
 		/* Assumes that permission checking has already been done. */
 		if (ForceForbidReason && !reason) {
-			this->OnSyntaxError(u);
+			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 
@@ -92,7 +92,7 @@ class CommandNSForbid : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(s_NickServ, u, "FORBID", ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
 	}

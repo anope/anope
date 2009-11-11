@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-NickAlias *makealias(const char *nick, NickCore *nc);
-
 class CommandNSGroup : public Command
 {
  public:
@@ -96,7 +94,7 @@ class CommandNSGroup : public Command
 			 * If not, check that it is valid.
 			 */
 			if (findnick(u->nick))
-				delnick(findnick(u->nick));
+				delete findnick(u->nick);
 			else
 			{
 				int prefixlen = strlen(NSGuestNickPrefix);
@@ -108,7 +106,8 @@ class CommandNSGroup : public Command
 					return MOD_CONT;
 				}
 			}
-			na = makealias(u->nick, target->nc);
+
+			na = new NickAlias(u->nick, target->nc);
 
 			if (na)
 			{
@@ -229,19 +228,5 @@ class NSGroup : public Module
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_GLIST);
 	}
 };
-
-/* Creates a new alias in NickServ database. */
-NickAlias *makealias(const char *nick, NickCore *nc)
-{
-	NickAlias *na;
-
-	/* Just need to make the alias */
-	na = new NickAlias;
-	na->nick = sstrdup(nick);
-	na->nc = nc;
-	slist_add(&nc->aliases, na);
-	alpha_insert_alias(na);
-	return na;
-}
 
 MODULE_INIT(NSGroup)

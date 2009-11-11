@@ -13,9 +13,16 @@
  */
 
 #include "services.h"
+#include "modules.h"
 
-ChannelInfo::ChannelInfo()
+/** Default constructor
+ * @param chname The channel name
+ */
+ChannelInfo::ChannelInfo(const std::string &chname)
 {
+	if (chname.empty())
+		throw CoreException("Empty channel passed to ChannelInfo constructor");
+
 	next = prev = NULL;
 	name[0] = last_topic_setter[0] = '\0';
 	founder = successor = NULL;
@@ -24,13 +31,13 @@ ChannelInfo::ChannelInfo()
 	levels = NULL;
 	entry_message = NULL;
 	c = NULL;
-	bi = NULL;
-	ttb = NULL;
 	bwcount = 0;
 	badwords = NULL;
 	capsmin = capspercent = 0;
 	floodlines = floodsecs = 0;
 	repeattimes = 0;
+
+	strscpy(this->name, chname.c_str(), CHANMAX);
 
 	/* If ircd doesn't exist, this is from DB load and mlock is set later */
 	if (ircd)
@@ -50,6 +57,86 @@ ChannelInfo::ChannelInfo()
 	bantype = CSDefBantype;
 	memos.memomax = MSMaxMemos;
 	last_used = time_registered = time(NULL);
+
+	this->ttb = new int16[2 * TTB_SIZE];
+	for (int i = 0; i < TTB_SIZE; i++)
+		this->ttb[i] = 0;
+	
+	reset_levels(this);
+	alpha_insert_chan(this);
+}
+
+/** Default destructor, cleans up the channel complete and removes it from the internal list
+ */
+ChannelInfo::~ChannelInfo()
+{
+	unsigned i;
+
+	FOREACH_MOD(I_OnDelChan, OnDelChan(this));
+
+	if (debug)
+		alog("debug: Deleting channel %s", this->name);
+
+	if (this->bi)
+		this->bi->chancount--;
+
+	if (this->c)
+	{
+		if (this->bi && this->c->usercount >= BSMinUsers)
+			ircdproto->SendPart(this->bi, this->c->name, NULL);
+		this->c->ci = NULL;
+	}
+
+	if (this->next)
+		this->next->prev = this->prev;
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		chanlists[static_cast<unsigned char>(tolower(this->name[1]))] = this->next;
+	if (this->desc)
+		delete [] this->desc;
+	if (this->url)
+		delete [] this->url;
+	if (this->email)
+		delete [] this->email;
+	if (this->entry_message)
+		delete [] this->entry_message;
+
+	if (this->last_topic)
+		delete [] this->last_topic;
+	if (this->forbidby)
+		delete [] this->forbidby;
+	if (this->forbidreason)
+		delete [] this->forbidreason;
+	this->ClearAkick();
+	if (this->levels)
+		delete [] this->levels;
+
+	if (!this->memos.memos.empty())
+	{
+		for (i = 0; i < this->memos.memos.size(); ++i)
+		{
+			if (this->memos.memos[i]->text)
+				delete [] this->memos.memos[i]->text;
+			delete this->memos.memos[i];
+		}
+		this->memos.memos.clear();
+	}
+
+	if (this->ttb)
+		delete [] this->ttb;
+
+	for (i = 0; i < this->bwcount; i++)
+	{
+		if (this->badwords[i].word)
+			delete [] this->badwords[i].word;
+	}
+
+	if (this->badwords)
+		free(this->badwords);
+	
+	if (this->founder)
+		this->founder->channelcount--;
 }
 
 /** Add an entry to the channel access list

@@ -50,9 +50,9 @@ class CommandCSForbid : public Command
 		}
 
 		if ((ci = cs_findchan(chan)) != NULL)
-			delchan(ci);
+			delete ci;
 
-		ci = makechan(chan);
+		ci = new ChannelInfo(chan);
 		if (!ci)
 		{
 			alog("%s: Valid FORBID for %s by %s failed", s_ChanServ, ci->name, u->nick);

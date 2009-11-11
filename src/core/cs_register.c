@@ -53,7 +53,7 @@ class CommandCSRegister : public Command
 			notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 		else if (CSMaxReg && u->nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
 			notice_lang(s_ChanServ, u, u->nc->channelcount > CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
-		else if (!(ci = makechan(chan)))
+		else if (!(ci = new ChannelInfo(chan)))
 		{
 			alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
 			notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);

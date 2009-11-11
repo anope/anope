@@ -75,7 +75,7 @@ class CommandCSDrop : public Command
 			 s_ChanServ, ci->name, u->nick, u->GetIdent().c_str(),
 			 u->host, (ci->founder ? ci->founder->display : "(none)"));
 
-		delchan(ci);
+		delete ci;
 
 		/* We must make sure that the Services admin has not normally the right to
 		 * drop the channel before issuing the wallops.

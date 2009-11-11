@@ -22,6 +22,107 @@ Channel *chanlist[1024];
 
 /*************************************************************************/
 
+/** Default constructor
+ * @param name The channel name
+ * @param ts The time the channel was created
+ */
+Channel::Channel(const std::string &name, time_t ts)
+{
+	Channel **list;
+
+	if (name.empty())
+		throw CoreException("A channel without a name ?");
+
+	strscpy(this->name, name.c_str(), sizeof(this->name));
+	list = &chanlist[HASH(this->name)];
+	this->prev = NULL;
+	this->next = *list;
+	if (*list)
+		(*list)->prev = this;
+	*list = this;
+
+	this->creation_time = ts;
+	this->topic = NULL;
+	*this->topic_setter = 0;
+	this->bans = this->excepts = this->invites = NULL;
+	this->users = NULL;
+	this->usercount = 0;
+	this->bd = NULL;
+	this->server_modetime = this->chanserv_modetime = 0;
+	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = 0;
+
+	this->ci = cs_findchan(this->name);
+	if (this->ci)
+	{
+		this->ci->c = this;
+
+		check_modes(this);
+		stick_all(this->ci);
+	}
+
+	if (serv_uplink && is_sync(serv_uplink) && (!(this->topic_sync)))
+		restore_topic(name.c_str());
+	
+	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
+}
+
+/** Default destructor
+ */
+Channel::~Channel()
+{
+	BanData *bd, *next;
+
+	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
+
+	if (debug)
+		alog("debug: Deleting channel %s", this->name);
+	
+	for (bd = this->bd; bd; bd = next)
+	{
+		if (bd->mask)
+			delete [] bd->mask;
+		next = bd->next;
+		delete bd;
+	}
+
+	if (this->ci)
+		this->ci->c = NULL;
+
+	if (this->topic)
+		delete [] this->topic;
+
+	if (this->bans && this->bans->count)
+	{
+		while (this->bans->entries)
+			entry_delete(this->bans, this->bans->entries);
+	}
+
+	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
+	{
+		if (this->excepts && this->excepts->count)
+		{
+			while (this->excepts->entries)
+				entry_delete(this->excepts, this->excepts->entries);
+		}
+	}
+
+	if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
+	{
+		if (this->invites && this->invites->count)
+		{
+			while (this->invites->entries)
+				entry_delete(this->invites, this->invites->entries);
+		}
+	}
+
+	if (this->next)
+		this->next->prev = this->prev;
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		chanlist[HASH(this->name)] = this->next;
+}
+
 /**
  * See if a channel has a mode
  * @param Name The mode name
@@ -77,7 +178,7 @@ void Channel::RemoveMode(ChannelModeName Name)
 		if (s_BotServ && ci->bi && usercount == BSMinUsers - 1)
 			ircdproto->SendPart(ci->bi, name, NULL);
 		if (!users)
-			chan_delete(this);
+			delete this;
 	}
 
 	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, Name));
@@ -348,7 +449,7 @@ void chan_deluser(User * user, Channel * c)
 		ircdproto->SendPart(c->ci->bi, c->name, NULL);
 
 	if (!c->users)
-		chan_delete(c);
+		delete c;
 }
 
 /*************************************************************************/
@@ -1866,126 +1967,6 @@ void chan_adduser2(User * user, Channel * c)
 
 /*************************************************************************/
 
-/* This creates the channel structure (was originally in
-   chan_adduser, but splitted to make it more efficient to use for
-   SJOINs). */
-
-Channel *chan_create(const char *chan, time_t ts)
-{
-	Channel *c;
-	Channel **list;
-
-	if (debug)
-		alog("debug: Creating channel %s", chan);
-	c = new Channel;
-	strscpy(c->name, chan, sizeof(c->name));
-	list = &chanlist[HASH(c->name)];
-	c->prev = NULL;
-	c->next = *list;
-	if (*list)
-		(*list)->prev = c;
-	*list = c;
-	c->creation_time = ts;
-	c->topic = NULL;
-	*c->topic_setter = 0;
-	c->topic_time = 0;
-	c->bans = c->excepts = c->invites = NULL;
-	c->users = NULL;
-	c->usercount = 0;
-	c->bd = NULL;
-	c->server_modetime = c->chanserv_modetime = 0;
-	c->server_modecount = c->chanserv_modecount = c->bouncy_modes = c->topic_sync = 0;
-	/* Store ChannelInfo pointer in channel record */
-	c->ci = cs_findchan(chan);
-	if (c->ci)
-		c->ci->c = c;
-	/* Restore locked modes and saved topic */
-	if (c->ci) {
-		check_modes(c);
-		stick_all(c->ci);
-	}
-
-	if (serv_uplink && is_sync(serv_uplink) && (!(c->topic_sync))) {
-		restore_topic(chan);
-	}
-
-	/* A channel set as persistant when it was not created has just
-	 * been created, mark it as persistant
-	 */
-	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
-	if (cm && c->ci && c->ci->HasFlag(CI_PERSIST) && !c->HasMode(CMODE_PERM))
-	{
-		ircdproto->SendMode(whosends(c->ci), c->name, "+%c", cm->ModeChar);
-		c->SetMode(CMODE_PERM);
-	}
-
-	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(c));
-
-	return c;
-}
-
-/*************************************************************************/
-
-/* This destroys the channel structure, freeing everything in it. */
-
-void chan_delete(Channel * c)
-{
-	BanData *bd, *next;
-
-	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(c));
-
-	if (debug)
-		alog("debug: Deleting channel %s", c->name);
-
-	for (bd = c->bd; bd; bd = next) {
-		if (bd->mask)
-			delete [] bd->mask;
-		next = bd->next;
-		delete bd;
-	}
-
-	if (c->ci)
-		c->ci->c = NULL;
-
-	if (c->topic)
-		delete [] c->topic;
-
-	if (c->bans && c->bans->count) {
-		while (c->bans->entries) {
-			entry_delete(c->bans, c->bans->entries);
-		}
-	}
-
-	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-	{
-		if (c->excepts && c->excepts->count) {
-			while (c->excepts->entries) {
-				entry_delete(c->excepts, c->excepts->entries);
-			}
-		}
-	}
-
-	if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
-	{
-		if (c->invites && c->invites->count) {
-			while (c->invites->entries) {
-				entry_delete(c->invites, c->invites->entries);
-			}
-		}
-	}
-
-	if (c->next)
-		c->next->prev = c->prev;
-	if (c->prev)
-		c->prev->next = c->next;
-	else
-		chanlist[HASH(c->name)] = c->next;
-
-	delete c;
-}
-
-/*************************************************************************/
-
 Channel *join_user_update(User * user, Channel * chan, const char *name,
 						  time_t chants)
 {
@@ -1993,7 +1974,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 
 	/* If it's a new channel, so we need to create it first. */
 	if (!chan)
-		chan = chan_create(name, chants);
+		chan = new Channel(name, chants);
 	else
 	{
 		// Check chants against 0, as not every ircd sends JOIN with a TS.

@@ -511,7 +511,7 @@ class CommandCSSet : public Command
 				/* Channel doesn't exist, create it internally */
 				if (!ci->c)
 				{
-					chan_create(ci->name, time(NULL));
+					new Channel(ci->name);
 					if (ci->bi)
 						bot_join(ci);
 				}
@@ -553,7 +553,7 @@ class CommandCSSet : public Command
 					if (s_BotServ && ci->bi && ci->c->usercount == BSMinUsers - 1)
 						ircdproto->SendPart(ci->bi, ci->c->name, NULL);
 					if (!ci->c->users)
-						chan_delete(ci->c);
+						delete ci->c;
 
 					/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 					 * which was assigned when persist was set on

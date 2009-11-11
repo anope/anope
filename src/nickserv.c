@@ -31,124 +31,106 @@ unsigned int guestnum;		  /* Current guest number */
 
 /*************************************************************************/
 
-class NickServCollide;
-class NickServRelease;
-
 static std::map<NickAlias *, NickServCollide *> NickServCollides;
 static std::map<NickAlias *, NickServRelease *> NickServReleases;
 
-class NickServCollide : public Timer
+NickServCollide::NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
 {
-  public:
-	NickAlias *na;
-	std::pair<std::map<NickAlias *, NickServCollide *>::iterator, bool> it;
-
-	NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+	/* Erase the current collide and use the new one */
+	std::map<NickAlias *, NickServCollide *>::iterator nit = NickServCollides.find(nickalias);
+	if (nit != NickServCollides.end())
 	{
-		/* Erase the current collide and use the new one */
-		std::map<NickAlias *, NickServCollide *>::iterator nit = NickServCollides.find(nickalias);
-		if (nit != NickServCollides.end())
-		{
-			TimerManager::DelTimer(nit->second);
-		}
-
-		it = NickServCollides.insert(std::make_pair(nickalias, this));
+		TimerManager::DelTimer(nit->second);
 	}
 
-	~NickServCollide()
-	{
-		if (it.second)
-		{
-			NickServCollides.erase(it.first);
-		}
-	}
+	it = NickServCollides.insert(std::make_pair(nickalias, this));
+}
 
-	void Tick(time_t ctime)
-	{
-		/* If they identified or don't exist anymore, don't kill them. */
-		User *u = finduser(na->nick);
-		if (!u || u->nc == na->nc || u->my_signon > this->GetSetTime())
-			return;
-
-		/* The RELEASE timeout will always add to the beginning of the
-		 * list, so we won't see it.  Which is fine because it can't be
-		 * triggered yet anyway. */
-		collide(na, 1);
-	}
-
-	static void ClearTimers(NickAlias *na)
-	{
-		std::map<NickAlias *, NickServCollide *>::iterator i = NickServCollides.find(na);
-		NickServCollide *t;
-
-		if (i != NickServCollides.end())
-		{
-			t = i->second;
-
-			TimerManager::DelTimer(t);
-		}
-	}
-};
-
-class NickServRelease : public Timer
+NickServCollide::~NickServCollide()
 {
-  public:
-	NickAlias *na;
-	std::string uid;
-	std::pair<std::map<NickAlias *, NickServRelease *>::iterator, bool> it;
-
-	NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+	if (it.second)
 	{
-		/* Erase the current release timer and use the new one */
-		std::map<NickAlias *, NickServRelease *>::iterator nit = NickServReleases.find(nickalias);
-		if (nit != NickServReleases.end())
-		{
-			TimerManager::DelTimer(nit->second);
-		}
+		NickServCollides.erase(it.first);
+	}
+}
 
-		it = NickServReleases.insert(std::make_pair(nickalias, this));
+void NickServCollide::Tick(time_t ctime)
+{
+	/* If they identified or don't exist anymore, don't kill them. */
+	User *u = finduser(na->nick);
+	if (!u || u->nc == na->nc || u->my_signon > this->GetSetTime())
+		return;
+
+	/* The RELEASE timeout will always add to the beginning of the
+	 * list, so we won't see it.  Which is fine because it can't be
+	 * triggered yet anyway. */
+	collide(na, 1);
+}
+
+void NickServCollide::ClearTimers(NickAlias *na)
+{
+	std::map<NickAlias *, NickServCollide *>::iterator i = NickServCollides.find(na);
+	NickServCollide *t;
+
+	if (i != NickServCollides.end())
+	{
+		t = i->second;
+
+		TimerManager::DelTimer(t);
+	}
+}
+
+NickServRelease::NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+{
+	/* Erase the current release timer and use the new one */
+	std::map<NickAlias *, NickServRelease *>::iterator nit = NickServReleases.find(nickalias);
+	if (nit != NickServReleases.end())
+	{
+		TimerManager::DelTimer(nit->second);
 	}
 
-	~NickServRelease()
-	{
-		if (it.second)
-		{
-			NickServReleases.erase(it.first);
-		}
-	}
+	it = NickServReleases.insert(std::make_pair(nickalias, this));
+}
 
-	void Tick(time_t ctime)
+NickServRelease::~NickServRelease()
+{
+	if (it.second)
 	{
-		if (ircd->svshold)
-		{
-			ircdproto->SendSVSHoldDel(na->nick);
-		}
+		NickServReleases.erase(it.first);
+	}
+}
+
+void NickServRelease::Tick(time_t ctime)
+{
+	if (ircd->svshold)
+	{
+		ircdproto->SendSVSHoldDel(na->nick);
+	}
+	else
+	{
+		if (ircd->ts6 && !uid.empty())
+			ircdproto->SendQuit(uid.c_str(), NULL);
 		else
-		{
-			if (ircd->ts6 && !uid.empty())
-				ircdproto->SendQuit(uid.c_str(), NULL);
-			else
-				ircdproto->SendQuit(na->nick, NULL);
-		}
-		na->UnsetFlag(NS_KILL_HELD);
+			ircdproto->SendQuit(na->nick, NULL);
 	}
+	na->UnsetFlag(NS_KILL_HELD);
+}
 
-	static void ClearTimers(NickAlias *na, bool dorelease = false)
+void NickServRelease::ClearTimers(NickAlias *na, bool dorelease)
+{
+	std::map<NickAlias *, NickServRelease *>::iterator i = NickServReleases.find(na);
+	NickServRelease *t;
+
+	if (i != NickServReleases.end())
 	{
-		std::map<NickAlias *, NickServRelease *>::iterator i = NickServReleases.find(na);
-		NickServRelease *t;
+		t = i->second;
 
-		if (i != NickServReleases.end())
-		{
-			t = i->second;
+		if (dorelease)
+			release(na, 1);
 
-			if (dorelease)
-				release(na, 1);
-
-			TimerManager::DelTimer(t);
-		}
+		TimerManager::DelTimer(t);
 	}
-};
+}
 
 /*************************************************************************/
 /* *INDENT-OFF* */
@@ -308,8 +290,12 @@ void load_ns_req_db()
 		{
 			if (c != 1)
 				fatal("Invalid format in %s", PreNickDBName);
-			nr = new NickRequest;
-			SAFE(read_string(&nr->nick, f));
+
+			char *s;
+			SAFE(read_string(&s, f));
+			nr = new NickRequest(s);
+			delete [] s;
+
 			SAFE(read_string(&nr->passcode, f));
 			if (ver < 2)
 			{
@@ -365,7 +351,9 @@ void load_ns_dbase()
 			if (c != 1)
 				fatal("Invalid format in %s", NickDBName);
 
-			nc = new NickCore();
+			SAFE(read_string(&s, f));
+			nc = new NickCore(s);
+			delete [] s;
 			*nclast = nc;
 			nclast = &nc->next;
 			nc->prev = ncprev;
@@ -373,7 +361,6 @@ void load_ns_dbase()
 
 			slist_init(&nc->aliases);
 
-			SAFE(read_string(&nc->display, f));
 			SAFE(read_buffer(nc->pass, f));
 
 			SAFE(read_string(&nc->email, f));
@@ -438,9 +425,9 @@ void load_ns_dbase()
 			if (c != 1)
 				fatal("Invalid format in %s", NickDBName);
 
-			na = new NickAlias();
-
-			SAFE(read_string(&na->nick, f));
+			SAFE(read_string(&s, f));
+			na = new NickAlias(s, nclists[0]); // XXXXXXXX
+			delete [] s;
 
 			SAFE(read_string(&na->last_usermask, f));
 			SAFE(read_string(&na->last_realname, f));
@@ -491,7 +478,7 @@ void load_ns_dbase()
 			if (!na->nc)
 			{
 				alog("%s: while loading database: %s has no core! We delete it.", s_NickServ, na->nick);
-				delnick(na);
+				delete na;
 				continue;
 			}
 
@@ -810,7 +797,7 @@ void expire_nicks()
 				     na->nick, na->nc->display,
 				     (na->nc->email ? na->nc->email : "none"));
 				tmpnick = sstrdup(na->nick);
-				delnick(na);
+				delete na;
 				FOREACH_MOD(I_OnNickExpire, OnNickExpire(tmpnick));
 				delete [] tmpnick;
 			}
@@ -831,7 +818,7 @@ void expire_requests()
 			if (NSRExpire && now - nr->requested >= NSRExpire)
 			{
 				alog("Request for nick %s expiring", nr->nick);
-				delnickrequest(nr);
+				delete nr;
 			}
 		}
 	}
@@ -1126,167 +1113,6 @@ void change_core_display(NickCore * nc)
 }
 
 
-/*************************************************************************/
-
-/* Deletes the core. This must be called only when there is no more
- * aliases for it, because no cleanup is done.
- * This function removes all references to the core as well.
- */
-
-static int delcore(NickCore * nc)
-{
-	unsigned i;
-	User *user;
-
-	FOREACH_MOD(I_OnDelCore, OnDelCore(nc));
-
-	/* Clean up this nick core from any users online using it
-	 * (ones that /nick but remain unidentified)
-	 */
-	for (i = 0; i < 1024; ++i)
-	{
-		for (user = userlist[i]; user; user = user->next)
-		{
-			if (user->nc && user->nc == nc)
-			{
-				ircdproto->SendAccountLogout(user, user->nc);
-				user->nc = NULL;
-				FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
-			}
-		}
-	}
-
-	/* (Hopefully complete) cleanup */
-	cs_remove_nick(nc);
-
-	/* Remove the core from the list */
-	if (nc->next)
-		nc->next->prev = nc->prev;
-	if (nc->prev)
-		nc->prev->next = nc->next;
-	else
-		nclists[HASH(nc->display)] = nc->next;
-
-	/* Log .. */
-	alog("%s: deleting nickname group %s", s_NickServ, nc->display);
-
-	/* Now we can safely free it. */
-	delete [] nc->display;
-
-	if (nc->email)
-		delete [] nc->email;
-	if (nc->greet)
-		delete [] nc->greet;
-	if (nc->url)
-		delete [] nc->url;
-
-	nc->ClearAccess();
-
-	if (!nc->memos.memos.empty())
-	{
-		for (i = 0; i < nc->memos.memos.size(); ++i)
-		{
-			if (nc->memos.memos[i]->text)
-				delete [] nc->memos.memos[i]->text;
-			delete nc->memos.memos[i];
-		}
-		nc->memos.memos.clear();
-	}
-
-	delete nc;
-	return 1;
-}
-
-
-/*************************************************************************/
-int delnickrequest(NickRequest * nr)
-{
-	if (nr)
-	{
-		FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(nr));
-		nrlists[HASH(nr->nick)] = nr->next;
-		if (nr->nick)
-			delete [] nr->nick;
-		if (nr->passcode)
-			delete [] nr->passcode;
-		if (nr->email)
-			delete [] nr->email;
-		delete nr;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Deletes an alias. The core will also be deleted if it has no more
- * nicks attached to it. Easy but powerful.
- * Well, we must also take care that the nick being deleted is not
- * the core display, and if so, change it to the next alias in the list,
- * otherwise weird things will happen.
- * Returns 1 on success, 0 otherwise.
- */
-
-int delnick(NickAlias * na)
-{
-	User *u = NULL;
-	/* First thing to do: remove any timeout belonging to the nick we're deleting */
-	NickServCollide::ClearTimers(na);
-	NickServRelease::ClearTimers(na, true);
-
-	FOREACH_MOD(I_OnDelNick, OnDelNick(na));
-
-	/* Second thing to do: look for an user using the alias
-	 * being deleted, and make appropriate changes */
-	if ((u = finduser(na->nick)))
-	{
-		if (ircd->modeonunreg)
-			common_svsmode(finduser(na->nick), ircd->modeonunreg, "1");
-		u->nc = NULL;
-	}
-
-	delHostCore(na->nick);	  /* delete any vHost's for this nick */
-
-	/* Accept nicks that have no core, because of database load functions */
-	if (na->nc)
-	{
-		/* Next: see if our core is still useful. */
-		slist_remove(&na->nc->aliases, na);
-		if (na->nc->aliases.count == 0)
-		{
-			if (!delcore(na->nc))
-				return 0;
-			na->nc = NULL;
-		}
-		else
-		{
-			/* Display updating stuff */
-			if (!stricmp(na->nick, na->nc->display))
-				change_core_display(na->nc);
-		}
-	}
-
-	/* Remove us from the aliases list */
-	if (na->next)
-		na->next->prev = na->prev;
-	if (na->prev)
-		na->prev->next = na->next;
-	else
-		nalists[HASH(na->nick)] = na->next;
-
-	delete [] na->nick;
-	if (na->last_usermask)
-		delete [] na->last_usermask;
-	if (na->last_realname)
-		delete [] na->last_realname;
-	if (na->last_quit)
-		delete [] na->last_quit;
-
-	delete na;
-	return 1;
-}
-
-/*************************************************************************/
 /*************************************************************************/
 
 /* Collide a nick.

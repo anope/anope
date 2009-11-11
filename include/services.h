@@ -946,12 +946,15 @@ class CoreExport Channel : public Extensible
 	  std::map<ChannelModeName, std::string> Params;
 
   public:
-	Channel() { }
+  	/** Default constructor
+	 * @param name The channel name
+	 * @param ts The time the channel was created
+	 */
+	Channel(const std::string &name, time_t ts = time(NULL));
 
-	~Channel()
-	{
-		Params.clear();
-	}
+	/** Default destructor
+	 */
+	~Channel();
 
 	Channel *next, *prev;
 	char name[CHANMAX];
@@ -1783,5 +1786,74 @@ E std::list<std::pair<std::string, std::string> > svsopers_in_config;
 /** List of available opertypes.
  */
 E std::list<OperType *> MyOperTypes;
+
+/*************************************************************************/
+
+#include "timers.h"
+
+/** Timer for colliding nicks to force people off of nicknames
+ */
+class NickServCollide : public Timer
+{
+ public:
+	/* NickAlias of the nick who were kicking off */
+	NickAlias *na;
+	/* Return for the std::map::insert */
+	std::pair<std::map<NickAlias *, NickServCollide *>::iterator, bool> it;
+
+	/** Default constructor
+	 * @param nickalias The nick alias were kicking off
+	 * @param delay How long to delay before kicking the user off the nick
+	 */
+	NickServCollide(NickAlias *nickalias, time_t delay);
+
+	/** Default destructor
+	 */
+	~NickServCollide();
+
+	/** Called when the delay is up
+	 * @param t The current time
+	 */
+	void Tick(time_t t);
+
+	/** Clear all timers for a nick
+	 * @param na The nick to remove the timers for
+	 */
+	static void ClearTimers(NickAlias *na);
+};
+
+/** Timers for releasing nicks to be available for use
+ */
+class NickServRelease : public Timer
+{
+ public:
+	/* The nick */
+ 	NickAlias *na;
+	/* The uid of the services enforcer client (used for TS6 ircds) */
+	std::string uid;
+	/* Return for std::map::insert */
+	std::pair<std::map<NickAlias *, NickServRelease *>::iterator, bool> it;
+
+	/** Default constructor
+	 * @param nickalias The nick
+	 * @param delay The delay before the nick is released
+	 */
+	NickServRelease(NickAlias *nickalias, time_t delay);
+	
+	/** Default destructor
+	 */
+	~NickServRelease();
+
+	/** Called when the delay is up
+	 * @param t The current time
+	 */
+	void Tick(time_t t);
+
+	/** Clear all timers for a nick
+	 * @param na The nick to remove the timers for
+	 * @param dorelase true to actually call release(), false to just remove the timers
+	 */
+	static void ClearTimers(NickAlias *na, bool dorelease = false);
+};
 
 #endif	/* SERVICES_H */

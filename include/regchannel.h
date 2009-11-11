@@ -69,7 +69,17 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	std::bitset<128> mlock_off;				/* Modes mlocked off */
 
  public:
-	ChannelInfo();
+ 	// XXX Hack for defcon, though this really isn't needed now and should be destroyed
+ 	ChannelInfo() { }
+
+ 	/** Default constructor
+	 * @param chname The channel name
+	 */
+	ChannelInfo(const std::string &chname);
+
+	/** Default destructor
+	 */
+	~ChannelInfo();
 
 	ChannelInfo *next, *prev;
 	char name[CHANMAX];

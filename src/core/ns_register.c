@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-NickRequest *makerequest(const char *nick);
-NickAlias *makenick(const char *nick);
 int do_sendregmail(User *u, NickRequest *nr);
 
 class CommandNSConfirm : public Command
@@ -24,8 +22,7 @@ class CommandNSConfirm : public Command
  protected:
 	CommandReturn ActuallyConfirmNick(User *u, NickRequest *nr, bool force)
 	{
-		NickAlias *na;
-		na = makenick(nr->nick);
+		NickAlias *na = new NickAlias(nr->nick, new NickCore(nr->nick));
 
 		if (!na)
 		{
@@ -69,7 +66,7 @@ class CommandNSConfirm : public Command
 				notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->GetAccess(0).c_str());
 			else
 				notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
-			delnickrequest(nr);
+			delete nr;
 
 			ircdproto->SendAccountLogin(u, u->nc);
 			ircdproto->SetAutoIdentificationToken(u);
@@ -87,7 +84,7 @@ class CommandNSConfirm : public Command
 
 			User *user = finduser(nr->nick);
 			/* Delrequest must be called before validate_user */
-			delnickrequest(nr);
+			delete nr;
 			if (user)
 			{
 				validate_user(user);
@@ -268,7 +265,7 @@ class CommandNSRegister : public CommandNSConfirm
 			for (idx = 0; idx < 9; ++idx)
 				passcode[idx] = chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 			passcode[idx] = '\0';
-			nr = makerequest(u->nick);
+			nr = new NickRequest(u->nick);
 			nr->passcode = sstrdup(passcode);
 			strscpy(nr->password, pass, PASSMAX);
 			enc_encrypt_in_place(nr->password, PASSMAX);
@@ -287,7 +284,7 @@ class CommandNSRegister : public CommandNSConfirm
 				{
 					alog("%s: Unable to send registration verification mail", s_NickServ);
 					notice_lang(s_NickServ, u, NICK_REG_UNABLE);
-					delnickrequest(nr); /* Delete the NickRequest if we couldnt send the mail */
+					delete nr;
 					return MOD_CONT;
 				}
 			}
@@ -386,39 +383,6 @@ class NSRegister : public Module
 };
 
 /*************************************************************************/
-
-NickRequest *makerequest(const char *nick)
-{
-	NickRequest *nr;
-
-	nr = new NickRequest;
-	nr->nick = sstrdup(nick);
-	insert_requestnick(nr);
-	alog("%s: Nick %s has been requested", s_NickServ, nr->nick);
-	return nr;
-}
-
-/* Creates a full new nick (alias + core) in NickServ database. */
-NickAlias *makenick(const char *nick)
-{
-	NickAlias *na;
-	NickCore *nc;
-
-	/* First make the core */
-	nc = new NickCore();
-	nc->display = sstrdup(nick);
-	slist_init(&nc->aliases);
-	insert_core(nc);
-	alog("%s: group %s has been created", s_NickServ, nc->display);
-
-	/* Then make the alias */
-	na = new NickAlias;
-	na->nick = sstrdup(nick);
-	na->nc = nc;
-	slist_add(&nc->aliases, na);
-	alpha_insert_alias(na);
-	return na;
-}
 
 int do_sendregmail(User *u, NickRequest *nr)
 {

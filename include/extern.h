@@ -73,8 +73,6 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *
 E Channel *chanlist[1024];
 
 E void chan_adduser2(User * user, Channel * c);
-E void chan_delete(Channel * c);
-E Channel *chan_create(const char *chan, time_t ts);
 E Channel *join_user_update(User * user, Channel * chan, const char *name, time_t chants);
 
 E void get_channel_stats(long *nrec, long *memuse);
@@ -132,7 +130,6 @@ E LevelInfo levelinfo[];
 
 E void get_chanserv_stats(long *nrec, long *memuse);
 
-E int delchan(ChannelInfo * ci);
 E void alpha_insert_chan(ChannelInfo * ci);
 E void reset_levels(ChannelInfo * ci);
 E void cs_init();
@@ -167,7 +164,6 @@ E void stick_mask(ChannelInfo * ci, AutoKick * akick);
 E void stick_all(ChannelInfo * ci);
 
 E int levelinfo_maxwidth;
-E ChannelInfo *makechan(const char *chan);
 E char *get_mlock_modes(ChannelInfo * ci, int complete);
 
 /**** compat.c ****/
@@ -605,7 +601,6 @@ E NickAlias *nalists[1024];
 E NickCore *nclists[1024];
 E NickRequest *nrlists[1024];
 E NickRequest *findrequestnick(const char *nick);
-E int delnickrequest(NickRequest * nr);
 E unsigned int guestnum;
 E void insert_requestnick(NickRequest * nr);
 E void alpha_insert_alias(NickAlias * na);
@@ -632,7 +627,6 @@ E int nick_identified(User * u);
 E void expire_nicks();
 E void expire_requests();
 EI int ns_do_register(User * u);
-E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
 E NickCore  *findcore(const char *nick);

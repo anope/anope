@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-NickAlias *makenick(const char *nick);
-
 class CommandNSForbid : public Command
 {
  public:
@@ -50,9 +48,9 @@ class CommandNSForbid : public Command
 				notice_lang(s_NickServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
-			delnick(na);
+			delete na;
 		}
-		na = makenick(nick);
+		na = new NickAlias(nick, new NickCore(nick));
 		if (na)
 		{
 			na->SetFlag(NS_FORBIDDEN);
@@ -118,26 +116,5 @@ class NSForbid : public Module
 		notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
 	}
 };
-
-NickAlias *makenick(const char *nick)
-{
-	NickAlias *na;
-	NickCore *nc;
-
-	/* First make the core */
-	nc = new NickCore();
-	nc->display = sstrdup(nick);
-	slist_init(&nc->aliases);
-	insert_core(nc);
-	alog("%s: group %s has been created", s_NickServ, nc->display);
-
-	/* Then make the alias */
-	na = new NickAlias;
-	na->nick = sstrdup(nick);
-	na->nc = nc;
-	slist_add(&nc->aliases, na);
-	alpha_insert_alias(na);
-	return na;
-}
 
 MODULE_INIT(NSForbid)

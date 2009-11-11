@@ -347,12 +347,13 @@ void load_cs_dbase()
 		while ((c = getc_db(f)) != 0) {
 			if (c != 1)
 				fatal("Invalid format in %s", ChanDBName);
-			ci = new ChannelInfo();
+			char channame[CHANMAX];
+			SAFE(read = read_buffer(channame, f));
+			ci = new ChannelInfo(channame);
 			*last = ci;
 			last = &ci->next;
 			ci->prev = prev;
 			prev = ci;
-			SAFE(read = read_buffer(ci->name, f));
 			SAFE(read_string(&s, f));
 			if (s) {
 				ci->founder = findcore(s);
@@ -596,7 +597,7 @@ void load_cs_dbase()
 			if (!(ci->HasFlag(CI_FORBIDDEN)) && !ci->founder) {
 				alog("%s: database load: Deleting founderless channel %s",
 					 s_ChanServ, ci->name);
-				delchan(ci);
+				delete ci;
 				continue;
 			}
 		}
@@ -1439,7 +1440,7 @@ void expire_chans()
 				char *chname = sstrdup(ci->name);
 				alog("Expiring channel %s (founder: %s)", ci->name,
 					 (ci->founder ? ci->founder->display : "(none)"));
-				delchan(ci);
+				delete ci;
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
 				delete [] chname;
 			}
@@ -1466,7 +1467,7 @@ void cs_remove_nick(const NickCore * nc)
 					NickCore *nc2 = ci->successor;
 					if (!nc2->IsServicesOper() && CSMaxReg && nc2->channelcount >= CSMaxReg) {
 						alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", s_ChanServ, nc2->display, ci->name);
-						delchan(ci);
+						delete ci;
 						continue;
 					} else {
 						alog("%s: Transferring foundership of %s from deleted " "nick %s to successor %s", s_ChanServ, ci->name, nc->display, nc2->display);
@@ -1487,7 +1488,7 @@ void cs_remove_nick(const NickCore * nc)
 						}
 					}
 
-					delchan(ci);
+					delete ci;
 					continue;
 				}
 			}
@@ -1608,141 +1609,6 @@ void alpha_insert_chan(ChannelInfo * ci)
 	if (ptr)
 		ptr->prev = ci;
 }
-
-/*************************************************************************/
-
-/* Add a channel to the database.  Returns a pointer to the new ChannelInfo
- * structure if the channel was successfully registered, NULL otherwise.
- * Assumes channel does not already exist. */
-
-ChannelInfo *makechan(const char *chan)
-{
-	int i;
-	ChannelInfo *ci;
-
-	ci = new ChannelInfo();
-	strscpy(ci->name, chan, CHANMAX);
-	ci->time_registered = time(NULL);
-	reset_levels(ci);
-	ci->ttb = new int16[2 * TTB_SIZE];
-	for (i = 0; i < TTB_SIZE; i++)
-		ci->ttb[i] = 0;
-	alpha_insert_chan(ci);
-	return ci;
-}
-
-/*************************************************************************/
-
-/* Remove a channel from the ChanServ database.  Return 1 on success, 0
- * otherwise. */
-
-int delchan(ChannelInfo * ci)
-{
-	unsigned i;
-	NickCore *nc;
-
-	if (!ci) {
-		if (debug) {
-			alog("debug: delchan called with NULL values");
-		}
-		return 0;
-	}
-
-	FOREACH_MOD(I_OnDelChan, OnDelChan(ci));
-
-	nc = ci->founder;
-
-	if (debug >= 2) {
-		alog("debug: delchan removing %s", ci->name);
-	}
-
-	if (ci->bi) {
-		ci->bi->chancount--;
-	}
-
-	if (debug >= 2) {
-		alog("debug: delchan top of removing the bot");
-	}
-	if (ci->c) {
-		if (ci->bi && ci->c->usercount >= BSMinUsers) {
-			ircdproto->SendPart(ci->bi, ci->c->name, NULL);
-		}
-		ci->c->ci = NULL;
-	}
-	if (debug >= 2) {
-		alog("debug: delchan() Bot has been removed moving on");
-	}
-
-	if (ci->next)
-		ci->next->prev = ci->prev;
-	if (ci->prev)
-		ci->prev->next = ci->next;
-	else
-		chanlists[static_cast<unsigned char>(tolower(ci->name[1]))] = ci->next;
-	if (ci->desc)
-		delete [] ci->desc;
-	if (ci->url)
-		delete [] ci->url;
-	if (ci->email)
-		delete [] ci->email;
-	if (ci->entry_message)
-		delete [] ci->entry_message;
-
-	if (ci->last_topic)
-		delete [] ci->last_topic;
-	if (ci->forbidby)
-		delete [] ci->forbidby;
-	if (ci->forbidreason)
-		delete [] ci->forbidreason;
-	ci->ClearAkick();
-	if (ci->levels)
-		delete [] ci->levels;
-	if (debug >= 2) {
-		alog("debug: delchan() top of the memo list");
-	}
-	if (!ci->memos.memos.empty()) {
-		for (i = 0; i < ci->memos.memos.size(); ++i) {
-			if (ci->memos.memos[i]->text)
-				delete [] ci->memos.memos[i]->text;
-			delete ci->memos.memos[i];
-		}
-		ci->memos.memos.clear();
-	}
-	if (debug >= 2) {
-		alog("debug: delchan() done with the memo list");
-	}
-	if (ci->ttb)
-		delete [] ci->ttb;
-
-	if (debug >= 2) {
-		alog("debug: delchan() top of the badword list");
-	}
-	for (i = 0; i < ci->bwcount; i++) {
-		if (ci->badwords[i].word)
-			delete [] ci->badwords[i].word;
-	}
-	if (ci->badwords)
-		free(ci->badwords);
-	if (debug >= 2) {
-		alog("debug: delchan() done with the badword list");
-	}
-
-
-	if (debug >= 2) {
-		alog("debug: delchan() calling on moduleCleanStruct()");
-	}
-
-	delete ci;
-	if (nc)
-		nc->channelcount--;
-
-	if (debug >= 2) {
-		alog("debug: delchan() all done");
-	}
-	return 1;
-}
-
-/*************************************************************************/
 
 /* Reset channel access level values to their default state. */
 

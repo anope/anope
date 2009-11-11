@@ -69,13 +69,10 @@ enum NickCoreFlag
 class NickRequest
 {
  public:
-	NickRequest()
-	{
-		next = prev = NULL;
-		nick = passcode = email = NULL;
-		*password = 0;
-		requested = lastmail = 0;
-	}
+	NickRequest(const std::string &nickname);
+
+	~NickRequest();
+
 	NickRequest *next, *prev;
 	char *nick;
 	char *passcode;
@@ -90,7 +87,15 @@ class NickCore;
 class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 {
  public:
-	NickAlias();
+ 	/** Default constructor
+	 * @param nickname The nick
+	 * @param nickcore The nickcofe for this nick
+	 */
+	NickAlias(const std::string &nickname, NickCore *nickcore);
+
+	/** Default destructor
+	 */
+	~NickAlias();
 
 	NickAlias *next, *prev;
 	char *nick;				/* Nickname */
@@ -105,7 +110,14 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 {
  public:
-	NickCore();
+ 	/** Default constructor
+	 * @param display The display nick
+	 */
+	NickCore(const std::string &nickdisplay);
+
+	/** Default destructor
+	 */
+	~NickCore();
 
 	NickCore *next, *prev;
 

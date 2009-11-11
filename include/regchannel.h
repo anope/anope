@@ -49,6 +49,12 @@ enum ChannelInfoFlag
 	CI_XOP,
 	/* Channel is suspended */
 	CI_SUSPENDED,
+	/* Channel still exists when emptied, this can be caused by setting a perm
+	 * channel mode (+P on InspIRCd) or /cs set #chan persist on.
+	 * This keeps the service bot in the channel regardless if a +P type mode
+	 * is set or not
+	 */
+	CI_PERSIST,
 
 	CI_END
 };

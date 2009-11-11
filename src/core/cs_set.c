@@ -498,6 +498,82 @@ class CommandCSSet : public Command
 		return MOD_CONT;
 	}
 
+	CommandReturn DoSetPersist(User *u, ChannelInfo *ci, const char *param)
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
+
+		if (!stricmp(param, "ON"))
+		{
+			if (!ci->HasFlag(CI_PERSIST))
+			{
+				ci->SetFlag(CI_PERSIST);
+
+				/* Channel doesn't exist, create it internally */
+				if (!ci->c)
+				{
+					chan_create(ci->name, time(NULL));
+					if (ci->bi)
+						bot_join(ci);
+				}
+
+				/* No botserv bot, no channel mode */
+				if (!ci->bi && !cm)
+				{
+					/* Give them ChanServ
+					 * Yes, this works fine with no s_BotServ
+					 */
+					findbot(s_ChanServ)->Assign(NULL, ci);
+				}
+
+				/* Set the perm mode */
+				if (cm && ci->c && !ci->c->HasMode(CMODE_PERM))
+				{
+					ci->c->SetMode(CMODE_PERM);
+					ircdproto->SendMode(whosends(ci), ci->c->name, "+%c", cm->ModeChar);
+				}
+			}
+
+			notice_lang(s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name);
+		}
+		else if (!stricmp(param, "OFF"))
+		{
+			if (ci->HasFlag(CI_PERSIST))
+			{
+				ci->UnsetFlag(CI_PERSIST);
+
+				/* Unset perm mode */
+				if (ci->c && ci->c->HasMode(CMODE_PERM))
+				{
+					ircdproto->SendMode(whosends(ci), ci->c->name, "-%c", cm->ModeChar);
+					ci->c->RemoveMode(CMODE_PERM);
+				}
+				/* Persist is set off... remove the bot and delete the channel if its empty */
+				else if (ci->c)
+				{
+					if (s_BotServ && ci->bi && ci->c->usercount == BSMinUsers - 1)
+						ircdproto->SendPart(ci->bi, ci->c->name, NULL);
+					if (!ci->c->users)
+						chan_delete(ci->c);
+
+					/* No channel mode, no BotServ, but using ChanServ as the botserv bot
+					 * which was assigned when persist was set on
+					 */
+					if (!cm && !s_BotServ && ci->bi)
+					{
+						/* Unassign bot */
+						findbot(s_ChanServ)->UnAssign(NULL, ci);	
+					}
+				}
+			}
+
+			notice_lang(s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name);
+		}
+		else
+			syntax_error(s_ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
+
+		return MOD_CONT;
+	}
+
 	CommandReturn DoSetNoExpire(User * u, ChannelInfo * ci, const char *param)
 	{
 		if (!u->nc->HasCommand("chanserv/set/noexpire"))
@@ -593,7 +669,9 @@ class CommandCSSet : public Command
 			}
 		} else if (cmd == "PEACE") {
 			DoSetPeace(u, ci, param);
-		} else if (cmd == "NOEXPIRE") {
+		} else if (cmd == "PERSIST")
+			DoSetPersist(u, ci, param);
+		else if (cmd == "NOEXPIRE") {
 			DoSetNoExpire(u, ci, param);
 		} else {
 			notice_lang(s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, cmd.c_str());
@@ -648,6 +726,8 @@ class CommandCSSet : public Command
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_XOP);
 		else if (subcommand == "PEACE")
 			notice_help(s_ChanServ, u, CHAN_HELP_SET_PEACE);
+		else if (subcommand == "PERSIST")
+			notice_help(s_ChanServ, u, CHAN_HELP_SET_PERSIST);
 		else if (subcommand == "NOEXPIRE")
 			notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
 		else

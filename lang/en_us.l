@@ -1204,6 +1204,14 @@ CHAN_SET_XOP_ON
 CHAN_SET_XOP_OFF
 	xOP lists system for %s is now OFF.
 
+# SET PERSISTANT responces
+CHAN_SET_PERSIST_SYNTAX
+	SET channel PERSISTS {ON | OFF}
+CHAN_SET_PERSIST_ON
+	Channel %s is now persistant.
+CHAN_SET_PERSIST_OFF
+	Channel %s is no longer persistant.
+
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX
 	SET channel NOEXPIRE {ON | OFF}
@@ -1572,6 +1580,8 @@ CHAN_INFO_OPT_TOPICLOCK
 	Topic Lock
 CHAN_INFO_OPT_XOP
 	xOP lists system
+CHAN_INFO_OPT_PERSIST
+	Persistant
 CHAN_INFO_OPT_NONE
 	None
 CHAN_INFO_MODE_LOCK
@@ -2078,7 +2088,9 @@ BOT_UNASSIGN_SYNTAX
 	UNASSIGN chan
 BOT_UNASSIGN_UNASSIGNED
 	There is no bot assigned to %s anymore.
-	
+BOT_UNASSIGN_PERSISTANT_CHAN
+	You can not unassign bots while persist is set on the channel.
+
 # INFO responses
 BOT_INFO_SYNTAX
 	INFO {chan | nick}
@@ -4134,6 +4146,7 @@ CHAN_HELP_SET
 	    SIGNKICK      Sign kicks that are done with KICK command
 	    TOPICLOCK     Topic can only be changed with TOPIC
 	    XOP           Toggle the user privilege system
+	    PERSIST       Set the channel as permanent
 	
 	Type %R%S HELP SET option for more information on a
 	particular option.
@@ -4328,6 +4341,29 @@ CHAN_HELP_SET_XOP
 	
 	Switching from xOP lists system to access list system
 	causes no problem though.
+
+CHAN_HELP_SET_PERSIST
+	Syntax: SET channel PERSIST {ON | OFF}
+
+	Enables or disables the persistant channel setting.
+	When persistant is set, the service bot will remain
+	in the channel when it has emptied of users.
+	
+	If your IRCd does not a permanent (persistant) channel
+	mode you must have a service bot in your channel to
+	set persist on, and it can not be unassigned while persist
+	is on.
+	
+	If this network does not have BotServ enabled and does
+	not have a permanent channel mode, ChanServ will
+	join your channel when you set persist on (and leave when
+	it has been set off).
+	
+	If your IRCd has a permanent (persistant) channel mode
+	and is is set or unset (for any reason, including MLOCK),
+	persist is automatically set and unset for the channel aswell.
+	Additionally, services will set or unset this mode when you
+	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
 	Syntax: SET channel OPNOTICE {ON | OFF}

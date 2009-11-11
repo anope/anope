@@ -86,6 +86,16 @@ class CommandCSRegister : public Command
 			else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
 				ircdproto->SendMode(findbot(s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
 
+			/* Mark the channel as persistant */
+			if (c->HasMode(CMODE_PERM))
+				ci->SetFlag(CI_PERSIST);
+			/* Persist may be in def cflags, set it here */
+			else if (ci->HasFlag(CI_PERSIST) && (cm = ModeManager::FindChannelModeByName(CMODE_PERM)))
+			{
+				ircdproto->SendMode(whosends(ci), chan, "+%c", cm->ModeChar);
+				ci->SetFlag(CI_PERSIST);
+			}
+
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
 		}
 		return MOD_CONT;

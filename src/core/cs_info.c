@@ -118,6 +118,7 @@ class CommandCSInfo : public Command
 				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, getstring(u,  CHAN_INFO_OPT_SIGNKICK), ci, u->nc);
 			CheckOptStr(optbuf, CI_TOPICLOCK, getstring(u,	CHAN_INFO_OPT_TOPICLOCK), ci, u->nc);
 			CheckOptStr(optbuf, CI_XOP, getstring(u,  CHAN_INFO_OPT_XOP), ci, u->nc);
+			CheckOptStr(optbuf, CI_PERSIST, getstring(u, CHAN_INFO_OPT_PERSIST), ci, u->nc);
 
 			notice_lang(s_ChanServ, u, CHAN_INFO_OPTIONS,	optbuf.empty() ? getstring(u, CHAN_INFO_OPT_NONE) : optbuf.c_str());
 			notice_lang(s_ChanServ, u, CHAN_INFO_MODE_LOCK,	get_mlock_modes(ci, 1));

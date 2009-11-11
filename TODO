@@ -26,6 +26,7 @@ Legend:
 [x] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
 [+] General options block, ability to turn LOGCHAN on from the config file..
 [ ] Docs directory cleanup
+[x] Fix permanent channels support properly
 
 Future
 ------
@@ -35,8 +36,7 @@ Future
   [ ] Requires a rejig of how Alias vs Core works
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] Add support for +k, +q, etc type umodes
-[ ] Fix permanent channels support properly. This will require removing do_sjoin().
-  [ ] burn do_sjoin with fire
+[ ] burn do_sjoin with fire
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] add overridden form of SendGlobops accepting BotInfo

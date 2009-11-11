@@ -164,8 +164,13 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (u && ci->c && ci->c->usercount >= BSMinUsers)
-		ircdproto->SendPart(ci->bi, ci->name, "UNASSIGN from %s", u->nick);
+	if (ci->c && ci->c->usercount >= BSMinUsers)
+	{
+		if (u)
+			ircdproto->SendPart(ci->bi, ci->name, "UNASSIGN from %s", u->nick);
+		else
+			ircdproto->SendPart(ci->bi, ci->name, "");
+	}
 
 	ci->bi->chancount--;
 	ci->bi = NULL;

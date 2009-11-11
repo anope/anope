@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-int do_unassign(User * u);
-
 class CommandBSUnassign : public Command
 {
  public:
@@ -28,6 +26,7 @@ class CommandBSUnassign : public Command
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci = cs_findchan(chan);
+		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
 		if (readonly)
 			notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
@@ -35,7 +34,10 @@ class CommandBSUnassign : public Command
 			notice_lang(s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)
 			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
-		else {
+		else if (ci->HasFlag(CI_PERSIST) && !cm)
+			notice_help(s_BotServ, u, BOT_UNASSIGN_PERSISTANT_CHAN);
+		else
+		{
 			ci->bi->UnAssign(u, ci);
 			notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
 		}

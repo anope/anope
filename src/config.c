@@ -1848,6 +1848,7 @@ int read_config(int reload)
 			else if (option == "opnotice") CSDefFlags.SetFlag(CI_OPNOTICE);
 			else if (option == "xop") CSDefFlags.SetFlag(CI_XOP);
 			else if (option == "peace") CSDefFlags.SetFlag(CI_PEACE);
+			else if (option == "persist") CSDefFlags.SetFlag(CI_PERSIST);
 		}
 	}
 

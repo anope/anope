@@ -39,6 +39,13 @@ bool Channel::HasMode(ChannelModeName Name)
 void Channel::SetMode(ChannelModeName Name)
 {
 	modes[(size_t)Name] = true;
+
+	/* Channel mode +P or so was set, mark this channel as persistant */
+	if (Name == CMODE_PERM && ci)
+	{
+		ci->SetFlag(CI_PERSIST);
+	}
+
 	FOREACH_MOD(I_OnChannelModeSet, OnChannelModeSet(this, Name));
 }
 
@@ -63,6 +70,16 @@ void Channel::SetMode(char Mode)
 void Channel::RemoveMode(ChannelModeName Name)
 {
 	modes[(size_t)Name] = false;
+
+	if (Name == CMODE_PERM && ci)
+	{
+		ci->UnsetFlag(CI_PERSIST);
+		if (s_BotServ && ci->bi && usercount == BSMinUsers - 1)
+			ircdproto->SendPart(ci->bi, name, NULL);
+		if (!users)
+			chan_delete(this);
+	}
+
 	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, Name));
 }
 
@@ -323,9 +340,12 @@ void chan_deluser(User * user, Channel * c)
 	delete u;
 	c->usercount--;
 
-	if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1) {
+	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
+	if (c->ci && c->ci->HasFlag(CI_PERSIST))
+		return;
+
+	if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1)
 		ircdproto->SendPart(c->ci->bi, c->name, NULL);
-	}
 
 	if (!c->users)
 		chan_delete(c);
@@ -1819,10 +1839,15 @@ void chan_adduser2(User * user, Channel * c)
 	 * and the ignored user dosnt just leave, the bot will never
 	 * make it into the channel, leaving the channel botless even for
 	 * legit users - Rob
+	 * But don't join the bot if the channel is persistant - Adam
 	 **/
-	if (s_BotServ && c->ci && c->ci->bi) {
+	if (s_BotServ && c->ci && c->ci->bi && !c->ci->HasFlag(CI_PERSIST))
+	{
 		if (c->usercount == BSMinUsers)
 			bot_join(c->ci);
+	}
+	if (s_BotServ && c->ci && c->ci->bi)
+	{
 		if (c->usercount >= BSMinUsers && (c->ci->botflags.HasFlag(BS_GREET))
 			&& user->nc && user->nc->greet
 			&& check_access(user, c->ci, CA_GREET)) {
@@ -1882,6 +1907,16 @@ Channel *chan_create(const char *chan, time_t ts)
 
 	if (serv_uplink && is_sync(serv_uplink) && (!(c->topic_sync))) {
 		restore_topic(chan);
+	}
+
+	/* A channel set as persistant when it was not created has just
+	 * been created, mark it as persistant
+	 */
+	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
+	if (cm && c->ci && c->ci->HasFlag(CI_PERSIST) && !c->HasMode(CMODE_PERM))
+	{
+		ircdproto->SendMode(whosends(c->ci), c->name, "+%c", cm->ModeChar);
+		c->SetMode(CMODE_PERM);
 	}
 
 	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(c));

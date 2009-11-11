@@ -19,22 +19,26 @@
 class CommandCSSet : public Command
 {
  private:
-	CommandReturn DoSetFounder(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetFounder(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		NickAlias *na = findnick(param);
+		NickAlias *na = findnick(param.c_str());
 		NickCore *nc, *nc0 = ci->founder;
 
-		if (!na) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, param);
+		if (!na)
+		{
+			notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, param.c_str());
 			return MOD_CONT;
-		} else if (na->HasFlag(NS_FORBIDDEN)) {
-			notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, param);
+		}
+		else if (na->HasFlag(NS_FORBIDDEN))
+		{
+			notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, param.c_str());
 			return MOD_CONT;
 		}
 
 		nc = na->nc;
-		if (CSMaxReg && nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit")) {
-			notice_lang(s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, param);
+		if (CSMaxReg && nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
+		{
+			notice_lang(s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, param.c_str());
 			return MOD_CONT;
 		}
 
@@ -50,36 +54,39 @@ class CommandCSSet : public Command
 		ci->founder = nc;
 		nc->channelcount++;
 
-		notice_lang(s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name, param);
+		notice_lang(s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name, param.c_str());
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSuccessor(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetSuccessor(User * u, ChannelInfo * ci, const ci::string &param)
 	{
 		NickAlias *na;
 		NickCore *nc;
 
-		if (param) {
-			na = findnick(param);
+		if (!param.empty())
+		{
+			na = findnick(param.c_str());
 
-			if (!na) {
-				notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, param);
+			if (!na)
+			{
+				notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, param.c_str());
 				return MOD_CONT;
 			}
-			if (na->HasFlag(NS_FORBIDDEN)) {
-				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, param);
+			if (na->HasFlag(NS_FORBIDDEN))
+			{
+				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, param.c_str());
 				return MOD_CONT;
 			}
-			if (na->nc == ci->founder) {
-				notice_lang(s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, param,
-							ci->name);
+			if (na->nc == ci->founder)
+			{
+				notice_lang(s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, param.c_str(), ci->name);
 				return MOD_CONT;
 			}
 			nc = na->nc;
 
-		} else {
-			nc = NULL;
 		}
+		else
+			nc = NULL;
 
 		alog("%s: Changing successor of %s from %s to %s by %s!%s@%s",
 			 s_ChanServ, ci->name,
@@ -89,59 +96,67 @@ class CommandCSSet : public Command
 		ci->successor = nc;
 
 		if (nc)
-			notice_lang(s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name,
-						param);
+			notice_lang(s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name, param.c_str());
 		else
 			notice_lang(s_ChanServ, u, CHAN_SUCCESSOR_UNSET, ci->name);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetDesc(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetDesc(User * u, ChannelInfo * ci, const ci::string &param)
 	{
 		if (ci->desc)
 			delete [] ci->desc;
-		ci->desc = sstrdup(param);
-		notice_lang(s_ChanServ, u, CHAN_DESC_CHANGED, ci->name, param);
+		ci->desc = sstrdup(param.c_str());
+		notice_lang(s_ChanServ, u, CHAN_DESC_CHANGED, ci->name, param.c_str());
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetURL(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetURL(User * u, ChannelInfo * ci, const ci::string &param)
 	{
 		if (ci->url)
 			delete [] ci->url;
-		if (param) {
-			ci->url = sstrdup(param);
-			notice_lang(s_ChanServ, u, CHAN_URL_CHANGED, ci->name, param);
-		} else {
+		if (!param.empty())
+		{
+			ci->url = sstrdup(param.c_str());
+			notice_lang(s_ChanServ, u, CHAN_URL_CHANGED, ci->name, param.c_str());
+		}
+		else
+		{
 			ci->url = NULL;
 			notice_lang(s_ChanServ, u, CHAN_URL_UNSET, ci->name);
 		}
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetEMail(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetEMail(User * u, ChannelInfo * ci, const ci::string &param)
 	{
 		if (ci->email)
 			delete [] ci->email;
-		if (param) {
-			ci->email = sstrdup(param);
-			notice_lang(s_ChanServ, u, CHAN_EMAIL_CHANGED, ci->name, param);
-		} else {
+		if (!param.empty())
+		{
+			ci->email = sstrdup(param.c_str());
+			notice_lang(s_ChanServ, u, CHAN_EMAIL_CHANGED, ci->name, param.c_str());
+		}
+		else
+		{
 			ci->email = NULL;
 			notice_lang(s_ChanServ, u, CHAN_EMAIL_UNSET, ci->name);
 		}
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetEntryMsg(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetEntryMsg(User * u, ChannelInfo * ci, const ci::string &param)
 	{
 		if (ci->entry_message)
 			delete [] ci->entry_message;
-		if (param) {
-			ci->entry_message = sstrdup(param);
-			notice_lang(s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name,
-						param);
-		} else {
+		if (!param.empty())
+		{
+			ci->entry_message = sstrdup(param.c_str());
+			notice_lang(s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name, param.c_str());
+		}
+		else
+		{
 			ci->entry_message = NULL;
 			notice_lang(s_ChanServ, u, CHAN_ENTRY_MSG_UNSET, ci->name);
 		}
@@ -280,181 +295,211 @@ class CommandCSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetKeepTopic(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetKeepTopic(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_KEEPTOPIC);
 			notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_KEEPTOPIC);
 			notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET KEEPTOPIC",
-						 CHAN_SET_KEEPTOPIC_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET KEEPTOPIC", CHAN_SET_KEEPTOPIC_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetTopicLock(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetTopicLock(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_TOPICLOCK);
 			notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_TOPICLOCK);
 			notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET TOPICLOCK",
-						 CHAN_SET_TOPICLOCK_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET TOPICLOCK", CHAN_SET_TOPICLOCK_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPrivate(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetPrivate(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_PRIVATE);
 			notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_PRIVATE);
 			notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET PRIVATE",
-						 CHAN_SET_PRIVATE_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSecureOps(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetSecureOps(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_SECUREOPS);
 			notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_SECUREOPS);
 			notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET SECUREOPS",
-						 CHAN_SET_SECUREOPS_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET SECUREOPS", CHAN_SET_SECUREOPS_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSecureFounder(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetSecureFounder(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_SECUREFOUNDER);
 			notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_SECUREFOUNDER);
 			notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET SECUREFOUNDER",
-						 CHAN_SET_SECUREFOUNDER_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetRestricted(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetRestricted(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
 			notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
 				ci->levels[CA_NOJOIN] = -2;
 			notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET RESTRICTED",
-						 CHAN_SET_RESTRICTED_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSecure(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetSecure(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_SECURE);
 			notice_lang(s_ChanServ, u, CHAN_SET_SECURE_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_SECURE);
 			notice_lang(s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSignKick(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetSignKick(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
 			notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name);
-		} else if (stricmp(param, "LEVEL") == 0) {
+		}
+		else if (param == "LEVEL")
+		{
 			ci->SetFlag(CI_SIGNKICK_LEVEL);
 			ci->UnsetFlag(CI_SIGNKICK);
 			notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
 			notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET SIGNKICK",
-						 CHAN_SET_SIGNKICK_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET SIGNKICK", CHAN_SET_SIGNKICK_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetOpNotice(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetOpNotice(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_OPNOTICE);
 			notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_OPNOTICE);
 			notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET OPNOTICE",
-						 CHAN_SET_OPNOTICE_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET OPNOTICE", CHAN_SET_OPNOTICE_SYNTAX);
+
 		return MOD_CONT;
 	}
 
 #define CHECKLEV(lev) ((ci->levels[(lev)] != ACCESS_INVALID) && (access->level >= ci->levels[(lev)]))
 
-	CommandReturn DoSetXOP(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetXOP(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
-			if (!(ci->HasFlag(CI_XOP))) {
+		if (param == "ON")
+		{
+			if (!(ci->HasFlag(CI_XOP)))
+			{
 				ChanAccess *access;
 
-				for (unsigned i = 0; i < ci->GetAccessCount(); i++) {
+				for (unsigned i = 0; i < ci->GetAccessCount(); i++)
+				{
 					access = ci->GetAccess(i);
 					if (!access->in_use)
 						continue;
 					/* This will probably cause wrong levels to be set, but hey,
 					 * it's better than losing it altogether.
 					 */
-					if (access->level == ACCESS_QOP) {
+					if (access->level == ACCESS_QOP)
 						access->level = ACCESS_QOP;
-					} else if (CHECKLEV(CA_AKICK) || CHECKLEV(CA_SET)) {
+					else if (CHECKLEV(CA_AKICK) || CHECKLEV(CA_SET))
 						access->level = ACCESS_SOP;
-					} else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP)
-							   || CHECKLEV(CA_OPDEOPME)) {
+					else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP) || CHECKLEV(CA_OPDEOPME))
 						access->level = ACCESS_AOP;
-					} else if (ModeManager::FindChannelModeByName(CMODE_HALFOP)) {
-						if (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP)
-							|| CHECKLEV(CA_HALFOPME)) {
+					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
+						if (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP) || CHECKLEV(CA_HALFOPME))
 							access->level = ACCESS_HOP;
-						}
-					} else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE)
-							   || CHECKLEV(CA_VOICEME)) {
+					else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE) || CHECKLEV(CA_VOICEME))
 						access->level = ACCESS_VOP;
-					} else {
+					else
+					{
 						access->in_use = 0;
 						access->nc = NULL;
 					}
@@ -470,39 +515,46 @@ class CommandCSSet : public Command
 			alog("%s: %s!%s@%s enabled XOP for %s", s_ChanServ, u->nick,
 				 u->GetIdent().c_str(), u->host, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_SET_XOP_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_XOP);
 
 			alog("%s: %s!%s@%s disabled XOP for %s", s_ChanServ, u->nick,
 				 u->GetIdent().c_str(), u->host, ci->name);
 			notice_lang(s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
+
 		return MOD_CONT;
 	}
 
 #undef CHECKLEV
 
-	CommandReturn DoSetPeace(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetPeace(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_PEACE);
 			notice_lang(s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_PEACE);
 			notice_lang(s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
+
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPersist(User *u, ChannelInfo *ci, const char *param)
+	CommandReturn DoSetPersist(User *u, ChannelInfo *ci, const ci::string &param)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
-		if (!stricmp(param, "ON"))
+		if (param == "ON")
 		{
 			if (!ci->HasFlag(CI_PERSIST))
 			{
@@ -535,7 +587,7 @@ class CommandCSSet : public Command
 
 			notice_lang(s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name);
 		}
-		else if (!stricmp(param, "OFF"))
+		else if (param == "OFF")
 		{
 			if (ci->HasFlag(CI_PERSIST))
 			{
@@ -574,23 +626,26 @@ class CommandCSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetNoExpire(User * u, ChannelInfo * ci, const char *param)
+	CommandReturn DoSetNoExpire(User * u, ChannelInfo * ci, const ci::string &param)
 	{
 		if (!u->nc->HasCommand("chanserv/set/noexpire"))
 		{
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
-		if (stricmp(param, "ON") == 0) {
+		if (param == "ON")
+		{
 			ci->SetFlag(CI_NO_EXPIRE);
 			notice_lang(s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name);
-		} else if (stricmp(param, "OFF") == 0) {
+		}
+		else if (param == "OFF")
+		{
 			ci->UnsetFlag(CI_NO_EXPIRE);
 			notice_lang(s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name);
-		} else {
-			syntax_error(s_ChanServ, u, "SET NOEXPIRE",
-						 CHAN_SET_NOEXPIRE_SYNTAX);
 		}
+		else
+			syntax_error(s_ChanServ, u, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
+
 		return MOD_CONT;
 	}
 
@@ -616,67 +671,76 @@ class CommandCSSet : public Command
 			syntax_error(s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 		else if (!is_servadmin && !check_access(u, ci, CA_SET))
 			notice_lang(s_ChanServ, u, ACCESS_DENIED);
-		else if (cmd == "FOUNDER") {
+		else if (cmd == "FOUNDER")
+		{
 			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)))
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			else
 				DoSetFounder(u, ci, param);
-		} else if (cmd == "SUCCESSOR") {
+		}
+		else if (cmd == "SUCCESSOR")
+		{
 			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)))
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			else
 				DoSetSuccessor(u, ci, param);
-		} else if (cmd == "DESC") {
+		}
+		else if (cmd == "DESC")
 			DoSetDesc(u, ci, param);
-		} else if (cmd == "URL") {
+		else if (cmd == "URL")
 			DoSetURL(u, ci, param);
-		} else if (cmd == "EMAIL") {
+		else if (cmd == "EMAIL")
 			DoSetEMail(u, ci, param);
-		} else if (cmd == "ENTRYMSG") {
+		else if (cmd == "ENTRYMSG")
 			DoSetEntryMsg(u, ci, param);
-		} else if (cmd == "TOPIC") {
+		else if (cmd == "TOPIC")
 			notice_lang(s_ChanServ, u, OBSOLETE_COMMAND, "TOPIC");
-		} else if (cmd == "BANTYPE") {
+		else if (cmd == "BANTYPE")
 			DoSetBanType(u, ci, param);
-		} else if (cmd == "MLOCK") {
+		else if (cmd == "MLOCK")
 			DoSetMLock(u, ci, param);
-		} else if (cmd == "KEEPTOPIC") {
+		else if (cmd == "KEEPTOPIC")
 			DoSetKeepTopic(u, ci, param);
-		} else if (cmd == "TOPICLOCK") {
+		else if (cmd == "TOPICLOCK")
 			DoSetTopicLock(u, ci, param);
-		} else if (cmd == "PRIVATE") {
+		else if (cmd == "PRIVATE")
 			DoSetPrivate(u, ci, param);
-		} else if (cmd == "SECUREOPS") {
+		else if (cmd == "SECUREOPS")
 			DoSetSecureOps(u, ci, param);
-		} else if (cmd == "SECUREFOUNDER") {
+		else if (cmd == "SECUREFOUNDER")
+		{
 			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)))
 				notice_lang(s_ChanServ, u, ACCESS_DENIED);
 			else
 				DoSetSecureFounder(u, ci, param);
-		} else if (cmd == "RESTRICTED") {
+		}
+		else if (cmd == "RESTRICTED")
 			DoSetRestricted(u, ci, param);
-		} else if (cmd == "SECURE") {
+		else if (cmd == "SECURE")
 			DoSetSecure(u, ci, param);
-		} else if (cmd == "SIGNKICK") {
+		else if (cmd == "SIGNKICK")
 			DoSetSignKick(u, ci, param);
-		} else if (cmd == "OPNOTICE") {
+		else if (cmd == "OPNOTICE")
 			DoSetOpNotice(u, ci, param);
-		} else if (cmd == "XOP") {
-			if (!(findModule("cs_xop"))) {
+		else if (cmd == "XOP")
+		{
+			if (!findModule("cs_xop"))
 				notice_lang(s_ChanServ, u, CHAN_XOP_NOT_AVAILABLE, cmd.c_str());
-			} else {
+			else
 				DoSetXOP(u, ci, param);
-			}
-		} else if (cmd == "PEACE") {
+		}
+		else if (cmd == "PEACE")
 			DoSetPeace(u, ci, param);
-		} else if (cmd == "PERSIST")
+		else if (cmd == "PERSIST")
 			DoSetPersist(u, ci, param);
-		else if (cmd == "NOEXPIRE") {
+		else if (cmd == "NOEXPIRE")
 			DoSetNoExpire(u, ci, param);
-		} else {
+		else
+		{
 			notice_lang(s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, cmd.c_str());
 			notice_lang(s_ChanServ, u, MORE_INFO, s_ChanServ, "SET");
 		}
+
 		return MOD_CONT;
 	}
 

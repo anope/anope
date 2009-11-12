@@ -105,7 +105,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 
 	if (params.size() < c->MinParams)
 	{
-		c->OnSyntaxError(u, params.size() > 1 ? params[1].c_str() : "");
+		c->OnSyntaxError(u, !params.empty() ? params[params.size() - 1] : "");
 		return;
 	}
 

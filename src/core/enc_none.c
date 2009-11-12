@@ -30,7 +30,7 @@ class ENone : public Module
 		if(size>=len)
 		{
 			memset(dest,0,size);
-			strlcpy(dest,src,len);
+			strlcpy(dest,src,len + 1);
 			return EVENT_ALLOW;
 		}
 		return EVENT_STOP;

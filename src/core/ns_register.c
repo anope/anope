@@ -94,7 +94,7 @@ class CommandNSConfirm : public Command
 
 	}
 
-	CommandReturn DoConfirm(User *u, std::vector<ci::string> &params)
+	CommandReturn DoConfirm(User *u, const std::vector<ci::string> &params)
 	{
 		NickRequest *nr = NULL;
 		const char *passcode = params.size() ? params[0].c_str() : NULL;
@@ -149,7 +149,7 @@ class CommandNSConfirm : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		return this->DoConfirm(u, params);
 	}
@@ -171,7 +171,7 @@ class CommandNSRegister : public CommandNSConfirm
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		NickRequest *nr = NULL, *anr = NULL;
 		NickAlias *na;
@@ -321,7 +321,7 @@ class CommandNSResend : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		NickRequest *nr = NULL;
 		if (NSEmailReg)

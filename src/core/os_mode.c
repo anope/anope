@@ -22,7 +22,7 @@ class CommandOSMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		int ac;
 		const char **av;

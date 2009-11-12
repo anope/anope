@@ -22,7 +22,7 @@ class CommandOSChanList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
 		ci::string opt = params.size() > 1 ? params[1] : "";

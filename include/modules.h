@@ -249,7 +249,7 @@ class CoreExport Command : public Flags<CommandFlag>
 	/** Execute this command.
 	 * @param u The user executing the command.
 	 */
-	virtual CommandReturn Execute(User *u, std::vector<ci::string> &);
+	virtual CommandReturn Execute(User *u, const std::vector<ci::string> &);
 
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
 	 * @param u The user requesting help

@@ -22,7 +22,7 @@ class CommandCSTopic : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *topic = params.size() > 1 ? params[1].c_str() : NULL;

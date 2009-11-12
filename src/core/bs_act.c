@@ -22,9 +22,10 @@ class CommandBSAct : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0].c_str());
+		ci::string message = params[1];
 
 		if (!check_access(u, ci, CA_SAY))
 		{
@@ -45,13 +46,13 @@ class CommandBSAct : public Command
 		}
 
 		size_t i = 0;
-		while ((i = params[1].find_first_of("\001"), i) && i != std::string::npos)
-			params[1].erase(i, 1);
+		while ((i = message.find_first_of("\001"), i) && i != std::string::npos)
+			message.erase(i, 1);
 
-		ircdproto->SendAction(ci->bi, ci->name, "%s", params[1].c_str());
+		ircdproto->SendAction(ci->bi, ci->name, "%s", message.c_str());
 		ci->bi->lastmsg = time(NULL);
 		if (LogBot && LogChannel && LogChan && !debug && findchan(LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s", u->nick, ci->name, params[1].c_str());
+			ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s", u->nick, ci->name, message.c_str());
 		return MOD_CONT;
 	}
 

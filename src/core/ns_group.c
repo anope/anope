@@ -23,7 +23,7 @@ class CommandNSGroup : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		NickAlias *na, *target;
 		const char *nick = params[0].c_str();
@@ -156,7 +156,7 @@ class CommandNSGList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 

@@ -74,7 +74,7 @@ class CommandHSRequest : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		char *nick;
 		const char *rawhostmask = params[0].c_str();
@@ -206,7 +206,7 @@ class CommandHSActivate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
@@ -271,7 +271,7 @@ class CommandHSReject : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
@@ -383,7 +383,7 @@ class CommandHSWaiting : public HSListBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		return this->DoList(u);
 	}

@@ -23,7 +23,7 @@ class CommandNSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		/* SADMINS can search for nicks based on their NS_FORBIDDEN and NS_NO_EXPIRE
 		 * status. The keywords FORBIDDEN and NOEXPIRE represent these two states

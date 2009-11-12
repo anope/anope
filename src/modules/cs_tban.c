@@ -43,7 +43,7 @@ class CommandCSTBan : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		char mask[BUFSIZE];
 		Channel *c;

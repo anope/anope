@@ -25,7 +25,7 @@ class CommandOSStaff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		User *au = NULL;
 		NickCore *nc;

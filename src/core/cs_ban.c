@@ -22,7 +22,7 @@ class CommandCSBan : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *target = params[1].c_str();
@@ -30,7 +30,6 @@ class CommandCSBan : public Command
 
 		if (params.size() > 2)
 		{
-			params[2].resize(200);
 			reason = params[2].c_str();
 		}
 
@@ -120,7 +119,7 @@ class CommandCSUnban : public Command
 
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		Channel *c;

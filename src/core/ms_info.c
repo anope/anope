@@ -22,7 +22,7 @@ class CommandMSInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		MemoInfo *mi;
 		NickAlias *na = NULL;

@@ -37,7 +37,7 @@ class CommandCSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		ci::string param = params.size() > 1 ? params[1] : "";

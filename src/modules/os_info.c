@@ -52,7 +52,7 @@ static Module *me;
 class CommandNSOInfo : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
@@ -83,7 +83,7 @@ class CommandNSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		NickAlias *na = NULL;
@@ -110,7 +110,7 @@ class CommandNSOInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 
@@ -139,7 +139,7 @@ class CommandNSOInfo : public Command
 class CommandCSOInfo : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
@@ -164,7 +164,7 @@ class CommandCSOInfo : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		ChannelInfo *ci = cs_findchan(chan);
@@ -185,7 +185,7 @@ class CommandCSOInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[1];
 

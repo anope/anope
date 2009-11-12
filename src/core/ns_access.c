@@ -18,7 +18,7 @@
 class CommandNSAccess : public Command
 {
  private:
-	CommandReturn DoServAdminList(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoServAdminList(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
 		unsigned i;
@@ -127,7 +127,7 @@ class CommandNSAccess : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;

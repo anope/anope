@@ -22,7 +22,7 @@ class CommandBSBotList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		int i, count = 0;
 		BotInfo *bi;

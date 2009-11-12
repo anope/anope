@@ -18,7 +18,7 @@
 class CommandOSIgnore : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
 		const char *time = params.size() > 1 ? params[1].c_str() : NULL;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
@@ -70,7 +70,7 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
 		if (!nick)
@@ -100,7 +100,7 @@ class CommandOSIgnore : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 

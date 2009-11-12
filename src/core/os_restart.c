@@ -22,7 +22,7 @@ class CommandOSRestart : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		quitmsg = new char[31 + strlen(u->nick)];
 		if (!quitmsg)

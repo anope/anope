@@ -25,7 +25,7 @@ class CommandMSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string param = params.size() ? params[0] : "", chan;
 		ChannelInfo *ci;

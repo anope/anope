@@ -18,7 +18,7 @@
 class CommandNSSet : public Command
 {
  private:
-	CommandReturn DoSetDisplay(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetDisplay(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -53,7 +53,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPassword(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetPassword(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -79,12 +79,10 @@ class CommandNSSet : public Command
 
 		if (enc_encrypt(param.c_str(), len, nc->pass, PASSMAX - 1) < 0)
 		{
-			params[1].clear();
 			alog("%s: Failed to encrypt password for %s (set)", s_NickServ, nc->display);
 			notice_lang(s_NickServ, u, NICK_SET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
-		params[1].clear();
 
 		if (enc_decrypt(nc->pass, tmp_pass, PASSMAX - 1) == 1)
 			notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, tmp_pass);
@@ -96,7 +94,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetLanguage(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetLanguage(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -124,7 +122,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetUrl(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetUrl(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -144,7 +142,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetEmail(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetEmail(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -177,7 +175,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetICQ(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetICQ(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -200,7 +198,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetGreet(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetGreet(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
 
@@ -225,7 +223,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetKill(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetKill(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -273,7 +271,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSecure(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetSecure(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -298,7 +296,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetPrivate(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetPrivate(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -323,7 +321,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetMsg(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetMsg(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -354,7 +352,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetHide(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetHide(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -415,7 +413,7 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetAutoOP(User *u, std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoSetAutoOP(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
 
@@ -450,7 +448,7 @@ class CommandNSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 

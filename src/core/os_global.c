@@ -22,7 +22,7 @@ class CommandOSGlobal : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *msg = params[0].c_str();
 

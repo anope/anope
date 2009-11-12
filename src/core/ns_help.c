@@ -23,7 +23,7 @@ class CommandNSHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 

@@ -27,7 +27,7 @@ class CommandNSGetEMail : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string email = params[0];
 		int i, j = 0;

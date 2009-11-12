@@ -139,7 +139,7 @@ int get_access_nc(NickCore *nc, ChannelInfo *ci)
 
 class CommandCSAKick : public Command
 {
-	void DoAdd(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoAdd(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		ci::string mask = params[2];
 		ci::string reason = params.size() > 3 ? params[3] : "";
@@ -263,7 +263,7 @@ class CommandCSAKick : public Command
 		this->DoEnforce(u, ci, params);
 	}
 
-	void DoStick(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoStick(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		NickAlias *na;
 		NickCore *nc;
@@ -303,7 +303,7 @@ class CommandCSAKick : public Command
 		        stick_mask(ci, akick);
 	}
 
-	void DoUnStick(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoUnStick(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		NickAlias *na;
 		NickCore *nc;
@@ -340,7 +340,7 @@ class CommandCSAKick : public Command
 		notice_lang(s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name);
 	}
 
-	void DoDel(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoDel(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		ci::string mask = params[2];
 		AutoKick *akick;
@@ -400,7 +400,7 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoList(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoList(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		int sent_header = 0;
 		ci::string mask = params.size() > 2 ? params[2] : "";
@@ -439,7 +439,7 @@ class CommandCSAKick : public Command
 
 	}
 
-	void DoView(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoView(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		int sent_header = 0;
 		ci::string mask = params.size() > 2 ? params[2] : "";
@@ -477,7 +477,7 @@ class CommandCSAKick : public Command
 
 	}
 
-	void DoEnforce(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoEnforce(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		Channel *c = ci->c;
 		c_userlist *cu, *unext;
@@ -514,7 +514,7 @@ class CommandCSAKick : public Command
 		notice_lang(s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name, count);
 	}
 
-	void DoClear(User *u, ChannelInfo *ci, std::vector<ci::string> &params)
+	void DoClear(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		ci->ClearAkick();
 		notice_lang(s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name);
@@ -525,7 +525,7 @@ class CommandCSAKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string chan = params[0];
 		ci::string cmd = params[1];

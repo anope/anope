@@ -18,7 +18,7 @@
 class CommandBSBot : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		const char *user = params[2].c_str();
@@ -117,7 +117,7 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoChange(User *u, std::vector<ci::string> &params)
+	CommandReturn DoChange(User *u, const std::vector<ci::string> &params)
 	{
 		const char *oldnick = params[1].c_str();
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
@@ -297,7 +297,7 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[1].c_str();
 		BotInfo *bi;
@@ -335,7 +335,7 @@ class CommandBSBot : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 
@@ -360,11 +360,12 @@ class CommandBSBot : public Command
 				return MOD_CONT;
 			}
 
+			std::vector<ci::string> tempparams = params;
 			// ADD takes less params than CHANGE, so we need to take 6 if given and append it with a space to 5.
-			if (params.size() >= 6)
-				params[4] = params[4] + " " + params[5];
+			if (tempparams.size() >= 6)
+				tempparams[4] = tempparams[4] + " " + tempparams[5];
 
-			return this->DoAdd(u, params);
+			return this->DoAdd(u, tempparams);
 		}
 		else if (cmd == "CHANGE")
 		{

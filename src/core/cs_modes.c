@@ -82,7 +82,7 @@ class CommandCSOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
@@ -109,7 +109,7 @@ class CommandCSDeOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
@@ -136,7 +136,7 @@ class CommandCSVoice : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
@@ -163,7 +163,7 @@ class CommandCSDeVoice : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
@@ -190,7 +190,7 @@ class CommandCSHalfOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 		
@@ -222,7 +222,7 @@ class CommandCSDeHalfOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
@@ -255,7 +255,7 @@ class CommandCSProtect : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
@@ -286,7 +286,7 @@ class CommandCSDeProtect : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
@@ -317,7 +317,7 @@ class CommandCSOwner : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
@@ -348,7 +348,7 @@ class CommandCSDeOwner : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 

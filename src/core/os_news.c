@@ -299,7 +299,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params, NewsType type, int *msgs)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params, NewsType type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
 		int n;
@@ -323,7 +323,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params, NewsType type, int *msgs)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params, NewsType type, int *msgs)
 	{
 		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
 		unsigned num;
@@ -364,7 +364,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoNews(User *u, std::vector<ci::string> &params, NewsType type)
+	CommandReturn DoNews(User *u, const std::vector<ci::string> &params, NewsType type)
 	{
 		ci::string cmd = params[0];
 		const char *type_name;
@@ -397,7 +397,7 @@ class NewsBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, std::vector<ci::string> &params) = 0;
+	virtual CommandReturn Execute(User *u, const std::vector<ci::string> &params) = 0;
 
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
@@ -411,7 +411,7 @@ class CommandOSLogonNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_LOGON);
 	}
@@ -435,7 +435,7 @@ class CommandOSOperNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_OPER);
 	}
@@ -459,7 +459,7 @@ class CommandOSRandomNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_RANDOM);
 	}

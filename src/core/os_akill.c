@@ -23,7 +23,7 @@ int akill_list(int number, Akill *ak, User *u, int *sent_header);
 class CommandOSAKill : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
 		int deleted = 0;
 		unsigned last_param = 2;
@@ -141,7 +141,7 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
 		const char *mask;
 		int res = 0;
@@ -192,7 +192,7 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -237,7 +237,7 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
 		const char *mask;
 		int res, sent_header = 0;
@@ -290,7 +290,7 @@ class CommandOSAKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 

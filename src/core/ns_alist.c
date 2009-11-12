@@ -22,7 +22,7 @@ class CommandNSAList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		/*
 		 * List the channels that the given nickname has access on

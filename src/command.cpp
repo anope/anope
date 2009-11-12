@@ -29,7 +29,7 @@ Command::~Command()
 	}
 }
 
-CommandReturn Command::Execute(User *u, std::vector<ci::string> &) { return MOD_CONT; }
+CommandReturn Command::Execute(User *u, const std::vector<ci::string> &) { return MOD_CONT; }
 
 bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
 

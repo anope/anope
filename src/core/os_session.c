@@ -18,7 +18,7 @@
 class CommandOSSession : public Command
 {
  private:
-	CommandReturn DoList(User *u, std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
 		Session *session;
 		int mincount, i;
@@ -43,7 +43,7 @@ class CommandOSSession : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
 		const char *param = params[1].c_str();
 		Session *session = findsession(param);
@@ -62,7 +62,7 @@ class CommandOSSession : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 
@@ -181,7 +181,7 @@ static int exception_view_callback(User *u, int num, va_list args)
 class CommandOSException : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
 		const char *mask, *expiry, *limitstr;
 		char reason[BUFSIZE];
@@ -255,7 +255,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 		int i;
@@ -314,7 +314,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoMove(User *u, std::vector<ci::string> &params)
+	CommandReturn DoMove(User *u, const std::vector<ci::string> &params)
 	{
 		Exception *exception;
 		const char *n1str = params.size() > 1 ? params[1].c_str() : NULL; /* From position */
@@ -365,7 +365,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
 		int sent_header = 0, i;
 		expire_exceptions();
@@ -387,7 +387,7 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
 		int sent_header = 0, i;
 		expire_exceptions();
@@ -413,7 +413,7 @@ class CommandOSException : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 

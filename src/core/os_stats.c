@@ -271,7 +271,7 @@ class CommandOSStats : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string extra = params.size() ? params[0] : "";
 

@@ -24,7 +24,7 @@ class CommandCSHelp : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 

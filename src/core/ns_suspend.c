@@ -22,7 +22,7 @@ class CommandNSSuspend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		NickAlias *na, *na2;
 		User *u2;
@@ -113,7 +113,7 @@ class CommandNSUnSuspend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		NickAlias *na;
 		const char *nick = params[0].c_str();

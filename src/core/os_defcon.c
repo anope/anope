@@ -62,7 +62,7 @@ class CommandOSDEFCON : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *lvl = params[0].c_str();
 		int newLevel = 0;

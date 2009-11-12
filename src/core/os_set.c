@@ -36,7 +36,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetIgnore(User *u, std::vector<ci::string> &params)
+	CommandReturn DoSetIgnore(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string setting = params.size() > 1 ? params[1] : "";
 
@@ -62,7 +62,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetReadOnly(User *u, std::vector<ci::string> &params)
+	CommandReturn DoSetReadOnly(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string setting = params.size() > 1 ? params[1] : "";
 
@@ -92,7 +92,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetLogChan(User *u, std::vector<ci::string> &params)
+	CommandReturn DoSetLogChan(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string setting = params.size() > 1 ? params[1] : "";
 		Channel *c;
@@ -134,7 +134,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSuperAdmin(User *u, std::vector<ci::string> &params)
+	CommandReturn DoSetSuperAdmin(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string setting = params.size() > 1 ? params[1] : "";
 
@@ -171,7 +171,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetDebug(User *u, std::vector<ci::string> &params)
+	CommandReturn DoSetDebug(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string setting = params.size() > 1 ? params[1] : "";
 
@@ -205,7 +205,7 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetNoExpire(User *u, std::vector<ci::string> &params)
+	CommandReturn DoSetNoExpire(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string setting = params.size() > 1 ? params[1] : "";
 
@@ -237,7 +237,7 @@ class CommandOSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string option = params[0];
 

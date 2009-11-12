@@ -36,7 +36,7 @@ class CommandNSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		/* Show hidden info to nick owners and sadmins when the "ALL" parameter is
 		 * supplied. If a nick is online, the "Last seen address" changes to "Is

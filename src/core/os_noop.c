@@ -22,7 +22,7 @@ class CommandOSNOOP : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 		const char *server = params[1].c_str();

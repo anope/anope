@@ -22,7 +22,7 @@ class CommandOSChanKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *expiry, *channel;
 		char reason[BUFSIZE], realreason[BUFSIZE];

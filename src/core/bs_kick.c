@@ -24,7 +24,7 @@ class CommandBSKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
 		ci::string option = params[1];

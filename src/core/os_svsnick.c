@@ -22,33 +22,31 @@ class CommandOSSVSNick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
-		const char *newnick = params[1].c_str();
+		ci::string newnick = params[1];
 
 		NickAlias *na;
-		const char *c;
 
 		/* Truncate long nicknames to NICKMAX-2 characters */
-		if (strlen(newnick) > NICKMAX - 2)
+		if (newnick.length() > NICKMAX - 2)
 		{
-			notice_lang(s_OperServ, u, NICK_X_TRUNCATED, newnick, NICKMAX - 2, newnick);
-			params[1] = params[1].substr(0, NICKMAX - 2);
-			newnick = params[1].c_str();
+			notice_lang(s_OperServ, u, NICK_X_TRUNCATED, newnick.c_str(), NICKMAX - 2, newnick.c_str());
+			newnick = params[1].substr(0, NICKMAX - 2);
 		}
 
 		/* Check for valid characters */
-		if (*newnick == '-' || isdigit(*newnick))
+		if (newnick[0] == '-' || isdigit(newnick[0]))
 		{
-			notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick);
+			notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 			return MOD_CONT;
 		}
-		for (c = newnick; *c && c - newnick < NICKMAX; ++c)
+		for (unsigned i = 0; i < newnick.size(); ++i)
 		{
-			if (!isvalidnick(*c))
+			if (!isvalidnick(newnick[i]))
 			{
-				notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick);
+				notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 				return MOD_CONT;
 			}
 		}
@@ -56,15 +54,15 @@ class CommandOSSVSNick : public Command
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!finduser(nick))
 			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (finduser(newnick))
-			notice_lang(s_OperServ, u, NICK_X_IN_USE, newnick);
-		else if ((na = findnick(newnick)) && (na->HasFlag(NS_FORBIDDEN)))
-			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick);
+		else if (finduser(newnick.c_str()))
+			notice_lang(s_OperServ, u, NICK_X_IN_USE, newnick.c_str());
+		else if ((na = findnick(newnick.c_str())) && (na->HasFlag(NS_FORBIDDEN)))
+			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick.c_str());
 		else
 		{
-			notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick);
-			ircdproto->SendGlobops(s_OperServ, "%s used SVSNICK to change %s to %s", u->nick, nick, newnick);
-			ircdproto->SendForceNickChange(nick, newnick, time(NULL));
+			notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
+			ircdproto->SendGlobops(s_OperServ, "%s used SVSNICK to change %s to %s", u->nick, nick, newnick.c_str());
+			ircdproto->SendForceNickChange(nick, newnick.c_str(), time(NULL));
 		}
 		return MOD_CONT;
 	}

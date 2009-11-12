@@ -18,7 +18,7 @@
 class CommandMSSet : public Command
 {
  private:
-	CommandReturn DoNotify(User *u, std::vector<ci::string> &params, MemoInfo *mi)
+	CommandReturn DoNotify(User *u, const std::vector<ci::string> &params, MemoInfo *mi)
 	{
 		ci::string param = params[1];
 
@@ -67,7 +67,7 @@ class CommandMSSet : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoLimit(User *u, std::vector<ci::string> &params, MemoInfo *mi)
+	CommandReturn DoLimit(User *u, const std::vector<ci::string> &params, MemoInfo *mi)
 	{
 		ci::string p1 = params[1];
 		ci::string p2 = params.size() > 2 ? params[2] : "";
@@ -207,7 +207,7 @@ class CommandMSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
 		MemoInfo *mi = &u->nc->memos;

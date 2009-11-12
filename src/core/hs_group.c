@@ -24,7 +24,7 @@ class CommandHSGroup : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		HostCore *tmp;
 		char *vHost = NULL;

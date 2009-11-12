@@ -24,7 +24,7 @@ class CommandMSCancel : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		int ischan;
 		int isforbid;

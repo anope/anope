@@ -24,7 +24,7 @@ class CommandHSSetAll : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
 		const char *rawhostmask = params[1].c_str();

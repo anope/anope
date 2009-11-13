@@ -62,24 +62,27 @@ class CommandNSGroup : public Command
 			}
 		}
 
+		na = findnick(u->nick);
 		if (!(target = findnick(nick)))
 			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (time(NULL) < u->lastnickreg + NSRegDelay)
 			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (NSRegDelay + u->lastnickreg) - time(NULL));
-		else if (u->nc && (u->nc->HasFlag(NI_SUSPENDED)))
+		else if (u->nc && u->nc->HasFlag(NI_SUSPENDED))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		}
-		else if (target && (target->nc->HasFlag(NI_SUSPENDED)))
+		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
 			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))
 			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
-		else if (u->nc && (target->nc == u->nc))
+		else if (na && target->nc == na->nc)
 			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
+		else if (na && na->nc != u->nc)
+			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 		else if (NSMaxAliases && (target->nc->aliases.count >= NSMaxAliases) && !target->nc->IsServicesOper())
 			notice_lang(s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, s_NickServ, s_NickServ);
 		else if (enc_check_password(pass, target->nc->pass) != 1)
@@ -93,8 +96,8 @@ class CommandNSGroup : public Command
 			/* If the nick is already registered, drop it.
 			 * If not, check that it is valid.
 			 */
-			if (findnick(u->nick))
-				delete findnick(u->nick);
+			if (na)
+				delete na;
 			else
 			{
 				int prefixlen = strlen(NSGuestNickPrefix);

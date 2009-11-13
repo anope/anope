@@ -2,145 +2,58 @@ How To Add IRCd Support
 -----------------------
 
 1) Files to Edit
-2) Modifing the Header File
-3) The Code
+2) The Code
+3) The IRCDVar struct
 4) Modes
 5) Functions / Events
 6) CAPAB/PROTOCTL 
+7) IRCDProto Class
 
 1) Files to Edit
 
-    When preparing to add support to Anope for your ircd, you need to edit
-    the following files. 
+    When preparing to add supprt to Anope for your IRCd, you need to edit
+    the following files
 
-    A) Make a copy of the .c and .h file of the IRCd that matches the ircd
-       that you are attempting to add support for best.
-    B) Make a backup copy of include/services.h, include/sysconf.h.in
-    C) Make a backup copy of Config and configure.in
+    A) Make a copy of the .cpp file of the IRCd that matches the IRCd that
+       you are attempting to add support for best.
+    B) Add your IRCd into the supported IRCds in example.conf
 
-    First step in this process is to rename the .c and .h file after the IRCd
-    that you are going to be adding support for. Its recommended that you come
-    up with a name that is clear and easy to understand.
+2) The Code
 
-    Now that you have the files that you will need to create your own ircd
-    support, starting with Config. This file is a shell script file; scroll
-    down until you find the list of ircs for the user to select. Indicate
-    the based ircd version which is supported such as a series 1.x or 2.2.x,
-    placing in the comment side an exact version that the support is for or
-    "experimental" if you are not the ircd developer. The next step is to
-    decide how the IRCd will be defined, following the existing examples edit
-    'IRCTYPE_DEF="IRC_RATBOX"' to be the descriptive define for your ircd. 
-
-    With the Config file ready to go, edit configure.in and find in there the
-    reference to --with-ircd. You should see the various other ircds, and
-    you will want to add yours in there using the same IRC_ name you came up
-    with above. Important in this step is to make sure that you set the
-    IRCDFILE to the name of the .c file you set in step 1. Once you have the
-    configure.in created you can remove the old configure and at the command
-    prompt type "autconf"; this will generate the new configure file.
-
-    Getting close to actually modify code. Open sysconf.h.in and add two
-    lines for your given ircd, which is similar to this:
-
-        /* "First IRCD type" */
-        #undef IRC_RATBOX
-
-    Open services.h and add a line with the rest of the ircd include files to
-    match the name of the .h file you set in step 1. 
-
-        #include "ratbox.h"
-
-    Taking the .c and .h file open them and replace the #ifdef IRC_* with the
-    IRC_ name you set in step two. Ensure that the code comments at the top
-    of the file match the ircd that the code will be for.
-
-    You are now ready to start getting into the code.
-
-2) Modifying the Header File
-
-    Now that you have gotten past the first part of the creation process, you
-    are into the code. This part is the harder and more complex part. You
-    will need a general understanding of C code to continue. Here are the
-    step by step instructions required to make this work.
-
-    Open the .h file and find the section of code with
-
-        #define PROTECT_SET_MODE "+"
-        #define PROTECT_UNSET_MODE "-"
-        #define CS_CMD_PROTECT "PROTECT"
-        #define CS_CMD_DEPROTECT "DEPROTECT"
-        #define FANT_PROTECT_ADD "!protect"
-        #define FANT_PROTECT_DEL "!deprotect"
-        #define LEVEL_PROTECT_WORD "AUTOPROTECT"
-        #define LEVELINFO_PROTECT_WORD "PROTECT"
-        #define LEVELINFO_PROTECTME_WORD "PROTECTME"
-
-    If the ircd supports a protective/admin (not owner) mode, set the
-    PROTECT_SET_MODE and PROTECT_UNSET_MODE to be that mode. On most ircds
-    it's usermode "a" so you will be setting it to "+a" and "-a". The next
-    two are based more on what this mode is called. When you message ChanServ
-    to get this mode, this is the command you will be using. After this are
-    the fantasy commands which can be used in channel to get these modes. The
-    next three relate to the ACCESS LEVEL list system. Again these are the
-    words to gain these levels in the ACCESS LEVEL system. If your ircd does
-    not have these functions, leave them at what ever value is currently set;
-    the core code will ignore the request of the user.
-
-    Now that this is set, you can define the MODES. All user modes are stored
-    with UMODE_ followed by a letter matching the modes case; be careful to
-    use the correct case as this will make it clear when you setup MODES in
-    the .c in a few. Use hex values for the modes so starting at 0x00000001
-    to 0x8000000. In most cases you want to list all modes. If you run out of
-    values look at removing any modes that do not impact services.
-
-    Channel modes are done much like user modes, with the exception that
-    bans, exceptions, invites, and modes that are applied to a user such as
-    op and voice are not defined here. All other modes are defined in here.
-    Again be clear and use the correct case and use hex values as done with
-    user modes.
-
-    Finally we come to DEFAULT_MLOCK; this is the mode that services will set
-    by default on channels when they are registered. In general you want this
-    to be what is acceptable by the ircd; in most cases this is "+nt"
-
-3) The Code
-
-    Here is where the code of the .c file comes in. Be prepared to spend at
+    Here is where the code of the .cpp file comes in. Be prepared to spend at
     least an hour, if not longer, going over the code and getting it right;
     Especially if you are setting up an ircd that is completely different
     than the one you used as a base. This section covers the majority of the
     code that is in use. 
 
-    The first bit of code you will face is:
+    The first bit of code you will face is the IRCDVar structure, which is
+    explained in depth in the next section.
 
-        const char version_protocol[] = "Ratbox IRCD";
+    Scroll down to the bottom and find the class for this module and rename it
+    to something reflecting your IRCd name. Find the function:
 
-    This the protocol name which will appear in various places; especially
+    pmodule_ircd_version("Unreal 3.2+");
+
+    This is the protocol name which will appear in various places; especially
     when you do -version at the command prompt, this is where you state the
     server name. The version is not always needed unless you are showing that
     the support is for one branch of a ircd family, such as Unreal 3.1 and
     Unreal 3.2.
-
-    Once you have decided on this little piece of code, you will come to
-    flood mode characters being used for setting and removing. If your IRCd
-    does not support flood modes, you can just use ""; we will be setting if
-    your IRCD supports flooding or not in a little bit.
-
-        const char flood_mode_char_set[] = "+f";
-        const char flood_mode_char_remove[] = "-f";
 
     The next task that you will face is setting whether the IRCD sends time
     stamps on modes but does not tell us that it will do so. If it does, set
     UseTSMODE to 1; if it does not set it to be 0. If you're not sure refer
     to your IRCd's documentation on how MODE is sent.
 
-        int UseTSMODE = 0;
+        pmodule_ircd_useTSMode(0);
+
+3) The IRCDVar struct
 
     Now you've come to the part where you setup your ircd. There are two
     structs which hold this information; This allows you to quickly setup
     your specific ircd.
 
-        IRCDVar ircd[] = { }
+        IRCDVar myIrcd[] = { };
 
     This struct contains your basic IRCd functions. Your base source file has
     the list of all available variables; note that you should not swap any
@@ -151,294 +64,136 @@ How To Add IRCd Support
              text about it's name and version. This is used to identify the
              build on startup.
 
-    2) NickServ Mode: This is the user mode set by Anope on NickServ.
-                      Normally you want this to be some form of oper flag,
-                      or a services flag. 
-
-    3) ChanServ Mode: This is the user mode set by Anope on ChanServ.
-                      Normally you want this to be some form of oper flag,
-                      or a services flag. 
-
-    4) MemoServ Mode: This is the user mode set by Anope on MemoServ.
-                      Normally you want this to be some form of oper flag,
-                      or a services flag. 
-
-    5) HostServ Mode: This is the user mode set by Anope on HostServ.
-                      Normally you want this to be some form of oper flag,
-                      or a services flag. Note that if your ircd does not
-                      support HostServ, you can safely make this NULL or +,
-                      as there is a check before bringing HostServ online.
-
-    6) OperServ Mode: This is the user mode set by Anope on OperServ.
-                      Normally you want this to be some form of oper flag,
-                      or a services flag. 
-
-    7) BotServ Mode: This is the user mode set by Anope on BotServ.
-                     Normally you want this to be some form of oper flag,
-                     or a services flag. 
-
-    8) HelpServ Mode: This is the user mode set by Anope on HelpServ.
-                      Normally you want this to be some form of oper flag,
-                      or a services flag. 
-
-    9) DevNull Mode: This is the user mode set by Anope on DevNull.
-                     Normally you want this to be some form of oper flag,
-                     or a services flag.
-
-    10) Global Mode: This is the user mode set by Anope on Global.
-                     Normally you want this to be some form of oper flag,
-                     or a services flag. 
-
-    11) NickServ Alias Mode: This is the user mode set by Anope on the alias
-                             of NickServ. Normally you want this to be some
-                             form of oper flag, or a services flag. 
-
-    12) ChanServ Alias Mode: This is the user mode set by Anope on the alias
-                             of ChanServ. Normally you want this to be some
-                             form of oper flag, or a services flag. 
-
-    13) MemoServ Alias Mode: This is the user mode set by Anope on the alias
-                             of MemoServ. Normally you want this to be some
-                             form of oper flag, or a services flag. 
-
-    14) HostServ Alias Mode: This is the user mode set by Anope on the alias
-                             of MemoServ. Normally you want this to be some
-                             form of oper flag, or a services flag. Note that
-                             if your ircd does not support HostServ, you can
-                             safely make this NULL or +, as there is a check
-                             before bringing HostServ online.
-
-    15) OperServ Alias Mode: This is the user mode set by Anope on the alias
-                             of OperServ. Normally you want this to be some
-                             form of oper flag, or a services flag. 
-
-    16) BotServ Alias Mode: This is the user mode set by Anope on the alias
-                            of BotServ. Normally you want this to be some
-                            form of oper flag, or a services flag. 
-
-    17) HelpServ Alias Mode: This is the user mode set by Anope on the alias
-                             of HelpServ. Normally you want this to be some
-                             form of oper flag, or a services flag. 
-
-    18) DevNull Alias Mode: This is the user mode set by Anope on the alias
-                            of DevNull. Normally you want this to be some
-                            form of oper flag, or a services flag. 
-
-    19) Global Alias Mode: This is the user mode set by Anope on the alias
-                           of Global. Normally you want this to be some form
-                           of oper flag, or a services flag. 
-
-    20) BotServ Bots Mode: This is the user mode set by Anope on all BotServ
+    2) Pseudo Client Mode: This is the user mode set by Anope on all BotServ
                            bots. Normally you want this to be a some form of
                            service or bot flag; you can use + for no mode at
                            all.
 
-    21) Max Channelmode Symbols: This is the total number of possible channel
+    3) Max Channelmode Symbols: This is the total number of possible channel
                                  modes that can appear before a nick. Do
                                  remember to count each possible mode, so +ov
                                  is 2.
 
-    22) Modes to Remove: This is every mode that Anope should remove when
-                         stripping channel modes.
-
-    23) Channelmode for bots: When a BotServ bot joins a channel, this is the
+    4) Channelmode for bots: When a BotServ bot joins a channel, this is the
                               mode set on them. Normally you will want them
                               opped (+o), and protected (+a) on IRCd's that
                               support it.
 
-    24) SVSNICK: Can the ircd use SVSNICK to change some ones nick? Otherwise,
+    5) SVSNICK: Can the ircd use SVSNICK to change some ones nick? Otherwise,
                  KILL is used. Use 1 for yes, 0 for no.
 
-    25) VHOST: Can a user's host be changed on the fly? Enabling this allow
+    6) VHOST: Can a user's host be changed on the fly? Enabling this allow
                HostServ online. Use 1 for yes, 0 for no.
 
-    26) OWNER: Has a channel umode for being the channel owner. For example,
-               UnrealIRCd has mode +q. Use 1 for yes, 0 for no.
-
-    27) OWNER MODE SET: What mode to set to make someone the owner. If the
-                        IRCd doesn't support owners, set this to NULL.
-
-    28) OWNER MODE UNSET: What mode to unset to take away someone's channel
-                          owner status. If the IRCd doesn't support owners,
-                          set this to NULL.
-
-    29) ADMIN MODE SET: What mode to set to make someone a channel admin.
-                        If the IRCd dosn't support admins, set to NULL.
-
-    30) ADMIN MODE UNSET: What mode to unset to take away channel admin.
-                          If the IRCd dosn't support admins, set to NULL.
-
-    31) Mode on Nick Register: What mode to give users when they register
-                               with NickServ. If your ircd doesn't set expect
-                               a mode to be set on registration, you should
-                               set this to NULL.
-
-    32) Mode on Nick Unregister: What mode to set give users when they cancel
+    7) Mode on Nick Unregister: What mode to set give users when they cancel
                                  their registration with NickServ. If your
                                  IRCd doesn't set a mode for registered users
                                  you should set this to NULL.
 
-    33) Mode on Nick Change: What mode to give users when they change their
-                             nick. If your ircd doesn't set a mode, you
-                             should set this to NULL.
-
-    34) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
+    8) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
                 0 for no.
 
-    35) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
+    9) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
 
-    36) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
+    10) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
 
-    37) HALFOP: Is channel mode +h for halfop supported by the IRCd? Use 1 for
-                yes, 0 for no.
-
-    38) Number of Server Args: When an IRCd connects, this is the number of
+    11) Number of Server Args: When an IRCd connects, this is the number of
                                parameters that are passed.
 
-    39) Join to Set: Services must join a channel to set any modes on that
+    12) Join to Set: Services must join a channel to set any modes on that
                      channel. Use 1 for yes, 0 for no.
 
-    40) Join to Message: Services must join a channel to send any message to
+    13) Join to Message: Services must join a channel to send any message to
                          that channel (cannot override +n). Use 1 for yes,
                          0 for no.
 
-    41) Exceptions: Support for channel exceptions (mode +e). Use 1 for yes,
-                    0 for no.
-
-    42) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
+    14) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
                           set forward by +1. Use 1 for yes, 0 for no.
 
-    43) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
+    15) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
                            like their topic TS set back by -1. Use 1 for yes,
                            0 for no.
 
-    44) Protected Umode: UMODE_ define that defines the protected usermod.
-                         Use 0 for no support, or enter the UMODE_ define.
-
-    45) Admin: Support for channel admins (Mainly used by UltimateIRCd). Use
-               1 for yes, 0 for no.
-
-    46) SQline Channels: The IRCd's supports banning channel names via
+    16) SQline Channels: The IRCd's supports banning channel names via
                          SQLINES. Use 1 for yes, 0 for no.
 
-    47) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
+    17) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
                       QUIT message for that user? Use 1 for yes, 0 for no.
 
-    48) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
+    18) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
                     1 for yes, 0 for no.
 
-    49) Protect: Support for channel protect (mode +a, mainly being used by
-                 UnrealIRCd and ViagraIRCd). Use 1 for yes, 0 for no.
-
-    50) Reverse: We can do a reverse check when unbanning. For use with 
+    19) Reverse: We can do a reverse check when unbanning. For use with 
                  DreamForge based IRCd's. Use 1 for yes, 0 for no.
 
-    51) Register Channels: Supports sending a channelmode for registered
-                           channels. Use 1 for yes, 0 for no.
-
-    52) Registered Mode: Channelmode to set on registered channels, see the
-                         option above. Use 1 for yes, 0 for no.
-
-    53) vIdent: Support for including a user's ident in their vHost. Use
+    20) vIdent: Support for including a user's ident in their vHost. Use
                 1 for yes, 0 for no.
 
-    54) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
+    21) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
                  a nick enforcer client. Use 1 for yes, 0 for no.
 
-    55) TS on MODE: We need to send a timestamp when modes are being changed.
+    22) TS on MODE: We need to send a timestamp when modes are being changed.
                     Use 1 for yes, 0 for no.
 
-    56) NICKIP: The IP address of new users is being sent along with their
+    23) NICKIP: The IP address of new users is being sent along with their
                 hostname when new users are being introduced on the network.
                 Use 1 for yes, 0 for no.
 
-    57) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
-               0 for no.
-
-    58) O:LINE: We can use OperServ to give some user a temporary O:LINE.
+    24) OMODE: We can use OperServ to give some user a temporary O:LINE.
                 Use 1 for yes, 0 for no.
 
-    59) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
+    25) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
+               0 for no.
+
+    26) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
                        0 for no.
 
-    60) Change Realname: Change real name. Use 1 for yes, 0 for no.
+    27) Change Realname: Change real name. Use 1 for yes, 0 for no.
 
-    61) Extra Help: If the IRCd has more help for functions in ChanServ than
-                    the default help, you should put the language string
-                    identifier here. Use 0 for no extra help.
+    28) Default MLock: Default channelmodes for MLOCK. This is really set later,
+        use 0 for now
 
-    62) No Knock: CMODE_ that defines NO KNOCK. Use 0 for no support.
-
-    63) Admin Only: CMODE_ that defines Admin Only. Use 0 for no support.
-
-    64) Default MLock: Default channelmodes for MLOCK. Use 0 for no modes.
-
-    65) Vhost Umode: UMODE_ that indicates if the user currently has a vHost.
-                     Use 0 for no support.
-
-    66) Flood Mode: The IRCd has a channelmode for blocking floods. Use 1 for
-                    yes, 0 for no.
-
-    67) Link Mode: The IRCd has a channelmode for linking a channel to some
-                   other channel. Use 1 for yes, 0 for no.
-
-    68) CMode F: CMODE_ that defines flood mode. Use 0 for no support.
-
-    69) CMode L: CMODE_ that defines link mode. Use 0 for no support.
-
-    70) Check Nick ID: Should we check if a user should remain identified when
+    29) Check Nick ID: Should we check if a user should remain identified when
                        changing their nick? This is for IRCd's that remove
                        their registered-user mode when someone changes their
                        nick (like Bahamut does).
                        Use 1 for yes, 0 for no.
 
-    71) No Knock Requires +i: Does the No Knock channel mode require invite
+    30) No Knock Requires +i: Does the No Knock channel mode require invite
                               only channels? Use 1 for yes, 0 for no.
-
-    72) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
+    
+    31) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
                     NULL by default.
 
-    73) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
+    32) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
                 0 for no.
 
-    74) Token Case Senstive: Are the IRCd's TOKENS/COMMANDS case sensitive?
-                             Use 1 for yes, 0 for no.
-
-    75) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
+    33) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
                          1 for yes, 0 for no.
 
-    76) Supports +I: Does the IRCd support channelmode +I? Use 1 for yes,
-                     0 for no.
+    34) SJOIN Ban Char: Character used to identify bans. Use ''.
 
-    77) SJOIN Ban Char: Character used to identify bans. Use ''.
+    35) SJOIN Except Char: Character used to identify exceptions. Use ''.
+    
+    36) SJOIN Invite char: Character used to idenfity invexs. Use ''.
 
-    78) SJOIN Except Char: Character used to identify exceptions. use ''.
-
-    79) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
+    37) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    80) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
+    38) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
-    81) Vhost Character: The character used to represent the vHost mode, if
+    39) Vhost Character: The character used to represent the vHost mode, if
                          this is supported by the IRCd.
 
-    82) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
+    40) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
 
-    83) UMode +h: Does the IRCd support usermode +h for helpers?
-                  Use 1 for yes, 0 for no.
+    41) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
 
-    84) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
-
-    85) Character Set: Unreal passes the character set during PROTOCTL,
+    42) Character Set: Unreal passes the character set during PROTOCTL,
                        the value is stored here. Set this NULL to start.
 
-    86) Reports sync: Does the IRCd report when it's in sync (or done bursting,
-                      depending on how you want to say it)? Remember to set
-                      the sync state for servers correctly if it does.
-                      Use 1 for yes, 0 for no.
-
-    87) Channel CIDR: Set to 1 if channel bans, excepts and invites
+    43) Channel CIDR: Set to 1 if channel bans, excepts and invites
                       support CIDR masks. Expected syntax: *!*@ip/mask.
                       When set to 1, anope will only parse strict CIDR masks.
                       IRCd's that try to correct invalid CIDR's (like nefarious)
@@ -446,80 +201,99 @@ How To Add IRCd Support
                       Contact the anope Dev Team if this is the case.
                       Set to 0 if CIDR's are not supported by your IRCd.
 
+    44) Global TLD Prefix: Prefix used to send global messages, should probably
+                           be "$"
+
+    45) Delayed AUTH: Does the ircd send if a user is identified for their nick
+                      AFTER the initial NICK/UID? Set this to 0 for no.
+
     So we've had this long list. Now there's a second struct to fill. This
     struct isn't as long as the previous one though, so we'll handle it quite
     quick compared to the previous one.
 
-        IRCDCAPAB ircdcap[] = { }
+        IRCDCAPAB myIrcdcap[] = { };
 
     This struct is based on the CAPAB defines. You should review the CAPAB
     table below to see how this should be done.
 
         Define Table
     --------------------------------------------------------------------------
-    Define          | Value      | Token     | Description
+    Define          |  Token     | Description
     ----------------|------------|-----------|--------------------------------
-    CAPAB_NOQUIT    | 0x00000001 | NOQUIT    | NOQUIT protocol support
-    CAPAB_TSMODE    | 0x00000002 | TS        | Chanmodes are timestamped
-    CAPAB_UNCONNECT | 0x00000004 | UNCONNECT | UNCONNECT protocol support
-    CAPAB_NICKIP    | 0x00000008 | NICKIP    | IP sent in the NICK line
-    CAPAB_NSJOIN    | 0x00000010 | SSJOIN    | Smart SJOIN support
-    CAPAB_ZIP       | 0x00000020 | ZIP       | Support for gzipped links
-    CAPAB_BURST     | 0x00000040 | BURST     | Supports BURST command
-    CAPAB_TS3       | 0x00000080 | TS3       | Support for TS3 protocol
-    CAPAB_TS5       | 0x00000100 | TS5       | Support for TS5 protocol
-    CAPAB_DKEY      | 0x00000200 | DKEY      | DH-Key exchange using DKEY
-    CAPAB_DOZIP     | 0x00000400 | ZIP       | Link traffic will be gzipped
-    CAPAB_DODKEY    | 0x00000800 | DKEY      | Do DKEY with this link
-    CAPAB_QS        | 0x00001000 | QS        | Supports quit storm removal
-    CAPAB_SCS       | 0x00002000 | SCS       | String Cache System support
-    CAPAB_PT4       | 0x00004000 | PT4       | Support for PT4 protocol
-    CAPAB_UID       | 0x00008000 | UID       | Support for UIDs
-    CAPAB_KNOCK     | 0x00010000 | KNOCK     | Supports KNOCK
-    CAPAB_CLIENT    | 0x00020000 | CLIENT    | Supports CLIENT
-    CAPAB_IPV6      | 0x00040000 | IPV6      | Support for IPv6 addresses
-    CAPAB_SSJ5      | 0x00080000 | SSJ5      | Smart Join protocol 5 support
-    CAPAB_SN2       | 0x00100000 | SN2       | Support for SN2 protocol
-    CAPAB_VHOST     | 0x00200000 | VHOST     | Supports VHOST protocol
-    CAPAB_TOKEN     | 0x00400000 | TOKEN     | Supports s2s tokens
-    CAPAB_SSJ3      | 0x00800000 | SSJ3      | Smart Join protocol 3 support
-    CAPAB_NICK2     | 0x01000000 | NICK2     | Support for extended NICK (v2)
-    CAPAB_UMODE2    | 0x02000000 | UMODE2    | Supports UMODE2 command
-    CAPAB_VL        | 0x04000000 | VL        | VLine information in info field
-    CAPAB_TLKEXT    | 0x08000000 | TLKEXT    | Not 8, but 10 params in TKL's
-    CAPAB_CHANMODE  | 0x10000000 | CHANMODE  | Channel modes are passed here
-    CAPAB_SJB64     | 0x20000000 | SJB64     | SJOIN timestamps are base64 encoded
-    CAPAB_NICKCHARS | 0x40000000 | NICKCHARS | Character set used by the IRCD for nicks
+    CAPAB_NOQUIT    |  NOQUIT    | NOQUIT protocol support
+    CAPAB_TSMODE    |  TS        | Chanmodes are timestamped
+    CAPAB_UNCONNECT |  UNCONNECT | UNCONNECT protocol support
+    CAPAB_NICKIP    |  NICKIP    | IP sent in the NICK line
+    CAPAB_NSJOIN    |  SSJOIN    | Smart SJOIN support
+    CAPAB_ZIP       |  ZIP       | Support for gzipped links
+    CAPAB_BURST     |  BURST     | Supports BURST command
+    CAPAB_TS3       |  TS3       | Support for TS3 protocol
+    CAPAB_TS5       |  TS5       | Support for TS5 protocol
+    CAPAB_DKEY      |  DKEY      | DH-Key exchange using DKEY
+    CAPAB_DOZIP     |  ZIP       | Link traffic will be gzipped
+    CAPAB_DODKEY    |  DKEY      | Do DKEY with this link
+    CAPAB_QS        |  QS        | Supports quit storm removal
+    CAPAB_SCS       |  SCS       | String Cache System support
+    CAPAB_PT4       |  PT4       | Support for PT4 protocol
+    CAPAB_UID       |  UID       | Support for UIDs
+    CAPAB_KNOCK     |  KNOCK     | Supports KNOCK
+    CAPAB_CLIENT    |  CLIENT    | Supports CLIENT
+    CAPAB_IPV6      |  IPV6      | Support for IPv6 addresses
+    CAPAB_SSJ5      |  SSJ5      | Smart Join protocol 5 support
+    CAPAB_SN2       |  SN2       | Support for SN2 protocol
+    CAPAB_VHOST     |  VHOST     | Supports VHOST protocol
+    CAPAB_TOKEN     |  TOKEN     | Supports s2s tokens
+    CAPAB_SSJ3      |  SSJ3      | Smart Join protocol 3 support
+    CAPAB_NICK2     |  NICK2     | Support for extended NICK (v2)
+    CAPAB_UMODE2    |  UMODE2    | Supports UMODE2 command
+    CAPAB_VL        |  VL        | VLine information in info field
+    CAPAB_TLKEXT    |  TLKEXT    | Not 8, but 10 params in TKL's
+    CAPAB_CHANMODE  |  CHANMODE  | Channel modes are passed here
+    CAPAB_SJB64     |  SJB64     | SJOIN timestamps are base64 encoded
+    CAPAB_NICKCHARS |  NICKCHARS | Character set used by the IRCD for nicks
 
 
 4) Modes 
 
-    The next thing you should do is defining the user modes. You will want to
-    have your .h file handy for this part.
+   Anope is told about modes in the moduleAddModes() function.
+   For the most part, the syntax for adding channel and user modes are:
+   
+   ModeManager::AddUserMode('N', new UserMode(UMODE_NETADMIN));
+   Where 'N' is the char for the mode, and UMODE_NETADMIN shows what the
+   mode does. Or:
 
-        unsigned long umodes[128] = { }
+   ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+   Where 'c' is the char for the mode and CMODE_BLOCKCOLOR shows what
+   the mode does
 
-    This array goes from 0 to 127 in the ASCII character set. Insert the user
-    modes at the slot where the mode fits. If you are adding a the user mode
-    of +i find the 105th (ASCII code of 'i') character slot in the array, and
-    place the UMODE_i into this slot. Your base .c file should contain a good
-    start for this, as well as a little help locating the characters.
+   A full list of valid mode names for the second param can be found
+   in services.h in the enum for ChannelModeName and UserModeName
+   If necessary, you can add additional modes to this list.
 
-	The following mode set is for the channel symbols. During a SJOIN event 
-    the modes are sent usually before the nick. These normally are @, +, %
-    etc.. depending on the ircd. Starting at ASCII 0 and running to 127. 
-    Replace the 0 with the character (o = @, h = %) for the given mode. In the
-    case of halfop which is usually sent as % replace the 37th character with
-    'h', do this until all modes that are possible be received in this manor 
-    have been inserted into the array.
+   Adding simple modes with parameters is similar, instead adding a
+   'new ChannelMode', use 'new ChannelModeParam', set the second optional
+   arg of ChannelModeParam to false if the param should NOT be sent when unsetting
+   it. Eg:
 
-	Now that you have that complete, the following array is ready to be dealt
-    with. This is the cmmodes array, like the others it is a ASCII array
-	starting at 0 and going to 127. However at the given letter you will want
-    to enter the add, and delete function for the given mode. In the case of
-    bans (+b) there is add_ban, and del_ban. Anope provides functions for 
-    bans, exceptions and invites, should your ircd have more then these please
-    contact Anope to discuss what can be done to add this mode.
+   ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD, true));
+
+   Anope will internally track the params, and they can be retrieved through
+   Channel::GetParam();
+
+   If you want to make param validity checking for a mode, you must create a new
+   class which inherits from ChannelModeParam and overload the IsValid function.
+   Modes CMODE_OPERONLY, CMODE_ADMINONLY, and CMODE_REGISTERED already exist
+   internally as classes, to overload the CanSet function to disable non opers
+   from mlocking (or in CMODE_REGISTERED's case, anyone) from setting them.
+   This should be added like:
+
+   ModeManager::AddChannelMode('O', new ChannelModeOper());
+
+   The CMODE_FLOOD param also has its own class, but due to the wide range of
+   valid parameters accepted across IRCds, your protocol module MUST have the
+   IsValid function for this.
+
+   bool ChannelModeFlood::IsValid(const char *value) { }
 
 5) Functions and Events
 
@@ -599,3 +373,21 @@ How To Add IRCd Support
 
            This function should call the capab_parse function which parses
            the received CAPAB/PROTOCTL line.
+
+7) IRCDProto Class
+
+    The IRCDProto class is set up like:
+
+    class MyIRCdProto : public IRCDProto { } ircdproto;
+
+    And told to Anope through the
+
+    pmodule_ircd_proto(&ircd_proto);
+
+    function.
+
+    This is used for sending out specific messages from Anope to your IRCd.
+    A list of all of the valid function names to overload and their args
+    are in services.h. If the protocol module you are editing is similar enough
+    to the IRCd you are adding support for, many of these probably won't need to
+    be changed.

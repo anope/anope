@@ -324,7 +324,12 @@ class CommandCSAccess : public Command
 
 				/* We don't know the nick if someone used numbers, so we trigger the event without
 				 * nick param. We just do this once, even if someone enters a range. -Certus */
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, (na->nick ? na->nick : NULL)));
+				/* Only call this event if na exists (if they deleted by user, not numlist).
+				 * The callback for deleting by numlist will call this event otherwise - Adam */
+				if (na)
+				{
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nick));
+				}
 			}
 		}
 		else if (cmd == "LIST")

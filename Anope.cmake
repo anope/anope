@@ -379,10 +379,7 @@ macro(calculate_depends SRC)
   foreach(INCLUDE ${INCLUDES})
     # Extract the filename from the #include line
     extract_include_filename(${INCLUDE} FILENAME QUOTE_TYPE)
-    if(QUOTE_TYPE STREQUAL "quotes")
-      # Append the filename to the list of headers
-      append_to_list(HEADERS ${FILENAME})
-    else(QUOTE_TYPE STREQUAL "quotes")
+    if(QUOTE_TYPE STREQUAL "angle brackets")
       # The following checks will only be done if there was a request for angle includes to be checked
       if(CHECK_ANGLE_INCLUDES)
         # Find the path of the include file
@@ -404,36 +401,8 @@ macro(calculate_depends SRC)
           message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
         endif(FOUND_${FILENAME}_INCLUDE)
       endif(CHECK_ANGLE_INCLUDES)
-    endif(QUOTE_TYPE STREQUAL "quotes")
+    endif(QUOTE_TYPE STREQUAL "angle brackets")
   endforeach(INCLUDE)
-  # Set the list of new headers to empty (this will store all the headers that the above list depends on)
-  set(NEW_HEADERS)
-  # Iterate through the list of headers
-  foreach(HEADER ${HEADERS})
-    # If the current header has it's own headers to depend on, append those to the list of new headers
-    if(${HEADER}_HEADERS)
-      append_to_list(NEW_HEADERS ${${HEADER}_HEADERS})
-    endif(${HEADER}_HEADERS)
-  endforeach(HEADER)
-  # If there were new headers, append them to the list of headers
-  if(NEW_HEADERS)
-    append_to_list(HEADERS ${NEW_HEADERS})
-  endif(NEW_HEADERS)
-  # If after all the above there is a list of header, we'll process them, converting them to full paths
-  if(HEADERS)
-    # Remove duplicate headers from the list and sort the list
-    remove_list_duplicates(HEADERS)
-    sort_list(HEADERS)
-    # Set the list of full path headers to empty
-    set(HEADERS_FULL)
-    # Iterate through the list of headers
-    foreach(HEADER ${HEADERS})
-      # Append the full path of the header to the full path headers list
-      append_to_list(HEADERS_FULL ${${HEADER}_FULLPATH})
-    endforeach(HEADER)
-    # Set the given source file to depend on the headers given
-    set_source_files_properties(${SRC} PROPERTIES OBJECT_DEPENDS "${HEADERS_FULL}")
-  endif(HEADERS)
 endmacro(calculate_depends)
 
 ###############################################################################

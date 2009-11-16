@@ -232,7 +232,8 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 	else if (v.GetBuild() == VERSION_BUILD)
 	{
-		alog("Module %s compiled against current version of Anope %d", modname.c_str(), v.GetBuild());
+		if (debug)
+			alog("Module %s compiled against current version of Anope %d", modname.c_str(), v.GetBuild());
 	}
 
 

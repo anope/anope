@@ -42,7 +42,6 @@ Run_Build_System () {
 	WITH_PERM=""
 	BUILD_TYPE=""
 	RUN_CC_PL=""
-	EXTRA_ARGS=""
 	GEN_TYPE=""
 
 	if [ "$INSTDIR" != "" ] ; then
@@ -114,9 +113,9 @@ Run_Build_System () {
 			REAL_SOURCE_DIR="$SOURCE_DIR"
 		fi
 
-		echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_ARGS $REAL_SOURCE_DIR"
+		echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
-		cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_ARGS $REAL_SOURCE_DIR
+		cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 
 		echo ""
 		if [ "$SOURCE_DIR" = "." ] ; then
@@ -126,9 +125,9 @@ Run_Build_System () {
 			echo "Now run make to build Anope."
 		fi
 	else
-		echo "./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_ARGS $RUN_CC_PL"
+		echo "./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_CONFIG_ARGS $RUN_CC_PL"
 
-		./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_ARGS $RUN_CC_PL
+		./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_CONFIG_ARGS $RUN_CC_PL
 	fi
 }
 
@@ -393,7 +392,9 @@ echo "(You may only need to do this if $BUILD_SYSTEM is unable to locate"
 echo "missing dependencies without hints)"
 echo2 "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-EXTRA_CONFIG_ARGS=$INPUT
+if [ "$INPUT" ] ; then
+  EXTRA_CONFIG_ARGS=$INPUT
+fi
 echo ""
 
 ####

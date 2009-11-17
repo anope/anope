@@ -62,7 +62,7 @@ Channel::Channel(const std::string &name, time_t ts)
 
 	if (serv_uplink && is_sync(serv_uplink) && (!(this->topic_sync)))
 		restore_topic(name.c_str());
-	
+
 	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
 }
 
@@ -76,7 +76,7 @@ Channel::~Channel()
 
 	if (debug)
 		alog("debug: Deleting channel %s", this->name);
-	
+
 	for (bd = this->bd; bd; bd = next)
 	{
 		if (bd->mask)
@@ -130,7 +130,7 @@ Channel::~Channel()
  */
 bool Channel::HasMode(ChannelModeName Name)
 {
-	return modes[(size_t)Name];
+	return modes[Name];
 }
 
 /**
@@ -139,7 +139,7 @@ bool Channel::HasMode(ChannelModeName Name)
  */
 void Channel::SetMode(ChannelModeName Name)
 {
-	modes[(size_t)Name] = true;
+	modes[Name] = true;
 
 	/* Channel mode +P or so was set, mark this channel as persistant */
 	if (Name == CMODE_PERM && ci)
@@ -170,7 +170,7 @@ void Channel::SetMode(char Mode)
  */
 void Channel::RemoveMode(ChannelModeName Name)
 {
-	modes[(size_t)Name] = false;
+	modes[Name] = false;
 
 	if (Name == CMODE_PERM && ci)
 	{
@@ -271,7 +271,7 @@ void Channel::ClearModes(char *client)
 
 	for (size_t n = CMODE_BEGIN + 1; n != CMODE_END; ++n)
 	{
-		cm = ModeManager::FindChannelModeByName((ChannelModeName)n);
+		cm = ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(n));
 
 		if (cm && this->HasMode(cm->Name))
 		{

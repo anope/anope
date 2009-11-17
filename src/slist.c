@@ -131,7 +131,7 @@ int slist_delete_range(SList * slist, const char *crange, slist_delcheckcb_t cb,
 {
 	int count = 0, i, n1, n2;
 	va_list args, preserve;
-	char *range = (char *)crange;
+	char *range = const_cast<char *>(crange); // XXX: unsafe cast
 
 	va_start(args, cb);
 
@@ -205,7 +205,7 @@ int slist_enum(SList * slist, const char *crange, slist_enumcb_t cb, ...)
 {
 	int count = 0, i, res;
 	va_list args, preserve;
-	char *range = (char *)crange;
+	char *range = const_cast<char *>(crange); // XXX: unsafe cast
 
 	va_start(args, cb);
 

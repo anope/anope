@@ -51,7 +51,7 @@ bool SetDefConParam(ChannelModeName Name, std::string &buf)
 bool GetDefConParam(ChannelModeName Name, std::string *buf)
 {
 	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
-	
+
 	buf->clear();
 
 	if (it != DefConModesOnParams.end())
@@ -1203,7 +1203,7 @@ static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 bool CheckDefCon(DefconLevel Level)
 {
 	if (DefConLevel)
-		return DefCon[DefConLevel][(size_t)Level];
+		return DefCon[DefConLevel][Level];
 	return false;
 }
 
@@ -1214,7 +1214,7 @@ bool CheckDefCon(DefconLevel Level)
  */
 bool CheckDefCon(int level, DefconLevel Level)
 {
-	return DefCon[level][(size_t)Level];
+	return DefCon[level][Level];
 }
 
 /** Add a defcon level option to a defcon level
@@ -1223,7 +1223,7 @@ bool CheckDefCon(int level, DefconLevel Level)
  */
 void AddDefCon(int level, DefconLevel Level)
 {
-	DefCon[level][(size_t)Level] = true;
+	DefCon[level][Level] = true;
 }
 
 /** Remove a defcon level option from a defcon level
@@ -1232,6 +1232,6 @@ void AddDefCon(int level, DefconLevel Level)
  */
 void DelDefCon(int level, DefconLevel Level)
 {
-	DefCon[level][(size_t)Level] = false;
+	DefCon[level][Level] = false;
 }
 

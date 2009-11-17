@@ -1108,9 +1108,9 @@ class ProtoInspIRCd : public Module
 
 		moduleAddModes();
 
-		ircd->DefMLock[(size_t)CMODE_NOEXTERNAL] = true;
-		ircd->DefMLock[(size_t)CMODE_TOPIC] = true;
-		ircd->DefMLock[(size_t)CMODE_REGISTERED] = true;
+		ircd->DefMLock[CMODE_NOEXTERNAL] = true;
+		ircd->DefMLock[CMODE_TOPIC] = true;
+		ircd->DefMLock[CMODE_REGISTERED] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

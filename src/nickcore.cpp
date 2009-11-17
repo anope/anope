@@ -25,8 +25,8 @@ NickCore::NickCore(const std::string &coredisplay)
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
-		if (NSDefFlags.HasFlag((NickCoreFlag)t))
-			SetFlag((NickCoreFlag)t);
+		if (NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
+			SetFlag(static_cast<NickCoreFlag>(t));
 }
 
 /** Default destructor

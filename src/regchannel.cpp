@@ -40,18 +40,18 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	/* If ircd doesn't exist, this is from DB load and mlock is set later */
 	if (ircd)
 		mlock_on = ircd->DefMLock;
-	
+
 	size_t t;
 	/* Set default channel flags */
 	for (t = CI_BEGIN + 1; t != CI_END - 1; ++t)
-		if (CSDefFlags.HasFlag((ChannelInfoFlag)t))
-			this->SetFlag((ChannelInfoFlag)t);
+		if (CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
+			this->SetFlag(static_cast<ChannelInfoFlag>(t));
 
 	/* Set default bot flags */
 	for (t = BI_BEGIN + 1; t != BI_END; ++t)
-		if (BSDefFlags.HasFlag((BotServFlag)t))
-			this->botflags.SetFlag((BotServFlag)t);
-	
+		if (BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
+			this->botflags.SetFlag(static_cast<BotServFlag>(t));
+
 	bantype = CSDefBantype;
 	memos.memomax = MSMaxMemos;
 	last_used = time_registered = time(NULL);
@@ -59,7 +59,7 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	this->ttb = new int16[2 * TTB_SIZE];
 	for (int i = 0; i < TTB_SIZE; i++)
 		this->ttb[i] = 0;
-	
+
 	reset_levels(this);
 	alpha_insert_chan(this);
 }
@@ -174,7 +174,7 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index)
  * @param level Optional channel access level to compare the access entries to
  * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
  *
- * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a 
+ * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a
 certain level.
  */
 
@@ -286,7 +286,7 @@ AutoKick *ChannelInfo::GetAkick(unsigned index)
 {
 	if (akick.empty() || index >= akick.size())
 		return NULL;
-	
+
 	return akick[index];
 }
 
@@ -332,7 +332,7 @@ BadWord *ChannelInfo::AddBadWord(const std::string &word, BadWordType type)
 	BadWord *bw = new BadWord;
 	bw->word = word;
 	bw->type = type;
-	
+
 	badwords.push_back(bw);
 	return bw;
 }
@@ -345,7 +345,7 @@ BadWord *ChannelInfo::GetBadWord(unsigned index)
 {
 	if (badwords.empty() || index >= badwords.size())
 		return NULL;
-	
+
 	return badwords[index];
 }
 
@@ -389,9 +389,9 @@ void ChannelInfo::ClearBadWords()
 const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
 {
 	if (status)
-		return mlock_on[(size_t)Name];
+		return mlock_on[Name];
 	else
-		return mlock_off[(size_t)Name];
+		return mlock_off[Name];
 }
 
 /** Set a mlock
@@ -400,7 +400,7 @@ const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
  */
 void ChannelInfo::SetMLock(ChannelModeName Name, bool status)
 {
-	size_t value = (size_t)Name;
+	size_t value = Name;
 
 	if (status)
 		mlock_on[value] = true;
@@ -414,7 +414,7 @@ void ChannelInfo::SetMLock(ChannelModeName Name, bool status)
  */
 void ChannelInfo::RemoveMLock(ChannelModeName Name, bool status)
 {
-	size_t value = (size_t)Name;
+	size_t value = Name;
 
 	if (status)
 		mlock_on[value] = false;

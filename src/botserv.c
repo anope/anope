@@ -348,7 +348,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 					if (BSGentleBWReason)
 						bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
 					else
-						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word);
+						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word.c_str());
 
 					/* free the normalized buffer before return (#850) */
 					delete [] nbuf;

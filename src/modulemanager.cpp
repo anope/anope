@@ -346,13 +346,13 @@ void ModuleManager::Attach(Implementation* i, Module* mod, size_t sz)
 void ModuleManager::DetachAll(Module* mod)
 {
 	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
-		Detach((Implementation)n, mod);
+		Detach(static_cast<Implementation>(n), mod);
 }
 
 bool ModuleManager::SetPriority(Module* mod, Priority s)
 {
 	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
-		SetPriority(mod, (Implementation)n, s);
+		SetPriority(mod, static_cast<Implementation>(n), s);
 
 	return true;
 }

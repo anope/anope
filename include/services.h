@@ -421,19 +421,18 @@ class CoreExport Extensible
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
  */
-template <class T>
-class CoreExport Flags
+template<typename T> class CoreExport Flags
 {
  protected:
- 	std::bitset<128> Flag_Values;
+	std::bitset<128> Flag_Values;
 
  public:
- 	/** Add a flag to this item
+	/** Add a flag to this item
 	 * @param Value The flag
 	 */
 	void SetFlag(T Value)
 	{
-		Flag_Values[(size_t)Value] = true;
+		Flag_Values[Value] = true;
 	}
 
 	/** Remove a flag from this item
@@ -441,22 +440,22 @@ class CoreExport Flags
 	 */
 	void UnsetFlag(T Value)
 	{
-		Flag_Values[(size_t)Value] = false;
+		Flag_Values[Value] = false;
 	}
 
 	/** Check if this item has a flag
 	 * @param Value The flag
 	 * @return true or false
 	 */
-	const bool HasFlag(T Value) const
+	bool HasFlag(T Value) const
 	{
-		return Flag_Values[(size_t)Value];
+		return Flag_Values[Value];
 	}
 
 	/** Check how many flags are set
 	 * @return The number of flags set
 	 */
-	const size_t FlagCount() const
+	size_t FlagCount() const
 	{
 		return Flag_Values.count();
 	}
@@ -1838,7 +1837,7 @@ class NickServRelease : public Timer
 	 * @param delay The delay before the nick is released
 	 */
 	NickServRelease(NickAlias *nickalias, time_t delay);
-	
+
 	/** Default destructor
 	 */
 	~NickServRelease();

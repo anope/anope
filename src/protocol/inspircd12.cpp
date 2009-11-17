@@ -150,7 +150,7 @@ int anope_event_idle(const char *source, int ac, const char **av)
 	if (!bi)
 		return MOD_CONT;
 
-	send_cmd(bi->uid, "IDLE %s %ld %ld", source, start_time, time(NULL) - bi->lastmsg);
+	send_cmd(bi->uid, "IDLE %s %ld %ld", source, static_cast<long>(start_time), static_cast<long>(time(NULL) - bi->lastmsg));
 	return MOD_CONT;
 }
 
@@ -1296,9 +1296,9 @@ class ProtoInspIRCd : public Module
 
 		moduleAddModes();
 
-		ircd->DefMLock[(size_t)CMODE_NOEXTERNAL] = true;
-		ircd->DefMLock[(size_t)CMODE_TOPIC] = true;
-		ircd->DefMLock[(size_t)CMODE_REGISTERED] = true;
+		ircd->DefMLock[CMODE_NOEXTERNAL] = true;
+		ircd->DefMLock[CMODE_TOPIC] = true;
+		ircd->DefMLock[CMODE_REGISTERED] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

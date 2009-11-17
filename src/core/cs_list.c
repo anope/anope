@@ -36,9 +36,7 @@ public:
 		int count = 0, from = 0, to = 0, tofree = 0;
 		char *tmp = NULL;
 		char *s = NULL;
-		bool forbidden, suspended, channoexpire;
-
-		forbidden = suspended = noexpire = false;
+		bool forbidden = false, suspended = false, channoexpire = false;
 
 		if (!(!CSListOpersOnly || (is_oper(u))))
 		{

@@ -176,7 +176,7 @@ class CommandOSAKill : public Command
 		}
 		else
 		{
-			if ((res = slist_indexof(&akills, (void *)mask)) == -1)
+			if ((res = slist_indexof(&akills, const_cast<void *>(static_cast<const void *>(mask)))) == -1) // XXX: possibly unsafe cast
 			{
 				notice_lang(s_OperServ, u, OPER_AKILL_NOT_FOUND, mask);
 				return MOD_CONT;

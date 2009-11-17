@@ -466,7 +466,7 @@ User *finduser(const char *nick)
  */
 const bool User::HasMode(UserModeName Name) const
 {
-	return modes[(size_t)Name];
+	return modes[Name];
 }
 
 /** Set a mode on the user
@@ -474,7 +474,7 @@ const bool User::HasMode(UserModeName Name) const
  */
 void User::SetMode(UserModeName Name)
 {
-	modes[(size_t)Name] = true;
+	modes[Name] = true;
 	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, Name));
 }
 
@@ -496,7 +496,7 @@ void User::SetMode(char ModeChar)
  */
 void User::RemoveMode(UserModeName Name)
 {
-	modes[(size_t)Name] = false;
+	modes[Name] = false;
 	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, Name));
 }
 

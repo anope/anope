@@ -109,7 +109,7 @@ void load_news()
 			news = new NewsItem;
 
 			SAFE(read_int16(&type, f));
-			news->type = (NewsType)type;
+			news->type = static_cast<NewsType>(type);
 			SAFE(read_int32(&news->num, f));
 			SAFE(read_string(&text, f));
 			news->Text = text;
@@ -219,7 +219,7 @@ static void DisplayNews(User *u, NewsType Type)
 static int add_newsitem(User * u, const char *text, NewsType type)
 {
 	int num = 0;
-	
+
 	for (unsigned i = News.size(); i > 0; --i)
 	{
 		if (News[i - 1]->type == type)
@@ -228,7 +228,7 @@ static int add_newsitem(User * u, const char *text, NewsType type)
 			break;
 		}
 	}
-	
+
 	NewsItem *news = new NewsItem;
 	news->type = type;
 	news->num = num + 1;

@@ -3,8 +3,8 @@
 static bool match_internal(const unsigned char *str, const unsigned char *mask, bool case_sensitive)
 {
 	unsigned char *cp = NULL, *mp = NULL;
-	unsigned char* string = (unsigned char*)str;
-	unsigned char* wild = (unsigned char*)mask;
+	unsigned char *string = const_cast<unsigned char *>(str); // XXX: unsafe cast
+	unsigned char *wild = const_cast<unsigned char *>(mask); // XXX: unsafe cast
 
 	while ((*string) && (*wild != '*'))
 	{
@@ -77,5 +77,5 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 
 CoreExport bool Anope::Match(const std::string &str, const std::string &mask, bool case_sensitive)
 {
-	return match_internal((const unsigned char *)str.c_str(), (const unsigned char *)mask.c_str(), case_sensitive);
+	return match_internal(reinterpret_cast<const unsigned char *>(str.c_str()), reinterpret_cast<const unsigned char *>(mask.c_str()), case_sensitive);
 }

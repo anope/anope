@@ -746,8 +746,7 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct BadWord
 {
-	uint16 in_use;
-	char *word;
+	std::string word;
 	BadWordType type;
 };
 

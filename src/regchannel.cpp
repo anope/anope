@@ -31,8 +31,6 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	levels = NULL;
 	entry_message = NULL;
 	c = NULL;
-	bwcount = 0;
-	badwords = NULL;
 	capsmin = capspercent = 0;
 	floodlines = floodsecs = 0;
 	repeattimes = 0;
@@ -126,15 +124,6 @@ ChannelInfo::~ChannelInfo()
 	if (this->ttb)
 		delete [] this->ttb;
 
-	for (i = 0; i < this->bwcount; i++)
-	{
-		if (this->badwords[i].word)
-			delete [] this->badwords[i].word;
-	}
-
-	if (this->badwords)
-		free(this->badwords);
-	
 	if (this->founder)
 		this->founder->channelcount--;
 }
@@ -330,6 +319,65 @@ void ChannelInfo::ClearAkick()
 	for (unsigned i = akick.size(); i > 0; --i)
 	{
 		EraseAkick(akick[i - 1]);
+	}
+}
+
+/** Add a badword to the badword list
+ * @param word The badword
+ * @param type The type (SINGLE START END)
+ * @return The badword
+ */
+BadWord *ChannelInfo::AddBadWord(const std::string &word, BadWordType type)
+{
+	BadWord *bw = new BadWord;
+	bw->word = word;
+	bw->type = type;
+	
+	badwords.push_back(bw);
+	return bw;
+}
+
+/** Get a badword structure by index
+ * @param index The index
+ * @return The badword
+ */
+BadWord *ChannelInfo::GetBadWord(unsigned index)
+{
+	if (badwords.empty() || index >= badwords.size())
+		return NULL;
+	
+	return badwords[index];
+}
+
+/** Get how many badwords are on this channel
+ * @return The number of badwords in the vector
+ */
+const unsigned ChannelInfo::GetBadWordCount() const
+{
+	return badwords.empty() ? 0 : badwords.size();
+}
+
+/** Remove a badword
+ * @param badword The badword
+ */
+void ChannelInfo::EraseBadWord(BadWord *badword)
+{
+	std::vector<BadWord *>::iterator it = std::find(badwords.begin(), badwords.end(), badword);
+
+	if (it != badwords.end())
+	{
+		delete *it;
+		badwords.erase(it);
+	}
+}
+
+/** Clear all badwords from the channel
+ */
+void ChannelInfo::ClearBadWords()
+{
+	for (unsigned i = badwords.size(); i > 0; --i)
+	{
+		EraseBadWord(badwords[i - 1]);
 	}
 }
 

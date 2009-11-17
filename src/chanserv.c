@@ -262,10 +262,7 @@ void get_chanserv_stats(long *nrec, long *memuse)
 			}
 			if (ci->ttb)
 				mem += sizeof(*ci->ttb) * TTB_SIZE;
-			mem += ci->bwcount * sizeof(BadWord);
-			for (j = 0; j < ci->bwcount; j++)
-				if (ci->badwords[j].word)
-					mem += strlen(ci->badwords[j].word) + 1;
+			mem += ci->GetBadWordCount() * sizeof(BadWord);
 		}
 	}
 	*nrec = count;
@@ -565,20 +562,21 @@ void load_cs_dbase()
 			SAFE(read_int16(&tmp16, f));
 			ci->repeattimes = tmp16;
 
-			SAFE(read_int16(&ci->bwcount, f));
-			if (ci->bwcount) {
-				ci->badwords = static_cast<BadWord *>(scalloc(ci->bwcount, sizeof(BadWord)));
-				for (j = 0; j < ci->bwcount; j++) {
-					SAFE(read_int16(&ci->badwords[j].in_use, f));
-					if (ci->badwords[j].in_use) {
-						SAFE(read_string(&ci->badwords[j].word, f));
+			SAFE(read_int16(&tmp16, f));
+			if (tmp16) {
+				for (j = 0; j < tmp16; j++) {
+					uint16 inuse;
+					SAFE(read_int16(&inuse, f));
+					//if (ci->badwords[j].in_use) {
+						char *badword;
+						SAFE(read_string(&badword, f));
 						//SAFE(read_int16(&ci->badwords[j].type, f));
 						SAFE(read_int16(&tmp16, f));
-						ci->badwords[j].type = BW_ANY; // for now
-					}
+						//ci->badwords[j].type = BW_ANY; // for now
+						ci->AddBadWord(badword, BW_ANY);
+						delete [] badword;
+				//	}
 				}
-			} else {
-				ci->badwords = NULL;
 			}
 		}					   /* while (getc_db(f) != 0) */
 
@@ -749,13 +747,18 @@ void save_cs_dbase()
 			SAFE(write_int16(ci->floodsecs, f));
 			SAFE(write_int16(ci->repeattimes, f));
 
-			SAFE(write_int16(ci->bwcount, f));
-			for (j = 0; j < ci->bwcount; j++) {
-				SAFE(write_int16(ci->badwords[j].in_use, f));
+			//SAFE(write_int16(ci->bwcount, f));
+			SAFE(write_int16(ci->GetBadWordCount(), f));
+			for (j = 0; j < ci->GetBadWordCount(); j++) {
+				BadWord *bw = ci->GetBadWord(j);
+				/*SAFE(write_int16(ci->badwords[j].in_use, f));
 				if (ci->badwords[j].in_use) {
 					SAFE(write_string(ci->badwords[j].word, f));
 					SAFE(write_int16(ci->badwords[j].type, f));
-				}
+				}*/
+				SAFE(write_int16(1, f));
+				SAFE(write_string(bw->word.c_str(), f));
+				SAFE(write_int16(0, f));
 			}
 		}					   /* for (chanlists[i]) */
 

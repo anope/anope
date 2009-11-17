@@ -63,8 +63,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 {
  private:
 	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name */
-	std::vector<ChanAccess *> access;                       /* List of authorized users */
-	std::vector<AutoKick *> akick;                          /* List of users to kickban */
+	std::vector<ChanAccess *> access;			/* List of authorized users */
+	std::vector<AutoKick *> akick;				/* List of users to kickban */
+	std::vector<BadWord *> badwords;				/* List of badwords */
 	std::bitset<128> mlock_on;				/* Modes mlocked on */
 	std::bitset<128> mlock_off;				/* Modes mlocked off */
 
@@ -112,8 +113,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	Flags<BotServFlag> botflags;
 	int16 *ttb;						/* Times to ban for each kicker */
 
-	uint16 bwcount;
-	BadWord *badwords;				/* For BADWORDS kicker */
 	int16 capsmin, capspercent;		/* For CAPS kicker */
 	int16 floodlines, floodsecs;	/* For FLOOD kicker */
 	int16 repeattimes;				/* For REPEAT kicker */
@@ -208,6 +207,33 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	/** Clear the whole akick list
 	 */
 	void ClearAkick();
+
+	/** Add a badword to the badword list
+	 * @param word The badword
+	 * @param type The type (SINGLE START END)
+	 * @return The badword
+	 */
+	BadWord *AddBadWord(const std::string &word, BadWordType type);
+
+	/** Get a badword structure by index
+	 * @param index The index
+	 * @return The badword
+	 */
+	BadWord *GetBadWord(unsigned index);
+
+	/** Get how many badwords are on this channel
+	 * @return The number of badwords in the vector
+	 */
+	const unsigned GetBadWordCount() const;
+
+	/** Remove a badword
+	 * @param badword The badword
+	 */
+	void EraseBadWord(BadWord *badword);
+
+	/** Clear all badwords from the channel
+	 */
+	void ClearBadWords();
 
 	/** Check if a mode is mlocked
 	 * @param Name The mode

@@ -232,7 +232,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 		/* Bad words kicker */
 		if (ci->botflags.HasFlag(BS_KICK_BADWORDS)) {
-			int i;
 			int mustkick = 0;
 			char *nbuf;
 			BadWord *bw;
@@ -240,28 +239,27 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 			/* Normalize the buffer */
 			nbuf = normalizeBuffer(buf);
 
-			for (i = 0, bw = ci->badwords; i < ci->bwcount; i++, bw++) {
-				if (!bw->in_use)
-					continue;
+			for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
+			{
+				bw = ci->GetBadWord(i);
 
 				if (bw->type == BW_ANY
-					&& ((BSCaseSensitive && strstr(nbuf, bw->word))
-						|| (!BSCaseSensitive && stristr(nbuf, bw->word)))) {
+					&& ((BSCaseSensitive && strstr(nbuf, bw->word.c_str()))
+						|| (!BSCaseSensitive && stristr(nbuf, bw->word.c_str())))) {
 					mustkick = 1;
 				} else if (bw->type == BW_SINGLE) {
-					int len = strlen(bw->word);
+					int len = bw->word.length();
 
-					if ((BSCaseSensitive && !strcmp(nbuf, bw->word))
+					if ((BSCaseSensitive && nbuf == bw->word)
 						|| (!BSCaseSensitive
-							&& (!stricmp(nbuf, bw->word)))) {
+							&& (!stricmp(nbuf, bw->word.c_str())))) {
 						mustkick = 1;
 						/* two next if are quite odd isn't it? =) */
 					} else if ((strchr(nbuf, ' ') == nbuf + len)
 							   &&
-							   ((BSCaseSensitive
-								 && !strcmp(nbuf, bw->word))
+							   ((BSCaseSensitive && nbuf == bw->word)
 								|| (!BSCaseSensitive
-									&& (stristr(nbuf, bw->word) ==
+									&& (stristr(nbuf, bw->word.c_str()) ==
 										nbuf)))) {
 						mustkick = 1;
 					} else {
@@ -269,10 +267,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							 nbuf + strlen(nbuf) - len - 1)
 							&&
 							((BSCaseSensitive
-							  && (strstr(nbuf, bw->word) ==
+							  && (strstr(nbuf, bw->word.c_str()) ==
 								  nbuf + strlen(nbuf) - len))
 							 || (!BSCaseSensitive
-								 && (stristr(nbuf, bw->word) ==
+								 && (stristr(nbuf, bw->word.c_str()) ==
 									 nbuf + strlen(nbuf) - len)))) {
 							mustkick = 1;
 						} else {
@@ -281,7 +279,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							wordbuf[0] = ' ';
 							wordbuf[len + 1] = ' ';
 							wordbuf[len + 2] = '\0';
-							memcpy(wordbuf + 1, bw->word, len);
+							memcpy(wordbuf + 1, bw->word.c_str(), len);
 
 							if ((BSCaseSensitive
 								 && (strstr(nbuf, wordbuf)))
@@ -295,17 +293,17 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						}
 					}
 				} else if (bw->type == BW_START) {
-					int len = strlen(bw->word);
+					int len = bw->word.length();
 
 					if ((BSCaseSensitive
-						 && (!strncmp(nbuf, bw->word, len)))
+						 && (!strncmp(nbuf, bw->word.c_str(), len)))
 						|| (!BSCaseSensitive
-							&& (!strnicmp(nbuf, bw->word, len)))) {
+							&& (!strnicmp(nbuf, bw->word.c_str(), len)))) {
 						mustkick = 1;
 					} else {
 						char *wordbuf = new char[len + 2];
 
-						memcpy(wordbuf + 1, bw->word, len);
+						memcpy(wordbuf + 1, bw->word.c_str(), len);
 						wordbuf[0] = ' ';
 						wordbuf[len + 1] = '\0';
 
@@ -317,22 +315,22 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						delete [] wordbuf;
 					}
 				} else if (bw->type == BW_END) {
-					int len = strlen(bw->word);
+					int len = bw->word.length();
 
 					if ((BSCaseSensitive
 						 &&
 						 (!strncmp
-						  (nbuf + strlen(nbuf) - len, bw->word, len)))
+						  (nbuf + strlen(nbuf) - len, bw->word.c_str(), len)))
 						|| (!BSCaseSensitive
 							&&
 							(!strnicmp
-							 (nbuf + strlen(nbuf) - len, bw->word,
+							 (nbuf + strlen(nbuf) - len, bw->word.c_str(),
 							  len)))) {
 						mustkick = 1;
 					} else {
 						char *wordbuf = new char[len + 2];
 
-						memcpy(wordbuf, bw->word, len);
+						memcpy(wordbuf, bw->word.c_str(), len);
 						wordbuf[len] = ' ';
 						wordbuf[len + 1] = '\0';
 

@@ -75,7 +75,7 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 	return !*wild;
 }
 
-CoreExport bool Anope::Match(const std::string &str, const std::string &mask, bool case_sensitive)
+bool Anope::Match(const std::string &str, const std::string &mask, bool case_sensitive)
 {
 	return match_internal(reinterpret_cast<const unsigned char *>(str.c_str()), reinterpret_cast<const unsigned char *>(mask.c_str()), case_sensitive);
 }

@@ -245,7 +245,7 @@ extern int strncasecmp(const char *, const char *, size_t);
  * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
  * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class CoreExport CoreException : public std::exception
+class CoreException : public std::exception
 {
  protected:
 	/** Holds the error message to be displayed
@@ -284,7 +284,7 @@ class CoreExport CoreException : public std::exception
 	}
 };
 
-class CoreExport ModuleException : public CoreException
+class ModuleException : public CoreException
 {
  public:
 	/** Default constructor, just uses the error mesage 'Module threw an exception'.
@@ -421,7 +421,7 @@ class CoreExport Extensible
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
  */
-template<typename T> class CoreExport Flags
+template<typename T> class Flags
 {
  protected:
 	std::bitset<128> Flag_Values;
@@ -474,7 +474,7 @@ template<typename T> class CoreExport Flags
 class User;
 class ChannelInfo;
 class Channel;
-class EList;
+struct EList;
 
 typedef struct bandata_ BanData;
 typedef struct userdata_ UserData;
@@ -644,7 +644,7 @@ enum MemoFlag
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
-class CoreExport Memo : public Flags<MemoFlag>
+class Memo : public Flags<MemoFlag>
 {
  public:
 	uint32 number;	/* Index number -- not necessarily array position! */
@@ -716,7 +716,7 @@ enum AutoKickFlag
 };
 
 /* AutoKick data. */
-class CoreExport AutoKick : public Flags<AutoKickFlag>
+class AutoKick : public Flags<AutoKickFlag>
 {
  public:
 	/* Only one of these can be in use */
@@ -872,7 +872,7 @@ enum ServerFlag
 	SERVER_END
 };
 
-class CoreExport Server : public Flags<ServerFlag>
+class Server : public Flags<ServerFlag>
 {
  public:
 	Server *next, *prev;
@@ -1069,7 +1069,7 @@ enum EntryType
 	ENTRYTYPE_HOST
 };
 
-class CoreExport Entry : public Flags<EntryType>
+class Entry : public Flags<EntryType>
 {
  public:
 	Entry *next, *prev;
@@ -1231,7 +1231,7 @@ class UserMode
 
 /** This class is a channel mode, all channel modes use this/inherit from this
  */
-class ChannelMode
+class CoreExport ChannelMode
 {
   public:
 
@@ -1264,7 +1264,7 @@ class ChannelMode
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
  */
-class ChannelModeList : public ChannelMode
+class CoreExport ChannelModeList : public ChannelMode
 {
   public:
 
@@ -1302,7 +1302,7 @@ class ChannelModeList : public ChannelMode
 
 /** This is a mode with a paramater, eg +k/l. These modes should use/inherit from this
 */
-class ChannelModeParam : public ChannelMode
+class CoreExport ChannelModeParam : public ChannelMode
 {
   public:
 
@@ -1332,7 +1332,7 @@ class ChannelModeParam : public ChannelMode
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
 */
-class ChannelModeStatus : public ChannelMode
+class CoreExport ChannelModeStatus : public ChannelMode
 {
   public:
 	/** CUS_ values, see below
@@ -1427,7 +1427,7 @@ class CoreExport ModeManager
 
 /** Channel mode +b
  */
-class ChannelModeBan : public ChannelModeList
+class CoreExport ChannelModeBan : public ChannelModeList
 {
   public:
 	ChannelModeBan() : ChannelModeList(CMODE_BAN) { }
@@ -1439,7 +1439,7 @@ class ChannelModeBan : public ChannelModeList
 
 /** Channel mode +e
  */
-class ChannelModeExcept : public ChannelModeList
+class CoreExport ChannelModeExcept : public ChannelModeList
 {
   public:
 	ChannelModeExcept() : ChannelModeList(CMODE_EXCEPT) { }
@@ -1451,7 +1451,7 @@ class ChannelModeExcept : public ChannelModeList
 
 /** Channel mode +I
  */
-class ChannelModeInvite : public ChannelModeList
+class CoreExport ChannelModeInvite : public ChannelModeList
 {
   public:
 	ChannelModeInvite() : ChannelModeList(CMODE_INVITEOVERRIDE) { }
@@ -1463,7 +1463,7 @@ class ChannelModeInvite : public ChannelModeList
 
 /** Channel mode +k (key)
  */
-class ChannelModeKey : public ChannelModeParam
+class CoreExport ChannelModeKey : public ChannelModeParam
 {
   public:
 	ChannelModeKey() : ChannelModeParam(CMODE_KEY) { }
@@ -1484,7 +1484,7 @@ class ChannelModeFlood : public ChannelModeParam
 /** This class is used for channel mode +A (Admin only)
  * Only opers can mlock it
  */
-class ChannelModeAdmin : public ChannelMode
+class CoreExport ChannelModeAdmin : public ChannelMode
 {
   public:
 	ChannelModeAdmin() : ChannelMode(CMODE_ADMINONLY) { }
@@ -1496,7 +1496,7 @@ class ChannelModeAdmin : public ChannelMode
 /** This class is used for channel mode +O (Opers only)
  * Only opers can mlock it
  */
-class ChannelModeOper : public ChannelMode
+class CoreExport ChannelModeOper : public ChannelMode
 {
   public:
 	ChannelModeOper() : ChannelMode(CMODE_OPERONLY) { }
@@ -1508,7 +1508,7 @@ class ChannelModeOper : public ChannelMode
 /** This class is used for channel mode +r (registered channel)
  * No one may mlock r
  */
-class ChannelModeRegistered : public ChannelMode
+class CoreExport ChannelModeRegistered : public ChannelMode
 {
   public:
 	ChannelModeRegistered() : ChannelMode(CMODE_REGISTERED) { }
@@ -1741,7 +1741,7 @@ class CoreExport IRCDProto
 		virtual void SetAutoIdentificationToken(User *u) { }
 };
 
-class CoreExport IRCDTS6Proto : public IRCDProto
+class IRCDTS6Proto : public IRCDProto
 {
 };
 
@@ -1764,7 +1764,7 @@ struct Uplink {
 	}
 };
 
-class Anope
+class CoreExport Anope
 {
  public:
 	/** Check whether two strings match.
@@ -1772,7 +1772,7 @@ class Anope
 	 * @param str The string to check against the pattern (e.g. foobar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
-	CoreExport static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
+	static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
 };
 
 /*************************************************************************/

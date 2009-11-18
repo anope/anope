@@ -164,7 +164,6 @@ MailInfo *MailMemoBegin(NickCore * nc)
 				getstring(MEMO_MAIL_SUBJECT));
 		return mail;
 	}
-	return NULL;
 }
 
 /*************************************************************************/

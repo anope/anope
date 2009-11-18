@@ -549,8 +549,6 @@ int delMessage(MessageHash * msgTable[], Message * m)
 							current->m = tail->next;
 						}
 						return MOD_ERR_OK;
-						last = tail;
-						tail = tail->next;
 					}
 				} else {
 					msgTable[index] = current->next;
@@ -567,8 +565,6 @@ int delMessage(MessageHash * msgTable[], Message * m)
 							current->m = tail->next;
 						}
 						return MOD_ERR_OK;
-						last = tail;
-						tail = tail->next;
 					}
 				} else {
 					lastHash->next = current->next;

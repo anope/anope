@@ -35,7 +35,6 @@ Command *lookup_cmd(Command * list, char *cmd)
 			return c;
 		}
 	}
-	return NULL;
 }
 
 /*************************************************************************/

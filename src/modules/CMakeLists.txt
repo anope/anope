@@ -33,10 +33,11 @@ foreach(SRC ${MODULES_SRCS})
   set(TEMP_DEPENDENCIES)
   # Calculate the library dependencies for the given source file
   calculate_libraries(${SRC} TEMP_LDFLAGS TEMP_DEPENDENCIES)
-  # For Visual Studio only, include win32_memory.cpp to the list of sources, required to override Visual Studio's overrides of the new/delete operators
+  # For Visual Studio only, include win32_memory static library, required to override Visual Studio's overrides of the new/delete operators
   if(MSVC)
-    append_to_list(SRC ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
-    set_source_files_properties(${Anope_SOURCE_DIR}/src/win32_memory.cpp LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+    set(WIN32_MEMORY win32_memory)
+  else(MSVC)
+    set(WIN32_MEMORY)
   endif(MSVC)
   # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} MODULE ${SRC})
@@ -44,7 +45,7 @@ foreach(SRC ${MODULES_SRCS})
   add_dependencies(${SO} ${PROGRAM_NAME})
   # For Windows only, have the module link to the export library of Anope as well as the wsock32 library (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
   if(WIN32)
-    target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 ${TEMP_DEPENDENCIES})
+    target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 ${WIN32_MEMORY} ${TEMP_DEPENDENCIES})
     set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
   endif(WIN32)
   # Set the module to be installed to the module directory under the data directory
@@ -113,10 +114,11 @@ foreach(FILE ${MODULES_FILES})
       remove_list_duplicates(SUBDIR_EXTRA_DEPENDS)
     endif(SUBDIR_EXTRA_DEPENDS)
 
-    # For Visual Studio only, include win32_memory.cpp to the list of sources, required to override Visual Studio's overrides of the new/delete operators
+    # For Visual Studio only, include win32_memory static library, required to override Visual Studio's overrides of the new/delete operators
     if(MSVC)
-      append_to_list(MODULE_SUBDIR_SRCS ${Anope_SOURCE_DIR}/src/win32_memory.cpp)
-      set_source_files_properties(${Anope_SOURCE_DIR}/src/win32_memory.cpp LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+      set(WIN32_MEMORY win32_memory)
+    else(MSVC)
+      set(WIN32_MEMORY)
     endif(MSVC)
 
     # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
@@ -125,7 +127,7 @@ foreach(FILE ${MODULES_FILES})
     add_dependencies(${SO} ${PROGRAM_NAME})
     # For Windows only, have the module link to the export library of Anope as well as the wsock32 library (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
     if(WIN32)
-      target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 ${SUBDIR_EXTRA_DEPENDS})
+      target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 ${WIN32_MEMORY} ${SUBDIR_EXTRA_DEPENDS})
       set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
     endif(WIN32)
     # Set the module to be installed to the module directory under the data directory

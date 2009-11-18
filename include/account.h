@@ -66,7 +66,7 @@ enum NickCoreFlag
 
 /** XXX: this really needs to die with fire and be merged with metadata into NickCore or something.
  */
-class NickRequest
+class CoreExport NickRequest
 {
  public:
 	NickRequest(const std::string &nickname);

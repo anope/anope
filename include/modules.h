@@ -276,7 +276,7 @@ class CoreExport Command : public Flags<CommandFlag>
 	Command *next;
 };
 
-class CoreExport Version
+class Version
 {
   private:
 	  unsigned Major;

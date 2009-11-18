@@ -113,7 +113,7 @@ namespace irc
 		 * @return similar to strcmp, zero for equal, less than zero for str1
 		 * being less and greater than zero for str1 being greater than str2.
 		 */
-		static CoreExport int compare(const char *str1, const char *str2, size_t n);
+		static int compare(const char *str1, const char *str2, size_t n);
 
 		/** Find a char within a string up to position n.
 		 * @param s1 String to find in
@@ -121,7 +121,7 @@ namespace irc
 		 * @param c Character to search for
 		 * @return Pointer to the first occurance of c in s1
 		 */
-		static CoreExport const char *find(const char *s1, int n, char c);
+		static const char *find(const char *s1, int n, char c);
 	};
 
 	/** This typedef declares irc::string based upon irc_char_traits.
@@ -137,7 +137,7 @@ namespace ci
 	 * This class is used to implement ci::string, a case-insensitive, ASCII-
 	 * comparing string class.
 	 */
-	struct ci_char_traits : std::char_traits<char>
+	struct CoreExport ci_char_traits : std::char_traits<char>
 	{
 		/** Check if two chars match.
 		 * @param c1st First character
@@ -167,7 +167,7 @@ namespace ci
 		 * @return similar to strcmp, zero for equal, less than zero for str1
 		 * being less and greater than zero for str1 being greater than str2.
 		 */
-		static CoreExport int compare(const char *str1, const char *str2, size_t n);
+		static int compare(const char *str1, const char *str2, size_t n);
 
 		/** Find a char within a string up to position n.
 		 * @param s1 String to find in
@@ -175,7 +175,7 @@ namespace ci
 		 * @param c Character to search for
 		 * @return Pointer to the first occurance of c in s1
 		 */
-		static CoreExport const char *find(const char *s1, int n, char c);
+		static const char *find(const char *s1, int n, char c);
 	};
 
 	/** This typedef declares ci::string based upon ci_char_traits.
@@ -449,7 +449,7 @@ class CoreExport sepstream
 
 /** A derived form of sepstream, which seperates on commas
  */
-class CoreExport commasepstream : public sepstream
+class commasepstream : public sepstream
 {
  public:
 	/** Initialize with comma seperator
@@ -461,7 +461,7 @@ class CoreExport commasepstream : public sepstream
 
 /** A derived form of sepstream, which seperates on spaces
  */
-class CoreExport spacesepstream : public sepstream
+class spacesepstream : public sepstream
 {
  public:
 	/** Initialize with space seperator

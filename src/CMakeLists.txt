@@ -2,10 +2,8 @@
 file(GLOB SRC_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
 file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
-# If not using Visual Studio, don't include win32_memory.cpp, it's only required by Visual Studio to override it's override of the new/delete operators
-if(NOT MSVC)
-  remove_item_from_list(SRC_SRCS win32_memory.cpp)
-endif(NOT MSVC)
+# Don't include win32_memory.cpp, it's only required by Visual Studio to override it's override of the new/delete operators
+remove_item_from_list(SRC_SRCS win32_memory.cpp)
 # If not using Windows, don't include windows.cpp, as it's Windows-specific
 if(NOT WIN32)
   remove_item_from_list(SRC_SRCS windows.cpp)
@@ -54,12 +52,21 @@ if(WIN32)
   endif(MINGW)
 endif(WIN32)
 
+# If compiling with Visual Studio, create a static library out of win32_memory.cpp to be included with everything else, needed to override it's override of new/delete operators
+if(MSVC)
+  set_source_files_properties(win32_memory.cpp PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+  add_library(win32_memory STATIC win32_memory.cpp)
+  set(WIN32_MEMORY win32_memory)
+else(MSVC)
+  set(WIN32_MEMORY)
+endif(MSVC)
+
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
 set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}" ENABLE_EXPORTS ON)
 # On Windows, also link Anope to the wsock32 library, as well as set the version
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} wsock32)
+  target_link_libraries(${PROGRAM_NAME} wsock32 ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 endif(WIN32)
 # Building the Anope executable requires the language files to be compiled first as well as the version.h header to be generated

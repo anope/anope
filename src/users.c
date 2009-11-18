@@ -341,7 +341,7 @@ void User::SendMessage(const char *source, const std::string &msg)
  */
 void User::CheckAuthenticationToken(const char *svid)
 {
-	const char *c;
+	const char *c = NULL;
 	NickAlias *na;
 
 	if ((na = findnick(this->nick)))

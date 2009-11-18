@@ -56,7 +56,7 @@ int akick_del_callback(User * u, int num, va_list args)
 	if (num < 1 || num > ci->GetAkickCount())
 		return 0;
 
-	ci->EraseAkick(ci->GetAkick(num - 1));
+	ci->GetAkick(num - 1)->InUse = false;
 	return 1;
 }
 
@@ -65,7 +65,7 @@ int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
 	AutoKick *akick = ci->GetAkick(index);
 
-	if (!(akick->HasFlag(AK_USED)))
+	if (!akick->InUse)
 		return 0;
 	if (!*sent_header) {
 		notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
@@ -95,7 +95,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 	char timebuf[64];
 	struct tm tm;
 
-	if (!(akick->HasFlag(AK_USED)))
+	if (!akick->InUse)
 		return 0;
 	if (!*sent_header) {
 		notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
@@ -235,7 +235,7 @@ class CommandCSAKick : public Command
 		for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
 		{
 			akick = ci->GetAkick(j);
-			if (!(akick->HasFlag(AK_USED)))
+			if (!akick->InUse)
 				continue;
 			if ((akick->HasFlag(AK_ISNICK)) ? akick->nc == nc : akick->mask == mask)
 			{
@@ -284,7 +284,7 @@ class CommandCSAKick : public Command
 		{
 			akick = ci->GetAkick(i);
 
-		        if (!akick->HasFlag(AK_USED) || akick->HasFlag(AK_ISNICK))
+		        if (!akick->InUse || akick->HasFlag(AK_ISNICK))
 		                continue;
 			if (akick->mask == mask)
 		                break;
@@ -324,7 +324,7 @@ class CommandCSAKick : public Command
 		{
 			akick = ci->GetAkick(i);
 
-		        if (!akick->HasFlag(AK_USED) || akick->HasFlag(AK_ISNICK))
+		        if (!akick->InUse || akick->HasFlag(AK_ISNICK))
 		                continue;
 			if (akick->mask == mask)
 		                break;
@@ -370,6 +370,8 @@ class CommandCSAKick : public Command
 		                notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED_ONE, ci->name);
 			else
 		                notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED_SEVERAL, deleted, ci->name);
+			if (deleted)
+				ci->CleanAkick();
 		}
 		else
 		{
@@ -380,7 +382,7 @@ class CommandCSAKick : public Command
 			{
 				akick = ci->GetAkick(i);
 
-				if (!(akick->HasFlag(AK_USED)))
+				if (!akick->InUse)
 					continue;
 				if (((akick->HasFlag(AK_ISNICK)) && akick->nc == nc)
 					|| (!(akick->HasFlag(AK_ISNICK))
@@ -421,7 +423,7 @@ class CommandCSAKick : public Command
 			{
 				akick = ci->GetAkick(i);
 
-				if (!(akick->HasFlag(AK_USED)))
+				if (!akick->InUse)
 					continue;
 		                if (!mask.empty())
 				{
@@ -460,7 +462,7 @@ class CommandCSAKick : public Command
 			{
 				akick = ci->GetAkick(i);
 
-		                if (!(akick->HasFlag(AK_USED)))
+				if (!akick->InUse)
 					continue;
 		                if (!mask.empty())
 				{

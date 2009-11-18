@@ -707,8 +707,6 @@ struct ChanAccess
  */
 enum AutoKickFlag
 {
-	/* This auto kick entry is in use */
-	AK_USED,
 	/* Is by nick core, not mask */
 	AK_ISNICK,
 	/* This entry is stuck */
@@ -719,6 +717,7 @@ enum AutoKickFlag
 class AutoKick : public Flags<AutoKickFlag>
 {
  public:
+ 	bool InUse;
 	/* Only one of these can be in use */
 	std::string mask;
 	NickCore *nc;
@@ -745,6 +744,7 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct BadWord
 {
+	bool InUse;
 	std::string word;
 	BadWordType type;
 };

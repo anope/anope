@@ -247,7 +247,7 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 		return NULL;
 
 	AutoKick *autokick = new AutoKick();
-	autokick->SetFlag(AK_USED);
+	autokick->InUse = true;
 	autokick->SetFlag(AK_ISNICK);
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -269,7 +269,7 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->mask = mask;
-	autokick->SetFlag(AK_USED);
+	autokick->InUse = true;
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;
@@ -322,6 +322,15 @@ void ChannelInfo::ClearAkick()
 	}
 }
 
+/** Clean all of the nonused entries from the akick list
+ */
+void ChannelInfo::CleanAkick()
+{
+	for (unsigned i = akick.size(); i > 0; --i)
+		if (!akick[i - 1]->InUse)
+			EraseAkick(akick[i - 1]);
+}
+
 /** Add a badword to the badword list
  * @param word The badword
  * @param type The type (SINGLE START END)
@@ -330,6 +339,7 @@ void ChannelInfo::ClearAkick()
 BadWord *ChannelInfo::AddBadWord(const std::string &word, BadWordType type)
 {
 	BadWord *bw = new BadWord;
+	bw->InUse = true;
 	bw->word = word;
 	bw->type = type;
 
@@ -379,6 +389,15 @@ void ChannelInfo::ClearBadWords()
 	{
 		EraseBadWord(badwords[i - 1]);
 	}
+}
+
+/** Clean all of the nonused entries from the badwords list
+ */
+void ChannelInfo::CleanBadWords()
+{
+	for (unsigned i = badwords.size(); i > 0; --i)
+		if (!badwords[i - 1]->InUse)
+			EraseBadWord(badwords[i - 1]);
 }
 
 /** Check if a mode is mlocked

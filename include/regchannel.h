@@ -208,6 +208,10 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	void ClearAkick();
 
+	/** Clean all of the nonused entries from the akick list
+	 */
+	void CleanAkick();
+
 	/** Add a badword to the badword list
 	 * @param word The badword
 	 * @param type The type (SINGLE START END)
@@ -234,6 +238,10 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	/** Clear all badwords from the channel
 	 */
 	void ClearBadWords();
+
+	/** Clean all of the nonused entries from the badwords list
+	 */
+	void CleanBadWords();
 
 	/** Check if a mode is mlocked
 	 * @param Name The mode

@@ -126,6 +126,9 @@ class CommandBSBadwords : public Command
 			{
 				notice_lang(s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL, deleted, ci->name);
 			}
+
+			if (deleted)
+				ci->CleanBadWords();
 		}
 		else
 		{
@@ -239,7 +242,6 @@ class BSBadwords : public Module
 
 int badwords_del_callback(User * u, int num, va_list args)
 {
-	BadWord *bw;
 	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 	int *last = va_arg(args, int *);
 
@@ -248,8 +250,7 @@ int badwords_del_callback(User * u, int num, va_list args)
 	if (num < 1 || num > ci->GetBadWordCount())
 		return 0;
 
-	bw = ci->GetBadWord(num - 1);
-	ci->EraseBadWord(bw);
+	ci->GetBadWord(num - 1)->InUse = false;
 
 	return 1;
 }

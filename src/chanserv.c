@@ -1200,7 +1200,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 	{
 		akick = ci->GetAkick(j);
 
-		if (!akick->HasFlag(AK_USED))
+		if (!akick->InUse)
 			continue;
 
 		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
@@ -1510,7 +1510,7 @@ void cs_remove_nick(const NickCore * nc)
 			for (j = ci->GetAkickCount(); j > 0; --j)
 			{
 				akick = ci->GetAkick(j - 1);
-				if (akick->HasFlag(AK_USED) && akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+				if (akick->InUse && akick->HasFlag(AK_ISNICK) && akick->nc == nc)
 					ci->EraseAkick(akick);
 			}
 		}
@@ -1852,7 +1852,7 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
-		if (!akick->HasFlag(AK_USED) || akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
+		if (!akick->InUse || akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
 			continue;
 
 		if (Anope::Match(akick->mask, mask, false))
@@ -1913,7 +1913,7 @@ void stick_all(ChannelInfo * ci)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
-		if (!akick->HasFlag(AK_USED) || (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK)))
+		if (!akick->InUse || (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK)))
 			continue;
 
 		av[0] = "+b";

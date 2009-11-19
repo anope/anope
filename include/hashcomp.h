@@ -189,7 +189,7 @@ namespace ci
 
 /** Operator << for irc::string
  */
-inline std::ostream &operator<<(std::ostream &os, const irc::string &str) { return os << str.c_str(); }
+inline std::ostream &operator<<(std::ostream &os, const irc::string &str) { return os << std::string(str.c_str()); }
 
 /** Operator >> for irc::string
  */
@@ -203,7 +203,7 @@ inline std::istream &operator>>(std::istream &is, irc::string &str)
 
 /** Operator << for ci::string
  */
-inline std::ostream &operator<<(std::ostream &os, const ci::string &str) { return os << str.c_str(); }
+inline std::ostream &operator<<(std::ostream &os, const ci::string &str) { return os << std::string(str.c_str()); }
 
 /** Operator >> for ci::string
  */

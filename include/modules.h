@@ -967,6 +967,20 @@ class CoreExport Module
 	 */
 	virtual void OnUserModeAdd(UserMode *um) { }
 
+	/** Called when a mode is about to be mlocked
+	 * @param Name The mode being mlocked
+	 * @param status true if its being mlocked +, false for -
+	 * @param param The param, if there is one and if status is true
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
+	 */
+	virtual EventReturn OnMLock(ChannelModeName Name, bool status, const std::string &param) { return EVENT_CONTINUE; }
+
+	/** Called when a mode is about to be unlocked
+	 * @param Name The mode being mlocked
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
+	 */
+	virtual EventReturn OnUnMLock(ChannelModeName Name) { return EVENT_CONTINUE; }
+
 };
 
 
@@ -1009,6 +1023,7 @@ enum Implementation
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
+		I_OnMLock, I_OnUnMLock,
 	I_END
 };
 

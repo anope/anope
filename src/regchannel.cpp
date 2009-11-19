@@ -416,29 +416,67 @@ const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
 /** Set a mlock
  * @param Name The mode
  * @param status True for mlock on, false for mlock off
+ * @param param The param to use for this mode, if required
+ * @return true on success, false on failure (module blocking)
  */
-void ChannelInfo::SetMLock(ChannelModeName Name, bool status)
+bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string param)
 {
 	size_t value = Name;
+
+	if (!status && !param.empty())
+		throw CoreException("Was told to mlock a mode negatively with a param?");
+
+	EventReturn MOD_RESULT;
+	FOREACH_MOD(I_OnMLock, OnMLock(Name, status, param));
+	if (MOD_RESULT == EVENT_STOP)
+		return false;
+
+	/* First, remove this everywhere */
+	mlock_on[value] = false;
+	mlock_off[value] = false;
+
+	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+	if (it != Params.end())
+	{
+		Params.erase(it);
+	}
 
 	if (status)
 		mlock_on[value] = true;
 	else
 		mlock_off[value] = true;
+	
+	if (status && !param.empty())
+	{
+		Params.insert(std::make_pair(Name, param));
+	}
+
+	return true;
 }
 
 /** Remove a mlock
  * @param Name The mode
- * @param status True for mlock on, false for mlock off
+ * @return true on success, false on failure (module blocking)
  */
-void ChannelInfo::RemoveMLock(ChannelModeName Name, bool status)
+bool ChannelInfo::RemoveMLock(ChannelModeName Name)
 {
 	size_t value = Name;
 
-	if (status)
-		mlock_on[value] = false;
-	else
-		mlock_off[value] = false;
+	EventReturn MOD_RESULT;
+	FOREACH_MOD(I_OnUnMLock, OnUnMLock(Name));
+	if (MOD_RESULT == EVENT_STOP)
+		return false;
+
+	mlock_on[value] = false;
+	mlock_off[value] = false;
+	
+	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+	if (it != Params.end())
+	{
+		Params.erase(it);
+	}
+
+	return true;
 }
 
 /** Clear all mlocks on the channel
@@ -459,29 +497,6 @@ const size_t ChannelInfo::GetMLockCount(bool status) const
 		return mlock_on.count();
 	else
 		return mlock_off.count();
-}
-
-/** Set a channel mode param on the channel
- * @param Name The mode
- * @param param The param
- * @param true on success
- */
-bool ChannelInfo::SetParam(ChannelModeName Name, std::string Value)
-{
-	return Params.insert(std::make_pair(Name, Value)).second;
-}
-
-/** Unset a param from the channel
- * @param Name The mode
- */
-void ChannelInfo::UnsetParam(ChannelModeName Name)
-{
-	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
-
-	if (it != Params.end())
-	{
-		Params.erase(it);
-	}
 }
 
 /** Get a param from the channel

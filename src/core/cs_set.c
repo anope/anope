@@ -208,6 +208,8 @@ class CommandCSSet : public Command
 				}
 				else if (add)
 				{
+					ci->RemoveMLock(cm->Name);
+
 					if (cm->Type == MODE_PARAM)
 					{
 						cmp = static_cast<ChannelModeParam *>(cm);
@@ -218,27 +220,16 @@ class CommandCSSet : public Command
 						if (!cmp->IsValid(param.c_str()))
 							continue;
 
-						ci->SetParam(cmp->Name, param);
+						ci->SetMLock(cmp->Name, true, param);
 					}
-
-					ci->SetMLock(cm->Name, true);
-					ci->RemoveMLock(cm->Name, false);
+					else
+					{
+						ci->SetMLock(cm->Name, true);
+					}
 				}
 				else
 				{
 					ci->SetMLock(cm->Name, false);
-
-					if (ci->HasMLock(cm->Name, true))
-					{
-						ci->RemoveMLock(cm->Name, true);
-
-						if (cm->Type == MODE_PARAM)
-						{
-							cmp = static_cast<ChannelModeParam *>(cm);
-
-							ci->UnsetParam(cmp->Name);
-						}
-					}
 				}
 			}
 			else
@@ -249,8 +240,7 @@ class CommandCSSet : public Command
 			/* We can't mlock +L if +l is not mlocked as well. */
 			if (ci->HasMLock(CMODE_REDIRECT, true) && !ci->HasMLock(CMODE_LIMIT, true))
 			{
-				ci->RemoveMLock(CMODE_REDIRECT, true);
-				ci->UnsetParam(CMODE_REDIRECT);
+				ci->RemoveMLock(CMODE_REDIRECT);
 				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_L_REQUIRED);
 			}
 		}
@@ -260,7 +250,7 @@ class CommandCSSet : public Command
 		if (ModeManager::FindChannelModeByName(CMODE_NOKNOCK) && ircd->knock_needs_i) {
 			if (ci->HasMLock(CMODE_NOKNOCK, true) && !ci->HasMLock(CMODE_INVITE, true))
 			{
-				ci->RemoveMLock(CMODE_NOKNOCK, true);
+				ci->RemoveMLock(CMODE_NOKNOCK);
 				notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_K_REQUIRED);
 			}
 		}

@@ -62,7 +62,7 @@ enum ChannelInfoFlag
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 {
  private:
-	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name */
+	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name for mlock */
 	std::vector<ChanAccess *> access;			/* List of authorized users */
 	std::vector<AutoKick *> akick;				/* List of users to kickban */
 	std::vector<BadWord *> badwords;				/* List of badwords */
@@ -253,14 +253,16 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	/** Set a mlock
 	 * @param Name The mode
 	 * @param status True for mlock on, false for mlock off
+	 * @param param An optional param arg for + mlocked modes
+	 * @return true on success, false on failure (module blocking)
 	 */
-	void SetMLock(ChannelModeName Name, bool status);
+	bool SetMLock(ChannelModeName Name, bool status, const std::string param = "");
 
 	/** Remove a mlock
 	 * @param Name The mode
-	 * @param status True for mlock on, false for mlock off
+	 * @return true on success, false on failure (module blcoking)
 	 */
-	void RemoveMLock(ChannelModeName Name, bool status);
+	bool RemoveMLock(ChannelModeName Name);
 
 	/** Clear all mlocks on the channel
 	 */
@@ -271,18 +273,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 * @return The number of mlocked modes
 	 */
 	const size_t GetMLockCount(bool status) const;
-
-	/** Set a channel mode param on the channel
-	 * @param Name The mode
-	 * @param param The param
-	 * @param true on success
-	 */
-	bool SetParam(ChannelModeName Name, std::string Value);
-
-	/** Unset a param from the channel
-	 * @param Name The mode
-	 */
-	void UnsetParam(ChannelModeName Name);
 
 	/** Get a param from the channel
 	 * @param Name The mode

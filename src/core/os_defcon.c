@@ -200,14 +200,15 @@ class OSDEFCON : public Module
 			std::string param;
 			GetDefConParam(Name, &param);
 			
-			c->SetMode(Name);
-
 			std::string buf = "+" + std::string(&cm->ModeChar);
 			if (!param.empty())
 			{
 				buf += " " + param;
-				c->SetParam(Name, param);
+				c->SetMode(Name, param);
 			}
+			else
+				c->SetMode(Name);
+
 			ircdproto->SendMode(findbot(s_OperServ), c->name, buf.c_str());
 		}
 	}
@@ -496,7 +497,6 @@ void defconParseModeString(const char *str)
 		{
 			DefConModesOn.UnsetFlag(CMODE_REDIRECT);
 
-			//DefConModesCI.UnsetParam(CMODE_REDIRECT);
 			alog("DefConChanModes must lock mode +l as well to lock mode +L");
 		}
 	}

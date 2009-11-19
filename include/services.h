@@ -989,14 +989,16 @@ class CoreExport Channel : public Extensible
 	/**
 	 * Set a mode on a channel
 	 * @param Name The mode name
+	 * @param param Optional param arg for the mode
 	 */
-	void SetMode(ChannelModeName Name);
+	void SetMode(ChannelModeName Name, const std::string param = "");
 
 	/**
 	 * Set a mode on a channel
 	 * @param Mode The mode
+	 * @param param Optional param arg for the mode
 	 */
-	void SetMode(char Mode);
+	void SetMode(char Mode, const std::string param = "");
 
 	/**
 	 * Remove a mode from a channel
@@ -1029,18 +1031,6 @@ class CoreExport Channel : public Extensible
 	 * @param client The client unsetting the modes
 	 */
 	void ClearInvites(char *client = NULL);
-
-	/** Set a channel mode param on the channel
-	 * @param Name The mode
-	 * @param param The param
-	 * @param true on success
-	 */
-	bool SetParam(ChannelModeName Name, std::string &param);
-
-	/** Unset a param from the channel
-	 * @param Name The mode
-	 */
-	void UnsetParam(ChannelModeName Name);
 
 	/** Get a param from the channel
 	 * @param Name The mode

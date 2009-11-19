@@ -137,7 +137,7 @@ bool Channel::HasMode(ChannelModeName Name)
  * Set a mode on a channel
  * @param Name The mode name
  */
-void Channel::SetMode(ChannelModeName Name)
+void Channel::SetMode(ChannelModeName Name, const std::string param)
 {
 	modes[Name] = true;
 
@@ -147,6 +147,18 @@ void Channel::SetMode(ChannelModeName Name)
 		ci->SetFlag(CI_PERSIST);
 	}
 
+	if (!param.empty())
+	{
+		/* They could be resetting the mode to change its params */
+		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+		if (it != Params.end())
+		{
+			Params.erase(it);
+		}
+
+		Params.insert(std::make_pair(Name, param));
+	}
+
 	FOREACH_MOD(I_OnChannelModeSet, OnChannelModeSet(this, Name));
 }
 
@@ -154,13 +166,13 @@ void Channel::SetMode(ChannelModeName Name)
  * Set a mode on a channel
  * @param Mode The mode
  */
-void Channel::SetMode(char Mode)
+void Channel::SetMode(char Mode, const std::string param)
 {
 	ChannelMode *cm;
 
 	if ((cm = ModeManager::FindChannelModeByChar(Mode)))
 	{
-		SetMode(cm->Name);
+		SetMode(cm->Name, param);
 	}
 }
 
@@ -181,6 +193,12 @@ void Channel::RemoveMode(ChannelModeName Name)
 			delete this;
 	}
 
+	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+	if (it != Params.end())
+	{
+		Params.erase(it);
+	}
+
 	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, Name));
 }
 
@@ -195,29 +213,6 @@ void Channel::RemoveMode(char Mode)
 	if ((cm = ModeManager::FindChannelModeByChar(Mode)))
 	{
 		RemoveMode(cm->Name);
-	}
-}
-
-/** Set a channel mode param on the channel
- * @param Name The mode
- * @param param The param
- * @param true on success
- */
-bool Channel::SetParam(ChannelModeName Name, std::string &Value)
-{
-	return Params.insert(std::make_pair(Name, Value)).second;
-}
-
-/** Unset a param from the channel
- * @param Name The mode
- */
-void Channel::UnsetParam(ChannelModeName Name)
-{
-	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
-
-	if (it != Params.end())
-	{
-		Params.erase(it);
 	}
 }
 
@@ -677,14 +672,6 @@ void chan_set_modes(const char *source, Channel *chan, int ac, const char **av, 
 			}
 			else
 			{
-				if (check >= 0)
-				{
-					if (add)
-						chan->SetMode(mode);
-					else
-						chan->RemoveMode(mode);
-				}
-
 				if (cm->Type == MODE_PARAM)
 				{
 					cmp = static_cast<ChannelModeParam *>(cm);
@@ -701,18 +688,19 @@ void chan_set_modes(const char *source, Channel *chan, int ac, const char **av, 
 						av++;
 					}
 
-					if (*av && !cmp->IsValid(*av))
+					if (!cmp->IsValid(*av))
 						continue;
 					if (add)
 					{
 						std::string Param = *av;
-						chan->SetParam(cmp->Name, Param);
+						chan->SetMode(mode, Param);
 					}
 					else
-						chan->UnsetParam(cmp->Name);
+					{
+						chan->RemoveMode(mode);
+					}
 				}
-
-				if (check < 0)
+				else
 				{
 					if (add)
 						chan->SetMode(mode);

@@ -483,27 +483,27 @@ void load_cs_dbase()
 			{
 				std::ostringstream limit;
 				limit << tmp32;
-				ci->SetParam(CMODE_LIMIT, limit.str());
+				ci->SetMLock(CMODE_LIMIT, true, limit.str());
 			}
 
 			SAFE(read_string(&s, f));
 			if (s)
 			{
-				ci->SetParam(CMODE_KEY, std::string(s));
+				ci->SetMLock(CMODE_KEY, true, std::string(s));
 				delete [] s;
 			}
 
 			SAFE(read_string(&s, f));
 			if (s)
 			{
-				ci->SetParam(CMODE_FLOOD, std::string(s));
+				ci->SetMLock(CMODE_FLOOD, true, std::string(s));
 				delete [] s;
 			}
 
 			SAFE(read_string(&s, f));
 			if (s)
 			{
-				ci->SetParam(CMODE_REDIRECT, std::string(s));
+				ci->SetMLock(CMODE_REDIRECT, true, std::string(s));
 				delete [] s;
 			}
 
@@ -836,7 +836,7 @@ void check_modes(Channel * c)
 		cm = it->second;
 
 		/* If this channel does not have the mode and the mode is mlocked */
-		if (!c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
+		if (cm->Type == MODE_REGULAR && !c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
 		{
 			modebuf += it->first;
 			c->SetMode(cm->Name);
@@ -853,18 +853,19 @@ void check_modes(Channel * c)
 				}
 			}
 		}
-		/* If this is a param mode and its mlocked and is set negative */
-		else if (cm->Type == MODE_PARAM && c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
+		/* If this is a param mode and its mlocked, check to ensure it is set and set to the correct value */
+		else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
 		{
 			cmp = static_cast<ChannelModeParam *>(cm);
 			c->GetParam(cmp->Name, &param);
 			ci->GetParam(cmp->Name, &ciparam);
 
-			if (!param.empty() && !ciparam.empty() && param != ciparam)
+			/* If the channel doesnt have the mode, or it does and it isn't set correctly */
+			if (!c->HasMode(cm->Name) || (!param.empty() && !ciparam.empty() && param != ciparam))
 			{
 				modebuf += it->first;
 
-				c->SetParam(cmp->Name, ciparam);
+				c->SetMode(cmp->Name, ciparam);
 
 				argbuf += " " + ciparam;
 			}

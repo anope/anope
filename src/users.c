@@ -679,7 +679,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		user->realname = sstrdup(realname);
 		user->timestamp = ts;
 		user->my_signon = time(NULL);
-		user->SetCloakedHost(vhost);
+		if (vhost)
+			user->SetCloakedHost(vhost);
 		user->SetVIdent(username);
 		/* We now store the user's ip in the user_ struct,
 		 * because we will use it in serveral places -- DrStein */

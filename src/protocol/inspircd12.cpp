@@ -1080,7 +1080,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		if (strstr(av[1], "m_knock.so"))
 			ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
 		if (strstr(av[1], "m_redirect.so"))
-			ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT));
+			ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT, true));
 		if (strstr(av[1], "m_nonicks.so"))
 			ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
 		if (strstr(av[1], "m_operchans.so"))
@@ -1269,7 +1269,7 @@ void moduleAddModes()
 	/* Add channel modes */
 	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
 	ModeManager::AddChannelMode('k', new ChannelModeKey());
-	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
+	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT, true));
 	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
 	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
 	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));

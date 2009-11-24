@@ -483,15 +483,13 @@ class CommandCSSet : public Command
 						access->level = ACCESS_SOP;
 					else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP) || CHECKLEV(CA_OPDEOPME))
 						access->level = ACCESS_AOP;
-					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-						if (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP) || CHECKLEV(CA_HALFOPME))
+					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP) || CHECKLEV(CA_HALFOPME)))
 							access->level = ACCESS_HOP;
 					else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE) || CHECKLEV(CA_VOICEME))
 						access->level = ACCESS_VOP;
 					else
 					{
-						access->in_use = 0;
-						access->nc = NULL;
+						ci->EraseAccess(i);
 					}
 				}
 

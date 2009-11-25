@@ -568,9 +568,9 @@ class CSXOP : public Module
  */
 int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, int xlev)
 {
-	char *nick = access->nc->display;
 	if (!access->in_use || access->level != xlev)
 		return 0;
+	char *nick = access->nc->display;
 	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
 	{
 		++(*perm);

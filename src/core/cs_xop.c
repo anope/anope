@@ -174,9 +174,10 @@ int do_vop(User * u)
 
 int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc, int xlev)
 {
+    char *nick;
     if (!access->in_use || !access->nc || access->level != xlev)
         return 0;
-    char *nick = access->nc->display;
+    nick = access->nc->display;
     if (!is_services_admin(u) && uacc <= access->level) {
         (*perm)++;
         return 0;
@@ -339,7 +340,7 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         }
 
     } else if (stricmp(cmd, "DEL") == 0) {
-        int deleted, a, b;
+        int deleted;
         if (readonly) {
             notice_lang(s_ChanServ, u, xmsgs[1]);
             return MOD_CONT;
@@ -439,9 +440,6 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         if (!sent_header)
             notice_lang(s_ChanServ, u, xmsgs[7], chan);
     } else if (stricmp(cmd, "CLEAR") == 0) {
-		uint16 j = 0;
-		int a, b;
-
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
             return MOD_CONT;

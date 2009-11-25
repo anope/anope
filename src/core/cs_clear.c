@@ -186,7 +186,6 @@ int do_clear(User * u)
         struct c_userlist *cu, *next;
 
         if (ircd->svsmode_ucmode) {
-            av[0] = chan;
             anope_cmd_svsmode_chan(av[0], "-o", NULL);
             if (ircd->owner) {
                 anope_cmd_svsmode_chan(av[0], ircd->ownerunset, NULL);
@@ -207,6 +206,7 @@ int do_clear(User * u)
                 snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
                         ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
 
+                av[0] = chan;
                 if (ircdcap->tsmode) {
                     snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
                     av[1] = buf;
@@ -226,7 +226,6 @@ int do_clear(User * u)
                 do_cmode(s_ChanServ, ac, av);
             }
         } else {
-            av[0] = chan;
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
                 isop = chan_has_user_status(c, cu->user, CUS_OP);
@@ -243,6 +242,7 @@ int do_clear(User * u)
                 snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? GET_USER(cu->user) : ""), 
                         (isadmin ? GET_USER(cu->user) : ""), (isown ? GET_USER(cu->user) : ""));
 
+                av[0] = chan;
                 if (ircdcap->tsmode) {
                     snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
                     av[1] = buf;

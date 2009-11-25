@@ -2747,3 +2747,48 @@ void stick_all(ChannelInfo * ci)
         free(av[0]);
     }
 }
+
+/** Reorder the access list to get rid of unused entries
+ * @param ci The channel to reorder the access of
+ */
+void CleanAccess(ChannelInfo *ci)
+{
+	int a, b;
+
+	if (!ci)
+		return;
+
+	for (b = 0; b < ci->accesscount; b++)
+	{
+		if (ci->access[b].in_use)
+		{
+			for (a = 0; a < ci->accesscount; a++)
+			{
+				if (a > b)
+					break;
+				if (!ci->access[a].in_use)
+				{
+					ci->access[a].in_use = 1;
+					ci->access[a].level = ci->access[b].level;
+					ci->access[a].nc = ci->access[b].nc;
+					ci->access[a].last_seen = ci->access[b].last_seen;
+					ci->access[b].nc = NULL;
+					ci->access[b].in_use = 0;
+					break;
+				}
+			}
+		}
+	}
+
+	/* After reordering, entries on the end of the list may be empty, remove them */
+	for (b = ci->accesscount - 1; b >= 0; --b)
+	{
+		if (ci->access[b].in_use)
+			break;
+		ci->accesscount--;
+	}
+
+	/* Reallocate the access list to only use the memory we need */
+	ci->access = srealloc(ci->access, sizeof(ChanAccess) * ci->accesscount);
+}
+

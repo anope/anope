@@ -303,13 +303,6 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         }
 
         if (!change) {
-            /* All entries should be in use so we no longer need
-             * to go over the entire list..
-            for (i = 0; i < ci->accesscount; i++)
-                if (!ci->access[i].in_use)
-                    break;
-             */
-
             if (i < CSAccessMax) {
                 ci->accesscount++;
                 ci->access =
@@ -415,40 +408,8 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                 deleted = 1;
             }
         }
-        if (deleted) {
-            /* Reordering - DrStein */
-            for (b = 0; b < ci->accesscount; b++) {
-                if (ci->access[b].in_use) {
-                    for (a = 0; a < ci->accesscount; a++) {
-                        if (a > b)
-                            break;
-                        if (!ci->access[a].in_use) {
-                            ci->access[a].in_use = 1;
-                            ci->access[a].level = ci->access[b].level;
-                            ci->access[a].nc = ci->access[b].nc;
-                            ci->access[a].last_seen =
-                                ci->access[b].last_seen;
-                            ci->access[b].nc = NULL;
-                            ci->access[b].in_use = 0;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            /* If the patch provided in bug #706 is applied, this should be placed
-             * before sending the events! */
-            /* After reordering only the entries at the end could still be empty.
-             * We ll free the places no longer in use... */
-            for (i = ci->accesscount - 1; i >= 0; i--) {
-                if (ci->access[i].in_use == 1)
-                    break;
-
-                ci->accesscount--;
-            }
-            ci->access =
-                srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
-        }
+        if (deleted)
+            CleanAccess(ci);
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;
 
@@ -500,30 +461,10 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
             if (ci->access[i].in_use && ci->access[i].level == xlev) {
                 ci->access[i].nc = NULL;
                 ci->access[i].in_use = 0;
-				j++;
             }
         }
 
-		for (b = 0; b < ci->accesscount; b++) {
-			if (ci->access[b].in_use) {
-				for (a = 0; a < ci->accesscount; a++) {
-					if (a > b)
-						break;
-					if (!ci->access[a].in_use) {
-						ci->access[a].in_use = 1;
-						ci->access[a].level = ci->access[b].level;
-						ci->access[a].nc = ci->access[b].nc;
-						ci->access[a].last_seen =
-							ci->access[b].last_seen;
-						ci->access[b].nc = NULL;
-						ci->access[b].in_use = 0;
-						break;
-					}
-				}
-			}
-		}
-
-		ci->accesscount = ci->accesscount - j;
+        CleanAccess(ci);
 
         send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
         

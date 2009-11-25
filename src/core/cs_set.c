@@ -765,17 +765,16 @@ int do_set_xop(User * u, ChannelInfo * ci, char *param)
                 } else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP)
                            || CHECKLEV(CA_OPDEOPME)) {
                     access->level = ACCESS_AOP;
-                } else if (ircd->halfop) {
-                    if (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP)
-                        || CHECKLEV(CA_HALFOPME)) {
+                } else if (ircd->halfop && (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP)
+                        || CHECKLEV(CA_HALFOPME))) {
                         access->level = ACCESS_HOP;
-                    }
                 } else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE)
                            || CHECKLEV(CA_VOICEME)) {
                     access->level = ACCESS_VOP;
                 } else {
                     access->in_use = 0;
                     access->nc = NULL;
+                    CleanAccess(ci);
                 }
             }
 

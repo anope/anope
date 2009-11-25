@@ -236,14 +236,6 @@ int do_access(User * u)
             }
         }
 
-        /* All entries should be in use so we no longer need
-         * to go over the entire list..
-        for (i = 0; i < ci->accesscount; i++) {
-            if (!ci->access[i].in_use)
-                break;
-        }
-         */
-
         if (i < CSAccessMax) {
             ci->accesscount++;
             ci->access =
@@ -268,8 +260,9 @@ int do_access(User * u)
         notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display,
                     ci->name, access->level);
     } else if (stricmp(cmd, "DEL") == 0) {
-        int deleted, a, b;
-        if (readonly) {
+        int deleted;
+        
+	if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
             return MOD_CONT;
         }
@@ -279,24 +272,8 @@ int do_access(User * u)
             return MOD_CONT;
         }
 
-		for (b = 0; b < ci->accesscount; b++) {
-			if (ci->access[b].in_use) {
-				for (a = 0; a < ci->accesscount; a++) {
-					if (a > b)
-						break;
-					if (!ci->access[a].in_use) {
-						ci->access[a].in_use = 1;
-						ci->access[a].level = ci->access[b].level;
-						ci->access[a].nc = ci->access[b].nc;
-						ci->access[a].last_seen =
-							ci->access[b].last_seen;
-						ci->access[b].nc = NULL;
-						ci->access[b].in_use = 0;
-						break;
-					}
-				}
-			}
-		}
+	/* Clean the access list to make sure every thing is in use */
+	CleanAccess(ci);
 
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
@@ -354,37 +331,7 @@ int do_access(User * u)
             }
         }
 
-        if (deleted) {
-            /* Reordering - DrStein */
-            for (b = 0; b < ci->accesscount; b++) {
-                if (ci->access[b].in_use) {
-                    for (a = 0; a < ci->accesscount; a++) {
-                        if (a > b)
-                            break;
-                        if (!ci->access[a].in_use) {
-                            ci->access[a].in_use = 1;
-                            ci->access[a].level = ci->access[b].level;
-                            ci->access[a].nc = ci->access[b].nc;
-                            ci->access[a].last_seen =
-                                ci->access[b].last_seen;
-                            ci->access[b].nc = NULL;
-                            ci->access[b].in_use = 0;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            /* After reordering only the entries at the end could still be empty.
-             * We ll free the places no longer in use... */
-            for (i = ci->accesscount - 1; i >= 0; i--) {
-                if (ci->access[i].in_use == 1)
-                    break;
-
-                ci->accesscount--;
-            }
-            ci->access =
-                srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
+        CleanAccess(ci);
 
             /* We don't know the nick if someone used numbers, so we trigger the event without
              * nick param. We just do this once, even if someone enters a range. -Certus */
@@ -392,34 +339,15 @@ int do_access(User * u)
                 send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
             else
                 send_event(EVENT_ACCESS_DEL, 2, ci->name, u->nick);
-        }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;
-		int a, b;
 
         if (ci->accesscount == 0) {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
             return MOD_CONT;
         }
 
-		for (b = 0; b < ci->accesscount; b++) {
-			if (ci->access[b].in_use) {
-				for (a = 0; a < ci->accesscount; a++) {
-					if (a > b)
-						break;
-					if (!ci->access[a].in_use) {
-						ci->access[a].in_use = 1;
-						ci->access[a].level = ci->access[b].level;
-						ci->access[a].nc = ci->access[b].nc;
-						ci->access[a].last_seen =
-							ci->access[b].last_seen;
-						ci->access[b].nc = NULL;
-						ci->access[b].in_use = 0;
-						break;
-					}
-				}
-			}
-		}
+        CleanAccess(ci);	
 
         if (nick && strspn(nick, "1234567890,-") == strlen(nick)) {
             process_numlist(nick, NULL, access_list_callback, u, ci,

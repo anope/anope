@@ -224,6 +224,7 @@ E int levelinfo_maxwidth;
 E ChannelInfo *makechan(const char *chan);
 E int is_identified(User * user, ChannelInfo * ci);
 E char *get_mlock_modes(ChannelInfo * ci, int complete);
+E void CleanAccess(ChannelInfo *ci);
 
 /**** compat.c ****/
 

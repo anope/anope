@@ -43,7 +43,7 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 
 	size_t t;
 	/* Set default channel flags */
-	for (t = CI_BEGIN + 1; t != CI_END - 1; ++t)
+	for (t = CI_BEGIN + 1; t != CI_END; ++t)
 		if (CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
 			this->SetFlag(static_cast<ChannelInfoFlag>(t));
 

@@ -35,9 +35,9 @@ class CommandNSLogout : public Command
 		if (!u->nc->IsServicesOper() && nick)
 			this->OnSyntaxError(u, "");
 		else if (!(u2 = (nick ? finduser(nick) : u)))
-			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (nick && u2->nc && !u2->nc->IsServicesOper())
-			notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
+			notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
 		else
 		{
 			na = findnick(u2->nick);
@@ -52,13 +52,13 @@ class CommandNSLogout : public Command
 				common_svsmode(u2, ircd->modeonunreg, "1");
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
-			alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u2->nick);
+			alog("%s: %s!%s@%s logged out nickname %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u2->nick);
 
 			/* Remove founder status from this user in all channels */
 			if (nick)
-				notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
+				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
 			else
-				notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
+				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
 			/* Clear any timers again */
 			if (na && u->nc->HasFlag(NI_KILLPROTECT))
@@ -77,16 +77,16 @@ class CommandNSLogout : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_LOGOUT);
+			notice_help(Config.s_NickServ, u, NICK_HELP_LOGOUT);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
 	}
 };
 
@@ -105,7 +105,7 @@ class NSLogout : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_LOGOUT);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LOGOUT);
 	}
 };
 

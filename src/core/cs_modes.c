@@ -45,17 +45,17 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 		ci = c->ci;
 
 	if (!c)
-		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+		notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 	else if (is_same ? !(u2 = u) : !(u2 = finduser(nick)))
-		notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 	else if (!is_on_chan(c, u2))
-		notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
+		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
-		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
-		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && is_protected(u2) && !is_same)
-		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else
 	{
 		snprintf(modebuf, sizeof(modebuf), "%c%c", (set ? '+' : '-'), cm->ModeChar);
@@ -65,7 +65,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 		av[0] = modebuf;
 		av[1] = u2->nick;
 
-		chan_set_modes(s_ChanServ, c, 2, av, 3);
+		chan_set_modes(Config.s_ChanServ, c, 2, av, 3);
 
 		if (notice && ci->HasFlag(notice))
 			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",
@@ -91,13 +91,13 @@ class CommandCSOp : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_OP);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_OP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
 	}
 };
 
@@ -118,13 +118,13 @@ class CommandCSDeOp : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_DEOP);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
 	}
 };
 
@@ -145,13 +145,13 @@ class CommandCSVoice : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_VOICE);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_VOICE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
 	}
 };
 
@@ -172,13 +172,13 @@ class CommandCSDeVoice : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_DEVOICE);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEVOICE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
 	}
 };
 
@@ -204,13 +204,13 @@ class CommandCSHalfOp : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_HALFOP);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_HALFOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
 	}
 };
 
@@ -237,13 +237,13 @@ class CommandCSDeHalfOp : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_DEHALFOP);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEHALFOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
 	}
 };
 
@@ -269,13 +269,13 @@ class CommandCSProtect : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_PROTECT);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_PROTECT);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
 	}
 };
 
@@ -300,13 +300,13 @@ class CommandCSDeProtect : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_DEPROTECT);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEPROTECT);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
 	}
 };
 
@@ -331,13 +331,13 @@ class CommandCSOwner : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_OWNER);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_OWNER);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
 	}
 };
 
@@ -362,13 +362,13 @@ class CommandCSDeOwner : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_DEOWNER);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEOWNER);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
 	}
 };
 
@@ -411,27 +411,27 @@ class CSModes : public Module
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OWNER);
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
+			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_OWNER);
+			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
 		{
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
+			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
+			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
 		}
 
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OP);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOP);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_OP);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEOP);
 
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 		{
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
-			notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
+			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
+			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
 		}
 
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOICE);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_VOICE);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
 	}
 };
 

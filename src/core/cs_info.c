@@ -54,12 +54,12 @@ class CommandCSInfo : public Command
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
 			if (is_oper(u) && ci->forbidby)
-				notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN_OPER, chan,
+				notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN_OPER, chan,
 							ci->forbidby,
 							(ci->forbidreason ? ci->
 							 forbidreason : getstring(u, NO_REASON)));
 			else
-				notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+				notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 
 			return MOD_CONT;
 		}
@@ -68,19 +68,19 @@ class CommandCSInfo : public Command
 		if (!param.empty() && param == "ALL" && (check_access(u, ci, CA_INFO) || has_auspex))
 			show_all = 1;
 
-		notice_lang(s_ChanServ, u, CHAN_INFO_HEADER, chan);
-		notice_lang(s_ChanServ, u, CHAN_INFO_NO_FOUNDER, ci->founder->display);
+		notice_lang(Config.s_ChanServ, u, CHAN_INFO_HEADER, chan);
+		notice_lang(Config.s_ChanServ, u, CHAN_INFO_NO_FOUNDER, ci->founder->display);
 
 		if (show_all && ci->successor)
-			notice_lang(s_ChanServ, u, CHAN_INFO_NO_SUCCESSOR, ci->successor->display);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_NO_SUCCESSOR, ci->successor->display);
 
-		notice_lang(s_ChanServ, u, CHAN_INFO_DESCRIPTION, ci->desc);
+		notice_lang(Config.s_ChanServ, u, CHAN_INFO_DESCRIPTION, ci->desc);
 		tm = localtime(&ci->time_registered);
 		strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-		notice_lang(s_ChanServ, u, CHAN_INFO_TIME_REGGED, buf);
+		notice_lang(Config.s_ChanServ, u, CHAN_INFO_TIME_REGGED, buf);
 		tm = localtime(&ci->last_used);
 		strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-		notice_lang(s_ChanServ, u, CHAN_INFO_LAST_USED, buf);
+		notice_lang(Config.s_ChanServ, u, CHAN_INFO_LAST_USED, buf);
 
 		cm = ModeManager::FindChannelModeByName(CMODE_SECRET);
 		// XXX: yuck.
@@ -88,20 +88,20 @@ class CommandCSInfo : public Command
 				(show_all || (!ci->HasMLock(cm->Name, true))
 											&& (!ci->c || !(ci->c->HasMode(CMODE_SECRET)))))
 		{
-			notice_lang(s_ChanServ, u, CHAN_INFO_LAST_TOPIC, ci->last_topic);
-			notice_lang(s_ChanServ, u, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_LAST_TOPIC, ci->last_topic);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter);
 		}
 
 		if (ci->entry_message && show_all)
-			notice_lang(s_ChanServ, u, CHAN_INFO_ENTRYMSG, ci->entry_message);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_ENTRYMSG, ci->entry_message);
 		if (ci->url)
-			notice_lang(s_ChanServ, u, CHAN_INFO_URL, ci->url);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_URL, ci->url);
 		if (ci->email)
-			notice_lang(s_ChanServ, u, CHAN_INFO_EMAIL, ci->email);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_EMAIL, ci->email);
 
 		if (show_all)
 		{
-			notice_lang(s_ChanServ, u, CHAN_INFO_BANTYPE, ci->bantype);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_BANTYPE, ci->bantype);
 			std::string optbuf;
 
 			CheckOptStr(optbuf, CI_KEEPTOPIC, getstring(u,  CHAN_INFO_OPT_KEEPTOPIC), ci, u->nc);
@@ -120,47 +120,47 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_XOP, getstring(u,  CHAN_INFO_OPT_XOP), ci, u->nc);
 			CheckOptStr(optbuf, CI_PERSIST, getstring(u, CHAN_INFO_OPT_PERSIST), ci, u->nc);
 
-			notice_lang(s_ChanServ, u, CHAN_INFO_OPTIONS,	optbuf.empty() ? getstring(u, CHAN_INFO_OPT_NONE) : optbuf.c_str());
-			notice_lang(s_ChanServ, u, CHAN_INFO_MODE_LOCK,	get_mlock_modes(ci, 1));
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_OPTIONS,	optbuf.empty() ? getstring(u, CHAN_INFO_OPT_NONE) : optbuf.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_MODE_LOCK,	get_mlock_modes(ci, 1));
 
 			// XXX: we could just as easily (and tidily) merge this in with the flags display above.
 			if (ci->HasFlag(CI_NO_EXPIRE))
 			{
-				notice_lang(s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
+				notice_lang(Config.s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
 			}
 			else
 			{
 				if (has_auspex)
 				{
-					expt = ci->last_used + CSExpire;
+					expt = ci->last_used + Config.CSExpire;
 					tm = localtime(&expt);
 					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-					notice_lang(s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
+					notice_lang(Config.s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
 				}
 			}
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
 		{
-			notice_lang(s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON)));
+			notice_lang(Config.s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON)));
 		}
 
 		if (!show_all && (check_access(u, ci, CA_INFO) || has_auspex))
-			notice_lang(s_ChanServ, u, NICK_INFO_FOR_MORE, s_ChanServ, ci->name);
+			notice_lang(Config.s_ChanServ, u, NICK_INFO_FOR_MORE, Config.s_ChanServ, ci->name);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_INFO);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_INFO);
 		if (u->nc && u->nc->IsServicesOper())
-			notice_lang(s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
+			notice_lang(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "INFO", CHAN_INFO_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "INFO", CHAN_INFO_SYNTAX);
 	}
 };
 
@@ -178,7 +178,7 @@ class CSInfo : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INFO);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_INFO);
 	}
 };
 

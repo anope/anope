@@ -113,7 +113,7 @@ int levelinfo_maxwidth = 0;
 /*************************************************************************/
 
 void moduleAddChanServCmds() {
-	ModuleManager::LoadModuleList(ChanServCoreModules);
+	ModuleManager::LoadModuleList(Config.ChanServCoreModules);
 }
 
 /* *INDENT-ON* */
@@ -136,7 +136,7 @@ class ChanServTimer : public Timer
 			if (ci)
 				ci->UnsetFlag(CI_INHABIT);
 
-			ircdproto->SendPart(findbot(s_ChanServ), channel.c_str(), NULL);
+			ircdproto->SendPart(findbot(Config.s_ChanServ), channel.c_str(), NULL);
 		}
 };
 
@@ -295,9 +295,9 @@ void chanserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(findbot(s_ChanServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_ChanServ), u->nick, "PING %s", s);
 	} else {
-		mod_run_cmd(s_ChanServ, u, CHANSERV, cmd);
+		mod_run_cmd(Config.s_ChanServ, u, CHANSERV, cmd);
 	}
 }
 
@@ -309,7 +309,7 @@ void chanserv(User * u, char *buf)
 #define SAFE(x) do {					\
 	if ((x) < 0) {					\
 	if (!forceload)					\
-		fatal("Read error on %s", ChanDBName);	\
+		fatal("Read error on %s", Config.ChanDBName);	\
 	failed = 1;					\
 	break;						\
 	}							\
@@ -323,7 +323,7 @@ void load_cs_dbase()
 	ChannelInfo *ci, **last, *prev;
 	int failed = 0;
 
-	if (!(f = open_db(s_ChanServ, ChanDBName, "r", CHAN_VERSION)))
+	if (!(f = open_db(Config.s_ChanServ, Config.ChanDBName, "r", CHAN_VERSION)))
 		return;
 
 	ver = get_file_version(f);
@@ -343,7 +343,7 @@ void load_cs_dbase()
 		prev = NULL;
 		while ((c = getc_db(f)) != 0) {
 			if (c != 1)
-				fatal("Invalid format in %s", ChanDBName);
+				fatal("Invalid format in %s", Config.ChanDBName);
 			char channame[CHANMAX];
 			SAFE(read = read_buffer(channame, f));
 			ci = new ChannelInfo(channame);
@@ -594,7 +594,7 @@ void load_cs_dbase()
 			next = ci->next;
 			if (!(ci->HasFlag(CI_FORBIDDEN)) && !ci->founder) {
 				alog("%s: database load: Deleting founderless channel %s",
-					 s_ChanServ, ci->name);
+					 Config.s_ChanServ, ci->name);
 				delete ci;
 				continue;
 			}
@@ -609,9 +609,9 @@ void load_cs_dbase()
 #define SAFE(x) do {						\
 	if ((x) < 0) {						\
 	restore_db(f);						\
-	log_perror("Write error on %s", ChanDBName);		\
-	if (time(NULL) - lastwarn > WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", ChanDBName,	\
+	log_perror("Write error on %s", Config.ChanDBName);		\
+	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.ChanDBName,	\
 			strerror(errno));			\
 		lastwarn = time(NULL);				\
 	}							\
@@ -627,7 +627,7 @@ void save_cs_dbase()
 	static time_t lastwarn = 0;
 	std::string param;
 
-	if (!(f = open_db(s_ChanServ, ChanDBName, "w", CHAN_VERSION)))
+	if (!(f = open_db(Config.s_ChanServ, Config.ChanDBName, "w", CHAN_VERSION)))
 		return;
 
 	for (i = 0; i < 256; i++) {
@@ -806,7 +806,7 @@ void check_modes(Channel * c)
 	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
 	{
 		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name);
-		alog("%s: Bouncy modes on channel %s", s_ChanServ, c->name);
+		alog("%s: Bouncy modes on channel %s", Config.s_ChanServ, c->name);
 		c->bouncy_modes = 1;
 		return;
 	}
@@ -911,7 +911,7 @@ void check_modes(Channel * c)
 	if (modebuf.empty())
 		return;
 
-	ircdproto->SendMode((ci ? whosends(ci) : findbot(s_OperServ)), c->name, "%s%s", modebuf.c_str(), argbuf.empty() ? "" : argbuf.c_str());
+	ircdproto->SendMode((ci ? whosends(ci) : findbot(Config.s_OperServ)), c->name, "%s%s", modebuf.c_str(), argbuf.empty() ? "" : argbuf.c_str());
 }
 
 /*************************************************************************/
@@ -931,7 +931,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 		return 0;
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
-		notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
+		notice_lang(Config.s_ChanServ, user, CHAN_IS_REGISTERED, Config.s_ChanServ);
 		ircdproto->SendMode(whosends(chan->ci), chan->name, "-%s %s",
 					   cm->ModeChar, user->nick);
 		return 0;
@@ -967,7 +967,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 	halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOOP)) {
-		notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
+		notice_lang(Config.s_ChanServ, user, CHAN_IS_REGISTERED, Config.s_ChanServ);
 		if (halfop)
 		{
 			if (owner && protect)
@@ -1214,7 +1214,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 				get_idealban(ci, user, mask, sizeof(mask));
 			else
 				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
-			reason = !akick->reason.empty() ? akick->reason.c_str() : CSAutokickReason;
+			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
 			goto kick;
 			}
 	}
@@ -1241,16 +1241,16 @@ int check_kick(User * user, const char *chan, time_t chants)
 	 * c may be NULL even if it exists */
 	if ((!(c = findchan(chan)) || c->usercount == 0) && !ci->HasFlag(CI_INHABIT))
 	{
-		ircdproto->SendJoin(findbot(s_ChanServ), chan, (c ? c->creation_time : chants));
+		ircdproto->SendJoin(findbot(Config.s_ChanServ), chan, (c ? c->creation_time : chants));
 		/*
 		 * If channel was forbidden, etc, set it +si to prevent rejoin
 		 */
 		if (set_modes)
 		{
-			ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
+			ircdproto->SendMode(findbot(Config.s_ChanServ), chan, "+ntsi");
 		}
 
-		t = new ChanServTimer(CSInhabit, chan);
+		t = new ChanServTimer(Config.CSInhabit, chan);
 		ci->SetFlag(CI_INHABIT);
 	}
 
@@ -1339,16 +1339,16 @@ void restore_topic(const char *chan)
 		strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
 	}
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(s_ChanServ)) {
-			ircdproto->SendJoin(findbot(s_ChanServ), chan, c->creation_time);
-			ircdproto->SendMode(NULL, chan, "+o %s", s_ChanServ);
+		if (whosends(ci) == findbot(Config.s_ChanServ)) {
+			ircdproto->SendJoin(findbot(Config.s_ChanServ), chan, c->creation_time);
+			ircdproto->SendMode(NULL, chan, "+o %s", Config.s_ChanServ);
 		}
 	}
 	ircdproto->SendTopic(whosends(ci), c->name, c->topic_setter,
 					c->topic ? c->topic : "", c->topic_time);
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(s_ChanServ)) {
-			ircdproto->SendPart(findbot(s_ChanServ), c->name, NULL);
+		if (whosends(ci) == findbot(Config.s_ChanServ)) {
+			ircdproto->SendPart(findbot(Config.s_ChanServ), c->name, NULL);
 		}
 	}
 }
@@ -1380,7 +1380,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 	} else {
 		c->topic = NULL;
 		/* Bot assigned & Symbiosis ON?, the bot will set the topic - doc */
-		/* Altough whosends() also checks for BSMinUsers -GD */
+		/* Altough whosends() also checks for Config.BSMinUsers -GD */
 		strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
 	}
 
@@ -1401,9 +1401,9 @@ int check_topiclock(Channel * c, time_t topic_time)
 	}
 
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(s_ChanServ)) {
-			ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
-			ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
+		if (whosends(ci) == findbot(Config.s_ChanServ)) {
+			ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
+			ircdproto->SendMode(NULL, c->name, "+o %s", Config.s_ChanServ);
 		}
 	}
 
@@ -1411,8 +1411,8 @@ int check_topiclock(Channel * c, time_t topic_time)
 					c->topic ? c->topic : "", c->topic_time);
 
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(s_ChanServ)) {
-			ircdproto->SendPart(findbot(s_ChanServ), c->ci->name, NULL);
+		if (whosends(ci) == findbot(Config.s_ChanServ)) {
+			ircdproto->SendPart(findbot(Config.s_ChanServ), c->ci->name, NULL);
 		}
 	}
 	return 1;
@@ -1428,13 +1428,13 @@ void expire_chans()
 	int i;
 	time_t now = time(NULL);
 
-	if (!CSExpire)
+	if (!Config.CSExpire)
 		return;
 
 	for (i = 0; i < 256; i++) {
 		for (ci = chanlists[i]; ci; ci = next) {
 			next = ci->next;
-			if (!ci->c && now - ci->last_used >= CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
+			if (!ci->c && now - ci->last_used >= Config.CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
 			{
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
@@ -1469,18 +1469,18 @@ void cs_remove_nick(const NickCore * nc)
 			if (ci->founder == nc) {
 				if (ci->successor) {
 					NickCore *nc2 = ci->successor;
-					if (!nc2->IsServicesOper() && CSMaxReg && nc2->channelcount >= CSMaxReg) {
-						alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", s_ChanServ, nc2->display, ci->name);
+					if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg) {
+						alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", Config.s_ChanServ, nc2->display, ci->name);
 						delete ci;
 						continue;
 					} else {
-						alog("%s: Transferring foundership of %s from deleted " "nick %s to successor %s", s_ChanServ, ci->name, nc->display, nc2->display);
+						alog("%s: Transferring foundership of %s from deleted " "nick %s to successor %s", Config.s_ChanServ, ci->name, nc->display, nc2->display);
 						ci->founder = nc2;
 						ci->successor = NULL;
 						nc2->channelcount++;
 					}
 				} else {
-					alog("%s: Deleting channel %s owned by deleted nick %s", s_ChanServ, ci->name, nc->display);
+					alog("%s: Deleting channel %s owned by deleted nick %s", Config.s_ChanServ, ci->name, nc->display);
 
 					if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
 					{
@@ -1898,7 +1898,7 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 	av[0] = "+b";
 	av[1] = akick->mask.c_str();
 	ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->mask.c_str());
-	chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
+	chan_set_modes(Config.s_ChanServ, ci->c, 2, av, 1);
 }
 
 /* Ban the stuck mask in a safe manner. */
@@ -1920,6 +1920,6 @@ void stick_all(ChannelInfo * ci)
 		av[0] = "+b";
 		av[1] = akick->mask.c_str();
 		ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->mask.c_str());
-		chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
+		chan_set_modes(Config.s_ChanServ, ci->c, 2, av, 1);
 	}
 }

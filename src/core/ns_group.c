@@ -30,33 +30,33 @@ class CommandNSGroup : public Command
 		const char *pass = params[1].c_str();
 		std::list<std::pair<std::string, std::string> >::iterator it;
 
-		if (NSEmailReg && findrequestnick(u->nick))
+		if (Config.NSEmailReg && findrequestnick(u->nick))
 		{
-			notice_lang(s_NickServ, u, NICK_REQUESTED);
+			notice_lang(Config.s_NickServ, u, NICK_REQUESTED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			notice_lang(s_NickServ, u, NICK_GROUP_DISABLED);
+			notice_lang(Config.s_NickServ, u, NICK_GROUP_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (!ircdproto->IsNickValid(u->nick))
 		{
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
 			return MOD_CONT;
 		}
 
-		if (RestrictOperNicks)
+		if (Config.RestrictOperNicks)
 		{
-			for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
+			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 			{
 				std::string nick = it->first;
 
 				if (stristr(u->nick, nick.c_str()) && !is_oper(u))
 				{
-					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
 					return MOD_CONT;
 				}
 			}
@@ -64,31 +64,31 @@ class CommandNSGroup : public Command
 
 		na = findnick(u->nick);
 		if (!(target = findnick(nick)))
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-		else if (time(NULL) < u->lastnickreg + NSRegDelay)
-			notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (NSRegDelay + u->lastnickreg) - time(NULL));
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+		else if (time(NULL) < u->lastnickreg + Config.NSRegDelay)
+			notice_lang(Config.s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (Config.NSRegDelay + u->lastnickreg) - time(NULL));
 		else if (u->nc && u->nc->HasFlag(NI_SUSPENDED))
 		{
-			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
+			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
-			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, target->nick);
+			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, nick);
 		else if (na && target->nc == na->nc)
-			notice_lang(s_NickServ, u, NICK_GROUP_SAME, target->nick);
+			notice_lang(Config.s_NickServ, u, NICK_GROUP_SAME, target->nick);
 		else if (na && na->nc != u->nc)
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-		else if (NSMaxAliases && (target->nc->aliases.count >= NSMaxAliases) && !target->nc->IsServicesOper())
-			notice_lang(s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, s_NickServ, s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
+		else if (Config.NSMaxAliases && (target->nc->aliases.count >= Config.NSMaxAliases) && !target->nc->IsServicesOper())
+			notice_lang(Config.s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, Config.s_NickServ, Config.s_NickServ);
 		else if (enc_check_password(pass, target->nc->pass) != 1)
 		{
-			alog("%s: Failed GROUP for %s!%s@%s (invalid password)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host);
-			notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
+			alog("%s: Failed GROUP for %s!%s@%s (invalid password)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host);
+			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
 			bad_password(u);
 		}
 		else
@@ -100,12 +100,12 @@ class CommandNSGroup : public Command
 				delete na;
 			else
 			{
-				int prefixlen = strlen(NSGuestNickPrefix);
+				int prefixlen = strlen(Config.NSGuestNickPrefix);
 				int nicklen = strlen(u->nick);
 
-				if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick, NSGuestNickPrefix) == u->nick && strspn(u->nick + prefixlen, "1234567890") == nicklen - prefixlen)
+				if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick, Config.NSGuestNickPrefix) == u->nick && strspn(u->nick + prefixlen, "1234567890") == nicklen - prefixlen)
 				{
-					notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
 					return MOD_CONT;
 				}
 			}
@@ -124,8 +124,8 @@ class CommandNSGroup : public Command
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 				ircdproto->SetAutoIdentificationToken(u);
 
-				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
-				notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
+				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
+				notice_lang(Config.s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
 				u->lastnickreg = time(NULL);
 
@@ -133,8 +133,8 @@ class CommandNSGroup : public Command
 			}
 			else
 			{
-				alog("%s: makealias(%s) failed", s_NickServ, u->nick);
-				notice_lang(s_NickServ, u, NICK_GROUP_FAILED);
+				alog("%s: makealias(%s) failed", Config.s_NickServ, u->nick);
+				notice_lang(Config.s_NickServ, u, NICK_GROUP_FAILED);
 			}
 		}
 		return MOD_CONT;
@@ -142,13 +142,13 @@ class CommandNSGroup : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_GROUP);
+		notice_help(Config.s_NickServ, u, NICK_HELP_GROUP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "GROUP", NICK_GROUP_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "GROUP", NICK_GROUP_SYNTAX);
 	}
 };
 
@@ -167,11 +167,11 @@ class CommandNSGList : public Command
 		int i;
 
 		if (nick && (stricmp(nick, u->nick) && !u->nc->IsServicesOper()))
-			notice_lang(s_NickServ, u, ACCESS_DENIED, s_NickServ);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED, Config.s_NickServ);
 		else if (nick && (!findnick(nick) || !(nc = findnick(nick)->nc)))
-			notice_lang(s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
 /*		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);*/
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);*/
 		else
 		{
 			time_t expt;
@@ -179,7 +179,7 @@ class CommandNSGList : public Command
 			char buf[BUFSIZE];
 			int wont_expire;
 
-			notice_lang(s_NickServ, u, nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display);
+			notice_lang(Config.s_NickServ, u, nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display);
 			for (i = 0; i < nc->aliases.count; ++i)
 			{
 				NickAlias *na2 = static_cast<NickAlias *>(nc->aliases.list[i]);
@@ -187,14 +187,14 @@ class CommandNSGList : public Command
 				{
 					if (!(wont_expire = na2->HasFlag(NS_NO_EXPIRE)))
 					{
-						expt = na2->last_seen + NSExpire;
+						expt = na2->last_seen + Config.NSExpire;
 						tm = localtime(&expt);
 						strftime_lang(buf, sizeof(buf), finduser(na2->nick), STRFTIME_DATE_TIME_FORMAT, tm);
 					}
-					notice_lang(s_NickServ, u, u->nc->IsServicesOper() && !wont_expire ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY, wont_expire ? '!' : ' ', na2->nick, buf);
+					notice_lang(Config.s_NickServ, u, u->nc->IsServicesOper() && !wont_expire ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY, wont_expire ? '!' : ' ', na2->nick, buf);
 				}
 			}
-			notice_lang(s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.count);
+			notice_lang(Config.s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.count);
 		}
 		return MOD_CONT;
 	}
@@ -203,9 +203,9 @@ class CommandNSGList : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_GLIST);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_GLIST);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_GLIST);
+			notice_help(Config.s_NickServ, u, NICK_HELP_GLIST);
 
 		return true;
 	}
@@ -227,8 +227,8 @@ class NSGroup : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_GROUP);
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_GLIST);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GROUP);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GLIST);
 	}
 };
 

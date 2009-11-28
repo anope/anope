@@ -64,7 +64,7 @@ User::User(const std::string &snick, const std::string &suid)
 	{
 		maxusercnt = usercnt;
 		maxusertime = time(NULL);
-		if (LogMaxUsers)
+		if (Config.LogMaxUsers)
 			alog("user: New maximum user count: %d", maxusercnt);
 	}
 
@@ -226,7 +226,7 @@ User::~User()
 	struct u_chanlist *c, *c2;
 	char *srealname;
 
-	if (LogUsers)
+	if (Config.LogUsers)
 	{
 		srealname = normalizeBuffer(this->realname);
 
@@ -324,8 +324,8 @@ void User::SendMessage(const char *source, const std::string &msg)
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
-	if (UsePrivmsg &&
-		((!this->nc && NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
+	if (Config.UsePrivmsg &&
+		((!this->nc && Config.NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
 	{
 		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
 	}
@@ -638,7 +638,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		}
 
 
-		if (LogUsers) {
+		if (Config.LogUsers) {
 		/**
 	 * Ugly swap routine for Flop's bug :)
  	 **/
@@ -706,7 +706,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (ircd->szline && ircd->nickip)
 			check_szline(nick, ipbuf);
 
-		if (LimitSessions && !is_ulined(server))
+		if (Config.LimitSessions && !is_ulined(server))
 			add_session(nick, host, ipbuf);
 
 		/* Only call I_OnUserConnect if the user still exists */
@@ -730,7 +730,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (debug)
 			alog("debug: %s changes nick to %s", source, nick);
 
-		if (LogUsers) {
+		if (Config.LogUsers) {
 			logrealname = normalizeBuffer(user->realname);
 			if (ircd->vhost) {
 				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick, user->GetIdent().c_str(), user->host, user->GetDisplayedHost().c_str(), logrealname, nick, user->server->name);
@@ -820,7 +820,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			std::string last_usermask = user->GetIdent() + "@" + user->GetDisplayedHost();
 			ntmp->last_usermask = sstrdup(last_usermask.c_str());
 			ircdproto->SetAutoIdentificationToken(user);
-			alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
+			alog("%s: %s!%s@%s automatically identified for nick %s", Config.s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
 		}
 
 		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
@@ -884,7 +884,7 @@ void do_quit(const char *source, int ac, const char **av)
 			delete [] na->last_quit;
 		na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
 	}
-	if (LimitSessions && !is_ulined(user->server->name)) {
+	if (Config.LimitSessions && !is_ulined(user->server->name)) {
 		del_session(user->host);
 	}
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
@@ -920,7 +920,7 @@ void do_kill(const char *nick, const char *msg)
 		na->last_quit = *msg ? sstrdup(msg) : NULL;
 
 	}
-	if (LimitSessions && !is_ulined(user->server->name)) {
+	if (Config.LimitSessions && !is_ulined(user->server->name)) {
 		del_session(user->host);
 	}
 	delete user;

@@ -33,42 +33,42 @@ class CommandNSGetPass : public Command
 		{
 			if ((nr = findrequestnick(nick)))
 			{
-				alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nick);
-				if (WallGetpass)
-					ircdproto->SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick, nick);
-				notice_lang(s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode);
+				alog("%s: %s!%s@%s used GETPASS on %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nick);
+				if (Config.WallGetpass)
+					ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick, nick);
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode);
 			}
 			else
-				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-		else if (NSSecureAdmins && na->nc->IsServicesOper())
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+		else if (Config.NSSecureAdmins && na->nc->IsServicesOper())
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)
 			{
-				alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nick);
-				if (WallGetpass)
-					ircdproto->SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick, nick);
-				notice_lang(s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass);
+				alog("%s: %s!%s@%s used GETPASS on %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nick);
+				if (Config.WallGetpass)
+					ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick, nick);
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass);
 			}
 			else
-				notice_lang(s_NickServ, u, NICK_GETPASS_UNAVAILABLE);
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_UNAVAILABLE);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_GETPASS);
+		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_GETPASS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
 	}
 };
 
@@ -91,7 +91,7 @@ class NSGetPass : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GETPASS);
 	}
 };
 

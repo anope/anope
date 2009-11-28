@@ -32,25 +32,25 @@ class CommandNSSuspend : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_NickServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
 		if (!(na = findnick(nick)))
 		{
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
 		}
 
-		if (NSSecureAdmins && na->nc->IsServicesOper())
+		if (Config.NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -78,31 +78,31 @@ class CommandNSSuspend : public Command
 				}
 			}
 
-			if (WallForbid)
-				ircdproto->SendGlobops(s_NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick, nick);
+			if (Config.WallForbid)
+				ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick, nick);
 
-			alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
-			notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
+			alog("%s: %s set SUSPEND for nick %s", Config.s_NickServ, u->nick, nick);
+			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na))
 		}
 		else
 		{
-			alog("%s: Valid SUSPEND for %s by %s failed", s_NickServ, nick, u->nick);
-			notice_lang(s_NickServ, u, NICK_SUSPEND_FAILED, nick);
+			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_NickServ, nick, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_FAILED, nick);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_SUSPEND);
+		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
 	}
 };
 
@@ -120,25 +120,25 @@ class CommandNSUnSuspend : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_NickServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
 		if (!(na = findnick(nick)))
 		{
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
 		}
 
-		if (NSSecureAdmins && na->nc->IsServicesOper())
+		if (Config.NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -146,31 +146,31 @@ class CommandNSUnSuspend : public Command
 		{
 			na->nc->UnsetFlag(NI_SUSPENDED);
 
-			if (WallForbid)
-				ircdproto->SendGlobops(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick, nick);
+			if (Config.WallForbid)
+				ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick, nick);
 
-			alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick, nick);
-			notice_lang(s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
+			alog("%s: %s set UNSUSPEND for nick %s", Config.s_NickServ, u->nick, nick);
+			notice_lang(Config.s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 		}
 		else
 		{
-			alog("%s: Valid UNSUSPEND for %s by %s failed", s_NickServ, nick, u->nick);
-			notice_lang(s_NickServ, u, NICK_UNSUSPEND_FAILED, nick);
+			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_NickServ, nick, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_UNSUSPEND_FAILED, nick);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_UNSUSPEND);
+		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
 	}
 };
 
@@ -190,8 +190,8 @@ class NSSuspend : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_SUSPEND);
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SUSPEND);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
 	}
 };
 

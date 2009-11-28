@@ -101,7 +101,7 @@ class CommandOSModList : public Command
 			}
 		}
 
-		notice_lang(s_OperServ, u, OPER_MODULE_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST_HEADER);
 
 		for (idx = 0; idx != MAX_CMD_HASH; ++idx)
 		{
@@ -112,58 +112,58 @@ class CommandOSModList : public Command
 					case CORE:
 						if (showCore)
 						{
-							notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), core);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), core);
 							++count;
 						}
 						break;
 					case THIRD:
 						if (showThird)
 						{
-							notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), third);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), third);
 							++count;
 						}
 						break;
 					case PROTOCOL:
 						if (showProto)
 						{
-							notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), proto);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), proto);
 							++count;
 						}
 						break;
 					case SUPPORTED:
 						if (showSupported)
 						{
-							notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), supported);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), supported);
 							++count;
 						}
 						break;
 					case QATESTED:
 						if (showQA)
 						{
-							notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), qa);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), qa);
 							++count;
 						}
 						break;
 					case ENCRYPTION:
 						if (showEnc)
 						{
-							notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), enc);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), enc);
 							++count;
 						}
 				}
 			}
 		}
 		if (!count)
-			notice_lang(s_OperServ, u, OPER_MODULE_NO_LIST);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_LIST);
 		else
-			notice_lang(s_OperServ, u, OPER_MODULE_LIST_FOOTER, count);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST_FOOTER, count);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_MODLIST);
+		notice_help(Config.s_OperServ, u, OPER_HELP_MODLIST);
 		return true;
 	}
 };
@@ -183,7 +183,7 @@ class OSModList : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLIST);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODLIST);
 	}
 };
 

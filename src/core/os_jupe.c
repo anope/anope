@@ -29,9 +29,9 @@ class CommandOSJupe : public Command
 		Server *server = findserver(servlist, jserver);
 
 		if (!isValidHost(jserver, 3))
-			notice_lang(s_OperServ, u, OPER_JUPE_HOST_ERROR);
+			notice_lang(Config.s_OperServ, u, OPER_JUPE_HOST_ERROR);
 		else if (server && (server->HasFlag(SERVER_ISME) || server->HasFlag(SERVER_ISUPLINK)))
-			notice_lang(s_OperServ, u, OPER_JUPE_INVALID_SERVER);
+			notice_lang(Config.s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else {
 			char rbuf[256];
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick, reason ? ": " : "", reason ? reason : "");
@@ -40,21 +40,21 @@ class CommandOSJupe : public Command
 			Server *juped_server = new_server(me_server, jserver, rbuf, SERVER_JUPED, ircd->ts6 ? ts6_sid_retrieve() : NULL);
 			ircdproto->SendServer(juped_server);
 
-			if (WallOSJupe)
-				ircdproto->SendGlobops(s_OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick, jserver);
+			if (Config.WallOSJupe)
+				ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick, jserver);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_JUPE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_JUPE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
 	}
 };
 
@@ -73,7 +73,7 @@ class OSJupe : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_JUPE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_JUPE);
 	}
 };
 

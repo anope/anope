@@ -63,7 +63,7 @@ class ENone : public Module
 			/* if we are NOT the first module in the list, 
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (stricmp(EncModuleList.begin()->c_str(), this->name.c_str()))
+			if (stricmp(Config.EncModuleList.begin()->c_str(), this->name.c_str()))
 			{
 				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
 			}

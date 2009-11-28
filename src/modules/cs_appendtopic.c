@@ -69,9 +69,9 @@ class CommandCSAppendTopic : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		else if (!check_access(u, ci, CA_TOPIC))
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
 			if (ci->last_topic)
@@ -96,20 +96,20 @@ class CommandCSAppendTopic : public Command
 				c->topic_time = ci->last_topic_time;
 
 			if (!check_access(u, ci, CA_TOPIC))
-				alog("%s: %s!%s@%s changed topic of %s as services admin.", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, c->name);
+				alog("%s: %s!%s@%s changed topic of %s as services admin.", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, c->name);
 			if (ircd->join2set)
 			{
-				if (whosends(ci) == findbot(s_ChanServ))
+				if (whosends(ci) == findbot(Config.s_ChanServ))
 				{
-					ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
-					ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
+					ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
+					ircdproto->SendMode(NULL, c->name, "+o %s", Config.s_ChanServ);
 				}
 			}
 			ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic, c->topic_time);
 			if (ircd->join2set)
 			{
-				if (whosends(ci) == findbot(s_ChanServ))
-					ircdproto->SendPart(findbot(s_ChanServ), c->name, NULL);
+				if (whosends(ci) == findbot(Config.s_ChanServ))
+					ircdproto->SendPart(findbot(Config.s_ChanServ), c->name, NULL);
 			}
 		}
 		return MOD_CONT;
@@ -117,16 +117,16 @@ class CommandCSAppendTopic : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
-		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
+		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	}
 };
 
@@ -227,7 +227,7 @@ class CSAppendTopic : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		this->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+		this->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
 	}
 };
 

@@ -93,13 +93,13 @@ class CommandHSRequest : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (!rawhostmask)
 			{
-				me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+				me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
 				delete [] vIdent;
 				return MOD_CONT;
 			}
 			if (strlen(vIdent) > USERMAX - 1)
 			{
-				notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
 				delete [] vIdent;
 				delete [] rawhostmask;
 				return MOD_CONT;
@@ -110,7 +110,7 @@ class CommandHSRequest : public Command
 				{
 					if (!my_isvalidchar(*s))
 					{
-						notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
+						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
 						delete [] vIdent;
 						delete [] rawhostmask;
 						return MOD_CONT;
@@ -119,7 +119,7 @@ class CommandHSRequest : public Command
 			}
 			if (!ircd->vident)
 			{
-				notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+				notice_lang(Config.s_HostServ, u, HOST_NO_VIDENT);
 				delete [] vIdent;
 				delete [] rawhostmask;
 				return MOD_CONT;
@@ -129,7 +129,7 @@ class CommandHSRequest : public Command
 			snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
 		else
 		{
-			notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
 			if (vIdent)
 			{
 				delete [] vIdent;
@@ -140,7 +140,7 @@ class CommandHSRequest : public Command
 
 		if (!isValidHost(hostmask, 3))
 		{
-			notice_lang(s_HostServ, u, HOST_SET_ERROR);
+			notice_lang(Config.s_HostServ, u, HOST_SET_ERROR);
 			if (vIdent)
 			{
 				delete [] vIdent;
@@ -154,9 +154,9 @@ class CommandHSRequest : public Command
 		{
 			if (HSRequestMemoOper || HSRequestMemoSetters)
 			{
-				if (MSSendDelay > 0 && u && u->lastmemosend + MSSendDelay > now)
+				if (Config.MSSendDelay > 0 && u && u->lastmemosend + Config.MSSendDelay > now)
 				{
-					me->NoticeLang(s_HostServ, u, LNG_REQUEST_WAIT, MSSendDelay);
+					me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_WAIT, Config.MSSendDelay);
 					u->lastmemosend = now;
 					if (vIdent)
 					{
@@ -168,12 +168,12 @@ class CommandHSRequest : public Command
 			}
 			my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
 
-			me->NoticeLang(s_HostServ, u, LNG_REQUESTED);
+			me->NoticeLang(Config.s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);
 			alog("New vHost Requested by %s", nick);
 		}
 		else
-			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
 
 		if (vIdent)
 		{
@@ -186,16 +186,16 @@ class CommandHSRequest : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
+		me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
+		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_REQUEST);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+		me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
 	}
 };
 
@@ -210,7 +210,7 @@ class CommandHSActivate : public Command
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
-			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_HostServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -235,32 +235,32 @@ class CommandHSActivate : public Command
 					my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
 
 				hs_request_head = deleteHostCore(hs_request_head, tmp);
-				me->NoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
+				me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATED, nick);
 				alog("Host Request for %s activated by %s", nick, u->nick);
 			}
 			else
-				me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+				me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
 		}
 		else
-			notice_lang(s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
+		me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_ACTIVATE);
 		if (HSRequestMemoUser)
-			me->NoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
+			me->NoticeLang(Config.s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 	}
 };
 
@@ -275,7 +275,7 @@ class CommandHSReject : public Command
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
-			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_HostServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -301,29 +301,29 @@ class CommandHSReject : public Command
 			}
 
 			hs_request_head = deleteHostCore(hs_request_head, tmp);
-			me->NoticeLang(s_HostServ, u, LNG_REJECTED, nick);
+			me->NoticeLang(Config.s_HostServ, u, LNG_REJECTED, nick);
 			alog("Host Request for %s rejected by %s (%s)", nick, u->nick, reason ? reason : "");
 		}
 		else
-			me->NoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+			me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT);
+		me->NoticeLang(Config.s_HostServ, u, LNG_REJECT_SYNTAX);
+		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_REJECT);
 		if (HSRequestMemoUser)
-			me->NoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
+			me->NoticeLang(Config.s_HostServ, u, LNG_HELP_REJECT_MEMO);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+		me->NoticeLang(Config.s_HostServ, u, LNG_REJECT_SYNTAX);
 	}
 };
 
@@ -334,7 +334,7 @@ class HSListBase : public Command
 	{
 		if (!u->nc->HasPriv("hostserv/set"))
 		{
-			notice_lang(s_HostServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_HostServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -348,20 +348,20 @@ class HSListBase : public Command
 		current = hs_request_head;
 		while (current)
 		{
-			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < NSListMax)
+			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
 			{
 				++display_counter;
 				tm = localtime(&current->time);
 				strftime(buf, sizeof(buf), getstring(u, STRFTIME_DATE_TIME_FORMAT), tm);
 				if (current->vIdent)
-					notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+					notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
 				else
-					notice_lang(s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+					notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
 			}
 			++counter;
 			current = current->next;
 		}
-		notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
+		notice_lang(Config.s_HostServ, u, HOST_LIST_FOOTER, display_counter);
 
 		return MOD_CONT;
 	}
@@ -390,9 +390,9 @@ class CommandHSWaiting : public HSListBase
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
-		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-		me->NoticeLang(s_HostServ, u, LNG_HELP_WAITING);
+		me->NoticeLang(Config.s_HostServ, u, LNG_WAITING_SYNTAX);
+		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_WAITING);
 
 		return true;
 	}
@@ -695,7 +695,7 @@ class HSRequest : public Module
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
-		if (s_HostServ && service == s_HostServ)
+		if (Config.s_HostServ && service == Config.s_HostServ)
 		{
 			if (command == "LIST")
 			{
@@ -710,7 +710,7 @@ class HSRequest : public Module
 				}
 			}
 		}
-		else if (service == s_NickServ)
+		else if (service == Config.s_NickServ)
 		{
 			if (command == "DROP")
 			{
@@ -769,8 +769,8 @@ class HSRequest : public Module
 
 	void OnHostServHelp(User *u)
 	{
-		this->NoticeLang(s_HostServ, u, LNG_HELP);
-		this->NoticeLang(s_HostServ, u, LNG_HELP_SETTER);
+		this->NoticeLang(Config.s_HostServ, u, LNG_HELP);
+		this->NoticeLang(Config.s_HostServ, u, LNG_HELP_SETTER);
 	}
 };
 
@@ -831,7 +831,7 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 
 	if (HSRequestMemoOper == 1)
 	{
-		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
+		for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 		{
 			std::string nick = it->first;
 			my_memo_lang(u, nick.c_str(), z, LNG_REQUEST_MEMO, host);

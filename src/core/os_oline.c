@@ -30,20 +30,20 @@ class CommandOSOLine : public Command
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (u2 && flag[0] == '+')
 		{
-			ircdproto->SendSVSO(s_OperServ, nick, flag);
+			ircdproto->SendSVSO(Config.s_OperServ, nick, flag);
 			common_svsmode(u2, "+o", NULL);
-			notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
-			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
-			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
+			notice_lang(Config.s_OperServ, u2, OPER_OLINE_IRCOP);
+			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
+			ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
 		}
 		else if (u2 && flag[0] == '-')
 		{
-			ircdproto->SendSVSO(s_OperServ, nick, flag);
-			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
-			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
+			ircdproto->SendSVSO(Config.s_OperServ, nick, flag);
+			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
+			ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
 		}
 		else
 			this->OnSyntaxError(u, "");
@@ -52,13 +52,13 @@ class CommandOSOLine : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_OLINE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_OLINE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
 	}
 };
 
@@ -80,7 +80,7 @@ class OSOLine : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_OLINE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_OLINE);
 	}
 };
 

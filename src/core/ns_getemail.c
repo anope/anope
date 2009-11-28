@@ -33,7 +33,7 @@ class CommandNSGetEMail : public Command
 		int i, j = 0;
 		NickCore *nc;
 
-		alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, email.c_str());
+		alog("%s: %s!%s@%s used GETEMAIL on %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, email.c_str());
 		for (i = 0; i < 1024; ++i)
 		{
 			for (nc = nclists[i]; nc; nc = nc->next)
@@ -43,14 +43,14 @@ class CommandNSGetEMail : public Command
 					if (nc->email == email)
 					{
 						++j;
-						notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
+						notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
 					}
 				}
 			}
 		}
 		if (j <= 0)
 		{
-			notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
+			notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
 			return MOD_CONT;
 		}
 		return MOD_CONT;
@@ -58,13 +58,13 @@ class CommandNSGetEMail : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
+		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
 	}
 };
 
@@ -83,7 +83,7 @@ class NSGetEMail : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
 	}
 };
 

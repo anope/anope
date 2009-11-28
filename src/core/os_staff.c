@@ -34,9 +34,9 @@ class CommandOSStaff : public Command
 		int i;
 		std::list<std::pair<std::string, std::string> >::iterator it;
 
-		notice_lang(s_OperServ, u, OPER_STAFF_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_STAFF_LIST_HEADER);
 
-		for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
+		for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 		{
 			found = 0;
 			std::string nick = it->first, type = it->second;
@@ -44,7 +44,7 @@ class CommandOSStaff : public Command
 			if ((au = finduser(nick.c_str())))
 			{
 				found = 1;
-				notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), nick.c_str());
+				notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), nick.c_str());
 			}
 			else if ((nc = findcore(nick.c_str())))
 			{
@@ -54,22 +54,22 @@ class CommandOSStaff : public Command
 					if ((au = finduser(na->nick)))
 					{
 						found = 1;
-						notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), nick.c_str(), u->nick);
+						notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), nick.c_str(), u->nick);
 					}
 				}
 			}
 
 			if (!found)
-				notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), nick.c_str());
+				notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), nick.c_str());
 		}
 
-		notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Staff");
+		notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Staff");
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_STAFF);
+		notice_help(Config.s_OperServ, u, OPER_HELP_STAFF);
 		return true;
 	}
 };
@@ -89,7 +89,7 @@ class OSStaff : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_STAFF);
 	}
 };
 

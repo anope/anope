@@ -30,27 +30,27 @@ class CommandHSDel : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
 			alog("vHost for user \002%s\002 deleted by oper \002%s\002", nick, u->nick);
 			delHostCore(nick);
-			notice_lang(s_HostServ, u, HOST_DEL, nick);
+			notice_lang(Config.s_HostServ, u, HOST_DEL, nick);
 		}
 		else
-			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_DEL);
+		notice_help(Config.s_HostServ, u, HOST_HELP_DEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
+		syntax_error(Config.s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
 	}
 };
 
@@ -69,7 +69,7 @@ class HSDel : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_DEL);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DEL);
 	}
 };
 

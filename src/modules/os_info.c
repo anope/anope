@@ -74,11 +74,11 @@ class CommandNSOInfo : public Command
 			}
 			/* Add the module data to the user */
 			na->nc->Extend("os_info", sstrdup(info));
-			me->NoticeLang(s_NickServ, u, OINFO_ADD_SUCCESS, nick);
+			me->NoticeLang(Config.s_NickServ, u, OINFO_ADD_SUCCESS, nick);
 
 		}
 		else /* NickCore not found! */
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 
 		return MOD_CONT;
 	}
@@ -97,11 +97,11 @@ class CommandNSOInfo : public Command
 				na->nc->Shrink("os_info");
 			}
 
-			me->NoticeLang(s_NickServ, u, OINFO_DEL_SUCCESS, nick);
+			me->NoticeLang(Config.s_NickServ, u, OINFO_DEL_SUCCESS, nick);
 
 		}
 		else /* NickCore not found! */
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 
 		return MOD_CONT;
 	}
@@ -126,13 +126,13 @@ class CommandNSOInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_NickServ, u, OINFO_HELP);
+		me->NoticeLang(Config.s_NickServ, u, OINFO_HELP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_NickServ, u, OINFO_SYNTAX);
+		me->NoticeLang(Config.s_NickServ, u, OINFO_SYNTAX);
 	}
 };
 
@@ -159,7 +159,7 @@ class CommandCSOInfo : public Command
 		}
 		/* Add the module data to the channel */
 		ci->Extend("os_info", sstrdup(info));
-		me->NoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
+		me->NoticeLang(Config.s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
 
 		return MOD_CONT;
 	}
@@ -176,7 +176,7 @@ class CommandCSOInfo : public Command
 			delete [] c;
 			ci->Shrink("os_info");
 		}
-		me->NoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
+		me->NoticeLang(Config.s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
 
 		return MOD_CONT;
 	}
@@ -200,13 +200,13 @@ class CommandCSOInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, OCINFO_HELP);
+		me->NoticeLang(Config.s_ChanServ, u, OCINFO_HELP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
+		me->NoticeLang(Config.s_ChanServ, u, OCINFO_SYNTAX);
 	}
 };
 
@@ -504,7 +504,7 @@ class OSInfo : public Module
 	{
 		if (command == "INFO")
 		{
-			if (service == s_NickServ)
+			if (service == Config.s_NickServ)
 			{
 				const char *nick = params[0].c_str();
 				NickAlias *na = NULL;
@@ -516,11 +516,11 @@ class OSInfo : public Module
 						/* If we have any info on this user */
 						char *c;
 						if (na->nc->GetExt("os_info", c))
-							u->SendMessage(s_NickServ, " OperInfo: %s", c);
+							u->SendMessage(Config.s_NickServ, " OperInfo: %s", c);
 					}
 				}
 			}
-			else if (service == s_ChanServ)
+			else if (service == Config.s_ChanServ)
 			{
 				const char *chan = params[0].c_str();
 				ChannelInfo *ci = NULL;
@@ -532,7 +532,7 @@ class OSInfo : public Module
 						/* If we have any info on this channel */
 						char *c;
 						if (ci->GetExt("os_info", c))
-							u->SendMessage(s_ChanServ, " OperInfo: %s", c);
+							u->SendMessage(Config.s_ChanServ, " OperInfo: %s", c);
 					}
 				}
 			}
@@ -550,7 +550,7 @@ class OSInfo : public Module
 		if (!(out = fopen(OSInfoDBName, "w")))
 		{
 			alog("os_info: ERROR: can not open the database file!");
-			ircdproto->SendGlobops(s_OperServ, "os_info: ERROR: can not open the database file!");
+			ircdproto->SendGlobops(Config.s_OperServ, "os_info: ERROR: can not open the database file!");
 			ret = 1;
 		}
 		else
@@ -609,12 +609,12 @@ class OSInfo : public Module
 
 	void OnNickServHelp(User *u)
 	{
-		this->NoticeLang(s_NickServ, u, OINFO_HELP_CMD);
+		this->NoticeLang(Config.s_NickServ, u, OINFO_HELP_CMD);
 	}
 
 	void OnChanServHelp(User *u)
 	{
-		this->NoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);
+		this->NoticeLang(Config.s_ChanServ, u, OCINFO_HELP_CMD);
 	}
 };
 

@@ -80,7 +80,7 @@ struct newsmsgs msgarray[] = {
 #define SAFE(x) do {					\
 	if ((x) < 0) {					\
 	if (!forceload)					\
-		fatal("Read error on %s", NewsDBName);	\
+		fatal("Read error on %s", Config.NewsDBName);	\
 	break;						\
 	}							\
 } while (0)
@@ -94,7 +94,7 @@ void load_news()
 	NewsItem *news;
 	char *text;
 
-	if (!(f = open_db(s_OperServ, NewsDBName, "r", NEWS_VERSION)))
+	if (!(f = open_db(Config.s_OperServ, Config.NewsDBName, "r", NEWS_VERSION)))
 		return;
 	switch (i = get_file_version(f)) {
 	case 9:
@@ -123,7 +123,7 @@ void load_news()
 		break;
 
 	default:
-		fatal("Unsupported version (%d) on %s", i, NewsDBName);
+		fatal("Unsupported version (%d) on %s", i, Config.NewsDBName);
 	}						   /* switch (ver) */
 
 	close_db(f);
@@ -134,9 +134,9 @@ void load_news()
 #define SAFE(x) do {						\
 	if ((x) < 0) {						\
 	restore_db(f);						\
-	log_perror("Write error on %s", NewsDBName);		\
-	if (time(NULL) - lastwarn > WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
+	log_perror("Write error on %s", Config.NewsDBName);		\
+	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.NewsDBName,	\
 			strerror(errno));			\
 		lastwarn = time(NULL);				\
 	}							\
@@ -149,7 +149,7 @@ void save_news()
 	dbFILE *f;
 	static time_t lastwarn = 0;
 
-	if (!(f = open_db(s_OperServ, NewsDBName, "w", NEWS_VERSION)))
+	if (!(f = open_db(Config.s_OperServ, Config.NewsDBName, "w", NEWS_VERSION)))
 		return;
 	SAFE(write_int16(News.size(), f));
 	for (unsigned i = 0; i < News.size(); i++) {
@@ -197,7 +197,7 @@ static void DisplayNews(User *u, NewsType Type)
 
 			tm = localtime(&News[i]->time);
 			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, tm);
-			notice_lang(s_GlobalNoticer, u, msg, timebuf, News[i]->Text.c_str());
+			notice_lang(Config.s_GlobalNoticer, u, msg, timebuf, News[i]->Text.c_str());
 
 			++displayed;
 
@@ -206,7 +206,7 @@ static void DisplayNews(User *u, NewsType Type)
 				current_news = i;
 				return;
 			}
-			else if (displayed >= NewsCount)
+			else if (displayed >= Config.NewsCount)
 				return;
 		}
 
@@ -284,17 +284,17 @@ class NewsBase : public Command
 			if (News[i]->type == type)
 			{
 				if (!count)
-					notice_lang(s_OperServ, u, msgs[MSG_LIST_HEADER]);
+					notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_HEADER]);
 				tm = localtime(&News[i]->time);
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-				notice_lang(s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, *News[i]->who ? News[i]->who : "<unknown>", News[i]->Text.c_str());
+				notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, *News[i]->who ? News[i]->who : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
 		}
 		if (!count)
-			notice_lang(s_OperServ, u, msgs[MSG_LIST_NONE]);
+			notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_NONE]);
 		else
-			notice_lang(s_OperServ, u, END_OF_ANY_LIST, "News");
+			notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "News");
 
 		return MOD_CONT;
 	}
@@ -310,14 +310,14 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			n = add_newsitem(u, text, type);
 			if (n < 0)
-				notice_lang(s_OperServ, u, msgs[MSG_ADD_FULL]);
+				notice_lang(Config.s_OperServ, u, msgs[MSG_ADD_FULL]);
 			else
-				notice_lang(s_OperServ, u, msgs[MSG_ADDED], n);
+				notice_lang(Config.s_OperServ, u, msgs[MSG_ADDED], n);
 		}
 
 		return MOD_CONT;
@@ -334,7 +334,7 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			if (stricmp(text, "ALL"))
@@ -342,7 +342,7 @@ class NewsBase : public Command
 				num = atoi(text);
 				if (num > 0 && del_newsitem(num, type))
 				{
-					notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
+					notice_lang(Config.s_OperServ, u, msgs[MSG_DELETED], num);
 					for (unsigned i = 0; i < News.size(); ++i)
 					{
 						if (News[i]->type == type && News[i]->num > num)
@@ -350,14 +350,14 @@ class NewsBase : public Command
 					}
 				}
 				else
-					notice_lang(s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
+					notice_lang(Config.s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
 			}
 			else
 			{
 				if (del_newsitem(0, type))
-					notice_lang(s_OperServ, u, msgs[MSG_DELETED_ALL]);
+					notice_lang(Config.s_OperServ, u, msgs[MSG_DELETED_ALL]);
 				else
-					notice_lang(s_OperServ, u, msgs[MSG_DEL_NONE]);
+					notice_lang(Config.s_OperServ, u, msgs[MSG_DEL_NONE]);
 			}
 		}
 
@@ -418,13 +418,13 @@ class CommandOSLogonNews : public NewsBase
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, NEWS_HELP_LOGON, NewsCount);
+		notice_help(Config.s_OperServ, u, NEWS_HELP_LOGON, Config.NewsCount);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
 };
 
@@ -442,13 +442,13 @@ class CommandOSOperNews : public NewsBase
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, NEWS_HELP_OPER, NewsCount);
+		notice_help(Config.s_OperServ, u, NEWS_HELP_OPER, Config.NewsCount);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
 	}
 };
 
@@ -466,13 +466,13 @@ class CommandOSRandomNews : public NewsBase
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, NEWS_HELP_RANDOM);
+		notice_help(Config.s_OperServ, u, NEWS_HELP_RANDOM);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
 	}
 };
 
@@ -500,9 +500,9 @@ class OSNews : public Module
 
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)

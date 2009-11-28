@@ -26,44 +26,44 @@ class CommandMSSet : public Command
 		{
 			u->nc->SetFlag(NI_MEMO_SIGNON);
 			u->nc->SetFlag(NI_MEMO_RECEIVE);
-			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_ON, s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_ON, Config.s_MemoServ);
 		}
 		else if (param == "LOGON")
 		{
 			u->nc->SetFlag(NI_MEMO_SIGNON);
 			u->nc->UnsetFlag(NI_MEMO_RECEIVE);
-			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, Config.s_MemoServ);
 		}
 		else if (param == "NEW")
 		{
 			u->nc->UnsetFlag(NI_MEMO_SIGNON);
 			u->nc->SetFlag(NI_MEMO_RECEIVE);
-			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NEW, s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NEW, Config.s_MemoServ);
 		}
 		else if (param == "MAIL")
 		{
 			if (u->nc->email)
 			{
 				u->nc->SetFlag(NI_MEMO_MAIL);
-				notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
 			}
 			else
-				notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_INVALIDMAIL);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_INVALIDMAIL);
 		}
 		else if (param == "NOMAIL")
 		{
 			u->nc->UnsetFlag(NI_MEMO_MAIL);
-			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
 		}
 		else if (param == "OFF")
 		{
 			u->nc->UnsetFlag(NI_MEMO_SIGNON);
 			u->nc->UnsetFlag(NI_MEMO_RECEIVE);
 			u->nc->UnsetFlag(NI_MEMO_MAIL);
-			notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_OFF, Config.s_MemoServ);
 		}
 		else
-			syntax_error(s_MemoServ, u, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);
+			syntax_error(Config.s_MemoServ, u, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -86,12 +86,12 @@ class CommandMSSet : public Command
 			p3 = params.size() > 4 ? params[4] : "";
 			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!is_servadmin && !check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -103,7 +103,7 @@ class CommandMSSet : public Command
 				NickAlias *na;
 				if (!(na = findnick(p1.c_str())))
 				{
-					notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, p1.c_str());
+					notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, p1.c_str());
 					return MOD_CONT;
 				}
 				user = p1;
@@ -114,12 +114,12 @@ class CommandMSSet : public Command
 			}
 			else if (p1.empty())
 			{
-				syntax_error(s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
+				syntax_error(Config.s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
 			}
 			if ((!isdigit(p1[0]) && p1 != "NONE") || (!p2.empty() && p2 != "HARD"))
 			{
-				syntax_error(s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
+				syntax_error(Config.s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
 			}
 			if (!chan.empty())
@@ -139,7 +139,7 @@ class CommandMSSet : public Command
 			limit = atoi(p1.c_str());
 			if (limit < 0 || limit > 32767)
 			{
-				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_OVERFLOW, 32767);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_OVERFLOW, 32767);
 				limit = 32767;
 			}
 			if (p1 == "NONE")
@@ -148,33 +148,33 @@ class CommandMSSet : public Command
 		else
 		{
 			if (p1.empty() || !p2.empty() || !isdigit(p1[0])) {
-				syntax_error(s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SYNTAX);
+				syntax_error(Config.s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SYNTAX);
 				return MOD_CONT;
 			}
 			if (!chan.empty() && (ci->HasFlag(CI_MEMO_HARDMAX)))
 			{
-				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_FORBIDDEN, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_FORBIDDEN, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (chan.empty() && (nc->HasFlag(NI_MEMO_HARDMAX)))
 			{
-				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
 				return MOD_CONT;
 			}
 			limit = atoi(p1.c_str());
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
-			if (limit < 0 || (MSMaxMemos > 0 && limit > MSMaxMemos))
+			if (limit < 0 || (Config.MSMaxMemos > 0 && limit > Config.MSMaxMemos))
 			{
 				if (!chan.empty())
-					notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_TOO_HIGH, chan.c_str(), MSMaxMemos);
+					notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_TOO_HIGH, chan.c_str(), Config.MSMaxMemos);
 				else
-					notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_TOO_HIGH, MSMaxMemos);
+					notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT_TOO_HIGH, Config.MSMaxMemos);
 				return MOD_CONT;
 			}
 			else if (limit > 32767)
 			{
-				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_OVERFLOW, 32767);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_OVERFLOW, 32767);
 				limit = 32767;
 			}
 		}
@@ -182,23 +182,23 @@ class CommandMSSet : public Command
 		if (limit > 0)
 		{
 			if (chan.empty() && nc == u->nc)
-				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT, limit);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT, limit);
 			else
-				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT, !chan.empty() ? chan.c_str() : user.c_str(), limit);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT, !chan.empty() ? chan.c_str() : user.c_str(), limit);
 		}
 		else if (!limit)
 		{
 			if (chan.empty() && nc == u->nc)
-				notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_ZERO);
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT_ZERO);
 			else
-				notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_ZERO, !chan.empty() ? chan.c_str() : user.c_str());
+				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_ZERO, !chan.empty() ? chan.c_str() : user.c_str());
 		}
 		else
 		{
 			if (chan.empty() && nc == u->nc)
-				notice_lang(s_MemoServ, u, MEMO_UNSET_YOUR_LIMIT);
+				notice_lang(Config.s_MemoServ, u, MEMO_UNSET_YOUR_LIMIT);
 			else
-				notice_lang(s_MemoServ, u, MEMO_UNSET_LIMIT, !chan.empty() ? chan.c_str() : user.c_str());
+				notice_lang(Config.s_MemoServ, u, MEMO_UNSET_LIMIT, !chan.empty() ? chan.c_str() : user.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -214,7 +214,7 @@ class CommandMSSet : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_MemoServ, u, MEMO_SET_DISABLED);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_DISABLED);
 			return MOD_CONT;
 		}
 		else if (cmd == "NOTIFY")
@@ -223,8 +223,8 @@ class CommandMSSet : public Command
 			return this->DoLimit(u, params, mi);
 		else
 		{
-			notice_lang(s_MemoServ, u, MEMO_SET_UNKNOWN_OPTION, cmd.c_str());
-			notice_lang(s_MemoServ, u, MORE_INFO, s_MemoServ, "SET");
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_UNKNOWN_OPTION, cmd.c_str());
+			notice_lang(Config.s_MemoServ, u, MORE_INFO, Config.s_MemoServ, "SET");
 		}
 		return MOD_CONT;
 	}
@@ -232,15 +232,15 @@ class CommandMSSet : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (subcommand.empty())
-			notice_help(s_MemoServ, u, MEMO_HELP_SET);
+			notice_help(Config.s_MemoServ, u, MEMO_HELP_SET);
 		else if (subcommand == "NOTIFY")
-			notice_help(s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
+			notice_help(Config.s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
 		else if (subcommand == "LIMIT")
 		{
 			if (u->nc && u->nc->IsServicesOper())
-				notice_help(s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, MSMaxMemos);
+				notice_help(Config.s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, Config.MSMaxMemos);
 			else
-				notice_help(s_MemoServ, u, MEMO_HELP_SET_LIMIT, MSMaxMemos);
+				notice_help(Config.s_MemoServ, u, MEMO_HELP_SET_LIMIT, Config.MSMaxMemos);
 		}
 		else
 			return false;
@@ -250,7 +250,7 @@ class CommandMSSet : public Command
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "SET", MEMO_SET_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "SET", MEMO_SET_SYNTAX);
 	}
 };
 
@@ -269,7 +269,7 @@ class MSSet : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SET);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SET);
 	}
 };
 

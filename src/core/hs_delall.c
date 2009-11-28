@@ -32,7 +32,7 @@ class CommandHSDelAll : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
 			nc = na->nc;
@@ -42,22 +42,22 @@ class CommandHSDelAll : public Command
 				delHostCore(na->nick);
 			}
 			alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);
-			notice_lang(s_HostServ, u, HOST_DELALL, nc->display);
+			notice_lang(Config.s_HostServ, u, HOST_DELALL, nc->display);
 		}
 		else
-			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_DELALL);
+		notice_help(Config.s_HostServ, u, HOST_HELP_DELALL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
+		syntax_error(Config.s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
 	}
 };
 
@@ -76,7 +76,7 @@ class HSDelAll : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DELALL);
 	}
 };
 

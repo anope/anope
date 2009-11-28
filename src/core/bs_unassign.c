@@ -29,30 +29,30 @@ class CommandBSUnassign : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
 		if (readonly)
-			notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
+			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_READONLY);
 		else if (!u->nc->HasPriv("botserv/administration")  && !check_access(u, ci, CA_ASSIGN))
-			notice_lang(s_BotServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)
-			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
+			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);
 		else if (ci->HasFlag(CI_PERSIST) && !cm)
-			notice_help(s_BotServ, u, BOT_UNASSIGN_PERSISTANT_CHAN);
+			notice_help(Config.s_BotServ, u, BOT_UNASSIGN_PERSISTANT_CHAN);
 		else
 		{
 			ci->bi->UnAssign(u, ci);
-			notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_BotServ, u, BOT_HELP_UNASSIGN);
+		notice_help(Config.s_BotServ, u, BOT_HELP_UNASSIGN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
+		syntax_error(Config.s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
 	}
 };
 
@@ -70,7 +70,7 @@ class BSUnassign : public Module
 	}
 	void OnBotServHelp(User *u)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_UNASSIGN);
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_UNASSIGN);
 	}
 };
 

@@ -35,13 +35,13 @@ class CommandOSReload : public Command
 		}
 
 		FOREACH_MOD(I_OnReload, OnReload(false));
-		notice_lang(s_OperServ, u, OPER_RELOAD);
+		notice_lang(Config.s_OperServ, u, OPER_RELOAD);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_RELOAD);
+		notice_help(Config.s_OperServ, u, OPER_HELP_RELOAD);
 		return true;
 	}
 };
@@ -61,7 +61,7 @@ class OSReload : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_RELOAD);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RELOAD);
 	}
 };
 

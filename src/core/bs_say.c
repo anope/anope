@@ -33,19 +33,19 @@ class CommandBSSay : public Command
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			notice_lang(s_BotServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
+			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
-		if (!ci->c || ci->c->usercount < BSMinUsers)
+		if (!ci->c || ci->c->usercount < Config.BSMinUsers)
 		{
-			notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
 			return MOD_CONT;
 		}
 
@@ -57,20 +57,20 @@ class CommandBSSay : public Command
 
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text);
 		ci->bi->lastmsg = time(NULL);
-		if (LogBot && LogChannel && LogChan && !debug && findchan(LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, LogChannel, "SAY %s %s %s", u->nick, ci->name, text);
+		if (Config.LogBot && Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel))
+			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "SAY %s %s %s", u->nick, ci->name, text);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_BotServ, u, BOT_HELP_SAY);
+		notice_help(Config.s_BotServ, u, BOT_HELP_SAY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
+		syntax_error(Config.s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
 	}
 };
 
@@ -88,7 +88,7 @@ class BSSay : public Module
 	}
 	void OnBotServHelp(User *u)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_SAY);
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_SAY);
 	}
 };
 

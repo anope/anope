@@ -25,15 +25,15 @@ class CommandMSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(s_MemoServ, u, MEMOSERV, params[0].c_str());
+		mod_help_cmd(Config.s_MemoServ, u, MEMOSERV, params[0].c_str());
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_HEADER);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_HEADER);
 		FOREACH_MOD(I_OnMemoServHelp, OnMemoServHelp(u));
-		notice_help(s_MemoServ, u, MEMO_HELP_FOOTER, s_ChanServ);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_FOOTER, Config.s_ChanServ);
 	}
 };
 

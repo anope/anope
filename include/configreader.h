@@ -374,6 +374,388 @@ class ServerConfig
 		void ValidateHostname(const char *, const std::string &, const std::string &);
 		void ValidateIP(const char *p, const std::string &, const std::string &, bool);
 		void ValidateNoSpaces(const char *, const std::string &, const std::string &);
+
+
+
+		/** Below here is a list of variables which contain the config files values
+		 */
+		/* IRCd module in use */
+		char *IRCDModule;
+
+		/* Host to connect to **/
+		char *LocalHost;
+		/* Port */
+		unsigned LocalPort;
+		/* List of uplink servers to try and connect to */
+		std::list<Uplink *> Uplinks;
+
+		/* Our server name */
+		char *ServerName;
+		/* Our servers description */
+		char *ServerDesc;
+		/* The username/ident of services clients */
+		char *ServiceUser;
+		/* The hostname if services clients */
+		char *ServiceHost;
+
+		/* Help channel, ops here get usermode +h **/
+		char *HelpChannel;
+		/* Log channel */
+		char *LogChannel;
+		/* Name of the network were on */
+		char *NetworkName;
+		/* The max legnth of nicks */
+		unsigned NickLen;
+
+		/* NickServ Name */
+		char *s_NickServ;
+		/* ChanServ Name */
+		char *s_ChanServ;
+		/* MemoServ Name */
+		char *s_MemoServ;
+		/* BotServ Name */
+		char *s_BotServ;
+		/* OperServ name */
+		char *s_OperServ;
+		/* Global name */
+		char *s_GlobalNoticer;
+		/* NickServs realname */
+		char *desc_NickServ;
+		/* ChanServ realname */
+		char *desc_ChanServ;
+		/* MemoServ relname */
+		char *desc_MemoServ;
+		/* BotServ realname */
+		char *desc_BotServ;
+		/* OperServ realname */
+		char *desc_OperServ;
+		/* Global realname */
+		char *desc_GlobalNoticer;
+
+		/* Name of the hostserv database */
+		char *HostDBName;
+		/* HostServ Name */
+		char *s_HostServ;
+		/* HostServ realname */
+		char *desc_HostServ;
+
+		/* Filename for the PID file */
+		char *PIDFilename;
+		/* MOTD filename */
+		char *MOTDFilename;
+		/* NickServ DB name */
+		char *NickDBName;
+		/* DB name for nicks being registered */
+		char *PreNickDBName;
+		/* Channel DB name */
+		char *ChanDBName;
+		/* Botserv DB name */
+		char *BotDBName;
+		/* OperServ db name */
+		char *OperDBName;
+		/* News DB name */
+		char *NewsDBName;
+
+		/* True if its ok to not be able to save backs */
+		bool NoBackupOkay;
+		/* Do password checking when new people register */
+		bool StrictPasswords;
+		/* How many times you're allowed to give a bad password before being killed */
+		unsigned BadPassLimit;
+		/* How long before bad passwords are forgotten */ 
+		time_t BadPassTimeout;
+		/* Delay between automatic database updates */
+		time_t UpdateTimeout;
+		/* Delay between checks for expired nicks and channels */
+		time_t ExpireTimeout;
+		/* How long to wait for something from the uplink, this is passed to select() */
+		time_t ReadTimeout;
+		/* How often to send program errors */
+		time_t WarningTimeout;
+		/* How long to process things such as timers to see if there is anything to calll */
+		time_t TimeoutCheck;
+		/* Num of days logfiles are kept */
+		int KeepLogs;
+		/* Number of days backups are kept */
+		int KeepBackups;
+		/* Forbidding requires a reason */
+		bool ForceForbidReason;
+		/* Services should use privmsgs instead of notices */
+		bool UsePrivmsg;
+		/* Services only respond to full PRIVMSG client@services.server.name messaegs */
+		bool UseStrictPrivMsg;
+		/* Dump a core file if we crash */
+		bool DumpCore;
+		/* Log users connecting/existing/changing nicks */
+		bool LogUsers;
+		/* Number of seconds between consecutive uses of the REGISTER command
+		 * Not to be confused with NSRegDelay */
+		unsigned NickRegDelay;
+		/* Max number if news items allowed in the list */
+		unsigned NewsCount;
+
+		/* Services can use email */
+		bool UseMail;
+		/* Path to the sendmail executable */
+		char *SendMailPath;
+		/* Address to send from */
+		char *SendFrom;
+		/* Only opers can have services send mail */
+		bool RestrictMail;
+		/* Delay between sending mail */
+		time_t MailDelay;
+		/* Don't quote the To: address */
+		bool DontQuoteAddresses;
+
+		/* Prefix of guest nicks when a user gets forced off of a nick */
+		char *NSGuestNickPrefix;
+		/* Allow users to set kill immed on */
+		bool NSAllowKillImmed;
+		/* Don't allow nicks to use /ns group to regroup nicks */ 
+		bool NSNoGroupChange;
+		/* Default flags for newly registered nicks */
+		Flags<NickCoreFlag> NSDefFlags;
+		/* Default language used by services */
+		unsigned NSDefLanguage;
+		/* Users must be connected this long before they can register
+		 * Not to be confused with NickRegDelay */
+		time_t NSRegDelay;
+		/* Time before the registering mail will be resent */
+		time_t NSResendDelay;
+		/* How long before nicks expir */
+		time_t NSExpire;
+		/* Time before NickRequests expire */
+		time_t NSRExpire;
+		/* Force email when registering */
+		bool NSForceEmail;
+		/* Max number of nicks in a group */
+		int NSMaxAliases;
+		/* Max number of allowed strings on the access list */
+		unsigned NSAccessMax;
+		/* Enforcer client user name */
+		char *NSEnforcerUser;
+		/* Enforcer client hostname */
+		char *NSEnforcerHost;
+		/* How long before recovered nicks are released */
+		time_t NSReleaseTimeout;
+		/* /nickserv list is oper only */
+		bool NSListOpersOnly;
+		/* Max number of entries that can be returned from the list command */
+		unsigned NSListMax;
+		/* Only allow usermode +a etc on real services admins */
+		bool NSSecureAdmins;
+		/* Services opers must be /operd on the ircd aswell */
+		bool NSStrictPrivileges;
+		/* Use email to verify new users registering */
+		bool NSEmailReg;
+		/* Set the proper channel modes on users when they identify */
+		bool NSModeOnID;
+		/* Add the users hostnask their access list when they register */
+		bool NSAddAccessOnReg;
+
+		/* Default flags for newly registered channels */
+		Flags<ChannelInfoFlag> CSDefFlags;
+		/* Max number of channels a user can own */
+		unsigned CSMaxReg;
+		/* Time before a channel expires */
+		time_t CSExpire;
+		/* Default ban type to use for channels */
+		int CSDefBantype;
+		/* Max number of entries allowed on channel access lists */
+		unsigned CSAccessMax;
+		/* Max number of entries allowed on autokick lists */
+		unsigned CSAutokickMax;
+		/* Default autokick reason */
+		char *CSAutokickReason;
+		/* Time ChanServ should stay in the channel to hold it to keep users from getting in */
+		time_t CSInhabit;
+		/* ChanServ's LIST command is oper only */
+		bool CSListOpersOnly;
+		/* Max number of entries allowed to be returned from the LIST command */
+		unsigned CSListMax;
+		/* true to make ChanServ oper only */
+		bool CSOpersOnly;
+
+		/* Max number of memos allowed */
+		unsigned MSMaxMemos;
+		/* Time you must wait between sending memos */
+		time_t MSSendDelay;
+		/* Notify all of the aliases of the core the memo was sent to */ 
+		bool MSNotifyAll;
+		/* Who can use memos reciepts */ 
+		unsigned MSMemoReceipt;
+
+		/* Defai;t BotServ flags */
+		Flags<BotServFlag> BSDefFlags;
+		/* How long before botserv forgets a user. This is used for flood kickers etc */
+		time_t BSKeepData;
+		/* Min number of users to have in the channel before the service bot joins */
+		unsigned BSMinUsers;
+		/* Max number of words allowed on the badwordslist */
+		unsigned BSBadWordsMax;
+		/* BotServ bot only joins if it would normally allowed to, abides by bans etc */
+		bool BSSmartJoin;
+		/* Dont tell users what badword they used */
+		bool BSGentleBWReason;
+		/* Case sensitive badwords matching */
+		bool BSCaseSensitive;
+		/* Char to use for the fantasy char, eg ! */
+		char *BSFantasyCharacter;
+
+		/* Only show /stats o to opers */
+		bool HideStatsO;
+		/* Send out a global when services shut down or restart */
+		bool GlobalOnCycle;
+		/* Don't include the opers name in globals */
+		bool AnonymousGlobal;
+		/* Dont allow users to register nicks with oper names in them */
+		bool RestrictOperNicks;
+		/* Message to send when shutting down */
+		char *GlobalOnCycleMessage;
+		/* Message to send when starting up */
+		char *GlobalOnCycleUP;
+		/* Super admin is allowed */
+		bool SuperAdmin;
+		/* Log things said through ACT/SAY */
+		bool LogBot;
+		/* Log when new user max is reached */
+		bool LogMaxUsers;
+		/* Default expiry time for akills */
+		time_t AutokillExpiry;
+		/* Default expiry time for chan kills */
+		time_t ChankillExpiry;
+		/* Default expiry time for SGLine Expire */
+		time_t SGLineExpiry;
+		/* Default expiry time for SQLines */
+		time_t SQLineExpiry;
+		/* Default expiry time for SZLine */
+		time_t SZLineExpiry;
+		/* Actually akill the user when the akill is added */
+		bool AkillOnAdd;
+		/* Kill users on SGline */
+		bool KillonSGline;
+		/* Kill users on SQline */
+		bool KillonSQline;
+		/* Send a WALLOPS/GLOBOPS when a user opers */
+		bool WallOper;
+		/* Send a WALLOPS/GLOBOPS when a nonoper tries to use OperServ */
+		bool WallBadOS;
+		/* Send a WALLOPS/GLOBOPS when someone uses the GLOBAL command */
+		bool WallOSGlobal;
+		/* Send a WALLOPS/GLOBOPS when someone uses the MODE command */
+		bool WallOSMode;
+		/* Send a WALLOPS/GLOBOPS when someone uses the CLEARMODES command */
+		bool WallOSClearmodes;
+		/* Send a WALLOPS/GLOBOPS when someone uses the KICK command */
+		bool WallOSKick;
+		/* Send a WALLOPS/GLOBOPS when someone uses the AKILL command */
+		bool WallOSAkill;
+		/* Send a WALLOPS/GLOBOPS when someone uses the SGLINE command */
+		bool WallOSSGLine;
+		/* Send a WALLOPS/GLOBOPS when someone uses the SQLINE command */
+		bool WallOSSQLine;
+		/* Send a WALLOPS/GLOBOPS when someone uses the SZLINE command */
+		bool WallOSSZLine;
+		/* Send a WALLOPS/GLOBOPS when someone uses the NOOP command */
+		bool WallOSNoOp;
+		/* Send a WALLOPS/GLOBOPS when when someone uses the JUPE command */
+		bool WallOSJupe;
+		/* Send a WALLOPS/GLOBOPS when an akill expires */
+		bool WallAkillExpire;
+		/* Send a WALLOPS/GLOBOPS when SGLines expire */
+		bool WallSGLineExpire;
+		/* Send a WALLOPS/GLOBOPS when SQLines expire */
+		bool WallSQLineExpire;
+		/* Send a WALLOPS/GLOBOPS when SZLines expire */
+		bool WallSZLineExpire;
+		/* Send a WALLOPS/GLOBOPS when exceptions expire */
+		bool WallExceptionExpire;
+		/* Send a WALLOPS/GLOBOPS when DROP is used */
+		bool WallDrop;
+		/* Send a WALLOPS/GLOBOPS when FORBID is used */
+		bool WallForbid;
+		/* Send a WALLOPS/GLOBOPS when GETPASS is used */
+		bool WallGetpass;
+		/* Send a WALLOPS/GLOBOPS when SETPASS is used */
+		bool WallSetpass;
+		/* Add the akillers nick to the akill reason */
+		bool AddAkiller;
+
+		/* Limit sessions */
+		bool LimitSessions;
+		/* The default session limit */
+		unsigned DefSessionLimit;
+		/* How long before exceptions expire */
+		time_t ExceptionExpiry;
+		/* How many times to kill before adding an KILL */ 
+		int MaxSessionKill;
+		/* Max limit that can be used for exceptions */
+		unsigned MaxSessionLimit;
+		/* How long session akills should last */
+		time_t SessionAutoKillExpiry;
+		/* DB name for exceptions */
+		char *ExceptionDBName;
+		/* Reason to use for session kills */ 
+		char *SessionLimitExceeded;
+		/* Optional second reason */
+		char *SessionLimitDetailsLoc;
+		/* OperServ requires you to be an operator */
+		bool OSOpersOnly;
+
+		/* List of modules to autoload */
+		std::list<std::string> ModulesAutoLoad;
+		/* Encryption modules */
+		std::list<std::string> EncModuleList;
+		/* HostServ Core Modules */
+		std::list<std::string> HostServCoreModules;
+		/* MemoServ Core Modules */
+		std::list<std::string> MemoServCoreModules;
+		/* BotServ Core Modules */
+		std::list<std::string> BotServCoreModules;
+		/* OperServ Core Modules */
+		std::list<std::string> OperServCoreModules;
+		/* NickServ Core Modules */
+		std::list<std::string> NickServCoreModules;
+		/* ChanServ Core Modules */
+		std::list<std::string> ChanServCoreModules;
+
+		/* Default defcon level */
+		int DefConLevel;
+		/* Timeout before defcon is reset */
+		time_t DefConTimeOut;
+		/* Session limiit to use when using defcon */
+		int DefConSessionLimit;
+		/* How long to add akills for defcon */
+		time_t DefConAKILL;
+		/* Chan modes for defcon */
+		char *DefConChanModes;
+		/* Should we global on defcon */
+		bool GlobalOnDefcon;
+		/* Should we send DefconMessage aswell? */
+		bool GlobalOnDefconMore;
+		/* Message to send when defcon is off */
+		char *DefConOffMessage;
+		/* Message to send when defcon is on*/
+		char *DefconMessage;
+		/* Reason to akill clients for defcon */
+		char *DefConAkillReason;
+
+		/* User keys to use for generating random hashes for pass codes etc */
+		long unsigned int UserKey1;
+		long unsigned int UserKey2;
+		long unsigned int UserKey3;
+
+		/* Numeric */
+		char *Numeric;
+		/* Array of ulined servers */
+		char **Ulines;
+		/* Number of ulines */
+		int NumUlines;
+
+		/* List of available opertypes */
+		std::list<OperType *> MyOperTypes;
+		/* List of pairs of opers and their opertype from the config */
+		std::list<std::pair<std::string, std::string> > Opers;
 };
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.

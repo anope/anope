@@ -38,9 +38,9 @@ public:
 		char *s = NULL;
 		bool forbidden = false, suspended = false, channoexpire = false;
 
-		if (!(!CSListOpersOnly || (is_oper(u))))
+		if (Config.CSListOpersOnly && !is_oper(u))
 		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -49,8 +49,8 @@ public:
 			tmp = myStrGetOnlyToken((pattern + 1), '-', 0); /* Read FROM out */
 			if (!tmp)
 			{
-				notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-				notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (s = tmp; *s; s++)
@@ -58,8 +58,8 @@ public:
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
-					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-					notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+					notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
+					notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 			}
@@ -68,8 +68,8 @@ public:
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (!tmp)
 			{
-				notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-				notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (s = tmp; *s; s++)
@@ -77,8 +77,8 @@ public:
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
-					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-					notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+					notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
+					notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 			}
@@ -111,7 +111,7 @@ public:
 		spattern = new char[spattern_size];
 		snprintf(spattern, spattern_size, "#%s", pattern);
 
-		notice_lang(s_ChanServ, u, CHAN_LIST_HEADER, pattern);
+		notice_lang(Config.s_ChanServ, u, CHAN_LIST_HEADER, pattern);
 		for (i = 0; i < 256; i++)
 		{
 			for (ci = chanlists[i]; ci; ci = ci->next)
@@ -133,7 +133,7 @@ public:
 				{
 					if ((((count + 1 >= from) && (count + 1 <= to))
 						  || ((from == 0) && (to == 0)))
-						  && (++nchans <= CSListMax))
+						  && (++nchans <= Config.CSListMax))
 					{
 						char noexpire_char = ' ';
 						if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
@@ -155,14 +155,14 @@ public:
 								   ci->name, ci->desc ? ci->desc : "");
 						}
 
-						u->SendMessage(s_ChanServ, "  %c%s", noexpire_char, buf);
+						u->SendMessage(Config.s_ChanServ, "  %c%s", noexpire_char, buf);
 					}
 					count++;
 				}
 			}
 		}
-		notice_lang(s_ChanServ, u, CHAN_LIST_END,
-				nchans > CSListMax ? CSListMax : nchans, nchans);
+		notice_lang(Config.s_ChanServ, u, CHAN_LIST_END,
+				nchans > Config.CSListMax ? Config.CSListMax : nchans, nchans);
 		delete [] spattern;
 		if (tofree)
 			delete [] pattern;
@@ -171,13 +171,13 @@ public:
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_LIST);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_LIST);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "LIST", CHAN_LIST_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "LIST", CHAN_LIST_SYNTAX);
 	}
 };
 
@@ -195,7 +195,7 @@ public:
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LIST);
 	}
 };
 

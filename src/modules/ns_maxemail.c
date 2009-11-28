@@ -103,7 +103,7 @@ class NSMaxEmail : public Module
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
-		if (service == s_NickServ)
+		if (service == Config.s_NickServ)
 		{
 			if (command == "REGISTER")
 			{
@@ -155,9 +155,9 @@ bool check_email_limit_reached(const char *email, User * u)
 		return false;
 
 	if (NSEmailMax == 1)
-		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
+		me->NoticeLang(Config.s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
 	else
-		me->NoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
+		me->NoticeLang(Config.s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
 
 	return true;
 }

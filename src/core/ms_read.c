@@ -40,12 +40,12 @@ class CommandMSRead : public Command
 
 			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -60,9 +60,9 @@ class CommandMSRead : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+				notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else {
 			int i;
@@ -81,9 +81,9 @@ class CommandMSRead : public Command
 				if (!readcount)
 				{
 					if (!chan.empty())
-						notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+						notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 					else
-						notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
+						notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
 			else if (numstr == "LAST")
@@ -96,9 +96,9 @@ class CommandMSRead : public Command
 				if (!process_numlist(numstr.c_str(), &count, read_memo_callback, u, mi, chan.c_str()))
 				{
 					if (count == 1)
-						notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);
+						notice_lang(Config.s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);
 					else
-						notice_lang(s_MemoServ, u, MEMO_LIST_NOT_FOUND, numstr.c_str());
+						notice_lang(Config.s_MemoServ, u, MEMO_LIST_NOT_FOUND, numstr.c_str());
 				}
 			}
 		}
@@ -107,13 +107,13 @@ class CommandMSRead : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_READ);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_READ);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 	}
 };
 
@@ -131,7 +131,7 @@ class MSRead : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_READ);
 	}
 };
 
@@ -178,10 +178,10 @@ int read_memo(User *u, int index, MemoInfo *mi, const char *chan)
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 	timebuf[sizeof(timebuf) - 1] = 0;
 	if (chan)
-		notice_lang(s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender, timebuf, s_MemoServ, chan, m->number);
+		notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender, timebuf, Config.s_MemoServ, chan, m->number);
 	else
-		notice_lang(s_MemoServ, u, MEMO_HEADER, m->number, m->sender, timebuf, s_MemoServ, m->number);
-	notice_lang(s_MemoServ, u, MEMO_TEXT, m->text);
+		notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender, timebuf, Config.s_MemoServ, m->number);
+	notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text);
 	m->UnsetFlag(MF_UNREAD);
 
 	/* Check if a receipt notification was requested */

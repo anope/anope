@@ -136,11 +136,11 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 {
 	if (has_chghostmod != 1)
 	{
-		ircdproto->SendGlobops(s_OperServ, "CHGHOST not loaded!");
+		ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST not loaded!");
 		return;
 	}
 
-	BotInfo *bi = findbot(s_OperServ);
+	BotInfo *bi = findbot(Config.s_OperServ);
 	send_cmd(bi->uid, "CHGHOST %s %s", nick, vhost);
 }
 
@@ -188,7 +188,7 @@ class InspIRCdProto : public IRCDProto
 				case 'o':
 					if (add) {
 						++opcnt;
-						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					}
 					else --opcnt;
 					break;
@@ -226,7 +226,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendAkillDel(const char *user, const char *host)
 	{
-		BotInfo *bi = findbot(s_OperServ);
+		BotInfo *bi = findbot(Config.s_OperServ);
 		send_cmd(bi->uid, "GLINE %s@%s", user, host);
 	}
 
@@ -254,7 +254,7 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = expires - time(NULL);
 		if (timeleft > 172800 || !expires)
 			timeleft = 172800;
-		BotInfo *bi = findbot(s_OperServ);
+		BotInfo *bi = findbot(Config.s_OperServ);
 		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
 	}
 
@@ -267,7 +267,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		BotInfo *bi = findbot(s_NickServ);
+		BotInfo *bi = findbot(Config.s_NickServ);
 		send_cmd(bi->uid, "MODE %s %s", u->GetUID().c_str(), merge_args(ac, av));
 	}
 
@@ -332,7 +332,7 @@ class InspIRCdProto : public IRCDProto
 	/* SQLINE */
 	void SendSQLine(const char *mask, const char *reason)
 	{
-		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
+		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", mask, Config.s_OperServ, static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SQUIT */
@@ -353,10 +353,10 @@ class InspIRCdProto : public IRCDProto
 	void SendConnect()
 	{
 		inspircd_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, TS6SID);
 		SendServer(me_server);
 		send_cmd(TS6SID, "BURST");
-		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModuleList.begin()->c_str(), version_build);
+		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, Config.ServerName, ircd->name, version_flags, Config.EncModuleList.begin()->c_str(), version_build);
 	}
 
 	/* CHGIDENT */
@@ -364,11 +364,11 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (has_chgidentmod == 0)
 		{
-			ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
+			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT not loaded!");
 		}
 		else
 		{
-			BotInfo *bi = findbot(s_OperServ);
+			BotInfo *bi = findbot(Config.s_OperServ);
 			send_cmd(bi->uid, "CHGIDENT %s %s", nick, vIdent);
 		}
 	}
@@ -376,14 +376,14 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi->uid, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(NSReleaseTimeout), "Being held for registered user");
+		BotInfo *bi = findbot(Config.s_OperServ);
+		send_cmd(bi->uid, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(Config.NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		BotInfo *bi = findbot(s_OperServ);
+		BotInfo *bi = findbot(Config.s_OperServ);
 		send_cmd(bi->uid, "SVSHOLD %s", nick);
 	}
 
@@ -1146,13 +1146,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod) {
-			ircdproto->SendGlobops(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(Config.s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chghostmod) {
-			ircdproto->SendGlobops(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chgidentmod) {
-			ircdproto->SendGlobops(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
 		}
 		if (has_messagefloodmod) {
 			ModeManager::AddChannelMode('f', new ChannelModeFlood());
@@ -1286,8 +1286,8 @@ class ProtoInspIRCd : public Module
 		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
-		if (Numeric)
-			TS6SID = sstrdup(Numeric);
+		if (Config.Numeric)
+			TS6SID = sstrdup(Config.Numeric);
 
 		pmodule_ircd_version("InspIRCd 1.2");
 		pmodule_ircd_cap(myIrcdcap);

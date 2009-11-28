@@ -30,8 +30,8 @@ class CommandOSRestart : public Command
 		else
 			sprintf(const_cast<char *>(quitmsg), /* XXX */ "RESTART command received from %s", u->nick);
 
-		if (GlobalOnCycle)
-			oper_global(NULL, "%s", GlobalOnCycleMessage);
+		if (Config.GlobalOnCycle)
+			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);
 		/*	raise(SIGHUP); */
 		do_restart_services();
 		return MOD_CONT;
@@ -39,7 +39,7 @@ class CommandOSRestart : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_RESTART);
+		notice_help(Config.s_OperServ, u, OPER_HELP_RESTART);
 		return true;
 	}
 };
@@ -58,7 +58,7 @@ class OSRestart : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_RESTART);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RESTART);
 	}
 };
 

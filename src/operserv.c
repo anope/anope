@@ -89,7 +89,7 @@ SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddOperServCmds() {
-	ModuleManager::LoadModuleList(OperServCoreModules);
+	ModuleManager::LoadModuleList(Config.OperServCoreModules);
 }
 
 /* *INDENT-ON* */
@@ -128,7 +128,7 @@ void operserv(User * u, char *buf)
 	const char *cmd;
 	const char *s;
 
-	alog("%s: %s: %s", s_OperServ, u->nick, buf);
+	alog("%s: %s: %s", Config.s_OperServ, u->nick, buf);
 
 	cmd = strtok(buf, " ");
 	if (!cmd) {
@@ -137,9 +137,9 @@ void operserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(s_OperServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_OperServ), u->nick, "PING %s", s);
 	} else {
-		mod_run_cmd(s_OperServ, u, OPERSERV, cmd);
+		mod_run_cmd(Config.s_OperServ, u, OPERSERV, cmd);
 	}
 }
 
@@ -152,7 +152,7 @@ void operserv(User * u, char *buf)
 #define SAFE(x) do {					\
 	if ((x) < 0) {					\
 	if (!forceload)					\
-		fatal("Read error on %s", OperDBName);	\
+		fatal("Read error on %s", Config.OperDBName);	\
 	failed = 1;					\
 	break;						\
 	}							\
@@ -166,14 +166,14 @@ void load_os_dbase()
 	uint32 tmp32;
 	int failed = 0;
 
-	if (!(f = open_db(s_OperServ, OperDBName, "r", OPER_VERSION)))
+	if (!(f = open_db(Config.s_OperServ, Config.OperDBName, "r", OPER_VERSION)))
 		return;
 
 	ver = get_file_version(f);
 	if (ver != 13)
 	{
 		close_db(f);
-		fatal("Read error on %s", ChanDBName);
+		fatal("Read error on %s", Config.ChanDBName);
 		return;
 	}
 
@@ -267,9 +267,9 @@ void load_os_dbase()
 #define SAFE(x) do {						\
 	if ((x) < 0) {						\
 	restore_db(f);						\
-	log_perror("Write error on %s", OperDBName);		\
-	if (time(NULL) - lastwarn > WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", OperDBName,	\
+	log_perror("Write error on %s", Config.OperDBName);		\
+	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.OperDBName,	\
 			strerror(errno));			\
 		lastwarn = time(NULL);				\
 	}							\
@@ -285,7 +285,7 @@ void save_os_dbase()
 	Akill *ak;
 	SXLine *sx;
 
-	if (!(f = open_db(s_OperServ, OperDBName, "w", OPER_VERSION)))
+	if (!(f = open_db(Config.s_OperServ, Config.OperDBName, "w", OPER_VERSION)))
 		return;
 	SAFE(write_int32(maxusercnt, f));
 	SAFE(write_int32(maxusertime, f));
@@ -356,7 +356,7 @@ Server *server_global(Server * s, char *msg)
 	while (s) {
 		/* Do not send the notice to ourselves our juped servers */
 		if (!s->HasFlag(SERVER_ISME) && !s->HasFlag(SERVER_JUPED))
-			notice_server(s_GlobalNoticer, s, "%s", msg);
+			notice_server(Config.s_GlobalNoticer, s, "%s", msg);
 
 		if (s->links) {
 			sl = server_global(s->links, msg);
@@ -383,7 +383,7 @@ void oper_global(char *nick, const char *fmt, ...)
 	va_end(args);
 
 	/* I don't like the way this is coded... */
-	if ((nick) && (!AnonymousGlobal)) {
+	if ((nick) && (!Config.AnonymousGlobal)) {
 		snprintf(dmsg, sizeof(dmsg), "[%s] %s", nick, msg);
 		server_global(servlist, dmsg);
 	} else {
@@ -443,13 +443,13 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 				 */
 				if (entry->expires >= expires || entry->expires == 0) {
 					if (u)
-						notice_lang(s_OperServ, u, OPER_AKILL_EXISTS,
+						notice_lang(Config.s_OperServ, u, OPER_AKILL_EXISTS,
 									mask);
 					return -1;
 				} else {
 					entry->expires = expires;
 					if (u)
-						notice_lang(s_OperServ, u, OPER_AKILL_CHANGED,
+						notice_lang(Config.s_OperServ, u, OPER_AKILL_CHANGED,
 									amask);
 					return -2;
 				}
@@ -458,7 +458,7 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 			if (Anope::Match(mask, amask, false)
 				&& (entry->expires >= expires || entry->expires == 0)) {
 				if (u)
-					notice_lang(s_OperServ, u, OPER_AKILL_ALREADY_COVERED,
+					notice_lang(Config.s_OperServ, u, OPER_AKILL_ALREADY_COVERED,
 								mask, amask);
 				return -1;
 			}
@@ -475,7 +475,7 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 	/* We can now check whether the list is full or not. */
 	if (slist_full(&akills)) {
 		if (u)
-			notice_lang(s_OperServ, u, OPER_AKILL_REACHED_LIMIT,
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_REACHED_LIMIT,
 						akills.limit);
 		return -1;
 	}
@@ -509,7 +509,7 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 
 	slist_add(&akills, entry);
 
-	if (AkillOnAdd)
+	if (Config.AkillOnAdd)
 		ircdproto->SendAkill(entry->user, entry->host, entry->by, entry->seton,
 						entry->expires, entry->reason);
 
@@ -579,8 +579,8 @@ void expire_akills()
 		if (!ak->expires || ak->expires > now)
 			continue;
 
-		if (WallAkillExpire)
-			ircdproto->SendGlobops(s_OperServ, "AKILL on %s@%s has expired",
+		if (Config.WallAkillExpire)
+			ircdproto->SendGlobops(Config.s_OperServ, "AKILL on %s@%s has expired",
 							 ak->user, ak->host);
 		slist_delete(&akills, i);
 	}
@@ -659,13 +659,13 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 			if (!stricmp(entry->mask, mask)) {
 				if (entry->expires >= expires || entry->expires == 0) {
 					if (u)
-						notice_lang(s_OperServ, u, OPER_SGLINE_EXISTS,
+						notice_lang(Config.s_OperServ, u, OPER_SGLINE_EXISTS,
 									mask);
 					return -1;
 				} else {
 					entry->expires = expires;
 					if (u)
-						notice_lang(s_OperServ, u, OPER_SGLINE_CHANGED,
+						notice_lang(Config.s_OperServ, u, OPER_SGLINE_CHANGED,
 									entry->mask);
 					return -2;
 				}
@@ -674,7 +674,7 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 			if (Anope::Match(mask, entry->mask, false )
 				&& (entry->expires >= expires || entry->expires == 0)) {
 				if (u)
-					notice_lang(s_OperServ, u, OPER_SGLINE_ALREADY_COVERED,
+					notice_lang(Config.s_OperServ, u, OPER_SGLINE_ALREADY_COVERED,
 								mask, entry->mask);
 				return -1;
 			}
@@ -691,7 +691,7 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 	/* We can now check whether the list is full or not. */
 	if (slist_full(&sglines)) {
 		if (u)
-			notice_lang(s_OperServ, u, OPER_SGLINE_REACHED_LIMIT,
+			notice_lang(Config.s_OperServ, u, OPER_SGLINE_REACHED_LIMIT,
 						sglines.limit);
 		return -1;
 	}
@@ -711,14 +711,14 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 
 	ircdproto->SendSGLine(entry->mask, entry->reason);
 
-	if (KillonSGline && !ircd->sglineenforce) {
+	if (Config.KillonSGline && !ircd->sglineenforce) {
 		snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
 		u2 = firstuser();
 		while (u2) {
 			next = nextuser();
 			if (!is_oper(u2)) {
 				if (Anope::Match(u2->realname, entry->mask, false)) {
-					kill_user(ServerName, u2->nick, buf);
+					kill_user(Config.ServerName, u2->nick, buf);
 				}
 			}
 			u2 = next;
@@ -745,7 +745,7 @@ int check_sgline(const char *nick, const char *realname)
 		if (Anope::Match(realname, sx->mask, false)) {
 			ircdproto->SendSGLine(sx->mask, sx->reason);
 			/* We kill nick since s_sgline can't */
-			ircdproto->SendSVSKill(ServerName, nick, "G-Lined: %s", sx->reason);
+			ircdproto->SendSVSKill(Config.ServerName, nick, "G-Lined: %s", sx->reason);
 			return 1;
 		}
 	}
@@ -767,8 +767,8 @@ void expire_sglines()
 		if (!sx->expires || sx->expires > now)
 			continue;
 
-		if (WallSGLineExpire)
-			ircdproto->SendGlobops(s_OperServ, "SGLINE on \2%s\2 has expired",
+		if (Config.WallSGLineExpire)
+			ircdproto->SendGlobops(Config.s_OperServ, "SGLINE on \2%s\2 has expired",
 							 sx->mask);
 		slist_delete(&sglines, i);
 	}
@@ -846,13 +846,13 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 			if (!stricmp(entry->mask, mask)) {
 				if (entry->expires >= expires || entry->expires == 0) {
 					if (u)
-						notice_lang(s_OperServ, u, OPER_SQLINE_EXISTS,
+						notice_lang(Config.s_OperServ, u, OPER_SQLINE_EXISTS,
 									mask);
 					return -1;
 				} else {
 					entry->expires = expires;
 					if (u)
-						notice_lang(s_OperServ, u, OPER_SQLINE_CHANGED,
+						notice_lang(Config.s_OperServ, u, OPER_SQLINE_CHANGED,
 									entry->mask);
 					return -2;
 				}
@@ -861,7 +861,7 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 			if (Anope::Match(mask, entry->mask, false)
 				&& (entry->expires >= expires || entry->expires == 0)) {
 				if (u)
-					notice_lang(s_OperServ, u, OPER_SQLINE_ALREADY_COVERED,
+					notice_lang(Config.s_OperServ, u, OPER_SQLINE_ALREADY_COVERED,
 								mask, entry->mask);
 				return -1;
 			}
@@ -878,7 +878,7 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 	/* We can now check whether the list is full or not. */
 	if (slist_full(&sqlines)) {
 		if (u)
-			notice_lang(s_OperServ, u, OPER_SQLINE_REACHED_LIMIT,
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_REACHED_LIMIT,
 						sqlines.limit);
 		return -1;
 	}
@@ -898,14 +898,14 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 
 	sqline(entry->mask, entry->reason);
 
-	if (KillonSQline) {
+	if (Config.KillonSQline) {
 		snprintf(buf, (BUFSIZE - 1), "Q-Lined: %s", entry->reason);
 		u2 = firstuser();
 		while (u2) {
 			next = nextuser();
 			if (!is_oper(u2)) {
 				if (Anope::Match(u2->nick, entry->mask, false)) {
-					kill_user(ServerName, u2->nick, buf);
+					kill_user(Config.ServerName, u2->nick, buf);
 				}
 			}
 			u2 = next;
@@ -940,7 +940,7 @@ int check_sqline(const char *nick, int nick_change)
 			sqline(sx->mask, sx->reason);
 			/* We kill nick since s_sqline can't */
 			snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
-			kill_user(s_OperServ, nick, reason);
+			kill_user(Config.s_OperServ, nick, reason);
 			return 1;
 		}
 	}
@@ -987,8 +987,8 @@ void expire_sqlines()
 		if (!sx->expires || sx->expires > now)
 			continue;
 
-		if (WallSQLineExpire)
-			ircdproto->SendGlobops(s_OperServ, "SQLINE on \2%s\2 has expired",
+		if (Config.WallSQLineExpire)
+			ircdproto->SendGlobops(Config.s_OperServ, "SQLINE on \2%s\2 has expired",
 							 sx->mask);
 
 		slist_delete(&sqlines, i);
@@ -1060,13 +1060,13 @@ int add_szline(User * u, const char *mask, const char *by, time_t expires,
 			if (!stricmp(entry->mask, mask)) {
 				if (entry->expires >= expires || entry->expires == 0) {
 					if (u)
-						notice_lang(s_OperServ, u, OPER_SZLINE_EXISTS,
+						notice_lang(Config.s_OperServ, u, OPER_SZLINE_EXISTS,
 									mask);
 					return -1;
 				} else {
 					entry->expires = expires;
 					if (u)
-						notice_lang(s_OperServ, u, OPER_SZLINE_EXISTS,
+						notice_lang(Config.s_OperServ, u, OPER_SZLINE_EXISTS,
 									mask);
 					return -2;
 				}
@@ -1074,7 +1074,7 @@ int add_szline(User * u, const char *mask, const char *by, time_t expires,
 
 			if (Anope::Match(mask, entry->mask, false)) {
 				if (u)
-					notice_lang(s_OperServ, u, OPER_SZLINE_ALREADY_COVERED,
+					notice_lang(Config.s_OperServ, u, OPER_SZLINE_ALREADY_COVERED,
 								mask, entry->mask);
 				return -1;
 			}
@@ -1090,7 +1090,7 @@ int add_szline(User * u, const char *mask, const char *by, time_t expires,
 	/* We can now check whether the list is full or not. */
 	if (slist_full(&szlines)) {
 		if (u)
-			notice_lang(s_OperServ, u, OPER_SZLINE_REACHED_LIMIT,
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_REACHED_LIMIT,
 						szlines.limit);
 		return -1;
 	}
@@ -1156,8 +1156,8 @@ void expire_szlines()
 		if (!sx->expires || sx->expires > now)
 			continue;
 
-		if (WallSZLineExpire)
-			ircdproto->SendGlobops(s_OperServ, "SZLINE on \2%s\2 has expired",
+		if (Config.WallSZLineExpire)
+			ircdproto->SendGlobops(Config.s_OperServ, "SZLINE on \2%s\2 has expired",
 							 sx->mask);
 		slist_delete(&szlines, i);
 	}
@@ -1202,8 +1202,8 @@ static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
  */
 bool CheckDefCon(DefconLevel Level)
 {
-	if (DefConLevel)
-		return DefCon[DefConLevel][Level];
+	if (Config.DefConLevel)
+		return DefCon[Config.DefConLevel][Level];
 	return false;
 }
 

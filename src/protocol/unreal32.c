@@ -127,12 +127,12 @@ void unreal_cmd_netinfo(int ac, const char **av)
    TKLEXT = Extended TKL we don't use it but best to have it
    SJB64  = Base64 encoded time stamps
    VL	 = Version Info
-   NS	 = Numeric Server
+   NS	 = Config.Numeric Server
 
 */
 void unreal_cmd_capab()
 {
-	if (Numeric)
+	if (Config.Numeric)
 	{
 		send_cmd(NULL, "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
 	}
@@ -154,7 +154,7 @@ void unreal_cmd_chghost(const char *nick, const char *vhost)
 	if (!nick || !vhost) {
 		return;
 	}
-	send_cmd(ServerName, "AL %s %s", nick, vhost);
+	send_cmd(Config.ServerName, "AL %s %s", nick, vhost);
 }
 
 /* CHGIDENT */
@@ -163,7 +163,7 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
 	if (!nick || !vIdent) {
 		return;
 	}
-	send_cmd(ServerName, "AZ %s %s", nick, vIdent);
+	send_cmd(Config.ServerName, "AZ %s %s", nick, vIdent);
 }
 
 
@@ -207,7 +207,7 @@ class UnrealIRCdProto : public IRCDProto
 				case 'o':
 					if (add) {
 						++opcnt;
-						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					}
 					else --opcnt;
 					break;
@@ -257,7 +257,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendAkillDel(const char *user, const char *host)
 	{
-		send_cmd(NULL, "BD - G %s %s %s", user, host, s_OperServ);
+		send_cmd(NULL, "BD - G %s %s %s", user, host, Config.s_OperServ);
 	}
 
 	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
@@ -302,7 +302,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (ac >= 1) {
 			if (!u || !av[0]) return;
-			send_cmd(ServerName, "v %s %s", u->nick, merge_args(ac, av));
+			send_cmd(Config.ServerName, "v %s %s", u->nick, merge_args(ac, av));
 		}
 	}
 
@@ -314,8 +314,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
-		EnforceQlinedNick(nick, s_BotServ);
-		send_cmd(NULL, "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
+		EnforceQlinedNick(nick, Config.s_BotServ);
+		send_cmd(NULL, "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick, static_cast<long>(time(NULL)), user, host, Config.ServerName, modes, host,
 			myIrcd->nickip ? " *" : " ", real);
 		SendSQLine(nick, "Reserved for services");
 	}
@@ -341,8 +341,8 @@ class UnrealIRCdProto : public IRCDProto
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
 	void SendServer(Server *server)
 	{
-		if (Numeric)
-			send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", server->name, server->hops, Numeric, server->desc);
+		if (Config.Numeric)
+			send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", server->name, server->hops, Config.Numeric, server->desc);
 		else
 			send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
 	}
@@ -350,7 +350,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(ServerName, "~ !%s %s :%s", base64enc(static_cast<long>(chantime)), channel, user->nick);
+		send_cmd(Config.ServerName, "~ !%s %s :%s", base64enc(static_cast<long>(chantime)), channel, user->nick);
 	}
 
 	/* unsqline
@@ -411,24 +411,24 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		unreal_cmd_capab();
 		unreal_cmd_pass(uplink_server->password);
-		if (Numeric)
-			me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
+		if (Config.Numeric)
+			me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, Config.Numeric);
 		else
-			me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+			me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, NULL);
 		SendServer(me_server);
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(NULL, "BD + Q H %s %s %ld %ld :%s", nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
+		send_cmd(NULL, "BD + Q H %s %s %ld %ld :%s", nick, Config.ServerName, static_cast<long>(time(NULL) + Config.NSReleaseTimeout),
 			static_cast<long>(time(NULL)), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		send_cmd(NULL, "BD - Q * %s %s", nick, ServerName);
+		send_cmd(NULL, "BD - Q * %s %s", nick, Config.ServerName);
 	}
 
 	/* UNSGLINE */
@@ -443,7 +443,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const char *mask)
 	{
-		send_cmd(NULL, "BD - Z * %s %s", mask, s_OperServ);
+		send_cmd(NULL, "BD - Z * %s %s", mask, Config.s_OperServ);
 	}
 
 	/* SZLINE */
@@ -475,8 +475,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(ServerName, "n %s %s %s", name, mode, nick);
-		else send_cmd(ServerName, "n %s %s", name, mode);
+		if (nick) send_cmd(Config.ServerName, "n %s %s %s", name, mode, nick);
+		else send_cmd(Config.ServerName, "n %s %s", name, mode);
 	}
 
 	/* svsjoin
@@ -511,7 +511,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendEOB()
 	{
-		send_cmd(ServerName, "ES");
+		send_cmd(Config.ServerName, "ES");
 	}
 
 	/*
@@ -568,7 +568,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+	ircdproto->SendPong(ac > 1 ? av[1] : Config.ServerName, av[0]);
 	return MOD_CONT;
 }
 

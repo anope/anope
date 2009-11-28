@@ -29,14 +29,14 @@ class CommandOSModLoad : public Command
 		Module *m = findModule(name);
 		if (m)
 		{
-			notice_lang(s_OperServ, u, OPER_MODULE_ALREADY_LOADED, name);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_ALREADY_LOADED, name);
 			return MOD_CONT;
 		}
 
 		int status = ModuleManager::LoadModule(name, u);
 		if (status != MOD_ERR_OK)
 		{
-			notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
 		}
 
 		return MOD_CONT;
@@ -44,13 +44,13 @@ class CommandOSModLoad : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_MODLOAD);
+		notice_help(Config.s_OperServ, u, OPER_HELP_MODLOAD);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
 	}
 };
 
@@ -70,7 +70,7 @@ class OSModLoad : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLOAD);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODLOAD);
 	}
 };
 

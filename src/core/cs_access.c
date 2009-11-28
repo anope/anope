@@ -57,17 +57,17 @@ static int access_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name);
 		*sent_header = 1;
 	}
 
 	if (ci->HasFlag(CI_XOP))
 	{
 		xop = get_xop_level(access->level);
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, index + 1, xop, access->nc->display);
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, index + 1, xop, access->nc->display);
 	}
 	else
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_AXS_FORMAT, index + 1, access->level, access->nc->display);
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_AXS_FORMAT, index + 1, access->level, access->nc->display);
 	return 1;
 }
 
@@ -92,7 +92,7 @@ static int access_view(User *u, int index, ChannelInfo *ci, int *sent_header)
 	
 	if (!*sent_header)
 	{
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name);
 		*sent_header = 1;
 	}
 
@@ -110,10 +110,10 @@ static int access_view(User *u, int index, ChannelInfo *ci, int *sent_header)
 	if (ci->HasFlag(CI_XOP))
 	{
 		xop = get_xop_level(access->level);
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_VIEW_XOP_FORMAT, index + 1, xop, access->nc->display, access->creator.c_str(), timebuf);
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_VIEW_XOP_FORMAT, index + 1, xop, access->nc->display, access->creator.c_str(), timebuf);
 	}
 	else
-		notice_lang(s_ChanServ, u, CHAN_ACCESS_VIEW_AXS_FORMAT, index + 1, access->level, access->nc->display, access->creator.c_str(), timebuf);
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_VIEW_AXS_FORMAT, index + 1, access->level, access->nc->display, access->creator.c_str(), timebuf);
 
 	return 1;
 }
@@ -158,21 +158,21 @@ class CommandCSAccess : public Command
 		else if ((ci->HasFlag(CI_XOP)) && !is_list)
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_XOP_HOP, Config.s_ChanServ);
 			else
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP, s_ChanServ);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_XOP, Config.s_ChanServ);
 		}
 		else if ((
 				 (is_list && !check_access(u, ci, CA_ACCESS_LIST) && !u->nc->HasCommand("chanserv/access/list"))
 				 ||
 				 (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->nc->HasPriv("chanserv/access/modify"))
 				))
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "ADD")
 		{
 			if (readonly)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
 				return MOD_CONT;
 			}
 
@@ -181,30 +181,30 @@ class CommandCSAccess : public Command
 
 			if (level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 			{
-				notice_lang(s_ChanServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
 			if (!level)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_NONZERO);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_NONZERO);
 				return MOD_CONT;
 			}
 			else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 				return MOD_CONT;
 			}
 
 			na = findnick(nick);
 			if (!na)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
 				return MOD_CONT;
 			}
 			else if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
 
@@ -215,26 +215,26 @@ class CommandCSAccess : public Command
 				/* Don't allow lowering from a level >= ulev */
 				if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
 				{
-					notice_lang(s_ChanServ, u, ACCESS_DENIED);
+					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 					return MOD_CONT;
 				}
 				if (access->level == level)
 				{
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display, chan, level);
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display, chan, level);
 					return MOD_CONT;
 				}
 				access->level = level;
 
 				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
 
-				alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, chan, level);
+				alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, chan, level);
 				return MOD_CONT;
 			}
 
-			if (ci->GetAccessCount() >= CSAccessMax)
+			if (ci->GetAccessCount() >= Config.CSAccessMax)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT, CSAccessMax);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT, Config.CSAccessMax);
 				return MOD_CONT;
 			}
 
@@ -243,21 +243,21 @@ class CommandCSAccess : public Command
 
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
 
-			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name);
-			notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, level);
+			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name, level);
 		}
 		else if (cmd == "DEL")
 		{
 			int deleted;
 			if (readonly)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
 				return MOD_CONT;
 			}
 
 			if (!ci->GetAccessCount())
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
 
@@ -269,22 +269,22 @@ class CommandCSAccess : public Command
 				if (!deleted)
 				{
 					if (perm)
-						notice_lang(s_ChanServ, u, ACCESS_DENIED);
+						notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 					else if (count == 1)
 					{
 						last = atoi(nick);
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_SUCH_ENTRY, last, ci->name);
+						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_SUCH_ENTRY, last, ci->name);
 					}
 					else
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name);
+						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name);
 				}
 				else
 				{
-					alog("%s: %s!%s@%s (level %d) deleted access of user%s %s on %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, get_access(u, ci), deleted == 1 ? "" : "s", nick, chan);
+					alog("%s: %s!%s@%s (level %d) deleted access of user%s %s on %s", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, get_access(u, ci), deleted == 1 ? "" : "s", nick, chan);
 					if (deleted == 1)
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name);
+						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name);
 					else
-						notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL, deleted, ci->name);
+						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL, deleted, ci->name);
 				}
 			}
 			else
@@ -292,25 +292,25 @@ class CommandCSAccess : public Command
 				na = findnick(nick);
 				if (!na)
 				{
-					notice_lang(s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
+					notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
 					return MOD_CONT;
 				}
 				nc = na->nc;
 				access = ci->GetAccess(nc);
 				if (!access)
 				{
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
 					return MOD_CONT;
 				}
 				if (get_access(u, ci) <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
 				{
 					deleted = 0;
-					notice_lang(s_ChanServ, u, ACCESS_DENIED);
+					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				}
 				else
 				{
-					notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name);
-					alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, get_access(u, ci), na->nick, access->nc->display, chan);
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name);
+					alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, get_access(u, ci), na->nick, access->nc->display, chan);
 					access->nc = NULL;
 					access->in_use = 0;
 					deleted = 1;
@@ -338,7 +338,7 @@ class CommandCSAccess : public Command
 
 			if (!ci->GetAccessCount())
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
 			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
@@ -354,9 +354,9 @@ class CommandCSAccess : public Command
 				}
 			}
 			if (!sent_header)
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
 			else
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
 		}
 		else if (cmd == "VIEW")
 		{
@@ -364,7 +364,7 @@ class CommandCSAccess : public Command
 
 			if (!ci->GetAccessCount())
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
 			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
@@ -380,21 +380,21 @@ class CommandCSAccess : public Command
 				}
 			}
 			if (!sent_header)
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
 			else
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name);
 		}
 		else if (cmd == "CLEAR")
 		{
 			if (readonly)
 			{
-				notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
 				return MOD_CONT;
 			}
 
 			if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
 			{
-				notice_lang(s_ChanServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -402,9 +402,9 @@ class CommandCSAccess : public Command
 
 			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-			notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name);
 			alog("%s: %s!%s@%s (level %d) cleared access list on %s",
-				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
+				 Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
 				 get_access(u, ci), chan);
 
 		}
@@ -415,14 +415,14 @@ class CommandCSAccess : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS);
-		notice_help(s_ChanServ, u, CHAN_HELP_ACCESS_LEVELS);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_ACCESS);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_ACCESS_LEVELS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
 	}
 };
 
@@ -452,9 +452,9 @@ class CommandCSLevels : public Command
 		if (cmd == "SET" ? !s : (cmd.substr(0, 3) == "DIS" ? (!what || s) : !!what))
 			this->OnSyntaxError(u, cmd);
 		else if (ci->HasFlag(CI_XOP))
-			notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
+			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_XOP);
 		else if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "SET") {
 			level = strtol(s, &error, 10);
 
@@ -464,7 +464,7 @@ class CommandCSLevels : public Command
 			}
 
 			if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER) {
-				notice_lang(s_ChanServ, u, CHAN_LEVELS_RANGE,
+				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RANGE,
 							ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 				return MOD_CONT;
 			}
@@ -474,15 +474,15 @@ class CommandCSLevels : public Command
 					ci->levels[levelinfo[i].what] = level;
 
 					alog("%s: %s!%s@%s set level %s on channel %s to %d",
-						 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
+						 Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
 						 levelinfo[i].name, ci->name, level);
-					notice_lang(s_ChanServ, u, CHAN_LEVELS_CHANGED,
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED,
 								levelinfo[i].name, chan, level);
 					return MOD_CONT;
 				}
 			}
 
-			notice_lang(s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, s_ChanServ);
+			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, Config.s_ChanServ);
 
 		} else if (cmd == "DIS" || cmd == "DISABLE") {
 			for (i = 0; levelinfo[i].what >= 0; i++) {
@@ -490,17 +490,17 @@ class CommandCSLevels : public Command
 					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
 
 					alog("%s: %s!%s@%s disabled level %s on channel %s",
-						 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
+						 Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host,
 						 levelinfo[i].name, ci->name);
-					notice_lang(s_ChanServ, u, CHAN_LEVELS_DISABLED,
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED,
 								levelinfo[i].name, chan);
 					return MOD_CONT;
 				}
 			}
 
-			notice_lang(s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, s_ChanServ);
+			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, Config.s_ChanServ);
 		} else if (cmd == "LIST") {
-			notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, chan);
 
 			if (!levelinfo_maxwidth) {
 				for (i = 0; levelinfo[i].what >= 0; i++) {
@@ -518,17 +518,17 @@ class CommandCSLevels : public Command
 
 					if (j == CA_AUTOOP || j == CA_AUTODEOP || j == CA_AUTOVOICE
 						|| j == CA_NOJOIN) {
-						notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED,
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED,
 									levelinfo_maxwidth, levelinfo[i].name);
 					} else {
-						notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED,
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED,
 									levelinfo_maxwidth, levelinfo[i].name);
 					}
 				} else if (j == ACCESS_FOUNDER) {
-					notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_FOUNDER,
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_FOUNDER,
 								levelinfo_maxwidth, levelinfo[i].name);
 				} else {
-					notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_NORMAL,
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_NORMAL,
 								levelinfo_maxwidth, levelinfo[i].name, j);
 				}
 			}
@@ -537,8 +537,8 @@ class CommandCSLevels : public Command
 			reset_levels(ci);
 
 			alog("%s: %s!%s@%s reset levels definitions on channel %s",
-				 s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ci->name);
-			notice_lang(s_ChanServ, u, CHAN_LEVELS_RESET, chan);
+				 Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RESET, chan);
 		} else {
 			this->OnSyntaxError(u, "");
 		}
@@ -547,13 +547,13 @@ class CommandCSLevels : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_LEVELS);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
 	}
 };
 
@@ -574,8 +574,8 @@ class CSAccess : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
 	}
 };
 

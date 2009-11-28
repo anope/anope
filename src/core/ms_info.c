@@ -35,12 +35,12 @@ class CommandMSInfo : public Command
 			na = findnick(name);
 			if (!na)
 			{
-				notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
+				notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
 				return MOD_CONT;
 			}
 			else if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, name);
+				notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, name);
 				return MOD_CONT;
 			}
 			mi = &na->nc->memos;
@@ -50,12 +50,12 @@ class CommandMSInfo : public Command
 		{
 			if (!(ci = cs_findchan(name)))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, name);
+				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, name);
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -63,7 +63,7 @@ class CommandMSInfo : public Command
 		}
 		else if (name) /* It's not a chan and we aren't services admin */
 		{
-			notice_lang(s_MemoServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else
@@ -75,13 +75,13 @@ class CommandMSInfo : public Command
 		if (name && (ci || na->nc != u->nc))
 		{
 			if (mi->memos.empty())
-				notice_lang(s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
 			else if (mi->memos.size() == 1)
 			{
 				if (mi->memos[0]->HasFlag(MF_UNREAD))
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMO_UNREAD, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMO_UNREAD, name);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMO, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMO, name);
 			}
 			else
 			{
@@ -92,55 +92,55 @@ class CommandMSInfo : public Command
 						++count;
 				}
 				if (count == mi->memos.size())
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_ALL_UNREAD, name, count);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ALL_UNREAD, name, count);
 				else if (!count)
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS, name, mi->memos.size());
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS, name, mi->memos.size());
 				else if (count == 1)
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_ONE_UNREAD, name, mi->memos.size());
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ONE_UNREAD, name, mi->memos.size());
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD, name, mi->memos.size(), count);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD, name, mi->memos.size(), count);
 			}
 			if (!mi->memomax)
 			{
 				if (hardmax)
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name, mi->memomax);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_LIMIT, name, mi->memomax);
 			}
 			else if (mi->memomax > 0)
 			{
 				if (hardmax)
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name, mi->memomax);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_LIMIT, name, mi->memomax);
 			}
 			else
-				notice_lang(s_MemoServ, u, MEMO_INFO_X_NO_LIMIT, name);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_LIMIT, name);
 
 			/* I ripped this code out of ircservices 4.4.5, since I didn't want
 			   to rewrite the whole thing (it pisses me off). */
 			if (na)
 			{
 				if (na->nc->HasFlag(NI_MEMO_RECEIVE) && na->nc->HasFlag(NI_MEMO_SIGNON))
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_ON, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_ON, name);
 				else if (na->nc->HasFlag(NI_MEMO_RECEIVE))
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_RECEIVE, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_RECEIVE, name);
 				else if (na->nc->HasFlag(NI_MEMO_SIGNON))
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_SIGNON, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_SIGNON, name);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name);
 			}
 		}
 		else /* !name || (!ci || na->nc == u->nc) */
 		{
 			if (mi->memos.empty())
-				notice_lang(s_MemoServ, u, MEMO_INFO_NO_MEMOS);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NO_MEMOS);
 			else if (mi->memos.size() == 1)
 			{
 				if (mi->memos[0]->HasFlag(MF_UNREAD))
-					notice_lang(s_MemoServ, u, MEMO_INFO_MEMO_UNREAD);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMO_UNREAD);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_MEMO);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMO);
 			}
 			else
 			{
@@ -151,41 +151,41 @@ class CommandMSInfo : public Command
 						++count;
 				}
 				if (count == mi->memos.size())
-					notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS_ALL_UNREAD, count);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMOS_ALL_UNREAD, count);
 				else if (!count)
-					notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS, mi->memos.size());
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMOS, mi->memos.size());
 				else if (count == 1)
-					notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS_ONE_UNREAD, mi->memos.size());
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMOS_ONE_UNREAD, mi->memos.size());
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_MEMOS_SOME_UNREAD, mi->memos.size(), count);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMOS_SOME_UNREAD, mi->memos.size(), count);
 			}
 
 			if (!mi->memomax)
 			{
 				if (!u->nc->IsServicesOper() && hardmax)
-					notice_lang(s_MemoServ, u, MEMO_INFO_HARD_LIMIT_ZERO);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_HARD_LIMIT_ZERO);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_LIMIT_ZERO);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_LIMIT_ZERO);
 			}
 			else if (mi->memomax > 0)
 			{
 				if (!u->nc->IsServicesOper() && hardmax)
-					notice_lang(s_MemoServ, u, MEMO_INFO_HARD_LIMIT, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_HARD_LIMIT, mi->memomax);
 				else
-					notice_lang(s_MemoServ, u, MEMO_INFO_LIMIT, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_LIMIT, mi->memomax);
 			}
 			else
-				notice_lang(s_MemoServ, u, MEMO_INFO_NO_LIMIT);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NO_LIMIT);
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
 			if (u->nc->HasFlag(NI_MEMO_RECEIVE) && u->nc->HasFlag(NI_MEMO_SIGNON))
-				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_ON);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_ON);
 			else if (u->nc->HasFlag(NI_MEMO_RECEIVE))
-				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_RECEIVE);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_RECEIVE);
 			else if (u->nc->HasFlag(NI_MEMO_SIGNON))
-				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_SIGNON);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_SIGNON);
 			else
-				notice_lang(s_MemoServ, u, MEMO_INFO_NOTIFY_OFF);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_OFF);
 		}
 		return MOD_CONT;
 	}
@@ -193,9 +193,9 @@ class CommandMSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_MemoServ, u, MEMO_SERVADMIN_HELP_INFO);
+			notice_help(Config.s_MemoServ, u, MEMO_SERVADMIN_HELP_INFO);
 		else
-			notice_help(s_MemoServ, u, MEMO_HELP_INFO);
+			notice_help(Config.s_MemoServ, u, MEMO_HELP_INFO);
 
 		return true;
 	}
@@ -215,7 +215,7 @@ class MSInfo : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_INFO);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_INFO);
 	}
 };
 

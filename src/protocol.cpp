@@ -2,7 +2,7 @@
 
 void IRCDProto::SendMessageInternal(BotInfo *bi, const char *dest, const char *buf)
 {
-	if (NSDefFlags.HasFlag(NI_MSG))
+	if (Config.NSDefFlags.HasFlag(NI_MSG))
 		SendPrivmsgInternal(bi, dest, buf);
 	else
 		SendNoticeInternal(bi, dest, buf);
@@ -40,7 +40,7 @@ void IRCDProto::SendGlobopsInternal(const char *source, const char *buf)
 	if (bi)
 		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "GLOBOPS :%s", buf);
 	else
-		send_cmd(ServerName, "GLOBOPS :%s", buf);
+		send_cmd(Config.ServerName, "GLOBOPS :%s", buf);
 }
 
 void IRCDProto::SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf)
@@ -170,9 +170,9 @@ void IRCDProto::SendQuit(BotInfo *bi, const char *fmt, ...)
 void IRCDProto::SendPong(const char *servname, const char *who)
 {
 	if (!servname)
-		send_cmd(ircd->ts6 ? TS6SID : ServerName, "PONG %s", who);
+		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PONG %s", who);
 	else 
-		send_cmd(ircd->ts6 ? TS6SID : ServerName, "PONG %s %s", servname, who);
+		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PONG %s %s", servname, who);
 }
 
 void IRCDProto::SendInvite(BotInfo *bi, const char *chan, const char *nick)

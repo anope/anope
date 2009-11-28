@@ -26,21 +26,21 @@ class CommandOSGlobal : public Command
 	{
 		const char *msg = params[0].c_str();
 
-		if (WallOSGlobal)
-			ircdproto->SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);
+		if (Config.WallOSGlobal)
+			ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);
 		oper_global(u->nick, "%s", msg);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_GLOBAL, s_GlobalNoticer);
+		notice_help(Config.s_OperServ, u, OPER_HELP_GLOBAL, Config.s_GlobalNoticer);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
 	}
 };
 
@@ -59,7 +59,7 @@ class OSGlobal : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_GLOBAL);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_GLOBAL);
 	}
 };
 

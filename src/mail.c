@@ -35,10 +35,10 @@ MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
 		return NULL;
 	}
 
-	if (!UseMail) {
+	if (!Config.UseMail) {
 		notice_lang(service, u, MAIL_DISABLED);
-	} else if ((time(NULL) - u->lastmail < MailDelay)) {
-	    timeToWait = MailDelay - (time(NULL) - u->lastmail);
+	} else if ((time(NULL) - u->lastmail < Config.MailDelay)) {
+	    timeToWait = Config.MailDelay - (time(NULL) - u->lastmail);
 		notice_lang(service, u, MAIL_DELAYED, timeToWait);
 	} else if (!nr->email) {
 		notice_lang(service, u, MAIL_INVALID, nr->nick);
@@ -50,14 +50,14 @@ MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
 		mail->recipient = NULL;
 		mail->recip = nr;
 
-		if (!(mail->pipe = popen(SendMailPath, "w"))) {
+		if (!(mail->pipe = popen(Config.SendMailPath, "w"))) {
 			delete mail;
 			notice_lang(service, u, MAIL_LATER);
 			return NULL;
 		}
 
-		fprintf(mail->pipe, "From: %s\n", SendFrom);
-		if (DontQuoteAddresses) {
+		fprintf(mail->pipe, "From: %s\n", Config.SendFrom);
+		if (Config.DontQuoteAddresses) {
 			fprintf(mail->pipe, "To: %s <%s>\n", nr->nick, nr->email);
 		} else {
 			fprintf(mail->pipe, "To: \"%s\" <%s>\n", nr->nick, nr->email);
@@ -87,12 +87,12 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
 		return NULL;
 	}
 
-	if (!UseMail) {
+	if (!Config.UseMail) {
 		notice_lang(service, u, MAIL_DISABLED);
-	} else if (((time(NULL) - u->lastmail < MailDelay)
-				|| (time(NULL) - nc->lastmail < MailDelay))
+	} else if (((time(NULL) - u->lastmail < Config.MailDelay)
+				|| (time(NULL) - nc->lastmail < Config.MailDelay))
 			   && !(u->nc && u->nc->IsServicesOper())) {
-		notice_lang(service, u, MAIL_DELAYED, MailDelay);
+		notice_lang(service, u, MAIL_DELAYED, Config.MailDelay);
 	} else if (!nc->email) {
 		notice_lang(service, u, MAIL_INVALID, nc->display);
 	} else {
@@ -103,14 +103,14 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
 		mail->recipient = nc;
 		mail->recip = NULL;
 
-		if (!(mail->pipe = popen(SendMailPath, "w"))) {
+		if (!(mail->pipe = popen(Config.SendMailPath, "w"))) {
 			delete mail;
 			notice_lang(service, u, MAIL_LATER);
 			return NULL;
 		}
 
-		fprintf(mail->pipe, "From: %s\n", SendFrom);
-		if (DontQuoteAddresses) {
+		fprintf(mail->pipe, "From: %s\n", Config.SendFrom);
+		if (Config.DontQuoteAddresses) {
 			fprintf(mail->pipe, "To: %s <%s>\n", nc->display, nc->email);
 		} else {
 			fprintf(mail->pipe, "To: \"%s\" <%s>\n", nc->display,
@@ -137,7 +137,7 @@ MailInfo *MailMemoBegin(NickCore * nc)
 	if (!nc)
 		return NULL;
 
-	if (!UseMail || !nc->email) {
+	if (!Config.UseMail || !nc->email) {
 		return NULL;
 
 	} else {
@@ -148,13 +148,13 @@ MailInfo *MailMemoBegin(NickCore * nc)
 		mail->recipient = nc;
 		mail->recip = NULL;
 
-		if (!(mail->pipe = popen(SendMailPath, "w"))) {
+		if (!(mail->pipe = popen(Config.SendMailPath, "w"))) {
 			delete mail;
 			return NULL;
 		}
 
-		fprintf(mail->pipe, "From: %s\n", SendFrom);
-		if (DontQuoteAddresses) {
+		fprintf(mail->pipe, "From: %s\n", Config.SendFrom);
+		if (Config.DontQuoteAddresses) {
 			fprintf(mail->pipe, "To: %s <%s>\n", nc->display, nc->email);
 		} else {
 			fprintf(mail->pipe, "To: \"%s\" <%s>\n", nc->display,

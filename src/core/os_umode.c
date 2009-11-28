@@ -39,31 +39,31 @@ class CommandOSUMode : public Command
 			return MOD_CONT;
 		}
 		if (!(u2 = finduser(nick)))
-			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else
 		{
-			ircdproto->SendMode(findbot(s_OperServ), nick, "%s", modes);
+			ircdproto->SendMode(findbot(Config.s_OperServ), nick, "%s", modes);
 
 			common_svsmode(u2, modes, NULL);
 
-			notice_lang(s_OperServ, u, OPER_UMODE_SUCCESS, nick);
-			notice_lang(s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
+			notice_lang(Config.s_OperServ, u, OPER_UMODE_SUCCESS, nick);
+			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
 
-			if (WallOSMode)
-				ircdproto->SendGlobops(s_OperServ, "\2%s\2 used UMODE on %s", u->nick, nick);
+			if (Config.WallOSMode)
+				ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used UMODE on %s", u->nick, nick);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_UMODE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_UMODE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
 	}
 };
 
@@ -85,7 +85,7 @@ class OSUMode : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_UMODE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_UMODE);
 	}
 };
 

@@ -39,7 +39,7 @@ class CommandOSChanList : public Command
 		{
 			struct u_chanlist *uc;
 
-			notice_lang(s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick);
+			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick);
 
 			for (uc = u2->chans; uc; uc = uc->next)
 			{
@@ -52,7 +52,7 @@ class CommandOSChanList : public Command
 					}
 				}
 
-				notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, uc->chan->name, uc->chan->usercount, chan_get_modes(uc->chan, 1, 1), uc->chan->topic ? uc->chan->topic : "");
+				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, uc->chan->name, uc->chan->usercount, chan_get_modes(uc->chan, 1, 1), uc->chan->topic ? uc->chan->topic : "");
 			}
 		}
 		else
@@ -60,7 +60,7 @@ class CommandOSChanList : public Command
 			int i;
 			Channel *c;
 
-			notice_lang(s_OperServ, u, OPER_CHANLIST_HEADER);
+			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER);
 
 			for (i = 0; i < 1024; ++i)
 			{
@@ -76,18 +76,18 @@ class CommandOSChanList : public Command
 								continue;
 						}
 					}
-					notice_lang(s_OperServ, u, OPER_CHANLIST_RECORD, c->name, c->usercount, chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
+					notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name, c->usercount, chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
 				}
 			}
 		}
 
-		notice_lang(s_OperServ, u, OPER_CHANLIST_END);
+		notice_lang(Config.s_OperServ, u, OPER_CHANLIST_END);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_CHANLIST);
+		notice_help(Config.s_OperServ, u, OPER_HELP_CHANLIST);
 		return true;
 	}
 };
@@ -107,7 +107,7 @@ class OSChanList : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANLIST);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CHANLIST);
 	}
 };
 

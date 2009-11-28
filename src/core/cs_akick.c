@@ -68,11 +68,11 @@ int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 	if (!akick->InUse)
 		return 0;
 	if (!*sent_header) {
-		notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
 		*sent_header = 1;
 	}
 
-	notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1,
+	notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1,
 				((akick->HasFlag(AK_ISNICK)) ? akick->nc->
 				 display : akick->mask.c_str()),
 				(!akick->reason.empty() ? akick->
@@ -98,7 +98,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 	if (!akick->InUse)
 		return 0;
 	if (!*sent_header) {
-		notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name);
 		*sent_header = 1;
 	}
 
@@ -110,7 +110,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 		snprintf(timebuf, sizeof(timebuf), "%s", getstring(u, UNKNOWN));
 	}
 
-	notice_lang(s_ChanServ, u, (akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT), index + 1,
+	notice_lang(Config.s_ChanServ, u, (akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT), index + 1,
 				((akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str()),
 				!akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf,
 				(!akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON)));
@@ -162,7 +162,7 @@ class CommandCSAKick : public Command
 		{
 			 if (na->HasFlag(NS_FORBIDDEN))
 			 {
-				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, mask.c_str());
+				notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, mask.c_str());
 				return;
 			 }
 
@@ -174,7 +174,7 @@ class CommandCSAKick : public Command
 		{
 			 if (is_excepted_mask(ci, mask.c_str()))
 			 {
-				notice_lang(s_ChanServ, u, CHAN_EXCEPTED, mask.c_str(), ci->name);
+				notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, mask.c_str(), ci->name);
 				return;
 			 }
 		}
@@ -185,7 +185,7 @@ class CommandCSAKick : public Command
 		{
 			 if ((nc == ci->founder) || (get_access_nc(nc, ci) >= get_access(u, ci)))
 			 {
-				notice_lang(s_ChanServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				return;
 			 }
 		}
@@ -202,7 +202,7 @@ class CommandCSAKick : public Command
 					{
 						if (match_usermask(mask.c_str(), u2))
 						{
-							notice_lang(s_ChanServ, u, ACCESS_DENIED);
+							notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 							return;
 						}
 					}
@@ -224,7 +224,7 @@ class CommandCSAKick : public Command
 						snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
 						if (Anope::Match(buf, mask.c_str(), false))
 						{
-							notice_lang(s_ChanServ, u, ACCESS_DENIED);
+							notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 							return;
 						}
 					}
@@ -239,17 +239,15 @@ class CommandCSAKick : public Command
 				continue;
 			if ((akick->HasFlag(AK_ISNICK)) ? akick->nc == nc : akick->mask == mask)
 			{
-				notice_lang(s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, (akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str(), ci->name);
+				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, (akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str(), ci->name);
 				return;
 			}
 		}
 
 
-		/* All entries should be in use so we don't have to go over
-		* the entire list. We simply add new entries at the end. */
-		if (ci->GetAkickCount() >= CSAutokickMax)
+		if (ci->GetAkickCount() >= Config.CSAutokickMax)
 		{
-			 notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, CSAutokickMax);
+			 notice_lang(Config.s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, Config.CSAutokickMax);
 			 return;
 		}
 
@@ -258,7 +256,7 @@ class CommandCSAKick : public Command
 		else
 			akick = ci->AddAkick(u->nick, mask.c_str(), !reason.empty() ? reason.c_str() : "");
 
-		notice_lang(s_ChanServ, u, CHAN_AKICK_ADDED, mask.c_str(), ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ADDED, mask.c_str(), ci->name);
 
 		this->DoEnforce(u, ci, params);
 	}
@@ -273,7 +271,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
 		}
 
@@ -292,12 +290,12 @@ class CommandCSAKick : public Command
 
 		if (i == ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
 		        return;
 		}
 
 		akick->SetFlag(AK_STUCK);
-		notice_lang(s_ChanServ, u, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name);
 
 		if (ci->c)
 		        stick_mask(ci, akick);
@@ -313,7 +311,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
 		}
 
@@ -332,12 +330,12 @@ class CommandCSAKick : public Command
 
 		if (i == ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
 		        return;
 		}
 
 		akick->UnsetFlag(AK_STUCK);
-		notice_lang(s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name);
 	}
 
 	void DoDel(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
@@ -348,7 +346,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
 		}
 
@@ -362,14 +360,14 @@ class CommandCSAKick : public Command
 		        if (!deleted)
 			{
 		                if (count == 1)
-					notice_lang(s_ChanServ, u, CHAN_AKICK_NO_SUCH_ENTRY, last, ci->name);
+					notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_SUCH_ENTRY, last, ci->name);
 		                else
-					notice_lang(s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name);
+					notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name);
 		        }
 			else if (deleted == 1)
-		                notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED_ONE, ci->name);
+		                notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DELETED_ONE, ci->name);
 			else
-		                notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED_SEVERAL, deleted, ci->name);
+		                notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DELETED_SEVERAL, deleted, ci->name);
 			if (deleted)
 				ci->CleanAkick();
 		}
@@ -392,13 +390,13 @@ class CommandCSAKick : public Command
 			
 			if (i == ci->GetAkickCount())
 			{
-			                notice_lang(s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
+			                notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name);
 			                return;
 		        }
 			
 			ci->EraseAkick(akick);
 			
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED, mask.c_str(), ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DELETED, mask.c_str(), ci->name);
 		}
 	}
 
@@ -411,7 +409,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
 		}
 
@@ -437,7 +435,7 @@ class CommandCSAKick : public Command
 		}
 
 		if (!sent_header)
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name);
 
 	}
 
@@ -450,7 +448,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
 		        return;
 		}
 
@@ -475,7 +473,7 @@ class CommandCSAKick : public Command
 		        }
 		}
 		if (!sent_header)
-		        notice_lang(s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name);
 
 	}
 
@@ -488,7 +486,7 @@ class CommandCSAKick : public Command
 
 		if (!c)
 		{
-		        notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, ci->name);
+		        notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, ci->name);
 		        return;
 		}
 
@@ -501,9 +499,9 @@ class CommandCSAKick : public Command
 			{
 				argv[0] = sstrdup(c->name);
 				argv[1] = sstrdup(cu->user->nick);
-				argv[2] = sstrdup(CSAutokickReason);
+				argv[2] = sstrdup(Config.CSAutokickReason);
 
-				do_kick(s_ChanServ, 3, argv);
+				do_kick(Config.s_ChanServ, 3, argv);
 
 				delete [] argv[2];
 				delete [] argv[1];
@@ -513,13 +511,13 @@ class CommandCSAKick : public Command
 		        cu = unext;
 		}
 
-		notice_lang(s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name, count);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name, count);
 	}
 
 	void DoClear(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		ci->ClearAkick();
-		notice_lang(s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name);
 	}
 
  public:
@@ -538,9 +536,9 @@ class CommandCSAKick : public Command
 		if (mask.empty() && (cmd == "ADD" || cmd == "STICK" || cmd == "UNSTICK" || cmd == "DEL"))
 			this->OnSyntaxError(u, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/modify"))
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd != "LIST" && cmd != "VIEW" && cmd != "ENFORCE" && readonly)
-			notice_lang(s_ChanServ, u, CHAN_AKICK_DISABLED);
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DISABLED);
 		else if (cmd == "ADD")
 			this->DoAdd(u, ci, params);
 		else if (cmd == "STICK")
@@ -565,13 +563,13 @@ class CommandCSAKick : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_AKICK);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_AKICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
 	}
 };
 
@@ -592,7 +590,7 @@ class CSAKick : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AKICK);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_AKICK);
 	}
 };
 

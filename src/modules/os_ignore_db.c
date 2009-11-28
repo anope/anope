@@ -113,7 +113,7 @@ class OSIgnoreDB : public Module
 		IgnoreData *ign, *next;
 
 		now = time(NULL);
-		fill_db_ptr(dbptr, 0, IGNOREDBVERSION, s_OperServ, IgnoreDB);
+		fill_db_ptr(dbptr, 0, IGNOREDBVERSION, Config.s_OperServ, IgnoreDB);
 
 		/* time to backup the old db */
 		rename(IgnoreDB, dbptr->temp_name);
@@ -197,7 +197,7 @@ void load_ignore_db() {
 	IgnoreData *ign;
 
 	expiry_time = time(NULL);
-	fill_db_ptr(dbptr, 0, IGNOREDBVERSION, s_OperServ, IgnoreDB);
+	fill_db_ptr(dbptr, 0, IGNOREDBVERSION, Config.s_OperServ, IgnoreDB);
 
 	/* let's remove existing temp files here, because we only load dbs on startup */
 	remove(dbptr->temp_name);

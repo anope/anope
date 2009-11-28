@@ -787,27 +787,27 @@ int nickIsServices(const char *tempnick, int bot)
 	s = strchr(nick, '@');
 	if (s) {
 		*s++ = 0;
-		if (stricmp(s, ServerName) != 0) {
+		if (stricmp(s, Config.ServerName) != 0) {
 			delete [] nick;
 			return found;
 		}
 	}
 
-	if (s_NickServ && (stricmp(nick, s_NickServ) == 0))
+	if (Config.s_NickServ && (stricmp(nick, Config.s_NickServ) == 0))
 		found++;
-	else if (s_ChanServ && (stricmp(nick, s_ChanServ) == 0))
+	else if (Config.s_ChanServ && (stricmp(nick, Config.s_ChanServ) == 0))
 		found++;
-	else if (s_HostServ && (stricmp(nick, s_HostServ) == 0))
+	else if (Config.s_HostServ && (stricmp(nick, Config.s_HostServ) == 0))
 		found++;
-	else if (s_MemoServ && (stricmp(nick, s_MemoServ) == 0))
+	else if (Config.s_MemoServ && (stricmp(nick, Config.s_MemoServ) == 0))
 		found++;
-	else if (s_BotServ && (stricmp(nick, s_BotServ) == 0))
+	else if (Config.s_BotServ && (stricmp(nick, Config.s_BotServ) == 0))
 		found++;
-	else if (s_OperServ && (stricmp(nick, s_OperServ) == 0))
+	else if (Config.s_OperServ && (stricmp(nick, Config.s_OperServ) == 0))
 		found++;
-	else if (s_GlobalNoticer && (stricmp(nick, s_GlobalNoticer) == 0))
+	else if (Config.s_GlobalNoticer && (stricmp(nick, Config.s_GlobalNoticer) == 0))
 		found++;
-	else if (s_BotServ && bot) {
+	else if (Config.s_BotServ && bot) {
 		BotInfo *bi;
 		int i;
 		for (i = 0; i < 256; i++) {
@@ -915,9 +915,9 @@ void rand_init()
  */
 void add_entropy_userkeys()
 {
-	arc4_addrandom(&UserKey1, sizeof(UserKey1));
-	arc4_addrandom(&UserKey2, sizeof(UserKey2));
-	arc4_addrandom(&UserKey3, sizeof(UserKey3));
+	arc4_addrandom(&Config.UserKey1, sizeof(Config.UserKey1));
+	arc4_addrandom(&Config.UserKey2, sizeof(Config.UserKey2));
+	arc4_addrandom(&Config.UserKey3, sizeof(Config.UserKey3));
 	/* UserKey3 is also used in mysql_rand() */
 }
 

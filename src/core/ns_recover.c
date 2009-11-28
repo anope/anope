@@ -31,15 +31,15 @@ class CommandNSRecover : public Command
 		User *u2;
 
 		if (!(u2 = finduser(nick)))
-			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (!(na = findnick(u2->nick)))
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (!stricmp(nick, u->nick))
-			notice_lang(s_NickServ, u, NICK_NO_RECOVER_SELF);
+			notice_lang(Config.s_NickServ, u, NICK_NO_RECOVER_SELF);
 		else if (pass)
 		{
 			int res = enc_check_password(pass, na->nc->pass);
@@ -48,20 +48,20 @@ class CommandNSRecover : public Command
 			{
 				char relstr[192];
 
-				notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
+				notice_lang(Config.s_NickServ, u2, FORCENICKCHANGE_NOW);
 				collide(na, 0);
 
-				/* Convert NSReleaseTimeout seconds to string format */
-				duration(na->nc, relstr, sizeof(relstr), NSReleaseTimeout);
+				/* Convert Config.NSReleaseTimeout seconds to string format */
+				duration(na->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
 
-				notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
+				notice_lang(Config.s_NickServ, u, NICK_RECOVERED, Config.s_NickServ, nick, relstr);
 			}
 			else
 			{
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: RECOVER: invalid password for %s by %s!%s@%s", s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
+					alog("%s: RECOVER: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
 					bad_password(u);
 				}
 			}
@@ -72,16 +72,16 @@ class CommandNSRecover : public Command
 			{
 				char relstr[192];
 
-				notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
+				notice_lang(Config.s_NickServ, u2, FORCENICKCHANGE_NOW);
 				collide(na, 0);
 
-				/* Convert NSReleaseTimeout seconds to string format */
-				duration(na->nc, relstr, sizeof(relstr), NSReleaseTimeout);
+				/* Convert Config.NSReleaseTimeout seconds to string format */
+				duration(na->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
 
-				notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
+				notice_lang(Config.s_NickServ, u, NICK_RECOVERED, Config.s_NickServ, nick, relstr);
 			}
 			else
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
@@ -90,18 +90,18 @@ class CommandNSRecover : public Command
 	{
 		char relstr[192];
 
-		/* Convert NSReleaseTimeout seconds to string format */
-		duration(u->nc, relstr, sizeof(relstr), NSReleaseTimeout);
+		/* Convert Config.NSReleaseTimeout seconds to string format */
+		duration(u->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
 
-		notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
-		//do_help_limited(s_NickServ, u, this);
+		notice_help(Config.s_NickServ, u, NICK_HELP_RECOVER, relstr);
+		//do_help_limited(Config.s_NickServ, u, this);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
 	}
 };
 
@@ -120,7 +120,7 @@ class NSRecover : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_RECOVER);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RECOVER);
 	}
 };
 

@@ -31,15 +31,15 @@ class CommandOSQuit : public Command
 		else
 			sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
 
-		if (GlobalOnCycle)
-			oper_global(NULL, "%s", GlobalOnCycleMessage);
+		if (Config.GlobalOnCycle)
+			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);
 		quitting = 1;
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_QUIT);
+		notice_help(Config.s_OperServ, u, OPER_HELP_QUIT);
 		return true;
 	}
 };
@@ -59,7 +59,7 @@ class OSQuit : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_QUIT);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_QUIT);
 	}
 };
 

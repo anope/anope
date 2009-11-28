@@ -31,7 +31,7 @@ class CommandCSInvite : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 			return MOD_CONT;
 		}
 
@@ -39,7 +39,7 @@ class CommandCSInvite : public Command
 
 		if (!u || !check_access(u, ci, CA_INVITE))
 		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -49,30 +49,30 @@ class CommandCSInvite : public Command
 		{
 			if (!(u2 = finduser(params[1].c_str())))
 			{
-				notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, params[1].c_str());
+				notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, params[1].c_str());
 				return MOD_CONT;
 			}
 		}
 
 		if (is_on_chan(c, u2))
-			notice_lang(s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name);
 		else
 		{
 			ircdproto->SendInvite(whosends(ci), chan, u2->nick);
-			notice_lang(s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_INVITE);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_INVITE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "INVITE", CHAN_INVITE_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "INVITE", CHAN_INVITE_SYNTAX);
 	}
 };
 
@@ -90,7 +90,7 @@ class CSInvite : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INVITE);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_INVITE);
 	}
 };
 

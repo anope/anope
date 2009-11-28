@@ -123,12 +123,12 @@ class CommandCSEnforce : public Command
 				av[1] = mask;
 				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask, time(NULL));
-				chan_set_modes(s_ChanServ, c, 2, av, 1);
+				chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
 				ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
 				av[0] = ci->name;
 				av[1] = u->nick;
 				av[2] = reason;
-				do_kick(s_ChanServ, 3, av);
+				do_kick(Config.s_ChanServ, 3, av);
 			}
 			user = next;
 		} while (user);
@@ -166,13 +166,13 @@ class CommandCSEnforce : public Command
 				if (!c->HasMode(CMODE_REGISTERED))
 				{
 					ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask, time(NULL));
-					chan_set_modes(s_ChanServ, c, 2, av, 1);
+					chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
 				}
 				ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
 				av[0] = ci->name;
 				av[1] = u->nick;
 				av[2] = reason;
-				do_kick(s_ChanServ, 3, av);
+				do_kick(Config.s_ChanServ, 3, av);
 			}
 			user = next;
 		} while (user);
@@ -193,35 +193,35 @@ class CommandCSEnforce : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		else if (!check_access(u, ci, CA_AKICK))
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
 			if (what.empty() || what == "SET")
 			{
 				this->DoSet(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, !what.empty() ? what.c_str() : "SET");
+				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, !what.empty() ? what.c_str() : "SET");
 			}
 			else if (what == "MODES")
 			{
 				this->DoModes(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else if (what == "SECUREOPS")
 			{
 				this->DoSecureOps(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else if (what == "RESTRICTED")
 			{
 				this->DoRestricted(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else if (what == "+R")
 			{
 				this->DoCModeR(c);
-				me->NoticeLang(s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else
 				this->OnSyntaxError(u, "");
@@ -232,21 +232,21 @@ class CommandCSEnforce : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-		me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
-		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
+		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
+		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-			me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
+			me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
 		else
-			me->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
+			me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	}
 };
 
@@ -475,7 +475,7 @@ class CSEnforce : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		this->NoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+		this->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
 	}
 };
 

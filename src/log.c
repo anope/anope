@@ -49,11 +49,11 @@ static void remove_log()
 
 	char name[PATH_MAX];
 
-	if (!KeepLogs)
+	if (!Config.KeepLogs)
 		return;
 
 	time(&t);
-	t -= (60 * 60 * 24 * KeepLogs);
+	t -= (60 * 60 * 24 * Config.KeepLogs);
 	tm = *localtime(&t);
 
 	/* removed if from here cause get_logchan is always 1 */
@@ -176,8 +176,8 @@ void alog(const char *fmt, ...)
 	if (nofork) {
 		fprintf(stderr, "%s %s\n", buf, str);
 	}
-	if (LogChannel && LogChan && !debug && findchan(LogChannel)) {
-		ircdproto->SendPrivmsg(findbot(s_GlobalNoticer), LogChannel, "%s", str);
+	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel)) {
+		ircdproto->SendPrivmsg(findbot(Config.s_GlobalNoticer), Config.LogChannel, "%s", str);
 	}
 	errno = errno_save;
 }

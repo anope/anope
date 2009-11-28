@@ -421,7 +421,7 @@ char *sgets(char *buf, int len, ano_socket_t s)
 		return NULL;
 	FD_ZERO(&fds);
 	FD_SET(s, &fds);
-	tv.tv_sec = ReadTimeout;
+	tv.tv_sec = Config.ReadTimeout;
 	tv.tv_usec = 0;
 	while (read_buffer_len() == 0 &&
 		   (c = select(s + 1, &fds, NULL, NULL, &tv)) < 0) {
@@ -547,8 +547,8 @@ static char *pack_ip(const char *ipaddr)
  * given (lhost==NULL, lport==0), then they are left free to vary.
  * @param host Remote Host
  * @param port Remote Port
- * @param lhost LocalHost
- * @param lport LocalPort
+ * @param lhost Config.LocalHost
+ * @param lport Config.LocalPort
  * @return int if successful
  */
 int conn(const char *host, int port, const char *lhost, int lport)

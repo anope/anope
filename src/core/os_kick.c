@@ -30,21 +30,21 @@ class CommandOSKick : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
 		{
-			notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 			return MOD_CONT;
 		}
-		ircdproto->SendKick(findbot(s_OperServ), chan, nick, "%s (%s)", u->nick, s);
-		if (WallOSKick)
-			ircdproto->SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick, nick, chan);
+		ircdproto->SendKick(findbot(Config.s_OperServ), chan, nick, "%s (%s)", u->nick, s);
+		if (Config.WallOSKick)
+			ircdproto->SendGlobops(Config.s_OperServ, "%s used KICK on %s/%s", u->nick, nick, chan);
 		argv[0] = sstrdup(chan);
 		argv[1] = sstrdup(nick);
 		argv[2] = sstrdup(s);
-		do_kick(s_OperServ, 3, argv);
+		do_kick(Config.s_OperServ, 3, argv);
 		delete [] argv[2];
 		delete [] argv[1];
 		delete [] argv[0];
@@ -53,13 +53,13 @@ class CommandOSKick : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_KICK);
+		notice_help(Config.s_OperServ, u, OPER_HELP_KICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
 	}
 };
 
@@ -78,7 +78,7 @@ class OSKick : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_KICK);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_KICK);
 	}
 };
 

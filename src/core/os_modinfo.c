@@ -37,7 +37,7 @@ class CommandOSModInfo : public Command
 		{
 			tm = *localtime(&m->created);
 			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
-			notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", timebuf);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", timebuf);
 			for (idx = 0; idx < MAX_CMD_HASH; ++idx)
 			{
 				showModuleCmdLoaded(HOSTSERV[idx], m->name.c_str(), u);
@@ -49,19 +49,19 @@ class CommandOSModInfo : public Command
 			}
 		}
 		else
-			notice_lang(s_OperServ, u, OPER_MODULE_NO_INFO, file);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_INFO, file);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_MODINFO);
+		notice_help(Config.s_OperServ, u, OPER_HELP_MODINFO);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "MODINFO", OPER_MODULE_INFO_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "MODINFO", OPER_MODULE_INFO_SYNTAX);
 	}
 };
 
@@ -79,7 +79,7 @@ class OSModInfo : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODINFO);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODINFO);
 	}
 };
 
@@ -95,7 +95,7 @@ int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u)
 		{
 			if (c->mod_name && !stricmp(c->mod_name, mod_name))
 			{
-				notice_lang(s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
+				notice_lang(Config.s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
 				++display;
 			}
 		}

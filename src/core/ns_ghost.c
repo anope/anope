@@ -30,15 +30,15 @@ class CommandNSGhost : public Command
 		NickAlias *na = findnick(nick);
 
 		if (!finduser(nick))
-			notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (!na)
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (!stricmp(nick, u->nick))
-			notice_lang(s_NickServ, u, NICK_NO_GHOST_SELF);
+			notice_lang(Config.s_NickServ, u, NICK_NO_GHOST_SELF);
 		else if (pass)
 		{
 			int res = enc_check_password(pass, na->nc->pass);
@@ -46,15 +46,15 @@ class CommandNSGhost : public Command
 			{
 				char buf[NICKMAX + 32];
 				snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);
-				kill_user(s_NickServ, nick, buf);
-				notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
+				kill_user(Config.s_NickServ, nick, buf);
+				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick);
 			}
 			else
 			{
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: GHOST: invalid password for %s by %s!%s@%s", s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
+					alog("%s: GHOST: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
 					bad_password(u);
 				}
 			}
@@ -65,24 +65,24 @@ class CommandNSGhost : public Command
 			{
 				char buf[NICKMAX + 32];
 				snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);
-				kill_user(s_NickServ, nick, buf);
-				notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
+				kill_user(Config.s_NickServ, nick, buf);
+				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick);
 			}
 			else
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_GHOST);
+		notice_help(Config.s_NickServ, u, NICK_HELP_GHOST);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
 	}
 };
 
@@ -101,7 +101,7 @@ class NSGhost : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_GHOST);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GHOST);
 	}
 };
 

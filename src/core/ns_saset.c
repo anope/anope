@@ -43,12 +43,12 @@ private:
 
 		if (i == nc->aliases.count)
 		{
-			notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_INVALID, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_DISPLAY_INVALID, nc->display);
 			return MOD_CONT;
 		}
 
 		change_core_display(nc, param.c_str());
-		notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_CHANGED, nc->display);
+		notice_lang(Config.s_NickServ, u, NICK_SASET_DISPLAY_CHANGED, nc->display);
 		return MOD_CONT;
 	}
 
@@ -65,37 +65,37 @@ private:
 		int len = param.size();
 		char tmp_pass[PASSMAX];
 
-		if (NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
+		if (Config.NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
 		{
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
-		else if (nc->display == param || (StrictPasswords && len < 5))
+		else if (nc->display == param || (Config.StrictPasswords && len < 5))
 		{
-			notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
+			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
 		}
 		else if (enc_encrypt_check_len(len, PASSMAX - 1))
 		{
-			notice_lang(s_NickServ, u, PASSWORD_TOO_LONG);
+			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
 			return MOD_CONT;
 		}
 
 		if (enc_encrypt(param.c_str(), len, nc->pass, PASSMAX - 1) < 0)
 		{
-			alog("%s: Failed to encrypt password for %s (set)", s_NickServ, nc->display);
-			notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_FAILED, nc->display);
+			alog("%s: Failed to encrypt password for %s (set)", Config.s_NickServ, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_FAILED, nc->display);
 			return MOD_CONT;
 		}
 
 		if (enc_decrypt(nc->pass, tmp_pass, PASSMAX - 1) == 1)
-			notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display, tmp_pass);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display, tmp_pass);
 		else
-			notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
 
-		alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
-		if (WallSetpass)
-			ircdproto->SendGlobops(s_NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick, nc->display);
+		alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
+		if (Config.WallSetpass)
+			ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick, nc->display);
 		return MOD_CONT;
 	}
 
@@ -109,12 +109,12 @@ private:
 		if (param)
 		{
 			nc->url = sstrdup(param);
-			notice_lang(s_NickServ, u, NICK_SASET_URL_CHANGED, nc->display, param);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_URL_CHANGED, nc->display, param);
 		}
 		else
 		{
 			nc->url = NULL;
-			notice_lang(s_NickServ, u, NICK_SASET_URL_UNSET, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_URL_UNSET, nc->display);
 		}
 		return MOD_CONT;
 	}
@@ -123,23 +123,23 @@ private:
 	{
 		const char *param = params.size() > 2 ? params[2].c_str() : NULL;
 
-		if (!param && NSForceEmail)
+		if (!param && Config.NSForceEmail)
 		{
-			notice_lang(s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
-		else if (NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
+		else if (Config.NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
 		{
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (param && !MailValidate(param))
 		{
-			notice_lang(s_NickServ, u, MAIL_X_INVALID, param);
+			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, param);
 			return MOD_CONT;
 		}
 
-		alog("%s: %s!%s@%s used SASET EMAIL on %s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
+		alog("%s: %s!%s@%s used SASET EMAIL on %s (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
 
 		if (nc->email)
 			delete [] nc->email;
@@ -147,12 +147,12 @@ private:
 		if (param)
 		{
 			nc->email = sstrdup(param);
-			notice_lang(s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display, param);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display, param);
 		}
 		else
 		{
 			nc->email = NULL;
-			notice_lang(s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display);
 		}
 		return MOD_CONT;
 	}
@@ -165,17 +165,17 @@ private:
 		{
 			int32 tmp = atol(param);
 			if (!tmp)
-				notice_lang(s_NickServ, u, NICK_SASET_ICQ_INVALID, param);
+				notice_lang(Config.s_NickServ, u, NICK_SASET_ICQ_INVALID, param);
 			else
 			{
 				nc->icq = tmp;
-				notice_lang(s_NickServ, u, NICK_SASET_ICQ_CHANGED, nc->display, param);
+				notice_lang(Config.s_NickServ, u, NICK_SASET_ICQ_CHANGED, nc->display, param);
 			}
 		}
 		else
 		{
 			nc->icq = 0;
-			notice_lang(s_NickServ, u, NICK_SASET_ICQ_UNSET, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_ICQ_UNSET, nc->display);
 		}
 		return MOD_CONT;
 	}
@@ -195,12 +195,12 @@ private:
 			snprintf(buf, sizeof(buf), "%s%s%s", param, rest ? " " : "", rest ? rest : "");
 
 			nc->greet = sstrdup(buf);
-			notice_lang(s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display, buf);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display, buf);
 		}
 		else
 		{
 			nc->greet = NULL;
-			notice_lang(s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display);
 		}
 		return MOD_CONT;
 	}
@@ -220,36 +220,36 @@ private:
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(s_NickServ, u, NICK_SASET_KILL_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_ON, nc->display);
 		}
 		else if (param == "QUICK")
 		{
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->SetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display);
 		}
 		else if (param == "IMMED")
 		{
-			if (NSAllowKillImmed)
+			if (Config.NSAllowKillImmed)
 			{
 				nc->SetFlag(NI_KILLPROTECT);
 				nc->SetFlag(NI_KILL_IMMED);
 				nc->UnsetFlag(NI_KILL_QUICK);
-				notice_lang(s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display);
+				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display);
 			}
 			else
-				notice_lang(s_NickServ, u, NICK_SASET_KILL_IMMED_DISABLED);
+				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED_DISABLED);
 		}
 		else if (param == "OFF")
 		{
 			nc->UnsetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(s_NickServ, u, NICK_SASET_KILL_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_OFF, nc->display);
 		}
 		else
-			syntax_error(s_NickServ, u, "SASET KILL", NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET KILL", Config.NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -266,15 +266,15 @@ private:
 		if (param == "ON")
 		{
 			nc->SetFlag(NI_SECURE);
-			notice_lang(s_NickServ, u, NICK_SASET_SECURE_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
 			nc->UnsetFlag(NI_SECURE);
-			notice_lang(s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display);
 		}
 		else
-			syntax_error(s_NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -291,15 +291,15 @@ private:
 		if (param == "ON")
 		{
 			nc->SetFlag(NI_PRIVATE);
-			notice_lang(s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
 			nc->UnsetFlag(NI_PRIVATE);
-			notice_lang(s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display);
 		}
 		else
-			syntax_error(s_NickServ, u, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -313,24 +313,24 @@ private:
 			return MOD_CONT;
 		}
 
-		if (!UsePrivmsg)
+		if (!Config.UsePrivmsg)
 		{
-			notice_lang(s_NickServ, u, NICK_SASET_OPTION_DISABLED, "MSG");
+			notice_lang(Config.s_NickServ, u, NICK_SASET_OPTION_DISABLED, "MSG");
 			return MOD_CONT;
 		}
 
 		if (param == "ON")
 		{
 			nc->SetFlag(NI_MSG);
-			notice_lang(s_NickServ, u, NICK_SASET_MSG_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_MSG_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
 			nc->UnsetFlag(NI_MSG);
-			notice_lang(s_NickServ, u, NICK_SASET_MSG_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_MSG_OFF, nc->display);
 		}
 		else
-			syntax_error(s_NickServ, u, "SASET MSG", NICK_SASET_MSG_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET MSG", NICK_SASET_MSG_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -373,25 +373,25 @@ private:
 		}
 		else
 		{
-			syntax_error(s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 			return MOD_CONT;
 		}
 
 		param = params.size() > 3 ? params[3] : "";
 		if (param.empty())
-			syntax_error(s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 		else if (param == "ON")
 		{
 			nc->SetFlag(flag);
-			notice_lang(s_NickServ, u, onmsg, nc->display, s_NickServ);
+			notice_lang(Config.s_NickServ, u, onmsg, nc->display, Config.s_NickServ);
 		}
 		else if (param == "OFF")
 		{
 			nc->UnsetFlag(flag);
-			notice_lang(s_NickServ, u, offmsg, nc->display, s_NickServ);
+			notice_lang(Config.s_NickServ, u, offmsg, nc->display, Config.s_NickServ);
 		}
 		else
-			syntax_error(s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -401,22 +401,22 @@ private:
 
 		if (param.empty())
 		{
-			syntax_error(s_NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
 			return MOD_CONT;
 		}
 
 		if (param == "ON")
 		{
 			na->SetFlag(NS_NO_EXPIRE);
-			notice_lang(s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick);
 		}
 		else if (param == "OFF")
 		{
 			na->UnsetFlag(NS_NO_EXPIRE);
-			notice_lang(s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick);
 		}
 		else
-			syntax_error(s_NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
 		return MOD_CONT;
 	}
 
@@ -433,15 +433,15 @@ private:
 		if (param == "ON")
 		{
 			nc->UnsetFlag(NI_AUTOOP);
-			notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
 			nc->SetFlag(NI_AUTOOP);
-			notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
 		}
 		else
-			syntax_error(s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
 
 		return MOD_CONT;
 	}
@@ -460,17 +460,17 @@ private:
 
 		if (param[strspn(param, "0123456789")]) /* i.e. not a number */
 		{
-			syntax_error(s_NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
 			return MOD_CONT;
 		}
 		langnum = atoi(param) - 1;
 		if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0)
 		{
-			notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_UNKNOWN, langnum + 1, s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ);
 			return MOD_CONT;
 		}
 		nc->language = langlist[langnum];
-		notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
+		notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
 
 		return MOD_CONT;
 	}
@@ -488,19 +488,19 @@ public:
 
 		if (readonly)
 		{
-			notice_lang(s_NickServ, u, NICK_SASET_DISABLED);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_DISABLED);
 			return MOD_CONT;
 		}
 		if (!(na = findnick(nick)))
 		{
-			notice_lang(s_NickServ, u, NICK_SASET_BAD_NICK, nick);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_BAD_NICK, nick);
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (cmd == "DISPLAY")
 			return this->DoSetDisplay(u, params, na->nc);
 		else if (cmd == "PASSWORD")
@@ -530,42 +530,42 @@ public:
 		else if (cmd == "LANGUAGE")
 			return this->DoSetLanguage(u, params, na->nc);
 		else
-			notice_lang(s_NickServ, u, NICK_SASET_UNKNOWN_OPTION, cmd.c_str());
+			notice_lang(Config.s_NickServ, u, NICK_SASET_UNKNOWN_OPTION, cmd.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (subcommand.empty())
-			notice_help(s_NickServ, u, NICK_HELP_SASET);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET);
 		else if (subcommand == "DISPLAY")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_DISPLAY);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_DISPLAY);
 		else if (subcommand == "PASSWORD")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_PASSWORD);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_PASSWORD);
 		else if (subcommand == "URL")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_URL);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_URL);
 		else if (subcommand == "EMAIL")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_EMAIL);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_EMAIL);
 		else if (subcommand == "ICQ")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_ICQ);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_ICQ);
 		else if (subcommand == "GREET")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_GREET);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_GREET);
 		else if (subcommand == "KILL")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_KILL);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_KILL);
 		else if (subcommand == "SECURE")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_SECURE);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_SECURE);
 		else if (subcommand == "PRIVATE")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_PRIVATE);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_PRIVATE);
 		else if (subcommand == "MSG")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_MSG);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_MSG);
 		else if (subcommand == "HIDE")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_HIDE);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_HIDE);
 		else if (subcommand == "NOEXPIRE")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_NOEXPIRE);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_NOEXPIRE);
 		else if (subcommand == "AUTOOP")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_AUTOOP);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_AUTOOP);
 		else if (subcommand == "LANGUAGE")
-			notice_help(s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
 		else
 			return false;
 
@@ -574,7 +574,7 @@ public:
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "SASET", NICK_SASET_SYNTAX);
 	}
 };
 
@@ -593,7 +593,7 @@ public:
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_SASET);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SASET);
 	}
 };
 

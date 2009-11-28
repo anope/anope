@@ -48,23 +48,23 @@ class CommandCSBan : public Command
 			ci = c->ci;
 
 		if (!c) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, target);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
 		} else if (!is_same ? !check_access(u, ci, CA_BAN) :
 					 !check_access(u, ci, CA_BANME)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else if (!is_same && (ci->HasFlag(CI_PEACE))
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			/*
 			 * Dont ban/kick the user on channels where he is excepted
 			 * to prevent services <-> server wars.
 			 */
 		} else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u2)) {
-			notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
 		} else if (is_protected(u2)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else {
 			const char *av[3];
 			char mask[BUFSIZE];
@@ -73,7 +73,7 @@ class CommandCSBan : public Command
 			get_idealban(ci, u2, mask, sizeof(mask));
 			av[1] = mask;
 			ircdproto->SendMode(whosends(ci), c->name, "+b %s", av[1]);
-			chan_set_modes(s_ChanServ, c, 2, av, 1);
+			chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
 
 			/* We still allow host banning while not allowing to kick */
 			if (!is_on_chan(c, u2))
@@ -91,7 +91,7 @@ class CommandCSBan : public Command
 			 kav[0] = ci->name;
 			 kav[1] = target;
 			 kav[2] = reason;
-			do_kick(s_ChanServ, 3, kav);
+			do_kick(Config.s_ChanServ, 3, kav);
 		}
 
 		return MOD_CONT;
@@ -99,13 +99,13 @@ class CommandCSBan : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_BAN);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_BAN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
 	}
 };
 
@@ -127,7 +127,7 @@ class CommandCSUnban : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 			return MOD_CONT;
 		}
 
@@ -135,24 +135,24 @@ class CommandCSUnban : public Command
 
 		if (!check_access(u, ci, CA_UNBAN))
 		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		common_unban(ci, u->nick);
-		notice_lang(s_ChanServ, u, CHAN_UNBANNED, chan);
+		notice_lang(Config.s_ChanServ, u, CHAN_UNBANNED, chan);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_UNBAN);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_UNBAN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
 	}
 };
 
@@ -173,8 +173,8 @@ class CSBan : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_BAN);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNBAN);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_BAN);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_UNBAN);
 	}
 };
 

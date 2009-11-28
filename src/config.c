@@ -18,242 +18,26 @@
 
 /*************************************************************************/
 
-ServerConfig serverConfig;
-
-/* Configurable variables: */
-
-char *IRCDModule;
-
-std::list<Uplink *> Uplinks;
-
-char *LocalHost;
-unsigned LocalPort;
-
-char *ServerName;
-char *ServerDesc;
-char *ServiceUser;
-char *ServiceHost;
-
-char *HelpChannel;
-char *LogChannel;
-char *NetworkName;
-unsigned NickLen;
-
-char *s_NickServ;
-char *s_ChanServ;
-char *s_MemoServ;
-char *s_BotServ;
-char *s_OperServ;
-char *s_GlobalNoticer;
-char *desc_NickServ;
-char *desc_ChanServ;
-char *desc_MemoServ;
-char *desc_BotServ;
-char *desc_OperServ;
-char *desc_GlobalNoticer;
-
-char *HostDBName;			   /* Name of HostServ DB File */
-char *s_HostServ;			   /* HostServ Name */
-char *desc_HostServ;			/* HostServ Description */
-
-char *PIDFilename;
-char *MOTDFilename;
-char *NickDBName;
-char *PreNickDBName;
-char *ChanDBName;
-char *BotDBName;
-char *OperDBName;
-char *NewsDBName;
-
-bool NoBackupOkay;
-bool StrictPasswords;
-unsigned BadPassLimit;
-time_t BadPassTimeout;
-time_t UpdateTimeout;
-time_t ExpireTimeout;
-time_t ReadTimeout;
-time_t WarningTimeout;
-time_t TimeoutCheck;
-int KeepLogs;
-int KeepBackups;
-bool ForceForbidReason;
-bool UsePrivmsg;
-bool UseStrictPrivMsg;
-bool DumpCore;
-bool LogUsers;
-unsigned NickRegDelay;
-unsigned NewsCount;
-
-bool UseMail;
-char *SendMailPath;
-char *SendFrom;
-bool RestrictMail;
-time_t MailDelay;
-bool DontQuoteAddresses;
-
-static std::string NSDefaults;
-char *NSGuestNickPrefix;
-bool NSAllowKillImmed;
-bool NSNoGroupChange;
-Flags<NickCoreFlag> NSDefFlags;
-unsigned NSDefLanguage;
-time_t NSRegDelay;
-time_t NSResendDelay;
-time_t NSExpire;
-time_t NSRExpire;
-bool NSForceEmail;
-int NSMaxAliases;
-unsigned NSAccessMax;
-char *NSEnforcerUser;
-char *NSEnforcerHost;
-static char *temp_nsuserhost;
-time_t NSReleaseTimeout;
-bool NSListOpersOnly;
-unsigned NSListMax;
-bool NSSecureAdmins;
-bool NSStrictPrivileges;
-bool NSEmailReg;
-bool NSModeOnID;
-bool NSAddAccessOnReg;
-
-static std::string CSDefaults;
-Flags<ChannelInfoFlag> CSDefFlags;
-unsigned CSMaxReg;
-time_t CSExpire;
-int CSDefBantype;
-unsigned CSAccessMax;
-unsigned CSAutokickMax;
-char *CSAutokickReason;
-time_t CSInhabit;
-bool CSListOpersOnly;
-unsigned CSListMax;
-bool CSOpersOnly;
-
-unsigned MSMaxMemos;
-time_t MSSendDelay;
-bool MSNotifyAll;
-unsigned MSMemoReceipt;
-
-static std::string BSDefaults;
-Flags<BotServFlag> BSDefFlags;
-time_t BSKeepData;
-unsigned BSMinUsers;
-unsigned BSBadWordsMax;
-bool BSSmartJoin;
-bool BSGentleBWReason;
-bool BSCaseSensitive;
-char *BSFantasyCharacter;
-
-bool HideStatsO;
-bool GlobalOnCycle;
-bool AnonymousGlobal;
-bool RestrictOperNicks;
-char *GlobalOnCycleMessage;
-char *GlobalOnCycleUP;
-bool SuperAdmin;
-bool LogBot;
-bool LogMaxUsers;
-bool DisableRaw;
-time_t AutokillExpiry;
-time_t ChankillExpiry;
-time_t SGLineExpiry;
-time_t SQLineExpiry;
-time_t SZLineExpiry;
-bool AkillOnAdd;
-bool KillonSGline;
-bool KillonSQline;
-static std::string OSNotifications;
-bool WallOper;
-bool WallBadOS;
-bool WallOSGlobal;
-bool WallOSMode;
-bool WallOSClearmodes;
-bool WallOSKick;
-bool WallOSAkill;
-bool WallOSSGLine;
-bool WallOSSQLine;
-bool WallOSSZLine;
-bool WallOSNoOp;
-bool WallOSJupe;
-bool WallAkillExpire;
-bool WallSGLineExpire;
-bool WallSQLineExpire;
-bool WallSZLineExpire;
-bool WallExceptionExpire;
-bool WallDrop;
-bool WallForbid;
-bool WallGetpass;
-bool WallSetpass;
-bool AddAkiller;
-
-bool LimitSessions;
-unsigned DefSessionLimit;
-time_t ExceptionExpiry;
-int MaxSessionKill;
-unsigned MaxSessionLimit;
-time_t SessionAutoKillExpiry;
-char *ExceptionDBName;
-char *SessionLimitExceeded;
-char *SessionLimitDetailsLoc;
-
-bool OSOpersOnly;
+ServerConfig Config;
 
 static std::string Modules;
-std::list<std::string> ModulesAutoLoad;
-
-/**
- * Core Module Stuff
- **/
 static std::string EncModules;
-std::list<std::string> EncModuleList;
-
 static std::string HostCoreModules;
-std::list<std::string> HostServCoreModules;
-
 static std::string MemoCoreModules;
-std::list<std::string> MemoServCoreModules;
-
 static std::string BotCoreModules;
-std::list<std::string> BotServCoreModules;
-
 static std::string OperCoreModules;
-std::list<std::string> OperServCoreModules;
-
 static std::string NickCoreModules;
-std::list<std::string> NickServCoreModules;
-
 static std::string ChanCoreModules;
-std::list<std::string> ChanServCoreModules;
-
-int DefConLevel;
 static std::string DefCon1;
 static std::string DefCon2;
 static std::string DefCon3;
 static std::string DefCon4;
-time_t DefConTimeOut;
-int DefConSessionLimit;
-time_t DefConAKILL;
-char *DefConChanModes;
-bool GlobalOnDefcon;
-bool GlobalOnDefconMore;
-char *DefConOffMessage;
-char *DefconMessage;
-char *DefConAkillReason;
-
-long unsigned int UserKey1;
-long unsigned int UserKey2;
-long unsigned int UserKey3;
-
-char *Numeric;
 static char *UlineServers;
-char **Ulines;
-int NumUlines;
-
-std::list<OperType *> MyOperTypes;
-/* Pair of nick/opertype lookup. It's stored like this currently, because config is parsed before db load.
- * XXX: It would be nice to not need this.
- */
-std::list<std::pair<std::string, std::string> > svsopers_in_config;
+static std::string OSNotifications;
+static std::string BSDefaults;
+static std::string CSDefaults;
+static char *temp_nsuserhost;
+static std::string NSDefaults;
 
 /*************************************************************************/
 
@@ -394,7 +178,7 @@ bool ValidateNotZero(ServerConfig *, const char *tag, const char *value, ValueIt
 
 bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (NSEmailReg)
+	if (Config.NSEmailReg)
 	{
 		if (std::string(value) == "prenickdatabase")
 		{
@@ -454,7 +238,7 @@ bool ValidateBantype(ServerConfig *, const char *, const char *, ValueItem &data
 
 bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (s_BotServ)
+	if (Config.s_BotServ)
 	{
 		if (std::string(value) == "description" || std::string(value) == "database")
 		{
@@ -472,7 +256,7 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 
 bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (s_HostServ)
+	if (Config.s_HostServ)
 	{
 		if (std::string(value) == "description" || std::string(value) == "database")
 		{
@@ -485,7 +269,7 @@ bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueI
 
 bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (LimitSessions)
+	if (Config.LimitSessions)
 	{
 		if (std::string(value) == "maxsessionlimit" || std::string(value) == "exceptionexpiry")
 		{
@@ -506,14 +290,14 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 		if (level > 5)
 			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
 	}
-	else if (DefConLevel)
+	else if (Config.DefConLevel)
 	{
 		if ((std::string(value).substr(0, 5) == "level" && isdigit(value[5])) || std::string(value) == "chanmodes" || std::string(value) == "akillreason")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
-		else if (std::string(value) == "message" && GlobalOnDefconMore)
+		else if (std::string(value) == "message" && Config.GlobalOnDefconMore)
 		{
 			if (data.GetValue().empty())
 				throw ConfigException("The value for <defcon:message> cannot be empty when globalondefconmore is enabled!");
@@ -546,7 +330,7 @@ bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data
 
 bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (UseMail)
+	if (Config.UseMail)
 	{
 		if (std::string(value) == "sendmailpath" || std::string(value) == "sendfrom")
 		{
@@ -559,12 +343,12 @@ bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem 
 
 bool ValidateGlobalOnCycle(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (GlobalOnCycle)
+	if (Config.GlobalOnCycle)
 	{
 		if (data.GetValue().empty())
 		{
 			alog("<%s:%s> was undefined, disabling <options:globaloncycle>", tag, value);
-			GlobalOnCycle = false;
+			Config.GlobalOnCycle = false;
 		}
 	}
 	return true;
@@ -585,13 +369,13 @@ bool InitUplinks(ServerConfig *, const char *, bool bail)
 	// If bail is false, we were reloading, don't clear anything
 	if (!bail)
 		return true;
-	if (!Uplinks.empty())
+	if (!Config.Uplinks.empty())
 	{
-		std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
+		std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end();
 		for (; curr_uplink != end_uplink; ++curr_uplink)
 			delete *curr_uplink;
 	}
-	Uplinks.clear();
+	Config.Uplinks.clear();
 	return true;
 }
 
@@ -614,7 +398,7 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 	if (!ValidateNotEmpty(conf, "uplink", "password", vi_password))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// If we get here, all the values are valid, we'll add it to the Uplinks list
-	Uplinks.push_back(new Uplink(host, port, password));
+	Config.Uplinks.push_back(new Uplink(host, port, password));
 	return true;
 }
 
@@ -623,17 +407,17 @@ bool DoneUplinks(ServerConfig *, const char *, bool bail)
 	// If bail is false, we were reloading, ignore this check
 	if (!bail)
 		return true;
-	if (Uplinks.empty())
+	if (Config.Uplinks.empty())
 		throw ConfigException("You must define at least one uplink block!");
 	return true;
 }
 
 static bool InitOperTypes(ServerConfig *, const char *, bool)
 {
-	for (std::list<OperType *>::iterator it = MyOperTypes.begin(); it != MyOperTypes.end(); ++it)
+	for (std::list<OperType *>::iterator it = Config.MyOperTypes.begin(); it != Config.MyOperTypes.end(); ++it)
 		delete *it;
 
-	MyOperTypes.clear();
+	Config.MyOperTypes.clear();
 	return true;
 }
 
@@ -658,7 +442,7 @@ static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueLis
 	while (privstr.GetToken(tok))
 		ot->AddPriv(tok);
 
-	MyOperTypes.push_back(ot);
+	Config.MyOperTypes.push_back(ot);
 	return true;
 }
 
@@ -694,14 +478,14 @@ static bool DoOper(ServerConfig *conf, const char *, const char **, ValueList &v
 	if (!ValidateNotEmpty(conf, "oper", "type", vi2))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 
-	svsopers_in_config.push_back(std::make_pair(name, type));
+	Config.Opers.push_back(std::make_pair(name, type));
 	return true;
 }
 
 static bool DoneOpers(ServerConfig *, const char *, bool)
 {
 	// XXX: this is duplicated in config.c
-	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
+	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 	{
 		std::string nick = it->first, type = it->second;
 
@@ -714,7 +498,7 @@ static bool DoneOpers(ServerConfig *, const char *, bool)
 			// Nick with no core (wtf?)
 			abort();
 
-		for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); ++tit)
+		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); ++tit)
 		{
 			OperType *ot = *tit;
 			if (ot->GetName() == type)
@@ -811,164 +595,164 @@ int ServerConfig::Read(bool bail)
 		 *
 		 * We may need to add some other validation functions to handle certain things, we can handle that later.
 		 * Any questions about these, w00t, feel free to ask. */
-		{"serverinfo", "name", "", new ValueContainerChar(&ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "description", "", new ValueContainerChar(&ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "localhost", "", new ValueContainerChar(&LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
-		{"serverinfo", "localport", "0", new ValueContainerUInt(&LocalPort), DT_UINTEGER | DT_NORELOAD, ValidatePort},
-		{"serverinfo", "type", "", new ValueContainerChar(&IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
-		{"serverinfo", "ident", "", new ValueContainerChar(&ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "hostname", "", new ValueContainerChar(&ServiceHost), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "pid", "services.pid", new ValueContainerChar(&PIDFilename), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "motd", "services.motd", new ValueContainerChar(&MOTDFilename), DT_CHARPTR, ValidateNotEmpty},
-		{"networkinfo", "helpchannel", "", new ValueContainerChar(&HelpChannel), DT_CHARPTR, NoValidation},
-		{"networkinfo", "logchannel", "", new ValueContainerChar(&LogChannel), DT_CHARPTR, NoValidation},
-		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
-		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
-		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
+		{"serverinfo", "name", "", new ValueContainerChar(&Config.ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "description", "", new ValueContainerChar(&Config.ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "localhost", "", new ValueContainerChar(&Config.LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
+		{"serverinfo", "localport", "0", new ValueContainerUInt(&Config.LocalPort), DT_UINTEGER | DT_NORELOAD, ValidatePort},
+		{"serverinfo", "type", "", new ValueContainerChar(&Config.IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "id", "", new ValueContainerChar(&Config.Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
+		{"serverinfo", "ident", "", new ValueContainerChar(&Config.ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "hostname", "", new ValueContainerChar(&Config.ServiceHost), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "pid", "services.pid", new ValueContainerChar(&Config.PIDFilename), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "motd", "services.motd", new ValueContainerChar(&Config.MOTDFilename), DT_CHARPTR, ValidateNotEmpty},
+		{"networkinfo", "helpchannel", "", new ValueContainerChar(&Config.HelpChannel), DT_CHARPTR, NoValidation},
+		{"networkinfo", "logchannel", "", new ValueContainerChar(&Config.LogChannel), DT_CHARPTR, NoValidation},
+		{"networkinfo", "logbot", "no", new ValueContainerBool(&Config.LogBot), DT_BOOLEAN, NoValidation},
+		{"networkinfo", "networkname", "", new ValueContainerChar(&Config.NetworkName), DT_CHARPTR, ValidateNotEmpty},
+		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&Config.NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"options", "userkey1", "0", new ValueContainerLUInt(&UserKey1), DT_LUINTEGER, NoValidation},
-		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
-		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
-		{"options", "nobackupokay", "no", new ValueContainerBool(&NoBackupOkay), DT_BOOLEAN, NoValidation},
-		{"options", "strictpasswords", "no", new ValueContainerBool(&StrictPasswords), DT_BOOLEAN, NoValidation},
-		{"options", "badpasslimit", "0", new ValueContainerUInt(&BadPassLimit), DT_UINTEGER, NoValidation},
-		{"options", "badpasstimeout", "0", new ValueContainerTime(&BadPassTimeout), DT_TIME, NoValidation},
-		{"options", "updatetimeout", "0", new ValueContainerTime(&UpdateTimeout), DT_TIME, ValidateNotZero},
-		{"options", "expiretimeout", "0", new ValueContainerTime(&ExpireTimeout), DT_TIME, ValidateNotZero},
-		{"options", "readtimeout", "0", new ValueContainerTime(&ReadTimeout), DT_TIME, ValidateNotZero},
-		{"options", "warningtimeout", "0", new ValueContainerTime(&WarningTimeout), DT_TIME, ValidateNotZero},
-		{"options", "timeoutcheck", "0", new ValueContainerTime(&TimeoutCheck), DT_TIME, NoValidation},
-		{"options", "keeplogs", "0", new ValueContainerInt(&KeepLogs), DT_INTEGER, NoValidation},
-		{"options", "keepbackups", "0", new ValueContainerInt(&KeepBackups), DT_INTEGER, NoValidation},
-		{"options", "forceforbidreason", "no", new ValueContainerBool(&ForceForbidReason), DT_BOOLEAN, NoValidation},
-		{"options", "useprivmsg", "no", new ValueContainerBool(&UsePrivmsg), DT_BOOLEAN, NoValidation},
-		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
-		{"options", "dumpcore", "yes", new ValueContainerBool(&DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
-		{"options", "logusers", "no", new ValueContainerBool(&LogUsers), DT_BOOLEAN, NoValidation},
-		{"options", "hidestatso", "no", new ValueContainerBool(&HideStatsO), DT_BOOLEAN, NoValidation},
-		{"options", "globaloncycle", "no", new ValueContainerBool(&GlobalOnCycle), DT_BOOLEAN, NoValidation},
-		{"options", "globaloncycledown", "", new ValueContainerChar(&GlobalOnCycleMessage), DT_CHARPTR, ValidateGlobalOnCycle},
-		{"options", "globaloncycleup", "", new ValueContainerChar(&GlobalOnCycleUP), DT_CHARPTR, ValidateGlobalOnCycle},
-		{"options", "anonymousglobal", "no", new ValueContainerBool(&AnonymousGlobal), DT_BOOLEAN, NoValidation},
-		{"options", "nickregdelay", "0", new ValueContainerUInt(&NickRegDelay), DT_UINTEGER, NoValidation},
-		{"options", "restrictopernicks", "no", new ValueContainerBool(&RestrictOperNicks), DT_BOOLEAN, NoValidation},
-		{"options", "newscount", "3", new ValueContainerUInt(&NewsCount), DT_UINTEGER, NoValidation},
+		{"options", "userkey1", "0", new ValueContainerLUInt(&Config.UserKey1), DT_LUINTEGER, NoValidation},
+		{"options", "userkey2", "0", new ValueContainerLUInt(&Config.UserKey2), DT_LUINTEGER, NoValidation},
+		{"options", "userkey3", "0", new ValueContainerLUInt(&Config.UserKey3), DT_LUINTEGER, NoValidation},
+		{"options", "nobackupokay", "no", new ValueContainerBool(&Config.NoBackupOkay), DT_BOOLEAN, NoValidation},
+		{"options", "strictpasswords", "no", new ValueContainerBool(&Config.StrictPasswords), DT_BOOLEAN, NoValidation},
+		{"options", "badpasslimit", "0", new ValueContainerUInt(&Config.BadPassLimit), DT_UINTEGER, NoValidation},
+		{"options", "badpasstimeout", "0", new ValueContainerTime(&Config.BadPassTimeout), DT_TIME, NoValidation},
+		{"options", "updatetimeout", "0", new ValueContainerTime(&Config.UpdateTimeout), DT_TIME, ValidateNotZero},
+		{"options", "expiretimeout", "0", new ValueContainerTime(&Config.ExpireTimeout), DT_TIME, ValidateNotZero},
+		{"options", "readtimeout", "0", new ValueContainerTime(&Config.ReadTimeout), DT_TIME, ValidateNotZero},
+		{"options", "warningtimeout", "0", new ValueContainerTime(&Config.WarningTimeout), DT_TIME, ValidateNotZero},
+		{"options", "timeoutcheck", "0", new ValueContainerTime(&Config.TimeoutCheck), DT_TIME, NoValidation},
+		{"options", "keeplogs", "0", new ValueContainerInt(&Config.KeepLogs), DT_INTEGER, NoValidation},
+		{"options", "keepbackups", "0", new ValueContainerInt(&Config.KeepBackups), DT_INTEGER, NoValidation},
+		{"options", "forceforbidreason", "no", new ValueContainerBool(&Config.ForceForbidReason), DT_BOOLEAN, NoValidation},
+		{"options", "useprivmsg", "no", new ValueContainerBool(&Config.UsePrivmsg), DT_BOOLEAN, NoValidation},
+		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&Config.UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
+		{"options", "dumpcore", "yes", new ValueContainerBool(&Config.DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
+		{"options", "logusers", "no", new ValueContainerBool(&Config.LogUsers), DT_BOOLEAN, NoValidation},
+		{"options", "hidestatso", "no", new ValueContainerBool(&Config.HideStatsO), DT_BOOLEAN, NoValidation},
+		{"options", "globaloncycle", "no", new ValueContainerBool(&Config.GlobalOnCycle), DT_BOOLEAN, NoValidation},
+		{"options", "globaloncycledown", "", new ValueContainerChar(&Config.GlobalOnCycleMessage), DT_CHARPTR, ValidateGlobalOnCycle},
+		{"options", "globaloncycleup", "", new ValueContainerChar(&Config.GlobalOnCycleUP), DT_CHARPTR, ValidateGlobalOnCycle},
+		{"options", "anonymousglobal", "no", new ValueContainerBool(&Config.AnonymousGlobal), DT_BOOLEAN, NoValidation},
+		{"options", "nickregdelay", "0", new ValueContainerUInt(&Config.NickRegDelay), DT_UINTEGER, NoValidation},
+		{"options", "restrictopernicks", "no", new ValueContainerBool(&Config.RestrictOperNicks), DT_BOOLEAN, NoValidation},
+		{"options", "newscount", "3", new ValueContainerUInt(&Config.NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerChar(&UlineServers), DT_CHARPTR, NoValidation},
 		{"options", "enablelogchannel", "no", new ValueContainerBool(&LogChan), DT_BOOLEAN, NoValidation},
-		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"nickserv", "emailregistration", "no", new ValueContainerBool(&NSEmailReg), DT_BOOLEAN, NoValidation},
-		{"nickserv", "prenickdatabase", "", new ValueContainerChar(&PreNickDBName), DT_CHARPTR, ValidateEmailReg},
+		{"nickserv", "nick", "NickServ", new ValueContainerChar(&Config.s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&Config.desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "database", "nick.db", new ValueContainerChar(&Config.NickDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"nickserv", "emailregistration", "no", new ValueContainerBool(&Config.NSEmailReg), DT_BOOLEAN, NoValidation},
+		{"nickserv", "prenickdatabase", "", new ValueContainerChar(&Config.PreNickDBName), DT_CHARPTR, ValidateEmailReg},
 		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
-		{"nickserv", "forceemail", "no", new ValueContainerBool(&NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
+		{"nickserv", "forceemail", "no", new ValueContainerBool(&Config.NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
-		{"nickserv", "defaultlanguage", "0", new ValueContainerUInt(&NSDefLanguage), DT_UINTEGER, ValidateLanguage},
-		{"nickserv", "regdelay", "0", new ValueContainerTime(&NSRegDelay), DT_TIME, NoValidation},
-		{"nickserv", "resenddelay", "0", new ValueContainerTime(&NSResendDelay), DT_TIME, NoValidation},
-		{"nickserv", "expire", "21d", new ValueContainerTime(&NSExpire), DT_TIME, NoValidation},
-		{"nickserv", "preregexpire", "0", new ValueContainerTime(&NSRExpire), DT_TIME, ValidateEmailReg},
-		{"nickserv", "maxaliases", "0", new ValueContainerInt(&NSMaxAliases), DT_INTEGER, NoValidation},
-		{"nickserv", "accessmax", "0", new ValueContainerUInt(&NSAccessMax), DT_UINTEGER, ValidateNotZero},
+		{"nickserv", "defaultlanguage", "0", new ValueContainerUInt(&Config.NSDefLanguage), DT_UINTEGER, ValidateLanguage},
+		{"nickserv", "regdelay", "0", new ValueContainerTime(&Config.NSRegDelay), DT_TIME, NoValidation},
+		{"nickserv", "resenddelay", "0", new ValueContainerTime(&Config.NSResendDelay), DT_TIME, NoValidation},
+		{"nickserv", "expire", "21d", new ValueContainerTime(&Config.NSExpire), DT_TIME, NoValidation},
+		{"nickserv", "preregexpire", "0", new ValueContainerTime(&Config.NSRExpire), DT_TIME, ValidateEmailReg},
+		{"nickserv", "maxaliases", "0", new ValueContainerInt(&Config.NSMaxAliases), DT_INTEGER, NoValidation},
+		{"nickserv", "accessmax", "0", new ValueContainerUInt(&Config.NSAccessMax), DT_UINTEGER, ValidateNotZero},
 		{"nickserv", "enforceruser", "", new ValueContainerChar(&temp_nsuserhost), DT_CHARPTR, ValidateNotEmpty},
-		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&NSReleaseTimeout), DT_TIME, ValidateNotZero},
-		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
-		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&NSNoGroupChange), DT_BOOLEAN, NoValidation},
-		{"nickserv", "listopersonly", "no", new ValueContainerBool(&NSListOpersOnly), DT_BOOLEAN, NoValidation},
-		{"nickserv", "listmax", "0", new ValueContainerUInt(&NSListMax), DT_UINTEGER, ValidateNotZero},
-		{"nickserv", "guestnickprefix", "", new ValueContainerChar(&NSGuestNickPrefix), DT_CHARPTR, ValidateGuestPrefix},
-		{"nickserv", "secureadmins", "no", new ValueContainerBool(&NSSecureAdmins), DT_BOOLEAN, NoValidation},
-		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&NSStrictPrivileges), DT_BOOLEAN, NoValidation},
-		{"nickserv", "modeonid", "no", new ValueContainerBool(&NSModeOnID), DT_BOOLEAN, NoValidation},
-		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
-		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
-		{"mail", "sendmailpath", "", new ValueContainerChar(&SendMailPath), DT_CHARPTR, ValidateMail},
-		{"mail", "sendfrom", "", new ValueContainerChar(&SendFrom), DT_CHARPTR, ValidateMail},
-		{"mail", "restrict", "no", new ValueContainerBool(&RestrictMail), DT_BOOLEAN, NoValidation},
-		{"mail", "delay", "0", new ValueContainerTime(&MailDelay), DT_TIME, NoValidation},
-		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&DontQuoteAddresses), DT_BOOLEAN, NoValidation},
-		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&Config.NSReleaseTimeout), DT_TIME, ValidateNotZero},
+		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&Config.NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
+		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&Config.NSNoGroupChange), DT_BOOLEAN, NoValidation},
+		{"nickserv", "listopersonly", "no", new ValueContainerBool(&Config.NSListOpersOnly), DT_BOOLEAN, NoValidation},
+		{"nickserv", "listmax", "0", new ValueContainerUInt(&Config.NSListMax), DT_UINTEGER, ValidateNotZero},
+		{"nickserv", "guestnickprefix", "", new ValueContainerChar(&Config.NSGuestNickPrefix), DT_CHARPTR, ValidateGuestPrefix},
+		{"nickserv", "secureadmins", "no", new ValueContainerBool(&Config.NSSecureAdmins), DT_BOOLEAN, NoValidation},
+		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&Config.NSStrictPrivileges), DT_BOOLEAN, NoValidation},
+		{"nickserv", "modeonid", "no", new ValueContainerBool(&Config.NSModeOnID), DT_BOOLEAN, NoValidation},
+		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&Config.NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
+		{"mail", "usemail", "no", new ValueContainerBool(&Config.UseMail), DT_BOOLEAN, ValidateEmailReg},
+		{"mail", "sendmailpath", "", new ValueContainerChar(&Config.SendMailPath), DT_CHARPTR, ValidateMail},
+		{"mail", "sendfrom", "", new ValueContainerChar(&Config.SendFrom), DT_CHARPTR, ValidateMail},
+		{"mail", "restrict", "no", new ValueContainerBool(&Config.RestrictMail), DT_BOOLEAN, NoValidation},
+		{"mail", "delay", "0", new ValueContainerTime(&Config.MailDelay), DT_TIME, NoValidation},
+		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&Config.DontQuoteAddresses), DT_BOOLEAN, NoValidation},
+		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&Config.s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&Config.desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"chanserv", "database", "chan.db", new ValueContainerChar(&Config.ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
-		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&CSMaxReg), DT_UINTEGER, NoValidation},
-		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
-		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},
-		{"chanserv", "accessmax", "0", new ValueContainerUInt(&CSAccessMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "autokickmax", "0", new ValueContainerUInt(&CSAutokickMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerChar(&CSAutokickReason), DT_CHARPTR, ValidateNotEmpty},
-		{"chanserv", "inhabit", "0", new ValueContainerTime(&CSInhabit), DT_TIME, ValidateNotZero},
-		{"chanserv", "listopersonly", "no", new ValueContainerBool(&CSListOpersOnly), DT_BOOLEAN, NoValidation},
-		{"chanserv", "listmax", "0", new ValueContainerUInt(&CSListMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
-		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&Config.CSMaxReg), DT_UINTEGER, NoValidation},
+		{"chanserv", "expire", "14d", new ValueContainerTime(&Config.CSExpire), DT_TIME, NoValidation},
+		{"chanserv", "defbantype", "2", new ValueContainerInt(&Config.CSDefBantype), DT_INTEGER, ValidateBantype},
+		{"chanserv", "accessmax", "0", new ValueContainerUInt(&Config.CSAccessMax), DT_UINTEGER, ValidateNotZero},
+		{"chanserv", "autokickmax", "0", new ValueContainerUInt(&Config.CSAutokickMax), DT_UINTEGER, ValidateNotZero},
+		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerChar(&Config.CSAutokickReason), DT_CHARPTR, ValidateNotEmpty},
+		{"chanserv", "inhabit", "0", new ValueContainerTime(&Config.CSInhabit), DT_TIME, ValidateNotZero},
+		{"chanserv", "listopersonly", "no", new ValueContainerBool(&Config.CSListOpersOnly), DT_BOOLEAN, NoValidation},
+		{"chanserv", "listmax", "0", new ValueContainerUInt(&Config.CSListMax), DT_UINTEGER, ValidateNotZero},
+		{"chanserv", "opersonly", "no", new ValueContainerBool(&Config.CSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&Config.s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"memoserv", "description", "Memo Service", new ValueContainerChar(&Config.desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "modules", "", new ValueContainerString(&MemoCoreModules), DT_STRING, NoValidation},
-		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&MSMaxMemos), DT_UINTEGER, NoValidation},
-		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
-		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
-		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&MSMemoReceipt), DT_UINTEGER, NoValidation},
-		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
-		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
-		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
+		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&Config.MSMaxMemos), DT_UINTEGER, NoValidation},
+		{"memoserv", "senddelay", "0", new ValueContainerTime(&Config.MSSendDelay), DT_TIME, NoValidation},
+		{"memoserv", "notifyall", "no", new ValueContainerBool(&Config.MSNotifyAll), DT_BOOLEAN, NoValidation},
+		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&Config.MSMemoReceipt), DT_UINTEGER, NoValidation},
+		{"botserv", "nick", "", new ValueContainerChar(&Config.s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
+		{"botserv", "description", "Bot Service", new ValueContainerChar(&Config.desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
+		{"botserv", "database", "bot.db", new ValueContainerChar(&Config.BotDBName), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "modules", "", new ValueContainerString(&BotCoreModules), DT_STRING, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
-		{"botserv", "minusers", "0", new ValueContainerUInt(&BSMinUsers), DT_UINTEGER, ValidateBotServ},
-		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
-		{"botserv", "keepdata", "0", new ValueContainerTime(&BSKeepData), DT_TIME, ValidateBotServ},
-		{"botserv", "smartjoin", "no", new ValueContainerBool(&BSSmartJoin), DT_BOOLEAN, NoValidation},
-		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
-		{"botserv", "casesensitive", "no", new ValueContainerBool(&BSCaseSensitive), DT_BOOLEAN, NoValidation},
-		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_CHARPTR, NoValidation},
-		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
-		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
-		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
+		{"botserv", "minusers", "0", new ValueContainerUInt(&Config.BSMinUsers), DT_UINTEGER, ValidateBotServ},
+		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&Config.BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
+		{"botserv", "keepdata", "0", new ValueContainerTime(&Config.BSKeepData), DT_TIME, ValidateBotServ},
+		{"botserv", "smartjoin", "no", new ValueContainerBool(&Config.BSSmartJoin), DT_BOOLEAN, NoValidation},
+		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&Config.BSGentleBWReason), DT_BOOLEAN, NoValidation},
+		{"botserv", "casesensitive", "no", new ValueContainerBool(&Config.BSCaseSensitive), DT_BOOLEAN, NoValidation},
+		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&Config.BSFantasyCharacter), DT_CHARPTR, NoValidation},
+		{"hostserv", "nick", "", new ValueContainerChar(&Config.s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
+		{"hostserv", "description", "vHost Service", new ValueContainerChar(&Config.desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
+		{"hostserv", "database", "hosts.db", new ValueContainerChar(&Config.HostDBName), DT_CHARPTR, ValidateHostServ},
 		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
-		{"operserv", "nick", "OperServ", new ValueContainerChar(&s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "nick", "OperServ", new ValueContainerChar(&Config.s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "description", "Operator Service", new ValueContainerChar(&Config.desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "globalnick", "Global", new ValueContainerChar(&Config.s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&Config.desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "database", "oper.db", new ValueContainerChar(&Config.OperDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&Config.NewsDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&Config.ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
-		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},
-		{"operserv", "logmaxusers", "no", new ValueContainerBool(&LogMaxUsers), DT_BOOLEAN, NoValidation},
-		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&AutokillExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&ChankillExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "sglineexpiry", "0", new ValueContainerTime(&SGLineExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&SQLineExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&SZLineExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "akillonadd", "no", new ValueContainerBool(&AkillOnAdd), DT_BOOLEAN, NoValidation},
-		{"operserv", "killonsgline", "no", new ValueContainerBool(&KillonSGline), DT_BOOLEAN, NoValidation},
-		{"operserv", "killonsqline", "no", new ValueContainerBool(&KillonSQline), DT_BOOLEAN, NoValidation},
+		{"operserv", "superadmin", "no", new ValueContainerBool(&Config.SuperAdmin), DT_BOOLEAN, NoValidation},
+		{"operserv", "logmaxusers", "no", new ValueContainerBool(&Config.LogMaxUsers), DT_BOOLEAN, NoValidation},
+		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&Config.AutokillExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&Config.ChankillExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "sglineexpiry", "0", new ValueContainerTime(&Config.SGLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&Config.SQLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&Config.SZLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "akillonadd", "no", new ValueContainerBool(&Config.AkillOnAdd), DT_BOOLEAN, NoValidation},
+		{"operserv", "killonsgline", "no", new ValueContainerBool(&Config.KillonSGline), DT_BOOLEAN, NoValidation},
+		{"operserv", "killonsqline", "no", new ValueContainerBool(&Config.KillonSQline), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
-		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
-		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&DefSessionLimit), DT_UINTEGER, NoValidation},
-		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&MaxSessionLimit), DT_UINTEGER, ValidateLimitSessions},
-		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&ExceptionExpiry), DT_TIME, ValidateLimitSessions},
-		{"operserv", "sessionlimitexceeded", "", new ValueContainerChar(&SessionLimitExceeded), DT_CHARPTR, NoValidation},
-		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerChar(&SessionLimitDetailsLoc), DT_CHARPTR, NoValidation},
-		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&MaxSessionKill), DT_INTEGER, NoValidation},
-		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&SessionAutoKillExpiry), DT_TIME, NoValidation},
-		{"operserv", "addakiller", "no", new ValueContainerBool(&AddAkiller), DT_BOOLEAN, NoValidation},
-		{"operserv", "opersonly", "no", new ValueContainerBool(&OSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"operserv", "limitsessions", "no", new ValueContainerBool(&Config.LimitSessions), DT_BOOLEAN, NoValidation},
+		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&Config.DefSessionLimit), DT_UINTEGER, NoValidation},
+		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&Config.MaxSessionLimit), DT_UINTEGER, ValidateLimitSessions},
+		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&Config.ExceptionExpiry), DT_TIME, ValidateLimitSessions},
+		{"operserv", "sessionlimitexceeded", "", new ValueContainerChar(&Config.SessionLimitExceeded), DT_CHARPTR, NoValidation},
+		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerChar(&Config.SessionLimitDetailsLoc), DT_CHARPTR, NoValidation},
+		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&Config.MaxSessionKill), DT_INTEGER, NoValidation},
+		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&Config.SessionAutoKillExpiry), DT_TIME, NoValidation},
+		{"operserv", "addakiller", "no", new ValueContainerBool(&Config.AddAkiller), DT_BOOLEAN, NoValidation},
+		{"operserv", "opersonly", "no", new ValueContainerBool(&Config.OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
 		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
 		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},
 		{"defcon", "level2", "", new ValueContainerString(&DefCon2), DT_STRING, ValidateDefCon},
 		{"defcon", "level1", "", new ValueContainerString(&DefCon1), DT_STRING, ValidateDefCon},
-		{"defcon", "sessionlimit", "0", new ValueContainerInt(&DefConSessionLimit), DT_INTEGER, ValidateDefCon},
-		{"defcon", "akillexpire", "0", new ValueContainerTime(&DefConAKILL), DT_TIME, ValidateDefCon},
-		{"defcon", "chanmodes", "", new ValueContainerChar(&DefConChanModes), DT_CHARPTR, ValidateDefCon},
-		{"defcon", "timeout", "0", new ValueContainerTime(&DefConTimeOut), DT_TIME, NoValidation},
-		{"defcon", "globalondefcon", "no", new ValueContainerBool(&GlobalOnDefcon), DT_BOOLEAN, NoValidation},
-		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
-		{"defcon", "message", "", new ValueContainerChar(&DefconMessage), DT_CHARPTR, ValidateDefCon},
-		{"defcon", "offmessage", "", new ValueContainerChar(&DefConOffMessage), DT_CHARPTR, NoValidation},
-		{"defcon", "akillreason", "", new ValueContainerChar(&DefConAkillReason), DT_CHARPTR, ValidateDefCon},
+		{"defcon", "sessionlimit", "0", new ValueContainerInt(&Config.DefConSessionLimit), DT_INTEGER, ValidateDefCon},
+		{"defcon", "akillexpire", "0", new ValueContainerTime(&Config.DefConAKILL), DT_TIME, ValidateDefCon},
+		{"defcon", "chanmodes", "", new ValueContainerChar(&Config.DefConChanModes), DT_CHARPTR, ValidateDefCon},
+		{"defcon", "timeout", "0", new ValueContainerTime(&Config.DefConTimeOut), DT_TIME, NoValidation},
+		{"defcon", "globalondefcon", "no", new ValueContainerBool(&Config.GlobalOnDefcon), DT_BOOLEAN, NoValidation},
+		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&Config.GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
+		{"defcon", "message", "", new ValueContainerChar(&Config.DefconMessage), DT_CHARPTR, ValidateDefCon},
+		{"defcon", "offmessage", "", new ValueContainerChar(&Config.DefConOffMessage), DT_CHARPTR, NoValidation},
+		{"defcon", "akillreason", "", new ValueContainerChar(&Config.DefConAkillReason), DT_CHARPTR, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 
@@ -1747,49 +1531,49 @@ int read_config(int reload)
 	std::list<std::pair<std::string, std::string> >::iterator it;
 
 	/* Clear current opers for reload */
-	for (it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
+	for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 	{
 		std::string nick = it->first;
 		NickCore *nc = findcore(nick.c_str());
 		if (nc)
 			nc->ot = NULL;
 	}
-	svsopers_in_config.clear();
+	Config.Opers.clear();
 
-	retval = serverConfig.Read(reload ? false : true);
+	retval = Config.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
 
 	if (!reload) {
-		if (LocalHost) {
-			std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
+		if (Config.LocalHost) {
+			std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end();
 			for (; curr_uplink != end_uplink; ++curr_uplink) {
 				Uplink *this_uplink = *curr_uplink;
-				if (!stricmp(LocalHost, this_uplink->host) && LocalPort == this_uplink->port) {
+				if (!stricmp(Config.LocalHost, this_uplink->host) && Config.LocalPort == this_uplink->port) {
 					printf("\n<serverinfo:localhost> matches an <uplink:host> entry (%s)\nand <serverinfo:localport> matches an <uplink:port> entry (%d).\nThis will fail, you must make sure they are different.\n", this_uplink->host, this_uplink->port);
 					retval = 0;
 				}
 			}
 		}
 		// Just in case someone put something in for <serverinfo:localport> without defining <serverinfo:localhost> too
-		else LocalPort = 0;
+		else Config.LocalPort = 0;
 	}
 
 	if (temp_nsuserhost) {
 		if (!(s = strchr(temp_nsuserhost, '@'))) {
-			NSEnforcerUser = temp_nsuserhost;
-			NSEnforcerHost = ServiceHost;
+			Config.NSEnforcerUser = temp_nsuserhost;
+			Config.NSEnforcerHost = Config.ServiceHost;
 		} else {
 			*s++ = 0;
-			NSEnforcerUser = temp_nsuserhost;
-			NSEnforcerHost = s;
+			Config.NSEnforcerUser = temp_nsuserhost;
+			Config.NSEnforcerHost = s;
 		}
 	}
 
 	if (NSDefaults.empty())
 	{
-		NSDefFlags.SetFlag(NI_SECURE);
-		NSDefFlags.SetFlag(NI_MEMO_SIGNON);
-		NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
+		Config.NSDefFlags.SetFlag(NI_SECURE);
+		Config.NSDefFlags.SetFlag(NI_MEMO_SIGNON);
+		Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
 	}
 	else if (NSDefaults != "none") {
 		bool hadAutoop = false;
@@ -1797,58 +1581,58 @@ int read_config(int reload)
 		std::string option;
 		while (options.GetToken(option))
 		{
-			if (option == "kill") NSDefFlags.SetFlag(NI_KILLPROTECT);
-			else if (option == "killquick") NSDefFlags.SetFlag(NI_KILL_QUICK);
-			else if (option == "secure") NSDefFlags.SetFlag(NI_SECURE);
-			else if (option == "private") NSDefFlags.SetFlag(NI_PRIVATE);
+			if (option == "kill") Config.NSDefFlags.SetFlag(NI_KILLPROTECT);
+			else if (option == "killquick") Config.NSDefFlags.SetFlag(NI_KILL_QUICK);
+			else if (option == "secure") Config.NSDefFlags.SetFlag(NI_SECURE);
+			else if (option == "private") Config.NSDefFlags.SetFlag(NI_PRIVATE);
 			else if (option == "msg") {
-				if (!UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
-				else NSDefFlags.SetFlag(NI_MSG);
+				if (!Config.UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
+				else Config.NSDefFlags.SetFlag(NI_MSG);
 			}
-			else if (option == "hideemail") NSDefFlags.SetFlag(NI_HIDE_EMAIL);
-			else if (option == "hideusermask") NSDefFlags.SetFlag(NI_HIDE_MASK);
-			else if (option == "hidequit") NSDefFlags.SetFlag(NI_HIDE_QUIT);
-			else if (option == "memosignon") NSDefFlags.SetFlag(NI_MEMO_SIGNON);
-			else if (option == "memoreceive") NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
+			else if (option == "hideemail") Config.NSDefFlags.SetFlag(NI_HIDE_EMAIL);
+			else if (option == "hideusermask") Config.NSDefFlags.SetFlag(NI_HIDE_MASK);
+			else if (option == "hidequit") Config.NSDefFlags.SetFlag(NI_HIDE_QUIT);
+			else if (option == "memosignon") Config.NSDefFlags.SetFlag(NI_MEMO_SIGNON);
+			else if (option == "memoreceive") Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
 			else if (option == "autoop") hadAutoop = true;
 		}
-		if (!hadAutoop) NSDefFlags.SetFlag(NI_AUTOOP);
+		if (!hadAutoop) Config.NSDefFlags.SetFlag(NI_AUTOOP);
 	}
 
 	if (reload) {
-		if ((NSDefLanguage = langlist[NSDefLanguage]) < 0)
-			NSDefLanguage = DEF_LANGUAGE;
+		if ((Config.NSDefLanguage = langlist[Config.NSDefLanguage]) < 0)
+			Config.NSDefLanguage = DEF_LANGUAGE;
 	}
 
-	if (CSDefBantype < 0 || CSDefBantype > 3) {
+	if (Config.CSDefBantype < 0 || Config.CSDefBantype > 3) {
 		error(0, "Value of CSDefBantype must be between 0 and 3 included");
 		retval = 0;
 	}
 
 	if (CSDefaults.empty())
 	{
-		CSDefFlags.SetFlag(CI_KEEPTOPIC);
-		CSDefFlags.SetFlag(CI_SECURE);
-		CSDefFlags.SetFlag(CI_SECUREFOUNDER);
-		CSDefFlags.SetFlag(CI_SIGNKICK);
+		Config.CSDefFlags.SetFlag(CI_KEEPTOPIC);
+		Config.CSDefFlags.SetFlag(CI_SECURE);
+		Config.CSDefFlags.SetFlag(CI_SECUREFOUNDER);
+		Config.CSDefFlags.SetFlag(CI_SIGNKICK);
 	}
 	else if (CSDefaults != "none") {
 		spacesepstream options(CSDefaults);
 		std::string option;
 		while (options.GetToken(option)) {
-			if (option == "keeptopic") CSDefFlags.SetFlag(CI_KEEPTOPIC);
-			else if (option == "topiclock") CSDefFlags.SetFlag(CI_TOPICLOCK);
-			else if (option == "private") CSDefFlags.SetFlag(CI_PRIVATE);
-			else if (option == "restricted") CSDefFlags.SetFlag(CI_RESTRICTED);
-			else if (option == "secure") CSDefFlags.SetFlag(CI_SECURE);
-			else if (option == "secureops") CSDefFlags.SetFlag(CI_SECUREOPS);
-			else if (option == "securefounder") CSDefFlags.SetFlag(CI_SECUREFOUNDER);
-			else if (option == "signkick") CSDefFlags.SetFlag(CI_SIGNKICK);
-			else if (option == "signkicklevel") CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
-			else if (option == "opnotice") CSDefFlags.SetFlag(CI_OPNOTICE);
-			else if (option == "xop") CSDefFlags.SetFlag(CI_XOP);
-			else if (option == "peace") CSDefFlags.SetFlag(CI_PEACE);
-			else if (option == "persist") CSDefFlags.SetFlag(CI_PERSIST);
+			if (option == "keeptopic") Config.CSDefFlags.SetFlag(CI_KEEPTOPIC);
+			else if (option == "topiclock") Config.CSDefFlags.SetFlag(CI_TOPICLOCK);
+			else if (option == "private") Config.CSDefFlags.SetFlag(CI_PRIVATE);
+			else if (option == "restricted") Config.CSDefFlags.SetFlag(CI_RESTRICTED);
+			else if (option == "secure") Config.CSDefFlags.SetFlag(CI_SECURE);
+			else if (option == "secureops") Config.CSDefFlags.SetFlag(CI_SECUREOPS);
+			else if (option == "securefounder") Config.CSDefFlags.SetFlag(CI_SECUREFOUNDER);
+			else if (option == "signkick") Config.CSDefFlags.SetFlag(CI_SIGNKICK);
+			else if (option == "signkicklevel") Config.CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
+			else if (option == "opnotice") Config.CSDefFlags.SetFlag(CI_OPNOTICE);
+			else if (option == "xop") Config.CSDefFlags.SetFlag(CI_XOP);
+			else if (option == "peace") Config.CSDefFlags.SetFlag(CI_PEACE);
+			else if (option == "persist") Config.CSDefFlags.SetFlag(CI_PERSIST);
 		}
 	}
 
@@ -1856,95 +1640,95 @@ int read_config(int reload)
 		spacesepstream options(BSDefaults);
 		std::string option;
 		while (options.GetToken(option)) {
-			if (option == "dontkickops") BSDefFlags.SetFlag(BS_DONTKICKOPS);
-			else if (option == "dontkickvoices") BSDefFlags.SetFlag(BS_DONTKICKVOICES);
-			else if (option == "greet") BSDefFlags.SetFlag(BS_GREET);
-			else if (option == "fantasy") BSDefFlags.SetFlag(BS_FANTASY);
-			else if (option == "symbiosis") BSDefFlags.SetFlag(BS_SYMBIOSIS);
+			if (option == "dontkickops") Config.BSDefFlags.SetFlag(BS_DONTKICKOPS);
+			else if (option == "dontkickvoices") Config.BSDefFlags.SetFlag(BS_DONTKICKVOICES);
+			else if (option == "greet") Config.BSDefFlags.SetFlag(BS_GREET);
+			else if (option == "fantasy") Config.BSDefFlags.SetFlag(BS_FANTASY);
+			else if (option == "symbiosis") Config.BSDefFlags.SetFlag(BS_SYMBIOSIS);
 		}
 	}
 
-	WallOper = WallBadOS = WallOSGlobal = WallOSMode = WallOSClearmodes = WallOSKick = WallOSAkill = WallOSSGLine = WallOSSQLine = WallOSSZLine = WallOSNoOp =
-		WallOSJupe = WallAkillExpire = WallSGLineExpire = WallSQLineExpire = WallSZLineExpire = WallExceptionExpire = WallGetpass = WallSetpass =
-		WallForbid = WallDrop = false;
+	Config.WallOper = Config.WallBadOS = Config.WallOSGlobal = Config.WallOSMode = Config.WallOSClearmodes = Config.WallOSKick = Config.WallOSAkill = Config.WallOSSGLine = Config.WallOSSQLine =
+	Config.WallOSSZLine = Config.WallOSNoOp = Config.WallOSJupe = Config.WallAkillExpire = Config.WallSGLineExpire = Config.WallSQLineExpire = Config.WallSZLineExpire = Config.WallExceptionExpire = Config.WallGetpass = Config.WallSetpass = Config.WallForbid =
+	Config.WallDrop = false;
 	if (!OSNotifications.empty()) {
 		spacesepstream notifications(OSNotifications);
 		std::string notice;
 		while (notifications.GetToken(notice)) {
-			if (notice == "oper") WallOper = true;
-			else if (notice == "bados") WallBadOS = true;
-			else if (notice == "osglobal") WallOSGlobal = true;
-			else if (notice == "osmode") WallOSMode = true;
-			else if (notice == "osclearmodes") WallOSClearmodes = true;
-			else if (notice == "oskick") WallOSKick = true;
-			else if (notice == "osakill") WallOSAkill = true;
-			else if (notice == "ossgline") WallOSSGLine = true;
-			else if (notice == "ossqline") WallOSSQLine = true;
-			else if (notice == "osszline") WallOSSZLine = true;
-			else if (notice == "osnoop") WallOSNoOp = true;
-			else if (notice == "osjupe") WallOSJupe = true;
-			else if (notice == "akillexpire") WallAkillExpire = true;
-			else if (notice == "sglineexpire") WallSGLineExpire = true;
-			else if (notice == "sqlineexpire") WallSQLineExpire = true;
-			else if (notice == "szlineexpire") WallSZLineExpire = true;
-			else if (notice == "exceptionexpire") WallExceptionExpire = true;
-			else if (notice == "getpass") WallGetpass = true;
-			else if (notice == "setpass") WallSetpass = true;
-			else if (notice == "forbid") WallForbid = true;
-			else if (notice == "drop") WallDrop = true;
+			if (notice == "oper") Config.WallOper = true;
+			else if (notice == "bados") Config.WallBadOS = true;
+			else if (notice == "osglobal") Config.WallOSGlobal = true;
+			else if (notice == "osmode") Config.WallOSMode = true;
+			else if (notice == "osclearmodes") Config.WallOSClearmodes = true;
+			else if (notice == "oskick") Config.WallOSKick = true;
+			else if (notice == "osakill") Config.WallOSAkill = true;
+			else if (notice == "ossgline") Config.WallOSSGLine = true;
+			else if (notice == "ossqline") Config.WallOSSQLine = true;
+			else if (notice == "osszline") Config.WallOSSZLine = true;
+			else if (notice == "osnoop") Config.WallOSNoOp = true;
+			else if (notice == "osjupe") Config.WallOSJupe = true;
+			else if (notice == "akillexpire") Config.WallAkillExpire = true;
+			else if (notice == "sglineexpire") Config.WallSGLineExpire = true;
+			else if (notice == "sqlineexpire") Config.WallSQLineExpire = true;
+			else if (notice == "szlineexpire") Config.WallSZLineExpire = true;
+			else if (notice == "exceptionexpire") Config.WallExceptionExpire = true;
+			else if (notice == "getpass") Config.WallGetpass = true;
+			else if (notice == "setpass") Config.WallSetpass = true;
+			else if (notice == "forbid") Config.WallForbid = true;
+			else if (notice == "drop") Config.WallDrop = true;
 		}
 	}
 
 	/* Ulines */
 
 	if (UlineServers) {
-		NumUlines = 0;
+		Config.NumUlines = 0;
 
 		s = strtok(UlineServers, " ");
 		do {
 			if (s) {
-				NumUlines++;
-				Ulines = static_cast<char **>(realloc(Ulines, sizeof(char *) * NumUlines));
-				Ulines[NumUlines - 1] = sstrdup(s);
+				Config.NumUlines++;
+				Config.Ulines = static_cast<char **>(realloc(Config.Ulines, sizeof(char *) * Config.NumUlines));
+				Config.Ulines[Config.NumUlines - 1] = sstrdup(s);
 			}
 		} while ((s = strtok(NULL, " ")));
 	}
 
 	/* Modules Autoload building... :P */
-	ModulesAutoLoad = BuildStringList(!Modules.empty() ? Modules : "");
-	EncModuleList = BuildStringList(!EncModules.empty() ? EncModules : "");
-	HostServCoreModules = BuildStringList(!HostCoreModules.empty() ? HostCoreModules : "");
-	MemoServCoreModules = BuildStringList(!MemoCoreModules.empty() ? MemoCoreModules : "");
-	BotServCoreModules = BuildStringList(!BotCoreModules.empty() ? BotCoreModules : "");
-	OperServCoreModules = BuildStringList(!OperCoreModules.empty() ? OperCoreModules : "");
-	ChanServCoreModules = BuildStringList(!ChanCoreModules.empty() ? ChanCoreModules : "");
-	NickServCoreModules = BuildStringList(!NickCoreModules.empty() ? NickCoreModules : "");
+	Config.ModulesAutoLoad = BuildStringList(!Modules.empty() ? Modules : "");
+	Config.EncModuleList = BuildStringList(!EncModules.empty() ? EncModules : "");
+	Config.HostServCoreModules = BuildStringList(!HostCoreModules.empty() ? HostCoreModules : "");
+	Config.MemoServCoreModules = BuildStringList(!MemoCoreModules.empty() ? MemoCoreModules : "");
+	Config.BotServCoreModules = BuildStringList(!BotCoreModules.empty() ? BotCoreModules : "");
+	Config.OperServCoreModules = BuildStringList(!OperCoreModules.empty() ? OperCoreModules : "");
+	Config.ChanServCoreModules = BuildStringList(!ChanCoreModules.empty() ? ChanCoreModules : "");
+	Config.NickServCoreModules = BuildStringList(!NickCoreModules.empty() ? NickCoreModules : "");
 
-	if (LimitSessions) {
-		if (MaxSessionKill && !SessionAutoKillExpiry)
-			SessionAutoKillExpiry = 1800;	/* 30 minutes */
+	if (Config.LimitSessions) {
+		if (Config.MaxSessionKill && !Config.SessionAutoKillExpiry)
+			Config.SessionAutoKillExpiry = 1800;	/* 30 minutes */
 	}
 
-	if (s_BotServ) {
-		if (!BSFantasyCharacter || !*BSFantasyCharacter)
-			BSFantasyCharacter = sstrdup("!");
-		if (*BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
+	if (Config.s_BotServ) {
+		if (!Config.BSFantasyCharacter || !*Config.BSFantasyCharacter)
+			Config.BSFantasyCharacter = sstrdup("!");
+		if (*Config.BSFantasyCharacter && (strlen(Config.BSFantasyCharacter) > 1)) {
 			printf
-				("*** BSFantasyCharacter is more than 1 character long. Only the first\n"
+				("*** Config.BSFantasyCharacter is more than 1 character long. Only the first\n"
 				 "*** character ('%c') will be used. The others will be ignored.\n",
-				 *BSFantasyCharacter);
+				 *Config.BSFantasyCharacter);
 		}
 	}
 
 	/* Check the user keys */
-	if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
-		|| (UserKey3 == UserKey2))
+	if ((Config.UserKey1 == Config.UserKey2) || (Config.UserKey1 == Config.UserKey3)
+		|| (Config.UserKey3 == Config.UserKey2))
 		alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
 
 	/**
 	 * Check all DEFCON dependiencies...
 	 **/
-	if (DefConLevel) {
+	if (Config.DefConLevel) {
 		/* Build DefCon's */
 		DefCon.reserve(6);
 		DefCon[5].reset();
@@ -1985,16 +1769,16 @@ int read_config(int reload)
 		{
 			if (CheckDefCon(defconCount, DEFCON_REDUCE_SESSION))
 			{
-				CHECK(DefConSessionLimit);
+				CHECK(Config.DefConSessionLimit);
 			}
 			if (CheckDefCon(defconCount, DEFCON_AKILL_NEW_CLIENTS))
 			{
-				CHECK(DefConAKILL);
-				CHECK(DefConAkillReason);
+				CHECK(Config.DefConAKILL);
+				CHECK(Config.DefConAkillReason);
 			}
 			if (CheckDefCon(defconCount, DEFCON_FORCE_CHAN_MODES))
 			{
-				CHECK(DefConChanModes);
+				CHECK(Config.DefConChanModes);
 			}
 		}
 	}
@@ -2005,10 +1789,10 @@ int read_config(int reload)
 	 *
 	 * rob
 	 **/
-	if (!NSEmailReg) {
-		delete [] PreNickDBName;
-		PreNickDBName = NULL;
-		NSRExpire = 0;
+	if (!Config.NSEmailReg) {
+		delete [] Config.PreNickDBName;
+		Config.PreNickDBName = NULL;
+		Config.NSRExpire = 0;
 	}
 
 	if (!retval) {

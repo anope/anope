@@ -49,19 +49,19 @@ class CommandCSKick : public Command
 			ci = c->ci;
 
 		if (!c) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, target);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
 		} else if (!is_on_chan(c, u2)) {
-			notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
 		} else if (!is_same ? !check_access(u, ci, CA_KICK) :
 					 !check_access(u, ci, CA_KICKME)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else if (!is_same && (ci->HasFlag(CI_PEACE))
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else if (is_protected(u2)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else {
 			const char *av[3];
 
@@ -75,20 +75,20 @@ class CommandCSKick : public Command
 			av[0] = ci->name;
 			av[1] = target;
 			av[2] = reason;
-			do_kick(s_ChanServ, 3, av);
+			do_kick(Config.s_ChanServ, 3, av);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_KICK);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_KICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
 	}
 };
 
@@ -106,7 +106,7 @@ class CSKick : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_KICK);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_KICK);
 	}
 };
 

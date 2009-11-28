@@ -42,12 +42,12 @@ class CommandOSChanKill : public Command
 		else
 			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : ChankillExpiry;
+		expires = expiry ? dotime(expiry) : Config.ChankillExpiry;
 		if (expiry && isdigit(expiry[strlen(expiry) - 1]))
 			expires *= 86400;
 		if (expires != 0 && expires < 60)
 		{
-			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -62,7 +62,7 @@ class CommandOSChanKill : public Command
 		if (*reason)
 		{
 
-			if (AddAkiller)
+			if (Config.AddAkiller)
 				snprintf(realreason, sizeof(realreason), "[%s] %s", u->nick, reason);
 			else
 				snprintf(realreason, sizeof(realreason), "%s", reason);
@@ -76,27 +76,27 @@ class CommandOSChanKill : public Command
 						continue;
 					strlcpy(mask, "*@", sizeof(mask)); /* Use *@" for the akill's, */
 					strlcat(mask, cu->user->host, sizeof(mask));
-					add_akill(NULL, mask, s_OperServ, expires, realreason);
+					add_akill(NULL, mask, Config.s_OperServ, expires, realreason);
 					check_akill(cu->user->nick, cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
 				}
-				if (WallOSAkill)
-					ircdproto->SendGlobops(s_OperServ, "%s used CHANKILL on %s (%s)", u->nick, channel, realreason);
+				if (Config.WallOSAkill)
+					ircdproto->SendGlobops(Config.s_OperServ, "%s used CHANKILL on %s (%s)", u->nick, channel, realreason);
 			}
 			else
-				notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
+				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_CHANKILL);
+		notice_help(Config.s_OperServ, u, OPER_HELP_CHANKILL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
 	}
 };
 
@@ -115,7 +115,7 @@ class OSChanKill : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANKILL);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CHANKILL);
 	}
 };
 

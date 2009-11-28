@@ -31,7 +31,6 @@ E char *uplink;
 E IRCDVar *ircd;
 E IRCDCAPAB *ircdcap;
 E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
-E char *IRCDModule;
 E IRCDProto *ircdproto;
 
 /**** actions.c ****/
@@ -121,7 +120,7 @@ E Entry *elist_find_mask(EList *list, const char *mask);
 E long get_memuse(EList *list);
 
 
-#define whosends(ci) ((!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? findbot(s_ChanServ) : (ci)->bi)
+#define whosends(ci) ((!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < Config.BSMinUsers) ? findbot(Config.s_ChanServ) : (ci)->bi)
 
 /**** chanserv.c ****/
 
@@ -178,212 +177,16 @@ char *sockstrerror(int error);
 
 /**** config.c ****/
 
-E ServerConfig serverConfig;
+E ServerConfig Config;
 
-E std::list<Uplink *> Uplinks;
-E char *LocalHost;
-E unsigned LocalPort;
-
-E char *ServerName;
-E char *ServerDesc;
-E char *ServiceUser;
-E char *ServiceHost;
-
-E char *HelpChannel;
-E char *LogChannel;
-E char *NetworkName;
-E unsigned NickLen;
-
-E char *s_NickServ;
-E char *s_ChanServ;
-E char *s_MemoServ;
-E char *s_BotServ;
-E char *s_OperServ;
-E char *s_GlobalNoticer;
-E char *desc_NickServ;
-E char *desc_ChanServ;
-E char *desc_MemoServ;
-E char *desc_BotServ;
-E char *desc_OperServ;
-E char *desc_GlobalNoticer;
-
-E char *HostDBName;
-E char *desc_HostServ;
-E char *s_HostServ;
 E void load_hs_dbase();
 E void save_hs_dbase();
 E int do_on_id(User * u);
 E void delHostCore(const char *nick);
 E void hostserv(User * u, char *buf);
 
-E char *PIDFilename;
-E char *MOTDFilename;
-E char *NickDBName;
-E char *PreNickDBName;
-E char *ChanDBName;
-E char *BotDBName;
-E char *OperDBName;
-E char *NewsDBName;
-
-E bool  NoBackupOkay;
-E bool  StrictPasswords;
-E unsigned BadPassLimit;
-E time_t BadPassTimeout;
-E time_t UpdateTimeout;
-E time_t ExpireTimeout;
-E time_t ReadTimeout;
-E time_t WarningTimeout;
-E time_t TimeoutCheck;
-E int   KeepLogs;
-E int   KeepBackups;
-E bool  ForceForbidReason;
-E bool  UsePrivmsg;
-E bool  UseStrictPrivMsg;
-E bool  DumpCore;
-E bool  LogUsers;
-E unsigned NickRegDelay;
-E bool   RestrictOperNicks;
-E unsigned NewsCount;
-E char *Numeric;
-
-E bool  UseMail;
-E char *SendMailPath;
-E char *SendFrom;
-E bool  RestrictMail;
-E time_t MailDelay;
-E bool  DontQuoteAddresses;
-
-E Flags<NickCoreFlag> NSDefFlags;
-E unsigned NSDefLanguage;
-E time_t NSRegDelay;
-E time_t NSResendDelay;
-E time_t NSExpire;
-E time_t NSRExpire;
-E bool  NSForceEmail;
-E int   NSMaxAliases;
-E unsigned NSAccessMax;
-E char *NSEnforcerUser;
-E char *NSEnforcerHost;
-E time_t NSReleaseTimeout;
-E bool  NSAllowKillImmed;
-E bool  NSNoGroupChange;
-E bool  NSListOpersOnly;
-E unsigned NSListMax;
-E char *NSGuestNickPrefix;
-E bool  NSSecureAdmins;
-E bool  NSStrictPrivileges;
-E bool  NSEmailReg;
-E bool  NSModeOnID;
-E bool  NSAddAccessOnReg;
-
-E Flags<ChannelInfoFlag> CSDefFlags;
-E unsigned CSMaxReg;
-E time_t CSExpire;
-E int   CSDefBantype;
-E unsigned CSAccessMax;
-E unsigned CSAutokickMax;
-E char *CSAutokickReason;
-E time_t CSInhabit;
-E bool  CSListOpersOnly;
-E unsigned CSListMax;
-E bool  CSRestrictGetPass;
-E bool  CSOpersOnly;
-
-E unsigned MSMaxMemos;
-E time_t MSSendDelay;
-E bool  MSNotifyAll;
-E unsigned MSMemoReceipt;
-
-E Flags<BotServFlag> BSDefFlags;
-E time_t BSKeepData;
-E unsigned BSMinUsers;
-E unsigned BSBadWordsMax;
-E bool  BSSmartJoin;
-E bool  BSGentleBWReason;
-E bool  BSCaseSensitive;
-E char *BSFantasyCharacter;
-
-E bool  HideStatsO;
-E bool  GlobalOnCycle;
-E bool  AnonymousGlobal;
-E char *GlobalOnCycleMessage;
-E char *GlobalOnCycleUP;
-E bool  LogMaxUsers;
-E bool  SuperAdmin;
-E bool  LogBot;
-E time_t AutokillExpiry;
-E time_t ChankillExpiry;
-E time_t SGLineExpiry;
-E time_t SQLineExpiry;
-E time_t SZLineExpiry;
-E bool  AkillOnAdd;
-E bool  KillonSGline;
-E bool  KillonSQline;
-E bool  WallOper;
-E bool  WallBadOS;
-E bool  WallOSGlobal;
-E bool  WallOSMode;
-E bool  WallOSClearmodes;
-E bool  WallOSKick;
-E bool  WallOSAkill;
-E bool  WallOSSGLine;
-E bool  WallOSSQLine;
-E bool  WallOSSZLine;
-E bool  WallOSNoOp;
-E bool  WallOSJupe;
-E bool  WallAkillExpire;
-E bool  WallSGLineExpire;
-E bool  WallSQLineExpire;
-E bool  WallSZLineExpire;
-E bool  WallExceptionExpire;
-E bool  WallDrop;
-E bool  WallForbid;
-E bool  WallGetpass;
-E bool  WallSetpass;
-E bool  AddAkiller;
-
-/**
- * Modules Stuff
- **/
-E std::list<std::string> ModulesAutoLoad;
-
-E std::list<std::string> EncModuleList;
-E std::list<std::string> HostServCoreModules;
-E std::list<std::string> MemoServCoreModules;
-E std::list<std::string> BotServCoreModules;
-E std::list<std::string> OperServCoreModules;
-E std::list<std::string> NickServCoreModules;
-E std::list<std::string> ChanServCoreModules;
-
-E bool  LimitSessions;
-E unsigned DefSessionLimit;
-E time_t ExceptionExpiry;
-E int   MaxSessionKill;
-E unsigned MaxSessionLimit;
-E time_t SessionAutoKillExpiry;
-E char *ExceptionDBName;
-E char *SessionLimitDetailsLoc;
-E char *SessionLimitExceeded;
-
-E char **Ulines;
-E int NumUlines;
-
 E int read_config(int reload);
 
-E int DefConLevel;
-E int DefConSessionLimit;
-E time_t DefConTimeOut;
-E time_t DefConAKILL;
-E char *DefConChanModes;
-E bool GlobalOnDefcon;
-E bool GlobalOnDefconMore;
-E char *DefconMessage;
-E char *DefConAkillReason;
-E char *DefConOffMessage;
-
-E long unsigned int UserKey1;
-E long unsigned int UserKey2;
-E long unsigned int UserKey3;
 /**** converter.c ****/
 
 E int convert_ircservices_44();
@@ -682,8 +485,6 @@ E bool CheckDefCon(int level, DefconLevel Level);
 E void AddDefCon(int level, DefconLevel Level);
 E void DelDefCon(int level, DefconLevel Level);
 E std::vector<std::bitset<32> > DefCon;
-
-E bool OSOpersOnly;
 
 /**** process.c ****/
 

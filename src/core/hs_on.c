@@ -30,13 +30,13 @@ class CommandHSOn : public Command
 		vHost = getvHost(u->nick);
 		vIdent = getvIdent(u->nick);
 		if (!vHost)
-			notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
 		else
 		{
 			if (vIdent)
-				notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent, vHost);
+				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent, vHost);
 			else
-				notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
+				notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, vHost);
 			ircdproto->SendVhost(u->nick, vIdent, vHost);
 			if (ircd->vhost)
 			{
@@ -57,7 +57,7 @@ class CommandHSOn : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_ON);
+		notice_help(Config.s_HostServ, u, HOST_HELP_ON);
 		return true;
 	}
 };
@@ -77,7 +77,7 @@ class HSOn : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_ON);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_ON);
 	}
 };
 

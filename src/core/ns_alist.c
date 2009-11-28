@@ -82,11 +82,11 @@ class CommandNSAList : public Command
 		}
 
 		if (!na)
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
-			notice_lang(s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			notice_lang(Config.s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
 			int i, level;
@@ -94,7 +94,7 @@ class CommandNSAList : public Command
 			int match_count = 0;
 			ChannelInfo *ci;
 
-			notice_lang(s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick);
+			notice_lang(Config.s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick);
 
 			for (i = 0; i < 256; ++i)
 			{
@@ -115,15 +115,15 @@ class CommandNSAList : public Command
 
 							xop = get_xop_level(level);
 
-							notice_lang(s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, xop, ci->desc ? ci->desc : "");
+							notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, xop, ci->desc ? ci->desc : "");
 						}
 						else
-							notice_lang(s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, level, ci->desc ? ci->desc : "");
+							notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, level, ci->desc ? ci->desc : "");
 					}
 				}
 			}
 
-			notice_lang(s_NickServ, u, NICK_ALIST_FOOTER, match_count, chan_count);
+			notice_lang(Config.s_NickServ, u, NICK_ALIST_FOOTER, match_count, chan_count);
 		}
 		return MOD_CONT;
 	}
@@ -131,9 +131,9 @@ class CommandNSAList : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_ALIST);
+			notice_help(Config.s_NickServ, u, NICK_HELP_ALIST);
 
 		return true;
 	}
@@ -154,7 +154,7 @@ class NSAList : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_ALIST);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_ALIST);
 	}
 };
 

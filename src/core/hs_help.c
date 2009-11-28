@@ -25,13 +25,13 @@ class CommandHSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(s_HostServ, u, HOSTSERV, params[0].c_str());
+		mod_help_cmd(Config.s_HostServ, u, HOSTSERV, params[0].c_str());
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP, s_HostServ);
+		notice_help(Config.s_HostServ, u, HOST_HELP, Config.s_HostServ);
 		FOREACH_MOD(I_OnHostServHelp, OnHostServHelp(u));
 	}
 };

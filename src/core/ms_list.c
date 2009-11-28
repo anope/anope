@@ -39,12 +39,12 @@ class CommandMSList : public Command
 
 			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -58,9 +58,9 @@ class CommandMSList : public Command
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
-				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+				notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -79,9 +79,9 @@ class CommandMSList : public Command
 					if (i == mi->memos.size())
 					{
 						if (!chan.empty())
-							notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+							notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 						else
-							notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
+							notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 						return MOD_CONT;
 					}
 				}
@@ -98,13 +98,13 @@ class CommandMSList : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_LIST);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_LIST);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
 	}
 };
 
@@ -122,7 +122,7 @@ class MSList : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_LIST);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_LIST);
 	}
 };
 
@@ -170,17 +170,17 @@ int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, cons
 	if (!*sent_header)
 	{
 		if (chan)
-			notice_lang(s_MemoServ, u, newi ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, chan, s_MemoServ, chan);
+			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, chan, Config.s_MemoServ, chan);
 		else
-			notice_lang(s_MemoServ, u, newi ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick, s_MemoServ);
-		notice_lang(s_MemoServ, u, MEMO_LIST_HEADER);
+			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick, Config.s_MemoServ);
+		notice_lang(Config.s_MemoServ, u, MEMO_LIST_HEADER);
 		*sent_header = 1;
 	}
 	m = mi->memos[index];
 	tm = *localtime(&m->time);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 	timebuf[sizeof(timebuf) - 1] = 0;   /* just in case */
-	notice_lang(s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender, timebuf);
+	notice_lang(Config.s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender, timebuf);
 	return 1;
 }
 

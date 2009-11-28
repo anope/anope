@@ -141,14 +141,14 @@ void save_databases()
 		alog("debug: Saving FFF databases");
 	backup_databases();
 	save_ns_dbase();
-	if (PreNickDBName) {
+	if (Config.PreNickDBName) {
 		save_ns_req_dbase();
 	}
 	save_cs_dbase();
-	if (s_BotServ) {
+	if (Config.s_BotServ) {
 		save_bs_dbase();
 	}
-	if (s_HostServ) {
+	if (Config.s_HostServ) {
 		save_hs_dbase();
 	}
 	save_os_dbase();
@@ -170,7 +170,7 @@ void do_restart_services()
 
 	if (!quitmsg)
 		quitmsg = "Restarting";
-	ircdproto->SendSquit(ServerName, quitmsg);
+	ircdproto->SendSquit(Config.ServerName, quitmsg);
 	disconn(servsock);
 	close_log();
 	/* First don't unload protocol module, then do so */
@@ -203,7 +203,7 @@ static void services_shutdown()
 		quitmsg = "Terminating, reason unknown";
 	alog("%s", quitmsg);
 	if (started) {
-		ircdproto->SendSquit(ServerName, quitmsg);
+		ircdproto->SendSquit(Config.ServerName, quitmsg);
 		if (uplink)
 			delete [] uplink;
 		if (ircd->chanmodes) {
@@ -432,7 +432,7 @@ int main(int ac, char **av, char **envp)
 	started = 1;
 
 #ifndef _WIN32
-	if (DumpCore)
+	if (Config.DumpCore)
 	{
 		rlimit rl;
 		if (getrlimit(RLIMIT_CORE, &rl) == -1)
@@ -459,13 +459,13 @@ int main(int ac, char **av, char **envp)
 			alog("debug: Top of main loop");
 
 		// Never fear. noexpire/readonly are checked in expire_all().
-		if (save_data || t - last_expire >= ExpireTimeout)
+		if (save_data || t - last_expire >= Config.ExpireTimeout)
 		{
 			expire_all();
 			last_expire = t;
 		}
 
-		if (!readonly && (save_data || t - last_update >= UpdateTimeout)) {
+		if (!readonly && (save_data || t - last_update >= Config.UpdateTimeout)) {
 			if (delayed_quit)
 				ircdproto->SendGlobops(NULL,
 								 "Updating databases on shutdown, please wait.");
@@ -482,7 +482,7 @@ int main(int ac, char **av, char **envp)
 		if (delayed_quit)
 			break;
 
-		if (t - last_check >= TimeoutCheck) {
+		if (t - last_check >= Config.TimeoutCheck) {
 			TimerManager::TickTimers(t);
 			last_check = t;
 		}
@@ -517,7 +517,7 @@ int main(int ac, char **av, char **envp)
 		alog("Restarting");
 		if (!quitmsg)
 			quitmsg = "Restarting";
-		ircdproto->SendSquit(ServerName, quitmsg);
+		ircdproto->SendSquit(Config.ServerName, quitmsg);
 		disconn(servsock);
 		close_log();
 		chdir(orig_cwd.c_str());

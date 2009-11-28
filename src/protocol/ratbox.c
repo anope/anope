@@ -189,7 +189,7 @@ class RatboxProto : public IRCDTS6Proto
 				case 'o':
 					if (add) {
 						++opcnt;
-						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					}
 					else --opcnt;
 			}
@@ -217,20 +217,20 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendSGLineDel(const char *mask)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi ? bi->uid : s_OperServ, "UNXLINE * %s", mask);
+		BotInfo *bi = findbot(Config.s_OperServ);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", mask);
 	}
 
 	void SendSGLine(const char *mask, const char *reason)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi ? bi->uid : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+		BotInfo *bi = findbot(Config.s_OperServ);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 	}
 
 	void SendAkillDel(const char *user, const char *host)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi ? bi->uid : s_OperServ, "UNKLINE * %s %s", user, host);
+		BotInfo *bi = findbot(Config.s_OperServ);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", user, host);
 	}
 
 	void SendSQLineDel(const char *user)
@@ -254,8 +254,8 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 	{
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi ? bi->uid : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
+		BotInfo *bi = findbot(Config.s_OperServ);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 	}
 
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
@@ -281,7 +281,7 @@ class RatboxProto : public IRCDTS6Proto
 		ratbox_cmd_pass(uplink_server->password);
 		ratbox_cmd_capab();
 		/* Make myself known to myself in the serverlist */
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, TS6SID);
 		SendServer(me_server);
 		ratbox_cmd_svinfo();
 	}
@@ -562,7 +562,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+	ircdproto->SendPong(ac > 1 ? av[1] : Config.ServerName, av[0]);
 	return MOD_CONT;
 }
 
@@ -888,8 +888,8 @@ class ProtoRatbox : public Module
 		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
-		if (Numeric)
-			TS6SID = sstrdup(Numeric);
+		if (Config.Numeric)
+			TS6SID = sstrdup(Config.Numeric);
 		UseTSMODE = 1;  /* TMODE */
 
 		pmodule_ircd_version("Ratbox IRCD 2.0+");

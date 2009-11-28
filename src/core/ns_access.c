@@ -25,31 +25,31 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display);
 			return MOD_CONT;
 		}
 
 /* reinstate when forbidden is moved to a group flag
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			return MOD_CONT;
 		}
 */
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, nc->display);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
+		notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
 		for (i = 0; i < nc->access.size(); ++i)
 		{
 			std::string access = nc->GetAccess(i);
 			if (mask && !Anope::Match(access, mask, true))
 				continue;
-			u->SendMessage(s_NickServ, "    %s", access.c_str());
+			u->SendMessage(Config.s_NickServ, "    %s", access.c_str());
 		}
 
 		return MOD_CONT;
@@ -63,20 +63,20 @@ class CommandNSAccess : public Command
 			return MOD_CONT;
 		}
 
-		if (nc->access.size() >= NSAccessMax)
+		if (nc->access.size() >= Config.NSAccessMax)
 		{
-			notice_lang(s_NickServ, u, NICK_ACCESS_REACHED_LIMIT, NSAccessMax);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_REACHED_LIMIT, Config.NSAccessMax);
 			return MOD_CONT;
 		}
 
 		if (nc->FindAccess(mask))
 		{
-			notice_lang(s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, *access);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, *access);
 			return MOD_CONT;
 		}
 
 		nc->AddAccess(mask);
-		notice_lang(s_NickServ, u, NICK_ACCESS_ADDED, mask);
+		notice_lang(Config.s_NickServ, u, NICK_ACCESS_ADDED, mask);
 
 		return MOD_CONT;
 	}
@@ -91,11 +91,11 @@ class CommandNSAccess : public Command
 
 		if (!nc->FindAccess(mask))
 		{
-			notice_lang(s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_NickServ, u, NICK_ACCESS_DELETED, mask);
+		notice_lang(Config.s_NickServ, u, NICK_ACCESS_DELETED, mask);
 		nc->EraseAccess(mask);
 
 		return MOD_CONT;
@@ -107,17 +107,17 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			notice_lang(s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_NickServ, u, NICK_ACCESS_LIST);
+		notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST);
 		for (i = 0; i < nc->access.size(); ++i)
 		{
 			std::string access = nc->GetAccess(i);
 			if (mask && !Anope::Match(access, mask, true))
 				continue;
-			u->SendMessage(s_NickServ, "    %s", access.c_str());
+			u->SendMessage(Config.s_NickServ, "    %s", access.c_str());
 		}
 
 		return MOD_CONT;
@@ -138,16 +138,16 @@ class CommandNSAccess : public Command
 
 		if (mask && !strchr(mask, '@'))
 		{
-			notice_lang(s_NickServ, u, BAD_USERHOST_MASK);
-			notice_lang(s_NickServ, u, MORE_INFO, s_NickServ, "ACCESS");
+			notice_lang(Config.s_NickServ, u, BAD_USERHOST_MASK);
+			notice_lang(Config.s_NickServ, u, MORE_INFO, Config.s_NickServ, "ACCESS");
 
 		}
 		/*
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			*/
 		else if (u->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
 		else if (cmd == "ADD")
 			return this->DoAdd(u, u->nc, mask);
 		else if (cmd == "DEL")
@@ -161,13 +161,13 @@ class CommandNSAccess : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_ACCESS);
+		notice_help(Config.s_NickServ, u, NICK_HELP_ACCESS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
 	}
 };
 
@@ -186,7 +186,7 @@ class NSAccess : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_ACCESS);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_ACCESS);
 	}
 };
 

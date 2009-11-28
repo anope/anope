@@ -42,14 +42,14 @@ class CommandHSSetAll : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (!rawhostmask)
 			{
-				notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
+				notice_lang(Config.s_HostServ, u, HOST_SETALL_SYNTAX, Config.s_HostServ);
 				delete [] vIdent;
 				delete [] hostmask;
 				return MOD_CONT;
 			}
 			if (strlen(vIdent) > USERMAX - 1)
 			{
-				notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
 				delete [] vIdent;
 				delete [] rawhostmask;
 				delete [] hostmask;
@@ -61,7 +61,7 @@ class CommandHSSetAll : public Command
 				{
 					if (!isvalidchar(*s))
 					{
-						notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
+						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
 						delete [] vIdent;
 						delete [] rawhostmask;
 						delete [] hostmask;
@@ -71,7 +71,7 @@ class CommandHSSetAll : public Command
 			}
 			if (!ircd->vident)
 			{
-				notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+				notice_lang(Config.s_HostServ, u, HOST_NO_VIDENT);
 				delete [] vIdent;
 				delete [] rawhostmask;
 				delete [] hostmask;
@@ -83,7 +83,7 @@ class CommandHSSetAll : public Command
 			snprintf(hostmask, HOSTMAX - 1, "%s", rawhostmask);
 		else
 		{
-			notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
 			if (vIdent)
 			{
 				delete [] vIdent;
@@ -95,7 +95,7 @@ class CommandHSSetAll : public Command
 
 		if (!isValidHost(hostmask, 3))
 		{
-			notice_lang(s_HostServ, u, HOST_SET_ERROR);
+			notice_lang(Config.s_HostServ, u, HOST_SET_ERROR);
 			if (vIdent)
 			{
 				delete [] vIdent;
@@ -111,7 +111,7 @@ class CommandHSSetAll : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				if (vIdent) {
 					delete [] vIdent;
 					delete [] rawhostmask;
@@ -125,12 +125,12 @@ class CommandHSSetAll : public Command
 				alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
 			do_hs_sync(na->nc, vIdent, hostmask, u->nick, tmp_time);
 			if (vIdent)
-				notice_lang(s_HostServ, u, HOST_IDENT_SETALL, nick, vIdent, hostmask);
+				notice_lang(Config.s_HostServ, u, HOST_IDENT_SETALL, nick, vIdent, hostmask);
 			else
-				notice_lang(s_HostServ, u, HOST_SETALL, nick, hostmask);
+				notice_lang(Config.s_HostServ, u, HOST_SETALL, nick, hostmask);
 		}
 		else
-			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
 		if (vIdent)
 		{
 			delete [] vIdent;
@@ -142,13 +142,13 @@ class CommandHSSetAll : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_SETALL);
+		notice_help(Config.s_HostServ, u, HOST_HELP_SETALL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
+		syntax_error(Config.s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
 	}
 };
 
@@ -167,7 +167,7 @@ class HSSetAll : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_SETALL);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_SETALL);
 	}
 };
 

@@ -37,22 +37,22 @@ class CommandOSNOOP : public Command
 			ircdproto->SendSVSNOOP(server, 1);
 
 			snprintf(reason, sizeof(reason), "NOOP command used by %s", u->nick);
-			if (WallOSNoOp)
-				ircdproto->SendGlobops(s_OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick, server);
-			notice_lang(s_OperServ, u, OPER_NOOP_SET, server);
+			if (Config.WallOSNoOp)
+				ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick, server);
+			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
 
 			/* Kill all the IRCops of the server */
 			for (u2 = firstuser(); u2; u2 = u3)
 			{
 				u3 = nextuser();
 				if (u2 && is_oper(u2) && u2->server->name && Anope::Match(u2->server->name, server, true))
-					kill_user(s_OperServ, u2->nick, reason);
+					kill_user(Config.s_OperServ, u2->nick, reason);
 			}
 		}
 		else if (cmd == "REVOKE")
 		{
 			ircdproto->SendSVSNOOP(server, 0);
-			notice_lang(s_OperServ, u, OPER_NOOP_REVOKE, server);
+			notice_lang(Config.s_OperServ, u, OPER_NOOP_REVOKE, server);
 		}
 		else
 			this->OnSyntaxError(u, "");
@@ -61,13 +61,13 @@ class CommandOSNOOP : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_NOOP);
+		notice_help(Config.s_OperServ, u, OPER_HELP_NOOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
 	}
 };
 
@@ -86,7 +86,7 @@ class OSNOOP : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_NOOP);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_NOOP);
 	}
 };
 

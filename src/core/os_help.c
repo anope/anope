@@ -24,15 +24,15 @@ class CommandOSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(s_OperServ, u, OPERSERV, params[0].c_str());
+		mod_help_cmd(Config.s_OperServ, u, OPERSERV, params[0].c_str());
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP);
+		notice_help(Config.s_OperServ, u, OPER_HELP);
 		FOREACH_MOD(I_OnOperServHelp, OnOperServHelp(u));
-		notice_help(s_OperServ, u, OPER_HELP_LOGGED);
+		notice_help(Config.s_OperServ, u, OPER_HELP_LOGGED);
 	}
 };
 

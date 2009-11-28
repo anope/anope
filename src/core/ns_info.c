@@ -55,26 +55,26 @@ class CommandNSInfo : public Command
 		{
 			if ((nr = findrequestnick(nick)))
 			{
-				notice_lang(s_NickServ, u, NICK_IS_PREREG);
+				notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 				if (!param.empty() && param == "ALL" && u->nc && u->nc->IsServicesOper())
-					notice_lang(s_NickServ, u, NICK_INFO_EMAIL, nr->email);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, nr->email);
 				else
 				{
 					if (u->nc && u->nc->IsServicesOper())
-						notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, nr->nick);
+						notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, nr->nick);
 				}
 			}
 			else if (nickIsServices(nick, 1))
-				notice_lang(s_NickServ, u, NICK_X_IS_SERVICES, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_IS_SERVICES, nick);
 			else
-				notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
 			if (is_oper(u) && na->last_usermask)
-				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u, NO_REASON));
+				notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u, NO_REASON));
 			else
-				notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, nick);
 		}
 		else
 		{
@@ -93,13 +93,13 @@ class CommandNSInfo : public Command
 			if (!param.empty() && param == "ALL" && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
 				show_hidden = 1;
 
-			notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
+			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
 
 			if (na->nc->IsServicesOper())
 			{
 				if (show_hidden || (!(na->nc->HasFlag(NI_HIDE_STATUS))))
 				{
-					notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
+					notice_lang(Config.s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
 
 				}
 			}
@@ -107,52 +107,52 @@ class CommandNSInfo : public Command
 			if (nick_online)
 			{
 				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
-					notice_lang(s_NickServ, u, NICK_INFO_ADDRESS_ONLINE, na->last_usermask);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE, na->last_usermask);
 				else
-					notice_lang(s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick);
 			}
 			else {
 				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
-					notice_lang(s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask);
 			}
 
 			tm = localtime(&na->time_registered);
 			strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-			notice_lang(s_NickServ, u, NICK_INFO_TIME_REGGED, buf);
+			notice_lang(Config.s_NickServ, u, NICK_INFO_TIME_REGGED, buf);
 
 			if (!nick_online)
 			{
 				tm = localtime(&na->last_seen);
 				strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-				notice_lang(s_NickServ, u, NICK_INFO_LAST_SEEN, buf);
+				notice_lang(Config.s_NickServ, u, NICK_INFO_LAST_SEEN, buf);
 			}
 
 			if (na->last_quit && (show_hidden || !(na->nc->HasFlag(NI_HIDE_QUIT))))
-				notice_lang(s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit);
+				notice_lang(Config.s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit);
 
 			if (na->nc->url)
-				notice_lang(s_NickServ, u, NICK_INFO_URL, na->nc->url);
+				notice_lang(Config.s_NickServ, u, NICK_INFO_URL, na->nc->url);
 			if (na->nc->email && (show_hidden || !(na->nc->HasFlag(NI_HIDE_EMAIL))))
-				notice_lang(s_NickServ, u, NICK_INFO_EMAIL, na->nc->email);
+				notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, na->nc->email);
 			if (na->nc->icq)
-				notice_lang(s_NickServ, u, NICK_INFO_ICQ, na->nc->icq);
+				notice_lang(Config.s_NickServ, u, NICK_INFO_ICQ, na->nc->icq);
 
 			if (show_hidden)
 			{
-				if (s_HostServ && ircd->vhost) {
+				if (Config.s_HostServ && ircd->vhost) {
 					if (getvHost(na->nick) != NULL) {
 						if (ircd->vident && getvIdent(na->nick) != NULL) {
-							notice_lang(s_NickServ, u, NICK_INFO_VHOST2,
+							notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST2,
 										getvIdent(na->nick),
 										getvHost(na->nick));
 						} else {
-							notice_lang(s_NickServ, u, NICK_INFO_VHOST,
+							notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST,
 										getvHost(na->nick));
 						}
 					}
 				}
 				if (na->nc->greet)
-					notice_lang(s_NickServ, u, NICK_INFO_GREET, na->nc->greet);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_GREET, na->nc->greet);
 
 				std::string optbuf;
 
@@ -162,32 +162,32 @@ class CommandNSInfo : public Command
 				CheckOptStr(optbuf, NI_MSG, getstring(u, NICK_INFO_OPT_MSG), na->nc);
 				CheckOptStr(optbuf, NI_AUTOOP, getstring(u, NICK_INFO_OPT_AUTOOP), na->nc, true);
 
-				notice_lang(s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u, NICK_INFO_OPT_NONE) : optbuf.c_str());
+				notice_lang(Config.s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u, NICK_INFO_OPT_NONE) : optbuf.c_str());
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
 					if (na->last_quit)
-						notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED, na->last_quit);
+						notice_lang(Config.s_NickServ, u, NICK_INFO_SUSPENDED, na->last_quit);
 					else
-						notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED_NO_REASON);
+						notice_lang(Config.s_NickServ, u, NICK_INFO_SUSPENDED_NO_REASON);
 				}
 
 				if (na->HasFlag(NS_NO_EXPIRE))
-					notice_lang(s_NickServ, u, NICK_INFO_NO_EXPIRE);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_NO_EXPIRE);
 				else
 				{
 					if (u->nc->IsServicesOper())
 					{
-						expt = na->last_seen + NSExpire;
+						expt = na->last_seen + Config.NSExpire;
 						tm = localtime(&expt);
 						strftime_lang(buf, sizeof(buf), finduser(na->nick), STRFTIME_DATE_TIME_FORMAT, tm);
-						notice_lang(s_NickServ, u, NICK_INFO_EXPIRE, buf);
+						notice_lang(Config.s_NickServ, u, NICK_INFO_EXPIRE, buf);
 					}
 				}
 			}
 
 			if (!show_hidden)
-				notice_lang(s_NickServ, u, NICK_INFO_FOR_MORE, s_NickServ, na->nick);
+				notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, na->nick);
 		}
 		return MOD_CONT;
 	}
@@ -195,15 +195,15 @@ class CommandNSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_INFO);
+			notice_help(Config.s_NickServ, u, NICK_HELP_INFO);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
 	}
 };
 
@@ -222,7 +222,7 @@ class NSInfo : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_INFO);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_INFO);
 	}
 };
 

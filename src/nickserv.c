@@ -136,7 +136,7 @@ void NickServRelease::ClearTimers(NickAlias *na, bool dorelease)
 /* *INDENT-OFF* */
 void moduleAddNickServCmds()
 {
-	ModuleManager::LoadModuleList(NickServCoreModules);
+	ModuleManager::LoadModuleList(Config.NickServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/
@@ -249,11 +249,11 @@ void nickserv(User * u, char *buf)
 		{
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(s_NickServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_NickServ), u->nick, "PING %s", s);
 	}
 	else
 	{
-		mod_run_cmd(s_NickServ, u, NICKSERV, cmd);
+		mod_run_cmd(Config.s_NickServ, u, NICKSERV, cmd);
 	}
 
 }
@@ -266,7 +266,7 @@ void nickserv(User * u, char *buf)
 #define SAFE(x) do {					\
 	if ((x) < 0) {					\
 	if (!forceload)					\
-		fatal("Read error on %s", NickDBName);	\
+		fatal("Read error on %s", Config.NickDBName);	\
 	failed = 1;					\
 	break;						\
 	}							\
@@ -281,7 +281,7 @@ void load_ns_req_db()
 	int failed = 0, len;
 	char *pass;
 
-	if (!(f = open_db(s_NickServ, PreNickDBName, "r", PRE_NICK_VERSION)))
+	if (!(f = open_db(Config.s_NickServ, Config.PreNickDBName, "r", PRE_NICK_VERSION)))
 		return;
 	ver = get_file_version(f);
 	for (i = 0; i < 1024 && !failed; i++)
@@ -289,7 +289,7 @@ void load_ns_req_db()
 		while ((c = getc_db(f)) == 1)
 		{
 			if (c != 1)
-				fatal("Invalid format in %s", PreNickDBName);
+				fatal("Invalid format in %s", Config.PreNickDBName);
 
 			char *s;
 			SAFE(read_string(&s, f));
@@ -328,7 +328,7 @@ void load_ns_dbase()
 	uint32 tmp32;
 	char *s;
 
-	if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
+	if (!(f = open_db(Config.s_NickServ, Config.NickDBName, "r", NICK_VERSION)))
 		return;
 
 	ver = get_file_version(f);
@@ -336,7 +336,7 @@ void load_ns_dbase()
 	if (ver != 14)
 	{
 		close_db(f);
-		fatal("DB %s is too old", NickDBName);
+		fatal("DB %s is too old", Config.NickDBName);
 		return;
 	}
 
@@ -349,7 +349,7 @@ void load_ns_dbase()
 		while ((c = getc_db(f)) == 1)
 		{
 			if (c != 1)
-				fatal("Invalid format in %s", NickDBName);
+				fatal("Invalid format in %s", Config.NickDBName);
 
 			SAFE(read_string(&s, f));
 			nc = new NickCore(s);
@@ -370,7 +370,7 @@ void load_ns_dbase()
 
 			//SAFE(read_int32(&nc->flags, f));
 			SAFE(read_int32(&tmp32, f));
-			if (!NSAllowKillImmed)
+			if (!Config.NSAllowKillImmed)
 				nc->UnsetFlag(NI_KILL_IMMED);
 			SAFE(read_int16(&nc->language, f));
 
@@ -423,7 +423,7 @@ void load_ns_dbase()
 		while ((c = getc_db(f)) == 1)
 		{
 			if (c != 1)
-				fatal("Invalid format in %s", NickDBName);
+				fatal("Invalid format in %s", Config.NickDBName);
 
 			SAFE(read_string(&s, f));
 			na = new NickAlias(s, nclists[0]); // XXXXXXXX
@@ -477,7 +477,7 @@ void load_ns_dbase()
 			/* We check for coreless nicks (although it should never happen) */
 			if (!na->nc)
 			{
-				alog("%s: while loading database: %s has no core! We delete it.", s_NickServ, na->nick);
+				alog("%s: while loading database: %s has no core! We delete it.", Config.s_NickServ, na->nick);
 				delete na;
 				continue;
 			}
@@ -493,9 +493,9 @@ void load_ns_dbase()
 #define SAFE(x) do {						\
 	if ((x) < 0) {						\
 	restore_db(f);						\
-	log_perror("Write error on %s", NickDBName);		\
-	if (time(NULL) - lastwarn > WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", NickDBName,	\
+	log_perror("Write error on %s", Config.NickDBName);		\
+	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.NickDBName,	\
 			strerror(errno));			\
 		lastwarn = time(NULL);				\
 	}							\
@@ -513,7 +513,7 @@ void save_ns_dbase()
 	NickCore *nc;
 	static time_t lastwarn = 0;
 
-	if (!(f = open_db(s_NickServ, NickDBName, "w", NICK_VERSION)))
+	if (!(f = open_db(Config.s_NickServ, Config.NickDBName, "w", NICK_VERSION)))
 		return;
 
 	for (i = 0; i < 1024; i++)
@@ -598,7 +598,7 @@ void save_ns_req_dbase()
 	NickRequest *nr;
 	static time_t lastwarn = 0;
 
-	if (!(f = open_db(s_NickServ, PreNickDBName, "w", PRE_NICK_VERSION)))
+	if (!(f = open_db(Config.s_NickServ, Config.PreNickDBName, "w", PRE_NICK_VERSION)))
 		return;
 
 	for (i = 0; i < 1024; i++)
@@ -638,7 +638,7 @@ int validate_user(User * u)
 
 	if ((nr = findrequestnick(u->nick)))
 	{
-		notice_lang(s_NickServ, u, NICK_IS_PREREG);
+		notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 	}
 
 	if (!(na = findnick(u->nick)))
@@ -646,14 +646,14 @@ int validate_user(User * u)
 
 	if (na->HasFlag(NS_FORBIDDEN))
 	{
-		notice_lang(s_NickServ, u, NICK_MAY_NOT_BE_USED);
+		notice_lang(Config.s_NickServ, u, NICK_MAY_NOT_BE_USED);
 		collide(na, 0);
 		return 0;
 	}
 
 	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
-		notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
+		notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick);
 		collide(na, 0);
 		return 0;
 	}
@@ -674,26 +674,26 @@ int validate_user(User * u)
 	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
 		if (na->nc->HasFlag(NI_SECURE))
-			notice_lang(s_NickServ, u, NICK_IS_SECURE, s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_IS_SECURE, Config.s_NickServ);
 		else
-			notice_lang(s_NickServ, u, NICK_IS_REGISTERED, s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_IS_REGISTERED, Config.s_NickServ);
 	}
 
 	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
 	{
 		if (na->nc->HasFlag(NI_KILL_IMMED))
 		{
-			notice_lang(s_NickServ, u, FORCENICKCHANGE_NOW);
+			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_NOW);
 			collide(na, 0);
 		}
 		else if (na->nc->HasFlag(NI_KILL_QUICK))
 		{
-			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
+			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
 			t = new NickServCollide(na, 20);
 		}
 		else
 		{
-			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
+			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
 			t = new NickServCollide(na, 60);
 		}
 	}
@@ -723,13 +723,13 @@ void cancel_user(User * u)
 			else if (ircd->svsnick)
 			{
 				uid = ts6_uid_retrieve();
-				ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser, NSEnforcerHost, "Services Enforcer", "+", uid.c_str());
-				t = new NickServRelease(na, NSReleaseTimeout);
+				ircdproto->SendClientIntroduction(u->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid.c_str());
+				t = new NickServRelease(na, Config.NSReleaseTimeout);
 				t->uid = uid;
 			}
 			else
 			{
-				ircdproto->SendSVSKill(s_NickServ, u->nick, "Please do not use a registered nickname without identifying");
+				ircdproto->SendSVSKill(Config.s_NickServ, u->nick, "Please do not use a registered nickname without identifying");
 			}
 			na->SetFlag(NS_KILL_HELD);
 		}
@@ -784,7 +784,7 @@ void expire_nicks()
 				continue;
 			}
 
-			if (NSExpire && now - na->last_seen >= NSExpire
+			if (Config.NSExpire && now - na->last_seen >= Config.NSExpire
 			        && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE)
 			        && !na->nc->HasFlag(NI_SUSPENDED))
 			{
@@ -815,7 +815,7 @@ void expire_requests()
 		for (nr = nrlists[i]; nr; nr = next)
 		{
 			next = nr->next;
-			if (NSRExpire && now - nr->requested >= NSRExpire)
+			if (Config.NSRExpire && now - nr->requested >= Config.NSRExpire)
 			{
 				alog("Request for nick %s expiring", nr->nick);
 				delete nr;
@@ -1087,7 +1087,7 @@ void change_core_display(NickCore * nc, const char *newdisplay)
 	*/
 	/* Log ... */
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
-	alog("%s: changing %s nickname group display to %s", s_NickServ,
+	alog("%s: changing %s nickname group display to %s", Config.s_NickServ,
 	     nc->display, newdisplay);
 
 	/* Remove the core from the list */
@@ -1135,7 +1135,7 @@ void collide(NickAlias * na, int from_timeout)
 	 * per second. So let use another safer method.
 	 *		  --lara
 	 */
-	/* So you should check the length of NSGuestNickPrefix, eh Lara?
+	/* So you should check the length of Config.NSGUestNickPrefix, eh Lara?
 	 *		  --Certus
 	 */
 
@@ -1145,16 +1145,16 @@ void collide(NickAlias * na, int from_timeout)
 		do
 		{
 			snprintf(guestnick, sizeof(guestnick), "%s%d",
-			         NSGuestNickPrefix, getrandom16());
+			         Config.NSGuestNickPrefix, getrandom16());
 		}
 		while (finduser(guestnick));
-		notice_lang(s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick);
+		notice_lang(Config.s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick);
 		ircdproto->SendForceNickChange(na->nick, guestnick, time(NULL));
 		na->SetFlag(NS_GUESTED);
 	}
 	else
 	{
-		kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");
+		kill_user(Config.s_NickServ, na->nick, "Services nickname-enforcer kill");
 	}
 }
 
@@ -1193,7 +1193,7 @@ void del_ns_timeout(NickAlias * na, int type)
  */
 void SetOperType(NickCore *nc)
 {
-	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); ++it)
+	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 	{
 		std::string nick = it->first;
 		std::string type = it->second;
@@ -1208,14 +1208,14 @@ void SetOperType(NickCore *nc)
 
 		if (na->nc == nc)
 		{
-			 for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); ++tit)
+			 for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); ++tit)
 			 {
 				 OperType *ot = *tit;
 
 				 if (ot->GetName() == type)
 				 {
 					 nc->ot = ot;
-					 alog("%s: Tied oper %s to type %s", s_OperServ, nc->display, type.c_str());
+					 alog("%s: Tied oper %s to type %s", Config.s_OperServ, nc->display, type.c_str());
 				 }
 			 }
 		}

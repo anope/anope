@@ -32,13 +32,13 @@ class CommandMSCancel : public Command
 		MemoInfo *mi;
 
 		if (!u->IsRecognized())
-			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
 		else if (!(mi = getmemoinfo(name, &ischan, &isforbid)))
 		{
 			if (isforbid)
-				notice_lang(s_MemoServ, u, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name);
+				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name);
 			else
-				notice_lang(s_MemoServ, u, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name);
+				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name);
 		}
 		else
 		{
@@ -49,25 +49,25 @@ class CommandMSCancel : public Command
 				if ((mi->memos[i]->HasFlag(MF_UNREAD)) && !stricmp(mi->memos[i]->sender, u->nc->display) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
 					delmemo(mi, mi->memos[i]->number);
-					notice_lang(s_MemoServ, u, MEMO_CANCELLED, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_CANCELLED, name);
 					return MOD_CONT;
 				}
 			}
 
-			notice_lang(s_MemoServ, u, MEMO_CANCEL_NONE);
+			notice_lang(Config.s_MemoServ, u, MEMO_CANCEL_NONE);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_CANCEL);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_CANCEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
 	}
 };
 
@@ -85,7 +85,7 @@ class MSCancel : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
 	}
 };
 

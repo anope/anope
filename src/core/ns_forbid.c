@@ -29,23 +29,23 @@ class CommandNSForbid : public Command
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		/* Assumes that permission checking has already been done. */
-		if (ForceForbidReason && !reason) {
+		if (Config.ForceForbidReason && !reason) {
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 
 		if (readonly)
-			notice_lang(s_NickServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
 		if (!ircdproto->IsNickValid(nick))
 		{
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, nick);
 			return MOD_CONT;
 		}
 		if ((na = findnick(nick)))
 		{
-			if (NSSecureAdmins && na->nc->IsServicesOper())
+			if (Config.NSSecureAdmins && na->nc->IsServicesOper())
 			{
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			delete na;
@@ -62,7 +62,7 @@ class CommandNSForbid : public Command
 
 			if (curr)
 			{
-				notice_lang(s_NickServ, curr, FORCENICKCHANGE_NOW);
+				notice_lang(Config.s_NickServ, curr, FORCENICKCHANGE_NOW);
 				collide(na, 0);
 			}
 
@@ -70,31 +70,31 @@ class CommandNSForbid : public Command
 			if (ircd->sqline)
 				ircdproto->SendSQLine(na->nick, reason ? reason : "Forbidden");
 
-			if (WallForbid)
-				ircdproto->SendGlobops(s_NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick, nick);
+			if (Config.WallForbid)
+				ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick, nick);
 
-			alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);
-			notice_lang(s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
+			alog("%s: %s set FORBID for nick %s", Config.s_NickServ, u->nick, nick);
+			notice_lang(Config.s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
 		}
 		else
 		{
-			alog("%s: Valid FORBID for %s by %s failed", s_NickServ, nick, u->nick);
-			notice_lang(s_NickServ, u, NICK_FORBID_FAILED, nick);
+			alog("%s: Valid FORBID for %s by %s failed", Config.s_NickServ, nick, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_FORBID_FAILED, nick);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
+		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "FORBID", ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "FORBID", Config.ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
 	}
 };
 
@@ -113,7 +113,7 @@ class NSForbid : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_FORBID);
 	}
 };
 

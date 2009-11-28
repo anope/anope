@@ -26,16 +26,16 @@ class CommandBSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(s_BotServ, u, BOTSERV, params[0].c_str());
+		mod_help_cmd(Config.s_BotServ, u, BOTSERV, params[0].c_str());
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		// Abuse syntax error to display general list help.
-		notice_help(s_BotServ, u, BOT_HELP);
+		notice_help(Config.s_BotServ, u, BOT_HELP);
 		FOREACH_MOD(I_OnBotServHelp, OnBotServHelp(u));
-		notice_help(s_BotServ, u, BOT_HELP_FOOTER, BSMinUsers);
+		notice_help(Config.s_BotServ, u, BOT_HELP_FOOTER, Config.BSMinUsers);
 	}
 };
 

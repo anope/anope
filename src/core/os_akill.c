@@ -41,7 +41,7 @@ class CommandOSAKill : public Command
 		else
 			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : AutokillExpiry;
+		expires = expiry ? dotime(expiry) : Config.AutokillExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -50,7 +50,7 @@ class CommandOSAKill : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires != 0 && expires < 60)
 		{
-			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -66,19 +66,19 @@ class CommandOSAKill : public Command
 			/* We first do some sanity check on the proposed mask. */
 			if (strchr(mask, '!'))
 			{
-				notice_lang(s_OperServ, u, OPER_AKILL_NO_NICK);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_NICK);
 				return MOD_CONT;
 			}
 
 			if (!strchr(mask, '@'))
 			{
-				notice_lang(s_OperServ, u, BAD_USERHOST_MASK);
+				notice_lang(Config.s_OperServ, u, BAD_USERHOST_MASK);
 				return MOD_CONT;
 			}
 
 			if (mask && strspn(mask, "~@.*?") == strlen(mask))
 			{
-				notice_lang(s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
+				notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
 				return MOD_CONT;
 			}
 
@@ -87,7 +87,7 @@ class CommandOSAKill : public Command
 			 * breason to match bufsize
 			 * -Rob
 			 **/
-			if (AddAkiller)
+			if (Config.AddAkiller)
 				snprintf(realreason, sizeof(realreason), "[%s] %s", u->nick, reason);
 			else
 				snprintf(realreason, sizeof(realreason), "%s", reason);
@@ -96,10 +96,10 @@ class CommandOSAKill : public Command
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
-				notice_lang(s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, deleted);
-			notice_lang(s_OperServ, u, OPER_AKILL_ADDED, mask);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, deleted);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_ADDED, mask);
 
-			if (WallOSAkill)
+			if (Config.WallOSAkill)
 			{
 				char buf[128];
 
@@ -129,11 +129,11 @@ class CommandOSAKill : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(s_OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick, mask, realreason, buf);
+				ircdproto->SendGlobops(Config.s_OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick, mask, realreason, buf);
 			}
 
 			if (readonly)
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(u, "ADD");
@@ -156,7 +156,7 @@ class CommandOSAKill : public Command
 
 		if (!akills.count)
 		{
-			notice_lang(s_OperServ, u, OPER_AKILL_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -166,28 +166,28 @@ class CommandOSAKill : public Command
 			res = slist_delete_range(&akills, mask, NULL);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 				return MOD_CONT;
 			}
 			else if (res == 1)
-				notice_lang(s_OperServ, u, OPER_AKILL_DELETED_ONE);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_ONE);
 			else
-				notice_lang(s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, res);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, res);
 		}
 		else
 		{
 			if ((res = slist_indexof(&akills, const_cast<void *>(static_cast<const void *>(mask)))) == -1) // XXX: possibly unsafe cast
 			{
-				notice_lang(s_OperServ, u, OPER_AKILL_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NOT_FOUND, mask);
 				return MOD_CONT;
 			}
 
 			slist_delete(&akills, res);
-			notice_lang(s_OperServ, u, OPER_AKILL_DELETED, mask);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED, mask);
 		}
 
 		if (readonly)
-			notice_lang(s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -199,7 +199,7 @@ class CommandOSAKill : public Command
 
 		if (!akills.count)
 		{
-			notice_lang(s_OperServ, u, OPER_AKILL_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -210,11 +210,11 @@ class CommandOSAKill : public Command
 			res = slist_enum(&akills, mask, &akill_list_callback, u, &sent_header);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 				return MOD_CONT;
 			}
 			else
-				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Akill");
+				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
 		}
 		else
 		{
@@ -229,9 +229,9 @@ class CommandOSAKill : public Command
 			}
 
 			if (!sent_header)
-				notice_lang(s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 			else
-				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Akill");
+				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
 		}
 
 		return MOD_CONT;
@@ -244,7 +244,7 @@ class CommandOSAKill : public Command
 
 		if (!akills.count)
 		{
-			notice_lang(s_OperServ, u, OPER_AKILL_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -255,7 +255,7 @@ class CommandOSAKill : public Command
 			res = slist_enum(&akills, mask, &akill_view_callback, u, &sent_header);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 				return MOD_CONT;
 			}
 		}
@@ -272,7 +272,7 @@ class CommandOSAKill : public Command
 			}
 
 			if (!sent_header)
-				notice_lang(s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -281,7 +281,7 @@ class CommandOSAKill : public Command
 	CommandReturn DoClear(User *u)
 	{
 		slist_clear(&akills, 1);
-		notice_lang(s_OperServ, u, OPER_AKILL_CLEAR);
+		notice_lang(Config.s_OperServ, u, OPER_AKILL_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -311,13 +311,13 @@ class CommandOSAKill : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_AKILL);
+		notice_help(Config.s_OperServ, u, OPER_HELP_AKILL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
 	}
 };
 
@@ -335,7 +335,7 @@ class OSAKill : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_AKILL);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_AKILL);
 	}
 };
 
@@ -350,7 +350,7 @@ int akill_view(int number, Akill *ak, User *u, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_OperServ, u, OPER_AKILL_VIEW_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_HEADER);
 		*sent_header = 1;
 	}
 
@@ -358,7 +358,7 @@ int akill_view(int number, Akill *ak, User *u, int *sent_header)
 	tm = *localtime(&ak->seton);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 	expire_left(u->nc, expirebuf, sizeof(expirebuf), ak->expires);
-	notice_lang(s_OperServ, u, OPER_AKILL_VIEW_FORMAT, number, mask, ak->by, timebuf, expirebuf, ak->reason);
+	notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, number, mask, ak->by, timebuf, expirebuf, ak->reason);
 
 	return 1;
 }
@@ -391,12 +391,12 @@ int akill_list(int number, Akill *ak, User *u, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_OperServ, u, OPER_AKILL_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_HEADER);
 		*sent_header = 1;
 	}
 
 	snprintf(mask, sizeof(mask), "%s@%s", ak->user, ak->host);
-	notice_lang(s_OperServ, u, OPER_AKILL_LIST_FORMAT, number, mask, ak->reason);
+	notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_FORMAT, number, mask, ak->reason);
 
 	return 1;
 }

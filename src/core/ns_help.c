@@ -30,25 +30,25 @@ class CommandNSHelp : public Command
 		if (cmd == "SET LANGUAGE")
 		{
 			int i;
-			notice_help(s_NickServ, u, NICK_HELP_SET_LANGUAGE);
+			notice_help(Config.s_NickServ, u, NICK_HELP_SET_LANGUAGE);
 			for (i = 0; i < NUM_LANGS && langlist[i] >= 0; ++i)
-				u->SendMessage(s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
+				u->SendMessage(Config.s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
 		}
 		else
-			mod_help_cmd(s_NickServ, u, NICKSERV, cmd.c_str());
+			mod_help_cmd(Config.s_NickServ, u, NICKSERV, cmd.c_str());
 
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP);
+		notice_help(Config.s_NickServ, u, NICK_HELP);
 		FOREACH_MOD(I_OnNickServHelp, OnNickServHelp(u));
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP);
-		if (NSExpire >= 86400)
-			notice_help(s_NickServ, u, NICK_HELP_EXPIRES, NSExpire / 86400);
-		notice_help(s_NickServ, u, NICK_HELP_FOOTER);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP);
+		if (Config.NSExpire >= 86400)
+			notice_help(Config.s_NickServ, u, NICK_HELP_EXPIRES, Config.NSExpire / 86400);
+		notice_help(Config.s_NickServ, u, NICK_HELP_FOOTER);
 	}
 };
 

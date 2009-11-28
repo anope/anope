@@ -41,7 +41,7 @@ class CommandOSSZLine : public Command
 		else
 			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : SZLineExpiry;
+		expires = expiry ? dotime(expiry) : Config.SZLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -50,7 +50,7 @@ class CommandOSSZLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires != 0 && expires < 60)
 		{
-			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -68,13 +68,13 @@ class CommandOSSZLine : public Command
 
 			if (strchr(mask, '!') || strchr(mask, '@'))
 			{
-				notice_lang(s_OperServ, u, OPER_SZLINE_ONLY_IPS);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_ONLY_IPS);
 				return MOD_CONT;
 			}
 
 			if (strspn(mask, "*?") == strlen(mask))
 			{
-				notice_lang(s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
+				notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
 				return MOD_CONT;
 			}
 
@@ -82,10 +82,10 @@ class CommandOSSZLine : public Command
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
-				notice_lang(s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, deleted);
-			notice_lang(s_OperServ, u, OPER_SZLINE_ADDED, mask);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, deleted);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_ADDED, mask);
 
-			if (WallOSSZLine)
+			if (Config.WallOSSZLine)
 			{
 				char buf[128];
 
@@ -115,11 +115,11 @@ class CommandOSSZLine : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(s_OperServ, "%s added an SZLINE for %s (%s)", u->nick, mask, buf);
+				ircdproto->SendGlobops(Config.s_OperServ, "%s added an SZLINE for %s (%s)", u->nick, mask, buf);
 			}
 
 			if (readonly)
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 
 		}
 		else
@@ -143,7 +143,7 @@ class CommandOSSZLine : public Command
 
 		if (!szlines.count)
 		{
-			notice_lang(s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -153,28 +153,28 @@ class CommandOSSZLine : public Command
 			res = slist_delete_range(&szlines, mask, NULL);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 				return MOD_CONT;
 			}
 			else if (res == 1)
-				notice_lang(s_OperServ, u, OPER_SZLINE_DELETED_ONE);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_ONE);
 			else
-				notice_lang(s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, res);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, res);
 		}
 		else
 		{
 			if ((res = slist_indexof(&szlines, const_cast<char *>(mask))) == -1)
 			{
-				notice_lang(s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask);
 				return MOD_CONT;
 			}
 
 			slist_delete(&szlines, res);
-			notice_lang(s_OperServ, u, OPER_SZLINE_DELETED, mask);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED, mask);
 		}
 
 		if (readonly)
-			notice_lang(s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -186,7 +186,7 @@ class CommandOSSZLine : public Command
 
 		if (!szlines.count)
 		{
-			notice_lang(s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -197,7 +197,7 @@ class CommandOSSZLine : public Command
 			res = slist_enum(&szlines, mask, &szline_list_callback, u, &sent_header);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 				return MOD_CONT;
 			}
 		}
@@ -214,7 +214,7 @@ class CommandOSSZLine : public Command
 			}
 
 			if (!sent_header)
-				notice_lang(s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -227,7 +227,7 @@ class CommandOSSZLine : public Command
 
 		if (!szlines.count)
 		{
-			notice_lang(s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -238,7 +238,7 @@ class CommandOSSZLine : public Command
 			res = slist_enum(&szlines, mask, &szline_view_callback, u, &sent_header);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 				return MOD_CONT;
 			}
 		}
@@ -255,7 +255,7 @@ class CommandOSSZLine : public Command
 			}
 
 			if (!sent_header)
-				notice_lang(s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -264,7 +264,7 @@ class CommandOSSZLine : public Command
 	CommandReturn DoClear(User *u)
 	{
 		slist_clear(&szlines, 1);
-		notice_lang(s_OperServ, u, OPER_SZLINE_CLEAR);
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -294,13 +294,13 @@ class CommandOSSZLine : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_SZLINE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_SZLINE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
 	}
 };
 
@@ -322,7 +322,7 @@ class OSSZLine : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SZLINE);
 	}
 };
 
@@ -336,14 +336,14 @@ int szline_view(int number, SXLine *sx, User *u, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
 		*sent_header = 1;
 	}
 
 	tm = *localtime(&sx->seton);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 	expire_left(u->nc, expirebuf, sizeof(expirebuf), sx->expires);
-	notice_lang(s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
+	notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
 
 	return 1;
 }
@@ -374,11 +374,11 @@ int szline_list(int number, SXLine *sx, User *u, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_OperServ, u, OPER_SZLINE_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
 		*sent_header = 1;
 	}
 
-	notice_lang(s_OperServ, u, OPER_SZLINE_LIST_FORMAT, number, sx->mask, sx->reason);
+	notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_FORMAT, number, sx->mask, sx->reason);
 
 	return 1;
 }

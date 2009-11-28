@@ -41,7 +41,7 @@ class CommandOSSQLine : public Command
 		else
 			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : SQLineExpiry;
+		expires = expiry ? dotime(expiry) : Config.SQLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -50,7 +50,7 @@ class CommandOSSQLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires != 0 && expires < 60)
 		{
-			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -67,14 +67,14 @@ class CommandOSSQLine : public Command
 			/* We first do some sanity check on the proposed mask. */
 			if (strspn(mask, "*") == strlen(mask))
 			{
-				notice_lang(s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
+				notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
 				return MOD_CONT;
 			}
 
 			/* Channel SQLINEs are only supported on Bahamut servers */
 			if (*mask == '#' && !ircd->chansqline)
 			{
-				notice_lang(s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
 				return MOD_CONT;
 			}
 
@@ -82,10 +82,10 @@ class CommandOSSQLine : public Command
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
-				notice_lang(s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, deleted);
-			notice_lang(s_OperServ, u, OPER_SQLINE_ADDED, mask);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, deleted);
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_ADDED, mask);
 
-			if (WallOSSQLine)
+			if (Config.WallOSSQLine)
 			{
 				char buf[128];
 
@@ -115,11 +115,11 @@ class CommandOSSQLine : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(s_OperServ, "%s added an SQLINE for %s (%s)", u->nick, mask, buf);
+				ircdproto->SendGlobops(Config.s_OperServ, "%s added an SQLINE for %s (%s)", u->nick, mask, buf);
 			}
 
 			if (readonly)
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 
 		}
 		else
@@ -143,7 +143,7 @@ class CommandOSSQLine : public Command
 
 		if (!sqlines.count)
 		{
-			notice_lang(s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -153,27 +153,27 @@ class CommandOSSQLine : public Command
 			res = slist_delete_range(&sqlines, mask, NULL);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_SQLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 				return MOD_CONT;
 			}
 			else if (res == 1)
-				notice_lang(s_OperServ, u, OPER_SQLINE_DELETED_ONE);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_ONE);
 			else
-				notice_lang(s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, res);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, res);
 		}
 		else {
 			if ((res = slist_indexof(&sqlines, const_cast<char *>(mask))) == -1)
 			{
-				notice_lang(s_OperServ, u, OPER_SQLINE_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NOT_FOUND, mask);
 				return MOD_CONT;
 			}
 
 			slist_delete(&sqlines, res);
-			notice_lang(s_OperServ, u, OPER_SQLINE_DELETED, mask);
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED, mask);
 		}
 
 		if (readonly)
-			notice_lang(s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -185,7 +185,7 @@ class CommandOSSQLine : public Command
 
 		if (!sqlines.count)
 		{
-			notice_lang(s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -196,7 +196,7 @@ class CommandOSSQLine : public Command
 			res = slist_enum(&sqlines, mask, &sqline_list_callback, u, &sent_header);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_SQLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 				return MOD_CONT;
 			}
 		}
@@ -213,9 +213,9 @@ class CommandOSSQLine : public Command
 			}
 
 			if (!sent_header)
-				notice_lang(s_OperServ, u, OPER_SQLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 			else
-				notice_lang(s_OperServ, u, END_OF_ANY_LIST, "SQLine");
+				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "SQLine");
 		}
 
 		return MOD_CONT;
@@ -228,7 +228,7 @@ class CommandOSSQLine : public Command
 
 		if (!sqlines.count)
 		{
-			notice_lang(s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -239,7 +239,7 @@ class CommandOSSQLine : public Command
 			res = slist_enum(&sqlines, mask, &sqline_view_callback, u, &sent_header);
 			if (!res)
 			{
-				notice_lang(s_OperServ, u, OPER_SQLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 				return MOD_CONT;
 			}
 		}
@@ -256,7 +256,7 @@ class CommandOSSQLine : public Command
 			}
 
 			if (!sent_header)
-				notice_lang(s_OperServ, u, OPER_SQLINE_NO_MATCH);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -265,7 +265,7 @@ class CommandOSSQLine : public Command
 	CommandReturn DoClear(User *u)
 	{
 		slist_clear(&sqlines, 1);
-		notice_lang(s_OperServ, u, OPER_SQLINE_CLEAR);
+		notice_lang(Config.s_OperServ, u, OPER_SQLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -295,13 +295,13 @@ class CommandOSSQLine : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_SQLINE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_SQLINE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "SQLINE", OPER_SQLINE_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "SQLINE", OPER_SQLINE_SYNTAX);
 	}
 };
 
@@ -323,7 +323,7 @@ class OSSQLine : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SQLINE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SQLINE);
 	}
 };
 
@@ -337,14 +337,14 @@ int sqline_view(int number, SXLine *sx, User *u, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_OperServ, u, OPER_SQLINE_VIEW_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_HEADER);
 		*sent_header = 1;
 	}
 
 	tm = *localtime(&sx->seton);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 	expire_left(u->nc, expirebuf, sizeof(expirebuf), sx->expires);
-	notice_lang(s_OperServ, u, OPER_SQLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
+	notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
 
 	return 1;
 }
@@ -366,11 +366,11 @@ int sqline_list(int number, SXLine *sx, User *u, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(s_OperServ, u, OPER_SQLINE_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_HEADER);
 		*sent_header = 1;
 	}
 
-	notice_lang(s_OperServ, u, OPER_SQLINE_LIST_FORMAT, number, sx->mask, sx->reason);
+	notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_FORMAT, number, sx->mask, sx->reason);
 
 	return 1;
 }

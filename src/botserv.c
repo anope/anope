@@ -34,7 +34,7 @@ E void moduleAddBotServCmds();
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddBotServCmds() {
-	ModuleManager::LoadModuleList(BotServCoreModules);
+	ModuleManager::LoadModuleList(Config.BotServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/
@@ -70,7 +70,7 @@ void get_botserv_stats(long *nrec, long *memuse)
 
 void bs_init()
 {
-	if (s_BotServ) {
+	if (Config.s_BotServ) {
 		moduleAddBotServCmds();
 	}
 }
@@ -91,9 +91,9 @@ void botserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(findbot(s_BotServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_BotServ), u->nick, "PING %s", s);
 	} else {
-		mod_run_cmd(s_BotServ, u, BOTSERV, cmd);
+		mod_run_cmd(Config.s_BotServ, u, BOTSERV, cmd);
 	}
 
 }
@@ -244,21 +244,21 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 				bw = ci->GetBadWord(i);
 
 				if (bw->type == BW_ANY
-					&& ((BSCaseSensitive && strstr(nbuf, bw->word.c_str()))
-						|| (!BSCaseSensitive && stristr(nbuf, bw->word.c_str())))) {
+					&& ((Config.BSCaseSensitive && strstr(nbuf, bw->word.c_str()))
+						|| (!Config.BSCaseSensitive && stristr(nbuf, bw->word.c_str())))) {
 					mustkick = 1;
 				} else if (bw->type == BW_SINGLE) {
 					int len = bw->word.length();
 
-					if ((BSCaseSensitive && nbuf == bw->word)
-						|| (!BSCaseSensitive
+					if ((Config.BSCaseSensitive && nbuf == bw->word)
+						|| (!Config.BSCaseSensitive
 							&& (!stricmp(nbuf, bw->word.c_str())))) {
 						mustkick = 1;
 						/* two next if are quite odd isn't it? =) */
 					} else if ((strchr(nbuf, ' ') == nbuf + len)
 							   &&
-							   ((BSCaseSensitive && nbuf == bw->word)
-								|| (!BSCaseSensitive
+							   ((Config.BSCaseSensitive && nbuf == bw->word)
+								|| (!Config.BSCaseSensitive
 									&& (stristr(nbuf, bw->word.c_str()) ==
 										nbuf)))) {
 						mustkick = 1;
@@ -266,10 +266,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						if ((strrchr(nbuf, ' ') ==
 							 nbuf + strlen(nbuf) - len - 1)
 							&&
-							((BSCaseSensitive
+							((Config.BSCaseSensitive
 							  && (strstr(nbuf, bw->word.c_str()) ==
 								  nbuf + strlen(nbuf) - len))
-							 || (!BSCaseSensitive
+							 || (!Config.BSCaseSensitive
 								 && (stristr(nbuf, bw->word.c_str()) ==
 									 nbuf + strlen(nbuf) - len)))) {
 							mustkick = 1;
@@ -281,9 +281,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							wordbuf[len + 2] = '\0';
 							memcpy(wordbuf + 1, bw->word.c_str(), len);
 
-							if ((BSCaseSensitive
+							if ((Config.BSCaseSensitive
 								 && (strstr(nbuf, wordbuf)))
-								|| (!BSCaseSensitive
+								|| (!Config.BSCaseSensitive
 									&& (stristr(nbuf, wordbuf)))) {
 								mustkick = 1;
 							}
@@ -295,9 +295,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 				} else if (bw->type == BW_START) {
 					int len = bw->word.length();
 
-					if ((BSCaseSensitive
+					if ((Config.BSCaseSensitive
 						 && (!strncmp(nbuf, bw->word.c_str(), len)))
-						|| (!BSCaseSensitive
+						|| (!Config.BSCaseSensitive
 							&& (!strnicmp(nbuf, bw->word.c_str(), len)))) {
 						mustkick = 1;
 					} else {
@@ -307,8 +307,8 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						wordbuf[0] = ' ';
 						wordbuf[len + 1] = '\0';
 
-						if ((BSCaseSensitive && (strstr(nbuf, wordbuf)))
-							|| (!BSCaseSensitive
+						if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf)))
+							|| (!Config.BSCaseSensitive
 								&& (stristr(nbuf, wordbuf))))
 							mustkick = 1;
 
@@ -317,11 +317,11 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 				} else if (bw->type == BW_END) {
 					int len = bw->word.length();
 
-					if ((BSCaseSensitive
+					if ((Config.BSCaseSensitive
 						 &&
 						 (!strncmp
 						  (nbuf + strlen(nbuf) - len, bw->word.c_str(), len)))
-						|| (!BSCaseSensitive
+						|| (!Config.BSCaseSensitive
 							&&
 							(!strnicmp
 							 (nbuf + strlen(nbuf) - len, bw->word.c_str(),
@@ -334,8 +334,8 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						wordbuf[len] = ' ';
 						wordbuf[len + 1] = '\0';
 
-						if ((BSCaseSensitive && (strstr(nbuf, wordbuf)))
-							|| (!BSCaseSensitive
+						if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf)))
+							|| (!Config.BSCaseSensitive
 								&& (stristr(nbuf, wordbuf))))
 							mustkick = 1;
 
@@ -345,7 +345,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 				if (mustkick) {
 					check_ban(ci, u, TTB_BADWORDS);
-					if (BSGentleBWReason)
+					if (Config.BSGentleBWReason)
 						bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
 					else
 						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word.c_str());
@@ -415,10 +415,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 	/* Fantaisist commands */
 
-	if (buf && ci->botflags.HasFlag(BS_FANTASY) && *buf == *BSFantasyCharacter && !was_action) {
+	if (buf && ci->botflags.HasFlag(BS_FANTASY) && *buf == *Config.BSFantasyCharacter && !was_action) {
 		cmd = strtok(buf, " ");
 
-		if (cmd && (cmd[0] == *BSFantasyCharacter)) {
+		if (cmd && (cmd[0] == *Config.BSFantasyCharacter)) {
 			char *params = strtok(NULL, "");
 
 			/* Strip off the fantasy character */
@@ -467,7 +467,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 #define SAFE(x) do {					\
 	if ((x) < 0) {					\
 	if (!forceload)					\
-		fatal("Read error on %s", BotDBName);	\
+		fatal("Read error on %s", Config.BotDBName);	\
 	failed = 1;					\
 	break;						\
 	}							\
@@ -482,7 +482,7 @@ void load_bs_dbase()
 	BotInfo *bi;
 	int failed = 0;
 
-	if (!(f = open_db(s_BotServ, BotDBName, "r", BOT_VERSION)))
+	if (!(f = open_db(Config.s_BotServ, Config.BotDBName, "r", BOT_VERSION)))
 		return;
 
 	ver = get_file_version(f);
@@ -491,7 +491,7 @@ void load_bs_dbase()
 		char *s;
 
 		if (c != 1)
-			fatal("Invalid format in %s %d", BotDBName, c);
+			fatal("Invalid format in %s %d", Config.BotDBName, c);
 
 		SAFE(read_string(&s, f));
 		bi = new BotInfo(s);
@@ -512,20 +512,20 @@ void load_bs_dbase()
 		 * changed in the config and different from database
 		 * names
 		 */
-		if (s_ChanServ && bi->HasFlag(BI_CHANSERV) && strcmp(bi->nick, s_ChanServ))
-			bi->ChangeNick(s_ChanServ);
-		else if (s_BotServ && bi->HasFlag(BI_BOTSERV) && strcmp(bi->nick, s_BotServ))
-			bi->ChangeNick(s_BotServ);
-		else if (s_HostServ && bi->HasFlag(BI_HOSTSERV) && strcmp(bi->nick, s_HostServ))
-			bi->ChangeNick(s_HostServ);
-		else if (s_OperServ && bi->HasFlag(BI_OPERSERV) && strcmp(bi->nick, s_OperServ))
-			bi->ChangeNick(s_OperServ);
-		else if (s_MemoServ && bi->HasFlag(BI_MEMOSERV) && strcmp(bi->nick, s_MemoServ))
-			bi->ChangeNick(s_MemoServ);
-		else if (s_NickServ && bi->HasFlag(BI_NICKSERV) && strcmp(bi->nick, s_NickServ))
-			bi->ChangeNick(s_NickServ);
-		else if (s_GlobalNoticer && bi->HasFlag(BI_GLOBAL) && strcmp(bi->nick, s_GlobalNoticer))
-			bi->ChangeNick(s_GlobalNoticer);
+		if (Config.s_ChanServ && bi->HasFlag(BI_CHANSERV) && strcmp(bi->nick, Config.s_ChanServ))
+			bi->ChangeNick(Config.s_ChanServ);
+		else if (Config.s_BotServ && bi->HasFlag(BI_BOTSERV) && strcmp(bi->nick, Config.s_BotServ))
+			bi->ChangeNick(Config.s_BotServ);
+		else if (Config.s_HostServ && bi->HasFlag(BI_HOSTSERV) && strcmp(bi->nick, Config.s_HostServ))
+			bi->ChangeNick(Config.s_HostServ);
+		else if (Config.s_OperServ && bi->HasFlag(BI_OPERSERV) && strcmp(bi->nick, Config.s_OperServ))
+			bi->ChangeNick(Config.s_OperServ);
+		else if (Config.s_MemoServ && bi->HasFlag(BI_MEMOSERV) && strcmp(bi->nick, Config.s_MemoServ))
+			bi->ChangeNick(Config.s_MemoServ);
+		else if (Config.s_NickServ && bi->HasFlag(BI_NICKSERV) && strcmp(bi->nick, Config.s_NickServ))
+			bi->ChangeNick(Config.s_NickServ);
+		else if (Config.s_GlobalNoticer && bi->HasFlag(BI_GLOBAL) && strcmp(bi->nick, Config.s_GlobalNoticer))
+			bi->ChangeNick(Config.s_GlobalNoticer);
 	}
 
 	close_db(f);
@@ -538,9 +538,9 @@ void load_bs_dbase()
 #define SAFE(x) do {						\
 	if ((x) < 0) {						\
 	restore_db(f);						\
-	log_perror("Write error on %s", BotDBName);		\
-	if (time(NULL) - lastwarn > WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", BotDBName,	\
+	log_perror("Write error on %s", Config.BotDBName);		\
+	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.BotDBName,	\
 			strerror(errno));			\
 		lastwarn = time(NULL);				\
 	}							\
@@ -555,7 +555,7 @@ void save_bs_dbase()
 	static time_t lastwarn = 0;
 	int i;
 
-	if (!(f = open_db(s_BotServ, BotDBName, "w", BOT_VERSION)))
+	if (!(f = open_db(Config.s_BotServ, Config.BotDBName, "w", BOT_VERSION)))
 		return;
 
 	for (i = 0; i < 256; i++) {
@@ -647,7 +647,7 @@ static BanData *get_ban_data(Channel * c, User * u)
 			 u->GetDisplayedHost().c_str());
 
 	for (bd = c->bd; bd; bd = next) {
-		if (now - bd->last_use > BSKeepData) {
+		if (now - bd->last_use > Config.BSKeepData) {
 			if (bd->next)
 				bd->next->prev = bd->prev;
 			if (bd->prev)
@@ -702,7 +702,7 @@ static UserData *get_user_data(Channel * c, User * u)
 				time_t now = time(NULL);
 
 				/* Checks whether data is obsolete */
-				if (now - user->ud->last_use > BSKeepData) {
+				if (now - user->ud->last_use > Config.BSKeepData) {
 					if (user->ud->lastline)
 						delete [] user->ud->lastline;
 					/* We should not free and realloc, but reset to 0
@@ -736,7 +736,7 @@ void bot_join(ChannelInfo * ci)
 	if (!ci || !ci->c || !ci->bi)
 		return;
 
-	if (BSSmartJoin) {
+	if (Config.BSSmartJoin) {
 		/* We check for bans */
 		if (ci->c->bans && ci->c->bans->count) {
 			char buf[BUFSIZE];

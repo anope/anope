@@ -52,23 +52,23 @@ class CommandHSGroup : public Command
 
 			do_hs_sync(u->nc, vIdent, vHost, creator, time);
 			if (tmp->vIdent)
-				notice_lang(s_HostServ, u, HOST_IDENT_GROUP, u->nc->display, vIdent, vHost);
+				notice_lang(Config.s_HostServ, u, HOST_IDENT_GROUP, u->nc->display, vIdent, vHost);
 			else
-				notice_lang(s_HostServ, u, HOST_GROUP, u->nc->display, vHost);
+				notice_lang(Config.s_HostServ, u, HOST_GROUP, u->nc->display, vHost);
 			delete [] vHost;
 			if (vIdent)
 				delete [] vIdent;
 			delete [] creator;
 		}
 		else
-			notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_GROUP);
+		notice_help(Config.s_HostServ, u, HOST_HELP_GROUP);
 		return true;
 	}
 };
@@ -88,7 +88,7 @@ class HSGroup : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_GROUP);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_GROUP);
 	}
 };
 

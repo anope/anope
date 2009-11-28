@@ -38,13 +38,13 @@ class CommandNSUpdate : public Command
 		na->last_seen = time(NULL);
 		if (ircd->vhost)
 			do_on_id(u);
-		notice_lang(s_NickServ, u, NICK_UPDATE_SUCCESS, s_NickServ);
+		notice_lang(Config.s_NickServ, u, NICK_UPDATE_SUCCESS, Config.s_NickServ);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_UPDATE);
+		notice_help(Config.s_NickServ, u, NICK_HELP_UPDATE);
 		return true;
 	}
 };
@@ -62,7 +62,7 @@ class NSUpdate : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_UPDATE);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UPDATE);
 	}
 };
 

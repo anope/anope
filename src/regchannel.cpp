@@ -44,16 +44,16 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	size_t t;
 	/* Set default channel flags */
 	for (t = CI_BEGIN + 1; t != CI_END; ++t)
-		if (CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
+		if (Config.CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
 			this->SetFlag(static_cast<ChannelInfoFlag>(t));
 
 	/* Set default bot flags */
 	for (t = BI_BEGIN + 1; t != BI_END; ++t)
-		if (BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
+		if (Config.BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
 			this->botflags.SetFlag(static_cast<BotServFlag>(t));
 
-	bantype = CSDefBantype;
-	memos.memomax = MSMaxMemos;
+	bantype = Config.CSDefBantype;
+	memos.memomax = Config.MSMaxMemos;
 	last_used = time_registered = time(NULL);
 
 	this->ttb = new int16[2 * TTB_SIZE];
@@ -86,7 +86,7 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->c)
 	{
-		if (this->bi && this->c->usercount >= BSMinUsers)
+		if (this->bi && this->c->usercount >= Config.BSMinUsers)
 			ircdproto->SendPart(this->bi, this->c->name, NULL);
 		this->c->ci = NULL;
 	}

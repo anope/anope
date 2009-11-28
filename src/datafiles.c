@@ -84,7 +84,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 	f = new dbFILE;
 	if (!f) {
 		log_perror("Can't read %s database %s", service, filename);
-		if (time(NULL) - lastwarn > WarningTimeout) {
+		if (time(NULL) - lastwarn > Config.WarningTimeout) {
 			ircdproto->SendGlobops(NULL,
 							 "Write error on %s: Memory allocation failed",
 							 filename);
@@ -100,7 +100,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 		if (errno != ENOENT)
 			log_perror("Can not read %s database %s", service,
 					   f->filename);
-		if (time(NULL) - lastwarn > WarningTimeout) {
+		if (time(NULL) - lastwarn > Config.WarningTimeout) {
 			ircdproto->SendGlobops(NULL, "Write error on %s: %s", f->filename,
 							 strerror(errno));
 			lastwarn = time(NULL);
@@ -201,7 +201,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #endif
 		errno = errno_save;
 		log_perror("Can not back up %s database %s", service, filename);
-		if (!NoBackupOkay) {
+		if (!Config.NoBackupOkay) {
 			if (f->backupfp)
 				fclose(f->backupfp);
 			delete f;
@@ -560,7 +560,7 @@ static void rename_database(const char *name, char *ext)
 	snprintf(destpath, sizeof(destpath), "backups/%s.%s", name, ext);
 	if (rename(name, destpath) != 0) {
 		alog("Backup of %s failed.", name);
-		ircdproto->SendGlobops(s_OperServ, "WARNING! Backup of %s failed.",
+		ircdproto->SendGlobops(Config.s_OperServ, "WARNING! Backup of %s failed.",
 						 name);
 	}
 }
@@ -582,59 +582,59 @@ static void remove_backups()
 	struct tm tm;
 
 	time(&t);
-	t -= (60 * 60 * 24 * KeepBackups);
+	t -= (60 * 60 * 24 * Config.KeepBackups);
 	tm = *localtime(&t);
 	strftime(ext, sizeof(ext), "%Y%m%d", &tm);
 
-	snprintf(path, sizeof(path), "backups/%s.%s", NickDBName, ext);
+	snprintf(path, sizeof(path), "backups/%s.%s", Config.NickDBName, ext);
 #ifndef _WIN32
 	unlink(path);
 #else
 	DeleteFile(path);
 #endif
-	snprintf(path, sizeof(path), "backups/%s.%s", ChanDBName, ext);
+	snprintf(path, sizeof(path), "backups/%s.%s", Config.ChanDBName, ext);
 #ifndef _WIN32
 	unlink(path);
 #else
 	DeleteFile(path);
 #endif
-	snprintf(path, sizeof(path), "backups/%s.%s", OperDBName, ext);
+	snprintf(path, sizeof(path), "backups/%s.%s", Config.OperDBName, ext);
 #ifndef _WIN32
 	unlink(path);
 #else
 	DeleteFile(path);
 #endif
-	snprintf(path, sizeof(path), "backups/%s.%s", NewsDBName, ext);
+	snprintf(path, sizeof(path), "backups/%s.%s", Config.NewsDBName, ext);
 #ifndef _WIN32
 	unlink(path);
 #else
 	DeleteFile(path);
 #endif
-	snprintf(path, sizeof(path), "backups/%s.%s", ExceptionDBName, ext);
+	snprintf(path, sizeof(path), "backups/%s.%s", Config.ExceptionDBName, ext);
 #ifndef _WIN32
 	unlink(path);
 #else
 	DeleteFile(path);
 #endif
 
-	if (s_BotServ) {
-		snprintf(path, sizeof(path), "backups/%s.%s", BotDBName, ext);
+	if (Config.s_BotServ) {
+		snprintf(path, sizeof(path), "backups/%s.%s", Config.BotDBName, ext);
 #ifndef _WIN32
 		unlink(path);
 #else
 		DeleteFile(path);
 #endif
 	}
-	if (s_HostServ) {
-		snprintf(path, sizeof(path), "backups/%s.%s", HostDBName, ext);
+	if (Config.s_HostServ) {
+		snprintf(path, sizeof(path), "backups/%s.%s", Config.HostDBName, ext);
 #ifndef _WIN32
 		unlink(path);
 #else
 		DeleteFile(path);
 #endif
 	}
-	if (NSEmailReg) {
-		snprintf(path, sizeof(path), "backups/%s.%s", PreNickDBName, ext);
+	if (Config.NSEmailReg) {
+		snprintf(path, sizeof(path), "backups/%s.%s", Config.PreNickDBName, ext);
 #ifndef _WIN32
 		unlink(path);
 #else
@@ -656,7 +656,7 @@ void backup_databases()
 	time_t t;
 	struct tm tm;
 
-	if (!KeepBackups) {
+	if (!Config.KeepBackups) {
 		return;
 	}
 
@@ -681,21 +681,21 @@ void backup_databases()
 		curday = tm.tm_yday;
 		strftime(ext, sizeof(ext), "%Y%m%d", &tm);
 
-		rename_database(NickDBName, ext);
-		if (s_BotServ) {
-			rename_database(BotDBName, ext);
+		rename_database(Config.NickDBName, ext);
+		if (Config.s_BotServ) {
+			rename_database(Config.BotDBName, ext);
 		}
-		rename_database(ChanDBName, ext);
-		if (s_HostServ) {
-			rename_database(HostDBName, ext);
+		rename_database(Config.ChanDBName, ext);
+		if (Config.s_HostServ) {
+			rename_database(Config.HostDBName, ext);
 		}
-		if (NSEmailReg) {
-			rename_database(PreNickDBName, ext);
+		if (Config.NSEmailReg) {
+			rename_database(Config.PreNickDBName, ext);
 		}
 
-		rename_database(OperDBName, ext);
-		rename_database(NewsDBName, ext);
-		rename_database(ExceptionDBName, ext);
+		rename_database(Config.OperDBName, ext);
+		rename_database(Config.NewsDBName, ext);
+		rename_database(Config.ExceptionDBName, ext);
 	}
 }
 
@@ -707,7 +707,7 @@ void ModuleDatabaseBackup(const char *dbname)
 	time_t t;
 	struct tm tm;
 
-	if (!KeepBackups) {
+	if (!Config.KeepBackups) {
 		return;
 	}
 
@@ -744,7 +744,7 @@ void ModuleRemoveBackups(const char *dbname)
 	struct tm tm;
 
 	time(&t);
-	t -= (60 * 60 * 24 * KeepBackups);
+	t -= (60 * 60 * 24 * Config.KeepBackups);
 	tm = *localtime(&t);
 	strftime(ext, sizeof(ext), "%Y%m%d", &tm);
 

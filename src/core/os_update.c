@@ -24,14 +24,14 @@ class CommandOSUpdate : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		notice_lang(s_OperServ, u, OPER_UPDATING);
+		notice_lang(Config.s_OperServ, u, OPER_UPDATING);
 		save_data = 1;
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_UPDATE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_UPDATE);
 		return true;
 	}
 };
@@ -51,7 +51,7 @@ class OSUpdate : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_UPDATE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_UPDATE);
 	}
 };
 

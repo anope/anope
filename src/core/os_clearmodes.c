@@ -34,12 +34,12 @@ class CommandOSClearModes : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
 		{
-			notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 			return MOD_CONT;
 		}
 		else
@@ -54,8 +54,8 @@ class CommandOSClearModes : public Command
 				}
 			}
 
-			if (WallOSClearmodes)
-				ircdproto->SendGlobops(s_OperServ, "%s used CLEARMODES%s on %s", u->nick, all ? " ALL" : "", chan);
+			if (Config.WallOSClearmodes)
+				ircdproto->SendGlobops(Config.s_OperServ, "%s used CLEARMODES%s on %s", u->nick, all ? " ALL" : "", chan);
 			if (all)
 			{
 				/* Clear mode +o */
@@ -69,8 +69,8 @@ class CommandOSClearModes : public Command
 					argv[0] = "-o";
 					argv[1] = cu->user->nick;
 					if (!ircd->svsmode_ucmode)
-						ircdproto->SendMode(findbot(s_OperServ), c->name, "-o %s", cu->user->nick);
-					chan_set_modes(s_OperServ, c, 2, argv, 0);
+						ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-o %s", cu->user->nick);
+					chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
 				}
 
 				/* Clear mode +v */
@@ -84,8 +84,8 @@ class CommandOSClearModes : public Command
 					argv[0] = "-v";
 					argv[1] = cu->user->nick;
 					if (!ircd->svsmode_ucmode)
-						ircdproto->SendMode(findbot(s_OperServ), c->name, "-v %s", cu->user->nick);
-					chan_set_modes(s_OperServ, c, 2, argv, 0);
+						ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-v %s", cu->user->nick);
+					chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
 				}
 
 				/* Clear mode +h */
@@ -101,8 +101,8 @@ class CommandOSClearModes : public Command
 						argv[0] = "-h";
 						argv[1] = cu->user->nick;
 						if (!ircd->svsmode_ucmode)
-							ircdproto->SendMode(findbot(s_OperServ), c->name, "-h %s", cu->user->nick);
-						chan_set_modes(s_OperServ, c, 2, argv, 0);
+							ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-h %s", cu->user->nick);
+						chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
 					}
 				}
 
@@ -122,8 +122,8 @@ class CommandOSClearModes : public Command
 						argv[0] = buf.c_str();
 						argv[1] = cu->user->nick;
 						if (!ircd->svsmode_ucmode)
-							ircdproto->SendMode(findbot(s_OperServ), c->name, "%s %s", buf.c_str(), cu->user->nick);
-						chan_set_modes(s_OperServ, c, 2, argv, 0);
+							ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s %s", buf.c_str(), cu->user->nick);
+						chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
 					}
 				}
 
@@ -143,37 +143,37 @@ class CommandOSClearModes : public Command
 						argv[0] = buf.c_str();
 						argv[1] = cu->user->nick;
 						if (!ircd->svsmode_ucmode)
-							ircdproto->SendMode(findbot(s_OperServ), c->name, "%s %s", buf.c_str(), cu->user->nick);
-						chan_set_modes(s_OperServ, c, 2, argv, 0);
+							ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s %s", buf.c_str(), cu->user->nick);
+						chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
 					}
 				}
 			}
 
 
-			c->ClearModes(s_OperServ);
+			c->ClearModes(Config.s_OperServ);
 
-			c->ClearBans(s_OperServ);
-			c->ClearExcepts(s_OperServ);
-			c->ClearInvites(s_OperServ);
+			c->ClearBans(Config.s_OperServ);
+			c->ClearExcepts(Config.s_OperServ);
+			c->ClearInvites(Config.s_OperServ);
 		}
 
 		if (all)
-			notice_lang(s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);
+			notice_lang(Config.s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);
 		else
-			notice_lang(s_OperServ, u, OPER_CLEARMODES_DONE, chan);
+			notice_lang(Config.s_OperServ, u, OPER_CLEARMODES_DONE, chan);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_CLEARMODES);
+		notice_help(Config.s_OperServ, u, OPER_HELP_CLEARMODES);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
 	}
 };
 
@@ -192,7 +192,7 @@ class OSClearModes : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
 	}
 };
 

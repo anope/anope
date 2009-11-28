@@ -32,29 +32,29 @@ class CommandCSGetKey : public Command
 
 		if (!check_access(u, ci, CA_GETKEY) && !u->nc->HasCommand("chanserv/getkey"))
 		{
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->GetParam(CMODE_KEY, &key))
 		{
-			notice_lang(s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_ChanServ, u, CHAN_GETKEY_KEY, chan, key.c_str());
+		notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_KEY, chan, key.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_GETKEY);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_GETKEY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "GETKEY", CHAN_GETKEY_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "GETKEY", CHAN_GETKEY_SYNTAX);
 	}
 };
 
@@ -73,7 +73,7 @@ class CSGetKey : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
 	}
 };
 

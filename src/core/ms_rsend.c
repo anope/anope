@@ -34,33 +34,33 @@ class CommandMSRSend : public Command
 		{
 			if (na->nc == u->nc)
 			{
-				notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
+				notice_lang(Config.s_MemoServ, u, MEMO_NO_RSEND_SELF);
 				return MOD_CONT;
 			}
 			else
 			{
-				notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, nick);
+				notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, nick);
 				return MOD_CONT;
 			}
 		}
 
-		if (MSMemoReceipt == 1)
+		if (Config.MSMemoReceipt == 1)
 		{
 			/* Services opers and above can use rsend */
 			if (u->nc->IsServicesOper())
 				memo_send(u, nick, text, z);
 			else
-				notice_lang(s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 		}
-		else if (MSMemoReceipt == 2)
+		else if (Config.MSMemoReceipt == 2)
 			/* Everybody can use rsend */
 			memo_send(u, nick, text, z);
 		else
 		{
 			/* rsend has been disabled */
 			if (debug)
-				alog("debug: MSMemoReceipt is set misconfigured to %d", MSMemoReceipt);
-			notice_lang(s_MemoServ, u, MEMO_RSEND_DISABLED);
+				alog("debug: MSMemoReceipt is set misconfigured to %d", Config.MSMemoReceipt);
+			notice_lang(Config.s_MemoServ, u, MEMO_RSEND_DISABLED);
 		}
 
 		return MOD_CONT;
@@ -68,13 +68,13 @@ class CommandMSRSend : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_RSEND);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_RSEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 	}
 };
 
@@ -88,14 +88,14 @@ class MSRSend : public Module
 		this->SetType(CORE);
 		this->AddCommand(MEMOSERV, new CommandMSRSend());
 
-		if (!MSMemoReceipt)
+		if (!Config.MSMemoReceipt)
 			throw ModuleException("Don't like memo reciepts, or something.");
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_RSEND);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_RSEND);
 	}
 };
 

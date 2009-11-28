@@ -161,7 +161,7 @@ void lang_sanitize()
 			if (strstr(langtexts[i][j], "%R")) {
 				len = strlen(langtexts[i][j]);
 				strscpy(tmp, langtexts[i][j], sizeof(tmp));
-				if (UseStrictPrivMsg) {
+				if (Config.UseStrictPrivMsg) {
 					strnrepl(tmp, sizeof(tmp), "%R", "/");
 				} else {
 					strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
@@ -215,8 +215,8 @@ void lang_init()
 
 	/* Not what I intended to do, but these services are so archaïc
 	 * that it's difficult to do more. */
-	if ((NSDefLanguage = langlist[NSDefLanguage]) < 0)
-		NSDefLanguage = DEF_LANGUAGE;
+	if ((Config.NSDefLanguage = langlist[Config.NSDefLanguage]) < 0)
+		Config.NSDefLanguage = DEF_LANGUAGE;
 
 	if (!langtexts[DEF_LANGUAGE])
 		fatal("Unable to load default language");
@@ -240,7 +240,7 @@ void lang_init()
 
 int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
 {
-	int language = u && u->nc ? u->nc->language : NSDefLanguage;
+	int language = u && u->nc ? u->nc->language : Config.NSDefLanguage;
 	char tmpbuf[BUFSIZE], buf2[BUFSIZE];
 	char *s;
 	int i, ret;
@@ -309,7 +309,7 @@ void syntax_error(char *service, User * u, const char *command, int msgnum)
 const char *getstring(NickAlias *na, int index)
 {
 	// Default to config
-	int langidx = NSDefLanguage;
+	int langidx = Config.NSDefLanguage;
 
 	// If they are registered (na->nc), and NOT forbidden
 	if (na && na->nc && !na->HasFlag(NS_FORBIDDEN))
@@ -321,7 +321,7 @@ const char *getstring(NickAlias *na, int index)
 const char *getstring(NickCore *nc, int index)
 {
 	// Default to config
-	int langidx = NSDefLanguage;
+	int langidx = Config.NSDefLanguage;
 
 	if (nc)
 	{
@@ -339,7 +339,7 @@ const char *getstring(User *u, int index)
 const char *getstring(int index)
 {
 	// Default to config
-	int langidx = NSDefLanguage;
+	int langidx = Config.NSDefLanguage;
 
 	return langtexts[langidx][index];
 }

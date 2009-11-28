@@ -25,7 +25,7 @@ NickCore::NickCore(const std::string &coredisplay)
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
-		if (NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
+		if (Config.NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
 			SetFlag(static_cast<NickCoreFlag>(t));
 }
 
@@ -64,7 +64,7 @@ NickCore::~NickCore()
 		nclists[HASH(this->display)] = this->next;
 
 	/* Log .. */
-	alog("%s: deleting nickname group %s", s_NickServ, this->display);
+	alog("%s: deleting nickname group %s", Config.s_NickServ, this->display);
 
 	/* Now we can safely free it. */
 	delete [] this->display;

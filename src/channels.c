@@ -187,7 +187,7 @@ void Channel::RemoveMode(ChannelModeName Name)
 	if (Name == CMODE_PERM && ci)
 	{
 		ci->UnsetFlag(CI_PERSIST);
-		if (s_BotServ && ci->bi && usercount == BSMinUsers - 1)
+		if (Config.s_BotServ && ci->bi && usercount == Config.BSMinUsers - 1)
 			ircdproto->SendPart(ci->bi, name, NULL);
 		if (!users)
 			delete this;
@@ -440,7 +440,7 @@ void chan_deluser(User * user, Channel * c)
 	if (c->ci && c->ci->HasFlag(CI_PERSIST))
 		return;
 
-	if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1)
+	if (Config.s_BotServ && c->ci && c->ci->bi && c->usercount == Config.BSMinUsers - 1)
 		ircdproto->SendPart(c->ci->bi, c->name, NULL);
 
 	if (!c->users)
@@ -766,8 +766,8 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 		alog("debug: setting user status (%d) on %s for %s", status,
 			 user->nick, chan->name);
 
-	if (HelpChannel && ((um = ModeManager::FindUserModeByName(UMODE_HELPOP))) && (status & CUS_OP)
-		&& (stricmp(chan->name, HelpChannel) == 0)
+	if (Config.HelpChannel && ((um = ModeManager::FindUserModeByName(UMODE_HELPOP))) && (status & CUS_OP)
+		&& (stricmp(chan->name, Config.HelpChannel) == 0)
 		&& (!chan->ci || check_access(user, chan->ci, CA_AUTOOP))) {
 		if (debug) {
 			alog("debug: %s being given helpop for having %d status in %s",
@@ -1044,7 +1044,7 @@ void do_kick(const char *source, int ac, const char **av)
 		 * channel and stop immediately.
 		 *	  --lara
 		 */
-		if (s_BotServ && (bi = findbot(s)) && (ci = cs_findchan(av[0]))) {
+		if (Config.s_BotServ && (bi = findbot(s)) && (ci = cs_findchan(av[0]))) {
 			bot_join(ci);
 			continue;
 		}
@@ -1329,7 +1329,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 
 			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
+				ircdproto->SendKick(findbot(Config.s_OperServ), av[1], s, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
@@ -1415,7 +1415,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 
 			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
+				ircdproto->SendKick(findbot(Config.s_OperServ), av[1], s, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
@@ -1491,7 +1491,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 
 			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
+				ircdproto->SendKick(findbot(Config.s_OperServ), av[1], s, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
@@ -1550,7 +1550,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 		}
 
 		if (is_sqlined && !is_oper(user)) {
-			ircdproto->SendKick(findbot(s_OperServ), av[1], user->nick, "Q-Lined");
+			ircdproto->SendKick(findbot(Config.s_OperServ), av[1], user->nick, "Q-Lined");
 		} else {
 			FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
@@ -1910,10 +1910,10 @@ void chan_adduser2(User * user, Channel * c)
 		if (c->ci && (check_access(user, c->ci, CA_MEMO))
 			&& (c->ci->memos.memos.size() > 0)) {
 			if (c->ci->memos.memos.size() == 1) {
-				notice_lang(s_MemoServ, user, MEMO_X_ONE_NOTICE,
+				notice_lang(Config.s_MemoServ, user, MEMO_X_ONE_NOTICE,
 							c->ci->memos.memos.size(), c->ci->name);
 			} else {
-				notice_lang(s_MemoServ, user, MEMO_X_MANY_NOTICE,
+				notice_lang(Config.s_MemoServ, user, MEMO_X_MANY_NOTICE,
 							c->ci->memos.memos.size(), c->ci->name);
 			}
 		}
@@ -1930,14 +1930,14 @@ void chan_adduser2(User * user, Channel * c)
 	 * legit users - Rob
 	 * But don't join the bot if the channel is persistant - Adam
 	 **/
-	if (s_BotServ && c->ci && c->ci->bi && !c->ci->HasFlag(CI_PERSIST))
+	if (Config.s_BotServ && c->ci && c->ci->bi && !c->ci->HasFlag(CI_PERSIST))
 	{
-		if (c->usercount == BSMinUsers)
+		if (c->usercount == Config.BSMinUsers)
 			bot_join(c->ci);
 	}
-	if (s_BotServ && c->ci && c->ci->bi)
+	if (Config.s_BotServ && c->ci && c->ci->bi)
 	{
-		if (c->usercount >= BSMinUsers && (c->ci->botflags.HasFlag(BS_GREET))
+		if (c->usercount >= Config.BSMinUsers && (c->ci->botflags.HasFlag(BS_GREET))
 			&& user->nc && user->nc->greet
 			&& check_access(user, c->ci, CA_GREET)) {
 			/* Only display the greet if the main uplink we're connected
@@ -1978,7 +1978,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 				modes[0] = "-ov";
 				modes[1] = cu->user->nick;
 				modes[2] = cu->user->nick;
-				chan_set_modes(s_OperServ, chan, 3, modes, 2);
+				chan_set_modes(Config.s_OperServ, chan, 3, modes, 2);
 			}
 			if (chan->ci)
 			{
@@ -2040,8 +2040,8 @@ void do_mass_mode(char *modes)
 			delete [] myModes;
 			return;
 		} else {
-			ircdproto->SendMode(findbot(s_OperServ), c->name, "%s", modes);
-			chan_set_modes(s_OperServ, c, ac, av, 1);
+			ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s", modes);
+			chan_set_modes(Config.s_OperServ, c, ac, av, 1);
 		}
 	}
 	free(av);

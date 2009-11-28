@@ -36,33 +36,33 @@ class CommandNSIdentify : public Command
 		if (!(na = findnick(u->nick)))
 		{
 			if ((nr = findrequestnick(u->nick)))
-				notice_lang(s_NickServ, u, NICK_IS_PREREG);
+				notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 			else
-				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
+				notice_lang(Config.s_NickServ, u, NICK_NOT_REGISTERED);
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		/* You can now identify for other nicks without logging out first,
 		 * however you can not identify again for the group you're already
 		 * identified as
 		 */
 		else if (u->nc && u->nc == na->nc)
-			notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
+			notice_lang(Config.s_NickServ, u, NICK_ALREADY_IDENTIFIED);
 		else if (!(res = enc_check_password(pass, na->nc->pass)))
 		{
-			alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host);
-			notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
+			alog("%s: Failed IDENTIFY for %s!%s@%s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host);
+			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
 			bad_password(u);
 		}
 		else if (res == -1)
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_FAILED);
+			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_FAILED);
 		else
 		{
 			if (nick_identified(u))
 			{
-				alog("%s: %s!%s@%s logged out of account %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nc->display);
+				alog("%s: %s!%s@%s logged out of account %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nc->display);
 			}
 
 			u->UpdateHost();
@@ -77,17 +77,17 @@ class CommandNSIdentify : public Command
 
 			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-			alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick);
-			notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
+			alog("%s: %s!%s@%s identified for nick %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
 			if (ircd->vhost)
 				do_on_id(u);
-			if (NSModeOnID)
+			if (Config.NSModeOnID)
 				do_setmodes(u);
 
-			if (NSForceEmail && u->nc && !u->nc->email)
+			if (Config.NSForceEmail && u->nc && !u->nc->email)
 			{
-				notice_lang(s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
-				notice_help(s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
+				notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
+				notice_help(Config.s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
 			}
 
 			if (nick_identified(u))
@@ -102,13 +102,13 @@ class CommandNSIdentify : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_IDENTIFY);
+		notice_help(Config.s_NickServ, u, NICK_HELP_IDENTIFY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
 	}
 };
 
@@ -128,7 +128,7 @@ class NSIdentify : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
 	}
 };
 

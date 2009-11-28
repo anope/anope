@@ -39,7 +39,7 @@ class CommandHSList : public Command
 
 		current = head;
 		if (!current)
-			notice_lang(s_HostServ, u, HOST_EMPTY);
+			notice_lang(Config.s_HostServ, u, HOST_EMPTY);
 		else
 		{
 			/**
@@ -53,7 +53,7 @@ class CommandHSList : public Command
 					tmp = myStrGetOnlyToken((key + 1), '-', 0); /* Read FROM out */
 					if (!tmp)
 					{
-						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+						notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 					for (s = tmp; *s; ++s)
@@ -61,7 +61,7 @@ class CommandHSList : public Command
 						if (!isdigit(*s))
 						{
 							delete [] tmp;
-							notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+							notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 							return MOD_CONT;
 						}
 					}
@@ -70,7 +70,7 @@ class CommandHSList : public Command
 					tmp = myStrGetTokenRemainder(key, '-', 1); /* Read TO out */
 					if (!tmp)
 					{
-						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+						notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 					for (s = tmp; *s; ++s)
@@ -78,7 +78,7 @@ class CommandHSList : public Command
 						if (!isdigit(*s))
 						{
 							delete [] tmp;
-							notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+							notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 							return MOD_CONT;
 						}
 					}
@@ -92,15 +92,15 @@ class CommandHSList : public Command
 			{
 				if (key)
 				{
-					if ((Anope::Match(current->nick, key, false) || Anope::Match(current->vHost, key, false)) && display_counter < NSListMax)
+					if ((Anope::Match(current->nick, key, false) || Anope::Match(current->vHost, key, false)) && display_counter < Config.NSListMax)
 					{
 						++display_counter;
 						tm = localtime(&current->time);
 						strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 						if (current->vIdent)
-							notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
 						else
-							notice_lang(s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
 					}
 				}
 				else
@@ -109,27 +109,27 @@ class CommandHSList : public Command
 					 * List the host if its in the display range, and not more
 					 * than NSListMax records have been displayed...
 					 **/
-					if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < NSListMax)
+					if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
 					{
 						++display_counter;
 						tm = localtime(&current->time);
 						strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 						if (current->vIdent)
-							notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
 						else
-							notice_lang(s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
 					}
 				}
 				++counter;
 				current = current->next;
 			}
 			if (key)
-				notice_lang(s_HostServ, u, HOST_LIST_KEY_FOOTER, key, display_counter);
+				notice_lang(Config.s_HostServ, u, HOST_LIST_KEY_FOOTER, key, display_counter);
 			else {
 				if (from)
-					notice_lang(s_HostServ, u, HOST_LIST_RANGE_FOOTER, from, to);
+					notice_lang(Config.s_HostServ, u, HOST_LIST_RANGE_FOOTER, from, to);
 				else
-					notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
+					notice_lang(Config.s_HostServ, u, HOST_LIST_FOOTER, display_counter);
 			}
 		}
 		return MOD_CONT;
@@ -137,7 +137,7 @@ class CommandHSList : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_LIST);
+		notice_help(Config.s_HostServ, u, HOST_HELP_LIST);
 		return true;
 	}
 };
@@ -157,7 +157,7 @@ class HSList : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_LIST);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_LIST);
 	}
 };
 

@@ -29,32 +29,32 @@ class CommandBSBot : public Command
 
 		if (findbot(nick))
 		{
-			notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
 			return MOD_CONT;
 		}
 
-		if (strlen(nick) > NickLen)
+		if (strlen(nick) > Config.NickLen)
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_NICK);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
 		if (strlen(user) >= USERMAX)
 		{
-			notice_lang(s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
 			return MOD_CONT;
 		}
 
 		if (strlen(user) > HOSTMAX)
 		{
-			notice_lang(s_BotServ, u, BOT_LONG_HOST, HOSTMAX);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, HOSTMAX);
 			return MOD_CONT;
 		}
 
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_NICK);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
@@ -62,7 +62,7 @@ class CommandBSBot : public Command
 		{
 			if (!isvalidnick(*ch))
 			{
-				notice_lang(s_BotServ, u, BOT_BAD_NICK);
+				notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 				return MOD_CONT;
 			}
 		}
@@ -70,14 +70,14 @@ class CommandBSBot : public Command
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_NICK);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
 		/* Check the host is valid re RFC 2812 */
 		if (!isValidHost(host, 3))
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_HOST);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_HOST);
 			return MOD_CONT;
 		}
 
@@ -85,7 +85,7 @@ class CommandBSBot : public Command
 		{
 			if (!isalnum(*ch))
 			{
-				notice_lang(s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+				notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
 				return MOD_CONT;
 			}
 		}
@@ -97,20 +97,20 @@ class CommandBSBot : public Command
 		*/
 		if (findnick(nick))
 		{
-			notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
+			notice_lang(Config.s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
 			return MOD_CONT;
 		}
 
 		if (!(bi = new BotInfo(nick, user, host, real)))
 		{
-			notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_CREATION_FAILED);
 			return MOD_CONT;
 		}
 
 		/* We check whether user with this nick is online, and kill it if so */
-		EnforceQlinedNick(nick, s_BotServ);
+		EnforceQlinedNick(nick, Config.s_BotServ);
 
-		notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
+		notice_lang(Config.s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
 			bi->host, bi->real);
 
 		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
@@ -135,37 +135,37 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(oldnick)))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;
 		}
 
 		if (stricmp(oldnick, nick) && nickIsServices(oldnick, 0))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;
 		}
 
-		if (strlen(nick) > NickLen)
+		if (strlen(nick) > Config.NickLen)
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_NICK);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
 		if (user && strlen(user) >= USERMAX)
 		{
-			notice_lang(s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
 			return MOD_CONT;
 		}
 
 		if (host && strlen(host) > HOSTMAX)
 		{
-			notice_lang(s_BotServ, u, BOT_LONG_HOST, HOSTMAX);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, HOSTMAX);
 			return MOD_CONT;
 		}
 
 		if (stricmp(oldnick, nick) && nickIsServices(nick, 0))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
 			return MOD_CONT;
 		}
 
@@ -179,14 +179,14 @@ class CommandBSBot : public Command
 			&& ((host) ? !strcmp(bi->host, host) : 1)
 			&& ((real) ? !strcmp(bi->real, real) : 1))
 		{
-			notice_lang(s_BotServ, u, BOT_BOT_ANY_CHANGES);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_ANY_CHANGES);
 			return MOD_CONT;
 		}
 
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_NICK);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
@@ -194,7 +194,7 @@ class CommandBSBot : public Command
 		{
 			if (!isvalidnick(*ch))
 			{
-				notice_lang(s_BotServ, u, BOT_BAD_NICK);
+				notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 				return MOD_CONT;
 			}
 		}
@@ -202,13 +202,13 @@ class CommandBSBot : public Command
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_NICK);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
 		if (host && !isValidHost(host, 3))
 		{
-			notice_lang(s_BotServ, u, BOT_BAD_HOST);
+			notice_lang(Config.s_BotServ, u, BOT_BAD_HOST);
 			return MOD_CONT;
 		}
 
@@ -218,7 +218,7 @@ class CommandBSBot : public Command
 			{
 				if (!isalnum(*ch))
 				{
-					notice_lang(s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+					notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
 					return MOD_CONT;
 				}
 			}
@@ -226,7 +226,7 @@ class CommandBSBot : public Command
 
 		if (stricmp(bi->nick, nick) && findbot(nick))
 		{
-			notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
 			return MOD_CONT;
 		}
 
@@ -238,7 +238,7 @@ class CommandBSBot : public Command
 			*/
 			if (findnick(nick))
 			{
-				notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
+				notice_lang(Config.s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
 				return MOD_CONT;
 			}
 
@@ -250,7 +250,7 @@ class CommandBSBot : public Command
 			}
 
 			/* We check whether user with this nick is online, and kill it if so */
-			EnforceQlinedNick(nick, s_BotServ);
+			EnforceQlinedNick(nick, Config.s_BotServ);
 		}
 
 		if (user)
@@ -290,7 +290,7 @@ class CommandBSBot : public Command
 			bi->RejoinAll();
 		}
 
-		notice_lang(s_BotServ, u, BOT_BOT_CHANGED,
+		notice_lang(Config.s_BotServ, u, BOT_BOT_CHANGED,
 			oldnick, bi->nick, bi->user, bi->host, bi->real);
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
@@ -310,13 +310,13 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(nick)))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
 			return MOD_CONT;
 		}
 
 		if (nickIsServices(nick, 0))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
 			return MOD_CONT;
 		}
 
@@ -326,7 +326,7 @@ class CommandBSBot : public Command
 		ircdproto->SendSQLineDel(bi->nick);
 
 		delete bi;
-		notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
+		notice_lang(Config.s_BotServ, u, BOT_BOT_DELETED, nick);
 		return MOD_CONT;
 	}
  public:
@@ -341,7 +341,7 @@ class CommandBSBot : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_BotServ, u, BOT_BOT_READONLY);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_READONLY);
 			return MOD_CONT;
 		}
 
@@ -350,7 +350,7 @@ class CommandBSBot : public Command
 			// ADD nick user host real - 5
 			if (!u->nc->HasCommand("botserv/bot/add"))
 			{
-				notice_lang(s_BotServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -373,7 +373,7 @@ class CommandBSBot : public Command
 			// but only oldn and newn are required
 			if (!u->nc->HasCommand("botserv/bot/change"))
 			{
-				notice_lang(s_BotServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -390,7 +390,7 @@ class CommandBSBot : public Command
 			// DEL nick
 			if (!u->nc->HasCommand("botserv/bot/del"))
 			{
-				notice_lang(s_BotServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -410,13 +410,13 @@ class CommandBSBot : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_lang(s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
+		notice_lang(Config.s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+		syntax_error(Config.s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 	}
 };
 
@@ -434,7 +434,7 @@ class BSBot : public Module
 	}
 	void OnBotServHelp(User *u)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BOT);
 	}
 };
 

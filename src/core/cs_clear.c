@@ -39,28 +39,28 @@ class CommandCSClear : public Command
 			ci = c->ci;
 
 		if (!c) {
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (!u || !check_access(u, ci, CA_CLEAR)) {
-			notice_lang(s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else if (what == "bans") {
 			c->ClearBans();
 
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_BANS, chan);
 		} else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what == "excepts") {
 			c->ClearExcepts();
 
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
 
 		} else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what == "invites") {
 			c->ClearInvites();
 
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
 
 		} else if (what == "modes") {
 			c->ClearModes();
 			check_modes(c);
 
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_MODES, chan);
 		} else if (what == "ops") {
 			const char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
 			int ac, isop, isadmin, isown, count, i;
@@ -111,7 +111,7 @@ class CommandCSClear : public Command
 						ac = 2 + i;
 					}
 
-					do_cmode(s_ChanServ, ac, av);
+					do_cmode(Config.s_ChanServ, ac, av);
 				}
 			} else {
 				av[0] = chan;
@@ -151,10 +151,10 @@ class CommandCSClear : public Command
 						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[1], tmp2);
 					}
 
-					do_cmode(s_ChanServ, ac, av);
+					do_cmode(Config.s_ChanServ, ac, av);
 				}
 			}
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan);
 		} else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && what == "hops") {
 			const char *av[4];
 			int ac;
@@ -186,7 +186,7 @@ class CommandCSClear : public Command
 					else
 						ircdproto->SendSVSModeChan(av[0], av[1], NULL);
 
-					do_cmode(s_ChanServ, ac, av);
+					do_cmode(Config.s_ChanServ, ac, av);
 					break;
 				} else {
 					if (ircdcap->tsmode)
@@ -196,9 +196,9 @@ class CommandCSClear : public Command
 						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[1],
 									   av[2]);
 				}
-				do_cmode(s_ChanServ, ac, av);
+				do_cmode(Config.s_ChanServ, ac, av);
 			}
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
 		} else if (what == "voices") {
 			const char *av[4];
 			int ac;
@@ -230,7 +230,7 @@ class CommandCSClear : public Command
 					else
 						ircdproto->SendSVSModeChan(av[0], av[1], NULL);
 
-					do_cmode(s_ChanServ, ac, av);
+					do_cmode(Config.s_ChanServ, ac, av);
 					break;
 				} else {
 					if (ircdcap->tsmode) {
@@ -241,9 +241,9 @@ class CommandCSClear : public Command
 									   av[2]);
 					}
 				}
-				do_cmode(s_ChanServ, ac, av);
+				do_cmode(Config.s_ChanServ, ac, av);
 			}
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
 		} else if (what == "users") {
 			const char *av[3];
 			struct c_userlist *cu, *bnext;
@@ -257,27 +257,27 @@ class CommandCSClear : public Command
 				av[1] = sstrdup(cu->user->nick);
 				av[2] = sstrdup(buf);
 				ircdproto->SendKick(whosends(ci), av[0], av[1], av[2]);
-				do_kick(s_ChanServ, 3, av);
+				do_kick(Config.s_ChanServ, 3, av);
 				delete [] av[2];
 				delete [] av[1];
 				delete [] av[0];
 			}
-			notice_lang(s_ChanServ, u, CHAN_CLEARED_USERS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_USERS, chan);
 		} else {
-			syntax_error(s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
+			syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_CLEAR);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_CLEAR);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 	}
 };
 
@@ -295,7 +295,7 @@ class CSClear : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
 	}
 };
 

@@ -28,7 +28,7 @@ class CommandBSBotList : public Command
 		BotInfo *bi;
 
 		if (!nbots) {
-			notice_lang(s_BotServ, u, BOT_BOTLIST_EMPTY);
+			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -36,20 +36,20 @@ class CommandBSBotList : public Command
 			for (bi = botlists[i]; bi; bi = bi->next) {
 				if (!(bi->HasFlag(BI_PRIVATE))) {
 					if (!count)
-						notice_lang(s_BotServ, u, BOT_BOTLIST_HEADER);
+						notice_lang(Config.s_BotServ, u, BOT_BOTLIST_HEADER);
 					count++;
-					u->SendMessage(s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
+					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
 				}
 			}
 		}
 
 		if (u->nc->HasCommand("botserv/botlist") && count < nbots) {
-			notice_lang(s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
+			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
 			for (i = 0; i < 256; i++) {
 				for (bi = botlists[i]; bi; bi = bi->next) {
 					if (bi->HasFlag(BI_PRIVATE)) {
-						u->SendMessage(s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
+						u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick, bi->user, bi->host);
 						count++;
 					}
 				}
@@ -57,15 +57,15 @@ class CommandBSBotList : public Command
 		}
 
 		if (!count)
-			notice_lang(s_BotServ, u, BOT_BOTLIST_EMPTY);
+			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
 		else
-			notice_lang(s_BotServ, u, BOT_BOTLIST_FOOTER, count);
+			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_FOOTER, count);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_BotServ, u, BOT_HELP_BOTLIST);
+		notice_help(Config.s_BotServ, u, BOT_HELP_BOTLIST);
 		return true;
 	}
 };
@@ -84,7 +84,7 @@ class BSBotList : public Module
 	}
 	void OnBotServHelp(User *u)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_BOTLIST);
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BOTLIST);
 	}
 };
 

@@ -31,21 +31,21 @@ class CommandCSForbid : public Command
 
 		Channel *c;
 
-		if (ForceForbidReason && !reason)
+		if (Config.ForceForbidReason && !reason)
 		{
-			syntax_error(s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
+			syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
 			return MOD_CONT;
 		}
 
 		if (*chan != '#')
 		{
-			notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+			notice_lang(Config.s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_ChanServ, u, READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
@@ -55,8 +55,8 @@ class CommandCSForbid : public Command
 		ci = new ChannelInfo(chan);
 		if (!ci)
 		{
-			alog("%s: Valid FORBID for %s by %s failed", s_ChanServ, ci->name, u->nick);
-			notice_lang(s_ChanServ, u, CHAN_FORBID_FAILED, chan);
+			alog("%s: Valid FORBID for %s by %s failed", Config.s_ChanServ, ci->name, u->nick);
+			notice_lang(Config.s_ChanServ, u, CHAN_FORBID_FAILED, chan);
 			return MOD_CONT;
 		}
 
@@ -85,21 +85,21 @@ class CommandCSForbid : public Command
 				av[0] = c->name;
 				av[1] = cu->user->nick;
 				av[2] = reason ? reason : getstring(cu->user->nc, CHAN_FORBID_REASON);
-				ircdproto->SendKick(findbot(s_ChanServ), av[0], av[1], av[2]);
-				do_kick(s_ChanServ, 3, av);
+				ircdproto->SendKick(findbot(Config.s_ChanServ), av[0], av[1], av[2]);
+				do_kick(Config.s_ChanServ, 3, av);
 			}
 		}
 
-		if (WallForbid)
-			ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick, ci->name);
+		if (Config.WallForbid)
+			ircdproto->SendGlobops(Config.s_ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick, ci->name);
 
 		if (ircd->chansqline)
 		{
 			ircdproto->SendSQLine(ci->name, ((reason) ? reason : "Forbidden"));
 		}
 
-		alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick, ci->name);
-		notice_lang(s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
+		alog("%s: %s set FORBID for channel %s", Config.s_ChanServ, u->nick, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));
 
@@ -108,13 +108,13 @@ class CommandCSForbid : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
+		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
 	}
 };
 
@@ -132,7 +132,7 @@ class CSForbid : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_FORBID);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_FORBID);
 	}
 };
 

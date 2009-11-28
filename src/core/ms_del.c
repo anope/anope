@@ -40,17 +40,17 @@ class CommandMSDel : public Command
 
 			if (!(ci = cs_findchan(chan.c_str())))
 			{
-				notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (readonly)
 			{
-				notice_lang(s_MemoServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_MemoServ, u, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -64,9 +64,9 @@ class CommandMSDel : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+				notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -88,18 +88,18 @@ class CommandMSDel : public Command
 						else
 							end += snprintf(end, sizeof(buf) - (end - buf), ",%d", last);
 						/* "buf+1" here because *buf == ',' */
-						notice_lang(s_MemoServ, u, MEMO_DELETED_SEVERAL, buf + 1);
+						notice_lang(Config.s_MemoServ, u, MEMO_DELETED_SEVERAL, buf + 1);
 					}
 					else
-						notice_lang(s_MemoServ, u, MEMO_DELETED_ONE, last);
+						notice_lang(Config.s_MemoServ, u, MEMO_DELETED_ONE, last);
 				}
 				else
 				{
 					/* No memos were deleted.  Tell them so. */
 					if (count == 1)
-						notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, atoi(numstr.c_str()));
+						notice_lang(Config.s_MemoServ, u, MEMO_DOES_NOT_EXIST, atoi(numstr.c_str()));
 					else
-						notice_lang(s_MemoServ, u, MEMO_DELETED_NONE);
+						notice_lang(Config.s_MemoServ, u, MEMO_DELETED_NONE);
 				}
 			}
 			else if (numstr == "LAST")
@@ -108,7 +108,7 @@ class CommandMSDel : public Command
 				for (i = 0; i < mi->memos.size(); ++i)
 					last = mi->memos[i]->number;
 				delmemo(mi, last);
-				notice_lang(s_MemoServ, u, MEMO_DELETED_ONE, last);
+				notice_lang(Config.s_MemoServ, u, MEMO_DELETED_ONE, last);
 			}
 			else
 			{
@@ -120,9 +120,9 @@ class CommandMSDel : public Command
 				}
 				mi->memos.clear();
 				if (!chan.empty())
-					notice_lang(s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan.c_str());
+					notice_lang(Config.s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan.c_str());
 				else
-					notice_lang(s_MemoServ, u, MEMO_DELETED_ALL);
+					notice_lang(Config.s_MemoServ, u, MEMO_DELETED_ALL);
 			}
 
 			/* Reset the order */
@@ -134,13 +134,13 @@ class CommandMSDel : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_DEL);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_DEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
 	}
 };
 
@@ -158,7 +158,7 @@ class MSDel : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_DEL);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_DEL);
 	}
 };
 

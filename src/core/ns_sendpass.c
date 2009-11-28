@@ -27,12 +27,12 @@ class CommandNSSendPass : public Command
 		const char *nick = params[0].c_str();
 		NickAlias *na;
 
-		if (RestrictMail && !u->nc->HasCommand("nickserv/sendpass"))
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+		if (Config.RestrictMail && !u->nc->HasCommand("nickserv/sendpass"))
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else
 		{
 			char buf[BUFSIZE];
@@ -42,7 +42,7 @@ class CommandNSSendPass : public Command
 				MailInfo *mail;
 
 				snprintf(buf, sizeof(buf), getstring(na, NICK_SENDPASS_SUBJECT), na->nick);
-				mail = MailBegin(u, na->nc, buf, s_NickServ);
+				mail = MailBegin(u, na->nc, buf, Config.s_NickServ);
 				if (!mail)
 					return MOD_CONT;
 
@@ -56,16 +56,16 @@ class CommandNSSendPass : public Command
 				fprintf(mail->pipe, "\n\n");
 				fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_LINE_4));
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_5), NetworkName);
+				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_5), Config.NetworkName);
 				fprintf(mail->pipe, "\n.\n");
 
 				MailEnd(mail);
 
-				alog("%s: %s!%s@%s used SENDPASS on %s", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nick);
-				notice_lang(s_NickServ, u, NICK_SENDPASS_OK, nick);
+				alog("%s: %s!%s@%s used SENDPASS on %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nick);
+				notice_lang(Config.s_NickServ, u, NICK_SENDPASS_OK, nick);
 			}
 			else
-				notice_lang(s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
+				notice_lang(Config.s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
 		}
 
 		return MOD_CONT;
@@ -73,13 +73,13 @@ class CommandNSSendPass : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_SENDPASS);
+		notice_help(Config.s_NickServ, u, NICK_HELP_SENDPASS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
 	}
 };
 
@@ -94,7 +94,7 @@ class NSSendPass : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSSendPass());
 
-		if (!UseMail)
+		if (!Config.UseMail)
 			throw ModuleException("Not using mail, whut.");
 
 		char tmp_pass[PASSMAX];
@@ -105,7 +105,7 @@ class NSSendPass : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_SENDPASS);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SENDPASS);
 	}
 };
 

@@ -38,23 +38,23 @@ class CommandCSStatus : public Command
 			ci = cs_findchan(chan);
 		}
 		if (!ci)
-			notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
+			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
 		else if ((u2 = finduser(nick)))
-			notice_lang(s_ChanServ, u, CHAN_STATUS_INFO, chan, nick, get_access(u2, ci));
+			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_INFO, chan, nick, get_access(u2, ci));
 		else /* !u2 */
-			notice_lang(s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick);
+			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
+		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
 	}
 };
 
@@ -73,7 +73,7 @@ class CSStatus : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_STATUS);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_STATUS);
 	}
 };
 

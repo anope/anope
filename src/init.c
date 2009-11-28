@@ -171,38 +171,38 @@ static int parse_options(int ac, char **av)
 					*t++ = 0;
 					portnum = atoi(t);
 					if ((portnum >= 0) && (portnum < 65535))
-						LocalPort = portnum;
+						Config.LocalPort = portnum;
 					else {
 						fprintf(stderr,
 								"-local: Port numbers must be in the range 1..65535 or 0. Using default.\n");
 						return -1;
 					}
 				}
-				LocalHost = s;
+				Config.LocalHost = s;
 			} else if (strcmp(s, "name") == 0) {
 				if (++i >= ac) {
 					fprintf(stderr, "-name requires a parameter\n");
 					return -1;
 				}
-				ServerName = av[i];
+				Config.ServerName = av[i];
 			} else if (strcmp(s, "desc") == 0) {
 				if (++i >= ac) {
 					fprintf(stderr, "-desc requires a parameter\n");
 					return -1;
 				}
-				ServerDesc = av[i];
+				Config.ServerDesc = av[i];
 			} else if (strcmp(s, "user") == 0) {
 				if (++i >= ac) {
 					fprintf(stderr, "-user requires a parameter\n");
 					return -1;
 				}
-				ServiceUser = av[i];
+				Config.ServiceUser = av[i];
 			} else if (strcmp(s, "host") == 0) {
 				if (++i >= ac) {
 					fprintf(stderr, "-host requires a parameter\n");
 					return -1;
 				}
-				ServiceHost = av[i];
+				Config.ServiceHost = av[i];
 			} else if (strcmp(s, "dir") == 0) {
 				/* Handled by parse_dir_options() */
 				i++;			/* Skip parameter */
@@ -220,7 +220,7 @@ static int parse_options(int ac, char **av)
 							"-update: number of seconds must be positive");
 					return -1;
 				} else
-					UpdateTimeout = atol(s);
+					Config.UpdateTimeout = atol(s);
 			} else if (strcmp(s, "expire") == 0) {
 				if (++i >= ac) {
 					fprintf(stderr, "-expire requires a parameter\n");
@@ -232,7 +232,7 @@ static int parse_options(int ac, char **av)
 							"-expire: number of seconds must be positive\n");
 					return -1;
 				} else
-					ExpireTimeout = atol(s);
+					Config.ExpireTimeout = atol(s);
 			} else if (strcmp(s, "debug") == 0) {
 				/* Handled by parse_dir_options() */
 			} else if (strcmp(s, "readonly") == 0) {
@@ -240,10 +240,10 @@ static int parse_options(int ac, char **av)
 			} else if (strcmp(s, "nofork") == 0) {
 				/* Handled by parse_dir_options() */
 			} else if (strcmp(s, "logchan") == 0) {
-				if (!LogChannel) {
+				if (!Config.LogChannel) {
 					fprintf(stderr,
-							"-logchan: LogChannel must be defined in services.conf\n");
-				} else {		/* LogChannel */
+							"-logchan: Config.LogChannel must be defined in services.conf\n");
+				} else {		/* Config.LogChannel */
 
 					LogChan = true;
 				}
@@ -310,7 +310,7 @@ static int parse_options(int ac, char **av)
 
 static void remove_pidfile()
 {
-	remove(PIDFilename);
+	remove(Config.PIDFilename);
 }
 
 /*************************************************************************/
@@ -321,7 +321,7 @@ static void write_pidfile()
 {
 	FILE *pidfile;
 
-	pidfile = fopen(PIDFilename, "w");
+	pidfile = fopen(Config.PIDFilename, "w");
 	if (pidfile) {
 #ifdef _WIN32
 		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
@@ -331,7 +331,7 @@ static void write_pidfile()
 		fclose(pidfile);
 		atexit(remove_pidfile);
 	} else {
-		log_perror("Warning: cannot write to PID file %s", PIDFilename);
+		log_perror("Warning: cannot write to PID file %s", Config.PIDFilename);
 	}
 }
 
@@ -378,7 +378,7 @@ int init_primary(int ac, char **av)
 	}
 
 	/* Disable the log channel if its defined in the conf, but not enabled */
-	if (!LogChannel && LogChan)
+	if (!Config.LogChannel && LogChan)
 		LogChan = false;
 
 	/* Add IRCD Protocol Module; exit if there are errors */
@@ -387,7 +387,7 @@ int init_primary(int ac, char **av)
 	}
 
 	/* Add Encryption Modules */
-	ModuleManager::LoadModuleList(EncModuleList);
+	ModuleManager::LoadModuleList(Config.EncModuleList);
 	return 0;
 }
 
@@ -493,7 +493,7 @@ int init_secondary(int ac, char **av)
 
 	/* load any custom modules */
 	if (!nothird)
-		ModuleManager::LoadModuleList(ModulesAutoLoad);
+		ModuleManager::LoadModuleList(Config.ModulesAutoLoad);
 
 	/* Initialize random number generator */
 	rand_init();
@@ -502,37 +502,37 @@ int init_secondary(int ac, char **av)
 	/* Load up databases */
 	load_ns_dbase();
 	if (debug)
-		alog("debug: Loaded %s database (1/%d)", s_NickServ,
-		 (PreNickDBName ? 7 : 6));
-	if (s_HostServ) {
+		alog("debug: Loaded %s database (1/%d)", Config.s_NickServ,
+		 (Config.PreNickDBName ? 7 : 6));
+	if (Config.s_HostServ) {
 		load_hs_dbase();
 		if (debug)
-		alog("debug: Loaded %s database (2/%d)", s_HostServ,
-			 (PreNickDBName ? 7 : 6));
+		alog("debug: Loaded %s database (2/%d)", Config.s_HostServ,
+			 (Config.PreNickDBName ? 7 : 6));
 	} else if (debug) {
-		alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 7 : 6));
+		alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (Config.PreNickDBName ? 7 : 6));
 	}
-	if (s_BotServ) {
+	if (Config.s_BotServ) {
 		load_bs_dbase();
 		if (debug)
-		alog("debug: Loaded %s database (3/%d)", s_BotServ,
-			 (PreNickDBName ? 7 : 6));
+		alog("debug: Loaded %s database (3/%d)", Config.s_BotServ,
+			 (Config.PreNickDBName ? 7 : 6));
 	} else if (debug) {
-		alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 7 : 6));
+		alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (Config.PreNickDBName ? 7 : 6));
 	}
 	load_cs_dbase();
 	if (debug)
-		alog("debug: Loaded %s database (4/%d)", s_ChanServ,
-		 (PreNickDBName ? 7 : 6));
+		alog("debug: Loaded %s database (4/%d)", Config.s_ChanServ,
+		 (Config.PreNickDBName ? 7 : 6));
 	load_os_dbase();
 	if (debug)
-		alog("debug: Loaded %s database (5/%d)", s_OperServ,
-		 (PreNickDBName ? 7 : 6));
+		alog("debug: Loaded %s database (5/%d)", Config.s_OperServ,
+		 (Config.PreNickDBName ? 7 : 6));
 	load_exceptions();
 	if (debug)
 		alog("debug: Loaded exception database (6/%d)",
-		 (PreNickDBName ? 7 : 6));
-	if (PreNickDBName) {
+		 (Config.PreNickDBName ? 7 : 6));
+	if (Config.PreNickDBName) {
 		load_ns_req_db();
 		if (debug)
 		alog("debug: Loaded PreNick database (7/7)");
@@ -540,7 +540,7 @@ int init_secondary(int ac, char **av)
 	alog("Databases loaded");
 
 	// XXX: this is duplicated in type loading.
-	for (std::list<std::pair<std::string, std::string> >::iterator it = svsopers_in_config.begin(); it != svsopers_in_config.end(); it++)
+	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
 	{
 		std::string nick = it->first;
 		std::string type = it->second;
@@ -559,7 +559,7 @@ int init_secondary(int ac, char **av)
 			abort();
 		}
 
-		for (std::list<OperType *>::iterator tit = MyOperTypes.begin(); tit != MyOperTypes.end(); tit++)
+		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); tit++)
 		{
 			OperType *ot = *tit;
 			if (ot->GetName() == type)
@@ -573,28 +573,28 @@ int init_secondary(int ac, char **av)
 
 
 	/* this is only used on the first run of Anope. */
-	/* s_NickServ will always be an existing bot (if there
+	/* Config.s_NickServ will always be an existing bot (if there
 	 * are databases) because Anope now tracks what nick
 	 * each core bot is on, and changes them if needed
 	 * when loading the databases
 	 */
-	BotInfo *bi = findbot(s_NickServ);
+	BotInfo *bi = findbot(Config.s_NickServ);
 	if (!bi)
 	{
-		if (s_OperServ)
-			bi = new BotInfo(s_OperServ, ServiceUser, ServiceHost, desc_OperServ);
-		if (s_NickServ)
-			bi = new BotInfo(s_NickServ, ServiceUser, ServiceHost, desc_NickServ);
-		if (s_ChanServ)
-			bi = new BotInfo(s_ChanServ, ServiceUser, ServiceHost, desc_ChanServ);
-		if (s_HostServ)
-			bi = new BotInfo(s_HostServ, ServiceUser, ServiceHost, desc_HostServ);
-		if (s_MemoServ)
-			bi = new BotInfo(s_MemoServ, ServiceUser, ServiceHost, desc_MemoServ);
-		if (s_BotServ)
-			bi = new BotInfo(s_BotServ, ServiceUser, ServiceHost, desc_BotServ);
-		if (s_GlobalNoticer)
-			bi = new BotInfo(s_GlobalNoticer, ServiceUser, ServiceHost, desc_GlobalNoticer);
+		if (Config.s_OperServ)
+			bi = new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
+		if (Config.s_NickServ)
+			bi = new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
+		if (Config.s_ChanServ)
+			bi = new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
+		if (Config.s_HostServ)
+			bi = new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
+		if (Config.s_MemoServ)
+			bi = new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
+		if (Config.s_BotServ)
+			bi = new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
+		if (Config.s_GlobalNoticer)
+			bi = new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
 	}
 
 	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
@@ -604,11 +604,11 @@ int init_secondary(int ac, char **av)
 	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 
 	/* Connect to the remote server */
-	std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
+	std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end();
 	int servernum = 1;
 	for (; curr_uplink != end_uplink; ++curr_uplink, ++servernum) {
 		uplink_server = *curr_uplink;
-		servsock = conn(uplink_server->host, uplink_server->port, LocalHost, LocalPort);
+		servsock = conn(uplink_server->host, uplink_server->port, Config.LocalHost, Config.LocalPort);
 		if (servsock >= 0) {
 			alog("Connected to Server %d (%s:%d)", servernum, uplink_server->host, uplink_server->port);
 			break;

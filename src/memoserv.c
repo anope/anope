@@ -25,7 +25,7 @@ E void rsend_notify(User *u, Memo *m, const char *chan);
 /*************************************************************************/
 
 void moduleAddMemoServCmds() {
-	ModuleManager::LoadModuleList(MemoServCoreModules);
+	ModuleManager::LoadModuleList(Config.MemoServCoreModules);
 }
 
 /*************************************************************************/
@@ -63,9 +63,9 @@ void memoserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(s_MemoServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_MemoServ), u->nick, "PING %s", s);
 	} else {
-		mod_run_cmd(s_MemoServ, u, MEMOSERV, cmd);
+		mod_run_cmd(Config.s_MemoServ, u, MEMOSERV, cmd);
 	}
 }
 
@@ -100,27 +100,27 @@ void check_memos(User * u)
 			newcnt++;
 	}
 	if (newcnt > 0) {
-		notice_lang(s_MemoServ, u,
+		notice_lang(Config.s_MemoServ, u,
 					newcnt == 1 ? MEMO_HAVE_NEW_MEMO : MEMO_HAVE_NEW_MEMOS,
 					newcnt);
 		if (newcnt == 1 && (nc->memos.memos[i - 1]->HasFlag(MF_UNREAD))) {
-			notice_lang(s_MemoServ, u, MEMO_TYPE_READ_LAST, s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_TYPE_READ_LAST, Config.s_MemoServ);
 		} else if (newcnt == 1) {
 			for (i = 0; i < nc->memos.memos.size(); i++) {
 				if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 					break;
 			}
-			notice_lang(s_MemoServ, u, MEMO_TYPE_READ_NUM, s_MemoServ,
+			notice_lang(Config.s_MemoServ, u, MEMO_TYPE_READ_NUM, Config.s_MemoServ,
 						nc->memos.memos[i]->number);
 		} else {
-			notice_lang(s_MemoServ, u, MEMO_TYPE_LIST_NEW, s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_TYPE_LIST_NEW, Config.s_MemoServ);
 		}
 	}
 	if (nc->memos.memomax > 0 && nc->memos.memos.size() >= nc->memos.memomax) {
 		if (nc->memos.memos.size() > nc->memos.memomax)
-			notice_lang(s_MemoServ, u, MEMO_OVER_LIMIT, nc->memos.memomax);
+			notice_lang(Config.s_MemoServ, u, MEMO_OVER_LIMIT, nc->memos.memomax);
 		else
-			notice_lang(s_MemoServ, u, MEMO_AT_LIMIT, nc->memos.memomax);
+			notice_lang(Config.s_MemoServ, u, MEMO_AT_LIMIT, nc->memos.memomax);
 	}
 }
 
@@ -200,48 +200,48 @@ void memo_send(User * u, const char *name, const char *text, int z)
 	int is_servoper = u->nc && u->nc->IsServicesOper();
 
 	if (readonly) {
-		notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
+		notice_lang(Config.s_MemoServ, u, MEMO_SEND_DISABLED);
 	} else if (!text) {
 		if (z == 0)
-			syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+			syntax_error(Config.s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
 
 		if (z == 3)
-			syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
+			syntax_error(Config.s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 
 	} else if (!nick_identified(u) && !u->IsRecognized()) {
 		if (z == 0 || z == 3)
-			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
 
 	} else if (!(mi = getmemoinfo(name, &ischan, &isforbid))) {
 		if (z == 0 || z == 3) {
 			if (isforbid) {
-				notice_lang(s_MemoServ, u,
+				notice_lang(Config.s_MemoServ, u,
 							ischan ? CHAN_X_FORBIDDEN :
 							NICK_X_FORBIDDEN, name);
 			} else {
-				notice_lang(s_MemoServ, u,
+				notice_lang(Config.s_MemoServ, u,
 							ischan ? CHAN_X_NOT_REGISTERED :
 							NICK_X_NOT_REGISTERED, name);
 			}
 		}
-	} else if (z != 2 && MSSendDelay > 0 &&
-			   u && u->lastmemosend + MSSendDelay > now) {
+	} else if (z != 2 && Config.MSSendDelay > 0 &&
+			   u && u->lastmemosend + Config.MSSendDelay > now) {
 		u->lastmemosend = now;
 		if (z == 0)
-			notice_lang(s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, MSSendDelay);
+			notice_lang(Config.s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, Config.MSSendDelay);
 
 		if (z == 3)
-			notice_lang(s_MemoServ, u, MEMO_RSEND_PLEASE_WAIT,
-						MSSendDelay);
+			notice_lang(Config.s_MemoServ, u, MEMO_RSEND_PLEASE_WAIT,
+						Config.MSSendDelay);
 
 	} else if (mi->memomax == 0 && !is_servoper) {
 		if (z == 0 || z == 3)
-			notice_lang(s_MemoServ, u, MEMO_X_GETS_NO_MEMOS, name);
+			notice_lang(Config.s_MemoServ, u, MEMO_X_GETS_NO_MEMOS, name);
 
 	} else if (mi->memomax > 0 && mi->memos.size() >= mi->memomax
 			   && !is_servoper) {
 		if (z == 0 || z == 3)
-			notice_lang(s_MemoServ, u, MEMO_X_HAS_TOO_MANY_MEMOS, name);
+			notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_TOO_MANY_MEMOS, name);
 
 	} else {
 		u->lastmemosend = now;
@@ -270,12 +270,12 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (z == 3)
 			m->SetFlag(MF_RECEIPT);
 		if (z == 0 || z == 3)
-			notice_lang(s_MemoServ, u, MEMO_SENT, name);
+			notice_lang(Config.s_MemoServ, u, MEMO_SENT, name);
 		if (!ischan) {
 			NickAlias *na;
 			NickCore *nc = (findnick(name))->nc;
 
-			if (MSNotifyAll) {
+			if (Config.MSNotifyAll) {
 				if ((nc->HasFlag(NI_MEMO_RECEIVE))
 					&& get_ignore(name) == NULL) {
 					int i;
@@ -283,15 +283,15 @@ void memo_send(User * u, const char *name, const char *text, int z)
 					for (i = 0; i < nc->aliases.count; i++) {
 						na = static_cast<NickAlias *>(nc->aliases.list[i]);
 						if (finduser(na->nick) && nick_identified(finduser(na->nick)))
-							notice_lang(s_MemoServ, finduser(na->nick),
+							notice_lang(Config.s_MemoServ, finduser(na->nick),
 										MEMO_NEW_MEMO_ARRIVED, source,
-										s_MemoServ, m->number);
+										Config.s_MemoServ, m->number);
 					}
 				} else {
 					if ((u = finduser(name)) && nick_identified(u)
 						&& (nc->HasFlag(NI_MEMO_RECEIVE)))
-						notice_lang(s_MemoServ, u, MEMO_NEW_MEMO_ARRIVED,
-									source, s_MemoServ, m->number);
+						notice_lang(Config.s_MemoServ, u, MEMO_NEW_MEMO_ARRIVED,
+									source, Config.s_MemoServ, m->number);
 				}			   /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
@@ -302,16 +302,16 @@ void memo_send(User * u, const char *name, const char *text, int z)
 			struct c_userlist *cu, *next;
 			Channel *c;
 
-			if (MSNotifyAll && (c = findchan(name))) {
+			if (Config.MSNotifyAll && (c = findchan(name))) {
 				for (cu = c->users; cu; cu = next) {
 					next = cu->next;
 					if (check_access(cu->user, c->ci, CA_MEMO)) {
 						if (cu->user->nc
 							&& (cu->user->nc->HasFlag(NI_MEMO_RECEIVE))
 							&& get_ignore(cu->user->nick) == NULL) {
-							notice_lang(s_MemoServ, cu->user,
+							notice_lang(Config.s_MemoServ, cu->user,
 										MEMO_NEW_X_MEMO_ARRIVED,
-										c->ci->name, s_MemoServ,
+										c->ci->name, Config.s_MemoServ,
 										c->ci->name, m->number);
 						}
 					}
@@ -417,7 +417,7 @@ void rsend_notify(User * u, Memo * m, const char *chan)
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */
-		notice_lang(s_MemoServ, u, MEMO_RSEND_USER_NOTIFICATION,
+		notice_lang(Config.s_MemoServ, u, MEMO_RSEND_USER_NOTIFICATION,
 					nc->display);
 	}
 

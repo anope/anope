@@ -25,17 +25,17 @@ class CommandOSSession : public Command
 		const char *param = params[1].c_str();
 
 		if ((mincount = atoi(param)) <= 1)
-			notice_lang(s_OperServ, u, OPER_SESSION_INVALID_THRESHOLD);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_INVALID_THRESHOLD);
 		else
 		{
-			notice_lang(s_OperServ, u, OPER_SESSION_LIST_HEADER, mincount);
-			notice_lang(s_OperServ, u, OPER_SESSION_LIST_COLHEAD);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_HEADER, mincount);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_COLHEAD);
 			for (i = 0; i < 1024; ++i)
 			{
 				for (session = sessionlist[i]; session; session = session->next)
 				{
 					if (session->count >= mincount)
-						notice_lang(s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host);
+						notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host);
 				}
 			}
 		}
@@ -49,10 +49,10 @@ class CommandOSSession : public Command
 		Session *session = findsession(param);
 
 		if (!session)
-			notice_lang(s_OperServ, u, OPER_SESSION_NOT_FOUND, param);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_NOT_FOUND, param);
 		else {
 			Exception *exception = find_host_exception(param);
-			notice_lang(s_OperServ, u, OPER_SESSION_VIEW_FORMAT, param, session->count, exception ? exception-> limit : DefSessionLimit);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_VIEW_FORMAT, param, session->count, exception ? exception-> limit : Config.DefSessionLimit);
 		}
 
 		return MOD_CONT;
@@ -66,9 +66,9 @@ class CommandOSSession : public Command
 	{
 		ci::string cmd = params[0];
 
-		if (!LimitSessions)
+		if (!Config.LimitSessions)
 		{
-			notice_lang(s_OperServ, u, OPER_SESSION_DISABLED);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -83,13 +83,13 @@ class CommandOSSession : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_SESSION);
+		notice_help(Config.s_OperServ, u, OPER_HELP_SESSION);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
 	}
 };
 
@@ -134,11 +134,11 @@ static int exception_list(User *u, const int index, int *sent_header)
 	if (index < 0 || index >= nexceptions)
 		return 0;
 	if (!*sent_header) {
-		notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
-		notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
 		*sent_header = 1;
 	}
-	notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index].limit, exceptions[index].mask);
+	notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index].limit, exceptions[index].mask);
 	return 1;
 }
 
@@ -158,7 +158,7 @@ static int exception_view(User *u, const int index, int *sent_header)
 	if (index < 0 || index >= nexceptions)
 		return 0;
 	if (!*sent_header) {
-		notice_lang(s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
 		*sent_header = 1;
 	}
 
@@ -167,7 +167,7 @@ static int exception_view(User *u, const int index, int *sent_header)
 
 	expire_left(u->nc, expirebuf, sizeof(expirebuf), exceptions[index].expires);
 
-	notice_lang(s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, *exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
+	notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, *exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
 	return 1;
 }
 
@@ -190,7 +190,7 @@ class CommandOSException : public Command
 
 		if (nexceptions >= 32767)
 		{
-			notice_lang(s_OperServ, u, OPER_EXCEPTION_TOO_MANY);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_TOO_MANY);
 			return MOD_CONT;
 		}
 
@@ -219,10 +219,10 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		time_t expires = expiry ? dotime(expiry) : ExceptionExpiry;
+		time_t expires = expiry ? dotime(expiry) : Config.ExceptionExpiry;
 		if (expires < 0)
 		{
-			notice_lang(s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -230,26 +230,26 @@ class CommandOSException : public Command
 
 		int limit = limitstr && isdigit(*limitstr) ? atoi(limitstr) : -1;
 
-		if (limit < 0 || limit > static_cast<int>(MaxSessionLimit))
+		if (limit < 0 || limit > static_cast<int>(Config.MaxSessionLimit))
 		{
-			notice_lang(s_OperServ, u, OPER_EXCEPTION_INVALID_LIMIT, MaxSessionLimit);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_INVALID_LIMIT, Config.MaxSessionLimit);
 			return MOD_CONT;
 		}
 		else
 		{
 			if (strchr(mask, '!') || strchr(mask, '@'))
 			{
-				notice_lang(s_OperServ, u, OPER_EXCEPTION_INVALID_HOSTMASK);
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_INVALID_HOSTMASK);
 				return MOD_CONT;
 			}
 
 			x = exception_add(u, mask, limit, reason, u->nick, expires);
 
 			if (x == 1)
-				notice_lang(s_OperServ, u, OPER_EXCEPTION_ADDED, mask, limit);
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_ADDED, mask, limit);
 
 			if (readonly)
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 		}
 
 		return MOD_CONT;
@@ -273,14 +273,14 @@ class CommandOSException : public Command
 			if (!deleted)
 			{
 				if (count == 1)
-					notice_lang(s_OperServ, u, OPER_EXCEPTION_NO_SUCH_ENTRY, last);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_SUCH_ENTRY, last);
 				else
-					notice_lang(s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 			}
 			else if (deleted == 1)
-				notice_lang(s_OperServ, u, OPER_EXCEPTION_DELETED_ONE);
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED_ONE);
 			else
-				notice_lang(s_OperServ, u, OPER_EXCEPTION_DELETED_SEVERAL, deleted);
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED_SEVERAL, deleted);
 		}
 		else
 		{
@@ -291,13 +291,13 @@ class CommandOSException : public Command
 				if (!stricmp(mask, exceptions[i].mask))
 				{
 					exception_del(i);
-					notice_lang(s_OperServ, u, OPER_EXCEPTION_DELETED, mask);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED, mask);
 					deleted = 1;
 					break;
 				}
 			}
 			if (!deleted && i == nexceptions)
-				notice_lang(s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask);
 		}
 
 		/* Renumber the exception list. I don't believe in having holes in
@@ -309,7 +309,7 @@ class CommandOSException : public Command
 			exceptions[i].num = i;
 
 		if (readonly)
-			notice_lang(s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -350,14 +350,14 @@ class CommandOSException : public Command
 
 			free(exception);
 
-			notice_lang(s_OperServ, u, OPER_EXCEPTION_MOVED, exceptions[n1].mask, n1 + 1, n2 + 1);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_MOVED, exceptions[n1].mask, n1 + 1, n2 + 1);
 
 			/* Renumber the exception list. See DoDel() above for why. */
 			for (i = 0; i < nexceptions; ++i)
 				exceptions[i].num = i;
 
 			if (readonly)
-				notice_lang(s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(u, "MOVE");
@@ -382,7 +382,7 @@ class CommandOSException : public Command
 			}
 		}
 		if (!sent_header)
-			notice_lang(s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 
 		return MOD_CONT;
 	}
@@ -404,7 +404,7 @@ class CommandOSException : public Command
 			}
 		}
 		if (!sent_header)
-			notice_lang(s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 
 		return MOD_CONT;
 	}
@@ -417,9 +417,9 @@ class CommandOSException : public Command
 	{
 		ci::string cmd = params[0];
 
-		if (!LimitSessions)
+		if (!Config.LimitSessions)
 		{
-			notice_lang(s_OperServ, u, OPER_EXCEPTION_DISABLED);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -440,13 +440,13 @@ class CommandOSException : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_EXCEPTION);
+		notice_help(Config.s_OperServ, u, OPER_HELP_EXCEPTION);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
 	}
 };
 
@@ -466,8 +466,8 @@ class OSSession : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SESSION);
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SESSION);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
 	}
 };
 

@@ -30,27 +30,27 @@ class CommandNSRelease : public Command
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (!(na->HasFlag(NS_KILL_HELD)))
-			notice_lang(s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
+			notice_lang(Config.s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
 		else if (pass)
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
 				release(na, 0);
-				notice_lang(s_NickServ, u, NICK_RELEASED);
+				notice_lang(Config.s_NickServ, u, NICK_RELEASED);
 			}
 			else
 			{
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: RELEASE: invalid password for %s by %s!%s@%s", s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
+					alog("%s: RELEASE: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
 					bad_password(u);
 				}
 			}
@@ -60,10 +60,10 @@ class CommandNSRelease : public Command
 			if (u->nc == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
 				release(na, 0);
-				notice_lang(s_NickServ, u, NICK_RELEASED);
+				notice_lang(Config.s_NickServ, u, NICK_RELEASED);
 			}
 			else
-				notice_lang(s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
@@ -72,18 +72,18 @@ class CommandNSRelease : public Command
 	{
 		char relstr[192];
 
-		/* Convert NSReleaseTimeout seconds to string format */
-		duration(u->nc, relstr, sizeof(relstr), NSReleaseTimeout);
+		/* Convert Config.NSReleaseTimeout seconds to string format */
+		duration(u->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
 
-		notice_help(s_NickServ, u, NICK_HELP_RELEASE, relstr);
-		//do_help_limited(s_NickServ, u, this);
+		notice_help(Config.s_NickServ, u, NICK_HELP_RELEASE, relstr);
+		//do_help_limited(Config.s_NickServ, u, this);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_NickServ, u, "RELEASE", NICK_RELEASE_SYNTAX);
+		syntax_error(Config.s_NickServ, u, "RELEASE", NICK_RELEASE_SYNTAX);
 	}
 };
 
@@ -102,7 +102,7 @@ class NSRelease : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_RELEASE);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RELEASE);
 	}
 };
 

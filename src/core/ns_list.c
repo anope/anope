@@ -53,9 +53,9 @@ class CommandNSList : public Command
 
 		suspended = nsnoexpire = forbidden = unconfirmed = false;
 
-		if (NSListOpersOnly && !is_oper(u)) /* reverse the help logic */
+		if (Config.NSListOpersOnly && !is_oper(u)) /* reverse the help logic */
 		{
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -64,7 +64,7 @@ class CommandNSList : public Command
 			tmp = myStrGetOnlyToken((pattern + 1), '-', 0); /* Read FROM out */
 			if (!tmp)
 			{
-				notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (s = tmp; *s; ++s)
@@ -72,7 +72,7 @@ class CommandNSList : public Command
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
-					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+					notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 			}
@@ -81,7 +81,7 @@ class CommandNSList : public Command
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (!tmp)
 			{
-				notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (s = tmp; *s; ++s)
@@ -89,7 +89,7 @@ class CommandNSList : public Command
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
-					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+					notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 			}
@@ -121,7 +121,7 @@ class CommandNSList : public Command
 
 		mync = u->nc;
 
-		notice_lang(s_NickServ, u, NICK_LIST_HEADER, pattern);
+		notice_lang(Config.s_NickServ, u, NICK_LIST_HEADER, pattern);
 		if (!unconfirmed)
 		{
 			for (i = 0; i < 1024; ++i)
@@ -146,7 +146,7 @@ class CommandNSList : public Command
 					snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->HasFlag(NS_FORBIDDEN)) ? na->last_usermask : "*@*");
 					if (!stricmp(pattern, na->nick) || Anope::Match(buf, pattern, false))
 					{
-						if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= NSListMax)
+						if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config.NSListMax)
 						{
 							if (is_servadmin && (na->HasFlag(NS_NO_EXPIRE)))
 								noexpire_char = '!';
@@ -160,7 +160,7 @@ class CommandNSList : public Command
 								snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick);
 							else
 								snprintf(buf, sizeof(buf), "%-20s  %s", na->nick, na->last_usermask);
-							u->SendMessage(s_NickServ, "   %c%s", noexpire_char, buf);
+							u->SendMessage(Config.s_NickServ, "   %c%s", noexpire_char, buf);
 						}
 						++count;
 					}
@@ -178,16 +178,16 @@ class CommandNSList : public Command
 					snprintf(buf, sizeof(buf), "%s!*@*", nr->nick);
 					if (!stricmp(pattern, nr->nick) || Anope::Match(buf, pattern, false))
 					{
-						if (++nnicks <= NSListMax)
+						if (++nnicks <= Config.NSListMax)
 						{
 							snprintf(buf, sizeof(buf), "%-20s  [UNCONFIRMED]", nr->nick);
-							u->SendMessage(s_NickServ, "   %c%s", noexpire_char, buf);
+							u->SendMessage(Config.s_NickServ, "   %c%s", noexpire_char, buf);
 						}
 					}
 				}
 			}
 		}
-		notice_lang(s_NickServ, u, NICK_LIST_RESULTS, nnicks > NSListMax ? NSListMax : nnicks, nnicks);
+		notice_lang(Config.s_NickServ, u, NICK_LIST_RESULTS, nnicks > Config.NSListMax ? Config.NSListMax : nnicks, nnicks);
 		if (tofree)
 			delete [] pattern;
 		return MOD_CONT;
@@ -196,9 +196,9 @@ class CommandNSList : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->IsServicesOper())
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_LIST);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_LIST);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_LIST);
+			notice_help(Config.s_NickServ, u, NICK_HELP_LIST);
 
 		return true;
 	}
@@ -206,9 +206,9 @@ class CommandNSList : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		if (u->nc->IsServicesOper())
-			syntax_error(s_NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
 		else
-			syntax_error(s_NickServ, u, "LIST", NICK_LIST_SYNTAX);
+			syntax_error(Config.s_NickServ, u, "LIST", NICK_LIST_SYNTAX);
 	}
 };
 
@@ -227,7 +227,7 @@ class NSList : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LIST);
 	}
 };
 

@@ -21,19 +21,19 @@ BotInfo::BotInfo(const char *nnick)
 	this->cmdTable = NULL;
 	this->chancount = 0;
 
-	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
+	if (Config.s_ChanServ && !stricmp(Config.s_ChanServ, nnick))
 		this->SetFlag(BI_CHANSERV);
-	else if (s_BotServ && !stricmp(s_BotServ, nnick))
+	else if (Config.s_BotServ && !stricmp(Config.s_BotServ, nnick))
 		this->SetFlag(BI_BOTSERV);
-	else if (s_HostServ && !stricmp(s_HostServ, nnick))
+	else if (Config.s_HostServ && !stricmp(Config.s_HostServ, nnick))
 		this->SetFlag(BI_HOSTSERV);
-	else if (s_OperServ && !stricmp(s_OperServ, nnick))
+	else if (Config.s_OperServ && !stricmp(Config.s_OperServ, nnick))
 		this->SetFlag(BI_OPERSERV);
-	else if (s_MemoServ && !stricmp(s_MemoServ, nnick))
+	else if (Config.s_MemoServ && !stricmp(Config.s_MemoServ, nnick))
 		this->SetFlag(BI_MEMOSERV);
-	else if (s_NickServ && !stricmp(s_NickServ, nnick))
+	else if (Config.s_NickServ && !stricmp(Config.s_NickServ, nnick))
 		this->SetFlag(BI_NICKSERV);
-	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
+	else if (Config.s_GlobalNoticer && !stricmp(Config.s_GlobalNoticer, nnick))
 		this->SetFlag(BI_GLOBAL);
 	
 	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
@@ -58,19 +58,19 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	this->cmdTable = NULL;
 	this->chancount = 0;
 
-	if (s_ChanServ && !stricmp(s_ChanServ, nnick))
+	if (Config.s_ChanServ && !stricmp(Config.s_ChanServ, nnick))
 		this->SetFlag(BI_CHANSERV);
-	else if (s_BotServ && !stricmp(s_BotServ, nnick))
+	else if (Config.s_BotServ && !stricmp(Config.s_BotServ, nnick))
 		this->SetFlag(BI_BOTSERV);
-	else if (s_HostServ && !stricmp(s_HostServ, nnick))
+	else if (Config.s_HostServ && !stricmp(Config.s_HostServ, nnick))
 		this->SetFlag(BI_HOSTSERV);
-	else if (s_OperServ && !stricmp(s_OperServ, nnick))
+	else if (Config.s_OperServ && !stricmp(Config.s_OperServ, nnick))
 		this->SetFlag(BI_OPERSERV);
-	else if (s_MemoServ && !stricmp(s_MemoServ, nnick))
+	else if (Config.s_MemoServ && !stricmp(Config.s_MemoServ, nnick))
 		this->SetFlag(BI_MEMOSERV);
-	else if (s_NickServ && !stricmp(s_NickServ, nnick))
+	else if (Config.s_NickServ && !stricmp(Config.s_NickServ, nnick))
 		this->SetFlag(BI_NICKSERV);
-	else if (s_GlobalNoticer && !stricmp(s_GlobalNoticer, nnick))
+	else if (Config.s_GlobalNoticer && !stricmp(Config.s_GlobalNoticer, nnick))
 		this->SetFlag(BI_GLOBAL);
 	
 	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
@@ -132,7 +132,7 @@ void BotInfo::RejoinAll()
 
 	for (i = 0; i < 256; i++)
 		for (ci = chanlists[i]; ci; ci = ci->next)
-			if (ci->bi == this && ci->c && (ci->c->usercount >= BSMinUsers))
+			if (ci->bi == this && ci->c && (ci->c->usercount >= Config.BSMinUsers))
 				bot_join(ci);
 }
 
@@ -153,7 +153,7 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 
 	ci->bi = this;
 	this->chancount++;
-	if (ci->c && ci->c->usercount >= BSMinUsers)
+	if (ci->c && ci->c->usercount >= Config.BSMinUsers)
 		bot_join(ci);
 }
 
@@ -164,7 +164,7 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (ci->c && ci->c->usercount >= BSMinUsers)
+	if (ci->c && ci->c->usercount >= Config.BSMinUsers)
 	{
 		if (u)
 			ircdproto->SendPart(ci->bi, ci->name, "UNASSIGN from %s", u->nick);

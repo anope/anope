@@ -33,18 +33,18 @@ class CommandMSCheck : public Command
 
 		if (!u->IsRecognized())
 		{
-			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
 			return MOD_CONT;
 		}
 		else if (!(na = findnick(recipient)))
 		{
-			notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
+			notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
 			return MOD_CONT;
 		}
 
 		if ((na->HasFlag(NS_FORBIDDEN)))
 		{
-			notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
+			notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
 			return MOD_CONT;
 		}
 
@@ -63,28 +63,28 @@ class CommandMSCheck : public Command
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 
 				if (mi->memos[i]->HasFlag(MF_UNREAD))
-					notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick, timebuf);
+					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick, timebuf);
 				else
-					notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick, timebuf);
+					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_READ, na->nick, timebuf);
 				break;
 			}
 		}
 
 		if (!found)
-			notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
+			notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_CHECK);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_CHECK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
 	}
 };
 
@@ -102,7 +102,7 @@ class MSCheck : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CHECK);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CHECK);
 	}
 };
 

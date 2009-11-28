@@ -30,11 +30,11 @@ class CommandHSOff : public Command
 		vhost = getvHost(u->nick);
 		vident = getvIdent(u->nick);
 		if (!vhost && !vident)
-			notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
 		else
 		{
 			ircdproto->SendVhostDel(u);
-			notice_lang(s_HostServ, u, HOST_OFF);
+			notice_lang(Config.s_HostServ, u, HOST_OFF);
 		}
 		
 		return MOD_CONT;
@@ -42,7 +42,7 @@ class CommandHSOff : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_HostServ, u, HOST_HELP_OFF);
+		notice_help(Config.s_HostServ, u, HOST_HELP_OFF);
 		return true;
 	}
 };
@@ -62,7 +62,7 @@ class HSOff : public Module
 	}
 	void OnHostServHelp(User *u)
 	{
-		notice_lang(s_HostServ, u, HOST_HELP_CMD_OFF);
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_OFF);
 	}
 };
 

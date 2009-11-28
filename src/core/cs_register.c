@@ -33,30 +33,30 @@ class CommandCSRegister : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_ChanServ, u, CHAN_REGISTER_DISABLED);
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTER_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (*chan == '&')
-			notice_lang(s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
 		else if (*chan != '#')
-			notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+			notice_lang(Config.s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
-			notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_INVALID, chan);
 		else if (!(c = findchan(chan)))
-			notice_lang(s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
 		else if ((ci = cs_findchan(chan)))
-			notice_lang(s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
 		else if (!stricmp(chan, "#"))
-			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 		else if (!chan_has_user_status(c, u, CUS_OP))
-			notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
-		else if (CSMaxReg && u->nc->channelcount >= CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
-			notice_lang(s_ChanServ, u, u->nc->channelcount > CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
+			notice_lang(Config.s_ChanServ, u, CHAN_MUST_BE_CHANOP);
+		else if (Config.CSMaxReg && u->nc->channelcount >= Config.CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
+			notice_lang(Config.s_ChanServ, u, u->nc->channelcount > Config.CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config.CSMaxReg);
 		else if (!(ci = new ChannelInfo(chan)))
 		{
-			alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
-			notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
+			alog("%s: makechan() failed for REGISTER %s", Config.s_ChanServ, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTRATION_FAILED);
 		}
 		else
 		{
@@ -71,20 +71,20 @@ class CommandCSRegister : public Command
 				strscpy(ci->last_topic_setter, c->topic_setter, NICKMAX);
 				ci->last_topic_time = c->topic_time;
 			}
-			else strscpy(ci->last_topic_setter, s_ChanServ, NICKMAX); /* Set this to something, otherwise it will maliform the topic */
+			else strscpy(ci->last_topic_setter, Config.s_ChanServ, NICKMAX); /* Set this to something, otherwise it will maliform the topic */
 
 			ci->bi = NULL;
 			++ci->founder->channelcount;
-			alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan, u->nick, u->GetIdent().c_str(), u->host);
-			notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
+			alog("%s: Channel '%s' registered by %s!%s@%s", Config.s_ChanServ, chan, u->nick, u->GetIdent().c_str(), u->host);
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
 
 			/* Implement new mode lock */
 			check_modes(c);
 			/* On most ircds you do not receive the admin/owner mode till its registered */
 			if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
-				ircdproto->SendMode(findbot(s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
+				ircdproto->SendMode(findbot(Config.s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
 			else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
-				ircdproto->SendMode(findbot(s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
+				ircdproto->SendMode(findbot(Config.s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
 
 			/* Mark the channel as persistant */
 			if (c->HasMode(CMODE_PERM))
@@ -103,13 +103,13 @@ class CommandCSRegister : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_HELP_REGISTER, s_ChanServ);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_REGISTER, Config.s_ChanServ);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}
 };
 
@@ -128,7 +128,7 @@ class CSRegister : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
 	}
 };
 

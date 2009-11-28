@@ -31,7 +31,7 @@ E void moduleAddHostServCmds();
 
 void moduleAddHostServCmds()
 {
-	ModuleManager::LoadModuleList(HostServCoreModules);
+	ModuleManager::LoadModuleList(Config.HostServCoreModules);
 }
 
 /*************************************************************************/
@@ -71,7 +71,7 @@ void get_hostserv_stats(long *nrec, long *memuse)
  */
 void hostserv_init()
 {
-	if (s_HostServ) {
+	if (Config.s_HostServ) {
 		moduleAddHostServCmds();
 	}
 }
@@ -96,12 +96,12 @@ void hostserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(s_HostServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_HostServ), u->nick, "PING %s", s);
 	} else {
 		if (ircd->vhost) {
-			mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);
+			mod_run_cmd(Config.s_HostServ, u, HOSTSERV, cmd);
 		} else {
-			notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
+			notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ);
 		}
 	}
 }
@@ -131,7 +131,7 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 
 	next = new HostCore;
 	if (next == NULL) {
-		ircdproto->SendGlobops(s_HostServ,
+		ircdproto->SendGlobops(Config.s_HostServ,
 						 "Unable to allocate memory to create the vHost LL, problems i sense..");
 	} else {
 		next->nick = new char[strlen(nick) + 1];
@@ -141,7 +141,7 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 			next->vIdent = new char[strlen(vIdent) + 1];
 		if ((next->nick == NULL) || (next->vHost == NULL)
 			|| (next->creator == NULL)) {
-			ircdproto->SendGlobops(s_HostServ,
+			ircdproto->SendGlobops(Config.s_HostServ,
 							 "Unable to allocate memory to create the vHost LL, problems i sense..");
 			return NULL;
 		}
@@ -150,7 +150,7 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 		strlcpy(next->creator, creator, strlen(creator) + 1);
 		if (vIdent) {
 			if ((next->vIdent == NULL)) {
-				ircdproto->SendGlobops(s_HostServ,
+				ircdproto->SendGlobops(Config.s_HostServ,
 								 "Unable to allocate memory to create the vHost LL, problems i sense..");
 				return NULL;
 			}
@@ -219,7 +219,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 
 	newCore = new HostCore;
 	if (newCore == NULL) {
-		ircdproto->SendGlobops(s_HostServ,
+		ircdproto->SendGlobops(Config.s_HostServ,
 						 "Unable to allocate memory to insert into the vHost LL, problems i sense..");
 		return NULL;
 	} else {
@@ -230,7 +230,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 			newCore->vIdent = new char[strlen(vIdent) + 1];
 		if ((newCore->nick == NULL) || (newCore->vHost == NULL)
 			|| (newCore->creator == NULL)) {
-			ircdproto->SendGlobops(s_HostServ,
+			ircdproto->SendGlobops(Config.s_HostServ,
 							 "Unable to allocate memory to create the vHost LL, problems i sense..");
 			return NULL;
 		}
@@ -239,7 +239,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 		strlcpy(newCore->creator, creator, strlen(creator) + 1);
 		if (vIdent) {
 			if ((newCore->vIdent == NULL)) {
-				ircdproto->SendGlobops(s_HostServ,
+				ircdproto->SendGlobops(Config.s_HostServ,
 								 "Unable to allocate memory to create the vHost LL, problems i sense..");
 				return NULL;
 			}
@@ -361,7 +361,7 @@ void delHostCore(const char *nick)
 #define SAFE(x) do {					\
 	if ((x) < 0) {					\
 	if (!forceload)					\
-		fatal("Read error on %s", HostDBName);	\
+		fatal("Read error on %s", Config.HostDBName);	\
 	failed = 1;					\
 	break;						\
 	}							\
@@ -372,14 +372,14 @@ void load_hs_dbase()
 	dbFILE *f;
 	int ver;
 
-	if (!(f = open_db(s_HostServ, HostDBName, "r", HOST_VERSION))) {
+	if (!(f = open_db(Config.s_HostServ, Config.HostDBName, "r", HOST_VERSION))) {
 		return;
 	}
 	ver = get_file_version(f);
 
 	if (ver != 3) {
 		close_db(f);
-		fatal("DB %s is too old", HostDBName);
+		fatal("DB %s is too old", Config.HostDBName);
 		return;
 	}
 
@@ -422,7 +422,7 @@ void load_hs_dbase(dbFILE * f)
 		}
 		else
 		{
-			fatal("Invalid format in %s %d", HostDBName, c);
+			fatal("Invalid format in %s %d", Config.HostDBName, c);
 		}
 	}
 }
@@ -432,9 +432,9 @@ void load_hs_dbase(dbFILE * f)
 #define SAFE(x) do {						\
 	if ((x) < 0) {						\
 	restore_db(f);						\
-	log_perror("Write error on %s", HostDBName);		\
-	if (time(NULL) - lastwarn > WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", HostDBName,	\
+	log_perror("Write error on %s", Config.HostDBName);		\
+	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.HostDBName,	\
 			strerror(errno));			\
 		lastwarn = time(NULL);				\
 	}							\
@@ -448,7 +448,7 @@ void save_hs_dbase()
 	static time_t lastwarn = 0;
 	HostCore *current;
 
-	if (!(f = open_db(s_HostServ, HostDBName, "w", HOST_VERSION)))
+	if (!(f = open_db(Config.s_HostServ, Config.HostDBName, "w", HOST_VERSION)))
 		return;
 
 	current = head;
@@ -497,10 +497,10 @@ int do_on_id(User * u)
 	vIdent = getvIdent(u->nick);
 	if (vHost != NULL) {
 		if (vIdent) {
-			notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent,
+			notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent,
 						vHost);
 		} else {
-			notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
+			notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, vHost);
 		}
 		ircdproto->SendVhost(u->nick, vIdent, vHost);
 		if (ircd->vhost)

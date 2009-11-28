@@ -31,13 +31,13 @@ class CommandBSAssign : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
+			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_READONLY);
 			return MOD_CONT;
 		}
 
 		if (!(bi = findbot(nick)))
 		{
-			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
 			return MOD_CONT;
 		}
 
@@ -45,36 +45,36 @@ class CommandBSAssign : public Command
 
 		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->nc->HasPriv("botserv/administration")))
 		{
-			notice_lang(s_BotServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (bi->HasFlag(BI_PRIVATE) && !u->nc->HasCommand("botserv/assign/private"))
 		{
-			notice_lang(s_BotServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if ((ci->bi) && (stricmp(ci->bi->nick, nick) == 0))
 		{
-			notice_lang(s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
+			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
 			return MOD_CONT;
 		}
 
 		bi->Assign(u, ci);
-		notice_lang(s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
+		notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_BotServ, u, BOT_HELP_ASSIGN);
+		notice_help(Config.s_BotServ, u, BOT_HELP_ASSIGN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_BotServ, u, "ASSIGN", BOT_ASSIGN_SYNTAX);
+		syntax_error(Config.s_BotServ, u, "ASSIGN", BOT_ASSIGN_SYNTAX);
 	}
 };
 
@@ -92,7 +92,7 @@ class BSAssign : public Module
 	}
 	void OnBotServHelp(User *u)
 	{
-		notice_lang(s_BotServ, u, BOT_HELP_CMD_ASSIGN);
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_ASSIGN);
 	}
 };
 

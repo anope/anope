@@ -35,18 +35,18 @@ class CommandOSIgnore : public Command
 
 			if (t <= -1)
 			{
-				notice_lang(s_OperServ, u, OPER_IGNORE_VALID_TIME);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_VALID_TIME);
 				return MOD_CONT;
 			}
 			else if (!t)
 			{
 				add_ignore(nick, t);
-				notice_lang(s_OperServ, u, OPER_IGNORE_PERM_DONE, nick);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_PERM_DONE, nick);
 			}
 			else
 			{
 				add_ignore(nick, t);
-				notice_lang(s_OperServ, u, OPER_IGNORE_TIME_DONE, nick, time);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_TIME_DONE, nick, time);
 			}
 		}
 
@@ -59,13 +59,13 @@ class CommandOSIgnore : public Command
 
 		if (!ignore)
 		{
-			notice_lang(s_OperServ, u, OPER_IGNORE_LIST_EMPTY);
+			notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		notice_lang(s_OperServ, u, OPER_IGNORE_LIST);
+		notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST);
 		for (id = ignore; id; id = id->next)
-			u->SendMessage(s_OperServ, "%s", id->mask);
+			u->SendMessage(Config.s_OperServ, "%s", id->mask);
 
 		return MOD_CONT;
 	}
@@ -79,10 +79,10 @@ class CommandOSIgnore : public Command
 		{
 			if (delete_ignore(nick))
 			{
-				notice_lang(s_OperServ, u, OPER_IGNORE_DEL_DONE, nick);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_DEL_DONE, nick);
 				return MOD_CONT;
 			}
-			notice_lang(s_OperServ, u, OPER_IGNORE_LIST_NOMATCH, nick);
+			notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST_NOMATCH, nick);
 		}
 
 		return MOD_CONT;
@@ -91,7 +91,7 @@ class CommandOSIgnore : public Command
 	CommandReturn DoClear(User *u)
 	{
 		clear_ignores();
-		notice_lang(s_OperServ, u, OPER_IGNORE_LIST_CLEARED);
+		notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST_CLEARED);
 
 		return MOD_CONT;
 	}
@@ -120,13 +120,13 @@ class CommandOSIgnore : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_IGNORE);
+		notice_help(Config.s_OperServ, u, OPER_HELP_IGNORE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
 	}
 };
 
@@ -144,7 +144,7 @@ class OSIgnore : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_IGNORE);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_IGNORE);
 	}
 };
 

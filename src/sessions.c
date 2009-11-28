@@ -138,13 +138,13 @@ int add_session(const char *nick, const char *host, char *hostip)
 	if (session) {
 		exception = find_hostip_exception(host, hostip);
 
-		sessionlimit = exception ? exception->limit : DefSessionLimit;
+		sessionlimit = exception ? exception->limit : Config.DefSessionLimit;
 
 		if (sessionlimit != 0 && session->count >= sessionlimit) {
-			if (SessionLimitExceeded)
-				ircdproto->SendMessage(findbot(s_OperServ), nick, SessionLimitExceeded, host);
-			if (SessionLimitDetailsLoc)
-				ircdproto->SendMessage(findbot(s_OperServ), nick, "%s", SessionLimitDetailsLoc);
+			if (Config.SessionLimitExceeded)
+				ircdproto->SendMessage(findbot(Config.s_OperServ), nick, Config.SessionLimitExceeded, host);
+			if (Config.SessionLimitDetailsLoc)
+				ircdproto->SendMessage(findbot(Config.s_OperServ), nick, "%s", Config.SessionLimitDetailsLoc);
 
 			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
 			 * decremented in do_quit, which caused problems and fixed here
@@ -154,16 +154,16 @@ int add_session(const char *nick, const char *host, char *hostip)
 			 * decremented in do_kill or in do_quit - Adam
 			 */
 			session->count++;
-			kill_user(s_OperServ, nick, "Session limit exceeded");
+			kill_user(Config.s_OperServ, nick, "Session limit exceeded");
 
 			session->hits++;
-			if (MaxSessionKill && session->hits >= MaxSessionKill) {
+			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill) {
 				char akillmask[BUFSIZE];
 				snprintf(akillmask, sizeof(akillmask), "*@%s", host);
-				add_akill(NULL, akillmask, s_OperServ,
-						  time(NULL) + SessionAutoKillExpiry,
+				add_akill(NULL, akillmask, Config.s_OperServ,
+						  time(NULL) + Config.SessionAutoKillExpiry,
 						  "Session limit exceeded");
-				ircdproto->SendGlobops(s_OperServ,
+				ircdproto->SendGlobops(Config.s_OperServ,
 								 "Added a temporary AKILL for \2%s\2 due to excessive connections",
 								 akillmask);
 			}
@@ -193,7 +193,7 @@ void del_session(const char *host)
 {
 	Session *session;
 
-	if (!LimitSessions) {
+	if (!Config.LimitSessions) {
 		if (debug) {
 			alog("debug: del_session called when LimitSessions is disabled");
 		}
@@ -214,7 +214,7 @@ void del_session(const char *host)
 
 	if (!session) {
 		if (debug) {
-			ircdproto->SendGlobops(s_OperServ,
+			ircdproto->SendGlobops(Config.s_OperServ,
 							 "WARNING: Tried to delete non-existant session: \2%s",
 							 host);
 			alog("session: Tried to delete non-existant session: %s",
@@ -260,8 +260,8 @@ void expire_exceptions()
 	for (i = 0; i < nexceptions; i++) {
 		if (exceptions[i].expires == 0 || exceptions[i].expires > now)
 			continue;
-		if (WallExceptionExpire)
-			ircdproto->SendGlobops(s_OperServ,
+		if (Config.WallExceptionExpire)
+			ircdproto->SendGlobops(Config.s_OperServ,
 							 "Session limit exception for %s has expired.",
 							 exceptions[i].mask);
 		delete [] exceptions[i].mask;
@@ -312,7 +312,7 @@ Exception *find_hostip_exception(const char *host, const char *hostip)
 #define SAFE(x) do {									\
 	if ((x) < 0) {									  \
 		if (!forceload)								 \
-			fatal("Read error on %s", ExceptionDBName); \
+			fatal("Read error on %s", Config.ExceptionDBName); \
 		nexceptions = i;								\
 		break;										  \
 	}												   \
@@ -327,7 +327,7 @@ void load_exceptions()
 	uint32 tmp32;
 
 	if (!
-		(f = open_db(s_OperServ, ExceptionDBName, "r", EXCEPTION_VERSION)))
+		(f = open_db(Config.s_OperServ, Config.ExceptionDBName, "r", EXCEPTION_VERSION)))
 		return;
 	switch (i = get_file_version(f)) {
 	case 9:
@@ -354,7 +354,7 @@ void load_exceptions()
 		break;
 
 	default:
-		fatal("Unsupported version (%d) on %s", i, ExceptionDBName);
+		fatal("Unsupported version (%d) on %s", i, Config.ExceptionDBName);
 	}						   /* switch (ver) */
 
 	close_db(f);
@@ -367,9 +367,9 @@ void load_exceptions()
 #define SAFE(x) do {											\
 	if ((x) < 0) {											  \
 		restore_db(f);										  \
-		log_perror("Write error on %s", ExceptionDBName);	   \
-		if (time(NULL) - lastwarn > WarningTimeout) {		   \
-			ircdproto->SendGlobops(NULL, "Write error on %s: %s", ExceptionDBName,  \
+		log_perror("Write error on %s", Config.ExceptionDBName);	   \
+		if (time(NULL) - lastwarn > Config.WarningTimeout) {		   \
+			ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.ExceptionDBName,  \
 						strerror(errno));					   \
 			lastwarn = time(NULL);							  \
 		}													   \
@@ -384,7 +384,7 @@ void save_exceptions()
 	static time_t lastwarn = 0;
 
 	if (!
-		(f = open_db(s_OperServ, ExceptionDBName, "w", EXCEPTION_VERSION)))
+		(f = open_db(Config.s_OperServ, Config.ExceptionDBName, "w", EXCEPTION_VERSION)))
 		return;
 	SAFE(write_int16(nexceptions, f));
 	for (i = 0; i < nexceptions; i++) {
@@ -416,12 +416,12 @@ int exception_add(User * u, const char *mask, const int limit,
 			if (exceptions[i].limit != limit) {
 				exceptions[i].limit = limit;
 				if (u)
-					notice_lang(s_OperServ, u, OPER_EXCEPTION_CHANGED,
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_CHANGED,
 								mask, exceptions[i].limit);
 				return -2;
 			} else {
 				if (u)
-					notice_lang(s_OperServ, u, OPER_EXCEPTION_EXISTS,
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_EXISTS,
 								mask);
 				return -1;
 			}

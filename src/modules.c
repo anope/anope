@@ -60,19 +60,19 @@ int protocol_module_init()
 {
 	int ret = 0;
 
-	alog("Loading IRCD Protocol Module: [%s]", IRCDModule);
-	ret = ModuleManager::LoadModule(IRCDModule, NULL);
+	alog("Loading IRCD Protocol Module: [%s]", Config.IRCDModule);
+	ret = ModuleManager::LoadModule(Config.IRCDModule, NULL);
 
 	if (ret == MOD_ERR_OK)
 	{
-		findModule(IRCDModule)->SetType(PROTOCOL);
+		findModule(Config.IRCDModule)->SetType(PROTOCOL);
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
 		 */
 		if (ircd->ts6)
 		{
-			if (!Numeric)
+			if (!Config.Numeric)
 			{
 				alog("This IRCd protocol requires a server id to be set in Anope's configuration.");
 				ret = -1;
@@ -220,38 +220,38 @@ int Module::AddCommand(CommandHash * cmdTable[], Command * c)
 
 
 	if (cmdTable == HOSTSERV) {
-		if (s_HostServ) {
-			c->service = sstrdup(s_HostServ);
+		if (Config.s_HostServ) {
+			c->service = sstrdup(Config.s_HostServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
 	} else if (cmdTable == BOTSERV) {
-		if (s_BotServ) {
-			c->service = sstrdup(s_BotServ);
+		if (Config.s_BotServ) {
+			c->service = sstrdup(Config.s_BotServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
 	} else if (cmdTable == MEMOSERV) {
-		if (s_MemoServ) {
-			c->service = sstrdup(s_MemoServ);
+		if (Config.s_MemoServ) {
+			c->service = sstrdup(Config.s_MemoServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
 	} else if (cmdTable == CHANSERV) {
-		if (s_ChanServ) {
-			c->service = sstrdup(s_ChanServ);
+		if (Config.s_ChanServ) {
+			c->service = sstrdup(Config.s_ChanServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
 	} else if (cmdTable == NICKSERV) {
-		if (s_NickServ) {
-			c->service = sstrdup(s_NickServ);
+		if (Config.s_NickServ) {
+			c->service = sstrdup(Config.s_NickServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
 	} else if (cmdTable == OPERSERV) {
-		if (s_OperServ) {
-			c->service = sstrdup(s_OperServ);
+		if (Config.s_OperServ) {
+			c->service = sstrdup(Config.s_OperServ);
 		} else {
 			return MOD_ERR_NOSERVICE;
 		}
@@ -688,7 +688,7 @@ void Module::NoticeLang(const char *source, User * u, int number, ...)
 	va_list va;
 	char buffer[4096], outbuf[4096];
 	char *fmt = NULL;
-	int mlang = NSDefLanguage;
+	int mlang = Config.NSDefLanguage;
 	char *s, *t, *buf;
 
 	/* Find the users lang, and use it if we can */
@@ -727,7 +727,7 @@ void Module::NoticeLang(const char *source, User * u, int number, ...)
 
 const char *Module::GetLangString(User * u, int number)
 {
-	int mlang = NSDefLanguage;
+	int mlang = Config.NSDefLanguage;
 
 	/* Find the users lang, and use it if we can */
 	if (u && u->nc)

@@ -32,7 +32,7 @@ class CommandNSDrop : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_NickServ, u, NICK_DROP_DISABLED);
+			notice_lang(Config.s_NickServ, u, NICK_DROP_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -42,17 +42,17 @@ class CommandNSDrop : public Command
 			{
 				if ((nr = findrequestnick(nick)) && u->nc->IsServicesOper())
 				{
-					if (WallDrop)
-						ircdproto->SendGlobops(s_NickServ, "\2%s\2 used DROP on \2%s\2", u->nick, nick);
-					alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->nick, nr->email);
+					if (Config.WallDrop)
+						ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used DROP on \2%s\2", u->nick, nick);
+					alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->nick, nr->email);
 					delete nr;
-					notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
+					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 				}
 				else
-					notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+					notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
 			}
 			else
-				notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
+				notice_lang(Config.s_NickServ, u, NICK_NOT_REGISTERED);
 			return MOD_CONT;
 		}
 
@@ -61,34 +61,34 @@ class CommandNSDrop : public Command
 			my_nick = sstrdup(na->nick);
 
 		if (!is_mine && !u->nc->HasPriv("nickserv/drop"))
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
-		else if (NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
+		else if (Config.NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
+			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else
 		{
 			if (readonly)
-				notice_lang(s_NickServ, u, READ_ONLY_MODE);
+				notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
 
 			if (ircd->sqline && (na->HasFlag(NS_FORBIDDEN)))
 				ircdproto->SendSQLineDel(na->nick);
 
-			alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)", s_NickServ, u->nick, u->GetIdent().c_str(), u->host, na->nick, na->nc->display, na->nc->email ? na->nc->email : "none");
+			alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, na->nick, na->nc->display, na->nc->email ? na->nc->email : "none");
 			delete na;
 
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(my_nick ? my_nick : nick));
 
 			if (!is_mine)
 			{
-				if (WallDrop)
-					ircdproto->SendGlobops(s_NickServ, "\2%s\2 used DROP on \2%s\2", u->nick, nick);
-				notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
+				if (Config.WallDrop)
+					ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used DROP on \2%s\2", u->nick, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 			}
 			else
 			{
 				if (nick)
-					notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
+					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 				else
-					notice_lang(s_NickServ, u, NICK_DROPPED);
+					notice_lang(Config.s_NickServ, u, NICK_DROPPED);
 				if (my_nick)
 					delete [] my_nick;
 			}
@@ -99,9 +99,9 @@ class CommandNSDrop : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		if (u->nc && u->nc->HasPriv("nickserv/drop"))
-			notice_help(s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
+			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
 		else
-			notice_help(s_NickServ, u, NICK_HELP_DROP);
+			notice_help(Config.s_NickServ, u, NICK_HELP_DROP);
 
 		return true;
 	}
@@ -122,7 +122,7 @@ class NSDrop : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_DROP);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_DROP);
 	}
 };
 

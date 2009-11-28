@@ -38,7 +38,7 @@ class CommandOSUserList : public Command
 		{
 			struct c_userlist *cu;
 
-			notice_lang(s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
+			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
 
 			for (cu = c->users; cu; cu = cu->next)
 			{
@@ -50,7 +50,7 @@ class CommandOSUserList : public Command
 							continue;
 					}
 				}
-				notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick, cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
+				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick, cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
 			}
 		}
 		else
@@ -59,7 +59,7 @@ class CommandOSUserList : public Command
 			int i;
 			User *u2;
 
-			notice_lang(s_OperServ, u, OPER_USERLIST_HEADER);
+			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER);
 
 			for (i = 0; i < 1024; ++i)
 			{
@@ -79,18 +79,18 @@ class CommandOSUserList : public Command
 							}
 						}
 					}
-					notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+					notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 				}
 			}
 		}
 
-		notice_lang(s_OperServ, u, OPER_USERLIST_END);
+		notice_lang(Config.s_OperServ, u, OPER_USERLIST_END);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_USERLIST);
+		notice_help(Config.s_OperServ, u, OPER_HELP_USERLIST);
 		return true;
 	}
 };
@@ -110,7 +110,7 @@ class OSUserList : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_USERLIST);
 	}
 };
 

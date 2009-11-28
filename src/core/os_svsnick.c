@@ -32,36 +32,36 @@ class CommandOSSVSNick : public Command
 		/* Truncate long nicknames to NICKMAX-2 characters */
 		if (newnick.length() > NICKMAX - 2)
 		{
-			notice_lang(s_OperServ, u, NICK_X_TRUNCATED, newnick.c_str(), NICKMAX - 2, newnick.c_str());
+			notice_lang(Config.s_OperServ, u, NICK_X_TRUNCATED, newnick.c_str(), NICKMAX - 2, newnick.c_str());
 			newnick = params[1].substr(0, NICKMAX - 2);
 		}
 
 		/* Check for valid characters */
 		if (newnick[0] == '-' || isdigit(newnick[0]))
 		{
-			notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
+			notice_lang(Config.s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 			return MOD_CONT;
 		}
 		for (unsigned i = 0; i < newnick.size(); ++i)
 		{
 			if (!isvalidnick(newnick[i]))
 			{
-				notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
+				notice_lang(Config.s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 				return MOD_CONT;
 			}
 		}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!finduser(nick))
-			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (finduser(newnick.c_str()))
-			notice_lang(s_OperServ, u, NICK_X_IN_USE, newnick.c_str());
+			notice_lang(Config.s_OperServ, u, NICK_X_IN_USE, newnick.c_str());
 		else if ((na = findnick(newnick.c_str())) && (na->HasFlag(NS_FORBIDDEN)))
-			notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick.c_str());
+			notice_lang(Config.s_OperServ, u, NICK_X_FORBIDDEN, newnick.c_str());
 		else
 		{
-			notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
-			ircdproto->SendGlobops(s_OperServ, "%s used SVSNICK to change %s to %s", u->nick, nick, newnick.c_str());
+			notice_lang(Config.s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
+			ircdproto->SendGlobops(Config.s_OperServ, "%s used SVSNICK to change %s to %s", u->nick, nick, newnick.c_str());
 			ircdproto->SendForceNickChange(nick, newnick.c_str(), time(NULL));
 		}
 		return MOD_CONT;
@@ -69,13 +69,13 @@ class CommandOSSVSNick : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_SVSNICK);
+		notice_help(Config.s_OperServ, u, OPER_HELP_SVSNICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "SVSNICK", OPER_SVSNICK_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "SVSNICK", OPER_SVSNICK_SYNTAX);
 	}
 };
 
@@ -97,7 +97,7 @@ class OSSVSNick : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_SVSNICK);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SVSNICK);
 	}
 };
 

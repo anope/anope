@@ -246,8 +246,8 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	if (u)
 	{
-		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
-		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
+		ircdproto->SendGlobops(Config.s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
+		notice_lang(Config.s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
 
 		/* If a user is loading this module, then the core databases have already been loaded
 		 * so trigger the event manually
@@ -263,21 +263,21 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 	if (!m || !m->handle)
 	{
 		if (u)
-			notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
 		return MOD_ERR_PARAMS;
 	}
 
 	if (m->GetPermanent() || m->type == PROTOCOL || m->type == ENCRYPTION)
 	{
 		if (u)
-			notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_UNLOAD);
 		return MOD_ERR_NOUNLOAD;
 	}
 
 	if (u)
 	{
-		ircdproto->SendGlobops(s_OperServ, "%s unloaded module %s", u->nick, m->name.c_str());
-		notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
+		ircdproto->SendGlobops(Config.s_OperServ, "%s unloaded module %s", u->nick, m->name.c_str());
+		notice_lang(Config.s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
 
 	DeleteModule(m);

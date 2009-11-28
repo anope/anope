@@ -168,7 +168,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 			/* And hybrid needs Global joined in the logchan */
 			if (LogChan && ircd->join2msg) {
 				/* XXX might desync */
-				ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
+				ircdproto->SendJoin(findbot(Config.s_GlobalNoticer), Config.LogChannel, time(NULL));
 			}
 		}
 		serv_uplink = serv;
@@ -227,7 +227,7 @@ static void delete_server(Server * serv, const char *quitreason)
 							(quitreason ? sstrdup(quitreason) : NULL);
 					}
 
-					if (LimitSessions && !is_ulined(u->server->name)) {
+					if (Config.LimitSessions && !is_ulined(u->server->name)) {
 						del_session(u->host);
 					}
 					delete u;
@@ -416,8 +416,8 @@ void do_server(const char *source, const char *servername, const char *hops,
 	newserver = new_server(s, servername, descript, SERVER_START, numeric);
 
 	/* Announce services being online. */
-	if (GlobalOnCycle && GlobalOnCycleUP)
-		notice_server(s_GlobalNoticer, newserver, "%s", GlobalOnCycleUP);
+	if (Config.GlobalOnCycle && Config.GlobalOnCycleUP)
+		notice_server(Config.s_GlobalNoticer, newserver, "%s", Config.GlobalOnCycleUP);
 
 	/* Let modules know about the connection */
 	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));
@@ -458,7 +458,7 @@ void do_squit(const char *source, int ac, const char **av)
 	{
 		snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
 				 s->name);
-		ircdproto->SendGlobops(s_OperServ, buf);
+		ircdproto->SendGlobops(Config.s_OperServ, buf);
 	}
 
 	snprintf(buf, sizeof(buf), "%s %s", s->name,
@@ -533,8 +533,8 @@ int is_ulined(const char *server)
 {
 	int j;
 
-	for (j = 0; j < NumUlines; j++) {
-		if (stricmp(Ulines[j], server) == 0) {
+	for (j = 0; j < Config.NumUlines; j++) {
+		if (stricmp(Config.Ulines[j], server) == 0) {
 			return 1;
 		}
 	}

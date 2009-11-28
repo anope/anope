@@ -30,7 +30,7 @@ class CommandMSSendAll : public Command
 
 		if (readonly)
 		{
-			notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
+			notice_lang(Config.s_MemoServ, u, MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -43,19 +43,19 @@ class CommandMSSendAll : public Command
 			} /* /nc */
 		} /* /i */
 
-		notice_lang(s_MemoServ, u, MEMO_MASS_SENT);
+		notice_lang(Config.s_MemoServ, u, MEMO_MASS_SENT);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_SENDALL);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_SENDALL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
 	}
 };
 
@@ -73,7 +73,7 @@ class MSSendAll : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
 	}
 };
 

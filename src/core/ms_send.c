@@ -33,13 +33,13 @@ class CommandMSSend : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_MemoServ, u, MEMO_HELP_SEND);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_SEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+		syntax_error(Config.s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
 	}
 };
 
@@ -57,7 +57,7 @@ class MSSend : public Module
 	}
 	void OnMemoServHelp(User *u)
 	{
-		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SEND);
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SEND);
 	}
 };
 

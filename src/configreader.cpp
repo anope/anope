@@ -13,7 +13,7 @@
 
 #include "services.h"
 
-ConfigReader::ConfigReader() : data(&serverConfig.config_data), errorlog(new std::ostringstream(std::stringstream::in | std::stringstream::out)), privatehash(false), error(CONF_NO_ERROR)
+ConfigReader::ConfigReader() : data(&Config.config_data), errorlog(new std::ostringstream(std::stringstream::in | std::stringstream::out)), privatehash(false), error(CONF_NO_ERROR)
 {
 }
 
@@ -27,7 +27,7 @@ ConfigReader::~ConfigReader()
 
 ConfigReader::ConfigReader(const std::string &filename) : data(new ConfigDataHash), errorlog(new std::ostringstream(std::stringstream::in | std::stringstream::out)), privatehash(true), error(CONF_NO_ERROR)
 {
-	serverConfig.ClearStack();
+	Config.ClearStack();
 }
 
 std::string ConfigReader::ReadValue(const std::string &tag, const std::string &name, const std::string &default_value, int index, bool allow_linefeeds)
@@ -35,7 +35,7 @@ std::string ConfigReader::ReadValue(const std::string &tag, const std::string &n
 	/* Don't need to strlcpy() tag and name anymore, ReadConf() takes const char* */
 	std::string result;
 
-	if (!serverConfig.ConfValue(*this->data, tag, name, default_value, index, result, allow_linefeeds))
+	if (!Config.ConfValue(*this->data, tag, name, default_value, index, result, allow_linefeeds))
 		this->error = CONF_VALUE_NOT_FOUND;
 
 	return result;
@@ -48,7 +48,7 @@ std::string ConfigReader::ReadValue(const std::string &tag, const std::string &n
 
 bool ConfigReader::ReadFlag(const std::string &tag, const std::string &name, const std::string &default_value, int index)
 {
-	return serverConfig.ConfValueBool(*this->data, tag, name, default_value, index);
+	return Config.ConfValueBool(*this->data, tag, name, default_value, index);
 }
 
 bool ConfigReader::ReadFlag(const std::string &tag, const std::string &name, int index)
@@ -60,7 +60,7 @@ int ConfigReader::ReadInteger(const std::string &tag, const std::string &name, c
 {
 	int result;
 
-	if (!serverConfig.ConfValueInteger(*this->data, tag, name, default_value, index, result))
+	if (!Config.ConfValueInteger(*this->data, tag, name, default_value, index, result))
 	{
 		this->error = CONF_VALUE_NOT_FOUND;
 		return 0;
@@ -89,17 +89,17 @@ long ConfigReader::GetError()
 
 void ConfigReader::DumpErrors(bool bail)
 {
-	serverConfig.ReportConfigError(this->errorlog->str(), bail);
+	Config.ReportConfigError(this->errorlog->str(), bail);
 }
 
 int ConfigReader::Enumerate(const std::string &tag)
 {
-	return serverConfig.ConfValueEnum(*this->data, tag);
+	return Config.ConfValueEnum(*this->data, tag);
 }
 
 int ConfigReader::EnumerateValues(const std::string &tag, int index)
 {
-	return serverConfig.ConfVarEnum(*this->data, tag, index);
+	return Config.ConfVarEnum(*this->data, tag, index);
 }
 
 bool ConfigReader::Verify()

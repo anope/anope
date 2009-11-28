@@ -30,7 +30,7 @@ class CommandOSModUnLoad : public Command
 		Module *m = findModule(name);
 		if (!m)
 		{
-			notice_lang(s_OperServ, u, OPER_MODULE_ISNT_LOADED, name);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_ISNT_LOADED, name);
 			return MOD_CONT;
 		}
 
@@ -39,20 +39,20 @@ class CommandOSModUnLoad : public Command
 		status = ModuleManager::UnloadModule(m, u);
 
 		if (status != MOD_ERR_OK)
-			notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_OperServ, u, OPER_HELP_MODUNLOAD);
+		notice_help(Config.s_OperServ, u, OPER_HELP_MODUNLOAD);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
+		syntax_error(Config.s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
 	}
 };
 
@@ -72,7 +72,7 @@ class OSModUnLoad : public Module
 	}
 	void OnOperServHelp(User *u)
 	{
-		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
 	}
 };
 

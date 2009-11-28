@@ -26,16 +26,16 @@ void bad_password(User * u)
 {
 	time_t now = time(NULL);
 
-	if (!u || !BadPassLimit) {
+	if (!u || !Config.BadPassLimit) {
 		return;
 	}
 
-	if (BadPassTimeout > 0 && u->invalid_pw_time > 0
-		&& u->invalid_pw_time < now - BadPassTimeout)
+	if (Config.BadPassTimeout > 0 && u->invalid_pw_time > 0
+		&& u->invalid_pw_time < now - Config.BadPassTimeout)
 		u->invalid_pw_count = 0;
 	u->invalid_pw_count++;
 	u->invalid_pw_time = now;
-	if (u->invalid_pw_count >= BadPassLimit) {
+	if (u->invalid_pw_count >= Config.BadPassLimit) {
 		kill_user(NULL, u->nick, "Too many invalid passwords");
 	}
 }
@@ -57,7 +57,7 @@ void kill_user(const char *source, const char *user, const char *reason)
 		return;
 	}
 	if (!source || !*source) {
-		source = ServerName;
+		source = Config.ServerName;
 	}
 	if (!reason) {
 		reason = "";
@@ -106,9 +106,9 @@ void sqline(char *mask, char *reason)
 						av[0] = c->name;
 						av[1] = cu->user->nick;
 						av[2] = reason;
-						ircdproto->SendKick(findbot(s_OperServ), av[0], av[1],
+						ircdproto->SendKick(findbot(Config.s_OperServ), av[0], av[1],
 									   "Q-Lined: %s", av[2]);
-						do_kick(s_ChanServ, 3, av);
+						do_kick(Config.s_ChanServ, 3, av);
 					}
 				}
 			}

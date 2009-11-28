@@ -40,18 +40,18 @@ class CommandNSStatus : public Command
 			na = findnick(nick);
 
 			if (!(u2 = finduser(nick))) /* Nick is not online */
-				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
 			else if (nick_identified(u2) && na && na->nc == u2->nc) /* Nick is identified */
-				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 3, u2->nc->display);
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 3, u2->nc->display);
 			else if (u2->IsRecognized()) /* Nick is recognised, but NOT identified */
-				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 2, (u2->nc ? u2->nc->display : ""));
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 2, (u2->nc ? u2->nc->display : ""));
 			else if (!na) /* Nick is online, but NOT a registered */
-				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
 			else
 				/* Nick is not identified for the nick, but they could be logged into an account,
 				 * so we tell the user about it
 				 */
-				notice_lang(s_NickServ, u, NICK_STATUS_REPLY, nick, 1, (u2->nc ? u2->nc->display : ""));
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 1, (u2->nc ? u2->nc->display : ""));
 
 			/* Get the next nickname */
 			nick = params.size() > i ? params[i].c_str() : NULL;
@@ -61,7 +61,7 @@ class CommandNSStatus : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_NickServ, u, NICK_HELP_STATUS);
+		notice_help(Config.s_NickServ, u, NICK_HELP_STATUS);
 		return true;
 	}
 };
@@ -81,7 +81,7 @@ class NSStatus : public Module
 	}
 	void OnNickServHelp(User *u)
 	{
-		notice_lang(s_NickServ, u, NICK_HELP_CMD_STATUS);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_STATUS);
 	}
 };
 

@@ -31,7 +31,7 @@ class CommandCSSuspend : public Command
 		Channel *c;
 
 		/* Assumes that permission checking has already been done. */
-		if (ForceForbidReason && !reason)
+		if (Config.ForceForbidReason && !reason)
 		{
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
@@ -39,19 +39,19 @@ class CommandCSSuspend : public Command
 
 		if (chan[0] != '#')
 		{
-			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
 			return MOD_CONT;
 		}
 
 		/* You should not SUSPEND a FORBIDEN channel */
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
-			notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 			return MOD_CONT;
 		}
 
 		if (readonly)
-			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_ChanServ, u, READ_ONLY_MODE);
 
 		if (ci)
 		{
@@ -75,36 +75,36 @@ class CommandCSSuspend : public Command
 					av[0] = c->name;
 					av[1] = cu->user->nick;
 					av[2] = reason ? reason : getstring(cu->user->nc, CHAN_SUSPEND_REASON);
-					ircdproto->SendKick(findbot(s_ChanServ), av[0], av[1], av[2]);
-					do_kick(s_ChanServ, 3, av);
+					ircdproto->SendKick(findbot(Config.s_ChanServ), av[0], av[1], av[2]);
+					do_kick(Config.s_ChanServ, 3, av);
 				}
 			}
 
-			if (WallForbid)
-				ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick, ci->name);
+			if (Config.WallForbid)
+				ircdproto->SendGlobops(Config.s_ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick, ci->name);
 
-			alog("%s: %s set SUSPEND for channel %s", s_ChanServ, u->nick, ci->name);
-			notice_lang(s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
+			alog("%s: %s set SUSPEND for channel %s", Config.s_ChanServ, u->nick, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
 
 			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
 		else
 		{
-			alog("%s: Valid SUSPEND for %s by %s failed", s_ChanServ, ci->name, u->nick);
-			notice_lang(s_ChanServ, u, CHAN_SUSPEND_FAILED, chan);
+			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_ChanServ, ci->name, u->nick);
+			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_FAILED, chan);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_SUSPEND);
+		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "SUSPEND", ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "SUSPEND", Config.ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
 	}
 };
 
@@ -123,16 +123,16 @@ class CommandCSUnSuspend : public Command
 
 		if (chan[0] != '#')
 		{
-			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
 			return MOD_CONT;
 		}
 		if (readonly)
-			notice_lang(s_ChanServ, u, READ_ONLY_MODE);
+			notice_lang(Config.s_ChanServ, u, READ_ONLY_MODE);
 
 		/* Only UNSUSPEND already suspended channels */
 		if (!(ci->HasFlag(CI_SUSPENDED)))
 		{
-			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
 			return MOD_CONT;
 		}
 
@@ -150,31 +150,31 @@ class CommandCSUnSuspend : public Command
 				ci->forbidby = NULL;
 			}
 
-			if (WallForbid)
-				ircdproto->SendGlobops(s_ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick, ci->name);
+			if (Config.WallForbid)
+				ircdproto->SendGlobops(Config.s_ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick, ci->name);
 
-			alog("%s: %s set UNSUSPEND for channel %s", s_ChanServ, u->nick, ci->name);
-			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
+			alog("%s: %s set UNSUSPEND for channel %s", Config.s_ChanServ, u->nick, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
 
 			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 		}
 		else
 		{
-			alog("%s: Valid UNSUSPEND for %s by %s failed", s_ChanServ, chan, u->nick);
-			notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
+			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_ChanServ, chan, u->nick);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		notice_help(s_ChanServ, u, CHAN_SERVADMIN_HELP_UNSUSPEND);
+		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(s_ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
 	}
 };
 
@@ -194,8 +194,8 @@ class CSSuspend : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
-		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
 	}
 };
 

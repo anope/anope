@@ -54,9 +54,9 @@ class CommandCSTBan : public Command
 		const char *time = params[2].c_str();
 
 		if (!(c = findchan(chan)))
-			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		else if (!(u2 = finduser(nick)))
-			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 		else
 		{
 			if (canBanUser(c, u, u2))
@@ -73,15 +73,15 @@ class CommandCSTBan : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		this->OnSyntaxError(u, "");
-		ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-		me->NoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
+		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		me->NoticeLang(Config.s_ChanServ, u, TBAN_HELP_DETAIL);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		me->NoticeLang(s_ChanServ, u, TBAN_SYNTAX);
+		me->NoticeLang(Config.s_ChanServ, u, TBAN_SYNTAX);
 	}
 };
 
@@ -159,13 +159,13 @@ class CSTBan : public Module
 	}
 	void OnChanServHelp(User *u)
 	{
-		this->NoticeLang(s_ChanServ, u, TBAN_HELP);
+		this->NoticeLang(Config.s_ChanServ, u, TBAN_HELP);
 	}
 };
 
 void mySendResponse(User *u, const char *channel, char *mask, const char *time)
 {
-	me->NoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
+	me->NoticeLang(Config.s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
 class TempBan : public Timer
@@ -188,7 +188,7 @@ class TempBan : public Timer
 			if ((c = findchan(chan.c_str())) && c->ci)
 			{
 				ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
-				chan_set_modes(s_ChanServ, c, 2, av, 1);
+				chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
 			}
 		}
 };
@@ -205,7 +205,7 @@ void addBan(Channel *c, time_t timeout, char *banmask)
 	av[1] = banmask;
 
 	ircdproto->SendMode(whosends(c->ci), c->name, "+b %s", av[1]);
-	chan_set_modes(s_ChanServ, c, 2, av, 1);
+	chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
 
 	me->AddCallBack(new TempBan(timeout, c->name, banmask));
 }
@@ -215,11 +215,11 @@ int canBanUser(Channel * c, User * u, User * u2)
 	ChannelInfo *ci = c->ci;
 	int ok = 0;
 	if (!check_access(u, ci, CA_BAN))
-		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (is_excepted(ci, u2))
-		notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
 	else if (is_protected(u2))
-		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else
 		ok = 1;
 

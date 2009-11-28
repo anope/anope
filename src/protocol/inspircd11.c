@@ -135,9 +135,9 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 	if (!nick || !vhost) {
 		return;
 	}
-	send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
+	send_cmd(Config.s_OperServ, "CHGHOST %s %s", nick, vhost);
 	} else {
-	ircdproto->SendGlobops(s_OperServ, "CHGHOST not loaded!");
+	ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST not loaded!");
 	}
 }
 
@@ -183,7 +183,7 @@ class InspIRCdProto : public IRCDProto
 				case 'o':
 					if (add) {
 						++opcnt;
-						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					}
 					else --opcnt;
 					break;
@@ -216,7 +216,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendAkillDel(const char *user, const char *host)
 	{
-		send_cmd(s_OperServ, "GLINE %s@%s", user, host);
+		send_cmd(Config.s_OperServ, "GLINE %s@%s", user, host);
 	}
 
 	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
@@ -243,7 +243,7 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = expires - time(NULL);
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
+		send_cmd(Config.ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
 	}
 
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
@@ -254,7 +254,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
+		send_cmd(Config.s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -264,19 +264,19 @@ class InspIRCdProto : public IRCDProto
 
 	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 	{
-		send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 	}
 
 	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		if (!buf) return;
 		Channel *c = findchan(dest);
-		send_cmd(source ? source->nick : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
+		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
-		send_cmd(ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 		send_cmd(nick, "OPERTYPE Service");
 	}
 
@@ -289,7 +289,7 @@ class InspIRCdProto : public IRCDProto
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
+		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest, buf);
 	}
 
 	void SendBotOp(const char *nick, const char *chan)
@@ -301,7 +301,7 @@ class InspIRCdProto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(Server *server)
 	{
-		send_cmd(ServerName, "SERVER %s %s %d :%s", server->name, currentpass, server->hops, server->desc);
+		send_cmd(Config.ServerName, "SERVER %s %s %d :%s", server->name, currentpass, server->hops, server->desc);
 	}
 
 	/* JOIN */
@@ -314,21 +314,21 @@ class InspIRCdProto : public IRCDProto
 	void SendSQLineDel(const char *user)
 	{
 		if (!user) return;
-		send_cmd(s_OperServ, "QLINE %s", user);
+		send_cmd(Config.s_OperServ, "QLINE %s", user);
 	}
 
 	/* SQLINE */
 	void SendSQLine(const char *mask, const char *reason)
 	{
 		if (!mask || !reason) return;
-		send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
+		send_cmd(Config.ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, Config.s_OperServ, static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SQUIT */
 	void SendSquit(const char *servname, const char *message)
 	{
 		if (!servname || !message) return;
-		send_cmd(ServerName, "SQUIT %s :%s", servname, message);
+		send_cmd(Config.ServerName, "SQUIT %s :%s", servname, message);
 	}
 
 	/* Functions that use serval cmd functions */
@@ -343,10 +343,10 @@ class InspIRCdProto : public IRCDProto
 	void SendConnect()
 	{
 		inspircd_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, NULL);
 		SendServer(me_server);
 		send_cmd(NULL, "BURST");
-		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModuleList.begin()->c_str(), version_build);
+		send_cmd(Config.ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, Config.ServerName, ircd->name, version_flags, Config.EncModuleList.begin()->c_str(), version_build);
 	}
 
 	/* CHGIDENT */
@@ -356,34 +356,34 @@ class InspIRCdProto : public IRCDProto
 			if (!nick || !vIdent || !*vIdent) {
 				return;
 			}
-			send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
+			send_cmd(Config.s_OperServ, "CHGIDENT %s %s", nick, vIdent);
 		} else {
-			ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
+			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT not loaded!");
 		}
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, static_cast<int>(NSReleaseTimeout), "Being held for registered user");
+		send_cmd(Config.s_OperServ, "SVSHOLD %s %ds :%s", nick, static_cast<int>(Config.NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		send_cmd(s_OperServ, "SVSHOLD %s", nick);
+		send_cmd(Config.s_OperServ, "SVSHOLD %s", nick);
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const char *mask)
 	{
-		send_cmd(s_OperServ, "ZLINE %s", mask);
+		send_cmd(Config.s_OperServ, "ZLINE %s", mask);
 	}
 
 	/* SZLINE */
 	void SendSZLine(const char *mask, const char *reason, const char *whom)
 	{
-		send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
+		send_cmd(Config.ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SVSMODE +- */
@@ -585,7 +585,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ServerName, av[0]);
+	ircdproto->SendPong(Config.ServerName, av[0]);
 	return MOD_CONT;
 }
 
@@ -661,7 +661,7 @@ int anope_event_rsquit(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	/* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
-	if (ac > 1 && strcmp(ServerName, av[0]) == 0)
+	if (ac > 1 && strcmp(Config.ServerName, av[0]) == 0)
 		do_squit(source, ac - 1, av + 1);
 	else
 		do_squit(source, ac, av);
@@ -962,13 +962,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod) {
-			ircdproto->SendGlobops(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(Config.s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chghostmod) {
-			ircdproto->SendGlobops(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chgidentmod) {
-			ircdproto->SendGlobops(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
 		}
 		if (has_messagefloodmod) {
 			ModeManager::AddChannelMode('f', new ChannelModeFlood());

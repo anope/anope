@@ -173,7 +173,7 @@ class BahamutIRCdProto : public IRCDProto
 				case 'o':
 					if (add) {
 						++opcnt;
-						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					}
 					else --opcnt;
 					break;
@@ -196,13 +196,13 @@ class BahamutIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(ServerName, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(NSReleaseTimeout), "Being held for registered user");
+		send_cmd(Config.ServerName, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(Config.NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		send_cmd(ServerName, "SVSHOLD %s 0", nick);
+		send_cmd(Config.ServerName, "SVSHOLD %s 0", nick);
 	}
 
 	/* SVSMODE -b */
@@ -214,8 +214,8 @@ class BahamutIRCdProto : public IRCDProto
 	/* SVSMODE channel modes */
 	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
-		else send_cmd(ServerName, "SVSMODE %s %s", name, mode);
+		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", name, mode, nick);
+		else send_cmd(Config.ServerName, "SVSMODE %s %s", name, mode);
 	}
 
 	void SendBotOp(const char *nick, const char *chan)
@@ -330,7 +330,7 @@ class BahamutIRCdProto : public IRCDProto
 	 */
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		send_cmd(ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
+		send_cmd(Config.ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
 	}
 
 	void SendEOB()
@@ -352,8 +352,8 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
-		EnforceQlinedNick(nick, s_BotServ);
-		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+		EnforceQlinedNick(nick, Config.s_BotServ);
+		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, Config.ServerName, real);
 		SendSQLine(nick, "Reserved for services");
 	}
 
@@ -374,7 +374,7 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		bahamut_cmd_pass(uplink_server->password);
 		bahamut_cmd_capab();
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, NULL);
 		SendServer(me_server);
 		bahamut_cmd_svinfo();
 		bahamut_cmd_burst();
@@ -464,7 +464,7 @@ int anope_event_os(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, s_OperServ, av[0]);
+	m_privmsg(source, Config.s_OperServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -473,7 +473,7 @@ int anope_event_ns(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, s_NickServ, av[0]);
+	m_privmsg(source, Config.s_NickServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -482,7 +482,7 @@ int anope_event_ms(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, s_MemoServ, av[0]);
+	m_privmsg(source, Config.s_MemoServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -491,7 +491,7 @@ int anope_event_hs(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, s_HostServ, av[0]);
+	m_privmsg(source, Config.s_HostServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -500,7 +500,7 @@ int anope_event_cs(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, s_ChanServ, av[0]);
+	m_privmsg(source, Config.s_ChanServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -639,7 +639,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+	ircdproto->SendPong(ac > 1 ? av[1] : Config.ServerName, av[0]);
 	return MOD_CONT;
 }
 

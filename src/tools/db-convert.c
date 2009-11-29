@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 			b64_encode(nc->pass, hashm == "plain" ? strlen(nc->pass) : 32, (char *)cpass, 5000);
 
 			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " " << nc->email;
-			fs << " " << GetLanguageID(nc->language) << nc->memos.memomax << " " << nc->channelcount << std::endl;
+			fs << " " << GetLanguageID(nc->language) << " " << nc->memos.memomax << " " << nc->channelcount << std::endl;
 
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
 			if (nc->greet)
@@ -692,6 +692,44 @@ int main(int argc, char *argv[])
 			READ(read_int16(&tmp16, f));
 			bi->chancount = tmp16;
 			insert_bot(bi);
+
+			/* fix for the 1.9.0 broken bot.db */
+			if ((stricmp(bi->nick, "ChanServ")==0) && !(bi->flags & BI_CHANSERV)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_CHANSERV;
+			}
+			if ((stricmp(bi->nick, "BotServ")==0) && !(bi->flags & BI_BOTSERV)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_BOTSERV | BI_PRIVATE;
+			}
+			if ((stricmp(bi->nick, "HostServ")==0) && !(bi->flags & BI_HOSTSERV)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_HOSTSERV | BI_PRIVATE;
+			}
+			if ((stricmp(bi->nick, "OperServ")==0) && !(bi->flags & BI_OPERSERV)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_OPERSERV | BI_PRIVATE;
+			}
+			if ((stricmp(bi->nick, "MemoServ")==0) && !(bi->flags & BI_MEMOSERV)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_MEMOSERV | BI_PRIVATE;
+			}
+			if ((stricmp(bi->nick, "NickServ")==0) && !(bi->flags & BI_NICKSERV)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_NICKSERV | BI_PRIVATE;
+			}
+			if ((stricmp(bi->nick, "Global")==0) && !(bi->flags & BI_GLOBAL)) 
+			{
+				bi->flags = 0;
+				bi->flags |= BI_GLOBAL | BI_PRIVATE;
+			}
+			/* end of 1.9.0 broken database fix */
 		}
 	}
 

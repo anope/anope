@@ -298,7 +298,6 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-
 	/* Section II: Chans */
 	// IIa: First database
 	if ((f = open_db_read("ChanServ", "chan.db", 16)))
@@ -594,12 +593,18 @@ int main(int argc, char *argv[])
 			}
 
 			/* TODO: convert to new mlock modes */
-			fs << "MD CH mlock_on " << ci->mlock_on << std::endl;
-			fs << "MD CH mlock_off " << ci->mlock_off << std::endl;
-			fs << "MD CH mlock_limit " << ci->mlock_limit << std::endl;
-			fs << "MD CH mlock_key" << ci->mlock_key << std::endl;
-			fs << "MD CH mlock_flood" << ci->mlock_flood << std::endl;
-			fs << "MD CH mlock_redirect" << ci->mlock_redirect << std::endl;
+			if (ci->mlock_on)
+				fs << "MD CH mlock_on " << ci->mlock_on << std::endl;
+			if (ci->mlock_off)
+				fs << "MD CH mlock_off " << ci->mlock_off << std::endl;
+			if (ci->mlock_limit)
+				fs << "MD CH mlock_limit " << ci->mlock_limit << std::endl;
+			if (ci->mlock_key)
+				fs << "MD CH mlock_key" << ci->mlock_key << std::endl;
+			if (ci->mlock_flood)
+				fs << "MD CH mlock_flood" << ci->mlock_flood << std::endl;
+			if (ci->mlock_redirect)
+				fs << "MD CH mlock_redirect" << ci->mlock_redirect << std::endl;
 
 			if (ci->memos.memocount)
 			{
@@ -616,7 +621,8 @@ int main(int argc, char *argv[])
 				fs << "MD CH entry_message :" << ci->entry_message << std::endl;
 			if (ci->bi)  // here is "bi" a *Char, not a pointer to BotInfo !
 				fs << "MD CH bot " << ci->bi << std::endl;
-			fs << "MD CH botflags "
+			if (ci->botflags)
+				fs << "MD CH botflags "
 					<< (( ci->botflags & BS_DONTKICKOPS     ) ? "DONTKICKOPS "    : "" )
 					<< (( ci->botflags & BS_DONTKICKVOICES  ) ? "DONTKICKVOICES "  : "")
 					<< (( ci->botflags & BS_FANTASY         ) ? "FANTASY "         : "")
@@ -635,11 +641,16 @@ int main(int argc, char *argv[])
 			for (j = 0; j < 8; j++)
 				fs << " " << ci->ttb[j];
 			fs << std::endl;
-			fs << "MD CH capsmin " << ci->capsmin << std::endl;
-			fs << "MD CH capspercent " << ci->capspercent << std::endl;
-			fs << "MD CH floodlines " << ci->floodlines << std::endl;
-			fs << "MD CH floodsecs " << ci->floodsecs << std::endl;
-			fs << "MD CH repeattimes " << ci->repeattimes << std::endl;
+			if (ci->capsmin)
+				fs << "MD CH capsmin " << ci->capsmin << std::endl;
+			if (ci->capspercent)
+				fs << "MD CH capspercent " << ci->capspercent << std::endl;
+			if (ci->floodlines)
+				fs << "MD CH floodlines " << ci->floodlines << std::endl;
+			if (ci->floodsecs)
+				fs << "MD CH floodsecs " << ci->floodsecs << std::endl;
+			if (ci->repeattimes)
+				fs << "MD CH repeattimes " << ci->repeattimes << std::endl;
 			for (j = 0; j < ci->bwcount; j++)
 			{
 				fs << "MD CH badword "
@@ -743,7 +754,7 @@ int main(int argc, char *argv[])
 
 
 	/* MERGING DONE \o/ HURRAY! */
-
+	fs.close();
 	printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n");
 	return 0;
 } /* End of main() */

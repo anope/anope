@@ -14,306 +14,7 @@
  *   GNU General Public License for more details.
  */
 
-
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <ctype.h>
-#include <time.h>
-
-#ifndef _WIN32
-#include <unistd.h>
-#else
-#include <windows.h>
-#include <io.h>
-#endif
-#include "sysconf.h"
-
-#include <string>
-#include <iostream>
-#include <fstream>
-
-#ifndef _WIN32
-#define C_LBLUE "\033[1;34m"
-#define C_NONE "\033[m"
-#else
-#define C_LBLUE ""
-#define C_NONE ""
-#endif
-
-#define getc_db(f)		(fgetc((f)->fp))
-#define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
-#define HASH2(chan)	((chan)[1] ? ((chan)[1]&31)<<5 | ((chan)[2]&31) : 0)
-#define read_buffer(buf,f)	(read_db((f),(buf),sizeof(buf)) == sizeof(buf))
-#define write_buffer(buf,f)	(write_db((f),(buf),sizeof(buf)) == sizeof(buf))
-#define read_db(f,buf,len)	(fread((buf),1,(len),(f)->fp))
-#define write_db(f,buf,len)	(fwrite((buf),1,(len),(f)->fp))
-#define read_int8(ret,f)	((*(ret)=fgetc((f)->fp))==EOF ? -1 : 0)
-#define write_int8(val,f)	(fputc((val),(f)->fp)==EOF ? -1 : 0)
-#define SAFE(x) do { \
-	if ((x) < 0) { \
-	printf("Error, the database is broken, trying to continue... no guarantee.\n"); \
-	} \
-} while (0)
-#define READ(x) do { \
-	if ((x) < 0) { \
-		printf("Error, the database is broken, trying to continue... no guarantee.\n"); \
-		exit(0); \
-	} \
-} while (0)
-
-typedef struct memo_ Memo;
-typedef struct dbFILE_ dbFILE;
-typedef struct nickalias_ NickAlias;
-typedef struct nickcore_ NickCore;
-typedef struct chaninfo_ ChannelInfo;
-typedef struct botinfo_ BotInfo;
-typedef struct badword_ BadWord;
-typedef struct hostcore_ HostCore;
-
-struct memo_ {
-	uint32 number;	  /* Index number -- not necessarily array position! */
-	uint16 flags;			/* Flags */
-	time_t time;		  /* When was it sent? */
-	char sender[32];   /* Name of the sender */
-	char *text;
-};
-
-struct dbFILE_ {
-	int mode;				   /* 'r' for reading, 'w' for writing */
-	FILE *fp;					/* The normal file descriptor */
-	char filename[1024];  /* Name of the database file */
-};
-
-typedef struct {
-	int16 memocount;  /* Current # of memos */
-	int16 memomax;	/* Max # of memos one can hold*/
-	Memo *memos;	 /* Pointer to original memos */
-} MemoInfo;
-
-typedef struct {
-	uint16 in_use;		 /* 1 if this entry is in use, else 0 */
-	int16 level;
-	NickCore *nc;	   /* Guaranteed to be non-NULL if in use, NULL if not */
-	time_t last_seen;
-} ChanAccess;
-
-typedef struct {
-	int16 in_use;		 /* Always 0 if not in use */
-	int16 is_nick;		 /* 1 if a regged nickname, 0 if a nick!user@host mask */
-	uint16 flags;
-	union {
-		char *mask;	  /* Guaranteed to be non-NULL if in use, NULL if not */
-		NickCore *nc;   /* Same */
-	} u;
-	char *reason;
-	char *creator;
-	time_t addtime;
-} AutoKick;
-
-struct nickalias_ {
-	NickAlias *next, *prev;
-	char *nick;					/* Nickname */
-	time_t time_registered;  /* When the nick was registered */
-	time_t last_seen;		   /* When it was seen online for the last time */
-	uint16 status;				  /* See NS_* below */
-	NickCore *nc;			   /* I'm an alias of this */
-};
-
-struct nickcore_ {
-	NickCore *next, *prev;
-
-	char *display;		   /* How the nick is displayed */
-	char pass[32];			   /* Password of the nicks */
-	char *email;			  /* E-mail associated to the nick */
-	char *greet;			  /* Greet associated to the nick */
-	uint32 icq;				 /* ICQ # associated to the nick */
-	char *url;				  /* URL associated to the nick */
-	uint32 flags;				/* See NI_* below */
-	uint16 language;		/* Language selected by nickname owner (LANG_*) */
-	uint16 accesscount;	 /* # of entries */
-	char **access;		  /* Array of strings */
-	MemoInfo memos;	 /* Memo information */
-	uint16 channelcount;  /* Number of channels currently registered */
-	int unused;				/* Used for nick collisions */
-	int aliascount;			/* How many aliases link to us? Remove the core if 0 */
-
-	char *last_quit;			 /* Last quit message */
-	char *last_realname;	 /* Last realname */
-	char *last_usermask;	 /* Last usermask */
-};
-
-struct chaninfo_ {
-	ChannelInfo *next, *prev;
-
-	char name[64];					 /* Channel name */
-	char *founder;					  /* Who registered the channel */
-	char *successor;				   /* Who gets the channel if the founder nick is dropped or expires */
-	char founderpass[32];			/* Channel password */
-	char *desc;						   /* Description */
-	char *url;							  /* URL */
-	char *email;						  /* Email address */
-	time_t time_registered;		  /* When was it registered */
-	time_t last_used;				   /* When was it used hte last time */
-	char *last_topic;						/* Last topic on the channel */
-	char last_topic_setter[32];	  /* Who set the last topic */
-	time_t last_topic_time;		   /* When the last topic was set */
-	uint32 flags;						  /* Flags */
-	char *forbidby;					  /* if forbidden: who did it */
-	char *forbidreason;				/* if forbidden: why */
-	int16 bantype;					   /* Bantype */
-	int16 *levels;						/* Access levels for commands */
-	uint16 accesscount;				 /* # of pple with access */
-	ChanAccess *access;			 /* List of authorized users */
-	uint16 akickcount;					/* # of akicked pple */
-	AutoKick *akick;					/* List of users to kickban */
-	uint32 mlock_on, mlock_off;   /* See channel modes below */
-	uint32 mlock_limit;				/* 0 if no limit */
-	char *mlock_key;				  /* NULL if no key */
-	char *mlock_flood;					/* NULL if no +f */
-	char *mlock_redirect;			/* NULL if no +L */
-	char *entry_message;		   /* Notice sent on entering channel */
-	MemoInfo memos;				 /* Memos */
-	char *bi;							   /* Bot used on this channel */
-	uint32 botflags;					  /* BS_* below */
-	int16 *ttb;							 /* Times to ban for each kicker */
-	uint16 bwcount;					   /* Badword count */
-	BadWord *badwords;			 /* For BADWORDS kicker */
-	int16 capsmin, capspercent;	/* For CAPS kicker */
-	int16 floodlines, floodsecs;	  /* For FLOOD kicker */
-	int16 repeattimes;				 /* For REPEAT kicker */
-};
-
-struct botinfo_ {
- 	BotInfo *next, *prev;
- 	char *nick;			/* Nickname of the bot */
- 	char *user;			/* Its user name */
- 	char *host;			/* Its hostname */
- 	char *real;			/* Its real name */
- 	int16 flags;			/* Bot flags */
- 	time_t created;	  /* Birth date */
-	int16 chancount;		/* Number of channels that use the bot. */
-};
-
-struct badword_ {
-	uint16 in_use;
-	char *word;
-	uint16 type;
-};
-
-struct hostcore_ {
-	HostCore *next, *last;
-	char *nick;		/* Owner of the vHost */
-	char *vIdent;	/* vIdent for the user */
-	char *vHost;	 /* Vhost for this user */
-	char *creator;   /* Oper Nick of the oper who set the vhost */
-	time_t time;	  /* Date/Time vHost was set */
-};
-
-dbFILE *open_db_write(const char *service, const char *filename, int version);
-dbFILE *open_db_read(const char *service, const char *filename, int version);
-NickCore *findcore(const char *nick, int version);
-NickAlias *findnick(const char *nick);
-BotInfo *findbot(char *nick);
-ChannelInfo *cs_findchan(const char *chan);
-char *strscpy(char *d, const char *s, size_t len);
-int write_file_version(dbFILE * f, uint32 version);
-int mystricmp(const char *s1, const char *s2);
-int delnick(NickAlias *na, int donttouchthelist);
-int write_string(const char *s, dbFILE * f);
-int write_ptr(const void *ptr, dbFILE * f);
-int read_int16(int16 * ret, dbFILE * f);
-int read_int32(int32 * ret, dbFILE * f);
-int read_uint16(uint16 * ret, dbFILE * f);
-int read_uint32(uint32 * ret, dbFILE * f);
-int read_string(char **ret, dbFILE * f);
-int write_int16(uint16 val, dbFILE * f);
-int write_int32(uint32 val, dbFILE * f);
-int read_ptr(void **ret, dbFILE * f);
-int delcore(NickCore *nc);
-void alpha_insert_chan(ChannelInfo * ci);
-void insert_bot(BotInfo * bi);
-void close_db(dbFILE * f);
-
-ChannelInfo *chanlists[256];
-NickAlias *nalists[1024];
-NickCore *nclists[1024];
-BotInfo *botlists[256];
-
-int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
-
-
-#define LANG_EN_US                        0     /* United States English */
-#define LANG_JA_JIS                      1      /* Japanese (JIS encoding) */
-#define LANG_JA_EUC                      2      /* Japanese (EUC encoding) */
-#define LANG_JA_SJIS                    3       /* Japanese (SJIS encoding) */
-#define LANG_ES                          4      /* Spanish */
-#define LANG_PT                          5      /* Portugese */
-#define LANG_FR                          6      /* French */
-#define LANG_TR                          7      /* Turkish */
-#define LANG_IT                          8      /* Italian */
-#define LANG_DE                          9      /* German */
-#define LANG_CAT                           10           /* Catalan */
-#define LANG_GR                         11      /* Greek */
-#define LANG_NL                         12      /* Dutch */
-#define LANG_RU                         13      /* Russian */
-#define LANG_HUN                           14           /* Hungarian */
-#define LANG_PL                         15      /* Polish */
-
-
-const std::string GetLanguageID(int id)
-{
-	switch (id)
-	{
-		case LANG_EN_US:
-			return "en";
-			break;
-		case LANG_JA_JIS:
-		case LANG_JA_EUC:
-		case LANG_JA_SJIS: // these seem to be unused
-			return "en";
-			break;
-		case LANG_ES:
-			return "es";
-			break;
-		case LANG_PT:
-			return "pt";
-			break;
-		case LANG_FR:
-			return "fr";
-			break;
-		case LANG_TR:
-			return "tr";
-			break;
-		case LANG_IT:
-			return "it";
-			break;
-		case LANG_DE:
-			return "de";
-			break;
-		case LANG_CAT:
-			return "ca"; // yes, iso639 defines catalan as CA
-			break;
-		case LANG_GR:
-			return "gr";
-			break;
-		case LANG_NL:
-			return "nl";
-			break;
-		case LANG_RU:
-			return "ru";
-			break;
-		case LANG_HUN:
-			return "hu";
-			break;
-		case LANG_PL:
-			return "pl";
-			break;
-		default:
-			abort();
-	}
-}
+#include "db-convert.h"
 
 int main(int argc, char *argv[])
 {
@@ -521,38 +222,48 @@ int main(int argc, char *argv[])
 			// Enc pass
 			b64_encode(nc->pass, hashm == "plain" ? strlen(nc->pass) : 32, (char *)cpass, 5000);
 
-			// Get language identifier
-			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " ";
-			fs << nc->email << " " << nc->flags << " " << GetLanguageID(nc->language) << std::endl;
+			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " " << nc->email;
+			fs << " " << GetLanguageID(nc->language) << nc->memos.memomax << " " << nc->channelcount << std::endl;
 
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
-
 			if (nc->greet)
-				fs << "MD NC " << nc->display << " greet :" << nc->greet << std::endl;
+				fs << "MD NC greet :" << nc->greet << std::endl;
 			if (nc->icq)
-				fs << "MD NC " << nc->display << " icq :" << nc->icq << std::endl;
+				fs << "MD NC icq :" << nc->icq << std::endl;
 			if (nc->url)
-				fs << "MD NC " << nc->display << " url :" << nc->url << std::endl;
+				fs << "MD NC url :" << nc->url << std::endl;
 
 			if (nc->accesscount)
 			{
-				fs << "MD NC " << nc->display << " obsolete_accesscount :" << nc->accesscount << std::endl;
 				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
-					fs << "MD NC " << nc->display << " ns_access " << *access << std::endl;
+					fs << "MD NC access " << *access << std::endl;
 			}
 
-			fs << "MD NC " << nc->display << " " << nc->memos.memomax;
-
+			fs << "MD NC flags "
+					<< ((nc->flags & NI_KILLPROTECT  ) ? "KILLPROTECT "  : "")
+					<< ((nc->flags & NI_SECURE       ) ? "SECURE "       : "")
+					<< ((nc->flags & NI_MSG          ) ? "MSG "          : "")
+					<< ((nc->flags & NI_MEMO_HARDMAX ) ? "MEMO_HARDMAX " : "")
+					<< ((nc->flags & NI_MEMO_SIGNON  ) ? "MEMO_SIGNON "  : "")
+					<< ((nc->flags & NI_MEMO_RECEIVE ) ? "MEMO_RECEIVE " : "")
+					<< ((nc->flags & NI_PRIVATE      ) ? "PRIVATE "      : "")
+					<< ((nc->flags & NI_HIDE_EMAIL   ) ? "HIDE_EMAIL "   : "")
+					<< ((nc->flags & NI_HIDE_MASK    ) ? "HIDE_MASK "    : "")
+					<< ((nc->flags & NI_HIDE_QUIT    ) ? "HIDE_QUIT "    : "")
+					<< ((nc->flags & NI_KILL_QUICK   ) ? "KILL_QUICK "   : "")
+					<< ((nc->flags & NI_KILL_IMMED   ) ? "KILL_IMMED "   : "")
+					<< ((nc->flags & NI_MEMO_MAIL    ) ? "MEMO_MAIL "    : "")
+					<< ((nc->flags & NI_HIDE_STATUS  ) ? "HIDE_STATUS "  : "")
+					<< ((nc->flags & NI_SUSPENDED    ) ? "SUSPENDED "    : "")
+					<< ((nc->flags & NI_AUTOOP       ) ? "AUTOOP "       : "")
+					<< ((nc->flags & NI_NOEXPIRE     ) ? "NOEXPIRE "     : "")
+					<< ((nc->flags & NI_FORBIDDEN    ) ? "FORBIDDEN "    : "") << std::endl;
 			if (nc->memos.memocount)
 			{
 				memos = nc->memos.memos;
-				fs << "MD NC " << nc->display << " obsolete_memocount :" << nc->memos.memocount << std::endl;
 				for (j = 0; j < nc->memos.memocount; j++, memos++)
-					fs << "ME " << nc->display << " " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
+					fs << "ME " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
 			}
-
-
-			fs << "MD NC " << nc->display << " channelfoundercount " << nc->channelcount << std::endl;
 
 			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
 			for (int tmp = 0; tmp < 1024; tmp++)
@@ -570,27 +281,23 @@ int main(int argc, char *argv[])
 
 					std::cout << "Writing: " << na->nc->display << "'s nick: " << na->nick << std::endl;
 
-
 					fs <<  "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << std::endl;
-
-/*				SAFE(write_int8(1, f));
-				SAFE(write_string(na->nick, f));
-				SAFE(write_string(na->last_usermask, f)); // core
-				SAFE(write_string(na->last_realname, f)); // core
-				SAFE(write_string(na->last_quit, f)); // core
-				SAFE(write_int32(na->time_registered, f));
-				SAFE(write_int32(na->last_seen, f));
-				SAFE(write_int16(na->status, f)); // needed?
-				SAFE(write_string(na->nc->display, f));
-*/
-
+					if (nc->last_usermask)
+						fs << "MD NA last_usermask :" << nc->last_usermask << std::endl;
+					if (nc->last_realname)
+						fs << "MD NA last_realname :" << nc->last_realname << std::endl;
+					if (nc->last_quit)
+						fs << "MD NA last_quit :" << nc->last_quit << std::endl;
+					if ((na->status & NS_FORBIDDEN) || (na->status & NS_NO_EXPIRE)) 
+					{
+						fs << "MD NA flags "
+							<< ((na->status & NS_FORBIDDEN) ? "FORBIDDEN " : "")
+							<< ((na->status & NS_NO_EXPIRE) ? "NOEXPIRE"   : "") << std::endl;
+					}
 				}
 			}
 		}
 	}
-
-
-
 
 	/* Section II: Chans */
 	// IIa: First database
@@ -603,7 +310,6 @@ int main(int argc, char *argv[])
 
 		for (i = 0; i < 256; i++)
 		{
-			std::cout << "iteration " << i << std::endl;
 			int16 tmp16;
 			int32 tmp32;
 			int n_levels;
@@ -615,7 +321,6 @@ int main(int argc, char *argv[])
 
 			while ((c = getc_db(f)) == 1)
 			{
-				std::cout << "got a channel" << std::endl;
 				int j;
 
 				if (c != 1)
@@ -822,105 +527,135 @@ int main(int argc, char *argv[])
 		{
 			int j;
 
-		/*	if (!ci->founder)
+		/*	commented because channels without founder can be forbidden
+			if (!ci->founder)
 			{
 				std::cout << "Skipping channel with no founder (wtf?)" << std::endl;
 				continue;
 			}*/
 
-			fs << "CH " << ci->name << " " << (ci->founder ? ci->founder : "") << " " << (ci->successor ? ci->successor : " ") << " " << ci->time_registered << " " << ci->last_used << " " << ci->flags << std::endl;
-
+			fs << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
+			fs << " " << ci->bantype << " " << ci->memos.memomax << std::endl;
+			if (ci->founder)
+				fs << "MD CH founder " << ci->founder << std::endl;
+			if (ci->successor)
+				fs << "MD CH successor " << ci->successor << std::endl;
+			fs << "MD CH lvl";
 			for (j = 0; j < 36; j++)
 			{
-				fs << "CHLVL " << ci->name << " " << j << " " << ci->levels[j] << std::endl;
+				fs << " " <<ci->levels[j];
+			}
+			fs << std::endl;
+			fs << "MD CH flags " 
+					<< ((ci->flags & CI_KEEPTOPIC     ) ? "KEEPTOPIC "     : "")
+					<< ((ci->flags & CI_SECUREOPS     ) ? "SECUREOPS "     : "")
+					<< ((ci->flags & CI_PRIVATE       ) ? "PRIVATE "       : "")
+					<< ((ci->flags & CI_TOPICLOCK     ) ? "TOPICLOCK "     : "")
+					<< ((ci->flags & CI_RESTRICTED    ) ? "RESTRICTED "    : "")
+					<< ((ci->flags & CI_PEACE         ) ? "PEACE "         : "")
+					<< ((ci->flags & CI_SECURE        ) ? "SECURE "        : "")
+					<< ((ci->flags & CI_FORBIDDEN     ) ? "FORBIDDEN "     : "")
+					<< ((ci->flags & CI_NO_EXPIRE     ) ? "NOEXPIRE "      : "")
+					<< ((ci->flags & CI_MEMO_HARDMAX  ) ? "MEMO_HARDMAX "  : "")
+					<< ((ci->flags & CI_OPNOTICE      ) ? "OPNOTICE "      : "")
+					<< ((ci->flags & CI_SECUREFOUNDER ) ? "SECUREFOUNDER " : "")
+					<< ((ci->flags & CI_SIGNKICK      ) ? "SIGNKICK "      : "")
+					<< ((ci->flags & CI_SIGNKICK_LEVEL) ? "SIGNKICKLEVEL " : "")
+					<< ((ci->flags & CI_XOP           ) ? "XOP "           : "")
+					<< ((ci->flags & CI_SUSPENDED     ) ? "SUSPENDED"      : "") << std::endl;
+			if (ci->desc)
+				fs << "MD CH desc :" << ci->desc << std::endl;
+			if (ci->url)
+				fs << "MD CH url :" << ci->url << std::endl;
+			if (ci->email)
+				fs << "MD CH email :" << ci->email << std::endl;
+			if (ci->last_topic)  // MD CH topic <setter> <time> :topic
+				fs << "MD CH topic " << ci->last_topic_setter << " " << ci->last_topic_time <<  " :" << ci->last_topic << std::endl;
+			if (ci->flags & CI_FORBIDDEN)
+				fs << "MD CH forbid " << ci->forbidby << " :" << ci->forbidreason << std::endl;
+
+			for (j = 0; j < ci->accesscount; j++)
+			{  // MD CH access <display> <level> <last_seen>
+				if (ci->access[j].in_use)
+					fs << "MD CH access "
+						<< ci->access[j].nc->display << " " << ci->access[j].level << " " 
+						<< ci->access[j].last_seen << " " << std::endl;
 			}
 
-			fs << "MD CH " << ci->name << " founderpass " << ci->founderpass << std::endl;
-			fs << "MD CH " << ci->name << " desc " << ci->desc << std::endl;
-			fs << "MD CH " << ci->name << " url " << (ci->url ? ci->url : "") << std::endl;
-			fs << "MD CH " << ci->name << " email " << (ci->email ? ci->email : "") << std::endl;
+			for (j = 0; j < ci->akickcount; j++)
+			{  // MD CH akick <USED/NOTUSED> <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
+				fs << "MD CH akick "
+					<< ((ci->akick[j].flags & AK_USED) ? "USED " : "NOTUSED ")
+					<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK" )
+					<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
+					<< ((ci->akick[j].flags & AK_ISNICK) ? ci->akick[j].u.nc->display : ci->akick[j].u.mask )
+					<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " :" << ci->akick[j].reason
+					<< std::endl;
+			}
 
-/*
-			SAFE(write_string(ci->last_topic, f));
-			SAFE(write_buffer(ci->last_topic_setter, f));
-			SAFE(write_int32(ci->last_topic_time, f));
-			//SAFE(write_int32(ci->flags, f));
-			SAFE(write_string(ci->forbidby, f));
-			SAFE(write_string(ci->forbidreason, f));
-			SAFE(write_int16(ci->bantype, f));
+			/* TODO: convert to new mlock modes */
+			fs << "MD CH mlock_on " << ci->mlock_on << std::endl;
+			fs << "MD CH mlock_off " << ci->mlock_off << std::endl;
+			fs << "MD CH mlock_limit " << ci->mlock_limit << std::endl;
+			fs << "MD CH mlock_key" << ci->mlock_key << std::endl;
+			fs << "MD CH mlock_flood" << ci->mlock_flood << std::endl;
+			fs << "MD CH mlock_redirect" << ci->mlock_redirect << std::endl;
 
-			SAFE(write_int16(ci->accesscount, f));
-			for (j = 0; j < ci->accesscount; j++) {
-				SAFE(write_int16(ci->access[j].in_use, f));
-				if (ci->access[j].in_use) {
-					SAFE(write_int16(ci->access[j].level, f));
-					SAFE(write_string(ci->access[j].nc->display, f));
-					SAFE(write_int32(ci->access[j].last_seen, f));
+			if (ci->memos.memocount)
+			{
+				Memo *memos;
+				memos = ci->memos.memos;
+				for (j = 0; j < ci->memos.memocount; j++, memos++)
+				{
+					fs << "ME " << memos->number << " " << memos->flags << " " 
+						<< memos->time << " " << memos->sender << " :" << memos->text << std::endl;
 				}
 			}
-			SAFE(write_int16(ci->akickcount, f));
-			for (j = 0; j < ci->akickcount; j++) {
-				SAFE(write_int16(ci->akick[j].flags, f));
-				if (ci->akick[j].flags & 0x0001) {
-					if (ci->akick[j].flags & 0x0002)
-						SAFE(write_string(ci->akick[j].u.nc->display, f));
-					else
-						SAFE(write_string(ci->akick[j].u.mask, f));
-					SAFE(write_string(ci->akick[j].reason, f));
-					SAFE(write_string(ci->akick[j].creator, f));
-					SAFE(write_int32(ci->akick[j].addtime, f));
-				}
-			}
 
-			SAFE(write_int32(ci->mlock_on, f));
-			SAFE(write_int32(ci->mlock_off, f));
-			SAFE(write_int32(ci->mlock_limit, f));
-			SAFE(write_string(ci->mlock_key, f));
-			SAFE(write_string(ci->mlock_flood, f));
-			SAFE(write_string(ci->mlock_redirect, f));
-			SAFE(write_int16(ci->memos.memocount, f));
-			SAFE(write_int16(ci->memos.memomax, f));
-			memos = ci->memos.memos;
-			for (j = 0; j < ci->memos.memocount; j++, memos++) {
-				SAFE(write_int32(memos->number, f));
-				SAFE(write_int16(memos->flags, f));
-				SAFE(write_int32(memos->time, f));
-				SAFE(write_buffer(memos->sender, f));
-				SAFE(write_string(memos->text, f));
-			}
-			SAFE(write_string(ci->entry_message, f));
-			if (ci->bi)
-				SAFE(write_string(ci->bi, f));
-			else
-				SAFE(write_string(NULL, f));
-			SAFE(write_int32(ci->botflags, f));
-			tmp16 = 8;
-			SAFE(write_int16(tmp16, f));
+			if (ci->entry_message)
+				fs << "MD CH entry_message :" << ci->entry_message << std::endl;
+			if (ci->bi)  // here is "bi" a *Char, not a pointer to BotInfo !
+				fs << "MD CH bot " << ci->bi << std::endl;
+			fs << "MD CH botflags "
+					<< (( ci->botflags & BS_DONTKICKOPS     ) ? "DONTKICKOPS "    : "" )
+					<< (( ci->botflags & BS_DONTKICKVOICES  ) ? "DONTKICKVOICES "  : "")
+					<< (( ci->botflags & BS_FANTASY         ) ? "FANTASY "         : "")
+					<< (( ci->botflags & BS_SYMBIOSIS       ) ? "SYMBIOSIS "       : "")
+					<< (( ci->botflags & BS_GREET           ) ? "GREET "           : "")
+					<< (( ci->botflags & BS_NOBOT           ) ? "NOBOT "           : "")
+					<< (( ci->botflags & BS_KICK_BOLDS      ) ? "KICK_BOLDS "      : "")
+					<< (( ci->botflags & BS_KICK_COLORS     ) ? "KICK_COLORS "     : "")
+					<< (( ci->botflags & BS_KICK_REVERSES   ) ? "KICK_REVERSES "   : "")
+					<< (( ci->botflags & BS_KICK_UNDERLINES ) ? "KICK_UNDERLINES " : "")
+					<< (( ci->botflags & BS_KICK_BADWORDS   ) ? "KICK_BADWORDS "   : "")
+					<< (( ci->botflags & BS_KICK_CAPS       ) ? "KICK_CAPS "       : "")
+					<< (( ci->botflags & BS_KICK_FLOOD      ) ? "KICK_FLOOD "      : "")
+					<< (( ci->botflags & BS_KICK_REPEAT     ) ? "KICK_REPEAT "     : "") << std::endl;
+			fs << "MD CH TTB";
 			for (j = 0; j < 8; j++)
-				SAFE(write_int16(ci->ttb[j], f));
-			SAFE(write_int16(ci->capsmin, f));
-			SAFE(write_int16(ci->capspercent, f));
-			SAFE(write_int16(ci->floodlines, f));
-			SAFE(write_int16(ci->floodsecs, f));
-			SAFE(write_int16(ci->repeattimes, f));
-
-			SAFE(write_int16(ci->bwcount, f));
-			for (j = 0; j < ci->bwcount; j++) {
-				SAFE(write_int16(ci->badwords[j].in_use, f));
-				if (ci->badwords[j].in_use) {
-					SAFE(write_string(ci->badwords[j].word, f));
-					SAFE(write_int16(ci->badwords[j].type, f));
-				}
+				fs << " " << ci->ttb[j];
+			fs << std::endl;
+			fs << "MD CH capsmin " << ci->capsmin << std::endl;
+			fs << "MD CH capspercent " << ci->capspercent << std::endl;
+			fs << "MD CH floodlines " << ci->floodlines << std::endl;
+			fs << "MD CH floodsecs " << ci->floodsecs << std::endl;
+			fs << "MD CH repeattimes " << ci->repeattimes << std::endl;
+			for (j = 0; j < ci->bwcount; j++)
+			{
+				fs << "MD CH badword "
+					<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
+					<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
+					<< (( ci->badwords[j].type == 3 ) ? "START "  : "" )
+					<< (( ci->badwords[j].type == 4 ) ? "END "    : "" )
+					<< " " << ci->badwords[j].word << std::endl;
 			}
-		*/
+
 		} /* for (chanlists[i]) */
 	} /* for (i) */
 
-#if 0
-
 	/* Section III: Bots */
 	/* IIIa: First database */
-	if ((f = open_db_read("Botserv", BOT_DB_1, 10))) {
+	if ((f = open_db_read("Botserv", "bot.db", 10))) {
 		BotInfo *bi;
 		int c;
 		int32 tmp32;
@@ -930,7 +665,7 @@ int main(int argc, char *argv[])
 
 		while ((c = getc_db(f)) == 1) {
 			if (c != 1) {
-				printf("Invalid format in %s.\n", BOT_DB_1);
+				printf("Invalid format in %s.\n", "bot.db");
 				exit(0);
 			}
 
@@ -950,29 +685,30 @@ int main(int argc, char *argv[])
 	}
 
 	/* IIIc: Saving */
-	if ((f = open_db_write("Botserv", BOT_DB_NEW, 10))) {
-		BotInfo *bi;
-		for (i = 0; i < 256; i++) {
-			for (bi = botlists[i]; bi; bi = bi->next) {
-				SAFE(write_int8(1, f));
-				SAFE(write_string(bi->nick, f));
-				SAFE(write_string(bi->user, f));
-				SAFE(write_string(bi->host, f));
-				SAFE(write_string(bi->real, f));
-				SAFE(write_int16(bi->flags, f));
-				SAFE(write_int32(bi->created, f));
-				SAFE(write_int16(bi->chancount, f));
-			}
-		}
-		SAFE(write_int8(0, f));
-		close_db(f);
-		printf("Bot merging done. New database saved as %s.\n", BOT_DB_NEW);
-	}
+	BotInfo *bi;
+	for (i = 0; i < 256; i++) 
+	{
+		for (bi = botlists[i]; bi; bi = bi->next) 
+		{
+			std::cout << "Writing Bot " << bi->nick << "!" << bi->user << "@" << bi->host << std::endl;
+			fs << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " 
+				<< bi->created << " " << bi->chancount << " :" << bi->real << std::endl;
+			fs << "MD BI flags "
+					<< (( bi->flags & BI_PRIVATE  ) ? "PRIVATE "  : "" )
+					<< (( bi->flags & BI_CHANSERV ) ? "CHANSERV " : "" )
+					<< (( bi->flags & BI_BOTSERV  ) ? "BOTSERV "  : "" )
+					<< (( bi->flags & BI_HOSTSERV  ) ? "HOSTSERV " : "" )
+					<< (( bi->flags & BI_OPERSERV ) ? "OPERSERV " : "" )
+					<< (( bi->flags & BI_MEMOSERV ) ? "MEMOSERV " : "" )
+					<< (( bi->flags & BI_NICKSERV ) ? "NICKSERV " : "" )
+					<< (( bi->flags & BI_GLOBAL   ) ? "GLOBAL "   : "" ) << std::endl;
+		} // for (botflists[i])
+	} // for (i)
 
 	/* Section IV: Hosts */
 	/* IVa: First database */
-	if ((f = open_db_read("HostServ", HOST_DB_1, 3))) {
-		HostCore *hc;
+	HostCore *hc, *firsthc;
+	if ((f = open_db_read("HostServ", "hosts.db", 3))) {
 		int c;
 		int32 tmp32;
 
@@ -980,7 +716,7 @@ int main(int argc, char *argv[])
 
 		while ((c = getc_db(f)) == 1) {
 			if (c != 1) {
-				printf("Invalid format in %s.\n", HOST_DB_1);
+				printf("Invalid format in %s.\n", "hosts.db");
 				exit(0);
 			}
 			hc = (HostCore *)calloc(1, sizeof(HostCore));
@@ -997,764 +733,17 @@ int main(int argc, char *argv[])
 			firsthc = hc;
 		}
 	}
+	/* IVb: Saving */
+	for (hc = firsthc; hc; hc = hc->next) 
+	{  // because vIdent can sometimes be empty, we put it at the end of the list 
+		std::cout << "Writing vHost for " << hc->nick << " (" << hc->vIdent << "@" << hc->vHost << ")" << std::endl;
+		fs << "HI " << hc->nick << " " << hc->creator << " " << hc->time << " " 
+				<< hc->vHost << " " << hc->vIdent << std::endl;
+	} // for (hc)
 
-	if ((f = open_db_write("HostServ", HOST_DB_NEW, 3))) {
-		HostCore *hcptr;
-		for (hcptr = firsthc; hcptr; hcptr = hcptr->next) {
-			SAFE(write_int8(1, f));
-			SAFE(write_string(hcptr->nick, f));
-			SAFE(write_string(hcptr->vIdent, f));
-			SAFE(write_string(hcptr->vHost, f));
-			SAFE(write_string(hcptr->creator, f));
-			SAFE(write_int32(hcptr->time, f));
-		}
-		SAFE(write_int8(0, f));
-		close_db(f);
-		printf("Host merging done. New database saved as %s.\n", HOST_DB_NEW);
-	}
 
-#endif
 	/* MERGING DONE \o/ HURRAY! */
 
 	printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n");
 	return 0;
 } /* End of main() */
-
-/* Open a database file for reading and check for the version */
-dbFILE *open_db_read(const char *service, const char *filename, int version)
-{
-	dbFILE *f;
-	FILE *fp;
-	int myversion;
-
-	f = (dbFILE *)calloc(sizeof(*f), 1);
-	if (!f) {
-		printf("Can't allocate memory for %s database %s.\n", service, filename);
-		exit(0);
-	}
-	strscpy(f->filename, filename, sizeof(f->filename));
-	f->mode = 'r';
-	fp = fopen(f->filename, "rb");
-	if (!fp) {
-		printf("Can't read %s database %s.\n", service, f->filename);
-		free(f);
-		return NULL;
-	}
-	f->fp = fp;
-	myversion = fgetc(fp) << 24 | fgetc(fp) << 16 | fgetc(fp) << 8 | fgetc(fp);
-	if (feof(fp)) {
-		printf("Error reading version number on %s: End of file detected.\n", f->filename);
-		exit(0);
-	} else if (myversion < version) {
-		printf("Unsuported database version (%d) on %s.\n", myversion, f->filename);
-		exit(0);
-	}
-	return f;
-}
-
-/* Open a database file for reading and check for the version */
-dbFILE *open_db_write(const char *service, const char *filename, int version)
-{
-	dbFILE *f;
-	int fd;
-
-	f = (dbFILE *)calloc(sizeof(*f), 1);
-	if (!f) {
-		printf("Can't allocate memory for %s database %s.\n", service, filename);
-		exit(0);
-	}
-	strscpy(f->filename, filename, sizeof(f->filename));
-	filename = f->filename;
-#ifndef _WIN32
-	unlink(filename);
-#else
-	DeleteFile(filename);
-#endif
-	f->mode = 'w';
-#ifndef _WIN32
-	fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0666);
-#else
-	fd = _open(filename, O_WRONLY | O_CREAT | O_EXCL | _O_BINARY, 0666);
-#endif
-	f->fp = fdopen(fd, "wb");   /* will fail and return NULL if fd < 0 */
-	if (!f->fp || !write_file_version(f, version)) {
-		printf("Can't write to %s database %s.\n", service, filename);
-		if (f->fp) {
-			fclose(f->fp);
-#ifndef _WIN32
-			unlink(filename);
-#else
-			DeleteFile(filename);
-#endif
-		}
-		free(f);
-		return NULL;
-	}
-	return f;
-}
-
-/* Close it */
-void close_db(dbFILE * f)
-{
-	fclose(f->fp);
-	free(f);
-}
-
-int read_int16(int16 * ret, dbFILE * f)
-{
-	int c1, c2;
-
-	c1 = fgetc(f->fp);
-	c2 = fgetc(f->fp);
-	if (c1 == EOF || c2 == EOF)
-		return -1;
-	*ret = c1 << 8 | c2;
-	return 0;
-}
-
-int read_uint16(uint16 * ret, dbFILE * f)
-{
-	int c1, c2;
-
-	c1 = fgetc(f->fp);
-	c2 = fgetc(f->fp);
-	if (c1 == EOF || c2 == EOF)
-		return -1;
-	*ret = c1 << 8 | c2;
-	return 0;
-}
-
-
-int write_int16(uint16 val, dbFILE * f)
-{
-	if (fputc((val >> 8) & 0xFF, f->fp) == EOF
-		|| fputc(val & 0xFF, f->fp) == EOF)
-		return -1;
-	return 0;
-}
-
-int read_int32(int32 * ret, dbFILE * f)
-{
-	int c1, c2, c3, c4;
-
-	c1 = fgetc(f->fp);
-	c2 = fgetc(f->fp);
-	c3 = fgetc(f->fp);
-	c4 = fgetc(f->fp);
-	if (c1 == EOF || c2 == EOF || c3 == EOF || c4 == EOF)
-		return -1;
-	*ret = c1 << 24 | c2 << 16 | c3 << 8 | c4;
-	return 0;
-}
-
-int read_uint32(uint32 * ret, dbFILE * f)
-{
-	int c1, c2, c3, c4;
-
-	c1 = fgetc(f->fp);
-	c2 = fgetc(f->fp);
-	c3 = fgetc(f->fp);
-	c4 = fgetc(f->fp);
-	if (c1 == EOF || c2 == EOF || c3 == EOF || c4 == EOF)
-		return -1;
-	*ret = c1 << 24 | c2 << 16 | c3 << 8 | c4;
-	return 0;
-}
-
-int write_int32(uint32 val, dbFILE * f)
-{
-	if (fputc((val >> 24) & 0xFF, f->fp) == EOF)
-		return -1;
-	if (fputc((val >> 16) & 0xFF, f->fp) == EOF)
-		return -1;
-	if (fputc((val >> 8) & 0xFF, f->fp) == EOF)
-		return -1;
-	if (fputc((val) & 0xFF, f->fp) == EOF)
-		return -1;
-	return 0;
-}
-
-
-int read_ptr(void **ret, dbFILE * f)
-{
-	int c;
-
-	c = fgetc(f->fp);
-	if (c == EOF)
-		return -1;
-	*ret = (c ? (void *) 1 : (void *) 0);
-	return 0;
-}
-
-int write_ptr(const void *ptr, dbFILE * f)
-{
-	if (fputc(ptr ? 1 : 0, f->fp) == EOF)
-		return -1;
-	return 0;
-}
-
-
-int read_string(char **ret, dbFILE * f)
-{
-	char *s;
-	uint16 len;
-
-	if (read_uint16(&len, f) < 0)
-		return -1;
-	if (len == 0) {
-		*ret = NULL;
-		return 0;
-	}
-	s = (char *)calloc(len, 1);
-	if (len != fread(s, 1, len, f->fp)) {
-		free(s);
-		return -1;
-	}
-	*ret = s;
-	return 0;
-}
-
-int write_string(const char *s, dbFILE * f)
-{
-	uint32 len;
-
-	if (!s)
-		return write_int16(0, f);
-	len = strlen(s);
-	if (len > 65534)
-		len = 65534;
-	if (write_int16((uint16) (len + 1), f) < 0)
-		return -1;
-	if (len > 0 && fwrite(s, 1, len, f->fp) != len)
-		return -1;
-	if (fputc(0, f->fp) == EOF)
-		return -1;
-	return 0;
-}
-
-NickCore *findcore(const char *nick, int unused)
-{
-	NickCore *nc;
-
-	for (nc = nclists[HASH(nick)]; nc; nc = nc->next) {
-		if (!mystricmp(nc->display, nick))
-			if ((nc->unused && unused) || (!nc->unused && !unused))
-				return nc;
-	}
-
-	return NULL;
-}
-
-NickAlias *findnick(const char *nick)
-{
-	NickAlias *na;
-
-	for (na = nalists[HASH(nick)]; na; na = na->next) {
-		if (!mystricmp(na->nick, nick))
-			return na;
-	}
-
-	return NULL;
-}
-
-int write_file_version(dbFILE * f, uint32 version)
-{
-	FILE *fp = f->fp;
-	if (fputc(version >> 24 & 0xFF, fp) < 0 ||
-		fputc(version >> 16 & 0xFF, fp) < 0 ||
-		fputc(version >> 8 & 0xFF, fp) < 0 ||
-		fputc(version & 0xFF, fp) < 0) {
-			printf("Error writing version number on %s.\n", f->filename);
-			exit(0);
-	}
-	return 1;
-}
-
-/* strscpy:  Copy at most len-1 characters from a string to a buffer, and
- *		   add a null terminator after the last character copied.
- */
-
-char *strscpy(char *d, const char *s, size_t len)
-{
-	char *d_orig = d;
-
-	if (!len)
-		return d;
-	while (--len && (*d++ = *s++));
-	*d = '\0';
-	return d_orig;
-}
-
-int mystricmp(const char *s1, const char *s2)
-{
-	register int c;
-
-	while ((c = tolower(*s1)) == tolower(*s2)) {
-		if (c == 0)
-			return 0;
-		s1++;
-		s2++;
-	}
-	if (c < tolower(*s2))
-		return -1;
-	return 1;
-}
-
-int delnick(NickAlias *na, int donttouchthelist)
-{
-	if (!donttouchthelist) {
-		/* Remove us from the aliases list */
-		if (na->next)
-			na->next->prev = na->prev;
-		if (na->prev)
-			na->prev->next = na->next;
-		else
-			nalists[HASH(na->nick)] = na->next;
-	}
-
-	/* free() us */
-	free(na->nick);
-	free(na);
-	return 1;
-}
-
-int delcore(NickCore *nc)
-{
-	int i;
-	/* Remove the core from the list */
-	if (nc->next)
-		nc->next->prev = nc->prev;
-	if (nc->prev)
-		nc->prev->next = nc->next;
-	else
-		nclists[HASH(nc->display)] = nc->next;
-
-	free(nc->display);
-	if (nc->pass)
-		free(nc->pass);
-	if (nc->email)
-		free(nc->email);
-	if (nc->greet)
-		free(nc->greet);
-	if (nc->url)
-		free(nc->url);
-	if (nc->last_usermask)
-		free(nc->last_usermask);
-	if (nc->last_realname)
-		free(nc->last_realname);
-	if (nc->last_quit)
-		free(nc->last_quit);
-	if (nc->access) {
-		for (i = 0; i < nc->accesscount; i++) {
-			if (nc->access[i])
-				free(nc->access[i]);
-		}
-		free(nc->access);
-	}
-	if (nc->memos.memos) {
-		for (i = 0; i < nc->memos.memocount; i++) {
-			if (nc->memos.memos[i].text)
-				free(nc->memos.memos[i].text);
-		}
-		free(nc->memos.memos);
-	}
-	free(nc);
-	return 1;
-}
-
-void insert_bot(BotInfo * bi)
-{
-	BotInfo *ptr, *prev;
-
-	for (prev = NULL, ptr = botlists[tolower(*bi->nick)];
-		 ptr != NULL && mystricmp(ptr->nick, bi->nick) < 0;
-		 prev = ptr, ptr = ptr->next);
-	bi->prev = prev;
-	bi->next = ptr;
-	if (!prev)
-		botlists[tolower(*bi->nick)] = bi;
-	else
-		prev->next = bi;
-	if (ptr)
-		ptr->prev = bi;
-}
-
-BotInfo *findbot(char *nick)
-{
-	BotInfo *bi;
-
-	for (bi = botlists[tolower(*nick)]; bi; bi = bi->next)
-		if (!mystricmp(nick, bi->nick))
-			return bi;
-
-	return NULL;
-}
-
-ChannelInfo *cs_findchan(const char *chan)
-{
-	ChannelInfo *ci;
-	for (ci = chanlists[tolower(chan[1])]; ci; ci = ci->next) {
-		if (!mystricmp(ci->name, chan))
-			return ci;
-	}
-	return NULL;
-}
-
-void alpha_insert_chan(ChannelInfo * ci)
-{
-	ChannelInfo *ptr, *prev;
-	char *chan = ci->name;
-
-	for (prev = NULL, ptr = chanlists[tolower(chan[1])];
-		 ptr != NULL && mystricmp(ptr->name, chan) < 0;
-		 prev = ptr, ptr = ptr->next);
-	ci->prev = prev;
-	ci->next = ptr;
-	if (!prev)
-		chanlists[tolower(chan[1])] = ci;
-	else
-		prev->next = ci;
-	if (ptr)
-		ptr->prev = ci;
-}
-
-
-
-static char *int_to_base64(long);
-static long base64_to_int(char *);
-
-const char* base64enc(long i)
-{
-	if (i < 0)
-		return ("0");
-	return int_to_base64(i);
-}
-
-long base64dec(char* b64)
-{
-	if (b64)
-		return base64_to_int(b64);
-	else
-		return 0;
-}
-
-
-static const char Base64[] =
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static const char Pad64 = '=';
-
-/* (From RFC1521 and draft-ietf-dnssec-secext-03.txt)
-   The following encoding technique is taken from RFC 1521 by Borenstein
-   and Freed.  It is reproduced here in a slightly edited form for
-   convenience.
-
-   A 65-character subset of US-ASCII is used, enabling 6 bits to be
-   represented per printable character. (The extra 65th character, "=",
-   is used to signify a special processing function.)
-
-   The encoding process represents 24-bit groups of input bits as output
-   strings of 4 encoded characters. Proceeding from left to right, a
-   24-bit input group is formed by concatenating 3 8-bit input groups.
-   These 24 bits are then treated as 4 concatenated 6-bit groups, each
-   of which is translated into a single digit in the base64 alphabet.
-
-   Each 6-bit group is used as an index into an array of 64 printable
-   characters. The character referenced by the index is placed in the
-   output string.
-
-						 Table 1: The Base64 Alphabet
-
-	  Value Encoding  Value Encoding  Value Encoding  Value Encoding
-		  0 A			17 R			34 i			51 z
-		  1 B			18 S			35 j			52 0
-		  2 C			19 T			36 k			53 1
-		  3 D			20 U			37 l			54 2
-		  4 E			21 V			38 m			55 3
-		  5 F			22 W			39 n			56 4
-		  6 G			23 X			40 o			57 5
-		  7 H			24 Y			41 p			58 6
-		  8 I			25 Z			42 q			59 7
-		  9 J			26 a			43 r			60 8
-		 10 K			27 b			44 s			61 9
-		 11 L			28 c			45 t			62 +
-		 12 M			29 d			46 u			63 /
-		 13 N			30 e			47 v
-		 14 O			31 f			48 w		 (pad) =
-		 15 P			32 g			49 x
-		 16 Q			33 h			50 y
-
-   Special processing is performed if fewer than 24 bits are available
-   at the end of the data being encoded.  A full encoding quantum is
-   always completed at the end of a quantity.  When fewer than 24 input
-   bits are available in an input group, zero bits are added (on the
-   right) to form an integral number of 6-bit groups.  Padding at the
-   end of the data is performed using the '=' character.
-
-   Since all base64 input is an integral number of octets, only the
-		 -------------------------------------------------
-   following cases can arise:
-
-	   (1) the final quantum of encoding input is an integral
-		   multiple of 24 bits; here, the final unit of encoded
-	   output will be an integral multiple of 4 characters
-	   with no "=" padding,
-	   (2) the final quantum of encoding input is exactly 8 bits;
-		   here, the final unit of encoded output will be two
-	   characters followed by two "=" padding characters, or
-	   (3) the final quantum of encoding input is exactly 16 bits;
-		   here, the final unit of encoded output will be three
-	   characters followed by one "=" padding character.
-   */
-
-int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
-{
-	size_t datalength = 0;
-	unsigned char input[3];
-	unsigned char output[4];
-	size_t i;
-
-	while (2 < srclength) {
-		input[0] = *src++;
-		input[1] = *src++;
-		input[2] = *src++;
-		srclength -= 3;
-
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-		output[3] = input[2] & 0x3f;
-
-		if (datalength + 4 > targsize)
-			return (-1);
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		target[datalength++] = Base64[output[2]];
-		target[datalength++] = Base64[output[3]];
-	}
-
-	/* Now we worry about padding. */
-	if (0 != srclength) {
-		/* Get what's left. */
-		input[0] = input[1] = input[2] = '\0';
-		for (i = 0; i < srclength; i++)
-			input[i] = *src++;
-
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-
-		if (datalength + 4 > targsize)
-			return (-1);
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		if (srclength == 1)
-			target[datalength++] = Pad64;
-		else
-			target[datalength++] = Base64[output[2]];
-		target[datalength++] = Pad64;
-	}
-	if (datalength >= targsize)
-		return (-1);
-	target[datalength] = '\0';  /* Returned value doesn't count \0. */
-	return (datalength);
-}
-
-/* skips all whitespace anywhere.
-   converts characters, four at a time, starting at (or after)
-   src from base - 64 numbers into three 8 bit bytes in the target area.
-   it returns the number of data bytes stored at the target, or -1 on error.
- */
-
-int b64_decode(const char *src, char *target, size_t targsize)
-{
-	int tarindex, state, ch;
-	char *pos;
-
-	state = 0;
-	tarindex = 0;
-
-	while ((ch = *src++) != '\0') {
-		if (isspace(ch))		/* Skip whitespace anywhere. */
-			continue;
-
-		if (ch == Pad64)
-			break;
-
-		pos = const_cast<char *>(strchr(Base64, ch));
-		if (pos == 0)		   /* A non-base64 character. */
-			return (-1);
-
-		switch (state) {
-		case 0:
-			if (target) {
-				if ((size_t) tarindex >= targsize)
-					return (-1);
-				target[tarindex] = (pos - Base64) << 2;
-			}
-			state = 1;
-			break;
-		case 1:
-			if (target) {
-				if ((size_t) tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64) >> 4;
-				target[tarindex + 1] = ((pos - Base64) & 0x0f)
-					<< 4;
-			}
-			tarindex++;
-			state = 2;
-			break;
-		case 2:
-			if (target) {
-				if ((size_t) tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64) >> 2;
-				target[tarindex + 1] = ((pos - Base64) & 0x03)
-					<< 6;
-			}
-			tarindex++;
-			state = 3;
-			break;
-		case 3:
-			if (target) {
-				if ((size_t) tarindex >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64);
-			}
-			tarindex++;
-			state = 0;
-			break;
-		default:
-			abort();
-		}
-	}
-
-	/*
-	 * We are done decoding Base-64 chars.  Let's see if we ended
-	 * on a byte boundary, and/or with erroneous trailing characters.
-	 */
-
-	if (ch == Pad64) {		  /* We got a pad char. */
-		ch = *src++;			/* Skip it, get next. */
-		switch (state) {
-		case 0:				/* Invalid = in first position */
-		case 1:				/* Invalid = in second position */
-			return (-1);
-
-		case 2:				/* Valid, means one byte of info */
-			/* Skip any number of spaces. */
-			for (; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					break;
-			/* Make sure there is another trailing = sign. */
-			if (ch != Pad64)
-				return (-1);
-			ch = *src++;		/* Skip the = */
-			/* Fall through to "single trailing =" case. */
-			/* FALLTHROUGH */
-
-		case 3:				/* Valid, means two bytes of info */
-			/*
-			 * We know this char is an =.  Is there anything but
-			 * whitespace after it?
-			 */
-			for (; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					return (-1);
-
-			/*
-			 * Now make sure for cases 2 and 3 that the "extra"
-			 * bits that slopped past the last full byte were
-			 * zeros.  If we don't check them, they become a
-			 * subliminal channel.
-			 */
-			if (target && target[tarindex] != 0)
-				return (-1);
-		}
-	} else {
-		/*
-		 * We ended by seeing the end of the string.  Make sure we
-		 * have no partial bytes lying around.
-		 */
-		if (state != 0)
-			return (-1);
-	}
-
-	return (tarindex);
-}
-
-/* ':' and '#' and '&' and '+' and '@' must never be in this table. */
-/* these tables must NEVER CHANGE! >) */
-char int6_to_base64_map[] = {
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
-	'E', 'F',
-	'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V',
-	'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-	'k', 'l',
-	'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-	'{', '}'
-};
-
-char base64_to_int6_map[] = {
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1,
-	-1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-	25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
-	-1, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-	51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, -1, 63, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-};
-
-static char *int_to_base64(long val)
-{
-	/* 32/6 == max 6 bytes for representation,
-	 * +1 for the null, +1 for byte boundaries
-	 */
-	static char base64buf[8];
-	long i = 7;
-
-	base64buf[i] = '\0';
-
-	/* Temporary debugging code.. remove before 2038 ;p.
-	 * This might happen in case of 64bit longs (opteron/ia64),
-	 * if the value is then too large it can easily lead to
-	 * a buffer underflow and thus to a crash. -- Syzop
-	 */
-	if (val > 2147483647L) {
-		abort();
-	}
-
-	do {
-		base64buf[--i] = int6_to_base64_map[val & 63];
-	}
-	while (val >>= 6);
-
-	return base64buf + i;
-}
-
-static long base64_to_int(char *b64)
-{
-	int v = base64_to_int6_map[(unsigned char) *b64++];
-
-	if (!b64)
-		return 0;
-
-	while (*b64) {
-		v <<= 6;
-		v += base64_to_int6_map[(unsigned char) *b64++];
-	}
-
-	return v;
-}
-
-

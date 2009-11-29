@@ -731,6 +731,7 @@ int main(int argc, char *argv[])
 			}
 			/* end of 1.9.0 broken database fix */
 		}
+	close_db(f);
 	}
 
 	/* IIIc: Saving */
@@ -781,6 +782,7 @@ int main(int argc, char *argv[])
 			hc->last = NULL;
 			firsthc = hc;
 		}
+	close_db(f);
 	}
 	/* IVb: Saving */
 	for (hc = firsthc; hc; hc = hc->next) 
@@ -790,6 +792,115 @@ int main(int argc, char *argv[])
 				<< hc->vHost << " " << hc->vIdent << std::endl;
 	} // for (hc)
 
+	/*********************************/
+	/*    OPERSERV Section           */
+	/*********************************/
+
+	int32 maxusercnt = 0;
+	int32 maxusertime = 0;
+	SList akills, sglines, sqlines, szlines;
+	Akill *ak;
+	SXLine *sx;
+
+	if ((f = open_db_read("OperServ", "oper.db", 13)))
+	{
+		int16 tmp16;
+		int32 tmp32;
+		SAFE(read_int32(&maxusercnt, f));
+		SAFE(read_int32(&tmp32, f));
+		maxusertime = tmp32;
+
+		read_int16(&tmp16, f);
+		slist_setcapacity(&akills, tmp16);
+		for (i = 0; i < akills.capacity; i++) 
+		{
+			ak = new Akill;
+			SAFE(read_string(&ak->user, f));
+			SAFE(read_string(&ak->host, f));
+			SAFE(read_string(&ak->by, f));
+			SAFE(read_string(&ak->reason, f));
+			SAFE(read_int32(&tmp32, f));
+			ak->seton = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			ak->expires = tmp32;
+			slist_add(&akills, ak);
+		}
+
+		read_int16(&tmp16, f);
+		slist_setcapacity(&sglines, tmp16);
+		for (i = 0; i < sglines.capacity; i++) 
+		{
+			sx = new SXLine;
+			SAFE(read_string(&sx->mask, f));
+			SAFE(read_string(&sx->by, f));
+			SAFE(read_string(&sx->reason, f));
+			SAFE(read_int32(&tmp32, f));
+			sx->seton = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			sx->expires = tmp32;
+			slist_add(&sglines, sx);
+		}
+
+		read_int16(&tmp16, f);
+		slist_setcapacity(&sqlines, tmp16);
+		for (i = 0; i < sqlines.capacity; i++) 
+		{
+			sx = new SXLine;
+			SAFE(read_string(&sx->mask, f));
+			SAFE(read_string(&sx->by, f));
+			SAFE(read_string(&sx->reason, f));
+			SAFE(read_int32(&tmp32, f));
+			sx->seton = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			sx->expires = tmp32;
+			slist_add(&sqlines, sx);
+		}
+
+		read_int16(&tmp16, f);
+		slist_setcapacity(&szlines, tmp16);
+		for (i = 0; i < szlines.capacity; i++) 
+		{
+			sx = new SXLine;
+			SAFE(read_string(&sx->mask, f));
+			SAFE(read_string(&sx->by, f));
+			SAFE(read_string(&sx->reason, f));
+			SAFE(read_int32(&tmp32, f));
+			sx->seton = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			sx->expires = tmp32;
+			slist_add(&szlines, sx);
+		}
+		close_db(f); // oper.db
+	} // if (open_db_read)
+		/* done reading oper.db, now lets save the data in the new format  */
+
+	std::cout << "Writing operserv data (stats, akills, sglines, szlines)" << std::endl;
+	fs << "OS STATS " << maxusercnt << " " << maxusertime << std::endl;
+
+	for (i = 0; i < akills.count; i++)
+	{
+		ak = static_cast<Akill *>(akills.list[i]);
+		fs << "OS AKILL " << ak->user << " " << ak->host << " " << ak->by << " " 
+					<< ak->seton << " " << ak->expires << " :" << ak->reason << std::endl;
+	}
+	for (i = 0; i < sglines.count; i++)
+	{
+		sx = static_cast<SXLine *>(sglines.list[i]);
+		fs << "OS SGLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " 
+					<< sx->expires << " :" << sx->reason << std::endl;
+	}
+	for (i = 0; i < sqlines.count; i++)
+	{
+		sx = static_cast<SXLine *>(sqlines.list[i]);
+		fs << "OS SQLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " 
+					<< sx->expires << " :" << sx->reason << std::endl;
+	}
+	for (i = 0; i < szlines.count; i++)
+	{
+		sx = static_cast<SXLine *>(szlines.list[i]);
+		fs << "OS SZLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " 
+					<< sx->expires << " :" << sx->reason << std::endl;
+	}
 
 	/* MERGING DONE \o/ HURRAY! */
 	fs.close();

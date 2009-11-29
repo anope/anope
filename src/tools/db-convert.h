@@ -70,6 +70,10 @@ typedef struct chaninfo_ ChannelInfo;
 typedef struct botinfo_ BotInfo;
 typedef struct badword_ BadWord;
 typedef struct hostcore_ HostCore;
+typedef struct akill_ Akill;
+typedef struct sxline_ SXLine;
+typedef struct slist_ SList;
+typedef struct slistopts_ SListOpts;
 
 struct memo_ {
 	uint32 number;	  /* Index number -- not necessarily array position! */
@@ -209,6 +213,61 @@ struct hostcore_ {
 	char *creator;   /* Oper Nick of the oper who set the vhost */
 	time_t time;	  /* Date/Time vHost was set */
 };
+
+struct akill_ {
+	char *user;			/* User part of the AKILL */
+	char *host;			/* Host part of the AKILL */
+
+	char *by;			/* Who set the akill */
+	char *reason;		/* Why they got akilled */
+
+	time_t seton;		/* When it was set */
+	time_t expires;		/* When it expires */
+};
+
+/*************************************************************************/
+
+/* Structure for OperServ SGLINE and SZLINE commands */
+
+struct sxline_ {
+	char *mask;
+	char *by;
+	char *reason;
+	time_t seton;
+	time_t expires;
+};
+
+struct slist_ {
+	void **list;
+	
+	int16 count;		/* Total entries of the list */
+	int16 capacity; 	/* Capacity of the list */
+	int16 limit;		/* Maximum possible entries on the list */
+	
+	SListOpts *opts;
+};
+
+
+struct slistopts_ {
+	int32 flags;		/* Flags for the list. See below. */
+	
+	int  (*compareitem)	(SList *slist, void *item1, void *item2); 	/* Called to compare two items */
+	int  (*isequal)     (SList *slist, void *item1, void *item2); 	/* Called by slist_indexof. item1 can be an arbitrary pointer. */
+	void (*freeitem) 	(SList *slist, void *item);					/* Called when an item is removed */
+};
+
+
+#define SLIST_DEFAULT_LIMIT 32767
+
+#define SLISTF_NODUP	0x00000001		/* No duplicates in the list. */
+#define SLISTF_SORT 	0x00000002		/* Automatically sort the list. Used with compareitem member. */
+
+/* Note that number is the index in the array + 1 */
+typedef int (*slist_enumcb_t) (SList *slist, int number, void *item, va_list args);
+/* Callback to know whether we can delete the entry. */
+typedef int (*slist_delcheckcb_t) (SList *slist, void *item, va_list args);
+
+
 
 dbFILE *open_db_write(const char *service, const char *filename, int version);
 dbFILE *open_db_read(const char *service, const char *filename, int version);
@@ -1178,4 +1237,72 @@ int stricmp(const char *s1, const char *s2)
 	return 1;
 }
 
+int slist_setcapacity(SList * slist, int16 capacity)
+{
+    if (slist->capacity == capacity)
+        return 1;
+    slist->capacity = capacity;
+    if (slist->capacity)
+        slist->list = static_cast<void **>(realloc(slist->list, sizeof(void *) * slist->capacity));
+    else {
+        free(slist->list);
+        slist->list = NULL;
+    }
+    if (slist->capacity < slist->count)
+        slist->count = slist->capacity;
+    return 1;
+}
+
+int slist_indexof(SList * slist, void *item)
+{
+    int16 i;
+    void *entry;
+
+    if (slist->count == 0)
+        return -1;
+
+    for (i = 0, entry = slist->list[0]; i < slist->count;
+         i++, entry = slist->list[i]) {
+        if ((slist->opts
+             && slist->opts->isequal) ? (slist->opts->isequal(slist, item,
+                                                              entry))
+            : (item == entry))
+            return i;
+    }
+
+    return -1;
+}
+
+
+int slist_add(SList * slist, void *item)
+{
+    if (slist->limit != 0 && slist->count >= slist->limit)
+        return -2;
+    if (slist->opts && (slist->opts->flags & SLISTF_NODUP)
+        && slist_indexof(slist, item) != -1)
+        return -3;
+    if (slist->capacity == slist->count)
+        slist_setcapacity(slist, slist->capacity + 1);
+
+    if (slist->opts && (slist->opts->flags & SLISTF_SORT)
+        && slist->opts->compareitem) {
+        int i;
+
+        for (i = 0; i < slist->count; i++) {
+            if (slist->opts->compareitem(slist, item, slist->list[i]) <= 0) {
+                memmove(&slist->list[i + 1], &slist->list[i],
+                        sizeof(void *) * (slist->count - i));
+                slist->list[i] = item;
+                break;
+            }
+        }
+
+        if (i == slist->count)
+            slist->list[slist->count] = item;
+    } else {
+        slist->list[slist->count] = item;
+    }
+
+    return slist->count++;
+}
 

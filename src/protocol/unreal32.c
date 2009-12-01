@@ -489,6 +489,12 @@ void unreal_set_umode(User * user, int ac, char **av)
             }
             break;
         case 'x':
+            if (!add)
+            {
+                if (user->vhost)
+                    free(user->vhost);
+                user->vhost = NULL;
+            }
             update_host(user);
             break;
         }
@@ -532,18 +538,9 @@ void unreal_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void unreal_cmd_vhost_off(User * u)
 {
-    if (UseSVS2MODE) {
-        send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"),
-                 u->nick);
-        send_cmd(s_HostServ, "%s %s +x", send_token("SVS2MODE", "v"),
-                 u->nick);
-    } else {
-        send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"),
-                 u->nick);
-        send_cmd(s_HostServ, "%s %s +x", send_token("SVSMODE", "n"),
-                 u->nick);
+    common_svsmode(u, "-xt", NULL);
+    common_svsmode(u, "+x", NULL);
 
-  }
     notice_lang(s_HostServ, u, HOST_OFF);
 }
 

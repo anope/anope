@@ -1388,7 +1388,7 @@ void solidircd_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void solidircd_cmd_vhost_off(User * u)
 {
-    send_cmd(s_HostServ, "SVSMODE %s -v", u->nick);
+    common_svsmode(u, "-v", NULL);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 

@@ -181,7 +181,8 @@ void common_unban(ChannelInfo * ci, char *nick)
         for (ban = ci->c->bans->entries; ban; ban = next) {
             next = ban->next;
             if (entry_match(ban, u->nick, u->username, u->host, ip) ||
-                entry_match(ban, u->nick, u->username, u->vhost, ip)) {
+                entry_match(ban, u->nick, u->username, u->vhost, ip) ||
+                entry_match(ban, u->nick, u->username, u->chost, ip)) {
                 anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
                 if (ircdcap->tsmode)
                     av[3] = ban->mask;
@@ -240,10 +241,10 @@ char *common_get_vhost(User * u)
     if (!u)
         return NULL;
 
-    if (ircd->vhostmode && (u->mode & ircd->vhostmode))
+    if (ircd->vhostmode && (u->mode & ircd->vhostmode) && u->vhost)
         return u->vhost;
-    else if (ircd->vhost && u->vhost)
-        return u->vhost;
+    else if (ircd->vhostmode && (u->mode & ircd->vhostmode) && u->chost)
+        return u->chost;
     else
         return u->host;
 }

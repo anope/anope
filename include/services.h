@@ -870,6 +870,7 @@ struct user_ {
     char *host;             	/* User's real hostname 	*/
     char *hostip;               /* User's IP number             */
     char *vhost;            	/* User's virtual hostname 	*/
+    char *chost;                /* User's cloaked hostname      */
     char *vident;           	/* User's virtual ident 	*/
     char *realname;		/* Realname 			*/
     Server *server;		/* Server user is connected to  */

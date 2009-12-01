@@ -812,7 +812,7 @@ void viagra_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void viagra_cmd_vhost_off(User * u)
 {
-    send_cmd(NULL, "SVSMODE %s -x", u->nick);
+    common_svsmode(u, "-x", NULL);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 

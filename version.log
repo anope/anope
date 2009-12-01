@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2671"
+VERSION_BUILD="2679"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2679 - Fixed bug #1106 - Anope now keeps track of users cloaked hosts as well as virtual host and will use both in matching for things
 #Revision 2671 - Fix bug #1114. Fixed a bug in cs_clear caused by do_cmode() modifying params passed to it. Also fixed some warnings in cs_xop.
 #Revision 2668 - Fix a few more XOP related problems.
 #Revision 2667 - Cleaned up a lot of the channel access reordering code, properly change users with less than voice access on channels to XOP, and fix a potential crashbug after switching to XOP on IRCds that do not support halfop

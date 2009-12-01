@@ -75,8 +75,12 @@ int do_off(User * u)
             vident = getvIdent(u->nick);
             if (vhost == NULL && vident == NULL)
                 notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            else
+            else {
                 anope_cmd_vhost_off(u);
+                if (u->vhost)
+                   free(u->vhost);
+                u->vhost = NULL;
+            }
         } else {
             notice_lang(s_HostServ, u, HOST_ID);
         }

@@ -224,6 +224,8 @@ void delete_user(User * user)
         alog("debug: delete_user(): free user data");
     free(user->username);
     free(user->host);
+    if (user->chost)
+        free(user->chost);
     if (user->vhost)
         free(user->vhost);
     if (user->vident)
@@ -633,6 +635,14 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         user->realname = sstrdup(realname);
         user->timestamp = ts;
         user->my_signon = time(NULL);
+        /* Initially set both the vhost and cloaked host to the users cloaked host, vhost will be changed
+         * later if they get a real vhost, chost however should *never* be changed to anything else.
+         * It is possible that on most IRCds (Unreal) a server splits and then comes back, reintroducing clients
+         * with a vhost (not a cloaked host) and never informing Anope about  the real cloaked host. For now I'm
+         * leaving this open (we should prboably request a USERHOST or so) as this won't occur that much, and any
+         * fixes to this problem are ugly. - Adam
+	 */
+        user->chost = vhost ? sstrdup(vhost) : sstrdup(host);
         user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
         if (uid) {
             user->uid = sstrdup(uid);   /* p10/ts6 stuff */
@@ -1002,11 +1012,13 @@ int match_usermask(const char *mask, User * user)
         result = match_wild_nocase(nick, user->nick)
             && match_wild_nocase(username, user->username)
             && (match_wild_nocase(host, user->host)
-                || match_wild_nocase(host, user->vhost));
+                || match_wild_nocase(host, user->vhost)
+                || match_wild_nocase(host, user->chost));
     } else {
         result = match_wild_nocase(username, user->username)
             && (match_wild_nocase(host, user->host)
-                || match_wild_nocase(host, user->vhost));
+                || match_wild_nocase(host, user->vhost)
+                || match_wild_nocase(host, user->chost));
     }
 
     free(mask2);

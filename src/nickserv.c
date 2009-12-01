@@ -1281,8 +1281,7 @@ NickCore *findcore(const char *nick)
 int is_on_access(User * u, NickCore * nc)
 {
     int i;
-    char *buf;
-    char *buf2 = NULL;
+    char *buf, *buf2 = NULL, *buf3 = NULL;
 
     if (nc->accesscount == 0)
         return 0;
@@ -1294,24 +1293,33 @@ int is_on_access(User * u, NickCore * nc)
             buf2 = scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
             sprintf(buf2, "%s@%s", u->username, u->vhost);
         }
+        if (u->chost)
+        {
+            buf3 = scalloc(strlen(u->username) + strlen(u->chost) + 2, 1);
+            sprintf(buf2, "%s@%s", u->username, u->chost);
+        }
     }
 
     for (i = 0; i < nc->accesscount; i++) {
-        if (match_wild_nocase(nc->access[i], buf)
-            || (ircd->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
+          if (match_wild_nocase(nc->access[i], buf) || (buf2 && match_wild_nocase(nc->access[i], buf2)) || (buf3 && match_wild_nocase(nc->access[i], buf3)))
+          {
             free(buf);
             if (ircd->vhost) {
                 if (u->vhost) {
                     free(buf2);
                 }
+                if (u->chost)
+                  free(buf3);
             }
             return 1;
         }
     }
     free(buf);
-    if (ircd->vhost) {
-        free(buf2);
-    }
+    if (buf2)
+    	free(buf2);
+    if (buf3)
+        free(buf3);
+    
     return 0;
 }
 

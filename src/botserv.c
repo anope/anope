@@ -782,7 +782,7 @@ void bot_join(ChannelInfo * ci)
 		/* Should we be invited? */
 		if (ci->c->HasMode(CMODE_INVITE)
 			|| (limit && ci->c->usercount >= limit))
-			ircdproto->SendNoticeChanops(NULL, ci->c->name,
+			ircdproto->SendNoticeChanops(ci->bi, ci->c->name,
 				 "%s invited %s into the channel.",
 				 ci->bi->nick, ci->bi->nick);
 	}

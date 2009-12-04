@@ -67,13 +67,7 @@ typedef struct dbFILE_ dbFILE;
 typedef struct nickalias_ NickAlias;
 typedef struct nickcore_ NickCore;
 typedef struct chaninfo_ ChannelInfo;
-typedef struct botinfo_ BotInfo;
 typedef struct badword_ BadWord;
-typedef struct hostcore_ HostCore;
-typedef struct akill_ Akill;
-typedef struct sxline_ SXLine;
-typedef struct slist_ SList;
-typedef struct slistopts_ SListOpts;
 
 struct memo_ {
 	uint32 number;	  /* Index number -- not necessarily array position! */
@@ -188,92 +182,17 @@ struct chaninfo_ {
 	int16 repeattimes;				 /* For REPEAT kicker */
 };
 
-struct botinfo_ {
- 	BotInfo *next, *prev;
- 	char *nick;			/* Nickname of the bot */
- 	char *user;			/* Its user name */
- 	char *host;			/* Its hostname */
- 	char *real;			/* Its real name */
- 	int16 flags;			/* Bot flags */
- 	time_t created;	  /* Birth date */
-	int16 chancount;		/* Number of channels that use the bot. */
-};
-
 struct badword_ {
 	uint16 in_use;
 	char *word;
 	uint16 type;
 };
 
-struct hostcore_ {
-	HostCore *next, *last;
-	char *nick;		/* Owner of the vHost */
-	char *vIdent;	/* vIdent for the user */
-	char *vHost;	 /* Vhost for this user */
-	char *creator;   /* Oper Nick of the oper who set the vhost */
-	time_t time;	  /* Date/Time vHost was set */
-};
-
-struct akill_ {
-	char *user;			/* User part of the AKILL */
-	char *host;			/* Host part of the AKILL */
-
-	char *by;			/* Who set the akill */
-	char *reason;		/* Why they got akilled */
-
-	time_t seton;		/* When it was set */
-	time_t expires;		/* When it expires */
-};
-
-/*************************************************************************/
-
-/* Structure for OperServ SGLINE and SZLINE commands */
-
-struct sxline_ {
-	char *mask;
-	char *by;
-	char *reason;
-	time_t seton;
-	time_t expires;
-};
-
-struct slist_ {
-	void **list;
-	
-	int16 count;		/* Total entries of the list */
-	int16 capacity; 	/* Capacity of the list */
-	int16 limit;		/* Maximum possible entries on the list */
-	
-	SListOpts *opts;
-};
-
-
-struct slistopts_ {
-	int32 flags;		/* Flags for the list. See below. */
-	
-	int  (*compareitem)	(SList *slist, void *item1, void *item2); 	/* Called to compare two items */
-	int  (*isequal)     (SList *slist, void *item1, void *item2); 	/* Called by slist_indexof. item1 can be an arbitrary pointer. */
-	void (*freeitem) 	(SList *slist, void *item);					/* Called when an item is removed */
-};
-
-
-#define SLIST_DEFAULT_LIMIT 32767
-
-#define SLISTF_NODUP	0x00000001		/* No duplicates in the list. */
-#define SLISTF_SORT 	0x00000002		/* Automatically sort the list. Used with compareitem member. */
-
-/* Note that number is the index in the array + 1 */
-typedef int (*slist_enumcb_t) (SList *slist, int number, void *item, va_list args);
-/* Callback to know whether we can delete the entry. */
-typedef int (*slist_delcheckcb_t) (SList *slist, void *item, va_list args);
-
-
 
 dbFILE *open_db_write(const char *service, const char *filename, int version);
 dbFILE *open_db_read(const char *service, const char *filename, int version);
 NickCore *findcore(const char *nick, int version);
 NickAlias *findnick(const char *nick);
-BotInfo *findbot(char *nick);
 ChannelInfo *cs_findchan(const char *chan);
 char *strscpy(char *d, const char *s, size_t len);
 int write_file_version(dbFILE * f, uint32 version);
@@ -291,13 +210,11 @@ int write_int32(uint32 val, dbFILE * f);
 int read_ptr(void **ret, dbFILE * f);
 int delcore(NickCore *nc);
 void alpha_insert_chan(ChannelInfo * ci);
-void insert_bot(BotInfo * bi);
 void close_db(dbFILE * f);
 
 ChannelInfo *chanlists[256];
 NickAlias *nalists[1024];
 NickCore *nclists[1024];
-BotInfo *botlists[256];
 
 int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
 
@@ -827,33 +744,6 @@ int delcore(NickCore *nc)
 	return 1;
 }
 
-void insert_bot(BotInfo * bi)
-{
-	BotInfo *ptr, *prev;
-
-	for (prev = NULL, ptr = botlists[tolower(*bi->nick)];
-		 ptr != NULL && mystricmp(ptr->nick, bi->nick) < 0;
-		 prev = ptr, ptr = ptr->next);
-	bi->prev = prev;
-	bi->next = ptr;
-	if (!prev)
-		botlists[tolower(*bi->nick)] = bi;
-	else
-		prev->next = bi;
-	if (ptr)
-		ptr->prev = bi;
-}
-
-BotInfo *findbot(char *nick)
-{
-	BotInfo *bi;
-
-	for (bi = botlists[tolower(*nick)]; bi; bi = bi->next)
-		if (!mystricmp(nick, bi->nick))
-			return bi;
-
-	return NULL;
-}
 
 ChannelInfo *cs_findchan(const char *chan)
 {
@@ -1236,73 +1126,3 @@ int stricmp(const char *s1, const char *s2)
 		return -1;
 	return 1;
 }
-
-int slist_setcapacity(SList * slist, int16 capacity)
-{
-    if (slist->capacity == capacity)
-        return 1;
-    slist->capacity = capacity;
-    if (slist->capacity)
-        slist->list = static_cast<void **>(realloc(slist->list, sizeof(void *) * slist->capacity));
-    else {
-        free(slist->list);
-        slist->list = NULL;
-    }
-    if (slist->capacity < slist->count)
-        slist->count = slist->capacity;
-    return 1;
-}
-
-int slist_indexof(SList * slist, void *item)
-{
-    int16 i;
-    void *entry;
-
-    if (slist->count == 0)
-        return -1;
-
-    for (i = 0, entry = slist->list[0]; i < slist->count;
-         i++, entry = slist->list[i]) {
-        if ((slist->opts
-             && slist->opts->isequal) ? (slist->opts->isequal(slist, item,
-                                                              entry))
-            : (item == entry))
-            return i;
-    }
-
-    return -1;
-}
-
-
-int slist_add(SList * slist, void *item)
-{
-    if (slist->limit != 0 && slist->count >= slist->limit)
-        return -2;
-    if (slist->opts && (slist->opts->flags & SLISTF_NODUP)
-        && slist_indexof(slist, item) != -1)
-        return -3;
-    if (slist->capacity == slist->count)
-        slist_setcapacity(slist, slist->capacity + 1);
-
-    if (slist->opts && (slist->opts->flags & SLISTF_SORT)
-        && slist->opts->compareitem) {
-        int i;
-
-        for (i = 0; i < slist->count; i++) {
-            if (slist->opts->compareitem(slist, item, slist->list[i]) <= 0) {
-                memmove(&slist->list[i + 1], &slist->list[i],
-                        sizeof(void *) * (slist->count - i));
-                slist->list[i] = item;
-                break;
-            }
-        }
-
-        if (i == slist->count)
-            slist->list[slist->count] = item;
-    } else {
-        slist->list[slist->count] = item;
-    }
-
-    return slist->count++;
-}
-

@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	std::ofstream fs;
 	std::string hashm;
 
-	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.x database converter"C_NONE"\n\n");
+	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.2+ database converter"C_NONE"\n\n");
 
 	hashm = "plain"; // XXX
 	/*
@@ -667,242 +667,159 @@ int main(int argc, char *argv[])
 	/* Section III: Bots */
 	/* IIIa: First database */
 	if ((f = open_db_read("Botserv", "bot.db", 10))) {
-		BotInfo *bi;
-		int c;
-		int32 tmp32;
-		int16 tmp16;
+		std::string input;
+		int c, broken = 0;
+		int32 created;
+		int16 flags, chancount;
+		char *nick, *user, *host, *real;
 
-		printf("Trying to merge bots...\n");
+		std::cout << "Trying to convert bots..." << std::endl;
+
+		while (input != "y" && input != "n")
+		{
+		std::cout << std::endl << "Are you converting an old 1.9.0 Database? (y/n) ? ";
+		std::cin >> input;
+		}
+		if (input == "y")
+			broken = 1;
 
 		while ((c = getc_db(f)) == 1) {
-			if (c != 1) {
-				printf("Invalid format in %s.\n", "bot.db");
-				exit(0);
-			}
-
-			bi = (BotInfo *)calloc(sizeof(BotInfo), 1);
-			READ(read_string(&bi->nick, f));
-			READ(read_string(&bi->user, f));
-			READ(read_string(&bi->host, f));
-			READ(read_string(&bi->real, f));
-			SAFE(read_int16(&tmp16, f));
-			bi->flags = tmp16;
-			READ(read_int32(&tmp32, f));
-			bi->created = tmp32;
-			READ(read_int16(&tmp16, f));
-			bi->chancount = tmp16;
-			insert_bot(bi);
+			READ(read_string(&nick, f));
+			READ(read_string(&user, f));
+			READ(read_string(&host, f));
+			READ(read_string(&real, f));
+			SAFE(read_int16(&flags, f));
+			READ(read_int32(&created, f));
+			READ(read_int16(&chancount, f));
 
 			/* fix for the 1.9.0 broken bot.db */
-			if ((stricmp(bi->nick, "ChanServ")==0) && !(bi->flags & BI_CHANSERV)) 
+			if (broken)
 			{
-				bi->flags = 0;
-				bi->flags |= BI_CHANSERV;
-			}
-			if ((stricmp(bi->nick, "BotServ")==0) && !(bi->flags & BI_BOTSERV)) 
-			{
-				bi->flags = 0;
-				bi->flags |= BI_BOTSERV | BI_PRIVATE;
-			}
-			if ((stricmp(bi->nick, "HostServ")==0) && !(bi->flags & BI_HOSTSERV)) 
-			{
-				bi->flags = 0;
-				bi->flags |= BI_HOSTSERV | BI_PRIVATE;
-			}
-			if ((stricmp(bi->nick, "OperServ")==0) && !(bi->flags & BI_OPERSERV)) 
-			{
-				bi->flags = 0;
-				bi->flags |= BI_OPERSERV | BI_PRIVATE;
-			}
-			if ((stricmp(bi->nick, "MemoServ")==0) && !(bi->flags & BI_MEMOSERV)) 
-			{
-				bi->flags = 0;
-				bi->flags |= BI_MEMOSERV | BI_PRIVATE;
-			}
-			if ((stricmp(bi->nick, "NickServ")==0) && !(bi->flags & BI_NICKSERV)) 
-			{
-				bi->flags = 0;
-				bi->flags |= BI_NICKSERV | BI_PRIVATE;
-			}
-			if ((stricmp(bi->nick, "Global")==0) && !(bi->flags & BI_GLOBAL)) 
-			{
-				bi->flags = 0;
-				bi->flags |= BI_GLOBAL | BI_PRIVATE;
-			}
-			/* end of 1.9.0 broken database fix */
+				flags = 0;
+				if (!stricmp(nick, "ChanServ"))
+					flags |= BI_CHANSERV;
+				if (!stricmp(nick, "BotServ"))
+					flags |= BI_BOTSERV | BI_PRIVATE;
+				if (!stricmp(nick, "HostServ"))
+					flags |= BI_HOSTSERV | BI_PRIVATE;
+				if (!stricmp(nick, "OperServ"))
+					flags |= BI_OPERSERV | BI_PRIVATE;
+				if (!stricmp(nick, "MemoServ"))
+					flags |= BI_MEMOSERV | BI_PRIVATE;
+				if (!stricmp(nick, "NickServ")) 
+					flags |= BI_NICKSERV | BI_PRIVATE;
+				if (!stricmp(nick, "Global"))
+					flags |= BI_GLOBAL | BI_PRIVATE;
+			} /* end of 1.9.0 broken database fix */
+			std::cout << "Writing Bot " << nick << "!" << user << "@" << host << std::endl;
+			fs << "BI " << nick << " " << user << " " << host << " " << created << " " << chancount << " :" << real << std::endl;
+			fs << "MD BI flags "
+					<< (( flags & BI_PRIVATE  ) ? "PRIVATE "  : "" )
+					<< (( flags & BI_CHANSERV ) ? "CHANSERV " : "" )
+					<< (( flags & BI_BOTSERV  ) ? "BOTSERV "  : "" )
+					<< (( flags & BI_HOSTSERV ) ? "HOSTSERV " : "" )
+					<< (( flags & BI_OPERSERV ) ? "OPERSERV " : "" )
+					<< (( flags & BI_MEMOSERV ) ? "MEMOSERV " : "" )
+					<< (( flags & BI_NICKSERV ) ? "NICKSERV " : "" )
+					<< (( flags & BI_GLOBAL   ) ? "GLOBAL "   : "" ) << std::endl;
 		}
 	close_db(f);
 	}
-
-	/* IIIc: Saving */
-	BotInfo *bi;
-	for (i = 0; i < 256; i++) 
-	{
-		for (bi = botlists[i]; bi; bi = bi->next) 
-		{
-			std::cout << "Writing Bot " << bi->nick << "!" << bi->user << "@" << bi->host << std::endl;
-			fs << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " 
-				<< bi->created << " " << bi->chancount << " :" << bi->real << std::endl;
-			fs << "MD BI flags "
-					<< (( bi->flags & BI_PRIVATE  ) ? "PRIVATE "  : "" )
-					<< (( bi->flags & BI_CHANSERV ) ? "CHANSERV " : "" )
-					<< (( bi->flags & BI_BOTSERV  ) ? "BOTSERV "  : "" )
-					<< (( bi->flags & BI_HOSTSERV  ) ? "HOSTSERV " : "" )
-					<< (( bi->flags & BI_OPERSERV ) ? "OPERSERV " : "" )
-					<< (( bi->flags & BI_MEMOSERV ) ? "MEMOSERV " : "" )
-					<< (( bi->flags & BI_NICKSERV ) ? "NICKSERV " : "" )
-					<< (( bi->flags & BI_GLOBAL   ) ? "GLOBAL "   : "" ) << std::endl;
-		} // for (botflists[i])
-	} // for (i)
 
 	/* Section IV: Hosts */
 	/* IVa: First database */
-	HostCore *hc, *firsthc;
 	if ((f = open_db_read("HostServ", "hosts.db", 3))) {
 		int c;
-		int32 tmp32;
+		int32 time;
+		char *nick, *vIdent, *vHost, *creator;
 
-		printf("Trying to merge hosts...\n");
+		std::cout << "Converting hosts..." << std::endl;
 
 		while ((c = getc_db(f)) == 1) {
-			if (c != 1) {
-				printf("Invalid format in %s.\n", "hosts.db");
-				exit(0);
-			}
-			hc = (HostCore *)calloc(1, sizeof(HostCore));
-			READ(read_string(&hc->nick, f));
-			READ(read_string(&hc->vIdent, f));
-			READ(read_string(&hc->vHost, f));
-			READ(read_string(&hc->creator, f));
-			READ(read_int32(&tmp32, f));
-			hc->time = tmp32;
-			hc->next = firsthc;
-			if (firsthc)
-				firsthc->last = hc;
-			hc->last = NULL;
-			firsthc = hc;
+			READ(read_string(&nick, f));
+			READ(read_string(&vIdent, f));
+			READ(read_string(&vHost, f));
+			READ(read_string(&creator, f));
+			READ(read_int32(&time, f));
+			std::cout << "Writing vHost for " << nick << " (" << vIdent << "@" << vHost << ")" << std::endl;
+			// because vIdent can sometimes be empty, we put it at the end of the list
+			fs << "HI " << nick << " " << creator << " " << time << " " << vHost << " " 
+										<< (vIdent ? vIdent : "") << std::endl;
+			free(nick); if (vIdent) free(vIdent); free(vHost); free(creator);
 		}
 	close_db(f);
-	}
-	/* IVb: Saving */
-	for (hc = firsthc; hc; hc = hc->next) 
-	{  // because vIdent can sometimes be empty, we put it at the end of the list 
-		std::cout << "Writing vHost for " << hc->nick << " (" << hc->vIdent << "@" << hc->vHost << ")" << std::endl;
-		fs << "HI " << hc->nick << " " << hc->creator << " " << hc->time << " " 
-				<< hc->vHost << " " << hc->vIdent << std::endl;
-	} // for (hc)
+	} // host database 
 
 	/*********************************/
 	/*    OPERSERV Section           */
 	/*********************************/
 
-	int32 maxusercnt = 0;
-	int32 maxusertime = 0;
-	SList akills, sglines, sqlines, szlines;
-	Akill *ak;
-	SXLine *sx;
-
 	if ((f = open_db_read("OperServ", "oper.db", 13)))
 	{
-		int16 tmp16;
-		int32 tmp32;
+		int32 maxusercnt = 0, maxusertime = 0, seton = 0, expires = 0;
+		int16 capacity = 0;
+		char *user, *host, *by, *reason, *mask;
+
+		std::cout << "Writing operserv data (stats, akills, sglines, szlines)" << std::endl;
+
 		SAFE(read_int32(&maxusercnt, f));
-		SAFE(read_int32(&tmp32, f));
-		maxusertime = tmp32;
+		SAFE(read_int32(&maxusertime, f));
+		fs << "OS STATS " << maxusercnt << " " << maxusertime << std::endl;
 
-		read_int16(&tmp16, f);
-		slist_setcapacity(&akills, tmp16);
-		for (i = 0; i < akills.capacity; i++) 
+		/* AKILLS */
+		read_int16(&capacity, f);
+		for (i = 0; i < capacity; i++) 
 		{
-			ak = new Akill;
-			SAFE(read_string(&ak->user, f));
-			SAFE(read_string(&ak->host, f));
-			SAFE(read_string(&ak->by, f));
-			SAFE(read_string(&ak->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			ak->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			ak->expires = tmp32;
-			slist_add(&akills, ak);
+			SAFE(read_string(&user, f));
+			SAFE(read_string(&host, f));
+			SAFE(read_string(&by, f));
+			SAFE(read_string(&reason, f));
+			SAFE(read_int32(&seton, f));
+			SAFE(read_int32(&expires, f));
+			fs << "OS AKILL " << user << " " << host << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
+			free(user); free(host); free(by); free(reason);
 		}
-
-		read_int16(&tmp16, f);
-		slist_setcapacity(&sglines, tmp16);
-		for (i = 0; i < sglines.capacity; i++) 
+		/* SGLINES */
+		read_int16(&capacity, f);
+		for (i = 0; i < capacity; i++) 
 		{
-			sx = new SXLine;
-			SAFE(read_string(&sx->mask, f));
-			SAFE(read_string(&sx->by, f));
-			SAFE(read_string(&sx->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			sx->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			sx->expires = tmp32;
-			slist_add(&sglines, sx);
+			SAFE(read_string(&mask, f));
+			SAFE(read_string(&by, f));
+			SAFE(read_string(&reason, f));
+			SAFE(read_int32(&seton, f));
+			SAFE(read_int32(&expires, f));
+			fs << "OS SGLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
+			free(mask); free(by); free(reason);
 		}
-
-		read_int16(&tmp16, f);
-		slist_setcapacity(&sqlines, tmp16);
-		for (i = 0; i < sqlines.capacity; i++) 
+		/* SQLINES */
+		read_int16(&capacity, f);
+		for (i = 0; i < capacity; i++) 
 		{
-			sx = new SXLine;
-			SAFE(read_string(&sx->mask, f));
-			SAFE(read_string(&sx->by, f));
-			SAFE(read_string(&sx->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			sx->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			sx->expires = tmp32;
-			slist_add(&sqlines, sx);
+			SAFE(read_string(&mask, f));
+			SAFE(read_string(&by, f));
+			SAFE(read_string(&reason, f));
+			SAFE(read_int32(&seton, f));
+			SAFE(read_int32(&expires, f));
+			fs << "OS SQLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
+			free(mask); free(by); free(reason);
 		}
-
-		read_int16(&tmp16, f);
-		slist_setcapacity(&szlines, tmp16);
-		for (i = 0; i < szlines.capacity; i++) 
+		/* SZLINES */
+		read_int16(&capacity, f);
+		for (i = 0; i < capacity; i++) 
 		{
-			sx = new SXLine;
-			SAFE(read_string(&sx->mask, f));
-			SAFE(read_string(&sx->by, f));
-			SAFE(read_string(&sx->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			sx->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			sx->expires = tmp32;
-			slist_add(&szlines, sx);
+			SAFE(read_string(&mask, f));
+			SAFE(read_string(&by, f));
+			SAFE(read_string(&reason, f));
+			SAFE(read_int32(&seton, f));
+			SAFE(read_int32(&expires, f));
+			fs << "OS SZLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
+			free(mask); free(by); free(reason);
 		}
-		close_db(f); // oper.db
-	} // if (open_db_read)
-		/* done reading oper.db, now lets save the data in the new format  */
+		close_db(f);
+	} // operserv database
 
-	std::cout << "Writing operserv data (stats, akills, sglines, szlines)" << std::endl;
-	fs << "OS STATS " << maxusercnt << " " << maxusertime << std::endl;
 
-	for (i = 0; i < akills.count; i++)
-	{
-		ak = static_cast<Akill *>(akills.list[i]);
-		fs << "OS AKILL " << ak->user << " " << ak->host << " " << ak->by << " " 
-					<< ak->seton << " " << ak->expires << " :" << ak->reason << std::endl;
-	}
-	for (i = 0; i < sglines.count; i++)
-	{
-		sx = static_cast<SXLine *>(sglines.list[i]);
-		fs << "OS SGLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " 
-					<< sx->expires << " :" << sx->reason << std::endl;
-	}
-	for (i = 0; i < sqlines.count; i++)
-	{
-		sx = static_cast<SXLine *>(sqlines.list[i]);
-		fs << "OS SQLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " 
-					<< sx->expires << " :" << sx->reason << std::endl;
-	}
-	for (i = 0; i < szlines.count; i++)
-	{
-		sx = static_cast<SXLine *>(szlines.list[i]);
-		fs << "OS SZLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " 
-					<< sx->expires << " :" << sx->reason << std::endl;
-	}
-
-	/* MERGING DONE \o/ HURRAY! */
+	/* CONVERTING DONE \o/ HURRAY! */
 	fs.close();
 	printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n");
 	return 0;

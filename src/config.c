@@ -461,6 +461,8 @@ static bool InitOpers(ServerConfig *, const char *, bool)
 	for (i = 0; i < 1024; ++i)
 		for (nc = nclists[i]; nc; nc = nc->next)
 			nc->ot = NULL;
+	
+	Config.Opers.clear();
 
 	return true;
 }
@@ -1528,17 +1530,6 @@ int read_config(int reload)
 	int retval = 1;
 	char *s;
 	int defconCount = 0;
-	std::list<std::pair<std::string, std::string> >::iterator it;
-
-	/* Clear current opers for reload */
-	for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
-	{
-		std::string nick = it->first;
-		NickCore *nc = findcore(nick.c_str());
-		if (nc)
-			nc->ot = NULL;
-	}
-	Config.Opers.clear();
 
 	retval = Config.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX

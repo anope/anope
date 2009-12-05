@@ -877,6 +877,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	La clave de %s ha sido enviada.
 
+# RESERTPASS responses
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFIRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL!
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # FORBID responses
 NICK_SUSPEND_SYNTAX
 	SUSPEND nickname reason
@@ -914,10 +932,6 @@ NICK_IS_PREREG
 	Este nick esta esperando una verificacion por e-mail antes de poder completar el registro.
 NICK_ENTER_REG_CODE
 	El password ha sido enviado a %s, tipea %R%s confirm <password> para completar el registro.
-NICK_CONFIRM_NOT_FOUND
-	El paso de registro 1 puede haber expirado. Usa "%R%s register <password> <email>" primero.
-NICK_CONFIRM_INVALID
-	Password invalido. Chequea el e-mail e intenta nuevamente.
 NICK_REG_MAIL_SUBJECT
 	Registro de Nick (%s)
 NICK_REG_MAIL_HEAD
@@ -936,6 +950,16 @@ NICK_GETPASS_PASSCODE_IS
 	El password para %s es %s.
 NICK_FORCE_REG
 	Nick %s confirmado.
+
+# Confirm responses
+NICK_CONFIRM_NOT_FOUND
+	El paso de registro 1 puede haber expirado. Usa "%R%s register <password> <email>" primero.
+NICK_CONFIRM_INVALID
+	Password invalido. Chequea el e-mail e intenta nuevamente.
+NICK_CONFIRM_EXPIRED
+	Your password reset request has expired.
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick. Change your password using "%R%s SET PASSWORD newpassword" now.
 
 ###########################################################################
 #
@@ -3367,6 +3391,8 @@ NICK_HELP_CMD_RELEASE
 	    RELEASE    Retoma custodia de tu nick luego de RECOVER
 NICK_HELP_CMD_SENDPASS
 	    SENDPASS   Olvidaste tu clave? Intenta esto
+NICK_HELP_CMD_RESETPASS
+	    RESETPASS  Helps you reset lost passwords.
 NICK_HELP_CMD_GHOST
 	    GHOST      Disconnects a "ghost" IRC session using your nick
 NICK_HELP_CMD_ALIST
@@ -3962,6 +3988,12 @@ NICK_HELP_SENDPASS
 	Puede ser limitado a operadores de IRC en ciertas
 	redes.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a code key to the nickname with instructions on how to
+	reset their password.
+
 NICK_HELP_CONFIRM
 	Sintaxis: CONFIRM passcode
 	
@@ -3971,6 +4003,9 @@ NICK_HELP_CONFIRM
 	enviado a tu direccion e-mail en el primer paso del proceso de 
 	registo. Para mas informacion sobre la primera etpa del proceso 
 	de registro, escribe: %R%S HELP REGISTER
+	
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

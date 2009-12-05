@@ -878,6 +878,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	Senha para %s foi enviada.
 
+# RESETPASS responses
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFIRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL!
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # SUSPEND responses
 NICK_SUSPEND_SYNTAX
 	SUSPEND nick motivo
@@ -915,10 +933,6 @@ NICK_IS_PREREG
 	Esse nick está aguardando um código de verificação por e-mail antes de completar o registro.
 NICK_ENTER_REG_CODE
 	O passcode foi enviado para %s, por favor digite %R%s confirm <passcode> para completar o registro.
-NICK_CONFIRM_NOT_FOUND
-	O primeiro passo do registro deve ter expirado, por favor use %R%s register <senha> <email> primeiro.
-NICK_CONFIRM_INVALID
-	Um passcode inválido foi digitado, por favor verifique o e-mail e tente novamente
 NICK_REG_MAIL_SUBJECT
 	Registro de nick (%s)
 NICK_REG_MAIL_HEAD
@@ -937,6 +951,16 @@ NICK_GETPASS_PASSCODE_IS
 	Passcode para %s é %s.
 NICK_FORCE_REG
 	Nick %s confirmado
+
+# CONFIRM responses
+NICK_CONFIRM_NOT_FOUND
+	O primeiro passo do registro deve ter expirado, por favor use %R%s register <senha> <email> primeiro.
+NICK_CONFIRM_INVALID
+	Um passcode inválido foi digitado, por favor verifique o e-mail e tente novamente
+NICK_CONFIRM_EXPIRED
+	Your password reset request has expired.
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick 
 
 ###########################################################################
 #
@@ -3882,6 +3906,12 @@ NICK_HELP_SENDPASS
 	
 	Poder ser limitado a Operadores de IRC em algumas redes.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a codekey to the nickname with the instructions on how to
+	reset their psasword.
+
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
 	
@@ -3891,6 +3921,9 @@ NICK_HELP_CONFIRM
 	is sent to your e-mail address in the first step of the
 	registration process. For more information about the first
 	stage of the registration process, type: %R%S HELP REGISTER
+	
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

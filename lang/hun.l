@@ -869,6 +869,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	%s nick jelszava elküldve.
 
+# RESETPASS responces
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFIRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # FORBID válaszok
 NICK_SUSPEND_SYNTAX
 	SUSPEND nickname reason
@@ -906,10 +924,6 @@ NICK_IS_PREREG
 	A nick az emailben elküldött kóddal való aktíválásra vár a regisztráció befejezéséhez.
 NICK_ENTER_REG_CODE
 	A kód a %s címre lett küldve, írd be %R%s confirm <kód> a regisztráció befejezéséhez.
-NICK_CONFIRM_NOT_FOUND
-	Regisztráció 1 lépése lehet, hogy elévült, írd be: "%R%s register <jelszó> <email>".
-NICK_CONFIRM_INVALID
-	Érvénytelen kód, ellenõrizze az e-mailben, majd próbálja újra.
 NICK_REG_MAIL_SUBJECT
 	Nicknév Regisztráció (%s)
 NICK_REG_MAIL_HEAD
@@ -928,6 +942,16 @@ NICK_GETPASS_PASSCODE_IS
 	Kód a %s nickhez:  %s.
 NICK_FORCE_REG
 	A %s nicknév érvényesítve. 
+
+# CONFIRM responces
+NICK_CONFIRM_NOT_FOUND
+	Regisztráció 1 lépése lehet, hogy elévült, írd be: "%R%s register <jelszó> <email>".
+NICK_CONFIRM_INVALID
+	Érvénytelen kód, ellenõrizze az e-mailben, majd próbálja újra.
+NICK_CONFIRM_EXPIRED
+	Your password request has expired.
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick. Change your password using "%R%s SET PASSWORD newpassword" now.
 
 ###########################################################
 #
@@ -3321,6 +3345,8 @@ NICK_HELP_CMD_RELEASE
 	    RELEASE    Visszaadja a neved a RECOVER után
 NICK_HELP_CMD_SENDPASS
 	    SENDPASS   Elfelejtetted a jelszavad? Próbáld ezt
+NICK_HELP_CMD_RESETPASS
+	    RESETPASS  Helps you reset lost passwords.
 NICK_HELP_CMD_GHOST
 	    GHOST      Disconnects a "ghost" IRC session using your nick
 NICK_HELP_CMD_ALIST
@@ -3902,6 +3928,12 @@ NICK_HELP_SENDPASS
 	
 	Korlátozni lehet IRC operátorokra egyes hálózatokon.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a code key to the nickname with instructions on how to
+	reset their password.
+
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcodE
 	
@@ -3911,6 +3943,9 @@ NICK_HELP_CONFIRM
 	is sent to your e-mail address in the first step of the
 	registration process. For more information about the first
 	stage of the registration process, type: %R%S HELP REGISTER
+	
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

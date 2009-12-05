@@ -860,6 +860,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	Пароль для ника %s был выслан на его email-адрес.
 
+# RESETPASS responses
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFIRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL!
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # SUSPEND responses
 NICK_SUSPEND_SYNTAX
 	SUSPEND ник причина
@@ -897,10 +915,6 @@ NICK_IS_PREREG
 	Этот ник ожидает подтверждения через e-mail перед завершением регистрации.
 NICK_ENTER_REG_CODE
 	Auth-код был выслан на %s, для завершения регистрации используйте команду %R%s confirm auth-код
-NICK_CONFIRM_NOT_FOUND
-	Время первой части регистрации истекло, воспользуйтесь командой "%R%s register <пароль> <email>"
-NICK_CONFIRM_INVALID
-	Был введен неверный auth-код, пожалуйста, проверьте ваш e-mail снова и попробуйте еще раз.
 NICK_REG_MAIL_SUBJECT
 	Регистрация ника %s
 NICK_REG_MAIL_HEAD
@@ -919,6 +933,15 @@ NICK_GETPASS_PASSCODE_IS
 	Пароль для ника %s - %s.
 NICK_FORCE_REG
 	Регистрация ника %s подтверждена.
+
+NICK_CONFIRM_NOT_FOUND
+	Время первой части регистрации истекло, воспользуйтесь командой "%R%s register <пароль> <email>"
+NICK_CONFIRM_INVALID
+	Был введен неверный auth-код, пожалуйста, проверьте ваш e-mail снова и попробуйте еще раз.
+NICK_CONFIRM_EXPIRED
+	Your password reset request has expired.
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick. Change your password using "%R%s SET PASSWORD newpassword" now.
 
 ###########################################################################
 #
@@ -3931,6 +3954,12 @@ NICK_HELP_SENDPASS
 	Примечание: SENDPASS может быть ограничен для использования только
 	IRC-операторами данной сети.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a code key to the nickname with the instructions on how to
+	reset their password.
+
 NICK_HELP_CONFIRM
 	Синтаксис: CONFIRM auth-код
 	
@@ -3940,6 +3969,9 @@ NICK_HELP_CONFIRM
 	Кодовая фраза, которая указывается в качестве параметра, высылается
 	на ваш e-mail в первой части процесса регистрации ника. Для более
 	подробной информации см. %R%S HELP REGISTER
+	
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

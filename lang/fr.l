@@ -884,6 +884,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	Le mot de passe de %s a été envoyé.
 
+# RESETPASS responces
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFIRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL!
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # FORBID responses
 NICK_SUSPEND_SYNTAX
 	SUSPEND pseudo raison
@@ -927,10 +945,6 @@ NICK_IS_PREREG
 	Une demande d'enregistrement pour ce pseudo est en cours. La confirmation n'a pas été effectuée.
 NICK_ENTER_REG_CODE
 	Un passcode a été envoyé à %s, merci de taper %R%s confirm <passcode> une fois que vous l'aurez reçu pour compléter l'enregistrement.
-NICK_CONFIRM_NOT_FOUND
-	Aucune validation en attente... Tapez: "%R%s register <password> <email>" pour l'enregistrer.
-NICK_CONFIRM_INVALID
-	Passcode invalide, merci de le vérifier.
 NICK_REG_MAIL_SUBJECT
 	Enregistrement d'un pseudo (%s)
 NICK_REG_MAIL_HEAD
@@ -949,6 +963,15 @@ NICK_GETPASS_PASSCODE_IS
 	Le passcode pour %s est %s.
 NICK_FORCE_REG
 	Pseudo %s confirmé
+
+NICK_CONFIRM_NOT_FOUND
+	Aucune validation en attente... Tapez: "%R%s register <password> <email>" pour l'enregistrer.
+NICK_CONFIRM_INVALID
+	Passcode invalide, merci de le vérifier.
+NICK_CONFIRM_EXPIRED
+	Your password reset request has expired.
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick. Change your password using "%R%s SET PASSWORD newpassword" now.
 
 ###########################################################################
 #
@@ -3420,6 +3443,8 @@ NICK_HELP_CMD_RELEASE
 	               après un RECOVER
 NICK_HELP_CMD_SENDPASS
 	    SENDPASS   A utiliser en cas de perte de mot de passe
+NICK_HELP_CMD_RESETPASS
+	    RESETPASS  Helps you reset lost passwords
 NICK_HELP_CMD_GHOST
 	    GHOST      Deconnecte un "ghost irc" utilisant votre pseudo
 NICK_HELP_CMD_ALIST
@@ -4021,6 +4046,12 @@ NICK_HELP_SENDPASS
 	Peut être limité aux Opérateurs IRC sur certains
 	réseaux.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a code key to the nickname with instructions on how to
+	reset their password.
+
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
 	
@@ -4031,6 +4062,9 @@ NICK_HELP_CONFIRM
 	fournie à la première étape de votre enregistrement.
 	Pour plus d'informations sur cette première étape, tapez:
 	%R%S HELP REGISTER
+	
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

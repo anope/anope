@@ -97,7 +97,7 @@ class CommandNSConfirm : public Command
 	CommandReturn DoConfirm(User *u, const std::vector<ci::string> &params)
 	{
 		NickRequest *nr = NULL;
-		const char *passcode = params.size() ? params[0].c_str() : NULL;
+		const char *passcode = !params.empty() ? params[0].c_str() : NULL;
 
 		nr = findrequestnick(u->nick);
 
@@ -105,7 +105,7 @@ class CommandNSConfirm : public Command
 		{
 			if (!passcode)
 			{
-				notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
+				this->OnSyntaxError(u, "");
 				return MOD_CONT;
 			}
 
@@ -143,6 +143,7 @@ class CommandNSConfirm : public Command
 		ActuallyConfirmNick(u, nr, false);
 		return MOD_CONT;
 	}
+
  public:
 	CommandNSConfirm(const std::string &cmdn, int min, int max) : Command(cmdn, min, max)
 	{
@@ -160,6 +161,11 @@ class CommandNSConfirm : public Command
 		if (u->nc && u->nc->HasPriv("nickserv/confirm"))
 			notice_help(Config.s_NickServ, u, NICK_HELP_CONFIRM_OPER);
 		return true;
+	}
+
+	void OnSyntaxError(User *u, const ci::string &subcommand)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
 	}
 };
 
@@ -366,7 +372,7 @@ class NSRegister : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSRegister());
-		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 0, 1));
+		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 1, 1));
 		this->AddCommand(NICKSERV, new CommandNSResend());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);

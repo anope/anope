@@ -859,6 +859,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	La password di %s è stata inviata.
 
+# RESETPASS responces
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL!
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # SUSPEND responses
 NICK_SUSPEND_SYNTAX
 	SUSPEND nick motivo
@@ -896,10 +914,6 @@ NICK_IS_PREREG
 	Questo nick è in attesa di un codice di attivazione via e-mail per completare la registrazione.
 NICK_ENTER_REG_CODE
 	Un codice di attivazione è stato inviato a %s. Digita %R%s CONFIRM <codice> per completare la registrazione.
-NICK_CONFIRM_NOT_FOUND
-	Il primo passo della registrazione potrebbe essere scaduto. Usa %R%s REGISTER <password> <e-mail>.
-NICK_CONFIRM_INVALID
-	È stato inserito un codice di attivazione non valido. Controlla di nuovo la tua casella di posta e riprova.
 NICK_REG_MAIL_SUBJECT
 	Registrazione del nick (%s)
 NICK_REG_MAIL_HEAD
@@ -918,6 +932,16 @@ NICK_GETPASS_PASSCODE_IS
 	Il codice di attivazione per %s is %s.
 NICK_FORCE_REG
 	Il nick %s è stato confermato.
+
+# CONFIRM responses
+NICK_CONFIRM_NOT_FOUND
+	Il primo passo della registrazione potrebbe essere scaduto. Usa %R%s REGISTER <password> <e-mail>.
+NICK_CONFIRM_INVALID
+	È stato inserito un codice di attivazione non valido. Controlla di nuovo la tua casella di posta e riprova.
+NICK_CONFIRM_EXPIRED
+	Your password reset request has expired.
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick. Change your password using "%R%s SET PASSWORD newpassword" now.
 
 
 
@@ -3272,6 +3296,8 @@ NICK_HELP_CMD_RELEASE
 	    RELEASE    Permette di usare di nuovo il proprio nick dopo un RECOVER
 NICK_HELP_CMD_SENDPASS
 	    SENDPASS   Invia la password del proprio nick via e-mail
+NICK_HELP_CMD_RESETPASS
+	    RESETPASS  Helps you reset lost passwords.
 NICK_HELP_CMD_GHOST
 	    GHOST      Disconnette un nick fantasma che non è ancora caduto
 NICK_HELP_CMD_ALIST
@@ -3869,6 +3895,12 @@ NICK_HELP_SENDPASS
 	
 	Potrebbe essere disponibile soltanto per gli IrcOp.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a code key to the nickname with instructions on how to
+	reset their password.
+
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
 	
@@ -3878,6 +3910,9 @@ NICK_HELP_CONFIRM
 	is sent to your e-mail address in the first step of the
 	registration process. For more information about the first
 	stage of the registration process, type: %R%S HELP REGISTER
+	
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

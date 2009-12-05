@@ -1108,6 +1108,24 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	Has³o do nicka %s zosta³o wys³ane.
 
+# RESETPASS responses
+NICK_RESETPASS_SYNTAX
+	RESETPASS nickname
+NICK_RESETPASS_SUBJECT
+	Reset password request for %s
+NICK_RESETPASS_MESSAGE
+	Hi,
+	
+	You have requested to have the password for %s reset.
+	To reset your password, type %R%s CONFIRM %s
+	If you don't know why this mail is sent to you, please ignore it silently.
+	
+	PLEASE DON'T ANSWER TO THIS MAIL!
+	
+	%s administrators.
+NICK_RESETPASS_COMPLETE
+	Password reset email for %s has been sent.
+
 # SUSPEND responses
 NICK_SUSPEND_SYNTAX
 	SUSPEND nick powód
@@ -1158,14 +1176,6 @@ NICK_ENTER_REG_CODE
 	Kod zosta³ wys³any na adres %s.
 	Napisz %R%s CONFIRM <kod>, aby dokoñczyæ procedurê rejestracji.
 
-NICK_CONFIRM_NOT_FOUND
-	Termin wa¿no¶ci kodu rejestracyjnego up³yn±³.
-	Napisz: %R%s REGISTER <has³o> <email>,
-	aby znowu zacz±æ rejestracje.
-
-NICK_CONFIRM_INVALID
-	Podano nieprawid³owy kod, sprawd¼ wiadomo¶æ e-mail i spróbowaæ ponownie.
-
 NICK_REG_MAIL_SUBJECT
 	Rejestracja nicka %s
 
@@ -1191,6 +1201,20 @@ NICK_GETPASS_PASSCODE_IS
 
 NICK_FORCE_REG
 	Nick %s potwierdzony.
+
+NICK_CONFIRM_NOT_FOUND
+	Termin wa¿no¶ci kodu rejestracyjnego up³yn±³.
+	Napisz: %R%s REGISTER <has³o> <email>,
+	aby znowu zacz±æ rejestracje.
+
+NICK_CONFIRM_INVALID
+	Podano nieprawid³owy kod, sprawd¼ wiadomo¶æ e-mail i spróbowaæ ponownie.
+
+NICK_CONFIRM_EXPIRED
+	Your password reset request has expired.
+
+NICK_CONFIRM_SUCCESS
+	You are now identified for your nick. Change your password using "%R%s SET PASSWORD newpassword" now.
 
 ###########################################################################
 #
@@ -4935,6 +4959,12 @@ NICK_HELP_SENDPASS
 	Ta komenda w niektórych sieciach mo¿e byæ dostêpna
 	jedynie dla osób z uprawnieniami IRC operatora.
 
+NICK_HELP_RESETPASS
+	Syntax: RESETPASS nickname
+	
+	Sends a code key to the nickname with the instructions on how to
+	reset their password.
+
 NICK_HELP_CONFIRM
 	Sk³adnia: CONFIRM kod
 	
@@ -4943,6 +4973,9 @@ NICK_HELP_CONFIRM
 	wywo³aæ to polecenie z kodem, który zosta³ wys³any na
 	adres e-mail podany podczas pierwszego kroku rejestracji.
 	Aby siê dowiedzieæ wiêcej wpisz %R%S HELP REGISTER
+
+	This is also used after the RESETPASS command has been used to
+	force identify you to your nick so you may change your password.
 
 NICK_HELP_CONFIRM_OPER
 	

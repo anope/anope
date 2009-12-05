@@ -42,7 +42,6 @@ IRCDVar myIrcd[] = {
 	 0,						 /* O:LINE			   */
 	 0,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 0,
 	 0,						 /* On nick change check if they could be identified */
 	 0,						 /* No Knock requires +i */
 	 NULL,					  /* CAPAB Chan Modes			 */
@@ -898,9 +897,6 @@ class ProtoRatbox : public Module
 		pmodule_ircd_useTSMode(1);
 
 		moduleAddModes();
-
-		ircd->DefMLock[CMODE_NOEXTERNAL] = true;
-		ircd->DefMLock[CMODE_TOPIC] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

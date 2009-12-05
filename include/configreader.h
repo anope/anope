@@ -493,6 +493,8 @@ class ServerConfig
 		unsigned NickRegDelay;
 		/* Max number if news items allowed in the list */
 		unsigned NewsCount;
+		/* Default mlock modes */
+		std::string MLock;
 
 		/* Services can use email */
 		bool UseMail;

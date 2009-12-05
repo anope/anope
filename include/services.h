@@ -559,7 +559,6 @@ struct ircdvars_ {
 	int umode;					/* change user modes		*/
 	int nickvhost;				/* Users vhost sent during NICK */
 	int chgreal;				/* Change RealName		*/
-	std::bitset<128> DefMLock;   /* Default mlock modes		*/
 	int check_nick_id;			/* On nick change check if they could be identified */
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
 	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */

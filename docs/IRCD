@@ -150,50 +150,47 @@ How To Add IRCd Support
 
     27) Change Realname: Change real name. Use 1 for yes, 0 for no.
 
-    28) Default MLock: Default channelmodes for MLOCK. This is really set later,
-        use 0 for now
-
-    29) Check Nick ID: Should we check if a user should remain identified when
+    28) Check Nick ID: Should we check if a user should remain identified when
                        changing their nick? This is for IRCd's that remove
                        their registered-user mode when someone changes their
                        nick (like Bahamut does).
                        Use 1 for yes, 0 for no.
 
-    30) No Knock Requires +i: Does the No Knock channel mode require invite
+    29) No Knock Requires +i: Does the No Knock channel mode require invite
                               only channels? Use 1 for yes, 0 for no.
     
-    31) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
+    30) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
                     NULL by default.
 
-    32) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
+    31) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
                 0 for no.
 
-    33) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
+    32) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
                          1 for yes, 0 for no.
 
-    34) SJOIN Ban Char: Character used to identify bans. Use ''.
+    33) SJOIN Ban Char: Character used to identify bans. Use ''.
 
-    35) SJOIN Except Char: Character used to identify exceptions. Use ''.
+    34) SJOIN Except Char: Character used to identify exceptions. Use ''.
     
-    36) SJOIN Invite char: Character used to idenfity invexs. Use ''.
+    35) SJOIN Invite char: Character used to idenfity invexs. Use ''.
 
-    37) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
+    36) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    38) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
+    37) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
-    39) Vhost Character: The character used to represent the vHost mode, if
+    38) Vhost Character: The character used to represent the vHost mode, if
                          this is supported by the IRCd.
 
-    40) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
+    39) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
 
-    41) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
+    40) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
 
-    42) Character Set: Unreal passes the character set during PROTOCTL,
+    41) Character Set: Unreal passes the character set during PROTOCTL,
                        the value is stored here. Set this NULL to start.
 
-    43) Channel CIDR: Set to 1 if channel bans, excepts and invites
+    42) Channel CIDR: Set to 1 if channel bans, excepts and invites
                       support CIDR masks. Expected syntax: *!*@ip/mask.
                       When set to 1, anope will only parse strict CIDR masks.
                       IRCd's that try to correct invalid CIDR's (like nefarious)
@@ -201,10 +198,10 @@ How To Add IRCd Support
                       Contact the anope Dev Team if this is the case.
                       Set to 0 if CIDR's are not supported by your IRCd.
 
-    44) Global TLD Prefix: Prefix used to send global messages, should probably
+    43) Global TLD Prefix: Prefix used to send global messages, should probably
                            be "$"
 
-    45) Delayed AUTH: Does the ircd send if a user is identified for their nick
+    44) Delayed AUTH: Does the ircd send if a user is identified for their nick
                       AFTER the initial NICK/UID? Set this to 0 for no.
 
     So we've had this long list. Now there's a second struct to fill. This

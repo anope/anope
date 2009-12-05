@@ -39,7 +39,11 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 
 	/* If ircd doesn't exist, this is from DB load and mlock is set later */
 	if (ircd)
-		mlock_on = ircd->DefMLock;
+	{
+		mlock_on = DefMLockOn;
+		mlock_off = DefMLockOff;
+		Params = DefMLockParams;
+	}
 
 	size_t t;
 	/* Set default channel flags */

@@ -22,6 +22,60 @@ std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
  * efficiency.
  */
 
+/* Default mlocked modes on */
+std::bitset<128> DefMLockOn;
+/* Default mlocked modes off */
+std::bitset<128> DefMLockOff;
+/* Map for default mlocked mode parameters */
+std::map<ChannelModeName, std::string> DefMLockParams;
+
+/** Parse the mode string from the config file and set the default mlocked modes
+ */
+void SetDefaultMLock()
+{
+	DefMLockOn.reset();
+	DefMLockOff.reset();
+	DefMLockParams.clear();
+	std::bitset<128> *ptr = NULL;
+
+	std::string modes, param;
+	spacesepstream sep(Config.MLock);
+	sep.GetToken(modes);
+
+	for (unsigned i = 0; i < modes.size(); ++i)
+	{
+		 if (modes[i] == '+')
+			  ptr = &DefMLockOn;
+		 else if (modes[i] == '-')
+			  ptr = &DefMLockOff;
+		 else
+		 {
+		 	if (!ptr)
+				continue;
+
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
+
+			if (cm && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM))
+			{
+				ptr->set(cm->Name);
+
+				if (*ptr == DefMLockOn && cm->Type == MODE_PARAM)
+				{
+					if (sep.GetToken(param))
+					{
+						DefMLockParams.insert(std::make_pair(cm->Name, param));
+					}
+					else
+					{
+						alog("Warning: Got default mlock mode %c with no param?", cm->ModeChar);
+						ptr->set(cm->Name, false);
+					}
+				}
+			}
+		}
+	}
+}
+
 /** Add a user mode to Anope
  * @param Mode The mode
  * @param um A UserMode or UserMode derived class
@@ -56,6 +110,9 @@ bool ModeManager::AddChannelMode(char Mode, ChannelMode *cm)
 	
 	if (ret)
 	{
+		/* Apply this mode to the new default mlock if its used */
+		SetDefaultMLock();
+
 		FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
 	}
 

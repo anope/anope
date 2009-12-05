@@ -62,7 +62,6 @@ IRCDVar myIrcd[] = {
 	 1,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
 	 0,
-	 0,
 	 1,						 /* No Knock requires +i */
 	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support inspircd TOKENS */
@@ -1107,10 +1106,6 @@ class ProtoInspIRCd : public Module
 		pmodule_ircd_useTSMode(0);
 
 		moduleAddModes();
-
-		ircd->DefMLock[CMODE_NOEXTERNAL] = true;
-		ircd->DefMLock[CMODE_TOPIC] = true;
-		ircd->DefMLock[CMODE_REGISTERED] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

@@ -642,6 +642,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "newscount", "3", new ValueContainerUInt(&Config.NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerChar(&UlineServers), DT_CHARPTR, NoValidation},
 		{"options", "enablelogchannel", "no", new ValueContainerBool(&LogChan), DT_BOOLEAN, NoValidation},
+		{"options", "mlock", "+nrt", new ValueContainerString(&Config.MLock), DT_STRING, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&Config.s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&Config.desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&Config.NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1785,6 +1786,8 @@ int read_config(int reload)
 		Config.PreNickDBName = NULL;
 		Config.NSRExpire = 0;
 	}
+
+	SetDefaultMLock();
 
 	if (!retval) {
 		printf

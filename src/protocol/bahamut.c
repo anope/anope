@@ -44,7 +44,6 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 0,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 0,
 	 1,
 	 1,						 /* No Knock requires +i */
 	 NULL,					  /* CAPAB Chan Modes			 */
@@ -764,10 +763,6 @@ class ProtoBahamut : public Module
 		pmodule_ircd_useTSMode(0);
 
 		moduleAddModes();
-
-		ircd->DefMLock[CMODE_NOEXTERNAL] = true;
-		ircd->DefMLock[CMODE_TOPIC] = true;
-		ircd->DefMLock[CMODE_REGISTERED] = true;
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

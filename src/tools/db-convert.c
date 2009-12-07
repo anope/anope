@@ -16,11 +16,68 @@
 
 #include "db-convert.h"
 
+void process_mlock_modes(std::ofstream &fs, size_t m, const std::string &ircd)
+{
+	/* this is the same in all protocol modules */
+		if (m &        0x1) fs << " INVITE";        // CMODE_i
+		if (m &        0x2) fs << " MODERATED";     // CMODE_m
+		if (m &        0x4) fs << " NOEXTERNAL";    // CMODE_n
+		if (m &        0x8) fs << " PRIVATE";       // CMODE_p
+		if (m &       0x10) fs << " SECRET";        // CMODE_s
+		if (m &       0x20) fs << " TOPIC";         // CMODE_t
+		if (m &       0x40) fs << " KEY";           // CMODE_k
+		if (m &       0x80) fs << " LIMIT";         // CMODE_l
+		if (m &      0x200) fs << " REGISTERED";    // CMODE_r
+
+	if (ircd == "unreal" || ircd == "inspircd")
+	{
+		if (m &      0x100) fs << " REGISTEREDONLY"; // CMODE_R
+		if (m &      0x400) fs << " BLOCKCOLOR";     // CMODE_c
+		if (m &     0x2000) fs << " NOKNOCK";        // CMODE_K
+		if (m &     0x4000) fs << " REDIRECT";       // CMODE_L
+		if (m &     0x8000) fs << " OPERONLY";       // CMODE_O
+		if (m &    0x10000) fs << " NOKICK";         // CMODE_Q
+		if (m &    0x20000) fs << " STRIPCOLOR";     // CMODE_S
+		if (m &    0x80000) fs << " FLOOD";          // CMODE_f
+		if (m &   0x100000) fs << " FILTER";         // CMODE_G
+		if (m &   0x200000) fs << " NOCTCP";         // CMODE_C
+		if (m &   0x400000) fs << " AUDITORIUM";     // CMODE_u
+		if (m &   0x800000) fs << " SSL";            // CMODE_z
+		if (m &  0x1000000) fs << " NONICK";         // CMODE_N
+		if (m &  0x4000000) fs << " REGMODERATED";   // CMODE_M
+	}
+
+	if (ircd == "unreal")
+	{
+		if (m &      0x800) fs << " ADMINONLY";       // CMODE_A
+		if (m &     0x1000) fs << "";                 // old CMODE_H (removed in 3.2)
+		if (m &    0x40000) fs << " NOINVITE";        // CMODE_f
+		if (m &  0x2000000) fs << " NONOTICE";        // CMODE_T
+		if (m &  0x8000000) fs << " JOINFLOOD";       // CMODE_j
+	} // if (unreal)
+	if (ircd == "inspircd" )
+	{
+		if (m &      0x800) fs << " ALLINVITE";        // CMODE_A
+		if (m &     0x1000) fs << " NONOTICE";         // CMODE_T
+		/* for some reason, there is no CMODE_P in 1.8.x and no CMODE_V in the 1.9.1 protocol module
+		   we are ignoring this flag until we find a solution for this problem, 
+		   so the +V/+P mlock mode is lost on convert 
+		   anope 1.8: if (m &    0x40000) fs << " NOINVITE";         // CMODE_V
+		   anope 1.9: if (m &    0x40000) fs << " PERM";             // CMODE_P
+		*/
+		if (m &  0x2000000) fs << " JOINFLOOD";        // CMODE_j
+		if (m &  0x8000000) fs << " BLOCKCAPS";        // CMODE_B
+		if (m & 0x10000000) fs << " NICKFLOOD";        // CMODE_F
+		if (m & 0x20000000) fs << "";                  // CMODE_g (mode +g <badword>) ... can't be mlocked in older version
+		if (m & 0x40000000) fs << "";                  // CMODE_J (mode +J [seconds] ... can't be mlocked in older versions
+	} // if (inspircd)
+}
+
 int main(int argc, char *argv[])
 {
 	dbFILE *f;
 	std::ofstream fs;
-	std::string hashm;
+	std::string hashm, ircd;
 
 	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.2+ database converter"C_NONE"\n\n");
 
@@ -34,6 +91,18 @@ int main(int argc, char *argv[])
 		std::cin >> hashm;
 	}
 	*/
+	while (ircd != "bahamut" && ircd != "charybdis" && ircd != "dreamforge" && ircd != "hybrid"
+				&& ircd != "inspircd" && ircd != "plexus2" && ircd != "plexus3" && ircd != "ptlink"
+				&& ircd != "rageircd" && ircd != "ratbox" && ircd != "shadowircd" && ircd != "solidircd"
+				&& ircd != "ultimate2" && ircd != "ultimate3" && ircd != "unreal" && ircd != "viagra")
+	{
+		if (!ircd.empty())
+			std::cout << "Select a valid option!" << std::endl;
+		std::cout << "Which IRCd did you use? (required for converting the mlock modes)" << std::endl;
+		std::cout << "(bahamut, charybdis, dreamforge, hybrid, inspircd, plexus2, plexus3, ptlink," << std::endl;
+		std::cout << "rageircd, ratbox, shadowircd, solidircd, ultimate2, ultimate3, unreal, viagra)" << std::endl;
+		std::cout << "Your IRCd: "; std::cin >> ircd;
+	}
 
 	std::cout << "You selected " << hashm << std::endl;
 
@@ -594,9 +663,17 @@ int main(int argc, char *argv[])
 
 			/* TODO: convert to new mlock modes */
 			if (ci->mlock_on)
-				fs << "MD CH mlock_on " << ci->mlock_on << std::endl;
+			{
+				fs << "MD CH mlock_on";
+				process_mlock_modes(fs, ci->mlock_on, ircd);
+				fs << std::endl;
+			}
 			if (ci->mlock_off)
-				fs << "MD CH mlock_off " << ci->mlock_off << std::endl;
+			{
+				fs << "MD CH mlock_off";
+				process_mlock_modes(fs, ci->mlock_off, ircd);
+				fs << std::endl;
+			}
 			if (ci->mlock_limit)
 				fs << "MD CH mlock_limit " << ci->mlock_limit << std::endl;
 			if (ci->mlock_key)

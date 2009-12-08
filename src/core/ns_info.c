@@ -85,7 +85,8 @@ class CommandNSInfo : public Command
 			time_t expt;
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
-			if (finduser(na->nick))
+			User *u2 = finduser(na->nick);
+			if (u2 && u2->nc == na->nc)
 				nick_online = 1;
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL

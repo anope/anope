@@ -187,7 +187,7 @@ class CommandNSInfo : public Command
 				}
 			}
 
-			if (!show_hidden)
+			if (!show_hidden && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
 				notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, na->nick);
 		}
 		return MOD_CONT;

@@ -150,7 +150,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty())
 	{
-		if (!u->nc->HasPriv(c->permission) && !u->nc->HasCommand(c->permission))
+		if (!u->nc->HasCommand(c->permission))
 		{
 			notice_lang(service, u, ACCESS_DENIED);
 			alog("Access denied for user %s with service %s and command %s", u->nick, service, cmd);

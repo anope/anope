@@ -202,7 +202,7 @@ class CommandCSSet : public Command
 
 			if ((cm = ModeManager::FindChannelModeByChar(mode)))
 			{
-				if (!cm->CanSet(u))
+				if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(u))
 				{
 					notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR, mode);
 				}

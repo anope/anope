@@ -433,7 +433,7 @@ void defconParseModeString(const char *str)
 
 		if ((cm = ModeManager::FindChannelModeByChar(mode)))
 		{
-			if (!cm->CanSet(NULL))
+			if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(NULL))
 			{
 				alog("DefConChanModes mode character '%c' cannot be locked", mode);
 				continue;

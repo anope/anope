@@ -78,7 +78,7 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->c && this->c->HasMode(CMODE_PERM))
 	{
-		this->c->RemoveMode(CMODE_PERM);
+		this->c->RemoveMode(NULL, CMODE_PERM);
 		ircdproto->SendMode(whosends(this), this->name, "-%c", ModeManager::FindChannelModeByName(CMODE_PERM)->ModeChar);
 	}
 

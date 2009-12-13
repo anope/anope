@@ -28,11 +28,9 @@
  */
 static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const char *nick, bool set, int level, int levelself, const std::string &name, ChannelInfoFlag notice)
 {
-	const char *av[2];
 	Channel *c = findchan(chan);
 	ChannelInfo *ci;
 	User *u2;
-	char modebuf[3];
 
 	int is_same;
 
@@ -58,14 +56,10 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else
 	{
-		snprintf(modebuf, sizeof(modebuf), "%c%c", (set ? '+' : '-'), cm->ModeChar);
-
-		ircdproto->SendMode(whosends(ci), c->name, "%s %s", modebuf, u2->nick);
-
-		av[0] = modebuf;
-		av[1] = u2->nick;
-
-		chan_set_modes(Config.s_ChanServ, c, 2, av, 3);
+		if (set)
+			c->SetMode(NULL, cm, u2->nick);
+		else
+			c->RemoveMode(NULL, cm, u2->nick);
 
 		if (notice && ci->HasFlag(notice))
 			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",

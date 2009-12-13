@@ -42,9 +42,7 @@ class CommandOSUMode : public Command
 			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else
 		{
-			ircdproto->SendMode(findbot(Config.s_OperServ), nick, "%s", modes);
-
-			common_svsmode(u2, modes, NULL);
+			u2->SetModes(modes);
 
 			notice_lang(Config.s_OperServ, u, OPER_UMODE_SUCCESS, nick);
 			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);

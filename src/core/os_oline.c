@@ -34,7 +34,7 @@ class CommandOSOLine : public Command
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config.s_OperServ, nick, flag);
-			common_svsmode(u2, "+o", NULL);
+			u2->SetMode(UMODE_OPER);
 			notice_lang(Config.s_OperServ, u2, OPER_OLINE_IRCOP);
 			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
 			ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);

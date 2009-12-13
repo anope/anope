@@ -23,7 +23,6 @@ IRCDVar myIrcd[] = {
 	 "+o",					  /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 0,						 /* Vhost  */
-	 "-r+d",					/* Mode on UnReg        */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
@@ -142,54 +141,17 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
 
 class BahamutIRCdProto : public IRCDProto
 {
-	void ProcessUsermodes(User *user, int ac, const char **av)
-	{
-		int add = 1; /* 1 if adding modes, 0 if deleting */
-		const char *modes = av[0];
-		--ac;
-		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-		while (*modes) {
-			if (add)
-				user->SetMode(*modes);
-			else
-				user->RemoveMode(*modes);
-
-			switch (*modes++) {
-				case '+':
-					add = 1;
-					break;
-				case '-':
-					add = 0;
-					break;
-				case 'd':
-					if (!ac) {
-						alog("user: umode +d with no parameter (?) for user %s", user->nick);
-						break;
-					}
-					--ac;
-					++av;
-					break;
-				case 'o':
-					if (add) {
-						++opcnt;
-						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					}
-					else --opcnt;
-					break;
-				case 'r':
-					if (add && !nick_identified(user)) {
-						common_svsmode(user, "-r", NULL);
-						user->RemoveMode(CMODE_REGISTERED);
-					}
-			}
-		}
-	}
-
 	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		if (!buf) return;
 		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest, buf);
 		else send_cmd(source->nick, "MODE %s %s", dest, buf);
+	}
+
+	void SendModeInternal(User *u, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(Config.ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), buf);
 	}
 
 	/* SVSHOLD - set */
@@ -215,11 +177,6 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", name, mode, nick);
 		else send_cmd(Config.ServerName, "SVSMODE %s %s", name, mode);
-	}
-
-	void SendBotOp(const char *nick, const char *chan)
-	{
-		SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
 	}
 
 	/* SQLINE */
@@ -329,7 +286,7 @@ class BahamutIRCdProto : public IRCDProto
 	 */
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		send_cmd(Config.ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
+		this->SendModeInternal(u, merge_args(ac, av));
 	}
 
 	void SendEOB()
@@ -360,7 +317,8 @@ class BahamutIRCdProto : public IRCDProto
 	/* nc_change was = 1, and there is no na->status */
 	void SendUnregisteredNick(User *u)
 	{
-		common_svsmode(u, "+d", "1");
+		u->RemoveMode(UMODE_REGISTERED);
+		ircdproto->SendMode(u, "+d 1");
 	}
 
 	/* SERVER */
@@ -397,7 +355,8 @@ class BahamutIRCdProto : public IRCDProto
 
 		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
 
-		common_svsmode(u, "+rd", svidbuf);
+		u->SetMode(UMODE_REGISTERED);
+		ircdproto->SendMode(u, "+d %s", svidbuf);
 	}
 
 } ircd_proto;
@@ -442,7 +401,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 			 */
 			user->CheckAuthenticationToken(av[7]);
 
-			ircdproto->ProcessUsermodes(user, 1, &av[3]);
+			UserSetInternalModes(user, 1, &av[3]);
 		}
 	} else {
 		do_nick(source, av[0], NULL, NULL, NULL, NULL,
@@ -723,6 +682,7 @@ void moduleAddModes()
 	ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
 	ModeManager::AddUserMode('s', new UserMode(UMODE_SNOMASK));
 	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
+	ModeManager::AddUserMode('d', new UserMode(UMODE_DEAF));
 
 	/* b/e/I */
 	ModeManager::AddChannelMode('b', new ChannelModeBan());

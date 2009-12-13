@@ -75,6 +75,16 @@ void IRCDProto::SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
 	SendModeInternal(bi, dest, buf);
 }
 
+void IRCDProto::SendMode(User *u, const char *fmt, ...)
+{
+	va_list args;
+	char buf[BUFSIZE] = "";
+	va_start(args, fmt);
+	vsnprintf(buf, BUFSIZE - 1, fmt, args);
+	va_end(args);
+	SendModeInternal(u, buf);
+}
+
 void IRCDProto::SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
 {
 	va_list args;

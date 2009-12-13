@@ -23,7 +23,6 @@ IRCDVar myIrcd[] = {
 	 "+ao",					 /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 1,						 /* Vhost  */
-	 "-r+d",				 /* Mode on UnReg */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
@@ -169,85 +168,6 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
 
 class UnrealIRCdProto : public IRCDProto
 {
-	void ProcessUsermodes(User *user, int ac, const char **av)
-	{
-		int add = 1; /* 1 if adding modes, 0 if deleting */
-		const char *modes = av[0];
-		--ac;
-		if (!user || !modes) return; /* Prevent NULLs from doing bad things */
-		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-
-		while (*modes) {
-			if (add)
-				user->SetMode(*modes);
-			else
-				user->RemoveMode(*modes);
-
-			switch (*modes++)
-			{
-				case '+':
-					add = 1;
-					break;
-				case '-':
-					add = 0;
-					break;
-				case 'd':
-					if (ac <= 0)
-						break;
-					if (isdigit(*av[1]))
-					{
-						/* +d was setting a service stamp, ignore the usermode +d */
-						if (add)
-							user->RemoveMode('d');
-						else
-							user->SetMode('d');
-					}
-					break;
-				case 'o':
-					if (add) {
-						++opcnt;
-						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					}
-					else --opcnt;
-					break;
-				case 'r':
-					if (add && !nick_identified(user)) {
-						common_svsmode(user, "-r", NULL);
-					}
-					break;
-				case 't':
-					if (add && !user->vhost && !user->GetCloakedHost().empty())
-					{
-						/* The user was introduced with a vhost as their host, so we don't
-						 * know their cloaked host.. Set their vhost correctly and clear
-						 * the chost so we can request it later (if needed)
-						 */
-						user->SetDisplayedHost(user->GetCloakedHost());
-						user->chost.clear();
-					}
-					break;
-				case 'x':
-					if (add)
-					{
-						/* We don't know their cloaked host.. get it */
-						if (user->GetCloakedHost().empty())
-							send_cmd(NULL, "USERHOST :%s", user->nick);
-					}
-					else
-					{
-						if (user->vhost)
-							delete [] user->vhost;
-						user->vhost = NULL;
-					}
-					user->UpdateHost();
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-
 	/* SVSNOOP */
 	void SendSVSNOOP(const char *server, int set)
 	{
@@ -266,8 +186,9 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		common_svsmode(u, "-xt", NULL);
-		common_svsmode(u, "+x", NULL);
+		u->RemoveMode(UMODE_CLOAK);
+		u->RemoveMode(UMODE_VHOST);
+		u->SetMode(UMODE_CLOAK);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
@@ -301,7 +222,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (ac >= 1) {
 			if (!u || !av[0]) return;
-			send_cmd(Config.ServerName, "v %s %s", u->nick, merge_args(ac, av));
+			this->SendModeInternal(u, merge_args(ac, av));
 		}
 	}
 
@@ -309,6 +230,12 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (!buf) return;
 		send_cmd(source->nick, "G %s %s", dest, buf);
+	}
+
+	void SendModeInternal(User *u, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(Config.ServerName, "v %s %s", u->nick, buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
@@ -329,11 +256,6 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (!buf) return;
 		send_cmd(source->nick, "B @%s :%s", dest, buf);
-	}
-
-	void SendBotOp(const char *nick, const char *chan)
-	{
-		SendMode(findbot(nick), chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 	}
 
 	/* SERVER name hop descript */
@@ -548,7 +470,14 @@ class UnrealIRCdProto : public IRCDProto
 
 		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
 
-		common_svsmode(u, "+rd", svidbuf);
+		u->SetMode(UMODE_REGISTERED);
+		ircdproto->SendMode(u, "+d %s", svidbuf);
+	}
+
+	void SendUnregisteredNick(User *u)
+	{
+		u->RemoveMode(UMODE_REGISTERED);
+		ircdproto->SendMode(u, "+d 1");
 	}
 
 } ircd_proto;
@@ -665,6 +594,11 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (ac < 2)
 		return MOD_CONT;
 
+	/* When a server sends a mode string it is appended with a timestamp
+	 * we don't need it
+	 */
+	if (findserver(servlist, source))
+		--ac;
 	if (*av[0] == '#' || *av[0] == '&') {
 		do_cmode(source, ac, av);
 	} else {
@@ -895,7 +829,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 				 */
 				user->CheckAuthenticationToken(av[6]);
 
-				ircdproto->ProcessUsermodes(user, 1, &av[7]);
+				UserSetInternalModes(user, 1, &av[7]);
 			}
 
 		} else {
@@ -910,7 +844,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 				 */
 				user->CheckAuthenticationToken(av[6]);
 
-				ircdproto->ProcessUsermodes(user, 1, &av[7]);
+				UserSetInternalModes(user, 1, &av[7]);
 			}
 		}
 	} else {
@@ -1194,7 +1128,7 @@ void moduleAddModes()
 	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
 	ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD, true));
 	ModeManager::AddChannelMode('k', new ChannelModeKey());
-	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
+	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT, true));
 	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
 	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
 	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));

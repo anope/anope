@@ -485,44 +485,9 @@ typedef struct hostcore_ HostCore;
 typedef struct exception_ Exception;
 typedef struct session_ Session;
 
-enum UserModeName
-{
-	UMODE_BEGIN,
-
-	/* Usermodes */
-	UMODE_SERV_ADMIN, UMODE_BOT, UMODE_CO_ADMIN, UMODE_FILTER, UMODE_HIDEOPER, UMODE_NETADMIN,
-	UMODE_REGPRIV, UMODE_PROTECTED, UMODE_NO_CTCP, UMODE_WEBTV, UMODE_WHOIS, UMODE_ADMIN, UMODE_DEAF,
-	UMODE_GLOBOPS, UMODE_HELPOP, UMODE_INVIS, UMODE_OPER, UMODE_PRIV, UMODE_GOD, UMODE_REGISTERED,
-	UMODE_SNOMASK, UMODE_VHOST, UMODE_WALLOPS, UMODE_CLOAK, UMODE_SSL, UMODE_CALLERID, UMODE_COMMONCHANS,
-	UMODE_HIDDEN, UMODE_STRIPCOLOR,
-
-	UMODE_END
-};
-
-enum ChannelModeName
-{
-	CMODE_BEGIN,
-
-	/* Channel modes */
-	CMODE_BLOCKCOLOR, CMODE_FLOOD, CMODE_INVITE, CMODE_KEY, CMODE_LIMIT, CMODE_MODERATED, CMODE_NOEXTERNAL,
-	CMODE_PRIVATE, CMODE_REGISTERED, CMODE_SECRET, CMODE_TOPIC, CMODE_AUDITORIUM, CMODE_SSL, CMODE_ADMINONLY,
-	CMODE_NOCTCP, CMODE_FILTER, CMODE_NOKNOCK, CMODE_REDIRECT, CMODE_REGMODERATED, CMODE_NONICK, CMODE_OPERONLY,
-	CMODE_NOKICK, CMODE_REGISTEREDONLY, CMODE_STRIPCOLOR, CMODE_NONOTICE, CMODE_NOINVITE, CMODE_ALLINVITE,
-	CMODE_BLOCKCAPS, CMODE_PERM, CMODE_NICKFLOOD, CMODE_JOINFLOOD,
-
-	/* b/e/I */
-	CMODE_BAN, CMODE_EXCEPT,
-	CMODE_INVITEOVERRIDE,
-
-	/* v/h/o/a/q */
-	CMODE_VOICE, CMODE_HALFOP, CMODE_OP,
-	CMODE_PROTECT, CMODE_OWNER,
-
-	CMODE_END
-};
-
 #include "bots.h"
 #include "opertype.h"
+#include "modes.h"
 
 /*************************************************************************/
 
@@ -538,7 +503,6 @@ struct ircdvars_ {
 	const char *botchanumode;			/* Modes set when botserv joins a channel */
 	int svsnick;				/* Supports SVSNICK		*/
 	int vhost;				/* Supports vhost		*/
-	const char *modeonunreg;			/* Mode on Unregister		*/
 	int sgline;				/* Supports SGline		*/
 	int sqline;				/* Supports SQline		*/
 	int szline;				/* Supports SZline		*/
@@ -985,51 +949,91 @@ class CoreExport Channel : public Extensible
 	 */
 	bool HasMode(ChannelModeName Name);
 
-	/**
-	 * Set a mode on a channel
-	 * @param Name The mode name
-	 * @param param Optional param arg for the mode
+	/** Set a mode internally on a channel, this is not sent out to the IRCd
+	 * @param cm The mode
+	 * @param param The param
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(ChannelModeName Name, const std::string param = "");
+	void SetModeInternal(ChannelMode *cm, const std::string &param = "", bool EnforceMLock = true);
+
+	/** Remove a mode internally on a channel, this is not sent out to the IRCd
+	 * @param cm The mode
+	 * @param param The param
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 */
+	void RemoveModeInternal(ChannelMode *cm, const std::string &param = "", bool EnforceMLock = true);
+
+	/** Set a mode on a channel
+	 * @param bi The client setting the modes
+	 * @param cm The mode
+	 * @param param Optional param arg for the mode
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 */
+	void SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Set a mode on a channel
+	 * @param bi The client setting the modes
+	 * @param Name The mode name
+	 * @param param Optional param arg for the mode
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 */
+	void SetMode(BotInfo *bi, ChannelModeName Name, const std::string &param = "", bool EnforceMLock = true);
+
+	/**
+	 * Set a mode on a channel
+	 * @param bi The client setting the modes
 	 * @param Mode The mode
 	 * @param param Optional param arg for the mode
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(char Mode, const std::string param = "");
+	void SetMode(BotInfo *bi, char Mode, const std::string &param = "", bool EnforceMLock = true);
+
+	/** Remove a mode from a channel
+	 * @param bi The client setting the modes
+	 * @param cm The mode
+	 * @param param Optional param arg for the mode
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 */
+	void RemoveMode(BotInfo *bi, ChannelMode *cm, const std::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Remove a mode from a channel
+	 * @param bi The client setting the modes
 	 * @param Name The mode name
+	 * @param param Optional param arg for the mode
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(ChannelModeName Name);
+	void RemoveMode(BotInfo *bi, ChannelModeName Name, const std::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Remove a mode from a channel
+	 * @param bi The client setting the modes
 	 * @param Mode The mode
+	 * @param param Optional param arg for the mode
+	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(char Mode);
+	void RemoveMode(BotInfo *bi, char Mode, const std::string &param = "", bool EnforceMLock = true);
 
 	/** Clear all the modes from the channel
-	 * @param client The client unsetting the modes
+	 * @param bi The client unsetting the modes
 	 */
-	void ClearModes(char *client = NULL);
+	void ClearModes(BotInfo *bi = NULL);
 
 	/** Clear all the bans from the channel
-	 * @param client The client unsetting the modes
+	 * @param bi The client unsetting the modes
 	 */
-	void ClearBans(char *client = NULL);
+	void ClearBans(BotInfo *bi = NULL);
 
 	/** Clear all the excepts from the channel
-	 * @param client The client unsetting the modes
+	 * @param bi The client unsetting the modes
 	 */
-	void ClearExcepts(char *client = NULL);
+	void ClearExcepts(BotInfo *bi = NULL);
 
 	/** Clear all the invites from the channel
-	 * @param client The client unsetting the modes
+	 * @param bi The client unsetting the modes
 	 */
-	void ClearInvites(char *client = NULL);
+	void ClearInvites(BotInfo *bi = NULL);
 
 	/** Get a param from the channel
 	 * @param Name The mode
@@ -1042,6 +1046,13 @@ class CoreExport Channel : public Extensible
 	 * @param Name The mode
 	 */
 	const bool HasParam(ChannelModeName Name);
+
+	/** Set a string of modes on the channel
+	 * @param bi The client setting the modes
+	 * @param EnforceMLock Should mlock be enforced on this mode change
+	 * @param cmodes The modes to set
+	 */
+	void SetModes(BotInfo *bi, bool EnforceMLock, const std::string &cmodes, ...);
 };
 
 /** Channelban type flags
@@ -1180,335 +1191,6 @@ struct exception_ {
 
 /*************************************************************************/
 
-/** The different types of modes
-*/
-enum ModeType
-{
-	/* Regular mode */
-	MODE_REGULAR,
-	/* b/e/I */
-	MODE_LIST,
-	/* k/l etc */
-	MODE_PARAM,
-	/* v/h/o/a/q */
-	MODE_STATUS
-};
-
-/** This class is a user mode, all user modes use this/inherit from this
- */
-class UserMode
-{
-  public:
-
-	/* Mode name */
-	UserModeName Name;
-	/* The mode char */
-	char ModeChar;
-
-	/** Default constructor
-	 * @param nName The mode name
-	 */
-	UserMode(UserModeName mName)
-	{
-		this->Name = mName;
-	}
-
-	/** Default destructor
-	 */
-	virtual ~UserMode() { }
-};
-
-/** This class is a channel mode, all channel modes use this/inherit from this
- */
-class CoreExport ChannelMode
-{
-  public:
-
-	/* Mode name */
-	ChannelModeName Name;
-	/* Type of mode this is */
-	ModeType Type;
-	/* The mode char */
-	char ModeChar;
-
-	/** Default constructor
-	 * @param mName The mode name
-	 */
-	ChannelMode(ChannelModeName mName)
-	{
-		this->Name = mName;
-		this->Type = MODE_REGULAR;
-	}
-
-	/** Default destructor
-	 */
-	virtual ~ChannelMode() { }
-
-	/** Can a user set this mode, used for mlock
-	 * NOTE: User CAN be NULL, this is for checking if it can be locked with defcon
-	 * @param u The user, or NULL
-	 */
-	virtual bool CanSet(User *u) { return true; }
-};
-
-/** This is a mode for lists, eg b/e/I. These modes should inherit from this
- */
-class CoreExport ChannelModeList : public ChannelMode
-{
-  public:
-
-	/** Default constructor
-	 * @param mName The mode name
-	 */
-	ChannelModeList(ChannelModeName mName) : ChannelMode(mName)
-	{
-		this->Type = MODE_LIST;
-	}
-
-	/** Default destructor
-	 */
-	virtual ~ChannelModeList() { }
-
-	/** Is the mask valid
-	 * @param mask The mask
-	 * @return true for yes, false for no
-	 */
-	virtual bool IsValid(const char *mask) { return true; }
-
-	/** Add the mask to the channel, this should be overridden
-	 * @param chan The channel
-	 * @param mask The mask
-	 */
-	virtual void AddMask(Channel *chan, const char *mask) { }
-
-	/** Delete the mask from the channel, this should be overridden
-	 * @param chan The channel
-	 * @param mask The mask
-	 */
-	virtual void DelMask(Channel *chan, const char *mask) { }
-
-};
-
-/** This is a mode with a paramater, eg +k/l. These modes should use/inherit from this
-*/
-class CoreExport ChannelModeParam : public ChannelMode
-{
-  public:
-
-	/** Default constructor
-	 * @param mName The mode name
-	 * @param MinusArg true if this mode sends no arg when unsetting
-	 */
-	ChannelModeParam(ChannelModeName mName, bool MinusArg = false) : ChannelMode(mName)
-	{
-		this->Type = MODE_PARAM;
-		MinusNoArg = MinusArg;
-	}
-
-	/** Default destructor
-	 */
-	virtual ~ChannelModeParam() { }
-
-	/* Should we send an arg when unsetting this mode? */
-	bool MinusNoArg;
-
-	/** Is the param valid
-	 * @param value The param
-	 * @return true for yes, false for no
-	 */
-	virtual bool IsValid(const char *value) { return true; }
-};
-
-/** This is a mode that is a channel status, eg +v/h/o/a/q.
-*/
-class CoreExport ChannelModeStatus : public ChannelMode
-{
-  public:
-	/** CUS_ values, see below
-	*/
-	int16 Status;
-	/* The symbol, eg @ % + */
-	char Symbol;
-
-	/** Default constructor
-	 * @param mName The mode name
-	 * @param mStatus A CUS_ value
-	 * @param mSymbol The symbol for the mode, eg @ % +
-	 * @param mProtectBotServ Should botserv clients reset this on themself if it gets unset>
-	 */
-	ChannelModeStatus(ChannelModeName mName, int16 mStatus, char mSymbol, bool mProtectBotServ = false) : ChannelMode(mName)
-	{
-		this->Type = MODE_STATUS;
-		this->Status = mStatus;
-		this->Symbol = mSymbol;
-		this->ProtectBotServ = mProtectBotServ;
-	}
-
-	/** Default destructor
-	 */
-	virtual ~ChannelModeStatus() { }
-
-	/* Should botserv protect itself with this mode? eg if someone -o's botserv it will +o */
-	bool ProtectBotServ;
-};
-
-/** This class manages modes, and has the ability to add channel and
- * user modes to Anope to track internally
- */
-class CoreExport ModeManager
-{
-  public:
-	/* User modes */
-	static std::map<char, UserMode *> UserModesByChar;
-	static std::map<UserModeName, UserMode *> UserModesByName;
-	/* Channel modes */
-	static std::map<char, ChannelMode *> ChannelModesByChar;
-	static std::map<ChannelModeName, ChannelMode *> ChannelModesByName;
-	/* Although there are two different maps for UserModes and ChannelModes
-	 * the pointers in each are the same. This is used to increase
-	 * efficiency.
-	 */
-
-	/** Add a user mode to Anope
-	 * @param Mode The mode
-	 * @param um A UserMode or UserMode derived class
-	 * @return true on success, false on error
-	 */
-	static bool AddUserMode(char Mode, UserMode *um);
-
-	/** Add a channel mode to Anope
-	 * @param Mode The mode
-	 * @param cm A ChannelMode or ChannelMode derived class
-	 * @return true on success, false on error
-	 */
-	static bool AddChannelMode(char Mode, ChannelMode *cm);
-
-	/** Find a channel mode
-	 * @param Mode The mode
-	 * @return The mode class
-	 */
-	static ChannelMode *FindChannelModeByChar(char Mode);
-
-	/** Find a user mode
-	 * @param Mode The mode
-	 * @return The mode class
-	 */
-	static UserMode *FindUserModeByChar(char Mode);
-
-	/** Find a channel mode
-	 * @param Mode The modename
-	 * @return The mode class
-	 */
-	static ChannelMode *FindChannelModeByName(ChannelModeName Name);
-
-	/** Find a user mode
-	 * @param Mode The modename
-	 * @return The mode class
-	 */
-	static UserMode *FindUserModeByName(UserModeName Name);
-
-	/** Gets the channel mode char for a symbol (eg + returns v)
-	 * @param Value The symbol
-	 * @return The char
-	 */
-	static char GetStatusChar(char Value);
-};
-
-/** Channel mode +b
- */
-class CoreExport ChannelModeBan : public ChannelModeList
-{
-  public:
-	ChannelModeBan() : ChannelModeList(CMODE_BAN) { }
-
-	void AddMask(Channel *chan, const char *mask);
-
-	void DelMask(Channel *chan, const char *mask);
-};
-
-/** Channel mode +e
- */
-class CoreExport ChannelModeExcept : public ChannelModeList
-{
-  public:
-	ChannelModeExcept() : ChannelModeList(CMODE_EXCEPT) { }
-
-	void AddMask(Channel *chan, const char *mask);
-
-	void DelMask(Channel *chan, const char *mask);
-};
-
-/** Channel mode +I
- */
-class CoreExport ChannelModeInvite : public ChannelModeList
-{
-  public:
-	ChannelModeInvite() : ChannelModeList(CMODE_INVITEOVERRIDE) { }
-
-	void AddMask(Channel *chan, const char *mask);
-
-	void DelMask(Channel *chan, const char *mask);
-};
-
-/** Channel mode +k (key)
- */
-class CoreExport ChannelModeKey : public ChannelModeParam
-{
-  public:
-	ChannelModeKey() : ChannelModeParam(CMODE_KEY) { }
-
-	bool IsValid(const char *value);
-};
-
-/** Channel mode +f (flood)
- */
-class ChannelModeFlood : public ChannelModeParam
-{
-  public:
-	ChannelModeFlood() : ChannelModeParam(CMODE_FLOOD) { }
-
-	bool IsValid(const char *value);
-};
-
-/** This class is used for channel mode +A (Admin only)
- * Only opers can mlock it
- */
-class CoreExport ChannelModeAdmin : public ChannelMode
-{
-  public:
-	ChannelModeAdmin() : ChannelMode(CMODE_ADMINONLY) { }
-
-	/* Opers only */
-	bool CanSet(User *u);
-};
-
-/** This class is used for channel mode +O (Opers only)
- * Only opers can mlock it
- */
-class CoreExport ChannelModeOper : public ChannelMode
-{
-  public:
-	ChannelModeOper() : ChannelMode(CMODE_OPERONLY) { }
-
-	/* Opers only */
-	bool CanSet(User *u);
-};
-
-/** This class is used for channel mode +r (registered channel)
- * No one may mlock r
- */
-class CoreExport ChannelModeRegistered : public ChannelMode
-{
-  public:
-	ChannelModeRegistered() : ChannelMode(CMODE_REGISTERED) { }
-
-	/* No one mlocks +r */
-	bool CanSet(User *u);
-};
-
-
-/*************************************************************************/
-
 struct session_ {
 	Session *prev, *next;
 	char *host;
@@ -1639,6 +1321,7 @@ class CoreExport IRCDProto
  private:
 		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
 		virtual void SendModeInternal(BotInfo *, const char *, const char *) = 0;
+		virtual void SendModeInternal(User *, const char *) = 0;
 		virtual void SendKickInternal(BotInfo *bi, const char *, const char *, const char *) = 0;
 		virtual void SendNoticeChanopsInternal(BotInfo *bi, const char *, const char *) = 0;
 		virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf);
@@ -1661,6 +1344,7 @@ class CoreExport IRCDProto
 		virtual void SendSVSKill(const char *source, const char *user, const char *fmt, ...);
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...);
+		virtual void SendMode(User *u, const char *fmt, ...);
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid) = 0;
 		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...);
 		virtual void SendNoticeChanops(BotInfo *bi, const char *dest, const char *fmt, ...);
@@ -1670,7 +1354,6 @@ class CoreExport IRCDProto
 		virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendGlobalNotice(BotInfo *bi, const char *dest, const char *msg);
 		virtual void SendGlobalPrivmsg(BotInfo *bi, const char *dest, const char *msg);
-		virtual void SendBotOp(const char *, const char *) = 0;
 
 		/** XXX: This is a hack for NickServ enforcers. It is deprecated.
 		 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
@@ -1707,7 +1390,6 @@ class CoreExport IRCDProto
 		virtual void SendSWhois(const char *, const char *, const char *) { }
 		virtual void SendEOB() { }
 		virtual void SendServer(Server *) = 0;
-		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int IsNickValid(const char *) { return 1; }
 		virtual int IsChannelValid(const char *);
 		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...);

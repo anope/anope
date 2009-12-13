@@ -24,7 +24,6 @@ class CommandOSClearModes : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		const char *argv[2];
 		const char *chan = params[0].c_str();
 		Channel *c;
 		int all = 0;
@@ -61,31 +60,31 @@ class CommandOSClearModes : public Command
 				/* Clear mode +o */
 				if (ircd->svsmode_ucmode)
 					ircdproto->SendSVSModeChan(c->name, "-o", NULL);
-				for (cu = c->users; cu; cu = next)
+				else
 				{
-					next = cu->next;
-					if (!chan_has_user_status(c, cu->user, CUS_OP))
-						continue;
-					argv[0] = "-o";
-					argv[1] = cu->user->nick;
-					if (!ircd->svsmode_ucmode)
-						ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-o %s", cu->user->nick);
-					chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
+					for (cu = c->users; cu; cu = next)
+					{
+						next = cu->next;
+						if (!chan_has_user_status(c, cu->user, CUS_OP))
+							continue;
+
+						c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+					}
 				}
 
 				/* Clear mode +v */
 				if (ircd->svsmode_ucmode)
 					ircdproto->SendSVSModeChan(c->name, "-v", NULL);
-				for (cu = c->users; cu; cu = next)
+				else
 				{
-					next = cu->next;
-					if (!chan_has_user_status(c, cu->user, CUS_VOICE))
-						continue;
-					argv[0] = "-v";
-					argv[1] = cu->user->nick;
-					if (!ircd->svsmode_ucmode)
-						ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-v %s", cu->user->nick);
-					chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
+					for (cu = c->users; cu; cu = next)
+					{
+						next = cu->next;
+						if (!chan_has_user_status(c, cu->user, CUS_VOICE))
+							continue;
+						
+						c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
+					}
 				}
 
 				/* Clear mode +h */
@@ -93,16 +92,16 @@ class CommandOSClearModes : public Command
 				{
 					if (ircd->svsmode_ucmode)
 						ircdproto->SendSVSModeChan(c->name, "-h", NULL);
-					for (cu = c->users; cu; cu = next)
+					else
 					{
-						next = cu->next;
-						if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
-							continue;
-						argv[0] = "-h";
-						argv[1] = cu->user->nick;
-						if (!ircd->svsmode_ucmode)
-							ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-h %s", cu->user->nick);
-						chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
+						for (cu = c->users; cu; cu = next)
+						{
+							next = cu->next;
+							if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
+								continue;
+							
+							c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
+						}
 					}
 				}
 
@@ -114,16 +113,16 @@ class CommandOSClearModes : public Command
 
 					if (ircd->svsmode_ucmode)
 						ircdproto->SendSVSModeChan(c->name, buf.c_str(), NULL);
-					for (cu = c->users; cu; cu = next)
+					else
 					{
-						next = cu->next;
-						if (!chan_has_user_status(c, cu->user, CUS_OWNER))
-							continue;
-						argv[0] = buf.c_str();
-						argv[1] = cu->user->nick;
-						if (!ircd->svsmode_ucmode)
-							ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s %s", buf.c_str(), cu->user->nick);
-						chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
+						for (cu = c->users; cu; cu = next)
+						{
+							next = cu->next;
+							if (!chan_has_user_status(c, cu->user, CUS_OWNER))
+								continue;
+
+							c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+						}
 					}
 				}
 
@@ -135,26 +134,25 @@ class CommandOSClearModes : public Command
 
 					if (ircd->svsmode_ucmode)
 						ircdproto->SendSVSModeChan(c->name, buf.c_str(), NULL);
-					for (cu = c->users; cu; cu = next)
+					else
 					{
-						next = cu->next;
-						if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
-							continue;
-						argv[0] = buf.c_str();
-						argv[1] = cu->user->nick;
-						if (!ircd->svsmode_ucmode)
-							ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s %s", buf.c_str(), cu->user->nick);
-						chan_set_modes(Config.s_OperServ, c, 2, argv, 0);
+						for (cu = c->users; cu; cu = next)
+						{
+							next = cu->next;
+							if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
+								continue;
+
+							c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+						}
 					}
 				}
 			}
 
 
-			c->ClearModes(Config.s_OperServ);
-
-			c->ClearBans(Config.s_OperServ);
-			c->ClearExcepts(Config.s_OperServ);
-			c->ClearInvites(Config.s_OperServ);
+			c->ClearModes();
+			c->ClearBans();
+			c->ClearExcepts();
+			c->ClearInvites();
 		}
 
 		if (all)

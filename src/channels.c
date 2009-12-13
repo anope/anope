@@ -133,58 +133,189 @@ bool Channel::HasMode(ChannelModeName Name)
 	return modes[Name];
 }
 
-/**
- * Set a mode on a channel
- * @param Name The mode name
+/** Set a mode internally on a channel, this is not sent out to the IRCd
+ * @param cm The mode
+ * @param param The param
+ * @param EnforeMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::SetMode(ChannelModeName Name, const std::string param)
+void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool EnforceMLock)
 {
-	modes[Name] = true;
+	if (!cm)
+		return;
+
+	/* Setting v/h/o/a/q etc */
+	if (cm->Type == MODE_STATUS)
+	{
+		if (param.empty())
+		{
+			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			return;
+		}
+
+		/* We don't track bots */
+		if (findbot(param.c_str()))
+			return;
+
+		User *u = finduser(param.c_str());
+		if (!u)
+		{
+			if (debug)
+				alog("debug: MODE %s +%c for nonexistant user %s", this->name, cm->ModeChar, param.c_str());
+			return;
+		}
+
+		if (debug)
+			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name, u->nick);
+
+		ChannelModeStatus *cms = static_cast<ChannelModeStatus *>(cm);
+		/* Set the new status on the user */
+		chan_set_user_status(this, u, cms->Status);
+		/* Enforce secureops, etc */
+		chan_set_correct_modes(u, this, 0);
+		return;
+	}
+	/* Setting b/e/I etc */
+	else if (cm->Type == MODE_LIST)
+	{
+		if (param.empty())
+		{
+			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			return;
+		}
+
+		ChannelModeList *cml = static_cast<ChannelModeList *>(cm);
+		cml->AddMask(this, param.c_str());
+		return;
+	}
+
+	modes[cm->Name] = true;
 
 	/* Channel mode +P or so was set, mark this channel as persistant */
-	if (Name == CMODE_PERM && ci)
+	if (cm->Name == CMODE_PERM && ci)
 	{
 		ci->SetFlag(CI_PERSIST);
 	}
 
 	if (!param.empty())
 	{
+		if (cm->Type != MODE_PARAM)
+		{
+			alog("Channel::SetModeInternal() mode %c for %s with a paramater, but its not a param mode", cm->ModeChar, this->name);
+			return;
+		}
+
 		/* They could be resetting the mode to change its params */
-		std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
+		std::map<ChannelModeName, std::string>::iterator it = Params.find(cm->Name);
 		if (it != Params.end())
 		{
 			Params.erase(it);
 		}
 
-		Params.insert(std::make_pair(Name, param));
+		Params.insert(std::make_pair(cm->Name, param));
 	}
 
-	FOREACH_MOD(I_OnChannelModeSet, OnChannelModeSet(this, Name));
-}
+	FOREACH_MOD(I_OnChannelModeSet, OnChannelModeSet(this, cm->Name));
 
-/**
- * Set a mode on a channel
- * @param Mode The mode
- */
-void Channel::SetMode(char Mode, const std::string param)
-{
-	ChannelMode *cm;
+	/* Check for mlock */
 
-	if ((cm = ModeManager::FindChannelModeByChar(Mode)))
+	/* Non registered channel, no mlock */
+	if (!ci || !EnforceMLock)
+		return;
+
+	/* If this channel has this mode locked negative */
+	if (ci->HasMLock(cm->Name, false))
 	{
-		SetMode(cm->Name, param);
+		/* Remove the mode */
+		if (cm->Type == MODE_PARAM)
+		{
+			ChannelModeParam *cmp = static_cast<ChannelModeParam *>(cmp);
+
+			if (!cmp->MinusNoArg)
+			{
+				/* Get the current param set on the channel and send it with the mode */
+				std::string cparam;
+				if (GetParam(cmp->Name, &cparam))
+					RemoveMode(NULL, cm, cparam);
+			}
+			else
+				RemoveMode(NULL, cm);
+		}
+		else if (cm->Type == MODE_REGULAR)
+			RemoveMode(NULL, cm);
+	}
+	/* If this is a param mode and its mlocked +, check to ensure someone didn't reset it with the wrong param */
+	else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
+	{
+		ChannelModeParam *cmp = static_cast<ChannelModeParam *>(cm);
+		std::string cparam, ciparam;
+		/* Get the param currently set on this channel */
+		GetParam(cmp->Name, &cparam);
+		/* Get the param set in mlock */
+		ci->GetParam(cmp->Name, &ciparam);
+
+		/* We have the wrong param set */
+		if (cparam.empty() || ciparam.empty() || cparam != ciparam)
+		{
+			/* Reset the mode with the correct param */
+			SetMode(NULL, cm, ciparam);
+		}
 	}
 }
 
-/**
- * Remove a mode from a channel
- * @param Name The mode name
+/** Remove a mode internally on a channel, this is not sent out to the IRCd
+ * @param cm The mode
+ * @param param The param
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::RemoveMode(ChannelModeName Name)
+void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool EnforceMLock)
 {
-	modes[Name] = false;
+	if (!cm)
+		return;
 
-	if (Name == CMODE_PERM && ci)
+	/* Setting v/h/o/a/q etc */
+	if (cm->Type == MODE_STATUS)
+	{
+		if (param.empty())
+		{
+			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			return;
+		}
+
+		/* We don't track bots */
+		if (findbot(param.c_str()))
+			return;
+
+		User *u = finduser(param.c_str());
+		if (!u)
+		{
+			alog("Channel::RemoveModeInternal() MODE %s +%c for nonexistant user %s", this->name, cm->ModeChar, param.c_str());
+			return;
+		}
+
+		if (debug)
+			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name, u->nick);
+
+		ChannelModeStatus *cms = static_cast<ChannelModeStatus *>(cm);
+		chan_remove_user_status(this, u, cms->Status);
+		return;
+	}
+	/* Setting b/e/I etc */
+	else if (cm->Type == MODE_LIST)
+	{
+		if (param.empty())
+		{
+			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			return;
+		}
+
+		ChannelModeList *cml = static_cast<ChannelModeList *>(cm);
+		cml->DelMask(this, param.c_str());
+		return;
+	}
+
+	modes[cm->Name] = false;
+
+	if (cm->Name == CMODE_PERM && ci)
 	{
 		ci->UnsetFlag(CI_PERSIST);
 		if (Config.s_BotServ && ci->bi && usercount == Config.BSMinUsers - 1)
@@ -193,27 +324,118 @@ void Channel::RemoveMode(ChannelModeName Name)
 			delete this;
 	}
 
-	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
-	if (it != Params.end())
+	if (cm->Type == MODE_PARAM)
 	{
-		Params.erase(it);
+		std::map<ChannelModeName, std::string>::iterator it = Params.find(cm->Name);
+		if (it != Params.end())
+		{
+			Params.erase(it);
+		}
 	}
 
-	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, Name));
+	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name));
+
+	/* Check for mlock */
+
+	/* Non registered channel, no mlock */
+	if (!ci || !EnforceMLock)
+		return;
+	
+	/* This channel has this the mode locked on */
+	if (ci->HasMLock(cm->Name, true))
+	{
+		if (cm->Type == MODE_REGULAR)
+		{
+			/* Set the mode */
+			SetMode(NULL, cm);
+		}
+		/* This is a param mode */
+		else if (cm->Type == MODE_PARAM)
+		{
+			std::string cparam;
+			/* Get the param stored in mlock for this mode */
+			if (ci->GetParam(cm->Name, &cparam))
+				SetMode(NULL, cm, cparam);
+		}
+	}
+}
+
+/** Set a mode on a channel
+ * @param bi The client setting the modes
+ * @param cm The mode
+ * @param param Optional param arg for the mode
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+ */
+void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bool EnforceMLock)
+{
+	if (!cm)
+		return;
+
+	ModeManager::StackerAdd(bi, this, cm, true, param);
+	SetModeInternal(cm, param, EnforceMLock);
+}
+
+/**
+ * Set a mode on a channel
+ * @param bi The client setting the modes
+ * @param Name The mode name
+ * @param param Optional param arg for the mode
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+ */
+void Channel::SetMode(BotInfo *bi, ChannelModeName Name, const std::string &param, bool EnforceMLock)
+{
+	SetMode(bi, ModeManager::FindChannelModeByName(Name), param, EnforceMLock);
+}
+
+/**
+ * Set a mode on a channel
+ * @param bi The client setting the modes
+ * @param Mode The mode
+ * @param param Optional param arg for the mode
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+ */
+void Channel::SetMode(BotInfo *bi, char Mode, const std::string &param, bool EnforceMLock)
+{
+	SetMode(bi, ModeManager::FindChannelModeByChar(Mode), param, EnforceMLock);
+}
+
+/** Remove a mode from a channel
+ * @param bi The client setting the modes
+ * @param cm The mode
+ * @param param Optional param arg for the mode
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+ */
+void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bool EnforceMLock)
+{
+	if (!cm)
+		return;
+
+	ModeManager::StackerAdd(bi, this, cm, false, param);
+	RemoveModeInternal(cm, param, EnforceMLock);
 }
 
 /**
  * Remove a mode from a channel
- * @param Mode The mode
+ * @param bi The client setting the modes
+ * @param Name The mode name
+ * @param param Optional param arg for the mode
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::RemoveMode(char Mode)
+void Channel::RemoveMode(BotInfo *bi, ChannelModeName Name, const std::string &param, bool EnforceMLock)
 {
-	ChannelMode *cm;
+	RemoveMode(bi, ModeManager::FindChannelModeByName(Name), param, EnforceMLock);
+}
 
-	if ((cm = ModeManager::FindChannelModeByChar(Mode)))
-	{
-		RemoveMode(cm->Name);
-	}
+/**
+ * Remove a mode from a channel
+ * @param bi The client setting the modes
+ * @param Mode The mode
+ * @param param Optional param arg for the mode
+ * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+ */
+void Channel::RemoveMode(BotInfo *bi, char Mode, const std::string &param, bool EnforceMLock)
+{
+	RemoveMode(bi, ModeManager::FindChannelModeByChar(Mode), param, EnforceMLock);
 }
 
 /** Get a param from the channel
@@ -254,15 +476,12 @@ const bool Channel::HasParam(ChannelModeName Name)
 /*************************************************************************/
 
 /** Clear all the modes from the channel
- * @param client The client unsetting the modes
+ * @param bi The client setting the modes
  */
-void Channel::ClearModes(char *client)
+void Channel::ClearModes(BotInfo *bi)
 {
 	ChannelMode *cm;
 	ChannelModeParam *cmp;
-	std::string buf, buf2;
-	const char *argv[2];
-	BotInfo *sender = (client ? findbot(client) : whosends(ci));
 
 	for (size_t n = CMODE_BEGIN + 1; n != CMODE_END; ++n)
 	{
@@ -272,41 +491,21 @@ void Channel::ClearModes(char *client)
 		{
 			if (cm->Type == MODE_REGULAR)
 			{
-				buf = '-';
-				buf += cm->ModeChar;
-
-				argv[0] = buf.c_str();
-
-				ircdproto->SendMode(sender, this->name, "-%c", cm->ModeChar);
-				chan_set_modes(sender->nick, this, 1, argv, 0);
+				this->RemoveMode(NULL, cm);
 			}
 			else if (cm->Type == MODE_PARAM)
 			{
 				cmp = static_cast<ChannelModeParam *>(cm);
 
-				buf = '-';
-				buf += cmp->ModeChar;
-				buf2.clear();
-
 				if (!cmp->MinusNoArg)
 				{
-					buf2 = this->GetParam(cmp->Name, &buf2);
-				}
-
-				argv[0] = buf.c_str();
-				if (!buf2.empty())
-				{
-					argv[1] = buf2.c_str();
-
-					ircdproto->SendMode(sender, this->name, "-%c %s", cm->ModeChar, buf2.c_str());
-					chan_set_modes(sender->nick, this, 2, argv, 0);
+					std::string buf;
+					if (this->GetParam(cmp->Name, &buf))
+						this->RemoveMode(NULL, cm, buf);
 				}
 				else
 				{
-					argv[1] = NULL;
-
-					ircdproto->SendMode(sender, this->name, "-%c", cm->ModeChar);
-					chan_set_modes(sender->nick, this, 1, argv, 0);
+					this->RemoveMode(NULL, cm);
 				}
 			}
 		}
@@ -316,95 +515,190 @@ void Channel::ClearModes(char *client)
 }
 
 /** Clear all the bans from the channel
- * @param client The client unsetting the modes
+ * @param bi The client setting the modes
  */
-void Channel::ClearBans(char *client)
+void Channel::ClearBans(BotInfo *bi)
 {
 	Entry *entry, *nexte;
-	BotInfo *sender = (client ? findbot(client) : whosends(ci));
 	ChannelModeList *cml;
-	std::string buf;
-	const char *argv[2];
 
 	cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 
 	if (cml && this->bans && this->bans->count)
 	{
-		buf = '-';
-		buf += cml->ModeChar;
-
 		for (entry = this->bans->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
-			argv[0] = buf.c_str();
-			argv[1] = sstrdup(entry->mask);
-			ircdproto->SendMode(sender, this->name, "%s %s", buf.c_str(), entry->mask);
-			chan_set_modes(sender->nick, this, 2, argv, 0);
-			delete [] argv[1];
+			this->RemoveMode(bi, CMODE_BAN, entry->mask);
 		}
 	}
 }
 
 /** Clear all the excepts from the channel
- * @param client The client unsetting the modes
+ * @param bi The client setting the modes
  */
-void Channel::ClearExcepts(char *client)
+void Channel::ClearExcepts(BotInfo *bi)
 {
 	Entry *entry, *nexte;
-	BotInfo *sender = (client ? findbot(client) : whosends(ci));
 	ChannelModeList *cml;
-	std::string buf;
-	const char *argv[2];
 
 	cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 
 	if (cml && this->excepts && this->excepts->count)
 	{
-		buf = '+';
-		buf += cml->ModeChar;
-
 		for (entry = this->excepts->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
-			argv[0] = buf.c_str();
-			argv[1] = sstrdup(entry->mask);
-			ircdproto->SendMode(sender, this->name, "%s %s", buf.c_str(), entry->mask);
-			chan_set_modes(sender->nick, this, 2, argv, 0);
-			delete [] argv[1];
+			this->RemoveMode(bi, CMODE_EXCEPT, entry->mask);
 		}
 	}
 }
 
 /** Clear all the invites from the channel
- * @param client The client unsetting the modes
+ * @param bi The client setting the modes
  */
-void Channel::ClearInvites(char *client)
+void Channel::ClearInvites(BotInfo *bi)
 {
 	Entry *entry, *nexte;
-	BotInfo *sender = (client ? findbot(client) : whosends(ci));
 	ChannelModeList *cml;
-	std::string buf;
-	const char *argv[2];
 
 	cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 
 	if (cml && this->invites && this->invites->count)
 	{
-		buf = '-';
-		buf += cml->ModeChar;
-
 		for (entry = this->invites->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
-			argv[0] = buf.c_str();
-			argv[1] = sstrdup(entry->mask);
-			ircdproto->SendMode(sender, this->name, "%s %s", buf.c_str(), entry->mask);
-			chan_set_modes(sender->nick, this, 2, argv, 0);
-			delete [] argv[1];
+			this->RemoveMode(bi, CMODE_INVITEOVERRIDE, entry->mask);
 		}
+	}
+}
+
+/** Set a string of modes on the channel
+ * @param bi The client setting the modes
+ * @param EnforceMLock Should mlock be enforced on this mode change
+ * @param cmodes The modes to set
+ */
+void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const std::string &cmodes, ...)
+{
+	char buf[BUFSIZE] = "";
+	va_list args;
+	std::string modebuf, sbuf;
+	int add = -1;
+	va_start(args, cmodes.c_str());
+	vsnprintf(buf, BUFSIZE - 1, cmodes.c_str(), args);
+	va_end(args);
+
+	spacesepstream sep(buf);
+	sep.GetToken(modebuf);
+	for (unsigned i = 0; i < modebuf.size(); ++i)
+	{
+		ChannelMode *cm;
+
+		switch (modebuf[i])
+		{
+			case '+':
+				add = 1;
+				continue;
+			case '-':
+				add = 0;
+				continue;
+			default:
+				if (add == -1)
+					continue;
+				cm = ModeManager::FindChannelModeByChar(modebuf[i]);
+				if (!cm)
+					continue;
+		}
+
+		if (add)
+		{
+			if (cm->Type == MODE_PARAM && sep.GetToken(sbuf))
+				this->SetMode(bi, cm, sbuf, EnforceMLock);
+			else
+				this->SetMode(bi, cm, "", EnforceMLock);
+		}
+		else if (add == 0)
+		{
+			if (cm->Type == MODE_PARAM && sep.GetToken(sbuf))
+				this->RemoveMode(bi, cm, sbuf, EnforceMLock);
+			else
+				this->RemoveMode(bi, cm, "", EnforceMLock);
+		}
+	}
+}
+
+/*************************************************************************/
+
+/** Set modes internally on the channel
+ * @param c The channel
+ * @param ac Number of args
+ * @param av args
+ */
+void ChanSetInternalModes(Channel *c, int ac, const char **av)
+{
+	if (!ac)
+		return;
+	
+	int k = 0, j = 0, add = -1;
+	for (unsigned int i = 0; i < strlen(av[0]); ++i)
+	{
+		ChannelMode *cm;
+
+		switch (av[0][i])
+		{
+			case '+':
+				add = 1;
+				continue;
+			case '-':
+				add = 0;
+				continue;
+			default:
+				if (add == -1)
+					continue;
+				cm = ModeManager::FindChannelModeByChar(av[0][i]);
+				if (!cm)
+					continue;
+		}
+
+		if (cm->Type == MODE_REGULAR)
+		{
+			if (add)
+				c->SetModeInternal(cm);
+			else
+				c->RemoveModeInternal(cm);
+			continue;
+		}
+		else if (cm->Type == MODE_PARAM)
+		{
+			ChannelModeParam *cmp = static_cast<ChannelModeParam *>(cm);
+
+			if (!add && cmp->MinusNoArg)
+			{
+				c->RemoveModeInternal(cm);
+				++k;
+				continue;
+			}
+		}
+		if (++j < ac)
+		{
+			if (add)
+				c->SetModeInternal(cm, av[j]);
+			else
+				c->RemoveModeInternal(cm, av[j]);
+		}
+		else
+		{
+			alog("warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: %s, ac: %d, j: %d", merge_args(ac, av), ac, j);
+		}
+	}
+
+	if (j + k + 1 < ac)
+	{
+		alog("warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: %s, ac: %d, j: %d k: %d", merge_args(ac, av), ac, j, k);
 	}
 }
 
@@ -563,204 +857,12 @@ void chan_remove_user_status(Channel * chan, User * user, int16 status)
 
 /*************************************************************************/
 
-void chan_set_modes(const char *source, Channel *chan, int ac, const char **av, int check)
-{
-	int add = 1, i, real_ac = ac;
-	ChannelMode *cm;
-	ChannelModeStatus *cms;
-	ChannelModeList *cml;
-	ChannelModeParam *cmp;
-	const char *modes, **real_av = av;
-	char mode;
-	BotInfo *bi;
-	unsigned char botmode = 0;
-	User *user;
-
-	modes = av[0];
-
-	if (debug)
-		alog("debug: Changing modes for %s to %s", chan->name, merge_args(ac, av));
-
-	ac--;
-
-	while ((mode = *modes++))
-	{
-		switch (mode)
-		{
-			case '+':
-				add = 1;
-				continue;
-			case '-':
-				add = 0;
-				continue;
-		}
-
-		if ((cm = ModeManager::FindChannelModeByChar(mode)))
-		{
-			/* v/h/o/a/q etc */
-			if (cm->Type == MODE_STATUS)
-			{
-				cms = static_cast<ChannelModeStatus *>(cm);
-
-				if (ac == 0)
-				{
-					alog("channel: mode %c%c with no parameter (?) for channel %s", add ? '+' : '-', mode, chan->name);
-					continue;
-				}
-
-				ac--;
-				av++;
-
-				if (cms->ProtectBotServ && !add)
-				{
-					if ((bi = findbot(*av)))
-					{
-						if (!botmode || botmode != mode)
-						{
-							ircdproto->SendMode(bi, chan->name, "+%c %s", mode, bi->nick);
-							botmode = mode;
-							continue;
-						}
-						else
-						{
-							botmode = mode;
-							continue;
-						}
-					}
-				}
-				else if ((bi = findbot(*av)))
-					continue;
-
-				if (!(user = finduser(*av)) && !(ircd->ts6 && (user = find_byuid(*av))))
-				{
-					if (debug)
-					{
-						alog("debug: MODE %s %c%c for nonexistent user %s",
-							 chan->name, (add ? '+' : '-'), mode, *av);
-					}
-					continue;
-				}
-
-				if (debug)
-					alog("debug: Setting %c%c on %s for %s", (add ? '+' : '-'),
-						 mode, chan->name, user->nick);
-
-				if (add)
-					chan_set_user_status(chan, user, cms->Status);
-					/* If this does +o, remove any DEOPPED flag */
-				else
-					chan_remove_user_status(chan, user, cms->Status);
-			}
-			/* b/e/I etc */
-			else if (cm->Type == MODE_LIST)
-			{
-				cml = static_cast<ChannelModeList *>(cm);
-
-				if (ac == 0)
-				{
-					alog("channel: mode %c%c with no parameter (?) for channel %s", add ? '+' : '-', mode, chan->name);
-					continue;
-				}
-
-				ac--;
-				av++;
-
-				if (add)
-					cml->AddMask(chan, *av);
-				else
-					cml->DelMask(chan, *av);
-			}
-			else
-			{
-				if (cm->Type == MODE_PARAM)
-				{
-					cmp = static_cast<ChannelModeParam *>(cm);
-
-					if (add || !cmp->MinusNoArg)
-					{
-						if (ac == 0)
-						{
-							alog("channel: mode %c%c with no parameter (?) for channel %s", add ? '+' : '-', mode, chan->name);
-							continue;
-						}
-
-						ac--;
-						av++;
-					}
-
-					if (!cmp->IsValid(*av))
-						continue;
-					if (add)
-					{
-						std::string Param = *av;
-						chan->SetMode(mode, Param);
-					}
-					else
-					{
-						chan->RemoveMode(mode);
-					}
-				}
-				else
-				{
-					if (add)
-						chan->SetMode(mode);
-					else
-						chan->RemoveMode(mode);
-				}
-			}
-		}
-	}
-
-	// Don't bounce modes from u:lined clients or servers, bug #1004
-	user = finduser(source);
-	if ((user && is_ulined(user->server->name)) || is_ulined(source))
-		return;
-
-	if (check > 0)
-	{
-		check_modes(chan);
-
-		if ((check < 2) || (check == 3))
-		{
-			/* Walk through all users we've set modes for and see if they are
-			 * valid. Invalid modes (like +o with SECUREOPS on) will be removed
-			 */
-			real_ac--;
-			real_av++;
-
-			for (i = 0; i < real_ac; i++)
-			{
-				if ((user = finduser(*real_av)) && is_on_chan(chan, user))
-				{
-					if (check < 2)
-						chan_set_correct_modes(user, chan, 0);
-					else if (chan->ci->HasFlag(CI_SECUREOPS))
-					{
-						/* Fixing bug #1006 oringinally caused by fixing #922
-						 * we must check for secureops here, not in chan_set_correct_modes
-						 * because chan_set_corret_modes will also check for usercount == 1
-						 * where it will deop the user, this way we know the channel was not
-						 * just created. (check == 3 from /cs (half)op) - Adam
-						 */
-						chan_set_correct_modes(user, chan, 0);
-					}
-				}
-
-				real_av++;
-			}
-		}
-	}
-}
-
-/*************************************************************************/
-
 /* Set the status of an user on a channel */
 
 void chan_set_user_status(Channel * chan, User * user, int16 status)
 {
 	struct u_chanlist *uc;
 	UserMode *um;
-	char av[3];
 
 	if (debug >= 2)
 		alog("debug: setting user status (%d) on %s for %s", status,
@@ -774,9 +876,7 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 				 user->nick, status, chan->name);
 		}
 
-		snprintf(av, sizeof(av), "+%c", um->ModeChar);
-
-		common_svsmode(user, av, NULL);
+		user->SetMode(um);
 	}
 
 	for (uc = user->chans; uc; uc = uc->next) {
@@ -1210,11 +1310,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 		else if (c->creation_time > ts) {
 			c->creation_time = ts;
 			for (cu = c->users; cu; cu = cu->next) {
-				/* XXX */
-				modes[0] = "-ov";
-				modes[1] = cu->user->nick;
-				modes[2] = cu->user->nick;
-				chan_set_modes(source, c, 3, modes, 2);
+				c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+				c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
 			}
 			if (c->ci)
 			{
@@ -1227,8 +1324,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				/* Make sure +r is set */
 				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 				{
-					c->SetMode(CMODE_REGISTERED);
-					ircdproto->SendMode(whosends(c->ci), c->name, "+r");
+					c->SetMode(NULL, CMODE_REGISTERED);
 				}
 			}
 			/* XXX simple modes and bans */
@@ -1348,8 +1444,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 						for (i = 1; i < end2 - cubuf; i++)
 							modes[i] = user->nick;
-						chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-									   modes, 2);
+
+						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
 					}
 
 					if (c->ci && (!serv || is_sync(serv))
@@ -1368,7 +1464,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 		if (c && keep_their_modes) {
 			/* We now update the channel mode. */
-			chan_set_modes(source, c, ac - 3, &av[2], 2);
+			ChanSetInternalModes(c, ac - 3, &av[2]);
 		}
 
 		/* Unreal just had to be different */
@@ -1434,8 +1530,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 						for (i = 1; i < end2 - cubuf; i++)
 							modes[i] = user->nick;
-						chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-									   modes, 2);
+						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
 					}
 
 					chan_set_correct_modes(user, c, 1);
@@ -1510,8 +1605,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 						for (i = 1; i < end2 - cubuf; i++)
 							modes[i] = user->nick;
-						chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-									   modes, 2);
+						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
 					}
 
 					chan_set_correct_modes(user, c, 1);
@@ -1564,79 +1658,76 @@ void do_sjoin(const char *source, int ac, const char **av)
 	}
 }
 
-
 /*************************************************************************/
 
-/* Handle a channel MODE command. */
-
-/*
- * av[0]: channel
- * av[1]: (tsmode) channel TS (this should be moved to a protocol module)
- * av[2-]: (tsmode) modes and parameters
- *
- * av[1-]: modes and parameters.
- *
+/** Process a MODE command from the server, and set the modes on the user/channel
+ * it was sent for
+ * @param source The source of the command
+ * @param ac Number of args in array..
+ * @param av Array of args
  */
 void do_cmode(const char *source, int ac, const char **av)
 {
-	Channel *chan;
-	ChannelInfo *ci = NULL;
+	Channel *c;
+	ChannelInfo *ci;
 	unsigned int i;
 	const char *t;
 
-	if (ircdcap->tsmode) {
-		/* TSMODE for bahamut - leave this code out to break MODEs. -GD */
-		/* if they don't send it in CAPAB check if we just want to enable it */
-		if (uplink_capab & ircdcap->tsmode || UseTSMODE) {
-			for (i = 0; i < strlen(av[1]); i++) {
+	if (ircdcap->tsmode)
+	{
+		if (uplink_capab & ircdcap->tsmode || UseTSMODE)
+		{
+			for (i = 0; i < strlen(av[1]); i++)
 				if (!isdigit(av[1][i]))
 					break;
-			}
-			if (av[1][i] == '\0') {
-				/* We have a valid TS field in av[1] now, so we can strip it off */
-				/* After we swap av[0] and av[1] ofcourse to not break stuff! :) */
+			if (av[1][i] == '\0')
+			{
 				t = av[0];
 				av[0] = av[1];
 				av[1] = t;
 				ac--;
 				av++;
-			} else {
-				alog("TSMODE enabled but MODE has no valid TS");
 			}
+			else
+				alog("TSMODE enabled but MODE has no valid TS");
 		}
 	}
 
 	/* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
-	if (ircd->ts6) {
-		if (isdigit(av[0][0])) {
+	if (ircd->ts6)
+	{
+		if (isdigit(av[0][0]))
+		{
 			ac--;
 			av++;
 		}
 	}
 
-	chan = findchan(av[0]);
-	if (!chan) {
-		if (debug) {
+	c = findchan(av[0]);
+	if (!c)
+	{
+		if (debug)
+		{
 			ci = cs_findchan(av[0]);
-			if (!(ci && (ci->HasFlag(CI_FORBIDDEN))))
-				alog("debug: MODE %s for nonexistent channel %s",
-					 merge_args(ac - 1, av + 1), av[0]);
+			if (!ci || ci->HasFlag(CI_FORBIDDEN))
+				alog("debug: MODE %s for nonexistant channel %s", merge_args(ac - 1, av + 1), av[0]);
 		}
 		return;
 	}
 
-	/* This shouldn't trigger on +o, etc. */
-	if (strchr(source, '.') && !av[1][strcspn(av[1], "bovahq")]) {
-		if (time(NULL) != chan->server_modetime) {
-			chan->server_modecount = 0;
-			chan->server_modetime = time(NULL);
+	if (strchr(source, '.') && !av[1][strcspn(av[1], "bovahq")])
+	{
+		if (time(NULL) != c->server_modetime)
+		{
+			c->server_modecount = 0;
+			c->server_modetime = time(NULL);
 		}
-		chan->server_modecount++;
+		c->server_modecount++;
 	}
 
 	ac--;
 	av++;
-	chan_set_modes(source, chan, ac, av, 1);
+	ChanSetInternalModes(c, ac, av);
 }
 
 /*************************************************************************/
@@ -1728,7 +1819,6 @@ void do_topic(const char *source, int ac, const char **av)
  **/
 void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 {
-	std::string modebuf, userbuf;
 	int status;
 	int add_modes = 0;
 	int rem_modes = 0;
@@ -1801,74 +1891,51 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 
 	if (add_modes > 0)
 	{
-		modebuf += "+";
-
 		if (owner && (add_modes & CUS_OWNER) && !(status & CUS_OWNER))
-		{
-			modebuf += owner->ModeChar;
-			userbuf += " " + std::string(user->nick);
-		}
+			c->SetMode(NULL, CMODE_OWNER, user->nick);
 		else
 			add_modes &= ~CUS_OWNER;
 
 		if (admin && (add_modes & CUS_PROTECT) && !(status & CUS_PROTECT))
-		{
-			modebuf += admin->ModeChar;
-			userbuf += " " + std::string(user->nick);
-		}
+			c->SetMode(NULL, CMODE_PROTECT, user->nick);
 		else
 			add_modes &= ~CUS_PROTECT;
 
 		if (op && (add_modes & CUS_OP) && !(status & CUS_OP))
-		{
-			modebuf += op->ModeChar;
-			userbuf += " " + std::string(user->nick);
-		}
+			c->SetMode(NULL, CMODE_OP, user->nick);
 		else
 			add_modes &= ~CUS_OP;
 
 		if (halfop && (add_modes & CUS_HALFOP) && !(status & CUS_HALFOP))
-		{
-			modebuf += halfop->ModeChar;
-			userbuf += " " + std::string(user->nick);
-		}
+			c->SetMode(NULL, CMODE_HALFOP, user->nick);
 		else
 			add_modes &= ~CUS_HALFOP;
 
 		if (voice && (add_modes & CUS_VOICE) && !(status & CUS_VOICE))
-		{
-			modebuf += voice->ModeChar;
-			userbuf += " " + std::string(user->nick);
-		}
+			c->SetMode(NULL, CMODE_VOICE, user->nick);
 		else
 			add_modes &= ~CUS_VOICE;
 	}
 	if (rem_modes > 0)
 	{
-		modebuf += "-";
-
 		if (owner && rem_modes & CUS_OWNER)
 		{
-			modebuf += owner->ModeChar;
-			userbuf += " " + std::string(user->nick);
+			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
 		}
 
 		if (admin && rem_modes & CUS_PROTECT)
 		{
-			modebuf += admin->ModeChar;
-			userbuf += " " + std::string(user->nick);
+			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		}
 
 		if (op && rem_modes & CUS_OP)
 		{
-			modebuf += op->ModeChar;
-			userbuf += " " + std::string(user->nick);
+			c->RemoveMode(NULL, CMODE_OP, user->nick);
 		}
 
 		if (halfop && rem_modes & CUS_HALFOP)
 		{
-			modebuf += halfop->ModeChar;
-			userbuf += " " + std::string(user->nick);
+			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 		}
 	}
 
@@ -1878,7 +1945,6 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!add_modes && !rem_modes)
 		return;
 
-	ircdproto->SendMode(whosends(ci), c->name, "%s%s", modebuf.c_str(), userbuf.c_str());
 	if (add_modes > 0)
 		chan_set_user_status(c, user, add_modes);
 	if (rem_modes > 0)
@@ -1969,16 +2035,12 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 		if (chan->creation_time > chants && chants != 0)
 		{
 			struct c_userlist *cu;
-			const char *modes[6];
 
 			chan->creation_time = chants;
 			for (cu = chan->users; cu; cu = cu->next)
 			{
-				/* XXX */
-				modes[0] = "-ov";
-				modes[1] = cu->user->nick;
-				modes[2] = cu->user->nick;
-				chan_set_modes(Config.s_OperServ, chan, 3, modes, 2);
+				chan->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+				chan->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
 			}
 			if (chan->ci)
 			{
@@ -1991,8 +2053,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 				/* Make sure +r is set */
 				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 				{
-					chan->SetMode(CMODE_REGISTERED);
-					ircdproto->SendMode(whosends(chan->ci), chan->name, "+r");
+					chan->SetMode(NULL, CMODE_REGISTERED);
 				}
 			}
 			/* XXX simple modes and bans */
@@ -2018,34 +2079,21 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 
 /*************************************************************************/
 
-
-void do_mass_mode(char *modes)
+/** Set modes on every channel
+ * This overrides mlock on channels
+ * @param bi The bot to send the modes from
+ * @param modes The modes
+ */
+void MassChannelModes(BotInfo *bi, const std::string &modes)
 {
-	int ac;
-	const char **av;
 	Channel *c;
-	char *myModes;
 
-	if (!modes) {
-		return;
-	}
-
-	/* Prevent modes being altered by split_buf */
-	myModes = sstrdup(modes);
-	ac = split_buf(myModes, &av, 1);
-
-	for (c = firstchan(); c; c = nextchan()) {
-		if (c->bouncy_modes) {
-			free(av);
-			delete [] myModes;
+	for (c = firstchan(); c; c = nextchan())
+	{
+		if (c->bouncy_modes)
 			return;
-		} else {
-			ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s", modes);
-			chan_set_modes(Config.s_OperServ, c, ac, av, 1);
-		}
+		c->SetModes(bi, false, modes);
 	}
-	free(av);
-	delete [] myModes;
 }
 
 /*************************************************************************/

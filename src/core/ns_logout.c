@@ -48,9 +48,6 @@ class CommandNSLogout : public Command
 				validate_user(u2);
 			}
 
-			if (ircd->modeonunreg)
-				common_svsmode(u2, ircd->modeonunreg, "1");
-
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
 			alog("%s: %s!%s@%s logged out nickname %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u2->nick);
 
@@ -65,6 +62,7 @@ class CommandNSLogout : public Command
 				del_ns_timeout(na, TO_COLLIDE);
 
 			ircdproto->SendAccountLogout(u2, u2->nc);
+			ircdproto->SendUnregisteredNick(u2);
 
 			u2->nc = NULL;
 

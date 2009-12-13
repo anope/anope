@@ -24,8 +24,6 @@ class CommandOSMode : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		int ac;
-		const char **av;
 		const char *chan = params[0].c_str(), *modes = params[1].c_str();
 		Channel *c;
 
@@ -35,11 +33,7 @@ class CommandOSMode : public Command
 			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 		else
 		{
-			ircdproto->SendMode(findbot(Config.s_OperServ), chan, "%s", modes);
-
-			ac = split_buf(const_cast<char *>(modes), /* XXX */ &av, 1);
-			chan_set_modes(Config.s_OperServ, c, ac, av, -1);
-			free(av);
+			c->SetModes(findbot(Config.s_OperServ), false, modes);
 
 			if (Config.WallOSMode)
 				ircdproto->SendGlobops(Config.s_OperServ, "%s used MODE %s on %s", u->nick, modes, chan);

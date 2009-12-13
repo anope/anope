@@ -130,10 +130,7 @@ void sqline(char *mask, char *reason)
  */
 void common_unban(ChannelInfo * ci, char *nick)
 {
-	const char *av[4];
 	char *host = NULL;
-	char buf[BUFSIZE];
-	int ac;
 	uint32 ip = 0;
 	User *u;
 	Entry *ban, *next;
@@ -163,63 +160,21 @@ void common_unban(ChannelInfo * ci, char *nick)
 	if (host)
 		ip = str_is_ip(host);
 
-	if (ircd->svsmode_unban) {
+	if (ircd->svsmode_unban)
 		ircdproto->SendBanDel(ci->name, nick);
-	} else {
-		if (ircdcap->tsmode) {
-			snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-			av[0] = ci->name;
-			av[1] = buf;
-			av[2] = "-b";
-			ac = 4;
-		} else {
-			av[0] = ci->name;
-			av[1] = "-b";
-			ac = 3;
-		}
-
-		for (ban = ci->c->bans->entries; ban; ban = next) {
+	else
+	{
+		for (ban = ci->c->bans->entries; ban; ban = next)
+		{
 			next = ban->next;
 			if (entry_match(ban, u->nick, u->GetIdent().c_str(), u->host, ip) ||
-				entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip)) {
-				ircdproto->SendMode(whosends(ci), ci->name, "-b %s", ban->mask);
-				if (ircdcap->tsmode)
-					av[3] = ban->mask;
-				else
-					av[2] = ban->mask;
-
-				do_cmode(whosends(ci)->nick, ac, av);
-			}
+				entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
+				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
 	}
 	/* host_resolve() sstrdup us this info so we gotta free it */
-	if (host) {
+	if (host)
 		delete [] host;
-	}
-}
-
-/*************************************************************************/
-
-/**
- * Prepare to set SVSMODE and update internal user modes
- * @param u user to apply modes to
- * @param modes the modes to set on the user
- * @param arg the arguments for the user modes
- * @return void
- */
-void common_svsmode(User * u, const char *modes, const char *arg)
-{
-	int ac = 1;
-	const char *av[2];
-
-	av[0] = modes;
-	if (arg) {
-		av[1] = arg;
-		ac++;
-	}
-
-	ircdproto->SendSVSMode(u, ac, av);
-	ircdproto->ProcessUsermodes(u, ac, av);
 }
 
 /*************************************************************************/

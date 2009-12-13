@@ -736,38 +736,20 @@ void bot_join(ChannelInfo * ci)
 	if (!ci || !ci->c || !ci->bi)
 		return;
 
-	if (Config.BSSmartJoin) {
+	if (Config.BSSmartJoin)
+	{
 		/* We check for bans */
-		if (ci->c->bans && ci->c->bans->count) {
-			char buf[BUFSIZE];
-			const char *av[4];
+		if (ci->c->bans && ci->c->bans->count)
+		{
 			Entry *ban, *next;
-			int ac;
 
-			if (ircdcap->tsmode) {
-				snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-				av[0] = ci->c->name;
-				av[1] = buf;
-				av[2] = "-b";
-				ac = 4;
-			} else {
-				av[0] = ci->c->name;
-				av[1] = "-b";
-				ac = 3;
-			}
-
-			for (ban = ci->c->bans->entries; ban; ban = next) {
+			for (ban = ci->c->bans->entries; ban; ban = next)
+			{
 				next = ban->next;
-				if (entry_match
-					(ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0)) {
-					ircdproto->SendMode(whosends(ci), ci->name, "-b %s",
-								   ban->mask);
-					if (ircdcap->tsmode)
-						av[3] = ban->mask;
-					else
-						av[2] = ban->mask;
 
-					do_cmode(whosends(ci)->nick, ac, av);
+				if (entry_match(ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0))
+				{
+					ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 				}
 			}
 		}
@@ -787,7 +769,8 @@ void bot_join(ChannelInfo * ci)
 				 ci->bi->nick, ci->bi->nick);
 	}
 	ircdproto->SendJoin(ci->bi, ci->c->name, ci->c->creation_time);
-	ircdproto->SendBotOp(ci->bi->nick, ci->c->name);
+	ci->c->SetMode(NULL, CMODE_PROTECT, ci->bi->nick);
+	ci->c->SetMode(NULL, CMODE_OP, ci->bi->nick);
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(ci, ci->bi));
 }
 
@@ -809,31 +792,14 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
 		/* Should not use == here because bd->ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
 		 * if the TTB was changed after it was not set (0) before and the user had already been
 		 * kicked a few times. Bug #1056 - Adam */
-		const char *av[4];
-		int ac;
 		char mask[BUFSIZE];
-		char buf[BUFSIZE];
 
 		bd->ttb[ttbtype] = 0;
 
 		get_idealban(ci, u, mask, sizeof(mask));
 
-		if (ircdcap->tsmode) {
-			snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-			av[0] = ci->name;
-			av[1] = buf;
-			av[2] = "+b";
-			av[3] = mask;
-			ac = 4;
-		} else {
-			av[0] = ci->name;
-			av[1] = "+b";
-			av[2] = mask;
-			ac = 3;
-		}
-
-		ircdproto->SendMode(ci->bi, ci->name, "+b %s", mask);
-		do_cmode(ci->bi->nick, ac, av);
+		if (ci->c)
+			ci->c->SetMode(NULL, CMODE_BAN, mask);
 		FOREACH_MOD(I_OnBotBan, OnBotBan(u, ci, mask));
 	}
 }
@@ -874,11 +840,8 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 				 const char *reason)
 {
-	int ac;
-	const char *av[4];
 	const char *kav[4]; // seperate as not everything is constified XXX -- w00t
 	char mask[BUFSIZE];
-	char buf[BUFSIZE];
 	User *u = finduser(nick);
 
 	if (!u)
@@ -907,22 +870,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
 	get_idealban(ci, u, mask, sizeof(mask));
 
-	if (ircdcap->tsmode) {
-		snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-		av[0] = ci->name;
-		av[1] = buf;
-		av[2] = "+b";
-		av[3] = mask;
-		ac = 4;
-	} else {
-		av[0] = ci->name;
-		av[1] = "+b";
-		av[2] = mask;
-		ac = 3;
-	}
-
-	ircdproto->SendMode(ci->bi, ci->name, "+b %s", mask);
-	do_cmode(ci->bi->nick, ac, av);
+	ci->c->SetMode(NULL, CMODE_BAN, mask);
 
 	kav[0] = ci->name;
 	kav[1] = nick;
@@ -998,8 +946,6 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 				  char *nick)
 {
-	const char *av[4];
-	int ac;
 	char buf[BUFSIZE];
 	User *u;
 
@@ -1024,22 +970,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 		&& (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
-	if (ircdcap->tsmode) {
-		av[0] = ci->name;
-		av[1] = buf;
-		av[2] = mode;
-		av[3] = nick;
-		ac = 4;
-		ircdproto->SendMode(ci->bi, av[0], "%s %s", av[2], av[3]);
-	} else {
-		av[0] = ci->name;
-		av[1] = mode;
-		av[2] = nick;
-		ac = 3;
-		ircdproto->SendMode(ci->bi, av[0], "%s %s", av[1], av[2]);
-	}
-
-	do_cmode(ci->bi->nick, ac, av);
+	ci->c->SetModes(NULL, "%s %s", mode, nick);
 }
 
 /*************************************************************************/

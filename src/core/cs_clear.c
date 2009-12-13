@@ -63,8 +63,7 @@ class CommandCSClear : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_MODES, chan);
 		} else if (what == "ops") {
 			const char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
-			int ac, isop, isadmin, isown, count, i;
-			char buf[BUFSIZE], tmp[BUFSIZE], tmp2[BUFSIZE];
+			int isop, isadmin, isown;
 			struct c_userlist *cu, *bnext;
 
 			if (ircd->svsmode_ucmode) {
@@ -82,167 +81,71 @@ class CommandCSClear : public Command
 
 					ircdproto->SendSVSModeChan(av[0], modebuf.c_str(), NULL);
 				}
-				for (cu = c->users; cu; cu = bnext) {
+				for (cu = c->users; cu; cu = bnext)
+				{
 					bnext = cu->next;
 					isop = chan_has_user_status(c, cu->user, CUS_OP);
 					isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
 					isown = chan_has_user_status(c, cu->user, CUS_OWNER);
-					count = (isop ? 1 : 0) + (isadmin ? 1 : 0) + (isown ? 1 : 0);
 
 					if (!isop && !isadmin && !isown)
 						continue;
 
-					snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
-							&admin->ModeChar : ""), (isown ? &owner->ModeChar : ""));
-
-					if (ircdcap->tsmode) {
-						snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-						av[1] = buf;
-						av[2] = tmp;
-						/* We have to give as much nicks as modes.. - Viper */
-						for (i = 0; i < count; i++)
-							av[i+3] = cu->user->nick;
-						ac = 3 + i;
-					} else {
-						av[1] = tmp;
-						/* We have to give as much nicks as modes.. - Viper */
-						for (i = 0; i < count; i++)
-							av[i+2] = cu->user->nick;
-						ac = 2 + i;
-					}
-
-					do_cmode(Config.s_ChanServ, ac, av);
+					if (isown)
+						c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+					if (admin)
+						c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+					if (isop)
+						c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
 				}
 			} else {
 				av[0] = chan;
-				for (cu = c->users; cu; cu = bnext) {
+				for (cu = c->users; cu; cu = bnext)
+				{
 					bnext = cu->next;
 					isop = chan_has_user_status(c, cu->user, CUS_OP);
 					isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
 					isown = chan_has_user_status(c, cu->user, CUS_OWNER);
-					count = (isop ? 1 : 0) + (isadmin ? 1 : 0) + (isown ? 1 : 0);
 
 					if (!isop && !isadmin && !isown)
 						continue;
 
-					snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
-							&admin->ModeChar : ""), (isown ? &owner->ModeChar : ""));
-					/* We need to send the IRCd a nick for every mode.. - Viper */
-					snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""),
-							(isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
-
-					if (ircdcap->tsmode) {
-						snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-						av[1] = buf;
-						av[2] = tmp;
-						/* We have to give as much nicks as modes.. - Viper */
-						for (i = 0; i < count; i++)
-							av[i+3] = cu->user->nick;
-						ac = 3 + i;
-
-						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[2], tmp2);
-					} else {
-						av[1] = tmp;
-						/* We have to give as much nicks as modes.. - Viper */
-						for (i = 0; i < count; i++)
-							av[i+2] = cu->user->nick;
-						ac = 2 + i;
-
-						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[1], tmp2);
-					}
-
-					do_cmode(Config.s_ChanServ, ac, av);
+					if (isown)
+						c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+					if (isadmin)
+						c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+					if (isop)
+						c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
 				}
 			}
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan);
 		} else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && what == "hops") {
-			const char *av[4];
-			int ac;
-			char buf[BUFSIZE];
 			struct c_userlist *cu, *bnext;
 
-			for (cu = c->users; cu; cu = bnext) {
+			for (cu = c->users; cu; cu = bnext)
+			{
 				bnext = cu->next;
+
 				if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
 					continue;
 
-				if (ircdcap->tsmode) {
-					snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-					av[0] = chan;
-					av[1] = buf;
-					av[2] = "-h";
-					av[3] = cu->user->nick;
-					ac = 4;
-				} else {
-					av[0] = chan;
-					av[1] = "-h";
-					av[2] = cu->user->nick;
-					ac = 3;
-				}
-
-				if (ircd->svsmode_ucmode) {
-					if (ircdcap->tsmode)
-						ircdproto->SendSVSModeChan(av[0], av[2], NULL);
-					else
-						ircdproto->SendSVSModeChan(av[0], av[1], NULL);
-
-					do_cmode(Config.s_ChanServ, ac, av);
-					break;
-				} else {
-					if (ircdcap->tsmode)
-						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[2],
-									   av[3]);
-					else
-						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[1],
-									   av[2]);
-				}
-				do_cmode(Config.s_ChanServ, ac, av);
+				c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
 			}
+
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
 		} else if (what == "voices") {
-			const char *av[4];
-			int ac;
-			char buf[BUFSIZE];
 			struct c_userlist *cu, *bnext;
 
-			for (cu = c->users; cu; cu = bnext) {
+			for (cu = c->users; cu; cu = bnext)
+			{
 				bnext = cu->next;
+
 				if (!chan_has_user_status(c, cu->user, CUS_VOICE))
 					continue;
 
-				if (ircdcap->tsmode) {
-					snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long int>(time(NULL)));
-					av[0] = chan;
-					av[1] = buf;
-					av[2] = "-v";
-					av[3] = cu->user->nick;
-					ac = 4;
-				} else {
-					av[0] = chan;
-					av[1] = "-v";
-					av[2] = cu->user->nick;
-					ac = 3;
-				}
-
-				if (ircd->svsmode_ucmode) {
-					if (ircdcap->tsmode)
-						ircdproto->SendSVSModeChan(av[0], av[2], NULL);
-					else
-						ircdproto->SendSVSModeChan(av[0], av[1], NULL);
-
-					do_cmode(Config.s_ChanServ, ac, av);
-					break;
-				} else {
-					if (ircdcap->tsmode) {
-						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[2],
-									   av[3]);
-					} else {
-						ircdproto->SendMode(whosends(ci), av[0], "%s %s", av[1],
-									   av[2]);
-					}
-				}
-				do_cmode(Config.s_ChanServ, ac, av);
+				c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
 			}
+
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
 		} else if (what == "users") {
 			const char *av[3];

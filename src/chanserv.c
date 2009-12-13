@@ -776,19 +776,14 @@ void save_cs_dbase()
 
 /* Check the current modes on a channel; if they conflict with a mode lock,
  * fix them.
- *
- * Also check to make sure that every mode set or unset is allowed by the
- * defcon mlock settings. This is more important than any normal channel
- * mlock'd mode. --gdex (21-04-07)
  */
 
-void check_modes(Channel * c)
+void check_modes(Channel *c)
 {
 	time_t t = time(NULL);
 	ChannelInfo *ci;
 	ChannelMode *cm;
 	ChannelModeParam *cmp;
-	std::string modebuf, argbuf;
 	std::map<char, ChannelMode *>::iterator it;
 	std::string param, ciparam;
 
@@ -811,7 +806,7 @@ void check_modes(Channel * c)
 		return;
 	}
 
-	if (c->chanserv_modetime != time(NULL))
+	if (c->chanserv_modetime != t)
 	{
 		c->chanserv_modecount = 0;
 		c->chanserv_modetime = t;
@@ -823,13 +818,10 @@ void check_modes(Channel * c)
 	{
 		if (c->HasMode(CMODE_REGISTERED))
 		{
-			c->RemoveMode(CMODE_REGISTERED);
-			ircdproto->SendMode(whosends(ci), c->name, "-r");
+			c->RemoveMode(NULL, CMODE_REGISTERED);
 		}
 		return;
 	}
-
-	modebuf = "+";
 
 	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
 	{
@@ -838,44 +830,30 @@ void check_modes(Channel * c)
 		/* If this channel does not have the mode and the mode is mlocked */
 		if (cm->Type == MODE_REGULAR && !c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
 		{
-			modebuf += it->first;
-			c->SetMode(cm->Name);
+			c->SetMode(NULL, cm);
 
 			/* Add the eventual parameter and modify the Channel structure */
 			if (cm->Type == MODE_PARAM)
 			{
-				cmp = static_cast<ChannelModeParam *>(cm);
-				ci->GetParam(cmp->Name, &param);
-
-				if (!param.empty())
-				{
-					argbuf += " " + param;
-				}
+				if (ci->GetParam(cmp->Name, &param))
+					c->SetMode(NULL, cm, param);
 			}
+			else
+				c->SetMode(NULL, cm);
 		}
 		/* If this is a param mode and its mlocked, check to ensure it is set and set to the correct value */
 		else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
 		{
-			cmp = static_cast<ChannelModeParam *>(cm);
-			c->GetParam(cmp->Name, &param);
-			ci->GetParam(cmp->Name, &ciparam);
+			c->GetParam(cm->Name, &param);
+			ci->GetParam(cm->Name, &ciparam);
 
 			/* If the channel doesnt have the mode, or it does and it isn't set correctly */
 			if (!c->HasMode(cm->Name) || (!param.empty() && !ciparam.empty() && param != ciparam))
 			{
-				modebuf += it->first;
-
-				c->SetMode(cmp->Name, ciparam);
-
-				argbuf += " " + ciparam;
+				c->SetMode(NULL, cm, ciparam);
 			}
 		}
 	}
-
-	if (modebuf == "+")
-		modebuf.clear();
-
-	modebuf += "-";
 
 	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
 	{
@@ -884,9 +862,6 @@ void check_modes(Channel * c)
 		/* If the channel has the mode */
 		if (c->HasMode(cm->Name) && ci->HasMLock(cm->Name, false))
 		{
-			modebuf += it->first;
-			c->RemoveMode(cm->Name);
-
 			/* Add the eventual parameter */
 			if (cm->Type == MODE_PARAM)
 			{
@@ -894,24 +869,14 @@ void check_modes(Channel * c)
 
 				if (!cmp->MinusNoArg)
 				{
-					c->GetParam(cmp->Name, &param);
-
-					if (!param.empty())
-					{
-						argbuf += " " + param;
-					}
+					if (c->GetParam(cmp->Name, &param))
+						c->RemoveMode(NULL, cm, param);
 				}
 			}
+			else
+				c->RemoveMode(NULL, cm);
 		}
 	}
-
-	if (modebuf[modebuf.length() - 1] == '-')
-		modebuf.erase(modebuf.length() - 1);
-	
-	if (modebuf.empty())
-		return;
-
-	ircdproto->SendMode((ci ? whosends(ci) : findbot(Config.s_OperServ)), c->name, "%s%s", modebuf.c_str(), argbuf.empty() ? "" : argbuf.c_str());
 }
 
 /*************************************************************************/
@@ -930,16 +895,16 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 	if (chan->ci->HasFlag(CI_FORBIDDEN))
 		return 0;
 
-	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
+	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT))
+	{
 		notice_lang(Config.s_ChanServ, user, CHAN_IS_REGISTERED, Config.s_ChanServ);
-		ircdproto->SendMode(whosends(chan->ci), chan->name, "-%s %s",
-					   cm->ModeChar, user->nick);
+		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		return 0;
 	}
 
-	if (check_access(user, chan->ci, CA_AUTODEOP)) {
-		ircdproto->SendMode(whosends(chan->ci), chan->name, "-%s %s",
-					   cm->ModeChar, user->nick);
+	if (check_access(user, chan->ci, CA_AUTODEOP))
+	{
+		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		return 0;
 	}
 
@@ -966,66 +931,32 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 	protect = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 	halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
-	if (servermode && !check_access(user, chan->ci, CA_AUTOOP)) {
+	if (servermode && !check_access(user, chan->ci, CA_AUTOOP))
+	{
 		notice_lang(Config.s_ChanServ, user, CHAN_IS_REGISTERED, Config.s_ChanServ);
-		if (halfop)
-		{
-			if (owner && protect)
-			{
-				if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "-%so%s %s %s %s", protect->ModeChar,
-								   owner->ModeChar, user->nick,
-								   user->nick, user->nick);
-				} else {
-					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "-%sho%s %s %s %s %s",
-								   protect->ModeChar,
-								   owner->ModeChar,
-								   user->nick, user->nick, user->nick,
-								   user->nick);
-				}
-			} else if (!owner && protect) {
-				if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "-%so %s %s", protect->ModeChar,
-								   user->nick, user->nick);
-				} else {
-					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "-%soh %s %s %s", protect->ModeChar,
-								   user->nick, user->nick, user->nick);
-				}
-			} else {
-				if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-					ircdproto->SendMode(whosends(chan->ci), chan->name, "-o %s",
-								   user->nick);
-				} else {
-					ircdproto->SendMode(whosends(chan->ci), chan->name,
-								   "-ho %s %s", user->nick, user->nick);
-				}
-			}
-		} else {
-			ircdproto->SendMode(whosends(chan->ci), chan->name, "-o %s",
-						   user->nick);
-		}
+
+		if (owner)
+			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);
+		if (protect)
+			chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
+		chan->RemoveMode(NULL, CMODE_OP, user->nick);
+		if (halfop && !check_access(user, chan->ci, CA_AUTOHALFOP))
+			chan->RemoveMode(NULL, CMODE_HALFOP, user->nick);
+		
 		return 0;
 	}
 
-	if (check_access(user, chan->ci, CA_AUTODEOP)) {
-		if (halfop) {
-			if (owner && protect) {
-				ircdproto->SendMode(whosends(chan->ci), chan->name,
-							   "-%sho%s %s %s %s %s", protect->ModeChar,
-							   owner->ModeChar, user->nick, user->nick,
-							   user->nick, user->nick);
-			} else {
-				ircdproto->SendMode(whosends(chan->ci), chan->name, "-ho %s %s",
-							   user->nick, user->nick);
-			}
-		} else {
-			ircdproto->SendMode(whosends(chan->ci), chan->name, "-o %s",
-						   user->nick);
-		}
+	if (check_access(user, chan->ci, CA_AUTODEOP))
+	{
+		chan->RemoveMode(NULL, CMODE_OP, user->nick);
+
+		if (owner)
+			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);
+		if (protect)
+			chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
+		if (halfop)
+			chan->RemoveMode(NULL, CMODE_HALFOP, user->nick);
+
 		return 0;
 	}
 
@@ -1048,8 +979,9 @@ int check_should_op(User * user, char *chan)
 	if ((ci->HasFlag(CI_SECURE)) && !nick_identified(user))
 		return 0;
 
-	if (check_access(user, ci, CA_AUTOOP)) {
-		ircdproto->SendMode(whosends(ci), chan, "+o %s", user->nick);
+	if (check_access(user, ci, CA_AUTOOP))
+	{
+		ci->c->SetMode(NULL, CMODE_OP, user->nick);	
 		return 1;
 	}
 
@@ -1071,8 +1003,9 @@ int check_should_voice(User * user, char *chan)
 	if ((ci->HasFlag(CI_SECURE)) && !nick_identified(user))
 		return 0;
 
-	if (check_access(user, ci, CA_AUTOVOICE)) {
-		ircdproto->SendMode(whosends(ci), chan, "+v %s", user->nick);
+	if (check_access(user, ci, CA_AUTOVOICE))
+	{
+		ci->c->SetMode(NULL, CMODE_VOICE, user->nick);
 		return 1;
 	}
 
@@ -1088,8 +1021,9 @@ int check_should_halfop(User * user, char *chan)
 	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
-	if (check_access(user, ci, CA_AUTOHALFOP)) {
-		ircdproto->SendMode(whosends(ci), chan, "+h %s", user->nick);
+	if (check_access(user, ci, CA_AUTOHALFOP))
+	{
+		ci->c->SetMode(NULL, CMODE_HALFOP, user->nick);
 		return 1;
 	}
 
@@ -1101,15 +1035,14 @@ int check_should_halfop(User * user, char *chan)
 int check_should_owner(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
-	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
-	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
+	if (!ci || !ci->c || ci->HasFlag(CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
-	if (((ci->HasFlag(CI_SECUREFOUNDER)) && IsRealFounder(user, ci))
-		|| (!(ci->HasFlag(CI_SECUREFOUNDER)) && IsFounder(user, ci))) {
-		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", cm->ModeChar, user->nick,
-					   user->nick);
+	if ((ci->HasFlag(CI_SECUREFOUNDER) && IsRealFounder(user, ci))
+		|| (!ci->HasFlag(CI_SECUREFOUNDER) && IsFounder(user, ci))) {
+		ci->c->SetMode(NULL, CMODE_OP, user->nick);
+		ci->c->SetMode(NULL, CMODE_OWNER, user->nick);
 		return 1;
 	}
 
@@ -1121,14 +1054,14 @@ int check_should_owner(User * user, char *chan)
 int check_should_protect(User * user, char *chan)
 {
 	ChannelInfo *ci = cs_findchan(chan);
-	ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
-	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
+	if (!ci || !ci->c || ci->HasFlag(CI_FORBIDDEN) || *chan == '+')
 		return 0;
 
-	if (check_access(user, ci, CA_AUTOPROTECT)) {
-		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", cm->ModeChar, user->nick,
-					   user->nick);
+	if (check_access(user, ci, CA_AUTOPROTECT))
+	{
+		ci->c->SetMode(NULL, CMODE_OWNER, user->nick);
+		ci->c->SetMode(NULL, CMODE_PROTECT, user->nick);
 		return 1;
 	}
 
@@ -1151,9 +1084,6 @@ int check_kick(User * user, const char *chan, time_t chants)
 	AutoKick *akick;
 	bool set_modes = false;
 	NickCore *nc;
-	const char *av[4];
-	int ac;
-	char buf[BUFSIZE];
 	char mask[BUFSIZE];
 	const char *reason;
 	ChanServTimer *t;
@@ -1247,32 +1177,22 @@ int check_kick(User * user, const char *chan, time_t chants)
 		 */
 		if (set_modes)
 		{
-			ircdproto->SendMode(findbot(Config.s_ChanServ), chan, "+ntsi");
+			c->SetMode(NULL, CMODE_NOEXTERNAL);
+			c->SetMode(NULL, CMODE_TOPIC);
+			c->SetMode(NULL, CMODE_SECRET);
+			c->SetMode(NULL, CMODE_INVITE);
 		}
 
 		t = new ChanServTimer(Config.CSInhabit, chan);
 		ci->SetFlag(CI_INHABIT);
 	}
 
-	if (c) {
-		if (ircdcap->tsmode) {
-			snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
-			av[0] = chan;
-			av[1] = buf;
-			av[2] = "+b";
-			av[3] = mask;
-			ac = 4;
-		} else {
-			av[0] = chan;
-			av[1] = "+b";
-			av[2] = mask;
-			ac = 3;
-		}
-
-		do_cmode(whosends(ci)->nick, ac, av);
+	if (c)
+	{
+		c->RemoveMode(NULL, CMODE_BAN, mask);
 	}
 
-	ircdproto->SendMode(whosends(ci), chan, "+b %s", mask);
+	c->SetMode(NULL, CMODE_BAN, mask);
 	ircdproto->SendKick(whosends(ci), chan, user->nick, "%s", reason);
 
 	return 1;
@@ -1341,7 +1261,7 @@ void restore_topic(const char *chan)
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
 			ircdproto->SendJoin(findbot(Config.s_ChanServ), chan, c->creation_time);
-			ircdproto->SendMode(NULL, chan, "+o %s", Config.s_ChanServ);
+			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
 	ircdproto->SendTopic(whosends(ci), c->name, c->topic_setter,
@@ -1403,7 +1323,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
 			ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
-			ircdproto->SendMode(NULL, c->name, "+o %s", Config.s_ChanServ);
+			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
 
@@ -1487,8 +1407,7 @@ void cs_remove_nick(const NickCore * nc)
 						/* Maybe move this to delchan() ? */
 						if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
 						{
-							ci->c->RemoveMode(CMODE_REGISTERED);
-							ircdproto->SendMode(whosends(ci), ci->name, "-r");
+							ci->c->RemoveMode(NULL, CMODE_REGISTERED);
 						}
 					}
 
@@ -1871,7 +1790,6 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 
 void stick_mask(ChannelInfo * ci, AutoKick * akick)
 {
-	const char *av[2];
 	Entry *ban;
 
 	if (!ci) {
@@ -1895,18 +1813,13 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 	}
 
 	/* Falling there means set the ban */
-	av[0] = "+b";
-	av[1] = akick->mask.c_str();
-	ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->mask.c_str());
-	chan_set_modes(Config.s_ChanServ, ci->c, 2, av, 1);
+	ci->c->SetMode(NULL, CMODE_BAN, akick->mask.c_str());
 }
 
 /* Ban the stuck mask in a safe manner. */
 
 void stick_all(ChannelInfo * ci)
 {
-	const char *av[2];
-
 	if (!ci)
 		return;
 
@@ -1917,9 +1830,6 @@ void stick_all(ChannelInfo * ci)
 		if (!akick->InUse || (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK)))
 			continue;
 
-		av[0] = "+b";
-		av[1] = akick->mask.c_str();
-		ircdproto->SendMode(whosends(ci), ci->c->name, "+b %s", akick->mask.c_str());
-		chan_set_modes(Config.s_ChanServ, ci->c, 2, av, 1);
+		ci->c->SetMode(NULL, CMODE_BAN, akick->mask.c_str());
 	}
 }

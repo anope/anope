@@ -39,7 +39,6 @@ E void kill_user(const char *source, const char *user, const char *reason);
 E void bad_password(User * u);
 E void sqline(char *mask, char *reason);
 E void common_unban(ChannelInfo * ci, char *nick);
-E void common_svsmode(User * u, const char *modes, const char *arg);
 
 /**** botserv.c ****/
 
@@ -79,14 +78,14 @@ E Channel *findchan(const char *chan);
 E Channel *firstchan();
 E Channel *nextchan();
 
+E void ChanSetInternalModes(Channel *c, int ac, const char **av);
+
 E void chan_deluser(User * user, Channel * c);
 
 E int is_on_chan(Channel * c, User * u);
 E User *nc_on_chan(Channel * c, NickCore * nc);
 
 E char *chan_get_modes(Channel * chan, int complete, int plus);
-E void chan_set_modes(const char *source, Channel * chan, int ac,
-					  const char **av, int check);
 
 E int chan_get_user_status(Channel * chan, User * user);
 E int chan_has_user_status(Channel * chan, User * user, int16 status);
@@ -102,7 +101,7 @@ E void do_kick(const char *source, int ac, const char **av);
 E void do_part(const char *source, int ac, const char **av);
 E void do_sjoin(const char *source, int ac, const char **av);
 E void do_topic(const char *source, int ac, const char **av);
-E void do_mass_mode(char *modes);
+E void MassChannelModes(BotInfo *bi, const std::string &modes);
 
 E void chan_set_correct_modes(User * user, Channel * c, int give_modes);
 E void restore_unsynced_topics();
@@ -640,6 +639,7 @@ E int is_excepted_mask(ChannelInfo * ci, const char *mask);
 E int match_usermask(const char *mask, User * user);
 E char *create_mask(User * u);
 
+E void UserSetInternalModes(User *user, int ac, const char **av);
 
 /******************************************************************************/
 

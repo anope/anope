@@ -186,8 +186,7 @@ class OSDEFCON : public Module
 
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOff.HasFlag(Name))
 		{
-			c->RemoveMode(Name);
-			ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "-%c", cm->ModeChar);
+			c->RemoveMode(NULL, Name);
 		}
 	}
 
@@ -198,18 +197,14 @@ class OSDEFCON : public Module
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOn.HasFlag(Name))
 		{
 			std::string param;
-			GetDefConParam(Name, &param);
 			
-			std::string buf = "+" + std::string(&cm->ModeChar);
-			if (!param.empty())
+			if (GetDefConParam(Name, &param))
 			{
-				buf += " " + param;
-				c->SetMode(Name, param);
+				c->SetMode(NULL, Name, param);
 			}
 			else
-				c->SetMode(Name);
+				c->SetMode(NULL, Name);
 
-			ircdproto->SendMode(findbot(Config.s_OperServ), c->name, buf.c_str());
 		}
 	}
 
@@ -328,20 +323,9 @@ class OSDEFCON : public Module
 
 	void OnChannelCreate(Channel *c)
 	{
-		char *myModes;
-		int ac;
-		const char **av;
-
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES))
 		{
-			myModes = sstrdup(Config.DefConChanModes);
-			ac = split_buf(myModes, &av, 1);
-
-			ircdproto->SendMode(findbot(Config.s_OperServ), c->name, "%s", Config.DefConChanModes);
-			chan_set_modes(Config.s_OperServ, c, ac, av, 1);
-
-			free(av);
-			delete [] myModes;
+			c->SetModes(findbot(Config.s_OperServ), false, Config.DefConChanModes);
 		}
 	}
 };
@@ -385,7 +369,7 @@ void runDefCon()
 			{
 				alog("DEFCON: setting %s on all chan's", Config.DefConChanModes);
 				DefConModesSet = 1;
-				do_mass_mode(Config.DefConChanModes);
+				MassChannelModes(findbot(Config.s_OperServ), Config.DefConChanModes);
 			}
 		}
 	}
@@ -399,7 +383,7 @@ void runDefCon()
 				if ((newmodes = defconReverseModes(Config.DefConChanModes)))
 				{
 					alog("DEFCON: setting %s on all chan's", newmodes);
-					do_mass_mode(newmodes);
+					MassChannelModes(findbot(Config.s_OperServ), newmodes);
 					delete [] newmodes;
 				}
 			}

@@ -568,8 +568,7 @@ class CommandCSSet : public Command
 				/* Set the perm mode */
 				if (cm && ci->c && !ci->c->HasMode(CMODE_PERM))
 				{
-					ci->c->SetMode(CMODE_PERM);
-					ircdproto->SendMode(whosends(ci), ci->c->name, "+%c", cm->ModeChar);
+					ci->c->SetMode(NULL, CMODE_PERM);
 				}
 			}
 
@@ -584,8 +583,7 @@ class CommandCSSet : public Command
 				/* Unset perm mode */
 				if (ci->c && ci->c->HasMode(CMODE_PERM))
 				{
-					ircdproto->SendMode(whosends(ci), ci->c->name, "-%c", cm->ModeChar);
-					ci->c->RemoveMode(CMODE_PERM);
+					ci->c->RemoveMode(NULL, CMODE_PERM);
 				}
 				/* Persist is set off... remove the bot and delete the channel if its empty */
 				else if (ci->c)

@@ -40,7 +40,6 @@ IRCDVar myIrcd[] = {
 	 "+ao",					 /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 1,						 /* Vhost  */
-	 "-r",					  /* Mode on UnReg */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
@@ -159,60 +158,6 @@ void inspircd_cmd_pass(const char *pass)
 
 class InspIRCdProto : public IRCDProto
 {
-
-	void ProcessUsermodes(User *user, int ac, const char **av)
-	{
-		int add = 1; /* 1 if adding modes, 0 if deleting */
-		const char *modes = av[0];
-		--ac;
-		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-		while (*modes) {
-			if (add)
-				user->SetMode(*modes);
-			else
-				user->RemoveMode(*modes);
-
-			switch (*modes++) {
-				case '+':
-					add = 1;
-					break;
-				case '-':
-					add = 0;
-					break;
-				case 'o':
-					if (add) {
-						++opcnt;
-						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					}
-					else --opcnt;
-					break;
-				case 'r':
-					if (add && !nick_identified(user))
-						SendUnregisteredNick(user);
-					break;
-				case 'x':
-					if (add && user->vhost)
-					{
-						/* If +x is recieved then User::vhost IS the cloaked host,
-						 * set the cloaked host correctly and destroy the vhost - Adam
-						 */
-						user->SetCloakedHost(user->vhost);
-						delete [] user->vhost;
-						user->vhost = NULL;
-					}
-					else
-					{
-						if (user->vhost)
-							delete [] user->vhost;
-						user->vhost = NULL;
-					}
-					user->UpdateHost();
-			}
-		}
-	}
-
-	/* *INDENT-ON* */
-
 	void SendAkillDel(const char *user, const char *host)
 	{
 		send_cmd(Config.s_OperServ, "GLINE %s@%s", user, host);
@@ -253,7 +198,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		send_cmd(Config.s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
+		this->SendModeInternal(u, merge_args(ac, av));
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -273,6 +218,12 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 	}
 
+	void SendModeInternal(User *u, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(Config.s_NickServ, "MODE %s %s", u->nick, buf);
+	}
+
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
@@ -290,12 +241,6 @@ class InspIRCdProto : public IRCDProto
 		if (!buf) return;
 		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest, buf);
 	}
-
-	void SendBotOp(const char *nick, const char *chan)
-	{
-		SendMode(findbot(nick), chan, "%s %s %s", ircd->botchanumode, nick, nick);
-	}
-
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(Server *server)
@@ -388,8 +333,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSMODE +- */
 	void SendUnregisteredNick(User *u)
 	{
-		if (u->HasMode(UMODE_REGISTERED))
-			common_svsmode(u, "-r", NULL);
+		u->RemoveMode(UMODE_REGISTERED);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -832,7 +776,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 				 */
 				user->CheckAuthenticationToken(av[0]);
 
-				ircdproto->ProcessUsermodes(user, 1, &av[5]);
+				UserSetInternalModes(user, 1, &av[5]);
 				user->SetCloakedHost(av[3]);
 			}
 		}

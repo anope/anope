@@ -46,6 +46,7 @@ NickCore::~NickCore()
 			if (user->nc && user->nc == this)
 			{
 				ircdproto->SendAccountLogout(user, user->nc);
+				ircdproto->SendUnregisteredNick(user);
 				user->nc = NULL;
 				FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
 			}

@@ -21,7 +21,6 @@ IRCDVar myIrcd[] = {
 	 "+o",					  /* Channel Umode used by Botserv bots */
 	 0,						 /* SVSNICK */
 	 0,						 /* Vhost  */
-	 NULL,					  /* Mode on UnReg       */
 	 1,						 /* Supports SGlines	 */
 	 1,						 /* Supports SQlines	 */
 	 0,						 /* Supports SZlines	 */
@@ -166,35 +165,6 @@ void ratbox_cmd_pass(const char *pass)
 
 class RatboxProto : public IRCDTS6Proto
 {
-	void ProcessUsermodes(User *user, int ac, const char **av)
-	{
-		int add = 1; /* 1 if adding modes, 0 if deleting */
-		const char *modes = av[0];
-		--ac;
-		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-		while (*modes) {
-			if (add)
-				user->SetMode(*modes);
-			else
-				user->RemoveMode(*modes);
-
-			switch (*modes++) {
-				case '+':
-					add = 1;
-					break;
-				case '-':
-					add = 0;
-					break;
-				case 'o':
-					if (add) {
-						++opcnt;
-						if (Config.WallOper) ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					}
-					else --opcnt;
-			}
-		}
-	}
-
 	void SendGlobopsInternal(const char *source, const char *buf)
 	{
 		if (source)
@@ -266,7 +236,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		send_cmd(TS6SID, "SVSMODE %s %s", u->nick, av[0]);
+		this->SendModeInternal(u, merge_args(ac, av));
 	}
 
 	/* SERVER name hop descript */
@@ -315,6 +285,12 @@ class RatboxProto : public IRCDTS6Proto
 		else send_cmd(TS6SID, "MODE %s %s", dest, buf);
 	}
 
+	void SendModeInternal(User *u, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(TS6SID, "SVSMODE %s %s", u->nick, buf);
+	}
+
 	void SendKickInternal(BotInfo *bi, const char *chan, const char *user, const char *buf)
 	{
 		User *u = finduser(user);
@@ -325,12 +301,6 @@ class RatboxProto : public IRCDTS6Proto
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
-	}
-
-	void SendBotOp(const char *nick, const char *chan)
-	{
-		BotInfo *bi = findbot(nick);
-		ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, bi ? bi->uid.c_str() : nick);
 	}
 
 	/* QUIT */
@@ -440,7 +410,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 			 */
 			user->CheckAuthenticationToken(av[2]);
 
-			ircdproto->ProcessUsermodes(user, 1, &av[3]);
+			UserSetInternalModes(user, 1, &av[3]);
 		}
 	} else {
 		if (ac == 2)

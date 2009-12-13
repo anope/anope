@@ -23,6 +23,8 @@ class CoreExport User : public Extensible
 	std::string ident;
 	std::string uid;
 	bool OnAccess;	/* If the user is on the access list of the nick theyre on */
+	std::bitset<128> modes; /* Bitset of mode names the user has set on them */
+	std::map<UserModeName, std::string> Params; /* Map of user modes and the params this user has */
 
  public: // XXX: exposing a tiny bit too much
 	User *next, *prev;
@@ -37,7 +39,6 @@ class CoreExport User : public Extensible
 	Server *server;		/* Server user is connected to  */
 	time_t timestamp;	/* Timestamp of the nick 	*/
 	time_t my_signon;	/* When did _we_ see the user?  */
-	std::bitset<128> modes;
 
 	NickCore *nc;
 
@@ -66,7 +67,6 @@ class CoreExport User : public Extensible
 	/** Destroy a user.
 	 */
 	~User();
-
 	
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
@@ -99,7 +99,6 @@ class CoreExport User : public Extensible
 	 * @return The UID of the user.
 	 */
 	const std::string &GetUID() const;
-
 
 	/** Update the displayed ident (username) of a user record.
 	 * @param ident The new ident to give this user.
@@ -161,26 +160,55 @@ class CoreExport User : public Extensible
         * @param Name Mode name
         * @return true or false
         */
-       const bool HasMode(UserModeName Name) const;
- 
-       /** Set a mode on the user
-        * @param Name The mode name
-        */
-       void SetMode(UserModeName Name);
- 
-       /* Set a mode on the user
-        * @param ModeChar The mode char
-        */
-       void SetMode(char ModeChar);
- 
-       /** Remove a mode from the user
-        * @param Name The mode name
-        */
-       void RemoveMode(UserModeName Name);
+	const bool HasMode(UserModeName Name) const;
+
+	/** Set a mode internally on the user, the IRCd is not informed
+	 * @param um The user mode
+	 * @param Param The param, if there is one
+	 */
+	void SetModeInternal(UserMode *um, const std::string &Param = "");
+
+	/** Remove a mode internally on the user, the IRCd is not informed
+	 * @param um The user mode
+	 */
+	void RemoveModeInternal(UserMode *um);
+
+	/** Set a mode on the user
+	 * @param um The user mode
+	 * @param Param Optional param for the mode
+	 */
+	void SetMode(UserMode *um, const std::string &Param = "");
+
+	/** Set a mode on the user
+	 * @param Name The mode name
+	 * @param Param Optional param for the mode
+	 */
+	void SetMode(UserModeName Name, const std::string &Param = "");
+
+	/* Set a mode on the user
+	 * @param ModeChar The mode char
+	 * @param param Optional param for the mode
+	 */
+	void SetMode(char ModeChar, const std::string &Param = "");
+
+	/** Remove a mode on the user
+	 * @param um The user mode
+	 */
+	void RemoveMode(UserMode *um);
 
 	/** Remove a mode from the user
-        * @param ModeChar The mode char
-        */
-       void RemoveMode(char ModeChar);
+	 * @param Name The mode name
+	 */
+	void RemoveMode(UserModeName Name);
+
+	/** Remove a mode from the user
+	 * @param ModeChar The mode char
+	 */
+	void RemoveMode(char ModeChar);
+
+	/** Set a string of modes on a user
+	 * @param modes The modes
+	 */
+	void SetModes(const std::string &modes, ...);
 };
 

@@ -65,10 +65,10 @@ NickAlias::~NickAlias()
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */
-	if ((u = finduser(this->nick)))
+	if ((u = finduser(this->nick)) && u->nc)
 	{
-		if (ircd->modeonunreg)
-			common_svsmode(finduser(this->nick), ircd->modeonunreg, "1");
+		ircdproto->SendAccountLogout(u, u->nc);
+		ircdproto->SendUnregisteredNick(u);
 		u->nc = NULL;
 	}
 

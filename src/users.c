@@ -469,26 +469,83 @@ const bool User::HasMode(UserModeName Name) const
 	return modes[Name];
 }
 
+/** Set a mode internally on the user, the IRCd is not informed
+ * @param um The user mode
+ * @param Param The param, if there is one
+ */
+void User::SetModeInternal(UserMode *um, const std::string &Param)
+{
+	if (!um)
+		return;
+	
+	modes[um->Name] = true;
+	if (!Param.empty())
+	{
+		Params.insert(std::make_pair(um->Name, Param));
+	}
+
+	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, um->Name));
+}
+
+/** Remove a mode internally on the user, the IRCd is not informed
+ * @param um The user mode
+ */
+void User::RemoveModeInternal(UserMode *um)
+{
+	if (!um)
+		return;
+	
+	modes[um->Name] = false;
+	std::map<UserModeName, std::string>::iterator it = Params.find(um->Name);
+	if (it != Params.end())
+	{
+		Params.erase(it);
+	}
+
+	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, um->Name));
+}
+
+/** Set a mode on the user
+ * @param um The user mode
+ * @param Param Optional param for the mode
+ */
+void User::SetMode(UserMode *um, const std::string &Param)
+{
+	if (!um)
+		return;
+
+	SetModeInternal(um, Param);
+	ModeManager::StackerAdd(NULL, this, um, true, Param);
+}
+
 /** Set a mode on the user
  * @param Name The mode name
+ * @param param Optional param for the mode
  */
-void User::SetMode(UserModeName Name)
+void User::SetMode(UserModeName Name, const std::string &Param)
 {
-	modes[Name] = true;
-	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, Name));
+	SetMode(ModeManager::FindUserModeByName(Name), Param);
 }
 
 /* Set a mode on the user
  * @param ModeChar The mode char
+ * @param param Optional param for the mode
  */
-void User::SetMode(char ModeChar)
+void User::SetMode(char ModeChar, const std::string &Param)
 {
-	UserMode *um;
+	SetMode(ModeManager::FindUserModeByChar(ModeChar), Param);
+}
 
-	if ((um = ModeManager::FindUserModeByChar(ModeChar)))
-	{
-		SetMode(um->Name);
-	}
+/** Remove a mode on the user
+ * @param um The user mode
+ */
+void User::RemoveMode(UserMode *um)
+{
+	if (!um)
+		return;
+
+	RemoveModeInternal(um);
+	ModeManager::StackerAdd(NULL, this, um, false);
 }
 
 /** Remove a mode from the user
@@ -496,8 +553,7 @@ void User::SetMode(char ModeChar)
  */
 void User::RemoveMode(UserModeName Name)
 {
-	modes[Name] = false;
-	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, Name));
+	RemoveMode(ModeManager::FindUserModeByName(Name));
 }
 
 /** Remove a mode from the user
@@ -505,11 +561,55 @@ void User::RemoveMode(UserModeName Name)
  */
 void User::RemoveMode(char ModeChar)
 {
-	UserMode *um;
+	RemoveMode(ModeManager::FindUserModeByChar(ModeChar));
+}
 
-	if ((um = ModeManager::FindUserModeByChar(ModeChar)))
+/** Set a string of modes on a user
+ * @param modes The modes
+ */
+void User::SetModes(const std::string &modes, ...)
+{
+	char buf[BUFSIZE] = "";
+	va_list args;
+	std::string modebuf, sbuf;
+	int add = -1;
+	va_start(args, modes.c_str());
+	vsnprintf(buf, BUFSIZE - 1, modes.c_str(), args);
+	va_end(args);
+
+	spacesepstream sep(buf);
+	sep.GetToken(modebuf);
+	for (unsigned i = 0; i < modebuf.size(); ++i)
 	{
-		RemoveMode(um->Name);
+		UserMode *um;
+
+		switch (modebuf[i])
+		{
+			case '+':
+				add = 1;
+				continue;
+			case '-':
+				add = 0;
+				continue;
+			default:
+				if (add == -1)
+					continue;
+				um = ModeManager::FindUserModeByChar(modebuf[i]);	
+				if (!um)
+					continue;
+		}
+		
+		if (add)
+		{
+			if (um->Type == MODE_PARAM && sep.GetToken(sbuf))
+				this->SetMode(um, sbuf);
+			else
+				this->SetMode(um);
+		}
+		else if (add == 0)
+		{
+			this->RemoveMode(um);
+		}
 	}
 }
 
@@ -854,7 +954,7 @@ void do_umode(const char *source, int ac, const char **av)
 		return;
 	}
 
-	ircdproto->ProcessUsermodes(user, ac - 1, &av[1]);
+	UserSetInternalModes(user, ac - 1, &av[1]);
 }
 
 /*************************************************************************/
@@ -1083,3 +1183,90 @@ char *create_mask(User * u)
 }
 
 /*************************************************************************/
+
+/** Set modes internally on a user
+ * @param user The user
+ * @param ac Number of args
+ * @param av Args
+ */
+void UserSetInternalModes(User *user, int ac, const char **av)
+{
+	int add = -1, j = 0;
+	const char *modes = av[0];
+	if (!user || !modes)
+		return;
+	
+	if (debug)
+		alog("debug: Changing user modes for %s to %s", user->nick, merge_args(ac, av));
+	
+	for (; *modes; *modes++)
+	{
+		UserMode *um;
+
+		switch (*modes)
+		{
+			case '+':
+				add = 1;
+				continue;
+			case '-':
+				add = 0;
+				continue;
+			default:
+				if (add == -1)
+					continue;
+				um = ModeManager::FindUserModeByChar(*modes);
+				if (!um)
+					continue;
+		}
+
+		if (um->Type == MODE_REGULAR)
+		{
+			if (add)
+				user->SetModeInternal(um);
+			else
+				user->RemoveModeInternal(um);
+		}
+		else if (++j < ac)
+		{
+			if (add)
+				user->SetModeInternal(um, av[j]);
+			else
+				user->RemoveModeInternal(um);
+		}
+
+		switch (um->Name)
+		{
+			case UMODE_OPER:
+				if (add)
+				{
+					++opcnt;
+					if (Config.WallOper)
+						ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+				}
+				else
+					--opcnt;
+				break;
+			case UMODE_REGISTERED:
+				if (add && !nick_identified(user))
+					user->RemoveMode(UMODE_REGISTERED);
+				break;
+			case UMODE_CLOAK:
+			case UMODE_VHOST:
+				if (add && user->vhost)
+				{
+					user->SetCloakedHost(user->vhost);
+					delete [] user->vhost;
+					user->vhost = NULL;
+				}
+				else if (user->vhost)
+				{
+					delete [] user->vhost;
+					user->vhost = NULL;
+				}
+				user->UpdateHost();
+			default:
+				break;
+		}
+	}
+}
+

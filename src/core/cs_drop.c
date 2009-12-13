@@ -61,8 +61,7 @@ class CommandCSDrop : public Command
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			{
-				ci->c->RemoveMode(CMODE_REGISTERED);
-				ircdproto->SendMode(whosends(ci), ci->name, "-r");
+				ci->c->RemoveMode(NULL, CMODE_REGISTERED);
 			}
 		}
 

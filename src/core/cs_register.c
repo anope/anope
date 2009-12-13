@@ -82,9 +82,9 @@ class CommandCSRegister : public Command
 			check_modes(c);
 			/* On most ircds you do not receive the admin/owner mode till its registered */
 			if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
-				ircdproto->SendMode(findbot(Config.s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
+				c->SetMode(NULL, cm, u->nick);
 			else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
-				ircdproto->SendMode(findbot(Config.s_ChanServ), chan, "+%c %s", cm->ModeChar, u->nick);
+				c->RemoveMode(NULL, cm, u->nick);
 
 			/* Mark the channel as persistant */
 			if (c->HasMode(CMODE_PERM))
@@ -92,7 +92,7 @@ class CommandCSRegister : public Command
 			/* Persist may be in def cflags, set it here */
 			else if (ci->HasFlag(CI_PERSIST) && (cm = ModeManager::FindChannelModeByName(CMODE_PERM)))
 			{
-				ircdproto->SendMode(whosends(ci), chan, "+%c", cm->ModeChar);
+				c->SetMode(NULL, CMODE_PERM);
 				ci->SetFlag(CI_PERSIST);
 			}
 

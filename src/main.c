@@ -487,6 +487,9 @@ int main(int ac, char **av, char **envp)
 			last_check = t;
 		}
 
+		/* Process any modes that need to be (un)set */
+		ModeManager::ProcessModes();
+
 		/* this is a nasty nasty typecast. we need to rewrite the
 		   socket stuff -Certus */
 		i = static_cast<int>(reinterpret_cast<long>(sgets2(inbuf, sizeof(inbuf), servsock)));

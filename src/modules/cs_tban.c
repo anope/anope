@@ -179,33 +179,18 @@ class TempBan : public Timer
 
 		void Tick(time_t ctime)
 		{
-			const char *av[3];
 			Channel *c;
-
-			av[0] = "-b";
-			av[1] = mask.c_str();
 
 			if ((c = findchan(chan.c_str())) && c->ci)
 			{
-				ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
-				chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
+				c->RemoveMode(NULL, CMODE_BAN, mask);
 			}
 		}
 };
 
 void addBan(Channel *c, time_t timeout, char *banmask)
 {
-	const char *av[3];
-	char *cb[2];
-
-	cb[0] = c->name;
-	cb[1] = banmask;
-
-	av[0] = "+b";
-	av[1] = banmask;
-
-	ircdproto->SendMode(whosends(c->ci), c->name, "+b %s", av[1]);
-	chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
+	c->SetMode(NULL, CMODE_BAN, banmask);
 
 	me->AddCallBack(new TempBan(timeout, c->name, banmask));
 }

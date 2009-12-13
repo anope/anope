@@ -66,14 +66,10 @@ class CommandCSBan : public Command
 		} else if (is_protected(u2)) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else {
-			const char *av[3];
 			char mask[BUFSIZE];
 
-			av[0] = "+b";
 			get_idealban(ci, u2, mask, sizeof(mask));
-			av[1] = mask;
-			ircdproto->SendMode(whosends(ci), c->name, "+b %s", av[1]);
-			chan_set_modes(Config.s_ChanServ, c, 2, av, 1);
+			c->SetMode(NULL, CMODE_BAN, mask);
 
 			/* We still allow host banning while not allowing to kick */
 			if (!is_on_chan(c, u2))

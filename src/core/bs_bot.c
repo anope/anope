@@ -107,8 +107,6 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		bi->created = time(NULL);
-
 		/* We check whether user with this nick is online, and kill it if so */
 		EnforceQlinedNick(nick, Config.s_BotServ);
 

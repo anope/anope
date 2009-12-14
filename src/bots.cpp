@@ -15,12 +15,11 @@
 BotInfo::BotInfo(const char *nnick)
 {
 	this->nick = sstrdup(nnick);
-	this->lastmsg = time(NULL);
+	this->lastmsg = this->created = time(NULL);
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
 	nbots++;
 	this->cmdTable = NULL;
 	this->chancount = 0;
-	this->created = 0;
 
 	if (Config.s_ChanServ && !stricmp(Config.s_ChanServ, nnick))
 		this->SetFlag(BI_CHANSERV);
@@ -53,12 +52,11 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 	this->user = sstrdup(nuser);
 	this->host = sstrdup(nhost);
 	this->real = sstrdup(nreal);
-	this->lastmsg = time(NULL);
+	this->lastmsg = this->created = time(NULL);
 	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
 	nbots++;
 	this->cmdTable = NULL;
 	this->chancount = 0;
-	this->created = 0;
 
 	if (Config.s_ChanServ && !stricmp(Config.s_ChanServ, nnick))
 		this->SetFlag(BI_CHANSERV);

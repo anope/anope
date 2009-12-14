@@ -85,112 +85,107 @@ How To Add IRCd Support
     6) VHOST: Can a user's host be changed on the fly? Enabling this allow
                HostServ online. Use 1 for yes, 0 for no.
 
-    7) Mode on Nick Unregister: What mode to set give users when they cancel
-                                 their registration with NickServ. If your
-                                 IRCd doesn't set a mode for registered users
-                                 you should set this to NULL.
-
-    8) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
+    7) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
                 0 for no.
 
-    9) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
+    8) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
 
-    10) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
+    9) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
 
-    11) Number of Server Args: When an IRCd connects, this is the number of
+    10) Number of Server Args: When an IRCd connects, this is the number of
                                parameters that are passed.
 
-    12) Join to Set: Services must join a channel to set any modes on that
+    11) Join to Set: Services must join a channel to set any modes on that
                      channel. Use 1 for yes, 0 for no.
 
-    13) Join to Message: Services must join a channel to send any message to
+    12) Join to Message: Services must join a channel to send any message to
                          that channel (cannot override +n). Use 1 for yes,
                          0 for no.
 
-    14) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
+    13) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
                           set forward by +1. Use 1 for yes, 0 for no.
 
-    15) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
+    14) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
                            like their topic TS set back by -1. Use 1 for yes,
                            0 for no.
 
-    16) SQline Channels: The IRCd's supports banning channel names via
+    15) SQline Channels: The IRCd's supports banning channel names via
                          SQLINES. Use 1 for yes, 0 for no.
 
-    17) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
+    16) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
                       QUIT message for that user? Use 1 for yes, 0 for no.
 
-    18) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
+    17) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
                     1 for yes, 0 for no.
 
-    19) Reverse: We can do a reverse check when unbanning. For use with 
+    18) Reverse: We can do a reverse check when unbanning. For use with 
                  DreamForge based IRCd's. Use 1 for yes, 0 for no.
 
-    20) vIdent: Support for including a user's ident in their vHost. Use
+    19) vIdent: Support for including a user's ident in their vHost. Use
                 1 for yes, 0 for no.
 
-    21) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
+    20) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
                  a nick enforcer client. Use 1 for yes, 0 for no.
 
-    22) TS on MODE: We need to send a timestamp when modes are being changed.
+    21) TS on MODE: We need to send a timestamp when modes are being changed.
                     Use 1 for yes, 0 for no.
 
-    23) NICKIP: The IP address of new users is being sent along with their
+    22) NICKIP: The IP address of new users is being sent along with their
                 hostname when new users are being introduced on the network.
                 Use 1 for yes, 0 for no.
 
-    24) OMODE: We can use OperServ to give some user a temporary O:LINE.
+    23) OMODE: We can use OperServ to give some user a temporary O:LINE.
                 Use 1 for yes, 0 for no.
 
-    25) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
+    24) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
                0 for no.
 
-    26) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
+    25) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
                        0 for no.
 
-    27) Change Realname: Change real name. Use 1 for yes, 0 for no.
+    26) Change Realname: Change real name. Use 1 for yes, 0 for no.
 
-    28) Check Nick ID: Should we check if a user should remain identified when
+    27) Check Nick ID: Should we check if a user should remain identified when
                        changing their nick? This is for IRCd's that remove
                        their registered-user mode when someone changes their
                        nick (like Bahamut does).
                        Use 1 for yes, 0 for no.
 
-    29) No Knock Requires +i: Does the No Knock channel mode require invite
+    28) No Knock Requires +i: Does the No Knock channel mode require invite
                               only channels? Use 1 for yes, 0 for no.
     
-    30) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
+    29) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
                     NULL by default.
 
-    31) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
+    30) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
                 0 for no.
 
-    32) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
+    31) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
                          1 for yes, 0 for no.
 
-    33) SJOIN Ban Char: Character used to identify bans. Use ''.
+    32) SJOIN Ban Char: Character used to identify bans. Use ''.
 
-    34) SJOIN Except Char: Character used to identify exceptions. Use ''.
+    33) SJOIN Except Char: Character used to identify exceptions. Use ''.
     
-    35) SJOIN Invite char: Character used to idenfity invexs. Use ''.
+    34) SJOIN Invite char: Character used to idenfity invexs. Use ''.
 
-    36) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
+    35) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    37) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
+    36) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
-    38) Vhost Character: The character used to represent the vHost mode, if
+    37) Vhost Character: The character used to represent the vHost mode, if
                          this is supported by the IRCd.
 
-    39) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
+    38) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
 
-    40) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
+    39) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
 
-    41) Character Set: Unreal passes the character set during PROTOCTL,
+    40) Character Set: Unreal passes the character set during PROTOCTL,
                        the value is stored here. Set this NULL to start.
 
-    42) Channel CIDR: Set to 1 if channel bans, excepts and invites
+    41) Channel CIDR: Set to 1 if channel bans, excepts and invites
                       support CIDR masks. Expected syntax: *!*@ip/mask.
                       When set to 1, anope will only parse strict CIDR masks.
                       IRCd's that try to correct invalid CIDR's (like nefarious)
@@ -198,10 +193,10 @@ How To Add IRCd Support
                       Contact the anope Dev Team if this is the case.
                       Set to 0 if CIDR's are not supported by your IRCd.
 
-    43) Global TLD Prefix: Prefix used to send global messages, should probably
+    42) Global TLD Prefix: Prefix used to send global messages, should probably
                            be "$"
 
-    44) Delayed AUTH: Does the ircd send if a user is identified for their nick
+    43) Delayed AUTH: Does the ircd send if a user is identified for their nick
                       AFTER the initial NICK/UID? Set this to 0 for no.
 
     So we've had this long list. Now there's a second struct to fill. This

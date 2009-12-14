@@ -16,6 +16,87 @@
 
 #include "db-convert.h"
 
+static std::string GetLevelName(int level)
+{
+	switch (level)
+	{
+		case 0:
+			return "INVITE";
+		case 1:
+			return "AKICK";
+		case 2:
+			return "SET";
+		case 3:
+			return "UNBAN";
+		case 4:
+			return "AUTOOP";
+		case 5:
+			return "AUTODEOP";
+		case 6:
+			return "AUTOVOICE";
+		case 7:
+			return "OPDEOP";
+		case 8:
+			return "ACCESS_LIST";
+		case 9:
+			return "CLEAR";
+		case 10:
+			return "NOJOIN";
+		case 11:
+			return "ACCESS_CHANGE";
+		case 12:	
+			return "MEMO";
+		case 13:
+			return "ASSIGN";
+		case 14:
+			return "BADWORDS";
+		case 15:
+			return "NOKICK";
+		case 16:
+			return "FANTASIA";
+		case 17:
+			return "SAY";
+		case 18:
+			return "GREET";
+		case 19:
+			return "VOICEME";
+		case 20:	
+			return "VOICE";
+		case 21:
+			return "GETKEY";
+		case 22:
+			return "AUTOHALFOP";
+		case 23:
+			return "AUTOPROTECT";
+		case 24:
+			return "OPDEOPME";
+		case 25:
+			return "HALFOPME";
+		case 26:
+			return "HALFOP";
+		case 27:
+			return "PROTECTME";
+		case 28:	
+			return "PROTECT";
+		case 29:	
+			return "KICKME";
+		case 30:
+			return "KICK";
+		case 31:
+			return "SIGNKICK";
+		case 32:
+			return "BANME";
+		case 33:
+			return "BAN";
+		case 34:
+			return "TOPIC";
+		case 35:
+			return "INFO";
+		default:
+			return "INVALID";
+	}
+}
+
 void process_mlock_modes(std::ofstream &fs, size_t m, const std::string &ircd)
 {
 	/* this is the same in all protocol modules */
@@ -296,19 +377,19 @@ int main(int argc, char *argv[])
 
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
 			if (nc->greet)
-				fs << "MD NC greet :" << nc->greet << std::endl;
+				fs << "MD GREET :" << nc->greet << std::endl;
 			if (nc->icq)
-				fs << "MD NC icq :" << nc->icq << std::endl;
+				fs << "MD ICQ :" << nc->icq << std::endl;
 			if (nc->url)
-				fs << "MD NC url :" << nc->url << std::endl;
+				fs << "MD URL :" << nc->url << std::endl;
 
 			if (nc->accesscount)
 			{
 				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
-					fs << "MD NC access " << *access << std::endl;
+					fs << "MD ACCESS " << *access << std::endl;
 			}
 
-			fs << "MD NC flags "
+			fs << "MD FLAGS "
 					<< ((nc->flags & NI_KILLPROTECT  ) ? "KILLPROTECT "  : "")
 					<< ((nc->flags & NI_SECURE       ) ? "SECURE "       : "")
 					<< ((nc->flags & NI_MSG          ) ? "MSG "          : "")
@@ -331,7 +412,7 @@ int main(int argc, char *argv[])
 			{
 				memos = nc->memos.memos;
 				for (j = 0; j < nc->memos.memocount; j++, memos++)
-					fs << "ME " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
+					fs << "MD MI " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
 			}
 
 			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
@@ -352,14 +433,14 @@ int main(int argc, char *argv[])
 
 					fs <<  "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << std::endl;
 					if (nc->last_usermask)
-						fs << "MD NA last_usermask :" << nc->last_usermask << std::endl;
+						fs << "MD LAST_USERMASK " << nc->last_usermask << std::endl;
 					if (nc->last_realname)
-						fs << "MD NA last_realname :" << nc->last_realname << std::endl;
+						fs << "MD LAST_REALNAME :" << nc->last_realname << std::endl;
 					if (nc->last_quit)
-						fs << "MD NA last_quit :" << nc->last_quit << std::endl;
+						fs << "MD LAST_QUIT :" << nc->last_quit << std::endl;
 					if ((na->status & NS_FORBIDDEN) || (na->status & NS_NO_EXPIRE)) 
 					{
-						fs << "MD NA flags "
+						fs << "MD FLAGS "
 							<< ((na->status & NS_FORBIDDEN) ? "FORBIDDEN " : "")
 							<< ((na->status & NS_NO_EXPIRE) ? "NOEXPIRE"   : "") << std::endl;
 					}
@@ -605,16 +686,16 @@ int main(int argc, char *argv[])
 			fs << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
 			fs << " " << ci->bantype << " " << ci->memos.memomax << std::endl;
 			if (ci->founder)
-				fs << "MD CH founder " << ci->founder << std::endl;
+				fs << "MD FOUNDER " << ci->founder << std::endl;
 			if (ci->successor)
-				fs << "MD CH successor " << ci->successor << std::endl;
-			fs << "MD CH lvl";
+				fs << "MD SUCCESSOR " << ci->successor << std::endl;
+			fs << "MD LEVELS";
 			for (j = 0; j < 36; j++)
 			{
-				fs << " " <<ci->levels[j];
+				fs << " " << GetLevelName(j) << " " << ci->levels[j];
 			}
 			fs << std::endl;
-			fs << "MD CH flags " 
+			fs << "MD FLAGS " 
 					<< ((ci->flags & CI_KEEPTOPIC     ) ? "KEEPTOPIC "     : "")
 					<< ((ci->flags & CI_SECUREOPS     ) ? "SECUREOPS "     : "")
 					<< ((ci->flags & CI_PRIVATE       ) ? "PRIVATE "       : "")
@@ -632,27 +713,27 @@ int main(int argc, char *argv[])
 					<< ((ci->flags & CI_XOP           ) ? "XOP "           : "")
 					<< ((ci->flags & CI_SUSPENDED     ) ? "SUSPENDED"      : "") << std::endl;
 			if (ci->desc)
-				fs << "MD CH desc :" << ci->desc << std::endl;
+				fs << "MD DESC :" << ci->desc << std::endl;
 			if (ci->url)
-				fs << "MD CH url :" << ci->url << std::endl;
+				fs << "MD URL :" << ci->url << std::endl;
 			if (ci->email)
-				fs << "MD CH email :" << ci->email << std::endl;
+				fs << "MD EMAIL :" << ci->email << std::endl;
 			if (ci->last_topic)  // MD CH topic <setter> <time> :topic
-				fs << "MD CH topic " << ci->last_topic_setter << " " << ci->last_topic_time <<  " :" << ci->last_topic << std::endl;
+				fs << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time <<  " :" << ci->last_topic << std::endl;
 			if (ci->flags & CI_FORBIDDEN)
-				fs << "MD CH forbid " << ci->forbidby << " :" << ci->forbidreason << std::endl;
+				fs << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << std::endl;
 
 			for (j = 0; j < ci->accesscount; j++)
 			{  // MD CH access <display> <level> <last_seen>
 				if (ci->access[j].in_use)
-					fs << "MD CH access "
+					fs << "MD ACCESS "
 						<< ci->access[j].nc->display << " " << ci->access[j].level << " " 
 						<< ci->access[j].last_seen << " " << std::endl;
 			}
 
 			for (j = 0; j < ci->akickcount; j++)
 			{  // MD CH akick <USED/NOTUSED> <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
-				fs << "MD CH akick "
+				fs << "MD AKICK "
 					<< ((ci->akick[j].flags & AK_USED) ? "USED " : "NOTUSED ")
 					<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK" )
 					<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
@@ -661,27 +742,26 @@ int main(int argc, char *argv[])
 					<< std::endl;
 			}
 
-			/* TODO: convert to new mlock modes */
 			if (ci->mlock_on)
 			{
-				fs << "MD CH mlock_on";
+				fs << "MD MLOCK_ON";
 				process_mlock_modes(fs, ci->mlock_on, ircd);
 				fs << std::endl;
 			}
 			if (ci->mlock_off)
 			{
-				fs << "MD CH mlock_off";
+				fs << "MD MLOCK_OFF";
 				process_mlock_modes(fs, ci->mlock_off, ircd);
 				fs << std::endl;
 			}
 			if (ci->mlock_limit)
-				fs << "MD CH mlock_limit " << ci->mlock_limit << std::endl;
+				fs << "MD MLP CMODE_LIMIT " << ci->mlock_limit << std::endl;
 			if (ci->mlock_key)
-				fs << "MD CH mlock_key" << ci->mlock_key << std::endl;
+				fs << "MD MLP CMODE_KEY " << ci->mlock_key << std::endl;
 			if (ci->mlock_flood)
-				fs << "MD CH mlock_flood" << ci->mlock_flood << std::endl;
+				fs << "MD MLP CMODE_FLOOD " << ci->mlock_flood << std::endl;
 			if (ci->mlock_redirect)
-				fs << "MD CH mlock_redirect" << ci->mlock_redirect << std::endl;
+				fs << "MD MLP CMODE_REDIRECT " << ci->mlock_redirect << std::endl;
 
 			if (ci->memos.memocount)
 			{
@@ -689,17 +769,17 @@ int main(int argc, char *argv[])
 				memos = ci->memos.memos;
 				for (j = 0; j < ci->memos.memocount; j++, memos++)
 				{
-					fs << "ME " << memos->number << " " << memos->flags << " " 
+					fs << "MD CI " << memos->number << " " << memos->flags << " " 
 						<< memos->time << " " << memos->sender << " :" << memos->text << std::endl;
 				}
 			}
 
 			if (ci->entry_message)
-				fs << "MD CH entry_message :" << ci->entry_message << std::endl;
+				fs << "MD ENTRYMSG :" << ci->entry_message << std::endl;
 			if (ci->bi)  // here is "bi" a *Char, not a pointer to BotInfo !
-				fs << "MD CH bot " << ci->bi << std::endl;
+				fs << "MD BI NAME " << ci->bi << std::endl;
 			if (ci->botflags)
-				fs << "MD CH botflags "
+				fs << "MD BI FLAGS "
 					<< (( ci->botflags & BS_DONTKICKOPS     ) ? "DONTKICKOPS "    : "" )
 					<< (( ci->botflags & BS_DONTKICKVOICES  ) ? "DONTKICKVOICES "  : "")
 					<< (( ci->botflags & BS_FANTASY         ) ? "FANTASY "         : "")
@@ -714,23 +794,29 @@ int main(int argc, char *argv[])
 					<< (( ci->botflags & BS_KICK_CAPS       ) ? "KICK_CAPS "       : "")
 					<< (( ci->botflags & BS_KICK_FLOOD      ) ? "KICK_FLOOD "      : "")
 					<< (( ci->botflags & BS_KICK_REPEAT     ) ? "KICK_REPEAT "     : "") << std::endl;
-			fs << "MD CH TTB";
-			for (j = 0; j < 8; j++)
-				fs << " " << ci->ttb[j];
+			fs << "MD BI TTB";
+			fs << " BOLDS " << ci->ttb[0];
+			fs << " COLORS " << ci->ttb[1];
+			fs << " REVERSES " << ci->ttb[2];
+			fs << " UNDERLINES " << ci->ttb[3];
+			fs << " BADWORDS " << ci->ttb[4];
+			fs << " CAPS " << ci->ttb[5];
+			fs << " FLOOD " << ci->ttb[6];
+			fs << " REPEAT " << ci->ttb[7];
 			fs << std::endl;
 			if (ci->capsmin)
-				fs << "MD CH capsmin " << ci->capsmin << std::endl;
+				fs << "MD BI CAPSMINS" << ci->capsmin << std::endl;
 			if (ci->capspercent)
-				fs << "MD CH capspercent " << ci->capspercent << std::endl;
+				fs << "MD BI CAPSPERCENT " << ci->capspercent << std::endl;
 			if (ci->floodlines)
-				fs << "MD CH floodlines " << ci->floodlines << std::endl;
+				fs << "MD BI FLOODLINES " << ci->floodlines << std::endl;
 			if (ci->floodsecs)
-				fs << "MD CH floodsecs " << ci->floodsecs << std::endl;
+				fs << "MD BI FLOODSECS " << ci->floodsecs << std::endl;
 			if (ci->repeattimes)
-				fs << "MD CH repeattimes " << ci->repeattimes << std::endl;
+				fs << "MD BI REPEATTIMES " << ci->repeattimes << std::endl;
 			for (j = 0; j < ci->bwcount; j++)
 			{
-				fs << "MD CH badword "
+				fs << "MD BI badword "
 					<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
 					<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
 					<< (( ci->badwords[j].type == 3 ) ? "START "  : "" )
@@ -754,8 +840,8 @@ int main(int argc, char *argv[])
 
 		while (input != "y" && input != "n")
 		{
-		std::cout << std::endl << "Are you converting an old 1.9.0 Database? (y/n) ? ";
-		std::cin >> input;
+			std::cout << std::endl << "Are you converting an old 1.9.0 Database? (y/n) ? ";
+			std::cin >> input;
 		}
 		if (input == "y")
 			broken = 1;
@@ -768,6 +854,9 @@ int main(int argc, char *argv[])
 			SAFE(read_int16(&flags, f));
 			READ(read_int32(&created, f));
 			READ(read_int16(&chancount, f));
+
+			if (created == 0)
+				created = time(NULL); // Unfortunatley, we forgot to store the created bot time in 1.9.1+
 
 			/* fix for the 1.9.0 broken bot.db */
 			if (broken)
@@ -790,7 +879,7 @@ int main(int argc, char *argv[])
 			} /* end of 1.9.0 broken database fix */
 			std::cout << "Writing Bot " << nick << "!" << user << "@" << host << std::endl;
 			fs << "BI " << nick << " " << user << " " << host << " " << created << " " << chancount << " :" << real << std::endl;
-			fs << "MD BI flags "
+			fs << "MD FLAGS "
 					<< (( flags & BI_PRIVATE  ) ? "PRIVATE "  : "" )
 					<< (( flags & BI_CHANSERV ) ? "CHANSERV " : "" )
 					<< (( flags & BI_BOTSERV  ) ? "BOTSERV "  : "" )
@@ -800,7 +889,7 @@ int main(int argc, char *argv[])
 					<< (( flags & BI_NICKSERV ) ? "NICKSERV " : "" )
 					<< (( flags & BI_GLOBAL   ) ? "GLOBAL "   : "" ) << std::endl;
 		}
-	close_db(f);
+		close_db(f);
 	}
 
 	/* Section IV: Hosts */
@@ -824,7 +913,7 @@ int main(int argc, char *argv[])
 										<< (vIdent ? vIdent : "") << std::endl;
 			free(nick); if (vIdent) free(vIdent); free(vHost); free(creator);
 		}
-	close_db(f);
+		close_db(f);
 	} // host database 
 
 	/*********************************/
@@ -898,6 +987,5 @@ int main(int argc, char *argv[])
 
 	/* CONVERTING DONE \o/ HURRAY! */
 	fs.close();
-	printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n");
 	return 0;
 } /* End of main() */

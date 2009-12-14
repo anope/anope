@@ -14,7 +14,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "pseudo.h" // Remove once new dbs are added
 
 /* List of messages for each news type.  This simplifies message sending. */
 
@@ -76,93 +75,6 @@ struct newsmsgs msgarray[] = {
 	  NEWS_RANDOM_DELETED_ALL}
 	 }
 };
-
-#define SAFE(x) do {					\
-	if ((x) < 0) {					\
-	if (!forceload)					\
-		fatal("Read error on %s", Config.NewsDBName);	\
-	break;						\
-	}							\
-} while (0)
-
-void load_news()
-{
-	dbFILE *f;
-	int i;
-	uint16 n, type;
-	uint32 tmp32;
-	NewsItem *news;
-	char *text;
-
-	if (!(f = open_db(Config.s_OperServ, Config.NewsDBName, "r", NEWS_VERSION)))
-		return;
-	switch (i = get_file_version(f)) {
-	case 9:
-	case 8:
-	case 7:
-		SAFE(read_int16(&n, f));
-		if (!n) {
-			close_db(f);
-			return;
-		}
-		for (i = 0; i < n; i++) {
-			news = new NewsItem;
-
-			SAFE(read_int16(&type, f));
-			news->type = static_cast<NewsType>(type);
-			SAFE(read_int32(&news->num, f));
-			SAFE(read_string(&text, f));
-			news->Text = text;
-			delete [] text;
-			SAFE(read_buffer(news->who, f));
-			SAFE(read_int32(&tmp32, f));
-			news->time = tmp32;
-
-			News.push_back(news);
-		}
-		break;
-
-	default:
-		fatal("Unsupported version (%d) on %s", i, Config.NewsDBName);
-	}						   /* switch (ver) */
-
-	close_db(f);
-}
-
-#undef SAFE
-
-#define SAFE(x) do {						\
-	if ((x) < 0) {						\
-	restore_db(f);						\
-	log_perror("Write error on %s", Config.NewsDBName);		\
-	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.NewsDBName,	\
-			strerror(errno));			\
-		lastwarn = time(NULL);				\
-	}							\
-	return;							\
-	}								\
-} while (0)
-
-void save_news()
-{
-	dbFILE *f;
-	static time_t lastwarn = 0;
-
-	if (!(f = open_db(Config.s_OperServ, Config.NewsDBName, "w", NEWS_VERSION)))
-		return;
-	SAFE(write_int16(News.size(), f));
-	for (unsigned i = 0; i < News.size(); i++) {
-		SAFE(write_int16(News[i]->type, f));
-		SAFE(write_int32(News[i]->num, f));
-		SAFE(write_string(News[i]->Text.c_str(), f));
-		SAFE(write_buffer(News[i]->who, f));
-		SAFE(write_int32(News[i]->time, f));
-	}
-	close_db(f);
-}
-
-#undef SAFE
 
 static void DisplayNews(User *u, NewsType Type)
 {
@@ -495,7 +407,6 @@ class OSNews : public Module
 
 	~OSNews()
 	{
-		save_news();
 	}
 
 	void OnOperServHelp(User *u)
@@ -521,14 +432,10 @@ class OSNews : public Module
 
 	void OnSaveDatabase()
 	{
-		/* This needs to be destroyed when new dbs are added... */
-		save_news();
 	}
 
 	void OnPostLoadDatabases()
 	{
-		/* This needs to be destroyed when new dbs are added... */
-		load_news();
 	}
 };
 

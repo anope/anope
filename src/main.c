@@ -139,20 +139,6 @@ void save_databases()
 	FOREACH_MOD(I_OnSaveDatabase, OnSaveDatabase())
 	if (debug)
 		alog("debug: Saving FFF databases");
-	backup_databases();
-	save_ns_dbase();
-	if (Config.PreNickDBName) {
-		save_ns_req_dbase();
-	}
-	save_cs_dbase();
-	if (Config.s_BotServ) {
-		save_bs_dbase();
-	}
-	if (Config.s_HostServ) {
-		save_hs_dbase();
-	}
-	save_os_dbase();
-	save_exceptions();
 }
 
 /*************************************************************************/

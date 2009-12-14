@@ -500,44 +500,7 @@ int init_secondary(int ac, char **av)
 	add_entropy_userkeys();
 
 	/* Load up databases */
-	load_ns_dbase();
-	if (debug)
-		alog("debug: Loaded %s database (1/%d)", Config.s_NickServ,
-		 (Config.PreNickDBName ? 7 : 6));
-	if (Config.s_HostServ) {
-		load_hs_dbase();
-		if (debug)
-		alog("debug: Loaded %s database (2/%d)", Config.s_HostServ,
-			 (Config.PreNickDBName ? 7 : 6));
-	} else if (debug) {
-		alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (Config.PreNickDBName ? 7 : 6));
-	}
-	if (Config.s_BotServ) {
-		load_bs_dbase();
-		if (debug)
-		alog("debug: Loaded %s database (3/%d)", Config.s_BotServ,
-			 (Config.PreNickDBName ? 7 : 6));
-	} else if (debug) {
-		alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (Config.PreNickDBName ? 7 : 6));
-	}
-	load_cs_dbase();
-	if (debug)
-		alog("debug: Loaded %s database (4/%d)", Config.s_ChanServ,
-		 (Config.PreNickDBName ? 7 : 6));
-	load_os_dbase();
-	if (debug)
-		alog("debug: Loaded %s database (5/%d)", Config.s_OperServ,
-		 (Config.PreNickDBName ? 7 : 6));
-	load_exceptions();
-	if (debug)
-		alog("debug: Loaded exception database (6/%d)",
-		 (Config.PreNickDBName ? 7 : 6));
-	if (Config.PreNickDBName) {
-		load_ns_req_db();
-		if (debug)
-		alog("debug: Loaded PreNick database (7/7)");
-	}
-	alog("Databases loaded");
+	//alog("Databases loaded");
 
 	// XXX: this is duplicated in type loading.
 	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)

@@ -49,8 +49,6 @@ E void bs_init();
 E void botserv(User *u, char *buf);
 E void botmsgs(User *u, BotInfo *bi, char *buf);
 E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
-E void load_bs_dbase();
-E void save_bs_dbase();
 E BotInfo *findbot(const char *nick);
 
 /** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
@@ -132,8 +130,6 @@ E void alpha_insert_chan(ChannelInfo * ci);
 E void reset_levels(ChannelInfo * ci);
 E void cs_init();
 E void chanserv(User * u, char *buf);
-E void load_cs_dbase();
-E void save_cs_dbase();
 E void expire_chans();
 E void cs_remove_nick(const NickCore * nc);
 
@@ -178,8 +174,6 @@ char *sockstrerror(int error);
 
 E ServerConfig Config;
 
-E void load_hs_dbase();
-E void save_hs_dbase();
 E int do_on_id(User * u);
 E void delHostCore(const char *nick);
 E void hostserv(User * u, char *buf);
@@ -424,10 +418,6 @@ E int should_mode_change(int16 status, int16 mode);
 
 E void ns_init();
 E void nickserv(User * u, char *buf);
-E void load_ns_dbase();
-E void load_ns_req_db();
-E void save_ns_dbase();
-E void save_ns_req_dbase();
 E int validate_user(User * u);
 E void cancel_user(User * u);
 E int nick_identified(User * u);
@@ -458,8 +448,6 @@ E void UnsetDefConParam(ChannelModeName);
 
 E void operserv(User *u, char *buf);
 E void os_init();
-E void load_os_dbase();
-E void save_os_dbase();
 
 E int add_akill(User *u, const char *mask, const char *by, const time_t expires, const char *reason);
 E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
@@ -562,8 +550,6 @@ E int do_session(User *u);
 E int add_session(const char *nick, const char *host, char *hostip);
 E void del_session(const char *host);
 
-E void load_exceptions();
-E void save_exceptions();
 E int do_exception(User *u);
 E void expire_exceptions();
 

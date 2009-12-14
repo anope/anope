@@ -18,8 +18,6 @@
 
 #define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
 
-void load_hs_dbase(dbFILE * f);
-
 HostCore *head = NULL;		  /* head of the HostCore list */
 
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
@@ -355,122 +353,7 @@ void delHostCore(const char *nick)
 /*************************************************************************/
 /*	End of Linked List routines					 */
 /*************************************************************************/
-/*************************************************************************/
-/*	Start of Load/Save routines					 */
-/*************************************************************************/
-#define SAFE(x) do {					\
-	if ((x) < 0) {					\
-	if (!forceload)					\
-		fatal("Read error on %s", Config.HostDBName);	\
-	failed = 1;					\
-	break;						\
-	}							\
-} while (0)
 
-void load_hs_dbase()
-{
-	dbFILE *f;
-	int ver;
-
-	if (!(f = open_db(Config.s_HostServ, Config.HostDBName, "r", HOST_VERSION))) {
-		return;
-	}
-	ver = get_file_version(f);
-
-	if (ver != 3) {
-		close_db(f);
-		fatal("DB %s is too old", Config.HostDBName);
-		return;
-	}
-
-	load_hs_dbase(f);
-	close_db(f);
-}
-
-void load_hs_dbase(dbFILE * f)
-{
-	int c;
-	int failed = 0;
-
-	char *nick;
-	char *vHost;
-	char *creator;
-	char *vIdent;
-	uint32 time;
-
-	while (!failed && (c = getc_db(f)) == 1) {
-		if (c == 1) {
-			SAFE(read_string(&nick, f));
-			SAFE(read_string(&vIdent, f));
-			SAFE(read_string(&vHost, f));
-			SAFE(read_string(&creator, f));
-			SAFE(read_int32(&time, f));
-
-			// Older Anope could save an empty vident when importing from MySQL, so trap that here.
-			if (vIdent && !strcmp(vIdent, ""))
-			{
-				delete [] vIdent;
-				vIdent = NULL;
-			}
-
-			addHostCore(nick, vIdent, vHost, creator, time);	/* could get a speed increase by not searching the list */
-			delete [] nick;		 /* as we know the db is in alphabetical order... */
-			delete [] vHost;
-			delete [] creator;
-			if (vIdent)
-				delete [] vIdent;
-		}
-		else
-		{
-			fatal("Invalid format in %s %d", Config.HostDBName, c);
-		}
-	}
-}
-
-#undef SAFE
-/*************************************************************************/
-#define SAFE(x) do {						\
-	if ((x) < 0) {						\
-	restore_db(f);						\
-	log_perror("Write error on %s", Config.HostDBName);		\
-	if (time(NULL) - lastwarn > Config.WarningTimeout) {		\
-		ircdproto->SendGlobops(NULL, "Write error on %s: %s", Config.HostDBName,	\
-			strerror(errno));			\
-		lastwarn = time(NULL);				\
-	}							\
-	return;							\
-	}								\
-} while (0)
-
-void save_hs_dbase()
-{
-	dbFILE *f;
-	static time_t lastwarn = 0;
-	HostCore *current;
-
-	if (!(f = open_db(Config.s_HostServ, Config.HostDBName, "w", HOST_VERSION)))
-		return;
-
-	current = head;
-	while (current != NULL) {
-		SAFE(write_int8(1, f));
-		SAFE(write_string(current->nick, f));
-		SAFE(write_string(current->vIdent, f));
-		SAFE(write_string(current->vHost, f));
-		SAFE(write_string(current->creator, f));
-		SAFE(write_int32(current->time, f));
-		current = current->next;
-	}
-	SAFE(write_int8(0, f));
-	close_db(f);
-
-}
-
-#undef SAFE
-
-/*************************************************************************/
-/*	End of Load/Save Functions					 */
-/*************************************************************************/
 /*************************************************************************/
 /*	Start of Generic Functions					 */
 /*************************************************************************/

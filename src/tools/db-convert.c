@@ -37,13 +37,13 @@ static std::string GetLevelName(int level)
 		case 7:
 			return "OPDEOP";
 		case 8:
-			return "ACCESS_LIST";
+			return "LIST";
 		case 9:
 			return "CLEAR";
 		case 10:
 			return "NOJOIN";
 		case 11:
-			return "ACCESS_CHANGE";
+			return "CHANGE";
 		case 12:	
 			return "MEMO";
 		case 13:
@@ -162,16 +162,14 @@ int main(int argc, char *argv[])
 
 	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.2+ database converter"C_NONE"\n\n");
 
-	hashm = "plain"; // XXX
-	/*
 	while (hashm != "md5" && hashm != "sha1" && hashm != "oldmd5" && hashm != "plain")
 	{
 		if (!hashm.empty())
-			std::cout << "Select a valid option, idiot. Thanks!" << std::endl;
+			std::cout << "Select a valid option, thanks!" << std::endl;
 		std::cout << "Which hash method did you use? (md5, sha1, oldmd5, plain)" << std::endl << "? ";
 		std::cin >> hashm;
 	}
-	*/
+	
 	while (ircd != "bahamut" && ircd != "charybdis" && ircd != "dreamforge" && ircd != "hybrid"
 				&& ircd != "inspircd" && ircd != "plexus2" && ircd != "plexus3" && ircd != "ptlink"
 				&& ircd != "rageircd" && ircd != "ratbox" && ircd != "shadowircd" && ircd != "solidircd"
@@ -440,16 +438,83 @@ int main(int argc, char *argv[])
 						fs << "MD LAST_QUIT :" << nc->last_quit << std::endl;
 					if ((na->status & NS_FORBIDDEN) || (na->status & NS_NO_EXPIRE)) 
 					{
-						fs << "MD FLAGS "
-							<< ((na->status & NS_FORBIDDEN) ? "FORBIDDEN " : "")
-							<< ((na->status & NS_NO_EXPIRE) ? "NOEXPIRE"   : "") << std::endl;
+						fs << "MD FLAGS"
+							<< ((na->status & NS_FORBIDDEN) ? " FORBIDDEN" : "")
+							<< ((na->status & NS_NO_EXPIRE) ? " NOEXPIRE"   : "") << std::endl;
 					}
 				}
 			}
 		}
 	}
-	/* Section II: Chans */
-	// IIa: First database
+
+
+	/* Section II: Bots */
+	/* IIa: First database */
+	if ((f = open_db_read("Botserv", "bot.db", 10))) {
+		std::string input;
+		int c, broken = 0;
+		int32 created;
+		int16 flags, chancount;
+		char *nick, *user, *host, *real;
+
+		std::cout << "Trying to convert bots..." << std::endl;
+
+		while (input != "y" && input != "n")
+		{
+			std::cout << std::endl << "Are you converting a 1.9.0 database? (y/n) " << std::endl << "? ";
+			std::cin >> input;
+		}
+		if (input == "y")
+			broken = 1;
+
+		while ((c = getc_db(f)) == 1) {
+			READ(read_string(&nick, f));
+			READ(read_string(&user, f));
+			READ(read_string(&host, f));
+			READ(read_string(&real, f));
+			SAFE(read_int16(&flags, f));
+			READ(read_int32(&created, f));
+			READ(read_int16(&chancount, f));
+
+			if (created == 0)
+				created = time(NULL); // Unfortunatley, we forgot to store the created bot time in 1.9.1+
+
+			/* fix for the 1.9.0 broken bot.db */
+			if (broken)
+			{
+				flags = 0;
+				if (!stricmp(nick, "ChanServ"))
+					flags |= BI_CHANSERV;
+				if (!stricmp(nick, "BotServ"))
+					flags |= BI_BOTSERV;
+				if (!stricmp(nick, "HostServ"))
+					flags |= BI_HOSTSERV;
+				if (!stricmp(nick, "OperServ"))
+					flags |= BI_OPERSERV;
+				if (!stricmp(nick, "MemoServ"))
+					flags |= BI_MEMOSERV;
+				if (!stricmp(nick, "NickServ"))
+					flags |= BI_NICKSERV;
+				if (!stricmp(nick, "Global"))
+					flags |= BI_GLOBAL;
+			} /* end of 1.9.0 broken database fix */
+			std::cout << "Writing Bot " << nick << "!" << user << "@" << host << std::endl;
+			fs << "BI " << nick << " " << user << " " << host << " " << created << " " << chancount << " :" << real << std::endl;
+			fs << "MD FLAGS"
+					<< (( flags & BI_PRIVATE  ) ? " PRIVATE"  : "" )
+					<< (( flags & BI_CHANSERV ) ? " CHANSERV" : "" )
+					<< (( flags & BI_BOTSERV  ) ? " BOTSERV"  : "" )
+					<< (( flags & BI_HOSTSERV ) ? " HOSTSERV" : "" )
+					<< (( flags & BI_OPERSERV ) ? " OPERSERV" : "" )
+					<< (( flags & BI_MEMOSERV ) ? " MEMOSERV" : "" )
+					<< (( flags & BI_NICKSERV ) ? " NICKSERV" : "" )
+					<< (( flags & BI_GLOBAL   ) ? " GLOBAL"   : "" ) << std::endl;
+		}
+		close_db(f);
+	}
+
+	/* Section III: Chans */
+	// IIIa: First database
 	if ((f = open_db_read("ChanServ", "chan.db", 16)))
 	{
 		ChannelInfo *ci, **last, *prev;
@@ -676,13 +741,6 @@ int main(int argc, char *argv[])
 		{
 			int j;
 
-		/*	commented because channels without founder can be forbidden
-			if (!ci->founder)
-			{
-				std::cout << "Skipping channel with no founder (wtf?)" << std::endl;
-				continue;
-			}*/
-
 			fs << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
 			fs << " " << ci->bantype << " " << ci->memos.memomax << std::endl;
 			if (ci->founder)
@@ -695,23 +753,23 @@ int main(int argc, char *argv[])
 				fs << " " << GetLevelName(j) << " " << ci->levels[j];
 			}
 			fs << std::endl;
-			fs << "MD FLAGS " 
-					<< ((ci->flags & CI_KEEPTOPIC     ) ? "KEEPTOPIC "     : "")
-					<< ((ci->flags & CI_SECUREOPS     ) ? "SECUREOPS "     : "")
-					<< ((ci->flags & CI_PRIVATE       ) ? "PRIVATE "       : "")
-					<< ((ci->flags & CI_TOPICLOCK     ) ? "TOPICLOCK "     : "")
-					<< ((ci->flags & CI_RESTRICTED    ) ? "RESTRICTED "    : "")
-					<< ((ci->flags & CI_PEACE         ) ? "PEACE "         : "")
-					<< ((ci->flags & CI_SECURE        ) ? "SECURE "        : "")
-					<< ((ci->flags & CI_FORBIDDEN     ) ? "FORBIDDEN "     : "")
-					<< ((ci->flags & CI_NO_EXPIRE     ) ? "NOEXPIRE "      : "")
-					<< ((ci->flags & CI_MEMO_HARDMAX  ) ? "MEMO_HARDMAX "  : "")
-					<< ((ci->flags & CI_OPNOTICE      ) ? "OPNOTICE "      : "")
-					<< ((ci->flags & CI_SECUREFOUNDER ) ? "SECUREFOUNDER " : "")
-					<< ((ci->flags & CI_SIGNKICK      ) ? "SIGNKICK "      : "")
-					<< ((ci->flags & CI_SIGNKICK_LEVEL) ? "SIGNKICKLEVEL " : "")
-					<< ((ci->flags & CI_XOP           ) ? "XOP "           : "")
-					<< ((ci->flags & CI_SUSPENDED     ) ? "SUSPENDED"      : "") << std::endl;
+			fs << "MD FLAGS" 
+					<< ((ci->flags & CI_KEEPTOPIC     ) ? " KEEPTOPIC"     : "")
+					<< ((ci->flags & CI_SECUREOPS     ) ? " SECUREOPS"     : "")
+					<< ((ci->flags & CI_PRIVATE       ) ? " PRIVATE"       : "")
+					<< ((ci->flags & CI_TOPICLOCK     ) ? " TOPICLOCK"     : "")
+					<< ((ci->flags & CI_RESTRICTED    ) ? " RESTRICTED"    : "")
+					<< ((ci->flags & CI_PEACE         ) ? " PEACE"         : "")
+					<< ((ci->flags & CI_SECURE        ) ? " SECURE"        : "")
+					<< ((ci->flags & CI_FORBIDDEN     ) ? " FORBIDDEN"     : "")
+					<< ((ci->flags & CI_NO_EXPIRE     ) ? " NOEXPIRE"      : "")
+					<< ((ci->flags & CI_MEMO_HARDMAX  ) ? " MEMO_HARDMAX"  : "")
+					<< ((ci->flags & CI_OPNOTICE      ) ? " OPNOTICE"      : "")
+					<< ((ci->flags & CI_SECUREFOUNDER ) ? " SECUREFOUNDER" : "")
+					<< ((ci->flags & CI_SIGNKICK      ) ? " SIGNKICK"      : "")
+					<< ((ci->flags & CI_SIGNKICK_LEVEL) ? " SIGNKICKLEVEL" : "")
+					<< ((ci->flags & CI_XOP           ) ? " XOP"           : "")
+					<< ((ci->flags & CI_SUSPENDED     ) ? " SUSPENDED"      : "") << std::endl;
 			if (ci->desc)
 				fs << "MD DESC :" << ci->desc << std::endl;
 			if (ci->url)
@@ -724,18 +782,18 @@ int main(int argc, char *argv[])
 				fs << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << std::endl;
 
 			for (j = 0; j < ci->accesscount; j++)
-			{  // MD CH access <display> <level> <last_seen>
+			{  // MD CH access <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2
 				if (ci->access[j].in_use)
 					fs << "MD ACCESS "
 						<< ci->access[j].nc->display << " " << ci->access[j].level << " " 
-						<< ci->access[j].last_seen << " " << std::endl;
+						<< ci->access[j].last_seen << " Unknown" << std::endl;
 			}
 
 			for (j = 0; j < ci->akickcount; j++)
 			{  // MD CH akick <USED/NOTUSED> <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
 				fs << "MD AKICK "
 					<< ((ci->akick[j].flags & AK_USED) ? "USED " : "NOTUSED ")
-					<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK" )
+					<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK " )
 					<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
 					<< ((ci->akick[j].flags & AK_ISNICK) ? ci->akick[j].u.nc->display : ci->akick[j].u.mask )
 					<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " :" << ci->akick[j].reason
@@ -754,22 +812,26 @@ int main(int argc, char *argv[])
 				process_mlock_modes(fs, ci->mlock_off, ircd);
 				fs << std::endl;
 			}
-			if (ci->mlock_limit)
-				fs << "MD MLP CMODE_LIMIT " << ci->mlock_limit << std::endl;
-			if (ci->mlock_key)
-				fs << "MD MLP CMODE_KEY " << ci->mlock_key << std::endl;
-			if (ci->mlock_flood)
-				fs << "MD MLP CMODE_FLOOD " << ci->mlock_flood << std::endl;
-			if (ci->mlock_redirect)
-				fs << "MD MLP CMODE_REDIRECT " << ci->mlock_redirect << std::endl;
-
+			if (ci->mlock_limit || ci->mlock_key || ci->mlock_flood || ci->mlock_redirect)
+			{
+				fs << "MD MLP";
+				if (ci->mlock_limit)
+					fs << " LIMIT" << ci->mlock_limit;
+				if (ci->mlock_key)
+					fs << " KEY" << ci->mlock_key;
+				if (ci->mlock_flood)
+					fs << " FLOOD" << ci->mlock_flood;
+				if (ci->mlock_redirect)
+					fs << " REDIRECT" << ci->mlock_redirect;
+				fs << std::endl;
+			}
 			if (ci->memos.memocount)
 			{
 				Memo *memos;
 				memos = ci->memos.memos;
 				for (j = 0; j < ci->memos.memocount; j++, memos++)
 				{
-					fs << "MD CI " << memos->number << " " << memos->flags << " " 
+					fs << "MD MI " << memos->number << " " << memos->flags << " " 
 						<< memos->time << " " << memos->sender << " :" << memos->text << std::endl;
 				}
 			}
@@ -779,21 +841,21 @@ int main(int argc, char *argv[])
 			if (ci->bi)  // here is "bi" a *Char, not a pointer to BotInfo !
 				fs << "MD BI NAME " << ci->bi << std::endl;
 			if (ci->botflags)
-				fs << "MD BI FLAGS "
-					<< (( ci->botflags & BS_DONTKICKOPS     ) ? "DONTKICKOPS "    : "" )
-					<< (( ci->botflags & BS_DONTKICKVOICES  ) ? "DONTKICKVOICES "  : "")
-					<< (( ci->botflags & BS_FANTASY         ) ? "FANTASY "         : "")
-					<< (( ci->botflags & BS_SYMBIOSIS       ) ? "SYMBIOSIS "       : "")
-					<< (( ci->botflags & BS_GREET           ) ? "GREET "           : "")
-					<< (( ci->botflags & BS_NOBOT           ) ? "NOBOT "           : "")
-					<< (( ci->botflags & BS_KICK_BOLDS      ) ? "KICK_BOLDS "      : "")
-					<< (( ci->botflags & BS_KICK_COLORS     ) ? "KICK_COLORS "     : "")
-					<< (( ci->botflags & BS_KICK_REVERSES   ) ? "KICK_REVERSES "   : "")
-					<< (( ci->botflags & BS_KICK_UNDERLINES ) ? "KICK_UNDERLINES " : "")
-					<< (( ci->botflags & BS_KICK_BADWORDS   ) ? "KICK_BADWORDS "   : "")
-					<< (( ci->botflags & BS_KICK_CAPS       ) ? "KICK_CAPS "       : "")
-					<< (( ci->botflags & BS_KICK_FLOOD      ) ? "KICK_FLOOD "      : "")
-					<< (( ci->botflags & BS_KICK_REPEAT     ) ? "KICK_REPEAT "     : "") << std::endl;
+				fs << "MD BI FLAGS"
+					<< (( ci->botflags & BS_DONTKICKOPS     ) ? " DONTKICKOPS"    : "" )
+					<< (( ci->botflags & BS_DONTKICKVOICES  ) ? " DONTKICKVOICES"  : "")
+					<< (( ci->botflags & BS_FANTASY         ) ? " FANTASY"         : "")
+					<< (( ci->botflags & BS_SYMBIOSIS       ) ? " SYMBIOSIS"       : "")
+					<< (( ci->botflags & BS_GREET           ) ? " GREET"           : "")
+					<< (( ci->botflags & BS_NOBOT           ) ? " NOBOT"           : "")
+					<< (( ci->botflags & BS_KICK_BOLDS      ) ? " KICK_BOLDS"      : "")
+					<< (( ci->botflags & BS_KICK_COLORS     ) ? " KICK_COLORS"     : "")
+					<< (( ci->botflags & BS_KICK_REVERSES   ) ? " KICK_REVERSES"   : "")
+					<< (( ci->botflags & BS_KICK_UNDERLINES ) ? " KICK_UNDERLINES" : "")
+					<< (( ci->botflags & BS_KICK_BADWORDS   ) ? " KICK_BADWORDS"   : "")
+					<< (( ci->botflags & BS_KICK_CAPS       ) ? " KICK_CAPS"       : "")
+					<< (( ci->botflags & BS_KICK_FLOOD      ) ? " KICK_FLOOD"      : "")
+					<< (( ci->botflags & BS_KICK_REPEAT     ) ? " KICK_REPEAT"     : "") << std::endl;
 			fs << "MD BI TTB";
 			fs << " BOLDS " << ci->ttb[0];
 			fs << " COLORS " << ci->ttb[1];
@@ -805,7 +867,7 @@ int main(int argc, char *argv[])
 			fs << " REPEAT " << ci->ttb[7];
 			fs << std::endl;
 			if (ci->capsmin)
-				fs << "MD BI CAPSMINS" << ci->capsmin << std::endl;
+				fs << "MD BI CAPSMINS " << ci->capsmin << std::endl;
 			if (ci->capspercent)
 				fs << "MD BI CAPSPERCENT " << ci->capspercent << std::endl;
 			if (ci->floodlines)
@@ -816,81 +878,16 @@ int main(int argc, char *argv[])
 				fs << "MD BI REPEATTIMES " << ci->repeattimes << std::endl;
 			for (j = 0; j < ci->bwcount; j++)
 			{
-				fs << "MD BI badword "
+				fs << "MD BI BADWORD "
 					<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
 					<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
 					<< (( ci->badwords[j].type == 3 ) ? "START "  : "" )
 					<< (( ci->badwords[j].type == 4 ) ? "END "    : "" )
-					<< " " << ci->badwords[j].word << std::endl;
+					<< ":" << ci->badwords[j].word << std::endl;
 			}
 
 		} /* for (chanlists[i]) */
 	} /* for (i) */
-
-	/* Section III: Bots */
-	/* IIIa: First database */
-	if ((f = open_db_read("Botserv", "bot.db", 10))) {
-		std::string input;
-		int c, broken = 0;
-		int32 created;
-		int16 flags, chancount;
-		char *nick, *user, *host, *real;
-
-		std::cout << "Trying to convert bots..." << std::endl;
-
-		while (input != "y" && input != "n")
-		{
-			std::cout << std::endl << "Are you converting an old 1.9.0 Database? (y/n) ? ";
-			std::cin >> input;
-		}
-		if (input == "y")
-			broken = 1;
-
-		while ((c = getc_db(f)) == 1) {
-			READ(read_string(&nick, f));
-			READ(read_string(&user, f));
-			READ(read_string(&host, f));
-			READ(read_string(&real, f));
-			SAFE(read_int16(&flags, f));
-			READ(read_int32(&created, f));
-			READ(read_int16(&chancount, f));
-
-			if (created == 0)
-				created = time(NULL); // Unfortunatley, we forgot to store the created bot time in 1.9.1+
-
-			/* fix for the 1.9.0 broken bot.db */
-			if (broken)
-			{
-				flags = 0;
-				if (!stricmp(nick, "ChanServ"))
-					flags |= BI_CHANSERV;
-				if (!stricmp(nick, "BotServ"))
-					flags |= BI_BOTSERV | BI_PRIVATE;
-				if (!stricmp(nick, "HostServ"))
-					flags |= BI_HOSTSERV | BI_PRIVATE;
-				if (!stricmp(nick, "OperServ"))
-					flags |= BI_OPERSERV | BI_PRIVATE;
-				if (!stricmp(nick, "MemoServ"))
-					flags |= BI_MEMOSERV | BI_PRIVATE;
-				if (!stricmp(nick, "NickServ")) 
-					flags |= BI_NICKSERV | BI_PRIVATE;
-				if (!stricmp(nick, "Global"))
-					flags |= BI_GLOBAL | BI_PRIVATE;
-			} /* end of 1.9.0 broken database fix */
-			std::cout << "Writing Bot " << nick << "!" << user << "@" << host << std::endl;
-			fs << "BI " << nick << " " << user << " " << host << " " << created << " " << chancount << " :" << real << std::endl;
-			fs << "MD FLAGS "
-					<< (( flags & BI_PRIVATE  ) ? "PRIVATE "  : "" )
-					<< (( flags & BI_CHANSERV ) ? "CHANSERV " : "" )
-					<< (( flags & BI_BOTSERV  ) ? "BOTSERV "  : "" )
-					<< (( flags & BI_HOSTSERV ) ? "HOSTSERV " : "" )
-					<< (( flags & BI_OPERSERV ) ? "OPERSERV " : "" )
-					<< (( flags & BI_MEMOSERV ) ? "MEMOSERV " : "" )
-					<< (( flags & BI_NICKSERV ) ? "NICKSERV " : "" )
-					<< (( flags & BI_GLOBAL   ) ? "GLOBAL "   : "" ) << std::endl;
-		}
-		close_db(f);
-	}
 
 	/* Section IV: Hosts */
 	/* IVa: First database */
@@ -907,9 +904,12 @@ int main(int argc, char *argv[])
 			READ(read_string(&vHost, f));
 			READ(read_string(&creator, f));
 			READ(read_int32(&time, f));
-			std::cout << "Writing vHost for " << nick << " (" << vIdent << "@" << vHost << ")" << std::endl;
+			if (vIdent)
+				std::cout << "Writing vHost for " << nick << " (" << vIdent << "@" << vHost << ")" << std::endl;
+			else
+				std::cout << "Writing vHost for " << nick << " (" << vHost << ")" << std::endl;
 			// because vIdent can sometimes be empty, we put it at the end of the list
-			fs << "HI " << nick << " " << creator << " " << time << " " << vHost << " " 
+			fs << "HI " << nick << " " << creator << " " << time << " " << vHost << " :" 
 										<< (vIdent ? vIdent : "") << std::endl;
 			free(nick); if (vIdent) free(vIdent); free(vHost); free(creator);
 		}

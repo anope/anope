@@ -18,7 +18,7 @@
 class CommandCSBan : public Command
 {
  public:
-	CommandCSBan() : Command("BAN", 2, 3)
+	CommandCSBan(const std::string &cname) : Command(cname, 2, 3)
 	{
 	}
 
@@ -162,7 +162,8 @@ class CSBan : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSBan());
+		this->AddCommand(CHANSERV, new CommandCSBan("BAN"));
+		this->AddCommand(CHANSERV, new CommandCSBan("KB"));
 		this->AddCommand(CHANSERV, new CommandCSUnban());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);

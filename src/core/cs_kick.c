@@ -18,7 +18,7 @@
 class CommandCSKick : public Command
 {
  public:
-	CommandCSKick() : Command("KICK", 2, 3)
+	CommandCSKick(const std::string& cname) : Command(cname, 2, 3)
 	{
 	}
 
@@ -100,7 +100,8 @@ class CSKick : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSKick());
+		this->AddCommand(CHANSERV, new CommandCSKick("KICK"));
+		this->AddCommand(CHANSERV, new CommandCSKick("K"));
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

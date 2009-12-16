@@ -165,18 +165,12 @@ void ratbox_cmd_pass(const char *pass)
 
 class RatboxProto : public IRCDTS6Proto
 {
-	void SendGlobopsInternal(const char *source, const char *buf)
+	void SendGlobopsInternal(BotInfo *source, const char *buf)
 	{
 		if (source)
-		{
-			BotInfo *bi = findbot(source);
-			if (bi)
-			{
-				send_cmd(bi->uid, "OPERWALL :%s", buf);
-				return;
-			}
-		}
-		send_cmd(TS6SID, "OPERWALL :%s", buf);
+			send_cmd(source->uid, "OPERWALL :%s", buf);
+		else
+			send_cmd(TS6SID, "OPERWALL :%s", buf);
 	}
 
 	void SendSQLine(const char *mask, const char *reason)
@@ -184,22 +178,22 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(TS6SID, "RESV * %s :%s", mask, reason);
 	}
 
-	void SendSGLineDel(const char *mask)
+	void SendSGLineDel(SXLine *sx)
 	{
 		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", mask);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", sx->mask);
 	}
 
-	void SendSGLine(const char *mask, const char *reason)
+	void SendSGLine(SXLine *sx)
 	{
 		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", sx->mask, sx->reason);
 	}
 
-	void SendAkillDel(const char *user, const char *host)
+	void SendAkillDel(Akill *ak)
 	{
 		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", user, host);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", ak->user, ak->host);
 	}
 
 	void SendSQLineDel(const char *user)
@@ -212,26 +206,15 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, user->uid.c_str());
 	}
 
-	/*
-	oper:		the nick of the oper performing the kline
-	target.server:	the server(s) this kline is destined for
-	duration:	the duration if a tkline, 0 if permanent.
-	user:		the 'user' portion of the kline
-	host:		the 'host' portion of the kline
-	reason:		the reason for the kline.
-	*/
-
-	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	void SendAkill(Akill *ak)
 	{
 		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(ak->expires - time(NULL)), ak->user, ak->host, ak->reason);
 	}
 
-	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		BotInfo *bi = findbot(source);
-		User *u = find_byuid(user);
-		send_cmd(bi ? bi->uid : source, "KILL %s :%s", u ? u->GetUID().c_str(): user, buf);
+		send_cmd(source ? source->uid : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -291,16 +274,15 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(TS6SID, "SVSMODE %s %s", u->nick, buf);
 	}
 
-	void SendKickInternal(BotInfo *bi, const char *chan, const char *user, const char *buf)
+	void SendKickInternal(BotInfo *bi, Channel *chan, User *user, const char *buf)
 	{
-		User *u = finduser(user);
-		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan, u ? u->GetUID().c_str() : user, buf);
-		else send_cmd(bi->uid, "KICK %s %s", chan, u ? u->GetUID().c_str() : user);
+		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan->name, user->GetUID().c_str(), buf);
+		else send_cmd(bi->uid, "KICK %s %s", chan->name, user->GetUID().c_str());
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
+		send_cmd(NULL, "NOTICE @%s :%s", dest->name, buf);
 	}
 
 	/* QUIT */
@@ -334,9 +316,9 @@ class RatboxProto : public IRCDTS6Proto
 		return 1;
 	}
 
-	void SendTopic(BotInfo *bi, const char *chan, const char *whosetit, const char *topic, time_t when)
+	void SendTopic(BotInfo *bi, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(bi->uid, "TOPIC %s :%s", chan, topic);
+		send_cmd(bi->uid, "TOPIC %s :%s", c->name, topic);
 	}
 
 	void SetAutoIdentificationToken(User *u)

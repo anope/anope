@@ -136,7 +136,8 @@ class ChanServTimer : public Timer
 			if (ci)
 				ci->UnsetFlag(CI_INHABIT);
 
-			ircdproto->SendPart(findbot(Config.s_ChanServ), channel.c_str(), NULL);
+			if (ci->c)
+				ircdproto->SendPart(findbot(Config.s_ChanServ), ci->c, NULL);
 		}
 };
 
@@ -722,7 +723,8 @@ int check_kick(User * user, const char *chan, time_t chants)
 	}
 
 	c->SetMode(NULL, CMODE_BAN, mask);
-	ircdproto->SendKick(whosends(ci), chan, user->nick, "%s", reason);
+	if (c)
+		ircdproto->SendKick(whosends(ci), c, user, "%s", reason);
 
 	return 1;
 }
@@ -793,11 +795,10 @@ void restore_topic(const char *chan)
 			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
-	ircdproto->SendTopic(whosends(ci), c->name, c->topic_setter,
-					c->topic ? c->topic : "", c->topic_time);
+	ircdproto->SendTopic(whosends(ci), c, c->topic_setter, c->topic ? c->topic : "");
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendPart(findbot(Config.s_ChanServ), c->name, NULL);
+			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
 		}
 	}
 }
@@ -856,12 +857,11 @@ int check_topiclock(Channel * c, time_t topic_time)
 		}
 	}
 
-	ircdproto->SendTopic(whosends(ci), c->name, c->topic_setter,
-					c->topic ? c->topic : "", c->topic_time);
+	ircdproto->SendTopic(whosends(ci), c, c->topic_setter, c->topic ? c->topic : "");
 
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendPart(findbot(Config.s_ChanServ), c->ci->name, NULL);
+			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
 		}
 	}
 	return 1;

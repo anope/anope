@@ -38,7 +38,7 @@ class CommandOSNOOP : public Command
 
 			snprintf(reason, sizeof(reason), "NOOP command used by %s", u->nick);
 			if (Config.WallOSNoOp)
-				ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick, server);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used NOOP on \2%s\2", u->nick, server);
 			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
 
 			/* Kill all the IRCops of the server */

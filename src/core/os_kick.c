@@ -27,6 +27,7 @@ class CommandOSKick : public Command
 		const char *argv[3];
 		const char *chan = params[0].c_str(), *nick = params[1].c_str(), *s = params[2].c_str();
 		Channel *c;
+		User *u2;
 
 		if (!(c = findchan(chan)))
 		{
@@ -38,11 +39,17 @@ class CommandOSKick : public Command
 			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 			return MOD_CONT;
 		}
-		ircdproto->SendKick(findbot(Config.s_OperServ), chan, nick, "%s (%s)", u->nick, s);
+		else if (!(u2 = finduser(nick)))
+		{
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			return MOD_CONT;
+		}
+
+		ircdproto->SendKick(findbot(Config.s_OperServ), c, u2, "%s (%s)", u->nick, s);
 		if (Config.WallOSKick)
-			ircdproto->SendGlobops(Config.s_OperServ, "%s used KICK on %s/%s", u->nick, nick, chan);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used KICK on %s/%s", u->nick, u2->nick, chan);
 		argv[0] = sstrdup(chan);
-		argv[1] = sstrdup(nick);
+		argv[1] = sstrdup(u2->nick);
 		argv[2] = sstrdup(s);
 		do_kick(Config.s_OperServ, 3, argv);
 		delete [] argv[2];

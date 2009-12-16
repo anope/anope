@@ -71,7 +71,7 @@ class CommandNSForbid : public Command
 				ircdproto->SendSQLine(na->nick, reason ? reason : "Forbidden");
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used FORBID on \2%s\2", u->nick, nick);
 
 			alog("%s: %s set FORBID for nick %s", Config.s_NickServ, u->nick, nick);
 			notice_lang(Config.s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);

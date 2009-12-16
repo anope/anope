@@ -54,12 +54,12 @@ class CommandOSClearModes : public Command
 			}
 
 			if (Config.WallOSClearmodes)
-				ircdproto->SendGlobops(Config.s_OperServ, "%s used CLEARMODES%s on %s", u->nick, all ? " ALL" : "", chan);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CLEARMODES%s on %s", u->nick, all ? " ALL" : "", chan);
 			if (all)
 			{
 				/* Clear mode +o */
 				if (ircd->svsmode_ucmode)
-					ircdproto->SendSVSModeChan(c->name, "-o", NULL);
+					ircdproto->SendSVSModeChan(c, "-o", NULL);
 				else
 				{
 					for (cu = c->users; cu; cu = next)
@@ -74,7 +74,7 @@ class CommandOSClearModes : public Command
 
 				/* Clear mode +v */
 				if (ircd->svsmode_ucmode)
-					ircdproto->SendSVSModeChan(c->name, "-v", NULL);
+					ircdproto->SendSVSModeChan(c, "-v", NULL);
 				else
 				{
 					for (cu = c->users; cu; cu = next)
@@ -91,7 +91,7 @@ class CommandOSClearModes : public Command
 				if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 				{
 					if (ircd->svsmode_ucmode)
-						ircdproto->SendSVSModeChan(c->name, "-h", NULL);
+						ircdproto->SendSVSModeChan(c, "-h", NULL);
 					else
 					{
 						for (cu = c->users; cu; cu = next)
@@ -112,7 +112,7 @@ class CommandOSClearModes : public Command
 					buf += cm->ModeChar;
 
 					if (ircd->svsmode_ucmode)
-						ircdproto->SendSVSModeChan(c->name, buf.c_str(), NULL);
+						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
 					else
 					{
 						for (cu = c->users; cu; cu = next)
@@ -133,7 +133,7 @@ class CommandOSClearModes : public Command
 					buf += cm->ModeChar;
 
 					if (ircd->svsmode_ucmode)
-						ircdproto->SendSVSModeChan(c->name, buf.c_str(), NULL);
+						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
 					else
 					{
 						for (cu = c->users; cu; cu = next)

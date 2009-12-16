@@ -1241,7 +1241,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				{
 					++opcnt;
 					if (Config.WallOper)
-						ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 is now an IRC operator.", user->nick);
 				}
 				else
 					--opcnt;

@@ -81,7 +81,7 @@ class CommandCSDrop : public Command
 		 */
 		if (Config.WallDrop) {
 			if ((level < ACCESS_FOUNDER) || (!IsRealFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER)))
-				ircdproto->SendGlobops(Config.s_ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
+				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
 		}
 
 		notice_lang(Config.s_ChanServ, u, CHAN_DROPPED, chan);

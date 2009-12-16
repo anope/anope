@@ -167,16 +167,16 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(const char *name, const char *nick)
+	void SendBanDel(Channel *c, const char *nick)
 	{
-		SendSVSModeChan(name, "-b", nick);
+		SendSVSModeChan(c, "-b", nick);
 	}
 
 	/* SVSMODE channel modes */
-	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
+	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", name, mode, nick);
-		else send_cmd(Config.ServerName, "SVSMODE %s %s", name, mode);
+		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name, mode, nick);
+		else send_cmd(Config.ServerName, "SVSMODE %s %s", c->name, mode);
 	}
 
 	/* SQLINE */
@@ -187,27 +187,27 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* UNSGLINE */
-	void SendSGLineDel(const char *mask)
+	void SendSGLineDel(SXLine *sx)
 	{
-		send_cmd(NULL, "UNSGLINE 0 :%s", mask);
+		send_cmd(NULL, "UNSGLINE 0 :%s", sx->mask);
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const char *mask)
+	void SendSZLineDel(SXLine *sx)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd(NULL, "UNSZLINE 0 %s", mask);
+		send_cmd(NULL, "UNSZLINE 0 %s", sx->mask);
 		/* this is how we are supposed to deal with it */
-		send_cmd(NULL, "RAKILL %s *", mask);
+		send_cmd(NULL, "RAKILL %s *", sx->mask);
 	}
 
 	/* SZLINE */
-	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	void SendSZLine(SXLine *sx)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd(NULL, "SZLINE %s :%s", mask, reason);
+		send_cmd(NULL, "SZLINE %s :%s", sx->mask, sx->reason);
 		/* this is how we are supposed to deal with it */
-		send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 172800, whom, static_cast<long>(time(NULL)), reason);
+		send_cmd(NULL, "AKILL %s * %d %s %ld :%s", sx->mask, 172800, sx->by, static_cast<long>(time(NULL)), sx->reason);
 	}
 
 	/* SVSNOOP */
@@ -217,21 +217,21 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SGLINE */
-	void SendSGLine(const char *mask, const char *reason)
+	void SendSGLine(SXLine *sx)
 	{
-		send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(mask)), mask, reason);
+		send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(sx->mask)), sx->mask, sx->reason);
 	}
 
 	/* RAKILL */
-	void SendAkillDel(const char *user, const char *host)
+	void SendAkillDel(Akill *ak)
 	{
-		send_cmd(NULL, "RAKILL %s %s", host, user);
+		send_cmd(NULL, "RAKILL %s %s", ak->host, ak->user);
 	}
 
 	/* TOPIC */
-	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
+		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name, whosetit, static_cast<unsigned long>(c->topic_time), topic);
 	}
 
 	/* UNSQLINE */
@@ -246,35 +246,20 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel);
 	}
 
-	/* AKILL
-	 * parv[1]=host
-	 * parv[2]=user
-	 * parv[3]=length
-	 * parv[4]=akiller
-	 * parv[5]=time set
-	 * parv[6]=reason
-	 */
-	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	void SendAkill(Akill *ak)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = expires - time(NULL);
+		time_t timeleft = ak->expires - time(NULL);
 		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, static_cast<int>(timeleft), who, static_cast<long>(time(NULL)), reason);
+		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", ak->host, ak->user, static_cast<int>(timeleft), ak->by, static_cast<long>(time(NULL)), ak->reason);
 	}
 
-	/* SVSKILL */
-	/* parv[0] = servername
-	 * parv[1] = client
-	 * parv[2] = nick stamp
-	 * parv[3] = kill message
-	 */
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		if (!source || !user || !buf) return;
-		send_cmd(source, "SVSKILL %s :%s", user, buf);
+		send_cmd(source ? source->nick : NULL, "SVSKILL %s :%s", user->nick, buf);
 	}
 
 	/* SVSMODE */
@@ -294,16 +279,16 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd(NULL, "BURST 0");
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
+		send_cmd(NULL, "NOTICE @%s :%s", dest->name, buf);
 	}
 
-	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
-		else send_cmd(source->nick, "KICK %s %s", chan, user);
+		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name, user->nick, buf);
+		else send_cmd(source->nick, "KICK %s %s", chan->name, user->nick);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)

@@ -134,7 +134,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 {
 	if (has_chghostmod != 1)
 	{
-		ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST not loaded!");
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST not loaded!");
 		return;
 	}
 
@@ -163,15 +163,15 @@ void inspircd_cmd_pass(const char *pass)
 
 class InspIRCdProto : public IRCDProto
 {
-	void SendAkillDel(const char *user, const char *host)
+	void SendAkillDel(Akill *ak)
 	{
 		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi->uid, "GLINE %s@%s", user, host);
+		send_cmd(bi->uid, "GLINE %s@%s", ak->user, ak->host);
 	}
 
-	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->uid, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
+		send_cmd(whosets->uid, "FTOPIC %s %lu %s :%s", c->name, static_cast<unsigned long>(c->topic_time), whosetit, topic);
 	}
 
 	void SendVhostDel(User *u)
@@ -187,21 +187,19 @@ class InspIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	void SendAkill(Akill *ak)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = expires - time(NULL);
-		if (timeleft > 172800 || !expires)
+		time_t timeleft = ak->expires - time(NULL);
+		if (timeleft > 172800 || !ak->expires)
 			timeleft = 172800;
 		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
+		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", ak->user, ak->host, ak->by, static_cast<long>(time(NULL)), static_cast<long>(timeleft), ak->reason);
 	}
 
-	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		BotInfo *bi = findbot(source);
-		User *u = finduser(user);
-		send_cmd(bi ? bi->uid : TS6SID, "KILL %s :%s", u ? u->GetUID().c_str(): user, buf);
+		send_cmd(source ? source->uid : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -236,18 +234,17 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", uid, static_cast<long>(time(NULL)), nick, host, host, user, static_cast<long>(time(NULL)), modes, real);
 	}
 
-	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		User *u = finduser(user);
 		if (buf)
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str(), buf);
+			send_cmd(source->uid, "KICK %s %s :%s", chan->name, user->GetUID().c_str(), buf);
 		else
-			send_cmd(source->uid, "KICK %s %s :%s", chan, u->GetUID().c_str(), user);
+			send_cmd(source->uid, "KICK %s %s :%s", chan->name, user->GetUID().c_str(), user->nick);
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		send_cmd(TS6SID, "NOTICE @%s :%s", dest, buf);
+		send_cmd(TS6SID, "NOTICE @%s :%s", dest->name, buf);
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
@@ -282,11 +279,11 @@ class InspIRCdProto : public IRCDProto
 
 	/* Functions that use serval cmd functions */
 
-	void SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	void SendVhost(User *u, const char *vIdent, const char *vhost)
 	{
 		if (vIdent)
-			inspircd_cmd_chgident(nick, vIdent);
-		inspircd_cmd_chghost(nick, vhost);
+			inspircd_cmd_chgident(u->nick, vIdent);
+		inspircd_cmd_chghost(u->nick, vhost);
 	}
 
 	void SendConnect()
@@ -303,7 +300,7 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (has_chgidentmod == 0)
 		{
-			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT not loaded!");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT not loaded!");
 		}
 		else
 		{
@@ -327,15 +324,15 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const char *mask)
+	void SendSZLineDel(SXLine *sx)
 	{
-		send_cmd(TS6SID, "DELLINE Z %s", mask);
+		send_cmd(TS6SID, "DELLINE Z %s", sx->mask);
 	}
 
 	/* SZLINE */
-	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	void SendSZLine(SXLine *sx)
 	{
-		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
+		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", sx->mask, sx->by, static_cast<long>(time(NULL)), sx->reason);
 	}
 
 	/* SVSMODE -r */
@@ -370,16 +367,12 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "ENDBURST");
 	}
 
-	void SendGlobopsInternal(const char *source, const char *buf)
+	void SendGlobopsInternal(BotInfo *source, const char *buf)
 	{
-		BotInfo *bi = findbot(source);
-		if (bi)
-		{
-			if (has_globopsmod)
-				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "SNONOTICE g :%s", buf);
-			else
-				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "SNONOTICE A :%s", buf);
-		}
+		if (has_globopsmod)
+			send_cmd(source ? source->uid : TS6SID, "SNONOTICE g :%s", buf);
+		else
+			send_cmd(source ? source->uid : TS6SID, "SNONOTICE A :%s", buf);
 	}
 
 	void SendAccountLogin(User *u, NickCore *account)
@@ -1079,18 +1072,18 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		}
 		if (!has_hidechansmod) {
 			send_cmd(NULL, "ERROR :m_hidechans.so is not loaded. This is required by Anope");
-			quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
+			quitmsg = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod) {
-			ircdproto->SendGlobops(Config.s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SVSHOLD missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chghostmod) {
-			ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chgidentmod) {
-			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT missing, Usage disabled until module is loaded.");
 		}
 		if (has_messagefloodmod) {
 			ModeManager::AddChannelMode('f', new ChannelModeFlood());

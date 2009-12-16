@@ -37,7 +37,7 @@ class CommandHSOn : public Command
 				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent, vHost);
 			else
 				notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, vHost);
-			ircdproto->SendVhost(u->nick, vIdent, vHost);
+			ircdproto->SendVhost(u, vIdent, vHost);
 			if (ircd->vhost)
 			{
 				if (u->vhost)

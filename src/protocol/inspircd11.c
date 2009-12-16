@@ -129,14 +129,14 @@ static int has_hidechansmod = 0;
 /* CHGHOST */
 void inspircd_cmd_chghost(const char *nick, const char *vhost)
 {
-	if (has_chghostmod == 1) {
-	if (!nick || !vhost) {
-		return;
+	if (has_chghostmod == 1)
+	{
+		if (!nick || !vhost)
+			return;
+		send_cmd(Config.s_OperServ, "CHGHOST %s %s", nick, vhost);
 	}
-	send_cmd(Config.s_OperServ, "CHGHOST %s %s", nick, vhost);
-	} else {
-	ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST not loaded!");
-	}
+	else 
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST not loaded!");
 }
 
 int anope_event_idle(const char *source, int ac, const char **av)
@@ -158,14 +158,14 @@ void inspircd_cmd_pass(const char *pass)
 
 class InspIRCdProto : public IRCDProto
 {
-	void SendAkillDel(const char *user, const char *host)
+	void SendAkillDel(Akill *ak)
 	{
-		send_cmd(Config.s_OperServ, "GLINE %s@%s", user, host);
+		send_cmd(Config.s_OperServ, "GLINE %s@%s", ak->user, ak->host);
 	}
 
-	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
+		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", c->name, static_cast<unsigned long>(c->topic_time), whosetit, topic);
 	}
 
 	void SendVhostDel(User *u)
@@ -181,19 +181,18 @@ class InspIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	void SendAkill(Akill *ak)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = expires - time(NULL);
+		time_t timeleft = ak->expires - time(NULL);
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd(Config.ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL)), static_cast<long>(timeleft), reason);
+		send_cmd(Config.ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", ak->user, ak->host, ak->by, static_cast<long>(time(NULL)), static_cast<long>(timeleft), ak->reason);
 	}
 
-	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		if (!buf || !source || !user) return;
-		send_cmd(source, "KILL %s :%s", user, buf);
+		send_cmd(source ? source->nick : Config.ServerName, "KILL %s :%s", user->nick, buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -230,16 +229,16 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(nick, "OPERTYPE Service");
 	}
 
-	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
-		else send_cmd(source->nick, "KICK %s %s :%s", chan, user, user);
+		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name, user->nick, buf);
+		else send_cmd(source->nick, "KICK %s %s :%s", chan->name, user->nick, user->nick);
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest, buf);
+		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest->name, buf);
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
@@ -277,11 +276,10 @@ class InspIRCdProto : public IRCDProto
 
 	/* Functions that use serval cmd functions */
 
-	void SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	void SendVhost(User *u, const char *vIdent, const char *vhost)
 	{
-		if (!nick) return;
-		if (vIdent) inspircd_cmd_chgident(nick, vIdent);
-		inspircd_cmd_chghost(nick, vhost);
+		if (vIdent) inspircd_cmd_chgident(u->nick, vIdent);
+		inspircd_cmd_chghost(u->nick, vhost);
 	}
 
 	void SendConnect()
@@ -302,7 +300,7 @@ class InspIRCdProto : public IRCDProto
 			}
 			send_cmd(Config.s_OperServ, "CHGIDENT %s %s", nick, vIdent);
 		} else {
-			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT not loaded!");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT not loaded!");
 		}
 	}
 
@@ -319,15 +317,15 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const char *mask)
+	void SendSZLineDel(SXLine *sx)
 	{
-		send_cmd(Config.s_OperServ, "ZLINE %s", mask);
+		send_cmd(Config.s_OperServ, "ZLINE %s", sx->mask);
 	}
 
 	/* SZLINE */
-	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	void SendSZLine(SXLine *sx)
 	{
-		send_cmd(Config.ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
+		send_cmd(Config.ServerName, "ADDLINE Z %s %s %ld 0 :%s", sx->mask, sx->by, static_cast<long>(time(NULL)), sx->reason);
 	}
 
 	/* SVSMODE +- */
@@ -905,13 +903,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod) {
-			ircdproto->SendGlobops(Config.s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SVSHOLD missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chghostmod) {
-			ircdproto->SendGlobops(Config.s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chgidentmod) {
-			ircdproto->SendGlobops(Config.s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT missing, Usage disabled until module is loaded.");
 		}
 		if (has_messagefloodmod) {
 			ModeManager::AddChannelMode('f', new ChannelModeFlood());

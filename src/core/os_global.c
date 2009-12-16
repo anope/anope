@@ -27,7 +27,7 @@ class CommandOSGlobal : public Command
 		const char *msg = params[0].c_str();
 
 		if (Config.WallOSGlobal)
-			ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 just used GLOBAL command.", u->nick);
 		oper_global(u->nick, "%s", msg);
 		return MOD_CONT;
 	}

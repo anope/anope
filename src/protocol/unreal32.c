@@ -174,14 +174,14 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(NULL, "f %s %s", server, set ? "+" : "-");
 	}
 
-	void SendAkillDel(const char *user, const char *host)
+	void SendAkillDel(Akill *ak)
 	{
-		send_cmd(NULL, "BD - G %s %s %s", user, host, Config.s_OperServ);
+		send_cmd(NULL, "BD - G %s %s %s", ak->user, ak->host, Config.s_OperServ);
 	}
 
-	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->nick, ") %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
+		send_cmd(whosets->nick, ") %s %s %lu :%s", c->name, whosetit, static_cast<unsigned long>(c->topic_time), topic);
 	}
 
 	void SendVhostDel(User *u)
@@ -191,24 +191,17 @@ class UnrealIRCdProto : public IRCDProto
 		u->SetMode(UMODE_CLOAK);
 	}
 
-	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	void SendAkill(Akill *ak)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = expires - time(NULL);
+		time_t timeleft = ak->expires - time(NULL);
 		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(NULL, "BD + G %s %s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL) + timeleft), static_cast<long>(when), reason);
+		send_cmd(NULL, "BD + G %s %s %s %ld %ld :%s", ak->user, ak->host, ak->by, static_cast<long>(time(NULL) + timeleft), static_cast<long>(ak->expires), ak->reason);
 	}
 
-	/*
-	** svskill
-	**	parv[0] = servername
-	**	parv[1] = client
-	**	parv[2] = kill message
-	*/
-	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		if (!source || !user || !buf) return;
-		send_cmd(source, "h %s :%s", user, buf);
+		send_cmd(source ? source->nick : Config.ServerName, "h %s :%s", user->nick, buf);
 	}
 
 	/*
@@ -246,16 +239,16 @@ class UnrealIRCdProto : public IRCDProto
 		SendSQLine(nick, "Reserved for services");
 	}
 
-	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "H %s %s :%s", chan, user, buf);
-		else send_cmd(source->nick, "H %s %s", chan, user);
+		if (buf) send_cmd(source->nick, "H %s %s :%s", chan->name, user->nick, buf);
+		else send_cmd(source->nick, "H %s %s", chan->name, user->nick);
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source->nick, "B @%s :%s", dest, buf);
+		send_cmd(source->nick, "B @%s :%s", dest->name, buf);
 	}
 
 	/* SERVER name hop descript */
@@ -321,11 +314,10 @@ class UnrealIRCdProto : public IRCDProto
 
 	/* Functions that use serval cmd functions */
 
-	void SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	void SendVhost(User *u, const char *vIdent, const char *vhost)
 	{
-		if (!nick) return;
-		if (vIdent) unreal_cmd_chgident(nick, vIdent);
-		unreal_cmd_chghost(nick, vhost);
+		if (vIdent) unreal_cmd_chgident(u->nick, vIdent);
+		unreal_cmd_chghost(u->nick, vhost);
 	}
 
 	void SendConnect()
@@ -356,48 +348,48 @@ class UnrealIRCdProto : public IRCDProto
 	/*
 	 * SVSNLINE - :realname mask
 	*/
-	void SendSGLineDel(const char *mask)
+	void SendSGLineDel(SXLine *sx)
 	{
-		send_cmd(NULL, "BR - :%s", mask);
+		send_cmd(NULL, "BR - :%s", sx->mask);
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const char *mask)
+	void SendSZLineDel(SXLine *sx)
 	{
-		send_cmd(NULL, "BD - Z * %s %s", mask, Config.s_OperServ);
+		send_cmd(NULL, "BD - Z * %s %s", sx->mask, Config.s_OperServ);
 	}
 
 	/* SZLINE */
-	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	void SendSZLine(SXLine *sx)
 	{
-		send_cmd(NULL, "BD + Z * %s %s %ld %ld :%s", mask, whom, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), reason);
+		send_cmd(NULL, "BD + Z * %s %s %ld %ld :%s", sx->mask, sx->by, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), sx->reason);
 	}
 
 	/* SGLINE */
 	/*
 	 * SVSNLINE + reason_where_is_space :realname mask with spaces
 	*/
-	void SendSGLine(const char *mask, const char *reason)
+	void SendSGLine(SXLine *sx)
 	{
 		char edited_reason[BUFSIZE];
-		strlcpy(edited_reason, reason, BUFSIZE);
+		strlcpy(edited_reason, sx->reason, BUFSIZE);
 		strnrepl(edited_reason, BUFSIZE, " ", "_");
-		send_cmd(NULL, "BR + %s :%s", edited_reason, mask);
+		send_cmd(NULL, "BR + %s :%s", edited_reason, sx->mask);
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(const char *name, const char *nick)
+	void SendBanDel(Channel *c, const char *nick)
 	{
-		SendSVSModeChan(name, "-b", nick);
+		SendSVSModeChan(c, "-b", nick);
 	}
 
 
 	/* SVSMODE channel modes */
 
-	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
+	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(Config.ServerName, "n %s %s %s", name, mode, nick);
-		else send_cmd(Config.ServerName, "n %s %s", name, mode);
+		if (nick) send_cmd(Config.ServerName, "n %s %s %s", c->name, mode, nick);
+		else send_cmd(Config.ServerName, "n %s %s", c->name, mode);
 	}
 
 	/* svsjoin

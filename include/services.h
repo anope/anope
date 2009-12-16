@@ -1319,17 +1319,17 @@ class ServerConfig;
 class CoreExport IRCDProto
 {
  private:
-		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
+		virtual void SendSVSKillInternal(BotInfo *, User *, const char *) = 0;
 		virtual void SendModeInternal(BotInfo *, const char *, const char *) = 0;
 		virtual void SendModeInternal(User *, const char *) = 0;
-		virtual void SendKickInternal(BotInfo *bi, const char *, const char *, const char *) = 0;
-		virtual void SendNoticeChanopsInternal(BotInfo *bi, const char *, const char *) = 0;
+		virtual void SendKickInternal(BotInfo *, Channel *, User *, const char *) = 0;
+		virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const char *) = 0;
 		virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf);
 		virtual void SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg);
 		virtual void SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf);
 		virtual void SendQuitInternal(BotInfo *bi, const char *buf);
-		virtual void SendPartInternal(BotInfo *bi, const char *chan, const char *buf);
-		virtual void SendGlobopsInternal(const char *source, const char *buf);
+		virtual void SendPartInternal(BotInfo *bi, Channel *chan, const char *buf);
+		virtual void SendGlobopsInternal(BotInfo *source, const char *buf);
 		virtual void SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf);
 		virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf);
 	public:
@@ -1337,23 +1337,23 @@ class CoreExport IRCDProto
 		virtual ~IRCDProto() { }
 
 		virtual void SendSVSNOOP(const char *, int) { }
-		virtual void SendAkillDel(const char *, const char *) = 0;
-		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
+		virtual void SendTopic(BotInfo *, Channel *, const char *, const char *) = 0;
 		virtual void SendVhostDel(User *) { }
-		virtual void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual void SendSVSKill(const char *source, const char *user, const char *fmt, ...);
+		virtual void SendAkill(Akill *) = 0;
+		virtual void SendAkillDel(Akill *) = 0;
+		virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendMode(User *u, const char *fmt, ...);
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid) = 0;
-		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...);
-		virtual void SendNoticeChanops(BotInfo *bi, const char *dest, const char *fmt, ...);
+		virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
+		virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);
 		virtual void SendMessage(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendNotice(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendAction(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendGlobalNotice(BotInfo *bi, const char *dest, const char *msg);
-		virtual void SendGlobalPrivmsg(BotInfo *bi, const char *dest, const char *msg);
+		virtual void SendGlobalNotice(BotInfo *bi, Server *dest, const char *msg);
+		virtual void SendGlobalPrivmsg(BotInfo *bi, Server *desc, const char *msg);
 
 		/** XXX: This is a hack for NickServ enforcers. It is deprecated.
 		 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
@@ -1366,23 +1366,23 @@ class CoreExport IRCDProto
 		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
 		virtual void SendSQLineDel(const char *) = 0;
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
-		virtual void SendPart(BotInfo *bi, const char *chan, const char *fmt, ...);
-		virtual void SendGlobops(const char *source, const char *fmt, ...);
+		virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
+		virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
 		virtual void SendSQLine(const char *, const char *) = 0;
 		virtual void SendSquit(const char *servname, const char *message);
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
-		virtual void SendForceNickChange(const char *oldnick, const char *newnick, time_t when);
-		virtual void SendVhost(const char *, const char *, const char *) { }
+		virtual void SendForceNickChange(User *u, const char *newnick, time_t when);
+		virtual void SendVhost(User *, const char *, const char *) { }
 		virtual void SendConnect() = 0;
 		virtual void SendSVSHold(const char *) { }
 		virtual void SendSVSHoldDel(const char *) { }
-		virtual void SendSGLineDel(const char *) { }
-		virtual void SendSZLineDel(const char *) { }
-		virtual void SendSZLine(const char *, const char *, const char *) { }
-		virtual void SendSGLine(const char *, const char *) { }
-		virtual void SendBanDel(const char *, const char *) { }
-		virtual void SendSVSModeChan(const char *, const char *, const char *) { }
+		virtual void SendSGLineDel(SXLine *) { }
+		virtual void SendSZLineDel(SXLine *) { }
+		virtual void SendSZLine(SXLine *) { }
+		virtual void SendSGLine(SXLine *) { }
+		virtual void SendBanDel(Channel *, const char *) { }
+		virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
 		virtual void SendUnregisteredNick(User *) { }
 		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...);
 		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }

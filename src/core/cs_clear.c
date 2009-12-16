@@ -68,18 +68,18 @@ class CommandCSClear : public Command
 
 			if (ircd->svsmode_ucmode) {
 				av[0] = chan;
-				ircdproto->SendSVSModeChan(av[0], "-o", NULL);
+				ircdproto->SendSVSModeChan(c, "-o", NULL);
 				if (owner) {
 					modebuf = '-';
 					modebuf += owner->ModeChar;
 
-					ircdproto->SendSVSModeChan(av[0], modebuf.c_str(), NULL);
+					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 				}
 				if (admin) {
 					modebuf = '-';
 					modebuf += admin->ModeChar;
 
-					ircdproto->SendSVSModeChan(av[0], modebuf.c_str(), NULL);
+					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 				}
 				for (cu = c->users; cu; cu = bnext)
 				{
@@ -159,7 +159,7 @@ class CommandCSClear : public Command
 				av[0] = sstrdup(chan);
 				av[1] = sstrdup(cu->user->nick);
 				av[2] = sstrdup(buf);
-				ircdproto->SendKick(whosends(ci), av[0], av[1], av[2]);
+				ircdproto->SendKick(whosends(ci), c, cu->user, av[2]);
 				do_kick(Config.s_ChanServ, 3, av);
 				delete [] av[2];
 				delete [] av[1];

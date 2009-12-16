@@ -79,7 +79,7 @@ class CommandNSSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SUSPEND on \2%s\2", u->nick, nick);
 
 			alog("%s: %s set SUSPEND for nick %s", Config.s_NickServ, u->nick, nick);
 			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
@@ -147,7 +147,7 @@ class CommandNSUnSuspend : public Command
 			na->nc->UnsetFlag(NI_SUSPENDED);
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used UNSUSPEND on \2%s\2", u->nick, nick);
 
 			alog("%s: %s set UNSUSPEND for nick %s", Config.s_NickServ, u->nick, nick);
 			notice_lang(Config.s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);

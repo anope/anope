@@ -95,7 +95,7 @@ private:
 
 		alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
 		if (Config.WallSetpass)
-			ircdproto->SendGlobops(Config.s_NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick, nc->display);
+			ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick, nc->display);
 		return MOD_CONT;
 	}
 

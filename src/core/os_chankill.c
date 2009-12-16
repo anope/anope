@@ -80,7 +80,7 @@ class CommandOSChanKill : public Command
 					check_akill(cu->user->nick, cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
 				}
 				if (Config.WallOSAkill)
-					ircdproto->SendGlobops(Config.s_OperServ, "%s used CHANKILL on %s (%s)", u->nick, channel, realreason);
+					ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CHANKILL on %s (%s)", u->nick, channel, realreason);
 			}
 			else
 				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel);

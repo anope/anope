@@ -105,11 +105,11 @@ class CommandCSAppendTopic : public Command
 					ircdproto->SendMode(NULL, c->name, "+o %s", Config.s_ChanServ);
 				}
 			}
-			ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic, c->topic_time);
+			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
 			if (ircd->join2set)
 			{
 				if (whosends(ci) == findbot(Config.s_ChanServ))
-					ircdproto->SendPart(findbot(Config.s_ChanServ), c->name, NULL);
+					ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
 			}
 		}
 		return MOD_CONT;

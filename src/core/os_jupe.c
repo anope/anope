@@ -41,7 +41,7 @@ class CommandOSJupe : public Command
 			ircdproto->SendServer(juped_server);
 
 			if (Config.WallOSJupe)
-				ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick, jserver);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used JUPE on \2%s\2", u->nick, jserver);
 		}
 		return MOD_CONT;
 	}

@@ -644,7 +644,7 @@ void bot_join(ChannelInfo * ci)
 		/* Should we be invited? */
 		if (ci->c->HasMode(CMODE_INVITE)
 			|| (limit && ci->c->usercount >= limit))
-			ircdproto->SendNoticeChanops(ci->bi, ci->c->name,
+			ircdproto->SendNoticeChanops(ci->bi, ci->c,
 				 "%s invited %s into the channel.",
 				 ci->bi->nick, ci->bi->nick);
 	}
@@ -708,7 +708,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 	av[0] = ci->name;
 	av[1] = u->nick;
 	av[2] = buf;
-	ircdproto->SendKick(ci->bi, av[0], av[1], "%s", av[2]);
+	ircdproto->SendKick(ci->bi, ci->c, u, "%s", av[2]);
 	do_kick(ci->bi->nick, 3, av);
 	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, buf));
 }
@@ -765,10 +765,9 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
 	/* Check if we need to do a signkick or not -GD */
 	if ((ci->HasFlag(CI_SIGNKICK) || ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK))
-		ircdproto->SendKick(ci->bi, kav[0], kav[1], "%s (%s)", kav[2],
-					   requester->nick);
+		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", kav[2], requester->nick);
 	else
-		ircdproto->SendKick(ci->bi, kav[0], kav[1], "%s", kav[2]);
+		ircdproto->SendKick(ci->bi, ci->c, u, "%s", kav[2]);
 
 	do_kick(ci->bi->nick, 3, kav);
 	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, kav[2]));
@@ -811,10 +810,9 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	}
 
 	if (ci->HasFlag(CI_SIGNKICK) || ((ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK)))
-		ircdproto->SendKick(ci->bi, av[0], av[1], "%s (%s)", av[2],
-					   requester->nick);
+		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", av[2], requester->nick);
 	else
-		ircdproto->SendKick(ci->bi, av[0], av[1], "%s", av[2]);
+		ircdproto->SendKick(ci->bi, ci->c, u, "%s", av[2]);
 	do_kick(ci->bi->nick, 3, av);
 	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, av[2]));
 }

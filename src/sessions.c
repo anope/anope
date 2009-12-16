@@ -163,7 +163,7 @@ int add_session(const char *nick, const char *host, char *hostip)
 				add_akill(NULL, akillmask, Config.s_OperServ,
 						  time(NULL) + Config.SessionAutoKillExpiry,
 						  "Session limit exceeded");
-				ircdproto->SendGlobops(Config.s_OperServ,
+				ircdproto->SendGlobops(findbot(Config.s_OperServ),
 								 "Added a temporary AKILL for \2%s\2 due to excessive connections",
 								 akillmask);
 			}
@@ -214,7 +214,7 @@ void del_session(const char *host)
 
 	if (!session) {
 		if (debug) {
-			ircdproto->SendGlobops(Config.s_OperServ,
+			ircdproto->SendGlobops(findbot(Config.s_OperServ),
 							 "WARNING: Tried to delete non-existant session: \2%s",
 							 host);
 			alog("session: Tried to delete non-existant session: %s",
@@ -261,7 +261,7 @@ void expire_exceptions()
 		if (exceptions[i].expires == 0 || exceptions[i].expires > now)
 			continue;
 		if (Config.WallExceptionExpire)
-			ircdproto->SendGlobops(Config.s_OperServ,
+			ircdproto->SendGlobops(findbot(Config.s_OperServ),
 							 "Session limit exception for %s has expired.",
 							 exceptions[i].mask);
 		delete [] exceptions[i].mask;

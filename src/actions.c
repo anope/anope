@@ -65,7 +65,7 @@ void kill_user(const char *source, const char *user, const char *reason)
 
 	snprintf(buf, sizeof(buf), "%s (%s)", source, reason);
 
-	ircdproto->SendSVSKill(source, user, buf);
+	ircdproto->SendSVSKill(findbot(source), finduser(user), buf);
 
 	if (!ircd->quitonkill && finduser(user)) {
 		do_kill(user, buf);
@@ -106,8 +106,7 @@ void sqline(char *mask, char *reason)
 						av[0] = c->name;
 						av[1] = cu->user->nick;
 						av[2] = reason;
-						ircdproto->SendKick(findbot(Config.s_OperServ), av[0], av[1],
-									   "Q-Lined: %s", av[2]);
+						ircdproto->SendKick(findbot(Config.s_OperServ), c, cu->user, "Q-Lined: %s", av[2]);
 						do_kick(Config.s_ChanServ, 3, av);
 					}
 				}
@@ -161,7 +160,7 @@ void common_unban(ChannelInfo * ci, char *nick)
 		ip = str_is_ip(host);
 
 	if (ircd->svsmode_unban)
-		ircdproto->SendBanDel(ci->name, nick);
+		ircdproto->SendBanDel(ci->c, nick);
 	else
 	{
 		for (ban = ci->c->bans->entries; ban; ban = next)

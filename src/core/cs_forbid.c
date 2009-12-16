@@ -85,13 +85,13 @@ class CommandCSForbid : public Command
 				av[0] = c->name;
 				av[1] = cu->user->nick;
 				av[2] = reason ? reason : getstring(cu->user->nc, CHAN_FORBID_REASON);
-				ircdproto->SendKick(findbot(Config.s_ChanServ), av[0], av[1], av[2]);
+				ircdproto->SendKick(findbot(Config.s_ChanServ), c, cu->user, av[2]);
 				do_kick(Config.s_ChanServ, 3, av);
 			}
 		}
 
 		if (Config.WallForbid)
-			ircdproto->SendGlobops(Config.s_ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick, ci->name);
+			ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used FORBID on channel \2%s\2", u->nick, ci->name);
 
 		if (ircd->chansqline)
 		{

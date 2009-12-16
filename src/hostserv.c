@@ -129,7 +129,7 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 
 	next = new HostCore;
 	if (next == NULL) {
-		ircdproto->SendGlobops(Config.s_HostServ,
+		ircdproto->SendGlobops(findbot(Config.s_HostServ),
 						 "Unable to allocate memory to create the vHost LL, problems i sense..");
 	} else {
 		next->nick = new char[strlen(nick) + 1];
@@ -139,7 +139,7 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 			next->vIdent = new char[strlen(vIdent) + 1];
 		if ((next->nick == NULL) || (next->vHost == NULL)
 			|| (next->creator == NULL)) {
-			ircdproto->SendGlobops(Config.s_HostServ,
+			ircdproto->SendGlobops(findbot(Config.s_HostServ),
 							 "Unable to allocate memory to create the vHost LL, problems i sense..");
 			return NULL;
 		}
@@ -148,7 +148,7 @@ HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
 		strlcpy(next->creator, creator, strlen(creator) + 1);
 		if (vIdent) {
 			if ((next->vIdent == NULL)) {
-				ircdproto->SendGlobops(Config.s_HostServ,
+				ircdproto->SendGlobops(findbot(Config.s_HostServ),
 								 "Unable to allocate memory to create the vHost LL, problems i sense..");
 				return NULL;
 			}
@@ -217,7 +217,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 
 	newCore = new HostCore;
 	if (newCore == NULL) {
-		ircdproto->SendGlobops(Config.s_HostServ,
+		ircdproto->SendGlobops(findbot(Config.s_HostServ),
 						 "Unable to allocate memory to insert into the vHost LL, problems i sense..");
 		return NULL;
 	} else {
@@ -228,7 +228,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 			newCore->vIdent = new char[strlen(vIdent) + 1];
 		if ((newCore->nick == NULL) || (newCore->vHost == NULL)
 			|| (newCore->creator == NULL)) {
-			ircdproto->SendGlobops(Config.s_HostServ,
+			ircdproto->SendGlobops(findbot(Config.s_HostServ),
 							 "Unable to allocate memory to create the vHost LL, problems i sense..");
 			return NULL;
 		}
@@ -237,7 +237,7 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
 		strlcpy(newCore->creator, creator, strlen(creator) + 1);
 		if (vIdent) {
 			if ((newCore->vIdent == NULL)) {
-				ircdproto->SendGlobops(Config.s_HostServ,
+				ircdproto->SendGlobops(findbot(Config.s_HostServ),
 								 "Unable to allocate memory to create the vHost LL, problems i sense..");
 				return NULL;
 			}
@@ -385,7 +385,7 @@ int do_on_id(User * u)
 		} else {
 			notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, vHost);
 		}
-		ircdproto->SendVhost(u->nick, vIdent, vHost);
+		ircdproto->SendVhost(u, vIdent, vHost);
 		if (ircd->vhost)
 		{
 			if (u->vhost)

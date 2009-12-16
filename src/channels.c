@@ -319,7 +319,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		ci->UnsetFlag(CI_PERSIST);
 		if (Config.s_BotServ && ci->bi && usercount == Config.BSMinUsers - 1)
-			ircdproto->SendPart(ci->bi, name, NULL);
+			ircdproto->SendPart(ci->bi, this, NULL);
 		if (!users)
 			delete this;
 	}
@@ -735,7 +735,7 @@ void chan_deluser(User * user, Channel * c)
 		return;
 
 	if (Config.s_BotServ && c->ci && c->ci->bi && c->usercount == Config.BSMinUsers - 1)
-		ircdproto->SendPart(c->ci->bi, c->name, NULL);
+		ircdproto->SendPart(c->ci->bi, c, NULL);
 
 	if (!c->users)
 		delete c;
@@ -1318,7 +1318,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				if (c->ci->bi)
 				{
 					/* This is ugly, but it always works */
-					ircdproto->SendPart(c->ci->bi, c->name, "TS reop");
+					ircdproto->SendPart(c->ci->bi, c, "TS reop");
 					bot_join(c->ci);
 				}
 				/* Make sure +r is set */
@@ -1425,7 +1425,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 
 			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(Config.s_OperServ), av[1], s, "Q-Lined");
+				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
@@ -1511,7 +1511,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 
 			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(Config.s_OperServ), av[1], s, "Q-Lined");
+				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
@@ -1586,7 +1586,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			}
 
 			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(Config.s_OperServ), av[1], s, "Q-Lined");
+				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 			} else {
 				if (!check_kick(user, av[1], ts)) {
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
@@ -1644,7 +1644,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 		}
 
 		if (is_sqlined && !is_oper(user)) {
-			ircdproto->SendKick(findbot(Config.s_OperServ), av[1], user->nick, "Q-Lined");
+			ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 		} else {
 			FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
@@ -2047,7 +2047,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 				if (chan->ci->bi)
 				{
 					/* This is ugly, but it always works */
-					ircdproto->SendPart(chan->ci->bi, chan->name, "TS reop");
+					ircdproto->SendPart(chan->ci->bi, chan, "TS reop");
 					bot_join(chan->ci);
 				}
 				/* Make sure +r is set */

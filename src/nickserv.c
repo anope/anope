@@ -367,7 +367,7 @@ void cancel_user(User * u)
 			}
 			else
 			{
-				ircdproto->SendSVSKill(Config.s_NickServ, u->nick, "Please do not use a registered nickname without identifying");
+				ircdproto->SendSVSKill(findbot(Config.s_NickServ), u, "Please do not use a registered nickname without identifying");
 			}
 			na->SetFlag(NS_KILL_HELD);
 		}
@@ -779,6 +779,10 @@ void collide(NickAlias * na, int from_timeout)
 
 	if (ircd->svsnick)
 	{
+		User *u = finduser(na->nick);
+		if (!u)
+			return;
+
 		/* We need to make sure the guestnick is free -- heinz */
 		do
 		{
@@ -787,7 +791,7 @@ void collide(NickAlias * na, int from_timeout)
 		}
 		while (finduser(guestnick));
 		notice_lang(Config.s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick);
-		ircdproto->SendForceNickChange(na->nick, guestnick, time(NULL));
+		ircdproto->SendForceNickChange(u, guestnick, time(NULL));
 		na->SetFlag(NS_GUESTED);
 	}
 	else

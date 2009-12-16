@@ -48,7 +48,7 @@ class CommandOSUMode : public Command
 			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(Config.s_OperServ, "\2%s\2 used UMODE on %s", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used UMODE on %s", u->nick, nick);
 		}
 		return MOD_CONT;
 	}

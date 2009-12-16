@@ -129,7 +129,7 @@ class CommandOSAKill : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(Config.s_OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick, mask, realreason, buf);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an AKILL for %s (%s) (%s)", u->nick, mask, realreason, buf);
 			}
 
 			if (readonly)

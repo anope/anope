@@ -246,7 +246,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	if (u)
 	{
-		ircdproto->SendGlobops(Config.s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s loaded module %s", u->nick, modname.c_str());
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
 
 		/* If a user is loading this module, then the core databases have already been loaded
@@ -276,7 +276,7 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 
 	if (u)
 	{
-		ircdproto->SendGlobops(Config.s_OperServ, "%s unloaded module %s", u->nick, m->name.c_str());
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s unloaded module %s", u->nick, m->name.c_str());
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
 

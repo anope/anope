@@ -550,7 +550,7 @@ class OSInfo : public Module
 		if (!(out = fopen(OSInfoDBName, "w")))
 		{
 			alog("os_info: ERROR: can not open the database file!");
-			ircdproto->SendGlobops(Config.s_OperServ, "os_info: ERROR: can not open the database file!");
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "os_info: ERROR: can not open the database file!");
 			ret = 1;
 		}
 		else

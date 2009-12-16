@@ -26,6 +26,7 @@ class CommandOSSVSNick : public Command
 	{
 		const char *nick = params[0].c_str();
 		ci::string newnick = params[1];
+		User *u2;
 
 		NickAlias *na;
 
@@ -52,7 +53,7 @@ class CommandOSSVSNick : public Command
 		}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
-		if (!finduser(nick))
+		if (!(u2 = finduser(nick)))
 			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else if (finduser(newnick.c_str()))
 			notice_lang(Config.s_OperServ, u, NICK_X_IN_USE, newnick.c_str());
@@ -61,8 +62,8 @@ class CommandOSSVSNick : public Command
 		else
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
-			ircdproto->SendGlobops(Config.s_OperServ, "%s used SVSNICK to change %s to %s", u->nick, nick, newnick.c_str());
-			ircdproto->SendForceNickChange(nick, newnick.c_str(), time(NULL));
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used SVSNICK to change %s to %s", u->nick, nick, newnick.c_str());
+			ircdproto->SendForceNickChange(u2, newnick.c_str(), time(NULL));
 		}
 		return MOD_CONT;
 	}

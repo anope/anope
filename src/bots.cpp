@@ -167,9 +167,9 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	if (ci->c && ci->c->usercount >= Config.BSMinUsers)
 	{
 		if (u)
-			ircdproto->SendPart(ci->bi, ci->name, "UNASSIGN from %s", u->nick);
+			ircdproto->SendPart(ci->bi, ci->c, "UNASSIGN from %s", u->nick);
 		else
-			ircdproto->SendPart(ci->bi, ci->name, "");
+			ircdproto->SendPart(ci->bi, ci->c, "");
 	}
 
 	ci->bi->chancount--;

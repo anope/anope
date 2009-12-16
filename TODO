@@ -27,21 +27,20 @@ Legend:
 [+] General options block, ability to turn LOGCHAN on from the config file..
 [x] Docs directory cleanup
 [x] Fix permanent channels support properly
+[x] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
+[x] Set forbidden channels +s
+[x] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
 
 Future
 ------
 [ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
-[ ] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
 [?] Remote identification (1.9.1? will this break stuff?)
-  [ ] Requires a rejig of how Alias vs Core works
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] Add support for +k, +q, etc type umodes
 [ ] burn do_sjoin with fire
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] add overridden form of SendGlobops accepting BotInfo
-[ ] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
-[ ] chan_set_modes should take BotInfo, possibly with override for User *?
 [ ] Language system is disgusting, it must die.
   [ ] Modules should also have a way to add strings programatically
   [ ] Should be able to add many strings by dropping a file in a set location.
@@ -55,7 +54,6 @@ Future
   [ ] Time added
   [ ] Time modified
   [ ] Expiry (useful?)
-[ ] Set forbidden channels +s
 [ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
   XXX: is SUSPEND overlapping with OS IGNORE functionality?
@@ -77,6 +75,5 @@ Future
 [ ] Method to list suspended/forbidden nicks/channels?
 [?] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
 [?] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
-[?] Review settings like NSModeOnID for whether they actually have a point existing (Rob says it does not - and that it should probably be a nickname setting)
 [?] OS INJECT
 [?] Drop CS SET ENTRYMSG, replace with a 'news' type system? (limited to a configured number of items, default 3)

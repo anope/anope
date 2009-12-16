@@ -311,8 +311,7 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 	slist_add(&akills, entry);
 
 	if (Config.AkillOnAdd)
-		ircdproto->SendAkill(entry->user, entry->host, entry->by, entry->seton,
-						entry->expires, entry->reason);
+		ircdproto->SendAkill(entry);
 
 	delete [] mask2;
 
@@ -336,16 +335,14 @@ int check_akill(const char *nick, const char *username, const char *host,
 			continue;
 		if (Anope::Match(username, ak->user, false)
 			&& Anope::Match(host, ak->host, false)) {
-			ircdproto->SendAkill(ak->user, ak->host, ak->by, ak->seton,
-							ak->expires, ak->reason);
+			ircdproto->SendAkill(ak);
 			return 1;
 		}
 		if (ircd->vhost) {
 			if (vhost) {
 				if (Anope::Match(username, ak->user, false)
 					&& Anope::Match(vhost, ak->host, false)) {
-					ircdproto->SendAkill(ak->user, ak->host, ak->by, ak->seton,
-									ak->expires, ak->reason);
+					ircdproto->SendAkill(ak);
 					return 1;
 				}
 			}
@@ -354,8 +351,7 @@ int check_akill(const char *nick, const char *username, const char *host,
 			if (ip) {
 				if (Anope::Match(username, ak->user, false)
 					&& Anope::Match(ip, ak->host, false)) {
-					ircdproto->SendAkill(ak->user, ak->host, ak->by, ak->seton,
-									ak->expires, ak->reason);
+					ircdproto->SendAkill(ak);
 					return 1;
 				}
 			}
@@ -381,7 +377,7 @@ void expire_akills()
 			continue;
 
 		if (Config.WallAkillExpire)
-			ircdproto->SendGlobops(Config.s_OperServ, "AKILL on %s@%s has expired",
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "AKILL on %s@%s has expired",
 							 ak->user, ak->host);
 		slist_delete(&akills, i);
 	}
@@ -392,7 +388,7 @@ static void free_akill_entry(SList * slist, void *item)
 	Akill *ak = static_cast<Akill *>(item);
 
 	/* Remove the AKILLs from all the servers */
-	ircdproto->SendAkillDel(ak->user, ak->host);
+	ircdproto->SendAkillDel(ak);
 
 	/* Free the structure */
 	delete [] ak->user;
@@ -510,7 +506,7 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 
 	slist_add(&sglines, entry);
 
-	ircdproto->SendSGLine(entry->mask, entry->reason);
+	ircdproto->SendSGLine(entry);
 
 	if (Config.KillonSGline && !ircd->sglineenforce) {
 		snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
@@ -544,9 +540,9 @@ int check_sgline(const char *nick, const char *realname)
 			continue;
 
 		if (Anope::Match(realname, sx->mask, false)) {
-			ircdproto->SendSGLine(sx->mask, sx->reason);
+			ircdproto->SendSGLine(sx);
 			/* We kill nick since s_sgline can't */
-			ircdproto->SendSVSKill(Config.ServerName, nick, "G-Lined: %s", sx->reason);
+			ircdproto->SendSVSKill(NULL, finduser(nick), "G-Lined: %s", sx->reason);
 			return 1;
 		}
 	}
@@ -569,7 +565,7 @@ void expire_sglines()
 			continue;
 
 		if (Config.WallSGLineExpire)
-			ircdproto->SendGlobops(Config.s_OperServ, "SGLINE on \2%s\2 has expired",
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SGLINE on \2%s\2 has expired",
 							 sx->mask);
 		slist_delete(&sglines, i);
 	}
@@ -580,7 +576,7 @@ static void free_sgline_entry(SList * slist, void *item)
 	SXLine *sx = static_cast<SXLine *>(item);
 
 	/* Remove the SGLINE from all the servers */
-	ircdproto->SendSGLineDel(sx->mask);
+	ircdproto->SendSGLineDel(sx);
 
 	/* Free the structure */
 	delete [] sx->mask;
@@ -789,7 +785,7 @@ void expire_sqlines()
 			continue;
 
 		if (Config.WallSQLineExpire)
-			ircdproto->SendGlobops(Config.s_OperServ, "SQLINE on \2%s\2 has expired",
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SQLINE on \2%s\2 has expired",
 							 sx->mask);
 
 		slist_delete(&sqlines, i);
@@ -908,7 +904,7 @@ int add_szline(User * u, const char *mask, const char *by, time_t expires,
 	entry->expires = expires;
 
 	slist_add(&szlines, entry);
-	ircdproto->SendSZLine(entry->mask, entry->reason, entry->by);
+	ircdproto->SendSZLine(entry);
 
 	return deleted;
 }
@@ -934,7 +930,7 @@ int check_szline(const char *nick, char *ip)
 		}
 
 		if (Anope::Match(ip, sx->mask, false)) {
-			ircdproto->SendSZLine(sx->mask, sx->reason, sx->by);
+			ircdproto->SendSZLine(sx);
 			return 1;
 		}
 	}
@@ -958,7 +954,7 @@ void expire_szlines()
 			continue;
 
 		if (Config.WallSZLineExpire)
-			ircdproto->SendGlobops(Config.s_OperServ, "SZLINE on \2%s\2 has expired",
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SZLINE on \2%s\2 has expired",
 							 sx->mask);
 		slist_delete(&szlines, i);
 	}
@@ -969,7 +965,7 @@ static void free_szline_entry(SList * slist, void *item)
 	SXLine *sx = static_cast<SXLine *>(item);
 
 	/* Remove the SZLINE from all the servers */
-	ircdproto->SendSZLineDel(sx->mask);
+	ircdproto->SendSZLineDel(sx);
 
 	/* Free the structure */
 	delete [] sx->mask;

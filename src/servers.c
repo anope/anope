@@ -458,7 +458,7 @@ void do_squit(const char *source, int ac, const char **av)
 	{
 		snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
 				 s->name);
-		ircdproto->SendGlobops(Config.s_OperServ, buf);
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), buf);
 	}
 
 	snprintf(buf, sizeof(buf), "%s %s", s->name,

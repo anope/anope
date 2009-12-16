@@ -589,7 +589,7 @@ class CommandCSSet : public Command
 				else if (ci->c)
 				{
 					if (Config.s_BotServ && ci->bi && ci->c->usercount == Config.BSMinUsers - 1)
-						ircdproto->SendPart(ci->bi, ci->c->name, NULL);
+						ircdproto->SendPart(ci->bi, ci->c, NULL);
 					if (!ci->c->users)
 						delete ci->c;
 

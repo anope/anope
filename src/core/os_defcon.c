@@ -37,7 +37,7 @@ class DefConTimeout : public Timer
 			Config.DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
 			alog("Defcon level timeout, returning to lvl %d", level);
-			ircdproto->SendGlobops(Config.s_OperServ, getstring(OPER_DEFCON_WALL), Config.s_OperServ, level);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), Config.s_OperServ, level);
 
 			if (Config.GlobalOnDefcon)
 			{
@@ -96,7 +96,7 @@ class CommandOSDEFCON : public Command
 		notice_lang(Config.s_OperServ, u, OPER_DEFCON_CHANGED, Config.DefConLevel);
 		defcon_sendlvls(u);
 		alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
-		ircdproto->SendGlobops(Config.s_OperServ, getstring(OPER_DEFCON_WALL), u->nick, newLevel);
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), u->nick, newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (Config.GlobalOnDefcon)
@@ -299,7 +299,7 @@ class OSDEFCON : public Module
 					char akillmask[BUFSIZE];
 					snprintf(akillmask, sizeof(akillmask), "*@%s", u->host);
 					add_akill(NULL, akillmask, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
-					ircdproto->SendGlobops(Config.s_OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
+					ircdproto->SendGlobops(findbot(Config.s_OperServ), "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
 				}
 			}
 		}

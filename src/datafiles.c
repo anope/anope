@@ -18,7 +18,6 @@
 #include <fcntl.h>
 
 static int curday = 0;
-static time_t lastwarn = 0;
 
 /*************************************************************************/
 
@@ -37,7 +36,7 @@ static void rename_database(const char *name, char *ext)
 	snprintf(destpath, sizeof(destpath), "backups/%s.%s", name, ext);
 	if (rename(name, destpath) != 0) {
 		alog("Backup of %s failed.", name);
-		ircdproto->SendGlobops(Config.s_OperServ, "WARNING! Backup of %s failed.",
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), "WARNING! Backup of %s failed.",
 						 name);
 	}
 }

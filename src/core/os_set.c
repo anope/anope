@@ -124,7 +124,7 @@ class CommandOSSet : public Command
 		{
 			alog("No longer sending log messages to a channel");
 			if (ircd->join2msg)
-				ircdproto->SendPart(findbot(Config.s_GlobalNoticer), Config.LogChannel, NULL);
+				ircdproto->SendPart(findbot(Config.s_GlobalNoticer), findchan(Config.LogChannel), NULL);
 			LogChan = false;
 			notice_lang(Config.s_OperServ, u, OPER_SET_LOGCHAN_OFF);
 		}
@@ -156,14 +156,14 @@ class CommandOSSet : public Command
 			u->isSuperAdmin = 1;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_ON);
 			alog("%s: %s is a SuperAdmin ", Config.s_OperServ, u->nick);
-			ircdproto->SendGlobops(Config.s_OperServ, getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick);
 		}
 		else if (setting == "OFF")
 		{
 			u->isSuperAdmin = 0;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_OFF);
 			alog("%s: %s is no longer a SuperAdmin", Config.s_OperServ, u->nick);
-			ircdproto->SendGlobops(Config.s_OperServ, getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick);
 		}
 		else
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_SYNTAX);

@@ -99,9 +99,9 @@ void notice_server(char *source, Server * s, const char *fmt, ...)
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
 		if (Config.NSDefFlags.HasFlag(NI_MSG)) {
-			ircdproto->SendGlobalPrivmsg(findbot(source), s->name, buf);
+			ircdproto->SendGlobalPrivmsg(findbot(source), s, buf);
 		} else {
-			ircdproto->SendGlobalNotice(findbot(source), s->name, buf);
+			ircdproto->SendGlobalNotice(findbot(source), s, buf);
 		}
 		va_end(args);
 	}

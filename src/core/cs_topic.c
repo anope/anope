@@ -61,9 +61,9 @@ class CommandCSTopic : public Command
 				ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
 				ircdproto->SendMode(NULL, c->name, "+o %s", Config.s_ChanServ);
 			}
-			ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic ? topic : "", c->topic_time);
+			ircdproto->SendTopic(whosends(ci), c, u->nick, topic ? topic : "");
 			if (ircd->join2set && whosends(ci) == findbot(Config.s_ChanServ))
-				ircdproto->SendPart(findbot(Config.s_ChanServ), c->name, NULL);
+				ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
 		}
 		return MOD_CONT;
 	}

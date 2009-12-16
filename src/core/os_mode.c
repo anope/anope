@@ -36,7 +36,7 @@ class CommandOSMode : public Command
 			c->SetModes(findbot(Config.s_OperServ), false, modes);
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(Config.s_OperServ, "%s used MODE %s on %s", u->nick, modes, chan);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used MODE %s on %s", u->nick, modes, chan);
 		}
 		return MOD_CONT;
 	}

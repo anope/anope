@@ -68,10 +68,10 @@ class CommandCSKick : public Command
 			if ((ci->HasFlag(CI_SIGNKICK))
 				|| ((ci->HasFlag(CI_SIGNKICK_LEVEL))
 					&& !check_access(u, ci, CA_SIGNKICK)))
-				ircdproto->SendKick(whosends(ci), ci->name, target, "%s (%s)",
+				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s (%s)",
 								 reason, u->nick);
 			else
-				ircdproto->SendKick(whosends(ci), ci->name, target, "%s", reason);
+				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s", reason);
 			av[0] = ci->name;
 			av[1] = target;
 			av[2] = reason;

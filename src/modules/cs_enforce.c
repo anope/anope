@@ -121,7 +121,7 @@ class CommandCSEnforce : public Command
 				get_idealban(ci, u, mask, sizeof(mask));
 				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
-				ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
+				ircdproto->SendKick(whosends(ci), ci->c, u, "%s", reason);
 				av[0] = ci->name;
 				av[1] = u->nick;
 				av[2] = reason;
@@ -162,7 +162,7 @@ class CommandCSEnforce : public Command
 				{
 					c->SetMode(NULL, CMODE_BAN, mask);
 				}
-				ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
+				ircdproto->SendKick(whosends(ci), ci->c, u, "%s", reason);
 				av[0] = ci->name;
 				av[1] = u->nick;
 				av[2] = reason;

@@ -9,7 +9,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2679"
+VERSION_BUILD="2707"
 
 # $Log$ # Changes since 1.8.2 Release
 #Revision 2679 - Fixed bug #1106 - Anope now keeps track of users cloaked hosts as well as virtual host and will use both in matching for things

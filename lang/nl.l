@@ -1657,9 +1657,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN kanaal
+	UNBAN kanaal [nick]
 CHAN_UNBANNED
 	Bans met betrekking tot jou op %s zijn opgeheven.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -4998,10 +5000,10 @@ CHAN_HELP_INVITE
 	niveau 5 of hoger op het kanaal.
 
 CHAN_HELP_UNBAN
-	Gebruik: UNBAN kanaal
+	Gebruik: UNBAN kanaal [nick]
 	
-	Zorgt ervoor dat %S alle bans verwijdert die je ervan
-	belemmeren het gegeven kanaal te joinen.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 	
 	Standaard is dit gelimiteerd tot AOPs of degenen met
 	niveau 5 of hoger op het kanaal.

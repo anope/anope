@@ -2,6 +2,7 @@ Anope Version 1.9.2
 --------------------
 A K alias to chanserv kick command
 A KB alias to chanserv ban command
+F Unban command to accept an optional nick arg
 
 Anope Version 1.9.1
 --------------------

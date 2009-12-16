@@ -105,54 +105,6 @@ class CommandCSBan : public Command
 };
 
 
-
-class CommandCSUnban : public Command
-{
- public:
-	CommandCSUnban() : Command("UNBAN", 1, 1)
-	{
-
-	}
-
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
-	{
-		const char *chan = params[0].c_str();
-		Channel *c;
-		ChannelInfo *ci;
-
-		if (!(c = findchan(chan)))
-		{
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-			return MOD_CONT;
-		}
-
-		ci = c->ci;
-
-		if (!check_access(u, ci, CA_UNBAN))
-		{
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
-		common_unban(ci, u->nick);
-		notice_lang(Config.s_ChanServ, u, CHAN_UNBANNED, chan);
-		return MOD_CONT;
-	}
-
-	bool OnHelp(User *u, const ci::string &subcommand)
-	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_UNBAN);
-		return true;
-	}
-
-	void OnSyntaxError(User *u, const ci::string &subcommand)
-	{
-		syntax_error(Config.s_ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
-	}
-};
-
-
-
 class CSBan : public Module
 {
  public:
@@ -163,14 +115,12 @@ class CSBan : public Module
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSBan("BAN"));
 		this->AddCommand(CHANSERV, new CommandCSBan("KB"));
-		this->AddCommand(CHANSERV, new CommandCSUnban());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
 	void OnChanServHelp(User *u)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_BAN);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_UNBAN);
 	}
 };
 

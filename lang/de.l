@@ -1675,9 +1675,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN Channel
+	UNBAN Channel [nick]
 CHAN_UNBANNED
 	Dein Ban in %s wurde entfernt.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # CLEAR responses
 CHAN_TOPIC_SYNTAX
@@ -4273,7 +4275,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Ändert den Topic des angegebenen Channels
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Enfernt ein ban(s) die dich betreffen aus einen Channel
+	    UNBAN      Remove all bans preventing a user from entering a channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Gibt den angegebenen User Voice-Status in einen Channel
 CHAN_HELP_CMD_VOP
@@ -5101,13 +5103,14 @@ CHAN_HELP_INVITE
 	(oder INVITE) hat.
 
 CHAN_HELP_UNBAN
-	Syntax: UNBAN Channel
+	Syntax: UNBAN Channel [nick]
 	
-	Durch %S werden alle Bans entfernt, die dich am joinen
-	des Channels hindern. Eine Vorraussetzung dafür ist
-	allerdings, dass dein Level in dem Channel grösser als
-	5 (oder UNBAN)ist.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 	
+	By default, limited to AOPs or those with level 5 and above
+	on the channel.
+
 CHAN_HELP_KICK
 	Syntax: KICK Channel Nickname [Grund]
 	

@@ -1670,9 +1670,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN κανάλι
+	UNBAN κανάλι [nick]
 CHAN_UNBANNED
 	γινες unban από το %s.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -4228,7 +4230,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Manipulate the topic of the specified channel
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Remove all bans preventing a user from entering a channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Voices a selected nick on a channel
 CHAN_HELP_CMD_VOP
@@ -5008,9 +5010,10 @@ CHAN_HELP_INVITE
 	παραπάνω στο κανάλι.
 	
 CHAN_HELP_UNBAN
-	Σύνταξη: UNBAN κανάλι
+	Σύνταξη: UNBAN κανάλι [nick]
 	
-	Ζητάει από τον %S να αφαιρέσει όλα τα bans ανάλογα για ποιο κανάλι του ζητάς.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 	    
 	Από default, χρησιμοποιείται από τους AOPs ή αυτούς που έχουν level 5 και
 	παραπάνω στο κανάλι.

@@ -2158,10 +2158,13 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN kana³
+	UNBAN kana³ [nick]
 
 CHAN_UNBANNED
 	Ban na kanale %s zosta³ zdjêty.
+
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -5186,7 +5189,7 @@ CHAN_HELP_CMD_TOPIC
 	    TOPIC       Zmienia temat podanego kana³u
 
 CHAN_HELP_CMD_UNBAN
-	    UNBAN       Usuwa wszystkie bany blokuj±ce wej¶cie na kana³
+	    UNBAN       Remove all bans preventing a user from entering a channel
 
 CHAN_HELP_CMD_VOICE
 	    VOICE       Nadaje wskazanej osobie prawo g³osu
@@ -6020,11 +6023,10 @@ CHAN_HELP_INVITE
 	dostêpu 5 lub wy¿szy.
 
 CHAN_HELP_UNBAN
-	Sk³adnia: UNBAN kana³
+	Sk³adnia: UNBAN kana³ [nick]
 	
-	Sprawia, ¿e %S zdejmie wszystkie bany, które
-	uniemo¿liwiaj± wydaj±cemu komendê wej¶cie na
-	wskazany kana³.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 	
 	Standardowo ta komenda jest dostêpna dla u¿ytkowników
 	wpisanych na listê AOP lub posiadaj±cych poziom

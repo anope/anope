@@ -1664,9 +1664,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN kanaladý
+	UNBAN kanaladý [name]
 CHAN_UNBANNED
 	%s kanalýndaki banýnýz kaldýrýldý.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -4218,7 +4220,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Manipulate the topic of the specified channel
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Remove all bans preventing a user from entering a channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Voices a selected nick on a channel
 CHAN_HELP_CMD_VOP
@@ -4977,10 +4979,10 @@ CHAN_HELP_INVITE
 	üzeri olanlar kullanabilir.
 
 CHAN_HELP_UNBAN
-	Kullanýmý: UNBAN kanaladý
+	Kullanýmý: UNBAN kanaladý [nick]
 	
-	%S'e sizin kanala girmenizi engelleyen tüm banlarý kaldýrmasýný
-	söyler.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 
 	Varsayýlan olarak, AOP lar ile 5 ve üzeri access seviyesi olanlar
 	kullanabilir.

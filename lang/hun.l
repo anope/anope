@@ -1664,9 +1664,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN válaszok
 CHAN_UNBAN_SYNTAX
-	UNBAN #szoba
+	UNBAN #szoba [nick]
 CHAN_UNBANNED
 	%s csatornán a tiltást levetetted magadról.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC válaszok
 CHAN_TOPIC_SYNTAX
@@ -4150,7 +4152,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Manipulate the topic of the specified channel
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Remove all bans preventing a user from entering a channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Voices a selected nick on a channel
 CHAN_HELP_CMD_VOP
@@ -4948,10 +4950,10 @@ CHAN_HELP_INVITE
 	kell rendelkezned a csatornán, hogy használhasd.
 	
 CHAN_HELP_UNBAN
-	Syntax: UNBAN #szoba
+	Syntax: UNBAN #szoba [nick]
 	
-	A %S leveszi rólad a kitiltást és szabadon
-	beléphetsz a csatonára.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 	
 	Alapbeállítás szerint, min. AOP vagy 5-ös access szinttel
 	kell rendelkezned, hogy használhasd.	

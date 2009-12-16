@@ -1668,9 +1668,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN canal
+	UNBAN canal [nick]
 CHAN_UNBANNED
 	Has estat desbanegat de %s.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -4238,7 +4240,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Manipulate the topic of the specified channel
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Remove all bans preventing a user from entering a channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Voices a selected nick on a channel
 CHAN_HELP_CMD_VOP
@@ -5061,10 +5063,10 @@ CHAN_HELP_INVITE
 	i major en el canal.
 
 CHAN_HELP_UNBAN
-	Sintàxi: UNBAN canal
+	Sintàxi: UNBAN canal [nick]
 	
-	Li diu a %S que esborri tots els bans que no permeten que 
-	entris al canal donat.
+	Tells %S to remove all bans preventing you or the given
+	user from entering the given channel.
 	
 	Per defecte, limitat a AOPs o aquells amb nivell 5
 	i major en el canal.

@@ -1637,9 +1637,11 @@ CHAN_INVITE_SUCCESS
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX
-	UNBAN #канал
+	UNBAN #канал [nick]
 CHAN_UNBANNED
 	Вы были разбанены на канале %s.
+CHAN_UNBANNED_OTHER
+	%s has been unbanned from %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -4166,7 +4168,7 @@ CHAN_HELP_CMD_OP
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Установка топика на канале посредством сервисов
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Удаление на канале всех банов, которые не позволяют вам войти
+	    UNBAN      Remove all bans preventing a user from entering a channel
 CHAN_HELP_CMD_VOICE
 	    VOICE      Установка статуса войса (+v) указанному нику на канале
 CHAN_HELP_CMD_VOP
@@ -5008,10 +5010,10 @@ CHAN_HELP_INVITE
 	лицами с уровнем доступа 5 и выше.
 
 CHAN_HELP_UNBAN
-	Синтаксис: UNBAN #канал
+	Синтаксис: UNBAN #канал [nick]
 	
-	Посылает %S запрос на удаление с указанного канала всех банов,
-	которые не позволяют вам на него (канал) зайти.
+	Remove all bans preventing a user from entering a channel
+	user from entering the given channel.
 	
 	По-умолчанию,  данная команда может быть использована AOP'ами
 	или лицами с уровнем доступа 5 и выше.

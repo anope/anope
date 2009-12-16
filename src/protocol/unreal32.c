@@ -586,17 +586,20 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (ac < 2)
 		return MOD_CONT;
 
-	/* When a server sends a mode string it is appended with a timestamp
-	 * we don't need it
-	 */
-	if (findserver(servlist, source))
-		--ac;
 	if (*av[0] == '#' || *av[0] == '&') {
 		do_cmode(source, ac, av);
 	} else {
 		do_umode(source, ac, av);
 	}
 	return MOD_CONT;
+}
+
+/* This is used to strip the TS from the end of the mode stirng */
+int anope_event_gmode(const char *source, int ac, const char **av)
+{
+        if (findserver(servlist, source))
+                --ac;
+        return anope_event_mode(source, ac, av);
 }
 
 /* Unreal sends USER modes with this */
@@ -983,7 +986,7 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
 	m = createMessage(".",		anope_event_kill); addCoreMessage(IRCD,m);
 	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("G",		anope_event_mode); addCoreMessage(IRCD,m);
+	m = createMessage("G",		anope_event_gmode); addCoreMessage(IRCD,m);
 	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
 	m = createMessage("F",		anope_event_motd); addCoreMessage(IRCD,m);
 	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);

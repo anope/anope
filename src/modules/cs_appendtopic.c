@@ -102,7 +102,7 @@ class CommandCSAppendTopic : public Command
 				if (whosends(ci) == findbot(Config.s_ChanServ))
 				{
 					ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
-					ircdproto->SendMode(NULL, c->name, "+o %s", Config.s_ChanServ);
+					ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ);
 				}
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);

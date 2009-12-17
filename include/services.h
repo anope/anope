@@ -1320,8 +1320,8 @@ class CoreExport IRCDProto
 {
  private:
 		virtual void SendSVSKillInternal(BotInfo *, User *, const char *) = 0;
-		virtual void SendModeInternal(BotInfo *, const char *, const char *) = 0;
-		virtual void SendModeInternal(User *, const char *) = 0;
+		virtual void SendModeInternal(BotInfo *, Channel *, const char *) = 0;
+		virtual void SendModeInternal(BotInfo *, User *, const char *) = 0;
 		virtual void SendKickInternal(BotInfo *, Channel *, User *, const char *) = 0;
 		virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const char *) = 0;
 		virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf);
@@ -1343,8 +1343,8 @@ class CoreExport IRCDProto
 		virtual void SendAkillDel(Akill *) = 0;
 		virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
 		virtual void SendSVSMode(User *, int, const char **) = 0;
-		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendMode(User *u, const char *fmt, ...);
+		virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
+		virtual void SendMode(BotInfo *bi, User *u, const char *fmt, ...);
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid) = 0;
 		virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
 		virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);

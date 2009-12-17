@@ -204,7 +204,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		this->SendModeInternal(u, merge_args(ac, av));
+		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -217,16 +217,15 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "UID %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 	}
 
-	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		Channel *c = findchan(dest);
-		send_cmd(source ? source->uid : TS6SID, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
+		send_cmd(source ? source->uid : TS6SID, "FMODE %s %u %s", dest->name, static_cast<unsigned>(dest->creation_time), buf);
 	}
 
-	void SendModeInternal(User *u, const char *buf)
+	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(findbot(Config.s_NickServ)->uid, "MODE %s %s", u->GetUID().c_str(), buf);
+		send_cmd(bi ? bi->uid : TS6SID, "MODE %s %s", u->GetUID().c_str(), buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
@@ -338,7 +337,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSMODE -r */
 	void SendUnregisteredNick(User *u)
 	{
-		u->RemoveMode(UMODE_REGISTERED);
+		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -398,7 +397,7 @@ class InspIRCdProto : public IRCDProto
 		if (!u->nc)
 			return;
 
-		u->SetMode(UMODE_REGISTERED);
+		u->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
 } ircd_proto;
@@ -839,7 +838,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	{
 		validate_user(user);
 		if (user->HasMode(UMODE_REGISTERED))
-			user->RemoveMode(UMODE_REGISTERED);
+			user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 	user = NULL;
 
@@ -1125,7 +1124,7 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	{
 		validate_user(u);
 		if (u->HasMode(UMODE_REGISTERED))
-			u->RemoveMode(UMODE_REGISTERED);
+			u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
 	alog("Processed ENDBURST for %s", s->name);

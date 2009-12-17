@@ -506,68 +506,75 @@ void User::RemoveModeInternal(UserMode *um)
 }
 
 /** Set a mode on the user
+ * @param bi The client setting the mode
  * @param um The user mode
  * @param Param Optional param for the mode
  */
-void User::SetMode(UserMode *um, const std::string &Param)
+void User::SetMode(BotInfo *bi, UserMode *um, const std::string &Param)
 {
 	if (!um)
 		return;
 
+	ModeManager::StackerAdd(bi, this, um, true, Param);
 	SetModeInternal(um, Param);
-	ModeManager::StackerAdd(NULL, this, um, true, Param);
 }
 
 /** Set a mode on the user
+ * @param bi The client setting the mode
  * @param Name The mode name
  * @param param Optional param for the mode
  */
-void User::SetMode(UserModeName Name, const std::string &Param)
+void User::SetMode(BotInfo *bi, UserModeName Name, const std::string &Param)
 {
-	SetMode(ModeManager::FindUserModeByName(Name), Param);
+	SetMode(bi, ModeManager::FindUserModeByName(Name), Param);
 }
 
 /* Set a mode on the user
+ * @param bi The client setting the mode
  * @param ModeChar The mode char
  * @param param Optional param for the mode
  */
-void User::SetMode(char ModeChar, const std::string &Param)
+void User::SetMode(BotInfo *bi, char ModeChar, const std::string &Param)
 {
-	SetMode(ModeManager::FindUserModeByChar(ModeChar), Param);
+	SetMode(bi, ModeManager::FindUserModeByChar(ModeChar), Param);
 }
 
 /** Remove a mode on the user
+ * @param bi The client setting the mode
  * @param um The user mode
  */
-void User::RemoveMode(UserMode *um)
+void User::RemoveMode(BotInfo *bi, UserMode *um)
 {
 	if (!um)
 		return;
 
+	ModeManager::StackerAdd(bi, this, um, false);
 	RemoveModeInternal(um);
-	ModeManager::StackerAdd(NULL, this, um, false);
 }
 
 /** Remove a mode from the user
+ * @param bi The client setting the mode
  * @param Name The mode name
  */
-void User::RemoveMode(UserModeName Name)
+void User::RemoveMode(BotInfo *bi, UserModeName Name)
 {
-	RemoveMode(ModeManager::FindUserModeByName(Name));
+	RemoveMode(bi, ModeManager::FindUserModeByName(Name));
 }
 
 /** Remove a mode from the user
+ * @param bi The client setting the mode
  * @param ModeChar The mode char
  */
-void User::RemoveMode(char ModeChar)
+void User::RemoveMode(BotInfo *bi, char ModeChar)
 {
-	RemoveMode(ModeManager::FindUserModeByChar(ModeChar));
+	RemoveMode(bi, ModeManager::FindUserModeByChar(ModeChar));
 }
 
 /** Set a string of modes on a user
+ * @param bi The client setting the mode
  * @param modes The modes
  */
-void User::SetModes(const std::string &modes, ...)
+void User::SetModes(BotInfo *bi, const std::string &modes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
@@ -602,13 +609,13 @@ void User::SetModes(const std::string &modes, ...)
 		if (add)
 		{
 			if (um->Type == MODE_PARAM && sep.GetToken(sbuf))
-				this->SetMode(um, sbuf);
+				this->SetMode(bi, um, sbuf);
 			else
-				this->SetMode(um);
+				this->SetMode(bi, um);
 		}
 		else if (add == 0)
 		{
-			this->RemoveMode(um);
+			this->RemoveMode(bi, um);
 		}
 	}
 }
@@ -1248,7 +1255,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				break;
 			case UMODE_REGISTERED:
 				if (add && !nick_identified(user))
-					user->RemoveMode(UMODE_REGISTERED);
+					user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:

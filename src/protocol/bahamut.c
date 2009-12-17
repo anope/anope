@@ -141,17 +141,17 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
 
 class BahamutIRCdProto : public IRCDProto
 {
-	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest, buf);
-		else send_cmd(source->nick, "MODE %s %s", dest, buf);
+		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest->name, buf);
+		else send_cmd(source->nick, "MODE %s %s", dest->name, buf);
 	}
 
-	void SendModeInternal(User *u, const char *buf)
+	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(Config.ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), buf);
 	}
 
 	/* SVSHOLD - set */
@@ -271,7 +271,7 @@ class BahamutIRCdProto : public IRCDProto
 	 */
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		this->SendModeInternal(u, merge_args(ac, av));
+		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
 	void SendEOB()
@@ -302,8 +302,9 @@ class BahamutIRCdProto : public IRCDProto
 	/* nc_change was = 1, and there is no na->status */
 	void SendUnregisteredNick(User *u)
 	{
-		u->RemoveMode(UMODE_REGISTERED);
-		ircdproto->SendMode(u, "+d 1");
+		BotInfo *bi = findbot(Config.s_NickServ);
+		u->RemoveMode(bi, UMODE_REGISTERED);
+		ircdproto->SendMode(bi, u, "+d 1");
 	}
 
 	/* SERVER */
@@ -340,8 +341,9 @@ class BahamutIRCdProto : public IRCDProto
 
 		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
 
-		u->SetMode(UMODE_REGISTERED);
-		ircdproto->SendMode(u, "+d %s", svidbuf);
+		BotInfo *bi = findbot(Config.s_NickServ);
+		u->SetMode(bi, UMODE_REGISTERED);
+		ircdproto->SendMode(bi, u, "+d %s", svidbuf);
 	}
 
 } ircd_proto;

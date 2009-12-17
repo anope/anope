@@ -876,7 +876,7 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 				 user->nick, status, chan->name);
 		}
 
-		user->SetMode(um);
+		user->SetMode(NULL, um);
 	}
 
 	for (uc = user->chans; uc; uc = uc->next) {

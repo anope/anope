@@ -186,9 +186,12 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		u->RemoveMode(UMODE_CLOAK);
-		u->RemoveMode(UMODE_VHOST);
-		u->SetMode(UMODE_CLOAK);
+		BotInfo *bi = findbot(Config.s_HostServ);
+		u->RemoveMode(bi, UMODE_CLOAK);
+		u->RemoveMode(bi, UMODE_VHOST);
+		ModeManager::ProcessModes();
+		u->SetMode(bi, UMODE_CLOAK);
+		ModeManager::ProcessModes();
 	}
 
 	void SendAkill(Akill *ak)
@@ -215,20 +218,20 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (ac >= 1) {
 			if (!u || !av[0]) return;
-			this->SendModeInternal(u, merge_args(ac, av));
+			this->SendModeInternal(NULL, u, merge_args(ac, av));
 		}
 	}
 
-	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source->nick, "G %s %s", dest, buf);
+		send_cmd(source->nick, "G %s %s", dest->name, buf);
 	}
 
-	void SendModeInternal(User *u, const char *buf)
+	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(Config.ServerName, "v %s %s", u->nick, buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "v %s %s", u->nick, buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
@@ -462,14 +465,16 @@ class UnrealIRCdProto : public IRCDProto
 
 		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
 
-		u->SetMode(UMODE_REGISTERED);
-		ircdproto->SendMode(u, "+d %s", svidbuf);
+		BotInfo *bi = findbot(Config.s_NickServ);
+		u->SetMode(bi, UMODE_REGISTERED);
+		ircdproto->SendMode(bi, u, "+d %s", svidbuf);
 	}
 
 	void SendUnregisteredNick(User *u)
 	{
-		u->RemoveMode(UMODE_REGISTERED);
-		ircdproto->SendMode(u, "+d 1");
+		BotInfo *bi = findbot(Config.s_NickServ);
+		u->RemoveMode(bi, UMODE_REGISTERED);
+		ircdproto->SendMode(bi, u, "+d 1");
 	}
 
 } ircd_proto;

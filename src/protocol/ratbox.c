@@ -219,7 +219,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		this->SendModeInternal(u, merge_args(ac, av));
+		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
 	/* SERVER name hop descript */
@@ -259,19 +259,19 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(TS6SID, "%03d %s %s", numeric, dest, buf);
 	}
 
-	void SendModeInternal(BotInfo *bi, const char *dest, const char *buf)
+	void SendModeInternal(BotInfo *bi, Channel *dest, const char *buf)
 	{
 		if (bi)
 		{
-			send_cmd(bi->uid, "MODE %s %s", dest, buf);
+			send_cmd(bi->uid, "MODE %s %s", dest->name, buf);
 		}
-		else send_cmd(TS6SID, "MODE %s %s", dest, buf);
+		else send_cmd(TS6SID, "MODE %s %s", dest->name, buf);
 	}
 
-	void SendModeInternal(User *u, const char *buf)
+	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(TS6SID, "SVSMODE %s %s", u->nick, buf);
+		send_cmd(bi ? bi->uid : TS6SID, "SVSMODE %s %s", u->nick, buf);
 	}
 
 	void SendKickInternal(BotInfo *bi, Channel *chan, User *user, const char *buf)

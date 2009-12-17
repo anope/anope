@@ -174,41 +174,48 @@ class CoreExport User : public Extensible
 	void RemoveModeInternal(UserMode *um);
 
 	/** Set a mode on the user
+	 * @param bi The client setting the mode
 	 * @param um The user mode
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(UserMode *um, const std::string &Param = "");
+	void SetMode(BotInfo *bi, UserMode *um, const std::string &Param = "");
 
 	/** Set a mode on the user
+	 * @param bi The client setting the mode
 	 * @param Name The mode name
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(UserModeName Name, const std::string &Param = "");
+	void SetMode(BotInfo *bi, UserModeName Name, const std::string &Param = "");
 
 	/* Set a mode on the user
+	 * @param bi The client setting the mode
 	 * @param ModeChar The mode char
 	 * @param param Optional param for the mode
 	 */
-	void SetMode(char ModeChar, const std::string &Param = "");
+	void SetMode(BotInfo *bi, char ModeChar, const std::string &Param = "");
 
 	/** Remove a mode on the user
+	 * @param bi The client setting the mode
 	 * @param um The user mode
 	 */
-	void RemoveMode(UserMode *um);
+	void RemoveMode(BotInfo *bi, UserMode *um);
 
 	/** Remove a mode from the user
+	 * @param bi The client setting the mode
 	 * @param Name The mode name
 	 */
-	void RemoveMode(UserModeName Name);
+	void RemoveMode(BotInfo *bi, UserModeName Name);
 
 	/** Remove a mode from the user
+	 * @param bi The client setting the mode
 	 * @param ModeChar The mode char
 	 */
-	void RemoveMode(char ModeChar);
+	void RemoveMode(BotInfo *bi, char ModeChar);
 
 	/** Set a string of modes on a user
+	 * @param bi The client setting the mode
 	 * @param modes The modes
 	 */
-	void SetModes(const std::string &modes, ...);
+	void SetModes(BotInfo *bi, const std::string &modes, ...);
 };
 

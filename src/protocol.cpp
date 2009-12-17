@@ -67,7 +67,7 @@ void IRCDProto::SendSVSKill(BotInfo *source, User *user, const char *fmt, ...)
 	SendSVSKillInternal(source, user, buf);
 }
 
-void IRCDProto::SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
+void IRCDProto::SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -77,14 +77,14 @@ void IRCDProto::SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
 	SendModeInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendMode(User *u, const char *fmt, ...)
+void IRCDProto::SendMode(BotInfo *bi, User *u, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendModeInternal(u, buf);
+	SendModeInternal(bi, u, buf);
 }
 
 void IRCDProto::SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...)

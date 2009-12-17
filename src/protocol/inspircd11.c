@@ -197,7 +197,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		this->SendModeInternal(u, merge_args(ac, av));
+		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -210,17 +210,16 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 	}
 
-	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		Channel *c = findchan(dest);
-		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
+		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest->name, static_cast<unsigned>(dest->creation_time), buf);
 	}
 
-	void SendModeInternal(User *u, const char *buf)
+	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(Config.s_NickServ, "MODE %s %s", u->nick, buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "MODE %s %s", u->nick, buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
@@ -331,7 +330,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSMODE +- */
 	void SendUnregisteredNick(User *u)
 	{
-		u->RemoveMode(UMODE_REGISTERED);
+		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)

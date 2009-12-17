@@ -243,7 +243,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 
 		if (entry_match(ban, bi->nick, bi->user, bi->host, 0))
 		{
-			ircdproto->SendMode(bi, chan->name, "-b %s", mask);
+			ircdproto->SendMode(bi, chan, "-b %s", mask);
 			entry_delete(chan->bans, ban);
 			return;
 		}
@@ -820,9 +820,9 @@ void ModeManager::ProcessModes()
 			for (std::list<std::string>::iterator lit = ModeStrings.begin(); lit != ModeStrings.end(); ++lit)
 			{
 				if (c)
-					ircdproto->SendMode(s->bi, c->name, lit->c_str());
+					ircdproto->SendMode(s->bi, c, lit->c_str());
 				else if (u)
-					ircdproto->SendMode(u, lit->c_str());
+					ircdproto->SendMode(s->bi, u, lit->c_str());
 			}
 			delete it->second;
 		}

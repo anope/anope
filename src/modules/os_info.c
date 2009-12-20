@@ -56,7 +56,6 @@ class CommandNSOInfo : public Command
 	{
 		const char *nick = params[1].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
-		char *c;
 		NickAlias *na = NULL;
 
 		if (!info)
@@ -67,13 +66,9 @@ class CommandNSOInfo : public Command
 
 		if ((na = findnick(nick))) /* ok we've found the user */
 		{
-			if (na->nc->GetExt("os_info", c))
-			{
-				delete [] c;
-				na->nc->Shrink("os_info");
-			}
+			na->nc->Shrink("os_info");
 			/* Add the module data to the user */
-			na->nc->Extend("os_info", sstrdup(info));
+			na->nc->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(info)));
 			me->NoticeLang(Config.s_NickServ, u, OINFO_ADD_SUCCESS, nick);
 
 		}
@@ -90,12 +85,7 @@ class CommandNSOInfo : public Command
 
 		if ((na = findnick(nick))) /* ok we've found the user */
 		{
-			char *c;
-			if (na->nc->GetExt("os_info", c))
-			{
-				delete [] c;
-				na->nc->Shrink("os_info");
-			}
+			na->nc->Shrink("os_info");
 
 			me->NoticeLang(Config.s_NickServ, u, OINFO_DEL_SUCCESS, nick);
 
@@ -143,7 +133,6 @@ class CommandCSOInfo : public Command
 	{
 		const char *chan = params[0].c_str();
 		const char *info = params.size() > 2 ? params[2].c_str() : NULL;
-		char *c;
 		ChannelInfo *ci = cs_findchan(chan);
 
 		if (!info)
@@ -152,13 +141,9 @@ class CommandCSOInfo : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->GetExt("os_info", c))
-		{
-			delete [] c;
-			ci->Shrink("os_info");
-		}
+		ci->Shrink("os_info");
 		/* Add the module data to the channel */
-		ci->Extend("os_info", sstrdup(info));
+		ci->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(info)));
 		me->NoticeLang(Config.s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
 
 		return MOD_CONT;
@@ -170,12 +155,7 @@ class CommandCSOInfo : public Command
 		ChannelInfo *ci = cs_findchan(chan);
 
 		/* Del the module data from the channel */
-		char *c;
-		if (ci->GetExt("os_info", c))
-		{
-			delete [] c;
-			ci->Shrink("os_info");
-		}
+		ci->Shrink("os_info");
 		me->NoticeLang(Config.s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
 
 		return MOD_CONT;
@@ -230,8 +210,6 @@ class OSInfo : public Module
 		ModuleManager::Attach(I_OnPostCommand, this);
 		ModuleManager::Attach(I_OnSaveDatabase, this);
 		ModuleManager::Attach(I_OnBackupDatabase, this);
-		ModuleManager::Attach(I_OnDelCore, this);
-		ModuleManager::Attach(I_OnDelChan, this);
 
 		mLoadData();
 		ModuleManager::Attach(I_OnReload, this);
@@ -457,7 +435,6 @@ class OSInfo : public Module
 	{
 		int i;
 		NickCore *nc;
-		char *c;
 		ChannelInfo *ci;
 
 		OnSaveDatabase();
@@ -467,11 +444,7 @@ class OSInfo : public Module
 			/* Remove the nick Cores */
 			for (nc = nclists[i]; nc; nc = nc->next)
 			{
-				if (nc->GetExt("os_info", c));
-				{
-					delete [] c;
-					nc->Shrink("os_info");
-				}
+				nc->Shrink("os_info");
 			}
 		}
 
@@ -479,11 +452,7 @@ class OSInfo : public Module
 		{
 			for (ci = chanlists[i]; ci; ci = ci->next)
 			{
-				if (ci->GetExt("os_info", c))
-				{
-					delete [] c;
-					ci->Shrink("os_info");
-				}
+				ci->Shrink("os_info");
 			}
 		}
 
@@ -515,7 +484,7 @@ class OSInfo : public Module
 					{
 						/* If we have any info on this user */
 						char *c;
-						if (na->nc->GetExt("os_info", c))
+						if (na->nc->GetExtArray("os_info", c))
 							u->SendMessage(Config.s_NickServ, " OperInfo: %s", c);
 					}
 				}
@@ -531,7 +500,7 @@ class OSInfo : public Module
 					{
 						/* If we have any info on this channel */
 						char *c;
-						if (ci->GetExt("os_info", c))
+						if (ci->GetExtArray("os_info", c))
 							u->SendMessage(Config.s_ChanServ, " OperInfo: %s", c);
 					}
 				}
@@ -561,7 +530,7 @@ class OSInfo : public Module
 				{
 					/* If we have any info on this user */
 					char *c;
-					if (nc->GetExt("os_info", c))
+					if (nc->GetExtArray("os_info", c))
 						fprintf(out, "N %s %s\n", nc->display, c);
 				}
 			}
@@ -572,7 +541,7 @@ class OSInfo : public Module
 				{
 					/* If we have any info on this channel */
 					char *c;
-					if (ci->GetExt("os_info", c))
+					if (ci->GetExtArray("os_info", c))
 						fprintf(out, "C %s %s\n", ci->name, c);
 				}
 			}
@@ -583,28 +552,6 @@ class OSInfo : public Module
 	void OnBackupDatabase()
 	{
 		ModuleDatabaseBackup(OSInfoDBName);
-	}
-
-	void OnDelCore(NickCore *nc)
-	{
-		char *c;
-
-		if (nc->GetExt("os_info", c))
-		{
-			delete [] c;
-			nc->Shrink("os_info");
-		}
-	}
-
-	void OnDelChan(ChannelInfo *ci)
-	{
-		char *c;
-
-		if (ci->GetExt("os_info", c))
-		{
-			delete [] c;
-			ci->Shrink("os_info");
-		}
 	}
 
 	void OnNickServHelp(User *u)
@@ -663,12 +610,12 @@ int mLoadData()
 						if (!stricmp(type, "C"))
 						{
 							if ((ci = cs_findchan(name)))
-								ci->Extend("os_info", sstrdup(info));
+								ci->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(info)));
 						}
 						else if (!stricmp(type, "N"))
 						{
 							if ((na = findnick(name)))
-								na->nc->Extend("os_info", sstrdup(info));
+								na->nc->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(info)));
 						}
 						delete [] info;
 					}

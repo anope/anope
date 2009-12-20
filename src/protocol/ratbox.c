@@ -323,20 +323,15 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		char svidbuf[15], *c;
+		char svidbuf[15];
 
 		if (!u->nc)
 			return;
 
 		snprintf(svidbuf, sizeof(svidbuf), "%ld", static_cast<long>(u->timestamp));
 
-		if (u->nc->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			u->nc->Shrink("authenticationtoken");
-		}
-
-		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
+		u->nc->Shrink("authenticationtoken");
+		u->nc->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(svidbuf));
 	}
 
 } ircd_proto;
@@ -852,24 +847,11 @@ class ProtoRatbox : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
-
-		ModuleManager::Attach(I_OnDelCore, this);
 	}
 
 	~ProtoRatbox()
 	{
 		delete [] TS6SID;
-	}
-
-	void OnDelCore(NickCore *nc)
-	{
-		char *c;
-
-		if (nc->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			nc->Shrink("authenticationtoken");
-		}
 	}
 
 };

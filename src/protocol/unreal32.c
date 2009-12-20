@@ -449,7 +449,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		char svidbuf[15], *c;
+		char svidbuf[15];
 
 		if (!u->nc)
 			return;
@@ -457,13 +457,8 @@ class UnrealIRCdProto : public IRCDProto
 		srand(time(NULL));
 		snprintf(svidbuf, sizeof(svidbuf), "%d", rand());
 
-		if (u->nc->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			u->nc->Shrink("authenticationtoken");
-		}
-
-		u->nc->Extend("authenticationtoken", sstrdup(svidbuf));
+		u->nc->Shrink("authenticationtoken");
+		u->nc->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 
 		BotInfo *bi = findbot(Config.s_NickServ);
 		u->SetMode(bi, UMODE_REGISTERED);
@@ -1170,19 +1165,6 @@ class ProtoUnreal : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
-
-		ModuleManager::Attach(I_OnDelCore, this);
-	}
-
-	void OnDelCore(NickCore *nc)
-	{
-		char *c;
-
-		if (nc->GetExt("authenticationtoken", c))
-		{
-			delete [] c;
-			nc->Shrink("authenticationtoken");
-		}
 	}
 
 };

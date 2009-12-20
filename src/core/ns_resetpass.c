@@ -61,22 +61,11 @@ class CommandNSResetPass : public Command
 			fprintf(mail->pipe, "\n.\n");
 			MailEnd(mail);
 
-			char *c;
-			time_t *t;
-			if (na->nc->GetExt("ns_resetpass_code", c))
-			{
-				delete [] c;
-				na->nc->Shrink("ns_resetpass_code");
-			}
-			if (na->nc->GetExt("ns_resetpass_time", t))
-			{
-				delete t;
-				na->nc->Shrink("ns_resetpass_time");
-			}
+			na->nc->Shrink("ns_resetpass_code");
+			na->nc->Shrink("ns_resetpass_time");
 
-			na->nc->Extend("ns_resetpass_code", sstrdup(passcode));
-			t = new time_t(time(NULL));
-			na->nc->Extend("ns_resetpass_time", t);
+			na->nc->Extend("ns_resetpass_code", new ExtensibleItemPointerArray<char>(sstrdup(passcode)));
+			na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(time(NULL)));
 
 			alog("%s: %s!%s@%s used RESETPASS on %s (%s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, na->nick, na->nc->display);
 			notice_lang(Config.s_NickServ, u, NICK_RESETPASS_COMPLETE, na->nick);
@@ -111,8 +100,8 @@ class NSResetPass : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSResetPass());
 
-		Implementation i[] = { I_OnNickServHelp, I_OnDelCore, I_OnPreCommand };
-		ModuleManager::Attach(i, this, 3);
+		Implementation i[] = { I_OnNickServHelp, I_OnPreCommand };
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	void OnNickServHelp(User *u)
@@ -120,37 +109,19 @@ class NSResetPass : public Module
 		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RESETPASS);
 	}
 
-	void OnDelCore(NickCore *nc)
-	{
-		char *c;
-		time_t *t;
-
-		if (nc->GetExt("ns_resetpass_code", c))
-		{
-			delete [] c;
-			nc->Shrink("ns_resetpass_code");
-		}
-		if (nc->GetExt("ns_resetpass_time", t))
-		{
-			delete t;
-			nc->Shrink("ns_resetpass_time");
-		}
-	}
-
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
+		time_t t;
+		char *c;
+
 		if (service == Config.s_NickServ && command == "CONFIRM" && !params.empty())
 		{
 			NickAlias *na = findnick(u->nick);
-			char *c;
-			time_t *t;
 			
-			if (na && na->nc->GetExt("ns_resetpass_code", c) && na->nc->GetExt("ns_resetpass_time", t))
+			if (na && na->nc->GetExtArray("ns_resetpass_code", c) && na->nc->GetExtRegular<time_t>("ns_resetpass_time", t))
 			{
-				if (*t < time(NULL) - 3600)
+				if (t < time(NULL) - 3600)
 				{
-					delete [] c;
-					delete t;
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
 					notice_lang(Config.s_NickServ, u, NICK_CONFIRM_EXPIRED);
@@ -160,8 +131,6 @@ class NSResetPass : public Module
 				std::string passcode = params[0].c_str();
 				if (passcode == c)
 				{
-					delete [] c;
-					delete t;
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
 

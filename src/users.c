@@ -341,12 +341,12 @@ void User::SendMessage(const char *source, const std::string &msg)
  */
 void User::CheckAuthenticationToken(const char *svid)
 {
-	const char *c = NULL;
+	char *c;
 	NickAlias *na;
 
 	if ((na = findnick(this->nick)))
 	{
-		if (na->nc && na->nc->GetExt("authenticationtoken", c))
+		if (na->nc && na->nc->GetExtArray("authenticationtoken", c))
 		{
 			if (svid && c && !strcmp(svid, c))
 			{

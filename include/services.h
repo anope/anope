@@ -301,123 +301,6 @@ class ModuleException : public CoreException
 	virtual ~ModuleException() throw() {}
 };
 
-/** Class with the ability to be extended with key:value pairs.
- * Thanks to InspIRCd for this.
- */
-class CoreExport Extensible
-{
- private:
-	std::map<std::string, void *> Extension_Items;
-
- public:
-	/** Extend an Extensible class.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 * @param p This parameter is a pointer to any data you wish to associate with the object
-	 *
-	 * You must provide a key to store the data as via the parameter 'key' and store the data
-	 * in the templated parameter 'p'.
-	 * The data will be inserted into the map. If the data already exists, you may not insert it
-	 * twice, Extensible::Extend will return false in this case.
-	 *
-	 * @return Returns true on success, false if otherwise
-	 */
-	template<typename T> bool Extend(const std::string &key, T *p)
-	{
-		/* This will only add an item if it doesnt already exist,
-		 * the return value is a std::pair of an iterator to the
-		 * element, and a bool saying if it was actually inserted.
-		 */
-		return this->Extension_Items.insert(std::make_pair(key, p)).second;
-	}
-
-	/** Extend an Extensible class.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 *
-	 * You must provide a key to store the data as via the parameter 'key', this single-parameter
-	 * version takes no 'data' parameter, this is used purely for boolean values.
-	 * The key will be inserted into the map with a NULL 'data' pointer. If the key already exists
-	 * then you may not insert it twice, Extensible::Extend will return false in this case.
-	 *
-	 * @return Returns true on success, false if otherwise
-	 */
-	bool Extend(const std::string &key)
-	{
-		/* This will only add an item if it doesnt already exist,
-		 * the return value is a std::pair of an iterator to the
-		 * element, and a bool saying if it was actually inserted.
-		 */
-		return this->Extension_Items.insert(std::make_pair(key, static_cast<char *>(NULL))).second;
-	}
-
-	/** Shrink an Extensible class.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 *
-	 * You must provide a key name. The given key name will be removed from the classes data. If
-	 * you provide a nonexistent key (case is important) then the function will return false.
-	 * @return Returns true on success.
-	 */
-	bool Shrink(const std::string &key)
-	{
-		/* map::size_type map::erase( const key_type& key );
-		 * returns the number of elements removed, std::map
-		 * is single-associative so this should only be 0 or 1
-		 */
-		return this->Extension_Items.erase(key);
-	}
-
-	/** Get an extension item.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 * @param p If you provide a non-existent key, this value will be NULL. Otherwise a pointer to the item you requested will be placed in this templated parameter.
-	 * @return Returns true if the item was found and false if it was nor, regardless of wether 'p' is NULL. This allows you to store NULL values in Extensible.
-	 */
-	template<typename T> bool GetExt(const std::string &key, T *&p)
-	{
-		std::map<std::string, void *>::iterator iter = this->Extension_Items.find(key); /* Find the item */
-		if(iter != this->Extension_Items.end())
-		{
-			p = static_cast<T *>(iter->second);	/* Item found */
-			return true;
-		}
-		else
-		{
-			p = NULL;		/* Item not found */
-			return false;
-		}
-	}
-
-	/** Get an extension item.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 * @return Returns true if the item was found and false if it was not.
-	 *
-	 * This single-parameter version only checks if the key exists, it does nothing with
-	 * the 'data' field and is probably only useful in conjunction with the single-parameter
-	 * version of Extend().
-	 */
-	bool GetExt(const std::string &key)
-	{
-		return (this->Extension_Items.find(key) != this->Extension_Items.end());
-	}
-
-	/** Get a list of all extension items names.
-	 * @param list A deque of strings to receive the list
-	 * @return This function writes a list of all extension items stored
-	 *         in this object by name into the given deque and returns void.
-	 */
-	void GetExtList(std::deque<std::string> &list)
-	{
-		for (std::map<std::string, void *>::iterator i = Extension_Items.begin(); i != Extension_Items.end(); ++i)
-		{
-			list.push_back(i->first);
-		}
-	}
-
-};
-
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
  */
@@ -485,6 +368,7 @@ typedef struct hostcore_ HostCore;
 typedef struct exception_ Exception;
 typedef struct session_ Session;
 
+#include "extensible.h"
 #include "bots.h"
 #include "opertype.h"
 #include "modes.h"

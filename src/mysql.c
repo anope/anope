@@ -1862,6 +1862,16 @@ int db_mysql_load_ns_dbase(void)
                     }
                 }
 
+		/* Versions previous to 1.8.3 have a problem with saving nick access lists to sql
+		 * because of the way the table is set up, causing nc->accesscount to be higher
+		 * than what is in the database, which causes numerious problems including crashes. - Adam
+		 */
+		if (nc->accesscount > i)
+		{
+			nc->accesscount = i;
+			nc->access = srealloc(nc->access, sizeof(char *) * nc->accesscount);
+		}
+
                 mysql_free_result(res);
             }
         }

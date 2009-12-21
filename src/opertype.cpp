@@ -8,10 +8,10 @@
  * $Id$
  *
  */
- 
- #include "services.h"
 
-OperType::OperType(const std::string &nname) : name(nname)
+#include "services.h"
+
+OperType::OperType(const ci::string &nname) : name(nname)
 {
 }
 
@@ -51,7 +51,7 @@ void OperType::AddPriv(const std::string &privstr)
 	this->privs.push_back(privstr);
 }
 
-const std::string &OperType::GetName() const
+const ci::string &OperType::GetName() const
 {
 	return this->name;
 }

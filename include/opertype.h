@@ -9,12 +9,14 @@
  *
  */
 
+#include "hashcomp.h"
+
 class CoreExport OperType
 {
  private:
 	/** The name of this opertype, e.g. "sra".
 	  */
-	std::string name;
+	ci::string name;
 
 	/** Privs that this opertype may use, e.g. 'users/auspex'.
 	  * This *must* be std::list, see commands comment for details.
@@ -34,7 +36,7 @@ class CoreExport OperType
 	/** Create a new opertype of the given name.
 	 * @param nname The opertype name, e.g. "sra".
 	 */
-	OperType(const std::string &nname);
+	OperType(const ci::string &nname);
 
 	/** Check whether this opertype has access to run the given command string.
 	  * @param cmdstr The string to check, e.g. botserv/set/private.
@@ -60,5 +62,5 @@ class CoreExport OperType
 
 	/** Returns the name of this opertype.
 	 */
-	const std::string &GetName() const;
+	const ci::string &GetName() const;
 };

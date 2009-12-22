@@ -118,7 +118,7 @@ class CommandCSAppendTopic : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
-		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		u->SendMessage(Config.s_ChanServ, " ");
 		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
 
 		return true;

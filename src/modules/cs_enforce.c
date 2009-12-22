@@ -227,9 +227,9 @@ class CommandCSEnforce : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		u->SendMessage(Config.s_ChanServ, " ");
 		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
-		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		u->SendMessage(Config.s_ChanServ, " ");
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
 		else

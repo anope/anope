@@ -187,7 +187,7 @@ class CommandHSRequest : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
-		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		u->SendMessage(Config.s_HostServ, " ");
 		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_REQUEST);
 
 		return true;
@@ -250,7 +250,7 @@ class CommandHSActivate : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		u->SendMessage(Config.s_HostServ, " ");
 		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_ACTIVATE);
 		if (HSRequestMemoUser)
 			me->NoticeLang(Config.s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
@@ -313,7 +313,7 @@ class CommandHSReject : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REJECT_SYNTAX);
-		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		u->SendMessage(Config.s_HostServ, " ");
 		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_REJECT);
 		if (HSRequestMemoUser)
 			me->NoticeLang(Config.s_HostServ, u, LNG_HELP_REJECT_MEMO);
@@ -391,7 +391,7 @@ class CommandHSWaiting : public HSListBase
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_WAITING_SYNTAX);
-		ircdproto->SendMessage(findbot(Config.s_HostServ), u->nick, " ");
+		u->SendMessage(Config.s_HostServ, " ");
 		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_WAITING);
 
 		return true;

@@ -167,7 +167,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		if (debug)
 			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name, u->nick);
 
-		ChannelModeStatus *cms = static_cast<ChannelModeStatus *>(cm);
+		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
 		/* Set the new status on the user */
 		chan_set_user_status(this, u, cms->Status);
 		/* Enforce secureops, etc */
@@ -183,7 +183,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 			return;
 		}
 
-		ChannelModeList *cml = static_cast<ChannelModeList *>(cm);
+		ChannelModeList *cml = dynamic_cast<ChannelModeList *>(cm);
 		cml->AddMask(this, param.c_str());
 		return;
 	}
@@ -228,7 +228,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		/* Remove the mode */
 		if (cm->Type == MODE_PARAM)
 		{
-			ChannelModeParam *cmp = static_cast<ChannelModeParam *>(cmp);
+			ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cmp);
 
 			if (!cmp->MinusNoArg)
 			{
@@ -246,7 +246,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	/* If this is a param mode and its mlocked +, check to ensure someone didn't reset it with the wrong param */
 	else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
 	{
-		ChannelModeParam *cmp = static_cast<ChannelModeParam *>(cm);
+		ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
 		std::string cparam, ciparam;
 		/* Get the param currently set on this channel */
 		GetParam(cmp->Name, &cparam);
@@ -295,7 +295,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		if (debug)
 			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name, u->nick);
 
-		ChannelModeStatus *cms = static_cast<ChannelModeStatus *>(cm);
+		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
 		chan_remove_user_status(this, u, cms->Status);
 		return;
 	}
@@ -308,7 +308,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 			return;
 		}
 
-		ChannelModeList *cml = static_cast<ChannelModeList *>(cm);
+		ChannelModeList *cml = dynamic_cast<ChannelModeList *>(cm);
 		cml->DelMask(this, param.c_str());
 		return;
 	}
@@ -495,7 +495,7 @@ void Channel::ClearModes(BotInfo *bi)
 			}
 			else if (cm->Type == MODE_PARAM)
 			{
-				cmp = static_cast<ChannelModeParam *>(cm);
+				cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 				if (!cmp->MinusNoArg)
 				{
@@ -522,7 +522,7 @@ void Channel::ClearBans(BotInfo *bi)
 	Entry *entry, *nexte;
 	ChannelModeList *cml;
 
-	cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
+	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 
 	if (cml && this->bans && this->bans->count)
 	{
@@ -543,7 +543,7 @@ void Channel::ClearExcepts(BotInfo *bi)
 	Entry *entry, *nexte;
 	ChannelModeList *cml;
 
-	cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
+	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 
 	if (cml && this->excepts && this->excepts->count)
 	{
@@ -564,7 +564,7 @@ void Channel::ClearInvites(BotInfo *bi)
 	Entry *entry, *nexte;
 	ChannelModeList *cml;
 
-	cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
+	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 
 	if (cml && this->invites && this->invites->count)
 	{
@@ -674,7 +674,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		}
 		else if (cm->Type == MODE_PARAM)
 		{
-			ChannelModeParam *cmp = static_cast<ChannelModeParam *>(cm);
+			ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 			if (!add && cmp->MinusNoArg)
 			{
@@ -771,7 +771,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 				{
 					if (cm->Type == MODE_PARAM)
 					{
-						cmp = static_cast<ChannelModeParam *>(cm);
+						cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 						if (plus || !cmp->MinusNoArg)
 						{
@@ -1358,7 +1358,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				if (*s == ircd->sjoinbanchar && keep_their_modes) {
 					buf = myStrGetToken(s, ircd->sjoinbanchar, 1);
 
-					cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
+					cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 					if (cml->IsValid(buf))
 						cml->AddMask(c, buf);
 
@@ -1373,7 +1373,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				if (*s == ircd->sjoinexchar && keep_their_modes) {
 					buf = myStrGetToken(s, ircd->sjoinexchar, 1);
 
-					cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
+					cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 					if (cml->IsValid(buf))
 						cml->AddMask(c, buf);
 
@@ -1389,7 +1389,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				if (*s == ircd->sjoininvchar && keep_their_modes) {
 					buf = myStrGetToken(s, ircd->sjoininvchar, 1);
 
-					cml = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
+					cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 					if (cml->IsValid(buf))
 						cml->AddMask(c, buf);
 

@@ -445,7 +445,7 @@ void defconParseModeString(const char *str)
 
 				if (cm->Type == MODE_PARAM)
 				{
-					cmp = static_cast<ChannelModeParam *>(cm);
+					cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 					if (!ss.GetToken(param))
 					{

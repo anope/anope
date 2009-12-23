@@ -193,7 +193,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 
 				if (cm->Type == MODE_PARAM)
 				{
-					cmp = static_cast<ChannelModeParam *>(cm);
+					cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 					ci->GetParam(cmp->Name, &param);
 
@@ -395,7 +395,7 @@ void check_modes(Channel *c)
 			/* Add the eventual parameter */
 			if (cm->Type == MODE_PARAM)
 			{
-				cmp = static_cast<ChannelModeParam *>(cm);
+				cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 				if (!cmp->MinusNoArg)
 				{

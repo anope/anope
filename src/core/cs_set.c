@@ -212,7 +212,7 @@ class CommandCSSet : public Command
 
 					if (cm->Type == MODE_PARAM)
 					{
-						cmp = static_cast<ChannelModeParam *>(cm);
+						cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 						if (!modeparams.GetToken(param))
 							continue;

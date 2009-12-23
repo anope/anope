@@ -735,15 +735,15 @@ int anope_event_bmask(const char *source, int ac, const char **av)
 		for (i = 0; i <= count - 1; i++) {
 			b = myStrGetToken(bans, ' ', i);
 			if (!stricmp(av[2], "b")) {
-				cms = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('b'));
+				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('b'));
 				cms->AddMask(c, b);
 			}
 			if (!stricmp(av[2], "e")) {
-				cms = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('e'));
+				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('e'));
 				cms->AddMask(c, b);
 			}
 			if (!stricmp(av[2], "I")) {
-				cms = static_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('I'));
+				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('I'));
 				cms->AddMask(c, b);
 			}
 			if (b)

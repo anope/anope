@@ -713,7 +713,7 @@ char ModeManager::GetStatusChar(char Value)
 		cm = it->second;
 		if (cm->Type == MODE_STATUS)
 		{
-			cms = static_cast<ChannelModeStatus *>(cm);
+			cms = dynamic_cast<ChannelModeStatus *>(cm);
 
 			if (Value == cms->Symbol)
 			{

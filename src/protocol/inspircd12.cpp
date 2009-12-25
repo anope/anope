@@ -581,9 +581,10 @@ endnick:
 	newav[0] = av[1];		   /* timestamp */
 	newav[1] = av[0];		   /* channel name */
 
-	int i ;
+	int i;
 
-	for (i = 2; i != ac; i++)
+	/* We want to replace the last string with our newly formatted user string */
+	for (i = 2; i != ac - 1; i++)
 	{
 		newav[i] = av[i];
 	}

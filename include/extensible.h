@@ -158,7 +158,6 @@ class CoreExport Extensible
 			return true;
 		}
 
-		p = 0;
 		return false;
 	}
 

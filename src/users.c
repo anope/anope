@@ -512,7 +512,7 @@ void User::RemoveModeInternal(UserMode *um)
  */
 void User::SetMode(BotInfo *bi, UserMode *um, const std::string &Param)
 {
-	if (!um)
+	if (!um || HasMode(um->Name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, um, true, Param);
@@ -545,7 +545,7 @@ void User::SetMode(BotInfo *bi, char ModeChar, const std::string &Param)
  */
 void User::RemoveMode(BotInfo *bi, UserMode *um)
 {
-	if (!um)
+	if (!um || !HasMode(um->Name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, um, false);

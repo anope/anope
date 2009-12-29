@@ -936,14 +936,16 @@ class CoreExport Module
 	/** Called when a mode is set on a channel
 	 * @param c The channel
 	 * @param Name The mode name
+	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual void OnChannelModeSet(Channel *c, ChannelModeName Name) { }
+	virtual EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
 	 * @param Name The mode name
+	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual void OnChannelModeUnset(Channel *c, ChannelModeName Name) { }
+	virtual EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is set on a user
 	 * @param u The user

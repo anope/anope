@@ -214,12 +214,13 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		Params.insert(std::make_pair(cm->Name, param));
 	}
 
-	FOREACH_MOD(I_OnChannelModeSet, OnChannelModeSet(this, cm->Name));
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, cm->Name));
 
 	/* Check for mlock */
 
 	/* Non registered channel, no mlock */
-	if (!ci || !EnforceMLock)
+	if (!ci || !EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
 
 	/* If this channel has this mode locked negative */
@@ -333,12 +334,13 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		}
 	}
 
-	FOREACH_MOD(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name));
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name));
 
 	/* Check for mlock */
 
 	/* Non registered channel, no mlock */
-	if (!ci || !EnforceMLock)
+	if (!ci || !EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
 	
 	/* This channel has this the mode locked on */
@@ -368,7 +370,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
  */
 void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bool EnforceMLock)
 {
-	if (!cm)
+	if (!cm || HasMode(cm->Name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
@@ -407,7 +409,7 @@ void Channel::SetMode(BotInfo *bi, char Mode, const std::string &param, bool Enf
  */
 void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bool EnforceMLock)
 {
-	if (!cm)
+	if (!cm || !HasMode(cm->Name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, cm, false, param);

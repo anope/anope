@@ -180,17 +180,21 @@ class OSDEFCON : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnChannelModeSet(Channel *c, ChannelModeName Name)
+	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOff.HasFlag(Name))
 		{
-			c->RemoveMode(NULL, Name);
+			c->RemoveMode(findbot(Config.s_OperServ), Name);
+			
+			return EVENT_STOP;
 		}
+
+		return EVENT_CONTINUE;
 	}
 
-	void OnChannelModeUnset(Channel *c, ChannelModeName Name)
+	EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
@@ -200,12 +204,16 @@ class OSDEFCON : public Module
 			
 			if (GetDefConParam(Name, &param))
 			{
-				c->SetMode(NULL, Name, param);
+				c->SetMode(findbot(Config.s_OperServ), Name, param);
 			}
 			else
-				c->SetMode(NULL, Name);
+				c->SetMode(findbot(Config.s_OperServ), Name);
+
+			return EVENT_STOP;
 
 		}
+
+		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnPreCommandRun(const char *service, User *u, const char *cmd, Command *c)

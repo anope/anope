@@ -162,7 +162,7 @@ void do_restart_services()
 	/* First don't unload protocol module, then do so */
 	modules_unload_all(false);
 	modules_unload_all(true);
-	chdir(orig_cwd.c_str());
+	chdir(binary_dir.c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
 	if (!readonly) {
 		open_log();
@@ -314,8 +314,8 @@ std::string GetFullProgDir(char *argv0)
 	if (GetModuleFileName(NULL, buffer, PATH_MAX))
 	{
 		std::string fullpath = buffer;
-		services_bin = fullpath.substr(orig_cwd.size() + 1);
 		std::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
+		services_bin = fullpath.substr(n + 1, fullpath.size());
 		return std::string(fullpath, 0, n);
 	}
 #else
@@ -327,8 +327,8 @@ std::string GetFullProgDir(char *argv0)
 		/* Does argv[0] start with /? If so, it's a full path, use it */
 		if (remainder[0] == '/')
 		{
-			services_bin = remainder.substr(orig_cwd.size() + 1);
 			std::string::size_type n = remainder.rfind("/" SERVICES_BIN);
+			services_bin = remainder.substr(n + 1, remainder.size());
 			return std::string(remainder, 0, n);
 		}
 
@@ -502,21 +502,10 @@ int main(int ac, char **av, char **envp)
 
 
 	/* Check for restart instead of exit */
-	if (save_data == -2) {
-		alog("Restarting");
-		if (!quitmsg)
-			quitmsg = "Restarting";
-		ircdproto->SendSquit(Config.ServerName, quitmsg);
-		disconn(servsock);
-		close_log();
-		chdir(orig_cwd.c_str());
-		execve(services_bin.c_str(), av, envp);
-		if (!readonly) {
-			open_log();
-			log_perror("Restart failed");
-			close_log();
-		}
-		return 1;
+	if (save_data == -2)
+	{
+		do_restart_services();
+		return 0;
 	}
 
 	/* Disconnect and exit */

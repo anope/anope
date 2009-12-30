@@ -93,7 +93,6 @@ class CommandCSRegister : public Command
 			else if (ci->HasFlag(CI_PERSIST) && (cm = ModeManager::FindChannelModeByName(CMODE_PERM)))
 			{
 				c->SetMode(NULL, CMODE_PERM);
-				ci->SetFlag(CI_PERSIST);
 			}
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));

@@ -783,15 +783,21 @@ struct c_userlist {
 	UserData *ud;
 };
 
-class CoreExport Channel : public Extensible
+enum ChannelFlags
 {
-  private:
-	  /** A map of channel modes with their parameters set on this channel
-	   */
-	  std::map<ChannelModeName, std::string> Params;
+	/* Channel still exists when emptied */
+	CH_PERSIST
+};
 
-  public:
-  	/** Default constructor
+class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
+{
+ private:
+	/** A map of channel modes with their parameters set on this channel
+	 */
+	std::map<ChannelModeName, std::string> Params;
+
+ public:
+	/** Default constructor
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */

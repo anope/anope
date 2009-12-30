@@ -568,7 +568,7 @@ class CommandCSSet : public Command
 				/* Set the perm mode */
 				if (cm && ci->c && !ci->c->HasMode(CMODE_PERM))
 				{
-					ci->c->SetMode(NULL, CMODE_PERM);
+					ci->c->SetMode(NULL, cm);
 				}
 			}
 
@@ -581,27 +581,22 @@ class CommandCSSet : public Command
 				ci->UnsetFlag(CI_PERSIST);
 
 				/* Unset perm mode */
-				if (ci->c && ci->c->HasMode(CMODE_PERM))
-				{
-					ci->c->RemoveMode(NULL, CMODE_PERM);
-				}
-				/* Persist is set off... remove the bot and delete the channel if its empty */
-				else if (ci->c)
-				{
-					if (Config.s_BotServ && ci->bi && ci->c->usercount == Config.BSMinUsers - 1)
-						ircdproto->SendPart(ci->bi, ci->c, NULL);
-					if (!ci->c->users)
-						delete ci->c;
+				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))
+					ci->c->RemoveMode(NULL, cm);
+				if (Config.s_BotServ && ci->bi && ci->c->usercount == Config.BSMinUsers - 1)
+					ircdproto->SendPart(ci->bi, ci->c, NULL);
 
-					/* No channel mode, no BotServ, but using ChanServ as the botserv bot
-					 * which was assigned when persist was set on
-					 */
-					if (!cm && !Config.s_BotServ && ci->bi)
-					{
-						/* Unassign bot */
-						findbot(Config.s_ChanServ)->UnAssign(NULL, ci);	
-					}
+				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
+				 * which was assigned when persist was set on
+				 */
+				if (!cm && !Config.s_BotServ && ci->bi)
+				{
+					/* Unassign bot */
+					findbot(Config.s_ChanServ)->UnAssign(NULL, ci);	
 				}
+
+				if (ci->c && !ci->c->users)
+					delete ci->c;
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name);

@@ -190,12 +190,6 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 
 	modes[cm->Name] = true;
 
-	/* Channel mode +P or so was set, mark this channel as persistant */
-	if (cm->Name == CMODE_PERM && ci)
-	{
-		ci->SetFlag(CI_PERSIST);
-	}
-
 	if (!param.empty())
 	{
 		if (cm->Type != MODE_PARAM)
@@ -212,6 +206,14 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		}
 
 		Params.insert(std::make_pair(cm->Name, param));
+	}
+
+	/* Channel mode +P or so was set, mark this channel as persistant */
+	if (cm->Name == CMODE_PERM)
+	{
+		this->SetFlag(CH_PERSIST);
+		if (ci)
+			ci->SetFlag(CI_PERSIST);
 	}
 
 	EventReturn MOD_RESULT;
@@ -305,7 +307,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		if (param.empty())
 		{
-			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
 			return;
 		}
 
@@ -316,15 +318,6 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 
 	modes[cm->Name] = false;
 
-	if (cm->Name == CMODE_PERM && ci)
-	{
-		ci->UnsetFlag(CI_PERSIST);
-		if (Config.s_BotServ && ci->bi && usercount == Config.BSMinUsers - 1)
-			ircdproto->SendPart(ci->bi, this, NULL);
-		if (!users)
-			delete this;
-	}
-
 	if (cm->Type == MODE_PARAM)
 	{
 		std::map<ChannelModeName, std::string>::iterator it = Params.find(cm->Name);
@@ -334,8 +327,27 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		}
 	}
 
+	if (cm->Name == CMODE_PERM)
+	{
+		this->UnsetFlag(CH_PERSIST);
+
+		if (ci)
+		{
+			ci->UnsetFlag(CI_PERSIST);
+			if (Config.s_BotServ && ci->bi && usercount == Config.BSMinUsers - 1)
+				ircdproto->SendPart(ci->bi, this, NULL);
+		}
+	}
+
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name));
+
+	/* We set -P in an empty channel, delete the channel */
+	if (cm->Name == CMODE_PERM && !users)
+	{
+		delete this;
+		return;
+	}
 
 	/* Check for mlock */
 
@@ -733,7 +745,7 @@ void chan_deluser(User * user, Channel * c)
 	c->usercount--;
 
 	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
-	if (c->ci && c->ci->HasFlag(CI_PERSIST))
+	if (c->HasFlag(CH_PERSIST) || (c->ci && c->ci->HasFlag(CI_PERSIST)))
 		return;
 
 	if (Config.s_BotServ && c->ci && c->ci->bi && c->usercount == Config.BSMinUsers - 1)

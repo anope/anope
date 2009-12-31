@@ -50,7 +50,9 @@ class CommandNSForbid : public Command
 			}
 			delete na;
 		}
-		na = new NickAlias(nick, new NickCore(nick));
+		NickCore *nc = new NickCore(nick);
+		nc->SetFlag(NI_FORBIDDEN);
+		na = new NickAlias(nick, nc);
 		if (na)
 		{
 			na->SetFlag(NS_FORBIDDEN);

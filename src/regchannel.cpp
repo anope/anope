@@ -34,16 +34,13 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	capsmin = capspercent = 0;
 	floodlines = floodsecs = 0;
 	repeattimes = 0;
+	bi = NULL;
 
 	strscpy(this->name, chname.c_str(), CHANMAX);
 
-	/* If ircd doesn't exist, this is from DB load and mlock is set later */
-	if (ircd)
-	{
-		mlock_on = DefMLockOn;
-		mlock_off = DefMLockOff;
-		Params = DefMLockParams;
-	}
+	mlock_on = DefMLockOn;
+	mlock_off = DefMLockOff;
+	Params = DefMLockParams;
 
 	size_t t;
 	/* Set default channel flags */

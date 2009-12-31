@@ -65,7 +65,6 @@ class CommandNSIdentify : public Command
 				alog("%s: %s!%s@%s logged out of account %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nc->display);
 			}
 
-			u->UpdateHost();
 			if (na->last_realname)
 				delete [] na->last_realname;
 			na->last_realname = sstrdup(u->realname);
@@ -74,6 +73,8 @@ class CommandNSIdentify : public Command
 
 			ircdproto->SendAccountLogin(u, u->nc);
 			ircdproto->SetAutoIdentificationToken(u);
+
+			u->UpdateHost();
 
 			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 

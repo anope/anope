@@ -401,12 +401,15 @@ class OSNews : public Module
 		this->AddCommand(OPERSERV, new CommandOSOperNews());
 		this->AddCommand(OPERSERV, new CommandOSRandomNews());
 
-		Implementation i[] = { I_OnOperServHelp, I_OnUserModeSet, I_OnUserConnect, I_OnSaveDatabase, I_OnPostLoadDatabases };
+		Implementation i[] = { I_OnOperServHelp, I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 5);
 	}
 
 	~OSNews()
 	{
+		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
+			delete *it;
+		News.clear();
 	}
 
 	void OnOperServHelp(User *u)
@@ -430,12 +433,45 @@ class OSNews : public Module
 		DisplayNews(u, NEWS_RANDOM);
 	}
 
-	void OnSaveDatabase()
+	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
 	{
+		if (params[0] == "OS" && params.size() >= 7 && params[1] == "NEWS")
+		{
+			NewsItem *n = new NewsItem;
+			n->num = atoi(params[2].c_str());
+			n->time = strtol(params[3].c_str(), NULL, 10);
+			strscpy(n->who, params[4].c_str(), NICKMAX);
+			if (params[5] == "LOGON")
+				n->type = NEWS_LOGON;
+			else if (params[5] == "RANDOM")
+				n->type = NEWS_RANDOM;
+			else if (params[5] == "OPER")
+				n->type = NEWS_OPER;
+			n->Text = params[6];
+			News.push_back(n);
+
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
 	}
 
-	void OnPostLoadDatabases()
+	void OnDatabaseWrite(void (*Write)(const std::string &))
 	{
+		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
+		{
+			NewsItem *n = *it;
+
+			char buf[512], *ntype;
+			if (n->type == NEWS_LOGON)
+				ntype = "LOGON";
+			else if (n->type == NEWS_RANDOM)
+				ntype = "RANDOM";
+			else if (n->type == NEWS_OPER)
+				ntype = "OPER";
+			snprintf(buf, sizeof(buf), "OS NEWS %d %ld %s %s :%s", n->num, n->time, n->who, ntype, n->Text.c_str());	
+			Write(buf);
+		}
 	}
 };
 

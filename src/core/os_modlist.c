@@ -32,6 +32,7 @@ class CommandOSModList : public Command
 		int showEnc = 1;
 		int showSupported = 1;
 		int showQA = 1;
+		int showDB = 1;
 
 		ci::string param = params.size() ? params[0] : "";
 		ModuleHash *current = NULL;
@@ -42,6 +43,7 @@ class CommandOSModList : public Command
 		char enc[] = "Encryption";
 		char supported[] = "Supported";
 		char qa[] = "QATested";
+		char db[] = "Database";
 
 		if (!param.empty())
 		{
@@ -53,6 +55,7 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showSupported = 0;
 				showQA = 0;
+				showDB = 0;
 			}
 			else if (param == third)
 			{
@@ -62,6 +65,7 @@ class CommandOSModList : public Command
 				showQA = 0;
 				showProto = 0;
 				showEnc = 0;
+				showDB = 0;
 			}
 			else if (param == proto)
 			{
@@ -71,6 +75,7 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showSupported = 0;
 				showQA = 0;
+				showDB = 0;
 			}
 			else if (param == supported)
 			{
@@ -80,6 +85,7 @@ class CommandOSModList : public Command
 				showSupported = 1;
 				showEnc = 0;
 				showQA = 0;
+				showDB = 0;
 			}
 			else if (param == qa)
 			{
@@ -89,6 +95,7 @@ class CommandOSModList : public Command
 				showSupported = 0;
 				showEnc = 0;
 				showQA = 1;
+				showDB = 0;
 			}
 			else if (param == enc)
 			{
@@ -98,6 +105,17 @@ class CommandOSModList : public Command
 				showSupported = 0;
 				showEnc = 1;
 				showQA = 0;
+				showDB = 0;
+			}
+			else if (param == db)
+			{
+				showCore = 0;
+				showThird = 0;
+				showProto = 0;
+				showSupported = 0;
+				showEnc = 0;
+				showQA = 0;
+				showDB = 1;
 			}
 		}
 
@@ -146,6 +164,13 @@ class CommandOSModList : public Command
 						break;
 					case ENCRYPTION:
 						if (showEnc)
+						{
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), enc);
+							++count;
+						}
+						break;
+					case DATABASE:
+						if (showDB)
 						{
 							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), enc);
 							++count;

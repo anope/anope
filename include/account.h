@@ -58,8 +58,8 @@ enum NickCoreFlag
 	NI_SUSPENDED,
 	/* Autoop nickname in channels */
 	NI_AUTOOP,
-	/* Nick won't expire */
-	NI_NOEXPIRE,
+	/* This nickcore is forbidden, which means the nickalias for it is aswell */
+	NI_FORBIDDEN,
 
 	NI_END
 };

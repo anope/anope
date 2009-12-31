@@ -1,5 +1,5 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
-		config.o datafiles.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
+		config.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o nickserv.o operserv.o \
 		process.o protocol.o send.o servers.o sessions.o slist.o sockutil.o opertype.o users.o module.o modulemanager.o configreader.o \
 		wildcard.o nickcore.o nickalias.o timers.o modes.o regchannel.o
@@ -7,7 +7,7 @@ OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o comm
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
 	../include/messages.h ../include/services.h \
-	../include/timers.h ../include/datafiles.h ../include/extern.h \
+	../include/timers.h ../include/extern.h \
 	../include/modules.h ../include/slist.h ../include/hashcomp.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
@@ -47,7 +47,6 @@ command.o:     command.cpp  $(INCLUDES)
 commands.o:     commands.c  $(INCLUDES)
 compat.o:       compat.c    $(INCLUDES)
 config.o:       config.c    $(INCLUDES)
-datafiles.o:    datafiles.c $(INCLUDES)
 encrypt.o:      encrypt.c   $(INCLUDES)
 init.o:         init.c      $(INCLUDES)
 ircd.o:         ircd.c      $(INCLUDES)

@@ -432,8 +432,6 @@ class ServerConfig
 		/* Global realname */
 		char *desc_GlobalNoticer;
 
-		/* Name of the hostserv database */
-		char *HostDBName;
 		/* HostServ Name */
 		char *s_HostServ;
 		/* HostServ realname */
@@ -443,18 +441,6 @@ class ServerConfig
 		char *PIDFilename;
 		/* MOTD filename */
 		char *MOTDFilename;
-		/* NickServ DB name */
-		char *NickDBName;
-		/* DB name for nicks being registered */
-		char *PreNickDBName;
-		/* Channel DB name */
-		char *ChanDBName;
-		/* Botserv DB name */
-		char *BotDBName;
-		/* OperServ db name */
-		char *OperDBName;
-		/* News DB name */
-		char *NewsDBName;
 
 		/* True if its ok to not be able to save backs */
 		bool NoBackupOkay;
@@ -695,8 +681,6 @@ class ServerConfig
 		unsigned MaxSessionLimit;
 		/* How long session akills should last */
 		time_t SessionAutoKillExpiry;
-		/* DB name for exceptions */
-		char *ExceptionDBName;
 		/* Reason to use for session kills */ 
 		char *SessionLimitExceeded;
 		/* Optional second reason */
@@ -708,6 +692,8 @@ class ServerConfig
 		std::list<std::string> ModulesAutoLoad;
 		/* Encryption modules */
 		std::list<std::string> EncModuleList;
+		/* Database modules */
+		std::list<std::string> DBModuleList;
 		/* HostServ Core Modules */
 		std::list<std::string> HostServCoreModules;
 		/* MemoServ Core Modules */

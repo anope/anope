@@ -297,26 +297,6 @@ int main(int argc, char *argv[])
 				na->nc = findcore(s, 0);
 				na->nc->aliascount++;
 				free(s);
-
-				if (!na->nc->last_quit && quit)
-					na->nc->last_quit = strdup(quit);
-				if (!na->nc->last_realname && real)
-					na->nc->last_realname = strdup(real);
-				if (!na->nc->last_usermask && mask)
-					na->nc->last_usermask = strdup(mask);
-
-				// Convert nick NOEXPIRE to group NOEXPIRE
-				if (na->status & 0x0004)
-				{
-					na->nc->flags |= 0x00100000;
-				}
-
-				// Convert nick FORBIDDEN to group FORBIDDEN
-				if (na->status & 0x0002)
-				{
-					na->nc->flags |= 0x80000000;
-				}
-
 				free(mask);
 				free(real);
 				free(quit);
@@ -370,10 +350,12 @@ int main(int argc, char *argv[])
 			// Enc pass
 			b64_encode(nc->pass, hashm == "plain" ? strlen(nc->pass) : 32, (char *)cpass, 5000);
 
-			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " " << nc->email;
+			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " ";
 			fs << " " << GetLanguageID(nc->language) << " " << nc->memos.memomax << " " << nc->channelcount << std::endl;
 
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
+			if (nc->email)
+				fs << "MD EMAIL " << nc->email << std::endl;
 			if (nc->greet)
 				fs << "MD GREET :" << nc->greet << std::endl;
 			if (nc->icq)
@@ -404,13 +386,21 @@ int main(int argc, char *argv[])
 					<< ((nc->flags & NI_HIDE_STATUS  ) ? "HIDE_STATUS "  : "")
 					<< ((nc->flags & NI_SUSPENDED    ) ? "SUSPENDED "    : "")
 					<< ((nc->flags & NI_AUTOOP       ) ? "AUTOOP "       : "")
-					<< ((nc->flags & NI_NOEXPIRE     ) ? "NOEXPIRE "     : "")
 					<< ((nc->flags & NI_FORBIDDEN    ) ? "FORBIDDEN "    : "") << std::endl;
 			if (nc->memos.memocount)
 			{
 				memos = nc->memos.memos;
 				for (j = 0; j < nc->memos.memocount; j++, memos++)
-					fs << "MD MI " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
+				{
+					fs << "MD MI " << memos->number << " " << memos->time << " " << memos->sender;
+					if (memos->flags & MF_UNREAD)
+						fs << " UNREAD";
+					if (memos->flags & MF_RECEIPT)
+						fs << " RECEIPT";
+					if (memos->flags & MF_NOTIFYS)
+						fs << " NOTIFYS";
+					fs << " :" << memos->text << std::endl;
+				}
 			}
 
 			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
@@ -430,12 +420,12 @@ int main(int argc, char *argv[])
 					std::cout << "Writing: " << na->nc->display << "'s nick: " << na->nick << std::endl;
 
 					fs <<  "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << std::endl;
-					if (nc->last_usermask)
-						fs << "MD LAST_USERMASK " << nc->last_usermask << std::endl;
-					if (nc->last_realname)
-						fs << "MD LAST_REALNAME :" << nc->last_realname << std::endl;
-					if (nc->last_quit)
-						fs << "MD LAST_QUIT :" << nc->last_quit << std::endl;
+					if (na->last_usermask)
+						fs << "MD LAST_USERMASK " << na->last_usermask << std::endl;
+					if (na->last_realname)
+						fs << "MD LAST_REALNAME :" << na->last_realname << std::endl;
+					if (na->last_quit)
+						fs << "MD LAST_QUIT :" << na->last_quit << std::endl;
 					if ((na->status & NS_FORBIDDEN) || (na->status & NS_NO_EXPIRE)) 
 					{
 						fs << "MD FLAGS"
@@ -728,10 +718,9 @@ int main(int argc, char *argv[])
 			}
 			*last = NULL;
 		}
+
+		close_db(f);
 	}
-
-	close_db(f);
-
 
 	ChannelInfo *ci;
 
@@ -762,7 +751,7 @@ int main(int argc, char *argv[])
 					<< ((ci->flags & CI_PEACE         ) ? " PEACE"         : "")
 					<< ((ci->flags & CI_SECURE        ) ? " SECURE"        : "")
 					<< ((ci->flags & CI_FORBIDDEN     ) ? " FORBIDDEN"     : "")
-					<< ((ci->flags & CI_NO_EXPIRE     ) ? " NOEXPIRE"      : "")
+					<< ((ci->flags & CI_NO_EXPIRE     ) ? " NO_EXPIRE"     : "")
 					<< ((ci->flags & CI_MEMO_HARDMAX  ) ? " MEMO_HARDMAX"  : "")
 					<< ((ci->flags & CI_OPNOTICE      ) ? " OPNOTICE"      : "")
 					<< ((ci->flags & CI_SECUREFOUNDER ) ? " SECUREFOUNDER" : "")
@@ -782,7 +771,7 @@ int main(int argc, char *argv[])
 				fs << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << std::endl;
 
 			for (j = 0; j < ci->accesscount; j++)
-			{  // MD CH access <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2
+			{  // MD ACCESS <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2
 				if (ci->access[j].in_use)
 					fs << "MD ACCESS "
 						<< ci->access[j].nc->display << " " << ci->access[j].level << " " 
@@ -790,14 +779,18 @@ int main(int argc, char *argv[])
 			}
 
 			for (j = 0; j < ci->akickcount; j++)
-			{  // MD CH akick <USED/NOTUSED> <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
-				fs << "MD AKICK "
-					<< ((ci->akick[j].flags & AK_USED) ? "USED " : "NOTUSED ")
-					<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK " )
-					<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
-					<< ((ci->akick[j].flags & AK_ISNICK) ? ci->akick[j].u.nc->display : ci->akick[j].u.mask )
-					<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " :" << ci->akick[j].reason
-					<< std::endl;
+			{  // MD AKICK <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
+				if (ci->akick[j].flags & 0x0001)
+				{
+					fs << "MD AKICK "
+						<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK " )
+						<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
+						<< ((ci->akick[j].flags & AK_ISNICK) ? ci->akick[j].u.nc->display : ci->akick[j].u.mask )
+						<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " :";
+						if (ci->akick[j].reason)
+							fs << ci->akick[j].reason;
+						fs << std::endl;
+				}
 			}
 
 			if (ci->mlock_on)
@@ -816,13 +809,13 @@ int main(int argc, char *argv[])
 			{
 				fs << "MD MLP";
 				if (ci->mlock_limit)
-					fs << " LIMIT" << ci->mlock_limit;
+					fs << " CMODE_LIMIT " << ci->mlock_limit;
 				if (ci->mlock_key)
-					fs << " KEY" << ci->mlock_key;
+					fs << " CMODE_KEY " << ci->mlock_key;
 				if (ci->mlock_flood)
-					fs << " FLOOD" << ci->mlock_flood;
+					fs << " CMODE_FLOOD " << ci->mlock_flood;
 				if (ci->mlock_redirect)
-					fs << " REDIRECT" << ci->mlock_redirect;
+					fs << " CMODE_REDIRECT " << ci->mlock_redirect;
 				fs << std::endl;
 			}
 			if (ci->memos.memocount)
@@ -831,8 +824,14 @@ int main(int argc, char *argv[])
 				memos = ci->memos.memos;
 				for (j = 0; j < ci->memos.memocount; j++, memos++)
 				{
-					fs << "MD MI " << memos->number << " " << memos->flags << " " 
-						<< memos->time << " " << memos->sender << " :" << memos->text << std::endl;
+					fs << "MD MI " << memos->number << " " << memos->time << " " << memos->sender;
+					if (memos->flags & MF_UNREAD)
+						fs << " UNREAD";
+					if (memos->flags & MF_RECEIPT)
+						fs << " RECEIPT";
+					if (memos->flags & MF_NOTIFYS)
+						fs << " NOTIFYS";
+					fs << " :" << memos->text << std::endl;
 				}
 			}
 
@@ -878,12 +877,15 @@ int main(int argc, char *argv[])
 				fs << "MD BI REPEATTIMES " << ci->repeattimes << std::endl;
 			for (j = 0; j < ci->bwcount; j++)
 			{
-				fs << "MD BI BADWORD "
-					<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
-					<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
-					<< (( ci->badwords[j].type == 3 ) ? "START "  : "" )
-					<< (( ci->badwords[j].type == 4 ) ? "END "    : "" )
-					<< ":" << ci->badwords[j].word << std::endl;
+				if (ci->badwords[j].in_use)
+				{
+					fs << "MD BI BADWORD "
+						<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
+						<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
+						<< (( ci->badwords[j].type == 3 ) ? "START "  : "" )
+						<< (( ci->badwords[j].type == 4 ) ? "END "    : "" )
+						<< ":" << ci->badwords[j].word << std::endl;
+				}
 			}
 
 		} /* for (chanlists[i]) */

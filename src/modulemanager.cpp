@@ -255,6 +255,8 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		m->OnPostLoadDatabases();
 	}
 
+	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
+
 	return MOD_ERR_OK;
 }
 
@@ -267,7 +269,7 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 		return MOD_ERR_PARAMS;
 	}
 
-	if (m->GetPermanent() || m->type == PROTOCOL || m->type == ENCRYPTION)
+	if (m->GetPermanent() || m->type == PROTOCOL || m->type == ENCRYPTION || m->type == DATABASE)
 	{
 		if (u)
 			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_UNLOAD);
@@ -279,6 +281,8 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 		ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s unloaded module %s", u->nick, m->name.c_str());
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
+
+	FOREACH_MOD(I_OnModuleUnload, OnModuleUnload(u, m));
 
 	DeleteModule(m);
 	return MOD_ERR_OK;

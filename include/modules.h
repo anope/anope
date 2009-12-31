@@ -186,7 +186,7 @@ enum CommandReturn
 	const char *ano_moderr();
 #endif
 
-typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION } MODType;
+typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION,DATABASE } MODType;
 typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
 
 /*************************************************************************/
@@ -561,11 +561,15 @@ class CoreExport Module
 	 */
 	virtual void OnPostLoadDatabases() { }
 
-	/** Called when anope saves databases.
-	 * NOTE: This event is deprecated pending new database handling.
-	 * XXX.
+	/** Called when the databases are saved
+	 * @return EVENT_CONTINUE to let other modules continue saving, EVENT_STOP to stop
 	 */
-	virtual void OnSaveDatabase() MARK_DEPRECATED { }
+	virtual EventReturn OnSaveDatabase() { return EVENT_CONTINUE; }
+
+	/** Called when the databases are loaded
+	 * @return EVENT_CONTINUE to let other modules continue saving, EVENT_STOP to stop
+	 */
+	virtual EventReturn OnLoadDatabase() { return EVENT_CONTINUE; }
 
 	/** Called when anope backs up databases.
 	 * NOTE: This event is deprecated pending new database handling.
@@ -683,6 +687,73 @@ class CoreExport Module
 	/** Called when the database expire routines are called
 	 */
 	virtual void OnDatabaseExpire() MARK_DEPRECATED { }
+
+	/** Called when the flatfile dbs are being written
+	 * @param Write A callback to the function used to insert a line into the database
+	 */
+	virtual void OnDatabaseWrite(void (*Write)(const std::string &)) { }
+
+	/** Called when a line is read from the database
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseRead(const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
+	/** Called when nickcore metadata is read from the database
+	 * @param nc The nickcore
+	 * @param key The metadata key
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseReadMetadata(NickCore *nc, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
+	/** Called when nickcore metadata is read from the database
+	 * @param na The nickalias
+	 * @param key The metadata key
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
+	/** Called when botinfo metadata is read from the database
+	 * @param bi The botinfo
+	 * @param key The metadata key
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseReadMetadata(BotInfo *bi, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
+	/** Called when chaninfo metadata is read from the database
+	 * @param ci The chaninfo
+	 * @param key The metadata key
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
+	/** Called when we are writing metadata for a nickcore
+	 * @param WriteMetata A callback function used to insert the metadata
+	 * @param nc The nickcore
+	 */
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickCore *nc) { }
+
+	/** Called when we are wrting metadata for a nickalias
+	 * @param WriteMetata A callback function used to insert the metadata
+	 * @param na The nick alias
+	 */
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickAlias *na) { }
+
+	/** Called when we are writing metadata for a botinfo
+	 * @param WriteMetata A callback function used to insert the metadata
+	 * @param bi The botinfo
+	 */
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), BotInfo *bi) { }
+
+	/** Called when are are writing metadata for a channelinfo
+	 * @param WriteMetata A callback function used to insert the metadata
+	 * @param bi The channelinfo
+	 */
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), ChannelInfo *ci) { }
 
 	/** Called before services restart
 	*/
@@ -983,6 +1054,18 @@ class CoreExport Module
 	 */
 	virtual EventReturn OnUnMLock(ChannelModeName Name) { return EVENT_CONTINUE; }
 
+	/** Called after a module is loaded
+	 * @param u The user loading the module, can be NULL
+	 * @param m The module
+	 */
+	virtual void OnModuleLoad(User *u, Module *m) { }
+
+	/** Called before a module is unloaded
+	 * @param u The user, can be NULL
+	 * @param m The module
+	 */
+	virtual void OnModuleUnload(User *u, Module *m) { }
+
 };
 
 
@@ -1019,9 +1102,17 @@ enum Implementation
 		/* OperServ */
 		I_OnOperServHelp, I_OnDefconLevel,
 
+		/* Database */
+		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase, I_OnBackupDatabase,
+		I_OnDatabaseExpire,
+		I_OnDatabaseWrite, I_OnDatabaseRead, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata,
+		
+		/* Modules */
+		I_OnModuleLoad, I_OnModuleUnload,
+
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreCommandRun, I_OnPreCommand, I_OnPostCommand, I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnBackupDatabase,
-		I_OnPreDatabaseExpire, I_OnDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
+		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreCommandRun, I_OnPreCommand, I_OnPostCommand,
+		I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,

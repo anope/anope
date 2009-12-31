@@ -140,11 +140,67 @@ class OSIgnore : public Module
 		this->SetType(CORE);
 		this->AddCommand(OPERSERV, new CommandOSIgnore());
 
-		ModuleManager::Attach(I_OnOperServHelp, this);
+		Implementation i[] = { I_OnOperServHelp, I_OnDatabaseRead, I_OnDatabaseWrite };
+		ModuleManager::Attach(i, this, 3);
 	}
+
 	void OnOperServHelp(User *u)
 	{
 		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_IGNORE);
+	}
+
+	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
+	{
+		std::string buf;
+
+		if (params[0] == "OS" && params.size() >= 4 && params[1] == "IGNORE")
+		{
+			IgnoreData *ign = new IgnoreData;
+			ign->mask = sstrdup(params[2].c_str());
+			ign->time = strtol(params[3].c_str(), NULL, 10);
+			ign->prev = NULL;
+			ign->next = ignore;
+			if (ignore)
+			ignore->prev = ign;
+			ignore = ign;
+
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	void OnDatabaseWrite(void (*Write)(const std::string &))
+	{
+		IgnoreData *ign, *next;
+		time_t now = time(NULL);
+
+		for (ign = ignore; ign; ign = next)
+		{
+			next = ign->next;
+
+			if (ign->time != 0 && ign->time <= now)
+			{
+				if (debug)
+					alog("[os_ignore] debug: Expiring ignore entry %s", ign->mask);
+				if (ign->prev)
+					ign->prev->next = ign->next;
+				else if (ignore == ign)
+					ignore = ign->next;
+				if (ign->next)
+					ign->next->prev = ign->prev;
+				delete [] ign->mask;
+				delete ign;
+				ign = NULL;
+			}
+			else
+			{
+				std::string buf = "OS IGNORE ";
+				buf += ign->mask;
+				buf += " " + ign->time;
+				Write(buf);
+			}
+		}
 	}
 };
 

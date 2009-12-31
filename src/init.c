@@ -388,6 +388,10 @@ int init_primary(int ac, char **av)
 
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config.EncModuleList);
+
+	/* Add Database Modules */
+	ModuleManager::LoadModuleList(Config.DBModuleList);
+
 	return 0;
 }
 
@@ -500,7 +504,10 @@ int init_secondary(int ac, char **av)
 	add_entropy_userkeys();
 
 	/* Load up databases */
-	//alog("Databases loaded");
+	alog("Loading databases...");
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
+	alog("Databases loaded");
 
 	// XXX: this is duplicated in type loading.
 	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
@@ -561,9 +568,6 @@ int init_secondary(int ac, char **av)
 	}
 
 	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
-	/* Save the databases back to file/mysql to reflect any changes */
-		alog("Info: Reflecting database records.");
-		save_databases();
 	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 
 	/* Connect to the remote server */

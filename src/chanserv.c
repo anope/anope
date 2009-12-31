@@ -719,12 +719,9 @@ int check_kick(User * user, const char *chan, time_t chants)
 
 	if (c)
 	{
-		c->RemoveMode(NULL, CMODE_BAN, mask);
-	}
-
-	c->SetMode(NULL, CMODE_BAN, mask);
-	if (c)
+		c->SetMode(NULL, CMODE_BAN, mask);
 		ircdproto->SendKick(whosends(ci), c, user, "%s", reason);
+	}
 
 	return 1;
 }

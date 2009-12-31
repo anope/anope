@@ -393,8 +393,6 @@ E void SetDefaultMLock();
 
 /**** modules.c ****/
 E void modules_unload_all(bool unload_proto);	/* Read warnings near function source */
-E void ModuleDatabaseBackup(const char *dbname);
-E void ModuleRemoveBackups(const char *dbname);
 
 /**** nickserv.c ****/
 

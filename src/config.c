@@ -22,6 +22,7 @@ ServerConfig Config;
 
 static std::string Modules;
 static std::string EncModules;
+static std::string DBModules;
 static std::string HostCoreModules;
 static std::string MemoCoreModules;
 static std::string BotCoreModules;
@@ -180,12 +181,7 @@ bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueI
 {
 	if (Config.NSEmailReg)
 	{
-		if (std::string(value) == "prenickdatabase")
-		{
-			if (data.GetValue().empty())
-				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when e-mail registrations are enabled!");
-		}
-		else if (std::string(value) == "preregexpire")
+		if (std::string(value) == "preregexpire")
 		{
 			if (!data.GetInteger())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
@@ -240,7 +236,7 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 {
 	if (Config.s_BotServ)
 	{
-		if (std::string(value) == "description" || std::string(value) == "database")
+		if (std::string(value) == "description")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
@@ -258,7 +254,7 @@ bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueI
 {
 	if (Config.s_HostServ)
 	{
-		if (std::string(value) == "description" || std::string(value) == "database")
+		if (std::string(value) == "description")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
@@ -613,6 +609,7 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "networkname", "", new ValueContainerChar(&Config.NetworkName), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&Config.NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "database", "", new ValueContainerString(&DBModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&Config.UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&Config.UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&Config.UserKey3), DT_LUINTEGER, NoValidation},
@@ -645,9 +642,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "mlock", "+nrt", new ValueContainerString(&Config.MLock), DT_STRING, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&Config.s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&Config.desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"nickserv", "database", "nick.db", new ValueContainerChar(&Config.NickDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&Config.NSEmailReg), DT_BOOLEAN, NoValidation},
-		{"nickserv", "prenickdatabase", "", new ValueContainerChar(&Config.PreNickDBName), DT_CHARPTR, ValidateEmailReg},
 		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&Config.NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
@@ -677,7 +672,6 @@ int ServerConfig::Read(bool bail)
 		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&Config.DontQuoteAddresses), DT_BOOLEAN, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&Config.s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&Config.desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"chanserv", "database", "chan.db", new ValueContainerChar(&Config.ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&Config.CSMaxReg), DT_UINTEGER, NoValidation},
@@ -699,7 +693,6 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&Config.MSMemoReceipt), DT_UINTEGER, NoValidation},
 		{"botserv", "nick", "", new ValueContainerChar(&Config.s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&Config.desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
-		{"botserv", "database", "bot.db", new ValueContainerChar(&Config.BotDBName), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "modules", "", new ValueContainerString(&BotCoreModules), DT_STRING, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerUInt(&Config.BSMinUsers), DT_UINTEGER, ValidateBotServ},
@@ -711,15 +704,11 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&Config.BSFantasyCharacter), DT_CHARPTR, NoValidation},
 		{"hostserv", "nick", "", new ValueContainerChar(&Config.s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&Config.desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
-		{"hostserv", "database", "hosts.db", new ValueContainerChar(&Config.HostDBName), DT_CHARPTR, ValidateHostServ},
 		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
 		{"operserv", "nick", "OperServ", new ValueContainerChar(&Config.s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&Config.desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&Config.s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&Config.desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "database", "oper.db", new ValueContainerChar(&Config.OperDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&Config.NewsDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&Config.ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&Config.SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&Config.LogMaxUsers), DT_BOOLEAN, NoValidation},
@@ -1689,6 +1678,7 @@ int read_config(int reload)
 	/* Modules Autoload building... :P */
 	Config.ModulesAutoLoad = BuildStringList(!Modules.empty() ? Modules : "");
 	Config.EncModuleList = BuildStringList(!EncModules.empty() ? EncModules : "");
+	Config.DBModuleList = BuildStringList(!DBModules.empty() ? DBModules : "");
 	Config.HostServCoreModules = BuildStringList(!HostCoreModules.empty() ? HostCoreModules : "");
 	Config.MemoServCoreModules = BuildStringList(!MemoCoreModules.empty() ? MemoCoreModules : "");
 	Config.BotServCoreModules = BuildStringList(!BotCoreModules.empty() ? BotCoreModules : "");
@@ -1773,18 +1763,6 @@ int read_config(int reload)
 				CHECK(Config.DefConChanModes);
 			}
 		}
-	}
-
-	/**
-	 * If they try to enable any email registration option,
-	 * make sure they have everything else they need too...
-	 *
-	 * rob
-	 **/
-	if (!Config.NSEmailReg) {
-		delete [] Config.PreNickDBName;
-		Config.PreNickDBName = NULL;
-		Config.NSRExpire = 0;
 	}
 
 	SetDefaultMLock();

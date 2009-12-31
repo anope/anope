@@ -24,9 +24,6 @@
 int HSRequestMemoUser = 0;
 int HSRequestMemoOper = 0;
 int HSRequestMemoSetters = 0;
-char *HSRequestDBName = NULL;
-
-#define HSREQ_DEFAULT_DBNAME "hs_request.db"
 
 /* Language defines */
 #define LNG_NUM_STRINGS 21
@@ -57,8 +54,6 @@ void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, i
 int my_isvalidchar(const char c);
 void my_memo_lang(User *u, const char *name, int z, int number, ...);
 void req_send_memos(User *u, char *vIdent, char *vHost);
-
-void hsreq_load_db();
 
 void my_load_config();
 void my_add_languages();
@@ -410,18 +405,12 @@ class HSRequest : public Module
 		this->AddCommand(HOSTSERV, new CommandHSReject());
 		this->AddCommand(HOSTSERV, new CommandHSWaiting());
 
-		ModuleManager::Attach(I_OnPreCommand, this);
-		ModuleManager::Attach(I_OnSaveDatabase, this);
-		ModuleManager::Attach(I_OnBackupDatabase, this);
-
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		my_load_config();
 		hs_request_head = NULL;
-
-		hsreq_load_db();
 
 		const char* langtable_en_us[] = {
 			/* LNG_REQUEST_SYNTAX */
@@ -679,7 +668,8 @@ class HSRequest : public Module
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 
-		ModuleManager::Attach(I_OnHostServHelp, this);
+		Implementation i[] = { I_OnHostServHelp, I_OnPreCommand, I_OnDatabaseRead, I_OnDatabaseWrite };
+		ModuleManager::Attach(i, this, 4);
 	}
 
 	~HSRequest()
@@ -689,8 +679,6 @@ class HSRequest : public Module
 		/* Clean up all open host requests */
 		while (hs_request_head)
 			hs_request_head = deleteHostCore(hs_request_head, NULL);
-
-		delete [] HSRequestDBName;
 	}
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
@@ -726,51 +714,42 @@ class HSRequest : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnSaveDatabase()
-	{
-		FILE *fp;
-		const char *db_filename;
-		const char *vident;
-		HostCore *current;
-
-		if (HSRequestDBName)
-			db_filename = HSRequestDBName;
-		else
-			db_filename = HSREQ_DEFAULT_DBNAME;
-
-		fp = fopen(db_filename, "w");
-		if (!fp)
-		{
-			alog("[hs_request] Unable to open database ('%s') for writing", db_filename);
-			return;
-		}
-
-		current = hs_request_head;
-		while (current)
-		{
-			vident = current->vIdent ? current->vIdent : "(null)";
-			fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident, current->vHost, static_cast<uint32>(current->time), current->creator);
-			current = current->next;
-		}
-
-		fclose(fp);
-
-		if (debug)
-			alog("[hs_request] Successfully saved database");
-	}
-
-	void OnBackupDatabase()
-	{
-		if (HSRequestDBName)
-			ModuleDatabaseBackup(HSRequestDBName);
-		else
-			ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
-	}
-
 	void OnHostServHelp(User *u)
 	{
 		this->NoticeLang(Config.s_HostServ, u, LNG_HELP);
 		this->NoticeLang(Config.s_HostServ, u, LNG_HELP_SETTER);
+	}
+
+	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
+	{
+		if (params[0] == "HS_REQUEST" && params.size() >= 6)
+		{
+			my_add_host_request(const_cast<char *>(params[1].c_str()), const_cast<char *>(params[2].c_str()), const_cast<char *>(params[3].c_str()), const_cast<char *>(params[4].c_str()), strtol(params[5].c_str(), NULL, 10));
+
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	void OnDatabaseWrite(void (*Write)(const std::string &))
+	{
+		for (HostCore *current = hs_request_head; current; current = current->next)
+		{
+			const char *vident = current->vIdent ? current->vIdent : "(null)";
+			std::string buf = "HS_REQUEST ";
+			// We really need a better + operator to make this easier ...
+			buf += current->nick;
+			buf += " ";
+			buf += vident;
+			buf += " ";
+			buf += current->vHost;
+			buf += " ";
+			buf += current->time;
+			buf += " ";
+			buf += current->creator;
+			Write(buf);
+		}
 	}
 };
 
@@ -872,84 +851,15 @@ int my_isvalidchar(const char c)
 		return 0;
 }
 
-void hsreq_load_db()
-{
-	FILE *fp;
-	const char *db_filename;
-	char readbuf[1024];
-	char *nick, *vident, *vhost, *creator, *tmp;
-	int32 tmp_time;
-	char *buf;
-
-	if (HSRequestDBName)
-		db_filename = HSRequestDBName;
-	else
-		db_filename = HSREQ_DEFAULT_DBNAME;
-
-	fp = fopen(db_filename, "r");
-	if (!fp)
-	{
-		alog("[hs_request] Unable to open database ('%s') for reading", db_filename);
-		return;
-	}
-
-	while (fgets(readbuf, 1024, fp))
-	{
-		buf = normalizeBuffer(readbuf);
-		if (buf || *buf)
-		{
-			nick = myStrGetToken(buf, ':', 0);
-			vident = myStrGetToken(buf, ':', 1);
-			vhost = myStrGetToken(buf, ':', 2);
-			tmp = myStrGetToken(buf, ':', 3);
-			if (tmp)
-			{
-				tmp_time = strtol(tmp, NULL, 16);
-				delete [] tmp;
-			}
-			else
-				tmp_time = 0;
-			creator = myStrGetToken(buf, ':', 4);
-			if (!nick || !vident || !vhost || !creator)
-			{
-				alog("[hs_request] Error while reading database, skipping record");
-				continue;
-			}
-			if (!stricmp(vident, "(null)"))
-			{
-				delete [] vident;
-				vident = NULL;
-			}
-			my_add_host_request(nick, vident, vhost, creator, tmp_time);
-			delete [] nick;
-			delete [] vhost;
-			delete [] creator;
-			if (vident)
-				delete [] vident;
-		}
-		delete [] buf;
-	}
-
-	fclose(fp);
-
-	if (debug)
-		alog("[hs_request] Successfully loaded database");
-}
-
 void my_load_config()
 {
 	ConfigReader config;
 	HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);
 	HSRequestMemoOper = config.ReadFlag("hs_request", "memooper", "no", 0);
 	HSRequestMemoSetters = config.ReadFlag("hs_request", "memosetters", "no", 0);
-	std::string tmp = config.ReadValue("hs_request", "database", HSREQ_DEFAULT_DBNAME, 0);
-
-	if (HSRequestDBName)
-		delete [] HSRequestDBName;
-	HSRequestDBName = sstrdup(tmp.c_str());
 
 	if (debug)
-		alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);
+		alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters);
 }
 
 MODULE_INIT(HSRequest)

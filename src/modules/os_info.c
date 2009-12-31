@@ -21,9 +21,6 @@
 #define AUTHOR "Rob"
 #define VERSION "$Id$"
 
-/* Default database name */
-#define DEFAULT_DB_NAME "os_info.db"
-
 /* Multi-language stuff */
 #define LANG_NUM_STRINGS   10
 
@@ -39,11 +36,6 @@
 #define OCINFO_HELP_CMD	 9
 
 /*************************************************************************/
-
-char *OSInfoDBName = NULL;
-
-int mLoadData();
-int mLoadConfig();
 
 static Module *me;
 
@@ -201,18 +193,8 @@ class OSInfo : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		if (mLoadConfig())
-			throw ModuleException("Unable to load config");
-
 		this->AddCommand(NICKSERV, new CommandNSOInfo());
 		this->AddCommand(CHANSERV, new CommandCSOInfo());
-
-		ModuleManager::Attach(I_OnPostCommand, this);
-		ModuleManager::Attach(I_OnSaveDatabase, this);
-		ModuleManager::Attach(I_OnBackupDatabase, this);
-
-		mLoadData();
-		ModuleManager::Attach(I_OnReload, this);
 
 		const char* langtable_en_us[] = {
 			/* OINFO_SYNTAX */
@@ -427,8 +409,8 @@ class OSInfo : public Module
 		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 
-		Implementation i[] = { I_OnNickServHelp, I_OnChanServHelp };
-		ModuleManager::Attach(i, this, 2);
+		Implementation i[] = { I_OnNickServHelp, I_OnChanServHelp, I_OnPostCommand, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata };
+		ModuleManager::Attach(i, this, 5);
 	}
 
 	~OSInfo()
@@ -455,18 +437,6 @@ class OSInfo : public Module
 				ci->Shrink("os_info");
 			}
 		}
-
-		if (OSInfoDBName)
-			delete [] OSInfoDBName;
-	}
-
-	void OnReload(bool starting)
-	{
-		alog("os_info: Reloading configuration directives...");
-		int ret = mLoadConfig();
-
-		if (ret)
-			alog("os_info.c: ERROR: An error has occured while reloading the configuration file");
 	}
 
 	void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
@@ -508,52 +478,6 @@ class OSInfo : public Module
 		}
 	}
 
-	void OnSaveDatabase()
-	{
-		ChannelInfo *ci = NULL;
-		NickCore *nc = NULL;
-		int i = 0;
-		int ret = 0;
-		FILE *out;
-
-		if (!(out = fopen(OSInfoDBName, "w")))
-		{
-			alog("os_info: ERROR: can not open the database file!");
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "os_info: ERROR: can not open the database file!");
-			ret = 1;
-		}
-		else
-		{
-			for (i = 0; i < 1024; ++i)
-			{
-				for (nc = nclists[i]; nc; nc = nc->next)
-				{
-					/* If we have any info on this user */
-					char *c;
-					if (nc->GetExtArray("os_info", c))
-						fprintf(out, "N %s %s\n", nc->display, c);
-				}
-			}
-
-			for (i = 0; i < 256; ++i)
-			{
-				for (ci = chanlists[i]; ci; ci = ci->next)
-				{
-					/* If we have any info on this channel */
-					char *c;
-					if (ci->GetExtArray("os_info", c))
-						fprintf(out, "C %s %s\n", ci->name, c);
-				}
-			}
-			fclose(out);
-		}
-	}
-
-	void OnBackupDatabase()
-	{
-		ModuleDatabaseBackup(OSInfoDBName);
-	}
-
 	void OnNickServHelp(User *u)
 	{
 		this->NoticeLang(Config.s_NickServ, u, OINFO_HELP_CMD);
@@ -563,91 +487,56 @@ class OSInfo : public Module
 	{
 		this->NoticeLang(Config.s_ChanServ, u, OCINFO_HELP_CMD);
 	}
-};
 
-/*************************************************************************/
-
-/**
- * Load data from the db file, and populate our OperInfo lines
- * @return 0 for success
- **/
-int mLoadData()
-{
-	int ret = 0;
-	FILE *in;
-
-	char *type = NULL;
-	char *name = NULL;
-	char *info = NULL;
-	int len = 0;
-
-	ChannelInfo *ci = NULL;
-	NickAlias *na = NULL;
-
-	/* will _never_ be this big thanks to the 512 limit of a message */
-	char buffer[2000];
-	if (!(in = fopen(OSInfoDBName, "r")))
+	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickCore *nc)
 	{
-		alog("os_info: WARNING: can not open the database file! (it might not exist, this is not fatal)");
-		ret = 1;
-	}
-	else
-	{
-		while (fgets(buffer, 1500, in))
+		char *c;
+
+		if (nc->GetExtArray("os_info", c))
 		{
-			type = myStrGetToken(buffer, ' ', 0);
-			name = myStrGetToken(buffer, ' ', 1);
-			info = myStrGetTokenRemainder(buffer, ' ', 2);
-			if (type)
-			{
-				if (name)
-				{
-					if (info)
-					{
-						len = strlen(info);
-						/* Take the \n from the end of the line */
-						info[len - 1] = '\0';
-						if (!stricmp(type, "C"))
-						{
-							if ((ci = cs_findchan(name)))
-								ci->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(info)));
-						}
-						else if (!stricmp(type, "N"))
-						{
-							if ((na = findnick(name)))
-								na->nc->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(info)));
-						}
-						delete [] info;
-					}
-					delete [] name;
-				}
-				delete [] type;
-			}
+			std::string buf = ":";
+			buf += c;
+			WriteMetadata("OS_INFO", buf.c_str());
 		}
 	}
-	return ret;
-}
 
-/**
- * Load the configuration directives from Services configuration file.
- * @return 0 for success
- **/
-int mLoadConfig()
-{
-	ConfigReader config;
-	std::string tmp = config.ReadValue("os_info", "database", DEFAULT_DB_NAME, 0);
+	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), ChannelInfo *ci)
+	{
+		char *c;
 
-	if (OSInfoDBName)
-		delete [] OSInfoDBName;
+		if (ci->GetExtArray("os_info", c))
+		{
+			std::string buf = ":";
+			buf += c;
+			WriteMetadata("OS_INFO", buf.c_str());
+		}
+	}
 
-	OSInfoDBName = sstrdup(tmp.c_str());
+	EventReturn OnDatabaseReadMetadata(NickCore *nc, const std::string &key, const std::vector<std::string> &params)
+	{
+		if (key == "OS_INFO")
+		{
+			nc->Shrink("os_info");
+			nc->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(params[0].c_str()))); /// We really should use std::string here...
 
-	alog("os_info: Directive OSInfoDBName loaded (%s)...", OSInfoDBName);
+			return EVENT_STOP;
+		}
 
-	return 0;
-}
+		return EVENT_CONTINUE;
+	}
 
+	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params)
+	{
+		if (key == "OS_INFO")
+		{
+			ci->Shrink("os_info");
+			ci->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(params[0].c_str())));
+			
+			return EVENT_STOP;
+		}
 
-/*************************************************************************/
+		return EVENT_CONTINUE;
+	}
+};
 
 MODULE_INIT(OSInfo)

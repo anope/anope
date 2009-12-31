@@ -25,6 +25,9 @@
 /* Name of configuration file (in Services directory) */
 #define SERVICES_CONF	"services.conf"
 
+/* Name of anope datbase */
+#define DATABASE_FILE	"anope.db"
+
 /* Name of log file (in Services directory) */
 #define LOG_FILENAME	"services.log"
 

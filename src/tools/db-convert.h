@@ -116,6 +116,10 @@ struct nickalias_ {
 	time_t last_seen;		   /* When it was seen online for the last time */
 	uint16 status;				  /* See NS_* below */
 	NickCore *nc;			   /* I'm an alias of this */
+
+	char *last_usermask;
+	char *last_realname;
+	char *last_quit;
 };
 
 struct nickcore_ {
@@ -136,9 +140,6 @@ struct nickcore_ {
 	int unused;				/* Used for nick collisions */
 	int aliascount;			/* How many aliases link to us? Remove the core if 0 */
 
-	char *last_quit;			 /* Last quit message */
-	char *last_realname;	 /* Last realname */
-	char *last_usermask;	 /* Last usermask */
 };
 
 struct chaninfo_ {
@@ -694,6 +695,12 @@ int delnick(NickAlias *na, int donttouchthelist)
 			nalists[HASH(na->nick)] = na->next;
 	}
 
+	if (na->last_usermask)
+		free(na->last_usermask);
+	if (na->last_realname)
+		free(na->last_realname);
+	if (na->last_quit)
+		free(na->last_quit);
 	/* free() us */
 	free(na->nick);
 	free(na);
@@ -720,12 +727,6 @@ int delcore(NickCore *nc)
 		free(nc->greet);
 	if (nc->url)
 		free(nc->url);
-	if (nc->last_usermask)
-		free(nc->last_usermask);
-	if (nc->last_realname)
-		free(nc->last_realname);
-	if (nc->last_quit)
-		free(nc->last_quit);
 	if (nc->access) {
 		for (i = 0; i < nc->accesscount; i++) {
 			if (nc->access[i])

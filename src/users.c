@@ -921,11 +921,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		else
 		{
 			ntmp->last_seen = time(NULL);
-
-			if (ntmp->last_usermask)
-				delete [] ntmp->last_usermask;
-			std::string last_usermask = user->GetIdent() + "@" + user->GetDisplayedHost();
-			ntmp->last_usermask = sstrdup(last_usermask.c_str());
+			user->UpdateHost();
 			ircdproto->SetAutoIdentificationToken(user);
 			alog("%s: %s!%s@%s automatically identified for nick %s", Config.s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
 		}

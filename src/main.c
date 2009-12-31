@@ -29,7 +29,6 @@
 #include "services.h"
 #include "timers.h"
 #include "version.h"
-#include "datafiles.h"
 #include "modules.h"
 
 // getrlimit.
@@ -136,7 +135,8 @@ extern void expire_all()
 
 void save_databases()
 {
-	FOREACH_MOD(I_OnSaveDatabase, OnSaveDatabase())
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	if (debug)
 		alog("debug: Saving FFF databases");
 }

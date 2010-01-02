@@ -390,7 +390,7 @@ void User::UpdateHost()
 {
 	NickAlias *na = findnick(this->nick);
 
-	if (nick_identified(this) || (na && !na->nc->HasFlag(NI_SECURE) && IsRecognized()))
+	if (na && (this->nc && na->nc == this->nc || !na->nc->HasFlag(NI_SECURE) && IsRecognized()))
 	{
 		if (na->last_usermask)
 			delete [] na->last_usermask;

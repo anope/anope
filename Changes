@@ -4,6 +4,7 @@ A K alias to chanserv kick command
 A KB alias to chanserv ban command
 F Unban command to accept an optional nick arg
 F Small typo in services.conf
+F Crash when users change their host that are identified to a group, but not a nick
 
 Anope Version 1.9.1
 --------------------

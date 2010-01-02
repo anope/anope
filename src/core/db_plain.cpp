@@ -78,7 +78,7 @@ static void ReadDatabase(Module *m = NULL)
 		}
 		if (MOD_RESULT == EVENT_STOP)
 			continue;
-	
+
 		std::string mdbuf;
 		NickCore *nc;
 		NickAlias *na;
@@ -98,7 +98,7 @@ static void ReadDatabase(Module *m = NULL)
 			}
 			else if (params[0] == "BI")
 			{
-				bi = findbot(params[1].c_str());
+				bi = findbot(params[1]);
 				Type = MD_BI;
 			}
 			else if (params[0] == "CH")
@@ -731,7 +731,7 @@ class DBPlain : public Module
 				ak->SetFlag(AK_STUCK);
 			if (Nick)
 				ak->SetFlag(AK_ISNICK);
-	
+
 		}
 		else if (key == "MLOCK_ON" || buf == "MLOCK_OFF")
 		{
@@ -773,7 +773,7 @@ class DBPlain : public Module
 		else if (key == "BI")
 		{
 			if (params[0] == "NAME")
-				ci->bi = findbot(params[1].c_str());
+				ci->bi = findbot(params[1]);
 			else if (params[0] == "FLAGS")
 			{
 				for (unsigned j = 1; j < params.size(); ++j)
@@ -1082,7 +1082,7 @@ class DBPlain : public Module
 				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 			}
 		}
-		
+
 		HostCore *hc;
 		for (hc = hostCoreListHead(); hc; hc = hc->next)
 		{

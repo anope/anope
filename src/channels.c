@@ -153,10 +153,10 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		}
 
 		/* We don't track bots */
-		if (findbot(param.c_str()))
+		if (findbot(param))
 			return;
 
-		User *u = finduser(param.c_str());
+		User *u = finduser(param);
 		if (!u)
 		{
 			if (debug)
@@ -285,10 +285,10 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		}
 
 		/* We don't track bots */
-		if (findbot(param.c_str()))
+		if (findbot(param))
 			return;
 
-		User *u = finduser(param.c_str());
+		User *u = finduser(param);
 		if (!u)
 		{
 			alog("Channel::RemoveModeInternal() MODE %s +%c for nonexistant user %s", this->name, cm->ModeChar, param.c_str());
@@ -354,7 +354,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	/* Non registered channel, no mlock */
 	if (!ci || !EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
-	
+
 	/* This channel has this the mode locked on */
 	if (ci->HasMLock(cm->Name, true))
 	{
@@ -656,7 +656,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 {
 	if (!ac)
 		return;
-	
+
 	int k = 0, j = 0, add = -1;
 	for (unsigned int i = 0; i < strlen(av[0]); ++i)
 	{

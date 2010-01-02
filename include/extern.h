@@ -35,10 +35,10 @@ E IRCDProto *ircdproto;
 
 /**** actions.c ****/
 
-E void kill_user(const char *source, const char *user, const char *reason);
-E void bad_password(User * u);
-E void sqline(char *mask, char *reason);
-E void common_unban(ChannelInfo * ci, char *nick);
+E void kill_user(const std::string &source, const std::string &user, const std::string &reason);
+E void bad_password(User *u);
+E void sqline(const std::string &mask, const std::string &reason);
+E void common_unban(ChannelInfo *ci, const std::string &nick);
 
 /**** botserv.c ****/
 
@@ -49,7 +49,7 @@ E void bs_init();
 E void botserv(User *u, char *buf);
 E void botmsgs(User *u, BotInfo *bi, char *buf);
 E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
-E BotInfo *findbot(const char *nick);
+E BotInfo *findbot(const std::string &nick);
 
 /** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
  * @param uid The UID to search for
@@ -596,11 +596,11 @@ E uint32 maxusercnt, usercnt;
 E time_t maxusertime;
 
 E void get_user_stats(long *nusers, long *memuse);
-E User *finduser(const char *nick);
+E User *finduser(const std::string &nick);
 E User *firstuser();
 E User *nextuser();
 
-E User *find_byuid(const char *uid);
+E User *find_byuid(const std::string &uid);
 E User *first_uid();
 E User *next_uid();
 E Server *findserver_uid(Server * s, const char *name);
@@ -612,7 +612,7 @@ E User *do_nick(const char *source, const char *nick, const char *username, cons
 
 E void do_umode(const char *source, int ac, const char **av);
 E void do_quit(const char *source, int ac, const char **av);
-E void do_kill(const char *source, const char *reason);
+E void do_kill(const std::string &source, const std::string &reason);
 
 E int is_oper(User * user);
 E int is_protected(User * user);

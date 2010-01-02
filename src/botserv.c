@@ -483,12 +483,14 @@ void insert_bot(BotInfo * bi)
 /*************************************************************************/
 /*************************************************************************/
 
-BotInfo *findbot(const char *nick)
+BotInfo *findbot(const std::string &nick)
 {
 	BotInfo *bi;
 
-	if (!nick || !*nick)
+	if (nick.empty())
 		return NULL;
+
+	ci::string ci_nick(nick.c_str());
 
 	/*
 	 * XXX Less than efficient, but we need to do this for good TS6 support currently. This *will* improve. -- w00t
@@ -497,10 +499,10 @@ BotInfo *findbot(const char *nick)
 	{
 		for (bi = botlists[i]; bi; bi = bi->next)
 		{
-			if (!stricmp(nick, bi->nick))
+			if (ci_nick == bi->nick)
 				return bi;
 
-			if (nick == bi->uid)
+			if (ci_nick == bi->uid)
 				return bi;
 		}
 	}

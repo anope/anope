@@ -167,9 +167,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(Channel *c, const char *nick)
+	void SendBanDel(Channel *c, const std::string &nick)
 	{
-		SendSVSModeChan(c, "-b", nick);
+		SendSVSModeChan(c, "-b", nick.empty() ? NULL : nick.c_str());
 	}
 
 	/* SVSMODE channel modes */
@@ -180,10 +180,11 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(const char *mask, const char *reason)
+	void SendSQLine(const std::string &mask, const std::string &reason)
 	{
-		if (!mask || !reason) return;
-		send_cmd(NULL, "SQLINE %s :%s", mask, reason);
+		if (mask.empty() || reason.empty())
+			return;
+		send_cmd(NULL, "SQLINE %s :%s", mask.c_str(), reason.c_str());
 	}
 
 	/* UNSGLINE */

@@ -1258,7 +1258,7 @@ class CoreExport IRCDProto
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
 		virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
 		virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
-		virtual void SendSQLine(const char *, const char *) = 0;
+		virtual void SendSQLine(const std::string &, const std::string &) = 0;
 		virtual void SendSquit(const char *servname, const char *message);
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
@@ -1271,7 +1271,7 @@ class CoreExport IRCDProto
 		virtual void SendSZLineDel(SXLine *) { }
 		virtual void SendSZLine(SXLine *) { }
 		virtual void SendSGLine(SXLine *) { }
-		virtual void SendBanDel(Channel *, const char *) { }
+		virtual void SendBanDel(Channel *, const std::string &) { }
 		virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
 		virtual void SendUnregisteredNick(User *) { }
 		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...);

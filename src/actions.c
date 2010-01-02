@@ -22,22 +22,19 @@
  * @param u the User to check
  * @return void
  */
-void bad_password(User * u)
+void bad_password(User *u)
 {
 	time_t now = time(NULL);
 
-	if (!u || !Config.BadPassLimit) {
+	if (!u || !Config.BadPassLimit)
 		return;
-	}
 
-	if (Config.BadPassTimeout > 0 && u->invalid_pw_time > 0
-		&& u->invalid_pw_time < now - Config.BadPassTimeout)
+	if (Config.BadPassTimeout > 0 && u->invalid_pw_time > 0 && u->invalid_pw_time < now - Config.BadPassTimeout)
 		u->invalid_pw_count = 0;
-	u->invalid_pw_count++;
+	++u->invalid_pw_count;
 	u->invalid_pw_time = now;
-	if (u->invalid_pw_count >= Config.BadPassLimit) {
-		kill_user(NULL, u->nick, "Too many invalid passwords");
-	}
+	if (u->invalid_pw_count >= Config.BadPassLimit)
+		kill_user("", u->nick, "Too many invalid passwords");
 }
 
 /*************************************************************************/
@@ -49,27 +46,21 @@ void bad_password(User * u)
  * @param reason for the kill
  * @return void
  */
-void kill_user(const char *source, const char *user, const char *reason)
+void kill_user(const std::string &source, const std::string &user, const std::string &reason)
 {
 	char buf[BUFSIZE];
 
-	if (!user || !*user) {
+	if (user.empty())
 		return;
-	}
-	if (!source || !*source) {
-		source = Config.ServerName;
-	}
-	if (!reason) {
-		reason = "";
-	}
 
-	snprintf(buf, sizeof(buf), "%s (%s)", source, reason);
+	std::string real_source = source.empty() ? Config.ServerName : source;
+
+	snprintf(buf, sizeof(buf), "%s (%s)", source.c_str(), reason.c_str());
 
 	ircdproto->SendSVSKill(findbot(source), finduser(user), buf);
 
-	if (!ircd->quitonkill && finduser(user)) {
+	if (!ircd->quitonkill && finduser(user))
 		do_kill(user, buf);
-	}
 }
 
 /*************************************************************************/
@@ -80,43 +71,46 @@ void kill_user(const char *source, const char *user, const char *reason)
  * @param reason for the sqline
  * @return void
  */
-void sqline(char *mask, char *reason)
+void sqline(const std::string &mask, const std::string &reason)
 {
 	int i;
 	Channel *c, *next;
 	const char *av[3];
 	struct c_userlist *cu, *cunext;
 
-	if (ircd->chansqline) {
-		if (*mask == '#') {
+	if (ircd->chansqline)
+	{
+		if (mask[0] == '#')
+		{
 			ircdproto->SendSQLine(mask, reason);
 
-			for (i = 0; i < 1024; i++) {
-				for (c = chanlist[i]; c; c = next) {
+			for (i = 0; i < 1024; ++i)
+			{
+				for (c = chanlist[i]; c; c = next)
+				{
 					next = c->next;
 
-					if (!Anope::Match(c->name, mask, false)) {
+					if (!Anope::Match(c->name, mask, false))
 						continue;
-					}
-					for (cu = c->users; cu; cu = cunext) {
+					for (cu = c->users; cu; cu = cunext)
+					{
 						cunext = cu->next;
-						if (is_oper(cu->user)) {
+						if (is_oper(cu->user))
 							continue;
-						}
 						av[0] = c->name;
 						av[1] = cu->user->nick;
-						av[2] = reason;
+						av[2] = reason.c_str();
 						ircdproto->SendKick(findbot(Config.s_OperServ), c, cu->user, "Q-Lined: %s", av[2]);
 						do_kick(Config.s_ChanServ, 3, av);
 					}
 				}
 			}
-		} else {
-			ircdproto->SendSQLine(mask, reason);
 		}
-	} else {
-		ircdproto->SendSQLine(mask, reason);
+		else
+			ircdproto->SendSQLine(mask, reason);
 	}
+	else
+		ircdproto->SendSQLine(mask, reason);
 }
 
 /*************************************************************************/
@@ -127,34 +121,32 @@ void sqline(char *mask, char *reason)
  * @param nick to remove the ban for
  * @return void
  */
-void common_unban(ChannelInfo * ci, char *nick)
+void common_unban(ChannelInfo *ci, const std::string &nick)
 {
 	char *host = NULL;
 	uint32 ip = 0;
 	User *u;
 	Entry *ban, *next;
 
-	if (!ci || !ci->c || !nick) {
-		return;
-	}
-
-	if (!(u = finduser(nick))) {
-		return;
-	}
-
-	if (!ci->c->bans || (ci->c->bans->count == 0))
+	if (!ci || !ci->c || nick.empty())
 		return;
 
-	if (u->hostip == NULL) {
+	if (!(u = finduser(nick)))
+		return;
+
+	if (!ci->c->bans || !ci->c->bans->count)
+		return;
+
+	if (u->hostip == NULL)
+	{
 		host = host_resolve(u->host);
 		/* we store the just resolved hostname so we don't
 		 * need to do this again */
-		if (host) {
+		if (host)
 			u->hostip = sstrdup(host);
-		}
-	} else {
-		host = sstrdup(u->hostip);
 	}
+	else
+		host = sstrdup(u->hostip);
 	/* Convert the host to an IP.. */
 	if (host)
 		ip = str_is_ip(host);
@@ -166,8 +158,7 @@ void common_unban(ChannelInfo * ci, char *nick)
 		for (ban = ci->c->bans->entries; ban; ban = next)
 		{
 			next = ban->next;
-			if (entry_match(ban, u->nick, u->GetIdent().c_str(), u->host, ip) ||
-				entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
+			if (entry_match(ban, u->nick, u->GetIdent().c_str(), u->host, ip) || entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
 				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
 	}
@@ -177,4 +168,3 @@ void common_unban(ChannelInfo * ci, char *nick)
 }
 
 /*************************************************************************/
-

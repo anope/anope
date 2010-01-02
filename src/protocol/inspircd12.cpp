@@ -265,9 +265,11 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(const char *mask, const char *reason)
+	void SendSQLine(const std::string &mask, const std::string &reason)
 	{
-		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", mask, Config.s_OperServ, static_cast<long>(time(NULL)), reason);
+		if (mask.empty() || reason.empty())
+			return;
+		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", mask.c_str(), Config.s_OperServ, static_cast<long>(time(NULL)), reason.c_str());
 	}
 
 	/* SQUIT */

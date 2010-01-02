@@ -441,18 +441,20 @@ void get_user_stats(long *nusers, long *memuse)
 
 /* Find a user by nick.  Return NULL if user could not be found. */
 
-User *finduser(const char *nick)
+User *finduser(const std::string &nick)
 {
 	User *user;
 
 	if (debug >= 3)
-		alog("debug: finduser(%p)", nick);
+		alog("debug: finduser(%p)", nick.c_str());
 
-	if (isdigit(*nick) && ircd->ts6)
+	if (isdigit(nick[0]) && ircd->ts6)
 		return find_byuid(nick);
 
+	ci::string ci_nick(nick.c_str());
+
 	user = userlist[HASH(nick)];
-	while (user && stricmp(user->nick, nick) != 0)
+	while (user && ci_nick != user->nick)
 		user = user->next;
 	if (debug >= 3)
 		alog("debug: finduser(%s) -> 0x%p", nick, static_cast<void *>(user));
@@ -477,7 +479,7 @@ void User::SetModeInternal(UserMode *um, const std::string &Param)
 {
 	if (!um)
 		return;
-	
+
 	modes[um->Name] = true;
 	if (!Param.empty())
 	{
@@ -494,7 +496,7 @@ void User::RemoveModeInternal(UserMode *um)
 {
 	if (!um)
 		return;
-	
+
 	modes[um->Name] = false;
 	std::map<UserModeName, std::string>::iterator it = Params.find(um->Name);
 	if (it != Params.end())
@@ -601,11 +603,11 @@ void User::SetModes(BotInfo *bi, const std::string &modes, ...)
 			default:
 				if (add == -1)
 					continue;
-				um = ModeManager::FindUserModeByChar(modebuf[i]);	
+				um = ModeManager::FindUserModeByChar(modebuf[i]);
 				if (!um)
 					continue;
 		}
-		
+
 		if (add)
 		{
 			if (um->Type == MODE_PARAM && sep.GetToken(sbuf))
@@ -654,7 +656,7 @@ User *nextuser()
 	return current;
 }
 
-User *find_byuid(const char *uid)
+User *find_byuid(const std::string &uid)
 {
 	User *u, *next;
 
@@ -1001,7 +1003,7 @@ void do_quit(const char *source, int ac, const char **av)
  *	av[1] = reason
  */
 
-void do_kill(const char *nick, const char *msg)
+void do_kill(const std::string &nick, const std::string &msg)
 {
 	User *user;
 	NickAlias *na;
@@ -1009,18 +1011,18 @@ void do_kill(const char *nick, const char *msg)
 	user = finduser(nick);
 	if (!user) {
 		if (debug) {
-			alog("debug: KILL of nonexistent nick: %s", nick);
+			alog("debug: KILL of nonexistent nick: %s", nick.c_str());
 		}
 		return;
 	}
 	if (debug) {
-		alog("debug: %s killed", nick);
+		alog("debug: %s killed", nick.c_str());
 	}
 	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;
-		na->last_quit = *msg ? sstrdup(msg) : NULL;
+		na->last_quit = !msg.empty() ? sstrdup(msg.c_str()) : NULL;
 
 	}
 	if (Config.LimitSessions && !is_ulined(user->server->name)) {
@@ -1198,10 +1200,10 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 	const char *modes = av[0];
 	if (!user || !modes)
 		return;
-	
+
 	if (debug)
 		alog("debug: Changing user modes for %s to %s", user->nick, merge_args(ac, av));
-	
+
 	for (; *modes; *modes++)
 	{
 		UserMode *um;

@@ -41,7 +41,7 @@ class CommandOSStaff : public Command
 			found = 0;
 			std::string nick = it->first, type = it->second;
 
-			if ((au = finduser(nick.c_str())))
+			if ((au = finduser(nick)))
 			{
 				found = 1;
 				notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), nick.c_str());

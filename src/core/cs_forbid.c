@@ -70,7 +70,7 @@ class CommandCSForbid : public Command
 			struct c_userlist *cu, *nextu;
 			const char *av[3];
 
-			/* Before banning everyone, it might be prudent to clear +e and +I lists.. 
+			/* Before banning everyone, it might be prudent to clear +e and +I lists..
 			 * to prevent ppl from rejoining.. ~ Viper */
 			c->ClearExcepts();
 			c->ClearInvites();
@@ -95,7 +95,7 @@ class CommandCSForbid : public Command
 
 		if (ircd->chansqline)
 		{
-			ircdproto->SendSQLine(ci->name, ((reason) ? reason : "Forbidden"));
+			ircdproto->SendSQLine(ci->name, reason ? reason : "Forbidden");
 		}
 
 		alog("%s: %s set FORBID for channel %s", Config.s_ChanServ, u->nick, ci->name);

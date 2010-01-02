@@ -173,9 +173,11 @@ class RatboxProto : public IRCDTS6Proto
 			send_cmd(TS6SID, "OPERWALL :%s", buf);
 	}
 
-	void SendSQLine(const char *mask, const char *reason)
+	void SendSQLine(const std::string &mask, const std::string &reason)
 	{
-		send_cmd(TS6SID, "RESV * %s :%s", mask, reason);
+		if (mask.empty() || reason.empty())
+			return;
+		send_cmd(TS6SID, "RESV * %s :%s", mask.c_str(), reason.c_str());
 	}
 
 	void SendSGLineDel(SXLine *sx)

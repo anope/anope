@@ -290,10 +290,11 @@ class UnrealIRCdProto : public IRCDProto
 	** - Unreal will translate this to TKL for us
 	**
 	*/
-	void SendSQLine(const char *mask, const char *reason)
+	void SendSQLine(const std::string &mask, const std::string &reason)
 	{
-		if (!mask || !reason) return;
-		send_cmd(NULL, "c %s :%s", mask, reason);
+		if (mask.empty() || reason.empty())
+			return;
+		send_cmd(NULL, "c %s :%s", mask.c_str(), reason.c_str());
 	}
 
 	/*
@@ -381,9 +382,9 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(Channel *c, const char *nick)
+	void SendBanDel(Channel *c, const std::string &nick)
 	{
-		SendSVSModeChan(c, "-b", nick);
+		SendSVSModeChan(c, "-b", nick.empty() ? NULL : nick.c_str());
 	}
 
 
@@ -958,7 +959,7 @@ int anope_event_userhost(const char *source, int ac, const char **av)
 	std::string host = std::string(std::find(reply.begin(), reply.end(), '@'), reply.end());
 	host.erase(host.begin());
 
-	User *u = finduser(user.c_str());
+	User *u = finduser(user);
 	if (u)
 	{
 		u->SetCloakedHost(host);

@@ -51,48 +51,47 @@ int AnopeInit(int argc, char **argv)
                       NICK_HELP_SASET, NICK_HELP_SASET, NICK_HELP_SASET);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET DISPLAY", NULL, is_services_oper,
-                      NICK_HELP_SASET_DISPLAY, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_DISPLAY, NICK_HELP_SASET_DISPLAY, NICK_HELP_SASET_DISPLAY);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET PASSWORD", NULL, is_services_oper,
-                      NICK_HELP_SASET_PASSWORD, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_PASSWORD, NICK_HELP_SASET_PASSWORD, NICK_HELP_SASET_PASSWORD);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET URL", NULL, is_services_oper,
-                      NICK_HELP_SASET_URL, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_URL, NICK_HELP_SASET_URL, NICK_HELP_SASET_URL);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET EMAIL", NULL, is_services_oper,
-                      NICK_HELP_SASET_EMAIL, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_EMAIL, NICK_HELP_SASET_EMAIL, NICK_HELP_SASET_EMAIL);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET ICQ", NULL, is_services_oper,
-                      NICK_HELP_SASET_ICQ, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_ICQ, NICK_HELP_SASET_ICQ, NICK_HELP_SASET_ICQ);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET GREET", NULL, is_services_oper,
-                      NICK_HELP_SASET_GREET, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_GREET, NICK_HELP_SASET_GREET, NICK_HELP_SASET_GREET);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET KILL", NULL, is_services_oper,
-                      NICK_HELP_SASET_KILL, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_KILL, NICK_HELP_SASET_KILL, NICK_HELP_SASET_KILL);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET SECURE", NULL, is_services_oper,
-                      NICK_HELP_SASET_SECURE, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_SECURE, NICK_HELP_SASET_SECURE, NICK_HELP_SASET_SECURE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET PRIVATE", NULL, is_services_oper,
-                      NICK_HELP_SASET_PRIVATE, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_PRIVATE, NICK_HELP_SASET_PRIVATE, NICK_HELP_SASET_PRIVATE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET MSG", NULL, is_services_oper,
-                      NICK_HELP_SASET_MSG, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_MSG, NICK_HELP_SASET_MSG, NICK_HELP_SASET_MSG);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET HIDE", NULL, is_services_oper,
-                      NICK_HELP_SASET_HIDE, -1, -1, -1, -1);
+                      -1, -1, NICK_HELP_SASET_HIDE, NICK_HELP_SASET_HIDE, NICK_HELP_SASET_HIDE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET NOEXPIRE", NULL, is_services_oper, -1, -1,
                       NICK_HELP_SASET_NOEXPIRE, NICK_HELP_SASET_NOEXPIRE,
                       NICK_HELP_SASET_NOEXPIRE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET AUTOOP", NULL, is_services_oper, -1, -1,
-                      -1, NICK_HELP_SASET_AUTOOP,
-                      NICK_HELP_SASET_AUTOOP);
+                      NICK_HELP_SASET_AUTOOP, NICK_HELP_SASET_AUTOOP, NICK_HELP_SASET_AUTOOP);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SASET LANGUAGE", NULL, is_services_oper,
-                      -1, -1, -1, -1, NICK_HELP_SASET_LANGUAGE);
+                      -1, -1, NICK_HELP_SASET_LANGUAGE, NICK_HELP_SASET_LANGUAGE, NICK_HELP_SASET_LANGUAGE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     moduleSetNickHelp(myNickServHelp);

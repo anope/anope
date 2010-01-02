@@ -168,7 +168,7 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     Module *calling_module = mod_current_module;
     char *calling_module_name = mod_current_module_name;
     int help_message;
-    int (*help_message_ptr)(User *u);
+    int (*help_message_ptr)(User *u) = NULL;
 
     for (current = c; (current) && (cont == MOD_CONT);
          current = current->next) {
@@ -218,7 +218,7 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
         }
 
         if (help_message) {
-            notice_lang(service, u, help_message, p1, p2, p3, p4);
+            notice_help(service, u, help_message, p1, p2, p3, p4);
             has_had_help = 1;
         } else if (help_message_ptr) {
             cont = help_message_ptr(u);

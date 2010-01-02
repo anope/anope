@@ -26,39 +26,14 @@ class CommandHSGroup : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		HostCore *tmp;
-		char *vHost = NULL;
-		char *vIdent = NULL;
-		char *creator = NULL;
-		HostCore *head = NULL;
-		time_t time;
-		bool found = false;
-
-		head = hostCoreListHead();
-
-		tmp = findHostCore(head, u->nick, &found);
-		if (found)
+		NickAlias *na = findnick(u->nick);
+		if (na && u->nc == na->nc && na->hostinfo.HasVhost())
 		{
-			if (!tmp)
-				tmp = head; /* incase first in list */
-			else if (tmp->next) /* we dont want the previous entry were not inserting! */
-				tmp = tmp->next; /* jump to the next */
-
-			vHost = sstrdup(tmp->vHost);
-			if (tmp->vIdent)
-				vIdent = sstrdup(tmp->vIdent);
-			creator = sstrdup(tmp->creator);
-			time = tmp->time;
-
-			do_hs_sync(u->nc, vIdent, vHost, creator, time);
-			if (tmp->vIdent)
-				notice_lang(Config.s_HostServ, u, HOST_IDENT_GROUP, u->nc->display, vIdent, vHost);
+			HostServSyncVhosts(na);
+			if (!na->hostinfo.GetIdent().empty())
+				notice_lang(Config.s_HostServ, u, HOST_IDENT_GROUP, u->nc->display, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				notice_lang(Config.s_HostServ, u, HOST_GROUP, u->nc->display, vHost);
-			delete [] vHost;
-			if (vIdent)
-				delete [] vIdent;
-			delete [] creator;
+				notice_lang(Config.s_HostServ, u, HOST_GROUP, u->nc->display, na->hostinfo.GetHost().c_str());
 		}
 		else
 			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);

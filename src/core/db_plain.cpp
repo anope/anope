@@ -63,8 +63,10 @@ static void ReadDatabase(Module *m = NULL)
 			if (buf[0] == ':')
 			{
 				buf.erase(buf.begin());
-				if (!buf.empty())
+				if (!buf.empty() && !sep.StreamEnd())
 					params.push_back(buf + " " + sep.GetRemaining());
+				else if (!buf.empty())
+					params.push_back(buf);
 			}
 			else
 				params.push_back(buf);
@@ -457,15 +459,6 @@ static void LoadChanInfo(const std::vector<std::string> &params)
 		alog("[db_plain]: loaded channel %s", ci->name);
 }
 
-static void LoadHostInfo(const std::vector<std::string> &params)
-{
-	if (!findnick(params[0].c_str()))
-		return;
-	addHostCore(params[0].c_str(), params[4].empty() ? NULL : const_cast<char *>(params[4].c_str()), const_cast<char *>(params[3].c_str()), params[1].c_str(), strtol(params[2].c_str(), NULL, 10)); // XXX
-	if (debug > 1)
-		alog("[db_plain]: loaded vhost for %s", params[0].c_str());
-}
-
 static void LoadOperInfo(const std::vector<std::string> &params)
 {
 	if (params[0] == "STATS")
@@ -538,8 +531,6 @@ class DBPlain : public Module
 			LoadBotInfo(otherparams);
 		else if (key == "CH")
 			LoadChanInfo(otherparams);
-		else if (key == "HI")
-			LoadHostInfo(otherparams);
 		else if (key == "OS")
 			LoadOperInfo(otherparams);
 
@@ -616,6 +607,10 @@ class DBPlain : public Module
 				else if (params[j] == "NOEXPIRE")
 					na->SetFlag(NS_NO_EXPIRE);
 			}
+		}
+		else if (key == "VHOST")
+		{
+			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], strtol(params[1].c_str(), NULL, 10));
 		}
 
 		return EVENT_CONTINUE;
@@ -927,6 +922,10 @@ class DBPlain : public Module
 				{
 					db << "MD FLAGS" << (na->HasFlag(NS_FORBIDDEN) ? " FORBIDDEN" : "") << (na->HasFlag(NS_NO_EXPIRE) ? " NOEXPIRE " : "") << endl;
 				}
+				if (na->hostinfo.HasVhost())
+				{
+					db << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
+				}
 
 				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 			}
@@ -1081,12 +1080,6 @@ class DBPlain : public Module
 
 				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 			}
-		}
-
-		HostCore *hc;
-		for (hc = hostCoreListHead(); hc; hc = hc->next)
-		{
-			db << "HI " << hc->nick << " " << hc->creator << " " << hc->time << " " << hc->vHost << " :" << hc->vIdent << endl;
 		}
 
 		for (i = 0; i < akills.count; ++i)

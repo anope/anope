@@ -35,11 +35,12 @@ class CommandHSDelAll : public Command
 				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
+			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			nc = na->nc;
 			for (i = 0; i < nc->aliases.count; ++i)
 			{
 				na = static_cast<NickAlias *>(nc->aliases.list[i]);
-				delHostCore(na->nick);
+				na->hostinfo.RemoveVhost();
 			}
 			alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);
 			notice_lang(Config.s_HostServ, u, HOST_DELALL, nc->display);

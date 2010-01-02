@@ -989,20 +989,15 @@ class CoreExport Module
 	 */
 	virtual void OnNickEraseAccess(NickCore *nc, const std::string &entry) { }
 
-	/** called when a HostCore is deleted
-	 * @param hc pointer to the HostCore
+	/** called when a vhost is deleted
+	 * @param na The nickalias of the vhost
 	 */
-	virtual void OnDeleteHostCore(HostCore *hc) { }
+	virtual void OnDeleteVhost(NickAlias *na) { }
 
-	/** called on findHostCore
-	 * @param nick the name of the HostCore we are searching for
+	/** Called when a vhost is set
+	 * @param na The nickalias of the vhost
 	 */
-	virtual void OnFindHostCore(const std::string &nick) { }
-
-	/** called when a new HostCore is inserted
-	 * @param hc pointer to the HostCore
-	 */
-	virtual void OnInsertHostCore(HostCore *hc) { }
+	virtual void OnSetVhost(NickAlias *na) { }
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel
@@ -1090,7 +1085,7 @@ enum Implementation
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBotPreLoad,
 
 		/* HostServ */
-		I_OnHostServHelp, I_OnDeleteHostCore, I_OnFindHostCore, I_OnInsertHostCore,
+		I_OnHostServHelp, I_OnSetVhost, I_OnDeleteVhost,
 
 		/* MemoServ */
 		I_OnMemoServHelp,

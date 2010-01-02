@@ -24,83 +24,55 @@ class CommandHSList : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		const char *key = params.size() ? params[0].c_str() : NULL;
-		struct tm *tm;
-		char buf[BUFSIZE];
-		int counter = 1;
-		int from = 0, to = 0;
-		char *tmp = NULL;
-		char *s = NULL;
+		ci::string key = params.size() ? params[0] : "";
+		int from = 0, to = 0, counter = 1;
 		unsigned display_counter = 0;
-		HostCore *head = NULL;
-		HostCore *current;
+		tm *tm;
+		char buf[BUFSIZE];
 
-		head = hostCoreListHead();
-
-		current = head;
-		if (!current)
-			notice_lang(Config.s_HostServ, u, HOST_EMPTY);
-		else
+		/**
+		 * Do a check for a range here, then in the next loop
+		 * we'll only display what has been requested..
+		 **/
+		if (!key.empty() && key[0] == '#')
 		{
-			/**
-			 * Do a check for a range here, then in the next loop
-			 * we'll only display what has been requested..
-			 **/
-			if (key)
+			size_t tmp = key.find('-');
+			if (tmp == ci::string::npos || tmp == key.size() || tmp == 1)
 			{
-				if (key[0] == '#')
-				{
-					tmp = myStrGetOnlyToken((key + 1), '-', 0); /* Read FROM out */
-					if (!tmp)
-					{
-						notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-						return MOD_CONT;
-					}
-					for (s = tmp; *s; ++s)
-					{
-						if (!isdigit(*s))
-						{
-							delete [] tmp;
-							notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-							return MOD_CONT;
-						}
-					}
-					from = atoi(tmp);
-					delete [] tmp;
-					tmp = myStrGetTokenRemainder(key, '-', 1); /* Read TO out */
-					if (!tmp)
-					{
-						notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-						return MOD_CONT;
-					}
-					for (s = tmp; *s; ++s)
-					{
-						if (!isdigit(*s))
-						{
-							delete [] tmp;
-							notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-							return MOD_CONT;
-						}
-					}
-					to = atoi(tmp);
-					delete [] tmp;
-					key = NULL;
-				}
+				notice_lang(Config.s_HostServ, u, LIST_INCORRECT_RANGE);
+				return MOD_CONT;
 			}
-
-			while (current)
+			for (unsigned i = 1; i < key.size(); ++i)
 			{
-				if (key)
+				if (!isdigit(key[i]) && i != tmp)
 				{
-					if ((Anope::Match(current->nick, key, false) || Anope::Match(current->vHost, key, false)) && display_counter < Config.NSListMax)
+					notice_lang(Config.s_HostServ, u, LIST_INCORRECT_RANGE);
+					return MOD_CONT;
+				}
+				from = atoi(key.substr(1, tmp - 1).c_str());
+				to = atoi(key.substr(tmp + 1, key.size()).c_str());
+			}
+		}
+
+		for (int j = 0; j < 1024; ++j)
+		{
+			for (NickAlias *na = nalists[j]; na; na = na->next)
+			{
+				if (!na->hostinfo.HasVhost())
+					continue;
+
+				if (!key.empty() && key[0] != '#')
+				{
+					if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key.c_str())) && display_counter < Config.NSListMax)
 					{
 						++display_counter;
-						tm = localtime(&current->time);
+						time_t time = na->hostinfo.GetTime();
+						tm = localtime(&time);
 						strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-						if (current->vIdent)
-							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+						if (!na->hostinfo.GetIdent().empty())
+							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 						else
-							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 					}
 				}
 				else
@@ -112,25 +84,26 @@ class CommandHSList : public Command
 					if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
 					{
 						++display_counter;
-						tm = localtime(&current->time);
+						time_t time = na->hostinfo.GetTime();
+						tm = localtime(&time);
 						strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-						if (current->vIdent)
-							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+						if (!na->hostinfo.GetIdent().empty())
+							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 						else
-							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 					}
 				}
 				++counter;
-				current = current->next;
 			}
-			if (key)
-				notice_lang(Config.s_HostServ, u, HOST_LIST_KEY_FOOTER, key, display_counter);
-			else {
-				if (from)
-					notice_lang(Config.s_HostServ, u, HOST_LIST_RANGE_FOOTER, from, to);
-				else
-					notice_lang(Config.s_HostServ, u, HOST_LIST_FOOTER, display_counter);
-			}
+		}
+		if (!key.empty())
+			notice_lang(Config.s_HostServ, u, HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
+		else
+		{
+			if (from)
+				notice_lang(Config.s_HostServ, u, HOST_LIST_RANGE_FOOTER, from, to);
+			else
+				notice_lang(Config.s_HostServ, u, HOST_LIST_FOOTER, display_counter);
 		}
 		return MOD_CONT;
 	}

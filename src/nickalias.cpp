@@ -72,8 +72,6 @@ NickAlias::~NickAlias()
 		u->nc = NULL;
 	}
 
-	delHostCore(this->nick);    /* delete any vHost's for this nick */
-
 	/* Accept nicks that have no core, because of database load functions */
 	if (this->nc)
 	{

@@ -457,7 +457,7 @@ User *finduser(const std::string &nick)
 	while (user && ci_nick != user->nick)
 		user = user->next;
 	if (debug >= 3)
-		alog("debug: finduser(%s) -> 0x%p", nick, static_cast<void *>(user));
+		alog("debug: finduser(%s) -> 0x%p", nick.c_str(), static_cast<void *>(user));
 	FOREACH_MOD(I_OnFindUser, OnFindUser(user));
 	return user;
 }

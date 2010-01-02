@@ -122,7 +122,8 @@ class CommandHSSet : public Command
 				alog("vHost for user \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
 			else
 				alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
-			addHostCore(nick, vIdent, hostmask, u->nick, tmp_time);
+			na->hostinfo.SetVhost(vIdent ? vIdent : "", hostmask, u->nick);
+			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 			if (vIdent)
 				notice_lang(Config.s_HostServ, u, HOST_IDENT_SET, nick, vIdent, hostmask);
 			else

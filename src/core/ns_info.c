@@ -140,17 +140,12 @@ class CommandNSInfo : public Command
 
 			if (show_hidden)
 			{
-				if (Config.s_HostServ && ircd->vhost) {
-					if (getvHost(na->nick) != NULL) {
-						if (ircd->vident && getvIdent(na->nick) != NULL) {
-							notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST2,
-										getvIdent(na->nick),
-										getvHost(na->nick));
-						} else {
-							notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST,
-										getvHost(na->nick));
-						}
-					}
+				if (Config.s_HostServ && ircd->vhost && na->hostinfo.HasVhost())
+				{
+					if (ircd->vident && !na->hostinfo.GetIdent().empty())
+						notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST2, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+					else	
+						notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST, na->hostinfo.GetHost().c_str());
 				}
 				if (na->nc->greet)
 					notice_lang(Config.s_NickServ, u, NICK_INFO_GREET, na->nc->greet);

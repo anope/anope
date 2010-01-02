@@ -50,7 +50,7 @@ int HSRequestMemoSetters = 0;
 #define LNG_WAITING_SYNTAX		19
 #define LNG_HELP_WAITING		20
 
-void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
+void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, time_t tmp_time);
 int my_isvalidchar(const char c);
 void my_memo_lang(User *u, const char *name, int z, int number, ...);
 void req_send_memos(User *u, char *vIdent, char *vHost);
@@ -58,7 +58,14 @@ void req_send_memos(User *u, char *vIdent, char *vHost);
 void my_load_config();
 void my_add_languages();
 
-HostCore *hs_request_head;
+struct HostRequest
+{
+	std::string ident;
+	std::string host;
+	time_t time;
+};
+
+std::map<std::string, HostRequest *> Requests;
 
 static Module *me;
 
@@ -75,7 +82,6 @@ class CommandHSRequest : public Command
 		const char *rawhostmask = params[0].c_str();
 		char hostmask[HOSTMAX];
 		NickAlias *na;
-		int32 tmp_time;
 		char *s;
 		char *vIdent = NULL;
 		time_t now = time(NULL);
@@ -144,7 +150,6 @@ class CommandHSRequest : public Command
 			return MOD_CONT;
 		}
 
-		tmp_time = time(NULL);
 		if ((na = findnick(nick)))
 		{
 			if (HSRequestMemoOper || HSRequestMemoSetters)
@@ -161,7 +166,7 @@ class CommandHSRequest : public Command
 					return MOD_CONT;
 				}
 			}
-			my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
+			my_add_host_request(nick, vIdent, hostmask, u->nick, now);
 
 			me->NoticeLang(Config.s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);
@@ -197,39 +202,26 @@ class CommandHSRequest : public Command
 class CommandHSActivate : public Command
 {
  public:
-	CommandHSActivate() : Command("ACTIVATE", 1, 1)
+	CommandHSActivate() : Command("ACTIVATE", 1, 1, "hostserv/set")
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		if (!u->nc->HasPriv("hostserv/set"))
-		{
-			notice_lang(Config.s_HostServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 		const char *nick = params[0].c_str();
 		NickAlias *na;
-		HostCore *tmp, *hc;
-		bool found = false;
 
 		if ((na = findnick(nick)))
 		{
-			tmp = findHostCore(hs_request_head, nick, &found);
-			if (found)
+			std::map<std::string, HostRequest *>::iterator it = Requests.find(na->nick);
+			if (it != Requests.end())
 			{
-				if (!tmp)
-					hc = hs_request_head;
-				else
-					hc = tmp->next;
-
-				addHostCore(hc->nick, hc->vIdent, hc->vHost, u->nick, time(NULL));
+				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick,  it->second->time);
+				Requests.erase(it);
 
 				if (HSRequestMemoUser)
-					my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
+					my_memo_lang(u, na->nick, 2, LNG_ACTIVATE_MEMO);
 
-				hs_request_head = deleteHostCore(hs_request_head, tmp);
 				me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATED, nick);
 				alog("Host Request for %s activated by %s", nick, u->nick);
 			}
@@ -262,40 +254,26 @@ class CommandHSActivate : public Command
 class CommandHSReject : public Command
 {
  public:
-	CommandHSReject() : Command("REJECT", 1, 2)
+	CommandHSReject() : Command("REJECT", 1, 2, "hostserv/set")
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		if (!u->nc->HasPriv("hostserv/set"))
-		{
-			notice_lang(Config.s_HostServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 		const char *nick = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
-		HostCore *tmp, *hc;
-		bool found = false;
 
-		tmp = findHostCore(hs_request_head, nick, &found);
-		if (found)
+		std::map<std::string, HostRequest *>::iterator it = Requests.find(nick);
+		if (it != Requests.end())
 		{
-			if (!tmp)
-				hc = hs_request_head;
-			else
-				hc = tmp->next;
-
 			if (HSRequestMemoUser)
 			{
 				if (reason)
-					my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO_REASON, reason);
+					my_memo_lang(u, nick, 2, LNG_REJECT_MEMO_REASON, reason);
 				else
-					my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO);
+					my_memo_lang(u, nick, 2, LNG_REJECT_MEMO);
 			}
 
-			hs_request_head = deleteHostCore(hs_request_head, tmp);
 			me->NoticeLang(Config.s_HostServ, u, LNG_REJECTED, nick);
 			alog("Host Request for %s rejected by %s (%s)", nick, u->nick, reason ? reason : "");
 		}
@@ -327,41 +305,33 @@ class HSListBase : public Command
  protected:
 	CommandReturn DoList(User *u)
 	{
-		if (!u->nc->HasPriv("hostserv/set"))
-		{
-			notice_lang(Config.s_HostServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
-		struct tm *tm;
 		char buf[BUFSIZE];
 		int counter = 1;
 		int from = 0, to = 0;
 		unsigned display_counter = 0;
-		HostCore *current;
+		tm *tm;
 
-		current = hs_request_head;
-		while (current)
+		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
 		{
+			HostRequest *hr = it->second;
 			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
 			{
 				++display_counter;
-				tm = localtime(&current->time);
+				tm = localtime(&hr->time);
 				strftime(buf, sizeof(buf), getstring(u, STRFTIME_DATE_TIME_FORMAT), tm);
-				if (current->vIdent)
-					notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, current->nick, current->vIdent, current->vHost, current->creator, buf);
+				if (!hr->ident.empty())
+					notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, it->first.c_str(), hr->ident.c_str(), hr->host.c_str(), it->first.c_str(), buf);
 				else
-					notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, current->nick, current->vHost, current->creator, buf);
+					notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, it->first.c_str(), hr->host.c_str(), it->first.c_str(), buf);
 			}
 			++counter;
-			current = current->next;
 		}
 		notice_lang(Config.s_HostServ, u, HOST_LIST_FOOTER, display_counter);
 
 		return MOD_CONT;
 	}
  public:
-	HSListBase(const std::string &cmd, int min, int max) : Command(cmd, min, max)
+	HSListBase(const std::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
 	{
 	}
 
@@ -410,7 +380,6 @@ class HSRequest : public Module
 		this->SetType(SUPPORTED);
 
 		my_load_config();
-		hs_request_head = NULL;
 
 		const char* langtable_en_us[] = {
 			/* LNG_REQUEST_SYNTAX */
@@ -674,11 +643,12 @@ class HSRequest : public Module
 
 	~HSRequest()
 	{
-		OnSaveDatabase();
-
 		/* Clean up all open host requests */
-		while (hs_request_head)
-			hs_request_head = deleteHostCore(hs_request_head, NULL);
+		while (!Requests.empty())
+		{
+			delete Requests.begin()->second;
+			Requests.erase(Requests.begin());
+		}
 	}
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
@@ -702,12 +672,18 @@ class HSRequest : public Module
 		{
 			if (command == "DROP")
 			{
-				bool found = false;
 				NickAlias *na = findnick(u->nick);
-				HostCore *tmp = findHostCore(hs_request_head, u->nick, &found);
 
-				if (found && na)
-					hs_request_head = deleteHostCore(hs_request_head, tmp);
+				if (na)
+				{
+					std::map<std::string, HostRequest *>::iterator it = Requests.find(na->nick);
+
+					if (it != Requests.end())
+					{
+						delete it->second;
+						Requests.erase(it);
+					}
+				}
 			}
 		}
 
@@ -722,9 +698,10 @@ class HSRequest : public Module
 
 	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
 	{
-		if (params[0] == "HS_REQUEST" && params.size() >= 6)
+		if (params[0] == "HS_REQUEST" && params.size() >= 5)
 		{
-			my_add_host_request(const_cast<char *>(params[1].c_str()), const_cast<char *>(params[2].c_str()), const_cast<char *>(params[3].c_str()), const_cast<char *>(params[4].c_str()), strtol(params[5].c_str(), NULL, 10));
+			char *vident = params[2] == "(null)" ? NULL : const_cast<char *>(params[2].c_str());
+			my_add_host_request(const_cast<char *>(params[1].c_str()), vident, const_cast<char *>(params[3].c_str()), const_cast<char *>(params[1].c_str()), strtol(params[4].c_str(), NULL, 10));
 
 			return EVENT_STOP;
 		}
@@ -734,20 +711,19 @@ class HSRequest : public Module
 
 	void OnDatabaseWrite(void (*Write)(const std::string &))
 	{
-		for (HostCore *current = hs_request_head; current; current = current->next)
+		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
 		{
-			const char *vident = current->vIdent ? current->vIdent : "(null)";
+			HostRequest *hr = it->second;
 			std::string buf = "HS_REQUEST ";
-			// We really need a better + operator to make this easier ...
-			buf += current->nick;
+			buf += it->first;
 			buf += " ";
-			buf += vident;
+			buf += hr->ident.empty() ? "(null)" : hr->ident;
 			buf += " ";
-			buf += current->vHost;
+			buf += hr->host;
 			buf += " ";
-			buf += current->time;
-			buf += " ";
-			buf += current->creator;
+			char tsbuf[16];
+			snprintf(tsbuf, sizeof(tsbuf), "%ld", hr->time);
+			buf += tsbuf;
 			Write(buf);
 		}
 	}
@@ -824,23 +800,16 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 	}
 }
 
-void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time)
+void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, time_t tmp_time)
 {
-	HostCore *tmp;
-	bool found = false;
-
-	if (!hs_request_head)
-		hs_request_head = createHostCorelist(hs_request_head, nick, vIdent, vhost, creator, tmp_time);
-	else {
-		tmp = findHostCore(hs_request_head, nick, &found);
-		if (!found)
-			hs_request_head = insertHostCore(hs_request_head, tmp, nick, vIdent, vhost, creator, tmp_time);
-		else
-		{
-			hs_request_head = deleteHostCore(hs_request_head, tmp); /* delete the old entry */
-			my_add_host_request(nick, vIdent, vhost, creator, tmp_time); /* recursive call to add new entry */
-		}
-	}
+	HostRequest *hr = new HostRequest;
+	hr->ident = vIdent ? vIdent : "";
+	hr->host = vhost;
+	hr->time = tmp_time;
+	std::map<std::string, HostRequest *>::iterator it = Requests.find(nick);
+	if (it != Requests.end())
+		Requests.erase(it);
+	Requests.insert(std::make_pair(nick, hr));
 }
 
 int my_isvalidchar(const char c)

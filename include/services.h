@@ -364,7 +364,6 @@ typedef struct userdata_ UserData;
 typedef struct mailinfo_ MailInfo;
 typedef struct akill_ Akill;
 typedef struct sxline_ SXLine;
-typedef struct hostcore_ HostCore;
 typedef struct exception_ Exception;
 typedef struct session_ Session;
 
@@ -507,6 +506,53 @@ typedef struct {
 
 
 /*************************************************************************/
+
+class HostInfo
+{
+ private:
+	std::string Ident;
+	std::string Host;
+	std::string Creator;
+	time_t Time;
+
+ public:
+ 	/** Set a vhost for the user
+	 * @param ident The ident
+	 * @param host The host
+	 * @param creator Who created the vhost
+	 * @param time When the vhost was craated
+	 */
+	void SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t time = time(NULL));
+	
+	/** Remove a users vhost
+	 **/
+	void RemoveVhost();
+	
+	/** Check if the user has a vhost
+	 * @return true or false
+	 */
+	bool HasVhost() const;
+
+	/** Retrieve the vhost ident
+	 * @return the ident
+	 */
+	const std::string &GetIdent() const;
+
+	/** Retrieve the vhost host
+	 * @return the host
+	 */
+	const std::string &GetHost() const;
+
+	/** Retrieve the vhost creator
+	 * @return the creator
+	 */
+	const std::string &GetCreator() const;
+
+	/** Retrieve when the vhost was crated
+	 * @return the time it was created
+	 */
+	const time_t GetTime() const;
+};
 
 // For NickServ
 #include "account.h"
@@ -1052,20 +1098,6 @@ struct sxline_ {
 
 /************************************************************************/
 
-/* Host serv structures */
-
-struct hostcore_ {
-	HostCore *next;
-	char *nick;				/* Owner of the vHost */
-	char *vIdent;			/* vIdent for the user */
-	char *vHost;			/* Vhost for this user */
-	char *creator;			/* Oper Nick of the oper who set the vhost */
-	time_t time;			/* Date/Time vHost was set */
-};
-
-/*************************************************************************/
-
-
 struct exception_ {
 	char *mask;				 /* Hosts to which this exception applies */
 	int limit;				  /* Session limit for exception */
@@ -1334,6 +1366,7 @@ class CoreExport Anope
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
 	static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
+	inline static bool Match(const ci::string &str, const ci::string &mask) { return Match(str.c_str(), mask.c_str(), false); }
 };
 
 /*************************************************************************/

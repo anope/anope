@@ -68,6 +68,7 @@ typedef struct nickalias_ NickAlias;
 typedef struct nickcore_ NickCore;
 typedef struct chaninfo_ ChannelInfo;
 typedef struct badword_ BadWord;
+typedef struct hostcore_ HostCore;
 
 struct memo_ {
 	uint32 number;	  /* Index number -- not necessarily array position! */
@@ -189,6 +190,14 @@ struct badword_ {
 	uint16 type;
 };
 
+struct hostcore_ {
+	HostCore *next;
+	char *nick;
+	char *vIdent;
+	char *vHost;
+	char *creator;
+	int32 time;
+};
 
 dbFILE *open_db_write(const char *service, const char *filename, int version);
 dbFILE *open_db_read(const char *service, const char *filename, int version);
@@ -216,6 +225,7 @@ void close_db(dbFILE * f);
 ChannelInfo *chanlists[256];
 NickAlias *nalists[1024];
 NickCore *nclists[1024];
+HostCore *head = NULL;
 
 int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
 
@@ -774,7 +784,15 @@ void alpha_insert_chan(ChannelInfo * ci)
 		ptr->prev = ci;
 }
 
-
+HostCore *findHostCore(char *nick)
+{
+	for (HostCore *hc = head; head; head = head->next)
+	{
+		if (nick && hc->nick && !mystricmp(hc->nick, nick))
+			return hc;
+	}
+	return NULL;
+}
 
 static char *int_to_base64(long);
 static long base64_to_int(char *);

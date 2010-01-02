@@ -24,33 +24,29 @@ class CommandHSOn : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		char *vHost;
-		char *vIdent = NULL;
-		
-		vHost = getvHost(u->nick);
-		vIdent = getvIdent(u->nick);
-		if (!vHost)
-			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
-		else
+		NickAlias *na = findnick(u->nick);
+		if (na && u->nc == na->nc && na->hostinfo.HasVhost())
 		{
-			if (vIdent)
-				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent, vHost);
+			if (!na->hostinfo.GetIdent().empty())
+				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, vHost);
-			ircdproto->SendVhost(u, vIdent, vHost);
+				notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+			ircdproto->SendVhost(u, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			if (ircd->vhost)
 			{
 				if (u->vhost)
 					delete [] u->vhost;
-				u->vhost = sstrdup(vHost);
+				u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
 			}
 			if (ircd->vident)
 			{
-				if (vIdent)
-					u->SetVIdent(vIdent);
+				if (!na->hostinfo.GetIdent().empty())
+					u->SetVIdent(na->hostinfo.GetIdent());
 			}
-			set_lastmask(u);
+			u->UpdateHost();
 		}
+		else
+			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
 		
 		return MOD_CONT;
 	}

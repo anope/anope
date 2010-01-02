@@ -173,16 +173,12 @@ char *sockstrerror(int error);
 /**** config.c ****/
 
 E ServerConfig Config;
-
-E int do_on_id(User * u);
-E void delHostCore(const char *nick);
-E void hostserv(User * u, char *buf);
-
 E int read_config(int reload);
 
-/**** converter.c ****/
-
-E int convert_ircservices_44();
+/* hostserv.c */
+E void do_on_id(User *u);
+E void hostserv(User *u, char *buf);
+E void HostServSyncVhosts(NickAlias *na);
 
 /**** encrypt.c ****/
 E void initEncryption();
@@ -200,15 +196,6 @@ E void encmodule_check_password(int (*func)(const char *plaintext, const char *p
 /**** hostserv.c  ****/
 E void get_hostserv_stats(long *nrec, long *memuse);
 E void hostserv_init();
-E void addHostCore(const char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
-E char *getvIdent(char *nick);
-E char *getvHost(char *nick);
-E HostCore *hostCoreListHead();
-E HostCore *findHostCore(HostCore * head, const char *nick, bool *found);
-E HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
-E HostCore *insertHostCore(HostCore * head, HostCore * prev, const char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
-E HostCore *deleteHostCore(HostCore * head, HostCore * prev);
-E void set_lastmask(User * u);
 
 /**** init.c ****/
 

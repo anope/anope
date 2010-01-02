@@ -324,6 +324,28 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	head = NULL;
+	if ((f = open_db_read("HostServ", "hosts.db", 3)))
+	{
+		int c;
+		HostCore *hc;
+
+		while ((c = getc_db(f)) == 1)
+		{
+			hc = (HostCore *)calloc(1, sizeof(HostCore));
+			READ(read_string(&hc->nick, f));
+			READ(read_string(&hc->vIdent, f));
+			READ(read_string(&hc->vHost, f));
+			READ(read_string(&hc->creator, f));
+			READ(read_int32(&hc->time, f));
+
+			hc->next = head;
+			head = hc;
+		}
+
+		close_db(f);
+	}
+
 	/* Nick cores */
 	for (i = 0; i < 1024; i++)
 	{
@@ -431,6 +453,12 @@ int main(int argc, char *argv[])
 						fs << "MD FLAGS"
 							<< ((na->status & NS_FORBIDDEN) ? " FORBIDDEN" : "")
 							<< ((na->status & NS_NO_EXPIRE) ? " NOEXPIRE"   : "") << std::endl;
+					}
+
+					HostCore *hc = findHostCore(na->nick);
+					if (hc)
+					{
+						fs << "MD VHOST " << hc->creator << " " << hc->time << " " << hc->vHost << " :" << hc->vIdent << std::endl;
 					}
 				}
 			}
@@ -890,33 +918,6 @@ int main(int argc, char *argv[])
 
 		} /* for (chanlists[i]) */
 	} /* for (i) */
-
-	/* Section IV: Hosts */
-	/* IVa: First database */
-	if ((f = open_db_read("HostServ", "hosts.db", 3))) {
-		int c;
-		int32 time;
-		char *nick, *vIdent, *vHost, *creator;
-
-		std::cout << "Converting hosts..." << std::endl;
-
-		while ((c = getc_db(f)) == 1) {
-			READ(read_string(&nick, f));
-			READ(read_string(&vIdent, f));
-			READ(read_string(&vHost, f));
-			READ(read_string(&creator, f));
-			READ(read_int32(&time, f));
-			if (vIdent)
-				std::cout << "Writing vHost for " << nick << " (" << vIdent << "@" << vHost << ")" << std::endl;
-			else
-				std::cout << "Writing vHost for " << nick << " (" << vHost << ")" << std::endl;
-			// because vIdent can sometimes be empty, we put it at the end of the list
-			fs << "HI " << nick << " " << creator << " " << time << " " << vHost << " :" 
-										<< (vIdent ? vIdent : "") << std::endl;
-			free(nick); if (vIdent) free(vIdent); free(vHost); free(creator);
-		}
-		close_db(f);
-	} // host database 
 
 	/*********************************/
 	/*    OPERSERV Section           */

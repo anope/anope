@@ -105,6 +105,7 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 	time_t time_registered;			/* When the nick was registered */
 	time_t last_seen;			/* When it was seen online for the last time */
 	NickCore *nc;				/* I'm an alias of this */
+	HostInfo hostinfo;
 };
 
 class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>

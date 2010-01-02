@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-extern int do_hs_sync(NickCore *nc, char *vIdent, char *hostmask, char *creator, time_t time);
-
 class CommandHSSetAll : public Command
 {
  public:
@@ -35,6 +33,17 @@ class CommandHSSetAll : public Command
 		char *s;
 
 		char *vIdent = NULL;
+
+		if (!(na = findnick(nick)))
+		{
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
+			return MOD_CONT;
+		}
+		else if (na->HasFlag(NS_FORBIDDEN))
+		{
+			notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
+			return MOD_CONT;
+		}
 
 		vIdent = myStrGetOnlyToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
 		if (vIdent)
@@ -107,30 +116,17 @@ class CommandHSSetAll : public Command
 
 		tmp_time = time(NULL);
 
-		if ((na = findnick(nick)))
-		{
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
-				if (vIdent) {
-					delete [] vIdent;
-					delete [] rawhostmask;
-				}
-				delete [] hostmask;
-				return MOD_CONT;
-			}
-			if (vIdent && ircd->vident)
-				alog("vHost for all nicks in group \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
-			else
-				alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
-			do_hs_sync(na->nc, vIdent, hostmask, u->nick, tmp_time);
-			if (vIdent)
-				notice_lang(Config.s_HostServ, u, HOST_IDENT_SETALL, nick, vIdent, hostmask);
-			else
-				notice_lang(Config.s_HostServ, u, HOST_SETALL, nick, hostmask);
-		}
+		if (vIdent && ircd->vident)
+			alog("vHost for all nicks in group \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
 		else
-			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
+			alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
+		na->hostinfo.SetVhost(vIdent ? vIdent : "", hostmask, u->nick);
+		HostServSyncVhosts(na);
+		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
+		if (vIdent)
+			notice_lang(Config.s_HostServ, u, HOST_IDENT_SETALL, nick, vIdent, hostmask);
+		else
+			notice_lang(Config.s_HostServ, u, HOST_SETALL, nick, hostmask);
 		if (vIdent)
 		{
 			delete [] vIdent;

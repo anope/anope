@@ -18,8 +18,6 @@
 
 #define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
 
-HostCore *head = NULL;		  /* head of the HostCore list */
-
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
 				 char *creator, time_t time);
 
@@ -42,19 +40,22 @@ void moduleAddHostServCmds()
 void get_hostserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	HostCore *hc;
 
-	for (hc = head; hc; hc = hc->next) {
-		count++;
-		mem += sizeof(*hc);
-		if (hc->nick)
-			mem += strlen(hc->nick) + 1;
-		if (hc->vIdent)
-			mem += strlen(hc->vIdent) + 1;
-		if (hc->vHost)
-			mem += strlen(hc->vHost) + 1;
-		if (hc->creator)
-			mem += strlen(hc->creator) + 1;
+	for (int i = 0; i < 1024; ++i)
+	{
+		for (NickAlias *na = nalists[i]; na; na = na->next)
+		{
+			if (!na->hostinfo.HasVhost())
+				continue;
+
+			if (!na->hostinfo.GetIdent().empty())
+				mem += na->hostinfo.GetIdent().size();
+			if (!na->hostinfo.GetHost().empty())
+				mem += na->hostinfo.GetHost().size();
+			if (!na->hostinfo.GetCreator().empty())
+				mem += na->hostinfo.GetCreator().size();
+			++count;
+		}
 	}
 
 	*nrec = count;
@@ -104,314 +105,116 @@ void hostserv(User * u, char *buf)
 	}
 }
 
-/*************************************************************************/
-/*	Start of Linked List routines										 */
-/*************************************************************************/
-
-HostCore *hostCoreListHead()
-{
-	return head;
-}
-
-/**
- * Create HostCore list member
- * @param next HostCore next slot
- * @param nick Nick to add
- * @param vIdent Virtual Ident
- * @param vHost  Virtual Host
- * @param creator Person whom set the vhost
- * @param time Time the vhost was Set
- * @return HostCore
+/** Set a vhost for the user
+ * @param ident The ident
+ * @param host The host
+ * @param creator Who created the vhost
+ * @param time When the vhost was craated
  */
-HostCore *createHostCorelist(HostCore * next, const char *nick, char *vIdent,
-							 char *vHost, const char *creator, int32 tmp_time)
+void HostInfo::SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t time)
 {
-
-	next = new HostCore;
-	if (next == NULL) {
-		ircdproto->SendGlobops(findbot(Config.s_HostServ),
-						 "Unable to allocate memory to create the vHost LL, problems i sense..");
-	} else {
-		next->nick = new char[strlen(nick) + 1];
-		next->vHost = new char[strlen(vHost) + 1];
-		next->creator = new char[strlen(creator) + 1];
-		if (vIdent)
-			next->vIdent = new char[strlen(vIdent) + 1];
-		if ((next->nick == NULL) || (next->vHost == NULL)
-			|| (next->creator == NULL)) {
-			ircdproto->SendGlobops(findbot(Config.s_HostServ),
-							 "Unable to allocate memory to create the vHost LL, problems i sense..");
-			return NULL;
-		}
-		strlcpy(next->nick, nick, strlen(nick) + 1);
-		strlcpy(next->vHost, vHost, strlen(vHost) + 1);
-		strlcpy(next->creator, creator, strlen(creator) + 1);
-		if (vIdent) {
-			if ((next->vIdent == NULL)) {
-				ircdproto->SendGlobops(findbot(Config.s_HostServ),
-								 "Unable to allocate memory to create the vHost LL, problems i sense..");
-				return NULL;
-			}
-			strlcpy(next->vIdent, vIdent, strlen(vIdent) + 1);
-		} else {
-			next->vIdent = NULL;
-		}
-		next->time = tmp_time;
-		next->next = NULL;
-		return next;
-	}
-	return NULL;
+	Ident = ident;
+	Host = host;
+	Creator = creator;
+	Time = time;
 }
 
-/*************************************************************************/
-/**
- * Returns either NULL for the head, or the location of the *PREVIOUS*
- * record, this is where we need to insert etc..
- * @param head HostCore head
- * @param nick Nick to find
- * @param found If found
- * @return HostCore
+/** Remove a users vhost
+ **/
+void HostInfo::RemoveVhost()
+{
+	Ident.clear();
+	Host.clear();
+	Creator.clear();
+	Time = 0;
+}
+
+/** Check if the user has a vhost
+ * @return true or false
  */
-HostCore *findHostCore(HostCore * phead, const char *nick, bool* found)
+bool HostInfo::HasVhost() const
 {
-	HostCore *previous, *current;
-
-	*found = false;
-	current = phead;
-	previous = current;
-
-	if (!nick) {
-		return NULL;
-	}
-	FOREACH_MOD(I_OnFindHostCore, OnFindHostCore(nick));
-	while (current != NULL) {
-		if (stricmp(nick, current->nick) == 0) {
-			*found = true;
-			break;
-		} else if (stricmp(nick, current->nick) < 0) {
-			/* we know were not gonna find it now.... */
-			break;
-		} else {
-			previous = current;
-			current = current->next;
-		}
-	}
-	if (current == phead) {
-		return NULL;
-	} else {
-		return previous;
-	}
+	return !Host.empty();
 }
 
-/*************************************************************************/
-HostCore *insertHostCore(HostCore * phead, HostCore * prev, const char *nick,
-						 char *vIdent, char *vHost, const char *creator,
-						 int32 tmp_time)
+/** Retrieve the vhost ident
+ * @return the ident
+ */
+const std::string &HostInfo::GetIdent() const
 {
-
-	HostCore *newCore, *tmp;
-
-	if (!nick || !vHost || !creator) {
-		return NULL;
-	}
-
-	newCore = new HostCore;
-	if (newCore == NULL) {
-		ircdproto->SendGlobops(findbot(Config.s_HostServ),
-						 "Unable to allocate memory to insert into the vHost LL, problems i sense..");
-		return NULL;
-	} else {
-		newCore->nick = new char[strlen(nick) + 1];
-		newCore->vHost = new char[strlen(vHost) + 1];
-		newCore->creator = new char[strlen(creator) + 1];
-		if (vIdent)
-			newCore->vIdent = new char[strlen(vIdent) + 1];
-		if ((newCore->nick == NULL) || (newCore->vHost == NULL)
-			|| (newCore->creator == NULL)) {
-			ircdproto->SendGlobops(findbot(Config.s_HostServ),
-							 "Unable to allocate memory to create the vHost LL, problems i sense..");
-			return NULL;
-		}
-		strlcpy(newCore->nick, nick, strlen(nick) + 1);
-		strlcpy(newCore->vHost, vHost, strlen(vHost) + 1);
-		strlcpy(newCore->creator, creator, strlen(creator) + 1);
-		if (vIdent) {
-			if ((newCore->vIdent == NULL)) {
-				ircdproto->SendGlobops(findbot(Config.s_HostServ),
-								 "Unable to allocate memory to create the vHost LL, problems i sense..");
-				return NULL;
-			}
-			strlcpy(newCore->vIdent, vIdent, strlen(vIdent) + 1);
-		} else {
-			newCore->vIdent = NULL;
-		}
-		newCore->time = tmp_time;
-		if (prev == NULL) {
-			tmp = phead;
-			phead = newCore;
-			newCore->next = tmp;
-		} else {
-			tmp = prev->next;
-			prev->next = newCore;
-			newCore->next = tmp;
-		}
-	}
-	FOREACH_MOD(I_OnInsertHostCore, OnInsertHostCore(newCore));
-	return phead;
+	return Ident;
 }
 
-/*************************************************************************/
-HostCore *deleteHostCore(HostCore * phead, HostCore * prev)
+/** Retrieve the vhost host
+ * @return the host
+ */
+const std::string &HostInfo::GetHost() const
 {
-
-	HostCore *tmp;
-
-	if (prev == NULL) {
-		tmp = phead;
-		phead = phead->next;
-	} else {
-		tmp = prev->next;
-		prev->next = tmp->next;
-	}
-	FOREACH_MOD(I_OnDeleteHostCore, OnDeleteHostCore(tmp));
-	delete [] tmp->vHost;
-	delete [] tmp->nick;
-	delete [] tmp->creator;
-	if (tmp->vIdent) {
-		delete [] tmp->vIdent;
-	}
-	delete tmp;
-	return phead;
+	return Host;
 }
 
-/*************************************************************************/
-void addHostCore(const char *nick, char *vIdent, char *vhost, const char *creator,
-				 int32 tmp_time)
+/** Retrieve the vhost creator
+ * @return the creator
+ */
+const std::string &HostInfo::GetCreator() const
 {
-	HostCore *tmp;
-	bool found = false;
-
-	if (head == NULL) {
-		head =
-			createHostCorelist(head, nick, vIdent, vhost, creator,
-							   tmp_time);
-	} else {
-		tmp = findHostCore(head, nick, &found);
-		if (!found) {
-			head =
-				insertHostCore(head, tmp, nick, vIdent, vhost, creator,
-							   tmp_time);
-		} else {
-			head = deleteHostCore(head, tmp);   /* delete the old entry */
-			addHostCore(nick, vIdent, vhost, creator, tmp_time);		/* recursive call to add new entry */
-		}
-	}
+	return Creator;
 }
 
-/*************************************************************************/
-char *getvHost(char *nick)
+/** Retrieve when the vhost was crated
+ * @return the time it was created
+ */
+const time_t HostInfo::GetTime() const
 {
-	HostCore *tmp;
-	bool found = false;
-	tmp = findHostCore(head, nick, &found);
-	if (found) {
-		if (tmp == NULL)
-			return head->vHost;
-		else
-			return tmp->next->vHost;
-	}
-	return NULL;
+	return Time;
 }
-
-/*************************************************************************/
-char *getvIdent(char *nick)
-{
-	HostCore *tmp;
-	bool found = false;
-	tmp = findHostCore(head, nick, &found);
-	if (found) {
-		if (tmp == NULL)
-			return head->vIdent;
-		else
-			return tmp->next->vIdent;
-	}
-	return NULL;
-}
-
-/*************************************************************************/
-void delHostCore(const char *nick)
-{
-	HostCore *tmp;
-	bool found = false;
-	tmp = findHostCore(head, nick, &found);
-	if (found) {
-		head = deleteHostCore(head, tmp);
-	}
-
-}
-
-/*************************************************************************/
-/*	End of Linked List routines					 */
-/*************************************************************************/
 
 /*************************************************************************/
 /*	Start of Generic Functions					 */
 /*************************************************************************/
 
-int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
-			   time_t time)
-{
-	int i;
-	NickAlias *na;
-
-	for (i = 0; i < nc->aliases.count; i++) {
-		na = static_cast<NickAlias *>(nc->aliases.list[i]);
-		addHostCore(na->nick, vIdent, hostmask, creator, time);
-	}
-	return MOD_CONT;
-}
-
-/*************************************************************************/
-int do_on_id(User * u)
-{							   /* we've assumed that the user exists etc.. */
-	char *vHost;				/* as were only gonna call this from nsid routine */
-	char *vIdent;
-	vHost = getvHost(u->nick);
-	vIdent = getvIdent(u->nick);
-	if (vHost != NULL) {
-		if (vIdent) {
-			notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent,
-						vHost);
-		} else {
-			notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, vHost);
-		}
-		ircdproto->SendVhost(u, vIdent, vHost);
-		if (ircd->vhost)
-		{
-			if (u->vhost)
-				delete [] u->vhost;
-			u->vhost = sstrdup(vHost);
-		}
-		if (ircd->vident) {
-			if (vIdent)
-				u->SetVIdent(vIdent);
-		}
-		set_lastmask(u);
-	}
-	return MOD_CONT;
-}
-
-/*************************************************************************/
-
-/*
- * Sets the last_usermak properly. Using virtual ident and/or host
+/** Sync all vhosts in a group to the same thing
+ * @param na The nick with the vhost wanting to by synced
  */
-void set_lastmask(User * u)
+void HostServSyncVhosts(NickAlias *na)
 {
-	NickAlias *na = findnick(u->nick);
-	if (na->last_usermask)
-		delete [] na->last_usermask;
+	if (!na || !na->hostinfo.HasVhost())
+		return;
 
-	std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-	na->last_usermask = sstrdup(last_usermask.c_str());
+	for (int i = 0; i < na->nc->aliases.count; i++)
+	{
+		NickAlias *nick = static_cast<NickAlias *>(na->nc->aliases.list[i]);
+		nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
+	}
 }
+
+/*************************************************************************/
+
+void do_on_id(User *u)
+{
+	if (!u)
+		return;
+	NickAlias *na = findnick(u->nick);
+	if (!na || !na->hostinfo.HasVhost())
+		return;
+	
+	ircdproto->SendVhost(u, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+	if (ircd->vhost)
+	{
+		if (u->vhost)
+			delete [] u->vhost;
+		u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
+	}
+	if (ircd->vident && !na->hostinfo.GetIdent().empty())
+	{
+		u->SetVIdent(na->hostinfo.GetIdent());
+	}
+	u->UpdateHost();
+
+	if (!na->hostinfo.GetIdent().empty())
+		notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+	else
+		notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+}
+
+

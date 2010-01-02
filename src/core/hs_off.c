@@ -24,12 +24,9 @@ class CommandHSOff : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		char *vhost;
-		char *vident = NULL;
-		
-		vhost = getvHost(u->nick);
-		vident = getvIdent(u->nick);
-		if (!vhost && !vident)
+		NickAlias *na = findnick(u->nick);
+
+		if (!na || !na->hostinfo.HasVhost())
 			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
 		else
 		{

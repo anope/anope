@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2727"
+VERSION_BUILD="2730"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2730 - Fixed typo in inspircd12.h causing 2 modes to use the same bit.
 #Revision 2727 - Fixed a few SASET help replies to reply to services opers, and fixed the rest to not reply to anyone who requests help
 #Revision 2726 - Fixed help system to use notice_help instead of notice_lang (bug from r2473)
 #Revision 2712 - Fixed loading of nickcore access lists from SQL to always set nickcores accesscount to the real amount of entries

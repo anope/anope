@@ -1673,6 +1673,8 @@ int anope_event_uid(char *source, int ac, char **av)
     if (user) {
         if (debug)
             alog("debug: User %s had +r but received no account info.", user->nick);
+        if (user->na)
+	    user->na->status &= ~NS_RECOGNIZED;
         validate_user(user);
         common_svsmode(user, "-r", NULL);
     }
@@ -1756,6 +1758,7 @@ int anope_event_metadata(char *source, int ac, char **av)
              * Invalidate the recognition. */
             if (debug)
                 alog("debug: User %s had +r but did not receive matching account info.", u->nick);
+            u->na->status &= ~NS_RECOGNIZED;
             common_svsmode(u, "-r", NULL);
             validate_user(u);
         }
@@ -1779,6 +1782,8 @@ int anope_event_eob(char *source, int ac, char **av)
 
     /* The burst is complete.. check if there was a user that got recognized and still needs to be invalidated.*/
     if (u) {
+        if (u->na)
+	    u->na->status &= ~NS_RECOGNIZED;
         common_svsmode(u, "-r", NULL);
         validate_user(u);
     }

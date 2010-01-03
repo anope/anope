@@ -18,23 +18,22 @@
 #include "services.h"
 
 static char *int_to_base64(long);
-static long base64_to_int(char *);
+static long base64_to_int(const char *);
 
-const char* base64enc(long i)
+const char *base64enc(long i)
 {
 	if (i < 0)
-		return ("0");
+		return "0";
 	return int_to_base64(i);
 }
 
-long base64dec(char* b64)
+long base64dec(const char *b64)
 {
 	if (b64)
 		return base64_to_int(b64);
 	else
 		return 0;
 }
-
 
 static const char Base64[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -103,14 +102,15 @@ static const char Pad64 = '=';
 	   characters followed by one "=" padding character.
    */
 
-int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
+int b64_encode(const char *src, size_t srclength, char *target, size_t targsize)
 {
 	size_t datalength = 0;
 	unsigned char input[3];
 	unsigned char output[4];
 	size_t i;
 
-	while (2 < srclength) {
+	while (2 < srclength)
+	{
 		input[0] = *src++;
 		input[1] = *src++;
 		input[2] = *src++;
@@ -122,7 +122,7 @@ int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
 		output[3] = input[2] & 0x3f;
 
 		if (datalength + 4 > targsize)
-			return (-1);
+			return -1;
 		target[datalength++] = Base64[output[0]];
 		target[datalength++] = Base64[output[1]];
 		target[datalength++] = Base64[output[2]];
@@ -130,10 +130,11 @@ int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
 	}
 
 	/* Now we worry about padding. */
-	if (0 != srclength) {
+	if (srclength)
+	{
 		/* Get what's left. */
 		input[0] = input[1] = input[2] = '\0';
-		for (i = 0; i < srclength; i++)
+		for (i = 0; i < srclength; ++i)
 			input[i] = *src++;
 
 		output[0] = input[0] >> 2;
@@ -141,7 +142,7 @@ int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
 		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
 
 		if (datalength + 4 > targsize)
-			return (-1);
+			return -1;
 		target[datalength++] = Base64[output[0]];
 		target[datalength++] = Base64[output[1]];
 		if (srclength == 1)
@@ -151,9 +152,9 @@ int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
 		target[datalength++] = Pad64;
 	}
 	if (datalength >= targsize)
-		return (-1);
-	target[datalength] = '\0';  /* Returned value doesn't count \0. */
-	return (datalength);
+		return -1;
+	target[datalength] = '\0'; /* Returned value doesn't count \0. */
+	return datalength;
 }
 
 /* skips all whitespace anywhere.
@@ -170,7 +171,8 @@ int b64_decode(const char *src, char *target, size_t targsize)
 	state = 0;
 	tarindex = 0;
 
-	while ((ch = *src++) != '\0') {
+	while ((ch = *src++) != '\0')
+	{
 		if (isspace(ch))		/* Skip whitespace anywhere. */
 			continue;
 
@@ -178,51 +180,54 @@ int b64_decode(const char *src, char *target, size_t targsize)
 			break;
 
 		pos = const_cast<char *>(strchr(Base64, ch));
-		if (pos == 0)		   /* A non-base64 character. */
-			return (-1);
+		if (!pos)		   /* A non-base64 character. */
+			return -1;
 
-		switch (state) {
-		case 0:
-			if (target) {
-				if (static_cast<size_t>(tarindex) >= targsize)
-					return (-1);
-				target[tarindex] = (pos - Base64) << 2;
-			}
-			state = 1;
-			break;
-		case 1:
-			if (target) {
-				if (static_cast<size_t>(tarindex) + 1 >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64) >> 4;
-				target[tarindex + 1] = ((pos - Base64) & 0x0f)
-					<< 4;
-			}
-			tarindex++;
-			state = 2;
-			break;
-		case 2:
-			if (target) {
-				if (static_cast<size_t>(tarindex) + 1 >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64) >> 2;
-				target[tarindex + 1] = ((pos - Base64) & 0x03)
-					<< 6;
-			}
-			tarindex++;
-			state = 3;
-			break;
-		case 3:
-			if (target) {
-				if (static_cast<size_t>(tarindex) >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64);
-			}
-			tarindex++;
-			state = 0;
-			break;
-		default:
-			abort();
+		switch (state)
+		{
+			case 0:
+				if (target)
+				{
+					if (static_cast<size_t>(tarindex) >= targsize)
+						return -1;
+					target[tarindex] = (pos - Base64) << 2;
+				}
+				state = 1;
+				break;
+			case 1:
+				if (target)
+				{
+					if (static_cast<size_t>(tarindex) + 1 >= targsize)
+						return -1;
+					target[tarindex] |= (pos - Base64) >> 4;
+					target[tarindex + 1] = ((pos - Base64) & 0x0f) << 4;
+				}
+				++tarindex;
+				state = 2;
+				break;
+			case 2:
+				if (target)
+				{
+					if (static_cast<size_t>(tarindex) + 1 >= targsize)
+						return -1;
+					target[tarindex] |= (pos - Base64) >> 2;
+					target[tarindex + 1] = ((pos - Base64) & 0x03) << 6;
+				}
+				++tarindex;
+				state = 3;
+				break;
+			case 3:
+				if (target)
+				{
+					if (static_cast<size_t>(tarindex) >= targsize)
+						return -1;
+					target[tarindex] |= (pos - Base64);
+				}
+				++tarindex;
+				state = 0;
+				break;
+			default:
+				abort();
 		}
 	}
 
@@ -231,53 +236,57 @@ int b64_decode(const char *src, char *target, size_t targsize)
 	 * on a byte boundary, and/or with erroneous trailing characters.
 	 */
 
-	if (ch == Pad64) {		  /* We got a pad char. */
+	if (ch == Pad64)		  /* We got a pad char. */
+	{
 		ch = *src++;			/* Skip it, get next. */
-		switch (state) {
-		case 0:				/* Invalid = in first position */
-		case 1:				/* Invalid = in second position */
-			return (-1);
+		switch (state)
+		{
+			case 0:				/* Invalid = in first position */
+			case 1:				/* Invalid = in second position */
+				return -1;
 
-		case 2:				/* Valid, means one byte of info */
-			/* Skip any number of spaces. */
-			for (; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					break;
-			/* Make sure there is another trailing = sign. */
-			if (ch != Pad64)
-				return (-1);
-			ch = *src++;		/* Skip the = */
-			/* Fall through to "single trailing =" case. */
-			/* FALLTHROUGH */
+			case 2:				/* Valid, means one byte of info */
+				/* Skip any number of spaces. */
+				for (; ch != '\0'; ch = *src++)
+					if (!isspace(ch))
+						break;
+				/* Make sure there is another trailing = sign. */
+				if (ch != Pad64)
+					return -1;
+				ch = *src++;		/* Skip the = */
+				/* Fall through to "single trailing =" case. */
+				/* FALLTHROUGH */
 
-		case 3:				/* Valid, means two bytes of info */
-			/*
-			 * We know this char is an =.  Is there anything but
-			 * whitespace after it?
-			 */
-			for (; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					return (-1);
+			case 3:				/* Valid, means two bytes of info */
+				/*
+				 * We know this char is an =.  Is there anything but
+				 * whitespace after it?
+				 */
+				for (; ch != '\0'; ch = *src++)
+					if (!isspace(ch))
+						return -1;
 
-			/*
-			 * Now make sure for cases 2 and 3 that the "extra"
-			 * bits that slopped past the last full byte were
-			 * zeros.  If we don't check them, they become a
-			 * subliminal channel.
-			 */
-			if (target && target[tarindex] != 0)
-				return (-1);
+				/*
+				 * Now make sure for cases 2 and 3 that the "extra"
+				 * bits that slopped past the last full byte were
+				 * zeros.  If we don't check them, they become a
+				 * subliminal channel.
+				 */
+				if (target && target[tarindex])
+					return -1;
 		}
-	} else {
+	}
+	else
+	{
 		/*
 		 * We ended by seeing the end of the string.  Make sure we
 		 * have no partial bytes lying around.
 		 */
-		if (state != 0)
-			return (-1);
+		if (state)
+			return -1;
 	}
 
-	return (tarindex);
+	return tarindex;
 }
 
 const char* encode_ip(unsigned char *ip)
@@ -290,13 +299,14 @@ const char* encode_ip(unsigned char *ip)
 	if (!ip)
 		return "*";
 
-	if (strchr(reinterpret_cast<char *>(ip), ':')) {
+	if (strchr(reinterpret_cast<char *>(ip), ':'))
 		return NULL;
-	} else {
+	else
+	{
 		s_ip = str_signed(ip);
 		ia.s_addr = inet_addr(s_ip);
 		cp = reinterpret_cast<unsigned char *>(ia.s_addr);
-		b64_encode(reinterpret_cast<char *>(&cp), sizeof(struct in_addr), buf, 25);
+		b64_encode(reinterpret_cast<const char *>(&cp), sizeof(struct in_addr), buf, 25);
 	}
 	return buf;
 }
@@ -309,9 +319,9 @@ int decode_ip(const char *buf)
 
 	b64_decode(buf, targ, 25);
 	ia = *reinterpret_cast<struct in_addr *>(targ);
-	if (len == 24) {			/* IPv6 */
+	if (len == 24)			/* IPv6 */
 		return 0;
-	} else if (len == 8)		/* IPv4 */
+	else if (len == 8)		/* IPv4 */
 		return ia.s_addr;
 	else						/* Error?? */
 		return 0;
@@ -364,28 +374,28 @@ static char *int_to_base64(long val)
 	 * if the value is then too large it can easily lead to
 	 * a buffer underflow and thus to a crash. -- Syzop
 	 */
-	if (val > 2147483647L) {
+	if (val > 2147483647L)
 		abort();
-	}
 
-	do {
+	do
+	{
 		base64buf[--i] = int6_to_base64_map[val & 63];
-	}
-	while (val >>= 6);
+	} while (val >>= 6);
 
 	return base64buf + i;
 }
 
-static long base64_to_int(char *b64)
+static long base64_to_int(const char *b64)
 {
-	int v = base64_to_int6_map[static_cast<unsigned char>(*b64++)];
+	int v = base64_to_int6_map[static_cast<const unsigned char>(*b64++)];
 
 	if (!b64)
 		return 0;
 
-	while (*b64) {
+	while (*b64)
+	{
 		v <<= 6;
-		v += base64_to_int6_map[static_cast<unsigned char>(*b64++)];
+		v += base64_to_int6_map[static_cast<const unsigned char>(*b64++)];
 	}
 
 	return v;
@@ -393,18 +403,14 @@ static long base64_to_int(char *b64)
 
 long base64dects(const char *ts)
 {
-	char *token;
-	long value;
-
-	if (!ts) {
+	if (!ts)
 		return 0;
-	}
-	token = myStrGetToken(ts, '!', 1);
 
-	if (!token) {
+	char *token = myStrGetToken(ts, '!', 1);
+	if (!token)
 		return strtoul(ts, NULL, 10);
-	}
-	value = base64dec(token);
+
+	long value = base64dec(token);
 	delete [] token;
 	return value;
 }

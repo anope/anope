@@ -614,12 +614,12 @@ E void UserSetInternalModes(User *user, int ac, const char **av);
 
 /******************************************************************************/
 
-E const char* base64enc(long i);
-E long base64dec(char *b64);
+E const char *base64enc(long i);
+E long base64dec(const char *b64);
 E long base64dects(const char *ts);
-E int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
+E int b64_encode(const char *src, size_t srclength, char *target, size_t targsize);
 E int b64_decode(const char *src, char *target, size_t targsize);
-E const char* encode_ip(unsigned char *ip);
+E const char *encode_ip(unsigned char *ip);
 E int decode_ip(const char *buf);
 
 E char *host_resolve(char *host);

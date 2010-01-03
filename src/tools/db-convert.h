@@ -786,7 +786,7 @@ void alpha_insert_chan(ChannelInfo * ci)
 
 HostCore *findHostCore(char *nick)
 {
-	for (HostCore *hc = head; head; head = head->next)
+	for (HostCore *hc = head; hc; hc = hc->next)
 	{
 		if (nick && hc->nick && !mystricmp(hc->nick, nick))
 			return hc;

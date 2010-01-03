@@ -458,7 +458,7 @@ int main(int argc, char *argv[])
 					HostCore *hc = findHostCore(na->nick);
 					if (hc)
 					{
-						fs << "MD VHOST " << hc->creator << " " << hc->time << " " << hc->vHost << " :" << hc->vIdent << std::endl;
+						fs << "MD VHOST " << hc->creator << " " << hc->time << " " << hc->vHost << " :" << (hc->vIdent ? hc->vIdent : "") << std::endl;
 					}
 				}
 			}

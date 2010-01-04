@@ -45,11 +45,11 @@ class CommandOSKick : public Command
 			return MOD_CONT;
 		}
 
-		ircdproto->SendKick(findbot(Config.s_OperServ), c, u2, "%s (%s)", u->nick, s);
+		ircdproto->SendKick(findbot(Config.s_OperServ), c, u2, "%s (%s)", u->nick.c_str(), s);
 		if (Config.WallOSKick)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used KICK on %s/%s", u->nick, u2->nick, chan);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan);
 		argv[0] = sstrdup(chan);
-		argv[1] = sstrdup(u2->nick);
+		argv[1] = sstrdup(u2->nick.c_str());
 		argv[2] = sstrdup(s);
 		do_kick(Config.s_OperServ, 3, argv);
 		delete [] argv[2];

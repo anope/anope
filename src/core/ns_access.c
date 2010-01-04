@@ -29,14 +29,6 @@ class CommandNSAccess : public Command
 			return MOD_CONT;
 		}
 
-/* reinstate when forbidden is moved to a group flag
-		if (na->HasFlag(NS_FORBIDDEN))
-		{
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-			return MOD_CONT;
-		}
-*/
-
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, nc->display);
@@ -107,7 +99,7 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick.c_str());
 			return MOD_CONT;
 		}
 

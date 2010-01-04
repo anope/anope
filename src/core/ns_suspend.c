@@ -79,16 +79,16 @@ class CommandNSSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SUSPEND on \2%s\2", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick);
 
-			alog("%s: %s set SUSPEND for nick %s", Config.s_NickServ, u->nick, nick);
+			alog("%s: %s set SUSPEND for nick %s", Config.s_NickServ, u->nick.c_str(), nick);
 			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na))
 		}
 		else
 		{
-			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_NickServ, nick, u->nick);
+			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_NickServ, nick, u->nick.c_str());
 			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_FAILED, nick);
 		}
 		return MOD_CONT;
@@ -147,16 +147,16 @@ class CommandNSUnSuspend : public Command
 			na->nc->UnsetFlag(NI_SUSPENDED);
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used UNSUSPEND on \2%s\2", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick);
 
-			alog("%s: %s set UNSUSPEND for nick %s", Config.s_NickServ, u->nick, nick);
+			alog("%s: %s set UNSUSPEND for nick %s", Config.s_NickServ, u->nick.c_str(), nick);
 			notice_lang(Config.s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 		}
 		else
 		{
-			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_NickServ, nick, u->nick);
+			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_NickServ, nick, u->nick.c_str());
 			notice_lang(Config.s_NickServ, u, NICK_UNSUSPEND_FAILED, nick);
 		}
 		return MOD_CONT;

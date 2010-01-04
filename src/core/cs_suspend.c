@@ -56,11 +56,11 @@ class CommandCSSuspend : public Command
 		if (ci)
 		{
 			ci->SetFlag(CI_SUSPENDED);
-			ci->forbidby = sstrdup(u->nick);
+			ci->forbidby = sstrdup(u->nick.c_str());
 			if (reason)
 				ci->forbidreason = sstrdup(reason);
 
-			if ((c = findchan(ci->name)))
+			if ((c = findchan(ci->name.c_str())))
 			{
 				struct c_userlist *cu, *nextu;
 				const char *av[3];
@@ -72,8 +72,8 @@ class CommandCSSuspend : public Command
 					if (is_oper(cu->user))
 						continue;
 
-					av[0] = c->name;
-					av[1] = cu->user->nick;
+					av[0] = c->name.c_str();
+					av[1] = cu->user->nick.c_str();
 					av[2] = reason ? reason : getstring(cu->user->nc, CHAN_SUSPEND_REASON);
 					ircdproto->SendKick(findbot(Config.s_ChanServ), c, cu->user, av[2]);
 					do_kick(Config.s_ChanServ, 3, av);
@@ -81,16 +81,16 @@ class CommandCSSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used SUSPEND on channel \2%s\2", u->nick, ci->name);
+				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			alog("%s: %s set SUSPEND for channel %s", Config.s_ChanServ, u->nick, ci->name);
+			alog("%s: %s set SUSPEND for channel %s", Config.s_ChanServ, u->nick.c_str(), ci->name.c_str());
 			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
 
 			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
 		else
 		{
-			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_ChanServ, ci->name, u->nick);
+			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_ChanServ, ci->name.c_str(), u->nick.c_str());
 			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_FAILED, chan);
 		}
 		return MOD_CONT;
@@ -151,16 +151,16 @@ class CommandCSUnSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick, ci->name);
+				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			alog("%s: %s set UNSUSPEND for channel %s", Config.s_ChanServ, u->nick, ci->name);
+			alog("%s: %s set UNSUSPEND for channel %s", Config.s_ChanServ, u->nick.c_str(), ci->name.c_str());
 			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
 
 			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 		}
 		else
 		{
-			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_ChanServ, chan, u->nick);
+			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_ChanServ, chan, u->nick.c_str());
 			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
 		}
 		return MOD_CONT;

@@ -38,7 +38,7 @@ class CommandMSSendAll : public Command
 		{
 			for (nc = nclists[i]; nc; nc = nc->next)
 			{
-				if (stricmp(u->nick, nc->display))
+				if (stricmp(u->nick.c_str(), nc->display))
 					memo_send(u, nc->display, text, z);
 			} /* /nc */
 		} /* /i */

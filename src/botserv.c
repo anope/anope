@@ -91,7 +91,7 @@ void botserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(findbot(Config.s_BotServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_BotServ), u->nick.c_str(), "PING %s", s);
 	} else {
 		mod_run_cmd(Config.s_BotServ, u, BOTSERV, cmd);
 	}
@@ -114,7 +114,7 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(bi, u->nick, "PING %s", s);
+		ircdproto->SendCTCP(bi, u->nick.c_str(), "PING %s", s);
 	}
 	else if (cmd && bi->cmdTable)
 	{
@@ -145,7 +145,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 	/* Answer to ping if needed, without breaking the buffer. */
 	if (!strnicmp(buf, "\1PING", 5)) {
-		ircdproto->SendCTCP(ci->bi, u->nick, "PING %s", buf);
+		ircdproto->SendCTCP(ci->bi, u->nick.c_str(), "PING %s", buf);
 	}
 
 	/* If it's a /me, cut the CTCP part at the beginning (not
@@ -409,7 +409,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 
 	/* return if the user is on the ignore list  */
-	if (get_ignore(u->nick) != NULL) {
+	if (get_ignore(u->nick.c_str()) != NULL) {
 		return;
 	}
 
@@ -650,7 +650,7 @@ void bot_join(ChannelInfo * ci)
 				 "%s invited %s into the channel.",
 				 ci->bi->nick, ci->bi->nick);
 	}
-	ircdproto->SendJoin(ci->bi, ci->c->name, ci->c->creation_time);
+	ircdproto->SendJoin(ci->bi, ci->c->name.c_str(), ci->c->creation_time);
 	ci->c->SetMode(NULL, CMODE_PROTECT, ci->bi->nick);
 	ci->c->SetMode(NULL, CMODE_OP, ci->bi->nick);
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(ci, ci->bi));
@@ -707,8 +707,8 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 	vsnprintf(buf, sizeof(buf), fmt, args);
 	va_end(args);
 
-	av[0] = ci->name;
-	av[1] = u->nick;
+	av[0] = ci->name.c_str();
+	av[1] = u->nick.c_str();
 	av[2] = buf;
 	ircdproto->SendKick(ci->bi, ci->c, u, "%s", av[2]);
 	do_kick(ci->bi->nick, 3, av);
@@ -732,20 +732,18 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
 	{
 		if (is_protected(u) && (requester != u)) {
-			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring(ACCESS_DENIED));
+			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
 			return;
 		}
 	}
 
-	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick, nick) && (get_access(u, ci) >= get_access(requester, ci)))
+	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick.c_str(), nick) && (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
 	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 	{
 		if (is_excepted(ci, u) == 1) {
-			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring(BOT_EXCEPT));
+			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(BOT_EXCEPT));
 			return;
 		}
 	}
@@ -754,7 +752,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
 	ci->c->SetMode(NULL, CMODE_BAN, mask);
 
-	kav[0] = ci->name;
+	kav[0] = ci->name.c_str();
 	kav[1] = nick;
 
 	if (!reason) {
@@ -767,7 +765,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
 	/* Check if we need to do a signkick or not -GD */
 	if ((ci->HasFlag(CI_SIGNKICK) || ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK))
-		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", kav[2], requester->nick);
+		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", kav[2], requester->nick.c_str());
 	else
 		ircdproto->SendKick(ci->bi, ci->c, u, "%s", kav[2]);
 
@@ -791,16 +789,15 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
 	{
 		if (is_protected(u) && (requester != u)) {
-			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring(ACCESS_DENIED));
+			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
 			return;
 		}
 	}
 
-	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick, nick) && (get_access(u, ci) >= get_access(requester, ci)))
+	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick.c_str(), nick) && (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
-	av[0] = ci->name;
+	av[0] = ci->name.c_str();
 	av[1] = nick;
 
 	if (!reason) {
@@ -812,7 +809,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	}
 
 	if (ci->HasFlag(CI_SIGNKICK) || ((ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK)))
-		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", av[2], requester->nick);
+		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", av[2], requester->nick.c_str());
 	else
 		ircdproto->SendKick(ci->bi, ci->c, u, "%s", av[2]);
 	do_kick(ci->bi->nick, 3, av);
@@ -839,15 +836,13 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
 
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED))) {
 		if (is_protected(u) && *mode == '-' && (requester != u)) {
-			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
-							  getstring(ACCESS_DENIED));
+			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
 			return;
 		}
 	}
 
 	if (*mode == '-' && ci->HasFlag(CI_PEACE)
-		&& stricmp(requester->nick, nick)
-		&& (get_access(u, ci) >= get_access(requester, ci)))
+		&& stricmp(requester->nick.c_str(), nick) && (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
 	ci->c->SetModes(NULL, "%s %s", mode, nick);

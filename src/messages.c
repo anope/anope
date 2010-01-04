@@ -174,7 +174,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 				{
 					notice_lang(Config.s_OperServ, u, ACCESS_DENIED);
 					if (Config.WallBadOS)
-						ircdproto->SendGlobops(findbot(Config.s_OperServ), "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ, u->nick, u->GetIdent().c_str(), u->host);
+						ircdproto->SendGlobops(findbot(Config.s_OperServ), "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 				}
 				else
 					operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX

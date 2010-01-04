@@ -25,7 +25,7 @@ class CommandOSChanKill : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *expiry, *channel;
-		char reason[BUFSIZE], realreason[BUFSIZE];
+		char reason[BUFSIZE];
 		time_t expires;
 		char mask[USERMAX + HOSTMAX + 2];
 		struct c_userlist *cu, *cunext;
@@ -62,10 +62,11 @@ class CommandOSChanKill : public Command
 		if (*reason)
 		{
 
+			std::string realreason;
 			if (Config.AddAkiller)
-				snprintf(realreason, sizeof(realreason), "[%s] %s", u->nick, reason);
+				realreason = "[" + u->nick + "] " + std::string(reason);
 			else
-				snprintf(realreason, sizeof(realreason), "%s", reason);
+				realreason = reason;
 
 			if ((c = findchan(channel)))
 			{
@@ -76,11 +77,11 @@ class CommandOSChanKill : public Command
 						continue;
 					strlcpy(mask, "*@", sizeof(mask)); /* Use *@" for the akill's, */
 					strlcat(mask, cu->user->host, sizeof(mask));
-					add_akill(NULL, mask, Config.s_OperServ, expires, realreason);
-					check_akill(cu->user->nick, cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
+					add_akill(NULL, mask, Config.s_OperServ, expires, realreason.c_str());
+					check_akill(cu->user->nick.c_str(), cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
 				}
 				if (Config.WallOSAkill)
-					ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CHANKILL on %s (%s)", u->nick, channel, realreason);
+					ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel, realreason.c_str());
 			}
 			else
 				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel);

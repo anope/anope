@@ -35,9 +35,9 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 	int is_same;
 
 	if (!nick)
-		nick = u->nick;
+		nick = u->nick.c_str();
 
-	is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick) == 0);
+	is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick.c_str()) == 0);
 
 	if (c)
 		ci = c->ci;
@@ -47,7 +47,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 	else if (is_same ? !(u2 = u) : !(u2 = finduser(nick)))
 		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 	else if (!is_on_chan(c, u2))
-		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
+		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
@@ -62,8 +62,8 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 			c->RemoveMode(NULL, cm, u2->nick);
 
 		if (notice && ci->HasFlag(notice))
-			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",
-				   name.c_str(), u2->nick, u->nick);
+			ircdproto->SendMessage(whosends(ci), c->name.c_str(), "%s command used for %s by %s",
+				   name.c_str(), u2->nick.c_str(), u->nick.c_str());
 	}
 
 	return MOD_CONT;

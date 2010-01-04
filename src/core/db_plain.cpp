@@ -456,7 +456,7 @@ static void LoadChanInfo(const std::vector<std::string> &params)
 	ci->memos.memomax = atoi(params[4].c_str());
 
 	if (debug > 1)
-		alog("[db_plain]: loaded channel %s", ci->name);
+		alog("[db_plain]: loaded channel %s", ci->name.c_str());
 }
 
 static void LoadOperInfo(const std::vector<std::string> &params)
@@ -486,7 +486,7 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 		exceptions[nexceptions - 1].mask = sstrdup(params[1].c_str());
 		exceptions[nexceptions - 1].limit = atol(params[2].c_str());
-		strscpy(exceptions[nexceptions - 1].who, params[3].c_str(), NICKMAX);
+		exceptions[nexceptions - 1].who = params[3];
 		exceptions[nexceptions - 1].time = strtol(params[4].c_str(), NULL, 10);
 		exceptions[nexceptions - 1].expires = strtol(params[5].c_str(), NULL, 10);
 		exceptions[nexceptions - 1].reason = sstrdup(params[6].c_str());
@@ -572,7 +572,7 @@ class DBPlain : public Module
 			Memo *m = new Memo;
 			m->number = atoi(params[0].c_str());
 			m->time = strtol(params[1].c_str(), NULL, 10);
-			strscpy(m->sender, params[2].c_str(), NICKMAX);
+			m->sender = params[2];
 			unsigned j;
 			for (j = 3; (params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"); ++j)
 			{
@@ -656,7 +656,7 @@ class DBPlain : public Module
 			ci->founder = findcore(params[0].c_str());
 			if (!ci->founder)
 			{
-				alog("[db_plain]: Deleting founderless channel %s", ci->name);
+				alog("[db_plain]: Deleting founderless channel %s", ci->name.c_str());
 				delete ci;
 				ci = NULL;
 				throw "no founder";
@@ -686,7 +686,7 @@ class DBPlain : public Module
 			ci->email = sstrdup(params[0].c_str());
 		else if (key == "TOPIC")
 		{
-			strscpy(ci->last_topic_setter, params[0].c_str(), NICKMAX);
+			ci->last_topic_setter = params[0];
 			ci->last_topic_time = strtol(params[1].c_str(), NULL, 10);
 			ci->last_topic = sstrdup(params[2].c_str());
 		}
@@ -749,7 +749,7 @@ class DBPlain : public Module
 			Memo *m = new Memo;
 			m->number = atoi(params[0].c_str());
 			m->time = strtol(params[1].c_str(), NULL, 10);
-			strscpy(m->sender, params[2].c_str(), NICKMAX);
+			m->sender = params[2];
 			unsigned j;
 			for (j = 3; j < params.size() - 1 && (buf == "UNREAD" || buf == "RECEIPT" || buf == "NOTIFYS"); ++j)
 			{

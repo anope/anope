@@ -89,7 +89,7 @@ class CommandCSInfo : public Command
 											&& (!ci->c || !(ci->c->HasMode(CMODE_SECRET)))))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_INFO_LAST_TOPIC, ci->last_topic);
-			notice_lang(Config.s_ChanServ, u, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter);
+			notice_lang(Config.s_ChanServ, u, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter.c_str());
 		}
 
 		if (ci->entry_message && show_all)
@@ -145,7 +145,7 @@ class CommandCSInfo : public Command
 		}
 
 		if (!show_all && (check_access(u, ci, CA_INFO) || has_auspex))
-			notice_lang(Config.s_ChanServ, u, NICK_INFO_FOR_MORE, Config.s_ChanServ, ci->name);
+			notice_lang(Config.s_ChanServ, u, NICK_INFO_FOR_MORE, Config.s_ChanServ, ci->name.c_str());
 		return MOD_CONT;
 	}
 

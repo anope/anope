@@ -68,15 +68,16 @@ class CommandCSRegister : public Command
 			if (c->topic)
 			{
 				ci->last_topic = sstrdup(c->topic);
-				strscpy(ci->last_topic_setter, c->topic_setter, NICKMAX);
+				ci->last_topic_setter = c->topic_setter;
 				ci->last_topic_time = c->topic_time;
 			}
-			else strscpy(ci->last_topic_setter, Config.s_ChanServ, NICKMAX); /* Set this to something, otherwise it will maliform the topic */
+			else
+				ci->last_topic_setter = Config.s_ChanServ;
 
 			ci->bi = NULL;
 			++ci->founder->channelcount;
-			alog("%s: Channel '%s' registered by %s!%s@%s", Config.s_ChanServ, chan, u->nick, u->GetIdent().c_str(), u->host);
-			notice_lang(Config.s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
+			alog("%s: Channel '%s' registered by %s!%s@%s", Config.s_ChanServ, chan, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTERED, chan, u->nick.c_str());
 
 			/* Implement new mode lock */
 			check_modes(c);

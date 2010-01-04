@@ -62,7 +62,7 @@ class CommandCSEnforce : public Command
 			return;
 
 		if (debug)
-			alog("debug: cs_enforce: Enforcing SECUREOPS on %s", c->name);
+			alog("debug: cs_enforce: Enforcing SECUREOPS on %s", c->name.c_str());
 
 		/* Dirty hack to allow chan_set_correct_modes to work ok.
 		 * We pretend like SECUREOPS is on so it doesn't ignore that
@@ -105,7 +105,7 @@ class CommandCSEnforce : public Command
 			return;
 
 		if (debug)
-			alog("debug: cs_enforce: Enforcing RESTRICTED on %s", c->name);
+			alog("debug: cs_enforce: Enforcing RESTRICTED on %s", c->name.c_str());
 
 		old_nojoin_level = ci->levels[CA_NOJOIN];
 		if (ci->levels[CA_NOJOIN] < 0)
@@ -122,8 +122,8 @@ class CommandCSEnforce : public Command
 				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				ircdproto->SendKick(whosends(ci), ci->c, u, "%s", reason);
-				av[0] = ci->name;
-				av[1] = u->nick;
+				av[0] = ci->name.c_str();
+				av[1] = u->nick.c_str();
 				av[2] = reason;
 				do_kick(Config.s_ChanServ, 3, av);
 			}
@@ -147,7 +147,7 @@ class CommandCSEnforce : public Command
 			return;
 
 		if (debug)
-			alog("debug: cs_enforce: Enforcing mode +R on %s", c->name);
+			alog("debug: cs_enforce: Enforcing mode +R on %s", c->name.c_str());
 
 		user = c->users;
 		do
@@ -163,8 +163,8 @@ class CommandCSEnforce : public Command
 					c->SetMode(NULL, CMODE_BAN, mask);
 				}
 				ircdproto->SendKick(whosends(ci), ci->c, u, "%s", reason);
-				av[0] = ci->name;
-				av[1] = u->nick;
+				av[0] = ci->name.c_str();
+				av[1] = u->nick.c_str();
 				av[2] = reason;
 				do_kick(Config.s_ChanServ, 3, av);
 			}

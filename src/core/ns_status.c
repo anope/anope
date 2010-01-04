@@ -27,34 +27,27 @@ class CommandNSStatus : public Command
 	{
 		User *u2;
 		NickAlias *na = NULL;
-		unsigned i = 0;
-		const char *nick = params.size() ? params[0].c_str() : NULL;
+		std::string nick = params.size() ? params[0].c_str() : u->nick;
+		spacesepstream sep(nick);
+		std::string nickbuf;
 
-		/* If no nickname is given, we assume that the user
-		 * is asking for himself */
-		if (!nick)
-			nick = u->nick;
-
-		while (nick && i++ < 16)
+		while (sep.GetToken(nickbuf))
 		{
 			na = findnick(nick);
 
-			if (!(u2 = finduser(nick))) /* Nick is not online */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
+			if (!(u2 = finduser(nickbuf))) /* Nick is not online */
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
 			else if (nick_identified(u2) && na && na->nc == u2->nc) /* Nick is identified */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 3, u2->nc->display);
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 3, u2->nc->display);
 			else if (u2->IsRecognized()) /* Nick is recognised, but NOT identified */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 2, (u2->nc ? u2->nc->display : ""));
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 2, (u2->nc ? u2->nc->display : ""));
 			else if (!na) /* Nick is online, but NOT a registered */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 0, "");
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
 			else
 				/* Nick is not identified for the nick, but they could be logged into an account,
 				 * so we tell the user about it
 				 */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nick, 1, (u2->nc ? u2->nc->display : ""));
-
-			/* Get the next nickname */
-			nick = params.size() > i ? params[i].c_str() : NULL;
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 1, (u2->nc ? u2->nc->display : ""));
 		}
 		return MOD_CONT;
 	}

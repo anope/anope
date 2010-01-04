@@ -50,7 +50,7 @@ class CommandNSRelease : public Command
 				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: RELEASE: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
+					alog("%s: RELEASE: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 					bad_password(u);
 				}
 			}

@@ -126,8 +126,8 @@ public:
 				else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
 					continue;
 
-				if ((stricmp(pattern, ci->name) == 0)
-					  || (stricmp(spattern, ci->name) == 0)
+				if ((stricmp(pattern, ci->name.c_str()) == 0)
+					  || (stricmp(spattern, ci->name.c_str()) == 0)
 					  || Anope::Match(ci->name, pattern, false)
 					  || Anope::Match(ci->name, spattern, false))
 				{
@@ -142,17 +142,17 @@ public:
 						if (ci->HasFlag(CI_FORBIDDEN))
 						{
 							snprintf(buf, sizeof(buf),
-								   "%-20s  [Forbidden]", ci->name);
+								   "%-20s  [Forbidden]", ci->name.c_str());
 						}
 						else if (ci->HasFlag(CI_SUSPENDED))
 						{
 							snprintf(buf, sizeof(buf),
-								   "%-20s  [Suspended]", ci->name);
+								   "%-20s  [Suspended]", ci->name.c_str());
 						}
 						else
 						{
 							snprintf(buf, sizeof(buf), "%-20s  %s",
-								   ci->name, ci->desc ? ci->desc : "");
+								   ci->name.c_str(), ci->desc ? ci->desc : "");
 						}
 
 						u->SendMessage(Config.s_ChanServ, "  %c%s", noexpire_char, buf);

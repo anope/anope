@@ -78,7 +78,7 @@ class CommandHSRequest : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		char *nick;
+		const char *nick;
 		const char *rawhostmask = params[0].c_str();
 		char hostmask[HOSTMAX];
 		NickAlias *na;
@@ -86,7 +86,7 @@ class CommandHSRequest : public Command
 		char *vIdent = NULL;
 		time_t now = time(NULL);
 
-		nick = u->nick;
+		nick = u->nick.c_str();
 
 		vIdent = myStrGetOnlyToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
 		if (vIdent)
@@ -166,7 +166,7 @@ class CommandHSRequest : public Command
 					return MOD_CONT;
 				}
 			}
-			my_add_host_request(nick, vIdent, hostmask, u->nick, now);
+			my_add_host_request(const_cast<char *>(nick), vIdent, hostmask, const_cast<char *>(u->nick.c_str()), now);
 
 			me->NoticeLang(Config.s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);
@@ -223,7 +223,7 @@ class CommandHSActivate : public Command
 					my_memo_lang(u, na->nick, 2, LNG_ACTIVATE_MEMO);
 
 				me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATED, nick);
-				alog("Host Request for %s activated by %s", nick, u->nick);
+				alog("Host Request for %s activated by %s", nick, u->nick.c_str());
 			}
 			else
 				me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
@@ -275,7 +275,7 @@ class CommandHSReject : public Command
 			}
 
 			me->NoticeLang(Config.s_HostServ, u, LNG_REJECTED, nick);
-			alog("Host Request for %s rejected by %s (%s)", nick, u->nick, reason ? reason : "");
+			alog("Host Request for %s rejected by %s (%s)", nick, u->nick.c_str(), reason ? reason : "");
 		}
 		else
 			me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);

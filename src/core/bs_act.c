@@ -41,7 +41,7 @@ class CommandBSAct : public Command
 
 		if (!ci->c || ci->c->usercount < Config.BSMinUsers)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -49,10 +49,10 @@ class CommandBSAct : public Command
 		while ((i = message.find_first_of("\001"), i) && i != std::string::npos)
 			message.erase(i, 1);
 
-		ircdproto->SendAction(ci->bi, ci->name, "%s", message.c_str());
+		ircdproto->SendAction(ci->bi, ci->name.c_str(), "%s", message.c_str());
 		ci->bi->lastmsg = time(NULL);
 		if (Config.LogBot && Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "ACT %s %s %s", u->nick, ci->name, message.c_str());
+			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "ACT %s %s %s", u->nick.c_str(), ci->name.c_str(), message.c_str());
 		return MOD_CONT;
 	}
 

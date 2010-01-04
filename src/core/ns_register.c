@@ -26,7 +26,7 @@ class CommandNSConfirm : public Command
 
 		if (!na)
 		{
-			alog("%s: makenick(%s) failed", Config.s_NickServ, u->nick);
+			alog("%s: makenick(%s) failed", Config.s_NickServ, u->nick.c_str());
 			notice_lang(Config.s_NickServ, u, NICK_REGISTRATION_FAILED);
 			return MOD_CONT;
 		}
@@ -61,11 +61,11 @@ class CommandNSConfirm : public Command
 		if (!force)
 		{
 			u->nc = na->nc;
-			alog("%s: '%s' registered by %s@%s (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
+			alog("%s: '%s' registered by %s@%s (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
 			if (Config.NSAddAccessOnReg)
-				notice_lang(Config.s_NickServ, u, NICK_REGISTERED, u->nick, na->nc->GetAccess(0).c_str());
+				notice_lang(Config.s_NickServ, u, NICK_REGISTERED, u->nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
-				notice_lang(Config.s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick);
+				notice_lang(Config.s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick.c_str());
 			delete nr;
 
 			ircdproto->SendAccountLogin(u, u->nc);
@@ -78,7 +78,7 @@ class CommandNSConfirm : public Command
 		}
 		else
 		{
-			alog("%s: '%s' confirmed by %s!%s@%s (email: %s)", Config.s_NickServ, nr->nick, u->nick, u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
+			alog("%s: '%s' confirmed by %s!%s@%s (email: %s)", Config.s_NickServ, nr->nick, u->nick.c_str(), u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
 
 			notice_lang(Config.s_NickServ, u, NICK_FORCE_REG, nr->nick);
 
@@ -99,7 +99,7 @@ class CommandNSConfirm : public Command
 		NickRequest *nr = NULL;
 		const char *passcode = !params.empty() ? params[0].c_str() : NULL;
 
-		nr = findrequestnick(u->nick);
+		nr = findrequestnick(u->nick.c_str());
 
 		if (Config.NSEmailReg)
 		{
@@ -182,7 +182,7 @@ class CommandNSRegister : public CommandNSConfirm
 		NickRequest *nr = NULL, *anr = NULL;
 		NickAlias *na;
 		int prefixlen = strlen(Config.NSGuestNickPrefix);
-		int nicklen = strlen(u->nick);
+		int nicklen = u->nick.length();
 		const char *pass = params[0].c_str();
 		const char *email = params.size() > 1 ? params[1].c_str() : NULL;
 		char passcode[11];
@@ -208,7 +208,7 @@ class CommandNSRegister : public CommandNSConfirm
 			return MOD_CONT;
 		}
 
-		if ((anr = findrequestnick(u->nick)))
+		if ((anr = findrequestnick(u->nick.c_str())))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_REQUESTED);
 			return MOD_CONT;
@@ -219,15 +219,15 @@ class CommandNSRegister : public CommandNSConfirm
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick, Config.NSGuestNickPrefix) == u->nick && strspn(u->nick + prefixlen, "1234567890") == nicklen - prefixlen)
+		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick.c_str(), Config.NSGuestNickPrefix) == u->nick.c_str() && strspn(u->nick.c_str() + prefixlen, "1234567890") == nicklen - prefixlen)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			return MOD_CONT;
 		}
 
-		if (!ircdproto->IsNickValid(u->nick))
+		if (!ircdproto->IsNickValid(u->nick.c_str()))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, u->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -237,9 +237,9 @@ class CommandNSRegister : public CommandNSConfirm
 			{
 				std::string nick = it->first;
 
-				if (stristr(u->nick, nick.c_str()) && !is_oper(u))
+				if (stristr(u->nick.c_str(), nick.c_str()) && !is_oper(u))
 				{
-					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
 			}
@@ -249,18 +249,18 @@ class CommandNSRegister : public CommandNSConfirm
 			this->OnSyntaxError(u, "");
 		else if (time(NULL) < u->lastnickreg + Config.NSRegDelay)
 			notice_lang(Config.s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + Config.NSRegDelay) - time(NULL));
-		else if ((na = findnick(u->nick)))
+		else if ((na = findnick(u->nick.c_str())))
 		{
 			/* i.e. there's already such a nick regged */
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				alog("%s: %s@%s tried to register FORBIDden nick %s", Config.s_NickServ, u->GetIdent().c_str(), u->host, u->nick);
-				notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+				alog("%s: %s@%s tried to register FORBIDden nick %s", Config.s_NickServ, u->GetIdent().c_str(), u->host, u->nick.c_str());
+				notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			}
 			else
-				notice_lang(Config.s_NickServ, u, NICK_ALREADY_REGISTERED, u->nick);
+				notice_lang(Config.s_NickServ, u, NICK_ALREADY_REGISTERED, u->nick.c_str());
 		}
-		else if (!stricmp(u->nick, pass) || (Config.StrictPasswords && strlen(pass) < 5))
+		else if (!stricmp(u->nick.c_str(), pass) || (Config.StrictPasswords && strlen(pass) < 5))
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
 		else if (enc_encrypt_check_len(strlen(pass), PASSMAX - 1))
 			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
@@ -332,7 +332,7 @@ class CommandNSResend : public Command
 		NickRequest *nr = NULL;
 		if (Config.NSEmailReg)
 		{
-			if ((nr = findrequestnick(u->nick)))
+			if ((nr = findrequestnick(u->nick.c_str())))
 			{
 				if (time(NULL) < nr->lastmail + Config.NSResendDelay)
 				{

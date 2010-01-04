@@ -31,10 +31,10 @@ class CommandOSSVSNick : public Command
 		NickAlias *na;
 
 		/* Truncate long nicknames to NICKMAX-2 characters */
-		if (newnick.length() > NICKMAX - 2)
+		if (newnick.length() > Config.NickLen)
 		{
-			notice_lang(Config.s_OperServ, u, NICK_X_TRUNCATED, newnick.c_str(), NICKMAX - 2, newnick.c_str());
-			newnick = params[1].substr(0, NICKMAX - 2);
+			notice_lang(Config.s_OperServ, u, NICK_X_TRUNCATED, newnick.c_str(), Config.NickLen, newnick.c_str());
+			newnick = params[1].substr(0, Config.NickLen);
 		}
 
 		/* Check for valid characters */
@@ -62,7 +62,7 @@ class CommandOSSVSNick : public Command
 		else
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used SVSNICK to change %s to %s", u->nick, nick, newnick.c_str());
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick, newnick.c_str());
 			ircdproto->SendForceNickChange(u2, newnick.c_str(), time(NULL));
 		}
 		return MOD_CONT;

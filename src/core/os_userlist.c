@@ -50,7 +50,7 @@ class CommandOSUserList : public Command
 							continue;
 					}
 				}
-				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick, cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
+				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick.c_str(), cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
 			}
 		}
 		else
@@ -67,7 +67,7 @@ class CommandOSUserList : public Command
 				{
 					if (pattern)
 					{
-						snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+						snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 						if (!Anope::Match(mask, pattern, false))
 							continue;
 						if (!Modes.empty())
@@ -79,7 +79,7 @@ class CommandOSUserList : public Command
 							}
 						}
 					}
-					notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick, u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+					notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 				}
 			}
 		}

@@ -50,17 +50,6 @@
  * unusable. 
  */
 
-/* Maximum length of a channel name, including the trailing null.  Any
- * channels with a length longer than (CHANMAX-1) including the leading #
- * will not be usable with ChanServ. */
-#define CHANMAX		64
-
-/* Maximum length of a nickname, including the trailing null.  This MUST be
- * at least one greater than the maximum allowable nickname length on your
- * network, or people will run into problems using Services!  The default
- * (32) works with all servers I know of. */
-#define NICKMAX		32
-
 /* Maximum length of a password */
 #define PASSMAX		32
 

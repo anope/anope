@@ -25,11 +25,11 @@ class CommandOSQuit : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 
-		quitmsg = new char[28 + strlen(u->nick)];
+		quitmsg = new char[28 + u->nick.length()];
 		if (!quitmsg)
 			quitmsg = "QUIT command received, but out of memory!";
 		else
-			sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
+			sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick.c_str()); // XXX we know this is safe, but..
 
 		if (Config.GlobalOnCycle)
 			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);

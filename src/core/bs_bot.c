@@ -58,7 +58,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = nick; *ch && (ch - nick) < NICKMAX; ch++)
+		for (ch = nick; *ch && (ch - nick) < Config.NickLen; ch++)
 		{
 			if (!isvalidnick(*ch))
 			{
@@ -190,7 +190,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = nick; *ch && (ch - nick) < NICKMAX; ch++)
+		for (ch = nick; *ch && (ch - nick) < Config.NickLen; ch++)
 		{
 			if (!isvalidnick(*ch))
 			{
@@ -322,7 +322,7 @@ class CommandBSBot : public Command
 
 		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
 
-		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick);
+		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick.c_str());
 		ircdproto->SendSQLineDel(bi->nick);
 
 		delete bi;

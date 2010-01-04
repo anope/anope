@@ -28,7 +28,7 @@ class CommandOSAKill : public Command
 		int deleted = 0;
 		unsigned last_param = 2;
 		const char *expiry, *mask;
-		char reason[BUFSIZE], realreason[BUFSIZE];
+		char reason[BUFSIZE];
 		time_t expires;
 
 		mask = params.size() > 1 ? params[1].c_str() : NULL;
@@ -82,17 +82,13 @@ class CommandOSAKill : public Command
 				return MOD_CONT;
 			}
 
-			/**
-			 * Changed sprintf() to snprintf()and increased the size of
-			 * breason to match bufsize
-			 * -Rob
-			 **/
+			std::string realreason;
 			if (Config.AddAkiller)
-				snprintf(realreason, sizeof(realreason), "[%s] %s", u->nick, reason);
+				realreason = "[" + u->nick + "] " + std::string(reason);
 			else
-				snprintf(realreason, sizeof(realreason), "%s", reason);
+				realreason = reason;
 
-			deleted = add_akill(u, mask, u->nick, expires, realreason);
+			deleted = add_akill(u, mask, u->nick.c_str(), expires, realreason.c_str());
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
@@ -129,7 +125,7 @@ class CommandOSAKill : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an AKILL for %s (%s) (%s)", u->nick, mask, realreason, buf);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask, realreason.c_str(), buf);
 			}
 
 			if (readonly)

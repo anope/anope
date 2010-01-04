@@ -38,7 +38,7 @@ class CommandNSRecover : public Command
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!stricmp(nick, u->nick))
+		else if (!stricmp(nick, u->nick.c_str()))
 			notice_lang(Config.s_NickServ, u, NICK_NO_RECOVER_SELF);
 		else if (pass)
 		{
@@ -61,7 +61,7 @@ class CommandNSRecover : public Command
 				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: RECOVER: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
+					alog("%s: RECOVER: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 					bad_password(u);
 				}
 			}

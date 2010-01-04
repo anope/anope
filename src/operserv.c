@@ -128,7 +128,7 @@ void operserv(User * u, char *buf)
 	const char *cmd;
 	const char *s;
 
-	alog("%s: %s: %s", Config.s_OperServ, u->nick, buf);
+	alog("%s: %s: %s", Config.s_OperServ, u->nick.c_str(), buf);
 
 	cmd = strtok(buf, " ");
 	if (!cmd) {
@@ -137,7 +137,7 @@ void operserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_OperServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_OperServ), u->nick.c_str(), "PING %s", s);
 	} else {
 		mod_run_cmd(Config.s_OperServ, u, OPERSERV, cmd);
 	}

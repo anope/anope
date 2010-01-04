@@ -24,11 +24,11 @@ class CommandOSRestart : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		quitmsg = new char[31 + strlen(u->nick)];
+		quitmsg = new char[31 + u->nick.length()];
 		if (!quitmsg)
 			quitmsg = "RESTART command received, but out of memory!";
 		else
-			sprintf(const_cast<char *>(quitmsg), /* XXX */ "RESTART command received from %s", u->nick);
+			sprintf(const_cast<char *>(quitmsg), /* XXX */ "RESTART command received from %s", u->nick.c_str());
 
 		if (Config.GlobalOnCycle)
 			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);

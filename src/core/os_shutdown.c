@@ -25,11 +25,11 @@ class CommandOSShutdown : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 
-		quitmsg = new char[32 + strlen(u->nick)];
+		quitmsg = new char[32 + u->nick.length()];
 		if (!quitmsg)
 			quitmsg = "SHUTDOWN command received, but out of memory!";
 		else
-			sprintf(const_cast<char *>(quitmsg), /* XXX */ "SHUTDOWN command received from %s", u->nick);
+			sprintf(const_cast<char *>(quitmsg), /* XXX */ "SHUTDOWN command received from %s", u->nick.c_str());
 
 		if (Config.GlobalOnCycle)
 			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);

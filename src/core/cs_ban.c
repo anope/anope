@@ -42,7 +42,7 @@ class CommandCSBan : public Command
 		if (!reason)
 			reason = "Requested";
 
-		is_same = (stricmp(target, u->nick) == 0);
+		is_same = (stricmp(target, u->nick.c_str()) == 0);
 
 		if (c)
 			ci = c->ci;
@@ -62,7 +62,7 @@ class CommandCSBan : public Command
 			 * to prevent services <-> server wars.
 			 */
 		} else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u2)) {
-			notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 		} else if (is_protected(u2)) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else {
@@ -78,12 +78,12 @@ class CommandCSBan : public Command
 			if ((ci->HasFlag(CI_SIGNKICK))
 				|| ((ci->HasFlag(CI_SIGNKICK_LEVEL))
 					&& !check_access(u, ci, CA_SIGNKICK)))
-				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s (%s)", reason, u->nick);
+				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s (%s)", reason, u->nick.c_str());
 			else
 				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s", reason);
 
 			const char *kav[4];
-			 kav[0] = ci->name;
+			 kav[0] = ci->name.c_str();
 			 kav[1] = target;
 			 kav[2] = reason;
 			do_kick(Config.s_ChanServ, 3, kav);

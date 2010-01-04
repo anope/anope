@@ -29,7 +29,7 @@ class CoreExport User : public Extensible
  public: // XXX: exposing a tiny bit too much
 	User *next, *prev;
 
-	char nick[NICKMAX];
+	std::string nick;	/* User's current nick */
 
 	char *host;		/* User's real hostname 	*/
 	char *hostip;		/* User's IP number			 */

@@ -265,26 +265,26 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		if (bi)
 		{
-			send_cmd(bi->uid, "MODE %s %s", dest->name, buf);
+			send_cmd(bi->uid, "MODE %s %s", dest->name.c_str(), buf);
 		}
-		else send_cmd(TS6SID, "MODE %s %s", dest->name, buf);
+		else send_cmd(TS6SID, "MODE %s %s", dest->name.c_str(), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(bi ? bi->uid : TS6SID, "SVSMODE %s %s", u->nick, buf);
+		send_cmd(bi ? bi->uid : TS6SID, "SVSMODE %s %s", u->nick.c_str(), buf);
 	}
 
 	void SendKickInternal(BotInfo *bi, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan->name, user->GetUID().c_str(), buf);
-		else send_cmd(bi->uid, "KICK %s %s", chan->name, user->GetUID().c_str());
+		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
+		else send_cmd(bi->uid, "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		send_cmd(NULL, "NOTICE @%s :%s", dest->name, buf);
+		send_cmd(NULL, "NOTICE @%s :%s", dest->name.c_str(), buf);
 	}
 
 	/* QUIT */
@@ -320,7 +320,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendTopic(BotInfo *bi, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(bi->uid, "TOPIC %s :%s", c->name, topic);
+		send_cmd(bi->uid, "TOPIC %s :%s", c->name.c_str(), topic);
 	}
 
 	void SetAutoIdentificationToken(User *u)
@@ -430,11 +430,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 			c->topic = sstrdup(av[1]);
 
 		u = find_byuid(source);
-		if (u) {
-			strscpy(c->topic_setter, u->nick, sizeof(c->topic_setter));
-		} else {
-			strscpy(c->topic_setter, source, sizeof(c->topic_setter));
-		}
+		c->topic_setter = u ? u->nick : source;
 		c->topic_time = topic_time;
 
 		record_topic(av[0]);
@@ -487,7 +483,7 @@ int anope_event_tburst(const char *source, int ac, const char **av)
 	if (ac > 1 && *av[3])
 		c->topic = sstrdup(av[3]);
 
-	strscpy(c->topic_setter, setter, sizeof(c->topic_setter));
+	c->topic_setter = setter;
 	c->topic_time = topic_time;
 
 	record_topic(av[0]);
@@ -519,7 +515,7 @@ int anope_event_away(const char *source, int ac, const char **av)
 	User *u = NULL;
 
 	u = find_byuid(source);
-	m_away(u ? u->nick : source, (ac ? av[0] : NULL));
+	m_away(u ? u->nick.c_str() : source, (ac ? av[0] : NULL));
 	return MOD_CONT;
 }
 
@@ -586,7 +582,7 @@ int anope_event_part(const char *source, int ac, const char **av)
 	}
 
 	u = find_byuid(source);
-	do_part(u ? u->nick : source, ac, av);
+	do_part(u ? u->nick.c_str() : source, ac, av);
 
 	return MOD_CONT;
 }
@@ -648,7 +644,7 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
 	u = find_byuid(source);
 
-	do_quit(u ? u->nick : source, ac, av);
+	do_quit(u ? u->nick.c_str() : source, ac, av);
 	return MOD_CONT;
 }
 
@@ -665,8 +661,8 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	} else {
 		u = find_byuid(source);
 		u2 = find_byuid(av[0]);
-		av[0] = u2->nick;
-		do_umode(u->nick, ac, av);
+		av[0] = u2->nick.c_str();
+		do_umode(u->nick.c_str(), ac, av);
 	}
 	return MOD_CONT;
 }

@@ -341,7 +341,7 @@ int exception_add(User * u, const char *mask, const int limit,
 	exceptions[nexceptions - 1].limit = limit;
 	exceptions[nexceptions - 1].reason = sstrdup(reason);
 	exceptions[nexceptions - 1].time = time(NULL);
-	strscpy(exceptions[nexceptions - 1].who, who, NICKMAX);
+	exceptions[nexceptions - 1].who = who;
 	exceptions[nexceptions - 1].expires = expires;
 	exceptions[nexceptions - 1].num = nexceptions - 1;
 

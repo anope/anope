@@ -178,9 +178,9 @@ int read_memo(User *u, int index, MemoInfo *mi, const char *chan)
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 	timebuf[sizeof(timebuf) - 1] = 0;
 	if (chan)
-		notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender, timebuf, Config.s_MemoServ, chan, m->number);
+		notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, chan, m->number);
 	else
-		notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender, timebuf, Config.s_MemoServ, m->number);
+		notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, m->number);
 	notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text);
 	m->UnsetFlag(MF_UNREAD);
 

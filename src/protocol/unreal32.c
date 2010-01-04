@@ -181,7 +181,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->nick, ") %s %s %lu :%s", c->name, whosetit, static_cast<unsigned long>(c->topic_time), topic);
+		send_cmd(whosets->nick, ") %s %s %lu :%s", c->name.c_str(), whosetit, static_cast<unsigned long>(c->topic_time), topic);
 	}
 
 	void SendVhostDel(User *u)
@@ -204,7 +204,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		send_cmd(source ? source->nick : Config.ServerName, "h %s :%s", user->nick, buf);
+		send_cmd(source ? source->nick : Config.ServerName, "h %s :%s", user->nick.c_str(), buf);
 	}
 
 	/*
@@ -225,13 +225,13 @@ class UnrealIRCdProto : public IRCDProto
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source->nick, "G %s %s", dest->name, buf);
+		send_cmd(source->nick, "G %s %s", dest->name.c_str(), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "v %s %s", u->nick, buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "v %s %s", u->nick.c_str(), buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
@@ -244,14 +244,14 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "H %s %s :%s", chan->name, user->nick, buf);
-		else send_cmd(source->nick, "H %s %s", chan->name, user->nick);
+		if (buf) send_cmd(source->nick, "H %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		else send_cmd(source->nick, "H %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source->nick, "B @%s :%s", dest->name, buf);
+		send_cmd(source->nick, "B @%s :%s", dest->name.c_str(), buf);
 	}
 
 	/* SERVER name hop descript */
@@ -320,8 +320,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhost(User *u, const char *vIdent, const char *vhost)
 	{
-		if (vIdent) unreal_cmd_chgident(u->nick, vIdent);
-		unreal_cmd_chghost(u->nick, vhost);
+		if (vIdent) unreal_cmd_chgident(u->nick.c_str(), vIdent);
+		unreal_cmd_chghost(u->nick.c_str(), vhost);
 	}
 
 	void SendConnect()
@@ -392,8 +392,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(Config.ServerName, "n %s %s %s", c->name, mode, nick);
-		else send_cmd(Config.ServerName, "n %s %s", c->name, mode);
+		if (nick) send_cmd(Config.ServerName, "n %s %s %s", c->name.c_str(), mode, nick);
+		else send_cmd(Config.ServerName, "n %s %s", c->name.c_str(), mode);
 	}
 
 	/* svsjoin

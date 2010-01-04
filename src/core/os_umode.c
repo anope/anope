@@ -45,10 +45,10 @@ class CommandOSUMode : public Command
 			u2->SetModes(findbot(Config.s_OperServ), modes);
 
 			notice_lang(Config.s_OperServ, u, OPER_UMODE_SUCCESS, nick);
-			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
+			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick.c_str());
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used UMODE on %s", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used UMODE on %s", u->nick.c_str(), nick);
 		}
 		return MOD_CONT;
 	}

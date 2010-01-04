@@ -30,7 +30,7 @@ class CommandNSGroup : public Command
 		const char *pass = params[1].c_str();
 		std::list<std::pair<std::string, std::string> >::iterator it;
 
-		if (Config.NSEmailReg && findrequestnick(u->nick))
+		if (Config.NSEmailReg && findrequestnick(u->nick.c_str()))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_REQUESTED);
 			return MOD_CONT;
@@ -42,9 +42,9 @@ class CommandNSGroup : public Command
 			return MOD_CONT;
 		}
 
-		if (!ircdproto->IsNickValid(u->nick))
+		if (!ircdproto->IsNickValid(u->nick.c_str()))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, u->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -54,9 +54,9 @@ class CommandNSGroup : public Command
 			{
 				std::string nick = it->first;
 
-				if (stristr(u->nick, nick.c_str()) && !is_oper(u))
+				if (stristr(u->nick.c_str(), nick.c_str()) && !is_oper(u))
 				{
-					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
 			}
@@ -69,12 +69,12 @@ class CommandNSGroup : public Command
 			notice_lang(Config.s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (Config.NSRegDelay + u->lastnickreg) - time(NULL));
 		else if (u->nc && u->nc->HasFlag(NI_SUSPENDED))
 		{
-			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick);
+			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, target->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
-			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, target->nick);
+			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, target->nick);
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))
@@ -87,7 +87,7 @@ class CommandNSGroup : public Command
 			notice_lang(Config.s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, Config.s_NickServ, Config.s_NickServ);
 		else if (enc_check_password(pass, target->nc->pass) != 1)
 		{
-			alog("%s: Failed GROUP for %s!%s@%s (invalid password)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host);
+			alog("%s: Failed GROUP for %s!%s@%s (invalid password)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
 			bad_password(u);
 		}
@@ -101,11 +101,11 @@ class CommandNSGroup : public Command
 			else
 			{
 				int prefixlen = strlen(Config.NSGuestNickPrefix);
-				int nicklen = strlen(u->nick);
+				int nicklen = u->nick.length();
 
-				if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick, Config.NSGuestNickPrefix) == u->nick && strspn(u->nick + prefixlen, "1234567890") == nicklen - prefixlen)
+				if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick.c_str(), Config.NSGuestNickPrefix) == u->nick.c_str() && strspn(u->nick.c_str() + prefixlen, "1234567890") == nicklen - prefixlen)
 				{
-					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
 			}
@@ -124,7 +124,7 @@ class CommandNSGroup : public Command
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 				ircdproto->SetAutoIdentificationToken(u);
 
-				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
+				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, u->nick.c_str(), target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
 				notice_lang(Config.s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
 				u->lastnickreg = time(NULL);
@@ -133,7 +133,7 @@ class CommandNSGroup : public Command
 			}
 			else
 			{
-				alog("%s: makealias(%s) failed", Config.s_NickServ, u->nick);
+				alog("%s: makealias(%s) failed", Config.s_NickServ, u->nick.c_str());
 				notice_lang(Config.s_NickServ, u, NICK_GROUP_FAILED);
 			}
 		}
@@ -166,12 +166,10 @@ class CommandNSGList : public Command
 		NickCore *nc = u->nc;
 		int i;
 
-		if (nick && (stricmp(nick, u->nick) && !u->nc->IsServicesOper()))
+		if (nick && (stricmp(nick, u->nick.c_str()) && !u->nc->IsServicesOper()))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED, Config.s_NickServ);
 		else if (nick && (!findnick(nick) || !(nc = findnick(nick)->nc)))
 			notice_lang(Config.s_NickServ, u, !nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick);
-/*		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);*/
 		else
 		{
 			time_t expt;

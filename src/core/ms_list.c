@@ -172,7 +172,7 @@ int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, cons
 		if (chan)
 			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, chan, Config.s_MemoServ, chan);
 		else
-			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick, Config.s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config.s_MemoServ);
 		notice_lang(Config.s_MemoServ, u, MEMO_LIST_HEADER);
 		*sent_header = 1;
 	}
@@ -180,7 +180,7 @@ int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, cons
 	tm = *localtime(&m->time);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 	timebuf[sizeof(timebuf) - 1] = 0;   /* just in case */
-	notice_lang(Config.s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender, timebuf);
+	notice_lang(Config.s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender.c_str(), timebuf);
 	return 1;
 }
 

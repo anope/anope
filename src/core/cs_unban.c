@@ -52,9 +52,9 @@ class CommandCSUnban : public Command
 
 		common_unban(c->ci, u2->nick);
 		if (u2 == u)
-			notice_lang(Config.s_ChanServ, u, CHAN_UNBANNED, c->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNBANNED, c->name.c_str());
 		else
-			notice_lang(Config.s_ChanServ, u, CHAN_UNBANNED_OTHER, u2->nick, c->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_UNBANNED_OTHER, u2->nick.c_str(), c->name.c_str());
 		return MOD_CONT;
 	}
 

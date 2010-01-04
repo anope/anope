@@ -43,8 +43,8 @@ class CommandNSDrop : public Command
 				if ((nr = findrequestnick(nick)) && u->nc->IsServicesOper())
 				{
 					if (Config.WallDrop)
-						ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick, nick);
-					alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nr->nick, nr->email);
+						ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
+					alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nr->nick, nr->email);
 					delete nr;
 					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 				}
@@ -72,7 +72,7 @@ class CommandNSDrop : public Command
 			if (ircd->sqline && (na->HasFlag(NS_FORBIDDEN)))
 				ircdproto->SendSQLineDel(na->nick);
 
-			alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, na->nick, na->nc->display, na->nc->email ? na->nc->email : "none");
+			alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, na->nick, na->nc->display, na->nc->email ? na->nc->email : "none");
 			delete na;
 
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(my_nick ? my_nick : nick));
@@ -80,7 +80,7 @@ class CommandNSDrop : public Command
 			if (!is_mine)
 			{
 				if (Config.WallDrop)
-					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick, nick);
+					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
 				notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 			}
 			else

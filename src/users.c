@@ -46,7 +46,7 @@ User::User(const std::string &snick, const std::string &suid)
 	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
 
-	strscpy(this->nick, snick.c_str(), NICKMAX);
+	this->nick = snick;
 	this->uid = suid;
 	list = &userlist[HASH(this->nick)];
 	this->next = *list;
@@ -82,7 +82,7 @@ void User::SetNewNick(const std::string &newnick)
 	}
 
 	if (debug)
-		alog("debug: %s changed nick to %s", this->nick, newnick.c_str());
+		alog("debug: %s changed nick to %s", this->nick.c_str(), newnick.c_str());
 
 	if (this->prev)
 		this->prev->next = this->next;
@@ -92,7 +92,7 @@ void User::SetNewNick(const std::string &newnick)
 	if (this->next)
 		this->next->prev = this->prev;
 
-	strscpy(this->nick, newnick.c_str(), NICKMAX);
+	this->nick = newnick;
 	list = &userlist[HASH(this->nick)];
 	this->next = *list;
 	this->prev = NULL;
@@ -117,7 +117,7 @@ void User::SetDisplayedHost(const std::string &shost)
 	this->vhost = sstrdup(shost.c_str());
 
 	if (debug)
-		alog("debug: %s changed vhost to %s", this->nick, shost.c_str());
+		alog("debug: %s changed vhost to %s", this->nick.c_str(), shost.c_str());
 
 	this->UpdateHost();
 }
@@ -146,7 +146,7 @@ void User::SetCloakedHost(const std::string &newhost)
 	chost = newhost;
 
 	if (debug)
-		alog("debug: %s changed cloaked host to %s", this->nick, newhost.c_str());
+		alog("debug: %s changed cloaked host to %s", this->nick.c_str(), newhost.c_str());
 
 	this->UpdateHost();
 }
@@ -170,7 +170,7 @@ void User::SetVIdent(const std::string &sident)
 	this->vident = sident;
 
 	if (debug)
-		alog("debug: %s changed ident to %s", this->nick, sident.c_str());
+		alog("debug: %s changed ident to %s", this->nick.c_str(), sident.c_str());
 
 	this->UpdateHost();
 }
@@ -190,7 +190,7 @@ void User::SetIdent(const std::string &sident)
 	this->ident = sident;
 
 	if (debug)
-		alog("debug: %s changed real ident to %s", this->nick, sident.c_str());
+		alog("debug: %s changed real ident to %s", this->nick.c_str(), sident.c_str());
 
 	this->UpdateHost();
 }
@@ -218,7 +218,7 @@ void User::SetRealname(const std::string &srealname)
 	}
 
 	if (debug)
-		alog("debug: %s changed realname to %s", this->nick, srealname.c_str());
+		alog("debug: %s changed realname to %s", this->nick.c_str(), srealname.c_str());
 }
 
 User::~User()
@@ -233,13 +233,13 @@ User::~User()
 		if (ircd->vhost)
 		{
 			alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
-				this->nick, this->GetIdent().c_str(), this->host,
+				this->nick.c_str(), this->GetIdent().c_str(), this->host,
 				this->GetDisplayedHost().c_str(), srealname, this->server->name);
 		}
 		else
 		{
 			alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
-				this->nick, this->GetIdent().c_str(), this->host,
+				this->nick.c_str(), this->GetIdent().c_str(), this->host,
 				srealname, this->server->name);
 		}
 
@@ -327,11 +327,11 @@ void User::SendMessage(const char *source, const std::string &msg)
 	if (Config.UsePrivmsg &&
 		((!this->nc && Config.NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
 	{
-		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
+		ircdproto->SendPrivmsg(findbot(source), this->nick.c_str(), "%s", msg.c_str());
 	}
 	else
 	{
-		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
+		ircdproto->SendNotice(findbot(source), this->nick.c_str(), "%s", msg.c_str());
 	}
 }
 
@@ -638,7 +638,7 @@ User *firstuser()
 		current = userlist[next_index++];
 	if (debug)
 		alog("debug: firstuser() returning %s",
-			 current ? current->nick : "NULL (end of list)");
+			 current ? current->nick.c_str() : "NULL (end of list)");
 	return current;
 }
 
@@ -652,7 +652,7 @@ User *nextuser()
 	}
 	if (debug)
 		alog("debug: nextuser() returning %s",
-			 current ? current->nick : "NULL (end of list)");
+			 current ? current->nick.c_str() : "NULL (end of list)");
 	return current;
 }
 
@@ -684,7 +684,7 @@ User *first_uid()
 	}
 	if (debug >= 2) {
 		alog("debug: first_uid() returning %s %s",
-			 current_uid ? current_uid->nick : "NULL (end of list)",
+			 current_uid ? current_uid->nick.c_str() : "NULL (end of list)",
 			 current_uid ? current_uid->GetUID().c_str() : "");
 	}
 	return current_uid;
@@ -700,7 +700,7 @@ User *next_uid()
 	}
 	if (debug >= 2) {
 		alog("debug: next_uid() returning %s %s",
-			 current_uid ? current_uid->nick : "NULL (end of list)",
+			 current_uid ? current_uid->nick.c_str() : "NULL (end of list)",
 			 current_uid ? current_uid->GetUID().c_str() : "");
 	}
 	return current_uid;
@@ -842,10 +842,10 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (Config.LogUsers) {
 			logrealname = normalizeBuffer(user->realname);
 			if (ircd->vhost) {
-				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick, user->GetIdent().c_str(), user->host, user->GetDisplayedHost().c_str(), logrealname, nick, user->server->name);
+				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick.c_str(), user->GetIdent().c_str(), user->host, user->GetDisplayedHost().c_str(), logrealname, nick, user->server->name);
 			} else {
 				alog("LOGUSERS: %s (%s@%s) (%s) changed nick to %s (%s).",
-					 user->nick, user->GetIdent().c_str(), user->host, logrealname,
+					 user->nick.c_str(), user->GetIdent().c_str(), user->host, logrealname,
 					 nick, user->server->name);
 			}
 			if (logrealname) {
@@ -855,7 +855,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 		user->timestamp = ts;
 
-		if (stricmp(nick, user->nick) == 0) {
+		if (stricmp(nick, user->nick.c_str()) == 0) {
 			/* No need to redo things */
 			user->SetNewNick(nick);
 			nc_changed = 0;
@@ -898,7 +898,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 		if (ircd->sqline)
 		{
-			if (!is_oper(user) && check_sqline(user->nick, 1))
+			if (!is_oper(user) && check_sqline(user->nick.c_str(), 1))
 				return NULL;
 		}
 
@@ -925,7 +925,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			ntmp->last_seen = time(NULL);
 			user->UpdateHost();
 			ircdproto->SetAutoIdentificationToken(user);
-			alog("%s: %s!%s@%s automatically identified for nick %s", Config.s_NickServ, user->nick, user->GetIdent().c_str(), user->host, user->nick);
+			alog("%s: %s!%s@%s automatically identified for nick %s", Config.s_NickServ, user->nick.c_str(), user->GetIdent().c_str(), user->host, user->nick.c_str());
 		}
 
 		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
@@ -1202,7 +1202,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 		return;
 
 	if (debug)
-		alog("debug: Changing user modes for %s to %s", user->nick, merge_args(ac, av));
+		alog("debug: Changing user modes for %s to %s", user->nick.c_str(), merge_args(ac, av));
 
 	for (; *modes; *modes++)
 	{
@@ -1246,7 +1246,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				{
 					++opcnt;
 					if (Config.WallOper)
-						ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 is now an IRC operator.", user->nick);
+						ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 is now an IRC operator.", user->nick.c_str());
 				}
 				else
 					--opcnt;

@@ -296,7 +296,7 @@ void chanserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(findbot(Config.s_ChanServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_ChanServ), u->nick.c_str(), "PING %s", s);
 	} else {
 		mod_run_cmd(Config.s_ChanServ, u, CHANSERV, cmd);
 	}
@@ -330,8 +330,8 @@ void check_modes(Channel *c)
 	/* Check for mode bouncing */
 	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
 	{
-		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name);
-		alog("%s: Bouncy modes on channel %s", Config.s_ChanServ, c->name);
+		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name.c_str());
+		alog("%s: Bouncy modes on channel %s", Config.s_ChanServ, c->name.c_str());
 		c->bouncy_modes = 1;
 		return;
 	}
@@ -669,7 +669,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 			&& match_usermask(akick->mask.c_str(), user)))
 			{
 			if (debug >= 2)
-				alog("debug: %s matched akick %s", user->nick, akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
+				alog("debug: %s matched akick %s", user->nick.c_str(), akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
 			if (akick->HasFlag(AK_ISNICK))
 				get_idealban(ci, user, mask, sizeof(mask));
 			else
@@ -690,7 +690,7 @@ int check_kick(User * user, const char *chan, time_t chants)
 
   kick:
 	if (debug)
-		alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick,
+		alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick.c_str(),
 			 user->GetIdent().c_str(), user->host, chan);
 
 	/* Remember that the user has not been added to our channel user list
@@ -750,7 +750,7 @@ void record_topic(const char *chan)
 	else
 		ci->last_topic = NULL;
 
-	strscpy(ci->last_topic_setter, c->topic_setter, NICKMAX);
+	ci->last_topic_setter = c->topic_setter;
 	ci->last_topic_time = c->topic_time;
 }
 
@@ -772,7 +772,7 @@ void restore_topic(const char *chan)
 		 * should be updated with a TOPIC from the IRCd soon. -GD
 		 */
 		ci->last_topic = NULL;
-		strscpy(ci->last_topic_setter, whosends(ci)->nick, NICKMAX);
+		ci->last_topic_setter = whosends(ci)->nick;
 		ci->last_topic_time = time(NULL);
 		return;
 	}
@@ -780,11 +780,11 @@ void restore_topic(const char *chan)
 		delete [] c->topic;
 	if (ci->last_topic) {
 		c->topic = sstrdup(ci->last_topic);
-		strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
+		c->topic_setter = ci->last_topic_setter;
 		c->topic_time = ci->last_topic_time;
 	} else {
 		c->topic = NULL;
-		strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
+		c->topic_setter = whosends(ci)->nick;
 	}
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
@@ -792,7 +792,7 @@ void restore_topic(const char *chan)
 			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
-	ircdproto->SendTopic(whosends(ci), c, c->topic_setter, c->topic ? c->topic : "");
+	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
 			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
@@ -823,12 +823,12 @@ int check_topiclock(Channel * c, time_t topic_time)
 		delete [] c->topic;
 	if (ci->last_topic) {
 		c->topic = sstrdup(ci->last_topic);
-		strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
+		c->topic_setter = ci->last_topic_setter;
 	} else {
 		c->topic = NULL;
 		/* Bot assigned & Symbiosis ON?, the bot will set the topic - doc */
 		/* Altough whosends() also checks for Config.BSMinUsers -GD */
-		strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
+		c->topic_setter = whosends(ci)->nick;
 	}
 
 	if (ircd->topictsforward) {
@@ -849,12 +849,12 @@ int check_topiclock(Channel * c, time_t topic_time)
 
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
+			ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name.c_str(), c->creation_time);
 			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
 
-	ircdproto->SendTopic(whosends(ci), c, c->topic_setter, c->topic ? c->topic : "");
+	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 
 	if (ircd->join2set) {
 		if (whosends(ci) == findbot(Config.s_ChanServ)) {
@@ -887,8 +887,8 @@ void expire_chans()
 				if (MOD_RESULT == EVENT_STOP)
 					continue;
 
-				char *chname = sstrdup(ci->name);
-				alog("Expiring channel %s (founder: %s)", ci->name,
+				char *chname = sstrdup(ci->name.c_str());
+				alog("Expiring channel %s (founder: %s)", ci->name.c_str(),
 					 (ci->founder ? ci->founder->display : "(none)"));
 				delete ci;
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
@@ -916,17 +916,17 @@ void cs_remove_nick(const NickCore * nc)
 				if (ci->successor) {
 					NickCore *nc2 = ci->successor;
 					if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg) {
-						alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", Config.s_ChanServ, nc2->display, ci->name);
+						alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", Config.s_ChanServ, nc2->display, ci->name.c_str());
 						delete ci;
 						continue;
 					} else {
-						alog("%s: Transferring foundership of %s from deleted " "nick %s to successor %s", Config.s_ChanServ, ci->name, nc->display, nc2->display);
+						alog("%s: Transferring foundership of %s from deleted " "nick %s to successor %s", Config.s_ChanServ, ci->name.c_str(), nc->display, nc2->display);
 						ci->founder = nc2;
 						ci->successor = NULL;
 						nc2->channelcount++;
 					}
 				} else {
-					alog("%s: Deleting channel %s owned by deleted nick %s", Config.s_ChanServ, ci->name, nc->display);
+					alog("%s: Deleting channel %s owned by deleted nick %s", Config.s_ChanServ, ci->name.c_str(), nc->display);
 
 					if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
 					{
@@ -981,7 +981,7 @@ ChannelInfo *cs_findchan(const char *chan)
 
 	for (ci = chanlists[static_cast<unsigned char>(tolower(chan[1]))]; ci;
 		 ci = ci->next) {
-		if (stricmp(ci->name, chan) == 0)
+		if (stricmp(ci->name.c_str(), chan) == 0)
 			return ci;
 	}
 	return NULL;
@@ -1035,7 +1035,6 @@ int check_access(User * user, ChannelInfo * ci, int what)
 void alpha_insert_chan(ChannelInfo * ci)
 {
 	ChannelInfo *ptr, *prev;
-	char *chan;
 
 	if (!ci) {
 		if (debug) {
@@ -1044,10 +1043,10 @@ void alpha_insert_chan(ChannelInfo * ci)
 		return;
 	}
 
-	chan = ci->name;
+	const char *chan = ci->name.c_str();
 
 	for (prev = NULL, ptr = chanlists[static_cast<unsigned char>(tolower(chan[1]))];
-		 ptr != NULL && stricmp(ptr->name, chan) < 0;
+		 ptr != NULL && stricmp(ptr->name.c_str(), chan) < 0;
 		 prev = ptr, ptr = ptr->next);
 	ci->prev = prev;
 	ci->next = ptr;

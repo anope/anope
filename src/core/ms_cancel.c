@@ -46,7 +46,7 @@ class CommandMSCancel : public Command
 
 			for (i = mi->memos.size() - 1; i >= 0; --i)
 			{
-				if ((mi->memos[i]->HasFlag(MF_UNREAD)) && !stricmp(mi->memos[i]->sender, u->nc->display) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
+				if ((mi->memos[i]->HasFlag(MF_UNREAD)) && !stricmp(mi->memos[i]->sender.c_str(), u->nc->display) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
 					delmemo(mi, mi->memos[i]->number);
 					notice_lang(Config.s_MemoServ, u, MEMO_CANCELLED, name);

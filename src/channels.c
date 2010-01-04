@@ -33,7 +33,7 @@ Channel::Channel(const std::string &name, time_t ts)
 	if (name.empty())
 		throw CoreException("A channel without a name ?");
 
-	strscpy(this->name, name.c_str(), sizeof(this->name));
+	this->name = name;
 	list = &chanlist[HASH(this->name)];
 	this->prev = NULL;
 	this->next = *list;
@@ -43,7 +43,6 @@ Channel::Channel(const std::string &name, time_t ts)
 
 	this->creation_time = ts;
 	this->topic = NULL;
-	*this->topic_setter = 0;
 	this->bans = this->excepts = this->invites = NULL;
 	this->users = NULL;
 	this->usercount = 0;
@@ -51,7 +50,7 @@ Channel::Channel(const std::string &name, time_t ts)
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = 0;
 
-	this->ci = cs_findchan(this->name);
+	this->ci = cs_findchan(this->name.c_str());
 	if (this->ci)
 	{
 		this->ci->c = this;
@@ -75,7 +74,7 @@ Channel::~Channel()
 	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
 
 	if (debug)
-		alog("debug: Deleting channel %s", this->name);
+		alog("debug: Deleting channel %s", this->name.c_str());
 
 	for (bd = this->bd; bd; bd = next)
 	{
@@ -148,7 +147,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	{
 		if (param.empty())
 		{
-			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
 			return;
 		}
 
@@ -160,12 +159,12 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		if (!u)
 		{
 			if (debug)
-				alog("debug: MODE %s +%c for nonexistant user %s", this->name, cm->ModeChar, param.c_str());
+				alog("debug: MODE %s +%c for nonexistant user %s", this->name.c_str(), cm->ModeChar, param.c_str());
 			return;
 		}
 
 		if (debug)
-			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name, u->nick);
+			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
 
 		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
 		/* Set the new status on the user */
@@ -179,7 +178,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	{
 		if (param.empty())
 		{
-			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
 			return;
 		}
 
@@ -194,7 +193,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	{
 		if (cm->Type != MODE_PARAM)
 		{
-			alog("Channel::SetModeInternal() mode %c for %s with a paramater, but its not a param mode", cm->ModeChar, this->name);
+			alog("Channel::SetModeInternal() mode %c for %s with a paramater, but its not a param mode", cm->ModeChar, this->name.c_str());
 			return;
 		}
 
@@ -280,7 +279,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		if (param.empty())
 		{
-			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
 			return;
 		}
 
@@ -291,12 +290,12 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		User *u = finduser(param);
 		if (!u)
 		{
-			alog("Channel::RemoveModeInternal() MODE %s +%c for nonexistant user %s", this->name, cm->ModeChar, param.c_str());
+			alog("Channel::RemoveModeInternal() MODE %s +%c for nonexistant user %s", this->name.c_str(), cm->ModeChar, param.c_str());
 			return;
 		}
 
 		if (debug)
-			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name, u->nick);
+			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
 
 		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
 		chan_remove_user_status(this, u, cms->Status);
@@ -307,7 +306,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		if (param.empty())
 		{
-			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name);
+			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
 			return;
 		}
 
@@ -859,7 +858,7 @@ void chan_remove_user_status(Channel * chan, User * user, int16 status)
 
 	if (debug >= 2)
 		alog("debug: removing user status (%d) from %s for %s", status,
-			 user->nick, chan->name);
+			 user->nick.c_str(), chan->name.c_str());
 
 	for (uc = user->chans; uc; uc = uc->next) {
 		if (uc->chan == chan) {
@@ -880,14 +879,14 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 
 	if (debug >= 2)
 		alog("debug: setting user status (%d) on %s for %s", status,
-			 user->nick, chan->name);
+			 user->nick.c_str(), chan->name.c_str());
 
 	if (Config.HelpChannel && ((um = ModeManager::FindUserModeByName(UMODE_HELPOP))) && (status & CUS_OP)
-		&& (stricmp(chan->name, Config.HelpChannel) == 0)
+		&& (stricmp(chan->name.c_str(), Config.HelpChannel) == 0)
 		&& (!chan->ci || check_access(user, chan->ci, CA_AUTOOP))) {
 		if (debug) {
 			alog("debug: %s being given helpop for having %d status in %s",
-				 user->nick, status, chan->name);
+				 user->nick.c_str(), status, chan->name.c_str());
 		}
 
 		user->SetMode(NULL, um);
@@ -922,7 +921,7 @@ Channel *findchan(const char *chan)
 		alog("debug: findchan(%p)", chan);
 	c = chanlist[HASH(chan)];
 	while (c) {
-		if (stricmp(c->name, chan) == 0) {
+		if (stricmp(c->name.c_str(), chan) == 0) {
 			if (debug >= 3)
 				alog("debug: findchan(%s) -> %p", chan, static_cast<void *>(c));
 			return c;
@@ -950,7 +949,7 @@ Channel *firstchan()
 		current = chanlist[next_index++];
 	if (debug >= 3)
 		alog("debug: firstchan() returning %s",
-			 current ? current->name : "NULL (end of list)");
+			 current ? current->name.c_str() : "NULL (end of list)");
 	return current;
 }
 
@@ -964,7 +963,7 @@ Channel *nextchan()
 	}
 	if (debug >= 3)
 		alog("debug: nextchan() returning %s",
-			 current ? current->name : "NULL (end of list)");
+			 current ? current->name.c_str() : "NULL (end of list)");
 	return current;
 }
 
@@ -1093,7 +1092,7 @@ void do_join(const char *source, int ac, const char **av)
 			c = user->chans;
 			while (c) {
 				nextc = c->next;
-				channame = sstrdup(c->chan->name);
+				channame = sstrdup(c->chan->name.c_str());
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 				chan_deluser(user, c->chan);
 				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame), channame, ""));
@@ -1179,9 +1178,9 @@ void do_kick(const char *source, int ac, const char **av)
 			continue;
 		}
 		if (debug) {
-			alog("debug: kicking %s from %s", user->nick, av[0]);
+			alog("debug: kicking %s from %s", user->nick.c_str(), av[0]);
 		}
-		for (c = user->chans; c && stricmp(av[0], c->chan->name) != 0;
+		for (c = user->chans; c && stricmp(av[0], c->chan->name.c_str()) != 0;
 			 c = c->next);
 		if (c)
 		{
@@ -1232,7 +1231,7 @@ void do_part(const char *source, int ac, const char **av)
 			*t++ = 0;
 		if (debug)
 			alog("debug: %s leaves %s", source, s);
-		for (c = user->chans; c && stricmp(s, c->chan->name) != 0;
+		for (c = user->chans; c && stricmp(s, c->chan->name.c_str()) != 0;
 			 c = c->next);
 		if (c) {
 			if (!c->chan) {
@@ -1457,14 +1456,14 @@ void do_sjoin(const char *source, int ac, const char **av)
 						int i;
 
 						for (i = 1; i < end2 - cubuf; i++)
-							modes[i] = user->nick;
+							modes[i] = user->nick.c_str();
 
 						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
 					}
 
 					if (c->ci && (!serv || is_sync(serv))
 						&& !c->topic_sync)
-						restore_topic(c->name);
+						restore_topic(c->name.c_str());
 					chan_set_correct_modes(user, c, 1);
 
 					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
@@ -1543,7 +1542,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 						int i;
 
 						for (i = 1; i < end2 - cubuf; i++)
-							modes[i] = user->nick;
+							modes[i] = user->nick.c_str();
 						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
 					}
 
@@ -1618,7 +1617,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 						int i;
 
 						for (i = 1; i < end2 - cubuf; i++)
-							modes[i] = user->nick;
+							modes[i] = user->nick.c_str();
 						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
 					}
 
@@ -1664,7 +1663,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 
 			c = join_user_update(user, c, av[1], ts);
 			if (is_created && c->ci)
-				restore_topic(c->name);
+				restore_topic(c->name.c_str());
 			chan_set_correct_modes(user, c, 1);
 
 			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
@@ -1791,7 +1790,7 @@ void do_topic(const char *source, int ac, const char **av)
 	 */
 	if ((ac > 3) && *av[3] && ci && ci->last_topic
 		&& (strcmp(av[3], ci->last_topic) == 0)
-		&& (strcmp(topicsetter, ci->last_topic_setter) == 0)) {
+		&& (strcmp(topicsetter, ci->last_topic_setter.c_str()) == 0)) {
 		delete [] topicsetter;
 		return;
 	}
@@ -1809,7 +1808,7 @@ void do_topic(const char *source, int ac, const char **av)
 		c->topic = sstrdup(av[3]);
 	}
 
-	strscpy(c->topic_setter, topicsetter, sizeof(c->topic_setter));
+	c->topic_setter = topicsetter;
 	c->topic_time = topic_time;
 	delete [] topicsetter;
 
@@ -1848,20 +1847,20 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!c || !(ci = c->ci))
 		return;
 
-	if ((ci->HasFlag(CI_FORBIDDEN)) || (*(c->name) == '+'))
+	if ((ci->HasFlag(CI_FORBIDDEN)) || (*(c->name.c_str()) == '+'))
 		return;
 
 	status = chan_get_user_status(c, user);
 
 	if (debug)
-		alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick, c->name, status, (give_modes ? "" : "not "));
+		alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick.c_str(), c->name.c_str(), status, (give_modes ? "" : "not "));
 
 	/* Changed the second line of this if a bit, to make sure unregistered
 	 * users can always get modes (IE: they always have autoop enabled). Before
 	 * this change, you were required to have a registered nick to be able
 	 * to receive modes. I wonder who added that... *looks at Rob* ;) -GD
 	 */
-	if (give_modes && (get_ignore(user->nick) == NULL)
+	if (give_modes && (get_ignore(user->nick.c_str()) == NULL)
 		&& (!user->nc || !user->nc->HasFlag(NI_AUTOOP))) {
 		if (owner && check_access(user, ci, CA_AUTOOWNER))
 			add_modes |= CUS_OWNER;
@@ -1986,21 +1985,21 @@ void chan_adduser2(User * user, Channel * c)
 	u->ud = NULL;
 	c->usercount++;
 
-	if (get_ignore(user->nick) == NULL) {
+	if (get_ignore(user->nick.c_str()) == NULL) {
 		if (c->ci && (check_access(user, c->ci, CA_MEMO))
 			&& (c->ci->memos.memos.size() > 0)) {
 			if (c->ci->memos.memos.size() == 1) {
 				notice_lang(Config.s_MemoServ, user, MEMO_X_ONE_NOTICE,
-							c->ci->memos.memos.size(), c->ci->name);
+							c->ci->memos.memos.size(), c->ci->name.c_str());
 			} else {
 				notice_lang(Config.s_MemoServ, user, MEMO_X_MANY_NOTICE,
-							c->ci->memos.memos.size(), c->ci->name);
+							c->ci->memos.memos.size(), c->ci->name.c_str());
 			}
 		}
 		/* Added channelname to entrymsg - 30.03.2004, Certus */
 		/* Also, don't send the entrymsg when bursting -GD */
 		if (c->ci && c->ci->entry_message && is_sync(user->server))
-			user->SendMessage(whosends(c->ci)->nick, "[%s] %s", c->name, c->ci->entry_message);
+			user->SendMessage(whosends(c->ci)->nick, "[%s] %s", c->name.c_str(), c->ci->entry_message);
 	}
 
 	/**
@@ -2025,7 +2024,7 @@ void chan_adduser2(User * user, Channel * c)
 			 * recovers from a netsplit. -GD
 			 */
 			if (is_sync(user->server)) {
-				ircdproto->SendPrivmsg(c->ci->bi, c->name, "[%s] %s",
+				ircdproto->SendPrivmsg(c->ci->bi, c->name.c_str(), "[%s] %s",
 								  user->nc->display, user->nc->greet);
 				c->ci->bi->lastmsg = time(NULL);
 			}
@@ -2075,7 +2074,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 	}
 
 	if (debug)
-		alog("debug: %s joins %s", user->nick, chan->name);
+		alog("debug: %s joins %s", user->nick.c_str(), chan->name.c_str());
 
 	c = new u_chanlist;
 	c->prev = NULL;
@@ -2118,7 +2117,7 @@ void restore_unsynced_topics()
 
 	for (c = firstchan(); c; c = nextchan()) {
 		if (!(c->topic_sync))
-			restore_topic(c->name);
+			restore_topic(c->name.c_str());
 	}
 }
 
@@ -2479,11 +2478,11 @@ Entry *elist_match_user(EList * list, User * u)
 		ip = str_is_ip(host);
 
 	/* Match what we ve got against the lists.. */
-	res = elist_match(list, u->nick, u->GetIdent().c_str(), u->host, ip);
+	res = elist_match(list, u->nick.c_str(), u->GetIdent().c_str(), u->host, ip);
 	if (!res)
-		res = elist_match(list, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip);
+		res = elist_match(list, u->nick.c_str(), u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip);
 	if (!res && !u->GetCloakedHost().empty() && u->GetCloakedHost() != u->GetDisplayedHost())
-		res = elist_match(list, u->nick, u->GetIdent().c_str(), u->GetCloakedHost().c_str(), ip);
+		res = elist_match(list, u->nick.c_str(), u->GetIdent().c_str(), u->GetCloakedHost().c_str(), ip);
 
 	if (host)
 		delete [] host;

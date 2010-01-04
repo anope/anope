@@ -30,14 +30,14 @@ class CommandBSInfo : public Command
 		for (i = 0; i < 256; i++) {
 			for (ci = chanlists[i]; ci; ci = ci->next) {
 				if (ci->bi == bi) {
-					if (strlen(buf) + strlen(ci->name) > 300) {
+					if (strlen(buf) + strlen(ci->name.c_str()) > 300) {
 						u->SendMessage(Config.s_BotServ, "%s", buf);
 						*buf = 0;
 						end = buf;
 					}
 					end +=
 						snprintf(end, sizeof(buf) - (end - buf), " %s ",
-								 ci->name);
+								 ci->name.c_str());
 				}
 			}
 		}
@@ -86,7 +86,7 @@ class CommandBSInfo : public Command
 				return MOD_CONT;
 			}
 
-			notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_HEADER, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_HEADER, ci->name.c_str());
 			if (ci->bi)
 				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_BOT, ci->bi->nick);
 			else

@@ -155,15 +155,15 @@ class CommandOSSet : public Command
 		{
 			u->isSuperAdmin = 1;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_ON);
-			alog("%s: %s is a SuperAdmin ", Config.s_OperServ, u->nick);
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick);
+			alog("%s: %s is a SuperAdmin ", Config.s_OperServ, u->nick.c_str());
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick.c_str());
 		}
 		else if (setting == "OFF")
 		{
 			u->isSuperAdmin = 0;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_OFF);
-			alog("%s: %s is no longer a SuperAdmin", Config.s_OperServ, u->nick);
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick);
+			alog("%s: %s is no longer a SuperAdmin", Config.s_OperServ, u->nick.c_str());
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick.c_str());
 		}
 		else
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_SYNTAX);

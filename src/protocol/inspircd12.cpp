@@ -171,19 +171,19 @@ class InspIRCdProto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->uid, "FTOPIC %s %lu %s :%s", c->name, static_cast<unsigned long>(c->topic_time), whosetit, topic);
+		send_cmd(whosets->uid, "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time), whosetit, topic);
 	}
 
 	void SendVhostDel(User *u)
 	{
 		if (u->HasMode(UMODE_CLOAK))
-			inspircd_cmd_chghost(u->nick, u->chost.c_str());
+			inspircd_cmd_chghost(u->nick.c_str(), u->chost.c_str());
 		else
-			inspircd_cmd_chghost(u->nick, u->host);
+			inspircd_cmd_chghost(u->nick.c_str(), u->host);
 
 		if (has_chgidentmod && u->GetIdent() != u->GetVIdent())
 		{
-			inspircd_cmd_chgident(u->nick, u->GetIdent().c_str());
+			inspircd_cmd_chgident(u->nick.c_str(), u->GetIdent().c_str());
 		}
 	}
 
@@ -219,7 +219,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		send_cmd(source ? source->uid : TS6SID, "FMODE %s %u %s", dest->name, static_cast<unsigned>(dest->creation_time), buf);
+		send_cmd(source ? source->uid : TS6SID, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
@@ -236,14 +236,14 @@ class InspIRCdProto : public IRCDProto
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
 		if (buf)
-			send_cmd(source->uid, "KICK %s %s :%s", chan->name, user->GetUID().c_str(), buf);
+			send_cmd(source->uid, "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
 		else
-			send_cmd(source->uid, "KICK %s %s :%s", chan->name, user->GetUID().c_str(), user->nick);
+			send_cmd(source->uid, "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), user->nick.c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		send_cmd(TS6SID, "NOTICE @%s :%s", dest->name, buf);
+		send_cmd(TS6SID, "NOTICE @%s :%s", dest->name.c_str(), buf);
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
@@ -283,8 +283,8 @@ class InspIRCdProto : public IRCDProto
 	void SendVhost(User *u, const char *vIdent, const char *vhost)
 	{
 		if (vIdent)
-			inspircd_cmd_chgident(u->nick, vIdent);
-		inspircd_cmd_chghost(u->nick, vhost);
+			inspircd_cmd_chgident(u->nick.c_str(), vIdent);
+		inspircd_cmd_chghost(u->nick.c_str(), vhost);
 	}
 
 	void SendConnect()
@@ -446,8 +446,8 @@ int anope_event_mode(const char *source, int ac, const char **av)
 		if (u == NULL)
 			return MOD_CONT;
 
-		av[0] = u2->nick;
-		do_umode(u->nick, ac, av);
+		av[0] = u2->nick.c_str();
+		do_umode(u->nick.c_str(), ac, av);
 	}
 	return MOD_CONT;
 }
@@ -660,7 +660,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 	if (ac > 1 && *av[1])
 		c->topic = sstrdup(av[1]);
 
-	strscpy(c->topic_setter, u ? u->nick : source, sizeof(c->topic_setter));
+	c->topic_setter = u ? u->nick : source;
 	c->topic_time = topic_time;
 
 	record_topic(av[0]);
@@ -698,7 +698,7 @@ int anope_event_kill(const char *source, int ac, const char **av)
 {
 	User *u = find_byuid(av[0]);
 	BotInfo *bi = findbot(av[0]);
-	m_kill(u ? u->nick : (bi ? bi->nick : av[0]), av[1]);
+	m_kill(u ? u->nick.c_str() : (bi ? bi->nick : av[0]), av[1]);
 	return MOD_CONT;
 }
 
@@ -908,7 +908,7 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
 	if (!u)
 		return MOD_CONT; // likely a message from a server, which can happen.
 
-	m_privmsg(u->nick, bi ? bi->nick: av[0], av[1]);
+	m_privmsg(u->nick.c_str(), bi ? bi->nick: av[0], av[1]);
 	return MOD_CONT;
 }
 

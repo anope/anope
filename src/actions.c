@@ -97,8 +97,8 @@ void sqline(const std::string &mask, const std::string &reason)
 						cunext = cu->next;
 						if (is_oper(cu->user))
 							continue;
-						av[0] = c->name;
-						av[1] = cu->user->nick;
+						av[0] = c->name.c_str();
+						av[1] = cu->user->nick.c_str();
 						av[2] = reason.c_str();
 						ircdproto->SendKick(findbot(Config.s_OperServ), c, cu->user, "Q-Lined: %s", av[2]);
 						do_kick(Config.s_ChanServ, 3, av);
@@ -158,7 +158,7 @@ void common_unban(ChannelInfo *ci, const std::string &nick)
 		for (ban = ci->c->bans->entries; ban; ban = next)
 		{
 			next = ban->next;
-			if (entry_match(ban, u->nick, u->GetIdent().c_str(), u->host, ip) || entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
+			if (entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->host, ip) || entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
 				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
 	}

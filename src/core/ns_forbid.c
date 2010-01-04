@@ -56,7 +56,7 @@ class CommandNSForbid : public Command
 		if (na)
 		{
 			na->SetFlag(NS_FORBIDDEN);
-			na->last_usermask = sstrdup(u->nick);
+			na->last_usermask = sstrdup(u->nick.c_str());
 			if (reason)
 				na->last_realname = sstrdup(reason);
 
@@ -73,16 +73,16 @@ class CommandNSForbid : public Command
 				ircdproto->SendSQLine(na->nick, reason ? reason : "Forbidden");
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used FORBID on \2%s\2", u->nick, nick);
+				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick);
 
-			alog("%s: %s set FORBID for nick %s", Config.s_NickServ, u->nick, nick);
+			alog("%s: %s set FORBID for nick %s", Config.s_NickServ, u->nick.c_str(), nick);
 			notice_lang(Config.s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
 		}
 		else
 		{
-			alog("%s: Valid FORBID for %s by %s failed", Config.s_NickServ, nick, u->nick);
+			alog("%s: Valid FORBID for %s by %s failed", Config.s_NickServ, nick, u->nick.c_str());
 			notice_lang(Config.s_NickServ, u, NICK_FORBID_FAILED, nick);
 		}
 		return MOD_CONT;

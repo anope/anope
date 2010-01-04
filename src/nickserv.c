@@ -249,7 +249,7 @@ void nickserv(User * u, char *buf)
 		{
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_NickServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_NickServ), u->nick.c_str(), "PING %s", s);
 	}
 	else
 	{
@@ -274,7 +274,7 @@ int validate_user(User * u)
 	NickRequest *nr;
 	NickServCollide *t;
 
-	if ((nr = findrequestnick(u->nick)))
+	if ((nr = findrequestnick(u->nick.c_str())))
 	{
 		notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 	}
@@ -291,7 +291,7 @@ int validate_user(User * u)
 
 	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
-		notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick);
+		notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
 		collide(na, 0);
 		return 0;
 	}
@@ -361,7 +361,7 @@ void cancel_user(User * u)
 			else if (ircd->svsnick)
 			{
 				uid = ts6_uid_retrieve();
-				ircdproto->SendClientIntroduction(u->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid.c_str());
+				ircdproto->SendClientIntroduction(u->nick.c_str(), Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid.c_str());
 				t = new NickServRelease(na, Config.NSReleaseTimeout);
 				t->uid = uid;
 			}
@@ -764,7 +764,7 @@ void change_core_display(NickCore * nc)
 
 void collide(NickAlias * na, int from_timeout)
 {
-	char guestnick[NICKMAX];
+	std::string guestnick;
 
 	if (!from_timeout)
 		NickServCollide::ClearTimers(na);
@@ -786,12 +786,13 @@ void collide(NickAlias * na, int from_timeout)
 		/* We need to make sure the guestnick is free -- heinz */
 		do
 		{
-			snprintf(guestnick, sizeof(guestnick), "%s%d",
-			         Config.NSGuestNickPrefix, getrandom16());
+			char randbuf[17];
+			guestnick = Config.NSGuestNickPrefix;
+			guestnick += randbuf;
 		}
-		while (finduser(guestnick));
-		notice_lang(Config.s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick);
-		ircdproto->SendForceNickChange(u, guestnick, time(NULL));
+		while (finduser(guestnick.c_str()));
+		notice_lang(Config.s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick.c_str());
+		ircdproto->SendForceNickChange(u, guestnick.c_str(), time(NULL));
 		na->SetFlag(NS_GUESTED);
 	}
 	else

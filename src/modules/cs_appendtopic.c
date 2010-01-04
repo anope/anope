@@ -83,29 +83,29 @@ class CommandCSAppendTopic : public Command
 				strscpy(topic, newtopic, sizeof(topic));
 
 			ci->last_topic = *topic ? sstrdup(topic) : NULL;
-			strscpy(ci->last_topic_setter, u->nick, NICKMAX);
+			ci->last_topic_setter = u->nick;
 			ci->last_topic_time = time(NULL);
 
 			if (c->topic)
 				delete [] c->topic;
 			c->topic = *topic ? sstrdup(topic) : NULL;
-			strscpy(c->topic_setter, u->nick, NICKMAX);
+			c->topic_setter = u->nick;
 			if (ircd->topictsbackward)
 				c->topic_time = c->topic_time - 1;
 			else
 				c->topic_time = ci->last_topic_time;
 
 			if (!check_access(u, ci, CA_TOPIC))
-				alog("%s: %s!%s@%s changed topic of %s as services admin.", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, c->name);
+				alog("%s: %s!%s@%s changed topic of %s as services admin.", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, c->name.c_str());
 			if (ircd->join2set)
 			{
 				if (whosends(ci) == findbot(Config.s_ChanServ))
 				{
-					ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name, c->creation_time);
+					ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name.c_str(), c->creation_time);
 					ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ);
 				}
 			}
-			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
+			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic);
 			if (ircd->join2set)
 			{
 				if (whosends(ci) == findbot(Config.s_ChanServ))

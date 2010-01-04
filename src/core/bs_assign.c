@@ -62,7 +62,7 @@ class CommandBSAssign : public Command
 		}
 
 		bi->Assign(u, ci);
-		notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
+		notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name.c_str());
 		return MOD_CONT;
 	}
 

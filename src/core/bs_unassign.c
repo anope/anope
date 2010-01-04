@@ -39,7 +39,7 @@ class CommandBSUnassign : public Command
 		else
 		{
 			ci->bi->UnAssign(u, ci);
-			notice_lang(Config.s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name.c_str());
 		}
 		return MOD_CONT;
 	}

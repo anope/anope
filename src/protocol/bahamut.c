@@ -144,14 +144,14 @@ class BahamutIRCdProto : public IRCDProto
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest->name, buf);
-		else send_cmd(source->nick, "MODE %s %s", dest->name, buf);
+		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf);
+		else send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf);
 	}
 
 	/* SVSHOLD - set */
@@ -175,8 +175,8 @@ class BahamutIRCdProto : public IRCDProto
 	/* SVSMODE channel modes */
 	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name, mode, nick);
-		else send_cmd(Config.ServerName, "SVSMODE %s %s", c->name, mode);
+		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode, nick);
+		else send_cmd(Config.ServerName, "SVSMODE %s %s", c->name.c_str(), mode);
 	}
 
 	/* SQLINE */
@@ -232,7 +232,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* TOPIC */
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name, whosetit, static_cast<unsigned long>(c->topic_time), topic);
+		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), whosetit, static_cast<unsigned long>(c->topic_time), topic);
 	}
 
 	/* UNSQLINE */
@@ -260,7 +260,7 @@ class BahamutIRCdProto : public IRCDProto
 	*/
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		send_cmd(source ? source->nick : NULL, "SVSKILL %s :%s", user->nick, buf);
+		send_cmd(source ? source->nick : NULL, "SVSKILL %s :%s", user->nick.c_str(), buf);
 	}
 
 	/* SVSMODE */
@@ -283,13 +283,13 @@ class BahamutIRCdProto : public IRCDProto
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(NULL, "NOTICE @%s :%s", dest->name, buf);
+		send_cmd(NULL, "NOTICE @%s :%s", dest->name.c_str(), buf);
 	}
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name, user->nick, buf);
-		else send_cmd(source->nick, "KICK %s %s", chan->name, user->nick);
+		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		else send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)

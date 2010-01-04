@@ -31,14 +31,14 @@ class CommandOSNOOP : public Command
 		{
 			User *u2;
 			User *u3 = NULL;
-			char reason[NICKMAX + 32];
+			std::string reason;
 
 			/* Remove the O:lines */
 			ircdproto->SendSVSNOOP(server, 1);
 
-			snprintf(reason, sizeof(reason), "NOOP command used by %s", u->nick);
+			reason = "NOOP command used by " + u->nick;
 			if (Config.WallOSNoOp)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used NOOP on \2%s\2", u->nick, server);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server);
 			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
 
 			/* Kill all the IRCops of the server */
@@ -46,7 +46,7 @@ class CommandOSNOOP : public Command
 			{
 				u3 = nextuser();
 				if (u2 && is_oper(u2) && u2->server->name && Anope::Match(u2->server->name, server, true))
-					kill_user(Config.s_OperServ, u2->nick, reason);
+					kill_user(Config.s_OperServ, u2->nick.c_str(), reason.c_str());
 			}
 		}
 		else if (cmd == "REVOKE")

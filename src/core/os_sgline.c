@@ -92,7 +92,7 @@ class CommandOSSGLine : public Command
 				return MOD_CONT;
 			}
 
-			deleted = add_sgline(u, cmask, u->nick, expires, reason.c_str());
+			deleted = add_sgline(u, cmask, u->nick.c_str(), expires, reason.c_str());
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
@@ -129,7 +129,7 @@ class CommandOSSGLine : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SGLINE for %s (%s)", u->nick, cmask, buf);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SGLINE for %s (%s)", u->nick.c_str(), cmask, buf);
 			}
 
 			if (readonly)

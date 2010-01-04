@@ -189,17 +189,17 @@ class XOPBase : public Command
 			access->creator = u->nick;
 		}
 
-		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick, u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", level, na->nick, nc->display, ci->name);
+		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", level, na->nick, nc->display, ci->name.c_str());
 
 		if (!change)
 		{
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
-			notice_lang(Config.s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name);
+			notice_lang(Config.s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name.c_str());
 		}
 		else
 		{
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
-			notice_lang(Config.s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name);
+			notice_lang(Config.s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -226,7 +226,7 @@ class XOPBase : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
+			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -250,15 +250,15 @@ class XOPBase : public Command
 				else if (count == 1)
 				{
 					last = atoi(nick);
-					notice_lang(Config.s_ChanServ, u, messages[XOP_NO_SUCH_ENTRY], last, ci->name);
+					notice_lang(Config.s_ChanServ, u, messages[XOP_NO_SUCH_ENTRY], last, ci->name.c_str());
 				}
 				else
-					notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name);
+					notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
 			}
 			else if (deleted == 1)
-				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name);
+				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name.c_str());
 			else
-				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_SEVERAL], deleted, ci->name);
+				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_SEVERAL], deleted, ci->name.c_str());
 		}
 		else
 		{
@@ -273,7 +273,7 @@ class XOPBase : public Command
 
 			if (!access)
 			{
-				notice_lang(Config.s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name);
+				notice_lang(Config.s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name.c_str());
 				return MOD_CONT;
 			}
 
@@ -284,7 +284,7 @@ class XOPBase : public Command
 			}
 			else
 			{
-				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED], access->nc->display, ci->name);
+				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED], access->nc->display, ci->name.c_str());
 				access->nc = NULL;
 				access->in_use = 0;
 
@@ -317,7 +317,7 @@ class XOPBase : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
+			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -334,7 +334,7 @@ class XOPBase : public Command
 			}
 		}
 		if (!sent_header)
-			notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name);
+			notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -349,7 +349,7 @@ class XOPBase : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name);
+			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -368,7 +368,7 @@ class XOPBase : public Command
 
 		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-		notice_lang(Config.s_ChanServ, u, messages[XOP_CLEAR], ci->name);
+		notice_lang(Config.s_ChanServ, u, messages[XOP_CLEAR], ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -609,7 +609,7 @@ int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, in
 
 	if (!*sent_header)
 	{
-		notice_lang(Config.s_ChanServ, u, xmsg, ci->name);
+		notice_lang(Config.s_ChanServ, u, xmsg, ci->name.c_str());
 		*sent_header = 1;
 	}
 

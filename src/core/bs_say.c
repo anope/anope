@@ -45,7 +45,7 @@ class CommandBSSay : public Command
 
 		if (!ci->c || ci->c->usercount < Config.BSMinUsers)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -55,10 +55,10 @@ class CommandBSSay : public Command
 			return MOD_CONT;
 		}
 
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text);
+		ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", text);
 		ci->bi->lastmsg = time(NULL);
 		if (Config.LogBot && Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "SAY %s %s %s", u->nick, ci->name, text);
+			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "SAY %s %s %s", u->nick.c_str(), ci->name.c_str(), text);
 		return MOD_CONT;
 	}
 

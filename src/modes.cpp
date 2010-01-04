@@ -250,7 +250,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 	}
 
 	if (debug)
-		alog("debug: Added ban %s to channel %s", mask, chan->name);
+		alog("debug: Added ban %s to channel %s", mask, chan->name.c_str());
 }
 
 /** Remove a ban from the channel
@@ -273,8 +273,7 @@ void ChannelModeBan::DelMask(Channel *chan, const char *mask)
 		entry_delete(chan->bans, ban);
 
 		if (debug)
-			alog("debug: Deleted ban %s from channel %s", mask,
-				 chan->name);
+			alog("debug: Deleted ban %s from channel %s", mask, chan->name.c_str());
 	}
 
 	if (chan->ci && (akick = is_stuck(chan->ci, mask)))
@@ -306,7 +305,7 @@ void ChannelModeExcept::AddMask(Channel *chan, const char *mask)
 		fatal("Creating new exception entry failed");
 
 	if (debug)
-		alog("debug: Added except %s to channel %s", mask, chan->name);
+		alog("debug: Added except %s to channel %s", mask, chan->name.c_str());
 }
 
 /** Remove an except from the channel
@@ -328,7 +327,7 @@ void ChannelModeExcept::DelMask(Channel *chan, const char *mask)
 		entry_delete(chan->excepts, exception);
 
 		if (debug)
-			alog("debug: Deleted except %s to channel %s", mask, chan->name);
+			alog("debug: Deleted except %s to channel %s", mask, chan->name.c_str());
 	}
 }
 
@@ -357,7 +356,7 @@ void ChannelModeInvite::AddMask(Channel *chan, const char *mask)
 		fatal("Creating new exception entry failed");
 
 	if (debug)
-		alog("debug: Added invite %s to channel %s", mask, chan->name);
+		alog("debug: Added invite %s to channel %s", mask, chan->name.c_str());
 
 }
 
@@ -380,8 +379,7 @@ void ChannelModeInvite::DelMask(Channel *chan, const char *mask)
 		entry_delete(chan->invites, invite);
 
 		if (debug)
-			alog("debug: Deleted invite %s to channel %s", mask,
-				 chan->name);
+			alog("debug: Deleted invite %s to channel %s", mask, chan->name.c_str());
 	}
 }
 

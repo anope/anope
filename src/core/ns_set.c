@@ -89,7 +89,7 @@ class CommandNSSet : public Command
 		else
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
 
-		alog("%s: %s!%s@%s (e-mail: %s) changed its password.", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->email ? nc->email : "none");
+		alog("%s: %s!%s@%s (e-mail: %s) changed its password.", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nc->email ? nc->email : "none");
 
 		return MOD_CONT;
 	}
@@ -157,7 +157,7 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.", Config.s_NickServ, u->nick, u->GetIdent().c_str(), u->host, nc->email ? nc->email : "none", param ? param : "none");
+		alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nc->email ? nc->email : "none", param ? param : "none");
 
 		if (nc->email)
 			delete [] nc->email;

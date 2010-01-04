@@ -314,12 +314,12 @@ bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data
 	{
 		alog("You have not defined the <networkinfo:nicklen> directive. It is strongly");
 		alog("adviced that you do configure this correctly in your services.conf");
-		data.Set(NICKMAX - 1);
+		data.Set(31);
 	}
-	else if (nicklen < 1 || nicklen >= NICKMAX)
+	else if (nicklen < 1)
 	{
-		alog("<networkinfo:nicklen> has an invalid value; setting to %d", NICKMAX - 1);
-		data.Set(NICKMAX - 1);
+		alog("<networkinfo:nicklen> has an invalid value; setting to %d", 31);
+		data.Set(31);
 	}
 	return true;
 }

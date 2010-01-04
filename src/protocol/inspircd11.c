@@ -165,19 +165,19 @@ class InspIRCdProto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", c->name, static_cast<unsigned long>(c->topic_time), whosetit, topic);
+		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time), whosetit, topic);
 	}
 
 	void SendVhostDel(User *u)
 	{
 		if (u->HasMode(UMODE_CLOAK))
-			inspircd_cmd_chghost(u->nick, u->chost.c_str());
+			inspircd_cmd_chghost(u->nick.c_str(), u->chost.c_str());
 		else
-			inspircd_cmd_chghost(u->nick, u->host);
+			inspircd_cmd_chghost(u->nick.c_str(), u->host);
 
 		if (has_chgidentmod && u->GetIdent() != u->GetVIdent())
 		{
-			inspircd_cmd_chgident(u->nick, u->GetIdent().c_str());
+			inspircd_cmd_chgident(u->nick.c_str(), u->GetIdent().c_str());
 		}
 	}
 
@@ -192,7 +192,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		send_cmd(source ? source->nick : Config.ServerName, "KILL %s :%s", user->nick, buf);
+		send_cmd(source ? source->nick : Config.ServerName, "KILL %s :%s", user->nick.c_str(), buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -213,13 +213,13 @@ class InspIRCdProto : public IRCDProto
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest->name, static_cast<unsigned>(dest->creation_time), buf);
+		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "MODE %s %s", u->nick, buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "MODE %s %s", u->nick.c_str(), buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
@@ -230,14 +230,14 @@ class InspIRCdProto : public IRCDProto
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name, user->nick, buf);
-		else send_cmd(source->nick, "KICK %s %s :%s", chan->name, user->nick, user->nick);
+		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		else send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), user->nick.c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest->name, buf);
+		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest->name.c_str(), buf);
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
@@ -278,8 +278,8 @@ class InspIRCdProto : public IRCDProto
 
 	void SendVhost(User *u, const char *vIdent, const char *vhost)
 	{
-		if (vIdent) inspircd_cmd_chgident(u->nick, vIdent);
-		inspircd_cmd_chghost(u->nick, vhost);
+		if (vIdent) inspircd_cmd_chgident(u->nick.c_str(), vIdent);
+		inspircd_cmd_chghost(u->nick.c_str(), vhost);
 	}
 
 	void SendConnect()
@@ -568,7 +568,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 	if (ac > 1 && *av[1])
 		c->topic = sstrdup(av[1]);
 
-	strscpy(c->topic_setter, source, sizeof(c->topic_setter));
+	c->topic_setter = source;
 	c->topic_time = topic_time;
 
 	record_topic(av[0]);

@@ -119,9 +119,9 @@ class CommandHSSet : public Command
 				return MOD_CONT;
 			}
 			if (vIdent && ircd->vident)
-				alog("vHost for user \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
+				alog("vHost for user \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick.c_str());
 			else
-				alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
+				alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick.c_str());
 			na->hostinfo.SetVhost(vIdent ? vIdent : "", hostmask, u->nick);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 			if (vIdent)

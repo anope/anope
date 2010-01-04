@@ -36,7 +36,7 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	repeattimes = 0;
 	bi = NULL;
 
-	strscpy(this->name, chname.c_str(), CHANMAX);
+	this->name = chname;
 
 	mlock_on = DefMLockOn;
 	mlock_off = DefMLockOff;
@@ -80,7 +80,7 @@ ChannelInfo::~ChannelInfo()
 	}
 
 	if (debug)
-		alog("debug: Deleting channel %s", this->name);
+		alog("debug: Deleting channel %s", this->name.c_str());
 
 	if (this->bi)
 		this->bi->chancount--;

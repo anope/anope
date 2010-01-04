@@ -54,7 +54,7 @@ class CommandOSClearModes : public Command
 			}
 
 			if (Config.WallOSClearmodes)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CLEARMODES%s on %s", u->nick, all ? " ALL" : "", chan);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CLEARMODES%s on %s", u->nick.c_str(), all ? " ALL" : "", chan);
 			if (all)
 			{
 				/* Clear mode +o */

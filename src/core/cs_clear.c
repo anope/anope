@@ -152,12 +152,12 @@ class CommandCSClear : public Command
 			struct c_userlist *cu, *bnext;
 			char buf[256];
 
-			snprintf(buf, sizeof(buf), "CLEAR USERS command from %s", u->nick);
+			snprintf(buf, sizeof(buf), "CLEAR USERS command from %s", u->nick.c_str());
 
 			for (cu = c->users; cu; cu = bnext) {
 				bnext = cu->next;
 				av[0] = sstrdup(chan);
-				av[1] = sstrdup(cu->user->nick);
+				av[1] = sstrdup(cu->user->nick.c_str());
 				av[2] = sstrdup(buf);
 				ircdproto->SendKick(whosends(ci), c, cu->user, av[2]);
 				do_kick(Config.s_ChanServ, 3, av);

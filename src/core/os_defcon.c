@@ -95,8 +95,8 @@ class CommandOSDEFCON : public Command
 
 		notice_lang(Config.s_OperServ, u, OPER_DEFCON_CHANGED, Config.DefConLevel);
 		defcon_sendlvls(u);
-		alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), u->nick, newLevel);
+		alog("Defcon level changed to %d by Oper %s", newLevel, u->nick.c_str());
+		ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (Config.GlobalOnDefcon)
@@ -296,9 +296,9 @@ class OSDEFCON : public Module
 			if (session && session->count > Config.DefConSessionLimit)
 			{
 				if (Config.SessionLimitExceeded)
-					ircdproto->SendMessage(findbot(Config.s_OperServ), u->nick, Config.SessionLimitExceeded, u->host);
+					ircdproto->SendMessage(findbot(Config.s_OperServ), u->nick.c_str(), Config.SessionLimitExceeded, u->host);
 				if (Config.SessionLimitDetailsLoc)
-					ircdproto->SendMessage(findbot(Config.s_OperServ), u->nick, "%s", Config.SessionLimitDetailsLoc);
+					ircdproto->SendMessage(findbot(Config.s_OperServ), u->nick.c_str(), "%s", Config.SessionLimitDetailsLoc);
 
 				kill_user(Config.s_OperServ, u->nick, "Session limit exceeded");
 				session->hits++;

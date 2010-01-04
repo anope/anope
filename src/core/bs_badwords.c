@@ -28,7 +28,7 @@ class CommandBSBadwords : public Command
 
 		if (!ci->GetBadWordCount())
 		{
-			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
 			return MOD_CONT;
 		}
 		if (!word.empty() && strspn(word.c_str(), "1234567890,-") == word.length())
@@ -48,7 +48,7 @@ class CommandBSBadwords : public Command
 			}
 		}
 		if (!sent_header)
-			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -87,14 +87,14 @@ class CommandBSBadwords : public Command
 			if (!bw->word.empty() && (Config.BSCaseSensitive && !stricmp(bw->word.c_str(), realword.c_str())
 				|| (!Config.BSCaseSensitive && bw->word == realword.c_str())))
 			{
-				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name);
+				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 		}
 
 		ci->AddBadWord(realword.c_str(), type);
 
-		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ADDED, realword.c_str(), ci->name);
+		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -111,20 +111,20 @@ class CommandBSBadwords : public Command
 			{
 				if (count == 1)
 				{
-					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_SUCH_ENTRY, last, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_SUCH_ENTRY, last, ci->name.c_str());
 				}
 				else
 				{
-					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 				}
 			}
 			else if (deleted == 1)
 			{
-				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_ONE, ci->name);
+				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_ONE, ci->name.c_str());
 			}
 			else
 			{
-				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL, deleted, ci->name);
+				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL, deleted, ci->name.c_str());
 			}
 
 			if (deleted)
@@ -145,13 +145,13 @@ class CommandBSBadwords : public Command
 
 			if (i == ci->GetBadWordCount())
 			{
-				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name);
+				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 			
 			ci->EraseBadWord(badword);
 
-			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name);
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -261,7 +261,7 @@ int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 
 	if (!*sent_header)
 	{
-		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name);
+		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
 		*sent_header = 1;
 	}
 

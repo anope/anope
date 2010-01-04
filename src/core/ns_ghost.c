@@ -37,16 +37,15 @@ class CommandNSGhost : public Command
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!stricmp(nick, u->nick))
+		else if (!stricmp(nick, u->nick.c_str()))
 			notice_lang(Config.s_NickServ, u, NICK_NO_GHOST_SELF);
 		else if (pass)
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
-				char buf[NICKMAX + 32];
-				snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);
-				kill_user(Config.s_NickServ, nick, buf);
+				std::string buf = "GHOST command used by " + u->nick;
+				kill_user(Config.s_NickServ, nick, buf.c_str());
 				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick);
 			}
 			else
@@ -54,7 +53,7 @@ class CommandNSGhost : public Command
 				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: GHOST: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick, u->GetIdent().c_str(), u->host);
+					alog("%s: GHOST: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 					bad_password(u);
 				}
 			}
@@ -63,9 +62,8 @@ class CommandNSGhost : public Command
 		{
 			if (u->nc == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
-				char buf[NICKMAX + 32];
-				snprintf(buf, sizeof(buf), "GHOST command used by %s", u->nick);
-				kill_user(Config.s_NickServ, nick, buf);
+				std::string buf = "GHOST command used by " + u->nick;
+				kill_user(Config.s_NickServ, nick, buf.c_str());
 				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick);
 			}
 			else

@@ -55,11 +55,11 @@ class CommandCSInvite : public Command
 		}
 
 		if (is_on_chan(c, u2))
-			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name.c_str());
 		else
 		{
-			ircdproto->SendInvite(whosends(ci), chan, u2->nick);
-			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name);
+			ircdproto->SendInvite(whosends(ci), chan, u2->nick.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name.c_str());
 		}
 		return MOD_CONT;
 	}

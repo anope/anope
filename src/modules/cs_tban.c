@@ -73,7 +73,7 @@ class CommandCSTBan : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		this->OnSyntaxError(u, "");
-		ircdproto->SendMessage(findbot(Config.s_ChanServ), u->nick, " ");
+		u->SendMessage(Config.s_ChanServ, " ");
 		me->NoticeLang(Config.s_ChanServ, u, TBAN_HELP_DETAIL);
 
 		return true;
@@ -202,7 +202,7 @@ int canBanUser(Channel * c, User * u, User * u2)
 	if (!check_access(u, ci, CA_BAN))
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (is_excepted(ci, u2))
-		notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
+		notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 	else if (is_protected(u2))
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else

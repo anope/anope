@@ -71,7 +71,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		if (!nick_identified(u))
 		{
 			notice_lang(service, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
-			alog("Access denied for unregistered user %s with service %s and command %s", u->nick, service, cmd);
+			alog("Access denied for unregistered user %s with service %s and command %s", u->nick.c_str(), service, cmd);
 			return;
 		}
 	}
@@ -120,16 +120,16 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 			{
 				if ((ci->HasFlag(CI_FORBIDDEN)) && (!c->HasFlag(CFLAG_ALLOW_FORBIDDEN)))
 				{
-					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name);
+					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name.c_str());
 					alog("Access denied for user %s with service %s and command %s because of FORBIDDEN channel %s",
-						u->nick, service, cmd, ci->name);
+						u->nick.c_str(), service, cmd, ci->name.c_str());
 					return;
 				}
 				else if ((ci->HasFlag(CI_SUSPENDED)) && (!c->HasFlag(CFLAG_ALLOW_SUSPENDED)))
 				{
-					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name);
+					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name.c_str());
 					alog("Access denied for user %s with service %s and command %s because of SUSPENDED channel %s",
-						u->nick, service, cmd, ci->name);
+						u->nick.c_str(), service, cmd, ci->name.c_str());
 					return;
 				}
 			}
@@ -153,7 +153,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		if (!u->nc->HasCommand(c->permission))
 		{
 			notice_lang(service, u, ACCESS_DENIED);
-			alog("Access denied for user %s with service %s and command %s", u->nick, service, cmd);
+			alog("Access denied for user %s with service %s and command %s", u->nick.c_str(), service, cmd);
 			return;
 		}
 

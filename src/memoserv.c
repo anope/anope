@@ -63,7 +63,7 @@ void memoserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_MemoServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_MemoServ), u->nick.c_str(), "PING %s", s);
 	} else {
 		mod_run_cmd(Config.s_MemoServ, u, MEMOSERV, cmd);
 	}
@@ -247,7 +247,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		u->lastmemosend = now;
 		m = new Memo;
 		mi->memos.push_back(m);
-		strscpy(m->sender, source, NICKMAX);
+		m->sender = source;
 		if (mi->memos.size() > 1) {
 			m->number = mi->memos[mi->memos.size() - 2]->number + 1;
 			if (m->number < 1) {
@@ -308,11 +308,11 @@ void memo_send(User * u, const char *name, const char *text, int z)
 					if (check_access(cu->user, c->ci, CA_MEMO)) {
 						if (cu->user->nc
 							&& (cu->user->nc->HasFlag(NI_MEMO_RECEIVE))
-							&& get_ignore(cu->user->nick) == NULL) {
+							&& get_ignore(cu->user->nick.c_str()) == NULL) {
 							notice_lang(Config.s_MemoServ, cu->user,
 										MEMO_NEW_X_MEMO_ARRIVED,
-										c->ci->name, Config.s_MemoServ,
-										c->ci->name, m->number);
+										c->ci->name.c_str(), Config.s_MemoServ,
+										c->ci->name.c_str(), m->number);
 						}
 					}
 				}
@@ -362,7 +362,7 @@ static void new_memo_mail(NickCore * nc, Memo * m)
 	}
 	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT1), nc->display);
 	fprintf(mail->pipe, "\n");
-	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT2), m->sender,
+	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT2), m->sender.c_str(),
 			m->number);
 	fprintf(mail->pipe, "\n\n");
 	fprintf(mail->pipe, "%s", getstring(MEMO_MAIL_TEXT3));
@@ -413,7 +413,7 @@ void rsend_notify(User * u, Memo * m, const char *chan)
 		}
 
 		/* Send notification */
-		memo_send(u, m->sender, text, 2);
+		memo_send(u, m->sender.c_str(), text, 2);
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */

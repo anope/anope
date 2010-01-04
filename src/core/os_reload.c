@@ -26,7 +26,7 @@ class CommandOSReload : public Command
 	{
 		if (!read_config(1))
 		{
-			quitmsg = new char[28 + strlen(u->nick)];
+			quitmsg = new char[28 + u->nick.length()];
 			if (!quitmsg)
 				quitmsg = "Error during the reload of the configuration file, but out of memory!";
 			else

@@ -43,7 +43,7 @@ class CommandCSKick : public Command
 			reason = "Requested";
 		}
 
-		is_same = (target == u->nick) ? 1 : (stricmp(target, u->nick) == 0);
+		is_same = (target == u->nick.c_str()) ? 1 : (stricmp(target, u->nick.c_str()) == 0);
 
 		if (c)
 			ci = c->ci;
@@ -53,7 +53,7 @@ class CommandCSKick : public Command
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
 		} else if (!is_on_chan(c, u2)) {
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		} else if (!is_same ? !check_access(u, ci, CA_KICK) :
 					 !check_access(u, ci, CA_KICKME)) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
@@ -69,10 +69,10 @@ class CommandCSKick : public Command
 				|| ((ci->HasFlag(CI_SIGNKICK_LEVEL))
 					&& !check_access(u, ci, CA_SIGNKICK)))
 				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s (%s)",
-								 reason, u->nick);
+								 reason, u->nick.c_str());
 			else
 				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s", reason);
-			av[0] = ci->name;
+			av[0] = ci->name.c_str();
 			av[1] = target;
 			av[2] = reason;
 			do_kick(Config.s_ChanServ, 3, av);

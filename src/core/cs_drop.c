@@ -67,11 +67,11 @@ class CommandCSDrop : public Command
 
 		if (ircd->chansqline && (ci->HasFlag(CI_FORBIDDEN)))
 		{
-			ircdproto->SendSQLineDel(ci->name);
+			ircdproto->SendSQLineDel(ci->name.c_str());
 		}
 
 		alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",
-			 Config.s_ChanServ, ci->name, u->nick, u->GetIdent().c_str(),
+			 Config.s_ChanServ, ci->name.c_str(), u->nick.c_str(), u->GetIdent().c_str(),
 			 u->host, (ci->founder ? ci->founder->display : "(none)"));
 
 		delete ci;
@@ -81,7 +81,7 @@ class CommandCSDrop : public Command
 		 */
 		if (Config.WallDrop) {
 			if ((level < ACCESS_FOUNDER) || (!IsRealFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER)))
-				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used DROP on channel \2%s\2", u->nick, chan);
+				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan);
 		}
 
 		notice_lang(Config.s_ChanServ, u, CHAN_DROPPED, chan);

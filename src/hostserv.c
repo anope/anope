@@ -95,7 +95,7 @@ void hostserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_HostServ), u->nick, "PING %s", s);
+		ircdproto->SendCTCP(findbot(Config.s_HostServ), u->nick.c_str(), "PING %s", s);
 	} else {
 		if (ircd->vhost) {
 			mod_run_cmd(Config.s_HostServ, u, HOSTSERV, cmd);

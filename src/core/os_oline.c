@@ -37,13 +37,13 @@ class CommandOSOLine : public Command
 			u2->SetMode(findbot(Config.s_OperServ), UMODE_OPER);
 			notice_lang(Config.s_OperServ, u2, OPER_OLINE_IRCOP);
 			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used OLINE for %s", u->nick, nick);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used OLINE for %s", u->nick.c_str(), nick);
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config.s_OperServ, nick, flag);
 			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used OLINE for %s", u->nick, nick);
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used OLINE for %s", u->nick.c_str(), nick);
 		}
 		else
 			this->OnSyntaxError(u, "");

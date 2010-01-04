@@ -495,7 +495,7 @@ class Memo : public Flags<MemoFlag>
  public:
 	uint32 number;	/* Index number -- not necessarily array position! */
 	time_t time;	/* When it was sent */
-	char sender[NICKMAX];
+	std::string sender;
 	char *text;
 };
 
@@ -854,11 +854,11 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	~Channel();
 
 	Channel *next, *prev;
-	char name[CHANMAX];
+	std::string name;		/* Channel name */
 	ChannelInfo *ci;			/* Corresponding ChannelInfo */
 	time_t creation_time;		/* When channel was created */
 	char *topic;
-	char topic_setter[NICKMAX];		/* Who set the topic */
+	std::string topic_setter;
 	time_t topic_time;			/* When topic was set */
 	std::bitset<128> modes;
 
@@ -1055,7 +1055,7 @@ struct NewsItem
 	NewsType type;
 	uint32 num;
 	std::string Text;
-	char who[NICKMAX];
+	std::string who;
 	time_t time;
 };
 
@@ -1101,7 +1101,7 @@ struct sxline_ {
 struct exception_ {
 	char *mask;				 /* Hosts to which this exception applies */
 	int limit;				  /* Session limit for exception */
-	char who[NICKMAX];		  /* Nick of person who added the exception */
+	std::string who;		/* Nick of person who added the exception */
 	char *reason;			   /* Reason for exception's addition */
 	time_t time;				/* When this exception was added */
 	time_t expires;			 /* Time when it expires. 0 == no expiry */

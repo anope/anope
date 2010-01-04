@@ -80,7 +80,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	~ChannelInfo();
 
 	ChannelInfo *next, *prev;
-	char name[CHANMAX];
+	std::string name;		/* Channel name */
 	NickCore *founder;
 	NickCore *successor;		/* Who gets the channel if the founder
 					 			 * nick is dropped or expires */
@@ -91,7 +91,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	time_t time_registered;
 	time_t last_used;
 	char *last_topic;			/* Last topic on the channel */
-	char last_topic_setter[NICKMAX];	/* Who set the last topic */
+	std::string last_topic_setter;			/* Who set the last topic */
 	time_t last_topic_time;		/* When the last topic was set */
 
 	char *forbidby;

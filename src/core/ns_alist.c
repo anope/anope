@@ -115,10 +115,10 @@ class CommandNSAList : public Command
 
 							xop = get_xop_level(level);
 
-							notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, xop, ci->desc ? ci->desc : "");
+							notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop, ci->desc ? ci->desc : "");
 						}
 						else
-							notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name, level, ci->desc ? ci->desc : "");
+							notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, ci->desc ? ci->desc : "");
 					}
 				}
 			}

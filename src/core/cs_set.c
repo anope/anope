@@ -43,7 +43,7 @@ class CommandCSSet : public Command
 		}
 
 		alog("%s: Changing founder of %s from %s to %s by %s!%s@%s",
-			 Config.s_ChanServ, ci->name, ci->founder->display, nc->display, u->nick,
+			 Config.s_ChanServ, ci->name.c_str(), ci->founder->display, nc->display, u->nick.c_str(),
 			 u->GetIdent().c_str(), u->host);
 
 		/* Founder and successor must not be the same group */
@@ -54,7 +54,7 @@ class CommandCSSet : public Command
 		ci->founder = nc;
 		nc->channelcount++;
 
-		notice_lang(Config.s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name, param.c_str());
+		notice_lang(Config.s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name.c_str(), param.c_str());
 		return MOD_CONT;
 	}
 
@@ -79,7 +79,7 @@ class CommandCSSet : public Command
 			}
 			if (na->nc == ci->founder)
 			{
-				notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, param.c_str(), ci->name);
+				notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, param.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 			nc = na->nc;
@@ -89,16 +89,16 @@ class CommandCSSet : public Command
 			nc = NULL;
 
 		alog("%s: Changing successor of %s from %s to %s by %s!%s@%s",
-			 Config.s_ChanServ, ci->name,
+			 Config.s_ChanServ, ci->name.c_str(),
 			 (ci->successor ? ci->successor->display : "none"),
-			 (nc ? nc->display : "none"), u->nick, u->GetIdent().c_str(), u->host);
+			 (nc ? nc->display : "none"), u->nick.c_str(), u->GetIdent().c_str(), u->host);
 
 		ci->successor = nc;
 
 		if (nc)
-			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name, param.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), param.c_str());
 		else
-			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_UNSET, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_UNSET, ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -108,7 +108,7 @@ class CommandCSSet : public Command
 		if (ci->desc)
 			delete [] ci->desc;
 		ci->desc = sstrdup(param.c_str());
-		notice_lang(Config.s_ChanServ, u, CHAN_DESC_CHANGED, ci->name, param.c_str());
+		notice_lang(Config.s_ChanServ, u, CHAN_DESC_CHANGED, ci->name.c_str(), param.c_str());
 		return MOD_CONT;
 	}
 
@@ -119,12 +119,12 @@ class CommandCSSet : public Command
 		if (!param.empty())
 		{
 			ci->url = sstrdup(param.c_str());
-			notice_lang(Config.s_ChanServ, u, CHAN_URL_CHANGED, ci->name, param.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_URL_CHANGED, ci->name.c_str(), param.c_str());
 		}
 		else
 		{
 			ci->url = NULL;
-			notice_lang(Config.s_ChanServ, u, CHAN_URL_UNSET, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_URL_UNSET, ci->name.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -136,12 +136,12 @@ class CommandCSSet : public Command
 		if (!param.empty())
 		{
 			ci->email = sstrdup(param.c_str());
-			notice_lang(Config.s_ChanServ, u, CHAN_EMAIL_CHANGED, ci->name, param.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_EMAIL_CHANGED, ci->name.c_str(), param.c_str());
 		}
 		else
 		{
 			ci->email = NULL;
-			notice_lang(Config.s_ChanServ, u, CHAN_EMAIL_UNSET, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_EMAIL_UNSET, ci->name.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -153,12 +153,12 @@ class CommandCSSet : public Command
 		if (!param.empty())
 		{
 			ci->entry_message = sstrdup(param.c_str());
-			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name, param.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name.c_str(), param.c_str());
 		}
 		else
 		{
 			ci->entry_message = NULL;
-			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_UNSET, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_UNSET, ci->name.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -259,7 +259,7 @@ class CommandCSSet : public Command
 		 * mode lock at all.
 		 */
 		if (get_mlock_modes(ci, 0)) {
-			notice_lang(Config.s_ChanServ, u, CHAN_MLOCK_CHANGED, ci->name,
+			notice_lang(Config.s_ChanServ, u, CHAN_MLOCK_CHANGED, ci->name.c_str(),
 						get_mlock_modes(ci, 0));
 		}
 
@@ -279,7 +279,7 @@ class CommandCSSet : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_BANTYPE_INVALID, param);
 		} else {
 			ci->bantype = bantype;
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_BANTYPE_CHANGED, ci->name,
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_BANTYPE_CHANGED, ci->name.c_str(),
 						ci->bantype);
 		}
 		return MOD_CONT;
@@ -290,12 +290,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_KEEPTOPIC);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_KEEPTOPIC);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "KEEPTOPIC");
@@ -308,12 +308,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_TOPICLOCK);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_TOPICLOCK_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_TOPICLOCK_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_TOPICLOCK);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "TOPICLOCK");
@@ -326,12 +326,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_PRIVATE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_PRIVATE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PRIVATE");
@@ -344,12 +344,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_SECUREOPS);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_SECUREOPS);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECUREOPS");
@@ -362,12 +362,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_SECUREFOUNDER);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_SECUREFOUNDER);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECUREFOUNDER");
@@ -382,14 +382,14 @@ class CommandCSSet : public Command
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
 				ci->levels[CA_NOJOIN] = -2;
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "RESTRICTED");
@@ -402,12 +402,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_SECURE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECURE_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECURE_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_SECURE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECURE");
@@ -421,19 +421,19 @@ class CommandCSSet : public Command
 		{
 			ci->SetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name.c_str());
 		}
 		else if (param == "LEVEL")
 		{
 			ci->SetFlag(CI_SIGNKICK_LEVEL);
 			ci->UnsetFlag(CI_SIGNKICK);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SIGNKICK");
@@ -446,12 +446,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_OPNOTICE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_OPNOTICE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "OPNOTICE");
@@ -500,17 +500,17 @@ class CommandCSSet : public Command
 				ci->SetFlag(CI_XOP);
 			}
 
-			alog("%s: %s!%s@%s enabled XOP for %s", Config.s_ChanServ, u->nick,
-				 u->GetIdent().c_str(), u->host, ci->name);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_ON, ci->name);
+			alog("%s: %s!%s@%s enabled XOP for %s", Config.s_ChanServ, u->nick.c_str(),
+				 u->GetIdent().c_str(), u->host, ci->name.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_XOP);
 
-			alog("%s: %s!%s@%s disabled XOP for %s", Config.s_ChanServ, u->nick,
-				 u->GetIdent().c_str(), u->host, ci->name);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name);
+			alog("%s: %s!%s@%s disabled XOP for %s", Config.s_ChanServ, u->nick.c_str(),
+				 u->GetIdent().c_str(), u->host, ci->name.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "XOP");
@@ -525,12 +525,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_PEACE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_PEACE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PEACE");
@@ -572,7 +572,7 @@ class CommandCSSet : public Command
 				}
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
@@ -599,7 +599,7 @@ class CommandCSSet : public Command
 					delete ci->c;
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PERSIST");
@@ -617,12 +617,12 @@ class CommandCSSet : public Command
 		if (param == "ON")
 		{
 			ci->SetFlag(CI_NO_EXPIRE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_NO_EXPIRE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "NOEXPIRE");

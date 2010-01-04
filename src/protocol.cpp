@@ -29,9 +29,9 @@ void IRCDProto::SendQuitInternal(BotInfo *bi, const char *buf)
 void IRCDProto::SendPartInternal(BotInfo *bi, Channel *chan, const char *buf)
 {
 	if (buf)
-		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s :%s", chan->name, buf);
+		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s :%s", chan->name.c_str(), buf);
 	else
-		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s", chan->name);
+		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s", chan->name.c_str());
 }
 
 void IRCDProto::SendGlobopsInternal(BotInfo *source, const char *buf)
@@ -230,7 +230,7 @@ void IRCDProto::SendChangeBotNick(BotInfo *bi, const char *newnick)
 }
 void IRCDProto::SendForceNickChange(User *u, const char *newnick, time_t when)
 {
-	send_cmd(NULL, "SVSNICK %s %s :%ld", u->nick, newnick, static_cast<long>(when));
+	send_cmd(NULL, "SVSNICK %s %s :%ld", u->nick.c_str(), newnick, static_cast<long>(when));
 }
 
 void IRCDProto::SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...)

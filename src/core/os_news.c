@@ -146,7 +146,7 @@ static int add_newsitem(User * u, const char *text, NewsType type)
 	news->num = num + 1;
 	news->Text = text;
 	news->time = time(NULL);
-	strscpy(news->who, u->nick, NICKMAX);
+	news->who = u->nick;
 
 	News.push_back(news);
 
@@ -199,7 +199,7 @@ class NewsBase : public Command
 					notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_HEADER]);
 				tm = localtime(&News[i]->time);
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-				notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, *News[i]->who ? News[i]->who : "<unknown>", News[i]->Text.c_str());
+				notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
 		}
@@ -440,7 +440,7 @@ class OSNews : public Module
 			NewsItem *n = new NewsItem;
 			n->num = atoi(params[2].c_str());
 			n->time = strtol(params[3].c_str(), NULL, 10);
-			strscpy(n->who, params[4].c_str(), NICKMAX);
+			n->who = params[4];
 			if (params[5] == "LOGON")
 				n->type = NEWS_LOGON;
 			else if (params[5] == "RANDOM")
@@ -469,7 +469,7 @@ class OSNews : public Module
 				ntype = "RANDOM";
 			else if (n->type == NEWS_OPER)
 				ntype = "OPER";
-			snprintf(buf, sizeof(buf), "OS NEWS %d %ld %s %s :%s", n->num, n->time, n->who, ntype, n->Text.c_str());	
+			snprintf(buf, sizeof(buf), "OS NEWS %d %ld %s %s :%s", n->num, n->time, n->who.c_str(), ntype, n->Text.c_str());	
 			Write(buf);
 		}
 	}

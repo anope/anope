@@ -70,11 +70,11 @@ class CommandBSSet : public Command
 				if (value == "ON") {
 					ci->botflags.SetFlag(BS_DONTKICKOPS);
 					notice_lang(Config.s_BotServ, u, BOT_SET_DONTKICKOPS_ON,
-								ci->name);
+								ci->name.c_str());
 				} else if (value == "OFF") {
 					ci->botflags.UnsetFlag(BS_DONTKICKOPS);
 					notice_lang(Config.s_BotServ, u, BOT_SET_DONTKICKOPS_OFF,
-								ci->name);
+								ci->name.c_str());
 				} else {
 					syntax_error(Config.s_BotServ, u, "SET DONTKICKOPS",
 								 BOT_SET_DONTKICKOPS_SYNTAX);
@@ -83,11 +83,11 @@ class CommandBSSet : public Command
 				if (value == "ON") {
 					ci->botflags.SetFlag(BS_DONTKICKVOICES);
 					notice_lang(Config.s_BotServ, u, BOT_SET_DONTKICKVOICES_ON,
-								ci->name);
+								ci->name.c_str());
 				} else if (value == "OFF") {
 					ci->botflags.UnsetFlag(BS_DONTKICKVOICES);
 					notice_lang(Config.s_BotServ, u, BOT_SET_DONTKICKVOICES_OFF,
-								ci->name);
+								ci->name.c_str());
 				} else {
 					syntax_error(Config.s_BotServ, u, "SET DONTKICKVOICES",
 								 BOT_SET_DONTKICKVOICES_SYNTAX);
@@ -95,10 +95,10 @@ class CommandBSSet : public Command
 			} else if (option == "FANTASY") {
 				if (value == "ON") {
 					ci->botflags.SetFlag(BS_FANTASY);
-					notice_lang(Config.s_BotServ, u, BOT_SET_FANTASY_ON, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_FANTASY_ON, ci->name.c_str());
 				} else if (value == "OFF") {
 					ci->botflags.UnsetFlag(BS_FANTASY);
-					notice_lang(Config.s_BotServ, u, BOT_SET_FANTASY_OFF, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_FANTASY_OFF, ci->name.c_str());
 				} else {
 					syntax_error(Config.s_BotServ, u, "SET FANTASY",
 								 BOT_SET_FANTASY_SYNTAX);
@@ -106,10 +106,10 @@ class CommandBSSet : public Command
 			} else if (option == "GREET") {
 				if (value == "ON") {
 					ci->botflags.SetFlag(BS_GREET);
-					notice_lang(Config.s_BotServ, u, BOT_SET_GREET_ON, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_GREET_ON, ci->name.c_str());
 				} else if (value == "OFF") {
 					ci->botflags.UnsetFlag(BS_GREET);
-					notice_lang(Config.s_BotServ, u, BOT_SET_GREET_OFF, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_GREET_OFF, ci->name.c_str());
 				} else {
 					syntax_error(Config.s_BotServ, u, "SET GREET",
 								 BOT_SET_GREET_SYNTAX);
@@ -119,10 +119,10 @@ class CommandBSSet : public Command
 					ci->botflags.SetFlag(BS_NOBOT);
 					if (ci->bi)
 						ci->bi->UnAssign(u, ci);
-					notice_lang(Config.s_BotServ, u, BOT_SET_NOBOT_ON, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_NOBOT_ON, ci->name.c_str());
 				} else if (value == "OFF") {
 					ci->botflags.UnsetFlag(BS_NOBOT);
-					notice_lang(Config.s_BotServ, u, BOT_SET_NOBOT_OFF, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_NOBOT_OFF, ci->name.c_str());
 				} else {
 					syntax_error(Config.s_BotServ, u, "SET NOBOT",
 								 BOT_SET_NOBOT_SYNTAX);
@@ -130,10 +130,10 @@ class CommandBSSet : public Command
 			} else if (option == "SYMBIOSIS") {
 				if (value == "ON") {
 					ci->botflags.SetFlag(BS_SYMBIOSIS);
-					notice_lang(Config.s_BotServ, u, BOT_SET_SYMBIOSIS_ON, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_SYMBIOSIS_ON, ci->name.c_str());
 				} else if (value == "OFF") {
 					ci->botflags.UnsetFlag(BS_SYMBIOSIS);
-					notice_lang(Config.s_BotServ, u, BOT_SET_SYMBIOSIS_OFF, ci->name);
+					notice_lang(Config.s_BotServ, u, BOT_SET_SYMBIOSIS_OFF, ci->name.c_str());
 				} else {
 					syntax_error(Config.s_BotServ, u, "SET SYMBIOSIS",
 								 BOT_SET_SYMBIOSIS_SYNTAX);

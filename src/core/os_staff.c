@@ -54,7 +54,7 @@ class CommandOSStaff : public Command
 					if ((au = finduser(na->nick)))
 					{
 						found = 1;
-						notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), nick.c_str(), u->nick);
+						notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), nick.c_str(), u->nick.c_str());
 					}
 				}
 			}

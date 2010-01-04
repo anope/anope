@@ -78,7 +78,7 @@ class CommandOSSQLine : public Command
 				return MOD_CONT;
 			}
 
-			deleted = add_sqline(u, mask, u->nick, expires, reason);
+			deleted = add_sqline(u, mask, u->nick.c_str(), expires, reason);
 			if (deleted < 0)
 				return MOD_CONT;
 			else if (deleted)
@@ -115,7 +115,7 @@ class CommandOSSQLine : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SQLINE for %s (%s)", u->nick, mask, buf);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SQLINE for %s (%s)", u->nick.c_str(), mask, buf);
 			}
 
 			if (readonly)

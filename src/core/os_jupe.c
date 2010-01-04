@@ -34,14 +34,14 @@ class CommandOSJupe : public Command
 			notice_lang(Config.s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else {
 			char rbuf[256];
-			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick, reason ? ": " : "", reason ? reason : "");
+			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick.c_str(), reason ? ": " : "", reason ? reason : "");
 			if (findserver(servlist, jserver))
 				ircdproto->SendSquit(jserver, rbuf);
 			Server *juped_server = new_server(me_server, jserver, rbuf, SERVER_JUPED, ircd->ts6 ? ts6_sid_retrieve() : NULL);
 			ircdproto->SendServer(juped_server);
 
 			if (Config.WallOSJupe)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used JUPE on \2%s\2", u->nick, jserver);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver);
 		}
 		return MOD_CONT;
 	}

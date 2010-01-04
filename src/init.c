@@ -21,7 +21,7 @@ extern void moduleAddIRCDMsgs();
 
 /*************************************************************************/
 
-void introduce_user(const char *user)
+void introduce_user(const std::string &user)
 {
 
 	/* Watch out for infinite loops... */
@@ -37,12 +37,13 @@ void introduce_user(const char *user)
 	int i;
 
 	/* XXX: it might be nice to have this inside BotInfo's constructor, or something? */
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 256; ++i)
 	{
 		for (bi = botlists[i]; bi; bi = bi->next)
 		{
-			if (!user || !stricmp(user, bi->nick))
-				ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid.c_str());
+			ci::string ci_bi_nick(bi->nick.c_str());
+			if (user.empty() || ci_bi_nick == user)
+				ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
 		}
 	}
 }

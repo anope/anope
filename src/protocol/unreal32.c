@@ -234,11 +234,10 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->nick : Config.ServerName, "v %s %s", u->nick.c_str(), buf);
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
+	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
 	{
 		EnforceQlinedNick(nick, Config.s_BotServ);
-		send_cmd(NULL, "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick, static_cast<long>(time(NULL)), user, host, Config.ServerName, modes, host,
-			myIrcd->nickip ? " *" : " ", real);
+		send_cmd(NULL, "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config.ServerName, modes, host.c_str(), myIrcd->nickip ? " *" : " ", real.c_str());
 		SendSQLine(nick, "Reserved for services");
 	}
 
@@ -267,17 +266,18 @@ class UnrealIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(Config.ServerName, "~ !%s %s :%s", base64enc(static_cast<long>(chantime)), channel, user->nick);
+		send_cmd(Config.ServerName, "~ !%s %s :%s", base64enc(static_cast<long>(chantime)), channel, user->nick.c_str());
 	}
 
 	/* unsqline
 	**	parv[0] = sender
 	**	parv[1] = nickmask
 	*/
-	void SendSQLineDel(const char *user)
+	void SendSQLineDel(const std::string &user)
 	{
-		if (!user) return;
-		send_cmd(NULL, "d %s", user);
+		if (user.empty())
+			return;
+		send_cmd(NULL, "d %s", user.c_str());
 	}
 
 

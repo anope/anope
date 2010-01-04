@@ -67,7 +67,7 @@ class CoreExport User : public Extensible
 	/** Destroy a user.
 	 */
 	~User();
-	
+
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 */
@@ -131,10 +131,9 @@ class CoreExport User : public Extensible
 	 * @param source Sender nick
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
-	 * @return void
 	 */
-	void SendMessage(const char *source, const char *fmt, ...);
-	void SendMessage(const char *source, const std::string &msg);
+	void SendMessage(const std::string &source, const char *fmt, ...);
+	void SendMessage(const std::string &source, const std::string &msg);
 
 	/** Check if the user should become identified because
 	 * their svid matches the one stored in their nickcore
@@ -155,7 +154,7 @@ class CoreExport User : public Extensible
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */
 	void UpdateHost();
-       
+
        /** Check if the user has a mode
         * @param Name Mode name
         * @return true or false

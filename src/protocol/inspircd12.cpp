@@ -228,9 +228,9 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->uid : TS6SID, "MODE %s %s", u->GetUID().c_str(), buf);
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
+	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
 	{
-		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", uid, static_cast<long>(time(NULL)), nick, host, host, user, static_cast<long>(time(NULL)), modes, real);
+		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", uid.c_str(), static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), static_cast<long>(time(NULL)), modes, real.c_str());
 	}
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
@@ -259,9 +259,11 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const char *user)
+	void SendSQLineDel(const std::string &user)
 	{
-		send_cmd(TS6SID, "DELLINE Q %s", user);
+		if (user.empty())
+			return;
+		send_cmd(TS6SID, "DELLINE Q %s", user.c_str());
 	}
 
 	/* SQLINE */

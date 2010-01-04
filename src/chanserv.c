@@ -131,7 +131,7 @@ class ChanServTimer : public Timer
 
 		void Tick(time_t ctime)
 		{
-			ChannelInfo *ci = cs_findchan(channel.c_str());
+			ChannelInfo *ci = cs_findchan(channel);
 
 			if (ci)
 				ci->UnsetFlag(CI_INHABIT);
@@ -472,7 +472,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 		chan->RemoveMode(NULL, CMODE_OP, user->nick);
 		if (halfop && !check_access(user, chan->ci, CA_AUTOHALFOP))
 			chan->RemoveMode(NULL, CMODE_HALFOP, user->nick);
-		
+
 		return 0;
 	}
 
@@ -511,7 +511,7 @@ int check_should_op(User * user, char *chan)
 
 	if (check_access(user, ci, CA_AUTOOP))
 	{
-		ci->c->SetMode(NULL, CMODE_OP, user->nick);	
+		ci->c->SetMode(NULL, CMODE_OP, user->nick);
 		return 1;
 	}
 
@@ -968,11 +968,11 @@ void cs_remove_nick(const NickCore * nc)
 /* Return the ChannelInfo structure for the given channel, or NULL if the
  * channel isn't registered. */
 
-ChannelInfo *cs_findchan(const char *chan)
+ChannelInfo *cs_findchan(const std::string &chan)
 {
 	ChannelInfo *ci;
 
-	if (!chan || !*chan) {
+	if (chan.empty()) {
 		if (debug) {
 			alog("debug: cs_findchan() called with NULL values");
 		}
@@ -981,7 +981,7 @@ ChannelInfo *cs_findchan(const char *chan)
 
 	for (ci = chanlists[static_cast<unsigned char>(tolower(chan[1]))]; ci;
 		 ci = ci->next) {
-		if (stricmp(ci->name.c_str(), chan) == 0)
+		if (ci::string(ci->name.c_str()) == chan)
 			return ci;
 	}
 	return NULL;
@@ -1094,7 +1094,7 @@ bool IsFounder(User *user, ChannelInfo *ci)
 
 	if (IsRealFounder(user, ci))
 		return true;
-	
+
 	if (user->nc)
 		access = ci->GetAccess(user->nc);
 	else
@@ -1103,7 +1103,7 @@ bool IsFounder(User *user, ChannelInfo *ci)
 		if (na)
 			access = ci->GetAccess(na->nc);
 	}
-	
+
 	/* If they're QOP+ and theyre identified or theyre recognized and the channel isn't secure */
 	if (access && access->level >= ACCESS_QOP && (user->nc || (user->IsRecognized() && !(ci->HasFlag(CI_SECURE)))))
 		return true;
@@ -1148,10 +1148,10 @@ int get_access(User *user, ChannelInfo *ci)
 	/* SuperAdmin always has highest level */
 	if (user->isSuperAdmin)
 		return ACCESS_SUPERADMIN;
-	
+
 	if (IsFounder(user, ci))
 		return ACCESS_FOUNDER;
-	
+
 	if (nick_identified(user))
 	{
 		access = ci->GetAccess(user->nc);
@@ -1292,7 +1292,7 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 {
 	if (!ci)
 		return NULL;
-	
+
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
 		AutoKick *akick = ci->GetAkick(i);

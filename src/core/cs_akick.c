@@ -387,16 +387,16 @@ class CommandCSAKick : public Command
 					&& akick->mask == mask))
 					break;
 			}
-			
+
 			if (i == ci->GetAkickCount())
 			{
-			                notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
-			                return;
-		        }
-			
+				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+				return;
+			}
+
 			ci->EraseAkick(akick);
-			
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DELETED, mask.c_str(), ci->name.c_str());
+
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DELETED, mask.c_str(), ci->name.c_str());
 		}
 	}
 
@@ -543,7 +543,7 @@ class CommandCSAKick : public Command
 			this->DoAdd(u, ci, params);
 		else if (cmd == "STICK")
 			this->DoStick(u, ci, params);
-		else if (cmd == "UNSTICK")	
+		else if (cmd == "UNSTICK")
 			this->DoUnStick(u, ci, params);
 		else if (cmd == "DEL")
 			this->DoDel(u, ci, params);

@@ -236,9 +236,11 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const char *user)
+	void SendSQLineDel(const std::string &user)
 	{
-		send_cmd(NULL, "UNSQLINE %s", user);
+		if (user.empty())
+			return;
+		send_cmd(NULL, "UNSQLINE %s", user.c_str());
 	}
 
 	/* JOIN - SJOIN */
@@ -292,10 +294,10 @@ class BahamutIRCdProto : public IRCDProto
 		else send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
+	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
 	{
 		EnforceQlinedNick(nick, Config.s_BotServ);
-		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, Config.ServerName, real);
+		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick.c_str(), static_cast<long>(time(NULL)), modes, user.c_str(), host.c_str(), Config.ServerName, real.c_str());
 		SendSQLine(nick, "Reserved for services");
 	}
 

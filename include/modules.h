@@ -537,7 +537,7 @@ class CoreExport Module
 	 * @param c The command class (if it exists)
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(const char *service, User *u, const char *cmd, Command *c) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(const std::string &service, User *u, const char *cmd, Command *c) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
@@ -1101,7 +1101,7 @@ enum Implementation
 		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase, I_OnBackupDatabase,
 		I_OnDatabaseExpire,
 		I_OnDatabaseWrite, I_OnDatabaseRead, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata,
-		
+
 		/* Modules */
 		I_OnModuleLoad, I_OnModuleUnload,
 

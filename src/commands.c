@@ -48,7 +48,7 @@ Command *lookup_cmd(Command * list, char *cmd)
  * @param cmd Command
  * @return void
  */
-void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *cmd)
+void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[], const char *cmd)
 {
 	Command *c = findCommand(cmdTable, cmd);
 	int retVal = MOD_CONT;
@@ -58,10 +58,10 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(service, u, cmd, c));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
-	
+
 	if (!c)
 	{
-		notice_lang(service, u, UNKNOWN_COMMAND_HELP, cmd, service);
+		notice_lang(service, u, UNKNOWN_COMMAND_HELP, cmd, service.c_str());
 		return;
 	}
 
@@ -71,7 +71,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		if (!nick_identified(u))
 		{
 			notice_lang(service, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
-			alog("Access denied for unregistered user %s with service %s and command %s", u->nick.c_str(), service, cmd);
+			alog("Access denied for unregistered user %s with service %s and command %s", u->nick.c_str(), service.c_str(), cmd);
 			return;
 		}
 	}
@@ -122,14 +122,14 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 				{
 					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name.c_str());
 					alog("Access denied for user %s with service %s and command %s because of FORBIDDEN channel %s",
-						u->nick.c_str(), service, cmd, ci->name.c_str());
+						u->nick.c_str(), service.c_str(), cmd, ci->name.c_str());
 					return;
 				}
 				else if ((ci->HasFlag(CI_SUSPENDED)) && (!c->HasFlag(CFLAG_ALLOW_SUSPENDED)))
 				{
 					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name.c_str());
 					alog("Access denied for user %s with service %s and command %s because of SUSPENDED channel %s",
-						u->nick.c_str(), service, cmd, ci->name.c_str());
+						u->nick.c_str(), service.c_str(), cmd, ci->name.c_str());
 					return;
 				}
 			}
@@ -153,7 +153,7 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[], const char *
 		if (!u->nc->HasCommand(c->permission))
 		{
 			notice_lang(service, u, ACCESS_DENIED);
-			alog("Access denied for user %s with service %s and command %s", u->nick.c_str(), service, cmd);
+			alog("Access denied for user %s with service %s and command %s", u->nick.c_str(), service.c_str(), cmd);
 			return;
 		}
 

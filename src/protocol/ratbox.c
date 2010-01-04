@@ -198,9 +198,11 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", ak->user, ak->host);
 	}
 
-	void SendSQLineDel(const char *user)
+	void SendSQLineDel(const std::string &user)
 	{
-		send_cmd(TS6SID, "UNRESV * %s", user);
+		if (user.empty())
+			return;
+		send_cmd(TS6SID, "UNRESV * %s", user.c_str());
 	}
 
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
@@ -240,10 +242,10 @@ class RatboxProto : public IRCDTS6Proto
 		ratbox_cmd_svinfo();
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
+	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
 	{
 		EnforceQlinedNick(nick, NULL);
-		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uid, real);
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick.c_str(), static_cast<long>(time(NULL)), modes, user.c_str(), host.c_str(), uid.c_str(), real.c_str());
 		SendSQLine(nick, "Reserved for services");
 	}
 

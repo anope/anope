@@ -50,7 +50,7 @@ Channel::Channel(const std::string &name, time_t ts)
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = 0;
 
-	this->ci = cs_findchan(this->name.c_str());
+	this->ci = cs_findchan(this->name);
 	if (this->ci)
 	{
 		this->ci->c = this;
@@ -1139,7 +1139,7 @@ void do_join(const char *source, int ac, const char **av)
  *	av[2] = reason
  */
 
-void do_kick(const char *source, int ac, const char **av)
+void do_kick(const std::string &source, int ac, const char **av)
 {
 	BotInfo *bi;
 	ChannelInfo *ci;
@@ -2309,32 +2309,26 @@ EList *list_create()
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match(Entry * e, const char *nick, const char *user, const char *host, uint32 ip)
+int entry_match(Entry *e, const std::string &nick, const std::string &user, const std::string &host, uint32 ip)
 {
 	/* If we don't get an entry, or it s an invalid one, no match ~ Viper */
 	if (!e || !e->FlagCount())
 		return 0;
 
-	if (ircd->cidrchanbei && (e->HasFlag(ENTRYTYPE_CIDR4)) &&
-		(!ip || (ip && ((ip & e->cidr_mask) != e->cidr_ip))))
+	ci::string ci_nick(nick.c_str()), ci_user(user.c_str()), ci_host(host.c_str());
+	if (ircd->cidrchanbei && e->HasFlag(ENTRYTYPE_CIDR4) && (!ip || (ip && (ip & e->cidr_mask) != e->cidr_ip)))
 		return 0;
-	if ((e->HasFlag(ENTRYTYPE_NICK))
-		&& (!nick || stricmp(e->nick, nick) != 0))
+	if (e->HasFlag(ENTRYTYPE_NICK) && (nick.empty() || nick != e->nick))
 		return 0;
-	if ((e->HasFlag(ENTRYTYPE_USER))
-		&& (!user || stricmp(e->user, user) != 0))
+	if (e->HasFlag(ENTRYTYPE_USER) && (user.empty() || user != e->user))
 		return 0;
-	if ((e->HasFlag(ENTRYTYPE_HOST))
-		&& (!user || stricmp(e->host, host) != 0))
+	if (e->HasFlag(ENTRYTYPE_HOST) && (host.empty() || host != e->host))
 		return 0;
-	if ((e->HasFlag(ENTRYTYPE_NICK_WILD))
-		&& !Anope::Match(nick, e->nick, false))
+	if (e->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(nick, e->nick, false))
 		return 0;
-	if ((e->HasFlag(ENTRYTYPE_USER_WILD))
-		&& !Anope::Match(user, e->user, false))
+	if (e->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(user, e->user, false))
 		return 0;
-	if ((e->HasFlag(ENTRYTYPE_HOST_WILD))
-		&& !Anope::Match(host, e->host, false))
+	if (e->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(host, e->host, false))
 		return 0;
 
 	return 1;

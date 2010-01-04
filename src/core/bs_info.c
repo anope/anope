@@ -66,9 +66,9 @@ class CommandBSInfo : public Command
 		{
 			struct tm *tm;
 
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_HEADER, bi->nick);
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_MASK, bi->user, bi->host);
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_REALNAME, bi->real);
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_HEADER, bi->nick.c_str());
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_MASK, bi->user.c_str(), bi->host.c_str());
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_REALNAME, bi->real.c_str());
 			tm = localtime(&bi->created);
 			strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_CREATED, buf);
@@ -88,7 +88,7 @@ class CommandBSInfo : public Command
 
 			notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_HEADER, ci->name.c_str());
 			if (ci->bi)
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_BOT, ci->bi->nick);
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_BOT, ci->bi->nick.c_str());
 			else
 				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_BOT_NONE);
 

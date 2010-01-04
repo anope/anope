@@ -753,7 +753,7 @@ void doCleanBuffer(char *str)
  * @param killer whom is doing the killing
  * @return void
  */
-void EnforceQlinedNick(const char *nick, const char *killer)
+void EnforceQlinedNick(const std::string &nick, const char *killer)
 {
 	User *u2;
 
@@ -812,7 +812,8 @@ int nickIsServices(const char *tempnick, int bot)
 		int i;
 		for (i = 0; i < 256; i++) {
 			for (bi = botlists[i]; bi; bi = bi->next) {
-				if (stricmp(nick, bi->nick) == 0) {
+				ci::string ci_bi_nick(bi->nick.c_str());
+				if (ci_bi_nick == nick) {
 					found++;
 					continue;
 				}
@@ -1043,7 +1044,7 @@ std::list<std::string> BuildStringList(const std::string &src)
 
 	while (tokens.GetToken(token))
 		Ret.push_back(token);
-	
+
 	return Ret;
 }
 

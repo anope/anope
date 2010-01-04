@@ -300,7 +300,7 @@ User::~User()
 		alog("debug: User::~User() done");
 }
 
-void User::SendMessage(const char *source, const char *fmt, ...)
+void User::SendMessage(const std::string &source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE];
@@ -317,7 +317,7 @@ void User::SendMessage(const char *source, const char *fmt, ...)
 	}
 }
 
-void User::SendMessage(const char *source, const std::string &msg)
+void User::SendMessage(const std::string &source, const std::string &msg)
 {
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled

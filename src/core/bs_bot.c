@@ -110,8 +110,7 @@ class CommandBSBot : public Command
 		/* We check whether user with this nick is online, and kill it if so */
 		EnforceQlinedNick(nick, Config.s_BotServ);
 
-		notice_lang(Config.s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
-			bi->host, bi->real);
+		notice_lang(Config.s_BotServ, u, BOT_BOT_ADDED, bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), bi->real.c_str());
 
 		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
 		return MOD_CONT;
@@ -174,10 +173,7 @@ class CommandBSBot : public Command
 		* And we must finally check that the nick is not already
 		* taken by another bot.
 		*/
-		if (!strcmp(bi->nick, nick)
-			&& ((user) ? !strcmp(bi->user, user) : 1)
-			&& ((host) ? !strcmp(bi->host, host) : 1)
-			&& ((real) ? !strcmp(bi->real, real) : 1))
+		if (bi->nick == nick && (user ? bi->user == user : 1) && (host ? bi->host == host : 1) && (real ? bi->real == real : 1))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BOT_ANY_CHANGES);
 			return MOD_CONT;
@@ -224,13 +220,14 @@ class CommandBSBot : public Command
 			}
 		}
 
-		if (stricmp(bi->nick, nick) && findbot(nick))
+		ci::string ci_bi_nick(bi->nick.c_str());
+		if (ci_bi_nick != nick && findbot(nick))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
 			return MOD_CONT;
 		}
 
-		if (stricmp(bi->nick, nick))
+		if (ci_bi_nick != nick)
 		{
 			/* We check whether the nick is registered, and inform the user
 			* if so. You need to drop the nick manually before you can use
@@ -260,24 +257,15 @@ class CommandBSBot : public Command
 			ircdproto->SendSQLine(bi->nick, "Reserved for services");
 		}
 
-		if (strcmp(nick, bi->nick))
+		if (bi->nick != nick)
 			bi->ChangeNick(nick);
 
-		if (user && strcmp(user, bi->user))
-		{
-			delete [] bi->user;
-			bi->user = sstrdup(user);
-		}
-		if (host && strcmp(host, bi->host))
-		{
-			delete [] bi->host;
-			bi->host = sstrdup(host);
-		}
-		if (real && strcmp(real, bi->real))
-		{
-			delete [] bi->real;
-			bi->real = sstrdup(real);
-		}
+		if (user && bi->user != user)
+			bi->user = user;
+		if (host && bi->host != host)
+			bi->host = host;
+		if (real && bi->real != real)
+			bi->real = real;
 
 		if (user)
 		{
@@ -285,13 +273,11 @@ class CommandBSBot : public Command
 				// This isn't the nicest way to do this, unfortunately.
 				bi->uid = ts6_uid_retrieve();
 			}
-			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
-					ircd->pseudoclient_mode, bi->uid.c_str());
+			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
 			bi->RejoinAll();
 		}
 
-		notice_lang(Config.s_BotServ, u, BOT_BOT_CHANGED,
-			oldnick, bi->nick, bi->user, bi->host, bi->real);
+		notice_lang(Config.s_BotServ, u, BOT_BOT_CHANGED, oldnick, bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), bi->real.c_str());
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
 		return MOD_CONT;

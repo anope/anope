@@ -39,7 +39,7 @@ int m_away(const char *source, const char *msg)
 
 /*************************************************************************/
 
-int m_kill(const char *nick, const char *msg)
+int m_kill(const std::string &nick, const char *msg)
 {
 	BotInfo *bi;
 
@@ -102,16 +102,16 @@ int m_motd(const char *source)
 
 /*************************************************************************/
 
-int m_privmsg(const char *source, const char *receiver, const char *msg)
+int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 {
-	char *s, *target;
+	char *target;
 	time_t starttime, stoptime; /* When processing started and finished */
 
 	BotInfo *bi;
 	ChannelInfo *ci;
 	User *u;
 
-	if (!source || !*source || !*receiver || !receiver || !msg) {
+	if (!source || !*source || receiver.empty() || !msg) {
 		return MOD_CONT;
 	}
 
@@ -127,7 +127,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 		return MOD_CONT;
 	}
 
-	if (*receiver == '#') {
+	if (receiver[0] == '#') {
 		if (Config.s_BotServ && (ci = cs_findchan(receiver))) {
 			/* Some paranoia checks */
 			if (!ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi) {
@@ -140,7 +140,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 			IgnoreData *ign = get_ignore(source);
 			if (ign) {
 				target = myStrGetToken(msg, ' ', 0);
-				alog("Ignored message from %s to %s using command %s", source, receiver, target);
+				alog("Ignored message from %s to %s using command %s", source, receiver.c_str(), target);
 				delete [] target;
 				return MOD_CONT;
 			}
@@ -148,17 +148,18 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
 		/* If a server is specified (nick@server format), make sure it matches
 		 * us, and strip it off. */
-		s = const_cast<char *>(strchr(receiver, '@'));
-		if (s) {
-			*s++ = 0;
-			if (stricmp(s, Config.ServerName) != 0)
+		unsigned s = receiver.find('@');
+		if (s != std::string::npos)
+		{
+			ci::string servername(receiver.begin() + s, receiver.end());
+			if (servername != Config.ServerName)
 				return MOD_CONT;
 		} else if (Config.UseStrictPrivMsg) {
 			if (debug) {
 				alog("Ignored PRIVMSG without @ from %s", source);
 			}
-			notice_lang(receiver, u, INVALID_TARGET, receiver, receiver,
-						Config.ServerName, receiver);
+			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(),
+						Config.ServerName, receiver.c_str());
 			return MOD_CONT;
 		}
 
@@ -168,7 +169,8 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
 		if (bi)
 		{
-			if (!stricmp(bi->nick, Config.s_OperServ))
+			ci::string ci_bi_nick(bi->nick.c_str());
+			if (ci_bi_nick == Config.s_OperServ)
 			{
 				if (!is_oper(u) && Config.OSOpersOnly)
 				{
@@ -179,22 +181,22 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 				else
 					operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
-			else if (!stricmp(bi->nick, Config.s_NickServ))
+			else if (ci_bi_nick == Config.s_NickServ)
 				nickserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-			else if (!stricmp(bi->nick, Config.s_ChanServ))
+			else if (ci_bi_nick== Config.s_ChanServ)
 			{
 				if (!is_oper(u) && Config.CSOpersOnly)
 					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				else
 					chanserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			}
-			else if (!stricmp(bi->nick, Config.s_MemoServ))
+			else if (ci_bi_nick == Config.s_MemoServ)
 				memoserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-			else if (Config.s_HostServ && !stricmp(bi->nick, Config.s_HostServ))
+			else if (Config.s_HostServ && ci_bi_nick == Config.s_HostServ)
 				hostserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 			else if (Config.s_BotServ)
 			{
-				if (!stricmp(bi->nick, Config.s_BotServ))
+				if (ci_bi_nick == Config.s_BotServ)
 					botserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
 				else
 					botmsgs(u, bi, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
@@ -307,10 +309,10 @@ int m_whois(const char *source, const char *who)
 			clientdesc = Config.desc_GlobalNoticer;
 		else if (Config.s_BotServ && (bi = findbot(who))) {
 			/* Bots are handled separately */
-			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick, bi->user, bi->host, bi->real);
-			ircdproto->SendNumeric(Config.ServerName, 307, source, "%s :is a registered nick", bi->nick);
-			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", bi->nick, Config.ServerName, Config.ServerDesc);
-			ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick, time(NULL) - bi->lastmsg, start_time);
+			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), bi->real.c_str());
+			ircdproto->SendNumeric(Config.ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
+			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config.ServerName, Config.ServerDesc);
+			ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);
 			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
 			return MOD_CONT;
 		} else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_KILL_HELD)) {

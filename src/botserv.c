@@ -52,10 +52,10 @@ void get_botserv_stats(long *nrec, long *memuse)
 		for (bi = botlists[i]; bi; bi = bi->next) {
 			count++;
 			mem += sizeof(*bi);
-			mem += strlen(bi->nick) + 1;
-			mem += strlen(bi->user) + 1;
-			mem += strlen(bi->host) + 1;
-			mem += strlen(bi->real) + 1;
+			mem += bi->nick.size() + 1;
+			mem += bi->user.size() + 1;
+			mem += bi->host.size() + 1;
+			mem += bi->real.size() + 1;
 		}
 	}
 
@@ -463,17 +463,18 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 /* Inserts a bot in the bot list. I can't be much explicit mh? */
 
-void insert_bot(BotInfo * bi)
+void insert_bot(BotInfo *bi)
 {
 	BotInfo *ptr, *prev;
 
-	for (prev = NULL, ptr = botlists[tolower(*bi->nick)];
-		 ptr != NULL && stricmp(ptr->nick, bi->nick) < 0;
+	ci::string ci_bi_nick(bi->nick.c_str());
+	for (prev = NULL, ptr = botlists[tolower(bi->nick[0])];
+		 ptr != NULL && ci_bi_nick > ptr->nick.c_str();
 		 prev = ptr, ptr = ptr->next);
 	bi->prev = prev;
 	bi->next = ptr;
 	if (!prev)
-		botlists[tolower(*bi->nick)] = bi;
+		botlists[tolower(bi->nick[0])] = bi;
 	else
 		prev->next = bi;
 	if (ptr)
@@ -648,7 +649,7 @@ void bot_join(ChannelInfo * ci)
 			|| (limit && ci->c->usercount >= limit))
 			ircdproto->SendNoticeChanops(ci->bi, ci->c,
 				 "%s invited %s into the channel.",
-				 ci->bi->nick, ci->bi->nick);
+				 ci->bi->nick.c_str(), ci->bi->nick.c_str());
 	}
 	ircdproto->SendJoin(ci->bi, ci->c->name.c_str(), ci->c->creation_time);
 	ci->c->SetMode(NULL, CMODE_PROTECT, ci->bi->nick);
@@ -756,7 +757,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 	kav[1] = nick;
 
 	if (!reason) {
-		kav[2] = ci->bi->nick;
+		kav[2] = ci->bi->nick.c_str();
 	} else {
 		if (strlen(reason) > 200)
 			(*const_cast<char **>(&reason))[200] = '\0'; // Unsafe cast -- will review later -- CyberBotX
@@ -801,7 +802,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	av[1] = nick;
 
 	if (!reason) {
-		av[2] = ci->bi->nick;
+		av[2] = ci->bi->nick.c_str();
 	} else {
 		if (strlen(reason) > 200)
 			(*const_cast<char **>(&reason))[200] = '\0'; // Unsafe cast -- will review later -- CyberBotX

@@ -55,14 +55,14 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if ((ci->bi) && (stricmp(ci->bi->nick, nick) == 0))
+		if (ci->bi && ci::string(ci->bi->nick.c_str()) == nick)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick, chan);
+			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick.c_str(), chan);
 			return MOD_CONT;
 		}
 
 		bi->Assign(u, ci);
-		notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name.c_str());
+		notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick.c_str(), ci->name.c_str());
 		return MOD_CONT;
 	}
 

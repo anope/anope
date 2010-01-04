@@ -95,7 +95,7 @@ E const char *get_xop_level(int level);
 
 E void do_cmode(const char *source, int ac, const char **av);
 E void do_join(const char *source, int ac, const char **av);
-E void do_kick(const char *source, int ac, const char **av);
+E void do_kick(const std::string &source, int ac, const char **av);
 E void do_part(const char *source, int ac, const char **av);
 E void do_sjoin(const char *source, int ac, const char **av);
 E void do_topic(const char *source, int ac, const char **av);
@@ -108,7 +108,7 @@ E Entry *entry_create(char *mask);
 E Entry *entry_add(EList *list, const char *mask);
 E void entry_delete(EList *list, Entry *e);
 E EList *list_create();
-E int entry_match(Entry *e, const char *nick, const char *user, const char *host, uint32 ip);
+E int entry_match(Entry *e, const std::string &nick, const std::string &user, const std::string &host, uint32 ip);
 E int entry_match_mask(Entry *e, const char *mask, uint32 ip);
 E Entry *elist_match(EList *list, const char *nick, const char *user, const char *host, uint32 ip);
 E Entry *elist_match_mask(EList *list, const char *mask, uint32 ip);
@@ -146,7 +146,7 @@ E void record_topic(const char *chan);
 E void restore_topic(const char *chan);
 E int check_topiclock(Channel * c, time_t topic_time);
 
-E ChannelInfo *cs_findchan(const char *chan);
+E ChannelInfo *cs_findchan(const std::string &chan);
 E int check_access(User * user, ChannelInfo * ci, int what);
 E bool IsFounder(User *user, ChannelInfo *ci);
 E bool IsRealFounder(User *user, ChannelInfo *ci);
@@ -199,7 +199,7 @@ E void hostserv_init();
 
 /**** init.c ****/
 
-E void introduce_user(const char *user);
+E void introduce_user(const std::string &user);
 E int init_primary(int ac, char **av);
 E int init_secondary(int ac, char **av);
 E Uplink *uplink_server;
@@ -299,9 +299,9 @@ E int delmemo(MemoInfo * mi, int num);
 
 E int m_nickcoll(const char *user);
 E int m_away(const char *source, const char *msg);
-E int m_kill(const char *nick, const char *msg);
+E int m_kill(const std::string &nick, const char *msg);
 E int m_motd(const char *source);
-E int m_privmsg(const char *source, const char *receiver, const char *msg);
+E int m_privmsg(const char *source, const std::string &receiver, const char *msg);
 E int m_stats(const char *source, int ac, const char **av);
 E int m_whois(const char *source, const char *who);
 E int m_time(const char *source, int ac, const char **av);
@@ -345,7 +345,7 @@ E char *myStrGetTokenRemainder(const char *str, const char dilim,
 E char *stripModePrefix(const char *str);
 E int myNumToken(const char *str, const char dilim);
 E void doCleanBuffer(char *str);
-E void EnforceQlinedNick(const char *nick, const char *killer);
+E void EnforceQlinedNick(const std::string &nick, const char *killer);
 E int nickIsServices(const char *nick, int bot);
 
 E void add_entropy_userkeys();
@@ -485,7 +485,7 @@ E void notice_server(char *source, Server * s, const char *fmt, ...)
 	FORMAT(printf,3,4);
 
 E void notice_list(const char *source, const char *dest, char **text); // MARK_DEPRECATED;
-E void notice_lang(const char *source, User *dest, int message, ...); // MARK_DEPRECATED;
+E void notice_lang(const std::string &source, User *dest, int message, ...); // MARK_DEPRECATED;
 E void notice_help(const char *source, User *dest, int message, ...); // MARK_DEPRECATED;
 
 

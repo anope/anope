@@ -361,7 +361,7 @@ void cancel_user(User * u)
 			else if (ircd->svsnick)
 			{
 				uid = ts6_uid_retrieve();
-				ircdproto->SendClientIntroduction(u->nick.c_str(), Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid.c_str());
+				ircdproto->SendClientIntroduction(u->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid);
 				t = new NickServRelease(na, Config.NSReleaseTimeout);
 				t->uid = uid;
 			}

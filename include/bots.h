@@ -41,10 +41,10 @@ class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 	BotInfo *next, *prev;
 
 	std::string uid;		/* required for UID supporting servers, as opposed to the shitty struct Uid. */
-	char *nick;				/* Nickname of the bot */
-	char *user;				/* Its user name */
-	char *host;				/* Its hostname */
-	char *real;	 		/* Its real name */
+	std::string nick;		/* Nickname of the bot */
+	std::string user;		/* Its user name */
+	std::string host;		/* Its hostname */
+	std::string real;		/* Its real name */
 	time_t created; 		/* Birth date ;) */
 	int16 chancount;		/* Number of channels that use the bot. */
 	/* Dynamic data */
@@ -52,17 +52,12 @@ class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 	CommandHash **cmdTable;
 
 	/** Create a new bot.
-	 * XXX: Note - this constructor is considered obsolete. Use the four parameter form.
-	 * @param nick The nickname to assign to the bot.
-	 */
-	BotInfo(const char *nick);
-	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
 	 * @param user The ident to give the bot.
 	 * @param host The hostname to give the bot.
 	 * @param real The realname to give the bot.
 	 */
-	BotInfo(const char *nick, const char *user, const char *host, const char *real);
+	BotInfo(const std::string &nick, const std::string &user = "", const std::string &host = "", const std::string &real = "");
 
 	/** Destroy a bot, clearing up appropriately.
 	 */
@@ -90,4 +85,3 @@ class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 	 */
 	void UnAssign(User *u, ChannelInfo *ci);
 };
-

@@ -222,9 +222,9 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->nick : Config.ServerName, "MODE %s %s", u->nick.c_str(), buf);
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
+	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
 	{
-		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), modes, real.c_str());
 		send_cmd(nick, "OPERTYPE Service");
 	}
 
@@ -253,10 +253,11 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const char *user)
+	void SendSQLineDel(const std::string &user)
 	{
-		if (!user) return;
-		send_cmd(Config.s_OperServ, "QLINE %s", user);
+		if (user.empty())
+			return;
+		send_cmd(Config.s_OperServ, "QLINE %s", user.c_str());
 	}
 
 	/* SQLINE */

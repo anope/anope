@@ -187,7 +187,7 @@ class OSDEFCON : public Module
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOff.HasFlag(Name))
 		{
 			c->RemoveMode(findbot(Config.s_OperServ), Name);
-			
+
 			return EVENT_STOP;
 		}
 
@@ -201,7 +201,7 @@ class OSDEFCON : public Module
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOn.HasFlag(Name))
 		{
 			std::string param;
-			
+
 			if (GetDefConParam(Name, &param))
 			{
 				c->SetMode(findbot(Config.s_OperServ), Name, param);
@@ -216,7 +216,7 @@ class OSDEFCON : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommandRun(const char *service, User *u, const char *cmd, Command *c)
+	EventReturn OnPreCommandRun(const std::string &service, User *u, const char *cmd, Command *c)
 	{
 		if (!c)
 		{
@@ -302,7 +302,7 @@ class OSDEFCON : public Module
 
 				kill_user(Config.s_OperServ, u->nick, "Session limit exceeded");
 				session->hits++;
-				if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill) 
+				if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
 				{
 					char akillmask[BUFSIZE];
 					snprintf(akillmask, sizeof(akillmask), "*@%s", u->host);

@@ -523,11 +523,11 @@ class HostInfo
 	 * @param time When the vhost was craated
 	 */
 	void SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t time = time(NULL));
-	
+
 	/** Remove a users vhost
 	 **/
 	void RemoveVhost();
-	
+
 	/** Check if the user has a vhost
 	 * @return true or false
 	 */
@@ -1267,7 +1267,7 @@ class CoreExport IRCDProto
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
 		virtual void SendMode(BotInfo *bi, User *u, const char *fmt, ...);
-		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid) = 0;
+		virtual void SendClientIntroduction(const std::string &, const std::string &, const std::string &, const std::string &, const char *, const std::string &uid) = 0;
 		virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
 		virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);
 		virtual void SendMessage(BotInfo *bi, const char *dest, const char *fmt, ...);
@@ -1286,7 +1286,7 @@ class CoreExport IRCDProto
 		virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
 		virtual void SendPong(const char *servname, const char *who);
 		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
-		virtual void SendSQLineDel(const char *) = 0;
+		virtual void SendSQLineDel(const std::string &) = 0;
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
 		virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
 		virtual void SendGlobops(BotInfo *source, const char *fmt, ...);

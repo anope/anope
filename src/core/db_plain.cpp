@@ -105,7 +105,7 @@ static void ReadDatabase(Module *m = NULL)
 			}
 			else if (params[0] == "CH")
 			{
-				ci = cs_findchan(params[1].c_str());
+				ci = cs_findchan(params[1]);
 				Type = MD_CH;
 			}
 			else if (params[0] == "MD")
@@ -435,7 +435,7 @@ static void LoadBotInfo(const std::vector<std::string> &params)
 	bi->real = sstrdup(params[6].c_str());
 
 	if (debug > 1)
-		alog("[db_plain]: Loaded botinfo for %s", bi->nick);
+		alog("[db_plain]: Loaded botinfo for %s", bi->nick.c_str());
 }
 
 static void LoadChanInfo(const std::vector<std::string> &params)

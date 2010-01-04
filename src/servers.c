@@ -163,7 +163,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 		if (serv_uplink != NULL)
 		{
 			/* Bring in our pseudo-clients */
-			introduce_user(NULL);
+			introduce_user("");
 
 			/* And hybrid needs Global joined in the logchan */
 			if (LogChan && ircd->join2msg) {

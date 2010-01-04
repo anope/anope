@@ -158,7 +158,7 @@ void common_unban(ChannelInfo *ci, const std::string &nick)
 		for (ban = ci->c->bans->entries; ban; ban = next)
 		{
 			next = ban->next;
-			if (entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->host, ip) || entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
+			if (entry_match(ban, u->nick, u->GetIdent(), u->host, ip) || entry_match(ban, u->nick, u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
 				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
 	}

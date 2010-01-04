@@ -49,12 +49,12 @@ class CommandBSSet : public Command
 			if (value == "ON")
 			{
 				bi->SetFlag(BI_PRIVATE);
-				notice_lang(Config.s_BotServ, u, BOT_SET_PRIVATE_ON, bi->nick);
+				notice_lang(Config.s_BotServ, u, BOT_SET_PRIVATE_ON, bi->nick.c_str());
 			}
 			else if (value == "OFF")
 			{
 				bi->UnsetFlag(BI_PRIVATE);
-				notice_lang(Config.s_BotServ, u, BOT_SET_PRIVATE_OFF, bi->nick);
+				notice_lang(Config.s_BotServ, u, BOT_SET_PRIVATE_OFF, bi->nick.c_str());
 			}
 			else
 			{

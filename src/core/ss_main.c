@@ -75,7 +75,7 @@ class SSMain : public Module
 
 	void OnBotPreLoad(BotInfo *bi)
 	{
-		if (!strcmp(bi->nick, "StatServ"))
+		if (bi->nick == "StatServ")
 		{
 			delete statserv;
 			statserv = bi;

@@ -215,6 +215,6 @@ class CoreExport User : public Extensible
 	 * @param bi The client setting the mode
 	 * @param modes The modes
 	 */
-	void SetModes(BotInfo *bi, const std::string &modes, ...);
+	void SetModes(BotInfo *bi, const char *modes, ...);
 };
 

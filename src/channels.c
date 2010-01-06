@@ -595,14 +595,14 @@ void Channel::ClearInvites(BotInfo *bi)
  * @param EnforceMLock Should mlock be enforced on this mode change
  * @param cmodes The modes to set
  */
-void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const std::string &cmodes, ...)
+void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
 	std::string modebuf, sbuf;
 	int add = -1;
-	va_start(args, cmodes.c_str());
-	vsnprintf(buf, BUFSIZE - 1, cmodes.c_str(), args);
+	va_start(args, cmodes);
+	vsnprintf(buf, BUFSIZE - 1, cmodes, args);
 	va_end(args);
 
 	spacesepstream sep(buf);
@@ -2105,7 +2105,7 @@ void MassChannelModes(BotInfo *bi, const std::string &modes)
 	{
 		if (c->bouncy_modes)
 			return;
-		c->SetModes(bi, false, modes);
+		c->SetModes(bi, false, modes.c_str());
 	}
 }
 

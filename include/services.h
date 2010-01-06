@@ -507,7 +507,7 @@ typedef struct {
 
 /*************************************************************************/
 
-class HostInfo
+class CoreExport HostInfo
 {
  private:
 	std::string Ident;
@@ -988,7 +988,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param EnforceMLock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(BotInfo *bi, bool EnforceMLock, const std::string &cmodes, ...);
+	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
 };
 
 /** Channelban type flags

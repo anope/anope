@@ -66,7 +66,7 @@ enum ModeType
 
 /** This class is a user mode, all user modes use this/inherit from this
  */
-class UserMode
+class CoreExport UserMode
 {
   public:
 

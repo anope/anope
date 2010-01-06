@@ -576,14 +576,14 @@ void User::RemoveMode(BotInfo *bi, char ModeChar)
  * @param bi The client setting the mode
  * @param modes The modes
  */
-void User::SetModes(BotInfo *bi, const std::string &modes, ...)
+void User::SetModes(BotInfo *bi, const char *modes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
 	std::string modebuf, sbuf;
 	int add = -1;
-	va_start(args, modes.c_str());
-	vsnprintf(buf, BUFSIZE - 1, modes.c_str(), args);
+	va_start(args, modes);
+	vsnprintf(buf, BUFSIZE - 1, modes, args);
 	va_end(args);
 
 	spacesepstream sep(buf);

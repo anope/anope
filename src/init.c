@@ -378,10 +378,6 @@ int init_primary(int ac, char **av)
 		return -1;
 	}
 
-	/* Disable the log channel if its defined in the conf, but not enabled */
-	if (!Config.LogChannel && LogChan)
-		LogChan = false;
-
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init()) {
 		return -1;

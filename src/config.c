@@ -1767,6 +1767,10 @@ int read_config(int reload)
 
 	SetDefaultMLock();
 
+	/* Disable the log channel if its defined in the conf, but not enabled */
+	if (!Config.LogChannel && LogChan)
+		LogChan = false;
+
 	if (!retval) {
 		printf
 			("\n*** Support resources: Read through the services.conf self-contained \n*** documentation. Read the documentation files found in the 'docs' \n*** folder. Visit our portal located at http://www.anope.org/. Join \n*** our support channel on /server irc.anope.org channel #anope.\n\n");

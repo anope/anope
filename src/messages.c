@@ -148,13 +148,16 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 
 		/* If a server is specified (nick@server format), make sure it matches
 		 * us, and strip it off. */
-		unsigned s = receiver.find('@');
+		std::string botname = receiver;
+		size_t s = receiver.find('@');
 		if (s != std::string::npos)
 		{
-			ci::string servername(receiver.begin() + s, receiver.end());
+			ci::string servername(receiver.begin() + s + 1, receiver.end());
+			botname = botname.erase(s);
 			if (servername != Config.ServerName)
 				return MOD_CONT;
-		} else if (Config.UseStrictPrivMsg) {
+		}
+		else if (Config.UseStrictPrivMsg) {
 			if (debug) {
 				alog("Ignored PRIVMSG without @ from %s", source);
 			}
@@ -165,7 +168,7 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 
 		starttime = time(NULL);
 
-		bi = findbot(receiver);
+		bi = findbot(botname);
 
 		if (bi)
 		{

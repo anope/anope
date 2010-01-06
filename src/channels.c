@@ -2392,6 +2392,8 @@ Entry *elist_match_user(EList * list, User * u)
     res = elist_match(list, u->nick, u->username, u->host, ip);
     if (!res)
         res = elist_match(list, u->nick, u->username, u->vhost, ip);
+    if (!res)
+        res = elist_match(list, u->nick, u->username, u->chost, ip);
 
     if (host)
         free(host);

@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2731"
+VERSION_BUILD="2734"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2734 - Made elist_match_user also check against the users cloaked host
 #Revision 2731 - Mark users as unrecognized on Inspircd 1.2 if no/invalid metadata is recieved for them before the next uid/eob
 #Revision 2730 - Fixed typo in inspircd12.h causing 2 modes to use the same bit.
 #Revision 2727 - Fixed a few SASET help replies to reply to services opers, and fixed the rest to not reply to anyone who requests help

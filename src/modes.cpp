@@ -241,7 +241,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 	{
 		BotInfo *bi = chan->ci->bi;
 
-		if (entry_match(ban, bi->nick, bi->user, bi->host, 0))
+		if (entry_match(ban, bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), 0))
 		{
 			ircdproto->SendMode(bi, chan, "-b %s", mask);
 			entry_delete(chan->bans, ban);

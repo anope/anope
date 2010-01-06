@@ -2309,7 +2309,7 @@ EList *list_create()
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match(Entry *e, const std::string &nick, const std::string &user, const std::string &host, uint32 ip)
+int entry_match(Entry *e, const ci::string &nick, const ci::string &user, const ci::string &host, uint32 ip)
 {
 	/* If we don't get an entry, or it s an invalid one, no match ~ Viper */
 	if (!e || !e->FlagCount())
@@ -2324,11 +2324,11 @@ int entry_match(Entry *e, const std::string &nick, const std::string &user, cons
 		return 0;
 	if (e->HasFlag(ENTRYTYPE_HOST) && (host.empty() || host != e->host))
 		return 0;
-	if (e->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(nick, e->nick, false))
+	if (e->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(nick, e->nick))
 		return 0;
-	if (e->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(user, e->user, false))
+	if (e->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(user, e->user))
 		return 0;
-	if (e->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(host, e->host, false))
+	if (e->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(host, e->host))
 		return 0;
 
 	return 1;
@@ -2365,7 +2365,7 @@ int entry_match_mask(Entry * e, const char *mask, uint32 ip)
 		host = hostmask;
 	}
 
-	res = entry_match(e, nick, user, host, ip);
+	res = entry_match(e, nick ? nick : "", user ? user : "", host ? host : "", ip);
 
 	/* Free the destroyed mask. */
 	delete [] hostmask;
@@ -2391,7 +2391,7 @@ Entry *elist_match(EList * list, const char *nick, const char *user, const char 
 		return NULL;
 
 	for (e = list->entries; e; e = e->next) {
-		if (entry_match(e, nick, user, host, ip))
+		if (entry_match(e, nick ? nick : "", user ? user : "", host ? host : "", ip))
 			return e;
 	}
 

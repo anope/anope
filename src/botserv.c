@@ -630,7 +630,7 @@ void bot_join(ChannelInfo * ci)
 			{
 				next = ban->next;
 
-				if (entry_match(ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0))
+				if (entry_match(ban, ci->bi->nick.c_str(), ci->bi->user.c_str(), ci->bi->host.c_str(), 0))
 				{
 					ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 				}

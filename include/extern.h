@@ -108,7 +108,7 @@ E Entry *entry_create(char *mask);
 E Entry *entry_add(EList *list, const char *mask);
 E void entry_delete(EList *list, Entry *e);
 E EList *list_create();
-E int entry_match(Entry *e, const std::string &nick, const std::string &user, const std::string &host, uint32 ip);
+E int entry_match(Entry *e, const ci::string &nick, const ci::string &user, const ci::string &host, uint32 ip);
 E int entry_match_mask(Entry *e, const char *mask, uint32 ip);
 E Entry *elist_match(EList *list, const char *nick, const char *user, const char *host, uint32 ip);
 E Entry *elist_match_mask(EList *list, const char *mask, uint32 ip);

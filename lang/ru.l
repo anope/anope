@@ -2448,6 +2448,8 @@ OPER_STATS_CHANSERV_MEM
 	ChanServ        : %6d записей, %5d kB
 OPER_STATS_BOTSERV_MEM
 	BotServ         : %6d записей, %5d kB
+OPER_STATS_HOSTSERV_MEM
+	HostServ        : %6d записей, %5d kB
 OPER_STATS_OPERSERV_MEM
 	OperServ        : %6d записей, %5d kB
 OPER_STATS_SESSIONS_MEM

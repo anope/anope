@@ -1296,7 +1296,7 @@ int is_on_access(User * u, NickCore * nc)
         if (u->chost)
         {
             buf3 = scalloc(strlen(u->username) + strlen(u->chost) + 2, 1);
-            sprintf(buf2, "%s@%s", u->username, u->chost);
+            sprintf(buf3, "%s@%s", u->username, u->chost);
         }
     }
 

@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2735"
+VERSION_BUILD="2743"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2743 - Fix a crash introduced in r2679 cause by is_on_access messing up the users host buffers
 #Revision 2735 - Added two missing language strings to de.l and ru.l
 #Revision 2734 - Made elist_match_user also check against the users cloaked host
 #Revision 2731 - Mark users as unrecognized on Inspircd 1.2 if no/invalid metadata is recieved for them before the next uid/eob

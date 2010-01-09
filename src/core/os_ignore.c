@@ -195,10 +195,9 @@ class OSIgnore : public Module
 			}
 			else
 			{
-				std::string buf = "OS IGNORE ";
-				buf += ign->mask;
-				buf += " " + ign->time;
-				Write(buf);
+				std::stringstream buf;
+				buf <<  "OS IGNORE " << ign->mask << " " << ign->time;
+				Write(buf.str());
 			}
 		}
 	}

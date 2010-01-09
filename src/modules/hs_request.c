@@ -714,17 +714,9 @@ class HSRequest : public Module
 		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
 		{
 			HostRequest *hr = it->second;
-			std::string buf = "HS_REQUEST ";
-			buf += it->first;
-			buf += " ";
-			buf += hr->ident.empty() ? "(null)" : hr->ident;
-			buf += " ";
-			buf += hr->host;
-			buf += " ";
-			char tsbuf[16];
-			snprintf(tsbuf, sizeof(tsbuf), "%ld", hr->time);
-			buf += tsbuf;
-			Write(buf);
+			std::stringstream buf;
+			buf << "HS_REQUEST " << it->first << " " << (hr->ident.empty() ? "(null)" : hr->ident) << " " << hr->host << " " << hr->time;
+			Write(buf.str());
 		}
 	}
 };

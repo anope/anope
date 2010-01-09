@@ -5,13 +5,13 @@ Legend:
 
 1.9.2
 -----
-[ ] Redo database insanity.
-  [ ] Move database load/save to a module
+[+] Redo database insanity.
+  [x] Move database load/save to a module
     [ ] realtime SQL/whatever module using events (possibly ongoing)
     [ ] flatfile save on a periodic timer
-    [ ] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
-    [ ] Salted SHA256 (contact Special for this)
-  [ ] New database format (text, not binary - works very well for merging and so on)
+    [x] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
+    [x] Salted SHA256 (contact Special for this)
+  [+] New database format (text, not binary - works very well for merging and so on)
 [ ] generic database routines modules can use to create their own database
 [ ] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
 [ ] Socket subsystem needs some serious loving

@@ -338,87 +338,61 @@ class EMD5 : public Module
 
 		ModuleManager::Attach(I_OnEncrypt, this);
 		ModuleManager::Attach(I_OnEncryptInPlace, this);
-		ModuleManager::Attach(I_OnEncryptCheckLen, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
-
 	}
 
 
-	EventReturn OnEncrypt(const char *src, int len, char *dest, int size)
+	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
 		MD5_CTX context;
-		char tmp[33];
-	
-		if (size < 16)
-			return EVENT_STOP;
-	
+		char digest[PASSMAX];
+		std::string buf = "md5:";
+		char cpass[1000];
+
 		MD5Init(&context);
-		MD5Update(&context, (unsigned char *)src, len);
-		MD5Final((unsigned char *)dest, &context);
-		
-		if(debug) 
-		{
-			memset(tmp,0,33);
-			binary_to_hex((unsigned char *)dest,tmp,16);
-			/* Dont log source if we were encrypting in place :) */
-			if (memcmp(src, dest, 16) != 0) 
-			{
-				alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 
-			} else {
-				alog("enc_md5: hashed password to [%s]",tmp); 
-			}
-		}
-		
+		MD5Update(&context, (unsigned char*)src.c_str(), src.size());
+		MD5Final((unsigned char*)digest, &context);
+
+		b64_encode(digest, 16, cpass, 1000);
+		buf.append(cpass);
+		if (debug > 1)
+			alog("debug: (enc_md5) hashed password %s to %s ", src.c_str(), buf.c_str());
+		dest.assign(buf);
 		return EVENT_ALLOW;
 	}
 
-
-	EventReturn OnEncryptInPlace(char *buf, int size)
+	EventReturn OnEncryptInPlace(std::string &buf)
 	{
-		return OnEncrypt(buf, strlen(buf), buf, size);
+		return this->OnEncrypt(buf, buf);
 	}
 
-
-	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
+	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest)
 	{
-		if (bufsize < 16)
-		{
-			fatal("enc_md5: md5_check_len(): buffer too small (%d)", bufsize);
-			return EVENT_STOP;
-		}
-		return EVENT_ALLOW;
-	}
-
-
-	EventReturn OnDecrypt(const char *src, char *dest, int size)
-	{
+		if (hashm != "md5")
+			return EVENT_CONTINUE;
 		return EVENT_STOP;
 	}
 
-
-	EventReturn OnCheckPassword(const char *plaintext, char *password)
+	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
 	{
-		char buf[BUFSIZE];
-
-		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
-			return EVENT_STOP;
-		if (memcmp(buf, password, 16) == 0)
+		if (hashm != "md5")
+			return EVENT_CONTINUE;
+		std::string buf;
+		this->OnEncrypt(plaintext, buf);
+		if (!password.compare(buf))
 		{
 			/* if we are NOT the first module in the list, 
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (stricmp(Config.EncModuleList.begin()->c_str(), this->name.c_str()))
+			if (Config.EncModuleList.front().compare(this->name))
 			{
-				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+				enc_encrypt(plaintext, password);
 			}
 			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 };
-
-/*************************************************************************/
-
 
 MODULE_INIT(EMD5)

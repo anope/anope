@@ -56,6 +56,7 @@ class CommandNSSet : public Command
 	CommandReturn DoSetPassword(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 1 ? params[1] : "";
+		std::string buf, tmp_pass;
 
 		if (param.empty())
 		{
@@ -64,28 +65,28 @@ class CommandNSSet : public Command
 		}
 
 		int len = param.size();
-		char tmp_pass[PASSMAX];
 
 		if (nc->display == param || (Config.StrictPasswords && len < 5))
 		{
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
 		}
-		else if (enc_encrypt_check_len(len, PASSMAX - 1))
+		else if (len > PASSMAX)
 		{
 			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
 			return MOD_CONT;
 		}
 
-		if (enc_encrypt(param.c_str(), len, nc->pass, PASSMAX - 1) < 0)
+		buf = param.c_str(); /* conversion from ci::string to std::string */
+		if (enc_encrypt(buf, nc->pass) < 0)
 		{
 			alog("%s: Failed to encrypt password for %s (set)", Config.s_NickServ, nc->display);
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
 
-		if (enc_decrypt(nc->pass, tmp_pass, PASSMAX - 1) == 1)
-			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, tmp_pass);
+		if (enc_decrypt(nc->pass, tmp_pass) == 1)
+			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, tmp_pass.c_str());
 		else
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
 

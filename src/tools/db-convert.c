@@ -353,7 +353,7 @@ int main(int argc, char *argv[])
 		NickCore *nc;
 		char **access;
 		Memo *memos;
-		int j;
+		int j, len;
 		char cpass[5000]; // if it's ever this long, I will commit suicide
 		for (nc = nclists[i]; nc; nc = nc->next)
 		{
@@ -370,7 +370,18 @@ int main(int argc, char *argv[])
 			}
 
 			// Enc pass
-			b64_encode(nc->pass, hashm == "plain" ? strlen(nc->pass) : 32, (char *)cpass, 5000);
+			if (hashm == "plain")
+				len = strlen(nc->pass);
+			else if (hashm == "md5")
+				len = 16;
+			else if (hashm == "sha1")
+				len = 20;
+			else if (hashm == "old")
+				len = 16;
+			else 
+				len = 32;
+			
+			b64_encode(nc->pass, len, (char *)cpass, 5000);
 
 			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " ";
 			fs << " " << GetLanguageID(nc->language) << " " << nc->memos.memomax << " " << nc->channelcount << std::endl;

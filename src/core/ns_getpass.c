@@ -25,7 +25,7 @@ class CommandNSGetPass : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
-		char tmp_pass[PASSMAX];
+		std::string tmp_pass;
 		NickAlias *na;
 		NickRequest *nr = NULL;
 
@@ -36,7 +36,7 @@ class CommandNSGetPass : public Command
 				alog("%s: %s!%s@%s used GETPASS on %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nick);
 				if (Config.WallGetpass)
 					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
-				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode);
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
@@ -47,12 +47,12 @@ class CommandNSGetPass : public Command
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else
 		{
-			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)
+			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
 				alog("%s: %s!%s@%s used GETPASS on %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nick);
 				if (Config.WallGetpass)
 					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
-				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass);
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, NICK_GETPASS_UNAVAILABLE);
@@ -83,8 +83,8 @@ class NSGetPass : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSGetPass());
 
-		char tmp_pass[PASSMAX];
-		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
+		std::string tmp_pass = "tmp";
+		if (!enc_decrypt(tmp_pass, tmp_pass))
 			throw ModuleException("Incompatible with the encryption module being used");
 
 		ModuleManager::Attach(I_OnNickServHelp, this);

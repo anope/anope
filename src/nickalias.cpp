@@ -9,8 +9,7 @@ NickRequest::NickRequest(const std::string &nickname)
 		throw CoreException("Empty nick passed to NickRequest constructor");
 
 	next = prev = NULL;
-	passcode = email = NULL;
-	*password = 0;
+	email = NULL;
 	requested = lastmail = 0;
 
 	this->nick = sstrdup(nickname.c_str());
@@ -24,8 +23,6 @@ NickRequest::~NickRequest()
 	nrlists[HASH(this->nick)] = this->next;
 	if (this->nick)
 		delete [] this->nick;
-	if (this->passcode)
-		delete [] this->passcode;
 	if (this->email)
 		delete [] this->email;
 }

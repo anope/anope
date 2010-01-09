@@ -75,8 +75,8 @@ class CoreExport NickRequest
 
 	NickRequest *next, *prev;
 	char *nick;
-	char *passcode;
-	char password[PASSMAX];
+	std::string passcode;
+	std::string password;
 	char *email;
 	time_t requested;
 	time_t lastmail;			/* Unsaved */
@@ -123,7 +123,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 	NickCore *next, *prev;
 
 	char *display;				/* How the nick is displayed */
-	char pass[PASSMAX];			/* Password of the nicks */
+	std::string pass;			/* Password of the nicks */
 	char *email;				/* E-mail associated to the nick */
 	char *greet;				/* Greet associated to the nick */
 	uint32 icq;				/* ICQ # associated to the nick */

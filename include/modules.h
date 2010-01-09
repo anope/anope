@@ -579,11 +579,10 @@ class CoreExport Module
 	/** Called when anope needs to check passwords against encryption
 	 *  see src/encrypt.c for detailed informations
 	 */
-	virtual EventReturn OnEncrypt(const char *src,int len,char *dest,int size) { return EVENT_CONTINUE; }
-	virtual EventReturn OnEncryptInPlace(char *buf, int size) { return EVENT_CONTINUE; }
-	virtual EventReturn OnEncryptCheckLen(int passlen, int bufsize) { return EVENT_CONTINUE; }
-	virtual EventReturn OnDecrypt(const char *src, char *dest, int size) { return EVENT_CONTINUE; }
-	virtual EventReturn OnCheckPassword(const char *plaintext, char *password) { return EVENT_CONTINUE; }
+	virtual EventReturn OnEncrypt(const std::string &src, std::string &dest) { return EVENT_CONTINUE; }
+	virtual EventReturn OnEncryptInPlace(std::string &buf) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password) { return EVENT_CONTINUE; }
 
 	/** Called on fantasy command
 	 * @param command The command

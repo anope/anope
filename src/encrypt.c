@@ -21,10 +21,10 @@
  * Encrypt string `src' of length `len', placing the result in buffer
  * `dest' of size `size'.  Returns 0 on success, -1 on error.
  **/
-int enc_encrypt(const char *src, int len, char *dest, int size)
+int enc_encrypt(const std::string &src, std::string &dest)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, len, dest, size));
+	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
 	if (MOD_RESULT == EVENT_ALLOW)
 		return 0;
 	return -1;
@@ -35,28 +35,10 @@ int enc_encrypt(const char *src, int len, char *dest, int size)
  * placing the result in the same buffer.  Returns 0 on success, -1 on
  * error.
  **/
-int enc_encrypt_in_place(char *buf, int size)
+int enc_encrypt_in_place(std::string &buf)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnEncryptInPlace, OnEncryptInPlace(buf, size));
-	if (MOD_RESULT == EVENT_ALLOW)
-	        return 0;
-	return -1;
-
-}
-
-/** 
- * Check whether the result of encrypting a password of length `passlen'
- * will fit in a buffer of size `bufsize'.  Returns 0 if the encrypted
- * password would fit in the buffer, otherwise returns the maximum length
- * password that would fit (this value will be smaller than `passlen').
- * If the result of encrypting even a 1-byte password would exceed the
- * specified buffer size, generates a fatal error.
- **/
-int enc_encrypt_check_len(int passlen, int bufsize)
-{
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnEncryptCheckLen, OnEncryptCheckLen(passlen, bufsize));
+	FOREACH_RESULT(I_OnEncryptInPlace, OnEncryptInPlace(buf));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 0;
 	return -1;
@@ -68,10 +50,18 @@ int enc_encrypt_check_len(int passlen, int bufsize)
  * allow decryption, and -1 if another failure occurred (e.g. destination
  * buffer too small).
  **/
-int enc_decrypt(const char *src, char *dest, int size)
+int enc_decrypt(std::string &src, std::string &dest)
 {
+	size_t pos = src.find(":");
+	if (pos == std::string::npos)
+	{
+		alog("Error: enc_decrypt() called with invalid password string (%s)", src.c_str());
+		return -1;
+	}
+	std::string hashm(src.begin(), src.begin()+pos);
+
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(src, dest, size));
+	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(hashm, src, dest));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 1;
 	return -1;
@@ -84,10 +74,19 @@ int enc_decrypt(const char *src, char *dest, int size)
  *   0 if the password does not match
  *   0 if an error occurred while checking
  **/
-int enc_check_password(const char *plaintext, char *password)
+int enc_check_password(std::string &plaintext, std::string &password)
 {
+	std::string hashm;
+	size_t pos = password.find(":");
+	if (pos == std::string::npos)
+	{
+		alog("Error: enc_check_password() called with invalid password string (%s)", password.c_str());
+		return 0;
+	}
+	hashm.assign(password.begin(), password.begin()+pos);
+
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(plaintext, password));
+	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(hashm, plaintext, password));
 	if (MOD_RESULT == EVENT_ALLOW)
 	        return 1;
 	return 0;

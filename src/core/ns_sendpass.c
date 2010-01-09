@@ -36,8 +36,8 @@ class CommandNSSendPass : public Command
 		else
 		{
 			char buf[BUFSIZE];
-			char tmp_pass[PASSMAX];
-			if (enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1) == 1)
+			std::string tmp_pass;
+			if (enc_decrypt(na->nc->pass,tmp_pass) == 1)
 			{
 				MailInfo *mail;
 
@@ -50,7 +50,7 @@ class CommandNSSendPass : public Command
 				fprintf(mail->pipe, "\n\n");
 				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_1), na->nick);
 				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_2), tmp_pass);
+				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_2), tmp_pass.c_str());
 				fprintf(mail->pipe, "\n\n");
 				fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_LINE_3));
 				fprintf(mail->pipe, "\n\n");
@@ -97,8 +97,8 @@ class NSSendPass : public Module
 		if (!Config.UseMail)
 			throw ModuleException("Not using mail, whut.");
 
-		char tmp_pass[PASSMAX];
-		if (!enc_decrypt("tmp", tmp_pass, PASSMAX - 1))
+		std::string tmp_pass = "tmp";
+		if (!enc_decrypt(tmp_pass, tmp_pass))
 			throw ModuleException("Incompatible with the encryption module being used");
 
 		ModuleManager::Attach(I_OnNickServHelp, this);

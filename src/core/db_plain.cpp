@@ -388,12 +388,7 @@ static void LoadNickCore(const std::vector<std::string> &params)
 		return;
 	}
 
-	size_t tmp = params[1].find(':'); // XXX till we store the hash method internally with the nickcore
-	const char *pass = params[1].c_str() + tmp + 1;
-	char passbuf[PASSMAX];
-	memset(&passbuf, 0, sizeof(passbuf));
-	b64_decode(pass, passbuf, PASSMAX);
-	strscpy(nc->pass, passbuf, PASSMAX);
+	nc->pass.assign(params[1]);
 
 	for (int i = 0; LangInfos[i].LanguageId != -1; ++i)
 		if (params[2] == LangInfos[i].Name)
@@ -854,10 +849,7 @@ class DBPlain : public Module
 				}
 				else
 				{
-					//XXX forced plain till we store hashm in pw
-					char temppass[5000];
-					b64_encode(nc->pass, strlen(nc->pass), temppass, 5000);
-					db << "NC " << nc->display << " plain:" << temppass << " ";
+					db << "NC " << nc->display << " " << nc->pass << " ";
 				}
 				for (j = 0; LangInfos[j].LanguageId != -1; ++j)
 					if (nc->language ==  LangInfos[j].LanguageId)

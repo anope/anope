@@ -26,7 +26,7 @@ class CommandNSRecover : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
-		const char *pass = params.size() > 1 ? params[1].c_str() : NULL;
+		std::string pass = params.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
 		User *u2;
 
@@ -40,7 +40,7 @@ class CommandNSRecover : public Command
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 		else if (!stricmp(nick, u->nick.c_str()))
 			notice_lang(Config.s_NickServ, u, NICK_NO_RECOVER_SELF);
-		else if (pass)
+		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 

@@ -20,60 +20,59 @@ class ENone : public Module
 
 		ModuleManager::Attach(I_OnEncrypt, this);
 		ModuleManager::Attach(I_OnEncryptInPlace, this);
-		ModuleManager::Attach(I_OnEncryptCheckLen, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
 
-	EventReturn OnEncrypt(const char *src,int len,char *dest,int size)
+	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
-		if(size>=len)
-		{
-			memset(dest,0,size);
-			strlcpy(dest,src,len + 1);
-			return EVENT_ALLOW;
-		}
-		return EVENT_STOP;
-	}
-
-	EventReturn OnEncryptInPlace(char *buf, int size)
-	{
+		std::string buf = "plain:";
+		char cpass[1000];
+		b64_encode(src.c_str(), src.size(), cpass, 1000);
+		buf.append(cpass);
+		if (debug > 1)
+			alog("debug: (enc_none) hashed password from [%s] to [%s]", src.c_str(), buf.c_str());
+		dest.assign(buf);
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
+	EventReturn OnEncryptInPlace(std::string &buf)
 	{
-		if(bufsize>=passlen)
-		{
-			return EVENT_ALLOW;
-		}
-		return EVENT_STOP;
+		return this->OnEncrypt(buf, buf);
 	}
 
-	EventReturn OnDecrypt(const char *src, char *dest, int size) {
-		memset(dest,0,size);
-		strlcpy(dest,src,size);
+	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest)
+	{
+		if (hashm != "plain")
+			return EVENT_CONTINUE;
+		char cpass[1000];
+		size_t pos = src.find(":");
+		std::string buf(src.begin()+pos+1, src.end());
+		b64_decode(buf.c_str(), static_cast<char *>(cpass), 1000);
+		dest.assign(cpass);
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckPassword(const char *plaintext, char *password) 
+	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password) 
 	{
-		if(strcmp(plaintext,password)==0)
+		if (hashm != "plain")
+			return EVENT_CONTINUE;
+		std::string buf;
+		this->OnEncrypt(plaintext, buf);
+		if(!password.compare(buf))
 		{
 			/* if we are NOT the first module in the list, 
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (stricmp(Config.EncModuleList.begin()->c_str(), this->name.c_str()))
+			if (Config.EncModuleList.front().compare(this->name))
 			{
-				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+				enc_encrypt(plaintext, password);
 			}
 			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 
 };
-/* EOF */
-
 
 MODULE_INIT(ENone)

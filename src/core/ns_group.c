@@ -27,7 +27,7 @@ class CommandNSGroup : public Command
 	{
 		NickAlias *na, *target;
 		const char *nick = params[0].c_str();
-		const char *pass = params[1].c_str();
+		std::string pass = params[1].c_str();
 		std::list<std::pair<std::string, std::string> >::iterator it;
 
 		if (Config.NSEmailReg && findrequestnick(u->nick.c_str()))

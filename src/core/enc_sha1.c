@@ -174,9 +174,7 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 }
 
 /*****************************************************************************/
-
-
-/*************************************************************************/
+/*****************************************************************************/
 
 /* Module stuff. */
 
@@ -198,84 +196,59 @@ class ESHA1 : public Module
 	}
 
 
-	EventReturn OnEncrypt(const char *src, int len, char *dest, int size)
+	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
 		SHA1_CTX context;
-		unsigned char tmp[41];
+		char digest[PASSMAX];
+		std::string buf = "sha1:";
+		char cpass[1000];
 
-		if (size < 20)
-			return EVENT_STOP; 
-
-		memset(dest,0,size);
+		memset(digest,0,32);
 
 		SHA1Init(&context);
-		SHA1Update(&context, (unsigned char *)src, len);
-		SHA1Final((unsigned char *)dest, &context);
+		SHA1Update(&context, (unsigned char *)src.c_str(), src.size());
+		SHA1Final((unsigned char *)digest, &context);
 
-		if(debug) 
-		{
-			memset(tmp,0,41);
-			binary_to_hex((unsigned char *)dest,(char *)tmp,20);
-			/* Dont log source if we were encrypting in place :) */
-			if (memcmp(src, dest, 20) != 0) 
-			{
-				alog("enc_sha1: hashed from [%s] to [%s]",src,tmp); 
-			} else {
-				alog("enc_sha1: hashed password to [%s]",tmp); 
-			}
-		}
-		return EVENT_ALLOW; 
-	}
-
-
-	EventReturn OnEncryptInPlace(char *buf, int size)
-	{
-		char tmp[41];
-
-		memset(tmp,0,41);
-		if(OnEncrypt(buf, strlen(buf), tmp, size)==EVENT_ALLOW) 
-		{
-			memcpy(buf, tmp, size);
-			return EVENT_ALLOW;
-		}
-		return EVENT_STOP; 
-	}
-
-
-	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
-	{
-		if (bufsize < 20)
-		{
-			fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
-			return EVENT_STOP; 
-		}
+		b64_encode(digest, 20, cpass, 1000);
+		buf.append(cpass);
+		if (debug > 1)
+			alog("debug: (enc_sha1) hashed password from [%s] to [%s] ", src.c_str(), buf.c_str());
+		dest.assign(buf);
 		return EVENT_ALLOW;
 	}
 
 
-	EventReturn OnDecrypt(const char *src, char *dest, int size)
+	EventReturn OnEncryptInPlace(std::string &buf)
 	{
-		return EVENT_STOP; 
+		return this->OnEncrypt(buf, buf);
+	}
+
+	EventReturn OnDecrypt(const std::string &hashm, std::string &src, std::string &dest)
+	{
+		if (hashm != "sha1")
+			return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 
 
-	EventReturn OnCheckPassword(const char *plaintext, char *password)
+	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
 	{
-		char buf[BUFSIZE];
-		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
-			return EVENT_STOP;
-		if (memcmp(buf, password, 20) == 0)
+		if (hashm != "sha1")
+			return EVENT_CONTINUE;
+		std::string buf;
+		this->OnEncrypt(plaintext, buf);
+		if (!password.compare(buf))
 		{
 			/* when we are NOT the first module in the list, 
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (stricmp(Config.EncModuleList.begin()->c_str(), this->name.c_str()))
+			if (Config.EncModuleList.front().compare(this->name))
 			{
-				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+				enc_encrypt(plaintext, password);
 			}
 			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 
 };

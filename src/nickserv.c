@@ -188,9 +188,8 @@ void get_core_stats(long *nrec, long *memuse)
 
 			if (nc->display)
 				mem += strlen(nc->display) + 1;
-			if (nc->pass)
-				mem += strlen(nc->pass) + 1;
-
+			if (!nc->pass.empty())
+				mem += (nc->pass.capacity() + (2 * sizeof(size_t)) + (2 * sizeof(void*)));
 			if (nc->url)
 				mem += strlen(nc->url) + 1;
 			if (nc->email)

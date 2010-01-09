@@ -336,96 +336,68 @@ class EOld : public Module
 
 		ModuleManager::Attach(I_OnEncrypt, this);
 		ModuleManager::Attach(I_OnEncryptInPlace, this);
-		ModuleManager::Attach(I_OnEncryptCheckLen, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
 
 	}
 
-
-	/* Encrypt `src' of length `len' and store the result in `dest'.  If the
-	 * resulting string would be longer than `size', return -1 and leave `dest'
-	 * unchanged; else return 0.
-	 */
-	EventReturn OnEncrypt(const char *src, int len, char *dest, int size)
+	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
 
 		MD5_CTX context;
-		char digest[33];
-		char tmp[33];
+		char digest[33], digest2[33];
+		char cpass[1000];
 		int i;
-
-		if (size < 16)
-			return EVENT_STOP;
+		std::string buf = "old:";
 
 		memset(&context, 0, sizeof(context));
 		memset(&digest, 0, sizeof(digest));
 
 		MD5Init(&context);
-		MD5Update(&context, (unsigned char *)src, len);
+		MD5Update(&context, (unsigned char *)src.c_str(), src.size());
 		MD5Final((unsigned char *)digest, &context);
 		for (i = 0; i < 32; i += 2)
-			dest[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
+			digest2[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
 
-		if(debug)
-		{
-			memset(tmp,0,33);
-			binary_to_hex((unsigned char *)dest,tmp,16);
-			alog("enc_old: Converted [%s] to [%s]",src,tmp); 
-		}
-
+		b64_encode(digest2, 16, cpass, 1000);
+		buf.append(cpass);
+		if (debug > 1)
+			alog("debug: (enc_old) hashed password from [%s] to [%s]", src.c_str(), buf.c_str());
+		dest.assign(buf);
 		return EVENT_ALLOW;
 	}
 
-
-	/* Shortcut for encrypting a null-terminated string in place. */
-	EventReturn OnEncryptInPlace(char *buf, int size)
+	EventReturn OnEncryptInPlace(std::string &buf)
 	{
-		return OnEncrypt(buf, strlen(buf), buf, size);
+		return this->OnEncrypt(buf, buf);
 	}
 
-	EventReturn OnEncryptCheckLen(int passlen, int bufsize)
+	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest )
 	{
-		if (bufsize < 16)
-		{
-			fatal("enc_old: old_check_len(): buffer too small (%d)", bufsize);
-			return EVENT_STOP;
-		}
-		return EVENT_ALLOW;
+		if (hashm != "old")
+			return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 
-
-	/* Compare a plaintext string against an encrypted password.  Return 1 if
-	 * they match, 0 if not, and -1 if something went wrong. */
-
-	EventReturn OnCheckPassword(const char *plaintext, char *password)
+	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
 	{
-		char buf[BUFSIZE];
-
-		if (OnEncrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) == EVENT_STOP)
-			return EVENT_STOP;
-		if (memcmp(buf, password, 16) == 0)
+		if (hashm != "old")
+			return EVENT_CONTINUE;
+		std::string buf;
+		this->OnEncrypt(plaintext, buf);
+		if (!password.compare(buf))
 		{
-			/* when we are NOT the first module in the list, 
+			/* if we are NOT the first module in the list, 
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (stricmp(Config.EncModuleList.begin()->c_str(), this->name.c_str()))
+			if (Config.EncModuleList.front().compare(this->name))
 			{
-				enc_encrypt(plaintext, strlen(password), password, PASSMAX -1 );
+				enc_encrypt(plaintext, password);
 			}
-			return EVENT_ALLOW; 
+			return EVENT_ALLOW;
 		}
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
-
-	EventReturn OnDecrypt(const char *src, char *dest, int size)
-	{
-		return EVENT_STOP; // 0
-	}
-
 };
-
-/*************************************************************************/
-
 
 MODULE_INIT(EOld)

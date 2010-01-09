@@ -31,9 +31,9 @@ class CommandNSConfirm : public Command
 			return MOD_CONT;
 		}
 
-		char tmp_pass[PASSMAX];
+		std::string tmp_pass;
 
-		memcpy(na->nc->pass, nr->password, PASSMAX);
+		na->nc->pass = nr->password;
 
 		na->nc->memos.memomax = Config.MSMaxMemos;
 
@@ -71,8 +71,8 @@ class CommandNSConfirm : public Command
 			ircdproto->SendAccountLogin(u, u->nc);
 			ircdproto->SetAutoIdentificationToken(u);
 
-			if (enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1) == 1)
-				notice_lang(Config.s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
+			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
+				notice_lang(Config.s_NickServ, u, NICK_PASSWORD_IS, tmp_pass.c_str());
 
 			u->lastnickreg = time(NULL);
 		}
@@ -97,13 +97,13 @@ class CommandNSConfirm : public Command
 	CommandReturn DoConfirm(User *u, const std::vector<ci::string> &params)
 	{
 		NickRequest *nr = NULL;
-		const char *passcode = !params.empty() ? params[0].c_str() : NULL;
+		std::string passcode = !params.empty() ? params[0].c_str() : "";
 
 		nr = findrequestnick(u->nick.c_str());
 
 		if (Config.NSEmailReg)
 		{
-			if (!passcode)
+			if (passcode.empty())
 			{
 				this->OnSyntaxError(u, "");
 				return MOD_CONT;
@@ -115,7 +115,7 @@ class CommandNSConfirm : public Command
 				{
 					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
 					   of the user they are trying to validate, and push that user through regardless of passcode */
-					nr = findrequestnick(passcode);
+					nr = findrequestnick(passcode.c_str());
 					if (nr)
 					{
 						ActuallyConfirmNick(u, nr, true);
@@ -127,7 +127,7 @@ class CommandNSConfirm : public Command
 				return MOD_CONT;
 			}
 
-			if (stricmp(nr->passcode, passcode))
+			if (nr->passcode.compare(passcode))
 			{
 				notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
 				return MOD_CONT;
@@ -262,7 +262,7 @@ class CommandNSRegister : public CommandNSConfirm
 		}
 		else if (!stricmp(u->nick.c_str(), pass) || (Config.StrictPasswords && strlen(pass) < 5))
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
-		else if (enc_encrypt_check_len(strlen(pass), PASSMAX - 1))
+		else if (strlen(pass) > PASSMAX)
 			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
 		else if (email && !MailValidate(email))
 			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, email);
@@ -272,9 +272,9 @@ class CommandNSRegister : public CommandNSConfirm
 				passcode[idx] = chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 			passcode[idx] = '\0';
 			nr = new NickRequest(u->nick);
-			nr->passcode = sstrdup(passcode);
-			strscpy(nr->password, pass, PASSMAX);
-			enc_encrypt_in_place(nr->password, PASSMAX);
+			nr->passcode = passcode;
+			nr->password = pass;
+			enc_encrypt_in_place(nr->password);
 			if (email)
 				nr->email = sstrdup(email);
 			nr->requested = time(NULL);
@@ -405,7 +405,7 @@ int do_sendregmail(User *u, NickRequest *nr)
 	fprintf(mail->pipe, "\n\n");
 	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_1), nr->nick);
 	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_2), Config.s_NickServ, nr->passcode);
+	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_2), Config.s_NickServ, nr->passcode.c_str());
 	fprintf(mail->pipe, "\n\n");
 	fprintf(mail->pipe, "%s", getstring(NICK_REG_MAIL_LINE_3));
 	fprintf(mail->pipe, "\n\n");

@@ -2155,6 +2155,9 @@ CHAN_INVITE_ALREADY_IN
 	Przebywasz ju¿ na kanale %s! 
 CHAN_INVITE_SUCCESS
 	Zosta³e¶ zaproszony do %s.
+CHAN_INVITE_OTHER_SUCCESS
+	%s has been invited to %s.
+
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX

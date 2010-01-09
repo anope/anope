@@ -59,7 +59,8 @@ class CommandCSInvite : public Command
 		else
 		{
 			ircdproto->SendInvite(whosends(ci), chan, u2->nick.c_str());
-			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_SUCCESS, c->name.c_str());
+			notice_lang(whosends(ci)->nick, u, CHAN_INVITE_OTHER_SUCCESS, u2->nick.c_str(), c->name.c_str());
+			notice_lang(whosends(ci)->nick, u2, CHAN_INVITE_SUCCESS, c->name.c_str());
 		}
 		return MOD_CONT;
 	}

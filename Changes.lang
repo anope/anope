@@ -1,6 +1,7 @@
 Anope Version 1.9.2
 --------------------
 *** New Strings:
+    CHAN_INVITE_OTHER_SUCCESS
     NICK_HELP_CONFIRM_OPER
     CHAN_QOP_DISABLED
     CHAN_QOP_NICKS_ONLY

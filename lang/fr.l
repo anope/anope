@@ -1673,6 +1673,8 @@ CHAN_INVITE_ALREADY_IN
 	Vous êtes déjà dans %s! 
 CHAN_INVITE_SUCCESS
 	Vous avez été invité à rejoindre %s.
+CHAN_INVITE_OTHER_SUCCESS
+	%s has been invited to %s.
 
 # UNBAN responses
 CHAN_UNBAN_SYNTAX

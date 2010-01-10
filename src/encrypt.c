@@ -50,7 +50,7 @@ int enc_encrypt_in_place(std::string &buf)
  * allow decryption, and -1 if another failure occurred (e.g. destination
  * buffer too small).
  **/
-int enc_decrypt(std::string &src, std::string &dest)
+int enc_decrypt(const std::string &src, std::string &dest)
 {
 	size_t pos = src.find(":");
 	if (pos == std::string::npos)

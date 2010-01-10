@@ -1,4 +1,13 @@
-/* Module for encryption using sha256.
+/* This module generates and compares password hashes using SHA256 algorithms.
+ * To help reduce the risk of dictionary attacks, the code appends random bytes
+ * (so-called "salt") to the original plain text before generating hashes and
+ * stores this salt appended to the result. To verify another plain text value
+ * against the given hash, this module will retrieve the salt value from the
+ * password string and use it when computing a new hash of the plain text.
+ *
+ * If an intruder gets access to your system or uses a brute force attack,
+ * salt will not provide much value.
+ * IMPORTANT: DATA HASHES CANNOT BE "DECRYPTED" BACK TO PLAIN TEXT.
  *
  * Modified for Anope.
  * (C) 2003-2009 Anope Team
@@ -7,15 +16,11 @@
  * Taken from InspIRCd ( www.inspircd.org )
  *  see http://wiki.inspircd.org/Credits
  *
- * This program is free but copyrighted software; see 
+ * This program is free but copyrighted software; see
  * the file COPYING for details.
  */
 
-/* m_sha256 - Based on m_opersha256 written by Special <john@yarbbles.com>
- * Modified and improved by Craig Edwards, December 2006.
- *
- *
- * FIPS 180-2 SHA-224/256/384/512 implementation
+/* FIPS 180-2 SHA-224/256/384/512 implementation
  * Last update: 05/23/2005
  * Issue date:  04/30/2005
  *
@@ -57,7 +62,7 @@
 typedef unsigned int uint32_t;
 #endif
 
-/** An sha 256 context, used by m_opersha256
+/** An sha256 context
  */
 class SHA256Context
 {
@@ -103,13 +108,6 @@ class SHA256Context
 	+ SHA256_F3(w[i - 15]) + w[i - 16];  \
 }
 
-// this is the hardcoded salt
-const unsigned int sha256_h0[8] =
-{
-	0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
-};
-
 uint32_t sha256_k[64] =
 {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
@@ -132,18 +130,52 @@ uint32_t sha256_k[64] =
 
 class ESHA256 : public Module
 {
-	void SHA256Init(SHA256Context *ctx, const unsigned int* ikey)
+	unsigned int salt[8];
+	bool use_salt;
+
+	/* initializes the salt with a new random value */
+	void NewRandomSalt()
 	{
-		if (ikey)
+		srand(time(NULL));
+		for (int i = 0; i < 8; i++)
 		{
-			for (int i = 0; i < 8; i++)
-				ctx->h[i] = ikey[i];
+			salt[i] = getrandom32();
 		}
-		else
+	}
+
+	/* returns the salt as base64-encrypted string */
+	std::string GetSaltString()
+	{
+		std::stringstream buf;
+		char buf2[1000];
+		buf << salt[0] << " " << salt[1] << " " << salt[2] << " " << salt[3] << " ";
+		buf << salt[4] << " " << salt[5] << " " << salt[6] << " " << salt[7];
+		b64_encode(buf.str().c_str(), buf.str().size(), buf2, 1000);
+		return buf2;
+	}
+
+	/* splits the appended salt from the password string so it can be used for the next encryption */ 
+	/* password format:  <hashmethod>:<password_b64>:<hash_b64> */
+	void GetSaltFromPass(std::string &password)
+	{
+		size_t pos, i = 0;
+		std::string saltstr;
+		pos = password.find(":");
+		std::string buf(password, password.find(":", pos+1)+1, password.size());
+		char buf2[1000];
+		b64_decode(buf.c_str(), buf2, 1000);
+		spacesepstream sep(buf2);
+		while (sep.GetToken(buf))
 		{
-			for (int i = 0; i < 8; i++)
-				ctx->h[i] = sha256_h0[i];
+			salt[i] = static_cast<unsigned int>(strtoul(buf.c_str(), NULL, 10));
+			i++;
 		}
+	}
+
+	void SHA256Init(SHA256Context *ctx)
+	{
+		for (int i = 0; i < 8; i++)
+			ctx->h[i] = salt[i];
 		ctx->len = 0;
 		ctx->tot_len = 0;
 	}
@@ -234,9 +266,6 @@ class ESHA256 : public Module
 			UNPACK32(ctx->h[i], &digest[i << 2]);
 	}
 
-	unsigned int* key;
-	char* chars;
-
 /**********   ANOPE ******/
  public:
 	ESHA256(const std::string &modname, const std::string &creator) : Module(modname, creator)
@@ -249,25 +278,31 @@ class ESHA256 : public Module
 		ModuleManager::Attach(I_OnEncryptInPlace, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
+
+		use_salt = false;
 	}
 
 	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
-		const unsigned int* ikey = NULL; // if its NULL, we use a hardcoded salt (const unsigned int sha256_h0[8])
 		char digest[SHA256_DIGEST_SIZE];
 		char cpass[1000];
 		SHA256Context ctx;
-		std::string buf = "sha256:";
-		
-		SHA256Init(&ctx, ikey);
+		std::stringstream buf;
+
+		if (!use_salt)
+			NewRandomSalt();
+		else
+			use_salt = false;
+
+		SHA256Init(&ctx);
 		SHA256Update(&ctx, (unsigned char *)src.c_str(), src.size());
 		SHA256Final(&ctx, (unsigned char*)digest);
 
 		b64_encode(digest, SHA256_DIGEST_SIZE, cpass, 1000);
-		buf.append(cpass);
+		buf << "sha256:" << cpass << ":" << GetSaltString();
 		if (debug > 1)
-			alog("debug: (enc_sha256) hashed password from [%s] to [%s]", src.c_str(), buf.c_str());
-		dest.assign(buf);
+			alog("debug: (enc_sha256) hashed password from [%s] to [%s]", src.c_str(), buf.str().c_str());
+		dest.assign(buf.str());
 		return EVENT_ALLOW;
 		
 	}
@@ -290,6 +325,8 @@ class ESHA256 : public Module
 			return EVENT_CONTINUE;
 		std::string buf;
 
+		GetSaltFromPass(password);
+		use_salt = true;
 		this->OnEncrypt(plaintext, buf);
 		if(!password.compare(buf))
 		{
@@ -304,7 +341,6 @@ class ESHA256 : public Module
 		}
 		return EVENT_STOP;
 	}
-
 };
 
 MODULE_INIT(ESHA256)

@@ -82,11 +82,7 @@ class CommandCSForbid : public Command
 				if (is_oper(cu->user))
 					continue;
 
-				av[0] = c->name.c_str();
-				av[1] = cu->user->nick.c_str();
-				av[2] = reason ? reason : getstring(cu->user->nc, CHAN_FORBID_REASON);
-				ircdproto->SendKick(findbot(Config.s_ChanServ), c, cu->user, av[2]);
-				do_kick(Config.s_ChanServ, 3, av);
+				c->Kick(findbot(Config.s_ChanServ), cu->user, "%s", reason ? reason : getstring(cu->user->nc, CHAN_FORBID_REASON));
 			}
 		}
 

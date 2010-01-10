@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-int do_kickcmd(User * u);
-
 class CommandBSKick : public Command
 {
  public:

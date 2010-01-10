@@ -989,6 +989,21 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param cmodes The modes to set
 	 */
 	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
+
+	/** Kick a user from a channel internally
+	 * @param source The sender of the kick
+	 * @param nick The nick being kicked
+	 * @param reason The reason for the kick
+	 */
+	void KickInternal(const std::string &source, const std::string &nick, const std::string &reason);
+
+	/** Kick a user from the channel
+	 * @param bi The sender, can be NULL for the service bot for this channel
+	 * @param u The user being kicked
+	 * @param reason The reason for the kick
+	 * @return true if the kick was scucessful, false if a module blocked the kick
+	 */
+	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
 };
 
 /** Channelban type flags

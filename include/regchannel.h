@@ -289,4 +289,10 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	/** Clear all the params from the channel
 	 */
 	void ClearParams();
+
+	/** Check whether a user is permitted to be on this channel
+	 * @param u The user
+	 * @return true if they are allowed, false if they aren't and were kicked
+	 */
+	bool CheckKick(User *user);
 };

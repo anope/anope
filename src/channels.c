@@ -715,6 +715,75 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 	}
 }
 
+/** Kick a user from a channel internally
+ * @param source The sender of the kick
+ * @param nick The nick being kicked
+ * @param reason The reason for the kick
+ */
+void Channel::KickInternal(const std::string &source, const std::string &nick, const std::string &reason)
+{
+	/* If it is the bot that is being kicked, we make it rejoin the
+	 * channel and stop immediately.
+	 *        --lara
+	 */
+	if (Config.s_BotServ && this->ci && findbot(nick))
+	{
+		bot_join(this->ci);
+		return;
+	}
+
+	User *user = finduser(nick);
+	if (!user)
+	{
+		if (debug)
+			alog("debug: Channel::KickInternal got a nonexistent user %s on %s: %s", nick.c_str(), this->name.c_str(), reason.c_str());
+		return;
+	}
+
+	if (debug)
+		alog("debug: Channel::KickInternal kicking %s from %s", user->nick.c_str(), this->name.c_str());
+	
+	struct u_chanlist *c;
+	for (c = user->chans; c && this != c->chan; c = c->next);
+	if (c)
+	{
+		FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, source, reason));
+		chan_deluser(user, c->chan);
+		if (c->next)
+			c->next->prev = c->prev;
+		if (c->prev)
+			c->prev->next = c->next;
+		else
+			user->chans = c->next;
+		delete c;
+	}
+	else if (debug)
+		alog("debug: Channel::KickInternal got kick for user %s who isn't on channel %s ?", user->nick.c_str(), this->name.c_str());
+}
+
+/** Kick a user from the channel
+ * @param bi The sender, can be NULL for the service bot for this channel
+ * @param u The user being kicked
+ * @param reason The reason for the kick
+ * @return true if the kick was scucessful, false if a module blocked the kick
+ */
+bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
+{
+	va_list args;
+	char buf[BUFSIZE] = "";
+	va_start(args, reason);
+	vsnprintf(buf, BUFSIZE - 1, reason, args);
+	va_end(args);
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnBotKick, OnBotKick(bi, this, u, buf));
+	if (MOD_RESULT == EVENT_STOP)
+		return false;
+	ircdproto->SendKick(bi ? bi : whosends(this->ci), this, u, "%s", buf);
+	this->KickInternal(bi ? bi->nick : whosends(this->ci)->nick, u->nick, buf);
+	return true;
+}
+
 /*************************************************************************/
 
 void chan_deluser(User * user, Channel * c)
@@ -1065,7 +1134,6 @@ void do_join(const char *source, int ac, const char **av)
 	char *s, *t;
 	struct u_chanlist *c, *nextc;
 	char *channame;
-	time_t ts = time(NULL);
 
 	if (ircd->ts6) {
 		user = find_byuid(source);
@@ -1113,9 +1181,10 @@ void do_join(const char *source, int ac, const char **av)
 		 * don't get to see things like channel keys. */
 		/* If channel already exists, check_kick() will use correct TS.
 		 * Otherwise, we lose. */
-		if (check_kick(user, s, ts))
+		if (chan && chan->ci && chan->ci->CheckKick(user))
 			continue;
 
+		time_t ts = time(NULL);
 		if (ac == 2) {
 			ts = strtoul(av[1], NULL, 10);
 			if (debug) {
@@ -1133,67 +1202,26 @@ void do_join(const char *source, int ac, const char **av)
 
 /*************************************************************************/
 
-/* Handle a KICK command.
- *	av[0] = channel
- *	av[1] = nick(s) being kicked
- *	av[2] = reason
+/** Handle a KICK command.
+ * @param source The source of the kick
+ * @param ac number of args
+ * @param av The channel, nick(s) being kicked, and reason
  */
-
 void do_kick(const std::string &source, int ac, const char **av)
 {
-	BotInfo *bi;
-	ChannelInfo *ci;
-	User *user;
-	char *s, *t;
-	struct u_chanlist *c;
+	Channel *c = findchan(av[0]);
+	if (!c)
+	{
+		if (debug)
+			alog("Recieved kick for nonexistant channel %s", av[0]);
+		return;
+	}
 
-	t = const_cast<char *>(av[1]); // XXX unsafe cast, this needs reviewing -- w00t
-	while (*(s = t)) {
-		t = s + strcspn(s, ",");
-		if (*t)
-			*t++ = 0;
-
-		/* If it is the bot that is being kicked, we make it rejoin the
-		 * channel and stop immediately.
-		 *	  --lara
-		 */
-		if (Config.s_BotServ && (bi = findbot(s)) && (ci = cs_findchan(av[0]))) {
-			bot_join(ci);
-			continue;
-		}
-
-		if (ircd->ts6) {
-			user = find_byuid(s);
-			if (!user) {
-				user = finduser(s);
-			}
-		} else {
-			user = finduser(s);
-		}
-		if (!user) {
-			if (debug) {
-				alog("debug: KICK for nonexistent user %s on %s: %s", s,
-					 av[0], merge_args(ac - 2, av + 2));
-			}
-			continue;
-		}
-		if (debug) {
-			alog("debug: kicking %s from %s", user->nick.c_str(), av[0]);
-		}
-		for (c = user->chans; c && stricmp(av[0], c->chan->name.c_str()) != 0;
-			 c = c->next);
-		if (c)
-		{
-			FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, source, merge_args(ac - 2, av + 2)));
-			chan_deluser(user, c->chan);
-			if (c->next)
-				c->next->prev = c->prev;
-			if (c->prev)
-				c->prev->next = c->next;
-			else
-				user->chans = c->next;
-			delete c;
-		}
+	std::string buf;
+	commasepstream sep(av[1]);
+	while (sep.GetToken(buf))
+	{
+		c->KickInternal(source, buf, av[2]);
 	}
 }
 
@@ -1440,7 +1468,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 			if (is_sqlined && !is_oper(user)) {
 				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 			} else {
-				if (!check_kick(user, av[1], ts)) {
+				if (!c || !c->ci || !c->ci->CheckKick(user))
+				{
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 					/* Make the user join; if the channel does not exist it
@@ -1526,7 +1555,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 			if (is_sqlined && !is_oper(user)) {
 				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 			} else {
-				if (!check_kick(user, av[1], ts)) {
+				if (!c || !c->ci || !c->ci->CheckKick(user))
+				{
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 					/* Make the user join; if the channel does not exist it
@@ -1601,7 +1631,8 @@ void do_sjoin(const char *source, int ac, const char **av)
 			if (is_sqlined && !is_oper(user)) {
 				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
 			} else {
-				if (!check_kick(user, av[1], ts)) {
+				if (!c || !c->ci || !c->ci->CheckKick(user))
+				{
 					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
 
 					/* Make the user join; if the channel does not exist it
@@ -1648,7 +1679,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			return;
 		}
 
-		if (check_kick(user, av[1], ts))
+		if (c && c->ci && c->ci->CheckKick(user))
 			return;
 
 		if (ircd->chansqline) {

@@ -75,18 +75,10 @@ class CommandCSBan : public Command
 			if (!is_on_chan(c, u2))
 				return MOD_CONT;
 
-			if ((ci->HasFlag(CI_SIGNKICK))
-				|| ((ci->HasFlag(CI_SIGNKICK_LEVEL))
-					&& !check_access(u, ci, CA_SIGNKICK)))
-				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s (%s)", reason, u->nick.c_str());
+			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
+				c->Kick(whosends(ci), u2, "%s (%s)", reason, u->nick.c_str());
 			else
-				ircdproto->SendKick(whosends(ci), ci->c, u2, "%s", reason);
-
-			const char *kav[4];
-			 kav[0] = ci->name.c_str();
-			 kav[1] = target;
-			 kav[2] = reason;
-			do_kick(Config.s_ChanServ, 3, kav);
+				c->Kick(whosends(ci), u2, "%s", reason);
 		}
 
 		return MOD_CONT;

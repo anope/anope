@@ -619,12 +619,14 @@ class CoreExport Module
 	 */
 	virtual void OnBotPreLoad(BotInfo *bi) { }
 
-	/** Called when a bot kicks a user
+	/** Called before a bot kicks a user
+	 * @param bi The bot sending the kick
+	 * @param c The channel the user is being kicked on
 	 * @param u The user being kicked
-	 * @param ci The channel
 	 * @param reason The reason
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual void OnBotKick(User *u, ChannelInfo *ci, const std::string &reason) { }
+	virtual EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const std::string &reason) { return EVENT_CONTINUE; }
 
 	/** Called before a user parts a channel
 	 * @param u The user

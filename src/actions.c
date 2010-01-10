@@ -75,7 +75,6 @@ void sqline(const std::string &mask, const std::string &reason)
 {
 	int i;
 	Channel *c, *next;
-	const char *av[3];
 	struct c_userlist *cu, *cunext;
 
 	if (ircd->chansqline)
@@ -97,11 +96,7 @@ void sqline(const std::string &mask, const std::string &reason)
 						cunext = cu->next;
 						if (is_oper(cu->user))
 							continue;
-						av[0] = c->name.c_str();
-						av[1] = cu->user->nick.c_str();
-						av[2] = reason.c_str();
-						ircdproto->SendKick(findbot(Config.s_OperServ), c, cu->user, "Q-Lined: %s", av[2]);
-						do_kick(Config.s_ChanServ, 3, av);
+						c->Kick(NULL, cu->user, "%s", reason.c_str());
 					}
 				}
 			}

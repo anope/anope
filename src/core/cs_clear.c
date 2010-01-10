@@ -148,22 +148,12 @@ class CommandCSClear : public Command
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
 		} else if (what == "users") {
-			const char *av[3];
 			struct c_userlist *cu, *bnext;
-			char buf[256];
-
-			snprintf(buf, sizeof(buf), "CLEAR USERS command from %s", u->nick.c_str());
+			std::string buf = "CLEAR USERS command from " + u->nick;
 
 			for (cu = c->users; cu; cu = bnext) {
 				bnext = cu->next;
-				av[0] = sstrdup(chan);
-				av[1] = sstrdup(cu->user->nick.c_str());
-				av[2] = sstrdup(buf);
-				ircdproto->SendKick(whosends(ci), c, cu->user, av[2]);
-				do_kick(Config.s_ChanServ, 3, av);
-				delete [] av[2];
-				delete [] av[1];
-				delete [] av[0];
+				c->Kick(NULL, cu->user, buf.c_str());
 			}
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_USERS, chan);
 		} else {

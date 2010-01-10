@@ -600,45 +600,39 @@ int check_should_protect(User * user, char *chan)
 
 /*************************************************************************/
 
-/* Check whether a user is permitted to be on a channel.  If so, return 0;
- * else, kickban the user with an appropriate message (could be either
- * AKICK or restricted access) and return 1.  Note that this is called
- * _before_ the user is added to internal channel lists (so do_kick() is
- * not called). The channel TS must be given for a new channel.
+/** Check whether a user is permitted to be on this channel
+ * @param u The user
+ * @return true if they were banned, false if they are allowed
  */
-
-int check_kick(User * user, const char *chan, time_t chants)
+bool ChannelInfo::CheckKick(User *user)
 {
-	ChannelInfo *ci = cs_findchan(chan);
-	Channel *c;
 	AutoKick *akick;
-	bool set_modes = false;
+	bool set_modes = false, do_kick = false;
 	NickCore *nc;
 	char mask[BUFSIZE];
 	const char *reason;
 	ChanServTimer *t;
 
-	if (!ci)
-		return 0;
+	if (!user)
+		return false;
 
 	if (user->isSuperAdmin == 1)
-		return 0;
+		return true;
 
 	/* We don't enforce services restrictions on clients on ulined services
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
-	if (is_ulined(user->server->name)) {
-		return 0;
-	}
+	if (is_ulined(user->server->name))
+		return true;
 
-	if (ci->HasFlag(CI_SUSPENDED) || ci->HasFlag(CI_FORBIDDEN))
+	if (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN))
 	{
 		if (is_oper(user))
 			return 0;
 
-		get_idealban(ci, user, mask, sizeof(mask));
-		reason = ci->forbidreason ? ci->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
+		get_idealban(this, user, mask, sizeof(mask));
+		reason = this->forbidreason ? this->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
 		set_modes = true;
-		goto kick;
+		do_kick = true;
 	}
 
 	if (user->nc || user->IsRecognized())
@@ -646,22 +640,14 @@ int check_kick(User * user, const char *chan, time_t chants)
 	else
 		nc = NULL;
 
-	/*
-	 * Before we go through akick lists, see if they're excepted FIRST
-	 * We cannot kick excempted users that are akicked or not on the channel access list
-	 * as that will start services <-> server wars which ends up as a DoS against services.
-	 *
-	 * UltimateIRCd 3.x at least informs channel staff when a joining user is matching an exempt.
-	 */
-	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, user) == 1) {
-		return 0;
-	}
+	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
+		return true;
 
-	for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
+	for (unsigned j = 0; j < this->GetAkickCount(); ++j)
 	{
-		akick = ci->GetAkick(j);
+		akick = this->GetAkick(j);
 
-		if (!akick->InUse)
+		if (!akick->InUse || do_kick)
 			continue;
 
 		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
@@ -671,27 +657,28 @@ int check_kick(User * user, const char *chan, time_t chants)
 			if (debug >= 2)
 				alog("debug: %s matched akick %s", user->nick.c_str(), akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
 			if (akick->HasFlag(AK_ISNICK))
-				get_idealban(ci, user, mask, sizeof(mask));
+				get_idealban(this, user, mask, sizeof(mask));
 			else
 				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
 			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
-			goto kick;
+			do_kick = true;
 			}
 	}
 
 
-	if (check_access(user, ci, CA_NOJOIN)) {
-		get_idealban(ci, user, mask, sizeof(mask));
+	if (!do_kick && check_access(user, this, CA_NOJOIN))
+	{
+		get_idealban(this, user, mask, sizeof(mask));
 		reason = getstring(user, CHAN_NOT_ALLOWED_TO_JOIN);
-		goto kick;
+		do_kick = true;
 	}
 
-	return 0;
+	if (!do_kick)
+		return false;
 
-  kick:
 	if (debug)
 		alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick.c_str(),
-			 user->GetIdent().c_str(), user->host, chan);
+			 user->GetIdent().c_str(), user->host, this->name.c_str());
 
 	/* Remember that the user has not been added to our channel user list
 	 * yet, so we check whether the channel does not exist OR has no user
@@ -699,9 +686,9 @@ int check_kick(User * user, const char *chan, time_t chants)
 	 * JOIN would not). */
 	/* Don't check for CI_INHABIT before for the Channel record cos else
 	 * c may be NULL even if it exists */
-	if ((!(c = findchan(chan)) || c->usercount == 0) && !ci->HasFlag(CI_INHABIT))
+	if ((!this->c || this->c->usercount == 0) && !this->HasFlag(CI_INHABIT))
 	{
-		ircdproto->SendJoin(findbot(Config.s_ChanServ), chan, (c ? c->creation_time : chants));
+		ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), (this->c ? this->c->creation_time : time(NULL)));
 		/*
 		 * If channel was forbidden, etc, set it +si to prevent rejoin
 		 */
@@ -713,17 +700,17 @@ int check_kick(User * user, const char *chan, time_t chants)
 			c->SetMode(NULL, CMODE_INVITE);
 		}
 
-		t = new ChanServTimer(Config.CSInhabit, chan);
-		ci->SetFlag(CI_INHABIT);
+		t = new ChanServTimer(Config.CSInhabit, this->name.c_str());
+		this->SetFlag(CI_INHABIT);
 	}
 
 	if (c)
 	{
 		c->SetMode(NULL, CMODE_BAN, mask);
-		ircdproto->SendKick(whosends(ci), c, user, "%s", reason);
+		ircdproto->SendKick(whosends(this), c, user, "%s", reason);
 	}
 
-	return 1;
+	return true;
 }
 
 /*************************************************************************/

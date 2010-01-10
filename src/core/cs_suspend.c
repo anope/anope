@@ -63,7 +63,6 @@ class CommandCSSuspend : public Command
 			if ((c = findchan(ci->name.c_str())))
 			{
 				struct c_userlist *cu, *nextu;
-				const char *av[3];
 
 				for (cu = c->users; cu; cu = nextu)
 				{
@@ -72,11 +71,7 @@ class CommandCSSuspend : public Command
 					if (is_oper(cu->user))
 						continue;
 
-					av[0] = c->name.c_str();
-					av[1] = cu->user->nick.c_str();
-					av[2] = reason ? reason : getstring(cu->user->nc, CHAN_SUSPEND_REASON);
-					ircdproto->SendKick(findbot(Config.s_ChanServ), c, cu->user, av[2]);
-					do_kick(Config.s_ChanServ, 3, av);
+					c->Kick(NULL, cu->user, "%s", reason ? reason : getstring(cu->user->nc, CHAN_SUSPEND_REASON));
 				}
 			}
 

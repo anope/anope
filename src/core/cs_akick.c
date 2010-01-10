@@ -482,7 +482,6 @@ class CommandCSAKick : public Command
 		Channel *c = ci->c;
 		c_userlist *cu, *unext;
 		int count = 0;
-		const char *argv[3];
 
 		if (!c)
 		{
@@ -495,17 +494,9 @@ class CommandCSAKick : public Command
 		while (cu)
 		{
 			unext = cu->next;
-			if (check_kick(cu->user, c->name.c_str(), c->creation_time))
+			if (ci->CheckKick(cu->user))
 			{
-				argv[0] = sstrdup(c->name.c_str());
-				argv[1] = sstrdup(cu->user->nick.c_str());
-				argv[2] = sstrdup(Config.CSAutokickReason);
-
-				do_kick(Config.s_ChanServ, 3, argv);
-
-				delete [] argv[2];
-				delete [] argv[1];
-				delete [] argv[0];
+				c->Kick(NULL, cu->user, "%s", Config.CSAutokickReason);
 				count++;
 		        }
 		        cu = unext;

@@ -696,7 +696,6 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 	va_list args;
 	char buf[1024];
 	const char *fmt;
-	const char *av[3];
 
 	if (!ci || !ci->bi || !ci->c || !u)
 		return;
@@ -708,22 +707,15 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 	vsnprintf(buf, sizeof(buf), fmt, args);
 	va_end(args);
 
-	av[0] = ci->name.c_str();
-	av[1] = u->nick.c_str();
-	av[2] = buf;
-	ircdproto->SendKick(ci->bi, ci->c, u, "%s", av[2]);
-	do_kick(ci->bi->nick, 3, av);
-	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, buf));
+	ci->c->Kick(ci->bi, u, "%s", buf);
 }
 
 /*************************************************************************/
 
 /* Makes a simple ban and kicks the target */
 
-void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
-				 const char *reason)
+void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, const char *reason)
 {
-	const char *kav[4]; // seperate as not everything is constified XXX -- w00t
 	char mask[BUFSIZE];
 	User *u = finduser(nick);
 
@@ -753,35 +745,19 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
 	ci->c->SetMode(NULL, CMODE_BAN, mask);
 
-	kav[0] = ci->name.c_str();
-	kav[1] = nick;
-
-	if (!reason) {
-		kav[2] = ci->bi->nick.c_str();
-	} else {
-		if (strlen(reason) > 200)
-			(*const_cast<char **>(&reason))[200] = '\0'; // Unsafe cast -- will review later -- CyberBotX
-		kav[2] = reason;
-	}
-
 	/* Check if we need to do a signkick or not -GD */
-	if ((ci->HasFlag(CI_SIGNKICK) || ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK))
-		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", kav[2], requester->nick.c_str());
+	if (ci->HasFlag(CI_SIGNKICK) || ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK))
+		ci->c->Kick(ci->bi, u, "%s (%s)", reason ? reason : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
-		ircdproto->SendKick(ci->bi, ci->c, u, "%s", kav[2]);
-
-	do_kick(ci->bi->nick, 3, kav);
-	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, kav[2]));
+		ci->c->Kick(ci->bi, u, "%s", reason ? reason : ci->bi->nick.c_str());
 }
 
 /*************************************************************************/
 
 /* Makes a kick with a "dynamic" reason ;) */
 
-void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
-				  const char *reason)
+void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, const char *reason)
 {
-	const char *av[3];
 	User *u = finduser(nick);
 
 	if (!u || !is_on_chan(ci->c, u))
@@ -798,31 +774,17 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick.c_str(), nick) && (get_access(u, ci) >= get_access(requester, ci)))
 		return;
 
-	av[0] = ci->name.c_str();
-	av[1] = nick;
-
-	if (!reason) {
-		av[2] = ci->bi->nick.c_str();
-	} else {
-		if (strlen(reason) > 200)
-			(*const_cast<char **>(&reason))[200] = '\0'; // Unsafe cast -- will review later -- CyberBotX
-		av[2] = reason;
-	}
-
-	if (ci->HasFlag(CI_SIGNKICK) || ((ci->HasFlag(CI_SIGNKICK_LEVEL)) && !check_access(requester, ci, CA_SIGNKICK)))
-		ircdproto->SendKick(ci->bi, ci->c, u, "%s (%s)", av[2], requester->nick.c_str());
+	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
+		ci->c->Kick(ci->bi, u, "%s (%s)", reason ? reason : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
-		ircdproto->SendKick(ci->bi, ci->c, u, "%s", av[2]);
-	do_kick(ci->bi->nick, 3, av);
-	FOREACH_MOD(I_OnBotKick, OnBotKick(u, ci, av[2]));
+		ci->c->Kick(ci->bi, u, "%s", reason ? reason : ci->bi->nick.c_str());
 }
 
 /*************************************************************************/
 
 /* Makes a mode operation on a channel for a nick */
 
-void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
-				  char *nick)
+void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *nick)
 {
 	char buf[BUFSIZE];
 	User *u;

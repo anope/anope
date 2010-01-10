@@ -141,7 +141,6 @@ E int check_should_voice(User * user, char *chan);
 E int check_should_halfop(User * user, char *chan);
 E int check_should_owner(User * user, char *chan);
 E int check_should_protect(User * user, char *chan);
-E int check_kick(User * user, const char *chan, time_t chants);
 E void record_topic(const char *chan);
 E void restore_topic(const char *chan);
 E int check_topiclock(Channel * c, time_t topic_time);

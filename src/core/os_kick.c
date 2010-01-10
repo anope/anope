@@ -24,7 +24,6 @@ class CommandOSKick : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		const char *argv[3];
 		const char *chan = params[0].c_str(), *nick = params[1].c_str(), *s = params[2].c_str();
 		Channel *c;
 		User *u2;
@@ -45,16 +44,9 @@ class CommandOSKick : public Command
 			return MOD_CONT;
 		}
 
-		ircdproto->SendKick(findbot(Config.s_OperServ), c, u2, "%s (%s)", u->nick.c_str(), s);
+		c->Kick(findbot(Config.s_OperServ), u2, "%s (%s)", u->nick.c_str(), s);
 		if (Config.WallOSKick)
 			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan);
-		argv[0] = sstrdup(chan);
-		argv[1] = sstrdup(u2->nick.c_str());
-		argv[2] = sstrdup(s);
-		do_kick(Config.s_OperServ, 3, argv);
-		delete [] argv[2];
-		delete [] argv[1];
-		delete [] argv[0];
 		return MOD_CONT;
 	}
 

@@ -121,11 +121,7 @@ class CommandCSEnforce : public Command
 				get_idealban(ci, u, mask, sizeof(mask));
 				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
-				ircdproto->SendKick(whosends(ci), ci->c, u, "%s", reason);
-				av[0] = ci->name.c_str();
-				av[1] = u->nick.c_str();
-				av[2] = reason;
-				do_kick(Config.s_ChanServ, 3, av);
+				c->Kick(NULL, u, "%s", reason);
 			}
 			user = next;
 		} while (user);
@@ -140,7 +136,6 @@ class CommandCSEnforce : public Command
 		ChannelInfo *ci;
 		char mask[BUFSIZE];
 		const char *reason;
-		const char *av[3];
 		User *u;
 
 		if (!(ci = c->ci))
@@ -162,11 +157,7 @@ class CommandCSEnforce : public Command
 				{
 					c->SetMode(NULL, CMODE_BAN, mask);
 				}
-				ircdproto->SendKick(whosends(ci), ci->c, u, "%s", reason);
-				av[0] = ci->name.c_str();
-				av[1] = u->nick.c_str();
-				av[2] = reason;
-				do_kick(Config.s_ChanServ, 3, av);
+				c->Kick(NULL, u, "%s", reason);
 			}
 			user = next;
 		} while (user);

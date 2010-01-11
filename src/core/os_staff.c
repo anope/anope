@@ -15,9 +15,6 @@
 
 #include "module.h"
 
-int opers_list_callback(SList *slist, int number, void *item, va_list args);
-int opers_list(int number, NickCore *nc, User *u, char *level);
-
 class CommandOSStaff : public Command
 {
  public:
@@ -27,40 +24,33 @@ class CommandOSStaff : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		User *au = NULL;
-		NickCore *nc;
-		NickAlias *na;
-		int found;
-		int i;
-		std::list<std::pair<std::string, std::string> >::iterator it;
-
 		notice_lang(Config.s_OperServ, u, OPER_STAFF_LIST_HEADER);
 
-		for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+		for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 		{
-			found = 0;
+			int found = 0;
 			std::string nick = it->first, type = it->second;
 
-			if ((au = finduser(nick)))
+			NickAlias *na = findnick(nick);
+			if (na)
 			{
-				found = 1;
-				notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), nick.c_str());
-			}
-			else if ((nc = findcore(nick.c_str())))
-			{
-				for (i = 0; i < nc->aliases.count; i++)
+				/* We have to loop all users as some may be logged into an account but not a nick */
+				for (User *u2 = firstuser(); u2; u2 = nextuser())
 				{
-					na = static_cast<NickAlias *>(nc->aliases.list[i]);
-					if ((au = finduser(na->nick)))
+					if (u2->nc && u2->nc == na->nc)
 					{
 						found = 1;
-						notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), nick.c_str(), u->nick.c_str());
+						if (na->nick == u2->nick)
+							notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
+						else
+							notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick, u2->nick.c_str());
 					}
 				}
+				if (!found)
+				{
+					notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick);
+				}
 			}
-
-			if (!found)
-				notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), nick.c_str());
 		}
 
 		notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Staff");

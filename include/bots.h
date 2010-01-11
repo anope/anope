@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2009 Robin Burchell <w00t@inspircd.org>
- * Copyright (C) 2008-2009 Anope Team <team@anope.org>
+ * Copyright (C) 2008-2010 Robin Burchell <w00t@inspircd.org>
+ * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *

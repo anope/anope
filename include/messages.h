@@ -1,6 +1,6 @@
 /* Declarations of IRC message structures, variables, and functions.
  *
- * (C) 2003-2009 Anope Team
+ * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for furhter details.

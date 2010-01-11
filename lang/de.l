@@ -4042,7 +4042,7 @@ NICK_HELP_GHOST
 	wenn dein Computer abstürtzt oder deine Internet-
 	Verbindung zusammenbricht, wenn du im IRC bist.
 	
-	Wenn du das GHOST Befehk benutzen willst,muss 
+	Wenn du das GHOST Befehl benutzen willst,muss 
 	deine aktuelle Hostmaske (siehe /WHOIS) in der
 	Zugriffsliste des entsprechenden Nicknamens oder
 	in der Gruppe des Nicknamens sein.Weiterhin musst 

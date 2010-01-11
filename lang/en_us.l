@@ -4411,8 +4411,8 @@ CHAN_HELP_SET_PEACE
 	Syntax: SET channel PEACE {ON | OFF}
 	
 	Enables or disables the peace option for a channel.
-	When peace is set, an user won't be able to kick,
-	ban or remove a channel status of an user that has
+	When peace is set, a user won't be able to kick,
+	ban or remove a channel status of a user that has
 	a level superior or equal to his via %S commands.
 
 CHAN_HELP_SET_PRIVATE
@@ -6146,7 +6146,7 @@ BOT_HELP_KICK_BOLDS
 	Sets the bolds kicker on or off. When enabled, this
 	option tells the bot to kick users who use bolds.
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6156,7 +6156,7 @@ BOT_HELP_KICK_COLORS
 	Sets the colors kicker on or off. When enabled, this
 	option tells the bot to kick users who use colors.
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6166,7 +6166,7 @@ BOT_HELP_KICK_REVERSES
 	Sets the reverses kicker on or off. When enabled, this
 	option tells the bot to kick users who use reverses.
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6176,7 +6176,7 @@ BOT_HELP_KICK_UNDERLINES
 	Sets the underlines kicker on or off. When enabled, this
 	option tells the bot to kick users who use underlines.
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6192,7 +6192,7 @@ BOT_HELP_KICK_CAPS
 	text line (if not given, it defaults to 10 characters
 	and 25%%).
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6204,7 +6204,7 @@ BOT_HELP_KICK_FLOOD
 	the channel using at least ln lines in secs seconds
 	(if not given, it defaults to 6 lines in 10 seconds).
 	
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6216,7 +6216,7 @@ BOT_HELP_KICK_REPEAT
 	themselves num times (if num is not given, it
 	defaults to 3).
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 
@@ -6231,7 +6231,7 @@ BOT_HELP_KICK_BADWORDS
 	BADWORDS command. Type %R%S HELP BADWORDS for
 	more information.
 
-	ttb is the number of times an user can be kicked
+	ttb is the number of times a user can be kicked
 	before it get banned. Don't give ttb to disable
 	the ban system once activated.
 	
@@ -6248,12 +6248,12 @@ BOT_HELP_BADWORDS
 	
 	The BADWORDS ADD command adds the given word to the
 	badword list. If SINGLE is specified, a kick will be
-	done only if an user says the entire word. If START is 
-	specified, a kick will be done if an user says a word
+	done only if a user says the entire word. If START is 
+	specified, a kick will be done if a user says a word
 	that starts with word. If END is specified, a kick
-	will be done if an user says a word that ends with
+	will be done if a user says a word that ends with
 	word. If you don't specify anything, a kick will
-	be issued every time word is said by an user.
+	be issued every time word is said by a user.
 	
 	The BADWORDS DEL command removes the given word from the
 	bad words list.  If a list of entry numbers is given, those

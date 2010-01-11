@@ -244,7 +244,7 @@ int do_bot(User * u)
             if (user) {
                 for (ch = user; *ch && (ch - user) < USERMAX; ch++) {
                     if (!isalnum(*ch)) {
-                        notice_lang(s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+                        notice_lang(s_BotServ, u, BOT_BAD_IDENT, USERMAX - 1);
                         return MOD_CONT;
                     }
                 }

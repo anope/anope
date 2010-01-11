@@ -85,7 +85,7 @@ class CommandBSBot : public Command
 		{
 			if (!isalnum(*ch))
 			{
-				notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+				notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, USERMAX - 1);
 				return MOD_CONT;
 			}
 		}

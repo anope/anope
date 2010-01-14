@@ -266,6 +266,7 @@ void expire_exceptions()
 							 exceptions[i].mask);
 		delete [] exceptions[i].mask;
 		delete [] exceptions[i].reason;
+		delete [] exceptions[i].who;
 		nexceptions--;
 		memmove(exceptions + i, exceptions + i + 1,
 				sizeof(Exception) * (nexceptions - i));
@@ -335,13 +336,13 @@ int exception_add(User * u, const char *mask, const int limit,
 	}
 
 	nexceptions++;
-	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
+	exceptions = new Exception[nexceptions];
 
 	exceptions[nexceptions - 1].mask = sstrdup(mask);
 	exceptions[nexceptions - 1].limit = limit;
 	exceptions[nexceptions - 1].reason = sstrdup(reason);
 	exceptions[nexceptions - 1].time = time(NULL);
-	exceptions[nexceptions - 1].who = who;
+	exceptions[nexceptions - 1].who = sstrdup(who);
 	exceptions[nexceptions - 1].expires = expires;
 	exceptions[nexceptions - 1].num = nexceptions - 1;
 

@@ -481,7 +481,7 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 		exceptions[nexceptions - 1].mask = sstrdup(params[1].c_str());
 		exceptions[nexceptions - 1].limit = atol(params[2].c_str());
-		exceptions[nexceptions - 1].who = params[3];
+		exceptions[nexceptions - 1].who = sstrdup(params[3].c_str());
 		exceptions[nexceptions - 1].time = strtol(params[4].c_str(), NULL, 10);
 		exceptions[nexceptions - 1].expires = strtol(params[5].c_str(), NULL, 10);
 		exceptions[nexceptions - 1].reason = sstrdup(params[6].c_str());

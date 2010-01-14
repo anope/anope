@@ -167,7 +167,7 @@ static int exception_view(User *u, const int index, int *sent_header)
 
 	expire_left(u->nc, expirebuf, sizeof(expirebuf), exceptions[index].expires);
 
-	notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, !exceptions[index].who.empty() ? exceptions[index].who.c_str() : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
+	notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
 	return 1;
 }
 

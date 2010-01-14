@@ -1129,7 +1129,7 @@ struct sxline_ {
 struct exception_ {
 	char *mask;				 /* Hosts to which this exception applies */
 	int limit;				  /* Session limit for exception */
-	std::string who;		/* Nick of person who added the exception */
+	char *who;		/* Nick of person who added the exception */
 	char *reason;			   /* Reason for exception's addition */
 	time_t time;				/* When this exception was added */
 	time_t expires;			 /* Time when it expires. 0 == no expiry */

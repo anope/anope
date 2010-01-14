@@ -180,13 +180,13 @@ class OSDEFCON : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name)
+	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const std::string &param)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOff.HasFlag(Name))
 		{
-			c->RemoveMode(findbot(Config.s_OperServ), Name);
+			c->RemoveMode(findbot(Config.s_OperServ), Name, param);
 
 			return EVENT_STOP;
 		}
@@ -194,7 +194,7 @@ class OSDEFCON : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name)
+	EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name, const std::string &)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 

@@ -269,6 +269,9 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	if (!cm)
 		return;
 
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, cm->Name, param));
+
 	/* Setting v/h/o/a/q etc */
 	if (cm->Type == MODE_STATUS)
 	{
@@ -342,9 +345,6 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 			ci->SetFlag(CI_PERSIST);
 	}
 
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, cm->Name));
-
 	/* Check for mlock */
 
 	/* Non registered channel, no mlock */
@@ -400,6 +400,9 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 {
 	if (!cm)
 		return;
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name, param));
 
 	/* Setting v/h/o/a/q etc */
 	if (cm->Type == MODE_STATUS)
@@ -464,9 +467,6 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 				ircdproto->SendPart(ci->bi, this, NULL);
 		}
 	}
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name));
 
 	/* We set -P in an empty channel, delete the channel */
 	if (cm->Name == CMODE_PERM && !users)

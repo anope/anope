@@ -30,6 +30,7 @@ Legend:
 [x] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
 [x] Set forbidden channels +s
 [x] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
+[x] burn do_sjoin with fire
 
 Future
 ------
@@ -37,7 +38,6 @@ Future
 [?] Remote identification (1.9.1? will this break stuff?)
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] Add support for +k, +q, etc type umodes
-[ ] burn do_sjoin with fire
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] add overridden form of SendGlobops accepting BotInfo

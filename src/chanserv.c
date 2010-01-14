@@ -119,26 +119,41 @@ void moduleAddChanServCmds() {
 /* *INDENT-ON* */
 /*************************************************************************/
 
+/** A timer used to keep the BotServ bot/ChanServ in the channel
+ * after kicking the last user in a channel
+ */
 class ChanServTimer : public Timer
 {
-	private:
-		std::string channel;
+ private:
+ 	Channel *c;
 
-	public:
-		ChanServTimer(long delay, const std::string &chan) : Timer(delay), channel(chan)
-		{
-		}
+ public:
+	ChanServTimer(Channel *chan) : Timer(Config.CSInhabit), c(chan)
+	{
+		if (c->ci)
+			c->ci->SetFlag(CI_INHABIT);
+	}
 
-		void Tick(time_t ctime)
-		{
-			ChannelInfo *ci = cs_findchan(channel);
+	void Tick(time_t)
+	{
+		if (!c->ci)
+			return;
 
-			if (ci)
-				ci->UnsetFlag(CI_INHABIT);
+		c->ci->UnsetFlag(CI_INHABIT);
 
-			if (ci->c)
-				ircdproto->SendPart(findbot(Config.s_ChanServ), ci->c, NULL);
-		}
+		/* If the channel has users again, don't part it and halt */
+		if (c->usercount)
+			return;
+
+		if (c->ci->bi)
+			ircdproto->SendPart(c->ci->bi, c, NULL);
+		else
+			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+
+		/* Now delete the channel as it is empty */
+		if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))
+			delete c;
+	}
 };
 
 /*************************************************************************/
@@ -611,9 +626,8 @@ bool ChannelInfo::CheckKick(User *user)
 	NickCore *nc;
 	char mask[BUFSIZE];
 	const char *reason;
-	ChanServTimer *t;
 
-	if (!user)
+	if (!user || !this->c)
 		return false;
 
 	if (user->isSuperAdmin == 1)
@@ -680,18 +694,12 @@ bool ChannelInfo::CheckKick(User *user)
 		alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick.c_str(),
 			 user->GetIdent().c_str(), user->host, this->name.c_str());
 
-	/* Remember that the user has not been added to our channel user list
-	 * yet, so we check whether the channel does not exist OR has no user
-	 * on it (before SJOIN would have created the channel structure, while
-	 * JOIN would not). */
-	/* Don't check for CI_INHABIT before for the Channel record cos else
-	 * c may be NULL even if it exists */
-	if ((!this->c || this->c->usercount == 0) && !this->HasFlag(CI_INHABIT))
+	/* If the channel doesnt have any users and if a bot isn't already in the channel, join it
+	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
+	 */
+	if (this->c->usercount == 1 && !this->HasFlag(CI_INHABIT))
 	{
-		ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), (this->c ? this->c->creation_time : time(NULL)));
-		/*
-		 * If channel was forbidden, etc, set it +si to prevent rejoin
-		 */
+		/* If channel was forbidden, etc, set it +si to prevent rejoin */
 		if (set_modes)
 		{
 			c->SetMode(NULL, CMODE_NOEXTERNAL);
@@ -700,15 +708,18 @@ bool ChannelInfo::CheckKick(User *user)
 			c->SetMode(NULL, CMODE_INVITE);
 		}
 
-		t = new ChanServTimer(Config.CSInhabit, this->name.c_str());
-		this->SetFlag(CI_INHABIT);
+		/* This channel has no bot assigned to it, join ChanServ */
+		if (!this->bi)
+		{
+			ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
+		}
+		
+		/* Set a timer for this channel to part the bots later */
+		new ChanServTimer(this->c);
 	}
 
-	if (c)
-	{
-		c->SetMode(NULL, CMODE_BAN, mask);
-		ircdproto->SendKick(whosends(this), c, user, "%s", reason);
-	}
+	this->c->SetMode(NULL, CMODE_BAN, mask);
+	this->c->Kick(NULL, user, "%s", reason);
 
 	return true;
 }

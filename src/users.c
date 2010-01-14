@@ -277,7 +277,7 @@ User::~User()
 	while (c)
 	{
 		c2 = c->next;
-		chan_deluser(this, c->chan);
+		c->chan->DeleteUser(this);
 		delete c;
 		c = c2;
 	}

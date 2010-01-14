@@ -65,9 +65,6 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support inspircd TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
-	 0,						 /* SJOIN ban char */
-	 0,						 /* SJOIN except char */
-	 0,						 /* SJOIN invite char */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 0,						 /* ts6 */
@@ -460,59 +457,121 @@ int anope_event_fmode(const char *source, int ac, const char **av)
 
 int anope_event_fjoin(const char *source, int ac, const char **av)
 {
-	const char *newav[10];
+	Channel *c = findchan(av[0]);
+	time_t ts = atol(av[1]);
+	bool was_created = false;
+	bool keep_their_modes = true;
 
-	/* storing the current nick */
-	char *curnick;
+	if (!c)
+	{
+		c = new Channel(av[0], ts);
+		was_created = true;
+	}
+	/* Our creation time is newer than what the server gave us */
+	else if (c->creation_time > ts)
+	{
+		c->creation_time = ts;
 
-	/* these are used to generate the final string that is passed to ircservices' core */
-	int nlen = 0;
-	char nicklist[514];
-
-	/* temporary buffer */
-	char prefixandnick[60];
-
-	*nicklist = '\0';
-	*prefixandnick = '\0';
-
-	if (ac < 3)
-		return MOD_CONT;
-
-	spacesepstream nicks(av[2]);
-	std::string nick;
-
-	while (nicks.GetToken(nick)) {
-		curnick = sstrdup(nick.c_str());
-		char *curnick_real = curnick;
-		for (; *curnick; curnick++) {
-			/* I bet theres a better way to do this... */
-			if ((*curnick == '&') ||
-				(*curnick == '~') || (*curnick == '@') || (*curnick == '%')
-				|| (*curnick == '+')) {
-				prefixandnick[nlen++] = *curnick;
-				continue;
-			} else {
-				if (*curnick == ',') {
-					curnick++;
-					strncpy(prefixandnick + nlen, curnick,
-							sizeof(prefixandnick) - nlen);
-					break;
-				} else {
-					alog("fjoin: unrecognised prefix: %c", *curnick);
-				}
-			}
+		/* Remove status from all of our users */
+		for (struct c_userlist *cu = c->users; cu; cu = cu->next)
+		{
+			c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
 		}
-		strlcat(nicklist, prefixandnick, sizeof(nicklist));
-		strlcat(nicklist, " ", sizeof(nicklist));
-		delete [] curnick_real;
-		nlen = 0;
+		if (c->ci)
+		{
+			/* Rejoin the bot to fix the TS */
+			if (c->ci->bi)
+			{
+				ircdproto->SendPart(c->ci->bi, c, "TS reop");
+				bot_join(c->ci);
+			}
+			/* Reset mlock */
+			check_modes(c);
+		}
+	}
+	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
+	else
+		keep_their_modes = false;
+	
+	/* Mark the channel as syncing */
+	if (was_created)
+		c->SetFlag(CH_SYNCING);
+
+	spacesepstream sep(av[ac - 1]);
+	std::string buf;
+	while (sep.GetToken(buf))
+	{
+		std::list<ChannelMode *> Status;
+		Status.clear();
+		char ch;
+
+		/* Loop through prefixes */
+		while ((ch = ModeManager::GetStatusChar(buf[0])))
+		{
+			buf.erase(buf.begin());
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+
+			if (cm)
+			{
+				alog("Recieved unknown mode prefix %c in FJOIN string", buf[0]);
+				continue;
+			}
+
+			Status.push_back(cm);
+		}
+
+		User *u = finduser(buf);
+		if (!u)
+		{
+			if (debug)
+				alog("debug: FJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+			continue;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+		/* Add the user to the channel */
+		c->JoinUser(u);
+
+		/* Update their status internally on the channel
+		 * This will enforce secureops etc on the user
+		 */
+		for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
+		{
+			c->SetModeInternal(*it, buf);
+		}
+
+		/* Now set whatever modes this user is allowed to have on the channel */
+		chan_set_correct_modes(u, c, 1);
+
+		/* Check to see if modules want the user to join, if they do
+		 * check to see if they are allowed to join (CheckKick will kick/ban them)
+		 * Don't trigger OnJoinChannel event then as the user will be destroyed
+		 */
+		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+			continue;
+
+		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
 	}
 
-	newav[0] = av[1];		   /* timestamp */
-	newav[1] = av[0];		   /* channel name */
-	newav[2] = "+";			 /* channel modes */
-	newav[3] = nicklist;
-	do_sjoin(source, 4, newav);
+	/* Channel is done syncing */
+	if (was_created)
+	{
+		/* Unset the syncing flag */
+		c->UnsetFlag(CH_SYNCING);
+
+		/* If there are users in the channel they are allowed to be, set topic mlock etc. */
+		if (c->usercount)
+			c->Sync();
+		/* If there are no users in the channel, there is a ChanServ timer set to part the service bot
+		 * and destroy the channel soon
+		 */
+	}
 
 	return MOD_CONT;
 }
@@ -972,11 +1031,11 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("IDLE",	  anope_event_idle); addCoreMessage(IRCD,m);
 }
 
-bool ChannelModeFlood::IsValid(const char *value)
+bool ChannelModeFlood::IsValid(const std::string &value)
 {
 	char *dp, *end;
 
-	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end)
+	if (!value.empty() && value[0] != ':' && strtoul((value[0] == '*' ? value.c_str() + 1 : value.c_str()), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end)
 		return true;
 
 	return false;

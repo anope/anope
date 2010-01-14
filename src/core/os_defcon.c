@@ -461,7 +461,7 @@ void defconParseModeString(const char *str)
 						continue;
 					}
 
-					if (!cmp->IsValid(param.c_str()))
+					if (!cmp->IsValid(param))
 						continue;
 
 					SetDefConParam(cmp->Name, param);

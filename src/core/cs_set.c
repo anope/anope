@@ -217,7 +217,7 @@ class CommandCSSet : public Command
 						if (!modeparams.GetToken(param))
 							continue;
 
-						if (!cmp->IsValid(param.c_str()))
+						if (!cmp->IsValid(param))
 							continue;
 
 						ci->SetMLock(cmp->Name, true, param);

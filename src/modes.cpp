@@ -168,9 +168,9 @@ ChannelModeStatus::~ChannelModeStatus()
  * @param value The key
  * @return true or false
  */
-bool ChannelModeKey::IsValid(const char *value)
+bool ChannelModeKey::IsValid(const std::string &value)
 {
-	if (value && *value != ':' && !strchr(value, ','))
+	if (!value.empty() && value.find(':') != std::string::npos && value.find(',') != std::string::npos)
 		return true;
 
 	return false;

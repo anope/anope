@@ -68,17 +68,12 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *
 
 E Channel *chanlist[1024];
 
-E void chan_adduser2(User * user, Channel * c);
-E Channel *join_user_update(User * user, Channel * chan, const char *name, time_t chants);
-
 E void get_channel_stats(long *nrec, long *memuse);
 E Channel *findchan(const char *chan);
 E Channel *firstchan();
 E Channel *nextchan();
 
 E void ChanSetInternalModes(Channel *c, int ac, const char **av);
-
-E void chan_deluser(User * user, Channel * c);
 
 E int is_on_chan(Channel * c, User * u);
 E User *nc_on_chan(Channel * c, NickCore * nc);
@@ -97,7 +92,6 @@ E void do_cmode(const char *source, int ac, const char **av);
 E void do_join(const char *source, int ac, const char **av);
 E void do_kick(const std::string &source, int ac, const char **av);
 E void do_part(const char *source, int ac, const char **av);
-E void do_sjoin(const char *source, int ac, const char **av);
 E void do_topic(const char *source, int ac, const char **av);
 E void MassChannelModes(BotInfo *bi, const std::string &modes);
 

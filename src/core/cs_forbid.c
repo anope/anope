@@ -68,7 +68,6 @@ class CommandCSForbid : public Command
 		if ((c = findchan(ci->name.c_str())))
 		{
 			struct c_userlist *cu, *nextu;
-			const char *av[3];
 
 			/* Before banning everyone, it might be prudent to clear +e and +I lists..
 			 * to prevent ppl from rejoining.. ~ Viper */

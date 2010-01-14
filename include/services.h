@@ -410,10 +410,7 @@ struct ircdvars_ {
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
 	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
 	int token;					/* Does Anope support the tokens for the ircd */
-	int sjb64;					/* Base 64 encode TIMESTAMP */
-	int sjoinbanchar;			/* use single quotes to define it */
-	int sjoinexchar;			/* use single quotes to define it */
-	int sjoininvchar;			/* use single quotes to define it */
+	int sjb64;
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	int ts6;					/* ircd is TS6 */
@@ -832,7 +829,9 @@ struct c_userlist {
 enum ChannelFlags
 {
 	/* Channel still exists when emptied */
-	CH_PERSIST
+	CH_PERSIST,
+	/* If set the channel is syncing users (eg, multi user SJOIN) and it should not be deleted */
+	CH_SYNCING
 };
 
 class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
@@ -877,6 +876,20 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16 bouncy_modes;			/* Did we fail to set modes here? */
 	int16 topic_sync;		   /* Is the topic in sync? */
+
+	/** Restore the channel topic, set mlock (key), set stickied bans, etc
+	 */
+	void Sync();
+
+	/** Join a user internally to the channel
+	 * @param u The user
+	 */
+	void JoinUser(User *u);
+
+	/** Remove a user internally from the channel
+	 * @param u The user
+	 */
+	void DeleteUser(User *u);
 
 	/**
 	 * See if a channel has a mode

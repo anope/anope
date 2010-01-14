@@ -52,15 +52,7 @@ Channel::Channel(const std::string &name, time_t ts)
 
 	this->ci = cs_findchan(this->name);
 	if (this->ci)
-	{
 		this->ci->c = this;
-
-		check_modes(this);
-		stick_all(this->ci);
-	}
-
-	if (serv_uplink && is_sync(serv_uplink) && (!(this->topic_sync)))
-		restore_topic(name.c_str());
 
 	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
 }
@@ -120,6 +112,141 @@ Channel::~Channel()
 		this->prev->next = this->next;
 	else
 		chanlist[HASH(this->name)] = this->next;
+}
+
+void Channel::Sync()
+{
+	if (this->ci)
+	{
+		check_modes(this);
+		stick_all(this->ci);
+	}
+
+	if (serv_uplink && is_sync(serv_uplink) && !this->topic_sync)
+		restore_topic(name.c_str());
+}
+
+void Channel::JoinUser(User *user)
+{
+	struct u_chanlist *c;
+
+	if (debug)
+		alog("debug: %s joins %s", user->nick.c_str(), this->name.c_str());
+
+	c = new u_chanlist;
+	c->prev = NULL;
+	c->next = user->chans;
+	if (user->chans)
+		user->chans->prev = c;
+	user->chans = c;
+	c->chan = this;
+	c->status = 0;
+
+	struct c_userlist *u;
+
+	u = new c_userlist;
+	u->prev = NULL;
+	u->next = this->users;
+	if (this->users)
+		this->users->prev = u;
+	this->users = u;
+	u->user = user;
+	u->ud = NULL;
+	this->usercount++;
+
+	if (get_ignore(user->nick.c_str()) == NULL)
+	{
+		if (this->ci && (check_access(user, this->ci, CA_MEMO)) && (this->ci->memos.memos.size() > 0))
+		{
+			if (this->ci->memos.memos.size() == 1)
+				notice_lang(Config.s_MemoServ, user, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+			else
+				notice_lang(Config.s_MemoServ, user, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+		}
+		/* Added channelname to entrymsg - 30.03.2004, Certus */
+		/* Also, don't send the entrymsg when bursting -GD */
+		if (this->ci && this->ci->entry_message && is_sync(user->server))
+			user->SendMessage(whosends(this->ci)->nick, "[%s] %s", this->name.c_str(), this->ci->entry_message);
+	}
+
+	/**
+	 * We let the bot join even if it was an ignored user, as if we don't,
+	 * and the ignored user doesnt just leave, the bot will never
+	 * make it into the channel, leaving the channel botless even for
+	 * legit users - Rob
+	 * But don't join the bot if the channel is persistant - Adam
+	 **/
+	if (Config.s_BotServ && this->ci && this->ci->bi && !this->ci->HasFlag(CI_PERSIST))
+	{
+		if (this->usercount == Config.BSMinUsers)
+			bot_join(this->ci);
+	}
+	if (Config.s_BotServ && this->ci && this->ci->bi)
+	{
+		if (this->usercount >= Config.BSMinUsers && (this->ci->botflags.HasFlag(BS_GREET))
+		&& user->nc && user->nc->greet && check_access(user, this->ci, CA_GREET))
+		{
+			/* Only display the greet if the main uplink we're connected
+			 * to has synced, or we'll get greet-floods when the net
+			 * recovers from a netsplit. -GD
+			 */
+			if (is_sync(user->server))
+			{
+				ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->nc->display, user->nc->greet);
+				this->ci->bi->lastmsg = time(NULL);
+			}
+		}
+	}
+}
+
+/** Remove a user internally from the channel
+ * @param u The user
+ */
+void Channel::DeleteUser(User *user)
+{
+	if (this->ci)
+		update_cs_lastseen(user, this->ci);
+
+	struct c_userlist *u;
+	for (u = this->users; u && u->user != user; u = u->next);
+	if (!u)
+		return;
+
+	if (u->ud)
+	{
+		if (u->ud->lastline)
+			delete [] u->ud->lastline;
+		delete u->ud;
+	}
+
+	if (u->next)
+		u->next->prev = u->prev;
+	if (u->prev)
+		u->prev->next = u->next;
+	else
+		this->users = u->next;
+	delete u;
+	this->usercount--;
+
+	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
+	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
+		return;
+	
+	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
+	 * We also don't part the bot here either, if necessary we will part it after the sync
+	 */
+	if (this->HasFlag(CH_SYNCING))
+		return;
+	
+	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
+	if (this->ci && this->ci->HasFlag(CI_INHABIT))
+		return;
+
+	if (Config.s_BotServ && this->ci && this->ci->bi && this->usercount <= Config.BSMinUsers - 1)
+		ircdproto->SendPart(this->ci->bi, this, NULL);
+	
+	if (!this->users)
+		delete this;
 }
 
 /**
@@ -290,12 +417,12 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		User *u = finduser(param);
 		if (!u)
 		{
-			alog("Channel::RemoveModeInternal() MODE %s +%c for nonexistant user %s", this->name.c_str(), cm->ModeChar, param.c_str());
+			alog("Channel::RemoveModeInternal() MODE %s -%c for nonexistant user %s", this->name.c_str(), cm->ModeChar, param.c_str());
 			return;
 		}
 
 		if (debug)
-			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
+			alog("debug: Setting -%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
 
 		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
 		chan_remove_user_status(this, u, cms->Status);
@@ -381,8 +508,23 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
  */
 void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bool EnforceMLock)
 {
-	if (!cm || HasMode(cm->Name))
+	if (!cm)
 		return;
+	/* Don't set modes already set */
+	if ((cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && HasMode(cm->Name))
+		return;
+
+	else if (cm->Type == MODE_STATUS)
+	{
+		User *u = finduser(param);
+		if (u)
+		{
+			if (chan_has_user_status(this, u, dynamic_cast<ChannelModeStatus *>(cm)->Status))
+			{
+				return;
+			}
+		}
+	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
 	SetModeInternal(cm, param, EnforceMLock);
@@ -420,8 +562,23 @@ void Channel::SetMode(BotInfo *bi, char Mode, const std::string &param, bool Enf
  */
 void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bool EnforceMLock)
 {
-	if (!cm || !HasMode(cm->Name))
+	if (!cm)
 		return;
+	/* Don't unset modes that arent set */
+	if ((cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && !HasMode(cm->Name))
+		return;
+	/* Don't unset status that aren't set */
+	else if (cm->Type == MODE_STATUS)
+	{
+		User *u = finduser(param);
+		if (u)
+		{
+			if (!chan_has_user_status(this, u, dynamic_cast<ChannelModeStatus *>(cm)->Status))
+			{
+				return;
+			}
+		}
+	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, param);
 	RemoveModeInternal(cm, param, EnforceMLock);
@@ -748,7 +905,7 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 	if (c)
 	{
 		FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, source, reason));
-		chan_deluser(user, c->chan);
+		c->chan->DeleteUser(user);
 		if (c->next)
 			c->next->prev = c->prev;
 		if (c->prev)
@@ -783,47 +940,6 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	this->KickInternal(bi ? bi->nick : whosends(this->ci)->nick, u->nick, buf);
 	return true;
 }
-
-/*************************************************************************/
-
-void chan_deluser(User * user, Channel * c)
-{
-	struct c_userlist *u;
-
-	if (c->ci)
-		update_cs_lastseen(user, c->ci);
-
-	for (u = c->users; u && u->user != user; u = u->next);
-	if (!u)
-		return;
-
-	if (u->ud) {
-		if (u->ud->lastline)
-			delete [] u->ud->lastline;
-		delete u->ud;
-	}
-
-	if (u->next)
-		u->next->prev = u->prev;
-	if (u->prev)
-		u->prev->next = u->next;
-	else
-		c->users = u->next;
-	delete u;
-	c->usercount--;
-
-	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
-	if (c->HasFlag(CH_PERSIST) || (c->ci && c->ci->HasFlag(CI_PERSIST)))
-		return;
-
-	if (Config.s_BotServ && c->ci && c->ci->bi && c->usercount == Config.BSMinUsers - 1)
-		ircdproto->SendPart(c->ci->bi, c, NULL);
-
-	if (!c->users)
-		delete c;
-}
-
-/*************************************************************************/
 
 /* Returns a fully featured binary modes string. If complete is 0, the
  * eventual parameters won't be added to the string.
@@ -1134,6 +1250,7 @@ void do_join(const char *source, int ac, const char **av)
 	char *s, *t;
 	struct u_chanlist *c, *nextc;
 	char *channame;
+	time_t ctime = time(NULL);
 
 	if (ircd->ts6) {
 		user = find_byuid(source);
@@ -1162,7 +1279,7 @@ void do_join(const char *source, int ac, const char **av)
 				nextc = c->next;
 				channame = sstrdup(c->chan->name.c_str());
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
-				chan_deluser(user, c->chan);
+				c->chan->DeleteUser(user);
 				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame), channame, ""));
 				delete [] channame;
 				delete c;
@@ -1174,27 +1291,51 @@ void do_join(const char *source, int ac, const char **av)
 
 		chan = findchan(s);
 
-		/* how about not triggering the JOIN event on an actual /part :) -certus */
-		FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, s));
+		/* Channel doesn't exist, create it */
+		if (!chan)
+		{
+			chan = new Channel(av[0], ctime);
+		}
 
-		/* Make sure check_kick comes before chan_adduser, so banned users
-		 * don't get to see things like channel keys. */
-		/* If channel already exists, check_kick() will use correct TS.
-		 * Otherwise, we lose. */
-		if (chan && chan->ci && chan->ci->CheckKick(user))
-			continue;
+		/* Join came with a TS */
+		if (ac == 2)
+		{
+			time_t ts = atol(av[1]);
 
-		time_t ts = time(NULL);
-		if (ac == 2) {
-			ts = strtoul(av[1], NULL, 10);
-			if (debug) {
-				alog("debug: recieved a new TS for JOIN: %ld",
-					 static_cast<long>(ts));
+			/* Their time is older, we lose */
+			if (chan->creation_time > ts)
+			{
+				if (debug)
+					alog("debug: recieved a new TS for JOIN: %ld", ts);
+
+				if (chan->ci)
+				{
+					/* Cycle the bot to fix ts */
+					if (chan->ci->bi)
+					{
+						ircdproto->SendPart(chan->ci->bi, chan, "TS reop");
+						bot_join(chan->ci);
+					}
+					/* Be sure to set mlock again, else we could be -r etc.. */
+					check_modes(chan);
+				}
 			}
 		}
 
-		chan = join_user_update(user, chan, s, ts);
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(user, chan));
+
+		/* Join the user to the channel */
+		chan->JoinUser(user);
+		/* Set the propre modes on the user */
 		chan_set_correct_modes(user, chan, 1);
+
+		/* Modules may want to allow this user in the channel, check.
+		 * If not, CheckKick will kick/ban them, don't call OnJoinChannel after this as the user will have
+		 * been destroyed
+		 */
+		if (MOD_RESULT != EVENT_STOP && chan && chan->ci && chan->ci->CheckKick(user))
+			continue;
 
 		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, chan));
 	}
@@ -1269,7 +1410,7 @@ void do_part(const char *source, int ac, const char **av)
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 			std::string ChannelName = c->chan->name;
 
-			chan_deluser(user, c->chan);
+			c->chan->DeleteUser(user);
 
 			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName.c_str()), ChannelName, av[1] ? av[1] : ""));
 
@@ -1280,424 +1421,6 @@ void do_part(const char *source, int ac, const char **av)
 			else
 				user->chans = c->next;
 			delete c;
-		}
-	}
-}
-
-/*************************************************************************/
-
-/* Handle a SJOIN command.
-
-   On channel creation, syntax is:
-
-   av[0] = timestamp
-   av[1] = channel name
-   av[2|3|4] = modes   \   depends of whether the modes k and l
-   av[3|4|5] = users   /   are set or not.
-
-   When a single user joins an (existing) channel, it is:
-
-   av[0] = timestamp
-   av[1] = user
-
-   ============================================================
-
-   Unreal SJOIN
-
-   On Services connect there is
-   SJOIN !11LkOb #ircops +nt :@Trystan &*!*@*.aol.com "*@*.home.com
-
-   av[0] = time stamp (base64)
-   av[1] = channel
-   av[2] = modes
-   av[3] = users + bans + exceptions
-
-   On Channel Creation or a User joins an existing
-   Luna.NomadIrc.Net SJOIN !11LkW9 #akill :@Trystan
-   Luna.NomadIrc.Net SJOIN !11LkW9 #akill :Trystan`
-
-   av[0] = time stamp (base64)
-   av[1] = channel
-   av[2] = users
-
-*/
-
-void do_sjoin(const char *source, int ac, const char **av)
-{
-	Channel *c;
-	User *user;
-	Server *serv;
-	struct c_userlist *cu;
-	const char *s = NULL;
-	char *buf, *end, cubuf[7], *end2, value;
-	const char *modes[6];
-	int is_sqlined = 0;
-	int ts = 0;
-	int is_created = 0;
-	int keep_their_modes = 1;
-	ChannelModeList *cml;
-
-	serv = findserver(servlist, source);
-
-	if (ircd->sjb64) {
-		ts = base64dects(av[0]);
-	} else {
-		ts = strtoul(av[0], NULL, 10);
-	}
-	c = findchan(av[1]);
-	if (c != NULL) {
-		if (c->creation_time == 0 || ts == 0)
-			c->creation_time = 0;
-		else if (c->creation_time > ts) {
-			c->creation_time = ts;
-			for (cu = c->users; cu; cu = cu->next) {
-				c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
-				c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
-			}
-			if (c->ci)
-			{
-				if (c->ci->bi)
-				{
-					/* This is ugly, but it always works */
-					ircdproto->SendPart(c->ci->bi, c, "TS reop");
-					bot_join(c->ci);
-				}
-				/* Make sure +r is set */
-				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-				{
-					c->SetMode(NULL, CMODE_REGISTERED);
-				}
-			}
-			/* XXX simple modes and bans */
-		} else if (c->creation_time < ts)
-			keep_their_modes = 0;
-	} else
-		is_created = 1;
-
-	/* Double check to avoid unknown modes that need parameters */
-	if (ac >= 4) {
-		if (ircd->chansqline) {
-			if (!c)
-				is_sqlined = check_chan_sqline(av[1]);
-		}
-
-		cubuf[0] = '+';
-		modes[0] = cubuf;
-
-		/* We make all the users join */
-		s = av[ac - 1];		 /* Users are always the last element */
-
-		while (*s) {
-			end = const_cast<char *>(strchr(s, ' '));
-			if (end)
-				*end = 0;
-
-			end2 = cubuf + 1;
-
-
-			if (ircd->sjoinbanchar) {
-				if (*s == ircd->sjoinbanchar && keep_their_modes) {
-					buf = myStrGetToken(s, ircd->sjoinbanchar, 1);
-
-					cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
-					if (cml->IsValid(buf))
-						cml->AddMask(c, buf);
-
-					delete [] buf;
-					if (!end)
-						break;
-					s = end + 1;
-					continue;
-				}
-			}
-			if (ircd->sjoinexchar) {
-				if (*s == ircd->sjoinexchar && keep_their_modes) {
-					buf = myStrGetToken(s, ircd->sjoinexchar, 1);
-
-					cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
-					if (cml->IsValid(buf))
-						cml->AddMask(c, buf);
-
-					delete [] buf;
-					if (!end)
-						break;
-					s = end + 1;
-					continue;
-				}
-			}
-
-			if (ircd->sjoininvchar) {
-				if (*s == ircd->sjoininvchar && keep_their_modes) {
-					buf = myStrGetToken(s, ircd->sjoininvchar, 1);
-
-					cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
-					if (cml->IsValid(buf))
-						cml->AddMask(c, buf);
-
-					delete [] buf;
-					if (!end)
-						break;
-					s = end + 1;
-					continue;
-				}
-			}
-
-			while ((value = ModeManager::GetStatusChar(*s)))
-			{
-				*end2++ = value;
-				*s++;
-			}
-			*end2 = 0;
-
-			if (ircd->ts6) {
-				user = find_byuid(s);
-				if (!user)
-					user = finduser(s);
-			} else {
-				user = finduser(s);
-			}
-
-			if (!user) {
-				if (debug) {
-					alog("debug: SJOIN for nonexistent user %s on %s", s,
-						 av[1]);
-				}
-				return;
-			}
-
-			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
-			} else {
-				if (!c || !c->ci || !c->ci->CheckKick(user))
-				{
-					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
-
-					/* Make the user join; if the channel does not exist it
-					 * will be created there. This ensures that the channel
-					 * is not created to be immediately destroyed, and
-					 * that the locked key or topic is not shown to anyone
-					 * who joins the channel when empty.
-					 */
-					c = join_user_update(user, c, av[1], ts);
-
-					/* We update user mode on the channel */
-					if (end2 - cubuf > 1 && keep_their_modes) {
-						int i;
-
-						for (i = 1; i < end2 - cubuf; i++)
-							modes[i] = user->nick.c_str();
-
-						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
-					}
-
-					if (c->ci && (!serv || is_sync(serv))
-						&& !c->topic_sync)
-						restore_topic(c->name.c_str());
-					chan_set_correct_modes(user, c, 1);
-
-					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
-				}
-			}
-
-			if (!end)
-				break;
-			s = end + 1;
-		}
-
-		if (c && keep_their_modes) {
-			/* We now update the channel mode. */
-			ChanSetInternalModes(c, ac - 3, &av[2]);
-		}
-
-		/* Unreal just had to be different */
-	} else if (ac == 3 && !ircd->ts6) {
-		if (ircd->chansqline) {
-			if (!c)
-				is_sqlined = check_chan_sqline(av[1]);
-		}
-
-		cubuf[0] = '+';
-		modes[0] = cubuf;
-
-		/* We make all the users join */
-		s = av[2];			  /* Users are always the last element */
-
-		while (*s) {
-			end = const_cast<char *>(strchr(s, ' '));
-			if (end)
-				*end = 0;
-
-			end2 = cubuf + 1;
-
-			while ((value = ModeManager::GetStatusChar(*s)))
-			{
-				*end2++ = value;
-				*s++;
-			}
-			*end2 = 0;
-
-			if (ircd->ts6) {
-				user = find_byuid(s);
-				if (!user)
-					user = finduser(s);
-			} else {
-				user = finduser(s);
-			}
-
-			if (!user) {
-				if (debug) {
-					alog("debug: SJOIN for nonexistent user %s on %s", s,
-						 av[1]);
-				}
-				return;
-			}
-
-			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
-			} else {
-				if (!c || !c->ci || !c->ci->CheckKick(user))
-				{
-					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
-
-					/* Make the user join; if the channel does not exist it
-					 * will be created there. This ensures that the channel
-					 * is not created to be immediately destroyed, and
-					 * that the locked key or topic is not shown to anyone
-					 * who joins the channel when empty.
-					 */
-					c = join_user_update(user, c, av[1], ts);
-
-					/* We update user mode on the channel */
-					if (end2 - cubuf > 1 && keep_their_modes) {
-						int i;
-
-						for (i = 1; i < end2 - cubuf; i++)
-							modes[i] = user->nick.c_str();
-						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
-					}
-
-					chan_set_correct_modes(user, c, 1);
-
-					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
-				}
-			}
-
-			if (!end)
-				break;
-			s = end + 1;
-		}
-	} else if (ac == 3 && ircd->ts6) {
-		if (ircd->chansqline) {
-			if (!c)
-				is_sqlined = check_chan_sqline(av[1]);
-		}
-
-		cubuf[0] = '+';
-		modes[0] = cubuf;
-
-		/* We make all the users join */
-		s = sstrdup(source);	/* Users are always the last element */
-
-		while (*s) {
-			end = const_cast<char *>(strchr(s, ' '));
-			if (end)
-				*end = 0;
-
-			end2 = cubuf + 1;
-
-			while ((value = ModeManager::GetStatusChar(*s)))
-			{
-				*end2++ = value;
-				*s++;
-			}
-			*end2 = 0;
-
-			if (ircd->ts6) {
-				user = find_byuid(s);
-				if (!user)
-					user = finduser(s);
-			} else {
-				user = finduser(s);
-			}
-			if (!user) {
-				if (debug) {
-					alog("debug: SJOIN for nonexistent user %s on %s", s,
-						 av[1]);
-				}
-				delete [] s;
-				return;
-			}
-
-			if (is_sqlined && !is_oper(user)) {
-				ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
-			} else {
-				if (!c || !c->ci || !c->ci->CheckKick(user))
-				{
-					FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
-
-					/* Make the user join; if the channel does not exist it
-					 * will be created there. This ensures that the channel
-					 * is not created to be immediately destroyed, and
-					 * that the locked key or topic is not shown to anyone
-					 * who joins the channel when empty.
-					 */
-					c = join_user_update(user, c, av[1], ts);
-
-					/* We update user mode on the channel */
-					if (end2 - cubuf > 1 && keep_their_modes) {
-						int i;
-
-						for (i = 1; i < end2 - cubuf; i++)
-							modes[i] = user->nick.c_str();
-						ChanSetInternalModes(c, 1 + (end2 - cubuf - 1), modes);
-					}
-
-					chan_set_correct_modes(user, c, 1);
-
-					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
-				}
-			}
-
-			if (!end)
-				break;
-			s = end + 1;
-		}
-		delete [] s;
-	} else if (ac == 2) {
-		if (ircd->ts6) {
-			user = find_byuid(source);
-			if (!user)
-				user = finduser(source);
-		} else {
-			user = finduser(source);
-		}
-		if (!user) {
-			if (debug) {
-				alog("debug: SJOIN for nonexistent user %s on %s", source,
-					 av[1]);
-			}
-			return;
-		}
-
-		if (c && c->ci && c->ci->CheckKick(user))
-			return;
-
-		if (ircd->chansqline) {
-			if (!c)
-				is_sqlined = check_chan_sqline(av[1]);
-		}
-
-		if (is_sqlined && !is_oper(user)) {
-			ircdproto->SendKick(findbot(Config.s_OperServ), c, user, "Q-Lined");
-		} else {
-			FOREACH_MOD(I_OnPreJoinChannel, OnPreJoinChannel(user, av[1]));
-
-			c = join_user_update(user, c, av[1], ts);
-			if (is_created && c->ci)
-				restore_topic(c->name.c_str());
-			chan_set_correct_modes(user, c, 1);
-
-			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, c));
 		}
 	}
 }
@@ -1993,132 +1716,6 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 		chan_set_user_status(c, user, add_modes);
 	if (rem_modes > 0)
 		chan_remove_user_status(c, user, rem_modes);
-}
-
-/*************************************************************************/
-
-/* Add/remove a user to/from a channel, creating or deleting the channel as
- * necessary.  If creating the channel, restore mode lock and topic as
- * necessary.  Also check for auto-opping and auto-voicing.
- */
-
-void chan_adduser2(User * user, Channel * c)
-{
-	struct c_userlist *u;
-
-	u = new c_userlist;
-	u->prev = NULL;
-	u->next = c->users;
-	if (c->users)
-		c->users->prev = u;
-	c->users = u;
-	u->user = user;
-	u->ud = NULL;
-	c->usercount++;
-
-	if (get_ignore(user->nick.c_str()) == NULL) {
-		if (c->ci && (check_access(user, c->ci, CA_MEMO))
-			&& (c->ci->memos.memos.size() > 0)) {
-			if (c->ci->memos.memos.size() == 1) {
-				notice_lang(Config.s_MemoServ, user, MEMO_X_ONE_NOTICE,
-							c->ci->memos.memos.size(), c->ci->name.c_str());
-			} else {
-				notice_lang(Config.s_MemoServ, user, MEMO_X_MANY_NOTICE,
-							c->ci->memos.memos.size(), c->ci->name.c_str());
-			}
-		}
-		/* Added channelname to entrymsg - 30.03.2004, Certus */
-		/* Also, don't send the entrymsg when bursting -GD */
-		if (c->ci && c->ci->entry_message && is_sync(user->server))
-			user->SendMessage(whosends(c->ci)->nick, "[%s] %s", c->name.c_str(), c->ci->entry_message);
-	}
-
-	/**
-	 * We let the bot join even if it was an ignored user, as if we don't,
-	 * and the ignored user dosnt just leave, the bot will never
-	 * make it into the channel, leaving the channel botless even for
-	 * legit users - Rob
-	 * But don't join the bot if the channel is persistant - Adam
-	 **/
-	if (Config.s_BotServ && c->ci && c->ci->bi && !c->ci->HasFlag(CI_PERSIST))
-	{
-		if (c->usercount == Config.BSMinUsers)
-			bot_join(c->ci);
-	}
-	if (Config.s_BotServ && c->ci && c->ci->bi)
-	{
-		if (c->usercount >= Config.BSMinUsers && (c->ci->botflags.HasFlag(BS_GREET))
-			&& user->nc && user->nc->greet
-			&& check_access(user, c->ci, CA_GREET)) {
-			/* Only display the greet if the main uplink we're connected
-			 * to has synced, or we'll get greet-floods when the net
-			 * recovers from a netsplit. -GD
-			 */
-			if (is_sync(user->server)) {
-				ircdproto->SendPrivmsg(c->ci->bi, c->name.c_str(), "[%s] %s",
-								  user->nc->display, user->nc->greet);
-				c->ci->bi->lastmsg = time(NULL);
-			}
-		}
-	}
-}
-
-/*************************************************************************/
-
-Channel *join_user_update(User * user, Channel * chan, const char *name,
-						  time_t chants)
-{
-	struct u_chanlist *c;
-
-	/* If it's a new channel, so we need to create it first. */
-	if (!chan)
-		chan = new Channel(name, chants);
-	else
-	{
-		// Check chants against 0, as not every ircd sends JOIN with a TS.
-		if (chan->creation_time > chants && chants != 0)
-		{
-			struct c_userlist *cu;
-
-			chan->creation_time = chants;
-			for (cu = chan->users; cu; cu = cu->next)
-			{
-				chan->RemoveMode(NULL, CMODE_OP, cu->user->nick);
-				chan->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
-			}
-			if (chan->ci)
-			{
-				if (chan->ci->bi)
-				{
-					/* This is ugly, but it always works */
-					ircdproto->SendPart(chan->ci->bi, chan, "TS reop");
-					bot_join(chan->ci);
-				}
-				/* Make sure +r is set */
-				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-				{
-					chan->SetMode(NULL, CMODE_REGISTERED);
-				}
-			}
-			/* XXX simple modes and bans */
-		}
-	}
-
-	if (debug)
-		alog("debug: %s joins %s", user->nick.c_str(), chan->name.c_str());
-
-	c = new u_chanlist;
-	c->prev = NULL;
-	c->next = user->chans;
-	if (user->chans)
-		user->chans->prev = c;
-	user->chans = c;
-	c->chan = chan;
-	c->status = 0;
-
-	chan_adduser2(user, chan);
-
-	return chan;
 }
 
 /*************************************************************************/

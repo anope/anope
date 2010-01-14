@@ -65,9 +65,6 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support inspircd TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
-	 0,						 /* SJOIN ban char */
-	 0,						 /* SJOIN except char */
-	 0,						 /* SJOIN invite char */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 1,						 /* ts6 */
@@ -513,91 +510,133 @@ int anope_event_fmode(const char *source, int ac, const char **av)
  *
  * 0: name
  * 1: channel ts (when it was created, see protocol docs for more info)
- * 2: channel modes + params (NOTEL this may definitely be more than one param!)
+ * 2: channel modes + params (NOTE: this may definitely be more than one param!)
  * last: users
  */
 int anope_event_fjoin(const char *source, int ac, const char **av)
 {
-	const char *newav[30]; // hopefully 30 will do until the stupid ac/av stuff goes away.
+	Channel *c = findchan(av[0]);
+	time_t ts = atol(av[1]);
+	bool was_created = false;
+	bool keep_their_modes = true;
 
-	/* storing the current nick */
-	char *curnick;
-
-	/* these are used to generate the final string that is passed to ircservices' core */
-	int nlen = 0;
-	char nicklist[514];
-
-	/* temporary buffer */
-	char prefixandnick[60];
-
-	*nicklist = '\0';
-	*prefixandnick = '\0';
-
-	if (ac <= 3)
-		return MOD_CONT;
-
-	spacesepstream nicks(av[ac - 1]);
-	std::string nick;
-
-	while (nicks.GetToken(nick))
+	if (!c)
 	{
-		curnick = sstrdup(nick.c_str());
-		char *curnick_real = curnick;
-		for (; *curnick; curnick++)
+		c = new Channel(av[0], ts);
+		was_created = true;
+	}
+	/* Our creation time is newer than what the server gave us */
+	else if (c->creation_time > ts)
+	{
+		c->creation_time = ts;
+
+		/* Remove status from all of our users */
+		for (struct c_userlist *cu = c->users; cu; cu = cu->next)
 		{
-			/* XXX: bleagh! -- w00t */
-			switch (*curnick)
+			c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
+		}
+		if (c->ci)
+		{
+			/* Rejoin the bot to fix the TS */
+			if (c->ci->bi)
 			{
-				case 'q':
-					prefixandnick[nlen++] = '~';
-					break;
-				case 'a':
-					prefixandnick[nlen++] = '&';
-					break;
-				case 'o':
-					prefixandnick[nlen++] = '@';
-					break;
-				case 'h':
-					prefixandnick[nlen++] = '%';
-					break;
-				case 'v':
-					prefixandnick[nlen++] = '+';
-					break;
-				case ',':
-					curnick++;
-					strncpy(prefixandnick + nlen, curnick, sizeof(prefixandnick) - nlen);
-					goto endnick;
-					break;
-				default:
-					alog("fjoin: unrecognised prefix: %c", *curnick);
-					break;
+				ircdproto->SendPart(c->ci->bi, c, "TS reop");
+				bot_join(c->ci);
 			}
+			/* Reset mlock */
+			check_modes(c);
+		}
+	}
+	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
+	else
+		keep_their_modes = false;
+	
+	/* Mark the channel as syncing */
+	if (was_created)
+		c->SetFlag(CH_SYNCING);
+	
+	/* If we need to keep their modes, and this FJOIN string contains modes */
+	if (keep_their_modes && ac >= 4)
+	{
+		/* Set the modes internally */
+		ChanSetInternalModes(c, ac - 3, av + 2);
+	}
+
+	spacesepstream sep(av[ac - 1]);
+	std::string buf;
+	while (sep.GetToken(buf))
+	{
+		std::list<ChannelMode *> Status;
+		Status.clear();
+
+		/* Loop through prefixes and find modes for them */
+		while (buf[0] != ',')
+		{
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(buf[0]);
+			buf.erase(buf.begin());
+			if (!cm)
+			{
+				alog("Recieved unknown mode prefix %c in FJOIN string", buf[0]);
+				continue;
+			}
+
+			Status.push_back(cm);
+		}
+		buf.erase(buf.begin());
+
+		User *u = find_byuid(buf);
+		if (!u)
+		{
+			if (debug)
+				alog("debug: FJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+			continue;
 		}
 
-// Much as I hate goto.. I can't `break 2' to get here.. XXX ugly
-endnick:
-		strlcat(nicklist, prefixandnick, sizeof(nicklist));
-		strlcat(nicklist, " ", sizeof(nicklist));
-		delete [] curnick_real;
-		nlen = 0;
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+		/* Add the user to the channel */
+		c->JoinUser(u);
+
+		/* Update their status internally on the channel
+		 * This will enforce secureops etc on the user
+		 */
+		for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
+		{
+			c->SetModeInternal(*it, buf);
+		}
+
+		/* Now set whatever modes this user is allowed to have on the channel */
+		chan_set_correct_modes(u, c, 1);
+
+		/* Check to see if modules want the user to join, if they do
+		 * check to see if they are allowed to join (CheckKick will kick/ban them)
+		 * Don't trigger OnJoinChannel event then as the user will be destroyed
+		 */
+		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+			continue;
+
+		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
 	}
 
-	newav[0] = av[1];		   /* timestamp */
-	newav[1] = av[0];		   /* channel name */
-
-	int i;
-
-	/* We want to replace the last string with our newly formatted user string */
-	for (i = 2; i != ac - 1; i++)
+	/* Channel is done syncing */
+	if (was_created)
 	{
-		newav[i] = av[i];
+		/* Unset the syncing flag */
+		c->UnsetFlag(CH_SYNCING);
+
+		/* If there are users in the channel they are allowed to be, set topic mlock etc */
+		if (c->usercount)
+			c->Sync();
+		/* If there are no users in the channel, there is a ChanServ timer set to part the service bot
+		 * and destroy the channel soon
+		 */
 	}
-
-	newav[i] = nicklist;
-	i++;
-
-	do_sjoin(source, i, newav);
-
+	
 	return MOD_CONT;
 }
 
@@ -1177,10 +1216,10 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("METADATA", anope_event_metadata); addCoreMessage(IRCD,m);
 }
 
-bool ChannelModeFlood::IsValid(const char *value)
+bool ChannelModeFlood::IsValid(const std::string &value)
 {
 	char *dp, *end;
-	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+	if (!value.empty() && value[0] != ':' && strtoul((value[0] == '*' ? value.c_str() + 1 : value.c_str()), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
 	else return 0;
 }
 

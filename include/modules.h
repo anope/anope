@@ -644,9 +644,10 @@ class CoreExport Module
 
 	/** Called before a user joins a channel
 	 * @param u The user
-	 * @param channel The channel
+	 * @param c The channel
+	 * @return EVENT_STOP to allow the user to join the channel through restrictions, EVENT_CONTINUE to let other modules decide
 	 */
-	virtual void OnPreJoinChannel(User *u, const char *channel) { }
+	virtual EventReturn OnPreJoinChannel(User *u, Channel *c) { return EVENT_CONTINUE; }
 
 	/** Called when a user joins a channel
 	 * @param u The user

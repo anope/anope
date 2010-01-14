@@ -46,9 +46,6 @@ IRCDVar myIrcd[] = {
 	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
-	 0,						 /* SJOIN ban char */
-	 0,						 /* SJOIN except char */
-	 0,						 /* SJOIN invite char */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 1,						 /* ts6 */
@@ -335,7 +332,7 @@ class RatboxProto : public IRCDTS6Proto
 		snprintf(svidbuf, sizeof(svidbuf), "%ld", static_cast<long>(u->timestamp));
 
 		u->nc->Shrink("authenticationtoken");
-		u->nc->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(svidbuf));
+		u->nc->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 	}
 
 } ircd_proto;
@@ -345,7 +342,128 @@ class RatboxProto : public IRCDTS6Proto
 
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
-	do_sjoin(source, ac, av);
+	Channel *c = findchan(av[1]);
+	time_t ts = atol(av[0]);
+	bool was_created = false;
+	bool keep_their_modes = true;
+
+	if (!c)
+	{
+		c = new Channel(av[1], ts);
+		was_created = true;
+	}
+	/* Our creation time is newer than what the server gave us */
+	else if (c->creation_time > ts)
+	{
+		c->creation_time = ts;
+
+		/* Remove status from all of our users */
+		for (struct c_userlist *cu = c->users; cu; cu = cu->next)
+		{
+			c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
+			c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
+		}
+		if (c->ci)
+		{
+			/* Rejoin the bot to fix the TS */
+			if (c->ci->bi)
+			{
+				ircdproto->SendPart(c->ci->bi, c, "TS reop");
+				bot_join(c->ci);
+			}
+			/* Reset mlock */
+			check_modes(c);
+		}
+	}
+	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
+	else
+		keep_their_modes = false;
+	
+	/* Mark the channel as syncing */
+	if (was_created)
+		c->SetFlag(CH_SYNCING);
+	
+	/* If we need to keep their modes, and this SJOIN string contains modes */
+	if (keep_their_modes && ac >= 4)
+	{
+		/* Set the modes internally */
+		ChanSetInternalModes(c, ac - 3, av + 2);
+	}
+
+	spacesepstream sep(av[ac - 1]);
+	std::string buf;
+	while (sep.GetToken(buf))
+	{
+		std::list<ChannelMode *> Status;
+		Status.clear();
+		char ch;
+
+		/* Get prefixes from the nick */
+		while ((ch = ModeManager::GetStatusChar(buf[0])))
+		{
+			buf.erase(buf.begin());
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+			if (!cm)
+			{
+				alog("Recieved unknown mode prefix %c in SJOIN string", buf[0]);
+				continue;
+			}
+
+			Status.push_back(cm);
+		}
+
+		User *u = find_byuid(buf);
+		if (!u)
+		{
+			if (debug)
+				alog("debug: SJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+			continue;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+		/* Add the user to the channel */
+		c->JoinUser(u);
+
+		/* Update their status internally on the channel
+		 * This will enforce secureops etc on the user
+		 */
+		for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
+		{
+			c->SetModeInternal(*it, buf);
+		}
+
+		/* Now set whatever modes this user is allowed to have on the channel */
+		chan_set_correct_modes(u, c, 1);
+
+		/* Check to see if modules want the user to join, if they do
+		 * check to see if they are allowed to join (CheckKick will kick/ban them)
+		 * Don't trigger OnJoinChannel event then as the user will be destroyed
+		 */
+		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+			continue;
+
+		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+	}
+
+	/* Channel is done syncing */
+	if (was_created)
+	{
+		/* Unset the syncing flag */
+		c->UnsetFlag(CH_SYNCING);
+
+		/* If there are users in the channel they are allowed to be, set topic mlock etc. */
+		if (c->usercount)
+			c->Sync();
+		/* If there are no users in the channel, there is a ChanServ timer set to part the service bot
+		 * and destroy the channel soon
+		 */
+	}
+
 	return MOD_CONT;
 }
 
@@ -541,7 +659,7 @@ int anope_event_kick(const char *source, int ac, const char **av)
 int anope_event_join(const char *source, int ac, const char **av)
 {
 	if (ac != 1) {
-		do_sjoin(source, ac, av);
+		anope_event_sjoin(source, ac, av);
 		return MOD_CONT;
 	} else {
 		do_join(source, ac, av);

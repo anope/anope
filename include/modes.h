@@ -99,7 +99,7 @@ class UserModeParam : public UserMode
 	 * @param value The param
 	 * @return true or false
 	 */
-	virtual bool IsValid(const char *value) { return true; }
+	virtual bool IsValid(const std::string &value) { return true; }
 };
 
 /** This class is a channel mode, all channel modes use this/inherit from this
@@ -151,7 +151,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mask The mask
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const char *mask) { return true; }
+	virtual bool IsValid(const std::string &mask) { return true; }
 
 	/** Add the mask to the channel, this should be overridden
 	 * @param chan The channel
@@ -190,7 +190,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 * @param value The param
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const char *value) { return true; }
+	virtual bool IsValid(const std::string &value) { return true; }
 };
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
@@ -264,7 +264,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
   public:
 	ChannelModeKey() : ChannelModeParam(CMODE_KEY) { }
 
-	bool IsValid(const char *value);
+	bool IsValid(const std::string &value);
 };
 
 /** Channel mode +f (flood)
@@ -274,7 +274,7 @@ class ChannelModeFlood : public ChannelModeParam
   public:
 	ChannelModeFlood() : ChannelModeParam(CMODE_FLOOD) { }
 
-	bool IsValid(const char *value);
+	bool IsValid(const std::string &value);
 };
 
 /** This class is used for channel mode +A (Admin only)

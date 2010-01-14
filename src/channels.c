@@ -1247,7 +1247,6 @@ void do_join(const char *source, int ac, const char **av)
 {
 	User *user;
 	Channel *chan;
-	char *s, *t;
 	struct u_chanlist *c, *nextc;
 	char *channame;
 	time_t ctime = time(NULL);
@@ -1267,13 +1266,11 @@ void do_join(const char *source, int ac, const char **av)
 		return;
 	}
 
-	t = const_cast<char *>(av[0]); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-	while (*(s = t)) {
-		t = s + strcspn(s, ",");
-		if (*t)
-			*t++ = 0;
-
-		if (*s == '0') {
+	commasepstream sep(av[0]);
+	ci::string buf;
+	while (sep.GetToken(buf))
+	{
+		if (buf[0] == '0') {
 			c = user->chans;
 			while (c) {
 				nextc = c->next;
@@ -1289,7 +1286,7 @@ void do_join(const char *source, int ac, const char **av)
 			continue;
 		}
 
-		chan = findchan(s);
+		chan = findchan(buf.c_str());
 
 		/* Channel doesn't exist, create it */
 		if (!chan)
@@ -1376,7 +1373,6 @@ void do_kick(const std::string &source, int ac, const char **av)
 void do_part(const char *source, int ac, const char **av)
 {
 	User *user;
-	char *s, *t;
 	struct u_chanlist *c;
 
 	if (ircd->ts6) {
@@ -1393,20 +1389,22 @@ void do_part(const char *source, int ac, const char **av)
 		}
 		return;
 	}
-	t = const_cast<char *>(av[0]); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-	while (*(s = t)) {
-		t = s + strcspn(s, ",");
-		if (*t)
-			*t++ = 0;
+
+	commasepstream sep(av[0]);
+	ci::string buf;
+	while (sep.GetToken(buf))
+	{
 		if (debug)
-			alog("debug: %s leaves %s", source, s);
-		for (c = user->chans; c && stricmp(s, c->chan->name.c_str()) != 0;
-			 c = c->next);
-		if (c) {
-			if (!c->chan) {
-				alog("user: BUG parting %s: channel entry found but c->chan NULL", s);
+			alog("debug: %s leaves %s", source, buf.c_str());
+		for (c = user->chans; c && buf != c->chan->name; c = c->next);
+		if (c)
+		{
+			if (!c->chan)
+			{
+				alog("user: BUG parting %s: channel entry found but c->chan NULL", buf.c_str());
 				return;
 			}
+
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
 			std::string ChannelName = c->chan->name;
 

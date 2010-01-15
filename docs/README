@@ -188,8 +188,6 @@ Table of Contents
           on daemons supporting ip cloaking, such as UnrealIRCd, UltimateIRCd
           and ViagraIRCd.
 
-        * HelpServ, a skeleton service used to serve help files.
-
     Anope currently works with:
 
         * Bahamut 1.4.27 or later (including 1.8)

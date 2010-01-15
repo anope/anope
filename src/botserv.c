@@ -845,6 +845,10 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
     if (!bd)
         return;
 
+    /* Bug #1135 - Don't kick/ban ULined clients */
+    if (is_ulined(u->server->name))
+        return;
+
     bd->ttb[ttbtype]++;
     if (bd->ttb[ttbtype] == ci->ttb[ttbtype]) {
         char *av[4];
@@ -892,6 +896,10 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     char *av[3];
 
     if (!ci || !ci->bi || !ci->c || !u)
+        return;
+
+    /* Bug #1135 - Don't kick ULined clients */
+    if (is_ulined(u->server->name))
         return;
 
     va_start(args, message);

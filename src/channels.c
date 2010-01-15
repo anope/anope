@@ -932,6 +932,10 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	vsnprintf(buf, BUFSIZE - 1, reason, args);
 	va_end(args);
 
+	/* May not kick ulines */
+	if (is_ulined(u->server->name))
+		return false;
+
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnBotKick, OnBotKick(bi, this, u, buf));
 	if (MOD_RESULT == EVENT_STOP)

@@ -659,14 +659,20 @@ void bot_join(ChannelInfo * ci)
 
 /*************************************************************************/
 
-/* This makes a ban if the user has to have one. In every cases it increments
-   the kick count for the user. */
-
-static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
+/** Check if a user should be banned by botserv
+ * @param ci The channel the user is on
+ * @param u The user
+ * @param ttbtype The type of bot kicker the user should be checked against
+ */
+static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 {
 	BanData *bd = get_ban_data(ci->c, u);
 
 	if (!bd)
+		return;
+	
+	/* Don't ban ulines */
+	if (is_ulined(u->server->name))
 		return;
 
 	bd->ttb[ttbtype]++;

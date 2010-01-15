@@ -164,12 +164,9 @@ class ESHA256 : public Module
 		std::string buf(password, password.find(":", pos+1)+1, password.size());
 		char buf2[1000];
 		b64_decode(buf.c_str(), buf2, 1000);
-		spacesepstream sep(buf2);
-		while (sep.GetToken(buf))
-		{
-			salt[i] = static_cast<unsigned int>(strtoul(buf.c_str(), NULL, 10));
-			i++;
-		}
+		std::stringstream sbuf(buf2);
+		for (i = 0; i < 8; i++)
+			sbuf >> salt[i];
 	}
 
 	void SHA256Init(SHA256Context *ctx)

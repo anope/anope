@@ -9,11 +9,16 @@
  *
  */
 
-struct u_chanlist {
-	struct u_chanlist *next, *prev;
+struct ChannelContainer
+{
 	Channel *chan;
-	int16 status;		/* Associated flags; see CSTATUS_* below. */
+	int16 status;
+
+	ChannelContainer(Channel *c) : chan(c) { status = 0; }
+	virtual ~ChannelContainer() { }
 };
+
+typedef std::list<ChannelContainer *> UChannelList;
 
 /* Online user and channel data. */
 class CoreExport User : public Extensible
@@ -44,7 +49,8 @@ class CoreExport User : public Extensible
 
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 
-	struct u_chanlist *chans;	/* Channels user has joined */
+	/* Channels the user is in */
+	UChannelList chans;
 
 	unsigned short invalid_pw_count;	/* # of invalid password attempts */
 	time_t invalid_pw_time;	/* Time of last invalid password */

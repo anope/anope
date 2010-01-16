@@ -583,7 +583,7 @@ class CommandCSSet : public Command
 				/* Unset perm mode */
 				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))
 					ci->c->RemoveMode(NULL, cm);
-				if (Config.s_BotServ && ci->bi && ci->c->usercount == Config.BSMinUsers - 1)
+				if (Config.s_BotServ && ci->bi && ci->c->users.size() == Config.BSMinUsers - 1)
 					ircdproto->SendPart(ci->bi, ci->c, NULL);
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
@@ -595,7 +595,7 @@ class CommandCSSet : public Command
 					findbot(Config.s_ChanServ)->UnAssign(NULL, ci);	
 				}
 
-				if (ci->c && !ci->c->users)
+				if (ci->c && ci->c->users.empty())
 					delete ci->c;
 			}
 

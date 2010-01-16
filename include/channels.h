@@ -9,6 +9,39 @@
  *
  */
 
+struct UserData
+{
+	UserData()
+	{
+		lastline = NULL;
+		last_use = time(NULL);
+	}
+
+	virtual ~UserData() { delete [] lastline; }
+
+	/* Data validity */
+	time_t last_use;
+
+	/* for flood kicker */
+	int16 lines;
+	time_t last_start;
+
+	/* for repeat kicker */
+	char *lastline;
+	int16 times;
+};
+
+struct UserContainer
+{
+	User *user;
+	UserData *ud;
+
+	UserContainer(User *u) : user(u) { ud = new UserData; }
+	virtual ~UserContainer() { delete ud; }
+};
+
+typedef std::list<UserContainer *> CUserList;
+
 enum ChannelFlags
 {
 	/* Channel still exists when emptied */
@@ -23,6 +56,9 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	/** A map of channel modes with their parameters set on this channel
 	 */
 	std::map<ChannelModeName, std::string> Params;
+
+	/* Modes set on the channel */
+	std::bitset<128> modes;
 
  public:
 	/** Default constructor
@@ -42,14 +78,13 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	char *topic;
 	std::string topic_setter;
 	time_t topic_time;		      /* When topic was set */
-	std::bitset<128> modes;
 
 	EList *bans;
 	EList *excepts;
 	EList *invites;
 
-	struct c_userlist *users;
-	uint16 usercount;
+	/* List of users in the channel */
+	CUserList users;
 
 	BanData *bd;
 				     
@@ -74,8 +109,12 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	void DeleteUser(User *u);
 
-	/**
-	 * See if a channel has a mode
+	/** See if the channel has any modes at all
+	 * @return true or false
+	 */
+	inline const bool HasModes() const { return modes.count(); }
+
+	/** See if a channel has a mode
 	 * @param Name The mode name
 	 * @return true or false
 	 */

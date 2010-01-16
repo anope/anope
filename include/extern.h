@@ -111,7 +111,7 @@ E Entry *elist_find_mask(EList *list, const char *mask);
 E long get_memuse(EList *list);
 
 
-#define whosends(ci) ((!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < Config.BSMinUsers) ? findbot(Config.s_ChanServ) : (ci)->bi)
+#define whosends(ci) ((!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->users.size() < Config.BSMinUsers) ? findbot(Config.s_ChanServ) : (ci)->bi)
 
 /**** chanserv.c ****/
 

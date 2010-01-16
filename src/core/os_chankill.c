@@ -28,7 +28,6 @@ class CommandOSChanKill : public Command
 		char reason[BUFSIZE];
 		time_t expires;
 		char mask[USERMAX + HOSTMAX + 2];
-		struct c_userlist *cu, *cunext;
 		unsigned last_param = 1;
 		Channel *c;
 
@@ -70,15 +69,17 @@ class CommandOSChanKill : public Command
 
 			if ((c = findchan(channel)))
 			{
-				for (cu = c->users; cu; cu = cunext)
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 				{
-					cunext = cu->next;
-					if (is_oper(cu->user))
+					UserContainer *uc = *it++;
+
+					if (is_oper(uc->user))
 						continue;
+
 					strlcpy(mask, "*@", sizeof(mask)); /* Use *@" for the akill's, */
-					strlcat(mask, cu->user->host, sizeof(mask));
+					strlcat(mask, uc->user->host, sizeof(mask));
 					add_akill(NULL, mask, Config.s_OperServ, expires, realreason.c_str());
-					check_akill(cu->user->nick.c_str(), cu->user->GetIdent().c_str(), cu->user->host, NULL, NULL);
+					check_akill(uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->host, NULL, NULL);
 				}
 				if (Config.WallOSAkill)
 					ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel, realreason.c_str());

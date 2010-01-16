@@ -27,7 +27,6 @@ class CommandOSClearModes : public Command
 		const char *chan = params[0].c_str();
 		Channel *c;
 		int all = 0;
-		struct c_userlist *cu, *next;
 		ChannelMode *cm;
 		std::string buf;
 
@@ -62,13 +61,14 @@ class CommandOSClearModes : public Command
 					ircdproto->SendSVSModeChan(c, "-o", NULL);
 				else
 				{
-					for (cu = c->users; cu; cu = next)
+					for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 					{
-						next = cu->next;
-						if (!chan_has_user_status(c, cu->user, CUS_OP))
+						UserContainer *uc = *it;
+
+						if (!chan_has_user_status(c, uc->user, CUS_OP))
 							continue;
 
-						c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
 					}
 				}
 
@@ -77,13 +77,14 @@ class CommandOSClearModes : public Command
 					ircdproto->SendSVSModeChan(c, "-v", NULL);
 				else
 				{
-					for (cu = c->users; cu; cu = next)
+					for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 					{
-						next = cu->next;
-						if (!chan_has_user_status(c, cu->user, CUS_VOICE))
+						UserContainer *uc = *it;
+
+						if (!chan_has_user_status(c, uc->user, CUS_VOICE))
 							continue;
 						
-						c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
+						c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
 					}
 				}
 
@@ -94,13 +95,14 @@ class CommandOSClearModes : public Command
 						ircdproto->SendSVSModeChan(c, "-h", NULL);
 					else
 					{
-						for (cu = c->users; cu; cu = next)
+						for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 						{
-							next = cu->next;
-							if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
+							UserContainer *uc = *it;
+
+							if (!chan_has_user_status(c, uc->user, CUS_HALFOP))
 								continue;
 							
-							c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
+							c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
 						}
 					}
 				}
@@ -115,13 +117,14 @@ class CommandOSClearModes : public Command
 						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
 					else
 					{
-						for (cu = c->users; cu; cu = next)
+						for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 						{
-							next = cu->next;
-							if (!chan_has_user_status(c, cu->user, CUS_OWNER))
+							UserContainer *uc = *it;
+
+							if (!chan_has_user_status(c, uc->user, CUS_OWNER))
 								continue;
 
-							c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+							c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
 						}
 					}
 				}
@@ -136,13 +139,14 @@ class CommandOSClearModes : public Command
 						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
 					else
 					{
-						for (cu = c->users; cu; cu = next)
+						for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 						{
-							next = cu->next;
-							if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
+							UserContainer *uc = *it;
+
+							if (!chan_has_user_status(c, uc->user, CUS_PROTECT))
 								continue;
 
-							c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+							c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
 						}
 					}
 				}

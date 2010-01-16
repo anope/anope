@@ -363,13 +363,15 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 		c->creation_time = ts;
 
 		/* Remove status from all of our users */
-		for (struct c_userlist *cu = c->users; cu; cu = cu->next)
+		for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 		{
-			c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
-			c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
-			c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
-			c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
-			c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
+			UserContainer *uc = *it;
+
+			c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
+			c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
+			c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
+			c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
+			c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
 		}
 		if (c->ci)
 		{
@@ -497,7 +499,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 		c->UnsetFlag(CH_SYNCING);
 
 		/* If there are users in the channel they are allowed to be, set topic mlock etc. */
-		if (c->usercount)
+		if (!c->users.empty())
 			c->Sync();
 		/* If there are no users in the channel, there is a ChanServ timer set to part the service bot
 		 * and destroy the channel soon

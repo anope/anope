@@ -572,38 +572,31 @@ static BanData *get_ban_data(Channel * c, User * u)
  * Allocates it if necessary.
  */
 
-static UserData *get_user_data(Channel * c, User * u)
+static UserData *get_user_data(Channel *c, User *u)
 {
-	struct c_userlist *user;
-
 	if (!c || !u)
 		return NULL;
 
-	for (user = c->users; user; user = user->next) {
-		if (user->user == u) {
-			if (user->ud) {
-				time_t now = time(NULL);
+	for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+	{
+		UserContainer *uc = *it;
 
-				/* Checks whether data is obsolete */
-				if (now - user->ud->last_use > Config.BSKeepData) {
-					if (user->ud->lastline)
-						delete [] user->ud->lastline;
-					/* We should not free and realloc, but reset to 0
-					   instead. */
-					memset(user->ud, 0, sizeof(UserData));
-					user->ud->last_use = now;
-				}
+		if (uc->user == u)
+		{
+			time_t now = time(NULL);
 
-				return user->ud;
-			} else {
-				user->ud = new UserData;
-				user->ud->last_use = time(NULL);
-				user->ud->lines = 0;
-				user->ud->last_start = 0;
-				user->ud->lastline = NULL;
-				user->ud->times = 0;
-				return user->ud;
+			/* Checks whether data is obsolete */
+			if (now - uc->ud->last_use > Config.BSKeepData)
+			{
+				if (uc->ud->lastline)
+					delete [] uc->ud->lastline;
+				/* We should not free and realloc, but reset to 0
+				   instead. */
+				memset(uc->ud, 0, sizeof(UserData));
+				uc->ud->last_use = now;
 			}
+
+			return uc->ud;
 		}
 	}
 
@@ -646,7 +639,7 @@ void bot_join(ChannelInfo * ci)
 
 		/* Should we be invited? */
 		if (ci->c->HasMode(CMODE_INVITE)
-			|| (limit && ci->c->usercount >= limit))
+			|| (limit && ci->c->users.size() >= limit))
 			ircdproto->SendNoticeChanops(ci->bi, ci->c,
 				 "%s invited %s into the channel.",
 				 ci->bi->nick.c_str(), ci->bi->nick.c_str());

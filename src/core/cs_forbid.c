@@ -67,21 +67,19 @@ class CommandCSForbid : public Command
 
 		if ((c = findchan(ci->name.c_str())))
 		{
-			struct c_userlist *cu, *nextu;
-
 			/* Before banning everyone, it might be prudent to clear +e and +I lists..
 			 * to prevent ppl from rejoining.. ~ Viper */
 			c->ClearExcepts();
 			c->ClearInvites();
 
-			for (cu = c->users; cu; cu = nextu)
+			for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 			{
-				nextu = cu->next;
+				UserContainer *uc = *it++;
 
-				if (is_oper(cu->user))
+				if (is_oper(uc->user))
 					continue;
 
-				c->Kick(findbot(Config.s_ChanServ), cu->user, "%s", reason ? reason : getstring(cu->user->nc, CHAN_FORBID_REASON));
+				c->Kick(findbot(Config.s_ChanServ), uc->user, "%s", reason ? reason : getstring(uc->user->nc, CHAN_FORBID_REASON));
 			}
 		}
 

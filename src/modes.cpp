@@ -237,7 +237,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 	/* Check whether it matches a botserv bot after adding internally
 	 * and parsing it through cidr support. ~ Viper */
 	if (Config.s_BotServ && Config.BSSmartJoin && chan->ci && chan->ci->bi
-		&& chan->usercount >= Config.BSMinUsers)
+		&& chan->users.size() >= Config.BSMinUsers)
 	{
 		BotInfo *bi = chan->ci->bi;
 

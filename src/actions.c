@@ -75,7 +75,6 @@ void sqline(const std::string &mask, const std::string &reason)
 {
 	int i;
 	Channel *c, *next;
-	struct c_userlist *cu, *cunext;
 
 	if (ircd->chansqline)
 	{
@@ -91,12 +90,14 @@ void sqline(const std::string &mask, const std::string &reason)
 
 					if (!Anope::Match(c->name, mask, false))
 						continue;
-					for (cu = c->users; cu; cu = cunext)
+					for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 					{
-						cunext = cu->next;
-						if (is_oper(cu->user))
+						UserContainer *uc = *it;
+						++it;
+
+						if (is_oper(uc->user))
 							continue;
-						c->Kick(NULL, cu->user, "%s", reason.c_str());
+						c->Kick(NULL, uc->user, "%s", reason.c_str());
 					}
 				}
 			}

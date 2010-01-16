@@ -142,7 +142,7 @@ class ChanServTimer : public Timer
 		c->ci->UnsetFlag(CI_INHABIT);
 
 		/* If the channel has users again, don't part it and halt */
-		if (c->usercount)
+		if (!c->users.empty())
 			return;
 
 		if (c->ci->bi)
@@ -697,7 +697,7 @@ bool ChannelInfo::CheckKick(User *user)
 	/* If the channel doesnt have any users and if a bot isn't already in the channel, join it
 	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
 	 */
-	if (this->c->usercount == 1 && !this->HasFlag(CI_INHABIT))
+	if (this->c->users.size() == 1 && !this->HasFlag(CI_INHABIT))
 	{
 		/* If channel was forbidden, etc, set it +si to prevent rejoin */
 		if (set_modes)

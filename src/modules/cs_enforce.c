@@ -53,8 +53,6 @@ class CommandCSEnforce : public Command
 
 	void DoSecureOps(Channel *c)
 	{
-		struct c_userlist *user;
-		struct c_userlist *next;
 		ChannelInfo *ci;
 		bool hadsecureops = false;
 
@@ -75,13 +73,12 @@ class CommandCSEnforce : public Command
 			hadsecureops = true;
 		}
 
-		user = c->users;
-		do
+		for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 		{
-			next = user->next;
-			chan_set_correct_modes(user->user, c, 0);
-			user = next;
-		} while (user);
+			UserContainer *uc = *it;
+
+			chan_set_correct_modes(uc->user, c, 0);
+		}
 
 		if (hadsecureops)
 		{
@@ -92,13 +89,10 @@ class CommandCSEnforce : public Command
 
 	void DoRestricted(Channel *c)
 	{
-		struct c_userlist *user;
-		struct c_userlist *next;
 		ChannelInfo *ci;
 		int16 old_nojoin_level;
 		char mask[BUFSIZE];
 		const char *reason;
-		const char *av[3];
 		User *u;
 
 		if (!(ci = c->ci))
@@ -111,28 +105,24 @@ class CommandCSEnforce : public Command
 		if (ci->levels[CA_NOJOIN] < 0)
 			ci->levels[CA_NOJOIN] = 0;
 
-		user = c->users;
-		do
+		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 		{
-			next = user->next;
-			u = user->user;
-			if (check_access(u, c->ci, CA_NOJOIN))
+			UserContainer *uc = *it++;
+
+			if (check_access(uc->user, ci, CA_NOJOIN))
 			{
 				get_idealban(ci, u, mask, sizeof(mask));
 				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				c->Kick(NULL, u, "%s", reason);
 			}
-			user = next;
-		} while (user);
+		}
 
 		ci->levels[CA_NOJOIN] = old_nojoin_level;
 	}
 
 	void DoCModeR(Channel *c)
 	{
-		struct c_userlist *user;
-		struct c_userlist *next;
 		ChannelInfo *ci;
 		char mask[BUFSIZE];
 		const char *reason;
@@ -144,23 +134,21 @@ class CommandCSEnforce : public Command
 		if (debug)
 			alog("debug: cs_enforce: Enforcing mode +R on %s", c->name.c_str());
 
-		user = c->users;
-		do
+		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 		{
-			next = user->next;
-			u = user->user;
-			if (!nick_identified(u))
+			UserContainer *uc = *it++;
+			
+			if (!nick_identified(uc->user))
 			{
-				get_idealban(ci, u, mask, sizeof(mask));
-				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
+				get_idealban(ci, uc->user, mask, sizeof(mask));
+				reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				if (!c->HasMode(CMODE_REGISTERED))
 				{
 					c->SetMode(NULL, CMODE_BAN, mask);
 				}
 				c->Kick(NULL, u, "%s", reason);
 			}
-			user = next;
-		} while (user);
+		}
 	}
  public:
 	CommandCSEnforce() : Command("ENFORCE", 1, 2)

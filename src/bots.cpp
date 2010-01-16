@@ -92,7 +92,7 @@ void BotInfo::RejoinAll()
 
 	for (i = 0; i < 256; ++i)
 		for (ci = chanlists[i]; ci; ci = ci->next)
-			if (ci->bi == this && ci->c && (ci->c->usercount >= Config.BSMinUsers))
+			if (ci->bi == this && ci->c && (ci->c->users.size() >= Config.BSMinUsers))
 				bot_join(ci);
 }
 
@@ -108,7 +108,7 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 
 	ci->bi = this;
 	++this->chancount;
-	if (ci->c && ci->c->usercount >= Config.BSMinUsers)
+	if (ci->c && ci->c->users.size() >= Config.BSMinUsers)
 		bot_join(ci);
 }
 
@@ -119,7 +119,7 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (ci->c && ci->c->usercount >= Config.BSMinUsers)
+	if (ci->c && ci->c->users.size() >= Config.BSMinUsers)
 	{
 		if (u)
 			ircdproto->SendPart(ci->bi, ci->c, "UNASSIGN from %s", u->nick.c_str());

@@ -38,127 +38,144 @@ class CommandCSClear : public Command
 		if (c)
 			ci = c->ci;
 
-		if (!c) {
+		if (!c)
 			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (!u || !check_access(u, ci, CA_CLEAR)) {
+		else if (!u || !check_access(u, ci, CA_CLEAR))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		} else if (what == "bans") {
+		else if (what == "bans")
+		{
 			c->ClearBans();
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_BANS, chan);
-		} else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what == "excepts") {
+		}
+		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what == "excepts")
+		{
 			c->ClearExcepts();
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
 
-		} else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what == "invites") {
+		}
+		else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what == "invites")
+		{
 			c->ClearInvites();
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
 
-		} else if (what == "modes") {
+		}
+		else if (what == "modes")
+		{
 			c->ClearModes();
 			check_modes(c);
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_MODES, chan);
-		} else if (what == "ops") {
-			const char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
+		}
+		else if (what == "ops")
+		{
 			int isop, isadmin, isown;
-			struct c_userlist *cu, *bnext;
 
-			if (ircd->svsmode_ucmode) {
-				av[0] = chan;
+			if (ircd->svsmode_ucmode)
+			{
 				ircdproto->SendSVSModeChan(c, "-o", NULL);
-				if (owner) {
+				if (owner)
+				{
 					modebuf = '-';
 					modebuf += owner->ModeChar;
 
 					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 				}
-				if (admin) {
+				if (admin)
+				{
 					modebuf = '-';
 					modebuf += admin->ModeChar;
 
 					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 				}
-				for (cu = c->users; cu; cu = bnext)
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 				{
-					bnext = cu->next;
-					isop = chan_has_user_status(c, cu->user, CUS_OP);
-					isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
-					isown = chan_has_user_status(c, cu->user, CUS_OWNER);
+					UserContainer *uc = *it;
+
+					isop = chan_has_user_status(c, uc->user, CUS_OP);
+					isadmin = chan_has_user_status(c, uc->user, CUS_PROTECT);
+					isown = chan_has_user_status(c, uc->user, CUS_OWNER);
 
 					if (!isop && !isadmin && !isown)
 						continue;
 
 					if (isown)
-						c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
+						c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
 					if (admin)
-						c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
+						c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
 					if (isop)
-						c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
-				}
-			} else {
-				av[0] = chan;
-				for (cu = c->users; cu; cu = bnext)
-				{
-					bnext = cu->next;
-					isop = chan_has_user_status(c, cu->user, CUS_OP);
-					isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
-					isown = chan_has_user_status(c, cu->user, CUS_OWNER);
-
-					if (!isop && !isadmin && !isown)
-						continue;
-
-					if (isown)
-						c->RemoveMode(NULL, CMODE_OWNER, cu->user->nick);
-					if (isadmin)
-						c->RemoveMode(NULL, CMODE_PROTECT, cu->user->nick);
-					if (isop)
-						c->RemoveMode(NULL, CMODE_OP, cu->user->nick);
+						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
 				}
 			}
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan);
-		} else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && what == "hops") {
-			struct c_userlist *cu, *bnext;
-
-			for (cu = c->users; cu; cu = bnext)
+			else
 			{
-				bnext = cu->next;
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+				{
+					UserContainer *uc = *it;
 
-				if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
+					isop = chan_has_user_status(c, uc->user, CUS_OP);
+					isadmin = chan_has_user_status(c, uc->user, CUS_PROTECT);
+					isown = chan_has_user_status(c, uc->user, CUS_OWNER);
+
+					if (!isop && !isadmin && !isown)
+						continue;
+
+					if (isown)
+						c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
+					if (isadmin)
+						c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
+					if (isop)
+						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
+				}
+			}
+
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan);
+		}
+		else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && what == "hops")
+		{
+			for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+			{
+				UserContainer *uc = *it;
+
+				if (!chan_has_user_status(c, uc->user, CUS_HALFOP))
 					continue;
 
-				c->RemoveMode(NULL, CMODE_HALFOP, cu->user->nick);
+				c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
-		} else if (what == "voices") {
-			struct c_userlist *cu, *bnext;
-
-			for (cu = c->users; cu; cu = bnext)
+		}
+		else if (what == "voices")
+		{
+			for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
 			{
-				bnext = cu->next;
+				UserContainer *uc = *it;
 
-				if (!chan_has_user_status(c, cu->user, CUS_VOICE))
+				if (!chan_has_user_status(c, uc->user, CUS_VOICE))
 					continue;
 
-				c->RemoveMode(NULL, CMODE_VOICE, cu->user->nick);
+				c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
-		} else if (what == "users") {
-			struct c_userlist *cu, *bnext;
+		}
+		else if (what == "users") {
 			std::string buf = "CLEAR USERS command from " + u->nick;
 
-			for (cu = c->users; cu; cu = bnext) {
-				bnext = cu->next;
-				c->Kick(NULL, cu->user, buf.c_str());
+			for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+			{
+				UserContainer *uc = *it++;
+
+				c->Kick(NULL, uc->user, buf.c_str());
 			}
+
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_USERS, chan);
-		} else {
-			syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 		}
+		else
+			syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
+
 		return MOD_CONT;
 	}
 

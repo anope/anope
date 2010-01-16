@@ -42,7 +42,6 @@ User::User(const std::string &snick, const std::string &suid)
 	host = hostip = vhost = realname = NULL;
 	server = NULL;
 	nc = NULL;
-	chans = NULL;
 	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
 
@@ -223,7 +222,6 @@ void User::SetRealname(const std::string &srealname)
 
 User::~User()
 {
-	struct u_chanlist *c, *c2;
 	char *srealname;
 
 	if (Config.LogUsers)
@@ -272,16 +270,14 @@ User::~User()
 	if (debug >= 2)
 		alog("debug: User::~User(): remove from channels");
 
-	c = this->chans;
-
-	while (c)
+	while (!this->chans.empty())
 	{
-		c2 = c->next;
-		c->chan->DeleteUser(this);
-		delete c;
-		c = c2;
+		ChannelContainer *cc = this->chans.front();
+		cc->chan->DeleteUser(this);
+		delete cc;
+		this->chans.pop_front();
 	}
-
+	
 	/* Cancel pending nickname enforcers, etc */
 	cancel_user(this);
 
@@ -413,7 +409,6 @@ void get_user_stats(long *nusers, long *memuse)
 	long count = 0, mem = 0;
 	int i;
 	User *user;
-	struct u_chanlist *uc;
 
 	for (i = 0; i < 1024; i++) {
 		for (user = userlist[i]; user; user = user->next) {
@@ -429,8 +424,7 @@ void get_user_stats(long *nusers, long *memuse)
 				mem += strlen(user->realname) + 1;
 			if (user->server->name)
 				mem += strlen(user->server->name) + 1;
-			for (uc = user->chans; uc; uc = uc->next)
-				mem += sizeof(*uc);
+			mem += (sizeof(ChannelContainer) * user->chans.size());
 		}
 	}
 	*nusers = count;

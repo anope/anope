@@ -360,7 +360,6 @@ class Channel;
 struct EList;
 
 typedef struct bandata_ BanData;
-typedef struct userdata_ UserData;
 typedef struct mailinfo_ MailInfo;
 typedef struct akill_ Akill;
 typedef struct sxline_ SXLine;
@@ -802,28 +801,6 @@ struct bandata_ {
 	time_t last_use;		/* Since time is the only way to check
 						   	   whether it's still useful */
 	int16 ttb[TTB_SIZE];
-};
-
-/* This structure stocks information on every user that will be used by
- * BotServ. */
-
-struct userdata_ {
-	/* Data validity */
-	time_t last_use;
-
-	/* for flood kicker */
-	int16 lines;
-	time_t last_start;
-
-	/* for repeat kicker */
-	char *lastline;
-	int16 times;
-};
-
-struct c_userlist {
-	struct c_userlist *next, *prev;
-	User *user;
-	UserData *ud;
 };
 
 #include "channels.h"

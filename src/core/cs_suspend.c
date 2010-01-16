@@ -62,16 +62,14 @@ class CommandCSSuspend : public Command
 
 			if ((c = findchan(ci->name.c_str())))
 			{
-				struct c_userlist *cu, *nextu;
-
-				for (cu = c->users; cu; cu = nextu)
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 				{
-					nextu = cu->next;
+					UserContainer *uc = *it++;
 
-					if (is_oper(cu->user))
+					if (is_oper(uc->user))
 						continue;
 
-					c->Kick(NULL, cu->user, "%s", reason ? reason : getstring(cu->user->nc, CHAN_SUSPEND_REASON));
+					c->Kick(NULL, uc->user, "%s", reason ? reason : getstring(uc->user->nc, CHAN_SUSPEND_REASON));
 				}
 			}
 

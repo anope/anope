@@ -36,21 +36,22 @@ class CommandOSUserList : public Command
 
 		if (pattern && (c = findchan(pattern)))
 		{
-			struct c_userlist *cu;
-
 			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
 
-			for (cu = c->users; cu; cu = cu->next)
+			for (CUserList::iterator cuit = c->users.begin(); cuit != c->users.end(); ++cuit)
 			{
+				UserContainer *uc = *cuit;
+
 				if (!Modes.empty())
 				{
 					for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
 					{
-						if (!cu->user->HasMode(*it))
+						if (!uc->user->HasMode(*it))
 							continue;
 					}
 				}
-				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, cu->user->nick.c_str(), cu->user->GetIdent().c_str(), cu->user->GetDisplayedHost().c_str());
+
+				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
 			}
 		}
 		else

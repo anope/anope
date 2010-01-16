@@ -87,7 +87,7 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->c)
 	{
-		if (this->bi && this->c->usercount >= Config.BSMinUsers)
+		if (this->bi && this->c->users.size() >= Config.BSMinUsers)
 			ircdproto->SendPart(this->bi, this->c, NULL);
 		this->c->ci = NULL;
 	}

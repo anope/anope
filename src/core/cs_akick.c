@@ -480,7 +480,6 @@ class CommandCSAKick : public Command
 	void DoEnforce(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		Channel *c = ci->c;
-		c_userlist *cu, *unext;
 		int count = 0;
 
 		if (!c)
@@ -489,17 +488,14 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		cu = c->users;
-
-		while (cu)
+		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 		{
-			unext = cu->next;
-			if (ci->CheckKick(cu->user))
+			UserContainer *uc = *it++;
+
+			if (ci->CheckKick(uc->user))
 			{
-				c->Kick(NULL, cu->user, "%s", Config.CSAutokickReason);
 				count++;
 		        }
-		        cu = unext;
 		}
 
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);

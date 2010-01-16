@@ -932,13 +932,14 @@ int should_mode_change(int16 status, int16 mode)
 
 int do_setmodes(User * u)
 {
-	struct u_chanlist *uc;
 	Channel *c;
 
 	/* Walk users current channels */
-	for (uc = u->chans; uc; uc = uc->next)
+	for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 	{
-		if ((c = uc->chan))
+		ChannelContainer *cc = *it;
+
+		if ((c = cc->chan))
 			chan_set_correct_modes(u, c, 1);
 	}
 	return MOD_CONT;

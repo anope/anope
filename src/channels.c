@@ -44,8 +44,6 @@ Channel::Channel(const std::string &name, time_t ts)
 	this->creation_time = ts;
 	this->topic = NULL;
 	this->bans = this->excepts = this->invites = NULL;
-	this->users = NULL;
-	this->usercount = 0;
 	this->bd = NULL;
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = 0;
@@ -128,31 +126,14 @@ void Channel::Sync()
 
 void Channel::JoinUser(User *user)
 {
-	struct u_chanlist *c;
-
 	if (debug)
 		alog("debug: %s joins %s", user->nick.c_str(), this->name.c_str());
 
-	c = new u_chanlist;
-	c->prev = NULL;
-	c->next = user->chans;
-	if (user->chans)
-		user->chans->prev = c;
-	user->chans = c;
-	c->chan = this;
-	c->status = 0;
+	ChannelContainer *cc = new ChannelContainer(this);
+	user->chans.push_back(cc);
 
-	struct c_userlist *u;
-
-	u = new c_userlist;
-	u->prev = NULL;
-	u->next = this->users;
-	if (this->users)
-		this->users->prev = u;
-	this->users = u;
-	u->user = user;
-	u->ud = NULL;
-	this->usercount++;
+	UserContainer *uc = new UserContainer(user);
+	this->users.push_back(uc);
 
 	if (get_ignore(user->nick.c_str()) == NULL)
 	{
@@ -178,12 +159,12 @@ void Channel::JoinUser(User *user)
 	 **/
 	if (Config.s_BotServ && this->ci && this->ci->bi && !this->ci->HasFlag(CI_PERSIST))
 	{
-		if (this->usercount == Config.BSMinUsers)
+		if (this->users.size() == Config.BSMinUsers)
 			bot_join(this->ci);
 	}
 	if (Config.s_BotServ && this->ci && this->ci->bi)
 	{
-		if (this->usercount >= Config.BSMinUsers && (this->ci->botflags.HasFlag(BS_GREET))
+		if (this->users.size() >= Config.BSMinUsers && (this->ci->botflags.HasFlag(BS_GREET))
 		&& user->nc && user->nc->greet && check_access(user, this->ci, CA_GREET))
 		{
 			/* Only display the greet if the main uplink we're connected
@@ -207,26 +188,17 @@ void Channel::DeleteUser(User *user)
 	if (this->ci)
 		update_cs_lastseen(user, this->ci);
 
-	struct c_userlist *u;
-	for (u = this->users; u && u->user != user; u = u->next);
-	if (!u)
-		return;
-
-	if (u->ud)
+	CUserList::iterator it;
+	for (it = this->users.begin(); (*it)->user != user && it != this->users.end(); ++it);
+	if (it == this->users.end())
 	{
-		if (u->ud->lastline)
-			delete [] u->ud->lastline;
-		delete u->ud;
+		if (debug)
+			alog("debug: Channel::DelUser() tried to delete nonexistnat user %s from channel %s", user->nick.c_str(), this->name.c_str());
+		return;
 	}
 
-	if (u->next)
-		u->next->prev = u->prev;
-	if (u->prev)
-		u->prev->next = u->next;
-	else
-		this->users = u->next;
-	delete u;
-	this->usercount--;
+	delete *it;
+	this->users.erase(it);
 
 	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
 	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
@@ -242,10 +214,10 @@ void Channel::DeleteUser(User *user)
 	if (this->ci && this->ci->HasFlag(CI_INHABIT))
 		return;
 
-	if (Config.s_BotServ && this->ci && this->ci->bi && this->usercount <= Config.BSMinUsers - 1)
+	if (Config.s_BotServ && this->ci && this->ci->bi && this->users.size() <= Config.BSMinUsers - 1)
 		ircdproto->SendPart(this->ci->bi, this, NULL);
 	
-	if (!this->users)
+	if (this->users.empty())
 		delete this;
 }
 
@@ -463,13 +435,13 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		if (ci)
 		{
 			ci->UnsetFlag(CI_PERSIST);
-			if (Config.s_BotServ && ci->bi && usercount == Config.BSMinUsers - 1)
+			if (Config.s_BotServ && ci->bi && users.size() == Config.BSMinUsers - 1)
 				ircdproto->SendPart(ci->bi, this, NULL);
 		}
 	}
 
 	/* We set -P in an empty channel, delete the channel */
-	if (cm->Name == CMODE_PERM && !users)
+	if (cm->Name == CMODE_PERM && users.empty())
 	{
 		delete this;
 		return;
@@ -900,19 +872,16 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 	if (debug)
 		alog("debug: Channel::KickInternal kicking %s from %s", user->nick.c_str(), this->name.c_str());
 	
-	struct u_chanlist *c;
-	for (c = user->chans; c && this != c->chan; c = c->next);
-	if (c)
+	UChannelList::iterator it;
+	for (it = user->chans.begin(); (*it)->chan != this && it != user->chans.end(); ++it);
+	if (it != user->chans.end())
 	{
-		FOREACH_MOD(I_OnUserKicked, OnUserKicked(c->chan, user, source, reason));
-		c->chan->DeleteUser(user);
-		if (c->next)
-			c->next->prev = c->prev;
-		if (c->prev)
-			c->prev->next = c->next;
-		else
-			user->chans = c->next;
-		delete c;
+		ChannelContainer *cc = *it;
+
+		FOREACH_MOD(I_OnUserKicked, OnUserKicked(cc->chan, user, source, reason));
+		cc->chan->DeleteUser(user);
+		delete cc;
+		user->chans.erase(it);
 	}
 	else if (debug)
 		alog("debug: Channel::KickInternal got kick for user %s who isn't on channel %s ?", user->nick.c_str(), this->name.c_str());
@@ -959,7 +928,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 	ChannelModeParam *cmp;
 	std::map<char, ChannelMode *>::iterator it;
 
-	if (!chan->modes.count())
+	if (chan->HasModes())
 	{
 		for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
 		{
@@ -1009,11 +978,9 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 
 int chan_get_user_status(Channel * chan, User * user)
 {
-	struct u_chanlist *uc;
-
-	for (uc = user->chans; uc; uc = uc->next)
-		if (uc->chan == chan)
-			return uc->status;
+	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
+		if ((*it)->chan == chan)
+			return (*it)->status;
 
 	return 0;
 }
@@ -1024,14 +991,15 @@ int chan_get_user_status(Channel * chan, User * user)
 
 int chan_has_user_status(Channel * chan, User * user, int16 status)
 {
-	struct u_chanlist *uc;
+	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
+	{
+		ChannelContainer *cc = *it;
 
-	for (uc = user->chans; uc; uc = uc->next) {
-		if (uc->chan == chan) {
-			if (debug) {
-				alog("debug: chan_has_user_status wanted %d the user is %d", status, uc->status);
-			}
-			return (uc->status & status);
+		if (cc->chan == chan)
+		{
+			if (debug)
+				alog("debug: chan_has_user_status wanted %d the user is %d", status, cc->status);
+			return (cc->status & status);
 		}
 	}
 	return 0;
@@ -1043,15 +1011,17 @@ int chan_has_user_status(Channel * chan, User * user, int16 status)
 
 void chan_remove_user_status(Channel * chan, User * user, int16 status)
 {
-	struct u_chanlist *uc;
-
 	if (debug >= 2)
 		alog("debug: removing user status (%d) from %s for %s", status,
 			 user->nick.c_str(), chan->name.c_str());
 
-	for (uc = user->chans; uc; uc = uc->next) {
-		if (uc->chan == chan) {
-			uc->status &= ~status;
+	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
+	{
+		ChannelContainer *cc = *it;
+
+		if (cc->chan == chan)
+		{
+			cc->status &= ~status;
 			break;
 		}
 	}
@@ -1063,7 +1033,6 @@ void chan_remove_user_status(Channel * chan, User * user, int16 status)
 
 void chan_set_user_status(Channel * chan, User * user, int16 status)
 {
-	struct u_chanlist *uc;
 	UserMode *um;
 
 	if (debug >= 2)
@@ -1081,9 +1050,13 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 		user->SetMode(NULL, um);
 	}
 
-	for (uc = user->chans; uc; uc = uc->next) {
-		if (uc->chan == chan) {
-			uc->status |= status;
+	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
+	{
+		ChannelContainer *cc = *it;
+
+		if (cc->chan == chan)
+		{
+			cc->status |= status;
 			break;
 		}
 	}
@@ -1164,7 +1137,6 @@ void get_channel_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
 	Channel *chan;
-	struct c_userlist *cu;
 	BanData *bd;
 	int i;
 	std::string buf;
@@ -1186,13 +1158,12 @@ void get_channel_stats(long *nrec, long *memuse)
 				mem += get_memuse(chan->excepts);
 			if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
 				mem += get_memuse(chan->invites);
-			for (cu = chan->users; cu; cu = cu->next) {
-				mem += sizeof(*cu);
-				if (cu->ud) {
-					mem += sizeof(*cu->ud);
-					if (cu->ud->lastline)
-						mem += strlen(cu->ud->lastline) + 1;
-				}
+			for (CUserList::iterator it = chan->users.begin(); it != chan->users.end(); ++it)
+			{
+				mem += sizeof(*it);
+				mem += sizeof((*it)->ud);
+				if ((*it)->ud->lastline)
+					mem += strlen((*it)->ud->lastline) + 1;
 			}
 			for (bd = chan->bd; bd; bd = bd->next) {
 				if (bd->mask)
@@ -1211,10 +1182,8 @@ void get_channel_stats(long *nrec, long *memuse)
 
 int is_on_chan(Channel * c, User * u)
 {
-	struct u_chanlist *uc;
-
-	for (uc = u->chans; uc; uc = uc->next)
-		if (uc->chan == c)
+	for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+		if ((*it)->chan == c)
 			return 1;
 
 	return 0;
@@ -1227,14 +1196,15 @@ int is_on_chan(Channel * c, User * u)
 
 User *nc_on_chan(Channel * c, NickCore * nc)
 {
-	struct c_userlist *u;
-
 	if (!c || !nc)
 		return NULL;
 
-	for (u = c->users; u; u = u->next) {
-		if (u->user->nc == nc)
-			return u->user;
+	for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+	{
+		UserContainer *uc = *it;
+
+		if (uc->user->nc == nc)
+			return uc->user;
 	}
 	return NULL;
 }
@@ -1251,17 +1221,9 @@ void do_join(const char *source, int ac, const char **av)
 {
 	User *user;
 	Channel *chan;
-	struct u_chanlist *c, *nextc;
-	char *channame;
 	time_t ctime = time(NULL);
 
-	if (ircd->ts6) {
-		user = find_byuid(source);
-		if (!user)
-			user = finduser(source);
-	} else {
-		user = finduser(source);
-	}
+	user = finduser(source);
 	if (!user) {
 		if (debug) {
 			alog("debug: JOIN from nonexistent user %s: %s", source,
@@ -1275,18 +1237,18 @@ void do_join(const char *source, int ac, const char **av)
 	while (sep.GetToken(buf))
 	{
 		if (buf[0] == '0') {
-			c = user->chans;
-			while (c) {
-				nextc = c->next;
-				channame = sstrdup(c->chan->name.c_str());
-				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
-				c->chan->DeleteUser(user);
-				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame), channame, ""));
-				delete [] channame;
-				delete c;
-				c = nextc;
+			for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end();)
+			{
+				ChannelContainer *cc = *it++;
+
+				std::string channame = cc->chan->name;
+				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
+				cc->chan->DeleteUser(user);
+				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame.c_str()), channame, ""));
+				delete cc;
+				user->chans.erase(it);
 			}
-			user->chans = NULL;
+			user->chans.clear();
 			continue;
 		}
 
@@ -1377,15 +1339,8 @@ void do_kick(const std::string &source, int ac, const char **av)
 void do_part(const char *source, int ac, const char **av)
 {
 	User *user;
-	struct u_chanlist *c;
 
-	if (ircd->ts6) {
-		user = find_byuid(source);
-		if (!user)
-			user = finduser(source);
-	} else {
-		user = finduser(source);
-	}
+	user = finduser(source);
 	if (!user) {
 		if (debug) {
 			alog("debug: PART from nonexistent user %s: %s", source,
@@ -1400,29 +1355,21 @@ void do_part(const char *source, int ac, const char **av)
 	{
 		if (debug)
 			alog("debug: %s leaves %s", source, buf.c_str());
-		for (c = user->chans; c && buf != c->chan->name; c = c->next);
-		if (c)
+		UChannelList::iterator it;
+		for (it = user->chans.begin(); buf != (*it)->chan->name && it != user->chans.end(); ++it);
+		if (it != user->chans.end())
 		{
-			if (!c->chan)
-			{
-				alog("user: BUG parting %s: channel entry found but c->chan NULL", buf.c_str());
-				return;
-			}
+			ChannelContainer *cc = *it;
 
-			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c->chan));
-			std::string ChannelName = c->chan->name;
+			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
+			std::string ChannelName = cc->chan->name;
 
-			c->chan->DeleteUser(user);
+			cc->chan->DeleteUser(user);
+
+			delete *it;
+			user->chans.erase(it);
 
 			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName.c_str()), ChannelName, av[1] ? av[1] : ""));
-
-			if (c->next)
-				c->next->prev = c->prev;
-			if (c->prev)
-				c->prev->next = c->next;
-			else
-				user->chans = c->next;
-			delete c;
 		}
 	}
 }
@@ -1636,7 +1583,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	 * Unless the channel has just been created. -heinz
 	 *	 Or the user matches CA_AUTODEOP... -GD
 	 */
-	if (((ci->HasFlag(CI_SECUREOPS)) || (c->usercount == 1)
+	if (((ci->HasFlag(CI_SECUREOPS)) || (c->users.size() == 1)
 		 || check_access(user, ci, CA_AUTODEOP))
 		&& !is_ulined(user->server->name)) {
 		if (owner && (status & CUS_OWNER) && !IsFounder(user, ci))

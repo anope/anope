@@ -43,7 +43,7 @@ class CommandBSSay : public Command
 			return MOD_CONT;
 		}
 
-		if (!ci->c || ci->c->usercount < Config.BSMinUsers)
+		if (!ci->c || ci->c->users.size() < Config.BSMinUsers)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;

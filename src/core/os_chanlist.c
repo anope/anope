@@ -37,22 +37,22 @@ class CommandOSChanList : public Command
 
 		if (pattern && (u2 = finduser(pattern)))
 		{
-			struct u_chanlist *uc;
-
 			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
 
-			for (uc = u2->chans; uc; uc = uc->next)
+			for (UChannelList::iterator it = u2->chans.begin(); it != u2->chans.end(); ++it)
 			{
+				ChannelContainer *cc = *it;
+
 				if (!Modes.empty())
 				{
 					for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
 					{
-						if (!uc->chan->HasMode(*it))
+						if (!cc->chan->HasMode(*it))
 							continue;
 					}
 				}
 
-				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, uc->chan->name.c_str(), uc->chan->usercount, chan_get_modes(uc->chan, 1, 1), uc->chan->topic ? uc->chan->topic : "");
+				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), chan_get_modes(cc->chan, 1, 1), cc->chan->topic ? cc->chan->topic : "");
 			}
 		}
 		else
@@ -76,7 +76,7 @@ class CommandOSChanList : public Command
 								continue;
 						}
 					}
-					notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->usercount, chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
+					notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
 				}
 			}
 		}

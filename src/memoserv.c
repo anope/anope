@@ -299,12 +299,14 @@ void memo_send(User * u, const char *name, const char *text, int z)
 			if (nc->HasFlag(NI_MEMO_MAIL))
 				new_memo_mail(nc, m);
 		} else {
-			struct c_userlist *cu, *next;
 			Channel *c;
 
-			if (Config.MSNotifyAll && (c = findchan(name))) {
-				for (cu = c->users; cu; cu = next) {
-					next = cu->next;
+			if (Config.MSNotifyAll && (c = findchan(name)))
+			{
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+				{
+					UserContainer *cu = *it;
+
 					if (check_access(cu->user, c->ci, CA_MEMO)) {
 						if (cu->user->nc
 							&& (cu->user->nc->HasFlag(NI_MEMO_RECEIVE))

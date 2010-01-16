@@ -86,10 +86,10 @@ class SHA256Context
 
 #define UNPACK32(x, str)		       \
 {					      \
-	*((str) + 3) = (uint8_t) ((x)      );      \
-	*((str) + 2) = (uint8_t) ((x) >>  8);      \
-	*((str) + 1) = (uint8_t) ((x) >> 16);      \
-	*((str) + 0) = (uint8_t) ((x) >> 24);      \
+	*((str) + 3) = (uint8) ((x)      );      \
+	*((str) + 2) = (uint8) ((x) >>  8);      \
+	*((str) + 1) = (uint8) ((x) >> 16);      \
+	*((str) + 0) = (uint8) ((x) >> 24);      \
 }
 
 #define PACK32(str, x)			 \

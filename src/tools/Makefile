@@ -16,9 +16,6 @@ all: ${OBJS}
 
 distclean: spotless
 
-anopesmtp:  $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
-
 $(OBJS): Makefile
 anopesmtp.o:    anopesmtp.c $(INCLUDES)
 db-merger.o:    db-merger.c $(INCLUDES)

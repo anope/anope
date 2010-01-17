@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2767"
+VERSION_BUILD="2768"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2768 - Another attempt at making the makefile understand
 #Revision 2767 - Fix small omission in src/tools/Makefile
 #Revision 2766 - Small documentation update
 #Revision 2761 - Don't kick or ban ulined clients for flood etc

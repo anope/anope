@@ -9,9 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2761"
+VERSION_BUILD="2767"
 
 # $Log$ # Changes since 1.8.2 Release
+#Revision 2767 - Fix small omission in src/tools/Makefile
+#Revision 2766 - Small documentation update
 #Revision 2761 - Don't kick or ban ulined clients for flood etc
 #Revision 2747 - Fixed a reply in bs_bot to be correct when you use an invalid ident
 #Revision 2743 - Fix a crash introduced in r2679 cause by is_on_access messing up the users host buffers

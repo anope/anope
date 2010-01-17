@@ -16,7 +16,7 @@ all: ${OBJS}
 
 distclean: spotless
 
-anopesmpt:  $(OBJS)
+anopesmtp:  $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
 
 $(OBJS): Makefile

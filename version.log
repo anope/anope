@@ -8,10 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="2"
-VERSION_EXTRA="-svn"
-VERSION_BUILD="2769"
+VERSION_EXTRA=""
+VERSION_BUILD="2771"
 
-# $Log$ # Changes since 1.8.2 Release
+# $Log$ # 
+
+# Leading up to 1.8.3 Release
+#Revision 2770 - Updated docs/INSTALL with some more upto date information
 #Revision 2769 - Updated docs/IRCD to be up to date
 #Revision 2768 - Another attempt at making the makefile understand
 #Revision 2767 - Fix small omission in src/tools/Makefile

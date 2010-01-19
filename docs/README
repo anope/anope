@@ -111,6 +111,7 @@ Table of Contents
         * Janos Kapitany <sarkanyka@cjbchat.hu>  (hun.l)
         * Szymon S'wierkosz <szymek@adres.pl> (pl.l)
         * Christopher N. <saka@epiknet.org> (fr.l)
+        * Yusuf Kurekci <ysfm.20@gmail.com> (tr.l)
 
     Anope uses the strlcat() and strlcpy() functions from OpenSSH 2.5.1p2.
     These functions are copyrighted by Todd C. Miller:

@@ -7,11 +7,13 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
-VERSION_PATCH="2"
-VERSION_EXTRA=""
-VERSION_BUILD="2771"
+VERSION_PATCH="3"
+VERSION_EXTRA="-svn"
+VERSION_BUILD="2774"
 
-# $Log$ # 
+# $Log$ # Changes since 1.8.3 Release
+
+#Revision 2774 - Bump Changes versions to 1.8-SVN & credit for tr.l
 
 # Leading up to 1.8.3 Release
 #Revision 2770 - Updated docs/INSTALL with some more upto date information

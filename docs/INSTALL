@@ -73,7 +73,8 @@ Note: You should also read the README and FAQ files!
     section 1. There are however a few specific guidelines:
 
         * IMPORTANT: Back up your old databases!
-        * If you are upgrading to a new major release, ALWAYS restart a
+        * Check Changes.conf for the new version for small config changes.
+        * If you are upgrading to a new major release, create a
           fresh configuration file from example.conf.
 
 3) Setting up the IRCd
@@ -115,20 +116,33 @@ Note: You should also read the README and FAQ files!
     Don't forget to /rehash your IRCd to apply changes.
 
     A new trend in ircd configuration is popping all over the place, good
-    examples are the latest Hybrid, Unreal and Bahamut, which use a more
+    examples are the latest Hybrid, Unreal, Bahamut & InspIRCd, which use a more
     "readable" form of configuration. For those, use something like:
+
+
+     UnrealIRCd
 
         link services.localhost.net
         {
             username        *;
             hostname        localhost;
             bind-ip         *;
-            port            6667;
+            port            7000;
             hub             *;
             password-connect "mypass";
             password-receive "mypass";
             class           servers;
         };
+
+    InspIRCd
+
+    <link name="services.localhost.net"
+      ipaddr="127.0.0.1"
+      port="7000"
+      allowmask="127.0.0.0/8"
+      sendpass="mypass"
+      recvpass="mypass">
+
 
     Note that this block-style configuration files differ heavily, depending
     on the IRCd. Consult the interactive link maker (link is below) for more
@@ -137,7 +151,9 @@ Note: You should also read the README and FAQ files!
     If you're unable to get a link with your IRCd after reading this section,
     you might try the interactive link maker, which is located at:
 
-        http://anope.org/ilm.php
+        http://www.anope.org/ilm.php
+
+    Or finally, contact your IRCd Support Community to seek advice.
 
 4) Starting Anope
 
@@ -154,8 +170,8 @@ Note: You should also read the README and FAQ files!
     to launch Anope with ./services -debug -nofork to see any errors that it
     encounters, and try to correct them.
 
-    If you need help to solve errors, feel free to subscribe to the Anope
-    mailing list and ask there. See the README file for details.
+    If you need help to solve errors, feel free to visit us on IRC at
+    irc.anope.org #anope and ask there. See the README file for further details.
 
 5) Setting up a crontab
 

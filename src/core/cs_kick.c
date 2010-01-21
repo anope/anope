@@ -52,7 +52,7 @@ class CommandCSKick : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
-		} else if (!is_on_chan(c, u2)) {
+		} else if (!c->FindUser(u2)) {
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		} else if (!is_same ? !check_access(u, ci, CA_KICK) :
 					 !check_access(u, ci, CA_KICKME)) {

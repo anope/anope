@@ -54,7 +54,7 @@ class CommandCSInvite : public Command
 			}
 		}
 
-		if (is_on_chan(c, u2))
+		if (c->FindUser(u2))
 			notice_lang(Config.s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name.c_str());
 		else
 		{

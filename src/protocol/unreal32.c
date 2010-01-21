@@ -1261,12 +1261,12 @@ void moduleAddModes()
 	ModeManager::AddChannelMode('I', new ChannelModeInvite());
 
 	/* v/h/o/a/q */
-	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, CUS_VOICE, '+'));
-	ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, CUS_HALFOP, '%'));
-	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, CUS_OP, '@', true));
-	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, CUS_PROTECT, '&', true));
+	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
+	ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, '%'));
+	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@', true));
+	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&', true));
 	/* Unreal sends +q as * */
-	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, CUS_OWNER, '*'));
+	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, '*'));
 
 	/* Add channel modes */
 	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));

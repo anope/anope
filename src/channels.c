@@ -129,10 +129,13 @@ void Channel::JoinUser(User *user)
 	if (debug)
 		alog("debug: %s joins %s", user->nick.c_str(), this->name.c_str());
 
+	Flags<ChannelModeName> *Status = new Flags<ChannelModeName>;
 	ChannelContainer *cc = new ChannelContainer(this);
+	cc->Status = Status;
 	user->chans.push_back(cc);
 
 	UserContainer *uc = new UserContainer(user);
+	uc->Status = Status;
 	this->users.push_back(uc);
 
 	if (get_ignore(user->nick.c_str()) == NULL)
@@ -188,17 +191,30 @@ void Channel::DeleteUser(User *user)
 	if (this->ci)
 		update_cs_lastseen(user, this->ci);
 
-	CUserList::iterator it;
-	for (it = this->users.begin(); (*it)->user != user && it != this->users.end(); ++it);
-	if (it == this->users.end())
+	CUserList::iterator cit;
+	for (cit = this->users.begin(); (*cit)->user != user && cit != this->users.end(); ++cit);
+	if (cit == this->users.end())
 	{
 		if (debug)
-			alog("debug: Channel::DelUser() tried to delete nonexistnat user %s from channel %s", user->nick.c_str(), this->name.c_str());
+			alog("debug: Channel::DeleteUser() tried to delete nonexistnat user %s from channel %s", user->nick.c_str(), this->name.c_str());
 		return;
 	}
 
-	delete *it;
-	this->users.erase(it);
+	delete (*cit)->Status;
+	delete *cit;
+	this->users.erase(cit);
+
+	UChannelList::iterator uit;
+	for (uit = user->chans.begin(); (*uit)->chan != this && uit != user->chans.end(); ++uit);
+	if (uit == user->chans.end())
+	{
+		if (debug)
+			alog("debug: Channel::DeleteUser() tried to delete nonexistant channel %s from %s's channel list", this->name.c_str(), user->nick.c_str());
+		return;
+	}
+
+	delete *uit;
+	user->chans.erase(uit);
 
 	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
 	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
@@ -219,6 +235,52 @@ void Channel::DeleteUser(User *user)
 	
 	if (this->users.empty())
 		delete this;
+}
+
+/** Check if the user is on the channel
+ * @param u The user
+ * @return A user container if found, else NULL
+ */
+UserContainer *Channel::FindUser(User *u)
+{
+	for (CUserList::iterator it = this->users.begin(); it != this->users.end(); ++it)
+		if ((*it)->user == u)
+			return *it;
+	return NULL;
+}
+
+/** Check if a user has a status on a channel
+ * @param u The user
+ * @param cms The status mode, or NULL to represent no status
+ * @return true or false
+ */
+bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms)
+{
+	if (!u || (cms && cms->Type != MODE_STATUS))
+		throw CoreException("Channel::HasUserStatus got bad mode");
+
+	/* Usually its more efficient to search the users channels than the channels users */
+	ChannelContainer *cc = u->FindChannel(this);
+	if (cc)
+	{
+		if (cms)
+			return cc->Status->HasFlag(cms->Name);
+		else
+			return !cc->Status->FlagCount();
+	}
+
+	return false;
+}
+
+/** Check if a user has a status on a channel
+ * Use the overloaded function for ChannelModeStatus* to check for no status
+ * @param u The user
+ * @param Name The Mode name, eg CMODE_OP, CMODE_VOICE
+ * @return true or false
+ */
+bool Channel::HasUserStatus(User *u, ChannelModeName Name)
+{
+	return HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(Name)));
 }
 
 /**
@@ -268,9 +330,13 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		if (debug)
 			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
 
-		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
-		/* Set the new status on the user */
-		chan_set_user_status(this, u, cms->Status);
+		/* Set the status on the user */
+		ChannelContainer *cc = u->FindChannel(this);
+		if (cc)
+		{
+			cc->Status->SetFlag(cm->Name);
+		}
+
 		/* Enforce secureops, etc */
 		chan_set_correct_modes(u, this, 0);
 		return;
@@ -399,8 +465,13 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		if (debug)
 			alog("debug: Setting -%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
 
-		ChannelModeStatus *cms = dynamic_cast<ChannelModeStatus *>(cm);
-		chan_remove_user_status(this, u, cms->Status);
+		/* Remove the status on the user */
+		ChannelContainer *cc = u->FindChannel(this);
+		if (cc)
+		{
+			cc->Status->UnsetFlag(cm->Name);
+		}
+
 		return;
 	}
 	/* Setting b/e/I etc */
@@ -489,13 +560,8 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bo
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
-		if (u)
-		{
-			if (chan_has_user_status(this, u, dynamic_cast<ChannelModeStatus *>(cm)->Status))
-			{
-				return;
-			}
-		}
+		if (u && HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(cm)))
+			return;
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
@@ -543,13 +609,8 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const std::string &param,
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
-		if (u)
-		{
-			if (!chan_has_user_status(this, u, dynamic_cast<ChannelModeStatus *>(cm)->Status))
-			{
-				return;
-			}
-		}
+		if (u && !HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(cm)))
+			return;
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, param);
@@ -872,16 +933,10 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 	if (debug)
 		alog("debug: Channel::KickInternal kicking %s from %s", user->nick.c_str(), this->name.c_str());
 	
-	UChannelList::iterator it;
-	for (it = user->chans.begin(); (*it)->chan != this && it != user->chans.end(); ++it);
-	if (it != user->chans.end())
+	if (user->FindChannel(this))
 	{
-		ChannelContainer *cc = *it;
-
-		FOREACH_MOD(I_OnUserKicked, OnUserKicked(cc->chan, user, source, reason));
-		cc->chan->DeleteUser(user);
-		delete cc;
-		user->chans.erase(it);
+		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, user, source, reason));
+		this->DeleteUser(user);
 	}
 	else if (debug)
 		alog("debug: Channel::KickInternal got kick for user %s who isn't on channel %s ?", user->nick.c_str(), this->name.c_str());
@@ -970,96 +1025,6 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 	*end = 0;
 
 	return res;
-}
-
-/*************************************************************************/
-
-/* Retrieves the status of an user on a channel */
-
-int chan_get_user_status(Channel * chan, User * user)
-{
-	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
-		if ((*it)->chan == chan)
-			return (*it)->status;
-
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Has the given user the given status on the given channel? :p */
-
-int chan_has_user_status(Channel * chan, User * user, int16 status)
-{
-	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
-	{
-		ChannelContainer *cc = *it;
-
-		if (cc->chan == chan)
-		{
-			if (debug)
-				alog("debug: chan_has_user_status wanted %d the user is %d", status, cc->status);
-			return (cc->status & status);
-		}
-	}
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Remove the status of an user on a channel */
-
-void chan_remove_user_status(Channel * chan, User * user, int16 status)
-{
-	if (debug >= 2)
-		alog("debug: removing user status (%d) from %s for %s", status,
-			 user->nick.c_str(), chan->name.c_str());
-
-	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
-	{
-		ChannelContainer *cc = *it;
-
-		if (cc->chan == chan)
-		{
-			cc->status &= ~status;
-			break;
-		}
-	}
-}
-
-/*************************************************************************/
-
-/* Set the status of an user on a channel */
-
-void chan_set_user_status(Channel * chan, User * user, int16 status)
-{
-	UserMode *um;
-
-	if (debug >= 2)
-		alog("debug: setting user status (%d) on %s for %s", status,
-			 user->nick.c_str(), chan->name.c_str());
-
-	if (Config.HelpChannel && ((um = ModeManager::FindUserModeByName(UMODE_HELPOP))) && (status & CUS_OP)
-		&& (stricmp(chan->name.c_str(), Config.HelpChannel) == 0)
-		&& (!chan->ci || check_access(user, chan->ci, CA_AUTOOP))) {
-		if (debug) {
-			alog("debug: %s being given helpop for having %d status in %s",
-				 user->nick.c_str(), status, chan->name.c_str());
-		}
-
-		user->SetMode(NULL, um);
-	}
-
-	for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end(); ++it)
-	{
-		ChannelContainer *cc = *it;
-
-		if (cc->chan == chan)
-		{
-			cc->status |= status;
-			break;
-		}
-	}
 }
 
 /*************************************************************************/
@@ -1178,19 +1143,6 @@ void get_channel_stats(long *nrec, long *memuse)
 
 /*************************************************************************/
 
-/* Is the given nick on the given channel? */
-
-int is_on_chan(Channel * c, User * u)
-{
-	for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
-		if ((*it)->chan == c)
-			return 1;
-
-	return 0;
-}
-
-/*************************************************************************/
-
 /* Is the given nick on the given channel?
    This function supports links. */
 
@@ -1236,7 +1188,8 @@ void do_join(const char *source, int ac, const char **av)
 	ci::string buf;
 	while (sep.GetToken(buf))
 	{
-		if (buf[0] == '0') {
+		if (buf[0] == '0')
+		{
 			for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end();)
 			{
 				ChannelContainer *cc = *it++;
@@ -1245,8 +1198,6 @@ void do_join(const char *source, int ac, const char **av)
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
 				cc->chan->DeleteUser(user);
 				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame.c_str()), channame, ""));
-				delete cc;
-				user->chans.erase(it);
 			}
 			user->chans.clear();
 			continue;
@@ -1338,14 +1289,11 @@ void do_kick(const std::string &source, int ac, const char **av)
 
 void do_part(const char *source, int ac, const char **av)
 {
-	User *user;
-
-	user = finduser(source);
-	if (!user) {
-		if (debug) {
-			alog("debug: PART from nonexistent user %s: %s", source,
-				 merge_args(ac, av));
-		}
+	User *user = finduser(source);
+	if (!user) 
+	{
+		if (debug)
+			alog("debug: PART from nonexistent user %s: %s", source, merge_args(ac, av));
 		return;
 	}
 
@@ -1353,24 +1301,26 @@ void do_part(const char *source, int ac, const char **av)
 	ci::string buf;
 	while (sep.GetToken(buf))
 	{
+		Channel *c = findchan(buf.c_str());
+		
+		if (!c)
+		{
+			if (debug)
+				alog("debug: Recieved PART from %s for nonexistant channel %s", user->nick.c_str(), buf.c_str());
+		}
+
 		if (debug)
 			alog("debug: %s leaves %s", source, buf.c_str());
-		UChannelList::iterator it;
-		for (it = user->chans.begin(); buf != (*it)->chan->name && it != user->chans.end(); ++it);
-		if (it != user->chans.end())
+
+		if (user->FindChannel(c))
 		{
-			ChannelContainer *cc = *it;
-
-			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
-			std::string ChannelName = cc->chan->name;
-
-			cc->chan->DeleteUser(user);
-
-			delete *it;
-			user->chans.erase(it);
-
+			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c));
+			std::string ChannelName = c->name;
+			c->DeleteUser(user);
 			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName.c_str()), ChannelName, av[1] ? av[1] : ""));
 		}
+		else if (debug)
+			alog("debug: Recieved PART from %s for %s, but %s isn't in %s ?", user->nick.c_str(), c->name.c_str(), user->nick.c_str(), c->name.c_str());
 	}
 }
 
@@ -1535,9 +1485,6 @@ void do_topic(const char *source, int ac, const char **av)
  **/
 void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 {
-	int status;
-	int add_modes = 0;
-	int rem_modes = 0;
 	ChannelInfo *ci;
 	ChannelMode *owner, *admin, *op, *halfop, *voice;
 
@@ -1553,118 +1500,40 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if ((ci->HasFlag(CI_FORBIDDEN)) || (*(c->name.c_str()) == '+'))
 		return;
 
-	status = chan_get_user_status(c, user);
-
 	if (debug)
-		alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick.c_str(), c->name.c_str(), status, (give_modes ? "" : "not "));
+		alog("debug: Setting correct user modes for %s on %s (%sgiving modes)", user->nick.c_str(), c->name.c_str(), (give_modes ? "" : "not "));
 
-	/* Changed the second line of this if a bit, to make sure unregistered
-	 * users can always get modes (IE: they always have autoop enabled). Before
-	 * this change, you were required to have a registered nick to be able
-	 * to receive modes. I wonder who added that... *looks at Rob* ;) -GD
-	 */
-	if (give_modes && (get_ignore(user->nick.c_str()) == NULL)
-		&& (!user->nc || !user->nc->HasFlag(NI_AUTOOP))) {
+	if (give_modes && !get_ignore(user->nick.c_str()) && (!user->nc || !user->nc->HasFlag(NI_AUTOOP)))
+	{
 		if (owner && check_access(user, ci, CA_AUTOOWNER))
-			add_modes |= CUS_OWNER;
-		else if (admin && check_access(user, ci, CA_AUTOPROTECT))
-			add_modes |= CUS_PROTECT;
-		if (op && check_access(user, ci, CA_AUTOOP))
-			add_modes |= CUS_OP;
-		else if (halfop && check_access(user, ci, CA_AUTOHALFOP))
-			add_modes |= CUS_HALFOP;
-		else if (voice && check_access(user, ci, CA_AUTOVOICE))
-			add_modes |= CUS_VOICE;
-	}
-
-	/* We check if every mode they have is legally acquired here, and remove
-	 * the modes that they're not allowed to have. But only if SECUREOPS is
-	 * on, because else every mode is legal. -GD
-	 * Unless the channel has just been created. -heinz
-	 *	 Or the user matches CA_AUTODEOP... -GD
-	 */
-	if (((ci->HasFlag(CI_SECUREOPS)) || (c->users.size() == 1)
-		 || check_access(user, ci, CA_AUTODEOP))
-		&& !is_ulined(user->server->name)) {
-		if (owner && (status & CUS_OWNER) && !IsFounder(user, ci))
-			rem_modes |= CUS_OWNER;
-		if (admin && (status & CUS_PROTECT)
-			&& !check_access(user, ci, CA_AUTOPROTECT)
-			&& !check_access(user, ci, CA_PROTECTME))
-			rem_modes |= CUS_PROTECT;
-		if (op && (status & CUS_OP) && !check_access(user, ci, CA_AUTOOP)
-			&& !check_access(user, ci, CA_OPDEOPME))
-			rem_modes |= CUS_OP;
-		if (halfop && (status & CUS_HALFOP)
-			&& !check_access(user, ci, CA_AUTOHALFOP)
-			&& !check_access(user, ci, CA_HALFOPME))
-			rem_modes |= CUS_HALFOP;
-	}
-
-	/* No modes to add or remove, exit function -GD */
-	if (!add_modes && !rem_modes)
-		return;
-
-	if (add_modes > 0)
-	{
-		if (owner && (add_modes & CUS_OWNER) && !(status & CUS_OWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);
-		else
-			add_modes &= ~CUS_OWNER;
 
-		if (admin && (add_modes & CUS_PROTECT) && !(status & CUS_PROTECT))
+		if (admin && check_access(user, ci, CA_AUTOPROTECT))
 			c->SetMode(NULL, CMODE_PROTECT, user->nick);
-		else
-			add_modes &= ~CUS_PROTECT;
 
-		if (op && (add_modes & CUS_OP) && !(status & CUS_OP))
+		if (op && check_access(user, ci, CA_AUTOOP))
 			c->SetMode(NULL, CMODE_OP, user->nick);
-		else
-			add_modes &= ~CUS_OP;
 
-		if (halfop && (add_modes & CUS_HALFOP) && !(status & CUS_HALFOP))
+		if (halfop && check_access(user, ci, CA_AUTOHALFOP))
 			c->SetMode(NULL, CMODE_HALFOP, user->nick);
-		else
-			add_modes &= ~CUS_HALFOP;
 
-		if (voice && (add_modes & CUS_VOICE) && !(status & CUS_VOICE))
+		if (voice && check_access(user, ci, CA_AUTOVOICE))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
-		else
-			add_modes &= ~CUS_VOICE;
 	}
-	if (rem_modes > 0)
+	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP)) && !is_ulined(user->server->name))
 	{
-		if (owner && rem_modes & CUS_OWNER)
-		{
+		if (owner && !IsFounder(user, ci))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
-		}
 
-		if (admin && rem_modes & CUS_PROTECT)
-		{
+		if (admin && !check_access(user, ci, CA_AUTOPROTECT) && !check_access(user, ci, CA_PROTECTME))
 			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
-		}
 
-		if (op && rem_modes & CUS_OP)
-		{
+		if (op && !check_access(user, ci, CA_AUTOOP) && !check_access(user, ci, CA_OPDEOPME))
 			c->RemoveMode(NULL, CMODE_OP, user->nick);
-		}
 
-		if (halfop && rem_modes & CUS_HALFOP)
-		{
+		if (halfop && !check_access(user, ci, CA_AUTOHALFOP) && !check_access(user, ci, CA_HALFOPME))
 			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
-		}
 	}
-
-	/* Here, both can be empty again due to the "isn't it set already?"
-	 * checks above. -GD
-	 */
-	if (!add_modes && !rem_modes)
-		return;
-
-	if (add_modes > 0)
-		chan_set_user_status(c, user, add_modes);
-	if (rem_modes > 0)
-		chan_remove_user_status(c, user, rem_modes);
 }
 
 /*************************************************************************/

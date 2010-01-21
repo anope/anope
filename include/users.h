@@ -12,9 +12,9 @@
 struct ChannelContainer
 {
 	Channel *chan;
-	int16 status;
+	Flags<ChannelModeName> *Status;
 
-	ChannelContainer(Channel *c) : chan(c) { status = 0; }
+	ChannelContainer(Channel *c) : chan(c) { }
 	virtual ~ChannelContainer() { }
 };
 
@@ -222,5 +222,13 @@ class CoreExport User : public Extensible
 	 * @param modes The modes
 	 */
 	void SetModes(BotInfo *bi, const char *modes, ...);
+
+	/** Find the channel container for Channel c that the user is on
+	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel
+	 * than channels a user is in
+	 * @param c The channel
+	 * @return The channel container, or NULL
+	 */
+	ChannelContainer *FindChannel(Channel *c);
 };
 

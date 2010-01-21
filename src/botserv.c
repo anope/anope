@@ -132,16 +132,14 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
 void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 {
 	int c;
-	int16 cstatus = 0;
 	char *cmd;
 	UserData *ud;
 	bool was_action = false;
 	Command *command;
 	std::string bbuf;
 
-	if (!u || !buf || !ci) {
+	if (!u || !buf || !ci || !ci->c)
 		return;
-	}
 
 	/* Answer to ping if needed, without breaking the buffer. */
 	if (!strnicmp(buf, "\1PING", 5)) {
@@ -167,15 +165,16 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 	 * way.
 	 */
 
-	/* We first retrieve the user status on the channel if needed */
-	if (ci->botflags.HasFlag(BS_DONTKICKOPS) || ci->botflags.HasFlag(BS_DONTKICKVOICES))
-		cstatus = chan_get_user_status(ci->c, u);
-
-	if (buf && !check_access(u, ci, CA_NOKICK) &&
-		(!ci->botflags.HasFlag(BS_DONTKICKOPS)
-		 || !(cstatus & (CUS_HALFOP | CUS_OP | CUS_OWNER | CUS_PROTECT)))
-		&& (!ci->botflags.HasFlag(BS_DONTKICKVOICES) || !(cstatus & CUS_VOICE))) {
-
+	bool Allow = false;
+	if (!ci->botflags.HasFlag(BS_DONTKICKOPS) && !ci->botflags.HasFlag(BS_DONTKICKVOICES))
+		Allow = true;
+	else if (ci->botflags.HasFlag(BS_DONTKICKOPS) && (ci->c->HasUserStatus(u, CMODE_HALFOP) || ci->c->HasUserStatus(u, CMODE_OP) || ci->c->HasUserStatus(u, CMODE_PROTECT) || ci->c->HasUserStatus(u, CMODE_OWNER)))
+		Allow = true;
+	else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && ci->c->HasUserStatus(u, CMODE_VOICE))
+		Allow = true;
+	
+	if (buf && !check_access(u, ci, CA_NOKICK) && Allow)
+	{
 		/* Bolds kicker */
 		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && strchr(buf, 2)) {
 			check_ban(ci, u, TTB_BOLDS);
@@ -759,7 +758,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, const char *re
 {
 	User *u = finduser(nick);
 
-	if (!u || !is_on_chan(ci->c, u))
+	if (!u || !ci->c->FindUser(u))
 		return;
 
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
@@ -791,7 +790,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *ni
 	*buf = '\0';
 	u = finduser(nick);
 
-	if (!u || !is_on_chan(ci->c, u))
+	if (!u || !ci->c->FindUser(u))
 		return;
 
 	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));

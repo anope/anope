@@ -49,7 +49,7 @@ class CommandCSRegister : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
 		else if (!stricmp(chan, "#"))
 			notice_lang(Config.s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
-		else if (!chan_has_user_status(c, u, CUS_OP))
+		else if (!c->HasUserStatus(u, CMODE_OP))
 			notice_lang(Config.s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 		else if (Config.CSMaxReg && u->nc->channelcount >= Config.CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
 			notice_lang(Config.s_ChanServ, u, u->nc->channelcount > Config.CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config.CSMaxReg);

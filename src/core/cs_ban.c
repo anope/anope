@@ -72,7 +72,7 @@ class CommandCSBan : public Command
 			c->SetMode(NULL, CMODE_BAN, mask);
 
 			/* We still allow host banning while not allowing to kick */
-			if (!is_on_chan(c, u2))
+			if (c->FindUser(u2))
 				return MOD_CONT;
 
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))

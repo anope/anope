@@ -198,19 +198,15 @@ class CoreExport ChannelModeParam : public ChannelMode
 class CoreExport ChannelModeStatus : public ChannelMode
 {
   public:
-	/** CUS_ values, see below
-	*/
-	int16 Status;
 	/* The symbol, eg @ % + */
 	char Symbol;
 
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mStatus A CUS_ value
 	 * @param mSymbol The symbol for the mode, eg @ % +
 	 * @param mProtectBotServ Should botserv clients reset this on themself if it gets unset?
 	 */
-	ChannelModeStatus(ChannelModeName mName, int16 mStatus, char mSymbol, bool mProtectBotServ = false);
+	ChannelModeStatus(ChannelModeName mName, char mSymbol, bool mProtectBotServ = false);
 
 	/** Default destructor
 	 */

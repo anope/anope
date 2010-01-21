@@ -868,68 +868,6 @@ void SetOperType(NickCore *nc)
 /*********************** NickServ command routines ***********************/
 /*************************************************************************/
 
-
-/* We don't use this function but we keep it for module coders -certus */
-int should_mode_change(int16 status, int16 mode)
-{
-	switch (mode)
-	{
-		case CUS_OP:
-			if (status & CUS_OP)
-			{
-				return 0;
-			}
-			break;
-		case CUS_VOICE:
-			if (status & CUS_OP)
-			{
-				return 0;
-			}
-			if (status & CUS_HALFOP)
-			{
-				return 0;
-			}
-			if (status & CUS_VOICE)
-			{
-				return 0;
-			}
-			return 1;
-			break;
-		case CUS_HALFOP:
-			if (status & CUS_OP)
-			{
-				return 0;
-			}
-			if (status & CUS_HALFOP)
-			{
-				return 0;
-			}
-			return 1;
-			break;
-		case CUS_OWNER:
-			if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			{
-				if (status & CUS_OWNER)
-				{
-					return 0;
-				}
-			}
-			break;
-		case CUS_PROTECT:
-			if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
-			{
-				if (status & CUS_PROTECT)
-				{
-					return 0;
-				}
-			}
-			break;
-	}
-	return 1;
-}
-
-/*************************************************************************/
-
 int do_setmodes(User * u)
 {
 	Channel *c;

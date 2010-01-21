@@ -35,6 +35,7 @@ struct UserContainer
 {
 	User *user;
 	UserData *ud;
+	Flags<ChannelModeName> *Status;
 
 	UserContainer(User *u) : user(u) { ud = new UserData; }
 	virtual ~UserContainer() { delete ud; }
@@ -108,6 +109,27 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param u The user
 	 */
 	void DeleteUser(User *u);
+
+	/** Check if the user is on the channel
+	 * @param u The user
+	 * @return A user container if found, else NULL
+	 */
+	UserContainer *FindUser(User *u);
+
+	/** Check if a user has a status on a channel
+	 * @param u The user
+	 * @param cms The status mode, or NULL to represent no status
+	 * @return true or false
+	 */
+	bool HasUserStatus(User *u, ChannelModeStatus *cms);
+
+	/** Check if a user has a status on a channel
+	 * Use the overloaded function for ChannelModeStatus* to check for no status
+	 * @param u The user
+	 * @param Name The Mode name, eg CMODE_OP, CMODE_VOICE
+	 * @return true or false
+	 */
+	bool HasUserStatus(User *u, ChannelModeName Name);
 
 	/** See if the channel has any modes at all
 	 * @return true or false

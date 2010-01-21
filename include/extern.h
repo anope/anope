@@ -75,15 +75,9 @@ E Channel *nextchan();
 
 E void ChanSetInternalModes(Channel *c, int ac, const char **av);
 
-E int is_on_chan(Channel * c, User * u);
 E User *nc_on_chan(Channel * c, NickCore * nc);
 
 E char *chan_get_modes(Channel * chan, int complete, int plus);
-
-E int chan_get_user_status(Channel * chan, User * user);
-E int chan_has_user_status(Channel * chan, User * user, int16 status);
-E void chan_remove_user_status(Channel * chan, User * user, int16 status);
-E void chan_set_user_status(Channel * chan, User * user, int16 status);
 
 E int get_access_level(ChannelInfo * ci, NickAlias * na);
 E const char *get_xop_level(int level);
@@ -385,7 +379,6 @@ E void change_core_display(NickCore * nc);
 E void change_core_display(NickCore * nc, const char *newdisplay);
 E void release(NickAlias * na, int from_timeout);
 E int do_setmodes(User * u);
-E int should_mode_change(int16 status, int16 mode);
 
 E void ns_init();
 E void nickserv(User * u, char *buf);

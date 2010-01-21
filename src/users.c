@@ -272,10 +272,7 @@ User::~User()
 
 	while (!this->chans.empty())
 	{
-		ChannelContainer *cc = this->chans.front();
-		cc->chan->DeleteUser(this);
-		delete cc;
-		this->chans.pop_front();
+		this->chans.front()->chan->DeleteUser(this);
 	}
 	
 	/* Cancel pending nickname enforcers, etc */
@@ -609,13 +606,26 @@ void User::SetModes(BotInfo *bi, const char *modes, ...)
 			else
 				this->SetMode(bi, um);
 		}
-		else if (add == 0)
+		else
 		{
 			this->RemoveMode(bi, um);
 		}
 	}
 }
 
+/** Find the channel container for Channel c that the user is on
+ * This is preferred over using FindUser in Channel, as there are usually more users in a channel
+ * than channels a user is in
+ * @param c The channel
+ * @return The channel container, or NULL
+ */
+ChannelContainer *User::FindChannel(Channel *c)
+{
+	for (UChannelList::iterator it = this->chans.begin(); it != this->chans.end(); ++it)
+		if ((*it)->chan == c)
+			return *it;
+	return NULL;
+}
 
 /*************************************************************************/
 

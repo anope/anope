@@ -778,15 +778,6 @@ class Server : public Flags<ServerFlag>
 
 /*************************************************************************/
 
-#define CUS_OP			0x0001
-#define CUS_VOICE		0x0002
-#define CUS_HALFOP		0x0004		/* Halfop (+h) */
-#define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
-#define CUS_PROTECT		0x0010		/* Protected users (+a) */
-/* #define CUS_DEOPPED		0x0080	*/	/* Removed due to IRCd checking it */
-
-/*************************************************************************/
-
 #include "users.h"
 
 /* This structure stocks ban data since it must not be removed when

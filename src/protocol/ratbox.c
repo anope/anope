@@ -931,8 +931,8 @@ void moduleAddModes()
 	ModeManager::AddChannelMode('I', new ChannelModeInvite());
 
 	/* v/h/o/a/q */
-	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, CUS_VOICE, '+'));
-	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, CUS_OP, '@', true));
+	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
+	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@', true));
 
 	/* Add channel modes */
 	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));

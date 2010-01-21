@@ -65,10 +65,8 @@ class CommandOSClearModes : public Command
 					{
 						UserContainer *uc = *it;
 
-						if (!chan_has_user_status(c, uc->user, CUS_OP))
-							continue;
-
-						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
+						if (uc->Status->HasFlag(CMODE_OP))
+							c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
 					}
 				}
 
@@ -81,10 +79,8 @@ class CommandOSClearModes : public Command
 					{
 						UserContainer *uc = *it;
 
-						if (!chan_has_user_status(c, uc->user, CUS_VOICE))
-							continue;
-						
-						c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
+						if (uc->Status->HasFlag(CMODE_VOICE))	
+							c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
 					}
 				}
 
@@ -99,10 +95,8 @@ class CommandOSClearModes : public Command
 						{
 							UserContainer *uc = *it;
 
-							if (!chan_has_user_status(c, uc->user, CUS_HALFOP))
-								continue;
-							
-							c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
+							if (uc->Status->HasFlag(CMODE_HALFOP))
+								c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
 						}
 					}
 				}
@@ -121,10 +115,8 @@ class CommandOSClearModes : public Command
 						{
 							UserContainer *uc = *it;
 
-							if (!chan_has_user_status(c, uc->user, CUS_OWNER))
-								continue;
-
-							c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
+							if (uc->Status->HasFlag(CMODE_OWNER))
+								c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
 						}
 					}
 				}
@@ -143,10 +135,8 @@ class CommandOSClearModes : public Command
 						{
 							UserContainer *uc = *it;
 
-							if (!chan_has_user_status(c, uc->user, CUS_PROTECT))
-								continue;
-
-							c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
+							if (uc->Status->HasFlag(CMODE_PROTECT))
+								c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
 						}
 					}
 				}

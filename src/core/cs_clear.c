@@ -71,8 +71,6 @@ class CommandCSClear : public Command
 		}
 		else if (what == "ops")
 		{
-			int isop, isadmin, isown;
-
 			if (ircd->svsmode_ucmode)
 			{
 				ircdproto->SendSVSModeChan(c, "-o", NULL);
@@ -94,18 +92,11 @@ class CommandCSClear : public Command
 				{
 					UserContainer *uc = *it;
 
-					isop = chan_has_user_status(c, uc->user, CUS_OP);
-					isadmin = chan_has_user_status(c, uc->user, CUS_PROTECT);
-					isown = chan_has_user_status(c, uc->user, CUS_OWNER);
-
-					if (!isop && !isadmin && !isown)
-						continue;
-
-					if (isown)
+					if (uc->Status->HasFlag(CMODE_OWNER))
 						c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
-					if (admin)
+					if (uc->Status->HasFlag(CMODE_PROTECT))
 						c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
-					if (isop)
+					if (uc->Status->HasFlag(CMODE_OP))
 						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
 				}
 			}
@@ -115,18 +106,11 @@ class CommandCSClear : public Command
 				{
 					UserContainer *uc = *it;
 
-					isop = chan_has_user_status(c, uc->user, CUS_OP);
-					isadmin = chan_has_user_status(c, uc->user, CUS_PROTECT);
-					isown = chan_has_user_status(c, uc->user, CUS_OWNER);
-
-					if (!isop && !isadmin && !isown)
-						continue;
-
-					if (isown)
+					if (uc->Status->HasFlag(CMODE_OWNER))
 						c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
-					if (isadmin)
+					if (uc->Status->HasFlag(CMODE_PROTECT))
 						c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
-					if (isop)
+					if (uc->Status->HasFlag(CMODE_OP))
 						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
 				}
 			}
@@ -139,10 +123,8 @@ class CommandCSClear : public Command
 			{
 				UserContainer *uc = *it;
 
-				if (!chan_has_user_status(c, uc->user, CUS_HALFOP))
-					continue;
-
-				c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
+				if (uc->Status->HasFlag(CMODE_HALFOP))
+					c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
@@ -153,10 +135,8 @@ class CommandCSClear : public Command
 			{
 				UserContainer *uc = *it;
 
-				if (!chan_has_user_status(c, uc->user, CUS_VOICE))
-					continue;
-
-				c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
+				if (uc->Status->HasFlag(CMODE_VOICE))
+					c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_VOICES, chan);

@@ -348,7 +348,7 @@ class EOld : public Module
 		char digest[33], digest2[33];
 		char cpass[1000];
 		int i;
-		std::string buf = "old:";
+		std::string buf = "oldmd5:";
 
 		memset(&context, 0, sizeof(context));
 		memset(&digest, 0, sizeof(digest));
@@ -374,14 +374,14 @@ class EOld : public Module
 
 	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest )
 	{
-		if (hashm != "old")
+		if (hashm != "oldmd5")
 			return EVENT_CONTINUE;
 		return EVENT_STOP;
 	}
 
 	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
 	{
-		if (hashm != "old")
+		if (hashm != "oldmd5")
 			return EVENT_CONTINUE;
 		std::string buf;
 		this->OnEncrypt(plaintext, buf);

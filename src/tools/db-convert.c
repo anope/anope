@@ -376,14 +376,14 @@ int main(int argc, char *argv[])
 				len = 16;
 			else if (hashm == "sha1")
 				len = 20;
-			else if (hashm == "old")
+			else if (hashm == "oldmd5")
 				len = 16;
 			else 
 				len = 32;
 			
 			b64_encode(nc->pass, len, (char *)cpass, 5000);
 
-			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " ";
+			fs << "NC " << nc->display << " " << hashm << ":" << cpass;
 			fs << " " << GetLanguageID(nc->language) << " " << nc->memos.memomax << " " << nc->channelcount << std::endl;
 
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;

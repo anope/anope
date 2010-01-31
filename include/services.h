@@ -1162,6 +1162,32 @@ struct Uplink {
 	}
 };
 
+enum LogLevel
+{
+	LOG_NORMAL,
+	LOG_DEBUG,
+	LOG_DEBUG_2,
+	LOG_DEBUG_3,
+	LOG_DEBUG_4
+};
+
+class CoreExport Alog
+{
+ private:
+	std::stringstream buf;
+	bool logit;
+ public:
+	Alog(LogLevel val = LOG_NORMAL);
+	~Alog();
+	template<typename T> Alog& operator<<(T val)
+	{
+		if (logit)
+			buf << val;
+		return *this;
+	}
+};
+
+
 class CoreExport Anope
 {
  public:

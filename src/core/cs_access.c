@@ -227,7 +227,8 @@ class CommandCSAccess : public Command
 
 				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
 
-				alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, ulev, access->level, na->nick, nc->display, ci->name.c_str());
+				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
+					<< access->level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, chan, level);
 				return MOD_CONT;
 			}
@@ -243,7 +244,8 @@ class CommandCSAccess : public Command
 
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
 
-			alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, ulev, level, na->nick, nc->display, ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
+				<< level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name.c_str(), level);
 		}
 		else if (cmd == "DEL")
@@ -280,7 +282,8 @@ class CommandCSAccess : public Command
 				}
 				else
 				{
-					alog("%s: %s!%s@%s (level %d) deleted access of user%s %s on %s", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, get_access(u, ci), deleted == 1 ? "" : "s", nick, chan);
+					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci)
+						<< ") deleted access of user" << (deleted == 1 ? " " : "s ") << nick << " on " << chan;
 					if (deleted == 1)
 						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name.c_str());
 					else
@@ -310,7 +313,8 @@ class CommandCSAccess : public Command
 				else
 				{
 					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name.c_str());
-					alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, get_access(u, ci), na->nick, access->nc->display, chan);
+					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci)
+						<< ") deleted access of " << na->nick << " (group " << access->nc->display << ") on " << chan;
 					access->nc = NULL;
 					access->in_use = 0;
 					deleted = 1;
@@ -403,10 +407,7 @@ class CommandCSAccess : public Command
 			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
 			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name.c_str());
-			alog("%s: %s!%s@%s (level %d) cleared access list on %s",
-				 Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host,
-				 get_access(u, ci), chan);
-
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << " cleared access list on " << chan;
 		}
 		else
 			this->OnSyntaxError(u, "");
@@ -473,9 +474,8 @@ class CommandCSLevels : public Command
 				if (stricmp(levelinfo[i].name, what) == 0) {
 					ci->levels[levelinfo[i].what] = level;
 
-					alog("%s: %s!%s@%s set level %s on channel %s to %d",
-						 Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host,
-						 levelinfo[i].name, ci->name.c_str(), level);
+					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set level " << levelinfo[i].name
+						<< " on channel " << ci->name << " to " << level;
 					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED,
 								levelinfo[i].name, chan, level);
 					return MOD_CONT;
@@ -489,9 +489,8 @@ class CommandCSLevels : public Command
 				if (stricmp(levelinfo[i].name, what) == 0) {
 					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
 
-					alog("%s: %s!%s@%s disabled level %s on channel %s",
-						 Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host,
-						 levelinfo[i].name, ci->name.c_str());
+					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name
+						<< " on channel " << ci->name;
 					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED,
 								levelinfo[i].name, chan);
 					return MOD_CONT;
@@ -536,8 +535,7 @@ class CommandCSLevels : public Command
 		} else if (cmd == "RESET") {
 			reset_levels(ci);
 
-			alog("%s: %s!%s@%s reset levels definitions on channel %s",
-				 Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " reset levels definitions on channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RESET, chan);
 		} else {
 			this->OnSyntaxError(u, "");

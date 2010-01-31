@@ -33,7 +33,7 @@ class CommandNSGetEMail : public Command
 		int i, j = 0;
 		NickCore *nc;
 
-		alog("%s: %s!%s@%s used GETEMAIL on %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, email.c_str());
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
 		for (i = 0; i < 1024; ++i)
 		{
 			for (nc = nclists[i]; nc; nc = nc->next)

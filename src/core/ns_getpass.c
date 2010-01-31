@@ -33,7 +33,7 @@ class CommandNSGetPass : public Command
 		{
 			if ((nr = findrequestnick(nick)))
 			{
-				alog("%s: %s!%s@%s used GETPASS on %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nick);
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETPASS on " << nick;
 				if (Config.WallGetpass)
 					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
 				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode.c_str());
@@ -49,7 +49,7 @@ class CommandNSGetPass : public Command
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
-				alog("%s: %s!%s@%s used GETPASS on %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nick);
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETPASS on " << nick;
 				if (Config.WallGetpass)
 					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
 				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass.c_str());

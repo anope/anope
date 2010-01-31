@@ -758,10 +758,8 @@ void EnforceQlinedNick(const std::string &nick, const char *killer)
 	User *u2;
 
 	if ((u2 = finduser(nick))) {
-		alog("Killed Q-lined nick: %s!%s@%s", u2->nick.c_str(), u2->GetIdent().c_str(),
-			 u2->host);
-		kill_user(killer, u2->nick.c_str(),
-				  "This nick is reserved for Services. Please use a non Q-Lined nick.");
+		Alog() << "Killed Q-lined nick: " << u2->GetMask();
+		kill_user(killer, u2->nick.c_str(), "This nick is reserved for Services. Please use a non Q-Lined nick.");
 	}
 }
 
@@ -1021,9 +1019,7 @@ char *host_resolve(char *host)
 		addr.s_addr = ip;
 		ntoa(addr, ipbuf, sizeof(ipbuf));
 		ipreturn = sstrdup(ipbuf);
-		if (debug) {
-			alog("debug: resolved %s to %s", host, ipbuf);
-		}
+		Alog(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
 		return ipreturn;
 	} else {
 		return ipreturn;

@@ -30,8 +30,7 @@ class ENone : public Module
 		char cpass[1000];
 		b64_encode(src.c_str(), src.size(), cpass, 1000);
 		buf.append(cpass);
-		if (debug > 1)
-			alog("debug: (enc_none) hashed password from [%s] to [%s]", src.c_str(), buf.c_str());
+		Alog(LOG_DEBUG_2) << "(enc_none) hashed password from [" << src << "] to [" << buf << "]";
 		dest.assign(buf);
 		return EVENT_ALLOW;
 	}

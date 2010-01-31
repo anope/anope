@@ -42,7 +42,7 @@ class CommandHSDelAll : public Command
 				na = static_cast<NickAlias *>(nc->aliases.list[i]);
 				na->hostinfo.RemoveVhost();
 			}
-			alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick.c_str());
+			Alog() << "vHosts for all nicks in group \002" << nc->display << "\002 deleted by oper \002" << u->nick << "\002";
 			notice_lang(Config.s_HostServ, u, HOST_DELALL, nc->display);
 		}
 		else

@@ -129,9 +129,7 @@ void bahamut_cmd_capab()
    call on this function */
 void bahamut_cmd_chghost(const char *nick, const char *vhost)
 {
-	if (debug) {
-		alog("debug: This IRCD does not support vhosting");
-	}
+		Alog(LOG_DEBUG) << "This IRCD does not support vhosting";
 }
 
 
@@ -408,8 +406,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 		User *u = finduser(source);
 		if (!u)
 		{
-			if (debug)
-				alog("debug: SJOIN for nonexistant user %s on %s", source, c->name.c_str());
+			Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
 		}
 		else
 		{
@@ -449,7 +446,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				if (!cm)
 				{
-					alog("Recieved unknown mode prefix %c in SJOIN string", buf[0]);
+					Alog() << "Recieved unknown mode prefix " << buf[0] << " in SJOIN string";
 					continue;
 				}
 
@@ -459,8 +456,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			User *u = finduser(buf);
 			if (!u)
 			{
-				if (debug)
-					alog("debug: SJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+				Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 				continue;
 			}
 
@@ -743,11 +739,8 @@ int anope_event_ping(const char *source, int ac, const char **av)
 
 int anope_event_error(const char *source, int ac, const char **av)
 {
-	if (ac >= 1) {
-		if (debug) {
-			alog("debug: %s", av[0]);
-		}
-	}
+	if (ac >= 1)
+		Alog(LOG_DEBUG) << av[0];
 	return MOD_CONT;
 }
 

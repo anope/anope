@@ -52,7 +52,7 @@ class CommandNSIdentify : public Command
 			notice_lang(Config.s_NickServ, u, NICK_ALREADY_IDENTIFIED);
 		else if (!(res = enc_check_password(pass, na->nc->pass)))
 		{
-			alog("%s: Failed IDENTIFY for %s!%s@%s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+			Alog() << Config.s_NickServ << ": Failed IDENTIFY for " << u->nick << "!" << u->GetIdent() << "@" << u->host;
 			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
 			bad_password(u);
 		}
@@ -62,7 +62,7 @@ class CommandNSIdentify : public Command
 		{
 			if (nick_identified(u))
 			{
-				alog("%s: %s!%s@%s logged out of account %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, u->nc->display);
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out of account " << u->nc->display;
 			}
 
 			if (na->last_realname)
@@ -78,7 +78,7 @@ class CommandNSIdentify : public Command
 
 			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-			alog("%s: %s!%s@%s identified for nick %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, u->nick.c_str());
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " identified for account " << u->nc->display;
 			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
 			if (ircd->vhost)
 				do_on_id(u);

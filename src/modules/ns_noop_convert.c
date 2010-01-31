@@ -72,8 +72,8 @@ class NSNOOPConvert : public Module
 
 		mLoadData();
 
-		alog("ns_noop_convert: Your auto-op database has been converted and this module will now");
-		alog("ns_noop_convert: unload itself.  You can now remove this module from your config");
+		Alog() << "ns_noop_convert: Your auto-op database has been converted and this module will now";
+		Alog() << "ns_noop_convert: unload itself.  You can now remove this module from your config";
 	}
 
 	~NSNOOPConvert()
@@ -102,7 +102,7 @@ int mLoadData()
 	/* will _never_ be this big thanks to the 512 limit of a message */
 	char buffer[2000];
 	if ((in = fopen(NSAutoOPDBName, "r")) == NULL) {
-		alog("ns_noop: WARNING: Can not open database file! (it might not exist, this is not fatal)");
+		Alog() << "ns_noop: WARNING: Can not open database file! (it might not exist, this is not fatal)";
 		ret = 1;
 	} else {
 		while (fgets(buffer, 1500, in)) {
@@ -138,11 +138,10 @@ int mLoadConfig(int argc, char **argv)
 	NSAutoOPDBName = sstrdup(tmp.c_str());
 
 	if (tmp.empty()) {
-		alog("ns_noop: FATAL: Can't read required configuration directives!");
+		Alog() << "ns_noop: FATAL: Can't read required configuration directives!";
 		return MOD_STOP;
 	} else {
-		alog("ns_noop: Directive NSAutoOPDBName loaded (%s)...",
-			 NSAutoOPDBName);
+		Alog() << "ns_noop: Directive NSAutoOPDBName loaded (" << NSAutoOPDBName << ")...";
 	}
 
 	return MOD_CONT;

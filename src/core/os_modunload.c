@@ -34,7 +34,7 @@ class CommandOSModUnLoad : public Command
 			return MOD_CONT;
 		}
 
-		alog("Trying to unload module [%s]", name);
+		Alog() << "Trying to unload module [" << name << "]";
 
 		status = ModuleManager::UnloadModule(m, u);
 

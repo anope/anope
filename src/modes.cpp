@@ -70,7 +70,7 @@ void SetDefaultMLock()
 					}
 					else
 					{
-						alog("Warning: Got default mlock mode %c with no param?", cm->ModeChar);
+						Alog() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
 						ptr->set(cm->Name, false);
 					}
 				}
@@ -218,8 +218,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 	/* check for NULL values otherwise we will segfault */
 	if (!chan || !mask)
 	{
-		if (debug)
-			alog("debug: add_ban called with NULL values");
+		Alog(LOG_DEBUG) << "add_ban called with NULL values";
 		return;
 	}
 
@@ -247,8 +246,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 		}
 	}
 
-	if (debug)
-		alog("debug: Added ban %s to channel %s", mask, chan->name.c_str());
+	Alog(LOG_DEBUG) << "Added ban " << mask << " to channel " << chan->name;
 }
 
 /** Remove a ban from the channel
@@ -270,8 +268,7 @@ void ChannelModeBan::DelMask(Channel *chan, const char *mask)
 	{
 		entry_delete(chan->bans, ban);
 
-		if (debug)
-			alog("debug: Deleted ban %s from channel %s", mask, chan->name.c_str());
+		Alog(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
 	}
 
 	if (chan->ci && (akick = is_stuck(chan->ci, mask)))
@@ -288,8 +285,7 @@ void ChannelModeExcept::AddMask(Channel *chan, const char *mask)
 
 	if (!chan || !mask)
 	{
-		if (debug)
-			alog("debug: add_exception called with NULL values");
+		Alog(LOG_DEBUG) << "add_exception called with NULL values";
 		return;
 	}
 
@@ -302,8 +298,7 @@ void ChannelModeExcept::AddMask(Channel *chan, const char *mask)
 	if (!exception)
 		fatal("Creating new exception entry failed");
 
-	if (debug)
-		alog("debug: Added except %s to channel %s", mask, chan->name.c_str());
+	Alog(LOG_DEBUG) << "Added except " << mask << " to channel " << chan->name;
 }
 
 /** Remove an except from the channel
@@ -323,9 +318,7 @@ void ChannelModeExcept::DelMask(Channel *chan, const char *mask)
 	if (exception)
 	{
 		entry_delete(chan->excepts, exception);
-
-		if (debug)
-			alog("debug: Deleted except %s to channel %s", mask, chan->name.c_str());
+		Alog(LOG_DEBUG) << "Deleted except " << mask << " to channel " << chan->name;
 	}
 }
 
@@ -339,8 +332,7 @@ void ChannelModeInvite::AddMask(Channel *chan, const char *mask)
 
 	if (!chan || !mask)
 	{
-		if (debug)
-			alog("debug: add_invite called with NULL values");
+		Alog(LOG_DEBUG) << "add_invite called with NULL values";
 		return;
 	}
 
@@ -353,8 +345,7 @@ void ChannelModeInvite::AddMask(Channel *chan, const char *mask)
 	if (!invite)
 		fatal("Creating new exception entry failed");
 
-	if (debug)
-		alog("debug: Added invite %s to channel %s", mask, chan->name.c_str());
+	Alog(LOG_DEBUG) << "Added invite " << mask << " to channel " << chan->name;
 
 }
 
@@ -375,9 +366,7 @@ void ChannelModeInvite::DelMask(Channel *chan, const char *mask)
 	if (invite)
 	{
 		entry_delete(chan->invites, invite);
-
-		if (debug)
-			alog("debug: Deleted invite %s to channel %s", mask, chan->name.c_str());
+		Alog(LOG_DEBUG) << "Deleted invite " << mask << " to channel " << chan->name;
 	}
 }
 

@@ -662,10 +662,9 @@ int anope_event_setname(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: SETNAME for nonexistent user %s", source);
-		}
+	if (!u) 
+	{
+		Alog(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -681,10 +680,9 @@ int anope_event_chgname(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(av[0]);
-	if (!u) {
-		if (debug) {
-			alog("debug: CHGNAME for nonexistent user %s", av[0]);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "CHGNAME for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -700,10 +698,9 @@ int anope_event_setident(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: SETIDENT for nonexistent user %s", source);
-		}
+	if (!u) 
+	{
+		Alog(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -718,10 +715,9 @@ int anope_event_chgident(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(av[0]);
-	if (!u) {
-		if (debug) {
-			alog("debug: CHGIDENT for nonexistent user %s", av[0]);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -737,10 +733,9 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: SETHOST for nonexistent user %s", source);
-		}
+	if (!u) 
+	{
+		Alog(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -856,10 +851,9 @@ int anope_event_chghost(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(av[0]);
-	if (!u) {
-		if (debug) {
-			alog("debug: CHGHOST for nonexistent user %s", av[0]);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "debug: CHGHOST for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -917,15 +911,14 @@ int anope_event_whois(const char *source, int ac, const char **av)
 
 int anope_event_error(const char *source, int ac, const char **av)
 {
-	if (av[0]) {
-		if (debug) {
-			alog("debug: %s", av[0]);
-		}
-	if(strstr(av[0],"No matching link configuration")!=0) {
-		alog("Error: Your IRCD's link block may not setup correctly, please check unrealircd.conf");
-	}
+	if (av[0])
+	{
+		Alog(LOG_DEBUG) << av[0];
+		if(strstr(av[0],"No matching link configuration")!=0) 
+			Alog() << "Error: Your IRCD's link block may not setup correctly, please check unrealircd.conf";
 	}
 	return MOD_CONT;
+
 }
 
 int anope_event_sdesc(const char *source, int ac, const char **av)
@@ -1063,7 +1056,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				if (!cm)
 				{
-					alog("Recieved unknown mode prefix %c in SJOIN string", buf[0]);
+					Alog() << "Recieved unknown mode prefix " << buf[0] << " in SJOIN string";
 					continue;
 				}
 
@@ -1073,8 +1066,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			User *u = finduser(buf);
 			if (!u)
 			{
-				if (debug)
-					alog("debug: SJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+				Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 				continue;
 			}
 

@@ -65,7 +65,7 @@ NickCore::~NickCore()
 		nclists[HASH(this->display)] = this->next;
 
 	/* Log .. */
-	alog("%s: deleting nickname group %s", Config.s_NickServ, this->display);
+	Alog() << Config.s_NickServ << ": deleting nickname group " << this->display;
 
 	/* Now we can safely free it. */
 	delete [] this->display;

@@ -63,8 +63,7 @@ Channel::~Channel()
 
 	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
 
-	if (debug)
-		alog("debug: Deleting channel %s", this->name.c_str());
+	Alog(LOG_DEBUG) << "Deleting channel " << this->name;
 
 	for (bd = this->bd; bd; bd = next)
 	{
@@ -126,8 +125,7 @@ void Channel::Sync()
 
 void Channel::JoinUser(User *user)
 {
-	if (debug)
-		alog("debug: %s joins %s", user->nick.c_str(), this->name.c_str());
+	Alog(LOG_DEBUG) << user->nick << " joins " << this->name;
 
 	Flags<ChannelModeName> *Status = new Flags<ChannelModeName>;
 	ChannelContainer *cc = new ChannelContainer(this);
@@ -195,8 +193,7 @@ void Channel::DeleteUser(User *user)
 	for (cit = this->users.begin(); (*cit)->user != user && cit != this->users.end(); ++cit);
 	if (cit == this->users.end())
 	{
-		if (debug)
-			alog("debug: Channel::DeleteUser() tried to delete nonexistnat user %s from channel %s", user->nick.c_str(), this->name.c_str());
+		Alog(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
 		return;
 	}
 
@@ -208,8 +205,7 @@ void Channel::DeleteUser(User *user)
 	for (uit = user->chans.begin(); (*uit)->chan != this && uit != user->chans.end(); ++uit);
 	if (uit == user->chans.end())
 	{
-		if (debug)
-			alog("debug: Channel::DeleteUser() tried to delete nonexistant channel %s from %s's channel list", this->name.c_str(), user->nick.c_str());
+		Alog(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
 		return;
 	}
 
@@ -311,7 +307,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	{
 		if (param.empty())
 		{
-			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
+			Alog() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -322,13 +318,11 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		User *u = finduser(param);
 		if (!u)
 		{
-			if (debug)
-				alog("debug: MODE %s +%c for nonexistant user %s", this->name.c_str(), cm->ModeChar, param.c_str());
+			Alog(LOG_DEBUG) << "MODE " << this->name << " +" << cm->ModeChar << " for nonexistant user " << param;
 			return;
 		}
 
-		if (debug)
-			alog("debug: Setting +%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
+		Alog(LOG_DEBUG) << "Setting +" << cm->ModeChar << " on " << this->name << " for " << u->nick;
 
 		/* Set the status on the user */
 		ChannelContainer *cc = u->FindChannel(this);
@@ -346,7 +340,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	{
 		if (param.empty())
 		{
-			alog("Channel::SetModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
+			Alog() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -361,7 +355,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 	{
 		if (cm->Type != MODE_PARAM)
 		{
-			alog("Channel::SetModeInternal() mode %c for %s with a paramater, but its not a param mode", cm->ModeChar, this->name.c_str());
+			Alog() << "Channel::SetModeInternal() mode " << cm->ModeChar << " for " << this->name << " with a paramater, but its not a param mode";
 			return;
 		}
 
@@ -447,7 +441,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		if (param.empty())
 		{
-			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
+			Alog() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -458,12 +452,11 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		User *u = finduser(param);
 		if (!u)
 		{
-			alog("Channel::RemoveModeInternal() MODE %s -%c for nonexistant user %s", this->name.c_str(), cm->ModeChar, param.c_str());
+			Alog() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->ModeChar << " for nonexistant user " << param;
 			return;
 		}
 
-		if (debug)
-			alog("debug: Setting -%c on %s for %s", cm->ModeChar, this->name.c_str(), u->nick.c_str());
+		Alog(LOG_DEBUG) << "Setting -" << cm->ModeChar << " on " << this->name << " for " << u->nick;
 
 		/* Remove the status on the user */
 		ChannelContainer *cc = u->FindChannel(this);
@@ -479,7 +472,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		if (param.empty())
 		{
-			alog("Channel::RemoveModeInternal() mode %c with no parameter for channel %s", cm->ModeChar, this->name.c_str());
+			Alog() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -895,13 +888,13 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		}
 		else
 		{
-			alog("warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: %s, ac: %d, j: %d", merge_args(ac, av), ac, j);
+			Alog() << "warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j;
 		}
 	}
 
 	if (j + k + 1 < ac)
 	{
-		alog("warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: %s, ac: %d, j: %d k: %d", merge_args(ac, av), ac, j, k);
+		Alog() << "warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j << " k: " << k;
 	}
 }
 
@@ -925,21 +918,19 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 	User *user = finduser(nick);
 	if (!user)
 	{
-		if (debug)
-			alog("debug: Channel::KickInternal got a nonexistent user %s on %s: %s", nick.c_str(), this->name.c_str(), reason.c_str());
+		Alog(LOG_DEBUG) << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
 		return;
 	}
 
-	if (debug)
-		alog("debug: Channel::KickInternal kicking %s from %s", user->nick.c_str(), this->name.c_str());
+	Alog(LOG_DEBUG) << "Channel::KickInternal kicking " << user->nick << " from " << this->name;
 	
 	if (user->FindChannel(this))
 	{
 		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, user, source, reason));
 		this->DeleteUser(user);
 	}
-	else if (debug)
-		alog("debug: Channel::KickInternal got kick for user %s who isn't on channel %s ?", user->nick.c_str(), this->name.c_str());
+	else
+		Alog(LOG_DEBUG) << "Channel::KickInternal got kick for user " << user->nick << " who isn't on channel " << this->name << " ?";
 }
 
 /** Kick a user from the channel
@@ -1037,26 +1028,22 @@ Channel *findchan(const char *chan)
 {
 	Channel *c;
 
-	if (!chan || !*chan) {
-		if (debug) {
-			alog("debug: findchan() called with NULL values");
-		}
+	if (!chan || !*chan)
+	{
+		Alog(LOG_DEBUG) << "findchan() called with NULL values";
 		return NULL;
 	}
 
-	if (debug >= 3)
-		alog("debug: findchan(%p)", chan);
 	c = chanlist[HASH(chan)];
-	while (c) {
-		if (stricmp(c->name.c_str(), chan) == 0) {
-			if (debug >= 3)
-				alog("debug: findchan(%s) -> %p", chan, static_cast<void *>(c));
+	while (c)
+	{
+		if (stricmp(c->name.c_str(), chan) == 0)
+		{
+			Alog(LOG_DEBUG_3) << "findchan(" << chan << ") -> " << static_cast<void *>(c);
 			return c;
 		}
 		c = c->next;
 	}
-	if (debug >= 3)
-		alog("debug: findchan(%s) -> %p", chan, static_cast<void *>(c));
 	return NULL;
 }
 
@@ -1074,9 +1061,7 @@ Channel *firstchan()
 	next_index = 0;
 	while (next_index < 1024 && current == NULL)
 		current = chanlist[next_index++];
-	if (debug >= 3)
-		alog("debug: firstchan() returning %s",
-			 current ? current->name.c_str() : "NULL (end of list)");
+	Alog(LOG_DEBUG_3) << "firstchan() returning " << (current ? current->name : "NULL (end of list)");
 	return current;
 }
 
@@ -1088,9 +1073,7 @@ Channel *nextchan()
 		while (next_index < 1024 && current == NULL)
 			current = chanlist[next_index++];
 	}
-	if (debug >= 3)
-		alog("debug: nextchan() returning %s",
-			 current ? current->name.c_str() : "NULL (end of list)");
+	Alog(LOG_DEBUG_3) << "nextchan() returning " << (current ? current->name : "NULL (end of list)");
 	return current;
 }
 
@@ -1176,11 +1159,9 @@ void do_join(const char *source, int ac, const char **av)
 	time_t ctime = time(NULL);
 
 	user = finduser(source);
-	if (!user) {
-		if (debug) {
-			alog("debug: JOIN from nonexistent user %s: %s", source,
-				 merge_args(ac, av));
-		}
+	if (!user)
+	{
+		Alog(LOG_DEBUG) << "JOIN from nonexistent user " << source << ": " << merge_args(ac, av);
 		return;
 	}
 
@@ -1219,8 +1200,7 @@ void do_join(const char *source, int ac, const char **av)
 			/* Their time is older, we lose */
 			if (chan->creation_time > ts)
 			{
-				if (debug)
-					alog("debug: recieved a new TS for JOIN: %ld", ts);
+				Alog(LOG_DEBUG) << "recieved a new TS for JOIN: " << ts;
 
 				if (chan->ci)
 				{
@@ -1267,8 +1247,7 @@ void do_kick(const std::string &source, int ac, const char **av)
 	Channel *c = findchan(av[0]);
 	if (!c)
 	{
-		if (debug)
-			alog("Recieved kick for nonexistant channel %s", av[0]);
+		Alog(LOG_DEBUG) << "Recieved kick for nonexistant channel " << av[0];
 		return;
 	}
 
@@ -1292,8 +1271,7 @@ void do_part(const char *source, int ac, const char **av)
 	User *user = finduser(source);
 	if (!user) 
 	{
-		if (debug)
-			alog("debug: PART from nonexistent user %s: %s", source, merge_args(ac, av));
+		Alog(LOG_DEBUG) << "PART from nonexistent user " << source << ": " << merge_args(ac, av);
 		return;
 	}
 
@@ -1305,12 +1283,10 @@ void do_part(const char *source, int ac, const char **av)
 		
 		if (!c)
 		{
-			if (debug)
-				alog("debug: Recieved PART from %s for nonexistant channel %s", user->nick.c_str(), buf.c_str());
+			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
 		}
 
-		if (debug)
-			alog("debug: %s leaves %s", source, buf.c_str());
+		Alog(LOG_DEBUG) << source << " leaves " << buf;
 
 		if (user->FindChannel(c))
 		{
@@ -1319,8 +1295,8 @@ void do_part(const char *source, int ac, const char **av)
 			c->DeleteUser(user);
 			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName.c_str()), ChannelName, av[1] ? av[1] : ""));
 		}
-		else if (debug)
-			alog("debug: Recieved PART from %s for %s, but %s isn't in %s ?", user->nick.c_str(), c->name.c_str(), user->nick.c_str(), c->name.c_str());
+		else
+			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for " << c->name << ", but " << user->nick << " isn't in " << c->name << "?";
 	}
 }
 
@@ -1355,7 +1331,7 @@ void do_cmode(const char *source, int ac, const char **av)
 				av++;
 			}
 			else
-				alog("TSMODE enabled but MODE has no valid TS");
+				Alog() << "TSMODE enabled but MODE has no valid TS";
 		}
 	}
 
@@ -1376,7 +1352,7 @@ void do_cmode(const char *source, int ac, const char **av)
 		{
 			ci = cs_findchan(av[0]);
 			if (!ci || ci->HasFlag(CI_FORBIDDEN))
-				alog("debug: MODE %s for nonexistant channel %s", merge_args(ac - 1, av + 1), av[0]);
+				Alog(LOG_DEBUG) << "MODE " << merge_args(ac - 1, av + 1) << " for nonexistant channel " << av[0];
 		}
 		return;
 	}
@@ -1410,20 +1386,16 @@ void do_topic(const char *source, int ac, const char **av)
 
 	if (ircd->sjb64) {
 		ts = base64dects(av[2]);
-		if (debug) {
-			alog("debug: encoded TOPIC TS %s converted to %d", av[2], ts);
-		}
+		Alog(LOG_DEBUG) << "encoded TOPIC TS " << av[2] << " converted to " << ts;
 	} else {
 		ts = strtoul(av[2], NULL, 10);
 	}
 
 	topic_time = ts;
 
-	if (!c) {
-		if (debug) {
-			alog("debug: TOPIC %s for nonexistent channel %s",
-				 merge_args(ac - 1, av + 1), av[0]);
-		}
+	if (!c) 
+	{
+		Alog(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return;
 	}
 
@@ -1500,8 +1472,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if ((ci->HasFlag(CI_FORBIDDEN)) || (*(c->name.c_str()) == '+'))
 		return;
 
-	if (debug)
-		alog("debug: Setting correct user modes for %s on %s (%sgiving modes)", user->nick.c_str(), c->name.c_str(), (give_modes ? "" : "not "));
+	Alog(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
 	if (give_modes && !get_ignore(user->nick.c_str()) && (!user->nc || !user->nc->HasFlag(NI_AUTOOP)))
 	{

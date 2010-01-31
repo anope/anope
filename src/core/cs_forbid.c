@@ -55,7 +55,7 @@ class CommandCSForbid : public Command
 		ci = new ChannelInfo(chan);
 		if (!ci)
 		{
-			alog("%s: Valid FORBID for %s by %s failed", Config.s_ChanServ, ci->name.c_str(), u->nick.c_str());
+			Alog() << Config.s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
 			notice_lang(Config.s_ChanServ, u, CHAN_FORBID_FAILED, chan);
 			return MOD_CONT;
 		}
@@ -91,7 +91,7 @@ class CommandCSForbid : public Command
 			ircdproto->SendSQLine(ci->name, reason ? reason : "Forbidden");
 		}
 
-		alog("%s: %s set FORBID for channel %s", Config.s_ChanServ, u->nick.c_str(), ci->name.c_str());
+		Alog() << Config.s_ChanServ << ": " << u->nick << " set FORBID for channel " << ci->name;
 		notice_lang(Config.s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));

@@ -414,9 +414,7 @@ void expire_nicks()
 			User *u = finduser(na->nick);
 			if (u && (na->nc->HasFlag(NI_SECURE) ? nick_identified(u) : u->IsRecognized()))
 			{
-				if (debug >= 2)
-					alog("debug: NickServ: updating last seen time for %s",
-					     na->nick);
+				Alog(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
 				na->last_seen = now;
 				continue;
 			}
@@ -429,10 +427,8 @@ void expire_nicks()
 				FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
 				if (MOD_RESULT == EVENT_STOP)
 					continue;
-
-				alog("Expiring nickname %s (group: %s) (e-mail: %s)",
-				     na->nick, na->nc->display,
-				     (na->nc->email ? na->nc->email : "none"));
+				Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: "
+					<< (na->nc->email ? na->nc->email : "none") << ")";
 				tmpnick = sstrdup(na->nick);
 				delete na;
 				FOREACH_MOD(I_OnNickExpire, OnNickExpire(tmpnick));
@@ -454,7 +450,7 @@ void expire_requests()
 			next = nr->next;
 			if (Config.NSRExpire && now - nr->requested >= Config.NSRExpire)
 			{
-				alog("Request for nick %s expiring", nr->nick);
+				Alog() << "Request for nick " << nr->nick << " expiring";
 				delete nr;
 			}
 		}
@@ -471,10 +467,7 @@ NickRequest *findrequestnick(const char *nick)
 
 	if (!*nick || !nick)
 	{
-		if (debug)
-		{
-			alog("debug: findrequestnick() called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "findrequestnick() called with NULL values";
 		return NULL;
 	}
 
@@ -499,10 +492,7 @@ NickAlias *findnick(const char *nick)
 
 	if (!nick || !*nick)
 	{
-		if (debug)
-		{
-			alog("debug: findnick() called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "findnick() called with NULL values";
 		return NULL;
 	}
 
@@ -534,10 +524,7 @@ NickCore *findcore(const char *nick)
 
 	if (!nick || !*nick)
 	{
-		if (debug)
-		{
-			alog("debug: findcore() called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "findcore() called with NULL values";
 		return NULL;
 	}
 
@@ -633,10 +620,7 @@ void alpha_insert_alias(NickAlias * na)
 
 	if (!na)
 	{
-		if (debug)
-		{
-			alog("debug: alpha_insert_alias called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "alpha_insert_alias called with NULL values";
 		return;
 	}
 
@@ -665,10 +649,7 @@ void insert_core(NickCore * nc)
 
 	if (!nc)
 	{
-		if (debug)
-		{
-			alog("debug: insert_core called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "insert_core called with NULL values";
 		return;
 	}
 
@@ -687,10 +668,7 @@ void insert_requestnick(NickRequest * nr)
 	int index = HASH(nr->nick);
 	if (!nr)
 	{
-		if (debug)
-		{
-			alog("debug: insert_requestnick called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "insert_requestnick called with NULL values";
 		return;
 	}
 
@@ -724,8 +702,7 @@ void change_core_display(NickCore * nc, const char *newdisplay)
 	*/
 	/* Log ... */
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
-	alog("%s: changing %s nickname group display to %s", Config.s_NickServ,
-	     nc->display, newdisplay);
+	Alog() << Config.s_NickServ << ": changing " << nc->display << " nickname group display to " << newdisplay;
 
 	/* Remove the core from the list */
 	if (nc->next)
@@ -857,7 +834,7 @@ void SetOperType(NickCore *nc)
 				 if (ot->GetName() == type)
 				 {
 					 nc->ot = ot;
-					 alog("%s: Tied oper %s to type %s", Config.s_OperServ, nc->display, type.c_str());
+					 Alog() << Config.s_OperServ << ": Tied oper " << nc->display << " to type " << type;
 				 }
 			 }
 		}

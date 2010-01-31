@@ -60,7 +60,7 @@ int protocol_module_init()
 {
 	int ret = 0;
 
-	alog("Loading IRCD Protocol Module: [%s]", Config.IRCDModule);
+	Alog() << "Loading IRCD Protocol Module: [" << Config.IRCDModule << "]";
 	ret = ModuleManager::LoadModule(Config.IRCDModule, NULL);
 
 	if (ret == MOD_ERR_OK)
@@ -74,7 +74,7 @@ int protocol_module_init()
 		{
 			if (!Config.Numeric)
 			{
-				alog("This IRCd protocol requires a server id to be set in Anope's configuration.");
+				Alog() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
 				ret = -1;
 			}
 			else
@@ -117,8 +117,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 {
 	int i;
 
-	if (debug)
-		alog("debug: %s Adding %d texts for language %d", this->name.c_str(), ac, langNumber);
+	Alog(LOG_DEBUG) << this->name << "Adding " << ac << " texts for language " << langNumber;
 
 	if (this->lang[langNumber].argc > 0) {
 		this->DeleteLanguage(langNumber);
@@ -261,7 +260,7 @@ int Module::AddCommand(CommandHash * cmdTable[], Command * c)
 	status = internal_addCommand(this, cmdTable, c);
 	if (status != MOD_ERR_OK)
 	{
-		alog("ERROR! [%d]", status);
+		Alog() << "ERROR! [ "<< status << "]";
 	}
 	return status;
 }
@@ -469,18 +468,15 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
 			if (pos == 1) {
 				m->next = current->m;
 				current->m = m;
-				if (debug)
-					alog("debug: existing msg: (0x%p), new msg (0x%p)",
-						 static_cast<void *>(m->next), static_cast<void *>(m));
+				Alog(LOG_DEBUG) << "existing msg: ("<< static_cast<void *>(m->next)
+					<< "), new msg (" << static_cast<void *>(m) << ")";
 				return MOD_ERR_OK;
 			} else if (pos == 2) {
 				tail = current->m;
 				while (tail->next)
 					tail = tail->next;
-				if (debug)
-					alog("debug: existing msg: (0x%p), new msg (0x%p)",
-						 static_cast<void *>(tail), static_cast<void *>(m));
-				tail->next = m;
+				Alog(LOG_DEBUG) << "existing msg: ("<< static_cast<void *>(tail)
+					<< "), new msg (" << static_cast<void *>(m) << ")";
 				m->next = NULL;
 				return MOD_ERR_OK;
 			} else
@@ -721,7 +717,7 @@ void Module::NoticeLang(const char *source, User * u, int number, ...)
 		}
 		delete [] buf;
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), mlang, number);
+		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 	}
 }
 
@@ -745,7 +741,7 @@ const char *Module::GetLangString(User * u, int number)
 	 * would happen!
 	 */
 	} else {
-		alog("%s: INVALID language string call, language: [%d], String [%d]", this->name.c_str(), mlang, number);
+		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 		return "";
 	}
 }
@@ -778,15 +774,13 @@ void ModuleRunTimeDirCleanUp()
 
 	snprintf(dirbuf, BUFSIZE, "%s/modules/runtime", services_dir.c_str());
 
-	if (debug) {
-		alog("debug: Cleaning out Module run time directory (%s) - this may take a moment please wait", dirbuf);
-	}
+	Alog(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
+
 
 #ifndef _WIN32
-	if ((dirp = opendir(dirbuf)) == NULL) {
-		if (debug) {
-			alog("debug: cannot open directory (%s)", dirbuf);
-		}
+	if ((dirp = opendir(dirbuf)) == NULL) 
+	{
+		Alog(LOG_DEBUG) << "cannot open directory (" << dirbuf << ")";
 		return;
 	}
 	while ((dp = readdir(dirp)) != NULL) {
@@ -802,10 +796,9 @@ void ModuleRunTimeDirCleanUp()
 	closedir(dirp);
 #else
 	/* Get the current working directory: */
-	if (_getcwd(buffer, _MAX_PATH) == NULL) {
-		if (debug) {
-			alog("debug: Unable to set Current working directory");
-		}
+	if (_getcwd(buffer, _MAX_PATH) == NULL) 
+	{
+		Alog(LOG_DEBUG) << "Unable to set Current working directory";
 	}
 	snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirbuf);
 
@@ -824,15 +817,11 @@ void ModuleRunTimeDirCleanUp()
 			}
 		}
 	} else {
-		if (debug) {
-			alog("debug: Invalid File Handle. GetLastError reports %d\n", static_cast<int>(GetLastError()));
-		}
+		Alog(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
 	}
 	FindClose(hList);
 #endif
-	if (debug) {
-		alog("debug: Module run time directory has been cleaned out");
-	}
+	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }
 
 /* EOF */

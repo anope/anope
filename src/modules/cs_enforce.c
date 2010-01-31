@@ -59,8 +59,7 @@ class CommandCSEnforce : public Command
 		if (!(ci = c->ci))
 			return;
 
-		if (debug)
-			alog("debug: cs_enforce: Enforcing SECUREOPS on %s", c->name.c_str());
+		Alog(LOG_DEBUG) << "[cs_enforce] Enforcing SECUREOPS on " << c->name;
 
 		/* Dirty hack to allow chan_set_correct_modes to work ok.
 		 * We pretend like SECUREOPS is on so it doesn't ignore that
@@ -98,8 +97,7 @@ class CommandCSEnforce : public Command
 		if (!(ci = c->ci))
 			return;
 
-		if (debug)
-			alog("debug: cs_enforce: Enforcing RESTRICTED on %s", c->name.c_str());
+		Alog(LOG_DEBUG) << "[cs_enforce] Enforcing RESTRICTED on " << c->name;
 
 		old_nojoin_level = ci->levels[CA_NOJOIN];
 		if (ci->levels[CA_NOJOIN] < 0)
@@ -131,8 +129,7 @@ class CommandCSEnforce : public Command
 		if (!(ci = c->ci))
 			return;
 
-		if (debug)
-			alog("debug: cs_enforce: Enforcing mode +R on %s", c->name.c_str());
+		Alog(LOG_DEBUG) << "[cs_enforce] Enforcing mode +R on " << c->name;
 
 		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 		{

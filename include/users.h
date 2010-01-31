@@ -128,6 +128,9 @@ class CoreExport User : public Extensible
 	 */
 	const std::string &GetIdent() const;
 
+	/** Get the full mask ( nick!ident@realhost ) of a user
+	 */
+	const std::string GetMask();
 	/** Updates the realname of the user record.
 	 */
 	void SetRealname(const std::string &realname);

@@ -69,7 +69,7 @@ static int set_group()
 		setgid(gr->gr_gid);
 		return 0;
 	} else {
-		alog("Unknown group `%s'\n", RUNGROUP);
+		Alog() << "Unknown group `" << RUNGROUP << "'";
 		return -1;
 	}
 #else
@@ -428,7 +428,7 @@ int init_secondary(int ac, char **av)
 	{
 		WSADATA wsa;
 		if (WSAStartup(MAKEWORD(1, 1), &wsa)) {
-			alog("Failed to initialized WinSock library");
+			Alog() << "Failed to initialized WinSock library";
 			return -1;
 		}
 	}
@@ -436,7 +436,7 @@ int init_secondary(int ac, char **av)
 
 		char *winver = GetWindowsVersion();
 
-		alog("%s is not a supported version of Windows", winver);
+		Alog() << winver << " is not a supported version of Windows";
 
 		delete [] winver;
 
@@ -444,7 +444,7 @@ int init_secondary(int ac, char **av)
 
 	}
 	if (!nofork) {
-		alog("Launching Anope into the background");
+		Alog() << "Launching Anope into the background";
 		FreeConsole();
 	}
 #endif
@@ -453,14 +453,9 @@ int init_secondary(int ac, char **av)
 	write_pidfile();
 
 	/* Announce ourselves to the logfile. */
-	if (debug || readonly) {
-		alog("Anope %s (ircd protocol: %s) starting up (options:%s%s)",
-			 version_number, version_protocol,
-			 debug ? " debug" : "", readonly ? " readonly" : "");
-	} else {
-		alog("Anope %s (ircd protocol: %s) starting up",
-			 version_number, version_protocol);
-	}
+	Alog() << "Anope " << version_number << " (ircd protocol: " << version_protocol << ") starting up" 
+		<< (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") 
+		<< (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 	start_time = time(NULL);
 
 
@@ -480,8 +475,7 @@ int init_secondary(int ac, char **av)
 
 	/* Initialize multi-language support */
 	lang_init();
-	if (debug)
-		alog("debug: Loaded languages");
+	Alog(LOG_DEBUG) << "Loaded languages";
 
 
 	/* Initialize subservices */
@@ -501,10 +495,10 @@ int init_secondary(int ac, char **av)
 	add_entropy_userkeys();
 
 	/* Load up databases */
-	alog("Loading databases...");
+	Alog() << "Loading databases...";
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
-	alog("Databases loaded");
+	Alog() << "Databases loaded";
 
 	// XXX: this is duplicated in type loading.
 	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
@@ -516,7 +510,7 @@ int init_secondary(int ac, char **av)
 		if (!na)
 		{
 			// Nonexistant nick
-			alog("Oper nick %s is not registered", nick.c_str());
+			Alog() << "Oper nick '" << nick << "' is not registered";
 			continue;
 		}
 
@@ -531,7 +525,7 @@ int init_secondary(int ac, char **av)
 			OperType *ot = *tit;
 			if (ot->GetName() == type)
 			{
-				alog("Tied oper %s to type %s", na->nc->display, type.c_str());
+				Alog() << "Tied oper " << na->nc->display << " to type " << type;
 				na->nc->ot = ot;
 			}
 		}
@@ -574,7 +568,7 @@ int init_secondary(int ac, char **av)
 		uplink_server = *curr_uplink;
 		servsock = conn(uplink_server->host, uplink_server->port, Config.LocalHost, Config.LocalPort);
 		if (servsock >= 0) {
-			alog("Connected to Server %d (%s:%d)", servernum, uplink_server->host, uplink_server->port);
+			Alog() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
 			break;
 		}
 	}

@@ -116,10 +116,10 @@ class CommandHSSetAll : public Command
 
 		tmp_time = time(NULL);
 
-		if (vIdent && ircd->vident)
-			alog("vHost for all nicks in group \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick.c_str());
-		else
-			alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick.c_str());
+		Alog() << "vHost for all nicks in group \002" << nick << "\002 set to \002"
+			<< (vIdent && ircd->vident ? vIdent : "") << (vIdent && ircd->vident ? "@" : "")
+			<< hostmask << " \002 by oper \002" << u->nick << "\002";
+
 		na->hostinfo.SetVhost(vIdent ? vIdent : "", hostmask, u->nick);
 		HostServSyncVhosts(na);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));

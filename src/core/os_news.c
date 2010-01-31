@@ -89,7 +89,7 @@ static void DisplayNews(User *u, NewsType Type)
 		msg = NEWS_RANDOM_TEXT;
 	else
 	{
-		alog("news: Invalid type (%d) to display_news()", Type);
+		Alog() << "news: Invalid type (" << Type << ") to display_news()";
 		return;
 	}
 
@@ -285,7 +285,7 @@ class NewsBase : public Command
 		msgs = findmsgs(type, &type_name);
 		if (!msgs)
 		{
-			alog("news: Invalid type to do_news()");
+			Alog() << "news: Invalid type to do_news()";
 			return MOD_CONT;
 		}
 
@@ -461,15 +461,14 @@ class OSNews : public Module
 		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
 		{
 			NewsItem *n = *it;
-
-			char buf[512], *ntype;
+			char buf[512]; const char* ntype;
 			if (n->type == NEWS_LOGON)
 				ntype = "LOGON";
 			else if (n->type == NEWS_RANDOM)
 				ntype = "RANDOM";
 			else if (n->type == NEWS_OPER)
 				ntype = "OPER";
-			snprintf(buf, sizeof(buf), "OS NEWS %d %ld %s %s :%s", n->num, n->time, n->who.c_str(), ntype, n->Text.c_str());	
+			snprintf(buf, sizeof(buf), "OS NEWS %d %ld %s %s :%s", n->num, n->time, n->who.c_str(), ntype, n->Text.c_str());
 			Write(buf);
 		}
 	}

@@ -83,10 +83,9 @@ void check_memos(User * u)
 	NickCore *nc;
 	unsigned i, newcnt = 0;
 
-	if (!u) {
-		if (debug) {
-			alog("debug: check_memos called with NULL values");
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "check_memos called with NULL values";
 		return;
 	}
 

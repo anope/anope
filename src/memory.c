@@ -100,7 +100,7 @@ char *sstrdup(const char *src)
 			abort();
 		strcpy(ret, src);
 	} else {
-		alog("sstrdup() called with NULL-arg");
+		Alog() << "sstrdup() called with NULL-arg";
 		abort();
 	}
 

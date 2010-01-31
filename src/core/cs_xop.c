@@ -189,7 +189,9 @@ class XOPBase : public Command
 			access->creator = u->nick;
 		}
 
-		alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, ulev, change ? "changed" : "set", level, na->nick, nc->display, ci->name.c_str());
+		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") " 
+			<< (change ? "changed" : "set") << " access level " << level << " to " << na->nick 
+			<< " (group " << nc->display << ") on channel " << ci->name;
 
 		if (!change)
 		{

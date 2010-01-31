@@ -212,7 +212,7 @@ int slist_enum(SList * slist, const char *crange, slist_enumcb_t cb, ...)
 	if (!range) {
 		for (i = 0; i < slist->count; i++) {
 			if (!slist->list[i]) {
-				alog("SList: warning: NULL pointer in the list (?)");
+				Alog() << "SList: warning: NULL pointer in the list (?)";
 				continue;
 			}
 
@@ -247,7 +247,7 @@ int slist_enum(SList * slist, const char *crange, slist_enumcb_t cb, ...)
 			}
 			for (i = n1; i <= n2 && i > 0 && i <= slist->count; i++) {
 				if (!slist->list[i - 1]) {
-					alog("SList: warning: NULL pointer in the list (?)");
+					Alog() << "SList: warning: NULL pointer in the list (?)";
 					continue;
 				}
 

@@ -76,14 +76,14 @@ class CommandCSSuspend : public Command
 			if (Config.WallForbid)
 				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			alog("%s: %s set SUSPEND for channel %s", Config.s_ChanServ, u->nick.c_str(), ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set SUSPEND for channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
 
 			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
 		else
 		{
-			alog("%s: Valid SUSPEND for %s by %s failed", Config.s_ChanServ, ci->name.c_str(), u->nick.c_str());
+			Alog() << Config.s_ChanServ << ": Valid SUSPEND for " << ci->name << " by " << u->GetMask() << " failed";
 			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_FAILED, chan);
 		}
 		return MOD_CONT;
@@ -146,14 +146,14 @@ class CommandCSUnSuspend : public Command
 			if (Config.WallForbid)
 				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			alog("%s: %s set UNSUSPEND for channel %s", Config.s_ChanServ, u->nick.c_str(), ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set UNSUSPEND for channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
 
 			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 		}
 		else
 		{
-			alog("%s: Valid UNSUSPEND for %s by %s failed", Config.s_ChanServ, chan, u->nick.c_str());
+			Alog() << Config.s_ChanServ << ": Valid UNSUSPEND for " << chan << " by " << u->nick << " failed";
 			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
 		}
 		return MOD_CONT;

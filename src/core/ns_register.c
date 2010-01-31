@@ -26,7 +26,7 @@ class CommandNSConfirm : public Command
 
 		if (!na)
 		{
-			alog("%s: makenick(%s) failed", Config.s_NickServ, u->nick.c_str());
+			Alog() << Config.s_NickServ << ": makenick(" << u->nick << ") failed";
 			notice_lang(Config.s_NickServ, u, NICK_REGISTRATION_FAILED);
 			return MOD_CONT;
 		}
@@ -61,7 +61,7 @@ class CommandNSConfirm : public Command
 		if (!force)
 		{
 			u->nc = na->nc;
-			alog("%s: '%s' registered by %s@%s (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
+			Alog() << Config.s_NickServ << ": '" << u->nick << "' registered by " << u->GetIdent() << "@" << u->host << " (e-mail: " << (nr->email ? nr->email : "none") << ")";
 			if (Config.NSAddAccessOnReg)
 				notice_lang(Config.s_NickServ, u, NICK_REGISTERED, u->nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
@@ -78,10 +78,8 @@ class CommandNSConfirm : public Command
 		}
 		else
 		{
-			alog("%s: '%s' confirmed by %s!%s@%s (email: %s)", Config.s_NickServ, nr->nick, u->nick.c_str(), u->GetIdent().c_str(), u->host, nr->email ? nr->email : "none");
-
+			Alog() << Config.s_NickServ << ": '" << nr->nick << "' confirmed by " << u->GetMask() << " (email: " << (nr->email ? nr->email : "none") << " )";
 			notice_lang(Config.s_NickServ, u, NICK_FORCE_REG, nr->nick);
-
 			User *user = finduser(nr->nick);
 			/* Delrequest must be called before validate_user */
 			delete nr;
@@ -254,7 +252,7 @@ class CommandNSRegister : public CommandNSConfirm
 			/* i.e. there's already such a nick regged */
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				alog("%s: %s@%s tried to register FORBIDden nick %s", Config.s_NickServ, u->GetIdent().c_str(), u->host, u->nick.c_str());
+				Alog() << Config.s_NickServ << ": " << u->GetIdent() << "@" << u->host << " tried to register FORBIDden nick " << u->nick;
 				notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			}
 			else
@@ -284,11 +282,11 @@ class CommandNSRegister : public CommandNSConfirm
 				if (!do_sendregmail(u, nr))
 				{
 					notice_lang(Config.s_NickServ, u, NICK_ENTER_REG_CODE, email, Config.s_NickServ);
-					alog("%s: sent registration verification code to %s", Config.s_NickServ, nr->email);
+					Alog() << Config.s_NickServ << ": sent registration verification code to " << nr->email;
 				}
 				else
 				{
-					alog("%s: Unable to send registration verification mail", Config.s_NickServ);
+					Alog() << Config.s_NickServ << ": Unable to send registration verification mail";
 					notice_lang(Config.s_NickServ, u, NICK_REG_UNABLE);
 					delete nr;
 					return MOD_CONT;
@@ -343,11 +341,11 @@ class CommandNSResend : public Command
 				{
 					nr->lastmail = time(NULL);
 					notice_lang(Config.s_NickServ, u, NICK_REG_RESENT, nr->email);
-					alog("%s: re-sent registration verification code for %s to %s", Config.s_NickServ, nr->nick, nr->email);
+					Alog() << Config.s_NickServ << ": re-sent registration verification code for " << nr->nick << " to " << nr->email;
 				}
 				else
 				{
-					alog("%s: Unable to re-send registration verification mail for %s", Config.s_NickServ, nr->nick);
+					Alog() << Config.s_NickServ << ": Unable to re-send registration verification mail for " << nr->nick;
 					return MOD_CONT;
 				}
 			}

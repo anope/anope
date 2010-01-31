@@ -410,7 +410,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 			if (!cm)
 			{
-				alog("Recieved unknown mode prefix %c in SJOIN string", buf[0]);
+				Alog() << "Recieved unknown mode prefix " << buf[0] << " in SJOIN string";
 				continue;
 			}
 
@@ -420,8 +420,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 		User *u = find_byuid(buf);
 		if (!u)
 		{
-			if (debug)
-				alog("debug: SJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+			Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 			continue;
 		}
 
@@ -534,10 +533,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 		time_t topic_time = time(NULL);
 
 		if (!c) {
-			if (debug) {
-				alog("debug: TOPIC %s for nonexistent channel %s",
-					 merge_args(ac - 1, av + 1), av[0]);
-			}
+			Alog(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 			return MOD_CONT;
 		}
 
@@ -582,11 +578,9 @@ int anope_event_tburst(const char *source, int ac, const char **av)
 	c = findchan(av[0]);
 	topic_time = strtol(av[1], NULL, 10);
 
-	if (!c) {
-		if (debug) {
-			alog("debug: TOPIC %s for nonexistent channel %s",
-				 merge_args(ac - 1, av + 1), av[0]);
-		}
+	if (!c) 
+	{
+		Alog(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		if (setter)
 			delete [] setter;
 		return MOD_CONT;
@@ -876,11 +870,8 @@ int anope_event_bmask(const char *source, int ac, const char **av)
 
 int anope_event_error(const char *source, int ac, const char **av)
 {
-	if (ac >= 1) {
-		if (debug) {
-			alog("debug: %s", av[0]);
-		}
-	}
+	if (ac >= 1)
+		Alog(LOG_DEBUG) << av[0];
 	return MOD_CONT;
 }
 

@@ -64,7 +64,7 @@ User::User(const std::string &snick, const std::string &suid)
 		maxusercnt = usercnt;
 		maxusertime = time(NULL);
 		if (Config.LogMaxUsers)
-			alog("user: New maximum user count: %d", maxusercnt);
+			Alog() << "user: New maximum user count: "<< maxusercnt;
 	}
 
 	this->isSuperAdmin = 0;	 /* always set SuperAdmin to 0 for new users */
@@ -80,8 +80,7 @@ void User::SetNewNick(const std::string &newnick)
 		throw "User::SetNewNick() got a bad argument";
 	}
 
-	if (debug)
-		alog("debug: %s changed nick to %s", this->nick.c_str(), newnick.c_str());
+	Alog(LOG_DEBUG) << this->nick << " changed nick to " << newnick;
 
 	if (this->prev)
 		this->prev->next = this->next;
@@ -115,8 +114,7 @@ void User::SetDisplayedHost(const std::string &shost)
 		delete [] this->vhost;
 	this->vhost = sstrdup(shost.c_str());
 
-	if (debug)
-		alog("debug: %s changed vhost to %s", this->nick.c_str(), shost.c_str());
+	Alog(LOG_DEBUG) << this->nick << " changed vhost to " << shost;
 
 	this->UpdateHost();
 }
@@ -144,8 +142,7 @@ void User::SetCloakedHost(const std::string &newhost)
 
 	chost = newhost;
 
-	if (debug)
-		alog("debug: %s changed cloaked host to %s", this->nick.c_str(), newhost.c_str());
+	Alog(LOG_DEBUG) << this->nick << " changed cloaked host to " << newhost;
 
 	this->UpdateHost();
 }
@@ -168,8 +165,7 @@ void User::SetVIdent(const std::string &sident)
 {
 	this->vident = sident;
 
-	if (debug)
-		alog("debug: %s changed ident to %s", this->nick.c_str(), sident.c_str());
+	Alog(LOG_DEBUG) << this->nick << " changed ident to " << sident;
 
 	this->UpdateHost();
 }
@@ -188,8 +184,7 @@ void User::SetIdent(const std::string &sident)
 {
 	this->ident = sident;
 
-	if (debug)
-		alog("debug: %s changed real ident to %s", this->nick.c_str(), sident.c_str());
+	Alog(LOG_DEBUG) << this->nick << " changed real ident to " << sident;
 
 	this->UpdateHost();
 }
@@ -197,6 +192,13 @@ void User::SetIdent(const std::string &sident)
 const std::string &User::GetIdent() const
 {
 	return this->ident;
+}
+
+const std::string User::GetMask()
+{
+	std::stringstream buf;
+	buf << this->nick << "!" << this->ident << "@" << this->host;
+	return buf.str();
 }
 
 void User::SetRealname(const std::string &srealname)
@@ -216,46 +218,34 @@ void User::SetRealname(const std::string &srealname)
 		na->last_realname = sstrdup(srealname.c_str());
 	}
 
-	if (debug)
-		alog("debug: %s changed realname to %s", this->nick.c_str(), srealname.c_str());
+	Alog(LOG_DEBUG) << this->nick << " changed realname to " << srealname;
 }
 
 User::~User()
 {
 	char *srealname;
 
+	Alog(LOG_DEBUG_2) << "User::~User() called";
+
 	if (Config.LogUsers)
 	{
 		srealname = normalizeBuffer(this->realname);
 
-		if (ircd->vhost)
-		{
-			alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
-				this->nick.c_str(), this->GetIdent().c_str(), this->host,
-				this->GetDisplayedHost().c_str(), srealname, this->server->name);
-		}
-		else
-		{
-			alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
-				this->nick.c_str(), this->GetIdent().c_str(), this->host,
-				srealname, this->server->name);
-		}
+		Alog() << "LOGUSERS: " << this->GetMask() << (ircd->vhost ? " => " : " ")
+			<< (ircd->vhost ? this->GetDisplayedHost() : "")
+			<< " (" << srealname << ") left the network (" << this->server->name << ").";
 
 		delete [] srealname;
 	}
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
 
-	if (debug >= 2)
-		alog("debug: User::~User() called");
-
 	usercnt--;
 
 	if (is_oper(this))
 		opcnt--;
 
-	if (debug >= 2)
-		alog("debug: User::~User(): free user data");
+	Alog(LOG_DEBUG_2) << "User::~User(): free user data";
 
 	delete [] this->host;
 
@@ -267,8 +257,7 @@ User::~User()
 	if (this->hostip)
 		delete [] this->hostip;
 
-	if (debug >= 2)
-		alog("debug: User::~User(): remove from channels");
+	Alog(LOG_DEBUG_2) << "User::~User(): remove from channels";
 
 	while (!this->chans.empty())
 	{
@@ -278,8 +267,7 @@ User::~User()
 	/* Cancel pending nickname enforcers, etc */
 	cancel_user(this);
 
-	if (debug >= 2)
-		alog("debug: User::~User(): delete from list");
+	Alog(LOG_DEBUG_2) << "User::~User(): delete from list";
 
 	if (this->prev)
 		this->prev->next = this->next;
@@ -289,8 +277,7 @@ User::~User()
 	if (this->next)
 		this->next->prev = this->prev;
 
-	if (debug >= 2)
-		alog("debug: User::~User() done");
+	Alog(LOG_DEBUG_2) << "User::~User() done";
 }
 
 void User::SendMessage(const std::string &source, const char *fmt, ...)
@@ -436,8 +423,7 @@ User *finduser(const std::string &nick)
 {
 	User *user;
 
-	if (debug >= 3)
-		alog("debug: finduser(%p)", nick.c_str());
+	Alog(LOG_DEBUG_3) << "finduser("<<  nick << ")";
 
 	if (isdigit(nick[0]) && ircd->ts6)
 		return find_byuid(nick);
@@ -447,8 +433,7 @@ User *finduser(const std::string &nick)
 	user = userlist[HASH(nick)];
 	while (user && ci_nick != user->nick)
 		user = user->next;
-	if (debug >= 3)
-		alog("debug: finduser(%s) -> 0x%p", nick.c_str(), static_cast<void *>(user));
+	Alog(LOG_DEBUG_3) << "finduser(" << nick << ") -> " << static_cast<void *>(user);
 	FOREACH_MOD(I_OnFindUser, OnFindUser(user));
 	return user;
 }
@@ -640,9 +625,7 @@ User *firstuser()
 	current = NULL;
 	while (next_index < 1024 && current == NULL)
 		current = userlist[next_index++];
-	if (debug)
-		alog("debug: firstuser() returning %s",
-			 current ? current->nick.c_str() : "NULL (end of list)");
+	Alog(LOG_DEBUG) << "firstuser() returning " << (current ? current->nick : "NULL (end of list)");
 	return current;
 }
 
@@ -654,9 +637,7 @@ User *nextuser()
 		while (next_index < 1024 && current == NULL)
 			current = userlist[next_index++];
 	}
-	if (debug)
-		alog("debug: nextuser() returning %s",
-			 current ? current->nick.c_str() : "NULL (end of list)");
+	Alog(LOG_DEBUG) << "nextuser() returning " << (current ? current->nick : "NULL (end of list)");
 	return current;
 }
 
@@ -686,11 +667,9 @@ User *first_uid()
 	while (next_index_uid < 1024 && current_uid == NULL) {
 		current_uid = userlist[next_index_uid++];
 	}
-	if (debug >= 2) {
-		alog("debug: first_uid() returning %s %s",
-			 current_uid ? current_uid->nick.c_str() : "NULL (end of list)",
-			 current_uid ? current_uid->GetUID().c_str() : "");
-	}
+	Alog(LOG_DEBUG_2) << "first_uid() returning "
+			<< (current_uid ? current_uid->nick : "NULL (end of list)") << " "
+			<< (current_uid ? current_uid->GetUID() : "");
 	return current_uid;
 }
 
@@ -702,11 +681,9 @@ User *next_uid()
 		while (next_index_uid < 1024 && current_uid == NULL)
 			current_uid = userlist[next_index_uid++];
 	}
-	if (debug >= 2) {
-		alog("debug: next_uid() returning %s %s",
-			 current_uid ? current_uid->nick.c_str() : "NULL (end of list)",
-			 current_uid ? current_uid->GetUID().c_str() : "");
-	}
+	Alog(LOG_DEBUG_2) << "next_uid() returning "
+			<< (current_uid ? current_uid->nick : "NULL (end of list)") << " "
+			<< (current_uid ? current_uid->GetUID() : "");
 	return current_uid;
 }
 
@@ -735,15 +712,13 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (vhost) {
 				if (!strcmp(vhost, "*")) {
 					vhost = NULL;
-					if (debug)
-						alog("debug: new user�with no vhost in NICK command: %s", nick);
+					Alog(LOG_DEBUG) << "new user with no vhost in NICK command: " << nick;
 				}
 			}
 		}
 
 		/* This is a new user; create a User structure for it. */
-		if (debug)
-			alog("debug: new user: %s", nick);
+		Alog(LOG_DEBUG) << "new user: " << nick;
 
 		if (ircd->nickip) {
 			addr.s_addr = htonl(ip);
@@ -752,8 +727,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 
 		if (Config.LogUsers) {
-		/**
-	 * Ugly swap routine for Flop's bug :)
+	/**
+	 * Ugly swap routine for Flop's bug :)   XXX
  	 **/
 			if (realname) {
 				tmp = const_cast<char *>(strchr(realname, '%'));
@@ -764,23 +739,14 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 			logrealname = normalizeBuffer(realname);
 
-		/**
+	/**
 	 * End of ugly swap
 	 **/
-
-			if (ircd->nickvhost) {
-				if (ircd->nickip) {
-					alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), logrealname, ipbuf, server);
-				} else {
-					alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), logrealname, server);
-				}
-			} else {
-				if (ircd->nickip) {
-					alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, logrealname, ipbuf, server);
-				} else {
-					alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, logrealname, server);
-				}
-			}
+			Alog() << "LOGUSERS: " << nick << " (" << username << "@" << host
+				<< (ircd->nickvhost && vhost ? " => " : "")
+				<< (ircd->nickvhost && vhost ? vhost : "") << ") (" << logrealname << ") "
+				<< (ircd->nickip ? "[" : "") << (ircd->nickip ? ipbuf : "") << (ircd->nickip ? "]" : "")
+				<< "connected to the network (" << server << ").";
 			delete [] logrealname;
 		}
 
@@ -836,25 +802,19 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user = finduser(source);
 
 		if (!user) {
-			alog("user: NICK from nonexistent nick %s", source);
+			Alog() << "user: NICK from nonexistent nick " << source;
 			return NULL;
 		}
 		user->isSuperAdmin = 0; /* Dont let people nick change and stay SuperAdmins */
-		if (debug)
-			alog("debug: %s changes nick to %s", source, nick);
+		Alog(LOG_DEBUG) << source << " changes nick to " <<  nick;
 
 		if (Config.LogUsers) {
 			logrealname = normalizeBuffer(user->realname);
-			if (ircd->vhost) {
-				alog("LOGUSERS: %s (%s@%s => %s) (%s) changed nick to %s (%s).", user->nick.c_str(), user->GetIdent().c_str(), user->host, user->GetDisplayedHost().c_str(), logrealname, nick, user->server->name);
-			} else {
-				alog("LOGUSERS: %s (%s@%s) (%s) changed nick to %s (%s).",
-					 user->nick.c_str(), user->GetIdent().c_str(), user->host, logrealname,
-					 nick, user->server->name);
-			}
-			if (logrealname) {
+			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host
+				<< (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" 
+				<< logrealname << ") " << "changed nick to " << nick << " (" << user->server->name << ").";
+			if (logrealname)
 				delete [] logrealname;
-			}
 		}
 
 		user->timestamp = ts;
@@ -929,7 +889,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			ntmp->last_seen = time(NULL);
 			user->UpdateHost();
 			ircdproto->SetAutoIdentificationToken(user);
-			alog("%s: %s!%s@%s automatically identified for nick %s", Config.s_NickServ, user->nick.c_str(), user->GetIdent().c_str(), user->host, user->nick.c_str());
+			Alog() << Config.s_NickServ << ": " << user->GetMask() << "automatically identified for group " << user->nc->display;
 		}
 
 		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
@@ -958,8 +918,7 @@ void do_umode(const char *source, int ac, const char **av)
 
 	user = finduser(av[0]);
 	if (!user) {
-		alog("user: MODE %s for nonexistent nick %s: %s", av[1], av[0],
-			 merge_args(ac, av));
+		Alog() << "user: MODE "<< av[1] << " for nonexistent nick "<< av[0] << ":" << merge_args(ac, av);
 		return;
 	}
 
@@ -979,13 +938,10 @@ void do_quit(const char *source, int ac, const char **av)
 
 	user = finduser(source);
 	if (!user) {
-		alog("user: QUIT from nonexistent user %s: %s", source,
-			 merge_args(ac, av));
+		Alog() << "user: QUIT from nonexistent user " << source << ":" << merge_args(ac, av);
 		return;
 	}
-	if (debug) {
-		alog("debug: %s quits", source);
-	}
+	Alog(LOG_DEBUG) << source << " quits";
 	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN)
 		&& !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) {
 		na->last_seen = time(NULL);
@@ -1013,21 +969,18 @@ void do_kill(const std::string &nick, const std::string &msg)
 	NickAlias *na;
 
 	user = finduser(nick);
-	if (!user) {
-		if (debug) {
-			alog("debug: KILL of nonexistent nick: %s", nick.c_str());
-		}
+	if (!user)
+	{
+		Alog(LOG_DEBUG) << "KILL of nonexistent nick: " <<  nick;
 		return;
 	}
-	if (debug) {
-		alog("debug: %s killed", nick.c_str());
-	}
-	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) {
+	Alog(LOG_DEBUG) << nick << " killed";
+	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) 
+	{
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;
 		na->last_quit = !msg.empty() ? sstrdup(msg.c_str()) : NULL;
-
 	}
 	if (Config.LimitSessions && !is_ulined(user->server->name)) {
 		del_session(user->host);
@@ -1205,8 +1158,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 	if (!user || !modes)
 		return;
 
-	if (debug)
-		alog("debug: Changing user modes for %s to %s", user->nick.c_str(), merge_args(ac, av));
+	Alog(LOG_DEBUG) << "Changing user modes for " << user->nick << " to " << merge_args(ac, av);
 
 	for (; *modes; *modes++)
 	{

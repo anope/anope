@@ -83,8 +83,7 @@ void add_ignore(const char *nick, time_t delta)
 		if (ignore)
 			ignore->prev = ign;
 		ignore = ign;
-		if (debug)
-			alog("debug: Added new ignore entry for %s", mask);
+		Alog(LOG_DEBUG) << "Added new ignore entry for " << mask;
 	}
 }
 
@@ -139,9 +138,9 @@ IgnoreData *get_ignore(const char *nick)
 				break;
 	}
 	/* Check whether the entry has timed out */
-	if (ign && ign->time != 0 && ign->time <= now) {
-		if (debug)
-			alog("debug: Expiring ignore entry %s", ign->mask);
+	if (ign && ign->time != 0 && ign->time <= now) 
+	{
+		Alog(LOG_DEBUG) << "Expiring ignore entry " << ign->mask;
 		if (ign->prev)
 			ign->prev->next = ign->next;
 		else if (ignore == ign)
@@ -153,7 +152,7 @@ IgnoreData *get_ignore(const char *nick)
 		ign = NULL;
 	}
 	if (ign && debug)
-		alog("debug: Found ignore entry (%s) for %s", ign->mask, nick);
+		Alog(LOG_DEBUG) << "Found ignore entry (" << ign->mask << ") for " << nick;
 	return ign;
 }
 
@@ -197,8 +196,7 @@ int delete_ignore(const char *nick)
 	/* No matching ignore found. */
 	if (!ign)
 		return 0;
-	if (debug)
-		alog("Deleting ignore entry %s", ign->mask);
+	Alog(LOG_DEBUG) << "Deleting ignore entry " << ign->mask;
 	/* Delete the entry and all references to it. */
 	if (ign->prev)
 		ign->prev->next = ign->next;
@@ -228,8 +226,7 @@ int clear_ignores()
 		return 0;
 	for (ign = ignore; ign; ign = next) {
 		next = ign->next;
-		if (debug)
-			alog("Deleting ignore entry %s", ign->mask);
+		Alog(LOG_DEBUG) << "Deleting ignore entry " << ign->mask;
 		delete [] ign->mask;
 		delete ign;
 		i++;
@@ -302,9 +299,7 @@ void process()
 	*cmd = '\0';
 
 	/* If debugging, log the buffer */
-	if (debug) {
-		alog("debug: Received: %s", inbuf);
-	}
+	Alog(LOG_DEBUG) << "Received: " << inbuf;
 
 	/* First make a copy of the buffer so we have the original in case we
 	 * crash - in that case, we want to know what we crashed on. */
@@ -338,17 +333,17 @@ void process()
 	if (protocoldebug)
 	{
 		if (*source)
-			alog("debug: Source %s", source);
+			Alog() << "Source " << source;
 		if (*cmd)
-			alog("debug: Token %s", cmd);
+			Alog() << "Token " << cmd;
 		if (ac)
 		{
 			int i;
 			for (i = 0; i < ac; i++)
-				alog("debug: av[%d] = %s", i, av[i]);
+				Alog() << "av[" << i << "] = " << av[i];
 		}
 		else
-			alog("debug: av[0] = NULL");
+			Alog() << "av[0] = NULL";
 	}
 
 	/* Do something with the message. */
@@ -365,8 +360,7 @@ void process()
 			}
 		}
 	} else {
-		if (debug)
-			alog("debug: unknown message from server (%s)", inbuf);
+		Alog(LOG_DEBUG) << "unknown message from server (" << inbuf << ")";
 	}
 
 	/* Free argument list we created */

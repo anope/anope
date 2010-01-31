@@ -210,7 +210,6 @@ E const char *getstring(int index);
 
 E int open_log();
 E void close_log();
-E void alog(const char *fmt, ...)		FORMAT(printf,1,2);
 E void log_perror(const char *fmt, ...)		FORMAT(printf,1,2);
 E void fatal(const char *fmt, ...)		FORMAT(printf,1,2);
 E void fatal_perror(const char *fmt, ...)	FORMAT(printf,1,2);

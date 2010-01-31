@@ -312,13 +312,13 @@ bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data
 	int nicklen = data.GetInteger();
 	if (!nicklen)
 	{
-		alog("You have not defined the <networkinfo:nicklen> directive. It is strongly");
-		alog("adviced that you do configure this correctly in your services.conf");
+		Alog() << "You have not defined the <networkinfo:nicklen> directive. It is strongly";
+		Alog() << "adviced that you do configure this correctly in your services.conf";
 		data.Set(31);
 	}
 	else if (nicklen < 1)
 	{
-		alog("<networkinfo:nicklen> has an invalid value; setting to %d", 31);
+		Alog() << "<networkinfo:nicklen> has an invalid value; setting to 31";
 		data.Set(31);
 	}
 	return true;
@@ -343,7 +343,7 @@ bool ValidateGlobalOnCycle(ServerConfig *, const char *tag, const char *value, V
 	{
 		if (data.GetValue().empty())
 		{
-			alog("<%s:%s> was undefined, disabling <options:globaloncycle>", tag, value);
+			Alog() << "<" << tag << ":" << value << "> was undefined, disabling <options:globaloncycle>";
 			Config.GlobalOnCycle = false;
 		}
 	}
@@ -352,7 +352,7 @@ bool ValidateGlobalOnCycle(ServerConfig *, const char *tag, const char *value, V
 
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
-	alog("There were errors in your configuration file: %s", errormessage.c_str());
+	Alog() << "There were errors in your configuration file: " << errormessage;
 	if (bail)
 	{
 		// TODO -- Need a way to stop loading in a safe way -- CyberBotX
@@ -501,7 +501,7 @@ static bool DoneOpers(ServerConfig *, const char *, bool)
 			OperType *ot = *tit;
 			if (ot->GetName() == type)
 			{
-				alog("Tied oper %s to type %s", na->nc->display, type.c_str());
+				Alog() << "Tied oper " << na->nc->display << " to type " << type;
 				na->nc->ot = ot;
 			}
 		}
@@ -1020,12 +1020,11 @@ int ServerConfig::Read(bool bail)
 		}
 		return 0;
 	}
-	if (debug)
-		alog("End config");
+	Alog(LOG_DEBUG) << "End config";
 	for (int Index = 0; Once[Index]; ++Index)
 		if (!CheckOnce(Once[Index]))
 			return 0;
-	alog("Done reading configuration file.");
+	Alog() << "Done reading configuration file.";
 	return 1;
 }
 
@@ -1041,8 +1040,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 		errorstream << "File " << filename << " could not be opened." << std::endl;
 		return false;
 	}
-	if (debug)
-		alog("Start to read conf %s", filename);
+	Alog(LOG_DEBUG) << "Start to read conf " << filename;
 	// Start reading characters...
 	while (getline(conf, line))
 	{
@@ -1146,8 +1144,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 						return false;
 					}
 					// this is the same as the below section for testing if itemname is non-empty after the loop, but done inside it to allow the above construct
-					if (debug)
-						alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
+					Alog(LOG_DEBUG) << "ln "<< linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
 					sectiondata.push_back(KeyVal(itemname, wordbuffer));
 					wordbuffer.clear();
 					itemname.clear();
@@ -1189,8 +1186,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 				errorstream << "Item without value: " << filename << ":" << linenumber << std::endl;
 				return false;
 			}
-			if (debug)
-				alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
+			Alog(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
 			sectiondata.push_back(KeyVal(itemname, wordbuffer));
 			wordbuffer.clear();
 			itemname.clear();
@@ -1259,7 +1255,7 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, con
 			{
 				if (!allow_linefeeds && j->second.find('\n') != std::string::npos)
 				{
-					alog("Value of <%s:%s> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.", tag.c_str(), var.c_str());
+					Alog(LOG_DEBUG) << "Value of <" << tag << ":" << var << "> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.";
 					std::string::iterator n = j->second.begin(), nend = j->second.end();
 					for (; n != nend; ++n)
 						if (*n == '\n')
@@ -1478,9 +1474,10 @@ void error(int linenum, const char *message, ...)
 	va_end(args);
 
 	if (linenum)
-		alog("%s:%d: %s", SERVICES_CONF, linenum, buf);
+		Alog() << SERVICES_CONF << ":" << linenum << ": " << buf;
 	else
-		alog("%s: %s", SERVICES_CONF, buf);
+		Alog() << SERVICES_CONF << ": " << buf;
+
 
 	if (!nofork && isatty(2)) {
 		if (linenum)
@@ -1567,7 +1564,7 @@ int read_config(int reload)
 			else if (option == "secure") Config.NSDefFlags.SetFlag(NI_SECURE);
 			else if (option == "private") Config.NSDefFlags.SetFlag(NI_PRIVATE);
 			else if (option == "msg") {
-				if (!Config.UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
+				if (!Config.UsePrivmsg) Alog() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
 				else Config.NSDefFlags.SetFlag(NI_MSG);
 			}
 			else if (option == "hideemail") Config.NSDefFlags.SetFlag(NI_HIDE_EMAIL);
@@ -1705,7 +1702,7 @@ int read_config(int reload)
 	/* Check the user keys */
 	if ((Config.UserKey1 == Config.UserKey2) || (Config.UserKey1 == Config.UserKey3)
 		|| (Config.UserKey3 == Config.UserKey2))
-		alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
+		Alog() << "Every UserKey must be different. It's for YOUR safety! Remember that!";
 
 	/**
 	 * Check all DEFCON dependiencies...

@@ -36,7 +36,7 @@ class DefConTimeout : public Timer
 		{
 			Config.DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
-			alog("Defcon level timeout, returning to lvl %d", level);
+			Alog() << "Defcon level timeout, returning to lvl " << level;
 			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), Config.s_OperServ, level);
 
 			if (Config.GlobalOnDefcon)
@@ -95,7 +95,7 @@ class CommandOSDEFCON : public Command
 
 		notice_lang(Config.s_OperServ, u, OPER_DEFCON_CHANGED, Config.DefConLevel);
 		defcon_sendlvls(u);
-		alog("Defcon level changed to %d by Oper %s", newLevel, u->nick.c_str());
+		Alog() << "Defcon level changed to " << newLevel << " by Oper " << u->nick;
 		ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
@@ -164,7 +164,7 @@ class OSDEFCON : public Module
 			if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
 			{
 				mask = "*@" + std::string(u->host);
-				alog("DEFCON: adding akill for %s", mask.c_str());
+				Alog() << "DEFCON: adding akill for " << mask;
 				add_akill(NULL, mask.c_str(), Config.s_OperServ,
 					time(NULL) + Config.DefConAKILL,
 					Config.DefConAkillReason ? Config.DefConAkillReason :
@@ -375,7 +375,7 @@ void runDefCon()
 		{
 			if (Config.DefConChanModes[0] == '+' || Config.DefConChanModes[0] == '-')
 			{
-				alog("DEFCON: setting %s on all chan's", Config.DefConChanModes);
+				Alog() << "DEFCON: setting " << Config.DefConChanModes << "on all chan's";
 				DefConModesSet = 1;
 				MassChannelModes(findbot(Config.s_OperServ), Config.DefConChanModes);
 			}
@@ -390,7 +390,7 @@ void runDefCon()
 				DefConModesSet = 0;
 				if ((newmodes = defconReverseModes(Config.DefConChanModes)))
 				{
-					alog("DEFCON: setting %s on all chan's", newmodes);
+					Alog() << "DEFCON: setting " << newmodes << " on all chan's";
 					MassChannelModes(findbot(Config.s_OperServ), newmodes);
 					delete [] newmodes;
 				}
@@ -443,7 +443,7 @@ void defconParseModeString(const char *str)
 		{
 			if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(NULL))
 			{
-				alog("DefConChanModes mode character '%c' cannot be locked", mode);
+				Alog() << "DefConChanModes mode character '" << mode << "' cannot be locked";
 				continue;
 			}
 			else if (add)
@@ -457,7 +457,7 @@ void defconParseModeString(const char *str)
 
 					if (!ss.GetToken(param))
 					{
-						alog("DefConChanModes mode character '%c' has no parameter while one is expected", mode);
+						Alog() << "DefConChanModes mode character '" << mode << "' has no parameter while one is expected";
 						continue;
 					}
 
@@ -489,7 +489,7 @@ void defconParseModeString(const char *str)
 		{
 			DefConModesOn.UnsetFlag(CMODE_REDIRECT);
 
-			alog("DefConChanModes must lock mode +l as well to lock mode +L");
+			Alog() << "DefConChanModes must lock mode +l as well to lock mode +L";
 		}
 	}
 
@@ -500,7 +500,7 @@ void defconParseModeString(const char *str)
 		if (DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_INVITE))
 		{
 			DefConModesOn.UnsetFlag(CMODE_NOKNOCK);
-			alog("DefConChanModes must lock mode +i as well to lock mode +K");
+			Alog() << "DefConChanModes must lock mode +i as well to lock mode +K";
 		}
 	}
 }

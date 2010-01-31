@@ -147,43 +147,6 @@ char *log_gettimestamp()
 
 /*************************************************************************/
 
-/* Log stuff to the log file with a datestamp.  Note that errno is
- * preserved by this routine and log_perror().
- */
-
-void alog(const char *fmt, ...)
-{
-	va_list args;
-	char *buf;
-	int errno_save = errno;
-	char str[BUFSIZE];
-
-	checkday();
-
-	if (!fmt) {
-		return;
-	}
-
-	va_start(args, fmt);
-	vsnprintf(str, sizeof(str), fmt, args);
-	va_end(args);
-
-	buf = log_gettimestamp();
-
-	if (logfile) {
-		fprintf(logfile, "%s %s\n", buf, str);
-	}
-	if (nofork) {
-		fprintf(stderr, "%s %s\n", buf, str);
-	}
-	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel)) {
-		ircdproto->SendPrivmsg(findbot(Config.s_GlobalNoticer), Config.LogChannel, "%s", str);
-	}
-	errno = errno_save;
-}
-
-/*************************************************************************/
-
 /* Like alog(), but tack a ": " and a system error message (as returned by
  * strerror()) onto the end.
  */
@@ -292,3 +255,38 @@ void fatal_perror(const char *fmt, ...)
 	exit(1);
 }
 
+Alog::Alog(LogLevel val)
+{
+	if (val > debug)
+		logit = false;
+	else
+	{
+		logit = true;
+		if (val >= LOG_DEBUG)
+			buf << "Debug: ";
+	}
+}
+
+Alog::~Alog()
+{
+	if (!logit)
+		return;
+
+	char *tbuf;
+	int errno_save = errno;
+
+	checkday();
+
+	tbuf = log_gettimestamp();
+
+	if (logfile) {
+		fprintf(logfile, "%s %s\n", tbuf, buf.str().c_str());
+	}
+	if (nofork) {
+		fprintf(stderr, "%s %s\n", tbuf, buf.str().c_str());
+	}
+	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel)) {
+		ircdproto->SendPrivmsg(findbot(Config.s_GlobalNoticer), Config.LogChannel, "%s", buf.str().c_str());
+	}
+	errno = errno_save;
+}

@@ -55,7 +55,7 @@ class CommandCSRegister : public Command
 			notice_lang(Config.s_ChanServ, u, u->nc->channelcount > Config.CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config.CSMaxReg);
 		else if (!(ci = new ChannelInfo(chan)))
 		{
-			alog("%s: makechan() failed for REGISTER %s", Config.s_ChanServ, chan);
+			Alog() << Config.s_ChanServ << ": makechan() failed for REGISTER " << chan;
 			notice_lang(Config.s_ChanServ, u, CHAN_REGISTRATION_FAILED);
 		}
 		else
@@ -76,7 +76,7 @@ class CommandCSRegister : public Command
 
 			ci->bi = NULL;
 			++ci->founder->channelcount;
-			alog("%s: Channel '%s' registered by %s!%s@%s", Config.s_ChanServ, chan, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+			Alog() << Config.s_ChanServ << ": Channel '" << chan << "' registered by " << u->GetMask();
 			notice_lang(Config.s_ChanServ, u, CHAN_REGISTERED, chan, u->nick.c_str());
 
 			/* Implement new mode lock */

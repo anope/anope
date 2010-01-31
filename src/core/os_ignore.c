@@ -181,8 +181,7 @@ class OSIgnore : public Module
 
 			if (ign->time != 0 && ign->time <= now)
 			{
-				if (debug)
-					alog("[os_ignore] debug: Expiring ignore entry %s", ign->mask);
+				Alog(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << ign->mask;
 				if (ign->prev)
 					ign->prev->next = ign->next;
 				else if (ignore == ign)

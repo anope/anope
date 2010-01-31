@@ -56,8 +56,7 @@ static int moduleCopyFile(const char *name, const char *output)
 		return MOD_ERR_FILE_IO;
 #endif
 
-	if (debug)
-		alog("Runtime module location: %s", output);
+	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
 	/* Linux/UNIX should ignore the b param, why do we still have seperate
 	 * calls for it here? -GD
@@ -139,8 +138,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	if (findModule(modname.c_str()) != NULL)
 		return MOD_ERR_EXISTS;
 
-	if (debug)
-		alog("trying to load [%s]", modname.c_str());
+	Alog(LOG_DEBUG) << "trying to load [" << modname <<  "]";
 
 	/* Generate the filename for the temporary copy of the module */
 	std::string pbuf;
@@ -169,7 +167,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	ano_module_t handle = dlopen(pbuf.c_str(), RTLD_LAZY);
 	if (handle == NULL && (err = dlerror()) != NULL)
 	{
-		alog("%s", err);
+		Alog() << err;
 		return MOD_ERR_NOLOAD;
 	}
 
@@ -177,7 +175,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	func = function_cast<Module *(*)(const std::string &, const std::string &)>(dlsym(handle, "init_module"));
 	if (func == NULL && (err = dlerror()) != NULL)
 	{
-		alog("No magical init function found, not an Anope module");
+		Alog() << "No magical init function found, not an Anope module";
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
@@ -202,7 +200,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 	catch (ModuleException &ex)
 	{
-		alog("Error while loading %s: %s", modname.c_str(), ex.GetReason());
+		Alog() << "Error while loading " << modname << ": " << ex.GetReason();
 		return MOD_STOP;
 	}
 
@@ -212,35 +210,34 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	Version v = m->GetVersion();
 	if (v.GetMajor() < VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() < VERSION_MINOR))
 	{
-		alog("Module %s is compiled against an older version of Anope %d.%d, this is %d.%d", modname.c_str(), v.GetMajor(), v.GetMinor(), VERSION_MAJOR, VERSION_MINOR);
+		Alog() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << VERSION_MAJOR << "." << VERSION_MINOR;
 		DeleteModule(m);
 		return MOD_STOP;
 	}
 	else if (v.GetMajor() > VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() > VERSION_MINOR))
 	{
-		alog("Module %s is compiled against a newer version of Anope %d.%d, this is %d.%d", modname.c_str(), v.GetMajor(), v.GetMinor(), VERSION_MAJOR, VERSION_MINOR);
+		Alog() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << VERSION_MAJOR << "." << VERSION_MINOR;
 		DeleteModule(m);
 		return MOD_STOP;
 	}
 	else if (v.GetBuild() < VERSION_BUILD)
 	{
-		alog("Module %s is compiled against an older revision of Anope %d, this is %d", modname.c_str(), v.GetBuild(), VERSION_BUILD);
+		Alog() << "Module " << modname << " is compiled against an older revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
 	}
 	else if (v.GetBuild() > VERSION_BUILD)
 	{
-		alog("Module %s is compiled against a newer revision of Anope %d, this is %d", modname.c_str(), v.GetBuild(), VERSION_BUILD);
+		Alog() << "Module " << modname << " is compiled against a newer revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
 	}
 	else if (v.GetBuild() == VERSION_BUILD)
 	{
-		if (debug)
-			alog("Module %s compiled against current version of Anope %d", modname.c_str(), v.GetBuild());
+		Alog(LOG_DEBUG) << "Module " << modname << " compiled against current version of Anope " << v.GetBuild();
 	}
 
 
 	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))
 	{
 		DeleteModule(m);
-		alog("You cannot load two protocol modules");
+		Alog() << "You cannot load two protocol modules";
 		return MOD_STOP;
 	}
 
@@ -306,7 +303,7 @@ void ModuleManager::DeleteModule(Module *m)
 	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "destroy_module"));
 	if (destroy_func == NULL && (err = dlerror()) != NULL)
 	{
-		alog("No magical destroy function found, chancing delete...");
+		Alog() << "No magical destroy function found, chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
 	}
 	else
@@ -317,7 +314,7 @@ void ModuleManager::DeleteModule(Module *m)
 	if (handle)
 	{
 		if ((dlclose(handle)) != 0)
-			alog("%s", dlerror());
+			Alog() << dlerror();
 	}
 }
 

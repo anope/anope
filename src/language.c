@@ -68,10 +68,7 @@ static void load_lang(int index, const char *filename)
 	FILE *f;
 	int32 num, i;
 
-	if (debug) {
-		alog("debug: Loading language %d from file `languages/%s'",
-			 index, filename);
-	}
+	Alog(LOG_DEBUG) << "Loading language " << index << " from file `languages/" << filename << "'";
 	snprintf(buf, sizeof(buf), "languages/%s", filename);
 #ifndef _WIN32
 	if (!(f = fopen(buf, "r"))) {
@@ -81,12 +78,11 @@ static void load_lang(int index, const char *filename)
 		log_perror("Failed to load language %d (%s)", index, filename);
 		return;
 	} else if (read_int32(&num, f) < 0) {
-		alog("Failed to read number of strings for language %d (%s)",
-			 index, filename);
+		Alog() << "Failed to read number of strings for language " << index << "(" << filename << ")";
 		return;
 	} else if (num != NUM_STRINGS) {
-		alog("Warning: Bad number of strings (%d, wanted %d) "
-			 "for language %d (%s)", num, NUM_STRINGS, index, filename);
+		Alog() << "Warning: Bad number of strings (" << num << " , wanted " << NUM_STRINGS << ") "
+			<< "for language " << index << " (" << filename << ")";
 	}
 	langtexts[index] = new char *[NUM_STRINGS];
 	if (num > NUM_STRINGS)
@@ -95,9 +91,9 @@ static void load_lang(int index, const char *filename)
 		int32 pos, len;
 		fseek(f, i * 8 + 4, SEEK_SET);
 		if (read_int32(&pos, f) < 0 || read_int32(&len, f) < 0) {
-			alog("Failed to read entry %d in language %d (%s) TOC",
-				 i, index, filename);
-			while (--i >= 0) {
+			Alog() << "Failed to read entry " << i << " in language " << index << " (" << filename << ") TOC";
+			while (--i >= 0) 
+			{
 				if (langtexts[index][i])
 					delete [] langtexts[index][i];
 			}
@@ -108,8 +104,7 @@ static void load_lang(int index, const char *filename)
 		if (len == 0) {
 			langtexts[index][i] = NULL;
 		} else if (len >= 65536) {
-			alog("Entry %d in language %d (%s) is too long (over 64k)--"
-				 "corrupt TOC?", i, index, filename);
+			Alog() << "Entry " << i << " in language " << index << " (" << filename << ") is too long (over 64k) -- corrupt TOC?";
 			while (--i >= 0) {
 				if (langtexts[index][i])
 					delete [] langtexts[index][i];
@@ -118,8 +113,7 @@ static void load_lang(int index, const char *filename)
 			langtexts[index] = NULL;
 			return;
 		} else if (len < 0) {
-			alog("Entry %d in language %d (%s) has negative length--"
-				 "corrupt TOC?", i, index, filename);
+			Alog() << "Entry " << i << " in language " << index << " (" << filename << ") has negative length -- corrupt TOC?";
 			while (--i >= 0) {
 				if (langtexts[index][i])
 					delete [] langtexts[index][i];
@@ -131,8 +125,7 @@ static void load_lang(int index, const char *filename)
 			langtexts[index][i] = new char[len + 1];
 			fseek(f, pos, SEEK_SET);
 			if (fread(langtexts[index][i], 1, len, f) != len) {
-				alog("Failed to read string %d in language %d (%s)",
-					 i, index, filename);
+				Alog() << "Failed to read string " << i << " in language " << index << "(" << filename << ")";
 				while (--i >= 0) {
 					if (langtexts[index][i])
 						delete [] langtexts[index][i];

@@ -122,8 +122,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 {
 	Server *serv;
 
-	if (debug)
-		alog("Creating %s(%s) uplinked to %s", name, suid, server_uplink ? server_uplink->name : "No uplink");
+	Alog(LOG_DEBUG) << "Creating " << name << "(" << suid << ") uplinked to " << (server_uplink ? server_uplink->name : "No uplink");
 	serv = new Server;
 	if (!name)
 		name = "";
@@ -196,18 +195,14 @@ static void delete_server(Server * serv, const char *quitreason)
 	User *u, *unext;
 	NickAlias *na;
 
-	if (debug)
-		alog("Deleting %s(%s) uplinked to %s(%s)", serv->name, serv->suid, serv->uplink ? serv->uplink->name : "NOTHING", serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK");
-
 	if (!serv) {
-		if (debug) {
-			alog("debug: delete_server() called with NULL arg!");
-		}
+		Alog(LOG_DEBUG) << "delete_server() called with NULL arg!";
 		return;
 	}
 
-	if (debug)
-		alog("debug: delete_server() called for %s", serv->name);
+	Alog(LOG_DEBUG) << "delete_server() called, deleting " << serv->name << "(" << serv->suid << ") uplinked to " 
+			<< (serv->uplink ? serv->uplink->name : "NOTHING") << "(" 
+			<< (serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK") << ")";
 
 	if (ircdcap->noquit || ircdcap->qs) {
 		if ((uplink_capab & ircdcap->noquit)
@@ -234,8 +229,7 @@ static void delete_server(Server * serv, const char *quitreason)
 				}
 				u = unext;
 			}
-			if (debug)
-				alog("debug: delete_server() cleared all users");
+			Alog(LOG_DEBUG) << "delete_server() cleared all users";
 		}
 	}
 
@@ -246,8 +240,7 @@ static void delete_server(Server * serv, const char *quitreason)
 		s = snext;
 	}
 
-	if (debug)
-		alog("debug: delete_server() cleared all servers");
+	Alog(LOG_DEBUG) << "delete_server() cleared all servers";
 
 	delete [] serv->name;
 	delete [] serv->desc;
@@ -258,8 +251,7 @@ static void delete_server(Server * serv, const char *quitreason)
 	if (serv->uplink->links == serv)
 		serv->uplink->links = serv->next;
 
-	if (debug)
-		alog("debug: delete_server() completed");
+	Alog(LOG_DEBUG) << "delete_server() completed";
 }
 
 /*************************************************************************/
@@ -278,13 +270,11 @@ Server *findserver(Server * s, const char *name)
 		return NULL;
 	}
 
-	if (debug)
-		alog("findserver(%s)", name);
+	Alog(LOG_DEBUG) << "findserver(" << name << ")";
 
 	while (s && (stricmp(s->name, name) != 0))
 	{
-		if (debug >= 3)
-			alog("Compared %s, not a match", s->name);
+		Alog(LOG_DEBUG_3) << "Compared " << s->name << ", not a match";
 		if (s->links)
 		{
 			sl = findserver(s->links, name);
@@ -303,8 +293,7 @@ Server *findserver(Server * s, const char *name)
 		}
 	}
 
-	if (debug)
-		alog("debug: findserver(%s) -> %p", name, static_cast<void *>(s));
+	Alog(LOG_DEBUG) << "findserver(" << name << ") -> " << static_cast<void *>(s);
 	return s;
 }
 
@@ -324,13 +313,11 @@ Server *findserver_uid(Server * s, const char *name)
 		return NULL;
 	}
 
-	if (debug)
-		alog("debug: findserver_uid(%s)", name);
+	Alog(LOG_DEBUG) << "findserver_uid(" << name << ")";
 
 	while (s && s->suid && (stricmp(s->suid, name) != 0))
 	{
-		if (debug >= 3)
-			alog("Compared %s, not a match", s->suid);
+		Alog(LOG_DEBUG_3) << "Compared " << s->suid << ", not a match";
 		if (s->links)
 		{
 			sl = findserver_uid(s->links, name);
@@ -349,8 +336,7 @@ Server *findserver_uid(Server * s, const char *name)
 		}
 	}
 
-	if (debug)
-		alog("debug: findserver_uid(%s) -> %p", name, static_cast<void *>(s));
+	Alog(LOG_DEBUG) << "findserver_uid(" << name << ") -> " << static_cast<void *>(s);
 	return s;
 }
 
@@ -392,14 +378,8 @@ void do_server(const char *source, const char *servername, const char *hops,
 {
 	Server *s, *newserver;
 
-	if (debug) {
-		if (!*source) {
-			alog("debug: Server introduced (%s)", servername);
-		} else {
-			alog("debug: Server introduced (%s) from %s", servername,
-				 source);
-		}
-	}
+	Alog(LOG_DEBUG) << "Server introduced (" << servername << ")" << (*source ? " from " : "") << (*source ? source : "");
+
 
 	if (source[0] == '\0')
 		s = me_server;
@@ -445,8 +425,9 @@ void do_squit(const char *source, int ac, const char **av)
 	} else {
 		s = findserver(servlist, av[0]);
 	}
-	if (!s) {
-		alog("SQUIT for nonexistent server (%s)!!", av[0]);
+	if (!s)
+	{
+		Alog() << "SQUIT for nonexistent server (" << av[0] << ")!!";
 		return;
 	}
 	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
@@ -467,9 +448,7 @@ void do_squit(const char *source, int ac, const char **av)
 	if (ircdcap->unconnect) {
 		if ((s->uplink == me_server)
 			&& (uplink_capab & ircdcap->unconnect)) {
-			if (debug) {
-				alog("debug: Sending UNCONNECT SQUIT for %s", s->name);
-			}
+			Alog(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->name;
 			/* need to fix */
 			ircdproto->SendSquit(s->name, buf);
 		}
@@ -575,10 +554,9 @@ void finish_sync(Server * serv, int sync_links)
 	/* Mark each server as in sync */
 	s = serv;
 	do {
-		if (!is_sync(s)) {
-			if (debug)
-				alog("debug: Finishing sync for server %s", s->name);
-
+		if (!is_sync(s)) 
+		{
+			Alog(LOG_DEBUG) << "Finishing sync for server " << s->name;
 			s->sync = SSYNC_DONE;
 		}
 
@@ -611,7 +589,7 @@ void finish_sync(Server * serv, int sync_links)
 	// XXX: this doesn't actually match the description. finish_sync(), depending on the ircd, can be called multiple times
 	// Perhaps this should be done if serv == serv_uplink?
 	restore_unsynced_topics();
-	alog("Server %s is done syncing", serv->name);
+	Alog() << "Server " << serv->name << " is done syncing";
 }
 
 /*******************************************************************/
@@ -654,7 +632,7 @@ const char *ts6_uid_retrieve()
 {
 	if (ircd->ts6 == 0)
 	{
-		alog("TS6 not supported on this ircd");
+		Alog(LOG_DEBUG) << "ts6_uid_retrieve(): TS6 not supported on this ircd";
 		return "";
 	}
 
@@ -716,8 +694,7 @@ const char *ts6_sid_retrieve()
 {
 	if (!ircd->ts6)
 	{
-		if (debug)
-			alog("TS6 not supported on this ircd");
+		Alog(LOG_DEBUG) << "ts6_sid_retrieve(): TS6 not supported on this ircd";
 		return "";
 	}
 

@@ -55,7 +55,7 @@ int enc_decrypt(const std::string &src, std::string &dest)
 	size_t pos = src.find(":");
 	if (pos == std::string::npos)
 	{
-		alog("Error: enc_decrypt() called with invalid password string (%s)", src.c_str());
+		Alog() << "Error: enc_decrypt() called with invalid password string (" << src << ")"; 
 		return -1;
 	}
 	std::string hashm(src.begin(), src.begin()+pos);
@@ -80,7 +80,7 @@ int enc_check_password(std::string &plaintext, std::string &password)
 	size_t pos = password.find(":");
 	if (pos == std::string::npos)
 	{
-		alog("Error: enc_check_password() called with invalid password string (%s)", password.c_str());
+		Alog() << "Error: enc_check_password() called with invalid password string (" << password << ")";
 		return 0;
 	}
 	hashm.assign(password.begin(), password.begin()+pos);

@@ -75,7 +75,7 @@ class CommandOSSet : public Command
 		if (setting == "ON")
 		{
 			readonly = 1;
-			alog("Read-only mode activated");
+			Alog() << "Read-only mode activated";
 			close_log();
 			notice_lang(Config.s_OperServ, u, OPER_SET_READONLY_ON);
 		}
@@ -83,7 +83,7 @@ class CommandOSSet : public Command
 		{
 			readonly = 0;
 			open_log();
-			alog("Read-only mode deactivated");
+			Alog() << "Read-only mode deactivated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_READONLY_OFF);
 		}
 		else
@@ -117,12 +117,12 @@ class CommandOSSet : public Command
 				ircdproto->SendJoin(findbot(Config.s_GlobalNoticer), Config.LogChannel, c ? c->creation_time : time(NULL));
 			}
 			LogChan = true;
-			alog("Now sending log messages to %s", Config.LogChannel);
+			Alog() << "Now sending log messages to " << Config.LogChannel;
 			notice_lang(Config.s_OperServ, u, OPER_SET_LOGCHAN_ON, Config.LogChannel);
 		}
 		else if (Config.LogChannel && setting == "OFF")
 		{
-			alog("No longer sending log messages to a channel");
+			Alog() << "No longer sending log messages to a channel";
 			if (ircd->join2msg)
 				ircdproto->SendPart(findbot(Config.s_GlobalNoticer), findchan(Config.LogChannel), NULL);
 			LogChan = false;
@@ -155,14 +155,14 @@ class CommandOSSet : public Command
 		{
 			u->isSuperAdmin = 1;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_ON);
-			alog("%s: %s is a SuperAdmin ", Config.s_OperServ, u->nick.c_str());
+			Alog() << Config.s_OperServ << ": " << u->nick << " is a SuperAdmin";
 			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick.c_str());
 		}
 		else if (setting == "OFF")
 		{
 			u->isSuperAdmin = 0;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_OFF);
-			alog("%s: %s is no longer a SuperAdmin", Config.s_OperServ, u->nick.c_str());
+			Alog() << Config.s_OperServ << ": " << u->nick << " is no longer a SuperAdmin";
 			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick.c_str());
 		}
 		else
@@ -184,19 +184,19 @@ class CommandOSSet : public Command
 		if (setting == "ON")
 		{
 			debug = 1;
-			alog("Debug mode activated");
+			Alog() << "Debug mode activated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_DEBUG_ON);
 		}
 		else if (setting == "OFF" || (setting[0] == '0' && !atoi(setting.c_str())))
 		{
-			alog("Debug mode deactivated");
+			Alog() << "Debug mode deactivated";
 			debug = 0;
 			notice_lang(Config.s_OperServ, u, OPER_SET_DEBUG_OFF);
 		}
 		else if (isdigit(setting[0]) && atoi(setting.c_str()) > 0)
 		{
 			debug = atoi(setting.c_str());
-			alog("Debug mode activated (level %d)", debug);
+			Alog() << "Debug mode activated (level " << debug << ")";
 			notice_lang(Config.s_OperServ, u, OPER_SET_DEBUG_LEVEL, debug);
 		}
 		else
@@ -218,13 +218,13 @@ class CommandOSSet : public Command
 		if (setting == "ON")
 		{
 			noexpire = 1;
-			alog("No expire mode activated");
+			Alog() << "No expire mode activated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_NOEXPIRE_ON);
 		}
 		else if (setting == "OFF")
 		{
 			noexpire = 0;
-			alog("No expire mode deactivated");
+			Alog() << "No expire mode deactivated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_NOEXPIRE_OFF);
 		}
 		else

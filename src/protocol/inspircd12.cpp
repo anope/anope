@@ -496,8 +496,7 @@ int anope_event_fmode(const char *source, int ac, const char **av)
 		if (n != 1) {
 			newav[o] = av[n];
 			o++;
-			if (debug)
-				alog("Param: %s", newav[o - 1]);
+			Alog(LOG_DEBUG) << "Param: " << newav[o - 1];
 		}
 		n++;
 	}
@@ -582,7 +581,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 			buf.erase(buf.begin());
 			if (!cm)
 			{
-				alog("Recieved unknown mode prefix %c in FJOIN string", buf[0]);
+				Alog() << "Recieved unknown mode prefix " << buf[0] << " in FJOIN string";
 				continue;
 			}
 
@@ -593,8 +592,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		User *u = find_byuid(buf);
 		if (!u)
 		{
-			if (debug)
-				alog("debug: FJOIN for nonexistant user %s on %s", buf.c_str(), c->name.c_str());
+			Alog(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
 			continue;
 		}
 
@@ -685,11 +683,9 @@ int anope_event_topic(const char *source, int ac, const char **av)
 	time_t topic_time = time(NULL);
 	User *u = find_byuid(source);
 
-	if (!c) {
-		if (debug) {
-			alog("debug: TOPIC %s for nonexistent channel %s",
-				 merge_args(ac - 1, av + 1), av[0]);
-		}
+	if (!c)
+	{
+		Alog(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return MOD_CONT;
 	}
 
@@ -769,10 +765,9 @@ int anope_event_setname(const char *source, int ac, const char **av)
 	User *u;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: SETNAME for nonexistent user %s", source);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -785,10 +780,9 @@ int anope_event_chgname(const char *source, int ac, const char **av)
 	User *u;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: FNAME for nonexistent user %s", source);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "FNAME for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -801,10 +795,9 @@ int anope_event_setident(const char *source, int ac, const char **av)
 	User *u;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: SETIDENT for nonexistent user %s", source);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -817,10 +810,9 @@ int anope_event_chgident(const char *source, int ac, const char **av)
 	User *u;
 
 	u = finduser(av[0]);
-	if (!u) {
-		if (debug) {
-			alog("debug: CHGIDENT for nonexistent user %s", av[0]);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -833,10 +825,9 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 	User *u;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: SETHOST for nonexistent user %s", source);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -913,10 +904,9 @@ int anope_event_chghost(const char *source, int ac, const char **av)
 	User *u;
 
 	u = finduser(source);
-	if (!u) {
-		if (debug) {
-			alog("debug: FHOST for nonexistent user %s", source);
-		}
+	if (!u)
+	{
+		Alog(LOG_DEBUG) << "FHOST for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -1173,7 +1163,7 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 			u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
-	alog("Processed ENDBURST for %s", s->name);
+	Alog() << "Processed ENDBURST for " << s->name;
 
 	finish_sync(s, 1);
 	return MOD_CONT;

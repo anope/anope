@@ -42,9 +42,8 @@ class CommandCSSet : public Command
 			return MOD_CONT;
 		}
 
-		alog("%s: Changing founder of %s from %s to %s by %s!%s@%s",
-			 Config.s_ChanServ, ci->name.c_str(), ci->founder->display, nc->display, u->nick.c_str(),
-			 u->GetIdent().c_str(), u->host);
+		Alog() << Config.s_ChanServ << ": Changing founder of " << ci->name << " from " << ci->founder->display
+			<< " to " << nc->display << " by " << u->GetMask();
 
 		/* Founder and successor must not be the same group */
 		if (nc == ci->successor)
@@ -88,10 +87,9 @@ class CommandCSSet : public Command
 		else
 			nc = NULL;
 
-		alog("%s: Changing successor of %s from %s to %s by %s!%s@%s",
-			 Config.s_ChanServ, ci->name.c_str(),
-			 (ci->successor ? ci->successor->display : "none"),
-			 (nc ? nc->display : "none"), u->nick.c_str(), u->GetIdent().c_str(), u->host);
+		Alog() << Config.s_ChanServ << ": Changing successor of " << ci->name << " from "
+			<< (ci->successor ? ci->successor->display : "none")
+			<< " to " << (nc ? nc->display : "none") << " by " << u->GetMask();
 
 		ci->successor = nc;
 
@@ -500,16 +498,14 @@ class CommandCSSet : public Command
 				ci->SetFlag(CI_XOP);
 			}
 
-			alog("%s: %s!%s@%s enabled XOP for %s", Config.s_ChanServ, u->nick.c_str(),
-				 u->GetIdent().c_str(), u->host, ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " enabled XOP for " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_ON, ci->name.c_str());
 		}
 		else if (param == "OFF")
 		{
 			ci->UnsetFlag(CI_XOP);
 
-			alog("%s: %s!%s@%s disabled XOP for %s", Config.s_ChanServ, u->nick.c_str(),
-				 u->GetIdent().c_str(), u->host, ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled XOP for " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name.c_str());
 		}
 		else

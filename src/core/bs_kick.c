@@ -46,15 +46,12 @@ class CommandBSKick : public Command
 				if (value == "ON") {
 					if (ttb) {
 						errno = 0;
-						ci->ttb[TTB_BADWORDS] =
-							strtol(ttb, NULL, 10);
+						ci->ttb[TTB_BADWORDS] = strtol(ttb, NULL, 10);
 						/* Only error if errno returns ERANGE or EINVAL or we are less then 0 - TSL */
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_BADWORDS] < 0) {
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_BADWORDS] < 0) 
+						{
 							/* leaving the debug behind since we might want to know what these are */
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_BADWORDS]);
-							}
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_BADWORDS];
 							/* reset the value back to 0 - TSL */
 							ci->ttb[TTB_BADWORDS] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
@@ -78,11 +75,9 @@ class CommandBSKick : public Command
 					if (ttb) {
 						errno = 0;
 						ci->ttb[TTB_BOLDS] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_BOLDS] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_BOLDS]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_BOLDS] < 0) 
+						{
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_BOLDS];
 							ci->ttb[TTB_BOLDS] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;
@@ -107,11 +102,9 @@ class CommandBSKick : public Command
 					if (ttb) {
 						errno = 0;
 						ci->ttb[TTB_CAPS] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_CAPS] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_CAPS]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_CAPS] < 0) 
+						{
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_CAPS];
 							ci->ttb[TTB_CAPS] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;
@@ -150,11 +143,9 @@ class CommandBSKick : public Command
 					if (ttb) {
 						errno = 0;
 						ci->ttb[TTB_COLORS] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_COLORS] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_COLORS]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_COLORS] < 0)
+						{
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_COLORS];
 							ci->ttb[TTB_COLORS] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;
@@ -179,11 +170,8 @@ class CommandBSKick : public Command
 					if (ttb) {
 						errno = 0;
 						ci->ttb[TTB_FLOOD] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_FLOOD] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_FLOOD]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_FLOOD] < 0) {
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_FLOOD];
 							ci->ttb[TTB_FLOOD] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;
@@ -224,11 +212,9 @@ class CommandBSKick : public Command
 					if (ttb) {
 						errno = 0;
 						ci->ttb[TTB_REPEAT] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_REPEAT] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_REPEAT]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_REPEAT] < 0) 
+						{
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_REPEAT];
 							ci->ttb[TTB_REPEAT] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;
@@ -260,11 +246,9 @@ class CommandBSKick : public Command
 						errno = 0;
 						ci->ttb[TTB_REVERSES] =
 							strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_REVERSES] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_REVERSES]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_REVERSES] < 0) 
+						{
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_REVERSES];
 							ci->ttb[TTB_REVERSES] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;
@@ -287,11 +271,9 @@ class CommandBSKick : public Command
 						errno = 0;
 						ci->ttb[TTB_UNDERLINES] =
 							strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL
-							|| ci->ttb[TTB_UNDERLINES] < 0) {
-							if (debug) {
-								alog("debug: errno is %d ERANGE %d EINVAL %d ttb %d", errno, ERANGE, EINVAL, ci->ttb[TTB_UNDERLINES]);
-							}
+						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_UNDERLINES] < 0) 
+						{
+							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_UNDERLINES];
 							ci->ttb[TTB_UNDERLINES] = 0;
 							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
 							return MOD_CONT;

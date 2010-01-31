@@ -127,7 +127,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						alog("[db_plain}: %s", err);
+						Alog() << "[db_plain}: " << err;
 					}
 				}
 				else if (na && Type == MD_NA)
@@ -143,7 +143,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						alog("[db_plain}: %s", err);
+						Alog() << "[db_plain}: " << err;
 					}
 				}
 				else if (bi && Type == MD_BI)
@@ -159,7 +159,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						alog("[db_plain}: %s", err);
+						Alog() << "[db_plain}: " << err;
 					}
 					}
 				else if (ci && Type == MD_CH)
@@ -175,7 +175,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						alog("[db_plain}: %s", err);
+						Alog() << "[db_plain}: " << err;
 					}
 				}
 			}
@@ -397,8 +397,7 @@ static void LoadNickCore(const std::vector<std::string> &params)
 	nc->memos.memomax = atoi(params[3].c_str());
 	nc->channelcount = atoi(params[4].c_str());
 
-	if (debug > 1)
-		alog("[db_plain]: Loaded NickCore %s", nc->display);
+	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded NickCore " << nc->display;
 }
 
 static void LoadNickAlias(const std::vector<std::string> &params)
@@ -406,7 +405,7 @@ static void LoadNickAlias(const std::vector<std::string> &params)
 	NickCore *nc = findcore(params[0].c_str());
 	if (!nc)
 	{
-		alog("[db_plain]: Unable to find core %s", params[0].c_str());
+		Alog() << "[db_plain]: Unable to find core " << params[0];
 		return;
 	}
 
@@ -416,8 +415,7 @@ static void LoadNickAlias(const std::vector<std::string> &params)
 
 	na->last_seen = strtol(params[3].c_str(), NULL, 10);
 
-	if (debug > 1)
-		alog("[db_plain}: Loaded nickalias for %s", na->nick);
+	Alog(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
 }
 
 static void LoadBotInfo(const std::vector<std::string> &params)
@@ -429,8 +427,7 @@ static void LoadBotInfo(const std::vector<std::string> &params)
 	bi->chancount = atol(params[5].c_str());
 	bi->real = sstrdup(params[6].c_str());
 
-	if (debug > 1)
-		alog("[db_plain]: Loaded botinfo for %s", bi->nick.c_str());
+	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
 }
 
 static void LoadChanInfo(const std::vector<std::string> &params)
@@ -450,8 +447,7 @@ static void LoadChanInfo(const std::vector<std::string> &params)
 
 	ci->memos.memomax = atoi(params[4].c_str());
 
-	if (debug > 1)
-		alog("[db_plain]: loaded channel %s", ci->name.c_str());
+	Alog(LOG_DEBUG_2) << "[db_plain]: loaded channel " << ci->name;
 }
 
 static void LoadOperInfo(const std::vector<std::string> &params)
@@ -651,7 +647,7 @@ class DBPlain : public Module
 			ci->founder = findcore(params[0].c_str());
 			if (!ci->founder)
 			{
-				alog("[db_plain]: Deleting founderless channel %s", ci->name.c_str());
+				Alog() << "[db_plain]: Deleting founderless channel " << ci->name;
 				delete ci;
 				ci = NULL;
 				throw "no founder";

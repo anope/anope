@@ -111,8 +111,7 @@ extern void expire_all()
 
 	FOREACH_MOD(I_OnPreDatabaseExpire, OnPreDatabaseExpire());
 
-	if (debug)
-		alog("debug: Running expire routines");
+	Alog(LOG_DEBUG) << "Running expire routines";
 	expire_nicks();
 	expire_chans();
 	expire_requests();
@@ -137,8 +136,7 @@ void save_databases()
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
-	if (debug)
-		alog("debug: Saving FFF databases");
+	Alog(LOG_DEBUG) << "Saving FFF databases";
 }
 
 /*************************************************************************/
@@ -150,7 +148,7 @@ void do_restart_services()
 		expire_all();
 		save_databases();
 	}
-	alog("Restarting");
+	Alog() << "Restarting";
 
 	FOREACH_MOD(I_OnPreRestart, OnPreRestart());
 
@@ -187,7 +185,7 @@ static void services_shutdown()
 
 	if (!quitmsg)
 		quitmsg = "Terminating, reason unknown";
-	alog("%s", quitmsg);
+	Alog() << quitmsg;
 	if (started) {
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
 		if (uplink)
@@ -229,7 +227,7 @@ void sighandler(int signum)
 #ifndef _WIN32
 		if (signum == SIGHUP)
 		{
-			alog("Received SIGHUP: Saving Databases & Rehash Configuration");
+			Alog() << "Received SIGHUP: Saving Databases & Rehash Configuration";
 
 			expire_all();
 			save_databases();
@@ -252,7 +250,7 @@ void sighandler(int signum)
 			signal(SIGHUP, SIG_IGN);
 #endif
 
-			alog("Received SIGTERM, exiting.");
+			Alog() << "Received SIGTERM, exiting.";
 
 			expire_all();
 			save_databases();
@@ -265,7 +263,7 @@ void sighandler(int signum)
 			if (nofork)
 			{
 				signal(SIGINT, SIG_IGN);
-				alog("Received SIGINT, exiting.");
+				Alog() << "Received SIGINT, exiting.";
 				expire_all();
 				save_databases();
 				quitmsg = "Shutting down on SIGINT";
@@ -292,7 +290,7 @@ void sighandler(int signum)
 		}
 		else
 		{
-			alog("%s", quitmsg);
+			Alog() << quitmsg;
 		}
 
 		exit(1);
@@ -423,14 +421,14 @@ int main(int ac, char **av, char **envp)
 		rlimit rl;
 		if (getrlimit(RLIMIT_CORE, &rl) == -1)
 		{
-			alog("Failed to getrlimit()!");
+			Alog() << "Failed to getrlimit()!";
 		}
 		else
 		{
 			rl.rlim_cur = rl.rlim_max;
 			if (setrlimit(RLIMIT_CORE, &rl) == -1)
 			{
-				alog("setrlimit() failed, cannot increase coredump size");
+				Alog() << "setrlimit() failed, cannot increase coredump size";
 			}
 		}
 	}
@@ -441,8 +439,7 @@ int main(int ac, char **av, char **envp)
 	while (!quitting) {
 		time_t t = time(NULL);
 
-		if (debug >= 2)
-			alog("debug: Top of main loop");
+		Alog(LOG_DEBUG_2) << "Top of main loop";
 
 		// Never fear. noexpire/readonly are checked in expire_all().
 		if (save_data || t - last_expire >= Config.ExpireTimeout)

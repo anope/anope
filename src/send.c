@@ -36,14 +36,12 @@ void send_cmd(const char *source, const char *fmt, ...)
 	if (source)
 	{
 		sockprintf(servsock, ":%s %s\r\n", source, buf);
-		if (debug)
-			alog("debug: Sent: :%s %s", source, buf);
+		Alog(LOG_DEBUG) << "Sent: :" << source << " " << buf;
 	}
 	else
 	{
 		sockprintf(servsock, "%s\r\n", buf);
-		if (debug)
-			alog("debug: Sent: %s", buf);
+		Alog(LOG_DEBUG) << "Sent: "<< buf;
 	}
 
 	va_end(args);
@@ -65,14 +63,12 @@ void send_cmd(const std::string &source, const char *fmt, ...)
 	if (!source.empty())
 	{
 		sockprintf(servsock, ":%s %s\r\n", source.c_str(), buf);
-		if (debug)
-			alog("debug: Sent: :%s %s", source.c_str(), buf);
+		Alog(LOG_DEBUG) << "Sent: :" << source << " " << buf;
 	}
 	else
 	{
 		sockprintf(servsock, "%s\r\n", buf);
-		if (debug)
-			alog("debug: Sent: %s", buf);
+		Alog(LOG_DEBUG) << "Sent: " << buf;
 	}
 
 	va_end(args);

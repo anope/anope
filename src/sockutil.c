@@ -82,9 +82,7 @@ static int buffered_read(ano_socket_t fd, char *buf, int len)
 				maxread = read_buftop - read_bufend;
 			nread = ano_sockread(fd, read_bufend, maxread);
 			errno_save = ano_sockgeterr();
-			if (debug >= 3)
-				alog("debug: buffered_read wanted %d, got %d", maxread,
-					 nread);
+			Alog(LOG_DEBUG_3) << "buffered_read wanted " << maxread << " got " << nread;
 			if (nread <= 0)
 				break;
 			read_bufend += nread;
@@ -114,10 +112,7 @@ static int buffered_read(ano_socket_t fd, char *buf, int len)
 		}
 	}
 	total_read += len - left;
-	if (debug >= 4) {
-		alog("debug: buffered_read(%d,%p,%d) returning %d",
-			 fd, buf, len, len - left);
-	}
+	Alog(LOG_DEBUG_4) << "buffered_read(" << fd << "," << static_cast<void *>(buf) << ", " << len << ") returning " << len - left;
 	ano_sockseterr(errno_save);
 	return len - left;
 }
@@ -159,9 +154,7 @@ static int buffered_read_one(ano_socket_t fd)
 			maxread = read_buftop - read_bufend;
 		nread = ano_sockread(fd, read_bufend, maxread);
 		errno_save = ano_sockgeterr();
-		if (debug >= 3)
-			alog("debug: buffered_read_one wanted %d, got %d", maxread,
-				 nread);
+		Alog(LOG_DEBUG_3) << "buffered_read_one wanted " << maxread << ", got " << nread;
 		if (nread <= 0)
 			break;
 		read_bufend += nread;
@@ -169,8 +162,7 @@ static int buffered_read_one(ano_socket_t fd)
 			read_bufend = read_netbuf;
 	}
 	if (read_curpos == read_bufend) {   /* No more data on socket */
-		if (debug >= 4)
-			alog("debug: buffered_read_one(%d) returning %d", fd, EOF);
+		Alog(LOG_DEBUG_4) << "buffered_read_one(" << fd << ") returning " << EOF;
 		ano_sockseterr(errno_save);
 		return EOF;
 	}
@@ -178,8 +170,7 @@ static int buffered_read_one(ano_socket_t fd)
 	if (read_curpos == read_buftop)
 		read_curpos = read_netbuf;
 	total_read++;
-	if (debug >= 4)
-		alog("debug: buffered_read_one(%d) returning %d", fd, c);
+	Alog(LOG_DEBUG_4) << "buffered_read_one(" << fd << ") returning " << c;
 	return static_cast<int>(c) & 0xFF;
 }
 
@@ -226,9 +217,7 @@ static int flush_write_buffer(int wait)
 			maxwrite = write_bufend - write_curpos;
 		nwritten = ano_sockwrite(write_fd, write_curpos, maxwrite);
 		errno_save = ano_sockgeterr();
-		if (debug >= 3)
-			alog("debug: flush_write_buffer wanted %d, got %d", maxwrite,
-				 nwritten);
+		Alog(LOG_DEBUG_3) << "flush_write_buffer wanted " << maxwrite << ", got " << nwritten;
 		if (nwritten > 0) {
 			write_curpos += nwritten;
 			if (write_curpos == write_buftop)
@@ -305,11 +294,8 @@ static int buffered_write(ano_socket_t fd, char *buf, int len)
 			break;
 		}
 	}
-
-	if (debug >= 4) {
-		alog("debug: buffered_write(%d,%p,%d) returning %d",
-			 fd, buf, len, len - left);
-	}
+	Alog(LOG_DEBUG_4) << "buffered_write(" << fd << "," << static_cast<void*>(buf) << "," << len
+			<< ") returning " << len - left;
 	ano_sockseterr(errno_save);
 	return len - left;
 }
@@ -337,17 +323,13 @@ static int buffered_write_one(int c, ano_socket_t fd)
 	write_fd = fd;
 
 	/* Try to flush the buffer if it's full. */
-	if (write_curpos == write_bufend + 1 ||
-		(write_curpos == write_netbuf
-		 && write_bufend == write_buftop - 1)) {
+	if (write_curpos == write_bufend + 1 || (write_curpos == write_netbuf && write_bufend == write_buftop - 1))
+	{
 		flush_write_buffer(1);
-		if (write_curpos == write_bufend + 1 ||
-			(write_curpos == write_netbuf
-			 && write_bufend == write_buftop - 1)) {
+		if (write_curpos == write_bufend + 1 || (write_curpos == write_netbuf && write_bufend == write_buftop - 1))
+		{
 			/* Write failed */
-			if (debug >= 4)
-				alog("debug: buffered_write_one(%d) returning %d", fd,
-					 EOF);
+			Alog(LOG_DEBUG_4) << "buffered_write_one(" << fd << ") returning " << EOF;
 			return EOF;
 		}
 	}
@@ -360,8 +342,7 @@ static int buffered_write_one(int c, ano_socket_t fd)
 	/* Move it to the socket if we can. */
 	flush_write_buffer(0);
 
-	if (debug >= 4)
-		alog("debug: buffered_write_one(%d) returning %d", fd, c);
+	Alog(LOG_DEBUG_4) << "buffered_write_one(" << fd << ") returning " << c;
 	return (int) c & 0xFF;
 }
 #endif						  /* 0 */
@@ -587,8 +568,9 @@ int conn(const char *host, int port, const char *lhost, int lport)
 	memcpy(&sa.sin_addr, hp->h_addr, hp->h_length);
 	sa.sin_family = hp->h_addrtype;
 #else
-	if (!(addr = pack_ip(host))) {
-		alog("conn(): `%s' is not a valid IP address", host);
+	if (!(addr = pack_ip(host))) 
+	{
+		Alog() << "conn(): `'" << host << "' is not a valid IP address";
 		ano_sockseterr(SOCKERR_EINVAL);
 		return -1;
 	}
@@ -600,13 +582,11 @@ int conn(const char *host, int port, const char *lhost, int lport)
 	if ((sock = socket(sa.sin_family, SOCK_STREAM, 0)) < 0)
 		return -1;
 
-	if (setsockopt
-		(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&sockopt),
-		 sizeof(int)) < 0)
-		alog("debug: couldn't set SO_REUSEADDR on socket");
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&sockopt), sizeof(int)) < 0)
+		Alog() << "couldn't set SO_REUSEADDR on socket";
 
-	if ((lhost || lport)
-		&& bind(sock, reinterpret_cast<struct sockaddr *>(&lsa), sizeof(lsa)) < 0) {
+	if ((lhost || lport) && bind(sock, reinterpret_cast<struct sockaddr *>(&lsa), sizeof(lsa)) < 0) 
+	{
 		int errno_save = ano_sockgeterr();
 		ano_sockclose(sock);
 		ano_sockseterr(errno_save);

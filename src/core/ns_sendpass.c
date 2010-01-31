@@ -61,7 +61,7 @@ class CommandNSSendPass : public Command
 
 				MailEnd(mail);
 
-				alog("%s: %s!%s@%s used SENDPASS on %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nick);
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SENDPASS on " << nick;
 				notice_lang(Config.s_NickServ, u, NICK_SENDPASS_OK, nick);
 			}
 			else

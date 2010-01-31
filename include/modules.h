@@ -70,7 +70,7 @@ enum EventReturn
 		} \
 		catch (CoreException& modexcept) \
 		{ \
-			alog("Exception caught: %s",modexcept.GetReason()); \
+			Alog() << "Exception caught: " << modexcept.GetReason(); \
 		} \
 		_i = safei; \
 	} \
@@ -99,7 +99,7 @@ do { \
 		} \
 		catch (CoreException& modexcept) \
 		{ \
-			alog("Exception caught: %s",modexcept.GetReason()); \
+			Alog() << "Exception caught: " << modexcept.GetReason(); \
 		} \
 		_i = safei; \
 	} \

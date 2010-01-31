@@ -334,8 +334,7 @@ void check_modes(Channel *c)
 
 	if (!c)
 	{
-		if (debug)
-			alog("debug: check_modes called with NULL values");
+		Alog(LOG_DEBUG) << "check_modes called with NULL values";
 		return;
 	}
 
@@ -346,7 +345,7 @@ void check_modes(Channel *c)
 	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
 	{
 		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name.c_str());
-		alog("%s: Bouncy modes on channel %s", Config.s_ChanServ, c->name.c_str());
+		Alog() << Config.s_ChanServ << ": Bouncy modes on channel " << c->name;
 		c->bouncy_modes = 1;
 		return;
 	}
@@ -664,19 +663,18 @@ bool ChannelInfo::CheckKick(User *user)
 		if (!akick->InUse || do_kick)
 			continue;
 
-		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) 
 			|| (!akick->HasFlag(AK_ISNICK)
 			&& match_usermask(akick->mask.c_str(), user)))
-			{
-			if (debug >= 2)
-				alog("debug: %s matched akick %s", user->nick.c_str(), akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str());
+		{
+			Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask);
 			if (akick->HasFlag(AK_ISNICK))
 				get_idealban(this, user, mask, sizeof(mask));
 			else
 				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
 			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
 			do_kick = true;
-			}
+		}
 	}
 
 
@@ -690,9 +688,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!do_kick)
 		return false;
 
-	if (debug)
-		alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick.c_str(),
-			 user->GetIdent().c_str(), user->host, this->name.c_str());
+	Alog(LOG_DEBUG) << "channel: Autokicking "<< user->GetMask() <<  " from " << this->name;
 
 	/* If the channel doesnt have any users and if a bot isn't already in the channel, join it
 	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
@@ -807,10 +803,9 @@ int check_topiclock(Channel * c, time_t topic_time)
 {
 	ChannelInfo *ci;
 
-	if (!c) {
-		if (debug) {
-			alog("debug: check_topiclock called with NULL values");
-		}
+	if (!c) 
+	{
+		Alog(LOG_DEBUG) << "check_topiclock called with NULL values";
 		return 0;
 	}
 
@@ -886,8 +881,7 @@ void expire_chans()
 					continue;
 
 				char *chname = sstrdup(ci->name.c_str());
-				alog("Expiring channel %s (founder: %s)", ci->name.c_str(),
-					 (ci->founder ? ci->founder->display : "(none)"));
+				Alog() << "Expiring channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << " )";
 				delete ci;
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
 				delete [] chname;
@@ -914,17 +908,17 @@ void cs_remove_nick(const NickCore * nc)
 				if (ci->successor) {
 					NickCore *nc2 = ci->successor;
 					if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg) {
-						alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", Config.s_ChanServ, nc2->display, ci->name.c_str());
+						Alog() << Config.s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel", 
 						delete ci;
 						continue;
 					} else {
-						alog("%s: Transferring foundership of %s from deleted " "nick %s to successor %s", Config.s_ChanServ, ci->name.c_str(), nc->display, nc2->display);
+						Alog() << Config.s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
 						ci->founder = nc2;
 						ci->successor = NULL;
 						nc2->channelcount++;
 					}
 				} else {
-					alog("%s: Deleting channel %s owned by deleted nick %s", Config.s_ChanServ, ci->name.c_str(), nc->display);
+					Alog() << Config.s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
 
 					if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
 					{
@@ -970,10 +964,9 @@ ChannelInfo *cs_findchan(const std::string &chan)
 {
 	ChannelInfo *ci;
 
-	if (chan.empty()) {
-		if (debug) {
-			alog("debug: cs_findchan() called with NULL values");
-		}
+	if (chan.empty()) 
+	{
+		Alog(LOG_DEBUG) << "cs_findchan() called with NULL values";
 		return NULL;
 	}
 
@@ -1034,10 +1027,9 @@ void alpha_insert_chan(ChannelInfo * ci)
 {
 	ChannelInfo *ptr, *prev;
 
-	if (!ci) {
-		if (debug) {
-			alog("debug: alpha_insert_chan called with NULL values");
-		}
+	if (!ci)
+	{
+		Alog(LOG_DEBUG) << "alpha_insert_chan() called with NULL values";
 		return;
 	}
 
@@ -1062,10 +1054,9 @@ void reset_levels(ChannelInfo * ci)
 {
 	int i;
 
-	if (!ci) {
-		if (debug) {
-			alog("debug: reset_levels called with NULL values");
-		}
+	if (!ci)
+	{
+		Alog(LOG_DEBUG) << "reset_levels() called with NULL values";
 		return;
 	}
 

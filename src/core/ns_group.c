@@ -69,12 +69,12 @@ class CommandNSGroup : public Command
 			notice_lang(Config.s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (Config.NSRegDelay + u->lastnickreg) - time(NULL));
 		else if (u->nc && u->nc->HasFlag(NI_SUSPENDED))
 		{
-			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, target->nick);
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
-			alog("%s: %s!%s@%s tried to use GROUP from SUSPENDED nick %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, target->nick);
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))
@@ -87,7 +87,7 @@ class CommandNSGroup : public Command
 			notice_lang(Config.s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, Config.s_NickServ, Config.s_NickServ);
 		else if (enc_check_password(pass, target->nc->pass) != 1)
 		{
-			alog("%s: Failed GROUP for %s!%s@%s (invalid password)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+			Alog() << Config.s_NickServ << ": Failed GROUP for " << u->GetMask() << " (invalid password)";
 			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
 			bad_password(u);
 		}
@@ -124,7 +124,9 @@ class CommandNSGroup : public Command
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 				ircdproto->SetAutoIdentificationToken(u);
 
-				alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, u->nick.c_str(), target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " makes " << u->nick
+						<< " join group of " << target->nick << " (" << target->nc->display
+						<< ") (e-mail: " <<  (target->nc->email ? target->nc->email : "none") << ")";
 				notice_lang(Config.s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
 				u->lastnickreg = time(NULL);
@@ -133,7 +135,7 @@ class CommandNSGroup : public Command
 			}
 			else
 			{
-				alog("%s: makealias(%s) failed", Config.s_NickServ, u->nick.c_str());
+				Alog() << Config.s_NickServ << ": makealias(" << u->nick << ") failed";
 				notice_lang(Config.s_NickServ, u, NICK_GROUP_FAILED);
 			}
 		}

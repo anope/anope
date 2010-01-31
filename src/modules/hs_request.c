@@ -170,7 +170,7 @@ class CommandHSRequest : public Command
 
 			me->NoticeLang(Config.s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);
-			alog("New vHost Requested by %s", nick);
+			Alog() << "New vHost Requested by " << nick;
 		}
 		else
 			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
@@ -223,7 +223,7 @@ class CommandHSActivate : public Command
 					my_memo_lang(u, na->nick, 2, LNG_ACTIVATE_MEMO);
 
 				me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATED, nick);
-				alog("Host Request for %s activated by %s", nick, u->nick.c_str());
+				Alog() << "Host Request for " << nick << " activated by " << u->nick;
 			}
 			else
 				me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
@@ -275,7 +275,7 @@ class CommandHSReject : public Command
 			}
 
 			me->NoticeLang(Config.s_HostServ, u, LNG_REJECTED, nick);
-			alog("Host Request for %s rejected by %s (%s)", nick, u->nick.c_str(), reason ? reason : "");
+			Alog() << "Host Request for " << nick << " rejected by " << u->nick << " (" << (reason ? reason : "") << ")";
 		}
 		else
 			me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
@@ -762,7 +762,7 @@ void my_memo_lang(User *u, const char *name, int z, int number, ...)
 		delete [] buf;
 	}
 	else
-		alog("%s: INVALID language string call, language: [%d], String [%d]", me->name.c_str(), lang, number);
+		Alog() << me->name << ": INVALID language string call, language: [" << lang << "], String [" << number << "]";
 }
 
 void req_send_memos(User *u, char *vIdent, char *vHost)
@@ -819,8 +819,7 @@ void my_load_config()
 	HSRequestMemoOper = config.ReadFlag("hs_request", "memooper", "no", 0);
 	HSRequestMemoSetters = config.ReadFlag("hs_request", "memosetters", "no", 0);
 
-	if (debug)
-		alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters);
+	Alog(LOG_DEBUG) << "[hs_request] Set config vars: MemoUser=" << HSRequestMemoUser << " MemoOper=" <<  HSRequestMemoOper << " MemoSetters=" << HSRequestMemoSetters;
 }
 
 MODULE_INIT(HSRequest)

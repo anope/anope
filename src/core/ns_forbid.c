@@ -75,14 +75,14 @@ class CommandNSForbid : public Command
 			if (Config.WallForbid)
 				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick);
 
-			alog("%s: %s set FORBID for nick %s", Config.s_NickServ, u->nick.c_str(), nick);
+			Alog() << Config.s_NickServ << ": " << u->nick << " set FORBID for nick " << nick;
 			notice_lang(Config.s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
 
 			FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
 		}
 		else
 		{
-			alog("%s: Valid FORBID for %s by %s failed", Config.s_NickServ, nick, u->nick.c_str());
+			Alog() << Config.s_NickServ << ": Valid FORBID for " << nick << " by " << u->nick << " failed";
 			notice_lang(Config.s_NickServ, u, NICK_FORBID_FAILED, nick);
 		}
 		return MOD_CONT;

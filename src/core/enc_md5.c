@@ -356,8 +356,7 @@ class EMD5 : public Module
 
 		b64_encode(digest, 16, cpass, 1000);
 		buf.append(cpass);
-		if (debug > 1)
-			alog("debug: (enc_md5) hashed password %s to %s ", src.c_str(), buf.c_str());
+		Alog(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest.assign(buf);
 		return EVENT_ALLOW;
 	}

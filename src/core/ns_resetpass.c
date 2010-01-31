@@ -67,7 +67,7 @@ class CommandNSResetPass : public Command
 			na->nc->Extend("ns_resetpass_code", new ExtensibleItemPointerArray<char>(sstrdup(passcode)));
 			na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(time(NULL)));
 
-			alog("%s: %s!%s@%s used RESETPASS on %s (%s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, na->nick, na->nc->display);
+			Alog() << Config.s_NickServ <<  ": " << u->GetMask() << " used RESETPASS on " << na->nick << " (" << na->nc->display << ")";
 			notice_lang(Config.s_NickServ, u, NICK_RESETPASS_COMPLETE, na->nick);
 		}
 
@@ -144,8 +144,7 @@ class NSResetPass : public Module
 					ircdproto->SetAutoIdentificationToken(u);
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-					alog("%s: %s!%s@%s used CONFIRM with RESETPASS to forcefully identify to %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, na->nick);
-
+					Alog() << Config.s_NickServ << ": " << u->GetMask() << " used CONFIRM with RESETPASS to forcefully identify to " << na->nick;
 					notice_lang(Config.s_NickServ, u, NICK_CONFIRM_SUCCESS, Config.s_NickServ);
 
 					if (ircd->vhost)
@@ -156,7 +155,7 @@ class NSResetPass : public Module
 				}
 				else
 				{
-					alog("%s: Invalid CONFIRM passcode for %s from %s!%s@%s", Config.s_NickServ, na->nick, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+					Alog() << Config.s_NickServ << ": Invalid CONFIRM passcode for " << na->nick << " from " << u->GetMask();
 					notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
 					bad_password(u);
 				}

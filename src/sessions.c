@@ -160,12 +160,10 @@ int add_session(const char *nick, const char *host, char *hostip)
 			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill) {
 				char akillmask[BUFSIZE];
 				snprintf(akillmask, sizeof(akillmask), "*@%s", host);
-				add_akill(NULL, akillmask, Config.s_OperServ,
-						  time(NULL) + Config.SessionAutoKillExpiry,
-						  "Session limit exceeded");
+				add_akill(NULL, akillmask, Config.s_OperServ, 
+						time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
 				ircdproto->SendGlobops(findbot(Config.s_OperServ),
-								 "Added a temporary AKILL for \2%s\2 due to excessive connections",
-								 akillmask);
+						"Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
 			}
 			return 0;
 		} else {
@@ -194,31 +192,24 @@ void del_session(const char *host)
 	Session *session;
 
 	if (!Config.LimitSessions) {
-		if (debug) {
-			alog("debug: del_session called when LimitSessions is disabled");
-		}
+		Alog(LOG_DEBUG) << "del_session called when LimitSessions is disabled";
 		return;
 	}
 
 	if (!host || !*host) {
-		if (debug) {
-			alog("debug: del_session called with NULL values");
-		}
+		Alog(LOG_DEBUG) << "del_session called with NULL values";
 		return;
 	}
 
-	if (debug >= 2)
-		alog("debug: del_session() called");
+	Alog(LOG_DEBUG_2) << "del_session() called";
 
 	session = findsession(host);
 
 	if (!session) {
-		if (debug) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ),
-							 "WARNING: Tried to delete non-existant session: \2%s",
-							 host);
-			alog("session: Tried to delete non-existant session: %s",
-				 host);
+		if (debug) 
+		{
+			ircdproto->SendGlobops(findbot(Config.s_OperServ), "WARNING: Tried to delete non-existant session: \2%s", host);
+			Alog(LOG_DEBUG) << "session: Tried to delete non-existant session: " << host;
 		}
 		return;
 	}
@@ -235,16 +226,14 @@ void del_session(const char *host)
 	if (session->next)
 		session->next->prev = session->prev;
 
-	if (debug >= 2)
-		alog("debug: del_session(): free session structure");
+	Alog(LOG_DEBUG_2) << "del_session(): free session structure";
 
 	delete [] session->host;
 	delete session;
 
 	nsessions--;
 
-	if (debug >= 2)
-		alog("debug: del_session() done");
+	Alog(LOG_DEBUG_2) << "del_session() done";
 }
 
 

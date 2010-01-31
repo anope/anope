@@ -83,7 +83,7 @@ private:
 		buf = param.c_str(); /* conversion from ci::string to std::string */
 		if (enc_encrypt(buf, nc->pass))
 		{
-			alog("%s: Failed to encrypt password for %s (set)", Config.s_NickServ, nc->display);
+			Alog() << Config.s_NickServ << ": Failed to encrypt password for " << nc->display << " (set)";
 			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_FAILED, nc->display);
 			return MOD_CONT;
 		}
@@ -93,7 +93,7 @@ private:
 		else
 			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
 
-		alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SASET PASSWORD on " << nc->display << " (e-mail: "<< (nc->email ? nc->email : "none")  << ")";
 		if (Config.WallSetpass)
 			ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display);
 		return MOD_CONT;
@@ -139,7 +139,7 @@ private:
 			return MOD_CONT;
 		}
 
-		alog("%s: %s!%s@%s used SASET EMAIL on %s (e-mail: %s)", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nc->display, nc->email ? nc->email : "none");
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SASET EMAIL on " << nc->display << " (e-mail: " << (nc->email ? nc->email : "none") << ")";
 
 		if (nc->email)
 			delete [] nc->email;

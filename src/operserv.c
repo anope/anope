@@ -128,7 +128,7 @@ void operserv(User * u, char *buf)
 	const char *cmd;
 	const char *s;
 
-	alog("%s: %s: %s", Config.s_OperServ, u->nick.c_str(), buf);
+	Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  buf;
 
 	cmd = strtok(buf, " ");
 	if (!cmd) {

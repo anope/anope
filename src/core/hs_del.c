@@ -33,7 +33,7 @@ class CommandHSDel : public Command
 				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
 				return MOD_CONT;
 			}
-			alog("vHost for user \002%s\002 deleted by oper \002%s\002", nick, u->nick.c_str());
+			Alog() << "vHost for user \002" << nick << "\002 deleted by oper \002" << u->nick << "\002";
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->hostinfo.RemoveVhost();
 			notice_lang(Config.s_HostServ, u, HOST_DEL, nick);

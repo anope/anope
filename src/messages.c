@@ -118,7 +118,7 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 	u = finduser(source);
 
 	if (!u) {
-		alog("%s: user record for %s not found", msg, source);
+		Alog() << msg << ": user record for " << source << " not found";
 		/* Two lookups naughty, however, this won't happen often. -- w00t */
 		if (findbot(receiver))
 		{
@@ -140,7 +140,7 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 			IgnoreData *ign = get_ignore(source);
 			if (ign) {
 				target = myStrGetToken(msg, ' ', 0);
-				alog("Ignored message from %s to %s using command %s", source, receiver.c_str(), target);
+				Alog() << "Ignored message from " << source << " to " << receiver << " using command " << target;
 				delete [] target;
 				return MOD_CONT;
 			}
@@ -158,9 +158,7 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 				return MOD_CONT;
 		}
 		else if (Config.UseStrictPrivMsg) {
-			if (debug) {
-				alog("Ignored PRIVMSG without @ from %s", source);
-			}
+			Alog(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
 			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(),
 						Config.ServerName, receiver.c_str());
 			return MOD_CONT;

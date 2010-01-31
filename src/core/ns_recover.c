@@ -61,7 +61,7 @@ class CommandNSRecover : public Command
 				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					alog("%s: RECOVER: invalid password for %s by %s!%s@%s", Config.s_NickServ, nick, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+					Alog() << Config.s_NickServ << ": RECOVER: invalid password for " << nick << " by " << u->GetMask();
 					bad_password(u);
 				}
 			}

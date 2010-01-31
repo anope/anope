@@ -297,8 +297,7 @@ class ESHA256 : public Module
 
 		b64_encode(digest, SHA256_DIGEST_SIZE, cpass, 1000);
 		buf << "sha256:" << cpass << ":" << GetSaltString();
-		if (debug > 1)
-			alog("debug: (enc_sha256) hashed password from [%s] to [%s]", src.c_str(), buf.str().c_str());
+		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest.assign(buf.str());
 		return EVENT_ALLOW;
 		

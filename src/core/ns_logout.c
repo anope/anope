@@ -49,7 +49,7 @@ class CommandNSLogout : public Command
 			}
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
-			alog("%s: %s!%s@%s logged out nickname %s", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, u2->nick.c_str());
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out nickname " << u2->nick;
 
 			/* Remove founder status from this user in all channels */
 			if (nick)

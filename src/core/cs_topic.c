@@ -55,7 +55,7 @@ class CommandCSTopic : public Command
 				c->topic_time = ci->last_topic_time;
 
 			if (!check_access(u, ci, CA_TOPIC))
-				alog("%s: %s!%s@%s changed topic of %s as services admin.", Config.s_ChanServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, c->name.c_str());
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
 			if (ircd->join2set && whosends(ci) == findbot(Config.s_ChanServ))
 			{
 				ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name.c_str(), c->creation_time);

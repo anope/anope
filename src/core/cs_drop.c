@@ -70,9 +70,8 @@ class CommandCSDrop : public Command
 			ircdproto->SendSQLineDel(ci->name.c_str());
 		}
 
-		alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",
-			 Config.s_ChanServ, ci->name.c_str(), u->nick.c_str(), u->GetIdent().c_str(),
-			 u->host, (ci->founder ? ci->founder->display : "(none)"));
+		Alog() << Config.s_ChanServ << ": Channel " << ci->name << " dropped by " << u->GetMask() << " (founder: "
+			<< (ci->founder ? ci->founder->display : "(none)") << ")";
 
 		delete ci;
 

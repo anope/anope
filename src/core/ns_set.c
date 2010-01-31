@@ -80,7 +80,7 @@ class CommandNSSet : public Command
 		buf = param.c_str(); /* conversion from ci::string to std::string */
 		if (enc_encrypt(buf, nc->pass) < 0)
 		{
-			alog("%s: Failed to encrypt password for %s (set)", Config.s_NickServ, nc->display);
+			Alog() << Config.s_NickServ << ": Failed to encrypt password for " << nc->display << " (set)";
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
@@ -90,7 +90,7 @@ class CommandNSSet : public Command
 		else
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
 
-		alog("%s: %s!%s@%s (e-mail: %s) changed its password.", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nc->email ? nc->email : "none");
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (nc->email ? nc->email : "none") << ") changed its password.";
 
 		return MOD_CONT;
 	}
@@ -158,7 +158,7 @@ class CommandNSSet : public Command
 			return MOD_CONT;
 		}
 
-		alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.", Config.s_NickServ, u->nick.c_str(), u->GetIdent().c_str(), u->host, nc->email ? nc->email : "none", param ? param : "none");
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (nc->email ? nc->email : "none")  << ") changed its e-mail to " << (param ? param : "none");
 
 		if (nc->email)
 			delete [] nc->email;

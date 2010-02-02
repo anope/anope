@@ -1478,31 +1478,28 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	{
 		if (owner && check_access(user, ci, CA_AUTOOWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);
-
-		if (admin && check_access(user, ci, CA_AUTOPROTECT))
+		else if (admin && check_access(user, ci, CA_AUTOPROTECT))
 			c->SetMode(NULL, CMODE_PROTECT, user->nick);
 
 		if (op && check_access(user, ci, CA_AUTOOP))
 			c->SetMode(NULL, CMODE_OP, user->nick);
-
-		if (halfop && check_access(user, ci, CA_AUTOHALFOP))
+		else if (halfop && check_access(user, ci, CA_AUTOHALFOP))
 			c->SetMode(NULL, CMODE_HALFOP, user->nick);
-
-		if (voice && check_access(user, ci, CA_AUTOVOICE))
+		else if (voice && check_access(user, ci, CA_AUTOVOICE))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP)) && !is_ulined(user->server->name))
 	{
-		if (owner && !IsFounder(user, ci))
+		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !IsFounder(user, ci))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
 
-		if (admin && !check_access(user, ci, CA_AUTOPROTECT) && !check_access(user, ci, CA_PROTECTME))
+		if (admin && c->HasUserStatus(user, CMODE_PROTECT) && !check_access(user, ci, CA_AUTOPROTECT) && !check_access(user, ci, CA_PROTECTME))
 			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && !check_access(user, ci, CA_AUTOOP) && !check_access(user, ci, CA_OPDEOPME))
+		if (op && c->HasUserStatus(user, CMODE_OP) && !check_access(user, ci, CA_AUTOOP) && !check_access(user, ci, CA_OPDEOPME))
 			c->RemoveMode(NULL, CMODE_OP, user->nick);
 
-		if (halfop && !check_access(user, ci, CA_AUTOHALFOP) && !check_access(user, ci, CA_HALFOPME))
+		if (halfop && c->HasUserStatus(user, CMODE_HALFOP) && !check_access(user, ci, CA_AUTOHALFOP) && !check_access(user, ci, CA_HALFOPME))
 			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 	}
 }

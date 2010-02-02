@@ -644,8 +644,10 @@ void bot_join(ChannelInfo * ci)
 				 ci->bi->nick.c_str(), ci->bi->nick.c_str());
 	}
 	ircdproto->SendJoin(ci->bi, ci->c->name.c_str(), ci->c->creation_time);
-	ci->c->SetMode(NULL, CMODE_PROTECT, ci->bi->nick);
-	ci->c->SetMode(NULL, CMODE_OP, ci->bi->nick);
+	for (std::list<ChannelModeStatus *>::iterator it = BotModes.begin(); it != BotModes.end(); ++it)
+	{
+		ci->c->SetMode(ci->bi, *it, ci->bi->nick, false);
+	}
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(ci, ci->bi));
 }
 

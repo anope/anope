@@ -481,6 +481,8 @@ class ServerConfig
 		unsigned NewsCount;
 		/* Default mlock modes */
 		std::string MLock;
+		/* Default botmodes on channels, defaults to ao */
+		std::string BotModes;
 
 		/* Services can use email */
 		bool UseMail;

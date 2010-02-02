@@ -15,6 +15,7 @@
 /* List of pairs of user/channels and their stacker info */
 std::list<std::pair<void *, StackerInfo *> > ModeManager::StackerObjects;
 
+/* User modes */
 std::map<char, UserMode *> ModeManager::UserModesByChar;
 std::map<UserModeName, UserMode *> ModeManager::UserModesByName;
 /* Channel modes */
@@ -31,6 +32,8 @@ std::bitset<128> DefMLockOn;
 std::bitset<128> DefMLockOff;
 /* Map for default mlocked mode parameters */
 std::map<ChannelModeName, std::string> DefMLockParams;
+/* Modes to set on bots when they join the channel */
+std::list<ChannelModeStatus *> BotModes;
 
 /** Parse the mode string from the config file and set the default mlocked modes
  */
@@ -75,6 +78,18 @@ void SetDefaultMLock()
 					}
 				}
 			}
+		}
+	}
+
+	/* Set Bot Modes */
+	BotModes.clear();
+	for (unsigned i = 0; i < Config.BotModes.size(); ++i)
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByChar(Config.BotModes[i]);
+
+		if (cm && cm->Type == MODE_STATUS && std::find(BotModes.begin(), BotModes.end(), cm) == BotModes.end())
+		{
+			BotModes.push_back(dynamic_cast<ChannelModeStatus *>(cm));
 		}
 	}
 }

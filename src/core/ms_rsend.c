@@ -32,7 +32,7 @@ class CommandMSRSend : public Command
 		/* prevent user from rsend to themselves */
 		if ((na = findnick(nick)))
 		{
-			if (na->nc == u->nc)
+			if (na->nc == u->Account())
 			{
 				notice_lang(Config.s_MemoServ, u, MEMO_NO_RSEND_SELF);
 				return MOD_CONT;
@@ -47,7 +47,7 @@ class CommandMSRSend : public Command
 		if (Config.MSMemoReceipt == 1)
 		{
 			/* Services opers and above can use rsend */
-			if (u->nc->IsServicesOper())
+			if (u->Account()->IsServicesOper())
 				memo_send(u, nick, text, z);
 			else
 				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);

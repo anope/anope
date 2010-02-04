@@ -60,7 +60,7 @@ class CommandNSConfirm : public Command
 
 		if (!force)
 		{
-			u->nc = na->nc;
+			u->Login(na->nc);
 			Alog() << Config.s_NickServ << ": '" << u->nick << "' registered by " << u->GetIdent() << "@" << u->host << " (e-mail: " << (nr->email ? nr->email : "none") << ")";
 			if (Config.NSAddAccessOnReg)
 				notice_lang(Config.s_NickServ, u, NICK_REGISTERED, u->nick.c_str(), na->nc->GetAccess(0).c_str());
@@ -68,7 +68,7 @@ class CommandNSConfirm : public Command
 				notice_lang(Config.s_NickServ, u, NICK_REGISTERED_NO_MASK, u->nick.c_str());
 			delete nr;
 
-			ircdproto->SendAccountLogin(u, u->nc);
+			ircdproto->SendAccountLogin(u, u->Account());
 			ircdproto->SetAutoIdentificationToken(u);
 
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
@@ -109,7 +109,7 @@ class CommandNSConfirm : public Command
 
 			if (!nr)
 			{
-				if (u->nc && u->nc->HasPriv("nickserv/confirm"))
+				if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
 				{
 					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
 					   of the user they are trying to validate, and push that user through regardless of passcode */
@@ -156,7 +156,7 @@ class CommandNSConfirm : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_CONFIRM);
-		if (u->nc && u->nc->HasPriv("nickserv/confirm"))
+		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
 			notice_help(Config.s_NickServ, u, NICK_HELP_CONFIRM_OPER);
 		return true;
 	}

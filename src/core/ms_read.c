@@ -52,7 +52,7 @@ class CommandMSRead : public Command
 		}
 		else
 		{
-			mi = &u->nc->memos;
+			mi = &u->Account()->memos;
 		}
 		num = !numstr.empty() ? atoi(numstr.c_str()) : -1;
 		if (numstr.empty() || (numstr != "LAST" && numstr != "NEW" && num <= 0))

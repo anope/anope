@@ -37,7 +37,7 @@ class CommandBSKick : public Command
 			syntax_error(Config.s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (value != "ON" && value != "OFF")
 			syntax_error(Config.s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
-		else if (!check_access(u, ci, CA_SET) && !u->nc->HasPriv("botserv/administration"))
+		else if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)
 			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);

@@ -60,7 +60,7 @@ class CommandNSGhost : public Command
 		}
 		else
 		{
-			if (u->nc == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
+			if (u->Account() == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
 				std::string buf = "GHOST command used by " + u->nick;
 				kill_user(Config.s_NickServ, nick, buf.c_str());

@@ -36,7 +36,7 @@ class CommandCSSet : public Command
 		}
 
 		nc = na->nc;
-		if (Config.CSMaxReg && nc->channelcount >= Config.CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
+		if (Config.CSMaxReg && nc->channelcount >= Config.CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, param.c_str());
 			return MOD_CONT;
@@ -605,7 +605,7 @@ class CommandCSSet : public Command
 
 	CommandReturn DoSetNoExpire(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		if (!u->nc->HasCommand("chanserv/set/noexpire"))
+		if (!u->Account()->HasCommand("chanserv/set/noexpire"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -637,7 +637,7 @@ class CommandCSSet : public Command
 		ci::string cmd = params[1];
 		ci::string param = params.size() > 2 ? params[2] : "";
 		ChannelInfo *ci = cs_findchan(chan);
-		bool is_servadmin = u->nc->HasPriv("chanserv/set");
+		bool is_servadmin = u->Account()->HasPriv("chanserv/set");
 
 		if (readonly) {
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_DISABLED);
@@ -726,7 +726,7 @@ class CommandCSSet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET);
-			if (u->nc && u->nc->IsServicesOper())
+			if (u->Account() && u->Account()->IsServicesOper())
 				notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_SET);
 		}
 		else if (subcommand == "FOUNDER")

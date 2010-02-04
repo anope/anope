@@ -43,7 +43,7 @@ class CommandNSList : public Command
 		NickCore *mync;
 		unsigned nnicks, i;
 		char buf[BUFSIZE];
-		bool is_servadmin = u->nc->IsServicesOper();
+		bool is_servadmin = u->Account()->IsServicesOper();
 		NickRequest *nr = NULL;
 		char noexpire_char = ' ';
 		int count = 0, from = 0, to = 0, tofree = 0;
@@ -119,7 +119,7 @@ class CommandNSList : public Command
 			}
 		}
 
-		mync = u->nc;
+		mync = u->Account();
 
 		notice_lang(Config.s_NickServ, u, NICK_LIST_HEADER, pattern);
 		if (!unconfirmed)
@@ -195,7 +195,7 @@ class CommandNSList : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_LIST);
 		else
 			notice_help(Config.s_NickServ, u, NICK_HELP_LIST);
@@ -205,7 +205,7 @@ class CommandNSList : public Command
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		if (u->nc->IsServicesOper())
+		if (u->Account()->IsServicesOper())
 			syntax_error(Config.s_NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
 		else
 			syntax_error(Config.s_NickServ, u, "LIST", NICK_LIST_SYNTAX);

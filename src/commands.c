@@ -68,7 +68,7 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED))
 	{
 		// Command requires registered users only
-		if (!nick_identified(u))
+		if (!u->IsIdentified())
 		{
 			notice_lang(service, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
 			Alog() << "Access denied for unregistered user " << u->nick << " with service " << service << " and command " << cmd;
@@ -150,7 +150,7 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty())
 	{
-		if (!u->nc->HasCommand(c->permission))
+		if (!u->Account()->HasCommand(c->permission))
 		{
 			notice_lang(service, u, ACCESS_DENIED);
 			Alog() << "Access denied for user " << u->nick << " with service " << service << " and command " << cmd;
@@ -198,10 +198,10 @@ void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[], const char 
 			notice_lang(service, u, COMMAND_REQUIRES_PERM, c->permission.c_str());
 
 		/* User isn't identified and needs to be to use this command */
-		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !nick_identified(u))
+		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 			notice_lang(service, u, COMMAND_IDENTIFY_REQUIRED);
 		/* User doesn't have the proper permission to use this command */
-		else if (!c->permission.empty() && (!u->nc || (!u->nc->HasCommand(c->permission))))
+		else if (!c->permission.empty() && (!u->Account() || (!u->Account()->HasCommand(c->permission))))
 			notice_lang(service, u, COMMAND_CANNOT_USE);
 		/* User can use this command */
 		else

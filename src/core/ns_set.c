@@ -463,34 +463,34 @@ class CommandNSSet : public Command
 		if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 */
-		if (u->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
+		if (u->Account()->HasFlag(NI_SUSPENDED))
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display);
 		else if (cmd == "DISPLAY")
-			return this->DoSetDisplay(u, params, u->nc);
+			return this->DoSetDisplay(u, params, u->Account());
 		else if (cmd == "PASSWORD")
-			return this->DoSetPassword(u, params, u->nc);
+			return this->DoSetPassword(u, params, u->Account());
 		else if (cmd == "LANGUAGE")
-			return this->DoSetLanguage(u, params, u->nc);
+			return this->DoSetLanguage(u, params, u->Account());
 		else if (cmd == "URL")
-			return this->DoSetUrl(u, params, u->nc);
+			return this->DoSetUrl(u, params, u->Account());
 		else if (cmd == "EMAIL")
-			return this->DoSetEmail(u, params, u->nc);
+			return this->DoSetEmail(u, params, u->Account());
 		else if (cmd == "ICQ")
-			return this->DoSetICQ(u, params, u->nc);
+			return this->DoSetICQ(u, params, u->Account());
 		else if (cmd == "GREET")
-			return this->DoSetGreet(u, params, u->nc);
+			return this->DoSetGreet(u, params, u->Account());
 		else if (cmd == "KILL")
-			return this->DoSetKill(u, params, u->nc);
+			return this->DoSetKill(u, params, u->Account());
 		else if (cmd == "SECURE")
-			return this->DoSetSecure(u, params, u->nc);
+			return this->DoSetSecure(u, params, u->Account());
 		else if (cmd == "PRIVATE")
-			return this->DoSetPrivate(u, params, u->nc);
+			return this->DoSetPrivate(u, params, u->Account());
 		else if (cmd == "MSG")
-			return this->DoSetMsg(u, params, u->nc);
+			return this->DoSetMsg(u, params, u->Account());
 		else if (cmd == "HIDE")
-			return this->DoSetHide(u, params, u->nc);
+			return this->DoSetHide(u, params, u->Account());
 		else if (cmd == "AUTOOP")
-			return this->DoSetAutoOP(u, params, u->nc);
+			return this->DoSetAutoOP(u, params, u->Account());
 		else
 			notice_lang(Config.s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd.c_str());
 		return MOD_CONT;

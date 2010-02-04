@@ -37,19 +37,19 @@ class CommandCSDrop : public Command
 
 		ci = cs_findchan(chan);
 
-		if ((ci->HasFlag(CI_FORBIDDEN)) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_FORBIDDEN)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if ((ci->HasFlag(CI_SUSPENDED)) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SUSPENDED)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)) && !u->nc->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -92,7 +92,7 @@ class CommandCSDrop : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_DROP);
 		else
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_DROP);

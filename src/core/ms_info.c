@@ -30,7 +30,7 @@ class CommandMSInfo : public Command
 		const char *name = params.size() ? params[0].c_str() : NULL;
 		int hardmax = 0;
 
-		if (name && *name != '#' && u->nc->HasPriv("memoserv/info"))
+		if (name && *name != '#' && u->Account()->HasPriv("memoserv/info"))
 		{
 			na = findnick(name);
 			if (!na)
@@ -68,11 +68,11 @@ class CommandMSInfo : public Command
 		}
 		else
 		{
-			mi = &u->nc->memos;
-			hardmax = u->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
+			mi = &u->Account()->memos;
+			hardmax = u->Account()->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}
 
-		if (name && (ci || na->nc != u->nc))
+		if (name && (ci || na->nc != u->Account()))
 		{
 			if (mi->memos.empty())
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
@@ -131,7 +131,7 @@ class CommandMSInfo : public Command
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name);
 			}
 		}
-		else /* !name || (!ci || na->nc == u->nc) */
+		else /* !name || (!ci || na->nc == u->Account()) */
 		{
 			if (mi->memos.empty())
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NO_MEMOS);
@@ -162,14 +162,14 @@ class CommandMSInfo : public Command
 
 			if (!mi->memomax)
 			{
-				if (!u->nc->IsServicesOper() && hardmax)
+				if (!u->Account()->IsServicesOper() && hardmax)
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_HARD_LIMIT_ZERO);
 				else
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_LIMIT_ZERO);
 			}
 			else if (mi->memomax > 0)
 			{
-				if (!u->nc->IsServicesOper() && hardmax)
+				if (!u->Account()->IsServicesOper() && hardmax)
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_HARD_LIMIT, mi->memomax);
 				else
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_LIMIT, mi->memomax);
@@ -178,11 +178,11 @@ class CommandMSInfo : public Command
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NO_LIMIT);
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
-			if (u->nc->HasFlag(NI_MEMO_RECEIVE) && u->nc->HasFlag(NI_MEMO_SIGNON))
+			if (u->Account()->HasFlag(NI_MEMO_RECEIVE) && u->Account()->HasFlag(NI_MEMO_SIGNON))
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_ON);
-			else if (u->nc->HasFlag(NI_MEMO_RECEIVE))
+			else if (u->Account()->HasFlag(NI_MEMO_RECEIVE))
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_RECEIVE);
-			else if (u->nc->HasFlag(NI_MEMO_SIGNON))
+			else if (u->Account()->HasFlag(NI_MEMO_SIGNON))
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_SIGNON);
 			else
 				notice_lang(Config.s_MemoServ, u, MEMO_INFO_NOTIFY_OFF);
@@ -192,7 +192,7 @@ class CommandMSInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_MemoServ, u, MEMO_SERVADMIN_HELP_INFO);
 		else
 			notice_help(Config.s_MemoServ, u, MEMO_HELP_INFO);

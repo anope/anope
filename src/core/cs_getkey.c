@@ -30,7 +30,7 @@ class CommandCSGetKey : public Command
 
 		ci = cs_findchan(chan);
 
-		if (!check_access(u, ci, CA_GETKEY) && !u->nc->HasCommand("chanserv/getkey"))
+		if (!check_access(u, ci, CA_GETKEY) && !u->Account()->HasCommand("chanserv/getkey"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;

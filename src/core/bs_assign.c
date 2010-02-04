@@ -43,13 +43,13 @@ class CommandBSAssign : public Command
 
 		ci = cs_findchan(chan);
 
-		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->nc->HasPriv("botserv/administration")))
+		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->Account()->HasPriv("botserv/administration")))
 		{
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
-		if (bi->HasFlag(BI_PRIVATE) && !u->nc->HasCommand("botserv/assign/private"))
+		if (bi->HasFlag(BI_PRIVATE) && !u->Account()->HasCommand("botserv/assign/private"))
 		{
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;

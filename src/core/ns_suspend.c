@@ -72,7 +72,7 @@ class CommandNSSuspend : public Command
 					na2->last_quit = sstrdup(reason);
 					/* removes nicktracking */
 					if ((u2 = finduser(na2->nick)))
-						u2->nc = NULL;
+						u2->Logout();
 					/* force guestnick */
 					collide(na2, 0);
 				}

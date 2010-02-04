@@ -351,13 +351,13 @@ class InspIRCdProto : public IRCDProto
 	{
 		char svidbuf[15];
 
-		if (!u->nc)
+		if (!u->Account())
 			return;
 
 		snprintf(svidbuf, sizeof(svidbuf), "%ld", static_cast<long>(u->timestamp));
 
-		u->nc->Shrink("authenticationtoken");
-		u->nc->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
+		u->Account()->Shrink("authenticationtoken");
+		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 	}
 
 } ircd_proto;

@@ -520,7 +520,7 @@ int check_should_op(User * user, char *chan)
 	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
-	if ((ci->HasFlag(CI_SECURE)) && !nick_identified(user))
+	if ((ci->HasFlag(CI_SECURE)) && !user->IsIdentified())
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOOP))
@@ -544,7 +544,7 @@ int check_should_voice(User * user, char *chan)
 	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
 		return 0;
 
-	if ((ci->HasFlag(CI_SECURE)) && !nick_identified(user))
+	if ((ci->HasFlag(CI_SECURE)) && !user->IsIdentified())
 		return 0;
 
 	if (check_access(user, ci, CA_AUTOVOICE))
@@ -648,8 +648,8 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 	}
 
-	if (user->nc || user->IsRecognized())
-		nc = user->nc;
+	if (user->Account() || user->IsRecognized())
+		nc = user->Account();
 	else
 		nc = NULL;
 
@@ -1084,8 +1084,8 @@ bool IsFounder(User *user, ChannelInfo *ci)
 	if (IsRealFounder(user, ci))
 		return true;
 
-	if (user->nc)
-		access = ci->GetAccess(user->nc);
+	if (user->Account())
+		access = ci->GetAccess(user->Account());
 	else
 	{
 		NickAlias *na = findnick(user->nick);
@@ -1094,7 +1094,7 @@ bool IsFounder(User *user, ChannelInfo *ci)
 	}
 
 	/* If they're QOP+ and theyre identified or theyre recognized and the channel isn't secure */
-	if (access && access->level >= ACCESS_QOP && (user->nc || (user->IsRecognized() && !(ci->HasFlag(CI_SECURE)))))
+	if (access && access->level >= ACCESS_QOP && (user->Account() || (user->IsRecognized() && !(ci->HasFlag(CI_SECURE)))))
 		return true;
 
 	return false;
@@ -1113,7 +1113,7 @@ bool IsRealFounder(User *user, ChannelInfo *ci)
 	if (user->isSuperAdmin)
 		return true;
 
-	if (user->nc && user->nc == ci->founder)
+	if (user->Account() && user->Account() == ci->founder)
 		return true;
 
 	return false;
@@ -1141,9 +1141,9 @@ int get_access(User *user, ChannelInfo *ci)
 	if (IsFounder(user, ci))
 		return ACCESS_FOUNDER;
 
-	if (nick_identified(user))
+	if (user->IsIdentified())
 	{
-		access = ci->GetAccess(user->nc);
+		access = ci->GetAccess(user->Account());
 		if (access)
 			return access->level;
 	}
@@ -1165,12 +1165,12 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 {
 	ChanAccess *access;
 
-	if (!ci || !user || !user->nc)
+	if (!ci || !user || !user->Account())
 		return;
 
-	if (IsFounder(user, ci) || nick_identified(user)
+	if (IsFounder(user, ci) || user->IsIdentified()
 		|| (user->IsRecognized() && !ci->HasFlag(CI_SECURE)))
-		if ((access = ci->GetAccess(user->nc)))
+		if ((access = ci->GetAccess(user->Account())))
 			access->last_seen = time(NULL);
 }
 

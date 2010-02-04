@@ -36,7 +36,7 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		}
 
-		if (u->nc->HasCommand("botserv/set/private") && option == "PRIVATE")
+		if (u->Account()->HasCommand("botserv/set/private") && option == "PRIVATE")
 		{
 			BotInfo *bi;
 
@@ -63,7 +63,7 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		} else if (!(ci = cs_findchan(chan)))
 			notice_lang(Config.s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-		else if (!u->nc->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
+		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 		else {
 			if (option == "DONTKICKOPS") {
@@ -114,7 +114,7 @@ class CommandBSSet : public Command
 					syntax_error(Config.s_BotServ, u, "SET GREET",
 								 BOT_SET_GREET_SYNTAX);
 				}
-			} else if (u->nc->HasCommand("botserv/set/nobot") && option == "NOBOT") {
+			} else if (u->Account()->HasCommand("botserv/set/nobot") && option == "NOBOT") {
 				if (value == "ON") {
 					ci->botflags.SetFlag(BS_NOBOT);
 					if (ci->bi)
@@ -150,7 +150,7 @@ class CommandBSSet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_BotServ, u, BOT_HELP_SET);
-			if (u->nc && u->nc->IsServicesOper())
+			if (u->Account() && u->Account()->IsServicesOper())
 				notice_help(Config.s_BotServ, u, BOT_SERVADMIN_HELP_SET);
 		}
 		else if (subcommand == "DONTKICKOPS")

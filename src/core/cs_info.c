@@ -44,7 +44,7 @@ class CommandCSInfo : public Command
 		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;
-		bool has_auspex = u->nc && u->nc->HasPriv("chanserv/auspex");
+		bool has_auspex = u->Account() && u->Account()->HasPriv("chanserv/auspex");
 		int show_all = 0;
 		time_t expt;
 		ChannelMode *cm;
@@ -104,21 +104,21 @@ class CommandCSInfo : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_INFO_BANTYPE, ci->bantype);
 			std::string optbuf;
 
-			CheckOptStr(optbuf, CI_KEEPTOPIC, getstring(u,  CHAN_INFO_OPT_KEEPTOPIC), ci, u->nc);
-			CheckOptStr(optbuf, CI_OPNOTICE, getstring(u,  CHAN_INFO_OPT_OPNOTICE),	ci, u->nc);
-			CheckOptStr(optbuf, CI_PEACE, getstring(u,  CHAN_INFO_OPT_PEACE), ci, u->nc);
-			CheckOptStr(optbuf, CI_PRIVATE,	getstring(u,  CHAN_INFO_OPT_PRIVATE), ci, u->nc);
-			CheckOptStr(optbuf, CI_RESTRICTED, getstring(u,  CHAN_INFO_OPT_RESTRICTED), ci, u->nc);
-			CheckOptStr(optbuf, CI_SECURE, getstring(u,  CHAN_INFO_OPT_SECURE), ci, u->nc);
-			CheckOptStr(optbuf, CI_SECUREFOUNDER, getstring(u,  CHAN_INFO_OPT_SECUREFOUNDER), ci, u->nc);
-			CheckOptStr(optbuf, CI_SECUREOPS, getstring(u,  CHAN_INFO_OPT_SECUREOPS), ci, u->nc);
+			CheckOptStr(optbuf, CI_KEEPTOPIC, getstring(u,  CHAN_INFO_OPT_KEEPTOPIC), ci, u->Account());
+			CheckOptStr(optbuf, CI_OPNOTICE, getstring(u,  CHAN_INFO_OPT_OPNOTICE),	ci, u->Account());
+			CheckOptStr(optbuf, CI_PEACE, getstring(u,  CHAN_INFO_OPT_PEACE), ci, u->Account());
+			CheckOptStr(optbuf, CI_PRIVATE,	getstring(u,  CHAN_INFO_OPT_PRIVATE), ci, u->Account());
+			CheckOptStr(optbuf, CI_RESTRICTED, getstring(u,  CHAN_INFO_OPT_RESTRICTED), ci, u->Account());
+			CheckOptStr(optbuf, CI_SECURE, getstring(u,  CHAN_INFO_OPT_SECURE), ci, u->Account());
+			CheckOptStr(optbuf, CI_SECUREFOUNDER, getstring(u,  CHAN_INFO_OPT_SECUREFOUNDER), ci, u->Account());
+			CheckOptStr(optbuf, CI_SECUREOPS, getstring(u,  CHAN_INFO_OPT_SECUREOPS), ci, u->Account());
 			if (ci->HasFlag(CI_SIGNKICK))
-				CheckOptStr(optbuf, CI_SIGNKICK, getstring(u,  CHAN_INFO_OPT_SIGNKICK), ci, u->nc);
+				CheckOptStr(optbuf, CI_SIGNKICK, getstring(u,  CHAN_INFO_OPT_SIGNKICK), ci, u->Account());
 			else
-				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, getstring(u,  CHAN_INFO_OPT_SIGNKICK), ci, u->nc);
-			CheckOptStr(optbuf, CI_TOPICLOCK, getstring(u,	CHAN_INFO_OPT_TOPICLOCK), ci, u->nc);
-			CheckOptStr(optbuf, CI_XOP, getstring(u,  CHAN_INFO_OPT_XOP), ci, u->nc);
-			CheckOptStr(optbuf, CI_PERSIST, getstring(u, CHAN_INFO_OPT_PERSIST), ci, u->nc);
+				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, getstring(u,  CHAN_INFO_OPT_SIGNKICK), ci, u->Account());
+			CheckOptStr(optbuf, CI_TOPICLOCK, getstring(u,	CHAN_INFO_OPT_TOPICLOCK), ci, u->Account());
+			CheckOptStr(optbuf, CI_XOP, getstring(u,  CHAN_INFO_OPT_XOP), ci, u->Account());
+			CheckOptStr(optbuf, CI_PERSIST, getstring(u, CHAN_INFO_OPT_PERSIST), ci, u->Account());
 
 			notice_lang(Config.s_ChanServ, u, CHAN_INFO_OPTIONS,	optbuf.empty() ? getstring(u, CHAN_INFO_OPT_NONE) : optbuf.c_str());
 			notice_lang(Config.s_ChanServ, u, CHAN_INFO_MODE_LOCK,	get_mlock_modes(ci, 1));
@@ -152,7 +152,7 @@ class CommandCSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_INFO);
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_lang(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
 
 		return true;

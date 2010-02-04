@@ -166,7 +166,7 @@ void Channel::JoinUser(User *user)
 	if (Config.s_BotServ && this->ci && this->ci->bi)
 	{
 		if (this->users.size() >= Config.BSMinUsers && (this->ci->botflags.HasFlag(BS_GREET))
-		&& user->nc && user->nc->greet && check_access(user, this->ci, CA_GREET))
+		&& user->Account() && user->Account()->greet && check_access(user, this->ci, CA_GREET))
 		{
 			/* Only display the greet if the main uplink we're connected
 			 * to has synced, or we'll get greet-floods when the net
@@ -174,7 +174,7 @@ void Channel::JoinUser(User *user)
 			 */
 			if (is_sync(user->server))
 			{
-				ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->nc->display, user->nc->greet);
+				ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->Account()->display, user->Account()->greet);
 				this->ci->bi->lastmsg = time(NULL);
 			}
 		}
@@ -1138,7 +1138,7 @@ User *nc_on_chan(Channel * c, NickCore * nc)
 	{
 		UserContainer *uc = *it;
 
-		if (uc->user->nc == nc)
+		if (uc->user->Account() == nc)
 			return uc->user;
 	}
 	return NULL;
@@ -1474,7 +1474,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 
 	Alog(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
-	if (give_modes && !get_ignore(user->nick.c_str()) && (!user->nc || !user->nc->HasFlag(NI_AUTOOP)))
+	if (give_modes && !get_ignore(user->nick.c_str()) && (!user->Account() || !user->Account()->HasFlag(NI_AUTOOP)))
 	{
 		if (owner && check_access(user, ci, CA_AUTOOWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);

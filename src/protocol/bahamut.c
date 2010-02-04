@@ -325,14 +325,14 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		char svidbuf[15];
 
-		if (!u->nc)
+		if (!u->Account())
 			return;
 
 		srand(time(NULL));
 		snprintf(svidbuf, sizeof(svidbuf), "%d", rand());
 
-		u->nc->Shrink("authenticationtoken");
-		u->nc->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
+		u->Account()->Shrink("authenticationtoken");
+		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 
 		BotInfo *bi = findbot(Config.s_NickServ);
 		u->SetMode(bi, UMODE_REGISTERED);

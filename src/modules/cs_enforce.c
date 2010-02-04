@@ -135,7 +135,7 @@ class CommandCSEnforce : public Command
 		{
 			UserContainer *uc = *it++;
 			
-			if (!nick_identified(uc->user))
+			if (!uc->user->IsIdentified())
 			{
 				get_idealban(ci, uc->user, mask, sizeof(mask));
 				reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);

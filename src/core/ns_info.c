@@ -56,11 +56,11 @@ class CommandNSInfo : public Command
 			if ((nr = findrequestnick(nick)))
 			{
 				notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
-				if (!param.empty() && param == "ALL" && u->nc && u->nc->IsServicesOper())
+				if (!param.empty() && param == "ALL" && u->Account() && u->Account()->IsServicesOper())
 					notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, nr->email);
 				else
 				{
-					if (u->nc && u->nc->IsServicesOper())
+					if (u->Account() && u->Account()->IsServicesOper())
 						notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, nr->nick);
 				}
 			}
@@ -86,12 +86,12 @@ class CommandNSInfo : public Command
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
 			User *u2 = finduser(na->nick);
-			if (u2 && u2->nc == na->nc)
+			if (u2 && u2->Account() == na->nc)
 				nick_online = 1;
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL
 			 * parameter is used. -TheShadow */
-			if (!param.empty() && param == "ALL" && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
+			if (!param.empty() && param == "ALL" && u->Account() && (na->nc == u->Account() || u->Account()->IsServicesOper()))
 				show_hidden = 1;
 
 			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
@@ -172,7 +172,7 @@ class CommandNSInfo : public Command
 					notice_lang(Config.s_NickServ, u, NICK_INFO_NO_EXPIRE);
 				else
 				{
-					if (u->nc->IsServicesOper())
+					if (u->Account()->IsServicesOper())
 					{
 						expt = na->last_seen + Config.NSExpire;
 						tm = localtime(&expt);
@@ -182,7 +182,7 @@ class CommandNSInfo : public Command
 				}
 			}
 
-			if (!show_hidden && u->nc && (na->nc == u->nc || u->nc->IsServicesOper()))
+			if (!show_hidden && u->Account() && (na->nc == u->Account() || u->Account()->IsServicesOper()))
 				notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, na->nick);
 		}
 		return MOD_CONT;
@@ -190,7 +190,7 @@ class CommandNSInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 		else
 			notice_help(Config.s_NickServ, u, NICK_HELP_INFO);

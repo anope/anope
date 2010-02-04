@@ -51,7 +51,7 @@ class CommandMSList : public Command
 		}
 		else
 		{
-			mi = &u->nc->memos;
+			mi = &u->Account()->memos;
 		}
 		if (!param.empty() && !isdigit(param[0]) && param != "NEW")
 			this->OnSyntaxError(u, param);

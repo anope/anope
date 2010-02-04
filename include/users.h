@@ -30,6 +30,7 @@ class CoreExport User : public Extensible
 	bool OnAccess;	/* If the user is on the access list of the nick theyre on */
 	std::bitset<128> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, std::string> Params; /* Map of user modes and the params this user has */
+	NickCore *nc; /* NickCore account the user is currently loggged in as */
 
  public: // XXX: exposing a tiny bit too much
 	User *next, *prev;
@@ -44,8 +45,6 @@ class CoreExport User : public Extensible
 	Server *server;		/* Server user is connected to  */
 	time_t timestamp;	/* Timestamp of the nick 	*/
 	time_t my_signon;	/* When did _we_ see the user?  */
-
-	NickCore *nc;
 
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 
@@ -154,6 +153,25 @@ class CoreExport User : public Extensible
 	 * @param account Display nick of account
 	 */
 	void AutoID(const char *acc);
+
+	/** Login the user to a NickCore
+	 * @param core The account the user is useing
+	 */
+	void Login(NickCore *core);
+
+	/** Logout the user
+	 */
+	void Logout();
+
+	/** Get the account the user is logged in using
+	 * @reurn The account or NULL
+	 */
+	NickCore *Account() const;
+
+	/** Check if the user is identified for their nick
+	 * @return true or false
+	 */
+	const bool IsIdentified() const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
 	 * @return true or false

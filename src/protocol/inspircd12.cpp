@@ -395,7 +395,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		if (!u->nc)
+		if (!u->Account())
 			return;
 
 		u->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
@@ -871,7 +871,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	user = prev_u_intro;
 	prev_u_intro = NULL;
 	if (user) na = findnick(user->nick);
-	if (user && user->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != user->nc))
+	if (user && user->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != user->Account()))
 	{
 		validate_user(user);
 		if (user->HasMode(UMODE_REGISTERED))
@@ -1156,7 +1156,7 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	 * If not, validate the user. ~ Viper*/
 	prev_u_intro = NULL;
 	if (u) na = findnick(u->nick);
-	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->nc))
+	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->Account()))
 	{
 		validate_user(u);
 		if (u->HasMode(UMODE_REGISTERED))

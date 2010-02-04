@@ -38,12 +38,12 @@ class CommandNSAList : public Command
 		NickAlias *na;
 
 		int min_level = 0;
-		int is_servadmin = u->nc->IsServicesOper();
+		int is_servadmin = u->Account()->IsServicesOper();
 		unsigned lev_param = 0;
 
 		if (!is_servadmin)
 			/* Non service admins can only see their own levels */
-			na = findnick(u->nc->display);
+			na = findnick(u->Account()->display);
 		else
 		{
 			/* Services admins can request ALIST on nicks.
@@ -130,7 +130,7 @@ class CommandNSAList : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
 		else
 			notice_help(Config.s_NickServ, u, NICK_HELP_ALIST);

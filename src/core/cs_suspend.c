@@ -69,7 +69,7 @@ class CommandCSSuspend : public Command
 					if (is_oper(uc->user))
 						continue;
 
-					c->Kick(NULL, uc->user, "%s", reason ? reason : getstring(uc->user->nc, CHAN_SUSPEND_REASON));
+					c->Kick(NULL, uc->user, "%s", reason ? reason : getstring(uc->user->Account(), CHAN_SUSPEND_REASON));
 				}
 			}
 

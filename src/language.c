@@ -233,7 +233,7 @@ void lang_init()
 
 int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
 {
-	int language = u && u->nc ? u->nc->language : Config.NSDefLanguage;
+	int language = u && u->Account() ? u->Account()->language : Config.NSDefLanguage;
 	char tmpbuf[BUFSIZE], buf2[BUFSIZE];
 	char *s;
 	int i, ret;
@@ -326,7 +326,7 @@ const char *getstring(NickCore *nc, int index)
 
 const char *getstring(User *u, int index)
 {
-	return getstring(u->nc, index);
+	return getstring(u->Account(), index);
 }
 
 const char *getstring(int index)

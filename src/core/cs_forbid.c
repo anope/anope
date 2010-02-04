@@ -79,7 +79,7 @@ class CommandCSForbid : public Command
 				if (is_oper(uc->user))
 					continue;
 
-				c->Kick(findbot(Config.s_ChanServ), uc->user, "%s", reason ? reason : getstring(uc->user->nc, CHAN_FORBID_REASON));
+				c->Kick(findbot(Config.s_ChanServ), uc->user, "%s", reason ? reason : getstring(uc->user->Account(), CHAN_FORBID_REASON));
 			}
 		}
 

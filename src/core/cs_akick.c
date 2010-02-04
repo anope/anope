@@ -522,7 +522,7 @@ class CommandCSAKick : public Command
 
 		if (mask.empty() && (cmd == "ADD" || cmd == "STICK" || cmd == "UNSTICK" || cmd == "DEL"))
 			this->OnSyntaxError(u, cmd);
-		else if (!check_access(u, ci, CA_AKICK) && !u->nc->HasPriv("chanserv/access/modify"))
+		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd != "LIST" && cmd != "VIEW" && cmd != "ENFORCE" && readonly)
 			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DISABLED);

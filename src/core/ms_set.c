@@ -24,27 +24,27 @@ class CommandMSSet : public Command
 
 		if (param == "ON")
 		{
-			u->nc->SetFlag(NI_MEMO_SIGNON);
-			u->nc->SetFlag(NI_MEMO_RECEIVE);
+			u->Account()->SetFlag(NI_MEMO_SIGNON);
+			u->Account()->SetFlag(NI_MEMO_RECEIVE);
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_ON, Config.s_MemoServ);
 		}
 		else if (param == "LOGON")
 		{
-			u->nc->SetFlag(NI_MEMO_SIGNON);
-			u->nc->UnsetFlag(NI_MEMO_RECEIVE);
+			u->Account()->SetFlag(NI_MEMO_SIGNON);
+			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, Config.s_MemoServ);
 		}
 		else if (param == "NEW")
 		{
-			u->nc->UnsetFlag(NI_MEMO_SIGNON);
-			u->nc->SetFlag(NI_MEMO_RECEIVE);
+			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
+			u->Account()->SetFlag(NI_MEMO_RECEIVE);
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NEW, Config.s_MemoServ);
 		}
 		else if (param == "MAIL")
 		{
-			if (u->nc->email)
+			if (u->Account()->email)
 			{
-				u->nc->SetFlag(NI_MEMO_MAIL);
+				u->Account()->SetFlag(NI_MEMO_MAIL);
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
 			}
 			else
@@ -52,14 +52,14 @@ class CommandMSSet : public Command
 		}
 		else if (param == "NOMAIL")
 		{
-			u->nc->UnsetFlag(NI_MEMO_MAIL);
+			u->Account()->UnsetFlag(NI_MEMO_MAIL);
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
 		}
 		else if (param == "OFF")
 		{
-			u->nc->UnsetFlag(NI_MEMO_SIGNON);
-			u->nc->UnsetFlag(NI_MEMO_RECEIVE);
-			u->nc->UnsetFlag(NI_MEMO_MAIL);
+			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
+			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
+			u->Account()->UnsetFlag(NI_MEMO_MAIL);
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_OFF, Config.s_MemoServ);
 		}
 		else
@@ -74,9 +74,9 @@ class CommandMSSet : public Command
 		ci::string p3 = params.size() > 3 ? params[3] : "";
 		ci::string user, chan;
 		int32 limit;
-		NickCore *nc = u->nc;
+		NickCore *nc = u->Account();
 		ChannelInfo *ci = NULL;
-		bool is_servadmin = u->nc->HasPriv("memoserv/set-limit");
+		bool is_servadmin = u->Account()->HasPriv("memoserv/set-limit");
 
 		if (p1[0] == '#')
 		{
@@ -181,21 +181,21 @@ class CommandMSSet : public Command
 		mi->memomax = limit;
 		if (limit > 0)
 		{
-			if (chan.empty() && nc == u->nc)
+			if (chan.empty() && nc == u->Account())
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT, limit);
 			else
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT, !chan.empty() ? chan.c_str() : user.c_str(), limit);
 		}
 		else if (!limit)
 		{
-			if (chan.empty() && nc == u->nc)
+			if (chan.empty() && nc == u->Account())
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT_ZERO);
 			else
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_ZERO, !chan.empty() ? chan.c_str() : user.c_str());
 		}
 		else
 		{
-			if (chan.empty() && nc == u->nc)
+			if (chan.empty() && nc == u->Account())
 				notice_lang(Config.s_MemoServ, u, MEMO_UNSET_YOUR_LIMIT);
 			else
 				notice_lang(Config.s_MemoServ, u, MEMO_UNSET_LIMIT, !chan.empty() ? chan.c_str() : user.c_str());
@@ -210,7 +210,7 @@ class CommandMSSet : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string cmd = params[0];
-		MemoInfo *mi = &u->nc->memos;
+		MemoInfo *mi = &u->Account()->memos;
 
 		if (readonly)
 		{
@@ -237,7 +237,7 @@ class CommandMSSet : public Command
 			notice_help(Config.s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
 		else if (subcommand == "LIMIT")
 		{
-			if (u->nc && u->nc->IsServicesOper())
+			if (u->Account() && u->Account()->IsServicesOper())
 				notice_help(Config.s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, Config.MSMaxMemos);
 			else
 				notice_help(Config.s_MemoServ, u, MEMO_HELP_SET_LIMIT, Config.MSMaxMemos);

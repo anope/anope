@@ -211,7 +211,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (nick_identified(this) || !this->nc || !this->nc->HasFlag(NI_SECURE) && IsRecognized()))
+	if (na && (this->IsIdentified() || (!this->nc->HasFlag(NI_SECURE) && IsRecognized())))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;
@@ -354,6 +354,48 @@ void User::AutoID(const char *account)
 			check_memos(this);
 		}
 	}
+}
+
+
+/** Login the user to a NickCore
+ * @param core The account the user is useing
+ */
+void User::Login(NickCore *core)
+{
+	nc = core;
+	core->Users.push_back(this);
+}
+
+/** Logout the user
+ */
+void User::Logout()
+{
+	if (!this->nc)
+		return;
+		
+	std::list<User *>::iterator it = std::find(this->nc->Users.begin(), this->nc->Users.end(), this);
+	if (it != this->nc->Users.end())
+	{
+		this->nc->Users.erase(it);
+	}
+
+	nc = NULL;
+}
+
+/** Get the account the user is logged in using
+ * @reurn The account or NULL
+ */
+NickCore *User::Account() const
+{
+	return nc;
+}
+
+/** Check if the user is identified for their nick
+ * @return true or false
+ */
+const bool User::IsIdentified() const
+{
+	return nc;
 }
 
 /** Check if the user is recognized for their nick (on the nicks access list)
@@ -838,7 +880,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user->SetNewNick(nick);
 			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick.c_str()));
 
-			if ((old_na ? old_na->nc : NULL) == user->nc)
+			if ((old_na ? old_na->nc : NULL) == user->Account())
 				nc_changed = 0;
 
 			if (!nc_changed)
@@ -853,7 +895,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			}
 			else
 			{
-				if (!nick_identified(user) || !user->IsRecognized())
+				if (!user->IsIdentified() || !user->IsRecognized())
 				{
 					ircdproto->SendUnregisteredNick(user);
 				}
@@ -874,12 +916,12 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	if (!(ircd->b_delay_auth && user->server->sync == SSYNC_IN_PROGRESS))
 	{
 		NickAlias *ntmp = findnick(user->nick);
-		if (ntmp && user->nc == ntmp->nc)
+		if (ntmp && user->Account() == ntmp->nc)
 		{
 			nc_changed = 0;
 		}
 
-		if (!ntmp || ntmp->nc != user->nc || nc_changed)
+		if (!ntmp || ntmp->nc != user->Account() || nc_changed)
 		{
 			if (validate_user(user))
 				check_memos(user);
@@ -889,13 +931,13 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			ntmp->last_seen = time(NULL);
 			user->UpdateHost();
 			ircdproto->SetAutoIdentificationToken(user);
-			Alog() << Config.s_NickServ << ": " << user->GetMask() << "automatically identified for group " << user->nc->display;
+			Alog() << Config.s_NickServ << ": " << user->GetMask() << "automatically identified for group " << user->Account()->display;
 		}
 
 		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
 		if (ircd->check_nick_id)
 		{
-			if (nick_identified(user))
+			if (user->IsIdentified())
 			{
 				ircdproto->SetAutoIdentificationToken(user);
 			}
@@ -943,7 +985,7 @@ void do_quit(const char *source, int ac, const char **av)
 	}
 	Alog(LOG_DEBUG) << source << " quits";
 	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN)
-		&& !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) {
+		&& !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified())) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;
@@ -975,7 +1017,7 @@ void do_kill(const std::string &nick, const std::string &msg)
 		return;
 	}
 	Alog(LOG_DEBUG) << nick << " killed";
-	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || nick_identified(user))) 
+	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified())) 
 	{
 		na->last_seen = time(NULL);
 		if (na->last_quit)
@@ -1208,7 +1250,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 					--opcnt;
 				break;
 			case UMODE_REGISTERED:
-				if (add && !nick_identified(user))
+				if (add && !user->IsIdentified())
 					user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 				break;
 			case UMODE_CLOAK:

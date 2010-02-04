@@ -48,7 +48,7 @@ class CommandNSIdentify : public Command
 		 * however you can not identify again for the group you're already
 		 * identified as
 		 */
-		else if (u->nc && u->nc == na->nc)
+		else if (u->Account() && u->Account() == na->nc)
 			notice_lang(Config.s_NickServ, u, NICK_ALREADY_IDENTIFIED);
 		else if (!(res = enc_check_password(pass, na->nc->pass)))
 		{
@@ -60,38 +60,38 @@ class CommandNSIdentify : public Command
 			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_FAILED);
 		else
 		{
-			if (nick_identified(u))
+			if (u->IsIdentified())
 			{
-				Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out of account " << u->nc->display;
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out of account " << u->Account()->display;
 			}
 
 			if (na->last_realname)
 				delete [] na->last_realname;
 			na->last_realname = sstrdup(u->realname);
 			na->last_seen = time(NULL);
-			u->nc = na->nc;
 
-			ircdproto->SendAccountLogin(u, u->nc);
+			u->Login(na->nc);
+			ircdproto->SendAccountLogin(u, u->Account());
 			ircdproto->SetAutoIdentificationToken(u);
 
 			u->UpdateHost();
 
 			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-			Alog() << Config.s_NickServ << ": " << u->GetMask() << " identified for account " << u->nc->display;
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " identified for account " << u->Account()->display;
 			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
 			if (ircd->vhost)
 				do_on_id(u);
 			if (Config.NSModeOnID)
 				do_setmodes(u);
 
-			if (Config.NSForceEmail && u->nc && !u->nc->email)
+			if (Config.NSForceEmail && u->Account() && !u->Account()->email)
 			{
 				notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
 				notice_help(Config.s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
 			}
 
-			if (nick_identified(u))
+			if (u->IsIdentified())
 				check_memos(u);
 
 			/* Clear any timers */

@@ -89,7 +89,7 @@ void check_memos(User * u)
 		return;
 	}
 
-	if (!(nc = u->nc) || !u->IsRecognized() ||
+	if (!(nc = u->Account()) || !u->IsRecognized() ||
 		!(nc->HasFlag(NI_MEMO_SIGNON))) {
 		return;
 	}
@@ -195,8 +195,8 @@ void memo_send(User * u, const char *name, const char *text, int z)
 	Memo *m;
 	MemoInfo *mi;
 	time_t now = time(NULL);
-	char *source = u->nc->display;
-	int is_servoper = u->nc && u->nc->IsServicesOper();
+	char *source = u->Account()->display;
+	int is_servoper = u->Account() && u->Account()->IsServicesOper();
 
 	if (readonly) {
 		notice_lang(Config.s_MemoServ, u, MEMO_SEND_DISABLED);
@@ -207,7 +207,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (z == 3)
 			syntax_error(Config.s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 
-	} else if (!nick_identified(u) && !u->IsRecognized()) {
+	} else if (!u->IsIdentified() && !u->IsRecognized()) {
 		if (z == 0 || z == 3)
 			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
 
@@ -281,13 +281,14 @@ void memo_send(User * u, const char *name, const char *text, int z)
 
 					for (i = 0; i < nc->aliases.count; i++) {
 						na = static_cast<NickAlias *>(nc->aliases.list[i]);
-						if (finduser(na->nick) && nick_identified(finduser(na->nick)))
-							notice_lang(Config.s_MemoServ, finduser(na->nick),
+						User *user = finduser(na->nick);
+						if (user && user->IsIdentified())
+							notice_lang(Config.s_MemoServ, user,
 										MEMO_NEW_MEMO_ARRIVED, source,
 										Config.s_MemoServ, m->number);
 					}
 				} else {
-					if ((u = finduser(name)) && nick_identified(u)
+					if ((u = finduser(name)) && u->IsIdentified() 
 						&& (nc->HasFlag(NI_MEMO_RECEIVE)))
 						notice_lang(Config.s_MemoServ, u, MEMO_NEW_MEMO_ARRIVED,
 									source, Config.s_MemoServ, m->number);
@@ -307,8 +308,8 @@ void memo_send(User * u, const char *name, const char *text, int z)
 					UserContainer *cu = *it;
 
 					if (check_access(cu->user, c->ci, CA_MEMO)) {
-						if (cu->user->nc
-							&& (cu->user->nc->HasFlag(NI_MEMO_RECEIVE))
+						if (cu->user->Account()
+							&& (cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
 							&& get_ignore(cu->user->nick.c_str()) == NULL) {
 							notice_lang(Config.s_MemoServ, cu->user,
 										MEMO_NEW_X_MEMO_ARRIVED,

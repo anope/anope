@@ -91,7 +91,7 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
 		notice_lang(service, u, MAIL_DISABLED);
 	} else if (((time(NULL) - u->lastmail < Config.MailDelay)
 				|| (time(NULL) - nc->lastmail < Config.MailDelay))
-			   && !(u->nc && u->nc->IsServicesOper())) {
+			   && !(u->Account() && u->Account()->IsServicesOper())) {
 		notice_lang(service, u, MAIL_DELAYED, Config.MailDelay);
 	} else if (!nc->email) {
 		notice_lang(service, u, MAIL_INVALID, nc->display);

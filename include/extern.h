@@ -385,7 +385,6 @@ E void ns_init();
 E void nickserv(User * u, char *buf);
 E int validate_user(User * u);
 E void cancel_user(User * u);
-E int nick_identified(User * u);
 E void expire_nicks();
 E void expire_requests();
 EI int ns_do_register(User * u);

@@ -334,7 +334,7 @@ class CommandBSBot : public Command
 		if (cmd == "ADD")
 		{
 			// ADD nick user host real - 5
-			if (!u->nc->HasCommand("botserv/bot/add"))
+			if (!u->Account()->HasCommand("botserv/bot/add"))
 			{
 				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;
@@ -357,7 +357,7 @@ class CommandBSBot : public Command
 		{
 			// CHANGE oldn newn user host real - 6
 			// but only oldn and newn are required
-			if (!u->nc->HasCommand("botserv/bot/change"))
+			if (!u->Account()->HasCommand("botserv/bot/change"))
 			{
 				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;
@@ -374,7 +374,7 @@ class CommandBSBot : public Command
 		else if (cmd == "DEL")
 		{
 			// DEL nick
-			if (!u->nc->HasCommand("botserv/bot/del"))
+			if (!u->Account()->HasCommand("botserv/bot/del"))
 			{
 				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;

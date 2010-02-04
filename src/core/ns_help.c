@@ -44,7 +44,7 @@ class CommandNSHelp : public Command
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP);
 		FOREACH_MOD(I_OnNickServHelp, OnNickServHelp(u));
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP);
 		if (Config.NSExpire >= 86400)
 			notice_help(Config.s_NickServ, u, NICK_HELP_EXPIRES, Config.NSExpire / 86400);

@@ -58,7 +58,7 @@ class CommandCSHelp : public Command
 		FOREACH_MOD(I_OnChanServHelp, OnChanServHelp(u));
 		if (Config.CSExpire >= 86400)
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_EXPIRES, Config.CSExpire / 86400);
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP);
 	}
 };

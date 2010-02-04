@@ -65,7 +65,7 @@ private:
 
 		int len = param.size();
 
-		if (Config.NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
+		if (Config.NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -128,7 +128,7 @@ private:
 			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
-		else if (Config.NSSecureAdmins && u->nc != nc && nc->IsServicesOper())
+		else if (Config.NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;

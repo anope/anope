@@ -62,11 +62,11 @@ NickAlias::~NickAlias()
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */
-	if ((u = finduser(this->nick)) && u->nc)
+	if ((u = finduser(this->nick)) && u->Account())
 	{
-		ircdproto->SendAccountLogout(u, u->nc);
+		ircdproto->SendAccountLogout(u, u->Account());
 		ircdproto->SendUnregisteredNick(u);
-		u->nc = NULL;
+		u->Logout();
 	}
 
 	/* Accept nicks that have no core, because of database load functions */

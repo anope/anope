@@ -122,6 +122,8 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 
 	NickCore *next, *prev;
 
+	std::list<User *> Users;
+
 	char *display;				/* How the nick is displayed */
 	std::string pass;			/* Password of the nicks */
 	char *email;				/* E-mail associated to the nick */

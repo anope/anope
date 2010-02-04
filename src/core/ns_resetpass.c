@@ -26,7 +26,7 @@ class CommandNSResetPass : public Command
 	{
 		NickAlias *na;
 
-		if (Config.RestrictMail && !u->nc->HasCommand("nickserv/resetpass"))
+		if (Config.RestrictMail && !u->Account()->HasCommand("nickserv/resetpass"))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		if (!(na = findnick(params[0].c_str())))
 			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, params[0].c_str());
@@ -139,8 +139,8 @@ class NSResetPass : public Module
 						delete [] na->last_realname;
 					na->last_realname = sstrdup(u->realname);
 					na->last_seen = time(NULL);
-					u->nc = na->nc;
-					ircdproto->SendAccountLogin(u, u->nc);
+					u->Login(na->nc);
+					ircdproto->SendAccountLogin(u, u->Account());
 					ircdproto->SetAutoIdentificationToken(u);
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 

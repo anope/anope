@@ -25,7 +25,7 @@ class CommandHSOn : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
-		if (na && u->nc == na->nc && na->hostinfo.HasVhost())
+		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			if (!na->hostinfo.GetIdent().empty())
 				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());

@@ -37,17 +37,17 @@ class CommandNSStatus : public Command
 
 			if (!(u2 = finduser(nickbuf))) /* Nick is not online */
 				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
-			else if (nick_identified(u2) && na && na->nc == u2->nc) /* Nick is identified */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 3, u2->nc->display);
+			else if (u2->IsIdentified() && na && na->nc == u2->Account()) /* Nick is identified */
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 3, u2->Account()->display);
 			else if (u2->IsRecognized()) /* Nick is recognised, but NOT identified */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 2, (u2->nc ? u2->nc->display : ""));
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 2, (u2->Account() ? u2->Account()->display : ""));
 			else if (!na) /* Nick is online, but NOT a registered */
 				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
 			else
 				/* Nick is not identified for the nick, but they could be logged into an account,
 				 * so we tell the user about it
 				 */
-				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 1, (u2->nc ? u2->nc->display : ""));
+				notice_lang(Config.s_NickServ, u, NICK_STATUS_REPLY, nickbuf.c_str(), 1, (u2->Account() ? u2->Account()->display : ""));
 		}
 		return MOD_CONT;
 	}

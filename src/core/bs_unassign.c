@@ -30,7 +30,7 @@ class CommandBSUnassign : public Command
 
 		if (readonly)
 			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_READONLY);
-		else if (!u->nc->HasPriv("botserv/administration")  && !check_access(u, ci, CA_ASSIGN))
+		else if (!u->Account()->HasPriv("botserv/administration")  && !check_access(u, ci, CA_ASSIGN))
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)
 			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);

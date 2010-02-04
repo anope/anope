@@ -358,7 +358,7 @@ int sgline_view(int number, SXLine *sx, User *u, int *sent_header)
 
 	tm = *localtime(&sx->seton);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-	expire_left(u->nc, expirebuf, sizeof(expirebuf), sx->expires);
+	expire_left(u->Account(), expirebuf, sizeof(expirebuf), sx->expires);
 	notice_lang(Config.s_OperServ, u, OPER_SGLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
 
 	return 1;

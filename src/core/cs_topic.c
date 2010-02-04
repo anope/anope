@@ -35,7 +35,7 @@ class CommandCSTopic : public Command
 
 		if (!c)
 			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		else if (!check_access(u, ci, CA_TOPIC) && !u->nc->HasCommand("chanserv/topic"))
+		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{

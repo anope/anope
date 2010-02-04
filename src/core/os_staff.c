@@ -37,7 +37,7 @@ class CommandOSStaff : public Command
 				/* We have to loop all users as some may be logged into an account but not a nick */
 				for (User *u2 = firstuser(); u2; u2 = nextuser())
 				{
-					if (u2->nc && u2->nc == na->nc)
+					if (u2->Account() && u2->Account() == na->nc)
 					{
 						found = 1;
 						if (na->nick == u2->nick)

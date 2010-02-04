@@ -75,12 +75,12 @@ class CommandBSInfo : public Command
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_OPTIONS, getstring(u, (bi->HasFlag(BI_PRIVATE) ? BOT_INFO_OPT_PRIVATE : BOT_INFO_OPT_NONE)));
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_USAGE, bi->chancount);
 
-			if (u->nc->HasPriv("botserv/administration"))
+			if (u->Account()->HasPriv("botserv/administration"))
 				this->send_bot_channels(u, bi);
 		}
 		else if ((ci = cs_findchan(query)))
 		{
-			if (!IsFounder(u, ci) && !u->nc->HasPriv("botserv/administration"))
+			if (!IsFounder(u, ci) && !u->Account()->HasPriv("botserv/administration"))
 			{
 				notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 				return MOD_CONT;

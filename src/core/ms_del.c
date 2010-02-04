@@ -57,7 +57,7 @@ class CommandMSDel : public Command
 		}
 		else
 		{
-			mi = &u->nc->memos;
+			mi = &u->Account()->memos;
 		}
 		if (numstr.empty() || (!isdigit(numstr[0]) && numstr != "ALL" && numstr != "LAST"))
 			this->OnSyntaxError(u, numstr);

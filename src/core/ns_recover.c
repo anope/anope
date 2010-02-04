@@ -68,7 +68,7 @@ class CommandNSRecover : public Command
 		}
 		else
 		{
-			if (u->nc == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
+			if (u->Account() == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
 				char relstr[192];
 
@@ -91,7 +91,7 @@ class CommandNSRecover : public Command
 		char relstr[192];
 
 		/* Convert Config.NSReleaseTimeout seconds to string format */
-		duration(u->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
+		duration(u->Account(), relstr, sizeof(relstr), Config.NSReleaseTimeout);
 
 		notice_help(Config.s_NickServ, u, NICK_HELP_RECOVER, relstr);
 		//do_help_limited(Config.s_NickServ, u, this);

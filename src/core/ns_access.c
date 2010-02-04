@@ -125,7 +125,7 @@ class CommandNSAccess : public Command
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 		NickAlias *na;
 
-		if (cmd == "LIST" && u->nc->IsServicesOper() && mask && (na = findnick(params[1].c_str())))
+		if (cmd == "LIST" && u->Account()->IsServicesOper() && mask && (na = findnick(params[1].c_str())))
 			return this->DoServAdminList(u, params, na->nc);
 
 		if (mask && !strchr(mask, '@'))
@@ -138,14 +138,14 @@ class CommandNSAccess : public Command
 		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			*/
-		else if (u->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nc->display);
+		else if (u->Account()->HasFlag(NI_SUSPENDED))
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display);
 		else if (cmd == "ADD")
-			return this->DoAdd(u, u->nc, mask);
+			return this->DoAdd(u, u->Account(), mask);
 		else if (cmd == "DEL")
-			return this->DoDel(u, u->nc, mask);
+			return this->DoDel(u, u->Account(), mask);
 		else if (cmd == "LIST")
-			return this->DoList(u, u->nc, mask);
+			return this->DoList(u, u->Account(), mask);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;

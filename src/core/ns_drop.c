@@ -40,7 +40,7 @@ class CommandNSDrop : public Command
 		{
 			if (nick)
 			{
-				if ((nr = findrequestnick(nick)) && u->nc->IsServicesOper())
+				if ((nr = findrequestnick(nick)) && u->Account()->IsServicesOper())
 				{
 					if (Config.WallDrop)
 						ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
@@ -56,11 +56,11 @@ class CommandNSDrop : public Command
 			return MOD_CONT;
 		}
 
-		is_mine = u->nc && u->nc == na->nc;
+		is_mine = u->Account() && u->Account() == na->nc;
 		if (is_mine && !nick)
 			my_nick = sstrdup(na->nick);
 
-		if (!is_mine && !u->nc->HasPriv("nickserv/drop"))
+		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else if (Config.NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
@@ -98,7 +98,7 @@ class CommandNSDrop : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->HasPriv("nickserv/drop"))
+		if (u->Account() && u->Account()->HasPriv("nickserv/drop"))
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
 		else
 			notice_help(Config.s_NickServ, u, NICK_HELP_DROP);

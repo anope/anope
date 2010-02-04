@@ -732,8 +732,8 @@ void my_memo_lang(User *u, const char *name, int z, int number, ...)
 
 	u2 = finduser(name);
 	/* Find the users lang, and use it if we cant */
-	if (u2 && u2->nc)
-		lang = u2->nc->language;
+	if (u2 && u2->Account())
+		lang = u2->Account()->language;
 
 	/* If the users lang isnt supported, drop back to enlgish */
 	if (!me->lang[lang].argc)

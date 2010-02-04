@@ -32,11 +32,11 @@ class CommandNSLogout : public Command
 		User *u2;
 		NickAlias *na;
 
-		if (!u->nc->IsServicesOper() && nick)
+		if (!u->Account()->IsServicesOper() && nick)
 			this->OnSyntaxError(u, "");
 		else if (!(u2 = (nick ? finduser(nick) : u)))
 			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (nick && u2->nc && !u2->nc->IsServicesOper())
+		else if (nick && u2->Account() && !u2->Account()->IsServicesOper())
 			notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
 		else
 		{
@@ -58,13 +58,13 @@ class CommandNSLogout : public Command
 				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
 			/* Clear any timers again */
-			if (na && u->nc->HasFlag(NI_KILLPROTECT))
+			if (na && u->Account()->HasFlag(NI_KILLPROTECT))
 				del_ns_timeout(na, TO_COLLIDE);
 
-			ircdproto->SendAccountLogout(u2, u2->nc);
+			ircdproto->SendAccountLogout(u2, u2->Account());
 			ircdproto->SendUnregisteredNick(u2);
 
-			u2->nc = NULL;
+			u2->Logout();
 
 			/* Send out an event */
 			FOREACH_MOD(I_OnNickLogout, OnNickLogout(u2));
@@ -74,7 +74,7 @@ class CommandNSLogout : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
-		if (u->nc && u->nc->IsServicesOper())
+		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
 		else
 			notice_help(Config.s_NickServ, u, NICK_HELP_LOGOUT);

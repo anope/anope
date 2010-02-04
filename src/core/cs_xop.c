@@ -138,7 +138,7 @@ class XOPBase : public Command
 
 		short ulev = get_access(u, ci);
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !u->nc->HasPriv("chanserv/access/modify"))
+		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -163,7 +163,7 @@ class XOPBase : public Command
 			/**
 			 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
 			 **/
-			if (access->level >= ulev && !u->nc->HasPriv("chanserv/access/modify"))
+			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
@@ -234,7 +234,7 @@ class XOPBase : public Command
 
 		short ulev = get_access(u, ci);
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !u->nc->HasPriv("chanserv/access/modify"))
+		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -279,7 +279,7 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 
-			if (ulev <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
+			if (ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
 				deleted = 0;
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
@@ -311,7 +311,7 @@ class XOPBase : public Command
 		int sent_header = 0;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 
-		if (level < ACCESS_AOP && !u->nc->HasCommand("chanserv/aop/list"))
+		if (level < ACCESS_AOP && !u->Account()->HasCommand("chanserv/aop/list"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -355,7 +355,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!IsFounder(u, ci) && !u->nc->HasPriv("chanserv/access/modify"))
+		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -573,7 +573,7 @@ int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, i
 	if (!access->in_use || access->level != xlev)
 		return 0;
 	char *nick = access->nc->display;
-	if (uacc <= access->level && !u->nc->HasPriv("chanserv/access/modify"))
+	if (uacc <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 	{
 		++(*perm);
 		return 0;

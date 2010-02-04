@@ -38,20 +38,15 @@ NickCore::~NickCore()
 	/* Clean up this nick core from any users online using it
 	 * (ones that /nick but remain unidentified)
 	 */
-	User *user;
-	for (int i = 0; i < 1024; ++i)
+	for (std::list<User *>::iterator it = this->Users.begin(); it != this->Users.end(); ++it)
 	{
-		for (user = userlist[i]; user; user = user->next)
-		{
-			if (user->nc && user->nc == this)
-			{
-				ircdproto->SendAccountLogout(user, user->nc);
-				ircdproto->SendUnregisteredNick(user);
-				user->nc = NULL;
-				FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
-			}
-		}
+		User *user = *it;
+		ircdproto->SendAccountLogout(user, user->Account());
+		ircdproto->SendUnregisteredNick(user);
+		user->Logout();
+		FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
 	}
+	this->Users.clear();
 
 	/* (Hopefully complete) cleanup */
 	cs_remove_nick(this);

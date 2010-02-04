@@ -353,7 +353,7 @@ int akill_view(int number, Akill *ak, User *u, int *sent_header)
 	snprintf(mask, sizeof(mask), "%s@%s", ak->user, ak->host);
 	tm = *localtime(&ak->seton);
 	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-	expire_left(u->nc, expirebuf, sizeof(expirebuf), ak->expires);
+	expire_left(u->Account(), expirebuf, sizeof(expirebuf), ak->expires);
 	notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, number, mask, ak->by, timebuf, expirebuf, ak->reason);
 
 	return 1;

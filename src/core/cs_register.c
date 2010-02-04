@@ -51,8 +51,8 @@ class CommandCSRegister : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 		else if (!c->HasUserStatus(u, CMODE_OP))
 			notice_lang(Config.s_ChanServ, u, CHAN_MUST_BE_CHANOP);
-		else if (Config.CSMaxReg && u->nc->channelcount >= Config.CSMaxReg && !u->nc->HasPriv("chanserv/no-register-limit"))
-			notice_lang(Config.s_ChanServ, u, u->nc->channelcount > Config.CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config.CSMaxReg);
+		else if (Config.CSMaxReg && u->Account()->channelcount >= Config.CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
+			notice_lang(Config.s_ChanServ, u, u->Account()->channelcount > Config.CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config.CSMaxReg);
 		else if (!(ci = new ChannelInfo(chan)))
 		{
 			Alog() << Config.s_ChanServ << ": makechan() failed for REGISTER " << chan;
@@ -62,7 +62,7 @@ class CommandCSRegister : public Command
 		{
 			c->ci = ci;
 			ci->c = c;
-			ci->founder = u->nc;
+			ci->founder = u->Account();
 			ci->desc = sstrdup(desc);
 
 			if (c->topic)

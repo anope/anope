@@ -184,7 +184,7 @@ class CommandBSBadwords : public Command
 
 		ci = cs_findchan(chan);
 
-		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->nc->HasPriv("botserv/administration")))
+		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->Account()->HasPriv("botserv/administration")))
 		{
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;

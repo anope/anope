@@ -58,7 +58,7 @@ void NickServCollide::Tick(time_t ctime)
 {
 	/* If they identified or don't exist anymore, don't kill them. */
 	User *u = finduser(na->nick);
-	if (!u || u->nc == na->nc || u->my_signon > this->GetSetTime())
+	if (!u || u->Account() == na->nc || u->my_signon > this->GetSetTime())
 		return;
 
 	/* The RELEASE timeout will always add to the beginning of the
@@ -380,20 +380,6 @@ void cancel_user(User * u)
 
 /*************************************************************************/
 
-/* Return whether a user has identified for their nickname. */
-
-int nick_identified(User * u)
-{
-	if (u->nc)
-	{
-		return 1;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
 /* Remove all nicks which have expired.  Also update last-seen time for all
  * nicks.
  */
@@ -412,7 +398,7 @@ void expire_nicks()
 			next = na->next;
 
 			User *u = finduser(na->nick);
-			if (u && (na->nc->HasFlag(NI_SECURE) ? nick_identified(u) : u->IsRecognized()))
+			if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified() : u->IsRecognized()))
 			{
 				Alog(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
 				na->last_seen = now;

@@ -794,34 +794,6 @@ int anope_event_tmode(const char *source, int ac, const char **av)
 /* Event: PROTOCTL */
 int anope_event_capab(const char *source, int ac, const char **av)
 {
-	int argvsize = 8;
-	int argc;
-	const char **argv;
-	char *str;
-
-	if (ac < 1)
-		return MOD_CONT;
-
-	/* We get the params as one arg, we should split it for capab_parse */
-	argv = static_cast<const char **>(scalloc(argvsize, sizeof(const char *)));
-	argc = 0;
-	while ((str = myStrGetToken(av[0], ' ', argc))) {
-		if (argc == argvsize) {
-			argvsize += 8;
-			argv = static_cast<const char **>(srealloc(argv, argvsize * sizeof(const char *)));
-		}
-		argv[argc] = str;
-		argc++;
-	}
-
-	capab_parse(argc, argv);
-
-	/* Free our built ac/av */
-	for (argvsize = 0; argvsize < argc; argvsize++) {
-		delete [] argv[argvsize];
-	}
-	free(const_cast<char **>(argv));
-
 	return MOD_CONT;
 }
 

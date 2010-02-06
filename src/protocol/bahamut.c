@@ -549,7 +549,6 @@ int anope_event_nick(const char *source, int ac, const char **av)
 /* EVENT : CAPAB */
 int anope_event_capab(const char *source, int ac, const char **av)
 {
-	capab_parse(ac, av);
 	return MOD_CONT;
 }
 

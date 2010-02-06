@@ -488,7 +488,6 @@ E Server *findserver(Server *s, const char *name);
 
 E void do_server(const char *source, const char *servername, const char *hops, const char *descript, const char *numeric);
 E void do_squit(const char *source, int ac, const char **av);
-E void capab_parse(int ac, const char **av);
 E int anope_check_sync(const char *name);
 
 E void finish_sync(Server *serv, int sync_links);

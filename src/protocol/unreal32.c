@@ -477,7 +477,139 @@ class UnrealIRCdProto : public IRCDProto
 /* Event: PROTOCTL */
 int anope_event_capab(const char *source, int ac, const char **av)
 {
-	capab_parse(ac, av);
+	for (int i = 0; i < ac; ++i)
+	{
+		std::string capab = av[i];
+
+		if (capab.find("CHANMODES") != std::string::npos)
+		{
+			std::string modes(capab.begin() + 10, capab.end());
+			commasepstream sep(modes);
+			std::string modebuf;
+
+			sep.GetToken(modebuf);
+			for (size_t t = 0; t < modebuf.size(); ++t)
+			{
+				switch (modebuf[t])
+				{
+					case 'b':
+						ModeManager::AddChannelMode('b', new ChannelModeBan());
+						continue;
+					case 'e':
+						ModeManager::AddChannelMode('e', new ChannelModeExcept());
+						continue;
+					case 'I':
+						ModeManager::AddChannelMode('I', new ChannelModeInvite());
+						continue;
+				}
+			}
+
+			sep.GetToken(modebuf);
+			for (size_t t = 0; t < modebuf.size(); ++t)
+			{
+				switch (modebuf[t])
+				{
+					case 'k':
+						ModeManager::AddChannelMode('k', new ChannelModeKey());
+						continue;
+					case 'f':
+						ModeManager::AddChannelMode('f', new ChannelModeFlood());
+						continue;
+					case 'L':
+						ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT));
+						continue;
+				}
+			}
+
+			sep.GetToken(modebuf);
+			for (size_t t = 0; t < modebuf.size(); ++t)
+			{
+				switch (modebuf[t])
+				{
+					case 'l':
+						ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT, true));
+						continue;
+					case 'j':
+						ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD, true));
+						continue;
+				}
+			}
+
+			sep.GetToken(modebuf);
+			for (size_t t = 0; t < modebuf.size(); ++t)
+			{
+				switch (modebuf[t])
+				{
+					case 'p':
+						ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
+						continue;
+					case 's':
+						ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
+						continue;
+					case 'm':
+						ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
+						continue;
+					case 'n':
+						ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
+						continue;
+					case 't':
+						ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
+						continue;
+					case 'i':
+						ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
+						continue;
+					case 'r':
+						ModeManager::AddChannelMode('r', new ChannelModeRegistered());
+						continue;
+					case 'R':
+						ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
+						continue;
+					case 'c':
+						ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+						continue;
+					case 'O':
+						ModeManager::AddChannelMode('O', new ChannelModeOper());
+						continue;
+					case 'A':
+						ModeManager::AddChannelMode('A', new ChannelModeAdmin());
+						continue;
+					case 'Q':
+						ModeManager::AddChannelMode('Q', new ChannelMode(CMODE_NOKICK));
+						continue;
+					case 'K':
+						ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
+						continue;
+					case 'V':
+						ModeManager::AddChannelMode('V', new ChannelMode(CMODE_NOINVITE));
+						continue;
+					case 'C':
+						ModeManager::AddChannelMode('C', new ChannelMode(CMODE_NOCTCP));
+						continue;
+					case 'u':
+						ModeManager::AddChannelMode('u', new ChannelMode(CMODE_AUDITORIUM));
+						continue;
+					case 'z':
+						ModeManager::AddChannelMode('z', new ChannelMode(CMODE_SSL));
+						continue;
+					case 'N':
+						ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
+						continue;
+					case 'S':
+						ModeManager::AddChannelMode('S', new ChannelMode(CMODE_STRIPCOLOR));
+						continue;
+					case 'M':
+						ModeManager::AddChannelMode('M', new ChannelMode(CMODE_REGMODERATED));
+						continue;
+					case 'T':
+						ModeManager::AddChannelMode('T', new ChannelMode(CMODE_NONOTICE));
+						continue;
+					case 'G':
+						ModeManager::AddChannelMode('G', new ChannelMode(CMODE_FILTER));
+						continue;
+				}
+			}
+		}
+	}
 	return MOD_CONT;
 }
 
@@ -1218,8 +1350,15 @@ bool ChannelModeFlood::IsValid(const std::string &value2)
 	}
 }
 
-void moduleAddModes()
+static void AddModes()
 {
+	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
+	ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, '%'));
+	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@', true));
+	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&', true));
+	/* Unreal sends +q as * */
+	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, '*'));
+
 	/* Add user modes */
 	ModeManager::AddUserMode('A', new UserMode(UMODE_SERV_ADMIN));
 	ModeManager::AddUserMode('B', new UserMode(UMODE_BOT));
@@ -1246,48 +1385,6 @@ void moduleAddModes()
 	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
 	ModeManager::AddUserMode('x', new UserMode(UMODE_CLOAK));
 	ModeManager::AddUserMode('z', new UserMode(UMODE_SSL));
-
-	/* b/e/I */
-	ModeManager::AddChannelMode('b', new ChannelModeBan());
-	ModeManager::AddChannelMode('e', new ChannelModeExcept());
-	ModeManager::AddChannelMode('I', new ChannelModeInvite());
-
-	/* v/h/o/a/q */
-	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
-	ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, '%'));
-	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@', true));
-	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&', true));
-	/* Unreal sends +q as * */
-	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, '*'));
-
-	/* Add channel modes */
-	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
-	ModeManager::AddChannelMode('f', new ChannelModeFlood());
-	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
-	ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD, true));
-	ModeManager::AddChannelMode('k', new ChannelModeKey());
-	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT, true));
-	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
-	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
-	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
-	ModeManager::AddChannelMode('r', new ChannelModeRegistered());
-	ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
-	ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
-	ModeManager::AddChannelMode('u', new ChannelMode(CMODE_AUDITORIUM));
-	ModeManager::AddChannelMode('z', new ChannelMode(CMODE_SSL));
-	ModeManager::AddChannelMode('A', new ChannelModeAdmin());
-	ModeManager::AddChannelMode('C', new ChannelMode(CMODE_NOCTCP));
-	ModeManager::AddChannelMode('G', new ChannelMode(CMODE_FILTER));
-	ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
-	ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT));
-	ModeManager::AddChannelMode('M', new ChannelMode(CMODE_REGMODERATED));
-	ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
-	ModeManager::AddChannelMode('O', new ChannelModeOper());
-	ModeManager::AddChannelMode('Q', new ChannelMode(CMODE_NOKICK));
-	ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
-	ModeManager::AddChannelMode('S', new ChannelMode(CMODE_STRIPCOLOR));
-	ModeManager::AddChannelMode('T', new ChannelMode(CMODE_NONOTICE));
-	ModeManager::AddChannelMode('V', new ChannelMode(CMODE_NOINVITE));
 }
 
 class ProtoUnreal : public Module
@@ -1304,7 +1401,7 @@ class ProtoUnreal : public Module
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(0);
 
-		moduleAddModes();
+		AddModes();
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();

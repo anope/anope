@@ -460,49 +460,6 @@ void do_squit(const char *source, int ac, const char **av)
 /*************************************************************************/
 
 /**
- * Handle parsing the CAPAB/PROTOCTL messages
- * @param ac Number of arguments in av
- * @param av Agruments
- * @return void
- */
-void capab_parse(int ac, const char **av)
-{
-	int i;
-	int j;
-	char *s, *tmp;
-
-	const char *temp;
-
-	for (i = 0; i < ac; i++) {
-		temp = av[i];
-
-		s = myStrGetToken(temp, '=', 0);
-		tmp = myStrGetTokenRemainder(temp, '=', 1);
-
-		if (!s)
-			continue;
-
-		for (j = 0; capab_info[j].token; j++) {
-			if (stricmp(s, capab_info[j].token) == 0)
-				uplink_capab |= capab_info[j].flag;
-			/* Special cases */
-			if ((stricmp(s, "NICKIP") == 0) && !ircd->nickip)
-				ircd->nickip = 1;
-			if ((stricmp(s, "CHANMODES") == 0) && tmp)
-				ircd->chanmodes = sstrdup(tmp);
-			if ((stricmp(s, "NICKCHARS") == 0) && tmp)
-				ircd->nickchars = sstrdup(tmp);
-		}
-
-		delete [] s;
-		if (tmp)
-			delete [] tmp;
-	}
-}
-
-/*************************************************************************/
-
-/**
  * Search the uline servers array to find out if the server that just set the
  * mode is in our uline list
  * @param server Server Setting the mode

@@ -73,6 +73,7 @@ IRCDVar myIrcd[] = {
 	 1,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
 	 false,					/* Auth for users is sent after the initial NICK/UID command */
+	 20,					/* Max number of modes we can send per line */
 	 }
 	,
 	{NULL}
@@ -1078,6 +1079,11 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							continue;
 					}
 				}
+			}
+			else if (capab.find("MAXMODES=") != std::string::npos)
+			{
+				std::string maxmodes(capab.begin() + 10, capab.end());
+				ircd->maxmodes = atoi(maxmodes.c_str());
 			}
 		}
 	} else if (strcasecmp(av[0], "END") == 0) {

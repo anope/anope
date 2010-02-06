@@ -484,7 +484,7 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 	buf = "+";
 	for (it = info->AddModes.begin(); it != info->AddModes.end(); ++it)
 	{
-		if (++Modes > 12) //XXX this number needs to be recieved from the ircd
+		if (++Modes > ircd->maxmodes)
 		{
 			ret.push_back(buf + parambuf);
 			buf = "+";
@@ -513,7 +513,7 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 	buf += "-";
 	for (it = info->DelModes.begin(); it != info->DelModes.end(); ++it)
 	{
-		if (++Modes > 12) //XXX this number needs to be recieved from the ircd
+		if (++Modes > ircd->maxmodes)
 		{
 			ret.push_back(buf + parambuf);
 			buf = "-";

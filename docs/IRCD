@@ -199,6 +199,8 @@ How To Add IRCd Support
     43) Delayed AUTH: Does the ircd send if a user is identified for their nick
                       AFTER the initial NICK/UID? Set this to 0 for no.
 
+    44) Max Modes: The max number of mode changes we can send in one line
+
     So we've had this long list. Now there's a second struct to fill. This
     struct isn't as long as the previous one though, so we'll handle it quite
     quick compared to the previous one.

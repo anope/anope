@@ -56,6 +56,7 @@ IRCDVar myIrcd[] = {
 	 0,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
 	 false,					/* Auth for users is sent after the initial NICK/UID command */
+	 12,					/* Max number of modes we can send per line */
 	 }
 	,
 	{NULL}

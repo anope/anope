@@ -1354,8 +1354,8 @@ static void AddModes()
 {
 	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
 	ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, '%'));
-	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@', true));
-	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&', true));
+	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@'));
+	ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&'));
 	/* Unreal sends +q as * */
 	ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, '*'));
 

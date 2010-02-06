@@ -445,9 +445,17 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 			return;
 		}
 
-		/* We don't track bots */
-		if (findbot(param))
+		/* Reset modes on bots if we're supposed to */
+		BotInfo *bi = findbot(param);
+		if (bi)
+		{
+			if (std::find(BotModes.begin(), BotModes.end(), cm) != BotModes.end())
+			{
+				this->SetMode(bi, cm, bi->nick);
+			}
+			/* We don't track bots */
 			return;
+		}
 
 		User *u = finduser(param);
 		if (!u)

@@ -162,13 +162,11 @@ ChannelModeParam::~ChannelModeParam()
 /** Default constructor
  * @param mName The mode name
  * @param mSymbol The symbol for the mode, eg @ % +
- * @param mProtectBotServ Should botserv clients reset this on themself if it gets unset?
  */
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char mSymbol, bool mProtectBotServ) : ChannelMode(mName)
+ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char mSymbol) : ChannelMode(mName)
 {
 	this->Type = MODE_STATUS;
 	this->Symbol = mSymbol;
-	this->ProtectBotServ = mProtectBotServ;
 }
 
 /** Default destructor

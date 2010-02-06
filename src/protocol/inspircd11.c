@@ -1065,10 +1065,10 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, '~'));
 							continue;
 						case 'a':
-							ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&', true));
+							ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&'));
 							continue;
 						case 'o':
-							ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@', true));
+							ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@'));
 							continue;
 						case 'h':
 							ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, '%'));

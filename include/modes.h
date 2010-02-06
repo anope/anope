@@ -204,16 +204,12 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	/** Default constructor
 	 * @param mName The mode name
 	 * @param mSymbol The symbol for the mode, eg @ % +
-	 * @param mProtectBotServ Should botserv clients reset this on themself if it gets unset?
 	 */
-	ChannelModeStatus(ChannelModeName mName, char mSymbol, bool mProtectBotServ = false);
+	ChannelModeStatus(ChannelModeName mName, char mSymbol);
 
 	/** Default destructor
 	 */
 	virtual ~ChannelModeStatus();
-
-	/* Should botserv protect itself with this mode? eg if someone -o's botserv it will +o */
-	bool ProtectBotServ;
 };
 
 /** Channel mode +b

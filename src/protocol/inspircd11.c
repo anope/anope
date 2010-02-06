@@ -516,7 +516,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 
-			if (cm)
+			if (!cm)
 			{
 				Alog() << "Recieved unknown mode prefix " << buf[0] << " in FJOIN string";
 				buf.erase(buf.begin());

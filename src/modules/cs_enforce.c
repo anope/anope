@@ -92,7 +92,6 @@ class CommandCSEnforce : public Command
 		int16 old_nojoin_level;
 		char mask[BUFSIZE];
 		const char *reason;
-		User *u;
 
 		if (!(ci = c->ci))
 			return;
@@ -109,10 +108,10 @@ class CommandCSEnforce : public Command
 
 			if (check_access(uc->user, ci, CA_NOJOIN))
 			{
-				get_idealban(ci, u, mask, sizeof(mask));
-				reason = getstring(u, CHAN_NOT_ALLOWED_TO_JOIN);
+				get_idealban(ci, uc->user, mask, sizeof(mask));
+				reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
-				c->Kick(NULL, u, "%s", reason);
+				c->Kick(NULL, uc->user, "%s", reason);
 			}
 		}
 
@@ -124,7 +123,6 @@ class CommandCSEnforce : public Command
 		ChannelInfo *ci;
 		char mask[BUFSIZE];
 		const char *reason;
-		User *u;
 
 		if (!(ci = c->ci))
 			return;
@@ -143,7 +141,7 @@ class CommandCSEnforce : public Command
 				{
 					c->SetMode(NULL, CMODE_BAN, mask);
 				}
-				c->Kick(NULL, u, "%s", reason);
+				c->Kick(NULL, uc->user, "%s", reason);
 			}
 		}
 	}

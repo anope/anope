@@ -43,14 +43,12 @@ IRCDVar myIrcd[] = {
 	 0,						 /* Change RealName	  */
 	 0,						 /* On nick change check if they could be identified */
 	 0,						 /* No Knock requires +i */
-	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 1,						 /* ts6 */
 	 0,						 /* p10 */
-	 NULL,					  /* character set */
 	 0,						 /* CIDR channelbans */
 	 "$$",					  /* TLD Prefix for Global */
 	 false,					/* Auth for users is sent after the initial NICK/UID command */
@@ -59,39 +57,6 @@ IRCDVar myIrcd[] = {
 	,
 	{NULL}
 };
-
-IRCDCAPAB myIrcdcap[] = {
-	{
-	 0,						 /* NOQUIT	   */
-	 0,						 /* TSMODE	   */
-	 0,						 /* UNCONNECT	*/
-	 0,						 /* NICKIP	   */
-	 0,						 /* SJOIN		*/
-	 CAPAB_ZIP,				 /* ZIP		  */
-	 0,						 /* BURST		*/
-	 CAPAB_TS5,				 /* TS5		  */
-	 0,						 /* TS3		  */
-	 0,						 /* DKEY		 */
-	 0,						 /* PT4		  */
-	 0,						 /* SCS		  */
-	 CAPAB_QS,				  /* QS		   */
-	 CAPAB_UID,				 /* UID		  */
-	 CAPAB_KNOCK,			   /* KNOCK		*/
-	 0,						 /* CLIENT	   */
-	 0,						 /* IPV6		 */
-	 0,						 /* SSJ5		 */
-	 0,						 /* SN2		  */
-	 0,						 /* TOKEN		*/
-	 0,						 /* VHOST		*/
-	 0,						 /* SSJ3		 */
-	 0,						 /* NICK2		*/
-	 0,						 /* VL		   */
-	 0,						 /* TLKEXT	   */
-	 0,						 /* DODKEY	   */
-	 0,						 /* DOZIP		*/
-	 0, 0, 0}
-};
-
 
 /*
  * SVINFO
@@ -795,6 +760,7 @@ int anope_event_tmode(const char *source, int ac, const char **av)
 /* Event: PROTOCTL */
 int anope_event_capab(const char *source, int ac, const char **av)
 {
+	CapabParse(ac, av);
 	return MOD_CONT;
 }
 
@@ -923,9 +889,12 @@ class ProtoRatbox : public Module
 		UseTSMODE = 1;  /* TMODE */
 
 		pmodule_ircd_version("Ratbox IRCD 2.0+");
-		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(1);
+
+		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK };
+		for (unsigned i = 0; i < 5; ++i)
+			Capab.SetFlag(c[i]);
 
 		moduleAddModes();
 

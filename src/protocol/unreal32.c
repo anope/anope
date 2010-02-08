@@ -45,14 +45,12 @@ IRCDVar myIrcd[] = {
 	 1,						 /* Change RealName	  */
 	 0,						 /* On nick change check if they could be identified */
 	 1,						 /* No Knock requires +i */
-	 NULL,					  /* CAPAB Chan Modes			 */
 	 1,						 /* We support Unreal TOKENS */
 	 1,						 /* TIME STAMPS are BASE64 */
 	 1,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 0,						 /* ts6 */
 	 0,						 /* p10 */
-	 NULL,					  /* character set */
 	 0,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
 	 false,					/* Auth for users is sent after the initial NICK/UID command */
@@ -60,41 +58,6 @@ IRCDVar myIrcd[] = {
 	 }
 	,
 	{NULL}
-};
-
-IRCDCAPAB myIrcdcap[] = {
-	{
-	 CAPAB_NOQUIT,			  /* NOQUIT	   */
-	 0,						 /* TSMODE	   */
-	 0,						 /* UNCONNECT	*/
-	 CAPAB_NICKIP,			  /* NICKIP	   */
-	 0,						 /* SJOIN		*/
-	 CAPAB_ZIP,				 /* ZIP		  */
-	 0,						 /* BURST		*/
-	 0,						 /* TS5		  */
-	 0,						 /* TS3		  */
-	 0,						 /* DKEY		 */
-	 0,						 /* PT4		  */
-	 0,						 /* SCS		  */
-	 0,						 /* QS		   */
-	 0,						 /* UID		  */
-	 0,						 /* KNOCK		*/
-	 0,						 /* CLIENT	   */
-	 0,						 /* IPV6		 */
-	 0,						 /* SSJ5		 */
-	 0,						 /* SN2		  */
-	 CAPAB_TOKEN,			   /* TOKEN		*/
-	 0,						 /* VHOST		*/
-	 CAPAB_SSJ3,				/* SSJ3		 */
-	 CAPAB_NICK2,			   /* NICK2		*/
-	 CAPAB_VL,				  /* VL		   */
-	 CAPAB_TLKEXT,			  /* TLKEXT	   */
-	 0,						 /* DODKEY	   */
-	 0,						 /* DOZIP		*/
-	 CAPAB_CHANMODE,			/* CHANMODE			 */
-	 CAPAB_SJB64,
-	 CAPAB_NICKCHARS,
-	 }
 };
 
 /* svswatch
@@ -611,6 +574,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 		}
 	}
+
+	CapabParse(ac, av);
+
 	return MOD_CONT;
 }
 
@@ -1398,9 +1364,12 @@ class ProtoUnreal : public Module
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("UnrealIRCd 3.2+");
-		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(0);
+
+		CapabType c[] = { CAPAB_NOQUIT, CAPAB_NICKIP, CAPAB_ZIP, CAPAB_TOKEN, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT, CAPAB_CHANMODE, CAPAB_SJB64, CAPAB_NICKCHARS };
+		for (unsigned i = 0; i < 11; ++i)
+			Capab.SetFlag(c[i]);
 
 		AddModes();
 

@@ -62,14 +62,12 @@ IRCDVar myIrcd[] = {
 	 0,						 /* Change RealName	  */
 	 0,
 	 1,						 /* No Knock requires +i */
-	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support inspircd TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 0,						 /* ts6 */
 	 0,						 /* p10 */
-	 NULL,					  /* character set */
 	 1,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
 	 false,					/* Auth for users is sent after the initial NICK/UID command */
@@ -79,39 +77,6 @@ IRCDVar myIrcd[] = {
 	{NULL}
 };
 
-
-IRCDCAPAB myIrcdcap[] = {
-	{
-	 CAPAB_NOQUIT,			  /* NOQUIT	   */
-	 0,						 /* TSMODE	   */
-	 1,						 /* UNCONNECT	*/
-	 0,						 /* NICKIP	   */
-	 0,						 /* SJOIN		*/
-	 0,						 /* ZIP		  */
-	 0,						 /* BURST		*/
-	 0,						 /* TS5		  */
-	 0,						 /* TS3		  */
-	 0,						 /* DKEY		 */
-	 0,						 /* PT4		  */
-	 0,						 /* SCS		  */
-	 0,						 /* QS		   */
-	 0,						 /* UID		  */
-	 0,						 /* KNOCK		*/
-	 0,						 /* CLIENT	   */
-	 0,						 /* IPV6		 */
-	 0,						 /* SSJ5		 */
-	 0,						 /* SN2		  */
-	 0,						 /* TOKEN		*/
-	 0,						 /* VHOST		*/
-	 CAPAB_SSJ3,				/* SSJ3		 */
-	 CAPAB_NICK2,			   /* NICK2		*/
-	 CAPAB_VL,				  /* VL		   */
-	 CAPAB_TLKEXT,			  /* TLKEXT	   */
-	 0,						 /* DODKEY	   */
-	 0,						 /* DOZIP		*/
-	 0,
-	 0, 0}
-};
 
 static int has_servicesmod = 0;
 static int has_globopsmod = 0;
@@ -1116,6 +1081,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		}
 		ircd->svshold = has_svsholdmod;
 	}
+	
+	CapabParse(ac, av);
 	return MOD_CONT;
 }
 
@@ -1193,9 +1160,12 @@ class ProtoInspIRCd : public Module
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("inspircdIRCd 1.1");
-		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(0);
+
+		CapabType c[] = { CAPAB_NOQUIT, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT };
+		for (unsigned i = 0; i < 5; ++i)
+			Capab.SetFlag(c[i]);
 
 		AddModes();
 

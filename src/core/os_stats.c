@@ -202,32 +202,21 @@ class CommandOSStats : public Command
 
 	CommandReturn DoStatsUplink(User *u)
 	{
-		char buf[512] = "";
-		int i;
-		for (i = 0; capab_info[i].token; ++i)
+		std::string buf;
+
+		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
 		{
-			if (uplink_capab & capab_info[i].flag)
+			if (Capab.HasFlag(Capab_Info[j].Flag))
 			{
-				strlcat(buf, " ", sizeof(buf));
-				strlcat(buf, capab_info[i].token, sizeof(buf));
-				/* Special cases */
-				if (capab_info[i].flag == CAPAB_CHANMODE)
-				{
-					strlcat(buf, "=", sizeof(buf));
-					strlcat(buf, ircd->chanmodes, sizeof(buf));
-				}
-				if (capab_info[i].flag == CAPAB_NICKCHARS)
-				{
-					strlcat(buf, "=", sizeof(buf));
-					if (ircd->nickchars)
-					{
-						strlcat(buf, ircd->nickchars, sizeof(buf));
-					} /* leave blank if it was null */
-				}
+				buf += " " + Capab_Info[j].Token;
 			}
 		}
+
+		if (!buf.empty())
+			buf.erase(buf.begin());
+
 		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER, serv_uplink->name);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf);
+		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf.c_str());
 		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(serv_uplink));
 		return MOD_CONT;
 	}

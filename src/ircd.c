@@ -21,7 +21,6 @@ IRCDProto *ircdproto;
  * Globals we want from the protocol file
  **/
 IRCDVar *ircd;
-IRCDCAPAB *ircdcap;
 char *version_protocol;
 int UseTSMODE;
 
@@ -48,11 +47,6 @@ void anope_SendNumeric(const char *source, int numeric, const char *dest, const 
 void pmodule_ircd_var(IRCDVar * ircdvar)
 {
 	ircd = ircdvar;
-}
-
-void pmodule_ircd_cap(IRCDCAPAB * cap)
-{
-	ircdcap = cap;
 }
 
 void pmodule_ircd_version(const char *version)

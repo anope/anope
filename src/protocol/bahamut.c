@@ -45,14 +45,12 @@ IRCDVar myIrcd[] = {
 	 0,						 /* Change RealName	  */
 	 1,
 	 1,						 /* No Knock requires +i */
-	 NULL,					  /* CAPAB Chan Modes			 */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
 	 0,						 /* Can remove User Channel Modes with SVSMODE */
 	 0,						 /* Sglines are not enforced until user reconnects */
 	 0,						 /* ts6 */
 	 0,						 /* p10 */
-	 NULL,					  /* character set */
 	 0,						 /* CIDR channelbans */
 	 "$",					   /* TLD Prefix for Global */
 	 false,					/* Auth for users is sent after the initial NICK/UID command */
@@ -61,39 +59,6 @@ IRCDVar myIrcd[] = {
 	,
 	{NULL}
 };
-
-IRCDCAPAB myIrcdcap[] = {
-	{
-	 CAPAB_NOQUIT,			  /* NOQUIT	   */
-	 CAPAB_TSMODE,			  /* TSMODE	   */
-	 CAPAB_UNCONNECT,		   /* UNCONNECT	*/
-	 0,						 /* NICKIP	   */
-	 0,						 /* SJOIN		*/
-	 0,						 /* ZIP		  */
-	 CAPAB_BURST,			   /* BURST		*/
-	 0,						 /* TS5		  */
-	 0,						 /* TS3		  */
-	 CAPAB_DKEY,				/* DKEY		 */
-	 0,						 /* PT4		  */
-	 0,						 /* SCS		  */
-	 0,						 /* QS		   */
-	 0,						 /* UID		  */
-	 0,						 /* KNOCK		*/
-	 0,						 /* CLIENT	   */
-	 0,						 /* IPV6		 */
-	 0,						 /* SSJ5		 */
-	 0,						 /* SN2		  */
-	 0,						 /* TOKEN		*/
-	 0,						 /* VHOST		*/
-	 0,						 /* SSJ3		 */
-	 0,						 /* NICK2		*/
-	 0,						 /* VL		   */
-	 0,						 /* TLKEXT	   */
-	 0,						 /* DODKEY	   */
-	 CAPAB_DOZIP,			   /* DOZIP		*/
-	 0, 0, 0}
-};
-
 
 void bahamut_cmd_burst()
 {
@@ -140,8 +105,10 @@ class BahamutIRCdProto : public IRCDProto
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
 		if (!buf) return;
-		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf);
-		else send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf);
+		if (Capab.HasFlag(CAPAB_TSMODE))
+			send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf);
+		else
+			send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
@@ -550,6 +517,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 /* EVENT : CAPAB */
 int anope_event_capab(const char *source, int ac, const char **av)
 {
+	CapabParse(ac, av);
 	return MOD_CONT;
 }
 
@@ -851,9 +819,12 @@ class ProtoBahamut : public Module
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("BahamutIRCd 1.4.*/1.8.*");
-		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(0);
+
+		CapabType c[] = { CAPAB_NOQUIT, CAPAB_TSMODE, CAPAB_UNCONNECT, CAPAB_BURST, CAPAB_DKEY, CAPAB_DOZIP };
+		for (unsigned i = 0; i < 6; ++i)
+			Capab.SetFlag(c[i]);
 
 		moduleAddIRCDMsgs();
 		moduleAddModes();

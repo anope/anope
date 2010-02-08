@@ -1323,24 +1323,21 @@ void do_cmode(const char *source, int ac, const char **av)
 	unsigned int i;
 	const char *t;
 
-	if (ircdcap->tsmode)
+	if (Capab.HasFlag(CAPAB_TSMODE) || UseTSMODE)
 	{
-		if (uplink_capab & ircdcap->tsmode || UseTSMODE)
+		for (i = 0; i < strlen(av[1]); i++)
+			if (!isdigit(av[1][i]))
+				break;
+		if (av[1][i] == '\0')
 		{
-			for (i = 0; i < strlen(av[1]); i++)
-				if (!isdigit(av[1][i]))
-					break;
-			if (av[1][i] == '\0')
-			{
-				t = av[0];
-				av[0] = av[1];
-				av[1] = t;
-				ac--;
-				av++;
-			}
-			else
-				Alog() << "TSMODE enabled but MODE has no valid TS";
+			t = av[0];
+			av[0] = av[1];
+			av[1] = t;
+			ac--;
+			av++;
 		}
+		else
+			Alog() << "TSMODE enabled but MODE has no valid TS";
 	}
 
 	/* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */

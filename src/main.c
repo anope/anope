@@ -190,9 +190,6 @@ static void services_shutdown()
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
 		if (uplink)
 			delete [] uplink;
-		if (ircd->chanmodes) {
-			delete [] ircd->chanmodes;
-		}
 		u = firstuser();
 		while (u) {
 			next = nextuser();

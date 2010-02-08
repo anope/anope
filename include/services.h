@@ -376,7 +376,6 @@ typedef struct session_ Session;
 /* Protocol tweaks */
 
 typedef struct ircdvars_ IRCDVar;
-typedef struct ircdcapab_ IRCDCAPAB;
 
 struct ircdvars_ {
 	const char *name;				/* Name of the IRCd command */
@@ -407,53 +406,18 @@ struct ircdvars_ {
 	int chgreal;				/* Change RealName		*/
 	int check_nick_id;			/* On nick change check if they could be identified */
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
-	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
 	int token;					/* Does Anope support the tokens for the ircd */
 	int sjb64;
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	int ts6;					/* ircd is TS6 */
 	int p10;					/* ircd is P10  */
-	char *nickchars;			/* character set */
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
 							 * 0 for no support, 1 for strict cidr support, anything else
 							 * for ircd specific support (nefarious only cares about first /mask) */
 	const char *globaltldprefix;		/* TLD prefix used for Global */
 	bool b_delay_auth;			/* Auth for users is sent after the initial NICK/UID command */
 	int maxmodes;				/* Max modes to send per line */
-};
-
-struct ircdcapab_ {
-  uint32 noquit;
-  uint32 tsmode;
-  uint32 unconnect;
-  uint32 nickip;
-  uint32 nsjoin;
-  uint32 zip;
-  uint32 burst;
-  uint32 ts5;
-  uint32 ts3;
-  uint32 dkey;
-  uint32 pt4;
-  uint32 scs;
-  uint32 qs;
-  uint32 uid;
-  uint32 knock;
-  uint32 client;
-  uint32 ipv6;
-  uint32 ssj5;
-  uint32 sn2;
-  uint32 token;
-  uint32 vhost;
-  uint32 ssj3;
-  uint32 nick2;
-  uint32 vl;
-  uint32 tlkext;
-  uint32 dodkey;
-  uint32 dozip;
-  uint32 chanmodes;
-  uint32 sjb64;
-  uint32 nickchars;
 };
 
 /*************************************************************************/
@@ -1018,8 +982,8 @@ enum CapabType
 /* CAPAB stuffs */
 struct CapabInfo
 {
-	const char *token;
-	CapabType flag;
+	std::string Token;
+	CapabType Flag;
 };
 
 /*************************************************************************/

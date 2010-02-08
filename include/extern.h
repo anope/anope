@@ -29,7 +29,6 @@ E char *uplink;
 /* IRC Variables */
 
 E IRCDVar *ircd;
-E IRCDCAPAB *ircdcap;
 E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
 E IRCDProto *ircdproto;
 
@@ -187,7 +186,6 @@ E Uplink *uplink_server;
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProto *);
 E void pmodule_ircd_var(IRCDVar * ircdvar);
-E void pmodule_ircd_cap(IRCDCAPAB * cap);
 E void pmodule_ircd_version(const char *version);
 E void pmodule_ircd_useTSMode(int use);
 
@@ -473,12 +471,13 @@ E void notice_help(const char *source, User *dest, int message, ...); // MARK_DE
 E Server *servlist;
 E Server *me_server;
 E Server *serv_uplink;
-E uint32 uplink_capab;
-E CapabInfo capab_info[];
+E Flags<CapabType> Capab;
+E CapabInfo Capab_Info[];
 
 E Server *first_server(ServerFlag flag);
 E Server *next_server(ServerFlag flag);
 
+E void CapabParse(int ac, const char **av);
 E int is_ulined(const char *server);
 E int is_sync(Server *server);
 

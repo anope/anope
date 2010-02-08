@@ -18,7 +18,7 @@
 Server *servlist = NULL;
 Server *me_server = NULL;	   /* This are we		*/
 Server *serv_uplink = NULL;	 /* This is our uplink */
-uint32 uplink_capab;
+Flags<CapabType> Capab;
 char *uplink;
 char *TS6UPLINK;
 char *TS6SID;
@@ -26,7 +26,7 @@ char *TS6SID;
 /* For first_server / next_server */
 static Server *server_cur;
 
-CapabInfo capab_info[] = {
+CapabInfo Capab_Info[] = {
 	{"NOQUIT", CAPAB_NOQUIT},
 	{"TSMODE", CAPAB_TSMODE},
 	{"UNCONNECT", CAPAB_UNCONNECT},
@@ -53,7 +53,7 @@ CapabInfo capab_info[] = {
 	{"SJB64", CAPAB_SJB64},
 	{"CHANMODES", CAPAB_CHANMODE},
 	{"NICKCHARS", CAPAB_NICKCHARS},
-	{NULL, CAPAB_END}
+	{"", CAPAB_END}
 };
 
 /*************************************************************************/
@@ -204,33 +204,30 @@ static void delete_server(Server * serv, const char *quitreason)
 			<< (serv->uplink ? serv->uplink->name : "NOTHING") << "(" 
 			<< (serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK") << ")";
 
-	if (ircdcap->noquit || ircdcap->qs) {
-		if ((uplink_capab & ircdcap->noquit)
-			|| (uplink_capab & ircdcap->qs)) {
-			u = firstuser();
-			while (u) {
-				unext = nextuser();
-				if (u->server == serv)
-				{
-					if ((na = findnick(u->nick)) && !na->HasFlag(NS_FORBIDDEN)
-						&& (!na->nc->HasFlag(NI_SUSPENDED))
-						&& (u->IsRecognized() || u->IsIdentified())) {
-						na->last_seen = time(NULL);
-						if (na->last_quit)
-							delete [] na->last_quit;
-						na->last_quit =
-							(quitreason ? sstrdup(quitreason) : NULL);
-					}
-
-					if (Config.LimitSessions && !is_ulined(u->server->name)) {
-						del_session(u->host);
-					}
-					delete u;
+	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
+	{
+		u = firstuser();
+		while (u)
+		{
+			unext = nextuser();
+			if (u->server == serv)
+			{
+				if ((na = findnick(u->nick)) && !na->HasFlag(NS_FORBIDDEN)
+					&& (!na->nc->HasFlag(NI_SUSPENDED))
+					&& (u->IsRecognized() || u->IsIdentified())) {
+					na->last_seen = time(NULL);
+					if (na->last_quit)
+						delete [] na->last_quit;
+					na->last_quit = (quitreason ? sstrdup(quitreason) : NULL);
 				}
-				u = unext;
+					if (Config.LimitSessions && !is_ulined(u->server->name)) {
+					del_session(u->host);
+				}
+				delete u;
 			}
-			Alog(LOG_DEBUG) << "delete_server() cleared all users";
+			u = unext;
 		}
+		Alog(LOG_DEBUG) << "delete_server() cleared all users";
 	}
 
 	s = serv->links;
@@ -445,16 +442,38 @@ void do_squit(const char *source, int ac, const char **av)
 	snprintf(buf, sizeof(buf), "%s %s", s->name,
 			 (s->uplink ? s->uplink->name : ""));
 
-	if (ircdcap->unconnect) {
-		if ((s->uplink == me_server)
-			&& (uplink_capab & ircdcap->unconnect)) {
-			Alog(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->name;
-			/* need to fix */
-			ircdproto->SendSquit(s->name, buf);
-		}
+	if (s->uplink == me_server && Capab.HasFlag(CAPAB_UNCONNECT))
+	{
+		Alog(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->name;
+		/* need to fix */
+		ircdproto->SendSquit(s->name, buf);
 	}
 
 	delete_server(s, buf);
+}
+
+/*************************************************************************/
+
+/** Handle parsing the CAPAB/PROTOCTL messages
+ * @param ac Number of args
+ * @param av Args
+ */
+void CapabParse(int ac, const char **av)
+{
+	for (int i = 0; i < ac; ++i)
+	{
+		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
+		{
+			if (av[i] == Capab_Info[j].Token)
+			{
+				Capab.SetFlag(Capab_Info[j].Flag);
+
+				if (Capab_Info[j].Token == "NICKIP" && !ircd->nickip)
+					ircd->nickip = 1;
+				break;
+			}
+		}
+	}
 }
 
 /*************************************************************************/

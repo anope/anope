@@ -262,9 +262,9 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
 
             if (add) {
                 chan_set_user_status(chan, user, cum->status);
-                /* If this does +o, remove any DEOPPED flag */
-                if (cum->status & CUS_OP)
-                    chan_remove_user_status(chan, user, CUS_DEOPPED);
+                /* If this does +o or +h, remove any DEOPPED flag */
+                if (cum->status & CUS_OP || cum->status & CUS_HALFOP)
+	                    chan_remove_user_status(chan, user, CUS_DEOPPED);
             } else {
                 chan_remove_user_status(chan, user, cum->status);
             }
@@ -1512,6 +1512,8 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, "h");
             strcat(userbuf, " ");
             strcat(userbuf, GET_USER(user));
+            /* Halfops are ops too, having a halfop with CUS_DEOPPED is not good - Adam */
+            rem_modes |= CUS_DEOPPED;
         } else {
             add_modes &= ~CUS_HALFOP;
         }
@@ -1543,12 +1545,17 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, "o");
             strcat(userbuf, " ");
             strcat(userbuf, GET_USER(user));
-            add_modes |= CUS_DEOPPED;
+            /* Do not mark a user as deopped if they are halfopd - Adam */
+            if (!(add_modes & CUS_HALFOP) && !(status & CUS_HALFOP))
+                add_modes |= CUS_DEOPPED;
         }
         if (rem_modes & CUS_HALFOP) {
             strcat(modebuf, "h");
             strcat(userbuf, " ");
             strcat(userbuf, GET_USER(user));
+            /* Do not mark a user as deopped if they are opped - Adam */
+            if (!(add_modes & CUS_OP) && !(status & CUS_OP))
+                add_modes |= CUS_DEOPPED;
         }
     }
 

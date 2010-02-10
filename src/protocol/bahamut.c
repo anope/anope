@@ -775,38 +775,38 @@ void moduleAddIRCDMsgs() {
 void moduleAddModes()
 {
 	/* Add user modes */
-	ModeManager::AddUserMode('A', new UserMode(UMODE_SERV_ADMIN));
-	ModeManager::AddUserMode('R', new UserMode(UMODE_REGPRIV));
-	ModeManager::AddUserMode('a', new UserMode(UMODE_ADMIN));
-	ModeManager::AddUserMode('i', new UserMode(UMODE_INVIS));
-	ModeManager::AddUserMode('o', new UserMode(UMODE_OPER));
-	ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
-	ModeManager::AddUserMode('s', new UserMode(UMODE_SNOMASK));
-	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
-	ModeManager::AddUserMode('d', new UserMode(UMODE_DEAF));
+	ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, 'A'));
+	ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
+	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
+	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
+	ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
+	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
+	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
+	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
+	ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
 
 	/* b/e/I */
-	ModeManager::AddChannelMode('b', new ChannelModeBan());
+	ModeManager::AddChannelMode(new ChannelModeBan('b'));
 
 	/* v/h/o/a/q */
-	ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
-	ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@'));
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
 
 	/* Add channel modes */
-	ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
-	ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
-	ModeManager::AddChannelMode('j', new ChannelModeFlood());
-	ModeManager::AddChannelMode('k', new ChannelModeKey());
-	ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT));
-	ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
-	ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
-	ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
-	ModeManager::AddChannelMode('r', new ChannelModeRegistered());
-	ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
-	ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
-	ModeManager::AddChannelMode('M', new ChannelMode(CMODE_REGMODERATED));
-	ModeManager::AddChannelMode('O', new ChannelModeOper());
-	ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+	ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+	ModeManager::AddChannelMode(new ChannelModeKey('k'));
+	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+	ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
+	ModeManager::AddChannelMode(new ChannelModeOper('O'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
 }
 
 class ProtoBahamut : public Module

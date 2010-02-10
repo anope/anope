@@ -25,6 +25,8 @@ std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
  * the pointers in each are the same. This is used to increase
  * efficiency.
  */
+/* List of all modes Anope knows about */
+std::list<Mode *> ModeManager::Modes;
 
 /* Default mlocked modes on */
 std::bitset<128> DefMLockOn;
@@ -95,12 +97,25 @@ void SetDefaultMLock()
 }
 
 /** Default constructor
- * @param mName The mode name
+ * @param mClass The type of mode this is
+ * @param modeChar The mode char
  */
-UserMode::UserMode(UserModeName mName)
+Mode::Mode(ModeClass mClass, char modeChar) : Class(mClass), ModeChar(modeChar)
 {
-	this->Name = mName;
-	this->Type = MODE_REGULAR;
+}
+
+/** Default destructor
+ */
+Mode::~Mode()
+{
+}
+
+/** Default constructor
+ * @param mName The mode name
+ * @param modeChar The mode char
+ */
+UserMode::UserMode(UserModeName mName, char modeChar) : Mode(MC_USER, modeChar), Name(mName), Type(MODE_REGULAR)
+{
 }
 
 /** Default destructor
@@ -109,18 +124,21 @@ UserMode::~UserMode()
 {
 }
 
-UserModeParam::UserModeParam(UserModeName mName) : UserMode(mName)
+/** Default constructor
+ * @param mName The mode name
+ * @param modeChar The mode char
+ */
+UserModeParam::UserModeParam(UserModeName mName, char modeChar) : UserMode(mName, modeChar)
 {
 	this->Type = MODE_PARAM;
 }
 
 /** Default constrcutor
  * @param mName The mode name
+ * @param modeChar The mode char
  */
-ChannelMode::ChannelMode(ChannelModeName mName)
+ChannelMode::ChannelMode(ChannelModeName mName, char modeChar) : Mode(MC_CHANNEL, modeChar), Name(mName), Type(MODE_REGULAR)
 {
-	this->Name = mName;
-	this->Type = MODE_REGULAR;
 }
 
 /** Default destructor
@@ -131,8 +149,9 @@ ChannelMode::~ChannelMode()
 
 /** Default constructor
  * @param mName The mode name
+ * @param modeChar The mode char
  */
-ChannelModeList::ChannelModeList(ChannelModeName mName) : ChannelMode(mName)
+ChannelModeList::ChannelModeList(ChannelModeName mName, char modeChar) : ChannelMode(mName, modeChar)
 {
 	this->Type = MODE_LIST;
 }
@@ -145,12 +164,12 @@ ChannelModeList::~ChannelModeList()
 
 /** Default constructor
  * @param mName The mode name
+ * @param modeChar The mode char
  * @param MinusArg true if the mode sends no arg when unsetting
  */
-ChannelModeParam::ChannelModeParam(ChannelModeName mName, bool MinusArg) : ChannelMode(mName)
+ChannelModeParam::ChannelModeParam(ChannelModeName mName, char modeChar, bool MinusArg) : ChannelMode(mName, modeChar), MinusNoArg(MinusArg)
 {
 	this->Type = MODE_PARAM;
-	this->MinusNoArg = MinusArg;
 }
 
 /** Default destructor
@@ -161,12 +180,12 @@ ChannelModeParam::~ChannelModeParam()
 
 /** Default constructor
  * @param mName The mode name
+ * @param modeChar The mode char
  * @param mSymbol The symbol for the mode, eg @ % +
  */
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char mSymbol) : ChannelMode(mName)
+ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol) : ChannelMode(mName, modeChar), Symbol(mSymbol)
 {
 	this->Type = MODE_STATUS;
-	this->Symbol = mSymbol;
 }
 
 /** Default destructor
@@ -479,17 +498,17 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 	std::string buf, parambuf;
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
-	unsigned Modes = 0;
+	unsigned NModes = 0;
 
 	buf = "+";
 	for (it = info->AddModes.begin(); it != info->AddModes.end(); ++it)
 	{
-		if (++Modes > ircd->maxmodes)
+		if (++NModes > ircd->maxmodes)
 		{
 			ret.push_back(buf + parambuf);
 			buf = "+";
 			parambuf.clear();
-			Modes = 1;
+			NModes = 1;
 		}
 
 		if (info->Type == ST_CHANNEL)
@@ -513,12 +532,12 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 	buf += "-";
 	for (it = info->DelModes.begin(); it != info->DelModes.end(); ++it)
 	{
-		if (++Modes > ircd->maxmodes)
+		if (++NModes > ircd->maxmodes)
 		{
 			ret.push_back(buf + parambuf);
 			buf = "-";
 			parambuf.clear();
-			Modes = 1;
+			NModes = 1;
 		}
 
 		if (info->Type == ST_CHANNEL)
@@ -591,46 +610,44 @@ void ModeManager::StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool
 }
 
 /** Add a user mode to Anope
- * @param Mode The mode
  * @param um A UserMode or UserMode derived class
  * @return true on success, false on error
  */
-bool ModeManager::AddUserMode(char Mode, UserMode *um)
+bool ModeManager::AddUserMode(UserMode *um)
 {
-	um->ModeChar = Mode;
-	bool ret = ModeManager::UserModesByChar.insert(std::make_pair(Mode, um)).second;
-	if (ret)
-		ret = ModeManager::UserModesByName.insert(std::make_pair(um->Name, um)).second;
-
-	if (ret)
+	if (ModeManager::UserModesByChar.insert(std::make_pair(um->ModeChar, um)).second)
 	{
+		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um)).second;
+		ModeManager::Modes.push_back(um);
+
 		FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
+
+		return true;
 	}
 
-	return ret;
+	return false;
 }
 
 /** Add a channel mode to Anope
- * @param Mode The mode
  * @param cm A ChannelMode or ChannelMode derived class
  * @return true on success, false on error
  */
-bool ModeManager::AddChannelMode(char Mode, ChannelMode *cm)
+bool ModeManager::AddChannelMode(ChannelMode *cm)
 {
-	cm->ModeChar = Mode;
-	bool ret = ModeManager::ChannelModesByChar.insert(std::make_pair(Mode, cm)).second;
-	if (ret)
-		ret = ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm)).second;
-
-	if (ret)
+	if (ModeManager::ChannelModesByChar.insert(std::make_pair(cm->ModeChar, cm)).second)
 	{
+		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm)).second;
+		ModeManager::Modes.push_back(cm);
+
 		/* Apply this mode to the new default mlock if its used */
 		SetDefaultMLock();
 
 		FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
+
+		return true;
 	}
 
-	return ret;
+	return false;
 }
 /** Find a channel mode
  * @param Mode The mode

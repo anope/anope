@@ -206,11 +206,11 @@ How To Add IRCd Support
    Anope is told about modes in the moduleAddModes() function.
    For the most part, the syntax for adding channel and user modes are:
    
-   ModeManager::AddUserMode('N', new UserMode(UMODE_NETADMIN));
+   ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
    Where 'N' is the char for the mode, and UMODE_NETADMIN shows what the
    mode does. Or:
 
-   ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+   ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
    Where 'c' is the char for the mode and CMODE_BLOCKCOLOR shows what
    the mode does
 
@@ -219,11 +219,11 @@ How To Add IRCd Support
    If necessary, you can add additional modes to this list.
 
    Adding simple modes with parameters is similar, instead adding a
-   'new ChannelMode', use 'new ChannelModeParam', set the second optional
+   'new ChannelMode', use 'new ChannelModeParam', set the third optional
    arg of ChannelModeParam to false if the param should NOT be sent when unsetting
    it. Eg:
 
-   ModeManager::AddChannelMode('j', new ChannelModeParam(CMODE_JOINFLOOD, true));
+   ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, 'j', true));
 
    Anope will internally track the params, and they can be retrieved through
    Channel::GetParam();
@@ -235,13 +235,13 @@ How To Add IRCd Support
    from mlocking (or in CMODE_REGISTERED's case, anyone) from setting them.
    This should be added like:
 
-   ModeManager::AddChannelMode('O', new ChannelModeOper());
+   ModeManager::AddChannelMode(new ChannelModeOper('O'));
 
    The CMODE_FLOOD param also has its own class, but due to the wide range of
    valid parameters accepted across IRCds, your protocol module MUST have the
    IsValid function for this.
 
-   bool ChannelModeFlood::IsValid(const char *value) { }
+   bool ChannelModeFlood::IsValid(const std::string &value) { }
 
 5) Functions and Events
 

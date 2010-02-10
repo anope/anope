@@ -912,13 +912,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'b':
-							ModeManager::AddChannelMode('b', new ChannelModeBan());
+							ModeManager::AddChannelMode(new ChannelModeBan('b'));
 							continue;
 						case 'e':
-							ModeManager::AddChannelMode('e', new ChannelModeExcept());
+							ModeManager::AddChannelMode(new ChannelModeExcept('e'));
 							continue;
 						case 'I':
-							ModeManager::AddChannelMode('I', new ChannelModeInvite());
+							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
 							continue;
 					}
 				}
@@ -929,7 +929,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'k':
-							ModeManager::AddChannelMode('k', new ChannelModeKey());
+							ModeManager::AddChannelMode(new ChannelModeKey('k'));
 							continue;
 					}
 				}
@@ -940,12 +940,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'f':
-							ModeManager::AddChannelMode('f', new ChannelModeFlood());
+							ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+							continue;
 						case 'l':
-							ModeManager::AddChannelMode('l', new ChannelModeParam(CMODE_LIMIT, true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
 							continue;
 						case 'L':
-							ModeManager::AddChannelMode('L', new ChannelModeParam(CMODE_REDIRECT, true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L', true));
 							continue;
 					}
 				}
@@ -956,64 +957,64 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'i':
-							ModeManager::AddChannelMode('i', new ChannelMode(CMODE_INVITE));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
 							continue;
 						case 'm':
-							ModeManager::AddChannelMode('m', new ChannelMode(CMODE_MODERATED));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
 							continue;
 						case 'n':
-							ModeManager::AddChannelMode('n', new ChannelMode(CMODE_NOEXTERNAL));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
 							continue;
 						case 'p':
-							ModeManager::AddChannelMode('p', new ChannelMode(CMODE_PRIVATE));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
 							continue;
 						case 's':
-							ModeManager::AddChannelMode('s', new ChannelMode(CMODE_SECRET));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
 							continue;
 						case 't':
-							ModeManager::AddChannelMode('t', new ChannelMode(CMODE_TOPIC));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
 							continue;
 						case 'r':
-							ModeManager::AddChannelMode('r', new ChannelModeRegistered());
+							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
 							continue;
 						case 'c':
-							ModeManager::AddChannelMode('c', new ChannelMode(CMODE_BLOCKCOLOR));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
 							continue;
 						case 'u':
-							ModeManager::AddChannelMode('u', new ChannelMode(CMODE_AUDITORIUM));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, 'u'));
 							continue;
 						case 'z':
-							ModeManager::AddChannelMode('z', new ChannelMode(CMODE_SSL));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
 							continue;
 						case 'A':
-							ModeManager::AddChannelMode('A', new ChannelMode(CMODE_ALLINVITE));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, 'A'));
 							continue;
 						case 'C':
-							ModeManager::AddChannelMode('C', new ChannelMode(CMODE_NOCTCP));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
 							continue;
 						case 'G':
-							ModeManager::AddChannelMode('G', new ChannelMode(CMODE_FILTER));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
 							continue;
 						case 'K':
-							ModeManager::AddChannelMode('K', new ChannelMode(CMODE_NOKNOCK));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, 'K'));
 							continue;
 						case 'N':
-							ModeManager::AddChannelMode('N', new ChannelMode(CMODE_NONICK));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, 'N'));
 							continue;
 						case 'O':
-							ModeManager::AddChannelMode('O', new ChannelModeOper());
+							ModeManager::AddChannelMode(new ChannelModeOper('O'));
 							continue;
 						case 'Q':
-							ModeManager::AddChannelMode('Q', new ChannelMode(CMODE_NOKICK));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, 'Q'));
 							continue;
 						case 'R':
-							ModeManager::AddChannelMode('R', new ChannelMode(CMODE_REGISTEREDONLY));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
 							continue;
 						case 'S':
-							ModeManager::AddChannelMode('S', new ChannelMode(CMODE_STRIPCOLOR));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, 'S'));
 							continue;
 						case 'V':
-							ModeManager::AddChannelMode('V', new ChannelMode(CMODE_NOINVITE));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOINVITE, 'V'));
 							continue;
 					}
 				}
@@ -1028,19 +1029,19 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modes[t])
 					{
 						case 'q':
-							ModeManager::AddChannelMode('q', new ChannelModeStatus(CMODE_OWNER, '~'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~'));
 							continue;
 						case 'a':
-							ModeManager::AddChannelMode('a', new ChannelModeStatus(CMODE_PROTECT, '&'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&'));
 							continue;
 						case 'o':
-							ModeManager::AddChannelMode('o', new ChannelModeStatus(CMODE_OP, '@'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
 							continue;
 						case 'h':
-							ModeManager::AddChannelMode('h', new ChannelModeStatus(CMODE_HALFOP, '%'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%'));
 							continue;
 						case 'v':
-							ModeManager::AddChannelMode('v', new ChannelModeStatus(CMODE_VOICE, '+'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
 							continue;
 					}
 				}
@@ -1141,13 +1142,13 @@ bool ChannelModeFlood::IsValid(const std::string &value)
 
 static void AddModes()
 {
-	ModeManager::AddUserMode('g', new UserMode(UMODE_CALLERID));
-	ModeManager::AddUserMode('h', new UserMode(UMODE_HELPOP));
-	ModeManager::AddUserMode('i', new UserMode(UMODE_INVIS));
-	ModeManager::AddUserMode('o', new UserMode(UMODE_OPER));
-	ModeManager::AddUserMode('r', new UserMode(UMODE_REGISTERED));
-	ModeManager::AddUserMode('w', new UserMode(UMODE_WALLOPS));
-	ModeManager::AddUserMode('x', new UserMode(UMODE_CLOAK));
+	ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
+	ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
+	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
+	ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
+	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
+	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
+	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
 }
 
 class ProtoInspIRCd : public Module

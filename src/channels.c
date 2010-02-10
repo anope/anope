@@ -978,25 +978,25 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 	char params[BUFSIZE];
 	char *end = res, *value, *pend = params, *pend2 = params;
 	std::string param;
-	ChannelMode *cm;
-	ChannelModeParam *cmp;
-	std::map<char, ChannelMode *>::iterator it;
 
 	if (chan->HasModes())
 	{
-		for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+		for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 		{
-			cm = it->second;
+			if ((*it)->Class != MC_CHANNEL)
+				continue;
+
+			ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
 
 			if (chan->HasMode(cm->Name))
 			{
-				*end++ = it->first;
+				*end++ = cm->ModeChar;
 
 				if (complete)
 				{
 					if (cm->Type == MODE_PARAM)
 					{
-						cmp = dynamic_cast<ChannelModeParam *>(cm);
+						ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 						if (plus || !cmp->MinusNoArg)
 						{

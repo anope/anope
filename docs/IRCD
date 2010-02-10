@@ -201,52 +201,6 @@ How To Add IRCd Support
 
     44) Max Modes: The max number of mode changes we can send in one line
 
-    So we've had this long list. Now there's a second struct to fill. This
-    struct isn't as long as the previous one though, so we'll handle it quite
-    quick compared to the previous one.
-
-        IRCDCAPAB myIrcdcap[] = { };
-
-    This struct is based on the CAPAB defines. You should review the CAPAB
-    table below to see how this should be done.
-
-        Define Table
-    --------------------------------------------------------------------------
-    Define          |  Token     | Description
-    ----------------|------------|-----------|--------------------------------
-    CAPAB_NOQUIT    |  NOQUIT    | NOQUIT protocol support
-    CAPAB_TSMODE    |  TS        | Chanmodes are timestamped
-    CAPAB_UNCONNECT |  UNCONNECT | UNCONNECT protocol support
-    CAPAB_NICKIP    |  NICKIP    | IP sent in the NICK line
-    CAPAB_NSJOIN    |  SSJOIN    | Smart SJOIN support
-    CAPAB_ZIP       |  ZIP       | Support for gzipped links
-    CAPAB_BURST     |  BURST     | Supports BURST command
-    CAPAB_TS3       |  TS3       | Support for TS3 protocol
-    CAPAB_TS5       |  TS5       | Support for TS5 protocol
-    CAPAB_DKEY      |  DKEY      | DH-Key exchange using DKEY
-    CAPAB_DOZIP     |  ZIP       | Link traffic will be gzipped
-    CAPAB_DODKEY    |  DKEY      | Do DKEY with this link
-    CAPAB_QS        |  QS        | Supports quit storm removal
-    CAPAB_SCS       |  SCS       | String Cache System support
-    CAPAB_PT4       |  PT4       | Support for PT4 protocol
-    CAPAB_UID       |  UID       | Support for UIDs
-    CAPAB_KNOCK     |  KNOCK     | Supports KNOCK
-    CAPAB_CLIENT    |  CLIENT    | Supports CLIENT
-    CAPAB_IPV6      |  IPV6      | Support for IPv6 addresses
-    CAPAB_SSJ5      |  SSJ5      | Smart Join protocol 5 support
-    CAPAB_SN2       |  SN2       | Support for SN2 protocol
-    CAPAB_VHOST     |  VHOST     | Supports VHOST protocol
-    CAPAB_TOKEN     |  TOKEN     | Supports s2s tokens
-    CAPAB_SSJ3      |  SSJ3      | Smart Join protocol 3 support
-    CAPAB_NICK2     |  NICK2     | Support for extended NICK (v2)
-    CAPAB_UMODE2    |  UMODE2    | Supports UMODE2 command
-    CAPAB_VL        |  VL        | VLine information in info field
-    CAPAB_TLKEXT    |  TLKEXT    | Not 8, but 10 params in TKL's
-    CAPAB_CHANMODE  |  CHANMODE  | Channel modes are passed here
-    CAPAB_SJB64     |  SJB64     | SJOIN timestamps are base64 encoded
-    CAPAB_NICKCHARS |  NICKCHARS | Character set used by the IRCD for nicks
-
-
 4) Modes 
 
    Anope is told about modes in the moduleAddModes() function.
@@ -331,8 +285,54 @@ How To Add IRCd Support
     the other end of the connection is capable of doing. Anope has a function
     to read these lines and set itself up to to handle these events better.
     When adding support for your ircd, take the following steps.
+    
+    1) In the module constructor you must tell Anope what the uplink is capable of that
+       isn't already passed in the CAPAB/PROTOCTL, you do this by something similar to:
 
-    1) In the ircd.c find the function anope_cmd_capab(); this function will
+       CapabType c[] = { CAPAB_NOQUIT, CAPAB_NICKIP, CAPAB_ZIP, CAPAB_TOKEN, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT, CAPAB_CHANMODE, CAPAB_SJB64, CAPAB_NICKCHARS };
+       for (unsigned i = 0; i < 11; ++i)
+           Capab.SetFlag(c[i]);
+
+       Anything else given to Anope in the CAPAB/PROTOCTL message will be handled later by CapabParse.
+
+       The available CAPAB options are:
+
+       --------------------------------------------------------------------------
+       Define          |  Description
+       ----------------|------------|-----------|--------------------------------
+       CAPAB_NOQUIT    |  NOQUIT protocol support
+       CAPAB_TSMODE    |  Chanmodes are timestamped
+       CAPAB_UNCONNECT |  UNCONNECT protocol support
+       CAPAB_NICKIP    |  IP sent in the NICK line
+       CAPAB_NSJOIN    |  Smart SJOIN support
+       CAPAB_ZIP       |  Support for gzipped links
+       CAPAB_BURST     |  Supports BURST command
+       CAPAB_TS3       |  Support for TS3 protocol
+       CAPAB_TS5       |  Support for TS5 protocol
+       CAPAB_DKEY      |  DH-Key exchange using DKEY
+       CAPAB_DOZIP     |  Link traffic will be gzipped
+       CAPAB_DODKEY    |  Do DKEY with this link
+       CAPAB_QS        |  Supports quit storm removal
+       CAPAB_SCS       |  String Cache System support
+       CAPAB_PT4       |  Support for PT4 protocol
+       CAPAB_UID       |  Support for UIDs
+       CAPAB_KNOCK     |  Supports KNOCK
+       CAPAB_CLIENT    |  Supports CLIENT
+       CAPAB_IPV6      |  Support for IPv6 addresses
+       CAPAB_SSJ5      |  Smart Join protocol 5 support
+       CAPAB_SN2       |  Support for SN2 protocol
+       CAPAB_VHOST     |  Supports VHOST protocol
+       CAPAB_TOKEN     |  Supports s2s tokens
+       CAPAB_SSJ3      |  Smart Join protocol 3 support
+       CAPAB_NICK2     |  Support for extended NICK (v2)
+       CAPAB_UMODE2    |  Supports UMODE2 command
+       CAPAB_VL        |  VLine information in info field
+       CAPAB_TLKEXT    |  Not 8, but 10 params in TKL's
+       CAPAB_CHANMODE  |  Channel modes are passed here
+       CAPAB_SJB64     |  SJOIN timestamps are base64 encoded
+       CAPAB_NICKCHARS |  Character set used by the IRCD for nicks
+
+    2) In the ircd.c find the function anope_cmd_capab(); this function will
        send the CAPAB/PROTOCTL line (consult your ircd documentation for
        which to send). In a single line type in the tokens that anope must
        send. Here is an example of Hybrid's capab line:
@@ -343,15 +343,9 @@ How To Add IRCd Support
             send_cmd(NULL, "CAPAB TS5 EX IE HOPS HUB AOPS");
         }
 
-    2) In the ircd.h file make sure to place the defines (see below) that
-       match your IRCd's tokens; only use the ones that matter to your ircd.
-       Should your IRCd add new features not covered in the defined, please
-       contact the Anope Dev team before doing so. See README for information
-       on how to contact the Anope team.
-
     3) Ensure that the CAPAB/PROTOCTL event his handled correctly. 
 
-        A) In the function "moduleAddIRCDMsgs" making sure that you have the
+        A) In the function module constructor make sure that you have the
            following two lines:
    
             m = createMessage("CAPAB", anope_event_capab); 
@@ -361,11 +355,11 @@ How To Add IRCd Support
 
             int anope_event_capab(char *source, int ac, char **av)
             {
-                capab_parse(ac, av);
+                CapabParse(ac, av);
                 return MOD_CONT;
             }
 
-           This function should call the capab_parse function which parses
+           This function should call the CapabParse function which parses
            the received CAPAB/PROTOCTL line.
 
 7) IRCDProto Class

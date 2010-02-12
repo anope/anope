@@ -28,6 +28,8 @@ std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
 /* List of all modes Anope knows about */
 std::list<Mode *> ModeManager::Modes;
 
+/* Number of generic modes we support */
+unsigned GenericChannelModes = 0, GenericUserModes = 0;
 /* Default mlocked modes on */
 std::bitset<128> DefMLockOn;
 /* Default mlocked modes off */
@@ -617,6 +619,11 @@ bool ModeManager::AddUserMode(UserMode *um)
 {
 	if (ModeManager::UserModesByChar.insert(std::make_pair(um->ModeChar, um)).second)
 	{
+		if (um->Name == UMODE_END)
+		{
+			um->Name = static_cast<UserModeName>(UMODE_END + ++GenericUserModes);
+			Alog() << "ModeManager: Added generic support for user mode " << um->ModeChar;
+		}
 		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um)).second;
 		ModeManager::Modes.push_back(um);
 
@@ -636,6 +643,11 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 {
 	if (ModeManager::ChannelModesByChar.insert(std::make_pair(cm->ModeChar, cm)).second)
 	{
+		if (cm->Name == CMODE_END)
+		{
+			cm->Name = static_cast<ChannelModeName>(CMODE_END + ++GenericChannelModes);
+			Alog() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
+		}
 		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm)).second;
 		ModeManager::Modes.push_back(cm);
 

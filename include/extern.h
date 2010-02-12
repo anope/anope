@@ -350,6 +350,8 @@ E uint32 str_is_ip(char *str);
 E int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host);
 
 /**** modes.cpp ****/
+/* Number of generic modes we support */
+E unsigned GenericChannelModes, GenericUserModes;
 E std::bitset<128> DefMLockOn;
 E std::bitset<128> DefMLockOff;
 E std::map<ChannelModeName, std::string> DefMLockParams;

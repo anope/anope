@@ -1011,6 +1011,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'I':
 							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
 							continue;
+						default:
+							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
 					}
 				}
 
@@ -1022,6 +1024,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'k':
 							ModeManager::AddChannelMode(new ChannelModeKey('k'));
 							continue;
+						default:
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
 					}
 				}
 
@@ -1048,6 +1052,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'l':
 							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
 							continue;
+						default:
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
 					}
 				}
 
@@ -1125,6 +1131,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'z':
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
 							continue;
+						default:
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
 					}
 				}
 			}
@@ -1194,6 +1202,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							case 'd':
 								ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
 								continue;
+							default:
+								ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
 						}
 					}
 				}

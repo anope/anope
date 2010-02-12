@@ -465,6 +465,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					case 'I':
 						ModeManager::AddChannelMode(new ChannelModeInvite('I'));
 						continue;
+					default:
+						ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
 				}
 			}
 
@@ -482,6 +484,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					case 'L':
 						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L'));
 						continue;
+					default:
+						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
 				}
 			}
 
@@ -496,6 +500,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					case 'j':
 						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, 'j', true));
 						continue;
+					default:
+						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
 				}
 			}
 
@@ -570,6 +576,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					case 'G':
 						ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
 						continue;
+					default:
+						ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
 				}
 			}
 		}

@@ -221,7 +221,7 @@ int do_list(User * u)
             }
         }
 
-        if (nronly == 1 || (is_servadmin && matchflags == 0)) {
+        if (nronly == 1 || (is_servadmin && matchflags == 0 && susp_keyword == 0)) {
             noexpire_char = ' ';
             for (i = 0; i < 1024; i++) {
                 for (nr = nrlists[i]; nr; nr = nr->next) {

@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2791"
+VERSION_BUILD="2792"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2792 - Documented /nickserv list's ability to accept ranges
 #Revision 2791 - Don't show unconfirmed nicks when services admins list suspended nicks
 #Revision 2787 - Fixed it so halfops can not be marked as forcibly deopped, fixes us sometimes undoing all modes by some halfops
 #Revision 2774 - Bump Changes versions to 1.8-SVN & credit for tr.l

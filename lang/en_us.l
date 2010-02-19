@@ -3900,6 +3900,7 @@ NICK_HELP_LIST
 	Lists all registered nicknames which match the given
 	pattern, in nick!user@host format.  Nicks with the
 	PRIVATE option set will not be displayed.
+	Note that a pattern preceding with a '#' specifies a range.
 	
 	Examples:
 	
@@ -3913,6 +3914,9 @@ NICK_HELP_LIST
 	    LIST *!*@*.bar.org
 	        Lists all nicks owned by users in the bar.org
 	        domain.
+	
+	    LIST #50-100
+	        Lists nicks numbers 50-100
 
 NICK_HELP_ALIST
 	Syntax: ALIST [level]

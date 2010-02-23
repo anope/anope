@@ -19,26 +19,46 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 	this->host = nhost;
 	this->real = nreal;
 	this->lastmsg = this->created = time(NULL);
-	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
-	++nbots;
+	this->uid = ts6_uid_retrieve();
 	this->cmdTable = NULL;
+	++nbots;
 	this->chancount = 0;
 
 	ci::string ci_nick(nnick.c_str());
 	if (Config.s_ChanServ && ci_nick == Config.s_ChanServ)
+	{
+		this->cmdTable = CHANSERV;
 		this->SetFlag(BI_CHANSERV);
+	}
 	else if (Config.s_BotServ && ci_nick == Config.s_BotServ)
+	{
+		this->cmdTable = BOTSERV;
 		this->SetFlag(BI_BOTSERV);
+	}
 	else if (Config.s_HostServ && ci_nick == Config.s_HostServ)
+	{
+		this->cmdTable = HOSTSERV;
 		this->SetFlag(BI_HOSTSERV);
+	}
 	else if (Config.s_OperServ && ci_nick == Config.s_OperServ)
+	{
+		this->cmdTable = OPERSERV;
 		this->SetFlag(BI_OPERSERV);
+	}
 	else if (Config.s_MemoServ && ci_nick == Config.s_MemoServ)
+	{
+		this->cmdTable = MEMOSERV;
 		this->SetFlag(BI_MEMOSERV);
+	}
 	else if (Config.s_NickServ && ci_nick == Config.s_NickServ)
+	{
+		this->cmdTable = NICKSERV;
 		this->SetFlag(BI_NICKSERV);
+	}
 	else if (Config.s_GlobalNoticer && ci_nick == Config.s_GlobalNoticer)
+	{
 		this->SetFlag(BI_GLOBAL);
+	}
 
 	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
 

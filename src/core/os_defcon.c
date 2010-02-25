@@ -86,7 +86,7 @@ class CommandOSDEFCON : public Command
 
 		if (timeout)
 		{
-			TimerManager::DelTimer(timeout);
+			delete timeout;
 			timeout = NULL;
 		}
 

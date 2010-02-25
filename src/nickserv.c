@@ -40,7 +40,7 @@ NickServCollide::NickServCollide(NickAlias *nickalias, time_t delay) : Timer(del
 	std::map<NickAlias *, NickServCollide *>::iterator nit = NickServCollides.find(nickalias);
 	if (nit != NickServCollides.end())
 	{
-		TimerManager::DelTimer(nit->second);
+		delete nit->second;
 	}
 
 	it = NickServCollides.insert(std::make_pair(nickalias, this));
@@ -70,13 +70,10 @@ void NickServCollide::Tick(time_t ctime)
 void NickServCollide::ClearTimers(NickAlias *na)
 {
 	std::map<NickAlias *, NickServCollide *>::iterator i = NickServCollides.find(na);
-	NickServCollide *t;
 
 	if (i != NickServCollides.end())
 	{
-		t = i->second;
-
-		TimerManager::DelTimer(t);
+		delete i->second;
 	}
 }
 
@@ -86,7 +83,7 @@ NickServRelease::NickServRelease(NickAlias *nickalias, time_t delay) : Timer(del
 	std::map<NickAlias *, NickServRelease *>::iterator nit = NickServReleases.find(nickalias);
 	if (nit != NickServReleases.end())
 	{
-		TimerManager::DelTimer(nit->second);
+		delete nit->second;
 	}
 
 	it = NickServReleases.insert(std::make_pair(nickalias, this));
@@ -119,16 +116,13 @@ void NickServRelease::Tick(time_t ctime)
 void NickServRelease::ClearTimers(NickAlias *na, bool dorelease)
 {
 	std::map<NickAlias *, NickServRelease *>::iterator i = NickServReleases.find(na);
-	NickServRelease *t;
 
 	if (i != NickServReleases.end())
 	{
-		t = i->second;
-
 		if (dorelease)
 			release(na, 1);
 
-		TimerManager::DelTimer(t);
+		delete i->second;
 	}
 }
 

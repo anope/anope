@@ -103,12 +103,6 @@ class CoreExport TimerManager : public Extensible
 		 */
 		static void DelTimer(Timer *T);
 		
-		/** Check if something is a timer
-		 * @param T A pointer
-		 * @return true or false
-		 */
-		static bool IsTimer(Timer *T);
-		
 		/** Tick all pending timers
 		 * @param ctime The current time
 		 */

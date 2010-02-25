@@ -311,6 +311,9 @@ class Version
 	const unsigned GetBuild();
 };
 
+/* Forward declaration of CallBack class for the Module class */
+class CallBack;
+
 /** Every module in Anope is actually a class.
  */
 class CoreExport Module
@@ -326,9 +329,9 @@ class CoreExport Module
 	 */
 	std::string filename;
 
-	/** Timers used in this module
+	/** Callbacks used in this module
 	 */
-	std::list<Timer *> CallBacks;
+	std::list<CallBack *> CallBacks;
 
 	ano_module_t handle;
 	time_t created;
@@ -431,20 +434,6 @@ class CoreExport Module
 	 * @return returns MOD_ERR_OK on success
 	 */
 	int DelCommand(CommandHash * cmdTable[], const char *name);
-
-	/**
-	 * Adds a timer to the current module
-	 * The timer handling will take care of everything for this timer, this is only here
-	 * so we have a list of timers to destroy when this module is unloaded
-	 * @param t A timer derived class
-	 */
-	void AddCallBack(Timer *t);
-
-	/**
-	 * Deletes a timer for the current module
-	 * @param t The timer
-	 */
-	bool DelCallBack(Timer *t);
 
 	/** Called on NickServ HELP
 	 * @param u The user requesting help
@@ -1201,10 +1190,10 @@ class CoreExport ModuleManager
 	 */
 	static void Attach(Implementation* i, Module* mod, size_t sz);
 
-	/** Delete all timers attached to a module
+	/** Delete all callbacks attached to a module
 	 * @param m The module
 	 */
-	static void ClearTimers(Module *m);
+	static void ClearCallBacks(Module *m);
 
 private:
 	/** Call the module_delete function to safely delete the module
@@ -1213,7 +1202,27 @@ private:
 	static void DeleteModule(Module *m);
 };
 
+/** Class used for callbacks within modules
+ */
+class CallBack : public Timer
+{
+ private:
+	Module *m;
+ public:
+	CallBack(Module *mod, long time_from_now, time_t now = time(NULL), bool repeating = false) : Timer(time_from_now, now, repeating),  m(mod)
+	{
+		m->CallBacks.push_back(this);
+	}
 
+	virtual ~CallBack()
+	{
+		std::list<CallBack *>::iterator it = std::find(m->CallBacks.begin(), m->CallBacks.end(), this);
+		if (it != m->CallBacks.end())
+		{
+			m->CallBacks.erase(it);
+		}
+	}
+};
 
 struct ModuleHash_ {
 		char *name;

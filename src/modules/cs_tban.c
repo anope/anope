@@ -168,14 +168,14 @@ void mySendResponse(User *u, const char *channel, char *mask, const char *time)
 	me->NoticeLang(Config.s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
-class TempBan : public Timer
+class TempBan : public CallBack
 {
 	private:
 		std::string chan;
 		std::string mask;
 
 	public:
-		TempBan(time_t seconds, const std::string &channel, const std::string &banmask) : Timer(seconds), chan(channel), mask(banmask) { }
+		TempBan(time_t seconds, const std::string &channel, const std::string &banmask) : CallBack(me, seconds), chan(channel), mask(banmask) { }
 
 		void Tick(time_t ctime)
 		{
@@ -192,7 +192,7 @@ void addBan(Channel *c, time_t timeout, char *banmask)
 {
 	c->SetMode(NULL, CMODE_BAN, banmask);
 
-	me->AddCallBack(new TempBan(timeout, c->name, banmask));
+	new TempBan(timeout, c->name, banmask);
 }
 
 int canBanUser(Channel * c, User * u, User * u2)

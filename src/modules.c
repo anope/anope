@@ -596,48 +596,6 @@ int destroyMessage(Message * m)
  * Module Callback Functions
  *******************************************************************************/
 
-/**
- * Adds a timer to the current module
- * The timer handling will take care of everything for this timer, this is only here
- * so we have a list of timers to destroy when this module is unloaded
- * @param t A timer derived class
- */
-void Module::AddCallBack(Timer *t)
-{
-	/* Remove no longer valid Timers from the modules internal list */
-	std::list<Timer *>::iterator it, it2;
-	for (it = this->CallBacks.begin(); it != this->CallBacks.end(); it = it2)
-	{
-		it2 = it;
-		++it2;
-
-		if (!TimerManager::IsTimer(*it))
-		{
-			this->CallBacks.erase(it);
-		}
-	}
-
-	this->CallBacks.push_back(t);
-}
-
-/**
- * Deletes a timer for the current module
- * @param t The timer
- */
-bool Module::DelCallBack(Timer *t)
-{
-	std::list<Timer *>::iterator it = std::find(this->CallBacks.begin(), this->CallBacks.end(), t);
-
-	if (it != this->CallBacks.end())
-	{
-		TimerManager::DelTimer(*it);
-		this->CallBacks.erase(it);
-		return true;
-	}
-
-	return false;
-}
-
  /* Check the current version of anope against a given version number
  * Specifiying -1 for minor,patch or build
  * @param major The major version of anope, the first part of the verison number

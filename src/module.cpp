@@ -66,8 +66,8 @@ Module::~Module()
 
 	Command *c;
 
-	/* Kill any active timers this module has */
-	ModuleManager::ClearTimers(this);
+	/* Clear any active callbacks this module has */
+	ModuleManager::ClearCallBacks(this);
 
 	/**
 	 * ok, im going to walk every hash looking for commands we own, now, not exactly elegant or efficiant :)

@@ -34,6 +34,7 @@ Timer::Timer(long time_from_now, time_t now, bool repeating)
  */
 Timer::~Timer()
 {
+	TimerManager::DelTimer(this);
 }
 
 /** Set the trigger time to a new value
@@ -94,25 +95,8 @@ void TimerManager::DelTimer(Timer *T)
 		
 	if (i != Timers.end())
 	{
-		delete (*i);
 		Timers.erase(i);
 	}
-}
-
-/** Check if something is a timer
- * @param T A pointer
- * @return true or false
- */
-bool TimerManager::IsTimer(Timer *T)
-{
-	std::vector<Timer *>::iterator i = std::find(Timers.begin(), Timers.end(), T);
-
-	if (i != Timers.end())
-	{
-		return true;
-	}
-	
-	return false;
 }
 
 /** Tick all pending timers
@@ -120,13 +104,9 @@ bool TimerManager::IsTimer(Timer *T)
  */
 void TimerManager::TickTimers(time_t ctime)
 {
-	std::vector<Timer *>::iterator i;
-	Timer *t;
-
-	while ((Timers.size()) && (ctime > (*Timers.begin())->GetTimer()))
+	while (Timers.size() && (ctime > Timers.front()->GetTimer()))
 	{
-		i = Timers.begin();
-		t = *i;
+		Timer *t = Timers.front();
 
 		t->Tick(ctime);
 		
@@ -136,7 +116,7 @@ void TimerManager::TickTimers(time_t ctime)
 			sort(Timers.begin(), Timers.end(), TimerManager::TimerComparison);
 		}
 		else
-			TimerManager::DelTimer(t);
+			delete t;
 	}
 }
 

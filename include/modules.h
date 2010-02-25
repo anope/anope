@@ -602,12 +602,6 @@ class CoreExport Module
 	 */
 	virtual void OnBotBan(User *u, ChannelInfo *ci, const char *mask) { }
 
-	/** Called after a bot has been created, but NOT added to the internal
-	 * list and NOT introduced
-	 * @param bi The bot
-	 */
-	virtual void OnBotPreLoad(BotInfo *bi) { }
-
 	/** Called before a bot kicks a user
 	 * @param bi The bot sending the kick
 	 * @param c The channel the user is being kicked on

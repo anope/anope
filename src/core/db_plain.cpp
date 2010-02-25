@@ -420,7 +420,9 @@ static void LoadNickAlias(const std::vector<std::string> &params)
 
 static void LoadBotInfo(const std::vector<std::string> &params)
 {
-	BotInfo *bi = new BotInfo(params[0].c_str());
+	BotInfo *bi = findbot(params[0]);
+	if (!bi)
+		bi = new BotInfo(params[0]);
 	bi->user = sstrdup(params[1].c_str());
 	bi->host = sstrdup(params[2].c_str());
 	bi->created = strtol(params[4].c_str(), NULL, 10);

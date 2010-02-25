@@ -60,8 +60,6 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 		this->SetFlag(BI_GLOBAL);
 	}
 
-	FOREACH_MOD(I_OnBotPreLoad, OnBotPreLoad(this));
-
 	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 
 	// If we're synchronised with the uplink already, call introduce_user() for this bot.

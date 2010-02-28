@@ -30,7 +30,7 @@ Timer::Timer(long time_from_now, time_t now, bool repeating)
 	TimerManager::AddTimer(this);
 }
 
-/** Default destructor, does nothing
+/** Default destructor, removes the timer from the list
  */
 Timer::~Timer()
 {

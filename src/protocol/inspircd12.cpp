@@ -1011,6 +1011,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'I':
 							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
 							continue;
+						// XXX list modes needs a bit of a rewrite, we need to be able to support +g here
 						default:
 							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
 					}
@@ -1104,6 +1105,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'T':
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'T'));
 							continue;
+						case 'c':
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+							continue;
 						case 'i':
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
 							continue;
@@ -1148,6 +1152,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					{
 						switch (modebuf[t])
 						{
+							case 'h':
+								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
+								continue;
 							case 's':
 								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
 								continue;
@@ -1237,7 +1244,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 			else if (capab.find("MAXMODES=") != std::string::npos)
 			{
-				std::string maxmodes(capab.begin() + 10, capab.end());
+				std::string maxmodes(capab.begin() + 9, capab.end());
 				ircd->maxmodes = atoi(maxmodes.c_str());
 			}
 		}

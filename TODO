@@ -7,7 +7,7 @@ Legend:
 -----
 [+] Redo database insanity.
   [x] Move database load/save to a module
-    [ ] realtime SQL/whatever module using events (possibly ongoing)
+    [+] realtime SQL/whatever module using events (possibly ongoing)
     [ ] flatfile save on a periodic timer
     [x] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
     [x] Salted SHA256 (contact Special for this)

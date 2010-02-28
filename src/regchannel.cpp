@@ -433,7 +433,7 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
 		throw CoreException("Was told to mlock a mode negatively with a param?");
 
 	EventReturn MOD_RESULT;
-	FOREACH_MOD(I_OnMLock, OnMLock(Name, status, param));
+	FOREACH_RESULT(I_OnMLock, OnMLock(Name, status, param));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
@@ -469,7 +469,7 @@ bool ChannelInfo::RemoveMLock(ChannelModeName Name)
 	size_t value = Name;
 
 	EventReturn MOD_RESULT;
-	FOREACH_MOD(I_OnUnMLock, OnUnMLock(Name));
+	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(Name));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 

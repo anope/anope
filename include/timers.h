@@ -47,7 +47,7 @@ class CoreExport Timer : public Extensible
 		 */
 		Timer(long time_from_now, time_t now = time(NULL), bool repeating = false);
 		
-		/** Default destructor, does nothing 
+		/** Default destructor, removes the timer from the list
 		 */
 		virtual ~Timer();
 		

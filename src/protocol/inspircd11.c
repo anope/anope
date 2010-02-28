@@ -1057,7 +1057,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 			else if (capab.find("MAXMODES=") != std::string::npos)
 			{
-				std::string maxmodes(capab.begin() + 10, capab.end());
+				std::string maxmodes(capab.begin() + 9, capab.end());
 				ircd->maxmodes = atoi(maxmodes.c_str());
 			}
 		}

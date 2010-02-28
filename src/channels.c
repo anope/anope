@@ -820,14 +820,14 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 
 		if (add)
 		{
-			if (cm->Type == MODE_PARAM && sep.GetToken(sbuf))
+			if (cm->Type != MODE_REGULAR && sep.GetToken(sbuf))
 				this->SetMode(bi, cm, sbuf, EnforceMLock);
 			else
 				this->SetMode(bi, cm, "", EnforceMLock);
 		}
 		else if (add == 0)
 		{
-			if (cm->Type == MODE_PARAM && sep.GetToken(sbuf))
+			if (cm->Type != MODE_REGULAR && sep.GetToken(sbuf))
 				this->RemoveMode(bi, cm, sbuf, EnforceMLock);
 			else
 				this->RemoveMode(bi, cm, "", EnforceMLock);

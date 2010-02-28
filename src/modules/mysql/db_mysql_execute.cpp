@@ -19,6 +19,7 @@ class FakeNickCore : public NickCore
 	~FakeNickCore()
 	{
 		insert_core(this);
+		Users.clear();
 	}
 
  	bool IsServicesOper() const { return true; }
@@ -54,6 +55,7 @@ class FakeUser : public User
 			(*list)->prev = this;
 		*list = this;
 		++usercnt;
+		nc = NULL;
 	}
 
 	void SetNewNick(const std::string &newnick) { this->nick = newnick; }
@@ -68,7 +70,12 @@ class FakeUser : public User
 class SQLTimer : public Timer
 {
  public:
-	SQLTimer() : Timer(Me->Delay, time(NULL), true) { }
+	SQLTimer() : Timer(Me->Delay, time(NULL), true)
+	{
+		mysqlpp::Query query(Me->Con);
+		query << "TRUNCATE TABLE `anope_commands`";
+		ExecuteQuery(query);
+	}
 
 	void Tick(time_t)
 	{

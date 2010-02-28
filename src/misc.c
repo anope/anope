@@ -1056,6 +1056,18 @@ std::list<ci::string> BuildStringList(const ci::string &src)
 	return Ret;
 }
 
+std::vector<std::string> BuildStringVector(const std::string &src)
+{
+	spacesepstream tokens(src);
+	std::string token;
+	std::vector<std::string> Ret;
+
+	while (tokens.GetToken(token))
+		Ret.push_back(token);
+	
+	return Ret;
+}
+
 /*************************************************************************/
 
 /**

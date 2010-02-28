@@ -811,25 +811,25 @@ class CoreExport Module
 	/** Called when access is deleted from a channel
 	 * @param ci The channel
 	 * @param u The user who removed the access
-	 * @param nick The name of the user whos access was removed
+	 * @param nc The user who was deleted
 	 */
-	virtual void OnAccessDel(ChannelInfo *ci, User *u, const char *nick) { }
+	virtual void OnAccessDel(ChannelInfo *ci, User *u, NickCore *nc) { }
 
 	/** Called when access is changed
 	 * @param ci The channel
 	 * @param u The user who changed the access
-	 * @param nick The nick whos access was changed
+	 * @param na The nick whos access was changed
 	 * @param level The level of the new access
 	 */
-	virtual void OnAccessChange(ChannelInfo *ci, User *u, const char *nick, int level) { }
+	virtual void OnAccessChange(ChannelInfo *ci, User *u, NickAlias *na, int level) { }
 
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param u The user who added the access
-	 * @param nick The nick who was added to access
+	 * @para na The nick who was added to access
 	 * @param level The level they were added at
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, User *u, const char *nick, int level) { }
+	virtual void OnAccessAdd(ChannelInfo *ci, User *u, NickAlias *na, int level) { }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel
@@ -840,7 +840,7 @@ class CoreExport Module
 	/** Called when a channel is dropped
 	 * @param chname The channel name
 	 */
-	virtual void OnChanDrop(const char *chname) { }
+	virtual void OnChanDrop(const std::string &chname) { }
 
 	/** Called when a channel is forbidden
 	 * @param ci The channel
@@ -968,6 +968,12 @@ class CoreExport Module
 	 */
 	virtual void OnNickClearAccess(NickCore *nc) { }
 
+	/** Called when a user adds an entry to their access list
+	 * @param nc The nick
+	 * @param entry The entry
+	 */
+	virtual void OnNickAddAccess(NickCore *nc, const std::string &entry) { }
+
 	/** called from NickCore::EraseAccess()
 	 * @param nc pointer to the NickCore
 	 * @param entry The access mask
@@ -1060,7 +1066,7 @@ enum Implementation
 		I_OnNickServHelp, I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnFindUser, I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
-		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickEraseAccess,
+		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 
 		/* ChanServ */
 		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,

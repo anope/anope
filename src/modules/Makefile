@@ -27,10 +27,14 @@ distclean: spotless
 .SUFFIXES: .c .cpp .so
 
 .c.so:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $@ $<
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp),-lmysqlpp) \
+	-I../${INCLUDEDIR} -o $@ $<
 
 .cpp.so:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $@ $<
+	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp),-lmysqlpp) \
+	-I../${INCLUDEDIR} -o $@ $<
 
 subs:
 	@for i in $(SUBS); do \

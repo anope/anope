@@ -74,7 +74,7 @@ static void ReadDatabase(Module *m = NULL)
 
 		if (m)
 			MOD_RESULT = m->OnDatabaseRead(params);
-			else
+		else
 		{
 			FOREACH_RESULT(I_OnDatabaseRead, OnDatabaseRead(params));
 		}
@@ -119,7 +119,7 @@ static void ReadDatabase(Module *m = NULL)
 					try
 					{
 						if (m)
-							MOD_RESULT = m->OnDatabaseReadMetadata(nc, key, params);
+							m->OnDatabaseReadMetadata(nc, key, params);
 						else
 						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, key, params));
@@ -127,7 +127,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						Alog() << "[db_plain}: " << err;
+						Alog() << "[db_plain]: " << err;
 					}
 				}
 				else if (na && Type == MD_NA)
@@ -135,7 +135,7 @@ static void ReadDatabase(Module *m = NULL)
 					try
 					{
 						if (m)
-							MOD_RESULT = m->OnDatabaseReadMetadata(na, key, params);
+							m->OnDatabaseReadMetadata(na, key, params);
 						else
 						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, key, params));
@@ -143,7 +143,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						Alog() << "[db_plain}: " << err;
+						Alog() << "[db_plain]: " << err;
 					}
 				}
 				else if (bi && Type == MD_BI)
@@ -151,7 +151,7 @@ static void ReadDatabase(Module *m = NULL)
 					try
 					{
 						if (m)
-							MOD_RESULT = m->OnDatabaseReadMetadata(bi, key, params);
+							m->OnDatabaseReadMetadata(bi, key, params);
 						else
 						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, key, params));
@@ -159,15 +159,15 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						Alog() << "[db_plain}: " << err;
+						Alog() << "[db_plain]: " << err;
 					}
-					}
+				}
 				else if (ci && Type == MD_CH)
 				{
 					try
 					{
 						if (m)
-							MOD_RESULT = m->OnDatabaseReadMetadata(ci, key, params);
+							m->OnDatabaseReadMetadata(ci, key, params);
 						else
 						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, key, params));
@@ -175,7 +175,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const char *err)
 					{
-						Alog() << "[db_plain}: " << err;
+						Alog() << "[db_plain]: " << err;
 					}
 				}
 			}

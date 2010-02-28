@@ -58,6 +58,7 @@ endforeach(SRC)
 file(GLOB MODULES_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*")
 remove_item_from_list(MODULES_FILES ".svn")
 remove_item_from_list(MODULES_FILES "CMakeFiles")
+remove_item_from_list(MODULES_FILES "mysql")
 
 # Iterate through this directory searching for subdirectories, and creating modules for those subdirectories
 foreach(FILE ${MODULES_FILES})

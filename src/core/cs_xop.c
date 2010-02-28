@@ -195,12 +195,12 @@ class XOPBase : public Command
 
 		if (!change)
 		{
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na, level));
 			notice_lang(Config.s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name.c_str());
 		}
 		else
 		{
-			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
+			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na, level));
 			notice_lang(Config.s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name.c_str());
 		}
 
@@ -290,7 +290,7 @@ class XOPBase : public Command
 				access->nc = NULL;
 				access->in_use = 0;
 
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nick));
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 
 				deleted = 1;
 			}
@@ -572,16 +572,16 @@ int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, i
 {
 	if (!access->in_use || access->level != xlev)
 		return 0;
-	char *nick = access->nc->display;
 	if (uacc <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 	{
 		++(*perm);
 		return 0;
 	}
+	NickCore *nc = access->nc;
 	access->nc = NULL;
 	access->in_use = 0;
 
-	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nick));
+	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nc));
 
 	return 1;
 }

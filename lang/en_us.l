@@ -6321,3 +6321,7 @@ OPER_UMODE_UNSUPPORTED
 OPER_SUPER_ADMIN_NOT_ENABLED
 	SuperAdmin setting not enabled in services.conf
 
+MYSQL_SYNC_UPDATING
+	Updating MySQL.
+MYSQL_SYNC_UPDATED
+	Finished updating MySQL.

@@ -1,6 +1,29 @@
 Anope MySQL Support
 -------------------
 
-MySQL Support was removed in 1.9.0 until it can be better implemented moving forward.
+MySQL support was readded in version 1.9.2 In the form of three modules.
 
+db_mysql_read - Allows you to load your databases from MySQL.
+  Note: At the time of writing, MySQL did not support full databases (no support for OperServ, MemoServ, and HostServ)
+  which means using this is limited. I recommend using db_plain with db_mysql_write and db_mysql_execute
+db_mysql_write - Allows live updating of SQL tables whenever something is executed in Anope.
+db_mysql_execute - Allows executing of Anope commands via SQL.
+
+To execute commands via SQL, you must insert the command into the anope_commands table, an example is as follows:
+
+INSERT INTO `anope_commands` (nick, service, command) VALUES('Adam', 'NickServ', 'REGISTER qwerty Adam@anope.org');
+
+By default, every 60 seconds Anope checks this table for commands to execute. When Anope sees a new command to execute, it checks the following.
+
+If the nick given is -SQLUser, then the command gets executed by a special fake user within Anope called -SQLUser. -SQLUser has every permission and command available, there are no permission checks at all for this user, it can do anything.
+
+If the nick is not -SQLUser, it checks to see if it is a registered nick. If it is, it sees if there are any users online using the NickCore of that nick.
+  If there is a user online with that core the command gets executed as if that user executed it, and the reply goes to that user.
+  If there isn't a user online with the core, it creates a fake user as the nick given to it, and gives to it the permissions the user would have if they were online and identified.
+If the nick is not registered, it checks to see if there is a user currently on that nick. If there is, it executes the command as that user, and the reply goes to that user.
+  If the nick is not registered and no one is using the nick, it creates a fake user of the nick given to it, and gives it regular nonidentified user access.
+
+Currently there is no way to check to see if a command was executed successfully within Anope from SQL (even if there was, the possibly update delay would be a problem).
+
+IMPORTANT: When using db_mysql_write when you already have a database, you need to do an initial import of the data to SQL (as db_mysql_write only updates it when it is changed, it never actually mass-dumps all of your data into SQL). To do this, start Anope and execute /OperServ SQLSYNC.
 

@@ -145,18 +145,18 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 	  * @param cmdstr The string to check, e.g. botserv/set/private.
 	  * @return True if this opertype may run the specified command, false otherwise.
 	  */
-	bool HasCommand(const std::string &cmdstr) const;
+	virtual bool HasCommand(const std::string &cmdstr) const;
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
 	 */
-	bool IsServicesOper() const;
+	virtual bool IsServicesOper() const;
 
 	/** Check whether this opertype has access to the given special permission.
 	  * @param privstr The priv to check for, e.g. users/auspex.
 	  * @return True if this opertype has the specified priv, false otherwise.
 	  */
-	bool HasPriv(const std::string &privstr) const;
+	virtual bool HasPriv(const std::string &privstr) const;
 
 	/** Add an entry to the nick's access list
 	 *

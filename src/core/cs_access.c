@@ -17,7 +17,6 @@
 
 static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm, int uacc)
 {
-	char *nick;
 	if (!access->in_use)
 		return 0;
 	if (uacc <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
@@ -25,11 +24,11 @@ static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm,
 		(*perm)++;
 		return 0;
 	}
-	nick = access->nc->display;
+	NickCore *nc = access->nc;
 	access->nc = NULL;
 	access->in_use = 0;
 
-	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nick));
+	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nc));
 
 	return 1;
 }
@@ -225,7 +224,7 @@ class CommandCSAccess : public Command
 				}
 				access->level = level;
 
-				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nick, level));
+				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na, level));
 
 				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
 					<< access->level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
@@ -242,7 +241,7 @@ class CommandCSAccess : public Command
 			std::string usernick = u->nick;
 			ci->AddAccess(nc, level, usernick);
 
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na->nick, level));
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na, level));
 
 			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
 				<< level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
@@ -326,13 +325,11 @@ class CommandCSAccess : public Command
 				/* We'll free the access entries no longer in use... */
 				ci->CleanAccess();
 
-				/* We don't know the nick if someone used numbers, so we trigger the event without
-				 * nick param. We just do this once, even if someone enters a range. -Certus */
 				/* Only call this event if na exists (if they deleted by user, not numlist).
 				 * The callback for deleting by numlist will call this event otherwise - Adam */
 				if (na)
 				{
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nick));
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 				}
 			}
 		}

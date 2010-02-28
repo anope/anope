@@ -88,6 +88,9 @@ class CommandNSConfirm : public Command
 				validate_user(user);
 			}
 		}
+		
+		FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
+
 		return MOD_CONT;
 
 	}

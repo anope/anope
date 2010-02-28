@@ -62,6 +62,9 @@ NickCore::~NickCore()
 	/* Log .. */
 	Alog() << Config.s_NickServ << ": deleting nickname group " << this->display;
 
+	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
+	this->ClearAccess();
+
 	/* Now we can safely free it. */
 	delete [] this->display;
 
@@ -71,8 +74,6 @@ NickCore::~NickCore()
 		delete [] this->greet;
 	if (this->url)
 	       delete [] this->url;
-
-	this->ClearAccess();
 
 	if (!this->memos.memos.empty())
 	{
@@ -119,6 +120,7 @@ bool NickCore::HasPriv(const std::string &privstr) const
 void NickCore::AddAccess(const std::string &entry)
 {
 	access.push_back(entry);
+	FOREACH_MOD(I_OnNickAddAccess, OnNickAddAccess(this, entry));
 }
 
 std::string NickCore::GetAccess(unsigned entry)

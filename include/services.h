@@ -422,21 +422,6 @@ struct ircdvars_ {
 
 /*************************************************************************/
 
-/* File version for each database. Was one version for all before but was
-   changed so they are now easier to maintain. =) */
-
-#define BOT_VERSION 		10
-#define CHAN_VERSION 		16
-#define EXCEPTION_VERSION 	9
-#define NEWS_VERSION 		9
-#define NICK_VERSION 		14
-#define PRE_NICK_VERSION 	2
-#define OPER_VERSION 		13
-#define HELP_VERSION 		1
-#define HOST_VERSION 		3
-
-/*************************************************************************/
-
 /** Memo Flags
  */
 enum MemoFlag

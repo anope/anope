@@ -23,7 +23,7 @@ typedef std::list<ChannelContainer *> UChannelList;
 /* Online user and channel data. */
 class CoreExport User : public Extensible
 {
- private:
+ protected:
 	std::string vident;
 	std::string ident;
 	std::string uid;
@@ -76,7 +76,7 @@ class CoreExport User : public Extensible
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 */
-	void SetNewNick(const std::string &newnick);
+	virtual void SetNewNick(const std::string &newnick);
 
 	/** Update the displayed (vhost) of a user record.
 	 * This is used (if set) instead of real host.
@@ -140,8 +140,8 @@ class CoreExport User : public Extensible
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(const std::string &source, const char *fmt, ...);
-	void SendMessage(const std::string &source, const std::string &msg);
+	virtual void SendMessage(const std::string &source, const char *fmt, ...);
+	virtual void SendMessage(const std::string &source, const std::string &msg);
 
 	/** Check if the user should become identified because
 	 * their svid matches the one stored in their nickcore
@@ -166,17 +166,17 @@ class CoreExport User : public Extensible
 	/** Get the account the user is logged in using
 	 * @reurn The account or NULL
 	 */
-	NickCore *Account() const;
+	virtual NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
 	 * @return true or false
 	 */
-	const bool IsIdentified() const;
+	virtual const bool IsIdentified() const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
 	 * @return true or false
 	 */
-	const bool IsRecognized() const;
+	virtual const bool IsRecognized() const;
 
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */

@@ -117,6 +117,7 @@ install: services
 	test -d ${INSTDIR}/data || mkdir ${INSTDIR}/data
 	(cd ../lang ; $(MAKE) install)
 	$(CP) ../data/* $(INSTDIR)/data
+	$(INSTALL) bin/mydbgen $(INSTDIR)/data/mydbgen
 	test -d $(INSTDIR)/data/backups || mkdir $(INSTDIR)/data/backups
 	test -d $(INSTDIR)/data/logs || mkdir $(INSTDIR)/data/logs
 	@if [ "$(INSTDIR)/data/modules" ] ; then \

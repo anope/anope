@@ -77,52 +77,6 @@ else
 fi
 
 
-DIS_MYSQL="  MySQL: No"
-AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to find it],,[
-	AC_ARG_WITH(mysqlconfig-path, [  --with-mysqlconfig-path=PATH Complete path to the mysql_config executable],
-	mysql_config_path="$withval", mysql_config_path="")
-	MYSQLCONF=""
-	if test "$mysql_config_path" != ""; then
-		if test -x "$mysql_config_path"; then
-			MYSQLCONF="$mysql_config_path"
-			echo "checking for mysql_config... $MYSQLCONF" >&6
-		fi
-	fi
-	if test "$MYSQLCONF" = ""; then
-		AC_PATH_PROG(MYSQLCONF,mysql_config, "")
-	fi
-	if test "$MYSQLCONF" != ""; then
-		hold_cflags="$CFLAGS"
-		hold_ldflags="$LDFLAGS"
-		if test "$MYSQL_CFLAGS" = ""; then
-			MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
-		fi
-		if test "$MYSQL_LDFLAGS" = ""; then
-			MYSQL_LDFLAGS="`$MYSQLCONF --libs`"
-		fi
-		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
-		LDFLAGS="$LDFLAGS $MYSQL_LDFLAGS"
-		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
-		AC_TRY_RUN([
-#include <mysql.h>
-
-int main()
-{
-	MYSQL *mysql = mysql_init(0);
-
-	return 0;
-}
-		], ac_cv_mysql_valid=yes, ac_cv_mysql_valid=no)
-		echo $ac_cv_mysql_valid >&6
-		if test "$ac_cv_mysql_valid" = "yes"; then
-			 DIS_MYSQL="  MySQL: Yes"
-		else
-			CFLAGS="$hold_cflags"
-			LDFLAGS="$hold_ldflags"
-		fi
-	fi
-])
-
 AC_MSG_CHECKING(whether this is a bit or little endian system)
 AC_TRY_RUN([
 int main()
@@ -280,8 +234,6 @@ AC_OUTPUT
 cat <<EOT
 
 $DIS_MODULES
-$DIS_MYSQL
-
 
 
 All done!  Now run "make" (or possibly "gmake") to compile Anope.

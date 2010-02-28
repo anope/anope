@@ -337,6 +337,7 @@ E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
 E std::list<std::string> BuildStringList(const std::string &);
 E std::list<ci::string> BuildStringList(const ci::string &);
+E std::vector<std::string> BuildStringVector(const std::string &);
 
 E void binary_to_hex(unsigned char *bin, char *hex, int length);
 

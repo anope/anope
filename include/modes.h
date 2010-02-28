@@ -296,7 +296,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
 class ChannelModeFlood : public ChannelModeParam
 {
   public:
-	ChannelModeFlood(char modeChar) : ChannelModeParam(CMODE_FLOOD, modeChar) { }
+	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
 
 	bool IsValid(const std::string &value);
 };

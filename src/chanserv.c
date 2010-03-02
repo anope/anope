@@ -1857,7 +1857,6 @@ void cs_remove_nick(const NickCore * nc)
                 if (ca->in_use && ca->nc == nc) {
                     ca->in_use = 0;
                     ca->nc = NULL;
-                    ci->accesscount--;
                 }
             }
             CleanAccess(ci);

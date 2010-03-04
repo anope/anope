@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2800"
+VERSION_BUILD="2801"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2801 - Fixed some memory leaks in ns_register
 #Revision 2800 - Fixed a bug that would cause users access in channels to seemingly disappear. Introduced in release 1.8.3, revision 2667
 #Revision 2792 - Documented /nickserv list's ability to accept ranges
 #Revision 2791 - Don't show unconfirmed nicks when services admins list suspended nicks

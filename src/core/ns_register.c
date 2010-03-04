@@ -383,6 +383,7 @@ int do_confirm(User * u)
             }
 
         } else {
+            free(passcode);
             notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
         }
         delnickrequest(nr);     /* remove the nick request */
@@ -390,6 +391,9 @@ int do_confirm(User * u)
         alog("%s: makenick(%s) failed", s_NickServ, u->nick);
         notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
     }
+
+    if (email)
+        free(email);
 
     /* Enable nick tracking if enabled */
     if (NSNickTracking)

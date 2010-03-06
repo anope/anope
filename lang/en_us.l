@@ -6321,7 +6321,15 @@ OPER_UMODE_UNSUPPORTED
 OPER_SUPER_ADMIN_NOT_ENABLED
 	SuperAdmin setting not enabled in services.conf
 
-MYSQL_SYNC_UPDATING
+OPER_HELP_SYNC
+	Syntax: SQLSYNC
+	
+	This command syncs your databases with SQL. You should
+	only have to execute this command once, when you initially
+	import your databases into SQL.
+OPER_HELP_CMD_SQLSYNC
+	    SQLSYNC     Import your databases to SQL
+OPER_SYNC_UPDATING
 	Updating MySQL.
-MYSQL_SYNC_UPDATED
+OPER_SYNC_UPDATED
 	Finished updating MySQL.

@@ -313,16 +313,22 @@ static void SaveDatabases()
 class CommandSyncSQL : public Command
 {
  public:
-	CommandSyncSQL(const std::string &cname) : Command(cname, 0, 0)
+	CommandSyncSQL(const std::string &cname) : Command(cname, 0, 0, "operserv/sqlsync")
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		notice_lang(Config.s_OperServ, u, MYSQL_SYNC_UPDATING);
+		notice_lang(Config.s_OperServ, u, OPER_SYNC_UPDATING);
 		SaveDatabases();
-		notice_lang(Config.s_OperServ, u, MYSQL_SYNC_UPDATED);
+		notice_lang(Config.s_OperServ, u, OPER_SYNC_UPDATED);
 		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const ci::string &subcommand)
+	{
+		notice_help(Config.s_OperServ, u, OPER_HELP_SYNC);
+		return true;
 	}
 };
 
@@ -334,6 +340,9 @@ class DBMySQLWrite : public DBMySQL
 		ModuleManager::Attach(I_OnServerConnect, this);
 
 		this->AddCommand(OPERSERV, new CommandSyncSQL("SQLSYNC"));
+		
+		if (uplink_server)
+			OnServerConnect();
 	}
 
 	~DBMySQLWrite()
@@ -355,9 +364,16 @@ class DBMySQLWrite : public DBMySQL
 			I_OnChanForbidden, I_OnDelChan, I_OnChanRegistered, I_OnChanSuspend,
 			/* BotServ */
 			I_OnBotCreate, I_OnBotChange, I_OnBotDelete,
-			I_OnBotAssign, I_OnBotUnAssign
+			I_OnBotAssign, I_OnBotUnAssign,
+			/* OperServ */
+			I_OnOperServHelp
 		};
-		ModuleManager::Attach(i, this, 26);
+		ModuleManager::Attach(i, this, 27);
+	}
+
+	void OnOperServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SQLSYNC);
 	}
 
 	EventReturn OnSaveDatabase()

@@ -425,6 +425,8 @@ int main(int argc, char *argv[])
 				memos = nc->memos.memos;
 				for (j = 0; j < nc->memos.memocount; j++, memos++)
 				{
+					if (!memos->text)
+						break;
 					fs << "MD MI " << memos->number << " " << memos->time << " " << memos->sender;
 					if (memos->flags & MF_UNREAD)
 						fs << " UNREAD";
@@ -1000,6 +1002,7 @@ int main(int argc, char *argv[])
 
 
 	/* CONVERTING DONE \o/ HURRAY! */
+	fs.flush();
 	fs.close();
 	return 0;
 } /* End of main() */

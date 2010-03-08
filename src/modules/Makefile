@@ -11,6 +11,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 OBJECTS= $(SRCS:.c=.so)
 OBJECTS+= $(SRCS:.cpp=.so)
 CDEFS= -rdynamic -Wall
+MYSQL_ARGS = -I$(MYSQLDIR)/include/ -L$(MYSQLDIR)/lib/ -Wl,-rpath -Wl,$(MYSQLDIR)/lib/ -lmysqlpp
 
 all: modules subs
 
@@ -28,12 +29,12 @@ distclean: spotless
 
 .c.so:
 	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
-	$(if $(shell grep RequiredLibraries $< | grep mysqlpp),-lmysqlpp) \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) \
 	-I../${INCLUDEDIR} -o $@ $<
 
 .cpp.so:
 	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
-	$(if $(shell grep RequiredLibraries $< | grep mysqlpp),-lmysqlpp) \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) \
 	-I../${INCLUDEDIR} -o $@ $<
 
 subs:

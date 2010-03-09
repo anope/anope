@@ -67,6 +67,7 @@ static void ReadDatabase(Module *m = NULL)
 					params.push_back(buf + " " + sep.GetRemaining());
 				else if (!buf.empty())
 					params.push_back(buf);
+				break;
 			}
 			else
 				params.push_back(buf);
@@ -566,8 +567,7 @@ class DBPlain : public Module
 			m->number = atoi(params[0].c_str());
 			m->time = strtol(params[1].c_str(), NULL, 10);
 			m->sender = params[2];
-			unsigned j;
-			for (j = 3; (params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"); ++j)
+			for (unsigned j = 3; (params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"); ++j)
 			{
 				if (params[j] == "UNREAD")
 					m->SetFlag(MF_UNREAD);
@@ -576,7 +576,7 @@ class DBPlain : public Module
 				else if (params[j] == "NOTIFYS")
 					m->SetFlag(MF_NOTIFYS);
 			}
-			m->text = sstrdup(params[j + 1].c_str());
+			m->text = sstrdup(params[params.size() - 1].c_str());
 			nc->memos.memos.push_back(m);
 		}
 
@@ -743,8 +743,7 @@ class DBPlain : public Module
 			m->number = atoi(params[0].c_str());
 			m->time = strtol(params[1].c_str(), NULL, 10);
 			m->sender = params[2];
-			unsigned j;
-			for (j = 3; j < params.size() - 1 && (buf == "UNREAD" || buf == "RECEIPT" || buf == "NOTIFYS"); ++j)
+			for (unsigned j = 3; (params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"); ++j)
 			{
 				if (params[j] == "UNREAD")
 					m->SetFlag(MF_UNREAD);
@@ -753,7 +752,7 @@ class DBPlain : public Module
 				else if (params[j] == "NOTIFYS")
 					m->SetFlag(MF_NOTIFYS);
 			}
-			m->text = sstrdup(params[j + 1].c_str());
+			m->text = sstrdup(params[params.size() - 1].c_str());
 			ci->memos.memos.push_back(m);
 		}
 		else if (key == "ENTRYMSG")

@@ -720,8 +720,6 @@ void change_core_display(NickCore * nc)
 
 void collide(NickAlias * na, int from_timeout)
 {
-	std::string guestnick;
-
 	if (!from_timeout)
 		NickServCollide::ClearTimers(na);
 
@@ -739,10 +737,12 @@ void collide(NickAlias * na, int from_timeout)
 		if (!u)
 			return;
 
+		std::string guestnick;
 		/* We need to make sure the guestnick is free -- heinz */
 		do
 		{
 			char randbuf[17];
+			snprintf(randbuf, sizeof(randbuf), "%d", getrandom16());
 			guestnick = Config.NSGuestNickPrefix;
 			guestnick += randbuf;
 		}

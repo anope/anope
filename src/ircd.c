@@ -1203,6 +1203,11 @@ void pmodule_limit_mode(int mode)
     ircd_modes.chan_limit = mode;
 }
 
+void pmodule_permchan_mode(int mode)
+{
+    ircd_modes.chan_perm = mode;
+}
+
 int anope_get_invis_mode()
 {
     return ircd_modes.user_invis;
@@ -1237,3 +1242,9 @@ int anope_get_limit_mode()
 {
     return ircd_modes.chan_limit;
 }
+
+int anope_get_permchan_mode()
+{
+    return ircd_modes.chan_perm;
+}
+

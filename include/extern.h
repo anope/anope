@@ -696,6 +696,7 @@ E void pmodule_set_umode(void (*func) (User * user, int ac, char **av));
 E void pmodule_valid_nick(int (*func) (char *nick));
 E void pmodule_valid_chan(int (*func) (char *chan));
 E void pmodule_flood_mode_check(int (*func) (char *value));
+E void pmodule_jointhrottle_mode_check(int (*func) (char *value));
 E void pmodule_ircd_var(IRCDVar * ircdvar);
 E void pmodule_ircd_cap(IRCDCAPAB * cap);
 E void pmodule_ircd_version(char *version);
@@ -714,7 +715,7 @@ E void pmodule_secret_cmode(int mode);
 E void pmodule_private_cmode(int mode);
 E void pmodule_key_mode(int mode);
 E void pmodule_limit_mode(int mode);
-E void pmodule_jointhrottle_mode_check(int (*func) (char *value));
+E void pmodule_permchan_mode(int mode);
 
 E int anope_get_secret_mode();
 E int anope_get_invite_mode();
@@ -723,6 +724,7 @@ E int anope_get_limit_mode();
 E int anope_get_private_mode();
 E int anope_get_invis_mode();
 E int anope_get_oper_mode();
+E int anope_get_permchan_mode();
 
 /**** language.c ****/
 

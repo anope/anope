@@ -1231,6 +1231,7 @@ typedef struct ircd_modes_ {
         int chan_private;
         int chan_key;
         int chan_limit;
+        int chan_perm;
 } IRCDModes;
 
 

@@ -52,6 +52,10 @@ void chan_deluser(User * user, Channel * c)
         anope_cmd_part(c->ci->bi->nick, c->name, NULL);
     }
 
+    /* Channel is permament and shouldn't be deleted */
+    if (anope_get_permchan_mode() && c->mode & anope_get_permchan_mode())
+        return;
+
     if (!c->users)
         chan_delete(c);
 }

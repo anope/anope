@@ -2672,6 +2672,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_private_cmode(CMODE_p);
     pmodule_key_mode(CMODE_k);
     pmodule_limit_mode(CMODE_l);
+    pmodule_permchan_mode(CMODE_P);
 
     moduleAddAnopeCmds();
     moduleAddIRCDMsgs();

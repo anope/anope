@@ -71,7 +71,7 @@ void my_memo_lang(User * u, char *name, int z, int number, ...);
 void req_send_memos(User * u, char *vHost);
 void show_list(User * u);
 int hs_do_waiting(User * u);
-int ns_do_drop(User * u);
+int hsreqevt_nick_dropped(int argc, char **argv);
 
 void hsreq_save_db(void);
 void hsreq_load_db(void);
@@ -112,8 +112,8 @@ int AnopeInit(int argc, char **argv)
                       -1, -1);
     moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
-    c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_HEAD);
+    hook = createEventHook(EVENT_NICK_DROPPED, hsreqevt_nick_dropped);
+    moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
     moduleAddEventHook(hook);
@@ -328,19 +328,19 @@ void req_send_memos(User * u, char *vHost)
     }
 }
 
-int ns_do_drop(User * u)
+int hsreqevt_nick_dropped(int argc, char **argv)
 {
-    HostCore *tmp;
-    boolean found = false;
-    NickAlias *na;
+	HostCore *tmp;
+	boolean found = false;
 
-    na = findnick(u->nick);
-    tmp = findHostCore(hs_request_head, u->nick, &found);
+	if (!argc)
+		return MOD_CONT;
 
-    if (found && na)
-        hs_request_head = deleteHostCore(hs_request_head, tmp);
+	tmp = findHostCore(hs_request_head, argv[0], &found);
+	if (found)
+		hs_request_head = deleteHostCore(hs_request_head, tmp);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_do_reject(User * u)

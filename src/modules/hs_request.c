@@ -126,7 +126,7 @@ class CommandHSRequest : public Command
 				return MOD_CONT;
 			}
 		}
-		if (strlen(rawhostmask) < HOSTMAX - 1)
+		if (strlen(rawhostmask) < HOSTMAX)
 			snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
 		else
 		{

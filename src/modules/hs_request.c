@@ -204,7 +204,7 @@ int hs_do_request(User * u)
             return MOD_CONT;
         }
     }
-    if (strlen(rawhostmask) < HOSTMAX - 1) {
+    if (strlen(rawhostmask) < HOSTMAX) {
         snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
     } else {
         notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);

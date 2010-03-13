@@ -743,23 +743,14 @@ void ModuleDatabaseBackup(char *dbname)
     time(&t);
     tm = *localtime(&t);
 
-    if (!curday) {
-        curday = tm.tm_yday;
-        return;
-    }
+    char ext[9];
 
-    if (curday != tm.tm_yday) {
-
-        char ext[9];
-
-        if (debug) {
-            alog("Module Database Backing up %s", dbname);
-        }
-        ModuleRemoveBackups(dbname);
-        curday = tm.tm_yday;
-        strftime(ext, sizeof(ext), "%Y%m%d", &tm);
-        rename_database(dbname, ext);
-    }
+    if (debug)
+        alog("Module Database Backing up %s", dbname);
+    ModuleRemoveBackups(dbname);
+    curday = tm.tm_yday;
+    strftime(ext, sizeof(ext), "%Y%m%d", &tm);
+    rename_database(dbname, ext);
 }
 
 /*************************************************************************/

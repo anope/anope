@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2810"
+VERSION_BUILD="2811"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2811 - Fixed bug #1140 - Made ModuleDatabaseBackup() not fail when multiple modules want to back up their databases
 #Revision 2810 - Fixed bug #1139 - Delete the correct nicks from hs_request database when they are dropped
 #Revision 2809 - Fixed bug #1138 - Fix maximum hostname length checking in hs_request
 #Revision 2808 - Fixed check_ban to apply bans even if TTB was changed after the user has been kicked

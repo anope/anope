@@ -850,7 +850,10 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
         return;
 
     bd->ttb[ttbtype]++;
-    if (bd->ttb[ttbtype] == ci->ttb[ttbtype]) {
+    if (ci->ttb[ttbtype] && bd->ttb[ttbtype] >= ci->ttb[ttbtype]) {
+        /* bd->ttb[ttbtype] can possibly be > ci->ttb[ttbtype] if ci->ttb[ttbtype] was changed after
+         * the user has been kicked - Adam
+         */
         char *av[4];
         int ac;
         char mask[BUFSIZE];

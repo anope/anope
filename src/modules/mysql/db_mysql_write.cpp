@@ -454,7 +454,7 @@ class DBMySQLWrite : public DBMySQL
 				}
 				else if (cmd == "KILL" || cmd == "SECURE" || cmd == "PRIVATE" || cmd == "MSG" || cmd == "HIDE" || cmd == "AUTOOP")
 				{
-					query << "UPDATE `anope_ns_core` SET `flags` = " << BuildFlagsList(nc) << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `flags` = '" << BuildFlagsList(nc) << "' WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 			}

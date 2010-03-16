@@ -123,8 +123,6 @@ int do_cs_kick(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
     } else if (is_same ? !(u2 = u) : !(u2 = finduser(params))) {
         notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, params);
-    } else if (!is_on_chan(c, u2)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
     } else if (!is_same ? !check_access(u, ci, CA_KICK) :
                !check_access(u, ci, CA_KICKME)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -133,6 +131,8 @@ int do_cs_kick(User * u)
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else if (is_protected(u2)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+    } else if (!is_on_chan(c, u2)) {
+        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
     } else {
         char *av[3];
 

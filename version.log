@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2816"
+VERSION_BUILD="2818"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2818 - Fixed bug #1141, reordered some access checks in cs_kick and cs_modes to hide who is on the channel
 #Revision 2816 - Fixed os_info to display syntax errors if you entered no text
 #Revision 2815 - Fixed os_info to backup its databases properly with the now-working ModuleDatabaseBackup function
 #Revision 2811 - Fixed bug #1140 - Made ModuleDatabaseBackup() not fail when multiple modules want to back up their databases

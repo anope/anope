@@ -243,10 +243,10 @@ int do_owner(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
     } else if (ci->flags & CI_VERBOTEN) {
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-    } else if (!is_on_chan(c, u)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
+    } else if (!is_on_chan(c, u)) {
+        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
     } else {
         anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerset,
                        GET_USER(u));
@@ -299,10 +299,10 @@ int do_deowner(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
     } else if (ci->flags & CI_VERBOTEN) {
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-    } else if (!is_on_chan(c, u)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
+    } else if (!is_on_chan(c, u)) {
+        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
     } else {
         anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
                        GET_USER(u));
@@ -366,8 +366,6 @@ int do_util(User * u, CSModeUtil * util)
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
     } else if (is_same ? !(u2 = u) : !(u2 = finduser(nick))) {
         notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-    } else if (!is_on_chan(c, u2)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
     } else if (is_same ? !check_access(u, ci, util->levelself) :
                !check_access(u, ci, util->level)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
@@ -376,6 +374,8 @@ int do_util(User * u, CSModeUtil * util)
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else if (*util->mode == '-' && is_protected(u2) && !is_same) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+    } else if (!is_on_chan(c, u2)) {
+        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
     } else {
         anope_cmd_mode(whosends(ci), c->name, "%s %s", util->mode,
                        GET_USER(u2));

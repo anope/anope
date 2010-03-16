@@ -198,6 +198,8 @@ int myAddNickInfo(User * u)
         } else {
             moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
         }
+    } else {
+        moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
     }
     return MOD_CONT;
 }
@@ -266,6 +268,8 @@ int myAddChanInfo(User * u)
         } else {
             moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
         }
+    } else {
+        moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
     }
     return MOD_CONT;
 }

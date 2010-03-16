@@ -459,7 +459,8 @@ int mSaveData(int argc, char **argv)
  **/
 int mBackupData(int argc, char **argv)
 {
-	ModuleDatabaseBackup(OSInfoDBName);
+	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
+		ModuleDatabaseBackup(OSInfoDBName);
 	
 	return MOD_CONT;
 }

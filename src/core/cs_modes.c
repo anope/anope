@@ -46,14 +46,14 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 		notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 	else if (is_same ? !(u2 = u) : !(u2 = finduser(nick)))
 		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-	else if (!c->FindUser(u2))
-		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && is_protected(u2) && !is_same)
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+	else if (!c->FindUser(u2))
+		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 	else
 	{
 		if (set)

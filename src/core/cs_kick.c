@@ -52,16 +52,15 @@ class CommandCSKick : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
 		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
-		} else if (!c->FindUser(u2)) {
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
-		} else if (!is_same ? !check_access(u, ci, CA_KICK) :
-					 !check_access(u, ci, CA_KICKME)) {
+		} else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME)) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else if (!is_same && (ci->HasFlag(CI_PEACE))
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		} else if (is_protected(u2)) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+		} else if (!c->FindUser(u2)) {
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		} else {
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
 				ci->c->Kick(whosends(ci), u2, "%s (%s)", reason, u->nick.c_str());

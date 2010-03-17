@@ -774,9 +774,9 @@ int do_set_xop(User * u, ChannelInfo * ci, char *param)
                 } else {
                     access->in_use = 0;
                     access->nc = NULL;
-                    CleanAccess(ci);
                 }
             }
+            CleanAccess(ci);
 
             reset_levels(ci);
             ci->flags |= CI_XOP;

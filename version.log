@@ -13,6 +13,7 @@ VERSION_BUILD="2818"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2819 - Fixed a bug introduced in r2667 that could cause some access entries to not convert to XOP correctly
 #Revision 2818 - Fixed bug #1141, reordered some access checks in cs_kick and cs_modes to hide who is on the channel
 #Revision 2816 - Fixed os_info to display syntax errors if you entered no text
 #Revision 2815 - Fixed os_info to backup its databases properly with the now-working ModuleDatabaseBackup function

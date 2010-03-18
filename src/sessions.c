@@ -325,7 +325,7 @@ int exception_add(User * u, const char *mask, const int limit,
 	}
 
 	nexceptions++;
-	exceptions = new Exception[nexceptions];
+	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 
 	exceptions[nexceptions - 1].mask = sstrdup(mask);
 	exceptions[nexceptions - 1].limit = limit;

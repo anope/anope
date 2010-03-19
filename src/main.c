@@ -331,7 +331,7 @@ void sighandler(int signum)
      * always set when we need it. It seems some signals slip through to the
      * QUIT code without having a valid quitmsg. -GD
      */
-    quitmsg = sstrdup("Signal Received");
+    quitmsg = "Signal Received";
     if (started) {
 #ifndef _WIN32
         if (signum == SIGHUP) { /* SIGHUP = save databases and restart */
@@ -362,8 +362,8 @@ void sighandler(int signum)
             save_databases();
 
             if (!read_config(1)) {
-                sprintf(quitmsg,
-                        "Error Reading Configuration File (Received SIGUSR2)");
+                static char *buf = "Error Reading Configuration File (Received SIGUSR2)";
+                quitmsg = buf;
                 quitting = 1;
             }
             send_event(EVENT_RELOAD, 1, EVENT_START);

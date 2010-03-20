@@ -66,7 +66,7 @@ class CommandMSList : public Command
 		{
 			int sent_header = 0;
 			if (!param.empty() && isdigit(param[0]))
-				process_numlist(param.c_str(), NULL, list_memo_callback, u, mi, &sent_header, chan.c_str());
+				process_numlist(param.c_str(), NULL, list_memo_callback, u, mi, &sent_header, chan.empty() ? NULL : chan.c_str());
 			else
 			{
 				if (!param.empty())
@@ -89,7 +89,7 @@ class CommandMSList : public Command
 				{
 					if (!param.empty() && !(mi->memos[i]->HasFlag(MF_UNREAD)))
 						continue;
-					list_memo(u, i, mi, &sent_header, !param.empty(), chan.c_str());
+					list_memo(u, i, mi, &sent_header, !param.empty(), chan.empty() ? NULL : chan.c_str());
 				}
 			}
 		}

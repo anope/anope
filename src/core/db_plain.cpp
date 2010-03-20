@@ -460,19 +460,31 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 		maxusercnt = atol(params[1].c_str());
 		maxusertime = strtol(params[2].c_str(), NULL, 10);
 	}
-	else if (params[0] == "AKILL" || params[0] == "SGLINE" || params[0] == "SQLINE" || params[0] == "SZLINE")
+	else if (params[0] == "SGLINE" || params[0] == "SQLINE" || params[0] == "SZLINE")
 	{
-		int (*add_sxline)(User *, const char *, const char *, time_t, const char *);
-		if (params[0] == "AKILL")
-			add_sxline = add_akill;
-		else if (params[0] == "SGLINE")
-			add_sxline = add_sgline;
+		SXLine *sx = new SXLine;
+		sx->mask = sstrdup(params[1].c_str());
+		sx->by = sstrdup(params[2].c_str());
+		sx->seton = atol(params[3].c_str());
+		sx->expires = atol(params[4].c_str());
+		sx->reason = sstrdup(params[5].c_str());
+		if (params[0] == "SGLINE")
+			slist_add(&sglines, sx);
 		else if (params[0] == "SQLINE")
-			add_sxline = add_sqline;
+			slist_add(&sqlines, sx);
 		else if (params[0] == "SZLINE")
-			add_sxline = add_szline;
-
-		add_sxline(NULL, (params[1] + "@" + params[2]).c_str(), params[3].c_str(), strtol(params[5].c_str(), NULL, 10), params[6].c_str());
+			slist_add(&szlines, sx);
+	}
+	else if (params[0] == "AKILL")
+	{
+		Akill *ak = new Akill;
+		ak->user = sstrdup(params[1].c_str());
+		ak->host = sstrdup(params[2].c_str());
+		ak->by = sstrdup(params[3].c_str());
+		ak->seton = atol(params[4].c_str());
+		ak->expires = atol(params[5].c_str());
+		ak->reason = sstrdup(params[6].c_str());
+		slist_add(&akills, ak);
 	}
 	else if (params[0] == "EXCEPTION")
 	{

@@ -777,6 +777,47 @@ class CoreExport Module
 	 */
 	virtual void OnDefconLevel(int level) { }
 
+	/** Called before an akill is added
+	 * @param u The user adding the akill
+	 * @param ak The akill
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnAddAkill(User *u, Akill *ak) { return EVENT_CONTINUE; }
+
+	/** Called before an akill is deleted
+	 * @param u The user removing the akill
+	 * @param ak The akill, can be NULL for all akills!
+	 */
+	virtual void OnDelAkill(User *u, Akill *ak) { }
+
+	/** Called after an exception has been added
+	 * @param u The user who added it
+	 * @param ex The exception
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnExceptionAdd(User *u, Exception *ex) { return EVENT_CONTINUE; }
+
+	/** Called before an exception is deleted
+	 * @param u The user who is deleting it
+	 * @param ex The exceotion
+	 */
+	virtual void OnExceptionDel(User *u, Exception *ex) { }
+
+	/** Called before a SXLine is added
+	 * @param u The user adding the SXLine
+	 * @param sx The SXLine
+	 * @param Type The type of SXLine this is
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 */
+	virtual EventReturn OnAddSXLine(User *u, SXLine *sx, SXLineType Type) { return EVENT_CONTINUE; }
+
+	/** Called before a SXLine is deleted
+	 * @param u The user deleting the SXLine
+	 * @param sx The SXLine, can be NULL for all SXLines
+	 * @param Type The type of SXLine this is
+	 */
+	virtual void OnDelSXLine(User *u, SXLine *sx, SXLineType Type) { }
+
 	/** Called when a server quits
 	 * @param server The server
 	 */
@@ -990,6 +1031,34 @@ class CoreExport Module
 	 */
 	virtual void OnSetVhost(NickAlias *na) { }
 
+	/** Called when a memo is sent
+	 * @param u The user sending the memo
+	 * @param nc The nickcore of who the memo was sent to
+	 * @param m The memo
+	 */
+	virtual void OnMemoSend(User *u, NickCore *nc, Memo *m) { }
+
+	/** Called when a memo is sent
+	 * @param u The user sending the memo
+	 * @param ci The channel the memo was sent to
+	 * @param m The memo
+	 */
+	virtual void OnMemoSend(User *u, ChannelInfo *ci, Memo *m) { }
+
+	/** Called when a memo is deleted
+	 * @param nc The nickcore of the memo being deleted
+	 * @param mi The memo info
+	 * @param number What memo number is being deleted, can be 0 for all memos
+	 */
+	virtual void OnMemoDel(NickCore *nc, MemoInfo *mi, int number) { }
+
+	/** Called when a memo is deleted
+	 * @param ci The channel of the memo being deleted
+	 * @param mi The memo info
+	 * @param number What memo number is being deleted, can be 0 for all memos
+	 */
+	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, int number) { }
+
 	/** Called when a mode is set on a channel
 	 * @param c The channel
 	 * @param Name The mode name
@@ -1081,14 +1150,15 @@ enum Implementation
 		I_OnHostServHelp, I_OnSetVhost, I_OnDeleteVhost,
 
 		/* MemoServ */
-		I_OnMemoServHelp,
+		I_OnMemoServHelp, I_OnMemoSend, I_OnMemoDel,
 
 		/* Users */
 		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
 		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */
-		I_OnOperServHelp, I_OnDefconLevel,
+		I_OnOperServHelp, I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
+		I_OnAddSXLine, I_OnDelSXLine,
 
 		/* Database */
 		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase, I_OnBackupDatabase,

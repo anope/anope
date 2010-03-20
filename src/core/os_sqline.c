@@ -20,6 +20,13 @@ int sqline_list_callback(SList *slist, int number, void *item, va_list args);
 int sqline_view(int number, SXLine *sx, User *u, int *sent_header);
 int sqline_list(int number, SXLine *sx, User *u, int *sent_header);
 
+static int sxline_del_callback(SList *slist, void *item, va_list args)
+{
+	User *u = va_arg(args, User *);
+	FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(item), SX_SQLINE));
+	return 1;
+}
+
 class CommandOSSQLine : public Command
 {
  private:
@@ -150,7 +157,7 @@ class CommandOSSQLine : public Command
 		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
 		{
 			/* Deleting a range */
-			res = slist_delete_range(&sqlines, mask, NULL);
+			res = slist_delete_range(&sqlines, mask, sxline_del_callback);
 			if (!res)
 			{
 				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
@@ -168,6 +175,7 @@ class CommandOSSQLine : public Command
 				return MOD_CONT;
 			}
 
+			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(sglines.list[res]), SX_SQLINE));
 			slist_delete(&sqlines, res);
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED, mask);
 		}
@@ -264,6 +272,7 @@ class CommandOSSQLine : public Command
 
 	CommandReturn DoClear(User *u)
 	{
+		FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, NULL, SX_SQLINE));
 		slist_clear(&sqlines, 1);
 		notice_lang(Config.s_OperServ, u, OPER_SQLINE_CLEAR);
 

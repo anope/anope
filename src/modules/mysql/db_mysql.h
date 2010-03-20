@@ -149,6 +149,19 @@ BotServFlagInfo BotServFlags[] = {
 	{"", static_cast<BotFlag>(-1)}
 };
 
+struct MemoFlagInfo
+{
+	std::string Name;
+	MemoFlag Flag;
+};
+
+MemoFlagInfo MemoFlags[] = {
+	{"UNREAD", MF_UNREAD},
+	{"RECEIPT", MF_RECEIPT},
+	{"NOTIFYS", MF_NOTIFYS},
+	{"", static_cast<MemoFlag>(-1)}
+};
+
 #define MYSQLPP_MYSQL_HEADERS_BURIED
 #include <mysql++/mysql++.h>
 

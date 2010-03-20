@@ -308,6 +308,14 @@ int add_akill(User * u, const char *mask, const char *by, const time_t expires,
 	entry->seton = time(NULL);
 	entry->expires = expires;
 
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, entry));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete entry;
+		return -1;
+	}
+
 	slist_add(&akills, entry);
 
 	if (Config.AkillOnAdd)
@@ -504,6 +512,14 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 	entry->seton = time(NULL);
 	entry->expires = expires;
 
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddSXLine, OnAddSXLine(u, entry, SX_SGLINE));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete entry;
+		return -1;
+	}
+
 	slist_add(&sglines, entry);
 
 	ircdproto->SendSGLine(entry);
@@ -690,6 +706,14 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 	entry->reason = sstrdup(reason);
 	entry->seton = time(NULL);
 	entry->expires = expires;
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddSXLine, OnAddSXLine(u, entry, SX_SQLINE));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete entry;
+		return -1;
+	}
 
 	slist_add(&sqlines, entry);
 
@@ -902,6 +926,14 @@ int add_szline(User * u, const char *mask, const char *by, time_t expires,
 	entry->reason = sstrdup(reason);
 	entry->seton = time(NULL);
 	entry->expires = expires;
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddSXLine, OnAddSXLine(u, entry, SX_SZLINE));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete entry;
+		return -1;
+	}
 
 	slist_add(&szlines, entry);
 	ircdproto->SendSZLine(entry);

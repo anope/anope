@@ -48,6 +48,7 @@ class CommandMSCancel : public Command
 			{
 				if ((mi->memos[i]->HasFlag(MF_UNREAD)) && !stricmp(mi->memos[i]->sender.c_str(), u->Account()->display) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(name)->nc, mi, mi->memos[i]->number))
 					delmemo(mi, mi->memos[i]->number);
 					notice_lang(Config.s_MemoServ, u, MEMO_CANCELLED, name);
 					return MOD_CONT;

@@ -20,6 +20,13 @@ int szline_list_callback(SList *slist, int number, void *item, va_list args);
 int szline_view(int number, SXLine *sx, User *u, int *sent_header);
 int szline_list(int number, SXLine *sx, User *u, int *sent_header);
 
+static int sxline_del_callback(SList *slist, void *item, va_list args)
+{
+	User *u = va_arg(args, User *);
+	FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(item), SX_SZLINE));
+	return 1;
+}
+
 class CommandOSSZLine : public Command
 {
  private:
@@ -150,7 +157,7 @@ class CommandOSSZLine : public Command
 		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
 		{
 			/* Deleting a range */
-			res = slist_delete_range(&szlines, mask, NULL);
+			res = slist_delete_range(&szlines, mask, sxline_del_callback);
 			if (!res)
 			{
 				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
@@ -169,6 +176,7 @@ class CommandOSSZLine : public Command
 				return MOD_CONT;
 			}
 
+			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(sglines.list[res]), SX_SZLINE));
 			slist_delete(&szlines, res);
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED, mask);
 		}
@@ -263,6 +271,7 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoClear(User *u)
 	{
+		FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, NULL, SX_SZLINE));
 		slist_clear(&szlines, 1);
 		notice_lang(Config.s_OperServ, u, OPER_SZLINE_CLEAR);
 

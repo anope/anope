@@ -486,6 +486,108 @@ static void LoadDatabase()
 			}
 		}
 	}
+
+	query << "SELECT * FROM `anope_ms_info`";
+	qres = StoreQuery(query);
+
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.num_rows(); ++i)
+		{
+			MemoInfo *mi = NULL;
+			if (qres[i]["serv"] == "NICK")
+			{
+				NickCore *nc = findcore(qres[i]["receiver"].c_str());
+				if (nc)
+					mi = &nc->memos;
+			}
+			else if (qres[i]["serv"] == "CHAN")
+			{
+				ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["receiver"]));
+				if (ci)
+					mi = &ci->memos;
+			}
+			if (mi)
+			{
+				Memo *m = new Memo();
+				mi->memos.push_back(m);
+				m->sender = SQLAssign(qres[i]["sender"]);
+				if (mi->memos.size() > 1)
+				{
+					m->number = mi->memos[mi->memos.size() - 2]->number + 1;
+					if (m->number < 1)
+					{
+						for (unsigned j = 0; j < mi->memos.size(); ++j)
+							mi->memos[j]->number = j + 1;
+					}
+				}
+				else
+				{
+					m->number = 1;
+				}
+				m->time = atol(qres[i]["time"].c_str());
+				m->text = sstrdup(qres[i]["text"].c_str());
+				
+				if (!qres[i]["flags"].empty())
+				{
+					spacesepstream sep(SQLAssign(qres[i]["flags"]));
+					std::string buf;
+					while (sep.GetToken(buf))
+					{
+						for (unsigned j = 0; MemoFlags[j].Flag != -1; ++j)
+						{
+							if (MemoFlags[j].Name == buf)
+							{
+								m->SetFlag(MemoFlags[j].Flag);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	query << "SELECT * FROM `anope_os_akills`";
+	qres = StoreQuery(query);
+
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.size(); ++i)
+		{
+			Akill *ak = new Akill;
+			ak->user = sstrdup(qres[i]["user"].c_str());
+			ak->host = sstrdup(qres[i]["host"].c_str());
+			ak->by = sstrdup(qres[i]["xby"].c_str());
+			ak->reason = sstrdup(qres[i]["reason"].c_str());
+			ak->seton = atol(qres[i]["seton"].c_str());
+			ak->expires = atol(qres[i]["expire"].c_str());
+			slist_add(&akills, ak);
+		}
+	}
+
+	query << "SELECT * FROM `anope_os_sxlines`";
+	qres = StoreQuery(query);
+
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.size(); ++i)
+		{
+			SXLine *sx = new SXLine;
+			sx->mask = sstrdup(qres[i]["mask"].c_str());
+			sx->by = sstrdup(qres[i]["xby"].c_str());
+			sx->reason = sstrdup(qres[i]["reason"].c_str());
+			sx->seton = atol(qres[i]["seton"].c_str());
+			sx->expires = atol(qres[i]["expires"].c_str());
+			if (qres[i]["type"] == "SGLINE")
+				slist_add(&sglines, sx);
+			else if (qres[i]["type"] == "SQLINE")
+				slist_add(&sqlines, sx);
+			else if (qres[i]["type"] == "SZLINE")
+				slist_add(&szlines, sx);
+			else
+				delete sx;
+		}
+	}
 }
 
 class DBMySQLRead : public DBMySQL

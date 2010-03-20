@@ -247,17 +247,19 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		m = new Memo;
 		mi->memos.push_back(m);
 		m->sender = source;
-		if (mi->memos.size() > 1) {
+		if (mi->memos.size() > 1)
+		{
 			m->number = mi->memos[mi->memos.size() - 2]->number + 1;
-			if (m->number < 1) {
-				unsigned i;
-				for (i = 0; i < mi->memos.size(); i++) {
+			if (m->number < 1)
+			{
+				for (unsigned i = 0; i < mi->memos.size(); i++)
+				{
 					mi->memos[i]->number = i + 1;
 				}
 			}
-		} else {
-			m->number = 1;
 		}
+		else
+			m->number = 1;
 		m->time = time(NULL);
 		m->text = sstrdup(text);
 		m->SetFlag(MF_UNREAD);
@@ -273,6 +275,8 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (!ischan) {
 			NickAlias *na;
 			NickCore *nc = (findnick(name))->nc;
+
+			FOREACH_MOD(I_OnMemoSend, OnMemoSend(u, nc, m));
 
 			if (Config.MSNotifyAll) {
 				if ((nc->HasFlag(NI_MEMO_RECEIVE))
@@ -300,6 +304,8 @@ void memo_send(User * u, const char *name, const char *text, int z)
 				new_memo_mail(nc, m);
 		} else {
 			Channel *c;
+
+			FOREACH_MOD(I_OnMemoSend, OnMemoSend(u, cs_findchan(name), m));
 
 			if (Config.MSNotifyAll && (c = findchan(name)))
 			{

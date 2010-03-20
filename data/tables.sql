@@ -172,6 +172,8 @@ CREATE TABLE anope_cs_info (
   PRIMARY KEY  (name)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table 'anope_cs_info_metadata'
 --
@@ -214,6 +216,87 @@ CREATE TABLE anope_bs_core (
   created int(11) NOT NULL default '0',
   chancount int(11) NOT NULL default '0',
   PRIMARY KEY (nick)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_ms_info'
+--
+
+DROP TABLE IF EXISTS anope_ms_info;
+CREATE TABLE anope_ms_info (
+  receiver varchar(255) NOT NULL,
+  number int(11) NOT NULL default '0',
+  flags int(11) NOT NULL default '0',
+  time int(11) NOT NULL default '0',
+  sender text NOT NULL,
+  text blob NOT NULL,
+  serv enum('NICK','CHAN') NOT NULL default 'NICK'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_os_akills'
+--
+
+DROP TABLE IF EXISTS anope_os_akills;
+CREATE TABLE anope_os_akills (
+  user varchar(255) NOT NULL,
+  host varchar(255) NOT NULL,
+  xby text NOT NULL,
+  reason text NOT NULL,
+  seton int(11) NOT NULL default '0',
+  expire int(11) NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_os_core'
+--
+
+DROP TABLE IF EXISTS anope_os_core;
+CREATE TABLE anope_os_core (
+  maxusercnt int(11) NOT NULL default '0',
+  maxusertime int(11) NOT NULL default '0',
+  akills_count int(11) NOT NULL default '0',
+  sglines_count int(11) NOT NULL default '0',
+  sqlines_count int(11) NOT NULL default '0',
+  szlines_count int(11) NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_os_exceptions'
+--
+
+DROP TABLE IF EXISTS anope_os_exceptions;
+CREATE TABLE anope_os_exceptions (
+  mask varchar(255) NOT NULL,
+  `limit` int(11) NOT NULL default '0',
+  who text NOT NULL,
+  reason text NOT NULL,
+  time int(11) NOT NULL default '0',
+  expires int(11) NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_os_sxlines'
+--
+
+DROP TABLE IF EXISTS anope_os_sxlines;
+CREATE TABLE anope_os_sxlines (
+  type varchar(20) NOT NULL,
+  mask varchar(255) NOT NULL,
+  xby text NOT NULL,
+  reason text NOT NULL,
+  seton int(11) NOT NULL default '0',
+  expire int(11) NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

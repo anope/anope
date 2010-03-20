@@ -362,7 +362,6 @@ struct EList;
 typedef struct bandata_ BanData;
 typedef struct mailinfo_ MailInfo;
 typedef struct akill_ Akill;
-typedef struct sxline_ SXLine;
 typedef struct exception_ Exception;
 typedef struct session_ Session;
 
@@ -842,7 +841,14 @@ struct akill_ {
 
 /* Structure for OperServ SGLINE and SZLINE commands */
 
-struct sxline_ {
+enum SXLineType
+{
+	SX_SGLINE,
+	SX_SQLINE,
+	SX_SZLINE
+};
+
+struct SXLine {
 	char *mask;
 	char *by;
 	char *reason;

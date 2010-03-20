@@ -335,5 +335,16 @@ int exception_add(User * u, const char *mask, const int limit,
 	exceptions[nexceptions - 1].expires = expires;
 	exceptions[nexceptions - 1].num = nexceptions - 1;
 
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(u, &exceptions[nexceptions - 1]));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete [] exceptions[nexceptions - 1].mask;
+		delete [] exceptions[nexceptions - 1].reason;
+		--nexceptions;
+		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
+		return -3;
+	}
+
 	return 1;
 }

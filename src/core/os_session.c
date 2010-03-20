@@ -93,10 +93,12 @@ class CommandOSSession : public Command
 	}
 };
 
-static int exception_del(const int index)
+static int exception_del(User *u, const int index)
 {
 	if (index < 0 || index >= nexceptions)
 		return 0;
+	
+	FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(u, &exceptions[index]));
 
 	delete [] exceptions[index].mask;
 	delete [] exceptions[index].reason;
@@ -124,7 +126,7 @@ static int exception_del_callback(User *u, int num, va_list args)
 			break;
 
 	if (i < nexceptions)
-		return exception_del(i);
+		return exception_del(u, i);
 	else
 		return 0;
 }
@@ -290,7 +292,7 @@ class CommandOSException : public Command
 			{
 				if (!stricmp(mask, exceptions[i].mask))
 				{
-					exception_del(i);
+					exception_del(u, i);
 					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED, mask);
 					deleted = 1;
 					break;

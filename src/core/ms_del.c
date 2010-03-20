@@ -27,9 +27,10 @@ class CommandMSDel : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		MemoInfo *mi;
-		ChannelInfo *ci;
+		ChannelInfo *ci = NULL;
 		ci::string numstr = params.size() ? params[0] : "", chan;
-		int last, last0, i;
+		int last, last0;
+		unsigned i;
 		char buf[BUFSIZE], *end;
 		int delcount, count, left;
 
@@ -77,7 +78,7 @@ class CommandMSDel : public Command
 				last0 = -1; /* Beginning of range of last memos deleted */
 				end = buf;
 				left = sizeof(buf);
-				delcount = process_numlist(numstr.c_str(), &count, del_memo_callback, u, mi, &last, &last0, &end, &left);
+				delcount = process_numlist(numstr.c_str(), &count, del_memo_callback, u, mi, &last, &last0, &end, &left, ci);
 				if (last != -1)
 				{
 					/* Some memos got deleted; tell them which ones. */
@@ -107,11 +108,27 @@ class CommandMSDel : public Command
 				/* Delete last memo. */
 				for (i = 0; i < mi->memos.size(); ++i)
 					last = mi->memos[i]->number;
+				if (ci)
+				{
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, last));
+				}
+				else
+				{
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, last))
+				}
 				delmemo(mi, last);
 				notice_lang(Config.s_MemoServ, u, MEMO_DELETED_ONE, last);
 			}
 			else
 			{
+				if (ci)
+				{
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, 0));
+				}
+				else
+				{
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, 0));
+				}
 				/* Delete all memos. */
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
@@ -176,7 +193,16 @@ int del_memo_callback(User *u, int num, va_list args)
 	int *last0 = va_arg(args, int *);
 	char **end = va_arg(args, char **);
 	int *left = va_arg(args, int *);
+	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 
+	if (ci)
+	{
+		FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, num));
+	}
+	else
+	{
+		FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, num));
+	}
 	if (delmemo(mi, num))
 	{
 		if (num != (*last) + 1)

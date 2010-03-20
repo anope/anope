@@ -20,6 +20,13 @@ int akill_list_callback(SList *slist, int number, void *item, va_list args);
 int akill_view(int number, Akill *ak, User *u, int *sent_header);
 int akill_list(int number, Akill *ak, User *u, int *sent_header);
 
+static int akill_del_callback(SList *slist, void *item, va_list args)
+{
+	User *u = va_arg(args, User *);
+	FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, static_cast<Akill *>(item)));
+	return 1;
+}
+
 class CommandOSAKill : public Command
 {
  private:
@@ -159,7 +166,7 @@ class CommandOSAKill : public Command
 		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
 		{
 			/* Deleting a range */
-			res = slist_delete_range(&akills, mask, NULL);
+			res = slist_delete_range(&akills, mask, akill_del_callback, u);
 			if (!res)
 			{
 				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
@@ -177,6 +184,8 @@ class CommandOSAKill : public Command
 				notice_lang(Config.s_OperServ, u, OPER_AKILL_NOT_FOUND, mask);
 				return MOD_CONT;
 			}
+
+			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, static_cast<Akill *>(akills.list[res])));
 
 			slist_delete(&akills, res);
 			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED, mask);
@@ -276,6 +285,7 @@ class CommandOSAKill : public Command
 
 	CommandReturn DoClear(User *u)
 	{
+		FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, NULL));
 		slist_clear(&akills, 1);
 		notice_lang(Config.s_OperServ, u, OPER_AKILL_CLEAR);
 

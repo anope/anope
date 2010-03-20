@@ -1056,7 +1056,7 @@ class CoreExport IRCDProto
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
 		virtual void SendForceNickChange(User *u, const char *newnick, time_t when);
-		virtual void SendVhost(User *, const char *, const char *) { }
+		virtual void SendVhost(User *, const std::string &, const std::string &) { }
 		virtual void SendConnect() = 0;
 		virtual void SendSVSHold(const char *) { }
 		virtual void SendSVSHoldDel(const char *) { }

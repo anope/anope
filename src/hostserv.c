@@ -198,7 +198,7 @@ void do_on_id(User *u)
 	if (!na || !na->hostinfo.HasVhost())
 		return;
 	
-	ircdproto->SendVhost(u, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+	ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 	if (ircd->vhost)
 	{
 		if (u->vhost)

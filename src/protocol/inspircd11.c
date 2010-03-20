@@ -240,10 +240,12 @@ class InspIRCdProto : public IRCDProto
 
 	/* Functions that use serval cmd functions */
 
-	void SendVhost(User *u, const char *vIdent, const char *vhost)
+	void SendVhost(User *u, const std::string &vIdent, const std::string &vhost)
 	{
-		if (vIdent) inspircd_cmd_chgident(u->nick.c_str(), vIdent);
-		inspircd_cmd_chghost(u->nick.c_str(), vhost);
+		if (!vIdent.empty())
+			inspircd_cmd_chgident(u->nick.c_str(), vIdent.c_str());
+		if (!vhost.empty())
+			inspircd_cmd_chghost(u->nick.c_str(), vhost.c_str());
 	}
 
 	void SendConnect()

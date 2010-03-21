@@ -580,7 +580,7 @@ class DBMySQLWrite : public DBMySQL
 		ExecuteQuery(query);
 		query << "DELETE FROM `anope_ns_core` WHERE `display` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
-		query << "DELETE FROM `anope_ms_core` WHERE `receiver` = " << mysqlpp::quote << nc->display;
+		query << "DELETE FROM `anope_ms_info` WHERE `receiver` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
 	}
 

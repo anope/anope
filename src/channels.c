@@ -157,8 +157,9 @@ void Channel::JoinUser(User *user)
 	 * make it into the channel, leaving the channel botless even for
 	 * legit users - Rob
 	 * But don't join the bot if the channel is persistant - Adam
+	 * But join persistant channels when syncing with our uplink- DP
 	 **/
-	if (Config.s_BotServ && this->ci && this->ci->bi && !this->ci->HasFlag(CI_PERSIST))
+	if (Config.s_BotServ && this->ci && this->ci->bi && ((serv_uplink->sync == SSYNC_IN_PROGRESS) || !this->ci->HasFlag(CI_PERSIST)))
 	{
 		if (this->users.size() == Config.BSMinUsers)
 			bot_join(this->ci);

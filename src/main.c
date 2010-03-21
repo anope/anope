@@ -99,6 +99,32 @@ static int started = 0;
 
 /*************************************************************************/
 
+class ExpireTimer : public Timer
+{
+ public:
+	ExpireTimer(time_t timeout, time_t now) : Timer(timeout, now, true) { }
+
+	void Tick(time_t)
+	{
+		if (!readonly && !noexpire)
+			expire_all();
+	}
+};
+
+class UpdateTimer : public Timer
+{
+ public:
+	UpdateTimer(time_t timeout, time_t now) : Timer(timeout, now, true) { }
+
+	void Tick(time_t)
+	{
+		if (!readonly)
+			save_databases();
+	}
+};
+
+/*************************************************************************/
+
 /* Run expiration routines */
 
 extern void expire_all()
@@ -344,10 +370,6 @@ std::string GetFullProgDir(char *argv0)
 
 int main(int ac, char **av, char **envp)
 {
-	time_t last_update;		/* When did we last update the databases? */
-	time_t last_expire;		/* When did we last expire nicks/channels? */
-	time_t last_check; /* When did we last check timeouts? */
-
 	int i;
 	char *progname;
 
@@ -405,11 +427,6 @@ int main(int ac, char **av, char **envp)
 	/* We have a line left over from earlier, so process it first. */
 	process();
 
-	/* Set up timers. */
-	last_update = time(NULL);
-	last_expire = time(NULL);
-	last_check = time(NULL);
-
 	started = 1;
 
 #ifndef _WIN32
@@ -431,38 +448,35 @@ int main(int ac, char **av, char **envp)
 	}
 #endif
 
-	/*** Main loop. ***/
+	/* Set up timers */
+	time_t last_check = time(NULL);
+	ExpireTimer expireTimer(Config.ExpireTimeout, last_check);
+	UpdateTimer updateTimer(Config.UpdateTimeout, last_check);
 
-	while (!quitting) {
+	/*** Main loop. ***/
+	while (!quitting)
+	{
 		time_t t = time(NULL);
 
 		Alog(LOG_DEBUG_2) << "Top of main loop";
 
-		// Never fear. noexpire/readonly are checked in expire_all().
-		if (save_data || t - last_expire >= Config.ExpireTimeout)
+		if (!readonly && save_data)
 		{
-			expire_all();
-			last_expire = t;
-		}
-
-		if (!readonly && (save_data || t - last_update >= Config.UpdateTimeout)) {
+			if (!noexpire)
+				expire_all();
 			if (delayed_quit)
-				ircdproto->SendGlobops(NULL,
-								 "Updating databases on shutdown, please wait.");
-
+				ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
 			save_databases();
-
 			if (save_data < 0)
-				break;		  /* out of main loop */
-
+				break;
 			save_data = 0;
-			last_update = t;
 		}
 
 		if (delayed_quit)
 			break;
 
-		if (t - last_check >= Config.TimeoutCheck) {
+		if (t - last_check >= Config.TimeoutCheck)
+		{
 			TimerManager::TickTimers(t);
 			last_check = t;
 		}

@@ -652,7 +652,7 @@ class DBMySQLWrite : public DBMySQL
 		ExecuteQuery(query);
 		query << "UPDATE `anope_cs_info` SET `successor` = " << mysqlpp::quote << newdisplay << " WHERE `successor` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
-		query << "UDATEE `anope_ms_info` SET `receiver` = " << mysqlpp::quote << newdisplay << " WHERE `receiver` = " << mysqlpp::quote << nc->display;
+		query << "UPDATE `anope_ms_info` SET `receiver` = " << mysqlpp::quote << newdisplay << " WHERE `receiver` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
 	}
 

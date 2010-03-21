@@ -75,7 +75,7 @@ private:
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
 		}
-		else if (len > PASSMAX)
+		else if (len > Config.PassLen)
 		{
 			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
 			return MOD_CONT;

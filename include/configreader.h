@@ -408,8 +408,11 @@ class ServerConfig
 		unsigned NickLen;
 		/* Max length of idents */
 		unsigned UserLen;
-		/* Max lenghts of hostnames */
+		/* Max lenght of hostnames */
 		unsigned HostLen;
+
+		/* Max length of passwords */
+		unsigned PassLen;
 
 		/* NickServ Name */
 		char *s_NickServ;

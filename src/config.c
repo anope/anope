@@ -611,6 +611,7 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&Config.UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&Config.HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "passlen", "32", new ValueContainerUInt(&Config.PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "database", "", new ValueContainerString(&DBModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&Config.UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&Config.UserKey2), DT_LUINTEGER, NoValidation},

@@ -263,7 +263,7 @@ class CommandNSRegister : public CommandNSConfirm
 		}
 		else if (!stricmp(u->nick.c_str(), pass) || (Config.StrictPasswords && strlen(pass) < 5))
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
-		else if (strlen(pass) > PASSMAX)
+		else if (strlen(pass) > Config.PassLen)
 			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
 		else if (email && !MailValidate(email))
 			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, email);

@@ -346,7 +346,7 @@ class EMD5 : public Module
 	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
 		MD5_CTX context;
-		char digest[PASSMAX];
+		char *digest = new char[Config.PassLen];
 		std::string buf = "md5:";
 		char cpass[1000];
 
@@ -358,6 +358,7 @@ class EMD5 : public Module
 		buf.append(cpass);
 		Alog(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest.assign(buf);
+		delete [] digest;
 		return EVENT_ALLOW;
 	}
 

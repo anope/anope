@@ -199,7 +199,7 @@ class ESHA1 : public Module
 	EventReturn OnEncrypt(const std::string &src, std::string &dest)
 	{
 		SHA1_CTX context;
-		char digest[PASSMAX];
+		char *digest = new char[Config.PassLen];
 		std::string buf = "sha1:";
 		char cpass[1000];
 
@@ -213,6 +213,7 @@ class ESHA1 : public Module
 		buf.append(cpass);
 		Alog(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
 		dest.assign(buf);
+		delete [] digest;
 		return EVENT_ALLOW;
 	}
 

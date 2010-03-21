@@ -16,6 +16,7 @@
 #include "module.h"
 
 std::fstream db;
+std::string DatabaseFile;
 
 /** Enum used for what METADATA type we are reading
  */
@@ -43,11 +44,11 @@ static void ReadDatabase(Module *m = NULL)
 	EventReturn MOD_RESULT;
 	MDType Type = MD_NONE;
 
-	db.open(DATABASE_FILE, std::ios_base::in);
+	db.open(DatabaseFile.c_str(), std::ios_base::in);
 
 	if (!db.is_open())
 	{
-		ircdproto->SendGlobops(NULL, "Unable to open %s for reading!", DATABASE_FILE);
+		ircdproto->SendGlobops(NULL, "Unable to open %s for reading!", DatabaseFile.c_str());
 		return;
 	}
 
@@ -519,8 +520,16 @@ class DBPlain : public Module
 		this->SetVersion("$Id$");
 		this->SetType(DATABASE);
 
-		Implementation i[] = { I_OnDatabaseRead, I_OnLoadDatabase, I_OnDatabaseReadMetadata, I_OnSaveDatabase, I_OnModuleLoad };
-		ModuleManager::Attach(i, this, 5);
+		Implementation i[] = { I_OnReload, I_OnDatabaseRead, I_OnLoadDatabase, I_OnDatabaseReadMetadata, I_OnSaveDatabase, I_OnModuleLoad };
+		ModuleManager::Attach(i, this, 6);
+
+		OnReload(true);
+	}
+
+	void OnReload(bool)
+	{
+		ConfigReader config;
+		DatabaseFile = config.ReadValue("db_plain", "database", "anope.db", 0);
 	}
 
 	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
@@ -832,11 +841,11 @@ class DBPlain : public Module
 
 	EventReturn OnSaveDatabase()
 	{
-		db.open(DATABASE_FILE, std::ios_base::out | std::ios_base::trunc);
+		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 		if (!db.is_open())
 		{
-			ircdproto->SendGlobops(NULL, "Unable to open %s for writing!", DATABASE_FILE);
+			ircdproto->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
 			return EVENT_CONTINUE;
 		}
 

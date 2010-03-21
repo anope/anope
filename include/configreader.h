@@ -406,6 +406,10 @@ class ServerConfig
 		char *NetworkName;
 		/* The max legnth of nicks */
 		unsigned NickLen;
+		/* Max length of idents */
+		unsigned UserLen;
+		/* Max lenghts of hostnames */
+		unsigned HostLen;
 
 		/* NickServ Name */
 		char *s_NickServ;

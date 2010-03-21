@@ -26,7 +26,7 @@ class CommandHSSet : public Command
 	{
 		const char *nick = params[0].c_str();
 		const char *rawhostmask = params[1].c_str();
-		char *hostmask = new char[HOSTMAX];
+		char *hostmask = new char[Config.HostLen];
 
 		NickAlias *na;
 		int32 tmp_time;
@@ -45,9 +45,9 @@ class CommandHSSet : public Command
 				delete [] hostmask;
 				return MOD_CONT;
 			}
-			if (strlen(vIdent) > USERMAX - 1)
+			if (strlen(vIdent) > Config.UserLen)
 			{
-				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, Config.UserLen);
 				delete [] vIdent;
 				delete [] rawhostmask;
 				delete [] hostmask;
@@ -76,11 +76,11 @@ class CommandHSSet : public Command
 				return MOD_CONT;
 			}
 		}
-		if (strlen(rawhostmask) < HOSTMAX - 1)
-			snprintf(hostmask, HOSTMAX - 1, "%s", rawhostmask);
+		if (strlen(rawhostmask) < Config.HostLen)
+			snprintf(hostmask, Config.HostLen, "%s", rawhostmask);
 		else
 		{
-			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, Config.HostLen);
 			if (vIdent)
 			{
 				delete [] vIdent;

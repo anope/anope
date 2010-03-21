@@ -482,7 +482,7 @@ int doValidHost(const char *host, int type)
 
 	len = strlen(host);
 
-	if (len > HOSTMAX) {
+	if (len > Config.HostLen) {
 		return 0;
 	}
 

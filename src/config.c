@@ -608,6 +608,8 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&Config.LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&Config.NetworkName), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&Config.NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
+		{"networkinfo", "userlen", "10", new ValueContainerUInt(&Config.UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&Config.HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "database", "", new ValueContainerString(&DBModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&Config.UserKey1), DT_LUINTEGER, NoValidation},

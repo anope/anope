@@ -39,15 +39,15 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (strlen(user) >= USERMAX)
+		if (strlen(user) > Config.UserLen)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, Config.UserLen);
 			return MOD_CONT;
 		}
 
-		if (strlen(user) > HOSTMAX)
+		if (strlen(user) > Config.HostLen)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, HOSTMAX);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, Config.HostLen);
 			return MOD_CONT;
 		}
 
@@ -81,11 +81,11 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = user; *ch && (ch - user) < USERMAX; ch++)
+		for (ch = user; *ch && (ch - user) < Config.UserLen; ch++)
 		{
 			if (!isalnum(*ch))
 			{
-				notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, USERMAX - 1);
+				notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, Config.UserLen);
 				return MOD_CONT;
 			}
 		}
@@ -150,15 +150,15 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (user && strlen(user) >= USERMAX)
+		if (user && strlen(user) > Config.UserLen)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, USERMAX - 1);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, Config.UserLen);
 			return MOD_CONT;
 		}
 
-		if (host && strlen(host) > HOSTMAX)
+		if (host && strlen(host) > Config.HostLen)
 		{
-			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, HOSTMAX);
+			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, Config.HostLen);
 			return MOD_CONT;
 		}
 
@@ -210,11 +210,11 @@ class CommandBSBot : public Command
 
 		if (user)
 		{
-			for (ch = user; *ch && (ch - user) < USERMAX; ch++)
+			for (ch = user; *ch && (ch - user) < Config.UserLen; ch++)
 			{
 				if (!isalnum(*ch))
 				{
-					notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, USERMAX - 1);
+					notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, Config.UserLen);
 					return MOD_CONT;
 				}
 			}

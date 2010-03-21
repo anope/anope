@@ -80,7 +80,7 @@ class CommandHSRequest : public Command
 	{
 		const char *nick;
 		const char *rawhostmask = params[0].c_str();
-		char hostmask[HOSTMAX];
+		char *hostmask = new char[Config.HostLen];
 		NickAlias *na;
 		char *s;
 		char *vIdent = NULL;
@@ -96,13 +96,15 @@ class CommandHSRequest : public Command
 			{
 				me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
 				delete [] vIdent;
+				delete [] hostmask;
 				return MOD_CONT;
 			}
-			if (strlen(vIdent) > USERMAX - 1)
+			if (strlen(vIdent) > Config.UserLen)
 			{
-				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, Config.UserLen);
 				delete [] vIdent;
 				delete [] rawhostmask;
+				delete [] hostmask;
 				return MOD_CONT;
 			}
 			else
@@ -114,6 +116,7 @@ class CommandHSRequest : public Command
 						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
 						delete [] vIdent;
 						delete [] rawhostmask;
+						delete [] hostmask;
 						return MOD_CONT;
 					}
 				}
@@ -123,19 +126,21 @@ class CommandHSRequest : public Command
 				notice_lang(Config.s_HostServ, u, HOST_NO_VIDENT);
 				delete [] vIdent;
 				delete [] rawhostmask;
+				delete [] hostmask;
 				return MOD_CONT;
 			}
 		}
-		if (strlen(rawhostmask) < HOSTMAX)
-			snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
+		if (strlen(rawhostmask) < Config.HostLen)
+			snprintf(hostmask, Config.HostLen, "%s", rawhostmask);
 		else
 		{
-			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, Config.HostLen);
 			if (vIdent)
 			{
 				delete [] vIdent;
 				delete [] rawhostmask;
 			}
+			delete [] hostmask;
 			return MOD_CONT;
 		}
 
@@ -147,6 +152,7 @@ class CommandHSRequest : public Command
 				delete [] vIdent;
 				delete [] rawhostmask;
 			}
+			delete [] hostmask;
 			return MOD_CONT;
 		}
 
@@ -163,6 +169,7 @@ class CommandHSRequest : public Command
 						delete [] vIdent;
 						delete [] rawhostmask;
 					}
+					delete [] hostmask;
 					return MOD_CONT;
 				}
 			}
@@ -180,6 +187,7 @@ class CommandHSRequest : public Command
 			delete [] vIdent;
 			delete [] rawhostmask;
 		}
+		delete [] hostmask;
 
 		return MOD_CONT;
 	}

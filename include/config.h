@@ -53,12 +53,6 @@
 /* Maximum length of a password */
 #define PASSMAX		32
 
-/* Maximum length of a username */
-#define USERMAX		10
-
-/* Maximum length of a domain */
-#define HOSTMAX		64
-
 /**************************************************************************/
 
 #endif	/* CONFIG_H */

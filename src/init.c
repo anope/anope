@@ -362,6 +362,7 @@ static int parse_options(int ac, char **av)
                 fprintf(stdout,
                         "-expire        -expire expiretime(secs)\n");
                 fprintf(stdout, "-debug         -debug\n");
+                fprintf(stdout, "-protocoldebug -protocoldebug\n");
                 fprintf(stdout, "-nofork        -nofork\n");
                 fprintf(stdout, "-logchan       -logchan channelname\n");
                 fprintf(stdout, "-skeleton      -skeleton\n");

@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2834"
+VERSION_BUILD="2836"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2836 - Document usage of the -protocoldebug option in services help
 #Revision 2834 - Removed some unused functions from extern.h and changed docs/IRCD to not tell lies
 #Revision 2821 - Fixed bug #1143 - Fixed a blind sprintf in sighandler that would write an error message to unallocated memory
 #Revision 2819 - Fixed a bug introduced in r2667 that could cause some access entries to not convert to XOP correctly

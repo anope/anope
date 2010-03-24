@@ -631,7 +631,7 @@ void bot_join(ChannelInfo * ci)
 
 		std::string Limit;
 		int limit = 0;
-		if (ci->c->GetParam(CMODE_LIMIT, &Limit))
+		if (ci->c->GetParam(CMODE_LIMIT, Limit))
 		{
 			limit = atoi(Limit.c_str());
 		}

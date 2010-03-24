@@ -44,7 +44,7 @@
 std::string services_dir;	  /* -dir dirname */
 std::string services_bin;	/* Binary as specified by the user */
 std::string orig_cwd;		/* Original current working directory */
-const char *log_filename = LOG_FILENAME;	  /* -log filename */
+std::string log_filename = LOG_FILENAME;	  /* -log filename */
 int debug = 0;				  /* -debug */
 int readonly = 0;			   /* -readonly */
 bool LogChan = false;				/* -logchan */
@@ -90,7 +90,7 @@ const char version_number_dotted[] = VERSION_STRING_DOTTED;
 const char version_build[] =
 	"build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */
-const char version_flags[] = " " VER_OS VER_MODULE;
+const char version_flags[] = " " VER_OS;
 
 /******** Local variables! ********/
 
@@ -371,7 +371,6 @@ std::string GetFullProgDir(char *argv0)
 int main(int ac, char **av, char **envp)
 {
 	int i;
-	char *progname;
 
 	my_av = av;
 	my_envp = envp;
@@ -412,12 +411,13 @@ int main(int ac, char **av, char **envp)
 	/* General initialization first */
 	if ((i = init_primary(ac, av)) != 0)
 		return i;
-
-	/* Find program name. */
-	if ((progname = strrchr(av[0], '/')) != NULL)
-		progname++;
-	else
-		progname = av[0];
+	
+	Alog(LOG_TERMINAL) << "Anope " << version_number << ", " << version_build;
+#ifdef _WIN32
+	Alog(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;
+#else
+	Alog(LOG_TERMINAL) << "Using configuration file " << services_dir << "/" << services_conf;
+#endif
 
 	/* Initialization stuff. */
 	if ((i = init_secondary(ac, av)) != 0)

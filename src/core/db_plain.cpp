@@ -1039,7 +1039,7 @@ class DBPlain : public Module
 				}
 				std::string Param;
 				for (j = 0; ChannelModes[j].Value != -1; ++j)
-					if (ci->GetParam(ChannelModes[j].Value, &Param))
+					if (ci->GetParam(ChannelModes[j].Value, Param))
 						db << "MD MLP " << ChannelModes[j].Name << " " << Param;
 				if (!ci->memos.memos.empty())
 				{

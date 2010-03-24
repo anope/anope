@@ -34,7 +34,7 @@ static int get_logname(char *name, int count, struct tm *tm)
 
 	/* fix bug 577 */
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
-	snprintf(name, count, "logs/%s.%s", log_filename, timestamp);
+	snprintf(name, count, "logs/%s.%s", log_filename.c_str(), timestamp);
 	curday = tm->tm_yday;
 
 	return 1;
@@ -255,21 +255,15 @@ void fatal_perror(const char *fmt, ...)
 	exit(1);
 }
 
-Alog::Alog(LogLevel val)
+Alog::Alog(LogLevel val) : Level(val)
 {
-	if (val > debug)
-		logit = false;
-	else
-	{
-		logit = true;
-		if (val >= LOG_DEBUG)
-			buf << "Debug: ";
-	}
+	if (Level >= LOG_DEBUG)
+		buf << "Debug: ";
 }
 
 Alog::~Alog()
 {
-	if (!logit)
+	if (Level >= LOG_DEBUG && (Level - LOG_DEBUG + 1) > debug)
 		return;
 
 	char *tbuf;
@@ -282,9 +276,10 @@ Alog::~Alog()
 	if (logfile) {
 		fprintf(logfile, "%s %s\n", tbuf, buf.str().c_str());
 	}
-	if (nofork) {
-		fprintf(stderr, "%s %s\n", tbuf, buf.str().c_str());
-	}
+	if (nofork)
+		std::cout << tbuf << " " << buf.str() << std::endl;
+	else if (Level == LOG_TERMINAL) // XXX dont use this yet unless you know we're at terminal and not daemonized
+		std::cout << buf.str() << std::endl;
 	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel)) {
 		ircdproto->SendPrivmsg(findbot(Config.s_GlobalNoticer), Config.LogChannel, "%s", buf.str().c_str());
 	}

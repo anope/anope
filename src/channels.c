@@ -396,7 +396,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 			{
 				/* Get the current param set on the channel and send it with the mode */
 				std::string cparam;
-				if (GetParam(cmp->Name, &cparam))
+				if (GetParam(cmp->Name, cparam))
 					RemoveMode(NULL, cm, cparam);
 			}
 			else
@@ -411,9 +411,9 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
 		std::string cparam, ciparam;
 		/* Get the param currently set on this channel */
-		GetParam(cmp->Name, &cparam);
+		GetParam(cmp->Name, cparam);
 		/* Get the param set in mlock */
-		ci->GetParam(cmp->Name, &ciparam);
+		ci->GetParam(cmp->Name, ciparam);
 
 		/* We have the wrong param set */
 		if (cparam.empty() || ciparam.empty() || cparam != ciparam)
@@ -539,7 +539,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		{
 			std::string cparam;
 			/* Get the param stored in mlock for this mode */
-			if (ci->GetParam(cm->Name, &cparam))
+			if (ci->GetParam(cm->Name, cparam))
 				SetMode(NULL, cm, cparam);
 		}
 	}
@@ -648,15 +648,15 @@ void Channel::RemoveMode(BotInfo *bi, char Mode, const std::string &param, bool 
  * @param Target a string to put the param into
  * @return true on success
  */
-const bool Channel::GetParam(ChannelModeName Name, std::string *Target)
+const bool Channel::GetParam(ChannelModeName Name, std::string &Target)
 {
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 
-	(*Target).clear();
+	Target.clear();
 
 	if (it != Params.end())
 	{
-		*Target = it->second;
+		Target = it->second;
 		return true;
 	}
 
@@ -705,7 +705,7 @@ void Channel::ClearModes(BotInfo *bi)
 				if (!cmp->MinusNoArg)
 				{
 					std::string buf;
-					if (this->GetParam(cmp->Name, &buf))
+					if (this->GetParam(cmp->Name, buf))
 						this->RemoveMode(NULL, cm, buf);
 				}
 				else
@@ -1001,7 +1001,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 
 						if (plus || !cmp->MinusNoArg)
 						{
-							chan->GetParam(cmp->Name, &param);
+							chan->GetParam(cmp->Name, param);
 
 							if (!param.empty())
 							{
@@ -1104,11 +1104,11 @@ void get_channel_stats(long *nrec, long *memuse)
 			mem += sizeof(*chan);
 			if (chan->topic)
 				mem += strlen(chan->topic) + 1;
-			if (chan->GetParam(CMODE_KEY, &buf))
+			if (chan->GetParam(CMODE_KEY, buf))
 				mem += buf.length() + 1;
-			if (chan->GetParam(CMODE_FLOOD, &buf))
+			if (chan->GetParam(CMODE_FLOOD, buf))
 				mem += buf.length() + 1;
-			if (chan->GetParam(CMODE_REDIRECT, &buf))
+			if (chan->GetParam(CMODE_REDIRECT, buf))
 				mem += buf.length() + 1;
 			mem += get_memuse(chan->bans);
 			if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))

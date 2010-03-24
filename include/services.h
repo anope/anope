@@ -231,6 +231,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include "slist.h"
 
 /* pull in the various bits of STL to pull in */
+#include <iostream>
 #include <string>
 #include <map>
 #include <exception>
@@ -1121,6 +1122,7 @@ struct Uplink {
 enum LogLevel
 {
 	LOG_NORMAL,
+	LOG_TERMINAL,
 	LOG_DEBUG,
 	LOG_DEBUG_2,
 	LOG_DEBUG_3,
@@ -1131,14 +1133,13 @@ class CoreExport Alog
 {
  private:
 	std::stringstream buf;
-	bool logit;
+	LogLevel Level;
  public:
 	Alog(LogLevel val = LOG_NORMAL);
 	~Alog();
 	template<typename T> Alog& operator<<(T val)
 	{
-		if (logit)
-			buf << val;
+		buf << val;
 		return *this;
 	}
 };

@@ -279,7 +279,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 * @param Target a string to put the param into
 	 * @return true on success
 	 */
-	const bool GetParam(ChannelModeName Name, std::string *Target);
+	const bool GetParam(ChannelModeName Name, std::string &Target);
 
 	/** Check if a mode is set and has a param
 	 * @param Name The mode

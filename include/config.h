@@ -22,9 +22,6 @@
 
 /******* General configuration *******/
 
-/* Name of configuration file (in Services directory) */
-#define SERVICES_CONF	"services.conf"
-
 /* Name of log file (in Services directory) */
 #define LOG_FILENAME	"services.log"
 

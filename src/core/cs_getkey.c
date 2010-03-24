@@ -36,7 +36,7 @@ class CommandCSGetKey : public Command
 			return MOD_CONT;
 		}
 
-		if (!ci->c || !ci->c->GetParam(CMODE_KEY, &key))
+		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
 			return MOD_CONT;

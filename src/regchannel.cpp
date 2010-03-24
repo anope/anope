@@ -510,15 +510,15 @@ const size_t ChannelInfo::GetMLockCount(bool status) const
  * @param Target a string to put the param into
  * @return true on success
  */
-const bool ChannelInfo::GetParam(ChannelModeName Name, std::string *Target)
+const bool ChannelInfo::GetParam(ChannelModeName Name, std::string &Target)
 {
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 
-	(*Target).clear();
+	Target.clear();
 
 	if (it != Params.end())
 	{
-		*Target = it->second;
+		Target = it->second;
 		return true;
 	}
 

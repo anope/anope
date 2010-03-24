@@ -79,230 +79,67 @@ static int set_group()
 
 /*************************************************************************/
 
-/* Parse command-line options for the "-dir" option only.  Return 0 if all
- * went well or -1 for a syntax error.
+/* Vector of pairs of command line arguments and their params */
+static std::vector<std::pair<std::string, std::string> > CommandLineArguments;
+
+/** Called on startup to organize our starting arguments in a better way
+ * and check for errors
+ * @param ac number of args
+ * @param av args
  */
-
-/* XXX this could fail if we have "-some-option-taking-an-argument -dir" */
-
-static int parse_dir_options(int ac, char **av)
+static void ParseCommandLineArguments(int ac, char **av)
 {
-	int i;
-	char *s;
-
-	for (i = 1; i < ac; i++) {
-		s = av[i];
-		if (*s == '-') {
-			s++;
-			if (strcmp(s, "dir") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-dir requires a parameter\n");
-					return -1;
-				}
-				services_dir = av[i];
-			} else if (strcmp(s, "log") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-log requires a parameter\n");
-					return -1;
-				}
-				log_filename = av[i];
-			} else if (strcmp(s, "debug") == 0) {
-				++debug;
-			} else if (strcmp(s, "nofork") == 0) {
-				nofork = 1;
-			} else if (strcmp(s, "support") == 0) {
-				nofork = 1;
-				++debug;
-				nothird = 1;
-			} else if (strcmp(s, "version") == 0) {
-				fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
-						version_flags, version_build);
-				exit(EXIT_SUCCESS);
-			}
+	for (int i = 1; i < ac; ++i)
+	{
+		std::string option = av[i];
+		std::string param = "";
+		while (!option.empty() && option[0] == '-')
+			option.erase(option.begin());
+		size_t t = option.find('=');
+		if (t != std::string::npos)
+		{
+			param = option.substr(t + 1);
+			option.erase(t);
 		}
+
+		if (option.empty())
+			continue;
+
+		CommandLineArguments.push_back(std::make_pair(option, param));
 	}
-	return 0;
 }
 
-/*************************************************************************/
-
-/* Parse command-line options.  Return 0 if all went well, -1 for an error
- * with an option, or 1 for -help.
+/** Check if an argument was given on startup
+ * @param name The argument name
+ * @param shortname A shorter name, eg --debug and -d
+ * @return true if name/shortname was found, false if not
  */
-
-static int parse_options(int ac, char **av)
+bool GetCommandLineArgument(const std::string &name, char shortname)
 {
-	int i;
-	char *s, *t;
+	std::string Unused;
+	return GetCommandLineArgument(name, shortname, Unused);
+}
 
-	for (i = 1; i < ac; i++) {
-		s = av[i];
-		if (*s == '-') {
-			s++;
-			if (strcmp(s, "remote") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-remote requires hostname[:port]\n");
-					return -1;
-				}
-				s = av[i];
-				t = strchr(s, ':');
-				if (t) {
-					int portnum;
-					*t++ = 0;
-					portnum = atoi(t);
-					if ((portnum > 0) && (portnum < 65535))
-						/*RemotePort = portnum*/; // Needs fixing to handle the Uplinks list
-					else {
-						fprintf(stderr,
-								"-remote: Port numbers must be in the range 1..65535. Using default.\n");
-						return -1;
-					}
-				}
-				/*RemoteServer = s*/; // Needs fixing to handle the Uplinks list
-			} else if (strcmp(s, "local") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr,
-							"-local requires hostname or [hostname]:[port]\n");
-					return -1;
-				}
-				s = av[i];
-				t = strchr(s, ':');
-				if (t) {
-					int portnum;
-					*t++ = 0;
-					portnum = atoi(t);
-					if ((portnum >= 0) && (portnum < 65535))
-						Config.LocalPort = portnum;
-					else {
-						fprintf(stderr,
-								"-local: Port numbers must be in the range 1..65535 or 0. Using default.\n");
-						return -1;
-					}
-				}
-				Config.LocalHost = s;
-			} else if (strcmp(s, "name") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-name requires a parameter\n");
-					return -1;
-				}
-				Config.ServerName = av[i];
-			} else if (strcmp(s, "desc") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-desc requires a parameter\n");
-					return -1;
-				}
-				Config.ServerDesc = av[i];
-			} else if (strcmp(s, "user") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-user requires a parameter\n");
-					return -1;
-				}
-				Config.ServiceUser = av[i];
-			} else if (strcmp(s, "host") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-host requires a parameter\n");
-					return -1;
-				}
-				Config.ServiceHost = av[i];
-			} else if (strcmp(s, "dir") == 0) {
-				/* Handled by parse_dir_options() */
-				i++;			/* Skip parameter */
-			} else if (strcmp(s, "log") == 0) {
-				/* Handled by parse_dir_options(), too */
-				i++;			/* Skip parameter */
-			} else if (strcmp(s, "update") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-update requires a parameter\n");
-					return -1;
-				}
-				s = av[i];
-				if (atoi(s) <= 0) {
-					fprintf(stderr,
-							"-update: number of seconds must be positive");
-					return -1;
-				} else
-					Config.UpdateTimeout = atol(s);
-			} else if (strcmp(s, "expire") == 0) {
-				if (++i >= ac) {
-					fprintf(stderr, "-expire requires a parameter\n");
-					return -1;
-				}
-				s = av[i];
-				if (atoi(s) <= 0) {
-					fprintf(stderr,
-							"-expire: number of seconds must be positive\n");
-					return -1;
-				} else
-					Config.ExpireTimeout = atol(s);
-			} else if (strcmp(s, "debug") == 0) {
-				/* Handled by parse_dir_options() */
-			} else if (strcmp(s, "readonly") == 0) {
-				readonly = 1;
-			} else if (strcmp(s, "nofork") == 0) {
-				/* Handled by parse_dir_options() */
-			} else if (strcmp(s, "logchan") == 0) {
-				if (!Config.LogChannel) {
-					fprintf(stderr,
-							"-logchan: Config.LogChannel must be defined in services.conf\n");
-				} else {		/* Config.LogChannel */
-
-					LogChan = true;
-				}
-			} else if (strcmp(s, "forceload") == 0) {
-				forceload = 1;
-			} else if (strcmp(s, "nothird") == 0) {
-				nothird = 1;
-			} else if (strcmp(s, "protocoldebug") == 0) {
-				protocoldebug = 1;
-			} else if (strcmp(s, "support") == 0) {
-				/* Handled by parse_dir_options() */
-			} else if (!strcmp(s, "noexpire")) {
-				noexpire = 1;
-			} else if (!strcmp(s, "help")) {
-				fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
-						version_flags, version_build);
-				fprintf(stdout,
-						"Anope IRC Services (http://www.anope.org)\n");
-				fprintf(stdout, "Usage ./" SERVICES_BIN " [options] ...\n");
-				fprintf(stdout,
-						"-remote		-remote hostname[:port]\n");
-				fprintf(stdout, "-local		 -local hostname[:port]\n");
-				fprintf(stdout, "-name		  -name servername\n");
-				fprintf(stdout, "-desc		  -desc serverdesc\n");
-				fprintf(stdout, "-user		  -user serviceuser\n");
-				fprintf(stdout, "-host		  -host servicehost\n");
-				fprintf(stdout,
-						"-update		-update updatetime(secs)\n");
-				fprintf(stdout,
-						"-expire		-expire expiretime(secs)\n");
-				fprintf(stdout, "-debug		 -debug\n");
-				fprintf(stdout, "-nofork		-nofork\n");
-				fprintf(stdout, "-logchan	   -logchan channelname\n");
-				fprintf(stdout, "-forceload	 -forceload\n");
-				fprintf(stdout, "-nothird	   -nothird\n");
-				fprintf(stdout, "-support	   -support\n");
-				fprintf(stdout, "-readonly	  -readonly\n");
-				fprintf(stdout, "-noexpire	  -noexpire\n");
-				fprintf(stdout, "-version	   -version\n");
-				fprintf(stdout, "-help		  -help\n");
-				fprintf(stdout, "-log		   -log logfilename\n");
-				fprintf(stdout,
-						"-dir		   -dir servicesdirectory\n\n");
-				fprintf(stdout,
-						"Further support is available from http://www.anope.org\n");
-				fprintf(stdout,
-						"Or visit US on IRC at irc.anope.org #anope\n");
-				exit(EXIT_SUCCESS);
-			} else {
-				fprintf(stderr, "Unknown option -%s\n", s);
-				return -1;
-			}
-		} else {
-			fprintf(stderr, "Non-option arguments not allowed\n");
-			return -1;
+/** Check if an argument was given on startup and its parameter
+ * @param name The argument name
+ * @param shortname A shorter name, eg --debug and -d
+ * @param param A string to put the param, if any, of the argument
+ * @return true if name/shortname was found, false if not
+ */
+bool GetCommandLineArgument(const std::string &name, char shortname, std::string &param)
+{
+	param.clear();
+	
+	for (std::vector<std::pair<std::string, std::string> >::iterator it = CommandLineArguments.begin(); it != CommandLineArguments.end(); ++it)
+	{
+		if (it->first == name || it->first[0] == shortname)
+		{
+			param = it->second;
+			return true;
 		}
 	}
-	return 0;
+
+	return false;
 }
 
 /*************************************************************************/
@@ -353,8 +190,116 @@ int init_primary(int ac, char **av)
 	if (set_group() < 0)
 		return -1;
 
-	/* Parse command line for -dir and -version options. */
-	parse_dir_options(ac, av);
+	/* Parse command line arguments */
+	ParseCommandLineArguments(ac, av);
+
+	if (GetCommandLineArgument("version", 'v'))
+	{
+		Alog(LOG_TERMINAL) << "Anope-" << version_number << version_flags << " -- " << version_build;
+		return -1;
+	}
+
+	if (GetCommandLineArgument("help", 'h'))
+	{
+		Alog(LOG_TERMINAL) << "Anope-" << version_number << version_flags << " -- " << version_build;
+		Alog(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
+		Alog(LOG_TERMINAL) << "Usage ./" << SERVICES_BIN << " [options] ...";
+		Alog(LOG_TERMINAL) << "-c, --config=filename.conf";
+		Alog(LOG_TERMINAL) << "-d, --debug[=level]";
+		Alog(LOG_TERMINAL) << "    --dir=services_directory";
+		Alog(LOG_TERMINAL) << "-h, --help";
+		Alog(LOG_TERMINAL) << "    --log=log_filename";
+		Alog(LOG_TERMINAL) << "-e, --noexpire";
+		Alog(LOG_TERMINAL) << "-n, --nofork";
+		Alog(LOG_TERMINAL) << "    --nothird";
+		Alog(LOG_TERMINAL) << "    --protocoldebug";
+		Alog(LOG_TERMINAL) << "-r, --readonly";
+		Alog(LOG_TERMINAL) << "-s, --support";
+		Alog(LOG_TERMINAL) << "-v, --version";
+		Alog(LOG_TERMINAL) << "";
+		Alog(LOG_TERMINAL) << "Further support is available from http://www.anope.org";
+		Alog(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
+		return -1;
+	}
+
+	if (GetCommandLineArgument("nofork", 'n'))
+	{
+		nofork = 1;
+	}
+
+	if (GetCommandLineArgument("support", 's'))
+	{
+		nofork = nothird = 1;
+		++debug;
+	}
+
+	if (GetCommandLineArgument("readonly", 'r'))
+	{
+		readonly = 1;
+	}
+
+	if (GetCommandLineArgument("nothird"))
+	{
+		nothird = 1;
+	}
+
+	if (GetCommandLineArgument("noexpire", 'e'))
+	{
+		noexpire = 1;
+	}
+
+	if (GetCommandLineArgument("protocoldebug"))
+	{
+		protocoldebug = 1;
+	}
+
+	std::string Arg;
+	if (GetCommandLineArgument("debug", 'd', Arg))
+	{
+		 if (!Arg.empty())
+		 {
+		 	int level = atoi(Arg.c_str());
+			if (level > 0)
+				debug = level;
+			else
+			{
+				Alog(LOG_TERMINAL) << "Invalid option given to --debug";
+				return -1;
+			}
+		 }
+		 else
+		 	++debug;
+	}
+
+	if (GetCommandLineArgument("config", 'c', Arg))
+	{
+		if (Arg.empty())
+		{
+			Alog(LOG_TERMINAL) << "The --config option requires a file name";
+			return -1;
+		}
+		services_conf = Arg;
+	}
+
+	if (GetCommandLineArgument("dir", 0, Arg))
+	{
+		if (Arg.empty())
+		{
+			Alog(LOG_TERMINAL) << "The --dir option requires a directory name";
+			return -1;
+		}
+		services_dir = Arg;
+	}
+
+	if (GetCommandLineArgument("log", 0, Arg))
+	{
+		if (Arg.empty())
+		{
+			Alog(LOG_TERMINAL) << "The --log option requires a file name";
+			return -1;
+		}
+		log_filename = Arg;
+	}
 
 	/* Chdir to Services data directory. */
 	if (chdir(services_dir.c_str()) < 0) {
@@ -367,7 +312,7 @@ int init_primary(int ac, char **av)
 		openlog_errno = errno;
 		if (started_from_term) {
 			fprintf(stderr, "Warning: unable to open log file %s: %s\n",
-					log_filename, strerror(errno));
+					log_filename.c_str(), strerror(errno));
 		} else {
 			openlog_failed = 1;
 		}
@@ -402,15 +347,13 @@ int init_secondary(int ac, char **av)
 	/* Add Core MSG handles */
 	moduleAddMsgs();
 
-	/* Parse all remaining command-line options. */
-	parse_options(ac, av);
-
 #ifndef _WIN32
 	if (!nofork) {
 		if ((i = fork()) < 0) {
 			perror("fork()");
 			return -1;
 		} else if (i != 0) {
+			Alog(LOG_TERMINAL) << "PID " << i;
 			exit(0);
 		}
 		if (started_from_term) {
@@ -444,6 +387,7 @@ int init_secondary(int ac, char **av)
 
 	}
 	if (!nofork) {
+		Alog(LOG_TERMINAL) << "PID " << GetCurrentProcessId();
 		Alog() << "Launching Anope into the background";
 		FreeConsole();
 	}

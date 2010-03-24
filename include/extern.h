@@ -158,6 +158,7 @@ char *sockstrerror(int error);
 
 /**** config.c ****/
 
+E std::string services_conf;
 E ServerConfig Config;
 E int read_config(int reload);
 
@@ -179,6 +180,8 @@ E void hostserv_init();
 /**** init.c ****/
 
 E void introduce_user(const std::string &user);
+E bool GetCommandLineArgument(const std::string &name, char shortname = 0);
+E bool GetCommandLineArgument(const std::string &name, char shortname, std::string &param);
 E int init_primary(int ac, char **av);
 E int init_secondary(int ac, char **av);
 E Uplink *uplink_server;
@@ -230,7 +233,7 @@ E char *version_protocol;
 E const char version_flags[];
 
 E std::string services_dir;
-E const char *log_filename;
+E std::string log_filename;
 E int   debug;
 E int   readonly;
 E bool LogChan;

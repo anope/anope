@@ -67,12 +67,6 @@ cat >$VERSIONH <<EOF
 # define VER_OS
 #endif
 
-#if defined(USE_MODULES)
-# define VER_MODULE "M"
-#else
-# define VER_MODULE
-#endif
-
 #endif
 
 EOF

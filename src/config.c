@@ -18,6 +18,7 @@
 
 /*************************************************************************/
 
+std::string services_conf = "services.conf"; // Services configuration file name
 ServerConfig Config;
 
 static std::string Modules;
@@ -785,7 +786,7 @@ int ServerConfig::Read(bool bail)
 	// Load and parse the config file, if there are any errors then explode
 	// Make a copy here so if it fails then we can carry on running with an unaffected config
 	newconfig.clear();
-	if (LoadConf(newconfig, SERVICES_CONF, errstr))
+	if (LoadConf(newconfig, services_conf, errstr))
 		// If we succeeded, set the config to the new one
 		config_data = newconfig;
 	else
@@ -1478,16 +1479,16 @@ void error(int linenum, const char *message, ...)
 	va_end(args);
 
 	if (linenum)
-		Alog() << SERVICES_CONF << ":" << linenum << ": " << buf;
+		Alog() << services_conf << ":" << linenum << ": " << buf;
 	else
-		Alog() << SERVICES_CONF << ": " << buf;
+		Alog() << services_conf << ": " << buf;
 
 
 	if (!nofork && isatty(2)) {
 		if (linenum)
-			fprintf(stderr, "%s:%d: %s\n", SERVICES_CONF, linenum, buf);
+			fprintf(stderr, "%s:%d: %s\n", services_conf.c_str(), linenum, buf);
 		else
-			fprintf(stderr, "%s: %s\n", SERVICES_CONF, buf);
+			fprintf(stderr, "%s: %s\n", services_conf.c_str(), buf);
 	}
 }
 

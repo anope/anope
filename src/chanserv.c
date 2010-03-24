@@ -210,7 +210,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 				{
 					cmp = dynamic_cast<ChannelModeParam *>(cm);
 
-					ci->GetParam(cmp->Name, &param);
+					ci->GetParam(cmp->Name, param);
 
 					if (!param.empty())
 					{
@@ -252,13 +252,13 @@ void get_chanserv_stats(long *nrec, long *memuse)
 			mem += ci->GetAccessCount() * sizeof(ChanAccess);
 			mem += ci->GetAkickCount() * sizeof(AutoKick);
 
-			if (ci->GetParam(CMODE_KEY, &param))
+			if (ci->GetParam(CMODE_KEY, param))
 				mem += param.length() + 1;
 
-			if (ci->GetParam(CMODE_FLOOD, &param))
+			if (ci->GetParam(CMODE_FLOOD, param))
 				mem += param.length() + 1;
 
-			if (ci->GetParam(CMODE_REDIRECT, &param))
+			if (ci->GetParam(CMODE_REDIRECT, param))
 				mem += param.length() + 1;
 
 			if (ci->last_topic)
@@ -379,7 +379,7 @@ void check_modes(Channel *c)
 			/* Add the eventual parameter and modify the Channel structure */
 			if (cm->Type == MODE_PARAM)
 			{
-				if (ci->GetParam(cmp->Name, &param))
+				if (ci->GetParam(cmp->Name, param))
 					c->SetMode(NULL, cm, param);
 			}
 			else
@@ -388,8 +388,8 @@ void check_modes(Channel *c)
 		/* If this is a param mode and its mlocked, check to ensure it is set and set to the correct value */
 		else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
 		{
-			c->GetParam(cm->Name, &param);
-			ci->GetParam(cm->Name, &ciparam);
+			c->GetParam(cm->Name, param);
+			ci->GetParam(cm->Name, ciparam);
 
 			/* If the channel doesnt have the mode, or it does and it isn't set correctly */
 			if (!c->HasMode(cm->Name) || (!param.empty() && !ciparam.empty() && param != ciparam))
@@ -413,7 +413,7 @@ void check_modes(Channel *c)
 
 				if (!cmp->MinusNoArg)
 				{
-					if (c->GetParam(cmp->Name, &param))
+					if (c->GetParam(cmp->Name, param))
 						c->RemoveMode(NULL, cm, param);
 				}
 			}

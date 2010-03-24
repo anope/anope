@@ -374,8 +374,10 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                     notice_lang(s_ChanServ, u, xmsgs[7], ci->name);
                 }
             } else if (deleted == 1) {
+                alog("%s: %s!%s@%s (level %d) deleted access of user %s on %s", s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), nick, ci->name);
                 notice_lang(s_ChanServ, u, xmsgs[9], ci->name);
             } else {
+                alog("%s: %s!%s@%s (level %d) deleted access of users %s on %s", s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), nick, ci->name);
                 notice_lang(s_ChanServ, u, xmsgs[10], deleted, ci->name);
             }
         } else {
@@ -400,6 +402,7 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                 deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
+                alog("%s: %s!%s@%s (level %d) deleted access of %s on %s", s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), access->nc->display, ci->name);
                 notice_lang(s_ChanServ, u, xmsgs[8], access->nc->display,
                             ci->name);
                 access->nc = NULL;
@@ -463,6 +466,8 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         }
 
         CleanAccess(ci);
+
+        alog("%s: %s!%s@%s cleared the %s list of %s", s_ChanServ, u->nick, u->username, u->host, xname, ci->name);
 
         send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
         

@@ -54,7 +54,6 @@ E BotInfo *findbot(const std::string &nick);
  * @param uid The UID to search for
  * @return The pseudoclient structure, or NULL if one could not be found
  */
-E BotInfo *findbot_byuid(const char *uid);
 E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
 E void insert_bot(BotInfo * bi);
@@ -391,7 +390,6 @@ E int validate_user(User * u);
 E void cancel_user(User * u);
 E void expire_nicks();
 E void expire_requests();
-EI int ns_do_register(User * u);
 E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
 E NickCore  *findcore(const char *nick);
@@ -514,11 +512,9 @@ E int32 nsessions;
 E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
 
-E int do_session(User *u);
 E int add_session(const char *nick, const char *host, char *hostip);
 E void del_session(const char *host);
 
-E int do_exception(User *u);
 E void expire_exceptions();
 
 E Session *findsession(const char *host);
@@ -606,8 +602,6 @@ E const char *encode_ip(unsigned char *ip);
 E int decode_ip(const char *buf);
 
 E char *host_resolve(char *host);
-
-E void event_process_hook(const char *name, int argc, char **argv);
 
 #ifdef _WIN32
 E char *GetWindowsVersion() ;

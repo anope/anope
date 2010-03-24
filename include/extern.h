@@ -530,7 +530,6 @@ E int rdb_save_ns_alias(NickAlias * na);
 E int rdb_save_ns_req(NickRequest * nr);
 E int rdb_save_cs_info(ChannelInfo * ci);
 E int rdb_save_bs_core(BotInfo * bi);
-E int rdb_save_bs_rdb_core(BotInfo * bi);
 E int rdb_save_hs_core(HostCore * hc);
 E int rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
                     SList * ak, SList * sgl, SList * sql, SList * szl);
@@ -574,13 +573,9 @@ E char *DefConOffMessage;
 E long unsigned int UserKey1;
 E long unsigned int UserKey2;     
 E long unsigned int UserKey3;
-/**** converter.c ****/
-
-E int convert_ircservices_44(void);
 
 /**** encrypt.c ****/
 E char *EncModule;
-E void initEncryption();
 E int enc_encrypt(const char *src, int len, char *dest, int size);
 E int enc_encrypt_in_place(char *buf, int size);
 E int enc_encrypt_check_len(int passlen, int bufsize);
@@ -1248,23 +1243,17 @@ E void anope_cmd_376(char *source);				 	  		  /* 376 */
 E void anope_cmd_391(char *source, char *timestr);                             		  /* 391 */
 E void anope_cmd_401(char *source, char *who);			  	  		  /* 401 */
 E void anope_cmd_akill(char *user, char *host, char *who, time_t when, time_t expires, char *reason); /* AKILL */
-E void anope_cmd_capab();						  	  		  /* CAPAB */
-E void anope_cmd_chghost(char *nick, char *vhost);                   			  /* CHGHOST */
-E void anope_cmd_chgident(char *nick, char *vIdent);                 			  /* CHGIDENT */
 E void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost);    			  /* CHGHOST + CHGIDENT */
 E void anope_cmd_vhost_off(User *u);
 E void anope_cmd_connect(int servernum);                             	           	  /* Connect */
 E void anope_cmd_bob();
-E void anope_cmd_ea();									  /* EA      */
 E void anope_cmd_global(char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
 E void anope_cmd_invite(char *source, char *chan, char *nick);       	  		  /* INVITE */
 E void anope_cmd_join(char *user, char *channel, time_t chantime);   	  		  /* JOIN */
 E void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt, ...);		  /* KICK */
 E void anope_cmd_mode(char *source, char *dest, const char *fmt, ...);   	  		  /* MODE */
-E void anope_cmd_tmode(char *source, char *dest, const char *fmt, ...);				  /* TMODE */
 E void anope_cmd_unban(char *name, char *nick);				  		  			      /* MODE -b */
 E void anope_cmd_bot_chan_mode(char *nick, char *chan);			  		  /* MODE BotServ */
-E void anope_cmd_netinfo(int ac, char **av);						  /* NETINFO */
 E void anope_cmd_nick(char *nick, char *name, char *mode);			  		  /* NICK */
 E void anope_cmd_chg_nick(char *oldnick, char *newnick);             	  		  /* NICK */
 E void anope_cmd_bot_nick(char *nick, char *user,char *host,char *real,char *modes);	  /* NICK */
@@ -1274,25 +1263,19 @@ E void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...); 		 
 E void anope_cmd_notice2(char *source, char *dest, char *msg);		  		  /* NOTICE */
 E void anope_cmd_serv_notice(char *source, char *dest, char *msg);		  		  /* NOTICE */
 E void anope_cmd_part(char *nick, char *chan, const char *fmt, ...); 	  		  /* PART */
-E void anope_cmd_pass(char *pass);                                   	  		  /* PASS */
 E void anope_cmd_pong(char *servname, char *who);                    	  		  /* PONG */
 E void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_action(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_privmsg2(char *source, char *dest, char *msg);		  		  /* PRIVMSG */
 E void anope_cmd_serv_privmsg(char *source, char *dest, char *msg);	  		  /* PRIVMSG */
-E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_cmd_quit(char *source, const char *fmt, ...);           	  		  /* QUIT */
 E void anope_cmd_remove_akill(char *user, char *host);			  		  /* RAKILL */
-E void anope_cmd_server(char *servname, int hop, char *descript);    	  		  /* SERVER */
 E void anope_cmd_sgline(char *mask, char *reason);			  	  		  /* SGLINE */
 E void anope_cmd_sqline(char *mask, char *reason);                   	  		  /* SQLINE */
 E void anope_cmd_szline(char *mask, char *reason, char *whom);				  /* SZLINE */
 E void anope_cmd_squit(char *servname, char *message);               	  		  /* SQUIT  */
-E void anope_cmd_svinfo();						  	  		  /* SVINFO */
-E void anope_cmd_svsadmin(char *server, int set);						  /* SVSADMIN */
 E void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */
 E void anope_cmd_release_svshold(char *nick);				  		  /* SVSHOLD */
-E void anope_cmd_svsinfo();								  /* SVSINFO */
 E void anope_cmd_svsjoin(char *source, char *nick,char *chan, char *param);          	  /* SVSJOIN */
 E void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
 E void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */
@@ -1307,8 +1290,6 @@ E void anope_cmd_unsgline(char *mask);				  	  		  /* UNSGLINE */
 E void anope_cmd_unsqline(char *user);                               	  		  /* UNSQLINE */
 E void anope_cmd_unszline(char *mask);				  	  		  /* UNSZLINE */
 E void anope_cmd_eob();									  /* EOB - end of burst */
-E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
-E void anope_cmd_svswatch(char *sender, char *nick, char *parm);
 E void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...);   	  		  /* CTCP */
 
 EI int anope_event_482(char *source, int ac, char **av);
@@ -1356,7 +1337,6 @@ EI int anope_event_eob(char *source, int ac, char **av);
 EI int anope_event_pass(char *source, int ac, char **av);
 EI int anope_event_netinfo(char *source, int ac, char **av);
 EI int anope_event_error(char *source, int ac, char **av);
-EI int anope_event_eb(char *source, int ac, char **av);
 EI int anope_event_netctrl(char *source, int ac, char **av);
 EI int anope_event_notice(char *source, int ac, char **av);
 EI int anope_event_snotice(char *source, int ac, char **av);

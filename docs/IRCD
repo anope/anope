@@ -501,24 +501,13 @@ How To Add IRCd Support
     to read these lines and set itself up to to handle these events better.
     When adding support for your ircd, take the following steps.
 
-    1) In the ircd.c find the function anope_cmd_capab(); this function will
-       send the CAPAB/PROTOCTL line (consult your ircd documentation for
-       which to send). In a single line type in the tokens that anope must
-       send. Here is an example of Hybrid's capab line:
-
-        /* CAPAB */
-        void anope_cmd_capab()
-        {
-            send_cmd(NULL, "CAPAB TS5 EX IE HOPS HUB AOPS");
-        }
-
-    2) In the ircd.h file make sure to place the defines (see below) that
+    1) In the ircd.h file make sure to place the defines (see below) that
        match your IRCd's tokens; only use the ones that matter to your ircd.
        Should your IRCd add new features not covered in the defined, please
        contact the Anope Dev team before doing so. See README for information
        on how to contact the Anope team.
 
-    3) Ensure that the CAPAB/PROTOCTL event his handled correctly. 
+    2) Ensure that the CAPAB/PROTOCTL event his handled correctly. 
 
         A) In the function "moduleAddIRCDMsgs" making sure that you have the
            following two lines:

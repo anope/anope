@@ -160,6 +160,7 @@ static std::string GetBotServFlags(BotInfo *bi)
 static NickAlias *CurNick = NULL;
 static NickCore *CurCore = NULL;
 static ChannelInfo *CurChannel = NULL;
+static BotInfo *CurBot = NULL;
 
 void Write(const std::string &data)
 {
@@ -202,6 +203,16 @@ void WriteChannelMetadata(const std::string &key, const std::string &data)
 
 	mysqlpp::Query query(Me->Con);
 	query << "INSERT DELAYED INTO `anope_cs_info_metadata` (channel, name, value) VALUES(" << mysqlpp::quote << CurChannel->name << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
+	ExecuteQuery(query);
+}
+
+void WriteBotMetadata(const std::string &key, const std::string &data)
+{
+	if (!CurBot)
+		throw CoreException("WriteBotMetadata without a bot to write");
+	
+	mysqlpp::Query query(Me->Con);
+	query << "INSERT DELAYED INTO `anope_bs_info_metadata` (botname, name, value) VALUES(" << mysqlpp::quote << CurBot->nick << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
 
@@ -383,13 +394,14 @@ class DBMySQLWrite : public DBMySQL
 			/* BotServ */
 			I_OnBotCreate, I_OnBotChange, I_OnBotDelete,
 			I_OnBotAssign, I_OnBotUnAssign,
+			I_OnBadWordAdd, I_OnBadWordDel,
 			/* MemoServ */
 			I_OnMemoSend, I_OnMemoDel,
 			/* OperServ */
 			I_OnOperServHelp, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
 			I_OnAddSXLine, I_OnDelSXLine
 		};
-		ModuleManager::Attach(i, this, 35);
+		ModuleManager::Attach(i, this, 37);
 	}
 
 	void OnOperServHelp(User *u)
@@ -431,6 +443,21 @@ class DBMySQLWrite : public DBMySQL
 			{
 				CurChannel = ci;
 				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, ci));
+			}
+		}
+		
+		for (int i = 0; i < 256; ++i)
+		{
+			for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
+			{
+				CurBot = bi;
+				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, bi));
+				/* This is for the core bots, bots added by users are already handled by an event */
+				query << "INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(";
+				query << mysqlpp::quote << bi->nick << ", " << mysqlpp::quote << bi->user << ", " << mysqlpp::quote << bi->host;
+				query << ", " << mysqlpp::quote << bi->real << ", '" << GetBotServFlags(bi) << "', " << bi->created << ", ";
+				query << bi->chancount << ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(created)";
+				ExecuteQuery(query);
 			}
 		}
 
@@ -569,6 +596,22 @@ class DBMySQLWrite : public DBMySQL
 						}
 						query << "UPDATE `anope_cs_info` SET `botflags` = '" << GetBotFlags(ci->botflags) << "' WHERE `name` = " << mysqlpp::quote << ci->name;
 						ExecuteQuery(query);
+
+						if (params[1] == "CAPS")
+						{
+							query << "UPDATE `anope_cs_info` SET `capsmin` = " << ci->capsmin << ", `capspercent` = " << ci->capspercent << " WHERE `name` = " << mysqlpp::quote << ci->name;
+							ExecuteQuery(query);
+						}
+						else if (params[1] == "FLOOD")
+						{
+							query << "UPDATE `anope_cs_info` SET `floodlines` = " << ci->floodlines << ", `floodsecs` = " << ci->floodsecs << " WHERE `name` = " << mysqlpp::quote << ci->name;
+							ExecuteQuery(query);
+						}
+						else if (params[1] == "REPEAT")
+						{
+							query << "UPDATE `anope_cs_info` SET `repeattimes` = " << ci->repeattimes << " WHERE `name` = " << mysqlpp::quote << ci->name;
+							ExecuteQuery(query);
+						}
 					}
 				}
 			}
@@ -829,6 +872,50 @@ class DBMySQLWrite : public DBMySQL
 		query << "UPDATE `anope_cs_info` SET `botnick` = '' WHERE `name` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		return EVENT_CONTINUE;
+	}
+
+	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw)
+	{
+		mysqlpp::Query query(Me->Con);
+		query << "INSERT DELAYED INTO `anope_bs_badwords` (channel, word, type) VALUES(" << mysqlpp::quote << ci->name << ", " << mysqlpp::quote << bw->word << ", '";
+		switch (bw->type)
+		{
+			case BW_SINGLE:
+				query << "SINGLE";
+				break;
+			case BW_START:
+				query << "START";
+				break;
+			case BW_END:
+				query << "END";
+				break;
+			default:
+				query << "ANY";
+		}
+		query << "') ON DUPLICATE KEY UPDATE channel=VALUES(channel), word=VALUES(word), type=VALUES(type)";
+		ExecuteQuery(query);
+	}
+
+	void OnBadWordDel(ChannelInfo *ci, BadWord *bw)
+	{
+		mysqlpp::Query query(Me->Con);
+		query << "DELETE FROM `anope_bs_badwords` WHERE `channel` = " << mysqlpp::quote << ci->name << " AND `word` = " << mysqlpp::quote << bw->word << " AND `type` = '";
+		switch (bw->type)
+		{
+			case BW_SINGLE:
+				query << "SINGLE";
+				break;
+			case BW_START:
+				query << "START";
+				break;
+			case BW_END:
+				query << "END";
+				break;
+			default:
+				query << "ANY";
+		}
+		query << "'";
+		ExecuteQuery(query);
 	}
 
 	void OnMemoSend(User *u, NickCore *nc, Memo *m)

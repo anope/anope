@@ -120,6 +120,8 @@ CREATE TABLE anope_ns_request (
   PRIMARY KEY  (nick)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 -- 
 -- Table structure for table 'anope_cs_access'
 -- 
@@ -132,6 +134,20 @@ CREATE TABLE anope_cs_access (
   last_seen int(11) NOT NULL default '0',
   creator varchar(255) NOT NULL default '',
   UNIQUE KEY (channel,display)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_bs_badwords'
+--
+
+DROP TABLE IF EXISTS anope_bs_badwords;
+CREATE TABLE anope_bs_badwords (
+  channel varchar(255) NOT NULL default '',
+  word varchar(255) NOT NULL,
+  type varchar(50) NOT NULL,
+  UNIQUE KEY channel (channel,word)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -182,8 +198,7 @@ DROP TABLE IF EXISTS anope_cs_info_metadata;
 CREATE TABLE anope_cs_info_metadata (
   channel varchar(255) NOT NULL default '',
   name varchar(255) NOT NULL default '',
-  value text NOT NULL default '',
-  PRIMARY KEY  (name)
+  value text NOT NULL default ''
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -230,6 +245,19 @@ CREATE TABLE anope_bs_core (
   created int(11) NOT NULL default '0',
   chancount int(11) NOT NULL default '0',
   PRIMARY KEY (nick)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table 'anope_bs_info_metadata'
+--
+
+DROP TABLE IF EXISTS anope_bs_info_metadata;
+CREATE TABLE anope_bs_info_metadata (
+ botname varchar(255) NOT NULL default '',
+ name varchar(255) NOT NULL default '',
+ value text NOT NULL default ''
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

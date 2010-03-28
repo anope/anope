@@ -601,6 +601,18 @@ class CoreExport Module
 	 * @param mask The mask being banned
 	 */
 	virtual void OnBotBan(User *u, ChannelInfo *ci, const char *mask) { }
+	
+	/** Called before a badword is added to the badword list
+	 * @param ci The channel
+	 * @param bw The badword
+	 */
+	virtual void OnBadWordAdd(ChannelInfo *ci, BadWord *bw) { }
+
+	/** Called before a badword is deleted from a channel
+	 * @param ci The channel
+	 * @param bw The badword
+	 */
+	virtual void OnBadWordDel(ChannelInfo *ci, BadWord *bw) { }
 
 	/** Called before a bot kicks a user
 	 * @param bi The bot sending the kick
@@ -1144,7 +1156,7 @@ enum Implementation
 
 		/* BotServ */
 		I_OnBotServHelp, I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
-		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBotPreLoad,
+		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
 
 		/* HostServ */
 		I_OnHostServHelp, I_OnSetVhost, I_OnDeleteVhost,

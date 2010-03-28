@@ -202,6 +202,33 @@ static void LoadDatabase()
 		}
 	}
 
+	query << "SELECT * FROM `anope_bs_info_metadata`";
+	qres = StoreQuery(query);
+
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.num_rows(); ++i)
+		{
+			BotInfo *bi = findbot(SQLAssign(qres[i]["botname"]));
+			if (!bi)
+			{
+				Alog() << "MySQL: BotInfo metadata for nonexistant bot " << qres[i]["botname"];
+				continue;
+			}
+
+			try
+			{
+				EventReturn MOD_RESULT;
+				std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
+				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, SQLAssign(qres[i]["name"]), Params));
+			}
+			catch (const char *err)
+			{
+				Alog() << "[db_mysql_read]: " << err;
+			}
+		}
+	}
+
 	query << "SELECT * FROM `anope_cs_info`";
 	qres = StoreQuery(query);
 
@@ -336,11 +363,54 @@ static void LoadDatabase()
 			if (!qres[i]["capspercent"].empty())
 				ci->capspercent = atoi(qres[i]["capspercent"].c_str());
 			if (!qres[i]["floodlines"].empty())
-				ci->floodlines = atoi(qres[i]["capspercent"].c_str());
+				ci->floodlines = atoi(qres[i]["floodlines"].c_str());
 			if (!qres[i]["floodsecs"].empty())
 				ci->floodsecs = atoi(qres[i]["floodsecs"].c_str());
 			if (!qres[i]["repeattimes"].empty())
 				ci->repeattimes = atoi(qres[i]["repeattimes"].c_str());
+		}
+	}
+
+	query << "SELECT * FROM `anope_cs_ttb";
+	qres = StoreQuery(query);
+
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.num_rows(); ++i)
+		{
+			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
+			if (!ci)
+			{
+				Alog() << "MySQL: Channel ttb for nonexistant channel " << qres[i]["channel"];
+				continue;
+			}
+
+			ci->ttb[atoi(qres[i]["ttb_id"].c_str())] = atoi(qres[i]["value"].c_str());
+		}
+	}
+
+	query << "SELECT * FROM `anope_bs_badwords`";
+	qres = StoreQuery(query);
+	
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.num_rows(); ++i)
+		{
+			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
+			if (!ci)
+			{
+				Alog() << "MySQL: Channel badwords entry for nonexistant channel " << qres[i]["channel"];
+				continue;
+			}
+			
+			BadWordType BWTYPE = BW_ANY;
+			if (qres[i]["type"] == "SINGLE")
+				BWTYPE = BW_SINGLE;
+			else if (qres[i]["type"] == "START")
+				BWTYPE = BW_START;
+			else if (qres[i]["type"] == "END")
+				BWTYPE = BW_END;
+			ci->AddBadWord(SQLAssign(qres[i]["word"]), BWTYPE);
 		}
 	}
 
@@ -395,7 +465,7 @@ static void LoadDatabase()
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel level entry for nonexistant channel " << qres[i]["channel"];
+				Alog() << "MySQL: Channel metadata for nonexistant channel " << qres[i]["channel"];
 				continue;
 			}
 			try

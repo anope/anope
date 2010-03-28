@@ -350,6 +350,9 @@ BadWord *ChannelInfo::AddBadWord(const std::string &word, BadWordType type)
 	bw->type = type;
 
 	badwords.push_back(bw);
+	
+	FOREACH_MOD(I_OnBadWordAdd, OnBadWordAdd(this, bw));
+
 	return bw;
 }
 
@@ -382,6 +385,7 @@ void ChannelInfo::EraseBadWord(BadWord *badword)
 
 	if (it != badwords.end())
 	{
+		FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, *it));
 		delete *it;
 		badwords.erase(it);
 	}

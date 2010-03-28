@@ -109,7 +109,7 @@ static std::string GetMLockParams(ChannelInfo *ci)
 	for (int i = 0; ChannelModes[i].Mode != -1; ++i)
 	{
 		std::string param;
-		if (ci->GetParam(ChannelModes[i].Mode, &param))
+		if (ci->GetParam(ChannelModes[i].Mode, param))
 		{
 			ret += " " + param;
 		}
@@ -401,6 +401,8 @@ class DBMySQLWrite : public DBMySQL
 	{
 		mysqlpp::Query query(Me->Con);
 
+		query << "TRUNCATE TABLE `anope_os_core`";
+		ExecuteQuery(query);
 		query << "INSERT DELAYED INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, sglines_count, sqlines_count, szlines_count) VALUES(";
 		query << maxusercnt << ", " << maxusertime << ", " << akills.count << ", " << sqlines.count << ", " << sglines.count << ", " << szlines.count << ")";
 		ExecuteQuery(query);
@@ -542,6 +544,53 @@ class DBMySQLWrite : public DBMySQL
 				else if (params[1] == "KEEPTOPIC" || params[1] == "TOPICLOCK" || params[1] == "PRIVATE" || params[1] == "SECUREOPS" || params[1] == "SECUREFOUNDER" || params[1] == "RESTRICTED" || params[1] == "SECURE" || params[1] == "SIGNKICK" || params[1] == "OPNOTICE" || params[1] == "XOP" || params[1] == "PEACE" || params[1] == "PERSIST" || params[1] == "NOEXPIRE")
 				{
 					query << "UPDATE `anope_cs_info` SET `flags` = '" << BuildFlagsList(ci) << "' WHERE `name` = " << mysqlpp::quote << ci->name;
+					ExecuteQuery(query);
+				}
+			}
+		}
+		else if (Config.s_BotServ && service == Config.s_BotServ)
+		{
+			if (command == "KICK" && params.size() > 2)
+			{
+				ChannelInfo *ci = cs_findchan(params[0].c_str());
+				if (!ci)
+					return;
+				if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
+					return;
+				if (params[1] == "BADWORDS" || params[1] == "BOLDS" || params[1] == "CAPS" || params[1] == "COLORS"
+					|| params[1] == "FLOOD" || params[1] == "REPEAT" || params[1] == "REVERSES" || params[1] == "UNDERLINES") 
+				{
+					if (params[2] == "ON" || params[2] == "OFF")
+					{
+						for (int i = 0; i < TTB_SIZE; ++i)
+						{
+							query << "INSERT DELAYED INTO `anope_cs_ttb` (channel, ttb_id, value) VALUES(" << mysqlpp::quote << ci->name << ", " << i << ", " << ci->ttb[i] << ") ON DUPLICATE KEY UPDATE channel=VALUES(channel), ttb_id=VALUES(ttb_id), value=VALUES(value)";
+							ExecuteQuery(query);
+						}
+						query << "UPDATE `anope_cs_info` SET `botflags` = '" << GetBotFlags(ci->botflags) << "' WHERE `name` = " << mysqlpp::quote << ci->name;
+						ExecuteQuery(query);
+					}
+				}
+			}
+			else if (command == "SET" && params.size() > 2)
+			{
+				ChannelInfo *ci = cs_findchan(params[0].c_str());
+				if (ci && !check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
+					return;
+				BotInfo *bi = NULL;
+				if (!ci)
+					bi = findbot(params[0].c_str());
+				if (bi && params[1] == "PRIVATE" && u->Account()->HasPriv("botserv/set/private"))
+				{
+					query << "UPDATE `anope_bs_core` SET `flags` = '" << GetBotServFlags(bi) << "' WHERE `nick` = " << mysqlpp::quote << bi->nick;
+					ExecuteQuery(query);
+				}
+				else if (!ci)
+					return;
+				else if (params[1] == "DONTKICKOPS" || params[1] == "DONTKICKVOICES" || params[1] == "FANTASY" || params[1] == "GREET"
+					|| params[1] == "SYMBIOSIS" || params[1] == "NOBOT")
+				{
+					query << "UPDATE `anope_cs_info` SET `botflags` = '" << GetBotFlags(ci->botflags) << "' WHERE `name` = " << mysqlpp::quote << ci->name;
 					ExecuteQuery(query);
 				}
 			}

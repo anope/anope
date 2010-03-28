@@ -203,6 +203,20 @@ CREATE TABLE anope_cs_levels (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table 'anope_cs_ttb'
+--
+
+DROP TABLE IF EXISTS anope_cs_ttb;
+CREATE TABLE anope_cs_ttb (
+  channel varchar(255) NOT NULL default '',
+  ttb_id int(11) NOT NULL default '0',
+  value int(11) NOT NULL default '0',
+  UNIQUE KEY channel (channel,ttb_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table 'anope_bs_core'
 --
 

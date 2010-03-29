@@ -274,6 +274,9 @@ void memo_send(User * u, char *name, char *text, int z)
         m->time = time(NULL);
         m->text = sstrdup(text);
         m->flags = MF_UNREAD;
+#ifdef USE_MYSQL
+	m->id = 0;
+#endif
         /* Set notify sent flag - DrStein */
         if (z == 2) {
             m->flags |= MF_NOTIFYS;

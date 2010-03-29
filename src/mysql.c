@@ -408,15 +408,17 @@ int db_mysql_save_ns_core(NickCore * nc)
         q_sender = db_mysql_quote(nc->memos.memos[i].sender);
         q_text = db_mysql_quote(nc->memos.memos[i].text);
 
-        ret = db_mysql_try("UPDATE anope_ms_info "
+        if (nc->memos.memos[i].id != 0)
+        {
+             ret = db_mysql_try("UPDATE anope_ms_info "
                            "SET receiver = '%s', number = %d, flags = %d, time = %d, sender = '%s', text = '%s', active = 1 "
                            "WHERE  nm_id = %d AND serv = 'NICK'",
                            q_display, nc->memos.memos[i].number,
                            nc->memos.memos[i].flags,
                            (int) nc->memos.memos[i].time, q_sender, q_text,
                            nc->memos.memos[i].id);
-
-        if (ret && (mysql_affected_rows(mysql) == 0)) {
+        }
+        if (nc->memos.memos[i].id == 0 || (ret && (mysql_affected_rows(mysql) == 0))) {
             ret = db_mysql_try("INSERT INTO anope_ms_info "
                                "(receiver, number, flags, time, sender, text, serv, active) "
                                "VALUES ('%s', %d, %d, %d, '%s', '%s', 'NICK', 1)",
@@ -626,15 +628,17 @@ int db_mysql_save_cs_info(ChannelInfo * ci)
         q_sender = db_mysql_quote(ci->memos.memos[i].sender);
         q_text = db_mysql_quote(ci->memos.memos[i].text);
 
-        ret = db_mysql_try("UPDATE anope_ms_info "
+        if (ci->memos.memos[i].id != 0)
+        {
+            ret = db_mysql_try("UPDATE anope_ms_info "
                            "SET receiver = '%s', number = %d, flags = %d, time = %d, sender = '%s', text = '%s', active = 1 "
                            "WHERE nm_id = %d AND serv = 'CHAN'",
                            q_name, ci->memos.memos[i].number,
                            ci->memos.memos[i].flags,
                            (int) ci->memos.memos[i].time, q_sender, q_text,
                            ci->memos.memos[i].id);
-
-        if (ret && (mysql_affected_rows(mysql) == 0)) {
+        }
+        if (ci->memos.memos[i].id == 0 || (ret && (mysql_affected_rows(mysql) == 0))) {
             ret = db_mysql_try("INSERT INTO anope_ms_info "
                                "(receiver, number,flags, time, sender, text, serv, active) "
                                "VALUES ('%s', %d, %d, %d, '%s', '%s', 'CHAN', 1)",

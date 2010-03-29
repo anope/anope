@@ -1570,7 +1570,7 @@ int check_kick(User * user, char *chan, time_t chants)
             if (akick->flags & AK_ISNICK)
                 get_idealban(ci, user, mask, sizeof(mask));
             else
-                strcpy(mask, akick->u.mask);
+                strscpy(mask, akick->u.mask, sizeof(mask));
             reason = akick->reason ? akick->reason : CSAutokickReason;
             goto kick;
         }

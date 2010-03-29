@@ -9,10 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2840"
+VERSION_BUILD="2841"
 
 # $Log$ # Changes since 1.8.3 Release
 
+#Revision 2841 - Fixed bugs #1146 and #1147 - Fixed check_modes to only apply defcon settings when defcon is actually on
 #Revision 2840 - Fixed bug #1144 - replaced some strcpy calls with strscpy to be safer
 #Revision 2837 - Log deleting and clearing XOP access lists
 #Revision 2836 - Document usage of the -protocoldebug option in services help

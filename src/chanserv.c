@@ -1086,6 +1086,7 @@ void check_modes(Channel * c)
     ChannelInfo *ci;
     CBModeInfo *cbmi = NULL;
     CBMode *cbm = NULL;
+    boolean DefConOn = DefConLevel != 5;
 
     if (!c) {
         if (debug) {
@@ -1131,7 +1132,7 @@ void check_modes(Channel * c)
      */
     if (ci) 
         modes = ~c->mode & ci->mlock_on;
-    if (DefConModesSet)
+    if (DefConOn && DefConModesSet)
         modes |= (~c->mode & DefConModesOn);
 
     /* Initialize the buffers */
@@ -1147,7 +1148,7 @@ void check_modes(Channel * c)
             if (cbmi->getvalue && cbmi->csgetvalue) {
                 char *value;
                 /* Check if it's a defcon or mlock mode */
-                if (DefConModesOn & cbmi->flag)
+                if (DefConOn && DefConModesOn & cbmi->flag)
                     value = cbmi->csgetvalue(&DefConModesCI);
                 else if (ci)
                     value = cbmi->csgetvalue(ci);
@@ -1168,13 +1169,13 @@ void check_modes(Channel * c)
             }
         } else if (cbmi->getvalue && cbmi->csgetvalue
                    && ((ci && (ci->mlock_on & cbmi->flag))
-                       || (DefConModesOn & cbmi->flag))
+                       || (DefConOn && DefConModesOn & cbmi->flag))
                    && (c->mode & cbmi->flag)) {
             char *value = cbmi->getvalue(c);
             char *csvalue;
 
             /* Check if it's a defcon or mlock mode */
-            if (DefConModesOn & cbmi->flag)
+            if (DefConOn && DefConModesOn & cbmi->flag)
                 csvalue = cbmi->csgetvalue(&DefConModesCI);
             else if (ci)
                 csvalue = cbmi->csgetvalue(ci);
@@ -1205,10 +1206,10 @@ void check_modes(Channel * c)
     if (ci) {
         modes = c->mode & ci->mlock_off;
         /* Make sure we don't remove a mode just set by defcon.. ~ Viper */
-        if (DefConModesSet)
+        if (DefConOn && DefConModesSet)
             modes &= ~(modes & DefConModesOn);
     }
-    if (DefConModesSet)
+    if (DefConOn && DefConModesSet)
         modes |= c->mode & DefConModesOff;
 
     if (modes) {

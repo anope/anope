@@ -26,7 +26,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
       	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' \
   	   'RUNGROUP=${RUNGROUP}' \
 	   'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}' \
-	   'MAKEBIN=${MAKEBIN}'
+	   'MAKEBIN=${MAKEBIN}' 'MYSQLDIR=${MYSQLDIR}'
 
 build: language headers
 	@${MAKE} -C src ${MAKEARGS} all

@@ -24,15 +24,11 @@ int AnopeInit(int argc, char **argv)
 {
     Message *msg = NULL;
     int status;
-#ifdef IRC_UNREAL32
     if (UseTokens) {
      msg = createMessage("!", my_privmsg);
     } else {
      msg = createMessage("PRIVMSG", my_privmsg);
     }
-#else
-    msg = createMessage("PRIVMSG", my_privmsg);
-#endif
     status = moduleAddMessage(msg, MOD_HEAD);
     if (status == MOD_ERR_OK) {
         addClient(s_CatServ, "meow!");
@@ -52,12 +48,15 @@ void AnopeFini(void)
 int my_privmsg(char *source, int ac, char **av)
 {
     User *u;
+    Uid *ud = NULL;
     char *s;
 
     /* First, some basic checks */
     if (ac != 2)
         return MOD_CONT;        /* bleh */
-    if (!(u = finduser(source))) {
+    if (ircd->ts6)
+        u = find_byuid(source); // If this is a ts6 ircd, find the user by uid
+    if (!u && !(u = finduser(source))) { // If user isn't found and we cant find them by nick, return
         return MOD_CONT;
     }                           /* non-user source */
     if (*av[0] == '#') {
@@ -71,7 +70,9 @@ int my_privmsg(char *source, int ac, char **av)
         if (stricmp(s, ServerName) != 0)
             return MOD_CONT;
     }
-    if ((stricmp(av[0], s_CatServ)) == 0) {     /* its for US! */
+    if (ircd->ts6)
+        ud = find_uid(s_CatServ); // Find CatServs UID
+    if (stricmp(av[0], s_CatServ) == 0 || (ud && strcmp(av[0], ud->uid) == 0)) {  /* If the nick or the uid matches its for us */
         catserv(u, av[1]);
         return MOD_STOP;
     } else {                    /* ok it isnt us, let the old code have it */

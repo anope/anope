@@ -541,17 +541,30 @@ class CSXOP : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			this->AddCommand(CHANSERV, new CommandCSQOP());
-		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
-			this->AddCommand(CHANSERV, new CommandCSAOP());
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-			this->AddCommand(CHANSERV, new CommandCSHOP());
 		this->AddCommand(CHANSERV, new CommandCSSOP());
+		this->AddCommand(CHANSERV, new CommandCSAOP());
 		this->AddCommand(CHANSERV, new CommandCSVOP());
 
+		if (serv_uplink && is_sync(serv_uplink))
+			OnUplinkSync();
+		else
+		{
+			/* We don't want to add some commands until we are synced, so we know what modes
+			 * exist and what dont
+			 */
+			ModuleManager::Attach(I_OnUplinkSync, this);
+		}
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
+
+	void OnUplinkSync()
+	{
+		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
+			this->AddCommand(CHANSERV, new CommandCSQOP());
+		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
+			this->AddCommand(CHANSERV, new CommandCSHOP());
+	}
+
 	void OnChanServHelp(User *u)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))

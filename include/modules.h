@@ -1147,6 +1147,15 @@ class CoreExport Module
 	 */
 	virtual void OnModuleUnload(User *u, Module *m) { }
 
+	/** Called when a server is synced
+	 * @param s The server, can be our uplink server
+	 */
+	virtual void OnServerSync(Server *s) { }
+
+	/** Called when we sync with our uplink
+	 */
+	virtual void OnUplinkSync() { }
+
 };
 
 
@@ -1198,7 +1207,7 @@ enum Implementation
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
-		I_OnMLock, I_OnUnMLock,
+		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync,
 	I_END
 };
 

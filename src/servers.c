@@ -566,6 +566,12 @@ void finish_sync(Server * serv, int sync_links)
 	// Perhaps this should be done if serv == serv_uplink?
 	restore_unsynced_topics();
 	Alog() << "Server " << serv->name << " is done syncing";
+
+	FOREACH_MOD(I_OnServerSync, OnServerSync(s));
+	if (serv == serv_uplink)
+	{
+		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync());
+	}
 }
 
 /*******************************************************************/

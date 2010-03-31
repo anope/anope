@@ -139,6 +139,24 @@ CREATE TABLE anope_cs_access (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table 'anope_cs_akick'
+--
+
+DROP TABLE IF EXISTS anope_cs_akick;
+CREATE TABLE anope_cs_akick (
+  channel varchar(255) NOT NULL default '',
+  flags varchar(255) NOT NULL default '',
+  mask varchar(255) NOT NULL default '',
+  reason text NOT NULL default '',
+  creator varchar(255) NOT NULL default '',
+  created int(11) NOT NULL default '0',
+  last_used int(11) NOT NULL default '0',
+  UNIQUE KEY channel (channel, mask)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table 'anope_bs_badwords'
 --
 

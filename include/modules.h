@@ -930,6 +930,18 @@ class CoreExport Module
 	 */
 	virtual void OnChannelDelete(Channel *c) { }
 
+	/** Called after adding an akick to a channel
+	 * @param ci The channel
+	 * @param ak The akick
+	 */
+	virtual void OnAkickAdd(ChannelInfo *ci, AutoKick *ak) { }
+
+	/** Called before removing an akick from a channel
+	 * @param ci The channel
+	 * @param ak The akick
+	 */
+	virtual void OnAkickDel(ChannelInfo *ci, AutoKick *ak) { }
+
 	/** Called when a nick is dropped
 	 * @param nick The nick
 	 */
@@ -1152,7 +1164,7 @@ enum Implementation
 		/* ChanServ */
 		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
-		I_OnChannelDelete,
+		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
 
 		/* BotServ */
 		I_OnBotServHelp, I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,

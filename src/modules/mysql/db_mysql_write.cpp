@@ -388,9 +388,10 @@ class DBMySQLWrite : public DBMySQL
 			I_OnDelCore, I_OnNickForbidden, I_OnNickGroup, I_OnMakeNickRequest,
 			I_OnDelNickRequest, I_OnNickRegister, I_OnChangeCoreDisplay,
 			I_OnNickSuspended,
-			/* Chanserv */
+			/* ChanServ */
 			I_OnAccessAdd, I_OnAccessDel, I_OnAccessChange, I_OnAccessClear,
 			I_OnChanForbidden, I_OnDelChan, I_OnChanRegistered, I_OnChanSuspend,
+			I_OnAkickAdd, I_OnAkickDel,
 			/* BotServ */
 			I_OnBotCreate, I_OnBotChange, I_OnBotDelete,
 			I_OnBotAssign, I_OnBotUnAssign,
@@ -401,7 +402,7 @@ class DBMySQLWrite : public DBMySQL
 			I_OnOperServHelp, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
 			I_OnAddSXLine, I_OnDelSXLine
 		};
-		ModuleManager::Attach(i, this, 37);
+		ModuleManager::Attach(i, this, 39);
 	}
 
 	void OnOperServHelp(User *u)
@@ -666,6 +667,8 @@ class DBMySQLWrite : public DBMySQL
 		mysqlpp::Query query(Me->Con);
 		query << "DELETE FROM `anope_cs_access` WHERE `display` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
+		query << "DELETE FROM `anope_cs_akick` WHERE `mask` = " << mysqlpp::quote << nc->display;
+		ExecuteQuery(query);
 		query << "DELETE FROM `anope_ns_access` WHERE `display` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
 		query << "DELETE FROM `anope_ns_alias` WHERE `display` = " << mysqlpp::quote << nc->display;
@@ -796,9 +799,15 @@ class DBMySQLWrite : public DBMySQL
 		mysqlpp::Query query(Me->Con);
 		query << "DELETE FROM `anope_cs_access` WHERE `channel` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
+		query << "DELETE FROM `anope_cs_akick` WHERE `channel` = " << mysqlpp::quote << ci->name;
+		ExecuteQuery(query);
 		query << "DELETE FROM `anope_cs_info` WHERE `name` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		query << "DELETE FROM `anope_cs_levels` WHERE `channel` = " << mysqlpp::quote << ci->name;
+		ExecuteQuery(query);
+		query << "DELETE From `anope_cs_ttb` WHERE `channel` = " << mysqlpp::quote << ci->name;
+		ExecuteQuery(query);
+		query << "DELETE FROM `anope_bs_badwords` WHERE `channel` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 	}
 	
@@ -831,6 +840,28 @@ class DBMySQLWrite : public DBMySQL
 		query << "UPDATE `anope_cs_info` SET `forbidby` = " << mysqlpp::quote << ci->forbidby << " WHERE `name` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		query << "UPDATE `anope_cs_info` SET `forbidreason` = " << mysqlpp::quote << ci->forbidreason << " WHERE `name` = " << mysqlpp::quote << ci->name;
+		ExecuteQuery(query);
+	}
+
+	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
+	{
+		mysqlpp::Query query(Me->Con);
+		query << "INSERT DELAYED INTO `anope_cs_akick` (channel, flags, mask, reason, creator, created, last_used) VALUES(";
+		query << mysqlpp::quote << ci->name << ", '";
+		if (ak->HasFlag(AK_ISNICK))
+			query << "ISNICK ";
+		if (ak->HasFlag(AK_STUCK))
+			query << "STUCK ";
+		query << "', " << mysqlpp::quote << (ak->HasFlag(AK_ISNICK) ? ak->nc->display : ak->mask) << ", ";
+		query << mysqlpp::quote << ak->reason << ", " << mysqlpp::quote << ak->creator << ", " << ak->addtime;
+		query << ", " << ak->last_used << ")";
+		ExecuteQuery(query);
+	}
+
+	void OnAkickDel(ChannelInfo *ci, AutoKick *ak)
+	{
+		mysqlpp::Query query(Me->Con);
+		query << "DELETE FROM `anope_cs_akick` WHERE `channel`= " << mysqlpp::quote << ci->name << " AND `mask` = " << mysqlpp::quote << (ak->HasFlag(AK_ISNICK) ? ak->nc->display : ak->mask);
 		ExecuteQuery(query);
 	}
 

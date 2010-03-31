@@ -264,6 +264,9 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 	autokick->last_used = lu;
 
 	akick.push_back(autokick);
+
+	FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(this, autokick));
+
 	return autokick;
 }
 
@@ -286,6 +289,9 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 	autokick->last_used = lu;
 
 	akick.push_back(autokick);
+
+	FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(this, autokick));
+
 	return autokick;
 }
 
@@ -318,6 +324,8 @@ void ChannelInfo::EraseAkick(AutoKick *autokick)
 
 	if (it != akick.end())
 	{
+		FOREACH_MOD(I_OnAkickDel, OnAkickDel(this, *it));
+
 		delete *it;
 		akick.erase(it);
 	}

@@ -438,6 +438,42 @@ static void LoadDatabase()
 		}
 	}
 
+	query << "SELECT * FROM `anope_cs_akick`";
+	qres = StoreQuery(query);
+
+	if (qres)
+	{
+		for (size_t i = 0; i < qres.num_rows(); ++i)
+		{
+			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
+			if (!ci)
+			{
+				Alog() << "MySQL: Channel akick entry for nonexistant channel " << qres[i]["channel"];
+				continue;
+			}
+			NickCore *nc = NULL;
+			spacesepstream sep(qres[i]["flags"]);
+			std::string flag, mask;
+			bool stuck = false;
+			while (sep.GetToken(flag))
+			{
+				if (flag == "ISNICK")
+					nc = findcore(qres[i]["mask"]);
+				else if (flag == "STUCK")
+					stuck = true;
+			}
+			AutoKick *ak;
+			if (nc)
+				ak = ci->AddAkick(SQLAssign(qres[i]["creator"]), nc, SQLAssign(qres[i]["reason"]), atol(qres[i]["created"].c_str()), atol(qres[i]["last_used"].c_str()));
+			else
+				ak = ci->AddAkick(SQLAssign(qres[i]["creator"]), SQLAssign(qres[i]["mask"]), SQLAssign(qres[i]["reason"]), atol(qres[i]["created"].c_str()), atol(qres[i]["last_used"].c_str()));
+			if (stuck)
+				ak->SetFlag(AK_STUCK);
+			if (nc)
+				ak->SetFlag(AK_ISNICK);
+		}
+	}
+
 	query << "SELECT * FROM `anope_cs_levels`";
 	qres = StoreQuery(query);
 

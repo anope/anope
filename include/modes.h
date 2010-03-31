@@ -75,7 +75,7 @@ enum ModeClass
 
 /** This class is the basis of all modes in Anope
  */
-class Mode
+class CoreExport Mode
 {
   public:
   	/* Class of mode this is */

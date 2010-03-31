@@ -732,7 +732,7 @@ void backup_databases(void)
 
 void ModuleDatabaseBackup(char *dbname)
 {
-
+    char ext[9];
     time_t t;
     struct tm tm;
 
@@ -742,8 +742,6 @@ void ModuleDatabaseBackup(char *dbname)
 
     time(&t);
     tm = *localtime(&t);
-
-    char ext[9];
 
     if (debug)
         alog("Module Database Backing up %s", dbname);

@@ -114,6 +114,13 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 				((akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str()),
 				!akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf,
 				(!akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON)));
+	if (akick->last_used)
+	{
+		char last_used[64];
+		tm = *localtime(&akick->last_used);
+		strftime_lang(last_used, sizeof(last_used), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LAST_USED, last_used);
+	}
 	return 1;
 }
 

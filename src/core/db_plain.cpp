@@ -733,9 +733,9 @@ class DBPlain : public Module
 			}
 			AutoKick *ak;
 			if (Nick)
-				ak = ci->AddAkick(params[3], nc, params.size() > 5 ? params[5] : "", strtol(params[4].c_str(), NULL, 10));
+				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", atol(params[4].c_str()), atol(params[5].c_str()));
 			else
-				ak = ci->AddAkick(params[3], params[2],  params.size() > 5 ? params[5] : "", strtol(params[4].c_str(), NULL, 10));
+				ak = ci->AddAkick(params[3], params[2],  params.size() > 6 ? params[6] : "", atol(params[4].c_str()), atol(params[5].c_str()));
 			if (Stuck)
 				ak->SetFlag(AK_STUCK);
 			if (Nick)
@@ -1016,7 +1016,8 @@ class DBPlain : public Module
 					<< (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ")
 					<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ")
 					<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask)
-					<< " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " :";
+					<< " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime
+					<< " " << ci->last_used << " :";
 					if (!ci->GetAkick(k)->reason.empty())
 						db << ci->GetAkick(k)->reason;
 					db << endl;

@@ -1506,6 +1506,8 @@ CHAN_AKICK_VIEW_FORMAT
 CHAN_AKICK_VIEW_FORMAT_STUCK
 	%3d %s (stuck) (by %s on %s)
 	    %s
+CHAN_AKICK_LAST_USED
+	    Last used %s
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE for %s complete; %d users were affected.
 CHAN_AKICK_CLEAR

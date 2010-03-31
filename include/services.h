@@ -564,6 +564,7 @@ class AutoKick : public Flags<AutoKickFlag>
 	std::string reason;
 	std::string creator;
 	time_t addtime;
+	time_t last_used;
 };
 
 /** Flags for badwords
@@ -1224,6 +1225,26 @@ class NickServRelease : public Timer
 	 * @param dorelase true to actually call release(), false to just remove the timers
 	 */
 	static void ClearTimers(NickAlias *na, bool dorelease = false);
+};
+
+/** A timer used to keep the BotServ bot/ChanServ in the channel
+ * after kicking the last user in a channel
+ */
+class ChanServTimer : public Timer
+{
+ private:
+	Channel *c;
+
+ public:
+ 	/** Default constructor
+	 * @param chan The channel
+	 */
+	ChanServTimer(Channel *chan);
+
+	/** Called when th edelay is up
+	 * @param The current time
+	 */
+	void Tick(time_t);
 };
 
 #endif	/* SERVICES_H */

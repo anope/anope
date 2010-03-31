@@ -14,6 +14,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "language.h"
 
 /** Default constructor
  * @param chname The channel name
@@ -245,9 +246,10 @@ void ChannelInfo::ClearAccess()
  * @param akicknc The nickcore being akicked
  * @param reason The reason for the akick
  * @param t The time the akick was added, defaults to now
+ * @param lu The time the akick was last used, defaults to never
  * @return The AutoKick structure
  */
-AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, const std::string &reason, time_t t)
+AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, const std::string &reason, time_t t, time_t lu)
 {
 	if (!akicknc)
 		return NULL;
@@ -259,6 +261,7 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;
+	autokick->last_used = lu;
 
 	akick.push_back(autokick);
 	return autokick;
@@ -269,9 +272,10 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
  * @param mask The mask of the akick
  * @param reason The reason for the akick
  * @param t The time the akick was added, defaults to now
+ * @param lu The time the akick was last used, defaults to never
  * @return The AutoKick structure
  */
-AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask, const std::string &reason, time_t t)
+AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask, const std::string &reason, time_t t, time_t lu)
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->mask = mask;
@@ -279,6 +283,7 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;
+	autokick->last_used = lu;
 
 	akick.push_back(autokick);
 	return autokick;
@@ -549,5 +554,113 @@ const bool ChannelInfo::HasParam(ChannelModeName Name)
 void ChannelInfo::ClearParams()
 {
 	Params.clear();
+}
+
+/** Check whether a user is permitted to be on this channel
+ * @param u The user
+ * @return true if they were banned, false if they are allowed
+ */
+bool ChannelInfo::CheckKick(User *user)
+{
+	AutoKick *akick;
+	bool set_modes = false, do_kick = false;
+	NickCore *nc;
+	char mask[BUFSIZE];
+	const char *reason;
+
+	if (!user || !this->c)
+		return false;
+
+	if (user->isSuperAdmin == 1)
+		return true;
+
+	/* We don't enforce services restrictions on clients on ulined services
+	 * as this will likely lead to kick/rejoin floods. ~ Viper */
+	if (is_ulined(user->server->name))
+		return true;
+
+	if (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN))
+	{
+		if (is_oper(user))
+			return 0;
+
+		get_idealban(this, user, mask, sizeof(mask));
+		reason = this->forbidreason ? this->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
+		set_modes = true;
+		do_kick = true;
+	}
+
+	if (user->Account() || user->IsRecognized())
+		nc = user->Account();
+	else
+		nc = NULL;
+
+	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
+		return true;
+
+	for (unsigned j = 0; j < this->GetAkickCount(); ++j)
+	{
+		akick = this->GetAkick(j);
+
+		if (!akick->InUse || do_kick)
+			continue;
+
+		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+			|| (!akick->HasFlag(AK_ISNICK)
+			&& match_usermask(akick->mask.c_str(), user)))
+		{
+			Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (akick->HasFlag(AK_ISNICK) ? 
+akick->nc->display : akick->mask);
+			akick->last_used = time(NULL);
+			if (akick->HasFlag(AK_ISNICK))
+				get_idealban(this, user, mask, sizeof(mask));
+			else
+				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
+			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
+			do_kick = true;
+		}
+	}
+
+
+	if (!do_kick && check_access(user, this, CA_NOJOIN))
+	{
+		get_idealban(this, user, mask, sizeof(mask));
+		reason = getstring(user, CHAN_NOT_ALLOWED_TO_JOIN);
+		do_kick = true;
+	}
+
+	if (!do_kick)
+		return false;
+
+	Alog(LOG_DEBUG) << "channel: Autokicking "<< user->GetMask() <<  " from " << this->name;
+
+	/* If the channel doesnt have any users and if a bot isn't already in the channel, join it
+	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
+	 */
+	if (this->c->users.size() == 1 && !this->HasFlag(CI_INHABIT))
+	{
+		/* If channel was forbidden, etc, set it +si to prevent rejoin */
+		if (set_modes)
+		{
+			c->SetMode(NULL, CMODE_NOEXTERNAL);
+			c->SetMode(NULL, CMODE_TOPIC);
+			c->SetMode(NULL, CMODE_SECRET);
+			c->SetMode(NULL, CMODE_INVITE);
+		}
+
+		/* This channel has no bot assigned to it, join ChanServ */
+		if (!this->bi)
+		{
+			ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
+		}
+
+		/* Set a timer for this channel to part the bots later */
+		new ChanServTimer(this->c);
+	}
+
+	this->c->SetMode(NULL, CMODE_BAN, mask);
+	this->c->Kick(NULL, user, "%s", reason);
+
+	return true;
 }
 

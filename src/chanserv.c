@@ -119,45 +119,6 @@ void moduleAddChanServCmds() {
 /* *INDENT-ON* */
 /*************************************************************************/
 
-/** A timer used to keep the BotServ bot/ChanServ in the channel
- * after kicking the last user in a channel
- */
-class ChanServTimer : public Timer
-{
- private:
- 	Channel *c;
-
- public:
-	ChanServTimer(Channel *chan) : Timer(Config.CSInhabit), c(chan)
-	{
-		if (c->ci)
-			c->ci->SetFlag(CI_INHABIT);
-	}
-
-	void Tick(time_t)
-	{
-		if (!c->ci)
-			return;
-
-		c->ci->UnsetFlag(CI_INHABIT);
-
-		/* If the channel has users again, don't part it and halt */
-		if (!c->users.empty())
-			return;
-
-		if (c->ci->bi)
-			ircdproto->SendPart(c->ci->bi, c, NULL);
-		else
-			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
-
-		/* Now delete the channel as it is empty */
-		if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))
-			delete c;
-	}
-};
-
-/*************************************************************************/
-
 /* Returns modes for mlock in a nice way. */
 
 char *get_mlock_modes(ChannelInfo * ci, int complete)
@@ -610,114 +571,6 @@ int check_should_protect(User * user, char *chan)
 	}
 
 	return 0;
-}
-
-/*************************************************************************/
-
-/** Check whether a user is permitted to be on this channel
- * @param u The user
- * @return true if they were banned, false if they are allowed
- */
-bool ChannelInfo::CheckKick(User *user)
-{
-	AutoKick *akick;
-	bool set_modes = false, do_kick = false;
-	NickCore *nc;
-	char mask[BUFSIZE];
-	const char *reason;
-
-	if (!user || !this->c)
-		return false;
-
-	if (user->isSuperAdmin == 1)
-		return true;
-
-	/* We don't enforce services restrictions on clients on ulined services
-	 * as this will likely lead to kick/rejoin floods. ~ Viper */
-	if (is_ulined(user->server->name))
-		return true;
-
-	if (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN))
-	{
-		if (is_oper(user))
-			return 0;
-
-		get_idealban(this, user, mask, sizeof(mask));
-		reason = this->forbidreason ? this->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
-		set_modes = true;
-		do_kick = true;
-	}
-
-	if (user->Account() || user->IsRecognized())
-		nc = user->Account();
-	else
-		nc = NULL;
-
-	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
-		return true;
-
-	for (unsigned j = 0; j < this->GetAkickCount(); ++j)
-	{
-		akick = this->GetAkick(j);
-
-		if (!akick->InUse || do_kick)
-			continue;
-
-		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) 
-			|| (!akick->HasFlag(AK_ISNICK)
-			&& match_usermask(akick->mask.c_str(), user)))
-		{
-			Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask);
-			if (akick->HasFlag(AK_ISNICK))
-				get_idealban(this, user, mask, sizeof(mask));
-			else
-				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
-			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
-			do_kick = true;
-		}
-	}
-
-
-	if (!do_kick && check_access(user, this, CA_NOJOIN))
-	{
-		get_idealban(this, user, mask, sizeof(mask));
-		reason = getstring(user, CHAN_NOT_ALLOWED_TO_JOIN);
-		do_kick = true;
-	}
-
-	if (!do_kick)
-		return false;
-
-	Alog(LOG_DEBUG) << "channel: Autokicking "<< user->GetMask() <<  " from " << this->name;
-
-	/* If the channel doesnt have any users and if a bot isn't already in the channel, join it
-	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
-	 */
-	if (this->c->users.size() == 1 && !this->HasFlag(CI_INHABIT))
-	{
-		/* If channel was forbidden, etc, set it +si to prevent rejoin */
-		if (set_modes)
-		{
-			c->SetMode(NULL, CMODE_NOEXTERNAL);
-			c->SetMode(NULL, CMODE_TOPIC);
-			c->SetMode(NULL, CMODE_SECRET);
-			c->SetMode(NULL, CMODE_INVITE);
-		}
-
-		/* This channel has no bot assigned to it, join ChanServ */
-		if (!this->bi)
-		{
-			ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
-		}
-		
-		/* Set a timer for this channel to part the bots later */
-		new ChanServTimer(this->c);
-	}
-
-	this->c->SetMode(NULL, CMODE_BAN, mask);
-	this->c->Kick(NULL, user, "%s", reason);
-
-	return true;
 }
 
 /*************************************************************************/
@@ -1263,18 +1116,6 @@ const char *get_xop_level(int level)
 /*********************** ChanServ command routines ***********************/
 /*************************************************************************/
 
-/*************************************************************************/
-
-
-/*************************************************************************/
-
-/* `last' is set to the last index this routine was called with
- * `perm' is incremented whenever a permission-denied error occurs
- */
-
-
-/*************************************************************************/
-
 /* Is the mask stuck? */
 
 AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
@@ -1347,3 +1188,31 @@ void stick_all(ChannelInfo * ci)
 		ci->c->SetMode(NULL, CMODE_BAN, akick->mask.c_str());
 	}
 }
+
+ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config.CSInhabit), c(chan)
+{
+	if (c->ci)
+		c->ci->SetFlag(CI_INHABIT);
+}
+
+void ChanServTimer::Tick(time_t)
+{
+	if (!c->ci)
+		return;
+	
+	c->ci->UnsetFlag(CI_INHABIT);
+
+	/* If the channel has users again, don't part it and halt */
+	if (!c->users.empty())
+		return;
+	
+	if (c->ci->bi)
+		ircdproto->SendPart(c->ci->bi, c, NULL);
+	else
+		ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+	
+	/* Now delete the channel as it is empty */
+	if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))
+		delete c;
+}
+

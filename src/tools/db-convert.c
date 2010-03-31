@@ -827,7 +827,7 @@ int main(int argc, char *argv[])
 						<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK " )
 						<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
 						<< ((ci->akick[j].flags & AK_ISNICK) ? ci->akick[j].u.nc->display : ci->akick[j].u.mask )
-						<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " :";
+						<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " 0 :"; // 0 is for last used, added in 1.9.2
 						if (ci->akick[j].reason)
 							fs << ci->akick[j].reason;
 						fs << std::endl;

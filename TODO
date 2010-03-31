@@ -12,8 +12,8 @@ Legend:
     [x] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
     [x] Salted SHA256 (contact Special for this)
   [+] New database format (text, not binary - works very well for merging and so on)
-[ ] generic database routines modules can use to create their own database
-[ ] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
+[x] generic database routines modules can use to create their own database
+[?] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
 [ ] Socket subsystem needs some serious loving
   [ ] Multiple sockets
   [ ] Asynchronous, using select() (multiple engines? not really needed..)
@@ -22,7 +22,7 @@ Legend:
 [x] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
 [?] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
     the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
-[ ] Last used time on AKICK/access entries
+[x] Last used time on AKICK/access entries
 [x] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
 [+] General options block, ability to turn LOGCHAN on from the config file..
 [x] Docs directory cleanup

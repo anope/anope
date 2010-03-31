@@ -172,7 +172,7 @@ class CommandOSModList : public Command
 					case DATABASE:
 						if (showDB)
 						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), enc);
+							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), db);
 							++count;
 						}
 				}

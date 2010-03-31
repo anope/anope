@@ -228,7 +228,7 @@ class DBMySQL : public Module
 
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
-		this->SetType(SUPPORTED);
+		this->SetType(DATABASE);
 
 		if (!LoadConfig())
 			throw ModuleException("Couldn't load config");

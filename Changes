@@ -1,6 +1,7 @@
 Anope Version 1.8 - SVN
 -----------------------
 3/10  F Added support for tracking permanent channels                    [  #00]
+3/29  F Fixed defcon to only apply its mode parameters when it's on      [#1146]
 
 Anope Version 1.8.3
 -------------------
@@ -27,7 +28,6 @@ Provided by Anope Dev. <team@anope.org> - 2009
 12/01 F Fixed tracking of users host when they disable their vhost       [#1106]
 12/20 F Fixed nickcores access list being loaded from SQL with RDB       [  #00]
 1/15  F Fixed BotServ from kicking and banning ULined clients            [#1135]
-3/29  F Fixed defcon to only apply its mode parameters when it's on      [#1146]
 
 Provided by Han` <Han@mefalcon.org> - 2009
 07/28 F Updated german language file.                                    [  #00]

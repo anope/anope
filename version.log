@@ -9,11 +9,12 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="3"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2855"
+VERSION_BUILD="2856"
 
 # $Log$ # Changes since 1.8.3 Release
 
 #Revision 2855 - Don't save databases when rehashed or shutdown from anoperc when in readonly mode
+#Revision 2854 - Small change to the win32 makefile to use Config.bat rather than install.js after spotless.
 #Revision 2843 - Fixed catserv module demo to work correctly on TS6 IRCds
 #Revision 2842 - Fixed bug #1149 - Number memos in MySQL correctly
 #Revision 2841 - Fixed bugs #1146 and #1147 - Fixed check_modes to only apply defcon settings when defcon is actually on

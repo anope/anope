@@ -145,6 +145,8 @@ extern void expire_all(void)
 
 void save_databases(void)
 {
+    if (readonly)
+        return;
     waiting = -19;
     send_event(EVENT_DB_SAVING, 1, EVENT_START);
     waiting = -2;

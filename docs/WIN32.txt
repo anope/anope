@@ -64,7 +64,7 @@ Anope for Windows
 	
 	e.g.
 
-	cd c:\anope-trunk
+	cd c:\anope-stable
        
     4) You now need to configure Anope to your requirements. At the prompt type:
     

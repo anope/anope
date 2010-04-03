@@ -44,7 +44,7 @@ spotless:
         -@erase include\language.h include\version.h *.manifest *~ anope.exe version.sh.exe *.obj anopesmtp.exe
 	-@echo --
 	-@echo NOTICE:
-	-@echo   You will need to run cscript /nologo install.js again
+	-@echo   You will need to run config.bat again
 	-@echo --
 
 mypasql: 

@@ -8,11 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
-VERSION_EXTRA=""
-VERSION_BUILD="2859"
+VERSION_EXTRA="-svn"
+VERSION_BUILD="2861"
 
-# $Log$ # Leading up to 1.8.4 Release
+# $Log$ # Changes since the 1.8.4 Release
 
+
+# Leading up to 1.8.4 Release
 #Revision 2855 - Don't save databases when rehashed or shutdown from anoperc when in readonly mode
 #Revision 2854 - Small change to the win32 makefile to use Config.bat rather than install.js after spotless.
 #Revision 2843 - Fixed catserv module demo to work correctly on TS6 IRCds

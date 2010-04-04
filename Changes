@@ -1,7 +1,18 @@
 Anope Version 1.8 - SVN
 -----------------------
-3/10  F Added support for tracking permanent channels                    [  #00]
+3/10  A Added support for tracking permanent channels                    [  #00]
+3/24  A Added logging of deleting and clearing XOP access lists          [  #00]
+2/9   F Fixed marking halfops as deopped, stops unsetting modes by them  [#1136]
+2/18  F Fixed listing unconfirmed nicks with suspended nicks to SA+      [  #00]
+3/2   F Fixed a bug that could cause access entries to disappear         [  #00]
+3/13  F Fixed maximum hostname checking in HS SET and HS REQUEST         [#1138]
+3/13  F Fixed deleting force dropped nicks from the hs_waiting list      [#1139]
+3/13  F Fixed backing up 3rd party module databases more than once a day [#1140]
+3/16  F Fixed os_info to display syntax errors if no command is entered  [  #00]
 3/29  F Fixed defcon to only apply its mode parameters when it's on      [#1146]
+3/29  F Fixed numbering of memos when saved in SQL                       [#1149]
+3/30  F Fixed module demos to work correctly on TS6 IRCDs                [  #00]
+4/3   F Fixed saving databases in readonly mode when using anoperc       [  #00]
 
 Anope Version 1.8.3
 -------------------

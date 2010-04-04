@@ -116,7 +116,7 @@ install: services
 	$(INSTALL) bin/anoperc $(INSTDIR)/bin/anoperc
 	test -d ${INSTDIR}/data || mkdir ${INSTDIR}/data
 	(cd ../lang ; $(MAKE) install)
-	$(CP) ../data/* $(INSTDIR)/data
+	$(CP) ../data/*.* $(INSTDIR)/data
 	$(INSTALL) bin/mydbgen $(INSTDIR)/bin/mydbgen
 	test -d $(INSTDIR)/data/backups || mkdir $(INSTDIR)/data/backups
 	test -d $(INSTDIR)/data/logs || mkdir $(INSTDIR)/data/logs

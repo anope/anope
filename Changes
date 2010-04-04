@@ -1,5 +1,5 @@
-Anope Version 1.8 - SVN
------------------------
+Anope Version 1.8.4
+-------------------
 3/10  A Added support for tracking permanent channels                    [  #00]
 3/24  A Added logging of deleting and clearing XOP access lists          [  #00]
 2/9   F Fixed marking halfops as deopped, stops unsetting modes by them  [#1136]

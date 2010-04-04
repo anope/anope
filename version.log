@@ -7,11 +7,11 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
-VERSION_PATCH="3"
-VERSION_EXTRA="-svn"
-VERSION_BUILD="2858"
+VERSION_PATCH="4"
+VERSION_EXTRA=""
+VERSION_BUILD="2859"
 
-# $Log$ # Changes since 1.8.3 Release
+# $Log$ # Leading up to 1.8.4 Release
 
 #Revision 2855 - Don't save databases when rehashed or shutdown from anoperc when in readonly mode
 #Revision 2854 - Small change to the win32 makefile to use Config.bat rather than install.js after spotless.

@@ -367,14 +367,6 @@ int init_secondary(int ac, char **av)
 		}
 	}
 #else
-	/* Initialize winsocks -- codemastr */
-	{
-		WSADATA wsa;
-		if (WSAStartup(MAKEWORD(1, 1), &wsa)) {
-			Alog() << "Failed to initialized WinSock library";
-			return -1;
-		}
-	}
 	if (!SupportedWindowsVersion()) {
 
 		char *winver = GetWindowsVersion();
@@ -487,56 +479,23 @@ int init_secondary(int ac, char **av)
 	if (!bi)
 	{
 		if (Config.s_OperServ)
-			bi = new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
+			new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
 		if (Config.s_NickServ)
-			bi = new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
+			new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
 		if (Config.s_ChanServ)
-			bi = new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
+			new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
 		if (Config.s_HostServ)
-			bi = new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
+			new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
 		if (Config.s_MemoServ)
-			bi = new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
+			new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
 		if (Config.s_BotServ)
-			bi = new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
+			new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
 		if (Config.s_GlobalNoticer)
-			bi = new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
+			new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
 	}
 
 	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
-	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 
-	/* Connect to the remote server */
-	std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end();
-	int servernum = 1;
-	for (; curr_uplink != end_uplink; ++curr_uplink, ++servernum) {
-		uplink_server = *curr_uplink;
-		servsock = conn(uplink_server->host, uplink_server->port, Config.LocalHost, Config.LocalPort);
-		if (servsock >= 0) {
-			Alog() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
-			break;
-		}
-	}
-	if (curr_uplink == end_uplink) fatal_perror("Can't connect to any servers");
-
-	ircdproto->SendConnect();
-	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
-
-	sgets2(inbuf, sizeof(inbuf), servsock);
-	if (strnicmp(inbuf, "ERROR", 5) == 0) {
-		/* Close server socket first to stop wallops, since the other
-		 * server doesn't want to listen to us anyway */
-		disconn(servsock);
-		servsock = -1;
-		fatal("Remote server returned: %s", inbuf);
-	}
-
-	/* Announce a logfile error if there was one */
-	if (openlog_failed) {
-		ircdproto->SendGlobops(NULL, "Warning: couldn't open logfile: %s",
-						 strerror(openlog_errno));
-	}
-
-	/* Success! */
 	return 0;
 }
 

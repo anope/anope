@@ -19,28 +19,23 @@
 #include "sysconf.h"
 #include "config.h"
 
-#ifndef MAX_CMD_HASH
-#define MAX_CMD_HASH 1024
-#endif
-
 /* Some SUN fixs */
 #ifdef __sun
-/* Solaris specific code, types that do not exist in Solaris'
- * sys/types.h
- **/
-#undef u_int8_t
-#undef u_int16_t
-#undef u_int32_t
-#undef u_int_64_t
-#define u_int8_t uint8_t
-#define u_int16_t uint16_t
-#define u_int32_t uint32_t
-#define u_int64_t uint64_t
+ /* Solaris specific code, types that do not exist in Solaris'
+  * sys/types.h
+  **/
+# undef u_int8_t
+# undef u_int16_t
+# undef u_int32_t
+# undef u_int_64_t
+# define u_int8_t uint8_t
+# define u_int16_t uint16_t
+# define u_int32_t uint32_t
+# define u_int64_t uint64_t
 
-#ifndef INADDR_NONE
-#define INADDR_NONE (-1)
-#endif
-
+#  ifndef INADDR_NONE
+#   define INADDR_NONE (-1)
+#  endif
 #endif
 
 
@@ -49,63 +44,57 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Windows does not have: unistd.h, grp.h, netdb.h, netinet/in.h, sys/socket.h, sys/time.h
- * Windows requires: winsock.h
- * -- codemastr
- */
-
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
 #include <signal.h>
 #include <time.h>
 #include <errno.h>
-
-#ifndef _WIN32
-#include <grp.h>
-#endif
-
 #include <limits.h>
 
-#ifndef _WIN32
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#else
-#include <winsock.h>
-#include <windows.h>
-#endif
-
-#include <sys/stat.h>	/* for umask() on some systems */
+#include <sys/stat.h>   /* for umask() on some systems */
 #include <sys/types.h>
-
-#ifdef HAVE_GETTIMEOFDAY
-#include <sys/time.h>
-#endif
-
-#ifdef _WIN32
-#include <sys/timeb.h>
-#include <direct.h>
-#include <io.h>
-#endif
 
 #include <fcntl.h>
 
 #ifndef _WIN32
-#ifdef HAVE_BACKTRACE
-#include <execinfo.h>
-#endif
-#endif
-
-#ifndef _WIN32
-#include <dirent.h>
-#endif
-
-#ifdef _WIN32
+# include <unistd.h>
+# include <grp.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <sys/socket.h>
+# include <dirent.h>
+# ifdef HAVE_BACKTRACE
+#  include <execinfo.h>
+# endif
+# define DllExport
+# define CoreExport
+# define MARK_DEPRECATED __attribute((deprecated))
+#else
+# include <winsock2.h>
+# include <ws2tcpip.h>
+# include <windows.h>
+# include <sys/timeb.h>
+# include <direct.h>
+# include <io.h>
+# ifdef MODULE_COMPILE
+#  define CoreExport __declspec(dllimport)
+#  define DllExport __declspec(dllexport)
+# else
+#  define CoreExport __declspec(dllexport)
+#  define DllExport __declspec(dllimport)
+# endif
 /* VS2008 hates having this define before its own */
-#define vsnprintf			   _vsnprintf
+# define vsnprintf _vsnprintf
+/* We have our own inet_pton and inet_ntop (Windows doesn't have its own) */
+# define inet_pton inet_pton_
+# define inet_ntop inet_ntop_
+# define MARK_DEPRECATED
+
+extern CoreExport int inet_pton(int af, const char *src, void *dst);
+extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+#endif
+
+#ifdef HAVE_GETTIMEOFDAY
+# include <sys/time.h>
 #endif
 
 #if HAVE_STRINGS_H
@@ -115,8 +104,6 @@
 #if HAVE_SYS_SELECT_H
 # include <sys/select.h>
 #endif
-
-#include "sockets.h"
 
 #ifndef va_copy
 # ifdef __va_copy
@@ -168,25 +155,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 # undef int32
 #endif
 
-#ifndef _WIN32
-	#define MARK_DEPRECATED __attribute((deprecated))
-#else
-	#define MARK_DEPRECATED
-#endif
-
-#ifdef _WIN32
-# ifdef MODULE_COMPILE
-#  define CoreExport __declspec(dllimport)
-#  define DllExport __declspec(dllexport)
-# else
-#  define CoreExport __declspec(dllexport)
-#  define DllExport __declspec(dllimport)
-# endif
-#else
-# define DllExport
-# define CoreExport
-#endif
-
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
  * It defines the class factory and external init_module function.
@@ -230,7 +198,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include "defs.h"
 #include "slist.h"
 
-/* pull in the various bits of STL to pull in */
+/* Pull in the various bits of STL */
 #include <iostream>
 #include <string>
 #include <map>
@@ -239,6 +207,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include <vector>
 #include <deque>
 #include <bitset>
+#include <set>
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
@@ -301,6 +270,13 @@ class ModuleException : public CoreException
 	 */
 	virtual ~ModuleException() throw() {}
 };
+
+
+/*************************************************************************/
+
+#include "sockets.h"
+
+/*************************************************************************/
 
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
@@ -1107,11 +1083,14 @@ struct Uplink {
 	char *host;
 	unsigned port;
 	char *password;
-	Uplink(const char *_host, int _port, const char *_password)
+	bool ipv6;
+
+	Uplink(const char *_host, int _port, const char *_password, bool _ipv6)
 	{
 		host = sstrdup(_host);
 		port = _port;
 		password = sstrdup(_password);
+		ipv6 = _ipv6;
 	}
 	~Uplink()
 	{

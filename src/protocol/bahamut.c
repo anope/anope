@@ -283,7 +283,7 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		bahamut_cmd_pass(uplink_server->password);
 		bahamut_cmd_capab();
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, NULL);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, "");
 		SendServer(me_server);
 		bahamut_cmd_svinfo();
 		bahamut_cmd_burst();

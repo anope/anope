@@ -118,7 +118,7 @@ Server *next_server(ServerFlag flag)
  * @return Server Struct
  */
 Server *new_server(Server * server_uplink, const char *name, const char *desc,
-				   ServerFlag flag, const char *suid)
+				   ServerFlag flag, const std::string &suid)
 {
 	Server *serv;
 
@@ -131,11 +131,10 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 	if (flag != SERVER_START)
 		serv->SetFlag(flag);
 	serv->uplink = server_uplink;
-	if (suid) {
-		serv->suid = sstrdup(suid);
-	} else {
+	if (!suid.empty())
+		serv->suid = sstrdup(suid.c_str());
+	else
 		serv->suid = NULL;
-	}
 
 	serv->sync = SSYNC_IN_PROGRESS;
 	serv->links = NULL;

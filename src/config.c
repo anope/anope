@@ -144,7 +144,7 @@ void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const
 	if (!strcasecmp(p, "localhost"))
 		return;
 
-	int num_dots = 0;
+	int num_dots = 0, num_seps = 0;
 	if (*p)
 	{
 		if (*p == '.')
@@ -157,9 +157,13 @@ void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const
 					throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 				case '.':
 					++num_dots;
+					break;
+				case ':':
+					++num_seps;
+					break;
 			}
 		}
-		if (!num_dots)
+		if (!num_dots && !num_seps)
 			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 	}
 }
@@ -382,8 +386,9 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 	if (!bail)
 		return true;
 	// Validation variables
-	const char *host = values[0].GetString(), *password = values[2].GetString();
-	int port = values[1].GetInteger();
+	const char *host = values[0].GetString(), *password = values[3].GetString();
+	int port = values[2].GetInteger();
+	bool ipv6 = values[1].GetBool();
 	ValueItem vi_host(host), vi_port(port), vi_password(password);
 	// Validate the host to make sure it is not empty
 	if (!ValidateNotEmpty(conf, "uplink", "host", vi_host))
@@ -395,7 +400,7 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 	if (!ValidateNotEmpty(conf, "uplink", "password", vi_password))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// If we get here, all the values are valid, we'll add it to the Uplinks list
-	Config.Uplinks.push_back(new Uplink(host, port, password));
+	Config.Uplinks.push_back(new Uplink(host, port, password, ipv6));
 	return true;
 }
 
@@ -597,7 +602,6 @@ int ServerConfig::Read(bool bail)
 		{"serverinfo", "name", "", new ValueContainerChar(&Config.ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "description", "", new ValueContainerChar(&Config.ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "localhost", "", new ValueContainerChar(&Config.LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
-		{"serverinfo", "localport", "0", new ValueContainerUInt(&Config.LocalPort), DT_UINTEGER | DT_NORELOAD, ValidatePort},
 		{"serverinfo", "type", "", new ValueContainerChar(&Config.IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "id", "", new ValueContainerChar(&Config.Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "ident", "", new ValueContainerChar(&Config.ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -645,6 +649,8 @@ int ServerConfig::Read(bool bail)
 		{"options", "enablelogchannel", "no", new ValueContainerBool(&LogChan), DT_BOOLEAN, NoValidation},
 		{"options", "mlock", "+nrt", new ValueContainerString(&Config.MLock), DT_STRING, NoValidation},
 		{"options", "botmodes", "", new ValueContainerString(&Config.BotModes), DT_STRING, NoValidation},
+		{"options", "maxretries", "10", new ValueContainerUInt(&Config.MaxRetries), DT_UINTEGER, NoValidation},
+		{"options", "retrywait", "60", new ValueContainerInt(&Config.RetryWait), DT_INTEGER, ValidateNotZero},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&Config.s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&Config.desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&Config.NSEmailReg), DT_BOOLEAN, NoValidation},
@@ -757,9 +763,9 @@ int ServerConfig::Read(bool bail)
 	 * which is different to the code for reading the singular tags listed above. */
 	MultiConfig MultiValues[] = {
 		{"uplink",
-			{"host", "port", "password", NULL},
-			{"", "0", "", NULL},
-			{DT_HOSTNAME | DT_NORELOAD, DT_UINTEGER | DT_NORELOAD, DT_NOSPACES | DT_NORELOAD},
+			{"host", "ipv6", "port", "password", NULL},
+			{"", "no", "0", "", NULL},
+			{DT_HOSTNAME | DT_NORELOAD, DT_BOOLEAN | DT_NORELOAD, DT_UINTEGER | DT_NORELOAD, DT_NOSPACES | DT_NORELOAD},
 			InitUplinks, DoUplink, DoneUplinks},
 		{"module",
 			{"name", NULL},
@@ -1525,21 +1531,6 @@ int read_config(int reload)
 
 	retval = Config.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
-
-	if (!reload) {
-		if (Config.LocalHost) {
-			std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end();
-			for (; curr_uplink != end_uplink; ++curr_uplink) {
-				Uplink *this_uplink = *curr_uplink;
-				if (!stricmp(Config.LocalHost, this_uplink->host) && Config.LocalPort == this_uplink->port) {
-					printf("\n<serverinfo:localhost> matches an <uplink:host> entry (%s)\nand <serverinfo:localport> matches an <uplink:port> entry (%d).\nThis will fail, you must make sure they are different.\n", this_uplink->host, this_uplink->port);
-					retval = 0;
-				}
-			}
-		}
-		// Just in case someone put something in for <serverinfo:localport> without defining <serverinfo:localhost> too
-		else Config.LocalPort = 0;
-	}
 
 	if (temp_nsuserhost) {
 		if (!(s = strchr(temp_nsuserhost, '@'))) {

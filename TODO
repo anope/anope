@@ -14,11 +14,10 @@ Legend:
   [+] New database format (text, not binary - works very well for merging and so on)
 [x] generic database routines modules can use to create their own database
 [?] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
-[ ] Socket subsystem needs some serious loving
-  [ ] Multiple sockets
-  [ ] Asynchronous, using select() (multiple engines? not really needed..)
-  [ ] Callbacks, event style, see also inspircd
-  [ ] Asynchronous DNS?
+[x] Socket subsystem needs some serious loving
+  [x] Multiple sockets
+  [x] Asynchronous, using select() (multiple engines? not really needed..)
+  [x] Callbacks, event style, see also inspircd
 [x] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
 [?] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
     the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
@@ -34,13 +33,15 @@ Legend:
 
 Future
 ------
+[ ] Asynchronous DNS
+[ ] CIDR Akills, session exceptions, etc
+[ ] Hashing system for storing just about everything needs to die
 [ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
 [?] Remote identification (1.9.1? will this break stuff?)
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] Add support for +k, +q, etc type umodes
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
-[ ] add overridden form of SendGlobops accepting BotInfo
 [ ] Language system is disgusting, it must die.
   [ ] Modules should also have a way to add strings programatically
   [ ] Should be able to add many strings by dropping a file in a set location.
@@ -71,8 +72,7 @@ Future
   [ ] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
-[ ] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK?
-[ ] Method to list suspended/forbidden nicks/channels?
+[?] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK? (AKA os_info)
 [?] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
 [?] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
 [?] OS INJECT

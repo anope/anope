@@ -547,14 +547,11 @@ class CSXOP : public Module
 
 		if (serv_uplink && is_sync(serv_uplink))
 			OnUplinkSync();
-		else
-		{
-			/* We don't want to add some commands until we are synced, so we know what modes
-			 * exist and what dont
-			 */
-			ModuleManager::Attach(I_OnUplinkSync, this);
-		}
-		ModuleManager::Attach(I_OnChanServHelp, this);
+
+		Implementation i[] = {
+			I_OnUplinkSync, I_OnServerDisconnect, I_OnChanServHelp
+		};
+		ModuleManager::Attach(i, this, 3);
 	}
 
 	void OnUplinkSync()
@@ -563,6 +560,12 @@ class CSXOP : public Module
 			this->AddCommand(CHANSERV, new CommandCSQOP());
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 			this->AddCommand(CHANSERV, new CommandCSHOP());
+	}
+
+	void OnServerDisconnect()
+	{
+		this->DelCommand(CHANSERV, "QOP");
+		this->DelCommand(CHANSERV, "HOP");
 	}
 
 	void OnChanServHelp(User *u)

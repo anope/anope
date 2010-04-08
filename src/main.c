@@ -64,16 +64,10 @@ std::string binary_dir; /* Used to store base path for Anope */
 int quitting = 0;
 
 /* Set to 1 if we are to quit after saving databases */
-int delayed_quit = 0;
+int shutting_down = 0;
 
 /* Contains a message as to why services is terminating */
 const char *quitmsg = NULL;
-
-/* Input buffer - global, so we can dump it if something goes wrong */
-char inbuf[BUFSIZE];
-
-/* Socket for talking to server */
-int servsock = -1;
 
 /* Should we update the databases now? */
 int save_data = 0;
@@ -123,6 +117,28 @@ class UpdateTimer : public Timer
 	}
 };
 
+Socket *UplinkSock = NULL;
+
+class UplinkSocket : public Socket
+{
+ public:
+	UplinkSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : Socket(nTargetHost, nPort, nBindHost, nIPv6)
+	{
+		UplinkSock = this;
+	}
+
+	~UplinkSocket()
+	{
+		UplinkSock = NULL;
+	}
+
+	bool Read(const std::string &buf)
+	{
+		process(buf);
+		return true;
+	}
+};
+
 /*************************************************************************/
 
 /* Run expiration routines */
@@ -160,6 +176,9 @@ extern void expire_all()
 
 void save_databases()
 {
+	if (readonly)
+		return;
+	
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	Alog(LOG_DEBUG) << "Saving FFF databases";
@@ -181,7 +200,7 @@ void do_restart_services()
 	if (!quitmsg)
 		quitmsg = "Restarting";
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
-	disconn(servsock);
+	delete UplinkSock;
 	close_log();
 	/* First don't unload protocol module, then do so */
 	modules_unload_all(false);
@@ -223,8 +242,8 @@ static void services_shutdown()
 			u = next;
 		}
 	}
+	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
-	disconn(servsock);
 	/* First don't unload protocol module, then do so */
 	modules_unload_all(false);
 	modules_unload_all(true);
@@ -366,6 +385,34 @@ std::string GetFullProgDir(char *argv0)
 
 /*************************************************************************/
 
+static bool Connect()
+{
+	/* Connect to the remote server */
+	std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end();
+	int servernum = 1;
+	for (; curr_uplink != end_uplink; ++curr_uplink, ++servernum)
+	{
+		uplink_server = *curr_uplink;
+
+		try
+		{
+			new UplinkSocket(uplink_server->host, uplink_server->port, Config.LocalHost ? Config.LocalHost : "", uplink_server->ipv6);
+		}
+		catch (SocketException& ex)
+		{
+			Alog() << "Unable to connect to server" << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "), " << ex.GetReason();
+			continue;
+		}
+
+		Alog() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
+		return true;
+	}
+
+	return false;
+}
+
+/*************************************************************************/
+
 /* Main routine.  (What does it look like? :-) ) */
 
 int main(int ac, char **av, char **envp)
@@ -423,9 +470,14 @@ int main(int ac, char **av, char **envp)
 	if ((i = init_secondary(ac, av)) != 0)
 		return i;
 
+	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 
-	/* We have a line left over from earlier, so process it first. */
-	process();
+	/* If the first connect fails give up, don't sit endlessly trying to reconnect */
+	if (!Connect())
+		fatal_perror("Can't connect to any servers");
+
+	ircdproto->SendConnect();
+	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
 
 	started = 1;
 
@@ -456,68 +508,70 @@ int main(int ac, char **av, char **envp)
 	/*** Main loop. ***/
 	while (!quitting)
 	{
-		time_t t = time(NULL);
-
-		Alog(LOG_DEBUG_2) << "Top of main loop";
-
-		if (!readonly && save_data)
+		while (!quitting && UplinkSock)
 		{
-			if (!noexpire)
-				expire_all();
-			if (delayed_quit)
-				ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
-			save_databases();
-			if (save_data < 0)
-				break;
-			save_data = 0;
-		}
+			time_t t = time(NULL);
 
-		if (delayed_quit)
-			break;
+			Alog(LOG_DEBUG_2) << "Top of main loop";
 
-		if (t - last_check >= Config.TimeoutCheck)
-		{
-			TimerManager::TickTimers(t);
-			last_check = t;
-		}
-
-		/* Process any modes that need to be (un)set */
-		ModeManager::ProcessModes();
-
-		/* this is a nasty nasty typecast. we need to rewrite the
-		   socket stuff -Certus */
-		i = static_cast<int>(reinterpret_cast<long>(sgets2(inbuf, sizeof(inbuf), servsock)));
-		if ((i > 0) || (i < (-1))) {
-			process();
-		} else if (i == 0) {
-			int errno_save = errno;
-			quitmsg = new char[BUFSIZE];
-			if (quitmsg) {
-		// Naughty, but oh well. :)
-				snprintf(const_cast<char *>(quitmsg), BUFSIZE,
-						 "Read error from server: %s (error num: %d)",
-						 strerror(errno_save), errno_save);
-			} else {
-				quitmsg = "Read error from server";
-			}
-			quitting = 1;
-
-			/* Save the databases */
-			if (!readonly)
+			if (!readonly && (save_data || shutting_down))
+			{
+				if (!noexpire)
+					expire_all();
+				if (shutting_down)
+					ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
 				save_databases();
+				save_data = 0;
+			}
+
+			if (shutting_down)
+			{
+				quitting = 1;
+				break;
+			}
+
+			if (t - last_check >= Config.TimeoutCheck)
+			{
+				TimerManager::TickTimers(t);
+				last_check = t;
+			}
+
+			/* Process any modes that need to be (un)set */
+			ModeManager::ProcessModes();
+
+			/* Process the socket engine */
+			socketEngine.Process();
+		}
+
+		if (quitting)
+		{
+			/* Disconnect and exit */
+			services_shutdown();
+		}
+		else
+		{
+			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
+
+			unsigned j = 0;
+			for (; j < (Config.MaxRetries ? Config.MaxRetries : j + 1); ++j)
+			{
+				Alog() << "Disconnected from the server, retrying in " << Config.RetryWait << " seconds";
+
+				sleep(Config.RetryWait);
+				if (Connect())
+				{
+					ircdproto->SendConnect();
+					FOREACH_MOD(I_OnServerConnect, OnServerConnect());
+					break;
+				}
+			}
+			if (Config.MaxRetries && j == Config.MaxRetries)
+			{
+				Alog() << "Max connection retry limit exceeded";
+				quitting = 1;
+			}
 		}
 	}
-
-
-	/* Check for restart instead of exit */
-	if (save_data == -2)
-	{
-		do_restart_services();
-		return 0;
-	}
-
-	/* Disconnect and exit */
-	services_shutdown();
 
 	return 0;
 }

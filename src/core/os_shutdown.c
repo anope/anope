@@ -33,8 +33,7 @@ class CommandOSShutdown : public Command
 
 		if (Config.GlobalOnCycle)
 			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);
-		save_data = 1;
-		delayed_quit = 1;
+		shutting_down = 1;
 		return MOD_CONT;
 	}
 

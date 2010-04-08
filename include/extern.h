@@ -244,13 +244,13 @@ E int   protocoldebug;
 
 E int   is44;
 E int   quitting;
-E int   delayed_quit;
+E int   shutting_down;
 E const char *quitmsg;
-E char  inbuf[BUFSIZE];
-E int   servsock;
 E int   save_data;
 E int   got_alarm;
 E time_t start_time;
+
+E Socket *UplinkSock;
 
 E void save_databases();
 E void expire_all();
@@ -455,7 +455,7 @@ E int delete_ignore(const char *nick);
 E int clear_ignores();
 
 E int split_buf(char *buf, const char ***argv, int colon_special);
-E void process();
+E void process(const std::string &buf);
 
 /**** send.c ****/
 
@@ -485,7 +485,7 @@ E void CapabParse(int ac, const char **av);
 E int is_ulined(const char *server);
 E int is_sync(Server *server);
 
-E Server *new_server(Server * uplink, const char *name, const char *desc, ServerFlag flag, const char *suid);
+E Server *new_server(Server * uplink, const char *name, const char *desc, ServerFlag flag, const std::string &suid);
 
 E Server *findserver(Server *s, const char *name);
 
@@ -538,20 +538,10 @@ E void slist_pack(SList *slist);
 E int slist_remove(SList *slist, void *item);
 E int slist_setcapacity(SList *slist, int16 capacity);
 
-/**** sockutil.c ****/
-
-E int32 total_read, total_written;
-E int32 read_buffer_len();
-E int32 write_buffer_len();
-
-E int sgetc(ano_socket_t s);
-E char *sgets(char *buf, int len, ano_socket_t s);
-E char *sgets2(char *buf, int len, ano_socket_t s);
-E int sread(ano_socket_t s, char *buf, int len);
-E int sputs(char *str, ano_socket_t s);
-E int sockprintf(ano_socket_t s, const char *fmt, ...);
-E int conn(const char *host, int port, const char *lhost, int lport);
-E void disconn(ano_socket_t s);
+/**** sockets.cpp ****/
+E SocketEngine socketEngine;
+E int32 TotalRead;
+E int32 TotalWritten;
 
 /**** users.c ****/
 

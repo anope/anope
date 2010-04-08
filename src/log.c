@@ -207,7 +207,7 @@ void fatal(const char *fmt, ...)
 		fprintf(logfile, "%s FATAL: %s\n", buf, buf2);
 	if (nofork)
 		fprintf(stderr, "%s FATAL: %s\n", buf, buf2);
-	if (servsock >= 0)
+	if (UplinkSock)
 		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s", buf2);
 
 	/* one of the many places this needs to be called from */
@@ -245,7 +245,7 @@ void fatal_perror(const char *fmt, ...)
 	if (nofork)
 		fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
 				strerror(errno_save));
-	if (servsock >= 0)
+	if (UplinkSock)
 		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2,
 						 strerror(errno_save));
 

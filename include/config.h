@@ -25,15 +25,15 @@
 /* Name of log file (in Services directory) */
 #define LOG_FILENAME	"services.log"
 
-/* Maximum amount of data from/to the network to buffer (bytes). */
-#define NET_BUFSIZE	65536
-
 /******************* END OF USER-CONFIGURABLE SECTION ********************/
 
 /* Size of input buffer (note: this is different from BUFSIZ)
  * This must be big enough to hold at least one full IRC message, or messy
  * things will happen. */
 #define BUFSIZE		1024
+
+/* Maximum amount of data from/to the network to buffer (bytes). */
+#define NET_BUFSIZE    65536
 
 /**************************************************************************/
 

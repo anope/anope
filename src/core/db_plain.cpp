@@ -48,7 +48,7 @@ static void ReadDatabase(Module *m = NULL)
 
 	if (!db.is_open())
 	{
-		ircdproto->SendGlobops(NULL, "Unable to open %s for reading!", DatabaseFile.c_str());
+		Alog() << "Unable to open " << DatabaseFile << " for reading!";
 		return;
 	}
 

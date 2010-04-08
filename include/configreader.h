@@ -384,8 +384,6 @@ class ServerConfig
 
 		/* Host to connect to **/
 		char *LocalHost;
-		/* Port */
-		unsigned LocalPort;
 		/* List of uplink servers to try and connect to */
 		std::list<Uplink *> Uplinks;
 
@@ -475,7 +473,7 @@ class ServerConfig
 		bool ForceForbidReason;
 		/* Services should use privmsgs instead of notices */
 		bool UsePrivmsg;
-		/* Services only respond to full PRIVMSG client@services.server.name messaegs */
+		/* Services only respond to full PRIVMSG client@services.server.name messages */
 		bool UseStrictPrivMsg;
 		/* Dump a core file if we crash */
 		bool DumpCore;
@@ -490,6 +488,10 @@ class ServerConfig
 		std::string MLock;
 		/* Default botmodes on channels, defaults to ao */
 		std::string BotModes;
+		/* How many times to try and reconnect to the uplink before giving up */
+		unsigned MaxRetries;
+		/* How long to wait between connection attempts */
+		int RetryWait;
 
 		/* Services can use email */
 		bool UseMail;

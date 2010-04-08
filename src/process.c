@@ -281,7 +281,7 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 /* process:  Main processing routine.  Takes the string in inbuf (global
  *		   variable) and does something appropriate with it. */
 
-void process()
+void process(const std::string &buffer)
 {
 	int retVal = 0;
 	Message *current = NULL;
@@ -299,11 +299,11 @@ void process()
 	*cmd = '\0';
 
 	/* If debugging, log the buffer */
-	Alog(LOG_DEBUG) << "Received: " << inbuf;
+	Alog(LOG_DEBUG) << "Received: " << buffer;
 
 	/* First make a copy of the buffer so we have the original in case we
 	 * crash - in that case, we want to know what we crashed on. */
-	strscpy(buf, inbuf, sizeof(buf));
+	strscpy(buf, buffer.c_str(), sizeof(buf));
 
 	doCleanBuffer(buf);
 
@@ -359,9 +359,8 @@ void process()
 				}
 			}
 		}
-	} else {
-		Alog(LOG_DEBUG) << "unknown message from server (" << inbuf << ")";
-	}
+	} else
+		Alog(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
 
 	/* Free argument list we created */
 	free(av);

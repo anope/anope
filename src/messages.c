@@ -231,8 +231,7 @@ int m_stats(const char *source, int ac, const char **av)
 		if (u && is_oper(u)) {
 
 			ircdproto->SendNumeric(Config.ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-			ircdproto->SendNumeric(Config.ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host, write_buffer_len(), total_written, -1, read_buffer_len(),
-				total_read, -1, time(NULL) - start_time);
+			ircdproto->SendNumeric(Config.ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host, UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, time(NULL) - start_time);
 		}
 
 		ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');

@@ -64,9 +64,9 @@ endif(MSVC)
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
 set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}" ENABLE_EXPORTS ON)
-# On Windows, also link Anope to the wsock32 library, as well as set the version
+# On Windows, also link Anope to the wsock32 and Ws2_32 library, as well as set the version
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} wsock32 ${WIN32_MEMORY})
+  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 endif(WIN32)
 # Building the Anope executable requires the language files to be compiled first as well as the version.h header to be generated

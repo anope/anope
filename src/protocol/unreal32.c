@@ -291,10 +291,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		unreal_cmd_capab();
 		unreal_cmd_pass(uplink_server->password);
-		if (Config.Numeric)
-			me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, Config.Numeric);
-		else
-			me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, NULL);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, (Config.Numeric ? Config.Numeric : ""));
 		SendServer(me_server);
 	}
 

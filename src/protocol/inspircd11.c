@@ -251,7 +251,7 @@ class InspIRCdProto : public IRCDProto
 	void SendConnect()
 	{
 		inspircd_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, NULL);
+		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, "");
 		SendServer(me_server);
 		send_cmd(NULL, "BURST");
 		send_cmd(Config.ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, Config.ServerName, ircd->name, version_flags, Config.EncModuleList.begin()->c_str(), version_build);

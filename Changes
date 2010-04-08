@@ -2,10 +2,29 @@ Anope Version 1.9.2
 --------------------
 A K alias to chanserv kick command
 A KB alias to chanserv ban command
+A The ability to register empty nonregistered channels
+A Flatfile plaintext databases and removed old binary ones
+A Added in live updating SQL and the ability to execute commands through SQL (see docs/MYSQL)
+A Added support for many more modes into Anope and the ability to have generic support for modes unknown to Anope
+A Added a mode stacker to combine many mode changes to one line
+A Added in the CS SET PERSIST command which can be used to keep service bots in channels even when the channel is empty
+A Added AUTOOWNER OWNER and OWNERME into CS LEVELS
+A Added ns_resetpass module to the core
+A CS ACCESS VIEW which shows who added the access and last time used
+A Last used time to CS AKICK VIEW
+A Added a sha_256 encryption module
+A Added the ability to load multiple encryption modules, and the ability to seamlessly convert your database between diferent encryptions
+A Added configuration options to allow Anope to reconnect if it disconnects from the uplink instead of dieing
 F Unban command to accept an optional nick arg
-F Small typo in services.conf
+F Some typos services.conf
 F Crash when users change their host that are identified to a group, but not a nick
-A Added in live updating SQL and the ability to execute commands through SQL
+F Host length checking in HS SET(ALL) and HS REQUEST
+F Only show if a user is online in NS INFO if they are really identiifed for the group of the nick they are on
+F Crash when using BSSmartJoin
+F Converting access entries to access from xop when a users access is below voice
+F A bad pointer passed to the OnDelEvent which could cause some 3rd party modules to crash
+F CS FORBID allows to you forbid unregistered channels
+F The -nothird command line option to work
 
 Anope Version 1.9.1
 --------------------

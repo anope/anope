@@ -984,7 +984,7 @@ int anope_event_server(const char *source, int ac, const char **av)
 		delete [] desc;
 		delete [] upnumeric;
 	} else {
-		do_server(source, av[0], av[1], av[2], NULL);
+		do_server(source, av[0], av[1], av[2], "");
 	}
 
 	return MOD_CONT;

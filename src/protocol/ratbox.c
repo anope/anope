@@ -688,10 +688,10 @@ int anope_event_server(const char *source, int ac, const char **av)
 		if (TS6UPLINK) {
 			do_server(source, av[0], av[1], av[2], TS6UPLINK);
 		} else {
-			do_server(source, av[0], av[1], av[2], NULL);
+			do_server(source, av[0], av[1], av[2], "");
 		}
 	} else {
-		do_server(source, av[0], av[1], av[2], NULL);
+		do_server(source, av[0], av[1], av[2], "");
 	}
 	return MOD_CONT;
 }

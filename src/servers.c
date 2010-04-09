@@ -370,7 +370,7 @@ int anope_check_sync(const char *name)
  * @return void
  */
 void do_server(const char *source, const char *servername, const char *hops,
-			   const char *descript, const char *numeric)
+			   const char *descript, const std::string &numeric)
 {
 	Server *s, *newserver;
 

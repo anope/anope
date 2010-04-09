@@ -489,7 +489,7 @@ E Server *new_server(Server * uplink, const char *name, const char *desc, Server
 
 E Server *findserver(Server *s, const char *name);
 
-E void do_server(const char *source, const char *servername, const char *hops, const char *descript, const char *numeric);
+E void do_server(const char *source, const char *servername, const char *hops, const char *descript, const std::string &numeric);
 E void do_squit(const char *source, int ac, const char **av);
 E int anope_check_sync(const char *name);
 

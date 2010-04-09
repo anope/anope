@@ -4470,7 +4470,7 @@ CHAN_HELP_QOP
 	only those entries are shown; for example:
 
 	   QOP #channel LIST 2-5,7-9
-	      Lists AOP entries numbered 2 through 5 and
+	      Lists QOP entries numbered 2 through 5 and
 	      7 through 9.
 	      
 	The QOP CLEAR command clears all entries of the

@@ -809,7 +809,7 @@ int main(int argc, char *argv[])
 			if (ci->last_topic)  // MD CH topic <setter> <time> :topic
 				fs << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time <<  " :" << ci->last_topic << std::endl;
 			if (ci->flags & CI_FORBIDDEN)
-				fs << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << std::endl;
+				fs << "MD FORBID " << ci->forbidby << " :" << (ci->forbidreason ? ci->forbidreason : "no reason given") << std::endl;
 
 			for (j = 0; j < ci->accesscount; j++)
 			{  // MD ACCESS <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2

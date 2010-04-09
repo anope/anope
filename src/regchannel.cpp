@@ -74,12 +74,6 @@ ChannelInfo::~ChannelInfo()
 
 	FOREACH_MOD(I_OnDelChan, OnDelChan(this));
 
-	if (this->c && this->c->HasMode(CMODE_PERM))
-	{
-		this->c->RemoveMode(NULL, CMODE_PERM);
-		ircdproto->SendMode(whosends(this), this->c, "-%c", ModeManager::FindChannelModeByName(CMODE_PERM)->ModeChar);
-	}
-
 	Alog(LOG_DEBUG) << "Deleting channel " << this->name;
 
 	if (this->bi)

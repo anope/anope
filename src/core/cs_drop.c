@@ -61,7 +61,7 @@ class CommandCSDrop : public Command
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			{
-				ci->c->RemoveMode(NULL, CMODE_REGISTERED);
+				ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 			}
 		}
 

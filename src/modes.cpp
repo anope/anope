@@ -426,43 +426,32 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 		otherlist = &AddModes;
 	}
 
-	/* Don't allow modes to be on the list twice, but only if they are
-	 * not a list or status mode
+	/* Note that this whole thing works fine with status and list modes, because those have paramaters
+	 * which make them not unique.
 	 */
-	if (cm && (cm->Type != MODE_LIST && cm->Type != MODE_STATUS))
+	it = std::find(list->begin(), list->end(), std::make_pair(Mode, Param));
+	if (it != list->end())
 	{
-		/* Remove this mode from our list if it already exists */
-		for (it = list->begin(); it != list->end(); ++it)
-		{
-			if (it->first == Mode)
-			{
-				list->erase(it);
-				/* It can't be on the list twice */
-				break;
-			}
-		}
-
-		/* Remove the mode from the other list */
-		for (it = otherlist->begin(); it != otherlist->end(); ++it)
-		{
-			if (it->first == Mode)
-			{
-				otherlist->erase(it);
-				/* It can't be on the list twice */
-				break;
-			}
-		}
+		/* It can't be on the list twice */
+		list->erase(it);
+		/* Note that we remove the mode and not return here because the new mode trying
+		 * to be set may have a different parameter than the one already in the stacker,
+		 * this new mode gets added to the list soon.
+		 */
 	}
-	/* This is a list mode or a status mode, or a usermode */
+	/* Not possible for a mode to be on both lists at once */
 	else
 	{
-		/* If exactly the same thing is being set on the other list, remove it from the other list */
 		it = std::find(otherlist->begin(), otherlist->end(), std::make_pair(Mode, Param));
 		if (it != otherlist->end())
 		{
+			/* Remove it from the other list now were doing the opposite */
 			otherlist->erase(it);
-			/* If it is on the other list then just return, it would alreayd be set proprely */
 			return;
+			/* Note that we return here because this is like setting + and - on the same mode within the same
+			 * cycle, no change is made. This causes no problems with something like - + and -, because after the
+			 * second mode change the list is empty, and the third mode change starts fresh.
+			 */
 		}
 	}
 

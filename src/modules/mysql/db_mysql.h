@@ -77,6 +77,7 @@ ChannelModeInfo ChannelModes[] = {
 	{"PERM", CMODE_PERM},
 	{"NICKFLOOD", CMODE_NICKFLOOD},
 	{"JOINFLOOD", CMODE_JOINFLOOD},
+	{"CMODE_NOREJOIN", CMODE_NOREJOIN},
 	{"", static_cast<ChannelModeName>(-1)}
 };
 

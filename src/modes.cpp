@@ -101,8 +101,9 @@ void SetDefaultMLock()
 /** Default constructor
  * @param mClass The type of mode this is
  * @param modeChar The mode char
+ * @param modeType The mode type
  */
-Mode::Mode(ModeClass mClass, char modeChar) : Class(mClass), ModeChar(modeChar)
+Mode::Mode(ModeClass mClass, char modeChar, ModeType modeType) : Class(mClass), ModeChar(modeChar), Type(modeType)
 {
 }
 
@@ -116,7 +117,7 @@ Mode::~Mode()
  * @param mName The mode name
  * @param modeChar The mode char
  */
-UserMode::UserMode(UserModeName mName, char modeChar) : Mode(MC_USER, modeChar), Name(mName), Type(MODE_REGULAR)
+UserMode::UserMode(UserModeName mName, char modeChar) : Mode(MC_USER, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -139,7 +140,7 @@ UserModeParam::UserModeParam(UserModeName mName, char modeChar) : UserMode(mName
  * @param mName The mode name
  * @param modeChar The mode char
  */
-ChannelMode::ChannelMode(ChannelModeName mName, char modeChar) : Mode(MC_CHANNEL, modeChar), Name(mName), Type(MODE_REGULAR)
+ChannelMode::ChannelMode(ChannelModeName mName, char modeChar) : Mode(MC_CHANNEL, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -410,11 +411,24 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 	UserMode *um = NULL;
 	std::list<std::pair<void *, std::string> > *list, *otherlist;
 	std::list<std::pair<void *, std::string > >::iterator it;
+	bool IsParam = false;
 
 	if (Type == ST_CHANNEL)
+	{
 		cm = static_cast<ChannelMode *>(Mode);
+		if (cm->Type == MODE_PARAM)
+		{
+			IsParam = true;
+		}
+	}
 	else if (Type == ST_USER)
+	{
 		um = static_cast<UserMode *>(Mode);
+		if (um->Type == MODE_PARAM)
+		{
+			IsParam = true;
+		}
+	}
 	if (Set)
 	{
 		list = &AddModes;
@@ -426,26 +440,27 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 		otherlist = &AddModes;
 	}
 
-	/* Note that this whole thing works fine with status and list modes, because those have parameters
-	 * which make them unique.
-	 */
-	it = std::find(list->begin(), list->end(), std::make_pair(Mode, Param));
-	if (it != list->end())
+	/* Loop through the list and find if this mode is already on here */
+	for (it = list->begin(); it != list->end(); ++it)
 	{
-		/* It can't be on the list twice */
-		list->erase(it);
-		/* Note that we remove the mode and not return here because the new mode trying
-		 * to be set may have a different parameter than the one already in the stacker,
-		 * this new mode gets added to the list soon.
+		/* The param must match too (can have multiple status or list modes), but
+		 * if it is a param mode it can match no matter what the param is
 		 */
-	}
-	/* Not possible for a mode to be on both lists at once */
-	else
-	{
-		it = std::find(otherlist->begin(), otherlist->end(), std::make_pair(Mode, Param));
-		if (it != otherlist->end())
+		if (it->first == Mode && (it->second == Param || IsParam))
 		{
-			/* Remove it from the other list now were doing the opposite */
+			list->erase(it);
+			/* It can only be on this list once */
+			break;
+		}
+	}
+	/* If the mode is on the other list, remove it from there (eg, we dont want +o-o Adam Adam) */
+	for (it = otherlist->begin(); it != otherlist->end(); ++it)
+	{
+		/* The param must match too (can have multiple status or list modes), but
+		 * if it is a param mode it can match no matter what the param is
+		 */
+		if (it->first == Mode && (it->second == Param || IsParam))
+		{
 			otherlist->erase(it);
 			return;
 			/* Note that we return here because this is like setting + and - on the same mode within the same

@@ -272,6 +272,7 @@ ChannelModeInfo ChannelModes[] = {
 	{"PERM", CMODE_PERM},
 	{"NICKFLOOD", CMODE_NICKFLOOD},
 	{"JOINFLOOD", CMODE_JOINFLOOD},
+	{"CMODE_NOREJOIN", CMODE_NOREJOIN},
 	{"", static_cast<ChannelModeName>(-1)}
 };
 
@@ -1041,7 +1042,7 @@ class DBPlain : public Module
 				std::string Param;
 				for (j = 0; ChannelModes[j].Value != -1; ++j)
 					if (ci->GetParam(ChannelModes[j].Value, Param))
-						db << "MD MLP " << ChannelModes[j].Name << " " << Param;
+						db << "MD MLP " << ChannelModes[j].Name << " " << Param << endl;
 				if (!ci->memos.memos.empty())
 				{
 					MemoInfo *memos = &ci->memos;

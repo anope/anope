@@ -390,17 +390,9 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		/* Remove the mode */
 		if (cm->Type == MODE_PARAM)
 		{
-			ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cmp);
-
-			if (!cmp->MinusNoArg)
-			{
-				/* Get the current param set on the channel and send it with the mode */
-				std::string cparam;
-				if (GetParam(cmp->Name, cparam))
-					RemoveMode(NULL, cm, cparam);
-			}
-			else
-				RemoveMode(NULL, cm);
+			std::string cparam;
+			GetParam(cm->Name, cparam);
+			RemoveMode(NULL, cm, cparam);
 		}
 		else if (cm->Type == MODE_REGULAR)
 			RemoveMode(NULL, cm);
@@ -556,14 +548,28 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bo
 	if (!cm)
 		return;
 	/* Don't set modes already set */
-	if ((cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && HasMode(cm->Name))
+	if (cm->Type == MODE_REGULAR && HasMode(cm->Name))
 		return;
-
+	else if (cm->Type == MODE_PARAM && HasMode(cm->Name))
+	{
+		std::string cparam;
+		if (GetParam(cm->Name, cparam))
+		{
+			if (cparam == param)
+			{
+				return;
+			}
+		}
+	}
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
 		if (u && HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(cm)))
 			return;
+	}
+	else if (cm->Type == MODE_LIST)
+	{
+		// XXX this needs rewritten
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
@@ -614,9 +620,22 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const std::string &param,
 		if (u && !HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(cm)))
 			return;
 	}
+	else if (cm->Type == MODE_LIST)
+	{
+		// XXX this needs to be rewritten sometime
+	}
+
+	/* If this mode needs no param when being unset, empty the param */
+	bool SendParam = true;
+	if (cm->Type == MODE_PARAM)
+	{
+		ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+		if (cmp->MinusNoArg)
+			SendParam = false;
+	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, param);
-	RemoveModeInternal(cm, param, EnforceMLock);
+	RemoveModeInternal(cm, SendParam ? param : "", EnforceMLock);
 }
 
 /**
@@ -686,7 +705,6 @@ const bool Channel::HasParam(ChannelModeName Name)
 void Channel::ClearModes(BotInfo *bi)
 {
 	ChannelMode *cm;
-	ChannelModeParam *cmp;
 
 	for (size_t n = CMODE_BEGIN + 1; n != CMODE_END; ++n)
 	{
@@ -700,18 +718,9 @@ void Channel::ClearModes(BotInfo *bi)
 			}
 			else if (cm->Type == MODE_PARAM)
 			{
-				cmp = dynamic_cast<ChannelModeParam *>(cm);
-
-				if (!cmp->MinusNoArg)
-				{
-					std::string buf;
-					if (this->GetParam(cmp->Name, buf))
-						this->RemoveMode(NULL, cm, buf);
-				}
-				else
-				{
-					this->RemoveMode(NULL, cm);
-				}
+				std::string param;
+				this->GetParam(cm->Name, param);
+				this->RemoveMode(NULL, cm, param);
 			}
 		}
 	}

@@ -36,7 +36,7 @@ enum ChannelModeName
 	CMODE_PRIVATE, CMODE_REGISTERED, CMODE_SECRET, CMODE_TOPIC, CMODE_AUDITORIUM, CMODE_SSL, CMODE_ADMINONLY,
 	CMODE_NOCTCP, CMODE_FILTER, CMODE_NOKNOCK, CMODE_REDIRECT, CMODE_REGMODERATED, CMODE_NONICK, CMODE_OPERONLY,
 	CMODE_NOKICK, CMODE_REGISTEREDONLY, CMODE_STRIPCOLOR, CMODE_NONOTICE, CMODE_NOINVITE, CMODE_ALLINVITE,
-	CMODE_BLOCKCAPS, CMODE_PERM, CMODE_NICKFLOOD, CMODE_JOINFLOOD, CMODE_DELAYEDJOIN,
+	CMODE_BLOCKCAPS, CMODE_PERM, CMODE_NICKFLOOD, CMODE_JOINFLOOD, CMODE_DELAYEDJOIN, CMODE_NOREJOIN,
 
 	/* b/e/I */
 	CMODE_BAN, CMODE_EXCEPT,
@@ -82,12 +82,15 @@ class CoreExport Mode
 	ModeClass Class;
 	/* Mode char for this */
 	char ModeChar;
+	/* Type of mode this is */
+	ModeType Type;
 
 	/** Default constructor
 	 * @param mClass The type of mode this is
 	 * @param modeChar The mode char
+	 * @param type The mode type
 	 */
-	Mode(ModeClass mClass, char modeChar);
+	Mode(ModeClass mClass, char modeChar, ModeType type);
 
 	/** Default destructor
 	 */
@@ -102,8 +105,6 @@ class CoreExport UserMode : public Mode
 
 	/* Mode name */
 	UserModeName Name;
-	/* Mode type, regular or param */
-	ModeType Type;
 
 	/** Default constructor
 	 * @param nName The mode name
@@ -140,8 +141,6 @@ class CoreExport ChannelMode : public Mode
 
 	/* Mode name */
 	ChannelModeName Name;
-	/* Type of mode this is */
-	ModeType Type;
 
 	/** Default constructor
 	 * @param mName The mode name

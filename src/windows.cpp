@@ -36,8 +36,8 @@ int inet_pton(int af, const char *src, void *dst)
 {
 	int address_length;
 	sockaddr_storage sa;
-	sockaddr_in *sin = static_cast<sockaddr_in *>(&sa);
-	sockaddr_in6 *sin6 = static_cast<sockaddr_in6 *>(&sa);
+	sockaddr_in *sin = reinterpret_cast<sockaddr_in *>(&sa);
+	sockaddr_in6 *sin6 = reinterpret_cast<sockaddr_in6 *>(&sa);
  
 	switch (af)
 	{
@@ -51,7 +51,7 @@ int inet_pton(int af, const char *src, void *dst)
 			return -1;
 	}
  
-	if (WSAStringToAddress(static_cast<LPTSTR>(src), af, NULL, static_cast<LPSOCKADDR>(&sa), &address_length) == 0) 
+	if (WSAStringToAddress((LPSTR) src, af, NULL, reinterpret_cast<LPSOCKADDR>(&sa), &address_length) == 0) 
 	{
 		switch (af)
 		{
@@ -80,8 +80,8 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 	int address_length;
 	DWORD string_length = size;
 	sockaddr_storage sa;
-	sockaddr_in *sin = static_cast<sockaddr_in *>(&sa);
-	sockaddr_in6 *sin6 = static_cast<sockaddr_in6 *>(&sa);
+	sockaddr_in *sin = reinterpret_cast<sockaddr_in *>(&sa);
+	sockaddr_in6 *sin6 = reinterpret_cast<sockaddr_in6 *>(&sa);
 	
 	memset(&sa, 0, sizeof(sa));
  
@@ -101,7 +101,7 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 			return NULL;
 	}
  
-	if (WSAAddressToString(static_cast<LPSOCKADDR>(&sa), address_length, NULL, dst, &string_length) == 0)
+	if (WSAAddressToString(reinterpret_cast<LPSOCKADDR>(&sa), address_length, NULL, dst, &string_length) == 0)
 		return dst;
  
 	return NULL;

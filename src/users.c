@@ -828,11 +828,11 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (Config.LimitSessions && !is_ulined(server))
 			add_session(nick, host, ipbuf);
 
-		/* Only call I_OnUserConnect if the user still exists */
-		if (finduser(nick))
-		{
-			FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
-		}
+		/* User is no longer connected, return */
+		if (!finduser(nick))
+			return NULL;
+
+		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
 	} else {
 		/* An old user changing nicks. */
 		if (ircd->ts6)

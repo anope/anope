@@ -451,8 +451,6 @@ NickRequest *findrequestnick(const char *nick)
 		return NULL;
 	}
 
-	FOREACH_MOD(I_OnFindRequestNick, OnFindRequestNick(nick));
-
 	for (nr = nrlists[HASH(nick)]; nr; nr = nr->next)
 	{
 		if (stricmp(nr->nick, nick) == 0)
@@ -475,8 +473,6 @@ NickAlias *findnick(const char *nick)
 		Alog(LOG_DEBUG) << "findnick() called with NULL values";
 		return NULL;
 	}
-
-	FOREACH_MOD(I_OnFindNick, OnFindNick(nick));
 
 	for (na = nalists[HASH(nick)]; na; na = na->next)
 	{
@@ -507,8 +503,6 @@ NickCore *findcore(const char *nick)
 		Alog(LOG_DEBUG) << "findcore() called with NULL values";
 		return NULL;
 	}
-
-	FOREACH_MOD(I_OnFindCore, OnFindCore(nick));
 
 	for (nc = nclists[HASH(nick)]; nc; nc = nc->next)
 	{

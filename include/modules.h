@@ -991,24 +991,10 @@ class CoreExport Module
 	 */
 	virtual void OnNickUnsuspended(NickAlias *na) { }
 
-	/** Called on finduser()
-	 * @param u pointer to the user
-	 */
-	virtual void OnFindUser(User *u) { }
-	/** Called on findnick()
-	 * @param nick nickname to be searched for
-	 */
-	virtual void OnFindNick(const std::string &nick) { }
-
 	/** Called on delnick()
 	 * @ param na pointer to the nickalias
 	 */
 	virtual void OnDelNick(NickAlias *na) { }
-
-	/** Called on findcore()
-	 * @param nick nickname to be searched for (nc->display)
-	 */
-	virtual void OnFindCore(const std::string &nick) { }
 
 	/** Called on delcore()
 	 * @param nc pointer to the NickCore
@@ -1020,11 +1006,6 @@ class CoreExport Module
 	 * @param newdisplay the new display
 	 */
 	virtual void OnChangeCoreDisplay(NickCore *nc, const std::string &newdisplay) { }
-
-	/** Called on findrequestnick()
-	 * @param nick nicname to be searched for
-	 */
-	virtual void OnFindRequestNick(const std::string &nick) { }
 
 	/** called from ns_register.c, after the NickRequest have been created
 	 * @param nr pointer to the NickRequest
@@ -1175,8 +1156,8 @@ enum Implementation
 		/* NickServ */
 		I_OnNickServHelp, I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
-		I_OnFindUser, I_OnFindNick, I_OnDelNick, I_OnFindCore, I_OnDelCore, I_OnChangeCoreDisplay,
-		I_OnFindRequestNick, I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
+		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
+		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 
 		/* ChanServ */
 		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,

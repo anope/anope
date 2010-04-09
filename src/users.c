@@ -476,7 +476,6 @@ User *finduser(const std::string &nick)
 	while (user && ci_nick != user->nick)
 		user = user->next;
 	Alog(LOG_DEBUG_3) << "finduser(" << nick << ") -> " << static_cast<void *>(user);
-	FOREACH_MOD(I_OnFindUser, OnFindUser(user));
 	return user;
 }
 
@@ -691,7 +690,6 @@ User *find_byuid(const std::string &uid)
 	while (u) {
 		next = next_uid();
 		if (u->GetUID() == uid) {
-			FOREACH_MOD(I_OnFindUser, OnFindUser(u));
 			return u;
 		}
 		u = next;

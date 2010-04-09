@@ -426,8 +426,8 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 		otherlist = &AddModes;
 	}
 
-	/* Note that this whole thing works fine with status and list modes, because those have paramaters
-	 * which make them not unique.
+	/* Note that this whole thing works fine with status and list modes, because those have parameters
+	 * which make them unique.
 	 */
 	it = std::find(list->begin(), list->end(), std::make_pair(Mode, Param));
 	if (it != list->end())

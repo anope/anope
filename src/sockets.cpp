@@ -52,7 +52,7 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 
 			Bound = bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr), sizeof(bindaddr));
 		}
-		if (!Bound)
+		if (Bound < 0)
 		{
 			if (IPv6)
 			{

@@ -200,6 +200,8 @@ void do_restart_services()
 	if (!quitmsg)
 		quitmsg = "Restarting";
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
+	/* Process to send the last bits of information before disconnecting */
+	socketEngine.Process();
 	delete UplinkSock;
 	close_log();
 	/* First don't unload protocol module, then do so */

@@ -37,7 +37,7 @@ class CommandOSJupe : public Command
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick.c_str(), reason ? ": " : "", reason ? reason : "");
 			if (findserver(servlist, jserver))
 				ircdproto->SendSquit(jserver, rbuf);
-			Server *juped_server = new_server(me_server, jserver, rbuf, SERVER_JUPED, ircd->ts6 ? ts6_sid_retrieve() : NULL);
+			Server *juped_server = new_server(me_server, jserver, rbuf, SERVER_JUPED, ircd->ts6 ? ts6_sid_retrieve() : "");
 			ircdproto->SendServer(juped_server);
 
 			if (Config.WallOSJupe)

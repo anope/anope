@@ -45,6 +45,7 @@ class ENone : public Module
 		if (hashm != "plain")
 			return EVENT_CONTINUE;
 		char cpass[1000];
+		memset(&cpass, 0, sizeof(cpass));
 		size_t pos = src.find(":");
 		std::string buf(src.begin()+pos+1, src.end());
 		b64_decode(buf.c_str(), static_cast<char *>(cpass), 1000);

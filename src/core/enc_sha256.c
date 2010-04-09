@@ -130,49 +130,51 @@ uint32_t sha256_k[64] =
 
 class ESHA256 : public Module
 {
-	unsigned int salt[8];
-	bool use_salt;
+	unsigned int iv[8];
+	bool use_iv;
 
-	/* initializes the salt with a new random value */
-	void NewRandomSalt()
+	/* initializes the IV with a new random value */
+	void NewRandomIV()
 	{
 		srand(time(NULL));
 		for (int i = 0; i < 8; i++)
 		{
-			salt[i] = getrandom32();
+			iv[i] = getrandom32();
 		}
 	}
 
-	/* returns the salt as base64-encrypted string */
-	std::string GetSaltString()
+	/* returns the IV as base64-encrypted string */
+	std::string GetIVString()
 	{
-		std::stringstream buf;
-		char buf2[1000];
-		buf << salt[0] << " " << salt[1] << " " << salt[2] << " " << salt[3] << " ";
-		buf << salt[4] << " " << salt[5] << " " << salt[6] << " " << salt[7];
-		b64_encode(buf.str().c_str(), buf.str().size(), buf2, 1000);
+		unsigned char buf[33];
+		char buf2[512];
+		for (int i = 0; i < 8; i++)
+		{
+			UNPACK32(iv[i], &buf[i << 2]);
+		}
+		b64_encode(reinterpret_cast<char*>(buf), 32, buf2, 512);
 		return buf2;
 	}
 
-	/* splits the appended salt from the password string so it can be used for the next encryption */ 
-	/* password format:  <hashmethod>:<password_b64>:<hash_b64> */
-	void GetSaltFromPass(std::string &password)
+	/* splits the appended IV from the password string so it can be used for the next encryption */ 
+	/* password format:  <hashmethod>:<password_b64>:<iv_b64> */
+	void GetIVFromPass(std::string &password)
 	{
-		size_t pos, i = 0;
-		std::string saltstr;
+		size_t pos;
 		pos = password.find(":");
 		std::string buf(password, password.find(":", pos+1)+1, password.size());
-		char buf2[1000];
-		b64_decode(buf.c_str(), buf2, 1000);
-		std::stringstream sbuf(buf2);
-		for (i = 0; i < 8; i++)
-			sbuf >> salt[i];
+		unsigned char buf2[33];
+		b64_decode(buf.c_str(), reinterpret_cast<char*>(buf2), 33);
+		for (int i = 0 ; i < 8; i++)
+		{
+			PACK32(&buf2[i<<2], &iv[i]);
+		}
 	}
 
 	void SHA256Init(SHA256Context *ctx)
 	{
 		for (int i = 0; i < 8; i++)
-			ctx->h[i] = salt[i];
+			ctx->h[i] = iv[i];
 		ctx->len = 0;
 		ctx->tot_len = 0;
 	}
@@ -276,7 +278,7 @@ class ESHA256 : public Module
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
 
-		use_salt = false;
+		use_iv = false;
 	}
 
 	EventReturn OnEncrypt(const std::string &src, std::string &dest)
@@ -286,17 +288,17 @@ class ESHA256 : public Module
 		SHA256Context ctx;
 		std::stringstream buf;
 
-		if (!use_salt)
-			NewRandomSalt();
+		if (!use_iv)
+			NewRandomIV();
 		else
-			use_salt = false;
+			use_iv = false;
 
 		SHA256Init(&ctx);
 		SHA256Update(&ctx, (unsigned char *)src.c_str(), src.size());
 		SHA256Final(&ctx, (unsigned char*)digest);
 
 		b64_encode(digest, SHA256_DIGEST_SIZE, cpass, 1000);
-		buf << "sha256:" << cpass << ":" << GetSaltString();
+		buf << "sha256:" << cpass << ":" << GetIVString();
 		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest.assign(buf.str());
 		return EVENT_ALLOW;
@@ -321,9 +323,10 @@ class ESHA256 : public Module
 			return EVENT_CONTINUE;
 		std::string buf;
 
-		GetSaltFromPass(password);
-		use_salt = true;
+		GetIVFromPass(password);
+		use_iv = true;
 		this->OnEncrypt(plaintext, buf);
+
 		if(!password.compare(buf))
 		{
 			/* if we are NOT the first module in the list, 

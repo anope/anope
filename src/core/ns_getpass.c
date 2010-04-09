@@ -83,8 +83,8 @@ class NSGetPass : public Module
 
 		this->AddCommand(NICKSERV, new CommandNSGetPass());
 
-		std::string tmp_pass = "tmp";
-		if (!enc_decrypt(tmp_pass, tmp_pass))
+		std::string tmp_pass = "plain:tmp";
+		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
 		ModuleManager::Attach(I_OnNickServHelp, this);

@@ -97,8 +97,8 @@ class NSSendPass : public Module
 		if (!Config.UseMail)
 			throw ModuleException("Not using mail, whut.");
 
-		std::string tmp_pass = "tmp";
-		if (!enc_decrypt(tmp_pass, tmp_pass))
+		std::string tmp_pass = "plain:tmp";
+		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
 		ModuleManager::Attach(I_OnNickServHelp, this);

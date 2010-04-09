@@ -557,6 +557,7 @@ void finish_sync(Server * serv, int sync_links)
 
 	if (serv == serv_uplink)
 	{
+		FOREACH_MOD(I_OnFinishSync, OnFinishSync(serv));
 		ircdproto->SendEOB();
 	}
 

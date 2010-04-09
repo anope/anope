@@ -675,6 +675,10 @@ class CoreExport Module
 	 */
 	virtual void OnServerConnect() { }
 
+	/** Called when we are done synching with the uplink, just before we send the EOB
+	 */
+	virtual void OnFinishSync(Server *serv) { }
+
 	/** Called when Anope disconnects from its uplink, before it tries to reconnect
 	 */
 	virtual void OnServerDisconnect() { }
@@ -1206,8 +1210,8 @@ enum Implementation
 		I_OnModuleLoad, I_OnModuleUnload,
 
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnServerDisconnect, I_OnPreCommandRun, I_OnPreCommand,
-		I_OnPostCommand, I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
+		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnFinishSync, I_OnServerDisconnect, I_OnPreCommandRun,
+		I_OnPreCommand, I_OnPostCommand, I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,

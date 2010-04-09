@@ -242,6 +242,8 @@ static void services_shutdown()
 			u = next;
 		}
 	}
+	/* Process to send the last bits of information before disconnecting */
+	socketEngine.Process();
 	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	/* First don't unload protocol module, then do so */

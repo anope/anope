@@ -560,11 +560,6 @@ class CoreExport Module
 	 */
 	virtual EventReturn OnLoadDatabase() { return EVENT_CONTINUE; }
 
-	/** Called when anope backs up databases.
-	 * NOTE: This event is deprecated pending new database handling.
-	 */
-	virtual void OnBackupDatabase() MARK_DEPRECATED { }
-
 	/** Called when anope needs to check passwords against encryption
 	 *  see src/encrypt.c for detailed informations
 	 */
@@ -1183,7 +1178,7 @@ enum Implementation
 		I_OnAddSXLine, I_OnDelSXLine,
 
 		/* Database */
-		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase, I_OnBackupDatabase,
+		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase,
 		I_OnDatabaseExpire,
 		I_OnDatabaseWrite, I_OnDatabaseRead, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata,
 

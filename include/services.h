@@ -68,6 +68,7 @@
 # define DllExport
 # define CoreExport
 # define MARK_DEPRECATED __attribute((deprecated))
+# define DeleteFile unlink
 #else
 # include <winsock2.h>
 # include <ws2tcpip.h>

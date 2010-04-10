@@ -514,6 +514,10 @@ void WriteMetadata(const std::string &key, const std::string &data)
 
 class DBPlain : public Module
 {
+	/* Day the last backup was on */
+	int LastDay;
+	/* Backup file names */
+	std::list<std::string> Backups;
  public:
 	DBPlain(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
@@ -525,6 +529,47 @@ class DBPlain : public Module
 		ModuleManager::Attach(i, this, 6);
 
 		OnReload(true);
+
+		LastDay = 0;
+	}
+
+	~DBPlain()
+	{
+	}
+
+	void BackupDatabase()
+	{
+		time_t now = time(NULL);
+		tm *tm = localtime(&now);
+
+		if (tm->tm_mday != LastDay)
+		{
+			LastDay = tm->tm_mday;
+			char *newname = new char[DatabaseFile.length() + 30];
+			snprintf(newname, DatabaseFile.length() + 30, "backups/%s.%d%d%d", DatabaseFile.c_str(), tm->tm_year, tm->tm_mon, tm->tm_mday);
+
+			if (rename(DatabaseFile.c_str(), newname) != 0)
+			{
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "Unable to backup database!");
+				Alog() << "Unable to back up database!";
+	
+				if (!Config.NoBackupOkay)
+					quitting = 1;
+
+				return;
+			}
+
+			Backups.push_back(newname);
+
+			delete [] newname;
+
+			unsigned KeepBackups = Config.KeepBackups;
+			if (KeepBackups && Backups.size() > KeepBackups)
+			{
+				DeleteFile(Backups.front().c_str());
+				Backups.pop_front();
+			}
+		}
 	}
 
 	void OnReload(bool)
@@ -842,6 +887,8 @@ class DBPlain : public Module
 
 	EventReturn OnSaveDatabase()
 	{
+		BackupDatabase();
+
 		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 		if (!db.is_open())

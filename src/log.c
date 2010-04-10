@@ -58,11 +58,7 @@ static void remove_log()
 
 	/* removed if from here cause get_logchan is always 1 */
 	get_logname(name, sizeof(name), &tm);
-#ifndef _WIN32
-	unlink(name);
-#else
 	DeleteFile(name);
-#endif
 }
 
 /*************************************************************************/

@@ -39,13 +39,13 @@ static void LoadDatabase()
 		{
 			NickCore *nc = new NickCore(SQLAssign(qres[i]["display"]));
 			nc->pass = SQLAssign(qres[i]["pass"]);
-			if (!qres[i]["email"].empty())
+			if (qres[i]["email"].size())
 				nc->email = sstrdup(qres[i]["email"].c_str());
-			if (!qres[i]["greet"].empty())
+			if (qres[i]["greet"].size())
 				nc->greet = sstrdup(qres[i]["greet"].c_str());
-			if (!qres[i]["icq"].empty())
+			if (qres[i]["icq"].size())
 				nc->icq = atol(qres[i]["icq"].c_str());
-			if (!qres[i]["url"].empty())
+			if (qres[i]["url"].size())
 				nc->url = sstrdup(qres[i]["url"].c_str());
 
 			spacesepstream sep(SQLAssign(qres[i]["flags"]));
@@ -181,7 +181,7 @@ static void LoadDatabase()
 		for (size_t i = 0; i < qres.num_rows(); ++i)
 		{
 			BotInfo *bi = new BotInfo(SQLAssign(qres[i]["nick"]), SQLAssign(qres[i]["user"]), SQLAssign(qres[i]["host"]), SQLAssign(qres[i]["rname"]));
-			if (!qres[i]["flags"].empty())
+			if (qres[i]["flags"].size())
 			{
 				spacesepstream sep(SQLAssign(qres[i]["flags"]));
 				std::string buf;
@@ -237,7 +237,7 @@ static void LoadDatabase()
 		for (size_t i = 0; i < qres.num_rows(); ++i)
 		{
 			NickCore *nc;
-			if (!qres[i]["founder"].empty())
+			if (qres[i]["founder"].size())
 			{
 				nc = findcore(qres[i]["founder"].c_str());
 				if (!nc)
@@ -249,22 +249,22 @@ static void LoadDatabase()
 
 			ChannelInfo *ci = new ChannelInfo(SQLAssign(qres[i]["name"]));
 			ci->founder = nc;
-			if (!qres[i]["successor"].empty())
+			if (qres[i]["successor"].size())
 				ci->successor = findcore(qres[i]["successor"].c_str());
 			ci->desc = sstrdup(qres[i]["descr"].c_str());
-			if (!qres[i]["url"].empty())
+			if (qres[i]["url"].size())
 				ci->url = sstrdup(qres[i]["url"].c_str());
-			if (!qres[i]["email"].empty())
+			if (qres[i]["email"].size())
 				ci->email = sstrdup(qres[i]["email"].c_str());
 			ci->time_registered = atol(qres[i]["time_registered"]);
 			ci->last_used = atol(qres[i]["last_used"]);
-			if (!qres[i]["last_topic"].empty())
+			if (qres[i]["last_topic"].size())
 				ci->last_topic = sstrdup(qres[i]["last_topic"].c_str());
-			if (!qres[i]["last_topic_setter"].empty())
+			if (qres[i]["last_topic_setter"].size())
 				ci->last_topic_setter = SQLAssign(qres[i]["last_topic_setter"]);
-			if (!qres[i]["last_topic_time"].empty())
+			if (qres[i]["last_topic_time"].size())
 				ci->last_topic_time = atol(qres[i]["last_topic_time"].c_str());
-			if (!qres[i]["flags"].empty())
+			if (qres[i]["flags"].size())
 			{
 				std::string buf;
 				spacesepstream sep(SQLAssign(qres[i]["flags"]));
@@ -280,12 +280,12 @@ static void LoadDatabase()
 					}
 				}
 			}
-			if (!qres[i]["forbidby"].empty())
+			if (qres[i]["forbidby"].size())
 				ci->forbidby = sstrdup(qres[i]["forbidby"].c_str());
-			if (!qres[i]["forbidreason"].empty())
+			if (qres[i]["forbidreason"].size())
 				ci->forbidreason = sstrdup(qres[i]["forbidreason"].c_str());
 			ci->bantype = atoi(qres[i]["bantype"].c_str());
-			if (!qres[i]["mlock_on"].empty())
+			if (qres[i]["mlock_on"].size())
 			{
 				std::string buf;
 				spacesepstream sep(SQLAssign(qres[i]["mlock_on"]));
@@ -301,7 +301,7 @@ static void LoadDatabase()
 					}
 				}
 			}
-			if (!qres[i]["mlock_off"].empty())
+			if (qres[i]["mlock_off"].size())
 			{
 				std::string buf;
 				spacesepstream sep(SQLAssign(qres[i]["mlock_off"]));
@@ -317,7 +317,7 @@ static void LoadDatabase()
 					}
 				}
 			}
-			if (!qres[i]["mlock_params"].empty())
+			if (qres[i]["mlock_params"].size())
 			{
 				std::string buf;
 				spacesepstream sep(SQLAssign(qres[i]["mlock_params"]));
@@ -334,14 +334,14 @@ static void LoadDatabase()
 					}
 				}
 			}
-			if (!qres[i]["entry_message"].empty())
+			if (qres[i]["entry_message"].size())
 				ci->entry_message = sstrdup(qres[i]["entry_message"].c_str());
 			ci->memos.memomax = atoi(qres[i]["memomax"].c_str());
-			if (!qres[i]["botnick"].empty())
+			if (qres[i]["botnick"].size())
 				ci->bi = findbot(SQLAssign(qres[i]["botnick"]));
 			if (ci->bi)
 			{
-				if (!qres[i]["botflags"].empty())
+				if (qres[i]["botflags"].size())
 				{
 					std::string buf;
 					spacesepstream sep(SQLAssign(qres[i]["botflags"]));
@@ -358,15 +358,15 @@ static void LoadDatabase()
 					}
 				}
 			}
-			if (!qres[i]["capsmin"].empty())
+			if (qres[i]["capsmin"].size())
 				ci->capsmin = atoi(qres[i]["capsmin"].c_str());
-			if (!qres[i]["capspercent"].empty())
+			if (qres[i]["capspercent"].size())
 				ci->capspercent = atoi(qres[i]["capspercent"].c_str());
-			if (!qres[i]["floodlines"].empty())
+			if (qres[i]["floodlines"].size())
 				ci->floodlines = atoi(qres[i]["floodlines"].c_str());
-			if (!qres[i]["floodsecs"].empty())
+			if (qres[i]["floodsecs"].size())
 				ci->floodsecs = atoi(qres[i]["floodsecs"].c_str());
-			if (!qres[i]["repeattimes"].empty())
+			if (qres[i]["repeattimes"].size())
 				ci->repeattimes = atoi(qres[i]["repeattimes"].c_str());
 		}
 	}
@@ -634,7 +634,7 @@ static void LoadDatabase()
 				m->time = atol(qres[i]["time"].c_str());
 				m->text = sstrdup(qres[i]["text"].c_str());
 				
-				if (!qres[i]["flags"].empty())
+				if (qres[i]["flags"].size())
 				{
 					spacesepstream sep(SQLAssign(qres[i]["flags"]));
 					std::string buf;

@@ -381,10 +381,21 @@ class CSModes : public Module
 		this->AddCommand(CHANSERV, new CommandCSVoice());
 		this->AddCommand(CHANSERV, new CommandCSDeVoice());
 
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
+		if (serv_uplink && is_sync(serv_uplink))
+			OnUplinkSync();
+
+		Implementation i[] = {
+			I_OnUplinkSync, I_OnServerDisconnect, I_OnChanServHelp
+		};
+		ModuleManager::Attach(i, this, 3);
+	}
+
+	void OnUplinkSync()
+	{
+		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{
-			this->AddCommand(CHANSERV, new CommandCSHalfOp());
-			this->AddCommand(CHANSERV, new CommandCSDeHalfOp());
+			this->AddCommand(CHANSERV, new CommandCSOwner());
+			this->AddCommand(CHANSERV, new CommandCSDeOwner());
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
@@ -393,14 +404,23 @@ class CSModes : public Module
 			this->AddCommand(CHANSERV, new CommandCSDeProtect());
 		}
 
-		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
+		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 		{
-			this->AddCommand(CHANSERV, new CommandCSOwner());
-			this->AddCommand(CHANSERV, new CommandCSDeOwner());
+			this->AddCommand(CHANSERV, new CommandCSHalfOp());
+			this->AddCommand(CHANSERV, new CommandCSDeHalfOp());
 		}
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
 	}
+
+	void OnServerDisconnect()
+	{
+		this->DelCommand(CHANSERV, "OWNER");
+		this->DelCommand(CHANSERV, "DEOWNER");
+		this->DelCommand(CHANSERV, "PROTECT");
+		this->DelCommand(CHANSERV, "DEPROTECT");
+		this->DelCommand(CHANSERV, "HALFOP");
+		this->DelCommand(CHANSERV, "DEHALFOP");
+	}
+
 	void OnChanServHelp(User *u)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))

@@ -177,7 +177,7 @@ bool ExecuteQuery(mysqlpp::Query& query)
 	
 	if (!query.execute())
 	{
-		Alog(LOG_DEBUG) << "MySQL: error executing query: " << query.error();
+		Alog() << "MySQL: error executing query: " << query.error();
 		return false;
 	}
 
@@ -191,7 +191,7 @@ mysqlpp::StoreQueryResult StoreQuery(mysqlpp::Query& query)
 	mysqlpp::StoreQueryResult result = query.store();
 	if (!result)
 	{
-		Alog(LOG_DEBUG) << "MySQL: error executing query: " << query.error();
+		Alog() << "MySQL: error executing query: " << query.error();
 	}
 	return result;
 }
@@ -215,6 +215,7 @@ class DBMySQL : public Module
 
  public:
  	mysqlpp::Connection *Con;
+	mysqlpp::NoExceptions *Ne;
 
  	std::string Database;
 	std::string Server;
@@ -235,6 +236,7 @@ class DBMySQL : public Module
 			throw ModuleException("Couldn't load config");
 
 		Con = new mysqlpp::Connection(false);
+		Ne = new mysqlpp::NoExceptions(Con);
 		if (!Con->connect(Database.c_str(), Server.c_str(), SQLUser.c_str(), Password.c_str(), Port))
 		{
 			std::string Error = "MySQL: Error connecting to SQL server: ";
@@ -246,6 +248,7 @@ class DBMySQL : public Module
 
 	virtual ~DBMySQL()
 	{
+		delete Ne;
 		delete Con;
 	}
 };

@@ -98,16 +98,9 @@ static void LoadDatabase()
 				Alog() << "MySQL: Got NickCore access entry for nonexistant core " << qres[i]["display"];
 				continue;
 			}
-			try
-			{
-				EventReturn MOD_RESULT;
-				std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
-				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, SQLAssign(qres[i]["name"]), Params));
-			}
-			catch (const char *err)
-			{
-				Alog() << "[db_mysql_read]: " << err;
-			}
+			EventReturn MOD_RESULT;
+			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, SQLAssign(qres[i]["name"]), Params));
 		}
 	}
 
@@ -160,16 +153,9 @@ static void LoadDatabase()
 				Alog() << "MySQL: Got metadata for nonexistant nick " << qres[i]["nick"];
 				continue;
 			}
-			try
-			{
-				EventReturn MOD_RESULT;
-				std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
-				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, SQLAssign(qres[i]["name"]), Params));
-			}
-			catch (const char *err)
-			{
-				Alog() << "[db_mysql_read]: " << err;
-			}
+			EventReturn MOD_RESULT;
+			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, SQLAssign(qres[i]["name"]), Params));
 		}
 	}
 
@@ -216,16 +202,9 @@ static void LoadDatabase()
 				continue;
 			}
 
-			try
-			{
-				EventReturn MOD_RESULT;
-				std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
-				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, SQLAssign(qres[i]["name"]), Params));
-			}
-			catch (const char *err)
-			{
-				Alog() << "[db_mysql_read]: " << err;
-			}
+			EventReturn MOD_RESULT;
+			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, SQLAssign(qres[i]["name"]), Params));
 		}
 	}
 
@@ -504,16 +483,10 @@ static void LoadDatabase()
 				Alog() << "MySQL: Channel metadata for nonexistant channel " << qres[i]["channel"];
 				continue;
 			}
-			try
-			{
-				EventReturn MOD_RESULT;
-				std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
-				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, SQLAssign(qres[i]["name"]), Params));
-			}
-			catch (const char *err)
-			{
-				Alog() << "[db_mysql_read]: " << err;
-			}
+			
+			EventReturn MOD_RESULT;
+			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, SQLAssign(qres[i]["name"]), Params));
 		}
 	}
 

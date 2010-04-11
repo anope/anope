@@ -1012,6 +1012,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						case 'I':
 							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
 							continue;
+						/* InspIRCd sends q and a here if they have no prefixes */
+						case 'q':
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '@'));
+							continue;
+						case 'a':
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT	, 'a', '@'));
+							continue;
 						// XXX list modes needs a bit of a rewrite, we need to be able to support +g here
 						default:
 							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));

@@ -539,6 +539,13 @@ class DBPlain : public Module
 
 	void BackupDatabase()
 	{
+		/* Do not backup a database that doesn't exist */
+		struct stat DBInfo;
+		if (stat(DatabaseFile.c_str(), &DBInfo))
+		{
+			return;
+		}
+
 		time_t now = time(NULL);
 		tm *tm = localtime(&now);
 
@@ -887,6 +894,8 @@ class DBPlain : public Module
 
 	EventReturn OnSaveDatabase()
 	{
+		BackupDatabase();
+
 		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 		if (!db.is_open())
@@ -1171,8 +1180,6 @@ class DBPlain : public Module
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
 
 		db.close();
-
-		BackupDatabase();
 
 		return EVENT_CONTINUE;
 	}

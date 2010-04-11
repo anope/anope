@@ -348,10 +348,17 @@ void User::AutoID(const char *account)
 
 	if ((tnc = findcore(account)))
 	{
-		this->nc = tnc;
 		if ((na = findnick(this->nick)) && na->nc == tnc)
 		{
+			if (na->last_realname)
+				delete [] na->last_realname;
+			na->last_realname = sstrdup(this->realname);
+			na->last_seen = time(NULL);
+			this->Login(na->nc);
+			this->UpdateHost();
 			check_memos(this);
+
+			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
 		}
 	}
 }

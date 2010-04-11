@@ -127,9 +127,9 @@ static void ReadDatabase(Module *m = NULL)
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, key, params));
 						}
 					}
-					catch (const char *err)
+					catch (DatabaseException& ex)
 					{
-						Alog() << "[db_plain]: " << err;
+						Alog() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (na && Type == MD_NA)
@@ -143,9 +143,9 @@ static void ReadDatabase(Module *m = NULL)
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, key, params));
 						}
 					}
-					catch (const char *err)
+					catch (DatabaseException& ex)
 					{
-						Alog() << "[db_plain]: " << err;
+						Alog() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (bi && Type == MD_BI)
@@ -159,9 +159,9 @@ static void ReadDatabase(Module *m = NULL)
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, key, params));
 						}
 					}
-					catch (const char *err)
+					catch (DatabaseException& ex)
 					{
-						Alog() << "[db_plain]: " << err;
+						Alog() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (ci && Type == MD_CH)
@@ -175,9 +175,14 @@ static void ReadDatabase(Module *m = NULL)
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, key, params));
 						}
 					}
-					catch (const char *err)
+					catch (DatabaseException& ex)
 					{
-						Alog() << "[db_plain]: " << err;
+						Alog() << "[db_plain]: " << ex.GetReason();
+						if (!ci->founder)
+						{
+							delete ci;
+							ci = NULL;
+						}
 					}
 				}
 			}
@@ -723,10 +728,9 @@ class DBPlain : public Module
 			ci->founder = findcore(params[0].c_str());
 			if (!ci->founder)
 			{
-				Alog() << "[db_plain]: Deleting founderless channel " << ci->name;
-				delete ci;
-				ci = NULL;
-				throw "no founder";
+				std::stringstream reason;
+				reason << "Deleting founderless channel " << ci->name << " (founder: " << params[0] << ")";
+				throw DatabaseException(reason.str());
 			}
 		}
 		else if (key == "SUCCESSOR")
@@ -766,7 +770,12 @@ class DBPlain : public Module
 		{
 			NickCore *nc = findcore(params[0].c_str());
 			if (!nc)
-				throw "access entry for nonexistant core";
+			{
+				std::stringstream reason;
+				reason << "Access entry for nonexistant core " << params[0] << " on " << ci->name;
+				throw DatabaseException(reason.str());
+			}
+
 			int level = atoi(params[1].c_str());
 			time_t last_seen = strtol(params[2].c_str(), NULL, 10);
 			ci->AddAccess(nc, level, buf, last_seen);
@@ -781,7 +790,9 @@ class DBPlain : public Module
 				nc = findcore(params[2].c_str());
 				if (!nc)
 				{
-					throw "akick for nonexistant core";
+					std::stringstream reason;
+					reason << "Akick for nonexistant core " << params[2] << " on " << ci->name;
+					throw DatabaseException(reason.str());
 				}
 			}
 			AutoKick *ak;

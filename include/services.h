@@ -272,6 +272,19 @@ class ModuleException : public CoreException
 	virtual ~ModuleException() throw() {}
 };
 
+class DatabaseException : public CoreException
+{
+ public:
+	/** This constructor can be used to specify an error message before throwing.
+	 * @param mmessage The exception
+	 */
+	DatabaseException(const std::string &message) : CoreException(message, "A database module") { }
+
+	/** Destructor
+	 * @throws Nothing
+	 */
+	virtual ~DatabaseException() throw() { }
+};
 
 /*************************************************************************/
 

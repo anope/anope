@@ -1503,7 +1503,8 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 		else if (voice && check_access(user, ci, CA_AUTOVOICE))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
-	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP)) && !is_ulined(user->server->name))
+	/* If this channel has secureops or the user matches autodeop or the channel is syncing and this is the first user and they are not ulined, check to remove modes */
+	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || (c->HasFlag(CH_SYNCING) && c->users.size() == 1)) && !is_ulined(user->server->name))
 	{
 		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !IsFounder(user, ci))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);

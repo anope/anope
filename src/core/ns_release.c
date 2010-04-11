@@ -51,7 +51,8 @@ class CommandNSRelease : public Command
 				if (!res)
 				{
 					Alog() << Config.s_NickServ << ": RELEASE: invalid password for " << nick << " by " << u->GetMask();
-					bad_password(u);
+					if (bad_password(u))
+						return MOD_STOP;
 				}
 			}
 		}

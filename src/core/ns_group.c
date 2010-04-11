@@ -89,7 +89,8 @@ class CommandNSGroup : public Command
 		{
 			Alog() << Config.s_NickServ << ": Failed GROUP for " << u->GetMask() << " (invalid password)";
 			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
-			bad_password(u);
+			if (bad_password(u))
+				return MOD_STOP;
 		}
 		else
 		{

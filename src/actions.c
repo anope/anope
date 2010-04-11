@@ -20,21 +20,26 @@
  * Note a bad password attempt for the given user.  If they've used up
  * their limit, toss them off.
  * @param u the User to check
- * @return void
+ * @return true if the user was killed, otherwise false
  */
-void bad_password(User *u)
+bool bad_password(User *u)
 {
 	time_t now = time(NULL);
 
 	if (!u || !Config.BadPassLimit)
-		return;
+		return false;
 
 	if (Config.BadPassTimeout > 0 && u->invalid_pw_time > 0 && u->invalid_pw_time < now - Config.BadPassTimeout)
 		u->invalid_pw_count = 0;
 	++u->invalid_pw_count;
 	u->invalid_pw_time = now;
 	if (u->invalid_pw_count >= Config.BadPassLimit)
+	{
 		kill_user("", u->nick, "Too many invalid passwords");
+		return true;
+	}
+
+	return false;
 }
 
 /*************************************************************************/

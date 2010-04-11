@@ -54,7 +54,8 @@ class CommandNSIdentify : public Command
 		{
 			Alog() << Config.s_NickServ << ": Failed IDENTIFY for " << u->nick << "!" << u->GetIdent() << "@" << u->host;
 			notice_lang(Config.s_NickServ, u, PASSWORD_INCORRECT);
-			bad_password(u);
+			if (bad_password(u))
+				return MOD_STOP;
 		}
 		else if (res == -1)
 			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_FAILED);

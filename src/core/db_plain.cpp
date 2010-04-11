@@ -887,8 +887,6 @@ class DBPlain : public Module
 
 	EventReturn OnSaveDatabase()
 	{
-		BackupDatabase();
-
 		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 		if (!db.is_open())
@@ -1173,6 +1171,8 @@ class DBPlain : public Module
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
 
 		db.close();
+
+		BackupDatabase();
 
 		return EVENT_CONTINUE;
 	}

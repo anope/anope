@@ -378,11 +378,21 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 			ci->SetFlag(CI_PERSIST);
 	}
 
-	/* Check for mlock */
-
-	/* Non registered channel, no mlock */
-	if (!ci || !EnforceMLock || MOD_RESULT == EVENT_STOP)
+	/* Check if we should enforce mlock */
+	if (!EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
+
+	/* Non registered channels can not be +r */
+	if (!ci && HasMode(CMODE_REGISTERED))
+	{
+		RemoveMode(NULL, CMODE_REGISTERED);
+	}
+
+	/* Non registered channel has no mlock */
+	if (!ci)
+	{
+		return;
+	}
 
 	/* If this channel has this mode locked negative */
 	if (ci->HasMLock(cm->Name, false))

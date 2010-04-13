@@ -363,10 +363,8 @@ void cancel_user(User * u)
 				ircdproto->SendSVSKill(findbot(Config.s_NickServ), u, "Please do not use a registered nickname without identifying");
 			}
 			na->SetFlag(NS_KILL_HELD);
+			na->UnsetFlag(NS_GUESTED);
 		}
-
-		na->UnsetFlag(NS_KILL_HELD);
-		na->UnsetFlag(NS_GUESTED);
 
 		NickServCollide::ClearTimers(na);
 	}

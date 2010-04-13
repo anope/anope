@@ -26,7 +26,7 @@ class CommandNSRecover : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *nick = params[0].c_str();
-		std::string pass = params.size() > 1 ? params[1].c_str() : NULL;
+		std::string pass = params.size() > 1 ? params[1].c_str() : "";
 		NickAlias *na;
 		User *u2;
 

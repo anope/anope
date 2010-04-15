@@ -399,6 +399,7 @@ int mLoadData(void)
                 free(type);
             }
         }
+        fclose(in);
     }
     return ret;
 }

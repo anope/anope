@@ -1274,10 +1274,18 @@ void do_topic(const char *source, int ac, char **av)
     /* If the current topic we have matches the last known topic for this
      * channel exactly, there's no need to update anything and we can as
      * well just return silently without updating anything. -GD
+     * But we still need to update the topic internally for the channel - Adam
      */
     if ((ac > 3) && *av[3] && ci && ci->last_topic
         && (strcmp(av[3], ci->last_topic) == 0)
         && (strcmp(topicsetter, ci->last_topic_setter) == 0)) {
+
+        if (c->topic)
+            free(c->topic);
+        c->topic = sstrdup(av[3]);
+        strscpy(c->topic_setter, topicsetter, sizeof(c->topic_setter));
+        c->topic_time = topic_time;
+
         free(topicsetter);
         return;
     }
@@ -1301,10 +1309,13 @@ void do_topic(const char *source, int ac, char **av)
 
     record_topic(av[0]);
 
-    if (ci && ci->last_topic) {
-        send_event(EVENT_TOPIC_UPDATED, 2, av[0], ci->last_topic);
-    } else {
-        send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+    /* Only call events if we are synced with the uplink */
+    if (serv_uplink && is_sync(serv_uplink)) {
+        if (ci && ci->last_topic) {
+            send_event(EVENT_TOPIC_UPDATED, 2, av[0], ci->last_topic);
+        } else {
+            send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+        }
     }
 }
 

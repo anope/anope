@@ -105,7 +105,8 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                     while (current && retVal == MOD_CONT) {
                         mod_current_module_name = current->mod_name;
                         mod_current_module = NULL;
-                        retVal = current->routine(u);
+                        if (current->routine)
+                            retVal = current->routine(u);
                         mod_current_module_name = NULL;
                         current = current->next;
                     }

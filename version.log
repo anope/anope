@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2893"
+VERSION_BUILD="2894"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2894 - Check if a command routine exists before all command calls
 #Revision 2893 - Closed a forgotten file pointer in os_info that would make Windows backups of os_info.db fail
 
 # Leading up to 1.8.4 Release

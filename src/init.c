@@ -470,13 +470,7 @@ int init_secondary(int ac, char **av)
 
 
 	/* this is only used on the first run of Anope. */
-	/* Config.s_NickServ will always be an existing bot (if there
-	 * are databases) because Anope now tracks what nick
-	 * each core bot is on, and changes them if needed
-	 * when loading the databases
-	 */
-	BotInfo *bi = findbot(Config.s_NickServ);
-	if (!bi)
+	if (!nbots)
 	{
 		if (Config.s_OperServ)
 			new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);

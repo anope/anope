@@ -433,9 +433,9 @@ static void LoadBotInfo(const std::vector<std::string> &params)
 		bi = new BotInfo(params[0]);
 	bi->user = sstrdup(params[1].c_str());
 	bi->host = sstrdup(params[2].c_str());
-	bi->created = strtol(params[4].c_str(), NULL, 10);
-	bi->chancount = atol(params[5].c_str());
-	bi->real = sstrdup(params[6].c_str());
+	bi->created = atol(params[3].c_str());
+	bi->chancount = atol(params[4].c_str());
+	bi->real = sstrdup(params[5].c_str());
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
 }

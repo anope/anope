@@ -186,6 +186,7 @@ int do_clear(User * u)
         struct c_userlist *cu, *next;
 
         if (ircd->svsmode_ucmode) {
+            av[0] = chan;
             anope_cmd_svsmode_chan(av[0], "-o", NULL);
             if (ircd->owner) {
                 anope_cmd_svsmode_chan(av[0], ircd->ownerunset, NULL);
@@ -206,7 +207,7 @@ int do_clear(User * u)
                 snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
                         ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
 
-                av[0] = chan;
+                av[0] = chan; /* do_cmode can modify av[0] */
                 if (ircdcap->tsmode) {
                     snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
                     av[1] = buf;

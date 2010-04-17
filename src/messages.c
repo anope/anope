@@ -288,34 +288,20 @@ int m_version(const char *source, int ac, const char **av)
 
 int m_whois(const char *source, const char *who)
 {
-	BotInfo *bi;
-	NickAlias *na;
-	const char *clientdesc;
-
-	if (source && who) {
-		if (stricmp(who, Config.s_NickServ) == 0)
-			clientdesc = Config.desc_NickServ;
-		else if (stricmp(who, Config.s_ChanServ) == 0)
-			clientdesc = Config.desc_ChanServ;
-		else if (stricmp(who, Config.s_MemoServ) == 0)
-			clientdesc = Config.desc_MemoServ;
-		else if (Config.s_BotServ && stricmp(who, Config.s_BotServ) == 0)
-			clientdesc = Config.desc_BotServ;
-		else if (Config.s_HostServ && stricmp(who, Config.s_HostServ) == 0)
-			clientdesc = Config.desc_HostServ;
-		else if (stricmp(who, Config.s_OperServ) == 0)
-			clientdesc = Config.desc_OperServ;
-		else if (stricmp(who, Config.s_GlobalNoticer) == 0)
-			clientdesc = Config.desc_GlobalNoticer;
-		else if (Config.s_BotServ && (bi = findbot(who))) {
-			/* Bots are handled separately */
+	if (source && who)
+	{
+		NickAlias *na;
+		BotInfo *bi = findbot(who);
+		if (bi)
+		{
 			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), bi->real.c_str());
 			ircdproto->SendNumeric(Config.ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
 			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config.ServerName, Config.ServerDesc);
 			ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);
 			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
-			return MOD_CONT;
-		} else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_KILL_HELD)) {
+		}
+		else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_KILL_HELD))
+		{
 			/* We have a nick enforcer client here that we need to respond to.
 			 * We can't just say it doesn't exist here, even tho it does for
 			 * other servers :) -GD
@@ -323,15 +309,11 @@ int m_whois(const char *source, const char *who)
 			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :Services Enforcer", na->nick, Config.NSEnforcerUser, Config.NSEnforcerHost);
 			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", na->nick, Config.ServerName, Config.ServerDesc);
 			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
-			return MOD_CONT;
-		} else {
-			ircdproto->SendNumeric(Config.ServerName, 401, source, "%s :No such service.", who);
-			return MOD_CONT;
 		}
-		ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", who, Config.ServiceUser, Config.ServiceHost, clientdesc);
-		ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", who, Config.ServerName, Config.ServerDesc);
-		ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", who, time(NULL) - start_time, start_time);
-		ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
+		else
+		{
+			ircdproto->SendNumeric(Config.ServerName, 401, source, "%s :No such service.", who);
+		}
 	}
 	return MOD_CONT;
 }

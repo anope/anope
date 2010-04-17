@@ -217,7 +217,7 @@ class InspIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(NULL, "FJOIN %s %ld + :,%s", channel, static_cast<long>(chantime), user->uid.c_str());
+		send_cmd(TS6SID, "FJOIN %s %ld + :,%s", channel, static_cast<long>(chantime), user->uid.c_str());
 	}
 
 	/* UNSQLINE */

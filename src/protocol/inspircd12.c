@@ -1005,7 +1005,7 @@ void inspircd_cmd_pong(char *servname, char *who)
 void inspircd_cmd_join(char *user, char *channel, time_t chantime)
 {
     Uid *ud = (user ? find_uid(user) : NULL);
-    send_cmd(NULL, "FJOIN %s %ud + :,%s", channel, (unsigned int)chantime, ud ? ud->uid : user);
+    send_cmd(TS6SID, "FJOIN %s %ud + :,%s", channel, (unsigned int)chantime, ud ? ud->uid : user);
 }
 
 /* UNSQLINE */

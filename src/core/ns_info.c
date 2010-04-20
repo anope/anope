@@ -264,7 +264,7 @@ int do_info(User * u)
             if (na->status & NS_NO_EXPIRE) {
                 notice_lang(s_NickServ, u, NICK_INFO_NO_EXPIRE);
             } else {
-                if (is_services_admin(u)) {
+                if (is_servadmin) {
                     expt = na->last_seen + NSExpire;
                     tm = localtime(&expt);
                     strftime_lang(buf, sizeof(buf), na->u,

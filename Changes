@@ -3,6 +3,7 @@ Anope Version 1.8 - SVN
 4/15  F Fixed os_info to backup its database on Windows                  [  #00]
 4/15  F Fixed a potential crash in cs_clear ops                          [#1154]
 4/16  F Fixed missing TS6SID on FJOIN in inspircd12                      [  #00]
+4/19  F Fixed ns_info to show nick expire times to opers not only admins [  #00]
 
 Anope Version 1.8.4
 -------------------

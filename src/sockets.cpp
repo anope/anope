@@ -191,7 +191,7 @@ bool Socket::ProcessRead()
 	char buffer[NET_BUFSIZE];
 	memset(&buffer, 0, sizeof(buffer));
 
-	RecvLen = RecvInternal(buffer, sizeof(buffer));
+	RecvLen = RecvInternal(buffer, sizeof(buffer) - 1);
 	if (RecvLen <= 0)
 	{
 		return false;
@@ -233,7 +233,7 @@ bool Socket::ProcessRead()
  */
 bool Socket::ProcessWrite()
 {
-	size_t Written = SendInternal(WriteBuffer);
+	int Written = SendInternal(WriteBuffer);
 	if (Written == -1)
 	{
 		return false;

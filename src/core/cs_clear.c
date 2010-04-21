@@ -28,15 +28,14 @@ class CommandCSClear : public Command
 		const char *chan = params[0].c_str();
 		ci::string what = params[1];
 		Channel *c = findchan(chan);
-		ChannelInfo *ci;
-		ChannelMode *owner, *admin;
+		ChannelInfo *ci = c ? c->ci : NULL;
 		std::string modebuf;
 
-		owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
-		admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
-
-		if (c)
-			ci = c->ci;
+		ChannelMode *owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
+		ChannelMode *admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
+		ChannelMode *op = ModeManager::FindChannelModeByName(CMODE_OP);
+		ChannelMode *halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
+		ChannelMode *voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		if (!c)
 			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
@@ -73,7 +72,6 @@ class CommandCSClear : public Command
 		{
 			if (ircd->svsmode_ucmode)
 			{
-				ircdproto->SendSVSModeChan(c, "-o", NULL);
 				if (owner)
 				{
 					modebuf = '-';
@@ -88,16 +86,12 @@ class CommandCSClear : public Command
 
 					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 				}
-				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+				if (op)
 				{
-					UserContainer *uc = *it;
+					modebuf = "-";
+					modebuf += op->ModeChar;
 
-					if (uc->Status->HasFlag(CMODE_OWNER))
-						c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
-					if (uc->Status->HasFlag(CMODE_PROTECT))
-						c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
-					if (uc->Status->HasFlag(CMODE_OP))
-						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
+					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 				}
 			}
 			else
@@ -107,41 +101,40 @@ class CommandCSClear : public Command
 					UserContainer *uc = *it;
 
 					if (uc->Status->HasFlag(CMODE_OWNER))
-						c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
+						c->RemoveMode(NULL, owner, uc->user->nick);
 					if (uc->Status->HasFlag(CMODE_PROTECT))
-						c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
+						c->RemoveMode(NULL, admin, uc->user->nick);
 					if (uc->Status->HasFlag(CMODE_OP))
-						c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
+						c->RemoveMode(NULL, op, uc->user->nick);
 				}
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan);
 		}
-		else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && what == "hops")
+		else if ((halfop && what == "hops") || (voice && what == "voices"))
 		{
-			for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+			ChannelMode *cm = (what == "hops" ? halfop : voice);
+
+			if (ircd->svsmode_ucmode)
 			{
-				UserContainer *uc = *it;
+				modebuf = "-";
+				modebuf += cm->ModeChar;
 
-				if (uc->Status->HasFlag(CMODE_HALFOP))
-					c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
+				ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
 			}
+			else
+			{
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+				{
+					UserContainer *uc = *it;
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
+					if (uc->Status->HasFlag(cm->Name))
+						c->RemoveMode(NULL, cm, uc->user->nick);
+				}
+			}
 		}
-		else if (what == "voices")
+		else if (what == "users")
 		{
-			for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
-			{
-				UserContainer *uc = *it;
-
-				if (uc->Status->HasFlag(CMODE_VOICE))
-					c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
-			}
-
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
-		}
-		else if (what == "users") {
 			std::string buf = "CLEAR USERS command from " + u->nick;
 
 			for (CUserList::iterator it = c->users.begin(); it != c->users.end();)

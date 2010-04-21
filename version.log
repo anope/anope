@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2900"
+VERSION_BUILD="2903"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2903 - Removed some unnecessary redundant code in cs_clear
 #Revision 2900 - Fixed /ns info to show when a nick expires to services opers, not only admins
 #Revision 2899 - Fixed missing SID on FJOIN in InspIRCd12 protocol module
 #Revision 2896 - Fixed bug #1153 - Always save channel topics internally, even if the new topic matches the last saved topic

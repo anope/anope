@@ -194,38 +194,7 @@ int do_clear(User * u)
             if (ircd->protect || ircd->admin) {
                 anope_cmd_svsmode_chan(av[0], ircd->adminunset, NULL);
             }
-            for (cu = c->users; cu; cu = next) {
-                next = cu->next;
-                isop = chan_has_user_status(c, cu->user, CUS_OP);
-                isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
-                isown = chan_has_user_status(c, cu->user, CUS_OWNER);
-                count = (isop ? 1 : 0) + (isadmin ? 1 : 0) + (isown ? 1 : 0);
-
-                if (!isop && !isadmin && !isown)
-                    continue;
-
-                snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
-                        ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
-
-                av[0] = chan; /* do_cmode can modify av[0] */
-                if (ircdcap->tsmode) {
-                    snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                    av[1] = buf;
-                    av[2] = tmp;
-                    /* We have to give as much nicks as modes.. - Viper */
-                    for (i = 0; i < count; i++)
-                        av[i+3] = GET_USER(cu->user);
-                    ac = 3 + i;
-                } else {
-                    av[1] = tmp;
-                    /* We have to give as much nicks as modes.. - Viper */
-                    for (i = 0; i < count; i++)
-                        av[i+2] = GET_USER(cu->user);
-                    ac = 2 + i;
-                }
-
-                do_cmode(s_ChanServ, ac, av);
-            }
+            /* No need to do anything here - we will receive the mode changes from the IRCd and process them then */
         } else {
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
@@ -274,51 +243,46 @@ int do_clear(User * u)
         char buf[BUFSIZE];
         struct c_userlist *cu, *next;
 
-        for (cu = c->users; cu; cu = next) {
-            next = cu->next;
-            if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
-                continue;
+        if (ircd->svsmode_ucmode) {
+            anope_cmd_svsmode_chan(chan, "-h", NULL);
+            /* No need to do anything here - we will receive the mode changes from the IRCd and process them then */
+        }
+        else {
+            for (cu = c->users; cu; cu = next) {
+                next = cu->next;
+                if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
+                    continue;
 
-            if (ircdcap->tsmode) {
-                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                av[0] = sstrdup(chan);
-                av[1] = buf;
-                av[2] = sstrdup("-h");
-                av[3] = sstrdup(GET_USER(cu->user));
-                ac = 4;
-            } else {
-                av[0] = sstrdup(chan);
-                av[1] = sstrdup("-h");
-                av[2] = sstrdup(GET_USER(cu->user));
-                ac = 3;
-            }
+                if (ircdcap->tsmode) {
+                    snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                    av[0] = sstrdup(chan);
+                    av[1] = buf;
+                    av[2] = sstrdup("-h");
+                    av[3] = sstrdup(GET_USER(cu->user));
+                    ac = 4;
+                } else {
+                    av[0] = sstrdup(chan);
+                    av[1] = sstrdup("-h");
+                    av[2] = sstrdup(GET_USER(cu->user));
+                    ac = 3;
+                }
 
-            if (ircd->svsmode_ucmode) {
                 if (ircdcap->tsmode)
-                    anope_cmd_svsmode_chan(av[0], av[2], NULL);
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2], av[3]);
                 else
-                    anope_cmd_svsmode_chan(av[0], av[1], NULL);
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1], av[2]);
 
                 do_cmode(s_ChanServ, ac, av);
-                break;
-            } else {
-                if (ircdcap->tsmode)
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2],
-                                   av[3]);
-                else
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1],
-                                   av[2]);
-            }
-            do_cmode(s_ChanServ, ac, av);
 
-            if (ircdcap->tsmode) {
-                free(av[3]);
-                free(av[2]);
-                free(av[0]);
-            } else {
-                free(av[2]);
-                free(av[1]);
-                free(av[0]);
+                if (ircdcap->tsmode) {
+                    free(av[3]);
+                    free(av[2]);
+                    free(av[0]);
+                } else {
+                    free(av[2]);
+                    free(av[1]);
+                    free(av[0]);
+                }
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
@@ -328,52 +292,47 @@ int do_clear(User * u)
         char buf[BUFSIZE];
         struct c_userlist *cu, *next;
 
-        for (cu = c->users; cu; cu = next) {
-            next = cu->next;
-            if (!chan_has_user_status(c, cu->user, CUS_VOICE))
-                continue;
+        if (ircd->svsmode_ucmode) {
+            anope_cmd_svsmode_chan(chan, "-v", NULL);
+	    /* No need to do anything here - we will receive the mode changes from the IRCd and process them then */
+	}
+	else {
+            for (cu = c->users; cu; cu = next) {
+                next = cu->next;
+                if (!chan_has_user_status(c, cu->user, CUS_VOICE))
+                    continue;
 
-            if (ircdcap->tsmode) {
-                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                av[0] = sstrdup(chan);
-                av[1] = buf;
-                av[2] = sstrdup("-v");
-                av[3] = sstrdup(GET_USER(cu->user));
-                ac = 4;
-            } else {
-                av[0] = sstrdup(chan);
-                av[1] = sstrdup("-v");
-                av[2] = sstrdup(GET_USER(cu->user));
-                ac = 3;
-            }
+                if (ircdcap->tsmode) {
+                    snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                    av[0] = sstrdup(chan);
+                    av[1] = buf;
+                    av[2] = sstrdup("-v");
+                    av[3] = sstrdup(GET_USER(cu->user));
+                    ac = 4;
+                } else {
+                    av[0] = sstrdup(chan);
+                    av[1] = sstrdup("-v");
+                    av[2] = sstrdup(GET_USER(cu->user));
+                    ac = 3;
+                }
 
-            if (ircd->svsmode_ucmode) {
-                if (ircdcap->tsmode)
-                    anope_cmd_svsmode_chan(av[0], av[2], NULL);
-                else
-                    anope_cmd_svsmode_chan(av[0], av[1], NULL);
+                if (ircdcap->tsmode) {
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2], av[3]);
+                } else {
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1], av[2]);
+                }
 
                 do_cmode(s_ChanServ, ac, av);
-                break;
-            } else {
-                if (ircdcap->tsmode) {
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2],
-                                   av[3]);
-                } else {
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1],
-                                   av[2]);
-                }
-            }
-            do_cmode(s_ChanServ, ac, av);
 
-            if (ircdcap->tsmode) {
-                free(av[3]);
-                free(av[2]);
-                free(av[0]);
-            } else {
-                free(av[2]);
-                free(av[1]);
-                free(av[0]);
+                if (ircdcap->tsmode) {
+                    free(av[3]);
+                    free(av[2]);
+                    free(av[0]);
+                } else {
+                    free(av[2]);
+                    free(av[1]);
+                    free(av[0]);
+               }
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_VOICES, chan);

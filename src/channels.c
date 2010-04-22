@@ -46,7 +46,7 @@ Channel::Channel(const std::string &name, time_t ts)
 	this->bans = this->excepts = this->invites = NULL;
 	this->bd = NULL;
 	this->server_modetime = this->chanserv_modetime = 0;
-	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = 0;
+	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = this->topic_time = 0;
 
 	this->ci = cs_findchan(this->name);
 	if (this->ci)
@@ -1138,8 +1138,8 @@ void get_channel_stats(long *nrec, long *memuse)
 			{
 				mem += sizeof(*it);
 				mem += sizeof((*it)->ud);
-				if ((*it)->ud->lastline)
-					mem += strlen((*it)->ud->lastline) + 1;
+				if ((*it)->ud.lastline)
+					mem += strlen((*it)->ud.lastline) + 1;
 			}
 			for (bd = chan->bd; bd; bd = bd->next) {
 				if (bd->mask)

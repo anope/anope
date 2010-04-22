@@ -14,7 +14,8 @@ struct UserData
 	UserData()
 	{
 		lastline = NULL;
-		last_use = time(NULL);
+		last_use = last_start = time(NULL);
+		lines = times = 0;
 	}
 
 	virtual ~UserData() { delete [] lastline; }
@@ -34,11 +35,11 @@ struct UserData
 struct UserContainer
 {
 	User *user;
-	UserData *ud;
+	UserData ud;
 	Flags<ChannelModeName> *Status;
 
-	UserContainer(User *u) : user(u) { ud = new UserData; }
-	virtual ~UserContainer() { delete ud; }
+	UserContainer(User *u) : user(u) { }
+	virtual ~UserContainer() { }
 };
 
 typedef std::list<UserContainer *> CUserList;

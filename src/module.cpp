@@ -137,6 +137,7 @@ Module::~Module()
 			}
 			delete [] mhash->name;
 			delete mhash;
+			break;
 		}
 		lastHash = mhash;
 	}

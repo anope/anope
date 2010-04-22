@@ -371,7 +371,7 @@ void SocketEngine::Process()
 	fd_set rfdset = ReadFDs, wfdset = WriteFDs, efdset = ReadFDs;
 	timeval tval;
 
-	tval.tv_sec = 10;
+	tval.tv_sec = Config.ReadTimeout;
 	tval.tv_usec = 0;
 
 	int sresult = select(MaxFD + 1, &rfdset, &wfdset, &efdset, &tval);

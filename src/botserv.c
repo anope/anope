@@ -585,17 +585,17 @@ static UserData *get_user_data(Channel *c, User *u)
 			time_t now = time(NULL);
 
 			/* Checks whether data is obsolete */
-			if (now - uc->ud->last_use > Config.BSKeepData)
+			if (now - uc->ud.last_use > Config.BSKeepData)
 			{
-				if (uc->ud->lastline)
-					delete [] uc->ud->lastline;
+				if (uc->ud.lastline)
+					delete [] uc->ud.lastline;
 				/* We should not free and realloc, but reset to 0
 				   instead. */
-				memset(uc->ud, 0, sizeof(UserData));
-				uc->ud->last_use = now;
+				memset(&uc->ud, 0, sizeof(UserData));
+				uc->ud.last_use = now;
 			}
 
-			return uc->ud;
+			return &uc->ud;
 		}
 	}
 

@@ -936,7 +936,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			ntmp->last_seen = time(NULL);
 			user->UpdateHost();
 			ircdproto->SetAutoIdentificationToken(user);
-			Alog() << Config.s_NickServ << ": " << user->GetMask() << "automatically identified for group " << user->Account()->display;
+			Alog() << Config.s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
 		}
 
 		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */

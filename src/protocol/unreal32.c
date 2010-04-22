@@ -1021,7 +1021,7 @@ int anope_event_error(const char *source, int ac, const char **av)
 	{
 		Alog(LOG_DEBUG) << av[0];
 		if(strstr(av[0],"No matching link configuration")!=0) 
-			Alog() << "Error: Your IRCD's link block may not setup correctly, please check unrealircd.conf";
+			Alog() << "Error: Your IRCD's link block may not be setup correctly, please check unrealircd.conf";
 	}
 	return MOD_CONT;
 

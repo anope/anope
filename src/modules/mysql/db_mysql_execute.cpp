@@ -37,6 +37,7 @@ class FakeUser : public User
 		this->realname = sstrdup("Fake SQL User");
 		this->hostip = sstrdup("255.255.255.255");
 		this->vhost = NULL;
+		this->server = serv_uplink; // XXX Need a good way to set this to ourself
 
 		if (this->prev)
 			this->prev->next = this->next;
@@ -49,6 +50,8 @@ class FakeUser : public User
 
 	~FakeUser()
 	{
+		this->server = serv_uplink; // XXX Need a good way to set this to ourself
+
 		User **list = &userlist[HASH(this->nick)];
 		this->next = *list;
 		if (*list)

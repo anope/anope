@@ -5,13 +5,13 @@ Legend:
 
 1.9.2
 -----
-[+] Redo database insanity.
+[x] Redo database insanity.
   [x] Move database load/save to a module
-    [+] realtime SQL/whatever module using events (possibly ongoing)
-    [ ] flatfile save on a periodic timer
+    [x] realtime SQL/whatever module using events (possibly ongoing)
+    [x] flatfile save on a periodic timer
     [x] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
     [x] Salted SHA256 (contact Special for this)
-  [+] New database format (text, not binary - works very well for merging and so on)
+  [x] New database format (text, not binary - works very well for merging and so on)
 [x] generic database routines modules can use to create their own database
 [?] IRCd capability support: don't rely on CAPAB, provide an interface to turn capabilities on specifically
 [x] Socket subsystem needs some serious loving
@@ -19,7 +19,7 @@ Legend:
   [x] Asynchronous, using select() (multiple engines? not really needed..)
   [x] Callbacks, event style, see also inspircd
 [x] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
-[?] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
+[x] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
     the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
 [x] Last used time on AKICK/access entries
 [x] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
@@ -30,6 +30,9 @@ Legend:
 [x] Set forbidden channels +s
 [x] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
 [x] burn do_sjoin with fire
+[x] Channel access additions
+  [x] Setter
+  [x] Last used
 
 Future
 ------
@@ -49,27 +52,25 @@ Future
 [?] Update help to reflect the fact /msg memoserv set notify mail - works just fine ;)
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN
+[+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [ ] Channel access additions
-  [x] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
-  [ ] Setter
   [ ] Time added
   [ ] Time modified
   [ ] Expiry (useful?)
 [ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
-  XXX: is SUSPEND overlapping with OS IGNORE functionality?
 [ ] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
 [?] Don't allow soper accounts to expire
 [?] Reason for CS SET RESTRICTED
 [ ] NS IDENTIFY changes
   [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
   [?] Last successful login time/ip? perhaps both of these should be a new nick setting
-[ ] AKILL/SGLINE/etc..
-  [ ] Setter
-  [ ] Time added
-  [ ] Time modified (can they be modified?)
+[x] AKILL/SGLINE/etc..
+  [x] Setter
+  [x] Time added
+  [+] Time modified (can they be modified?)
   [ ] Time until expiry/expiry time (YES, time until expiry *instead of* expiry time, more human)
-  [ ] Reason
+  [x] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
 [?] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK? (AKA os_info)

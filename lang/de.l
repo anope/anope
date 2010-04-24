@@ -825,9 +825,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	%d Nicknamen in der Gruppe.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (wird in %s auslaufen)
+	   %s (wird in %s auslaufen)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX

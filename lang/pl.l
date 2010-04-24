@@ -1019,10 +1019,10 @@ NICK_GLIST_FOOTER
 	%d nicków w grupie.
 
 NICK_GLIST_REPLY
-	   %c%s
+	   %s (wygasa za %s)
 
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (wygasa za %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX

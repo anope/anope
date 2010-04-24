@@ -790,9 +790,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	%d nicknames in the group.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (expires in %s)
+	   %s (expires in %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX

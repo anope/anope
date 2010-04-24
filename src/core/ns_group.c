@@ -182,16 +182,14 @@ class CommandNSGList : public Command
 			for (i = 0; i < nc->aliases.count; ++i)
 			{
 				NickAlias *na2 = static_cast<NickAlias *>(nc->aliases.list[i]);
-				if (na2->nc == nc)
+				
+				if (!(wont_expire = na2->HasFlag(NS_NO_EXPIRE)))
 				{
-					if (!(wont_expire = na2->HasFlag(NS_NO_EXPIRE)))
-					{
-						expt = na2->last_seen + Config.NSExpire;
-						tm = localtime(&expt);
-						strftime_lang(buf, sizeof(buf), finduser(na2->nick), STRFTIME_DATE_TIME_FORMAT, tm);
-					}
-					notice_lang(Config.s_NickServ, u, u->Account()->IsServicesOper() && !wont_expire ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY, wont_expire ? '!' : ' ', na2->nick, buf);
+					expt = na2->last_seen + Config.NSExpire;
+					tm = localtime(&expt);
+					strftime_lang(buf, sizeof(buf), finduser(na2->nick), STRFTIME_DATE_TIME_FORMAT, tm);
 				}
+				notice_lang(Config.s_NickServ, u, wont_expire ? NICK_GLIST_REPLY_NOEXPIRE : NICK_GLIST_REPLY, na2->nick, buf);
 			}
 			notice_lang(Config.s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.count);
 		}

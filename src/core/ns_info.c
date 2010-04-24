@@ -171,13 +171,10 @@ class CommandNSInfo : public Command
 					notice_lang(Config.s_NickServ, u, NICK_INFO_NO_EXPIRE);
 				else
 				{
-					if (u->Account()->IsServicesOper())
-					{
-						expt = na->last_seen + Config.NSExpire;
-						tm = localtime(&expt);
-						strftime_lang(buf, sizeof(buf), finduser(na->nick), STRFTIME_DATE_TIME_FORMAT, tm);
-						notice_lang(Config.s_NickServ, u, NICK_INFO_EXPIRE, buf);
-					}
+					expt = na->last_seen + Config.NSExpire;
+					tm = localtime(&expt);
+					strftime_lang(buf, sizeof(buf), finduser(na->nick), STRFTIME_DATE_TIME_FORMAT, tm);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_EXPIRE, buf);
 				}
 			}
 

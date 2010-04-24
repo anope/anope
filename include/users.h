@@ -157,7 +157,7 @@ class CoreExport User : public Extensible
 	/** Login the user to a NickCore
 	 * @param core The account the user is useing
 	 */
-	void Login(NickCore *core);
+	virtual void Login(NickCore *core);
 
 	/** Logout the user
 	 */

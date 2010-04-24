@@ -63,6 +63,7 @@ class FakeUser : public User
 	void SendMessage(const std::string &, const char *, ...) { }
 	void SendMessage(const std::string &, const std::string &) { }
 
+	void Login(NickCore *core) { nc = core; }
 	NickCore *Account() const { return nc; }
 	const bool IsIdentified() const { return nc ? true : false; }
 } SQLUser;

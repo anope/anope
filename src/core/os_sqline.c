@@ -175,7 +175,7 @@ class CommandOSSQLine : public Command
 				return MOD_CONT;
 			}
 
-			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(sglines.list[res]), SX_SQLINE));
+			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(sqlines.list[res]), SX_SQLINE));
 			slist_delete(&sqlines, res);
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED, mask);
 		}

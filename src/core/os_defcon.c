@@ -375,7 +375,7 @@ void runDefCon()
 		{
 			if (Config.DefConChanModes[0] == '+' || Config.DefConChanModes[0] == '-')
 			{
-				Alog() << "DEFCON: setting " << Config.DefConChanModes << "on all chan's";
+				Alog() << "DEFCON: setting " << Config.DefConChanModes << " on all channels";
 				DefConModesSet = 1;
 				MassChannelModes(findbot(Config.s_OperServ), Config.DefConChanModes);
 			}
@@ -390,7 +390,7 @@ void runDefCon()
 				DefConModesSet = 0;
 				if ((newmodes = defconReverseModes(Config.DefConChanModes)))
 				{
-					Alog() << "DEFCON: setting " << newmodes << " on all chan's";
+					Alog() << "DEFCON: setting " << newmodes << " on all channels";
 					MassChannelModes(findbot(Config.s_OperServ), newmodes);
 					delete [] newmodes;
 				}

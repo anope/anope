@@ -793,7 +793,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 				<< (ircd->nickvhost && vhost ? " => " : "")
 				<< (ircd->nickvhost && vhost ? vhost : "") << ") (" << logrealname << ") "
 				<< (ircd->nickip ? "[" : "") << (ircd->nickip ? ipbuf : "") << (ircd->nickip ? "]" : "")
-				<< "connected to the network (" << server << ").";
+				<< " connected to the network (" << server << ").";
 			delete [] logrealname;
 		}
 

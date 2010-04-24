@@ -143,7 +143,7 @@ class CommandNSConfirm : public Command
 	}
 
  public:
-	CommandNSConfirm(const std::string &cmdn, int min, int max) : Command(cmdn, min, max)
+	CommandNSConfirm(const ci::string &cmdn, int min, int max) : Command(cmdn, min, max)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}

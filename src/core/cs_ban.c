@@ -17,7 +17,7 @@
 class CommandCSBan : public Command
 {
  public:
-	CommandCSBan(const std::string &cname) : Command(cname, 2, 3)
+	CommandCSBan(const ci::string &cname) : Command(cname, 2, 3)
 	{
 	}
 

@@ -17,7 +17,7 @@
 class CommandNSIdentify : public Command
 {
  public:
-	CommandNSIdentify(const std::string &cname) : Command(cname, 1, 1)
+	CommandNSIdentify(const ci::string &cname) : Command(cname, 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}

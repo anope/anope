@@ -4082,11 +4082,11 @@ NICK_SERVADMIN_HELP_DROP
 	Μπορεί να σβήσεις κάποιο ψευδώνυμο που μπορεί να είναι στην ομάδα σου χωρίς 
 	να έχεις ξεχωριστά δικαιώματα. Το σβήσιμο του ψευδώνυμου έχουν το δικαίωμα να το 
 	κάνουν οι (επικεφαλείς) Services Operators.
-	
+
 NICK_SERVADMIN_HELP_INFO
 	
-	Οι Services Operators μπορούν να χρησιμοποιούν την ALL παράμετρο για 
-	κάθε ψευδώνυμο.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Σύνταξη: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]

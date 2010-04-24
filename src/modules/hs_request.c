@@ -339,7 +339,7 @@ class HSListBase : public Command
 		return MOD_CONT;
 	}
  public:
-	HSListBase(const std::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
+	HSListBase(const ci::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
 	{
 	}
 

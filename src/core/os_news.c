@@ -300,7 +300,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
  public:
-	NewsBase(const std::string &newstype) : Command(newstype, 1, 2, "operserv/news")
+	NewsBase(const ci::string &newstype) : Command(newstype, 1, 2, "operserv/news")
 	{
 	}
 

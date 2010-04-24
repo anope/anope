@@ -3993,10 +3993,11 @@ NICK_SERVADMIN_HELP_DROP
 	különleges kiváltsága.
 	
 	Használat korlátozva Szervíz adminoknak.
-	
+
 NICK_SERVADMIN_HELP_INFO
 	
-	Szervíz adminok használhatják az ALL paramétert.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]

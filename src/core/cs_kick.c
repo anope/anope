@@ -17,7 +17,7 @@
 class CommandCSKick : public Command
 {
  public:
-	CommandCSKick(const std::string& cname) : Command(cname, 2, 3)
+	CommandCSKick(const ci::string &cname) : Command(cname, 2, 3)
 	{
 	}
 

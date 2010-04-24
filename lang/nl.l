@@ -4030,7 +4030,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Services Operators mogen het ALL parameter met elke nick gebruiken.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Gebruik: trefbeeld [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]

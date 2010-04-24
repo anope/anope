@@ -1,6 +1,14 @@
 Anope Version 1.9.3
--------------------
+--------------------
+*** New Strings:
+    NICK_GLIST_REPLY_NOEXPIRE
+    NICK_SERVADMIN_HELP_INFO
 
+*** Mod Strings:
+    NICK_GLIST_REPLY
+
+*** Del Strings:
+    NICK_GLIST_REPLY_ADMIN
 
 Anope Version 1.9.2
 --------------------

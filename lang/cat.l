@@ -4084,8 +4084,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Administradors de serveis poden utilitzar el parametre
-	ALL amb qualsevol nick.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Sintaxis: LIST patró [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]

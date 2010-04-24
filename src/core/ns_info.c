@@ -79,19 +79,19 @@ class CommandNSInfo : public Command
 		{
 			struct tm *tm;
 			char buf[BUFSIZE];
-			int nick_online = 0;
-			int show_hidden = 0;
+			bool nick_online = false, show_hidden = false;
 			time_t expt;
+			bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex");
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
 			User *u2 = finduser(na->nick);
 			if (u2 && u2->Account() == na->nc)
-				nick_online = 1;
+				nick_online = true;
 
 			/* Only show hidden fields to owner and sadmins and only when the ALL
 			 * parameter is used. -TheShadow */
-			if (!param.empty() && param == "ALL" && u->Account() && (na->nc == u->Account() || u->Account()->IsServicesOper()))
-				show_hidden = 1;
+			if (!param.empty() && param == "ALL" && u->Account() && (na->nc == u->Account() || has_auspex))
+				show_hidden = true;
 
 			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
 
@@ -100,7 +100,6 @@ class CommandNSInfo : public Command
 				if (show_hidden || (!(na->nc->HasFlag(NI_HIDE_STATUS))))
 				{
 					notice_lang(Config.s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
-
 				}
 			}
 
@@ -111,7 +110,8 @@ class CommandNSInfo : public Command
 				else
 					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick);
 			}
-			else {
+			else
+			{
 				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
 					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask);
 			}
@@ -178,7 +178,7 @@ class CommandNSInfo : public Command
 				}
 			}
 
-			if (!show_hidden && u->Account() && (na->nc == u->Account() || u->Account()->IsServicesOper()))
+			if (!show_hidden && u->Account() && (na->nc == u->Account() || has_auspex))
 				notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, na->nick);
 		}
 		return MOD_CONT;
@@ -187,7 +187,7 @@ class CommandNSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_INFO);
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex"))
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 
 		return true;

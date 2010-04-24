@@ -43,7 +43,7 @@ class CommandCSInfo : public Command
 		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;
-		bool has_auspex = u->Account() && u->Account()->HasPriv("chanserv/auspex");
+		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex");
 		int show_all = 0;
 		time_t expt;
 
@@ -146,7 +146,7 @@ class CommandCSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_INFO);
-		if (u->Account() && u->Account()->HasPriv("chanserv/auspex"))
+		if (u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex"))
 			notice_lang(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
 
 		return true;

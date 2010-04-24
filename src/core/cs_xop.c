@@ -396,7 +396,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
  public:
-	XOPBase(const std::string &command) : Command(command, 2, 3)
+	XOPBase(const ci::string &command) : Command(command, 2, 3)
 	{
 	}
 

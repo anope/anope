@@ -5171,8 +5171,8 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 
 CHAN_SERVADMIN_HELP_INFO
 	
-	Administradors de serveis poden utilitzar el paràmetre
-	ALL amb qualsevol canal
+	Services Operators with the chanserv/auspex permission can
+	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Sintàxi: LIST patró [FORBIDDEN] [NOEXPIRE]

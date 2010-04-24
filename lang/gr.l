@@ -236,7 +236,7 @@ MAIL_X_INVALID
 MAIL_LATER
 	Δεν μπορεί να σταλεί στη διεύθυνση το μήνυμα για την ώρα; παρακαλώ προσπάθησε λίγο αργότερα.
 MAIL_DELAYED
-	Παρακαλώ περίμενε ^B%d^B δευτερόλεπτα και ξαναπροσπάθησε.
+	Παρακαλώ περίμενε %d δευτερόλεπτα και ξαναπροσπάθησε.
 	
 NO_REASON
 	Χωρίς λόγος
@@ -366,7 +366,7 @@ NICK_GROUP_SAME
 	Είσαι ήδη μέλος της ομάδας του %s.
 NICK_GROUP_TOO_MANY
 	Είναι πάρα πολλά ψευδώνυμα μέσα %s's ομάδα; κράτα μερικά και βγάλε κάποια.
-	Γράψε ^B%R%s HELP GLIST^B και %R%s HELP DROP 
+	Γράψε %R%s HELP GLIST και %R%s HELP DROP 
 	για περισσότερες πληροφορίες.
 NICK_GROUP_JOINED
 	Είσαι τώρα μέσα στην ομάδα του %s.
@@ -5108,8 +5108,8 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 
 CHAN_SERVADMIN_HELP_INFO
 	
-	Οι Services Operators μπορούν να χρησιμοποιήσουν την παράμετρο ALL για κάθε
-	κανάλι.
+	Services Operators with the chanserv/auspex permission can
+	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Σύνταξη: LIST pattern [FORBIDDEN] [NOEXPIRE]

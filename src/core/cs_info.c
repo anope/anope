@@ -152,7 +152,7 @@ class CommandCSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_INFO);
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->Account() && u->Account()->HasPriv("chanserv/auspex"))
 			notice_lang(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
 
 		return true;

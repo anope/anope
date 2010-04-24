@@ -190,10 +190,10 @@ class CommandNSInfo : public Command
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
+		notice_help(Config.s_NickServ, u, NICK_HELP_INFO);
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
-		else
-			notice_help(Config.s_NickServ, u, NICK_HELP_INFO);
+
 		return true;
 	}
 

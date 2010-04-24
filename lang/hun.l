@@ -5043,11 +5043,11 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	
 	Korlátozva Szervíz adminnak.
 
-
 CHAN_SERVADMIN_HELP_INFO
 	
-	Szervíz adminok használhatják az ALL paramétert.
-	
+	Services Operators with the chanserv/auspex permission can
+	use the ALL parameter with any channel.
+
 CHAN_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern[FORBIDDEN] [SUSPENDED] [NOEXPIRE]
 	

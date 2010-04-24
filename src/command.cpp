@@ -10,7 +10,7 @@
 #include "services.h"
 #include "modules.h"
 
-Command::Command(const std::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
+Command::Command(const ci::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
 	this->core = 0;
 	this->mod_name = NULL;

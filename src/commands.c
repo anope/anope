@@ -12,11 +12,35 @@
  */
 
 #include "services.h"
-#include "commands.h"
+#include "modules.h"
 #include "language.h"
 #include "hashcomp.h"
 
 /*************************************************************************/
+
+/**
+ * Search the command table gieven for a command.
+ * @param cmdTable the name of the command table to search
+ * @param name the name of the command to look for
+ * @return returns a pointer to the found command struct, or NULL
+ */
+Command *findCommand(CommandHash * cmdTable[], const char *name)
+{
+	int idx;
+	CommandHash *current = NULL;
+	if (!cmdTable || !name) {
+		return NULL;
+	}
+
+	idx = CMD_HASH(name);
+
+	for (current = cmdTable[idx]; current; current = current->next) {
+		if (stricmp(name, current->name) == 0) {
+			return current->c;
+		}
+	}
+	return NULL;
+}
 
 /**
  * Return the Command corresponding to the given name, or NULL if no such

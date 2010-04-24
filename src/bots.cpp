@@ -10,6 +10,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "commands.h"
 
 BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::string &nhost, const std::string &nreal)
 {

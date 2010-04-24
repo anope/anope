@@ -1250,7 +1250,7 @@ CHAN_SET_XOP_OFF
 
 # SET PERSISTANT responces
 CHAN_SET_PERSIST_SYNTAX
-	SET channel PERSISTS {ON | OFF}
+	SET channel PERSIST {ON | OFF}
 CHAN_SET_PERSIST_ON
 	Channel %s is now persistant.
 CHAN_SET_PERSIST_OFF

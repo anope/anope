@@ -690,8 +690,6 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(BotInfo *bi, const std::string &key, const std::vector<std::string> &params)
 	{
-		std::string buf;
-
 		if (key == "FLAGS")
 		{
 			for (unsigned j = 0; j < params.size(); ++j)
@@ -720,7 +718,6 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params)
 	{
-		std::string buf;
 		int i;
 
 		if (key == "FOUNDER")
@@ -778,7 +775,7 @@ class DBPlain : public Module
 
 			int level = atoi(params[1].c_str());
 			time_t last_seen = strtol(params[2].c_str(), NULL, 10);
-			ci->AddAccess(nc, level, buf, last_seen);
+			ci->AddAccess(nc, level, params[3], last_seen);
 		}
 		else if (key == "AKICK")
 		{
@@ -806,7 +803,7 @@ class DBPlain : public Module
 				ak->SetFlag(AK_ISNICK);
 
 		}
-		else if (key == "MLOCK_ON" || buf == "MLOCK_OFF")
+		else if (key == "MLOCK_ON" || key == "MLOCK_OFF")
 		{
 			bool Set = key == "MLOCK_ON" ? true : false;
 

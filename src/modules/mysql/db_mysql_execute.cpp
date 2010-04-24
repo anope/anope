@@ -66,7 +66,6 @@ class FakeUser : public User
 	void SendMessage(const std::string &, const char *, ...) { }
 	void SendMessage(const std::string &, const std::string &) { }
 
-	void Login(NickCore *core) { nc = core; }
 	NickCore *Account() const { return nc; }
 	const bool IsIdentified() const { return nc ? true : false; }
 } SQLUser;
@@ -95,14 +94,15 @@ class SQLTimer : public Timer
 			{
 				User *u;
 				NickAlias *na = NULL;
+				bool logout = false;
 
 				/* If they want -SQLUser to execute the command, use it */
 				if (qres[i]["nick"] == "-SQLUser")
 				{
 					u = &SQLUser;
 					u->SetNewNick("-SQLUser");
-					SQLCore.Users.clear();
 					u->Login(&SQLCore);
+					logout = true;
 				}
 				else
 				{
@@ -119,6 +119,7 @@ class SQLTimer : public Timer
 							u = &SQLUser;
 							u->SetNewNick(SQLAssign(qres[i]["nick"]));
 							u->Login(na->nc);
+							logout = true;
 						}
 					}
 					else
@@ -131,6 +132,7 @@ class SQLTimer : public Timer
 							u = &SQLUser;
 							u->SetNewNick(SQLAssign(qres[i]["nick"]));
 							u->Logout();
+							logout = true;
 						}
 					}
 				}
@@ -147,6 +149,9 @@ class SQLTimer : public Timer
 				char *cmd = strtok(cmdbuf, " ");
 				mod_run_cmd(bi->nick, u, bi->cmdTable, cmd);
 				delete [] cmdbuf;
+
+				if (logout)
+					u->Logout();
 			}
 
 			query << "TRUNCATE TABLE `anope_commands`";

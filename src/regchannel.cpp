@@ -574,12 +574,12 @@ bool ChannelInfo::CheckKick(User *user)
 		return false;
 
 	if (user->isSuperAdmin == 1)
-		return true;
+		return false;
 
 	/* We don't enforce services restrictions on clients on ulined services
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
 	if (is_ulined(user->server->name))
-		return true;
+		return false;
 
 	if (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN))
 	{

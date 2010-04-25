@@ -233,7 +233,8 @@ static void services_shutdown()
 	if (!quitmsg)
 		quitmsg = "Terminating, reason unknown";
 	Alog() << quitmsg;
-	if (started) {
+	if (started && UplinkSock)
+	{
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
 		if (uplink)
 			delete [] uplink;

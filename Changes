@@ -6,7 +6,7 @@ A The ability to register empty nonregistered channels
 A Flatfile plaintext databases and removed old binary ones
 A Added in live updating SQL and the ability to execute commands through SQL (see docs/MYSQL)
 A Added support for many more modes into Anope and the ability to have generic support for modes unknown to Anope
-A Added a mode stacker to combine many mode changes to one line
+A Added a mode stacker to combine many mode changes into fewer
 A Added in the CS SET PERSIST command which can be used to keep service bots in channels even when the channel is empty
 A Added AUTOOWNER OWNER and OWNERME into CS LEVELS
 A Added ns_resetpass module to the core
@@ -15,8 +15,9 @@ A Last used time to CS AKICK VIEW
 A Added a sha_256 encryption module
 A Added the ability to load multiple encryption modules, and the ability to seamlessly convert your database between diferent encryptions
 A Added configuration options to allow Anope to reconnect if it disconnects from the uplink instead of dieing
+A Added support for linking with IPv6
 F Unban command to accept an optional nick arg
-F Some typos services.conf
+F Some typos in services.conf
 F Crash when users change their host that are identified to a group, but not a nick
 F Host length checking in HS SET(ALL) and HS REQUEST
 F Only show if a user is online in NS INFO if they are really identiifed for the group of the nick they are on

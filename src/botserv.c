@@ -723,7 +723,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, const char *rea
 
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
 	{
-		if (is_protected(u) && (requester != u)) {
+		if (u->IsProtected() && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
 			return;
 		}
@@ -764,7 +764,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, const char *re
 
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED)))
 	{
-		if (is_protected(u) && (requester != u)) {
+		if (u->IsProtected() && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
 			return;
 		}
@@ -797,7 +797,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *ni
 	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 
 	if ((ModeManager::FindUserModeByName(UMODE_PROTECTED))) {
-		if (is_protected(u) && *mode == '-' && (requester != u)) {
+		if (u->IsProtected() && *mode == '-' && (requester != u)) {
 			ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
 			return;
 		}

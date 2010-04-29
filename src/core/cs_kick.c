@@ -56,9 +56,9 @@ class CommandCSKick : public Command
 		} else if (!is_same && (ci->HasFlag(CI_PEACE))
 					 && (get_access(u2, ci) >= get_access(u, ci))) {
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		} else if (is_protected(u2)) {
+		} else if (u2->IsProtected())
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		} else if (!c->FindUser(u2)) {
+		else if (!c->FindUser(u2)) {
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		} else {
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))

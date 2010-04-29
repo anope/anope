@@ -526,7 +526,6 @@ E void do_quit(const char *source, int ac, const char **av);
 E void do_kill(const std::string &source, const std::string &reason);
 
 E int is_oper(User * user);
-E int is_protected(User * user);
 
 E int is_excepted(ChannelInfo * ci, User * user);
 E int is_excepted_mask(ChannelInfo * ci, const char *mask);

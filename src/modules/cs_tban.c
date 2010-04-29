@@ -203,7 +203,7 @@ int canBanUser(Channel * c, User * u, User * u2)
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (is_excepted(ci, u2))
 		notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
-	else if (is_protected(u2))
+	else if (u2->IsProtected())
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else
 		ok = 1;

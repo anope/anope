@@ -564,7 +564,7 @@ void ChannelInfo::ClearParams()
  */
 bool ChannelInfo::CheckKick(User *user)
 {
-	AutoKick *akick;
+	AutoKick *autokick;
 	bool set_modes = false, do_kick = false;
 	NickCore *nc;
 	char mask[BUFSIZE];
@@ -573,7 +573,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!user || !this->c)
 		return false;
 
-	if (user->isSuperAdmin == 1)
+	if (user->isSuperAdmin)
 		return false;
 
 	/* We don't enforce services restrictions on clients on ulined services
@@ -589,34 +589,40 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 	}
 
+	if (!do_kick && user->IsProtected())
+		return false;
+	
+	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
+		return false;
+
 	if (user->Account() || user->IsRecognized())
 		nc = user->Account();
 	else
 		nc = NULL;
 
-	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
-		return false;
-
-	for (unsigned j = 0; j < this->GetAkickCount(); ++j)
+	if (!do_kick)
 	{
-		akick = this->GetAkick(j);
-
-		if (!akick->InUse || do_kick)
-			continue;
-
-		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
-			|| (!akick->HasFlag(AK_ISNICK)
-			&& match_usermask(akick->mask.c_str(), user)))
+		for (unsigned j = 0; j < this->GetAkickCount(); ++j)
 		{
-			Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (akick->HasFlag(AK_ISNICK) ? 
-akick->nc->display : akick->mask);
-			akick->last_used = time(NULL);
-			if (akick->HasFlag(AK_ISNICK))
-				get_idealban(this, user, mask, sizeof(mask));
-			else
-				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
-			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
-			do_kick = true;
+			autokick = this->GetAkick(j);
+
+			if (!autokick->InUse)
+				continue;
+
+			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc)
+				|| (!autokick->HasFlag(AK_ISNICK)
+				&& match_usermask(autokick->mask.c_str(), user)))
+			{
+				Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
+				autokick->last_used = time(NULL);
+				if (autokick->HasFlag(AK_ISNICK))
+					get_idealban(this, user, mask, sizeof(mask));
+				else
+					strlcpy(mask, autokick->mask.c_str(), sizeof(mask));
+				reason = !autokick->reason.empty() ? autokick->reason.c_str() : Config.CSAutokickReason;
+				do_kick = true;
+				break;
+			}
 		}
 	}
 
@@ -631,7 +637,7 @@ akick->nc->display : akick->mask);
 	if (!do_kick)
 		return false;
 
-	Alog(LOG_DEBUG) << "channel: Autokicking "<< user->GetMask() <<  " from " << this->name;
+	Alog(LOG_DEBUG) << "Autokicking "<< user->GetMask() <<  " from " << this->name;
 
 	/* If the channel isn't syncing and doesn't have any users, join ChanServ
 	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed

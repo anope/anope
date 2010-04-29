@@ -977,6 +977,10 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	/* May not kick ulines */
 	if (u->server->IsULined())
 		return false;
+	
+	/* Do not kick protected clients */
+	if (u->IsProtected())
+		return false;
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnBotKick, OnBotKick(bi, this, u, buf));

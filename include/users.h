@@ -258,5 +258,10 @@ class CoreExport User : public Extensible
 	 * @return The channel container, or NULL
 	 */
 	ChannelContainer *FindChannel(Channel *c);
+
+	/** Check if the user is protected from kicks and negative mode changes
+	 * @return true or false
+	 */
+	bool IsProtected() const;
 };
 

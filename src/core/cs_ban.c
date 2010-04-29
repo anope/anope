@@ -62,9 +62,9 @@ class CommandCSBan : public Command
 			 */
 		} else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u2)) {
 			notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
-		} else if (is_protected(u2)) {
+		} else if (u2->IsProtected())
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		} else {
+		else {
 			char mask[BUFSIZE];
 
 			get_idealban(ci, u2, mask, sizeof(mask));

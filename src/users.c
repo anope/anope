@@ -755,6 +755,17 @@ ChannelContainer *User::FindChannel(Channel *c)
 	return NULL;
 }
 
+/** Check if the user is protected from kicks and negative mode changes
+ * @return true or false
+ */
+bool User::IsProtected() const
+{
+	if (this->HasMode(UMODE_PROTECTED) || this->HasMode(UMODE_GOD))
+		return true;
+
+	return false;
+}
+
 /*************************************************************************/
 
 /* Iterate over all users in the user list.  Return NULL at end of list. */
@@ -1094,18 +1105,6 @@ void do_kill(const std::string &nick, const std::string &msg)
 }
 
 /*************************************************************************/
-/*************************************************************************/
-
-/* Is the given user protected from kicks and negative mode changes? */
-
-int is_protected(User * user)
-{
-	if (user && user->HasMode(UMODE_PROTECTED))
-		return 1;
-
-	return 0;
-}
-
 /*************************************************************************/
 
 /* Is the given nick an oper? */

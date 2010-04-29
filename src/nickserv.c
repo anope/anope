@@ -1539,7 +1539,13 @@ static int delcore(NickCore * nc)
 int delnickrequest(NickRequest * nr)
 {
     if (nr) {
-        nrlists[HASH(nr->nick)] = nr->next;
+        if (nr->next)
+	    nr->next->prev = nr->prev;
+        if (nr->prev)
+            nr->prev->next = nr->next;
+        else
+            nrlists[HASH(nr->nick)] = nr->next;
+
         if (nr->nick)
             free(nr->nick);
         if (nr->passcode)

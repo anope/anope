@@ -581,11 +581,8 @@ bool ChannelInfo::CheckKick(User *user)
 	if (is_ulined(user->server->name))
 		return false;
 
-	if (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN))
+	if (!is_oper(user) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
 	{
-		if (is_oper(user))
-			return 0;
-
 		get_idealban(this, user, mask, sizeof(mask));
 		reason = this->forbidreason ? this->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
 		set_modes = true;
@@ -598,7 +595,7 @@ bool ChannelInfo::CheckKick(User *user)
 		nc = NULL;
 
 	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
-		return true;
+		return false;
 
 	for (unsigned j = 0; j < this->GetAkickCount(); ++j)
 	{

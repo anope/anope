@@ -273,15 +273,15 @@ class BahamutIRCdProto : public IRCDProto
 	/* SERVER */
 	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
+		send_cmd(NULL, "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
 
 	void SendConnect()
 	{
+		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, "");
 		bahamut_cmd_pass(uplink_server->password);
 		bahamut_cmd_capab();
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, "");
-		SendServer(me_server);
+		SendServer(Me);
 		bahamut_cmd_svinfo();
 		bahamut_cmd_burst();
 	}
@@ -575,11 +575,7 @@ int anope_event_436(const char *source, int ac, const char **av)
 /* EVENT : SERVER */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-	if (!stricmp(av[1], "1")) {
-		uplink = sstrdup(av[0]);
-	}
-
-	do_server(source, av[0], av[1], av[2], "");
+	do_server(source, av[0], atoi(av[1]), av[2], "");
 	return MOD_CONT;
 }
 
@@ -711,8 +707,8 @@ int anope_event_error(const char *source, int ac, const char **av)
 
 int anope_event_burst(const char *source, int ac, const char **av)
 {
-	Server *s;
-	s = findserver(servlist, source);
+	Server *s = Server::Find(source ? source : "");
+
 	if (!ac) {
 		/* for future use  - start burst */
 	} else {
@@ -720,9 +716,10 @@ int anope_event_burst(const char *source, int ac, const char **av)
 		 * finished bursting. If there was no source, then our uplink
 		 * server finished bursting. -GD
 		 */
-		if (!s && serv_uplink)
-			s = serv_uplink;
-		finish_sync(s, 1);
+		if (!s)
+			s = Me->GetUplink();
+		if (s)
+			s->Sync(true);
 	}
 	return MOD_CONT;
 }

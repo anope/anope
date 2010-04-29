@@ -578,7 +578,7 @@ bool ChannelInfo::CheckKick(User *user)
 
 	/* We don't enforce services restrictions on clients on ulined services
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
-	if (is_ulined(user->server->name))
+	if (user->server->IsULined())
 		return false;
 
 	if (!is_oper(user) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))

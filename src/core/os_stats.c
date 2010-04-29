@@ -21,16 +21,19 @@ void get_operserv_stats(long *nrec, long *memuse);
  * @param s The server to start counting from
  * @return Amount of servers connected to server s
  **/
-int stats_count_servers(Server *s)
+static int stats_count_servers(Server *s)
 {
-	int count = 0;
+	if (!s)
+		return 0;
+	
+	int count = 1;
 
-	while (s)
+	if (s->GetLinks())
 	{
-		++count;
-		if (s->links)
-			count += stats_count_servers(s->links);
-		s = s->next;
+		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
+		{
+			count += stats_count_servers(*it);
+		}
 	}
 
 	return count;
@@ -214,9 +217,9 @@ class CommandOSStats : public Command
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER, serv_uplink->name);
+		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER, Me->GetUplink()->GetName().c_str());
 		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf.c_str());
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(serv_uplink));
+		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetUplink()));
 		return MOD_CONT;
 	}
 

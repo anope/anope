@@ -1,8 +1,8 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
-		config.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
-		memory.o memoserv.o messages.o misc.o modules.o nickserv.o operserv.o \
-		process.o protocol.o send.o servers.o sessions.o slist.o sockets.o opertype.o users.o module.o modulemanager.o configreader.o \
-		wildcard.o nickcore.o nickalias.o timers.o modes.o regchannel.o
+		config.o configreader.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
+		memory.o memoserv.o messages.o misc.o modes.o modules.o module.o modulemanager.o nickalias.o \
+		nickcore.o nickserv.o operserv.o process.o protocol.o regchannel.o send.o servers.o sessions.o slist.o \
+		sockets.o timers.o opertype.o users.o wildcard.o
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
@@ -33,20 +33,17 @@ services:  $(OBJS)
 	$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
-modes.o:	modes.cpp $(INCLUDES)
-timers.o:	timers.cpp $(INCLUDES)
-nickcore.o:     nickcore.cpp $(INCLUDES)
-nickalias.o:    nickalias.cpp $(INCLUDES)
 actions.o:      actions.c   $(INCLUDES)
 base64.o:       base64.c    $(INCLUDES)
 bots.o:         bots.cpp    $(INCLUDES)
 botserv.o:      botserv.c   $(INCLUDES)
 channels.o:     channels.c  $(INCLUDES)
 chanserv.o:     chanserv.c  $(INCLUDES)
-command.o:     command.cpp  $(INCLUDES)
+command.o:      command.cpp  $(INCLUDES)
 commands.o:     commands.c  $(INCLUDES)
 compat.o:       compat.c    $(INCLUDES)
 config.o:       config.c    $(INCLUDES)
+configreader.o: configreader.cpp $(INCLUDES)
 encrypt.o:      encrypt.c   $(INCLUDES)
 init.o:         init.c      $(INCLUDES)
 ircd.o:         ircd.c      $(INCLUDES)
@@ -58,23 +55,26 @@ main.o:         main.c      $(INCLUDES)
 memory.o:       memory.c    $(INCLUDES)
 memoserv.o:     memoserv.c  $(INCLUDES)
 messages.o:     messages.c  $(INCLUDES)
+modes.o:        modes.cpp $(INCLUDES)
 modules.o:      modules.c   $(INCLUDES)
 module.o:       module.cpp   $(INCLUDES)
 modulemanager.o:      modulemanager.cpp   $(INCLUDES)
 misc.o:         misc.c      $(INCLUDES)
+nickalias.o:    nickalias.cpp $(INCLUDES)
+nickcore.o:     nickcore.cpp $(INCLUDES)
 nickserv.o:     nickserv.c  $(INCLUDES)
 operserv.o:     operserv.c  $(INCLUDES)
+opertype.o:     opertype.cpp  $(INCLUDES)
 process.o:      process.c   $(INCLUDES)
 protocol.o:     protocol.cpp  $(INCLUDES)
 regchannel.o:	regchannel.cpp $(INCLUDES)
 send.o:         send.c      $(INCLUDES)
-servers.o:      servers.c   $(INCLUDES)
+servers.o:      servers.cpp   $(INCLUDES)
 sessions.o:     sessions.c  $(INCLUDES)
 slist.o:        slist.c     $(INCLUDES)
-sockets.o:     sockets.cpp  $(INCLUDES)
-opertype.o:   opertype.cpp  $(INCLUDES)
+sockets.o:      sockets.cpp  $(INCLUDES)
+timers.o:       timers.cpp $(INCLUDES)
 users.o:        users.c     $(INCLUDES)
-vsnprintf.o:    vsnprintf.c $(INCLUDES)
 wildcard.o:     wildcard.cpp $(INCLUDES)
 
 modules: DUMMY

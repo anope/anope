@@ -235,8 +235,6 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
-		if (uplink)
-			delete [] uplink;
 		u = firstuser();
 		while (u) {
 			next = nextuser();

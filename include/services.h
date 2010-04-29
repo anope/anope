@@ -348,6 +348,7 @@ template<typename T> class Flags
 class User;
 class ChannelInfo;
 class Channel;
+class Server;
 struct EList;
 
 typedef struct bandata_ BanData;
@@ -677,48 +678,7 @@ typedef struct {
 
 /*************************************************************************/
 
-/* Server data */
-
-typedef enum {
-	SSYNC_IN_PROGRESS   = 0,	/* Sync is currently in progress */
-	SSYNC_DONE		  = 1		/* We're in sync				 */
-} SyncState;
-
-/** Flags set on servers
- */
-enum ServerFlag
-{
-	SERVER_START,
-
-	/* This server is me */
-	SERVER_ISME,
-	/* This server was juped */
-	SERVER_JUPED,
-	/* This server is the current uplink */
-	SERVER_ISUPLINK,
-
-	SERVER_END
-};
-
-class Server : public Flags<ServerFlag>
-{
- public:
-	Server *next, *prev;
-
-	char *name;	 /* Server name						*/
-	uint16 hops;	/* Hops between services and server   */
-	char *desc;	 /* Server description				 */
-	char *suid;	 /* Server Univeral ID				 */
-	SyncState sync; /* Server sync state (see above)	  */
-
-	Server *links;	/* Linked list head for linked servers 	  */
-	Server *uplink;	/* Server which pretends to be the uplink */
-};
-
-/*************************************************************************/
-
 #include "users.h"
-
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
  */
@@ -920,55 +880,6 @@ enum DefconLevel
 
 /*************************************************************************/
 
-/* Types of capab
- */
-enum CapabType
-{
-	CAPAB_BEGIN,
-
-	CAPAB_NOQUIT,
-	CAPAB_TSMODE,
-	CAPAB_UNCONNECT,
-	CAPAB_NICKIP,
-	CAPAB_NSJOIN,
-	CAPAB_ZIP,
-	CAPAB_BURST,
-	CAPAB_TS3,
-	CAPAB_TS5,
-	CAPAB_DKEY,
-	CAPAB_DOZIP,
-	CAPAB_DODKEY,
-	CAPAB_QS,
-	CAPAB_SCS,
-	CAPAB_PT4,
-	CAPAB_UID,
-	CAPAB_KNOCK,
-	CAPAB_CLIENT,
-	CAPAB_IPV6,
-	CAPAB_SSJ5,
-	CAPAB_SN2,
-	CAPAB_VHOST,
-	CAPAB_TOKEN,
-	CAPAB_SSJ3,
-	CAPAB_NICK2,
-	CAPAB_VL,
-	CAPAB_TLKEXT,
-	CAPAB_CHANMODE,
-	CAPAB_SJB64,
-	CAPAB_NICKCHARS,
-
-	CAPAB_END
-};
-
-/* CAPAB stuffs */
-struct CapabInfo
-{
-	std::string Token;
-	CapabType Flag;
-};
-
-/*************************************************************************/
-
 /**
  * RFC: defination of a valid nick
  * nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
@@ -986,7 +897,9 @@ struct CapabInfo
 class IRCDProto;
 struct Uplink;
 class ServerConfig;
+
 #include "extern.h"
+#include "servers.h"
 #include "configreader.h"
 
 class CoreExport IRCDProto

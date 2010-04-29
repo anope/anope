@@ -25,18 +25,20 @@ class CommandOSJupe : public Command
 	{
 		const char *jserver = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
-		Server *server = findserver(servlist, jserver);
+		Server *server = Server::Find(jserver);
 
 		if (!isValidHost(jserver, 3))
 			notice_lang(Config.s_OperServ, u, OPER_JUPE_HOST_ERROR);
-		else if (server && (server->HasFlag(SERVER_ISME) || server->HasFlag(SERVER_ISUPLINK)))
+		else if (server && (server == Me || server == Me->GetUplink()))
 			notice_lang(Config.s_OperServ, u, OPER_JUPE_INVALID_SERVER);
-		else {
+		else
+		{
 			char rbuf[256];
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick.c_str(), reason ? ": " : "", reason ? reason : "");
-			if (findserver(servlist, jserver))
+			if (server)
 				ircdproto->SendSquit(jserver, rbuf);
-			Server *juped_server = new_server(me_server, jserver, rbuf, SERVER_JUPED, ircd->ts6 ? ts6_sid_retrieve() : "");
+			Server *juped_server = new Server(Me, jserver, 0, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "");
+			juped_server->SetFlag(SERVER_JUPED);
 			ircdproto->SendServer(juped_server);
 
 			if (Config.WallOSJupe)

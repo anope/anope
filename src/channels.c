@@ -118,7 +118,7 @@ void Channel::Sync()
 		stick_all(this->ci);
 	}
 
-	if (serv_uplink && is_sync(serv_uplink) && !this->topic_sync)
+	if (Me && Me->IsSynced() && !this->topic_sync)
 		restore_topic(name.c_str());
 }
 
@@ -146,7 +146,7 @@ void Channel::JoinUser(User *user)
 		}
 		/* Added channelname to entrymsg - 30.03.2004, Certus */
 		/* Also, don't send the entrymsg when bursting -GD */
-		if (this->ci && this->ci->entry_message && is_sync(user->server))
+		if (this->ci && this->ci->entry_message && user->server->IsSynced())
 			user->SendMessage(whosends(this->ci)->nick, "[%s] %s", this->name.c_str(), this->ci->entry_message);
 	}
 
@@ -158,7 +158,7 @@ void Channel::JoinUser(User *user)
 	 * But don't join the bot if the channel is persistant - Adam
 	 * But join persistant channels when syncing with our uplink- DP
 	 **/
-	if (Config.s_BotServ && this->ci && this->ci->bi && ((serv_uplink->sync == SSYNC_IN_PROGRESS) || !this->ci->HasFlag(CI_PERSIST)))
+	if (Config.s_BotServ && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)))
 	{
 		if (this->users.size() == Config.BSMinUsers)
 			bot_join(this->ci);
@@ -172,7 +172,7 @@ void Channel::JoinUser(User *user)
 			 * to has synced, or we'll get greet-floods when the net
 			 * recovers from a netsplit. -GD
 			 */
-			if (is_sync(user->server))
+			if (user->server->IsSynced())
 			{
 				ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->Account()->display, user->Account()->greet);
 				this->ci->bi->lastmsg = time(NULL);
@@ -975,7 +975,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	va_end(args);
 
 	/* May not kick ulines */
-	if (is_ulined(u->server->name))
+	if (u->server->IsULined())
 		return false;
 
 	EventReturn MOD_RESULT;
@@ -1513,7 +1513,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	/* If this channel has secureops or the user matches autodeop or the channel is syncing and this is the first user and they are not ulined, check to remove modes */
-	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || (c->HasFlag(CH_SYNCING) && c->users.size() == 1)) && !is_ulined(user->server->name))
+	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || (c->HasFlag(CH_SYNCING) && c->users.size() == 1)) && !user->server->IsULined())
 	{
 		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !IsFounder(user, ci))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);

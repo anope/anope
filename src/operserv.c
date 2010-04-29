@@ -144,59 +144,48 @@ void operserv(User * u, char *buf)
 
 /*************************************************************************/
 /*********************** OperServ command functions **********************/
-/*************************************************************************/
+/*******************************
+ * ******************************************/
 
 /*************************************************************************/
 
 
-Server *server_global(Server * s, char *msg)
+void server_global(Server *s, const std::string &message)
 {
-	Server *sl;
+	/* Do not send the notice to ourselves our juped servers */
+	if (s != Me && !s->HasFlag(SERVER_JUPED))
+		notice_server(Config.s_GlobalNoticer, s, "%s", message.c_str());
 
-	while (s) {
-		/* Do not send the notice to ourselves our juped servers */
-		if (!s->HasFlag(SERVER_ISME) && !s->HasFlag(SERVER_JUPED))
-			notice_server(Config.s_GlobalNoticer, s, "%s", msg);
-
-		if (s->links) {
-			sl = server_global(s->links, msg);
-			if (sl)
-				s = sl;
-			else
-				s = s->next;
-		} else {
-			s = s->next;
+	if (s->GetLinks())
+	{
+		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
+		{
+			server_global(*it, message);
 		}
 	}
-	return s;
-
 }
 
 void oper_global(char *nick, const char *fmt, ...)
 {
 	va_list args;
 	char msg[2048];			 /* largest valid message is 512, this should cover any global */
-	char dmsg[2048];			/* largest valid message is 512, this should cover any global */
 
 	va_start(args, fmt);
 	vsnprintf(msg, sizeof(msg), fmt, args);
 	va_end(args);
 
 	/* I don't like the way this is coded... */
-	if ((nick) && (!Config.AnonymousGlobal)) {
-		snprintf(dmsg, sizeof(dmsg), "[%s] %s", nick, msg);
-		server_global(servlist, dmsg);
-	} else {
-		server_global(servlist, msg);
+	if (nick && !Config.AnonymousGlobal)
+	{
+		std::string rmsg = std::string("[") + nick + std::string("] ") + msg;
+		server_global(Me->GetUplink(), rmsg.c_str());
 	}
+	else
+		server_global(Me->GetUplink(), msg);
 
 }
 
 /**************************************************************************/
-
-
-/************************************************************************/
-/*************************************************************************/
 
 /* Adds an AKILL to the list. Returns >= 0 on success, -1 if it fails, -2
  * if only the expiry time was changed.

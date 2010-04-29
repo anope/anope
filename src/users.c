@@ -231,7 +231,7 @@ User::~User()
 
 		Alog() << "LOGUSERS: " << this->GetMask() << (ircd->vhost ? " => " : " ")
 			<< (ircd->vhost ? this->GetDisplayedHost() : "")
-			<< " (" << srealname << ") left the network (" << this->server->name << ").";
+			<< " (" << srealname << ") left the network (" << this->server->GetName() << ").";
 
 		delete [] srealname;
 	}
@@ -551,8 +551,7 @@ void get_user_stats(long *nusers, long *memuse)
 			}
 			if (user->realname)
 				mem += strlen(user->realname) + 1;
-			if (user->server->name)
-				mem += strlen(user->server->name) + 1;
+			mem += user->server->GetName().length() + 1;
 			mem += (sizeof(ChannelContainer) * user->chans.size());
 		}
 	}
@@ -862,6 +861,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			ntoa(addr, ipbuf, sizeof(ipbuf));
 		}
 
+		Server *serv = Server::Find(server);
 
 		if (Config.LogUsers)
 		{
@@ -886,7 +886,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 				<< (ircd->nickvhost && vhost ? " => " : "")
 				<< (ircd->nickvhost && vhost ? vhost : "") << ") (" << logrealname << ") "
 				<< (ircd->nickip ? "[" : "") << (ircd->nickip ? ipbuf : "") << (ircd->nickip ? "]" : "")
-				<< " connected to the network (" << server << ").";
+				<< " connected to the network (" << serv->GetName() << ").";
 			delete [] logrealname;
 		}
 
@@ -894,7 +894,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		user = new User(nick, uid ? uid : "");
 		user->SetIdent(username);
 		user->host = sstrdup(host);
-		user->server = findserver(servlist, server);
+		user->server = serv;
 		user->realname = sstrdup(realname);
 		user->timestamp = ts;
 		user->my_signon = time(NULL);
@@ -925,7 +925,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (ircd->szline && ircd->nickip)
 			check_szline(nick, ipbuf);
 
-		if (Config.LimitSessions && !is_ulined(server))
+		if (Config.LimitSessions && !serv->IsULined())
 			add_session(nick, host, ipbuf);
 
 		/* User is no longer connected, return */
@@ -954,8 +954,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		{
 			const char *logrealname = normalizeBuffer(user->realname);
 			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host
-				<< (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") ("
-				<< logrealname << ") " << "changed nick to " << nick << " (" << user->server->name << ").";
+				<< (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" 
+				<< logrealname << ") " << "changed nick to " << nick << " (" << user->server->GetName() << ").";
 			if (logrealname)
 				delete [] logrealname;
 		}
@@ -1055,9 +1055,8 @@ void do_quit(const char *source, int ac, const char **av)
 			delete [] na->last_quit;
 		na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
 	}
-	if (Config.LimitSessions && !is_ulined(user->server->name)) {
+	if (Config.LimitSessions && !user->server->IsULined())
 		del_session(user->host);
-	}
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
 	delete user;
 }
@@ -1088,7 +1087,7 @@ void do_kill(const std::string &nick, const std::string &msg)
 			delete [] na->last_quit;
 		na->last_quit = !msg.empty() ? sstrdup(msg.c_str()) : NULL;
 	}
-	if (Config.LimitSessions && !is_ulined(user->server->name)) {
+	if (Config.LimitSessions && !user->server->IsULined()) {
 		del_session(user->host);
 	}
 	delete user;

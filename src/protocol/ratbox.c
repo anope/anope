@@ -14,6 +14,8 @@
 #include "services.h"
 #include "pseudo.h"
 
+static char *TS6UPLINK = NULL; // XXX is this needed?
+
 IRCDVar myIrcd[] = {
 	{"Ratbox 2.0+",			 /* ircd name */
 	 "+oi",					 /* Modes used by pseudoclients */
@@ -190,16 +192,16 @@ class RatboxProto : public IRCDTS6Proto
 	/* SERVER name hop descript */
 	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
+		send_cmd(NULL, "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
 
 	void SendConnect()
 	{
+		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, TS6SID);
 		ratbox_cmd_pass(uplink_server->password);
 		ratbox_cmd_capab();
 		/* Make myself known to myself in the serverlist */
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, TS6SID);
-		SendServer(me_server);
+		SendServer(Me);
 		ratbox_cmd_svinfo();
 	}
 
@@ -457,14 +459,13 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 */
 int anope_event_nick(const char *source, int ac, const char **av)
 {
-	Server *s;
 	User *user;
 
 	if (ac == 9)
 	{
-		s = findserver_uid(servlist, source);
+		Server *s = Server::Find(source ? source : "");
 		/* Source is always the server */
-		user = do_nick("", av[0], av[4], av[5], s->name, av[8],
+		user = do_nick("", av[0], av[4], av[5], s->GetName().c_str(), av[8],
 					   strtoul(av[2], NULL, 10), 0, "*", av[7]);
 		if (user)
 		{
@@ -681,27 +682,24 @@ int anope_event_whois(const char *source, int ac, const char **av)
 int anope_event_server(const char *source, int ac, const char **av)
 {
 	if (!stricmp(av[1], "1")) {
-		uplink = sstrdup(av[0]);
 		if (TS6UPLINK) {
-			do_server(source, av[0], av[1], av[2], TS6UPLINK);
+			do_server(source, av[0], atoi(av[1]), av[2], TS6UPLINK);
 		} else {
-			do_server(source, av[0], av[1], av[2], "");
+			do_server(source, av[0], atoi(av[1]), av[2], "");
 		}
 	} else {
-		do_server(source, av[0], av[1], av[2], "");
+		do_server(source, av[0], atoi(av[1]), av[2], "");
 	}
 	return MOD_CONT;
 }
 
 int anope_event_sid(const char *source, int ac, const char **av)
 {
-	Server *s;
-
 	/* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
 
-	s = findserver_uid(servlist, source);
+	Server *s = Server::Find(source);
 
-	do_server(s->name, av[0], av[1], av[3], av[2]);
+	do_server(s->GetName(), av[0], atoi(av[1]), av[3], av[2]);
 	return MOD_CONT;
 }
 

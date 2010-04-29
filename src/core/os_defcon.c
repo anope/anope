@@ -156,13 +156,11 @@ class OSDEFCON : public Module
 
 	EventReturn OnPreUserConnect(User *u)
 	{
-		std::string mask;
-
-		if (u && is_sync(u->server) && CheckDefCon(DEFCON_AKILL_NEW_CLIENTS) && !is_ulined(u->server->name))
+		if (u->server->IsSynced() && CheckDefCon(DEFCON_AKILL_NEW_CLIENTS) && !u->server->IsULined())
 		{
 			if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
 			{
-				mask = "*@" + std::string(u->host);
+				std::string mask = "*@" + std::string(u->host);
 				Alog() << "DEFCON: adding akill for " << mask;
 				add_akill(NULL, mask.c_str(), Config.s_OperServ,
 					time(NULL) + Config.DefConAKILL,

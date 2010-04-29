@@ -216,9 +216,9 @@ class UnrealIRCdProto : public IRCDProto
 	void SendServer(Server *server)
 	{
 		if (Config.Numeric)
-			send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", server->name, server->hops, Config.Numeric, server->desc);
+			send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", server->GetName().c_str(), server->GetHops(), Config.Numeric, server->GetDescription().c_str());
 		else
-			send_cmd(NULL, "SERVER %s %d :%s", server->name, server->hops, server->desc);
+			send_cmd(NULL, "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */
@@ -286,10 +286,10 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
+		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, (Config.Numeric ? Config.Numeric : ""));
 		unreal_cmd_capab();
 		unreal_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, (Config.Numeric ? Config.Numeric : ""));
-		SendServer(me_server);
+		SendServer(Me);
 	}
 
 	/* SVSHOLD - set */
@@ -701,7 +701,7 @@ int anope_event_mode(const char *source, int ac, const char **av)
 /* This is used to strip the TS from the end of the mode stirng */
 int anope_event_gmode(const char *source, int ac, const char **av)
 {
-	if (findserver(servlist, source))
+	if (Server::Find(source))
 		--ac;
 	return anope_event_mode(source, ac, av);
 }
@@ -966,16 +966,15 @@ int anope_event_server(const char *source, int ac, const char **av)
 	char *upnumeric;
 
 	if (!stricmp(av[1], "1")) {
-		uplink = sstrdup(av[0]);
 		vl = myStrGetToken(av[2], ' ', 0);
 		upnumeric = myStrGetToken(vl, '-', 2);
 		desc = myStrGetTokenRemainder(av[2], ' ', 1);
-		do_server(source, av[0], av[1], desc, upnumeric);
+		do_server(source, av[0], atoi(av[1]), desc, upnumeric);
 		delete [] vl;
 		delete [] desc;
 		delete [] upnumeric;
 	} else {
-		do_server(source, av[0], av[1], av[2], "");
+		do_server(source, av[0], atoi(av[1]), av[2], "");
 	}
 	ircdproto->SendPing(Config.ServerName, av[0]);
 
@@ -1021,12 +1020,10 @@ int anope_event_error(const char *source, int ac, const char **av)
 
 int anope_event_sdesc(const char *source, int ac, const char **av)
 {
-	Server *s;
-	s = findserver(servlist, source);
+	Server *s = Server::Find(source ? source : "");
 
-	if (s) {
-		s->desc = const_cast<char *>(av[0]); // XXX Unsafe cast -- CyberBotX
-	}
+	if (s)
+		s->SetDescription(av[0]);
 
 	return MOD_CONT;
 }

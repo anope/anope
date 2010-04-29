@@ -153,12 +153,12 @@ void IRCDProto::SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...)
 
 void IRCDProto::SendGlobalNotice(BotInfo *bi, Server *dest, const char *msg)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->name, msg);
+	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg);
 }
 
 void IRCDProto::SendGlobalPrivmsg(BotInfo *bi, Server *dest, const char *msg)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->name, msg);
+	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg);
 }
 
 void IRCDProto::SendQuit(const char *nick, const char *)

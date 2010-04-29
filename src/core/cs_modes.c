@@ -380,7 +380,7 @@ class CSModes : public Module
 		this->AddCommand(CHANSERV, new CommandCSVoice());
 		this->AddCommand(CHANSERV, new CommandCSDeVoice());
 
-		if (serv_uplink && is_sync(serv_uplink))
+		if (Me && Me->IsSynced())
 			OnUplinkSync();
 
 		Implementation i[] = {

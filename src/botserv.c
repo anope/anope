@@ -665,7 +665,7 @@ static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 		return;
 
 	/* Don't ban ulines */
-	if (is_ulined(u->server->name))
+	if (u->server->IsULined())
 		return;
 
 	bd->ttb[ttbtype]++;

@@ -544,7 +544,7 @@ class CSXOP : public Module
 		this->AddCommand(CHANSERV, new CommandCSAOP());
 		this->AddCommand(CHANSERV, new CommandCSVOP());
 
-		if (serv_uplink && is_sync(serv_uplink))
+		if (Me && Me->IsSynced())
 			OnUplinkSync();
 
 		Implementation i[] = {

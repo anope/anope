@@ -23,8 +23,6 @@
 E void ModuleRunTimeDirCleanUp();
 
 
-E char *uplink;
-
 /* IRC Variables */
 
 E IRCDVar *ircd;
@@ -423,7 +421,7 @@ E int add_szline(User * u, const char *mask, const char *by,
 E void expire_szlines();
 E int check_szline(const char *nick, char *ip);
 
-E Server *server_global(Server * s, char *msg);
+E void server_global(Server *s, const std::string &message);
 
 E std::vector<NewsItem *> News;
 
@@ -458,37 +456,6 @@ E void notice_list(const char *source, const char *dest, char **text); // MARK_D
 E void notice_lang(const std::string &source, User *dest, int message, ...); // MARK_DEPRECATED;
 E void notice_help(const char *source, User *dest, int message, ...); // MARK_DEPRECATED;
 
-
-/**** servers.c ****/
-
-E Server *servlist;
-E Server *me_server;
-E Server *serv_uplink;
-E Flags<CapabType> Capab;
-E CapabInfo Capab_Info[];
-
-E Server *first_server(ServerFlag flag);
-E Server *next_server(ServerFlag flag);
-
-E void CapabParse(int ac, const char **av);
-E int is_ulined(const char *server);
-E int is_sync(Server *server);
-
-E Server *new_server(Server * uplink, const char *name, const char *desc, ServerFlag flag, const std::string &suid);
-
-E Server *findserver(Server *s, const char *name);
-
-E void do_server(const char *source, const char *servername, const char *hops, const char *descript, const std::string &numeric);
-E void do_squit(const char *source, int ac, const char **av);
-E int anope_check_sync(const char *name);
-
-E void finish_sync(Server *serv, int sync_links);
-
-E void ts6_uid_init();
-E void ts6_uid_increment(unsigned int slot);
-E const char *ts6_uid_retrieve();
-
-E const char *ts6_sid_retrieve();
 
 /**** sessions.c ****/
 
@@ -550,7 +517,6 @@ E User *first_uid();
 E User *next_uid();
 E Server *findserver_uid(Server * s, const char *name);
 E char *TS6SID;
-E char *TS6UPLINK;
 
 E User *do_nick(const char *source, const char *nick, const char *username, const char *host,
 			  const char *server, const char *realname, time_t ts, uint32 ip, const char *vhost, const char *uid);

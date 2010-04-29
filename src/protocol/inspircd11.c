@@ -204,7 +204,7 @@ class InspIRCdProto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(Server *server)
 	{
-		send_cmd(Config.ServerName, "SERVER %s %s %d :%s", server->name, currentpass, server->hops, server->desc);
+		send_cmd(Config.ServerName, "SERVER %s %s %d :%s", server->GetName().c_str(), currentpass, server->GetHops(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */
@@ -248,9 +248,9 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
+		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, "");
 		inspircd_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, "");
-		SendServer(me_server);
+		SendServer(Me);
 		send_cmd(NULL, "BURST");
 		send_cmd(Config.ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, Config.ServerName, ircd->name, version_flags, Config.EncModuleList.begin()->c_str(), version_build);
 	}
@@ -823,10 +823,7 @@ int anope_event_chghost(const char *source, int ac, const char **av)
 /* EVENT: SERVER */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-	if (!stricmp(av[1], "1")) {
-		uplink = sstrdup(av[0]);
-	}
-	do_server(source, av[0], av[1], av[2], "");
+	do_server(source, av[0], atoi(av[1]), av[2], "");
 	return MOD_CONT;
 }
 
@@ -1100,7 +1097,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 
 int anope_event_endburst(const char *source, int ac, const char **av)
 {
-	finish_sync(serv_uplink, 1);
+	Me->GetUplink()->Sync(true);
 	return MOD_CONT;
 }
 

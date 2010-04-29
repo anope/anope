@@ -209,7 +209,7 @@ class InspIRCdProto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %s %d %s :%s", server->name, currentpass, server->hops, server->suid, server->desc);
+		send_cmd(NULL, "SERVER %s %s %d %s :%s", server->GetName().c_str(), currentpass, server->GetHops(), server->GetSID().c_str(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */
@@ -252,9 +252,9 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
+		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, TS6SID);
 		inspircd_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, TS6SID);
-		SendServer(me_server);
+		SendServer(Me);
 		send_cmd(TS6SID, "BURST");
 		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, Config.ServerName, ircd->name, version_flags, Config.EncModuleList.begin()->c_str(), version_build);
 	}
@@ -837,7 +837,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	User *user;
 	NickAlias *na;
 	struct in_addr addy;
-	Server *s = findserver_uid(servlist, source);
+	Server *s = Server::Find(source ? source : "");
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 	int ts = strtoul(av[1], NULL, 10);
 
@@ -846,7 +846,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	user = prev_u_intro;
 	prev_u_intro = NULL;
 	if (user) na = findnick(user->nick);
-	if (user && user->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != user->Account()))
+	if (user && !user->server->IsSynced() && (!na || na->nc != user->Account()))
 	{
 		validate_user(user);
 		if (user->HasMode(UMODE_REGISTERED))
@@ -858,14 +858,14 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	user = do_nick("", av[2],   /* nick */
 			av[5],   /* username */
 			av[3],   /* realhost */
-			s->name,  /* server */
+			s->GetName().c_str(),  /* server */
 			av[ac - 1],   /* realname */
 			ts, htonl(*ad), av[4], av[0]);
 	if (user)
 	{
 		UserSetInternalModes(user, 1, &av[8]);
 		user->SetCloakedHost(av[4]);
-		if (user->server->sync == SSYNC_IN_PROGRESS)
+		if (!user->server->IsSynced())
 		{
 			prev_u_intro = user;
 		}
@@ -903,11 +903,7 @@ int anope_event_chghost(const char *source, int ac, const char **av)
  */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-	if (!stricmp(av[2], "0"))
-	{
-		uplink = sstrdup(av[0]);
-	}
-	do_server(source, av[0], av[2], av[4], av[3]);
+	do_server(source, av[0], atoi(av[2]), av[4], av[3]);
 	return MOD_CONT;
 }
 
@@ -1308,7 +1304,8 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 {
 	NickAlias *na;
 	User *u = prev_u_intro;
-	Server *s = findserver_uid(servlist, source);
+	Server *s = Server::Find(source ? source : "");
+
 	if (!s)
 	{
 		throw new CoreException("Got ENDBURST without a source");
@@ -1318,16 +1315,16 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	 * If not, validate the user. ~ Viper*/
 	prev_u_intro = NULL;
 	if (u) na = findnick(u->nick);
-	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->Account()))
+	if (u && !u->server->IsSynced() && (!na || na->nc != u->Account()))
 	{
 		validate_user(u);
 		if (u->HasMode(UMODE_REGISTERED))
 			u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
-	Alog() << "Processed ENDBURST for " << s->name;
+	Alog() << "Processed ENDBURST for " << s->GetName();
 
-	finish_sync(s, 1);
+	s->Sync(true);
 	return MOD_CONT;
 }
 

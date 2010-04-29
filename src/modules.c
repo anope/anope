@@ -76,10 +76,6 @@ int protocol_module_init()
 				Alog() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
 				ret = -1;
 			}
-			else
-			{
-				ts6_uid_init();
-			}
 		}
 	}
 

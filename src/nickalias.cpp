@@ -20,7 +20,13 @@ NickRequest::~NickRequest()
 {
 	FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(this));
 
-	nrlists[HASH(this->nick)] = this->next;
+	if (this->next)
+		this->next->prev = this->prev;
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		nrlists[HASH(this->nick)] = this->next;
+	
 	if (this->nick)
 		delete [] this->nick;
 	if (this->email)

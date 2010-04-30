@@ -633,10 +633,10 @@ akick->nc->display : akick->mask);
 
 	Alog(LOG_DEBUG) << "channel: Autokicking "<< user->GetMask() <<  " from " << this->name;
 
-	/* If the channel doesnt have any users and if a bot isn't already in the channel, join it
+	/* If the channel isn't syncing and doesn't have any users, join ChanServ
 	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
 	 */
-	if (this->c->users.size() == 1 && !this->HasFlag(CI_INHABIT))
+	if (this->c->users.size() == 1 && !this->HasFlag(CI_INHABIT) && !this->c->HasFlag(CH_SYNCING))
 	{
 		/* If channel was forbidden, etc, set it +si to prevent rejoin */
 		if (set_modes)

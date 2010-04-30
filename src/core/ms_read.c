@@ -74,7 +74,7 @@ class CommandMSRead : public Command
 				{
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 					{
-						read_memo(u, i, mi, chan.c_str());
+						read_memo(u, i, mi, !chan.empty() ? chan.c_str() : NULL);
 						++readcount;
 					}
 				}
@@ -89,11 +89,11 @@ class CommandMSRead : public Command
 			else if (numstr == "LAST")
 			{
 				for (i = 0; i < mi->memos.size() - 1; ++i);
-				read_memo(u, i, mi, chan.c_str());
+				read_memo(u, i, mi, !chan.empty() ? chan.c_str() : NULL);
 			}
 			else /* number[s] */
 			{
-				if (!process_numlist(numstr.c_str(), &count, read_memo_callback, u, mi, chan.c_str()))
+				if (!process_numlist(numstr.c_str(), &count, read_memo_callback, u, mi, !chan.empty() ? chan.c_str() : NULL))
 				{
 					if (count == 1)
 						notice_lang(Config.s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);

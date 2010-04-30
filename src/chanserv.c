@@ -1206,10 +1206,7 @@ void ChanServTimer::Tick(time_t)
 	if (!c->users.empty())
 		return;
 	
-	if (c->ci->bi)
-		ircdproto->SendPart(c->ci->bi, c, NULL);
-	else
-		ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+	ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
 	
 	/* Now delete the channel as it is empty */
 	if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))

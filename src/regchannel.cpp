@@ -647,13 +647,10 @@ akick->nc->display : akick->mask);
 			c->SetMode(NULL, CMODE_INVITE);
 		}
 
-		/* This channel has no bot assigned to it, join ChanServ */
-		if (!this->bi)
-		{
-			ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
-		}
+		/* Join ChanServ */
+		ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
 
-		/* Set a timer for this channel to part the bots later */
+		/* Set a timer for this channel to part ChanServ later */
 		new ChanServTimer(this->c);
 	}
 

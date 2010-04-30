@@ -26,6 +26,7 @@ F Converting access entries to access from xop when a users access is below voic
 F A bad pointer passed to the OnDelEvent which could cause some 3rd party modules to crash
 F CS FORBID allows to you forbid unregistered channels
 F The -nothird command line option to work
+F ms_rsend to really work
 
 Anope Version 1.9.1
 --------------------

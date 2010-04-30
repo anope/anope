@@ -37,11 +37,6 @@ class CommandMSRSend : public Command
 				notice_lang(Config.s_MemoServ, u, MEMO_NO_RSEND_SELF);
 				return MOD_CONT;
 			}
-			else
-			{
-				notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, nick);
-				return MOD_CONT;
-			}
 		}
 
 		if (Config.MSMemoReceipt == 1)

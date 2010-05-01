@@ -34,7 +34,7 @@ int inet_aton(const char *name, struct in_addr *addr)
 #endif
 
 IRCDVar myIrcd[] = {
-	{"InspIRCd 1.2",			/* ircd name */
+	{"InspIRCd 1.2 & 2.0",			/* ircd name */
 	 "+I",					  /* Modes used by pseudoclients */
 	 5,						 /* Chan Max Symbols	 */
 	 "+ao",					 /* Channel Umode used by Botserv bots */
@@ -1377,7 +1377,7 @@ class ProtoInspIRCd : public Module
 		if (Config.Numeric)
 			TS6SID = sstrdup(Config.Numeric);
 
-		pmodule_ircd_version("InspIRCd 1.2");
+		pmodule_ircd_version("InspIRCd 1.2 & 2.0");
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(0);
 

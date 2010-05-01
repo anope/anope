@@ -191,7 +191,7 @@ Table of Contents
     Anope currently works with:
 
         * Bahamut 1.4.27 or later (including 1.8)
-        * InspIRCd 1.1 or later (including 1.2)
+        * InspIRCd 1.1, 1.2, or 2.0
         * Ratbox 2.0.6 or later
         * UnrealIRCd 3.2 or later
 

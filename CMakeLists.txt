@@ -427,7 +427,7 @@ if(WIN32)
   install(FILES ${Anope_SOURCE_DIR}/anope.bat
     DESTINATION bin
   )
-  install(FILES ${Anope_SOURCE_DIR}/Changes ${Anope_SOURCE_DIR}/Changes.conf ${Anope_SOURCE_DIR}/Changes.lang
+  install(FILES ${Anope_SOURCE_DIR}/docs/Changes ${Anope_SOURCE_DIR}/docs/Changes.conf ${Anope_SOURCE_DIR}/docs/Changes.lang
     DESTINATION .
   )
 endif(WIN32)

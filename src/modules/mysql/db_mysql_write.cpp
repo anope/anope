@@ -481,7 +481,7 @@ class DBMySQLWrite : public DBMySQL
 					return;
 				if (cmd == "PASSWORD" && params.size() > 1)
 				{
-					query << "UPDATE `anope_ns_core` SET `password` = " << mysqlpp::quote << nc->pass << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `pass` = " << mysqlpp::quote << nc->pass << " WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 				else if (cmd == "LANGUAGE" && params.size() > 1)

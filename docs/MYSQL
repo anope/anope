@@ -4,8 +4,6 @@ Anope MySQL Support
 MySQL support was readded in version 1.9.2 In the form of three modules.
 
 db_mysql_read - Allows you to load your databases from MySQL.
-  Note: At the time of writing, MySQL did not support full databases (no support for OperServ, MemoServ, and HostServ)
-  which means using this is limited. I recommend using db_plain with db_mysql_write and db_mysql_execute
 db_mysql_write - Allows live updating of SQL tables whenever something is executed in Anope.
 db_mysql_execute - Allows executing of Anope commands via SQL.
 

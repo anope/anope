@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2929"
+VERSION_BUILD="2930"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2930 - Print an error if the TS6 SID isn't set/is set incorrectly, most people don't know how to work logfiles
 #Revision 2929 - Added an internal event called when a nick is requested
 #Revision 2918 - Fixed deleting nick requests to only delete the requested nick
 #Revision 2903 - Removed some unnecessary redundant code in cs_clear

@@ -2636,19 +2636,25 @@ void moduleAddAnopeCmds()
  **/
 int AnopeInit(int argc, char **argv)
 {
+    int noforksave = nofork;
+
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
     moduleSetType(PROTOCOL);
 
     if (!UseTS6) {
+        nofork = 1; /* We're going down, set nofork so this error is printed */
         alog("FATAL ERROR: The InspIRCd 1.2 protocol module requires UseTS6 to be enabled in the services.conf.");
+        nofork = noforksave;
         return MOD_STOP;
     }
 
     if (Numeric && is_sid(Numeric))
         TS6SID = sstrdup(Numeric);
     else {
+        nofork = 1; /* We're going down, set nofork so this error is printed */
         alog("FATAL ERROR: The InspIRCd 1.2 protocol module requires the Numeric in the services.conf to contain a TS6SID.");
+        nofork = noforksave;
         return MOD_STOP;
     }
 

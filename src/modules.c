@@ -173,7 +173,7 @@ int encryption_module_init(void) {
  **/
 int protocol_module_init(void)
 {
-    int ret = 0;
+    int ret = 0, noforksave = nofork;
     Module *m;
 	
     m = createModule(IRCDModule);
@@ -190,21 +190,23 @@ int protocol_module_init(void)
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
 		 */
-	    if (UseTokens && !(ircd->token)) {
-    	    alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
-        	UseTokens = 0;
-	    }
+		if (UseTokens && !ircd->token) {
+			alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
+			UseTokens = 0;
+		}
 		
-		if (UseTS6 && !(ircd->ts6)) {
+		if (UseTS6 && !ircd->ts6) {
 			alog("Chosen IRCd does not support TS6, unsetting UseTS6");
 			UseTS6 = 0;
 		}
 		
 		/* We can assume the ircd supports TS6 here */
-    	if (UseTS6 && !Numeric) {
-        	alog("UseTS6 requires the setting of Numeric to be enabled.");
-	        ret = -1;
-    	}
+                if (UseTS6 && !Numeric) {
+                    nofork = 1; /* We're going down, set nofork so this error is printed */
+                    alog("UseTS6 requires the setting of Numeric to be enabled.");
+                    nofork = noforksave;
+                    ret = -1;
+                }
 	} else {
 		destroyModule(m);
 	}

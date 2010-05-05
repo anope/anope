@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- * $Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $
+ * $Id$
  *
  */
 /*************************************************************************/
@@ -584,7 +584,7 @@ public:
 	NSSASet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSSASet());

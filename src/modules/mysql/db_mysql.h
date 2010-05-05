@@ -243,6 +243,8 @@ class DBMySQL : public Module
 			Error += Con->error();
 			delete Con;
 			throw ModuleException(Error.c_str());
+		} else {
+			ExecuteQuery("SET NAMES 'utf8'");
 		}
 	}
 

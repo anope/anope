@@ -243,9 +243,11 @@ class DBMySQL : public Module
 			Error += Con->error();
 			delete Con;
 			throw ModuleException(Error.c_str());
-		} else {
-			ExecuteQuery("SET NAMES 'utf8'");
 		}
+		
+		mysqlpp::Query query(Con);
+		query << "SET NAMES 'utf8'";
+		ExecuteQuery(query);
 	}
 
 	virtual ~DBMySQL()

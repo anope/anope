@@ -395,14 +395,18 @@ void process()
     if (m) {
         if (m->func) {
             mod_current_module_name = m->mod_name;
+            mod_current_module = findModule(m->mod_name);
             retVal = m->func(source, ac, av);
             mod_current_module_name = NULL;
+            mod_current_module = NULL;
             if (retVal == MOD_CONT) {
                 current = m->next;
                 while (current && current->func && retVal == MOD_CONT) {
                     mod_current_module_name = current->mod_name;
+                    mod_current_module = findModule(current->mod_name);
                     retVal = current->func(source, ac, av);
                     mod_current_module_name = NULL;
+                    mod_current_module = NULL;
                     current = current->next;
                 }
             }

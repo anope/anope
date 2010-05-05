@@ -96,18 +96,18 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
             }
         } else {
             mod_current_module_name = c->mod_name;
-            mod_current_module = NULL;
+            mod_current_module = findModule(c->mod_name);
             if ((c->has_priv == NULL) || c->has_priv(u)) {
                 retVal = c->routine(u);
-                mod_current_module_name = NULL;
                 if (retVal == MOD_CONT) {
                     current = c->next;
                     while (current && retVal == MOD_CONT) {
                         mod_current_module_name = current->mod_name;
-                        mod_current_module = NULL;
+                        mod_current_module = findModule(current->mod_name);
                         if (current->routine)
                             retVal = current->routine(u);
                         mod_current_module_name = NULL;
+                        mod_current_module = NULL;
                         current = current->next;
                     }
                 }
@@ -117,6 +117,7 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                      u->nick, service, cmd);
             }
             mod_current_module_name = NULL;
+            mod_current_module = NULL;
         }
     } else {
         if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u)) {

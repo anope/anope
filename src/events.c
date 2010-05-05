@@ -129,14 +129,18 @@ void event_message_process(char *eventbuf)
     if (evm) {
         if (evm->func) {
             mod_current_module_name = evm->mod_name;
+            mod_current_module = findModule(evm->mod_name);
             retVal = evm->func(source, ac, av);
             mod_current_module_name = NULL;
+            mod_current_module = NULL;
             if (retVal == MOD_CONT) {
                 current = evm->next;
                 while (current && current->func && retVal == MOD_CONT) {
                     mod_current_module_name = current->mod_name;
+                    mod_current_module = findModule(current->mod_name);
                     retVal = current->func(source, ac, av);
                     mod_current_module_name = NULL;
+                    mod_current_module = NULL;
                     current = current->next;
                 }
             }
@@ -158,14 +162,18 @@ void event_process_hook(const char *name, int argc, char **argv)
     evh = find_eventhook(name);
     if (evh) {
         if (evh->func) {
+            mod_current_module = findModule(evh->mod_name);
             mod_current_module_name = evh->mod_name;
             retVal = evh->func(argc, argv);
+            mod_current_module = NULL;
             mod_current_module_name = NULL;
             if (retVal == MOD_CONT) {
                 current = evh->next;
                 while (current && current->func && retVal == MOD_CONT) {
+                    mod_current_module = findModule(current->mod_name);
                     mod_current_module_name = current->mod_name;
                     retVal = current->func(argc, argv);
+                    mod_current_module = NULL;
                     mod_current_module_name = NULL;
                     current = current->next;
                 }
@@ -495,14 +503,10 @@ int moduleAddEventHandler(EvtMessage * evm)
         return MOD_ERR_PARAMS;
     }
 
-    /* ok, this appears to be a module adding a message from outside of AnopeInit, try to look up its module struct for it */
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
-
     if (!mod_current_module) {
         return MOD_ERR_UNKNOWN;
     }                           /* shouldnt happen */
+
     evm->core = 0;
     if (!evm->mod_name) {
         evm->mod_name = sstrdup(mod_current_module->name);
@@ -529,13 +533,10 @@ int moduleAddEventHook(EvtHook * evh)
         return MOD_ERR_PARAMS;
     }
 
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
-
     if (!mod_current_module) {
         return MOD_ERR_UNKNOWN;
     }                           /* shouldnt happen */
+
     evh->core = 0;
     if (!evh->mod_name) {
         evh->mod_name = sstrdup(mod_current_module->name);

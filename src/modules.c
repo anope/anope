@@ -105,6 +105,7 @@ void modules_init(void)
         if (!m) {
             m = createModule(ModulesAutoload[idx]);
             mod_current_module = m;
+            mod_current_module_name = m->name;
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
 			ret = loadModule(mod_current_module, NULL);
@@ -112,6 +113,7 @@ void modules_init(void)
 			if (ret != MOD_ERR_OK)
 				destroyModule(m);
             mod_current_module = NULL;
+            mod_current_module_name = NULL;
             mod_current_user = NULL;
         }
     }
@@ -133,8 +135,11 @@ void modules_core_init(int number, char **list)
         if (!m) {
             m = createModule(list[idx]);
             mod_current_module = m;
+            mod_current_module_name = m->name;
             mod_current_user = NULL;
             status = loadModule(mod_current_module, NULL);
+            mod_current_module = m;
+            mod_current_module_name = m->name;
             if (debug || status) {
                 alog("debug: trying to load core module [%s]",
                      mod_current_module->name);
@@ -143,6 +148,7 @@ void modules_core_init(int number, char **list)
 					destroyModule(mod_current_module);
             }
             mod_current_module = NULL;
+            mod_current_module_name = NULL;
             mod_current_user = NULL;
         }
     }
@@ -156,12 +162,16 @@ int encryption_module_init(void) {
 	
     m = createModule(EncModule);
     mod_current_module = m;
+    mod_current_module_name = m->name;
     mod_current_user = NULL;
     alog("Loading Encryption Module: [%s]", mod_current_module->name);
     ret = loadModule(mod_current_module, NULL);
+    mod_current_module = m;
+    mod_current_module_name = m->name;
     moduleSetType(ENCRYPTION);
     alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
     mod_current_module = NULL;
+    mod_current_module_name = NULL;
     if (ret != MOD_ERR_OK) {
         destroyModule(m);
     }
@@ -178,12 +188,16 @@ int protocol_module_init(void)
 	
     m = createModule(IRCDModule);
     mod_current_module = m;
+    mod_current_module_name = m->name;
     mod_current_user = NULL;
     alog("Loading IRCD Protocol Module: [%s]", mod_current_module->name);
     ret = loadModule(mod_current_module, NULL);
+    mod_current_module = m;
+    mod_current_module_name = m->name;
     moduleSetType(PROTOCOL);
     alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
     mod_current_module = NULL;
+    mod_current_module_name = NULL;
 	
 	if (ret == MOD_ERR_OK) {
 		/* This is really NOT the correct place to do config checks, but
@@ -235,11 +249,13 @@ void modules_delayed_init(void)
         if (!m) {
             m = createModule(ModulesDelayedAutoload[idx]);
             mod_current_module = m;
+            mod_current_module_name = m->name;
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
 			ret = loadModule(mod_current_module, NULL);
             alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
+            mod_current_module_name = NULL;
             mod_current_user = NULL;
 			if (ret != MOD_ERR_OK)
 				destroyModule(m);
@@ -271,12 +287,11 @@ void modules_unload_all(boolean fini, boolean unload_proto)
 			next = mh->next;
 			if (unload_proto || (mh->m->type != PROTOCOL)) {
 				mod_current_module = mh->m;
+				mod_current_module_name = mh->m->name;
 			    if(fini) {
 			        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
 		    	    if (func) {
-		        	    mod_current_module_name = mh->m->name;
 		            	func();                 /* exec AnopeFini */
-			            mod_current_module_name = NULL;
 			        }
 				
 		    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
@@ -291,6 +306,8 @@ void modules_unload_all(boolean fini, boolean unload_proto)
 		    	} else {
                 	        delModule(mh->m);
 				}
+			mod_current_module = NULL;
+			mod_current_module_name = NULL;
 		    }
 	   	    mh = next;
 		}
@@ -347,6 +364,7 @@ int destroyModule(Module * m)
     }
 
     mod_current_module = m;
+    mod_current_module_name = m->name;
     for (i = 0; i < NUM_LANGS; i++) {
         moduleDeleteLanguage(i);
     }
@@ -368,6 +386,10 @@ int destroyModule(Module * m)
 
     /* No need to free our cmd/msg list, as they will always be empty by the module is destroyed */
     free(m);
+    
+    mod_current_module = NULL;
+    mod_current_module_name = NULL;
+
     return MOD_ERR_OK;
 }
 
@@ -651,6 +673,7 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
 	}
 	/* TODO */
+        mod_current_module = m;
         mod_current_module_name = m->name;
         /* argv[0] is the user if there was one, or NULL if not */
         if (u) {
@@ -674,10 +697,12 @@ int loadModule(Module * m, User * u)
         if (ret == MOD_STOP) {
             alog("%s requested unload...", m->name);
             unloadModule(m, NULL);
+            mod_current_module = NULL;
             mod_current_module_name = NULL;
             return MOD_ERR_NOLOAD;
         }
 
+        mod_current_module = NULL;
         mod_current_module_name = NULL;
     }
 
@@ -726,8 +751,10 @@ int unloadModule(Module * m, User * u)
 
     func = (void (*)(void))ano_modsym(m->handle, "AnopeFini");
     if (func) {
+        mod_current_module = m;
         mod_current_module_name = m->name;
         func();                 /* exec AnopeFini */
+        mod_current_module = NULL;
         mod_current_module_name = NULL;
     }
 
@@ -761,9 +788,6 @@ int unloadModule(Module * m, User * u)
  **/
 void moduleSetType(MODType type)
 {
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
     mod_current_module->type = type;
 }
 
@@ -1017,10 +1041,6 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
 
     if (!cmdTable || !c) {
         return MOD_ERR_PARAMS;
-    }
-    /* ok, this appears to be a module adding a command from outside of AnopeInit, try to look up its module struct for it */
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
     }
 
     if (!mod_current_module) {
@@ -1542,11 +1562,6 @@ int moduleAddMessage(Message * m, int pos)
         return MOD_ERR_PARAMS;
     }
 
-    /* ok, this appears to be a module adding a message from outside of AnopeInit, try to look up its module struct for it */
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
-
     if (!mod_current_module) {
         return MOD_ERR_UNKNOWN;
     }                           /* shouldnt happen */
@@ -1777,9 +1792,11 @@ void moduleCallBackRun(void)
 		if (debug)
 			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
 		if (tmp->func) {
+			mod_current_module = findModule(tmp->owner_name);
 			mod_current_module_name = tmp->owner_name;
 			tmp->func(tmp->argc, tmp->argv);
 			mod_current_module = NULL;
+			mod_current_module_name = NULL;
 			moduleCallBackDeleteEntry(NULL);
 		}
 	}

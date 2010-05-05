@@ -2,13 +2,23 @@
 file(GLOB SRC_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
 file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
+
 # Don't include win32_memory.cpp, it's only required by Visual Studio to override it's override of the new/delete operators
 remove_item_from_list(SRC_SRCS win32_memory.cpp)
+
 # If not using Windows, don't include windows.cpp, as it's Windows-specific
 if(NOT WIN32)
   remove_item_from_list(SRC_SRCS windows.cpp)
 endif(NOT WIN32)
 sort_list(SRC_SRCS)
+
+# If using Windows, remove the pthread threading engine from the list
+if(WIN32)
+  remove_item_from_list(SRC_SRCS threadengine_pthread.cpp)
+# If not using Windows, remove the Windows threading engine from the list
+else(WIN32)
+  remove_item_from_list(SRC_SRCS threadengine_win32.cpp)
+endif(WIN32)
 
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")

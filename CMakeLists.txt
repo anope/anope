@@ -286,6 +286,13 @@ if(NOT MSVC)
     if(HAVE_NSL_LIB)
       set(LDFLAGS "${LDFLAGS} -lnsl")
     endif(HAVE_NSL_LIB)
+    # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
+    check_library_exists(pthread pthread_create "" HAVE_PTHREAD)
+    if(HAVE_PTHREAD)
+      set(LDFLAGS "${LDFLAGS} -pthread")
+    else(HAVE_PTHREAD)
+      message(FATAL_ERROR "The pthread library is required to build Anope")
+    endif(HAVE_PTHREAD)
   endif(NOT WIN32)
 endif(NOT MSVC)
 

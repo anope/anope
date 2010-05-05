@@ -2,13 +2,14 @@ OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o comm
 		config.o configreader.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modes.o modules.o module.o modulemanager.o nickalias.o \
 		nickcore.o nickserv.o operserv.o process.o protocol.o regchannel.o send.o servers.o sessions.o slist.o \
-		sockets.o timers.o opertype.o users.o wildcard.o
+		sockets.o threadengine.o threadengine_pthread.o timers.o opertype.o users.o wildcard.o
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
 	../include/messages.h ../include/services.h \
 	../include/timers.h ../include/extern.h \
-	../include/modules.h ../include/slist.h ../include/hashcomp.h
+	../include/modules.h ../include/slist.h ../include/hashcomp.h \
+	../include/threadengine.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'INSTDIR=${INSTDIR}' 'INSTALL=${INSTALL}' \
@@ -72,8 +73,10 @@ send.o:         send.c      $(INCLUDES)
 servers.o:      servers.cpp   $(INCLUDES)
 sessions.o:     sessions.c  $(INCLUDES)
 slist.o:        slist.c     $(INCLUDES)
-sockets.o:      sockets.cpp  $(INCLUDES)
-timers.o:       timers.cpp $(INCLUDES)
+sockets.o:     sockets.cpp  $(INCLUDES)
+threadengine.o: threadengine.cpp $(INCLUDES)
+threadengine_pthread.o: threadengine_pthread.cpp $(INCLUDES)
+timers.o:       timers.cpp  $(INCLUDES)
 users.o:        users.c     $(INCLUDES)
 wildcard.o:     wildcard.cpp $(INCLUDES)
 

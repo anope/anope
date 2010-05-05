@@ -358,6 +358,7 @@ typedef struct exception_ Exception;
 typedef struct session_ Session;
 
 #include "extensible.h"
+#include "threadengine.h"
 #include "bots.h"
 #include "opertype.h"
 #include "modes.h"

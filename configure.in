@@ -95,6 +95,8 @@ int main()
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
 
+ANOPELIBS="$ANOPELIBS -pthread"
+
 AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
 dnl module checking based on Unreal's module checking code
 AC_DEFUN(AC_ENABLE_DYN,

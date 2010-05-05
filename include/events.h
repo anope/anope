@@ -42,6 +42,7 @@
 #define EVENT_SHUTDOWN "shutdown"
 #define EVENT_SIGNAL "signal"
 #define EVENT_NICK_REGISTERED "nick_registered"
+#define EVENT_NICK_REQUESTED "nick_requested"
 #define EVENT_NICK_DROPPED "nick_dropped"
 #define EVENT_NICK_FORBIDDEN "nick_forbidden"
 #define EVENT_NICK_EXPIRE "nick_expire"

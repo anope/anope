@@ -266,6 +266,10 @@ Anope Internal Events
         A new channel has been registered.
         av[0]  The name of the channel that has been registered.
 
+    EVENT_NICK_REQUESTED
+        A new nick has been requested, and mail has been sent to confirm the nick.
+        av[0]  The name of the nick that was requested
+
     EVENT_CHAN_SUSPENDED
         A channel has been suspended (ChanServ SUSPEND).
         av[0]  The name of the channel that has been suspended.

@@ -208,6 +208,7 @@ int do_register(User * u)
         }
         nr->requested = time(NULL);
         if (NSEmailReg) {
+            send_event(EVENT_NICK_REQUESTED, 1, nr->nick);
             if (do_sendregmail(u, nr) == 0) {
                 notice_lang(s_NickServ, u, NICK_ENTER_REG_CODE, email,
                             s_NickServ);

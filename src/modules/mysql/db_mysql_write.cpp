@@ -1010,7 +1010,7 @@ class DBMySQLWrite : public DBMySQL
 	EventReturn OnExceptionAdd(User *u, Exception *ex)
 	{
 		mysqlpp::Query query(Me->Con);
-		query << "INSERT DELAYED INTO `anope_os_exceptions` (mask, limit, who, reason, time, expires) VALUES(";
+		query << "INSERT DELAYED INTO `anope_os_exceptions` (mask, slimit, who, reason, time, expires) VALUES(";
 		query << mysqlpp::quote << ex->mask << ", " << ex->limit << ", " << mysqlpp::quote << ex->who << ", ";
 		query << mysqlpp::quote << ex->reason << ", " << ex->time << ", " << ex->expires << ")";
 		ExecuteQuery(query);

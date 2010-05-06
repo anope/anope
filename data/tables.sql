@@ -73,7 +73,7 @@ CREATE TABLE anope_ns_alias (
   last_quit text NOT NULL,
   last_realname text NOT NULL,
   last_usermask text NOT NULL,
-  time_registered int(11) unsigned NOT NULL default '0',
+  time_registered int(10) unsigned NOT NULL default '0',
   last_seen int(10) unsigned NOT NULL default '0',
   flags text NOT NULL default '',
   display varchar(255) NOT NULL default '',
@@ -116,7 +116,7 @@ CREATE TABLE anope_ns_request (
   passcode text NOT NULL,
   password text NOT NULL,
   email text NOT NULL,
-  requested int(11) NOT NULL default '0',
+  requested int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (nick)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -131,7 +131,7 @@ CREATE TABLE anope_cs_access (
   level int(11) NOT NULL default '0',
   display varchar(255) NOT NULL default '',
   channel varchar(255) NOT NULL default '',
-  last_seen int(11) NOT NULL default '0',
+  last_seen int(10) unsigned NOT NULL default '0',
   creator varchar(255) NOT NULL default '',
   UNIQUE KEY (channel,display)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -149,8 +149,8 @@ CREATE TABLE anope_cs_akick (
   mask varchar(255) NOT NULL default '',
   reason text NOT NULL default '',
   creator varchar(255) NOT NULL default '',
-  created int(11) NOT NULL default '0',
-  last_used int(11) NOT NULL default '0',
+  created int(10) unsigned NOT NULL default '0',
+  last_used int(10) unsigned NOT NULL default '0',
   UNIQUE KEY channel (channel, mask)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -182,11 +182,11 @@ CREATE TABLE anope_cs_info (
   descr text NOT NULL,
   url text NOT NULL,
   email text NOT NULL,
-  time_registered int(11) unsigned NOT NULL default '0',
+  time_registered int(10) unsigned NOT NULL default '0',
   last_used int(10) unsigned NOT NULL default '0',
   last_topic text NOT NULL,
   last_topic_setter text NOT NULL,
-  last_topic_time int(11) unsigned NOT NULL default '0',
+  last_topic_time int(10) unsigned NOT NULL default '0',
   flags text NOT NULL default '',
   forbidby text NOT NULL,
   forbidreason text NOT NULL,
@@ -260,7 +260,7 @@ CREATE TABLE anope_bs_core (
   host text NOT NULL default '',
   rname text NOT NULL default '',
   flags text NOT NULL default '',
-  created int(11) NOT NULL default '0',
+  created int(10) unsigned NOT NULL default '0',
   chancount int(11) NOT NULL default '0',
   PRIMARY KEY (nick)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -289,7 +289,7 @@ CREATE TABLE anope_ms_info (
   receiver varchar(255) NOT NULL,
   number int(11) NOT NULL default '0',
   flags int(11) NOT NULL default '0',
-  time int(11) NOT NULL default '0',
+  time int(10) unsigned NOT NULL default '0',
   sender text NOT NULL,
   text blob NOT NULL,
   serv enum('NICK','CHAN') NOT NULL default 'NICK'
@@ -307,8 +307,8 @@ CREATE TABLE anope_os_akills (
   host varchar(255) NOT NULL,
   xby text NOT NULL,
   reason text NOT NULL,
-  seton int(11) NOT NULL default '0',
-  expire int(11) NOT NULL default '0'
+  seton int(10) unsigned NOT NULL default '0',
+  expire int(10) unsigned NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -320,7 +320,7 @@ CREATE TABLE anope_os_akills (
 DROP TABLE IF EXISTS anope_os_core;
 CREATE TABLE anope_os_core (
   maxusercnt int(11) NOT NULL default '0',
-  maxusertime int(11) NOT NULL default '0',
+  maxusertime int(10) unsigned NOT NULL default '0',
   akills_count int(11) NOT NULL default '0',
   sglines_count int(11) NOT NULL default '0',
   sqlines_count int(11) NOT NULL default '0',
@@ -336,11 +336,11 @@ CREATE TABLE anope_os_core (
 DROP TABLE IF EXISTS anope_os_exceptions;
 CREATE TABLE anope_os_exceptions (
   mask varchar(255) NOT NULL,
-  `limit` int(11) NOT NULL default '0',
+  slimit int(11) NOT NULL default '0',
   who text NOT NULL,
   reason text NOT NULL,
-  time int(11) NOT NULL default '0',
-  expires int(11) NOT NULL default '0'
+  time int(10) unsigned NOT NULL default '0',
+  expires int(10) unsigned NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -355,8 +355,8 @@ CREATE TABLE anope_os_sxlines (
   mask varchar(255) NOT NULL,
   xby text NOT NULL,
   reason text NOT NULL,
-  seton int(11) NOT NULL default '0',
-  expire int(11) NOT NULL default '0'
+  seton int(10) unsigned NOT NULL default '0',
+  expire int(10) unsigned NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

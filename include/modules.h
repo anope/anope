@@ -868,6 +868,13 @@ class CoreExport Module
 	 */
 	virtual void OnAkickDel(ChannelInfo *ci, AutoKick *ak) { }
 
+	/** Called when a user requests info for a channel
+	 * @param u The user requesting info
+	 * @param ci The channel the user is requesting info for
+	 * @param ShowHidden true if we should show the user everything
+	 */
+	virtual void OnChanInfo(User *u, ChannelInfo *ci, bool ShowHidden) { }
+
 	/** Called when a nick is dropped
 	 * @param nick The nick
 	 */
@@ -946,13 +953,20 @@ class CoreExport Module
 	 */
 	virtual void OnNickAddAccess(NickCore *nc, const std::string &entry) { }
 
-	/** called from NickCore::EraseAccess()
+	/** Called from NickCore::EraseAccess()
 	 * @param nc pointer to the NickCore
 	 * @param entry The access mask
 	 */
 	virtual void OnNickEraseAccess(NickCore *nc, const std::string &entry) { }
 
-	/** called when a vhost is deleted
+	/** Called when a user requests info for a nick
+	 * @param u The user requesting info
+	 * @param na The nick the user is requesting info from
+	 * @param ShowHidden true if we should show the user everything
+	 */
+	virtual void OnNickInfo(User *u, NickAlias *na, bool ShowHidden) { }
+
+	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
 	 */
 	virtual void OnDeleteVhost(NickAlias *na) { }
@@ -1077,11 +1091,13 @@ enum Implementation
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
+		I_OnNickInfo,
 
 		/* ChanServ */
 		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
+		I_OnChanInfo,
 
 		/* BotServ */
 		I_OnBotServHelp, I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,

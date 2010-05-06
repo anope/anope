@@ -44,7 +44,7 @@ class CommandCSInfo : public Command
 		char buf[BUFSIZE];
 		struct tm *tm;
 		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex");
-		int show_all = 0;
+		bool show_all = false;
 		time_t expt;
 
 		ci = cs_findchan(chan);
@@ -64,7 +64,7 @@ class CommandCSInfo : public Command
 
 		/* Should we show all fields? Only for sadmins and identified users */
 		if (!param.empty() && param == "ALL" && (check_access(u, ci, CA_INFO) || has_auspex))
-			show_all = 1;
+			show_all = true;
 
 		notice_lang(Config.s_ChanServ, u, CHAN_INFO_HEADER, chan);
 		notice_lang(Config.s_ChanServ, u, CHAN_INFO_NO_FOUNDER, ci->founder->display);
@@ -137,6 +137,8 @@ class CommandCSInfo : public Command
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON)));
 		}
+
+		FOREACH_MOD(I_OnChanInfo, OnChanInfo(u, ci, show_all));
 
 		if (!show_all && (check_access(u, ci, CA_INFO) || has_auspex))
 			notice_lang(Config.s_ChanServ, u, NICK_INFO_FOR_MORE, Config.s_ChanServ, ci->name.c_str());

@@ -409,8 +409,8 @@ class OSInfo : public Module
 		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 
-		Implementation i[] = { I_OnNickServHelp, I_OnChanServHelp, I_OnPostCommand, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata };
-		ModuleManager::Attach(i, this, 5);
+		Implementation i[] = { I_OnNickServHelp, I_OnChanServHelp, I_OnNickInfo, I_OnChanInfo, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata };
+		ModuleManager::Attach(i, this, 6);
 	}
 
 	~OSInfo()
@@ -439,42 +439,23 @@ class OSInfo : public Module
 		}
 	}
 
-	void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
+	void OnNickInfo(User *u, NickAlias *na, bool)
 	{
-		if (command == "INFO")
+		if (is_oper(u))
 		{
-			if (service == Config.s_NickServ)
-			{
-				const char *nick = params[0].c_str();
-				NickAlias *na = NULL;
+			char *c;
+			if (na->nc->GetExtArray("os_info", c))
+				u->SendMessage(Config.s_NickServ, " OperInfo: %s", c);
+		}
+	}
 
-				if (is_oper(u)) /* Only show our goodies to opers */
-				{
-					if ((na = findnick(nick))) /* ok we've found the user */
-					{
-						/* If we have any info on this user */
-						char *c;
-						if (na->nc->GetExtArray("os_info", c))
-							u->SendMessage(Config.s_NickServ, " OperInfo: %s", c);
-					}
-				}
-			}
-			else if (service == Config.s_ChanServ)
-			{
-				const char *chan = params[0].c_str();
-				ChannelInfo *ci = NULL;
-
-				if (is_oper(u)) /* Only show our goodies to opers */
-				{
-					if ((ci = cs_findchan(chan)))
-					{
-						/* If we have any info on this channel */
-						char *c;
-						if (ci->GetExtArray("os_info", c))
-							u->SendMessage(Config.s_ChanServ, " OperInfo: %s", c);
-					}
-				}
-			}
+	void OnChanInfo(User *u, ChannelInfo *ci, bool)
+	{
+		if (is_oper(u))
+		{
+			char *c;
+			if (ci->GetExtArray("os_info", c))
+				u->SendMessage(Config.s_ChanServ, " OperInfo: %s", c);
 		}
 	}
 

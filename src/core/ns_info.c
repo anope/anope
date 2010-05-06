@@ -178,6 +178,8 @@ class CommandNSInfo : public Command
 				}
 			}
 
+			FOREACH_MOD(I_OnNickInfo, OnNickInfo(u, na, show_hidden));
+
 			if (!show_hidden && u->Account() && (na->nc == u->Account() || has_auspex))
 				notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, na->nick);
 		}

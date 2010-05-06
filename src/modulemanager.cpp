@@ -164,10 +164,10 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 
 	ano_modclearerr();
-	func = function_cast<Module *(*)(const std::string &, const std::string &)>(dlsym(handle, "init_module"));
+	func = function_cast<Module *(*)(const std::string &, const std::string &)>(dlsym(handle, "AnopeInit"));
 	if (func == NULL && (err = dlerror()) != NULL)
 	{
-		Alog() << "No magical init function found, not an Anope module";
+		Alog() << "No init function found, not an Anope module";
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
@@ -292,10 +292,10 @@ void ModuleManager::DeleteModule(Module *m)
 	handle = m->handle;
 
 	ano_modclearerr();
-	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "destroy_module"));
+	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
 	if (destroy_func == NULL && (err = dlerror()) != NULL)
 	{
-		Alog() << "No magical destroy function found, chancing delete...";
+		Alog() << "No destroy function found, chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
 	}
 	else

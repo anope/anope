@@ -158,12 +158,12 @@ extern int strncasecmp(const char *, const char *, size_t);
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
- * It defines the class factory and external init_module function.
+ * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
 #ifdef _WIN32
 	#define MODULE_INIT(x) \
-		extern "C" DllExport Module *init_module(const std::string &, const std::string &); \
-		extern "C" Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" DllExport Module *AnopeInit(const std::string &, const std::string &); \
+		extern "C" Module *AnopeInit(const std::string &modname, const std::string &creator) \
 		{ \
 			return new x(modname, creator); \
 		} \
@@ -177,19 +177,19 @@ extern int strncasecmp(const char *, const char *, size_t);
 			} \
 			return TRUE; \
 		} \
-		extern "C" DllExport void destroy_module(x *); \
-		extern "C" void destroy_module(x *m) \
+		extern "C" DllExport void AnopeFini(x *); \
+		extern "C" void AnopeFini(x *m) \
 		{ \
 			delete m; \
 		}
 
 #else
 	#define MODULE_INIT(x) \
-		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" DllExport Module *AnopeInit(const std::string &modname, const std::string &creator) \
 		{ \
 			return new x(modname, creator); \
 		} \
-		extern "C" DllExport void destroy_module(x *m) \
+		extern "C" DllExport void AnopeFini(x *m) \
 		{ \
 			delete m; \
 		}

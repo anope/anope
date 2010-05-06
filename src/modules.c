@@ -754,8 +754,6 @@ int unloadModule(Module * m, User * u)
         mod_current_module = m;
         mod_current_module_name = m->name;
         func();                 /* exec AnopeFini */
-        mod_current_module = NULL;
-        mod_current_module_name = NULL;
     }
 
     if (prepForUnload(m) != MOD_ERR_OK) {
@@ -767,6 +765,8 @@ int unloadModule(Module * m, User * u)
         if (u) {
             notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name);
         }
+        mod_current_module = NULL;
+        mod_current_module_name = NULL;
         return MOD_ERR_NOUNLOAD;
     } else {
         if (u) {
@@ -775,6 +775,8 @@ int unloadModule(Module * m, User * u)
             notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name);
         }
         delModule(m);
+        mod_current_module = NULL;
+        mod_current_module_name = NULL;
         return MOD_ERR_OK;
     }
 #else

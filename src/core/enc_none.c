@@ -48,7 +48,7 @@ class ENone : public Module
 		memset(&cpass, 0, sizeof(cpass));
 		size_t pos = src.find(":");
 		std::string buf(src.begin()+pos+1, src.end());
-		b64_decode(buf.c_str(), static_cast<char *>(cpass), 1000);
+		b64_decode(buf.c_str(), cpass, 1000);
 		dest.assign(cpass);
 		return EVENT_ALLOW;
 	}

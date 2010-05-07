@@ -286,6 +286,7 @@ E int m_version(const char *source, int ac, const char **av);
 
 /**** misc.c ****/
 
+E bool IsFile(const std::string &filename);
 E int toupper(char);
 E int tolower(char);
 E char *strscpy(char *d, const char *s, size_t len);

@@ -556,8 +556,7 @@ class DBPlain : public Module
 	void BackupDatabase()
 	{
 		/* Do not backup a database that doesn't exist */
-		struct stat DBInfo;
-		if (stat(DatabaseFile.c_str(), &DBInfo))
+		if (!IsFile(DatabaseFile))
 		{
 			return;
 		}

@@ -27,6 +27,21 @@ struct arc4_stream {
 
 /*************************************************************************/
 
+/** Check if a file exists
+ * @param filename The file
+ * @return true if the file exists, false if it doens't
+ */
+bool IsFile(const std::string &filename)
+{
+	struct stat fileinfo;
+	if (!stat(filename.c_str(), &fileinfo))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 /**
  * toupper:  Like the ANSI functions, but make sure we return an
  *				   int instead of a (signed) char.

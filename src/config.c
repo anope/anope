@@ -425,8 +425,9 @@ static bool InitOperTypes(ServerConfig *, const char *, bool)
 static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueList &values, int *, bool)
 {
 	const char *name = values[0].GetString();
-	const char *commands = values[1].GetString();
-	const char *privs = values[2].GetString();
+	const char *inherits = values[1].GetString();
+	const char *commands = values[2].GetString();
+	const char *privs = values[3].GetString();
 
 	ValueItem vi(name);
 	if (!ValidateNotEmpty(conf, "opertype", "name", vi))
@@ -442,6 +443,23 @@ static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueLis
 	spacesepstream privstr(privs);
 	while (privstr.GetToken(tok))
 		ot->AddPriv(tok);
+	
+	commasepstream inheritstr(inherits);
+	while (inheritstr.GetToken(tok))
+	{
+		/* Strip leading ' ' after , */
+		if (tok.size() > 1 && tok[0] == ' ')
+			tok.erase(tok.begin());
+		for (std::list<OperType *>::iterator it = Config.MyOperTypes.begin(); it != Config.MyOperTypes.end(); ++it)
+		{
+			if ((*it)->GetName() == tok)
+			{
+				Alog() << "Inheriting commands and privs from " << (*it)->GetName() << " to " << ot->GetName();
+				ot->Inherits(*it);
+				break;
+			}
+		}
+	}
 
 	Config.MyOperTypes.push_back(ot);
 	return true;
@@ -772,9 +790,9 @@ int ServerConfig::Read(bool bail)
 			{DT_CHARPTR},
 			InitModules, DoModule, DoneModules},
 		{"opertype",
-			{"name", "commands", "privs", NULL},
-			{"", "", "", NULL},
-			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
+			{"name", "inherits", "commands", "privs", NULL},
+			{"", "", "", "", NULL},
+			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
 			InitOperTypes, DoOperType, DoneOperTypes},
 		{"oper",
 			{"name", "type", NULL},

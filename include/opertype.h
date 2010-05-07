@@ -31,6 +31,10 @@ class CoreExport OperType
 	  * as we don't invoke it often.
 	  */
 	std::list<std::string> commands;
+
+	/** Set of opertypes we inherit from
+	 */
+	std::set<OperType *> inheritances;
  public:
 	/** Create a new opertype of the given name.
 	 * @param nname The opertype name, e.g. "sra".
@@ -62,4 +66,9 @@ class CoreExport OperType
 	/** Returns the name of this opertype.
 	 */
 	const ci::string &GetName() const;
+
+	/** Make this opertype inherit commands and privs from another opertype
+	 * @param ot The opertype to inherit from
+	 */
+	void Inherits(OperType *ot);
 };

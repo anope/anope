@@ -29,12 +29,12 @@ distclean: spotless
 
 .c.so:
 	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
-	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) $(if $(shell grep RequiredLibraries $< | grep ssl), -lssl) $(if $(shell grep RequiredLibraries $< | grep crypt), -lcrypt) \
 	-I../${INCLUDEDIR} -o $@ $<
 
 .cpp.so:
 	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
-	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) $(if $(shell grep RequiredLibraries $< | grep ssl), -lssl) $(if $(shell grep RequiredLibraries $< | grep crypt), -lcrypt) \
 	-I../${INCLUDEDIR} -o $@ $<
 
 subs:

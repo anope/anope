@@ -65,6 +65,7 @@ class SSLModule : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion("$Id$");
 		this->SetType(SUPPORTED);
+		this->SetPermanent(true);
 
 		SSL_load_error_strings();
 		SSLeay_add_ssl_algorithms();
@@ -112,7 +113,6 @@ class SSLModule : public Module
 
 		SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
 		SSL_CTX_set_options(ctx, SSL_OP_TLS_ROLLBACK_BUG | SSL_OP_ALL);
-//		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, always_accept_verify_cb);
 
 		ModuleManager::Attach(I_OnPreServerConnect, this);
 	}

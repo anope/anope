@@ -311,7 +311,7 @@ class XOPBase : public Command
 		int sent_header = 0;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 
-		if (level < ACCESS_AOP && !u->Account()->HasCommand("chanserv/aop/list"))
+		if (!get_access(u, ci) && !u->Account()->HasCommand("chanserv/access/list"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;

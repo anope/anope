@@ -4151,35 +4151,32 @@ CHAN_HELP_EXPIRES
 	automaticamente cancelado o seu registro.
 
 CHAN_HELP_REGISTER
-	Sintaxe: REGISTER canal senha descrição
+	Sintaxe: REGISTER canal descrição
 	
-	Registra um canal no banco de dados do %S sob seu nick. 
-	Para utilizar este comando, você deve primeiro ser OP
-	do canal que está tentando registrar.
-	
-	A senha é usada com o comando IDENTIFY para permitir
-	que outras pessoas façam alterações nas configurações do
-	canal. O último parâmetro, que deve ser incluído, é uma
-	descrição geral da finalidade do canal.
-	
-	Quando você registra um canal, você é gravado como "fundador"
-	do mesmo. Ao fundador do canal é permitido alterar todas as
-	configurações do mesmo; %S irá dar automaticamente ao fundador
-	privilégios de Operador de Canal quando ele entrar no canal.
-	Veja o comando ACCESS (%R%S HELP ACCESS) para
-	informação sobre como liberar uma parte dos seus privilégios
-	a outros usuários do canal.
-	
-	IMPORTANTE: Para registrar um canal, você deve antes ter
-	registrado seu nick. Se ainda não tiver seu nick registrado,
-	digite %R%s HELP para mais informações de como fazê-lo.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Sintaxe: DROP canal
 	
 	Cancela o registro do canal. So poderá ser usado pelo
-	fundador do canal, que primeiramente deverá estar
-	identificado com o NickServ.
+	fundador do canal.
 
 CHAN_HELP_SET
 	Sintaxe: SET canal opção parâmetros

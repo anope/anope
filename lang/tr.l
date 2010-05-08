@@ -4262,32 +4262,31 @@ CHAN_HELP_EXPIRES
 	kanala girmezse ) kaydý silinir.
 
 CHAN_HELP_REGISTER
-	Kullanýmý: REGISTER kanaladý þifre açýklama
+	Kullanýmý: REGISTER kanaladý açýklama
 	
-	%S veritabanýna belirtilen kanalý ekler yani kaydeder.
-	Bu komutu kullanabilmek için kayýt etmek istediðiniz kanal
-	önceden kayýtlý olmamalý ve kanalda op olmalýsýnýz. Þifre
-	kanal özelliklerinde deðiþiklikler yapmanýz için ilerde
-	lazým olacaktýr. Son parametre kanalýn genel bir tanýmýdýr
-	ve mutlaka belirtilmelidir.
-	
-	Kanalý kayýt ettiðiniz zaman, kanalýn "founder" 'ý olursunuz.
-	Kanal founderý kanalýn tüm özelliklerini deðiþtirme yetkisine 
-	sahip olan kiþidir; %S kanala girdiðiniz zaman size
-	otomatik kanal opu hakkýný verecektir. Kanal opu hakkýný
-	baþkalarýnada vermek için gerekli bilgiyi ACCESS komutunun
-	yardýmýna bakarak alabilirsiniz (%R%S HELP ACCESS).
-	
-	NOT: Bir kanalý kaydedebilmek için, önce nickinizi kaydetmelisiniz.
-	Eðer kaydetmediyseniz %R%s HELP yazarak nasýl yapacaðýnýz
-	hakkýnda bilgi alabilirsiniz.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Kullanýmý: DROP kanaladý
 	
-	Kanalýn kaydýný siler.  Sadece kanal founderý tarafýndan
-	kullanýlabilir ve o kiþinin önce IDENTIFY komutunu kullanarak
-	kanalýn sahibi olduðunu belirtmesi gerekir.
+	Kanalýn kaydýný siler.
 
 CHAN_HELP_SET
 	Kullanýmý: SET kanaladý özellik parametre

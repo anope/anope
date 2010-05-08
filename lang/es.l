@@ -4255,35 +4255,32 @@ CHAN_HELP_EXPIRES
 	automaticamente botado.
 
 CHAN_HELP_REGISTER
-	Sintaxis: REGISTER canal clave descripcion
-	
-	Registra un canal en la base de datos de %S. Para
-	usar este comando, debes primero ser un operador en el
-	canal que intentas registrar. La clave es usada con
-	el comando IDENTIFY para permitir a otros hacer
-	cambios al seteo del canal posteriormente.
-	El ultimo parametro, el cual debe ser incluido, es
-	una descripcion general del proposito del canal.
-	
-	Cuando registras un canal, eres reconocido como el
-	"fundador" del canal. El fundador del canal puede
-	cambiar todos los seteos para el canal;
-	%S tambien dara al fundador prvilegios de operador
-	automaticamente cuando el usuario entre al canal.
-	Averigua sobre el comando ACCESS
-	(%R%S HELP ACCESS) para informacion sobre
-	como dar estos privilegios a otros usuarios del canal.
-	
-	NOTESE: Para registrar un canal debes haber registrado
-	tu nickname primero. Si aun no lo haz hecho, tipea
-	%R%s HELP para mayor informacion en como hacerlo.
+	Sintaxis: REGISTER canal descripcion
+
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Sintaxis: DROP canal
 	
 	Desregistra el canal dado. Solo puede ser usado por el
-	fundador del canal, quien debe primero usar el comando
-	 IDENTIFY.
+	fundador del canal.
 
 CHAN_HELP_SET
 	Sintaxis: SET canal opcion parametros

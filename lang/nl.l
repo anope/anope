@@ -4231,34 +4231,32 @@ CHAN_HELP_EXPIRES
 	het kanaal binnen is gekomen) automatisch zal worden verwijderd.
 
 CHAN_HELP_REGISTER
-	Gebruik: REGISTER kanaal wachtwoord beschrijving
+	Gebruik: REGISTER kanaal beschrijving
 	
-	Registreert een kanaal in de %S database. Om dit commando te
-	gebruiken moet je eerst een operator op het kanaal zijn dat
-	je wil registreren. Het wachtwoord wordt gebruikt met het
-	IDENTIFY commando dat anderen in staat stelt om later
-	wijzigingen aan de kanaalinstellingen door te voeren. Het
-	laatste paramenter, die moet worden opgegeven, is een
-	algemene beschrijving van het doel van het kanaal.
-	
-	Wanneer je een kanaal registreert wordt je de "stichter"
-	van het kanaal. De kanaalstichter mag alle instellingen
-	van het kanaal veranderen. %S zal ook de stichter automatisch
-	stichterrechten geven wanneer deze het kanaal binnenkomt.
-	Zie het ACCESS commando (%R%S HELP ACCESS) voor meer
-	informatie over het geven van rechten aan andere kanaalgebruikers.
-	
-	OPMERKING: Om een kanaal te registreren moet je je nick
-	eerst geregistreerd hebben. Als je dit niet gedaan hebt
-	bekijk dan %R%s HELP voor informatie over hoe je
-	dit kunt doen.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Gebruik: DROP kanaal
 	
 	Heft de registratie van het gegeven kanaal op. Kan alleen
-	gebruik wordt door de kanaalstichter, die eerst het
-	IDENTIFY commando moet gebruiken.
+	gebruik wordt door de kanaalstichter.
 
 CHAN_HELP_SET
 	Gebruik: SET kanaal optie parameters

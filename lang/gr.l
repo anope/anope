@@ -4273,34 +4273,32 @@ CHAN_HELP_EXPIRES
 	για εκείνη την περίοδο των ημερών) θα διαγραφεί αυτόματα.
 
 CHAN_HELP_REGISTER
-	Σύνταξη: REGISTER κανάλι κωδικός περιγραφή
+	Σύνταξη: REGISTER κανάλι περιγραφή
 	
-	Κατοχυρώνει ένα κανάλι στη βάση δεδομένων του %S.  Για
-	να χρησιμοποιήσετε αυτή την εντολή, πρέπει πρώτα να είστε
-	διαχειριστής καναλιού μέσα στο κανάλι που προσπαθείτε να
-	κατοχυρώσετε.  Ο κωδικός χρησιμοποιείται με την εντολή
-	IDENTIFY για να σας επιτρέπει να κάνετε αλλαγές στις
-	ρυθμίσεις του καναλιού αργότερα.  Η τελευταία παράμετρος,
-	η οποία και πρέπει να συμπεριληφθεί, είναι μία γενική	
-	περιγραφή για το σκοπό ύπαρξης του καναλιού.
-	
-	Όταν κατοχυρώνετε ένα κανάλι, ορίζεστε σαν "ιδρυτής" του.
-	Ο ιδρυτής ενός καναλιού, επιτρέπεται να αλλάξει όλες τις
-	ρυθμίσεις του;  Ο	%S επίσης θα του δώσει αυτόματα
-	αρμοδιότητες ιδρυτή και διαχειριστή καναλιού, με την είσοδό
-	του στο κανάλι.Δείτε την εντολή ACCESS command.
-	(%R%S HELP ACCESS) για πληροφορίες σχετικά με την παροχή μέρους των
-	αρμοδιοτήτων αυτών, σε άλλους χρήστες του καναλιού.
-	    
-	ΣΗΜΕΙΩΣΗ: Για να κατοχυρώσετε ένα κανάλι, πρέπει να έχετε
-	πρώτα κατοχυρώσει το ψευδώνυμό σας.  Αν δεν το έχετε κάνει,
-	%R%s HELP για περισσότερες πληροφορίες σχετικά.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Σύνταξη: DROP κανάλι
 	
 	Κάνει το κανάλι ξεκατοχυρώσημο,το αφήνει ελεύθερο χωρίς founder. Για να
-	γίνει αυτό πρέπει ο founder, να κάνει IDENTIFY πρώτα και ύστερα drop.
+	γίνει αυτό πρέπει ο founder.
 
 CHAN_HELP_SET
 	Σύνταξη: SET κανάλι επιλογή παράμετροι

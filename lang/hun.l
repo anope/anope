@@ -4195,38 +4195,32 @@ CHAN_HELP_EXPIRES
 	Automatikusan dropolásra kerülnek.
 	
 CHAN_HELP_REGISTER
-	Syntax: REGISTER #szoba jelszó leírás
+	Syntax: REGISTER #szoba leírás
 	
-	A csatornádat regisztrálja a %S adatbázisába.
-	Hogy kiadhasd ezt a paracsot operátornak kell lenned
-	az adott csatornán.
-	A jelszót használhatod az IDENTIFY parancs segitségével
-	azonosításra, mielõtt beállításokat eszközölsz a 
-	késöbbiekben az adott csatonán.
-	
-	Az utolsó paraméternek, tartalmaznia kell
-	a szoba általános leírását.
-	
-	Amikor regisztrálsz egy csatornát, te leszel a "founder".
-	szoba founderjének van lehetõsége a szoba beállításait,
-	a hozzáférési listáját, az autókirúgás listát, az infókat
-	megváltoztatni; a %S automatikusan megadja belépéskor a
-	founder hozzáférési jogot és szoba operátori jogokat.
-	Nézd meg az ACCESS parancsot (%R%S HELP ACCESS),
-	hogy infomálódj a különbözõ szintû kiváltságok adásáról
-	(a szoba többi felhasználója részére).
-	
-	Megjegyzés: Ha regisztrálsz egy csatornát, elõször 
-	regisztrálnod kell a nickneved és azonosítanod kell
-	magad. (NickServ identify jelszó)
-	Ha még nem nézted meg, akkor lásd még: %R%s HELP.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Syntax: DROP #szoba
 	
 	Törli a megnevezett szoba regisztrációját.
-	Csak a szoba founder használhatja, akinek
-	elõbb használnia kell az IDENTIFY parancsot.
+	Csak a szoba founder használhatja.
 
 CHAN_HELP_SET
 	Syntax: SET #szoba opció paraméterek

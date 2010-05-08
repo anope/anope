@@ -4284,35 +4284,32 @@ CHAN_HELP_EXPIRES
 	automaticament eliminat.
 
 CHAN_HELP_REGISTER
-	Sintaxis: REGISTER canal clau descripció
+	Sintaxis: REGISTER canal descripció
 	
-	Registra un canal en la base de dades de %S. Per a
-	utilitzar aquesta comanda, has de ser un operador en el
-	canal que intentis registrar. La clau es utilitzada amb
-	la comanda IDENTIFY per a permetre a altres fer
-	canvis en les opcions del canal posteriorment.
-	L'últim parametre, el qual ha de ser inclòs, és
-	una descripció general del propòsit del canal.
-	
-	Quant registres un canal, ets reconegut com el
-	"fundador" del canal. El fundador del canal pot
-	canviar tots els parametres pel canal;
-	%S també donarà al fundador privilegis d'operador
-	automaticamente quant l'usuari entri al canal.
-	Esbrina sobre la comanda ACCESS
-	(%R%S HELP ACCESS) Per més informació sobre
-	com donar aquests privilegis a altres usuaris del canal.
-	
-	NOTA: Per registrar un canal has d'haver registrat
-	el teu nickname primer. Si encara no ho has fet, escriu
-	%R%s HELP per més informació de com fer-ho.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Sintaxis: DROP canal
 	
 	Desenregistra el canal especificat. Nomès pot ser utilitzat pel
-	fundador del canal, qui ha d'utilitzar primer la comanda
-	 IDENTIFY.
+	fundador del canal.
 
 CHAN_HELP_SET
 	Sintaxis: SET canal opció parametres

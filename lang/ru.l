@@ -4213,36 +4213,32 @@ CHAN_HELP_EXPIRES
 	удален из базы данных сервисов.
 
 CHAN_HELP_REGISTER
-	Синтаксис: REGISTER #канал пароль описание
+	Синтаксис: REGISTER #канал описание
 	
-	Регистрирует канал в базе данных %S. Чтобы использовать эту
-	команду, вы должны быть оператором того канала, который вы пытаетесь
-	зарегистрировать. Указанный при регистрации пароль можно использовать
-	(командой IDENTIFY) для получения доступа к каналу и его различным
-	настройкам.
-	Последний параметр описание, который обязательно должен быть
-	указан, является описанием канала и/или, возможно, его тематикой.
-	
-	Сразу после регистрации канала, вы будете автоматически внесены в
-	список доступа с уровенем founder (основатель, владелец). Владелец
-	канала имеет возможность изменять любые его настройки, а так же,
-	автоматически получать статус опператора от %S при заходе
-	на канал.
-	Помимо всего этого, как владелец, вы можете воспользоваться командой
-	ACCESS, что бы назначить дополнительных операторов канала, т. н.
-	администрацию. Более подробную информацию о системе привелегий вы
-	можете получить по команде %R%S HELP ACCESS
-	
-	Примечание: учтите, что перед тем как регистрировать свой канал, вы
-	должны сперва зарегистрировать свой ник. Более подробная информация
-	о том, как регистрировать ник, доступна по %R%s HELP
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Синтаксис: DROP #канал
 	
 	Удаляет указанный канал из базы данных сервисов. Использовать DROP
-	может лишь владелец канала, предварительно проидентифицировавшись
-	к нему с помощью команды IDENTIFY.
+	может лишь владелец канала.
 
 CHAN_HELP_SET
 	Синтаксис: SET #канал опция параметр

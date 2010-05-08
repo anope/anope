@@ -5244,31 +5244,30 @@ CHAN_HELP_EXPIRES
 CHAN_HELP_REGISTER
 	Sk³adnia: REGISTER kana³ has³o opis
 	
-	Rejestruje kana³ w bazie danych %S. Aby u¿yæ
-	tej komendy musisz byæ operatorem na kanale, który
-	chcesz zarejestrowaæ. Has³o umo¿liwia pó¼niejsz±
-	identyfikacjê jako w³a¶ciciel kana³u (IDENTIFY).
-	Ostatni parametr, który musi zostaæ podany, okre¶la
-	cel istnienia kana³u.
-	
-	Po rejestracji kana³u stajesz siê jego w³a¶cicielem,
-	który mo¿e zmieniaæ wszystkie jego ustawienia.
-	%S automatycznie nadaje uprawnienia operatora
-	w³a¶cicielowi, który wchodzi na kana³. Informacje 
-	na temat nadawania uprawnieñ innym u¿ytkownikom
-	znajduj± siê w pomocy polecenia ACCESS
-	(%R%S HELP ACCESS).
-	
-	UWAGA: Aby zarejestrowaæ kana³ nale¿y posiadaæ
-	zarejestrowany nick, aby uzyskaæ wiêcej informacji
-	na temat zarz±dzania nickiem wpisz: %R%s HELP
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Sk³adnia: DROP kana³
 	
 	Usuwa podany kana³. Komenda mo¿e zostaæ u¿yta
-	jedynie przez w³a¶ciciela kana³u, po wcze¶niejszej
-	IDENTIFYKACJI przy pomocy has³a kana³u.
+	jedynie przez w³a¶ciciela kana³u.
 
 CHAN_HELP_SET
 	Sk³adnia: SET kana³ opcja parametry

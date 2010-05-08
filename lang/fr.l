@@ -4317,36 +4317,32 @@ CHAN_HELP_EXPIRES
 	ne vient sur le canal) il sera automatiquement effacé.
 
 CHAN_HELP_REGISTER
-	Syntaxe: REGISTER canal motdepasse description
+	Syntaxe: REGISTER canal description
 	
-	Enregistre un canal dans la base de données de %S. Pour
-	utiliser cette commande, vous devez d'abord être un
-	OPérateur sur le canal que vous essayez 
-	d'enregistrer. Le mot de passe est utilisé avec la commande
-	IDENTIFY pour permettre à d'autres de faire des changements
-	dans la configuration du canal plus tard. Le dernier
-	paramètre, qui doit être inclus, est une description
-	générale du canal.
-	
-	Quand vous enregistrez un canal, vous êtes enregistré
-	comme "propriétaire" du canal. Le propriétaire du canal peut
-	tout changer dans la configuration du canal, %S donnera
-	aussi automatiquement au propriétaire les droits d'OPérateur
-	du canal quand il ou elle rejoint le canal.
-	Consultez la commande ACCESS (%R%S HELP ACCESS) pour
-	savoir comment donner un sous-ensemble de ces droits à
-	d'autres utilisateurs du canal.
-	
-	REMARQUE: Pour enregistrer un canal, vous devez
-	d'abord enregistrer votre pseudo. Si ce n'est pas déjà fait,
-	tapez %R%s HELP pour savoir comment faire.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Syntaxe: DROP canal
 	
 	Efface le canal donné. Peut uniquement être utilisé par
-	le propriétaire du canal, qui doit utiliser la commande
-	IDENTIFY d'abord.
+	le propriétaire du canal.
 
 CHAN_HELP_SET
 	Syntaxe: SET canal option paramètres

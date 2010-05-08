@@ -4127,14 +4127,12 @@ CHAN_HELP_EXPIRES
 	for that period of time) will be automatically dropped.
 
 CHAN_HELP_REGISTER
-	Syntax: REGISTER channel password description
+	Syntax: REGISTER channel description
 	
 	Registers a channel in the %S database.  In order
 	to use this command, you must first be a channel operator
-	on the channel you're trying to register.  The password
-	is used with the IDENTIFY command to allow others to
-	make changes to the channel settings at a later time.
-	The last parameter, which must be included, is a
+	on the channel you're trying to register.
+	The description, which must be included, is a
 	general description of the channel's purpose.
 	
 	When you register a channel, you are recorded as the
@@ -4154,7 +4152,7 @@ CHAN_HELP_DROP
 	Syntax: DROP channel
 	
 	Unregisters the named channel.  Can only be used by
-	channel founder, who must use the IDENTIFY command first.
+	channel founder.
 
 CHAN_HELP_SET
 	Syntax: SET channel option parameters

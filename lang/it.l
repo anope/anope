@@ -4147,36 +4147,32 @@ CHAN_HELP_EXPIRES
 	automaticamente deregistrati.
 
 CHAN_HELP_REGISTER
-	Sintassi: REGISTER canale password descrizione
+	Sintassi: REGISTER canale descrizione
 	
-	Registra un canale nel database di %S. Per poter usare
-	questo comando, devi essere operatore di canale (op) sul
-	canale che intendi registrare. La password è usata con
-	il comando IDENTIFY per permettere agli altri di
-	effettuare in seguito dei cambiamenti sulle varie
-	impostazioni di canale. L'ultimo parametro, che deve
-	essere incluso, è una descrizione generica del canale
-	stesso.
-	
-	Quando registri un canale, vieni registrato come il
-	"fondatore" (founder) del canale. Il fondatore di un
-	canale può cambiare tutte le impostazioni del canale
-	stesso; inoltre, %S gli assegnerà automaticamente i
-	privilegi di operatore di canale (+o) quando entra nel
-	canale.
-	Per assegnare alcuni di questi privilegi ad altri
-	utenti, vedi il comando ACCESS (%R%S HELP ACCESS).
-	
-	NOTA: Per registrare un canale, devi aver prima
-	registrato il tuo nick. Se non l'hai fatto, digita
-	%R%s HELP per avere informazioni su come farlo.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Sintassi: DROP canale
 	
 	Deregistra il canale specificato. Può essere usato soltanto
-	da un fondatore di canale, che deve prima usare il comando
-	IDENTIFY.
+	da un fondatore di canale.
 
 CHAN_HELP_SET
 	Sintassi: SET canale opzione parametri

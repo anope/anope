@@ -4320,30 +4320,26 @@ CHAN_HELP_EXPIRES
 	genutzt wird,automatisch auslaufen wird.
 
 CHAN_HELP_REGISTER
-	Syntax: REGISTER Channel Password Beschreibung
+	Syntax: REGISTER Channel Beschreibung
 	
-	Registriert einen Channel in der Datenbank von %S.
-	Wenn du dieses Befehl nutzen möchtest, musst du
-	Operator-Status in dem Channel besitzen. Das
-	Passwort, dass du mit dem IDENTIFY Befehl
-	einstellst, erlaubt es später anderen Änderungen 
-	am Channel durchzuführen.Der letzte Parameter, der 
-	angegeben werden MUSS,sollte eine allgemeine 
-	Beschreibung des Channels bzw dessen Zweck beinhalten.	
-	
-	Wenn du einen Channel registrierst, wird dein Nickname
-	als Founder (Gründer) eingetragen. Der Channel-Founder 
-	kann alle Einstellungen des Channels bearbeiten, und 
-	wird automatisch beim Joinen des Channels durch %S mit 
-	Founder/Operator Privilegien ausgestattet.  Mit Hilfe 
-	des ACCESS Befehls (%R%S HELP ACCESS) kann man 
-	einen Teil dieser Privilegien anderen registrierten 
-	Nicknamen ebenfalls erteilen.
-	
-	Hinweis: Für das Registrieren eines Channels musst du 
-	einen registrierten und identifizierten Nickname benutzen. 
-	Hast du dies noch nicht getan, tippe %R%s HELP REGISTER 
-	um weitere Informationen darüber zu erhalten.
+	Registers a channel in the %S database.  In order
+	to use this command, you must first be a channel operator
+	on the channel you're trying to register.
+	The description, which must be included, is a
+	general description of the channel's purpose.
+
+	When you register a channel, you are recorded as the
+	"founder" of the channel.  The channel founder is allowed
+	to change all of the channel settings for the channel;
+	%S will also automatically give the founder
+	channel-operator privileges when s/he enters the channel.
+	See the ACCESS command (%R%S HELP ACCESS) for
+	information on giving a subset of these privileges to
+	other channel users.
+
+	NOTICE: In order to register a channel, you must have
+	first registered your nickname.  If you haven't,
+	%R%s HELP for information on how to do so.
 
 CHAN_HELP_DROP
 	Syntax: DROP Channel

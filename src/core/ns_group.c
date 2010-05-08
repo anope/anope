@@ -51,9 +51,7 @@ class CommandNSGroup : public Command
 		{
 			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 			{
-				std::string nick = it->first;
-
-				if (stristr(u->nick.c_str(), nick.c_str()) && !is_oper(u))
+				if (!is_oper(u) && u->nick.find(it->first) != std::string::npos)
 				{
 					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
@@ -153,6 +151,67 @@ class CommandNSGroup : public Command
 	}
 };
 
+class CommandNSUngroup : public Command
+{
+ public:
+	CommandNSUngroup() : Command("UNGROUP", 0, 1)
+	{
+	}
+
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	{
+		const char *nick = params.size() ? params[0].c_str() : NULL;
+		NickAlias *na = nick ? findnick(nick) : findnick(u->nick);
+
+		if (u->Account()->aliases.count == 1)
+			notice_lang(Config.s_NickServ, u, NICK_UNGROUP_ONE_NICK);
+		else if (!na)
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick ? nick : u->nick.c_str());
+		else if (na->nc != u->Account())
+			notice_lang(Config.s_NickServ, u, NICK_UNGROUP_NOT_IN_GROUP, na->nick);
+		else
+		{
+			NickCore *oldcore = na->nc;
+
+			slist_remove(&oldcore->aliases, na);
+			if (!stricmp(oldcore->display, na->nick))
+			{
+				change_core_display(oldcore);
+			}
+
+			na->nc = new NickCore(na->nick);
+			slist_add(&na->nc->aliases, na);
+
+			na->nc->pass = oldcore->pass;
+			if (oldcore->email)
+				na->nc->email = sstrdup(oldcore->email);
+			if (oldcore->greet)
+				na->nc->greet = sstrdup(oldcore->greet);
+			na->nc->icq = oldcore->icq;
+			if (oldcore->url)
+				na->nc->url = sstrdup(oldcore->url);
+			na->nc->language = oldcore->language;
+
+			notice_lang(Config.s_NickServ, u, NICK_UNGROUP_SUCCESSFUL, na->nick, oldcore->display);
+
+			User *user = finduser(na->nick);
+			if (user)
+			{
+				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
+				user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+			}
+		}
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const ci::string &subcommand)
+	{
+		notice_help(Config.s_NickServ, u, NICK_HELP_UNGROUP);
+		return true;
+	}
+};
+
 class CommandNSGList : public Command
 {
  public:
@@ -218,13 +277,16 @@ class NSGroup : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSGroup());
+		this->AddCommand(NICKSERV, new CommandNSUngroup());
 		this->AddCommand(NICKSERV, new CommandNSGList());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
+
 	void OnNickServHelp(User *u)
 	{
 		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GROUP);
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UNGROUP);
 		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GLIST);
 	}
 };

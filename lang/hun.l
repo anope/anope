@@ -377,6 +377,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Mostantól tagja vagy a %scsoportnak.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY válaszok
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY jelszó
@@ -3336,6 +3344,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Nicknév regisztráció
 NICK_HELP_CMD_GROUP
 	    GROUP      Csatlakozás egy csoporthoz
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Jelszavas azonosítás
 NICK_HELP_CMD_ACCESS
@@ -3473,6 +3483,15 @@ NICK_HELP_IDENTIFY
 	Tudatja a %S-vel, hogy te vagy a tulajdonosa ennek a 
 	nicknek. Jelszónak ugyanannak kell lennie amit a 
 	regisztrációnál megadtál, vagy amire módosítottad.
+
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
 
 NICK_HELP_UPDATE
 	Syntax: UPDATE

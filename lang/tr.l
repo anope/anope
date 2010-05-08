@@ -375,6 +375,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	%s grubuna dahil edildiniz.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY þifreniz
@@ -3404,6 +3412,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Nickinizi kaydeder
 NICK_HELP_CMD_GROUP
 	    GROUP      Bir gruba dahil eder
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Þifrenizle nickinizi tanýtýr
 NICK_HELP_CMD_ACCESS
@@ -3535,6 +3545,15 @@ NICK_HELP_GROUP
 	mümkün deðildir.
 	
 	Not: bir gruptaki tüm nickler bir þifreye sahip olurlar.
+
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
 
 NICK_HELP_IDENTIFY
 	Kullanýmý: IDENTIFY þifreniz

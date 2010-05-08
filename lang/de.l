@@ -391,6 +391,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Du bist jetzt in der Gruppe %s vertreten.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY Passwort
@@ -3365,6 +3373,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER    Registriert einen Nicknamen
 NICK_HELP_CMD_GROUP
 	    GROUP       Verwaltung von Nickname-Gruppierungen
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP     Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY    Identifizierung des Nicknames
 NICK_HELP_CMD_ACCESS
@@ -3511,6 +3521,15 @@ NICK_HELP_GROUP
 	
 	Achtung: Alle Mitglieder einer Gruppe haben dasselbe
 	Passwort.
+
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
 
 NICK_HELP_IDENTIFY
 	Syntax: IDENTIFY Passwort

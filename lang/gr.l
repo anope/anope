@@ -371,6 +371,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Είσαι τώρα μέσα στην ομάδα του %s.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY ^_κωδικό^_
@@ -3402,6 +3410,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Κατοχυρώνει ένα ψευδώνυμο
 NICK_HELP_CMD_GROUP
 	    GROUP      Μπένετε σε ομάδα ψευδώνυμου
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Σας αναγνωρίζει με τη χρήση κωδικού
 NICK_HELP_CMD_ACCESS
@@ -3538,7 +3548,16 @@ NICK_HELP_GROUP
 	    
 	Σημείωση: όλα τα ψευδώνυμα που ανήκουν στην ίδια ομάδα έχουν τον ίδιο 
 	κωδικό.
-	
+
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Σύνταξη: IDENTIFY κωδικό
 	

@@ -17,7 +17,8 @@
 /*************************************************************************/
 
 #include "sysconf.h"
-#include "config.h"
+
+#define BUFSIZE 1024
 
 /* Some SUN fixs */
 #ifdef __sun
@@ -901,7 +902,7 @@ class ServerConfig;
 
 #include "extern.h"
 #include "servers.h"
-#include "configreader.h"
+#include "config.h"
 
 class CoreExport IRCDProto
 {

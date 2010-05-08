@@ -12,7 +12,7 @@
  */
 
 #include "services.h"
-#include "configreader.h"
+#include "config.h"
 #include "hashcomp.h" // If this gets added to services.h or someplace else later, remove it from here -- CyberBotX
 
 /*************************************************************************/

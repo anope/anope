@@ -43,7 +43,7 @@
 std::string services_dir;	  /* -dir dirname */
 std::string services_bin;	/* Binary as specified by the user */
 std::string orig_cwd;		/* Original current working directory */
-std::string log_filename = LOG_FILENAME;	  /* -log filename */
+std::string log_filename = "services.log";	  /* -log filename */
 int debug = 0;				  /* -debug */
 int readonly = 0;			   /* -readonly */
 bool LogChan = false;				/* -logchan */

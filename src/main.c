@@ -389,18 +389,20 @@ std::string GetFullProgDir(char *argv0)
 
 static bool Connect()
 {
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreServerConnect, OnPreServerConnect());
-	if (MOD_RESULT != EVENT_CONTINUE)
-	{
-		return (MOD_RESULT == EVENT_ALLOW ? true : false);
-	}
-
 	/* Connect to the remote server */
 	int servernum = 1;
 	for (std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(); curr_uplink != Config.Uplinks.end(); ++curr_uplink, ++servernum)
 	{
 		uplink_server = *curr_uplink;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreServerConnect, OnPreServerConnect(*curr_uplink, servernum));
+		if (MOD_RESULT != EVENT_CONTINUE)
+		{
+			if (MOD_RESULT == EVENT_STOP)
+				break;
+			return true;
+		}
 
 		try
 		{
@@ -415,6 +417,8 @@ static bool Connect()
 		Alog() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
 		return true;
 	}
+
+	uplink_server = NULL;
 
 	return false;
 }

@@ -122,28 +122,26 @@ class SSLModule : public Module
 		SSL_CTX_free(ctx);
 	}
 
-	EventReturn OnPreServerConnect()
+	EventReturn OnPreServerConnect(Uplink *u, int Number)
 	{
-		int servernum = 1;
-		for (std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(); curr_uplink != Config.Uplinks.end(); ++curr_uplink, ++servernum)
-		{
-			uplink_server = *curr_uplink;
+		ConfigReader config;
 
+		if (config.ReadFlag("uplink", "ssl", "no", Number - 1))
+		{
 			try
 			{
-				new SSLSocket(uplink_server->host, uplink_server->port, Config.LocalHost ? Config.LocalHost : "", uplink_server->ipv6);
+				new SSLSocket(u->host, u->port, Config.LocalHost ? Config.LocalHost : "", u->ipv6);
+				Alog() << "Connected to Server " << Number << " (" << u->host << ":" << u->port << ")";
 			}
 			catch (SocketException& ex)
 			{
-				Alog() << "Unable to connect to server" << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "), " << ex.GetReason();
-				continue;
+				Alog() << "Unable to connect with SSL to server" << Number << " (" << u->host << ":" << u->port << "), " << ex.GetReason();
 			}
 
-			Alog() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
 			return EVENT_ALLOW;
 		}
 
-		return EVENT_STOP;
+		return EVENT_CONTINUE;
 	}
 };
 

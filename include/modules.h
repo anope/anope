@@ -577,10 +577,12 @@ class CoreExport Module
 	 */
 	virtual void OnChanExpire(const char *chname) { }
 
-	/** Called before anope connects to its uplink
+	/** Called before Anope connects to its uplink
+	 * @param u The uplink we're going to connect to
+	 * @param Number What number the uplink is
 	 * @return Other than EVENT_CONTINUE to stop attempting to connect
 	 */
-	virtual EventReturn OnPreServerConnect() { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreServerConnect(Uplink *u, int Number) { return EVENT_CONTINUE; }
 
 	/** Called when Anope connects to its uplink
 	 */

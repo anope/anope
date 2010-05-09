@@ -36,10 +36,7 @@ class Thread : public Extensible
  private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
 	bool Exit; 
-
-	/** Join to the thread, sets the exit state to true
-	 */
-	void Join();
+ 
  public:
  	/* Handle for this thread */
 	ThreadHandle Handle;
@@ -51,6 +48,10 @@ class Thread : public Extensible
 	/** Threads destructor
 	 */
 	virtual ~Thread();
+
+	/** Join to the thread, sets the exit state to true
+	 */
+	void Join();
 
 	/** Sets the exit state as true informing the thread we want it to shut down
 	 */

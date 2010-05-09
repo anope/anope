@@ -1,14 +1,5 @@
 #include "services.h"
 
-/** Join to the thread, sets the exit state to true
- */
-void Thread::Join()
-{
-	SetExitState();
-	WaitForSingleObject(Handle, INFINITE);
-	delete this;
-}
-
 /** Entry point for the thread
  * @param paramter A Thread* cast to a void*
  */
@@ -16,6 +7,11 @@ static DWORD WINAPI entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
+	if (!thread->GetExitState())
+	{
+		thread->Join();
+	}
+	delete thread;
 	return 0;
 }
 
@@ -31,6 +27,14 @@ ThreadEngine::~ThreadEngine()
 {
 }
 
+/** Join to the thread, sets the exit state to true
+ */
+void Thread::Join()
+{
+	SetExitState();
+	WaitForSingleObject(Handle, INFINITE);
+}
+
 /** Start a new thread
  * @param thread A pointer to a newley allocated thread
  */
@@ -41,7 +45,7 @@ void ThreadEngine::Start(Thread *thread)
 	if (!thread->Handle)
 	{
 		delete thread;
-		throw CoreException("Unable to create thread");
+		throw CoreException("Unable to create thread: " + std::string(dlerror()));
 	}
 }
 

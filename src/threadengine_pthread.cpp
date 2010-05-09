@@ -1,14 +1,5 @@
 #include "services.h"
 
-/** Join to the thread, sets the exit state to true
- */
-void Thread::Join()
-{
-	SetExitState();
-	pthread_join(Handle, NULL);
-	delete this;
-}
-
 /* Threadengine attributes used by this thread engine */
 static pthread_attr_t threadengine_attr;
 
@@ -19,6 +10,11 @@ static void *entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
+	if (!thread->GetExitState())
+	{
+		thread->Join();
+	}
+	delete thread;
 	pthread_exit(0);
 }
 
@@ -39,6 +35,14 @@ ThreadEngine::~ThreadEngine()
 	pthread_attr_destroy(&threadengine_attr);
 }
 
+/** Join to the thread, sets the exit state to true
+ */
+void Thread::Join()
+{
+	SetExitState();
+	pthread_join(Handle, NULL);
+}
+
 /** Start a new thread
  * @param thread A pointer to a newley allocated thread
  */
@@ -47,7 +51,7 @@ void ThreadEngine::Start(Thread *thread)
 	if (pthread_create(&thread->Handle, &threadengine_attr, entry_point, thread))
 	{
 		delete thread;
-		throw CoreException("Unable to create thread");
+		throw CoreException("Unable to create thread: " + std::string(strerror(errno)));
 	}
 }
 

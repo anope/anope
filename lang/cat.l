@@ -866,18 +866,15 @@ NICK_SENDPASS_UNAVAILABLE
 	La comanda SENDPASS no esta disponible per l'us d'encriptació.
 NICK_SENDPASS_SUBJECT
 	Clau pel Nickname (%s)
-NICK_SENDPASS_HEAD
-	Hola,
-NICK_SENDPASS_LINE_1
-	El teu has demanat rebre la clau pel nickname %s via e-mail.
-NICK_SENDPASS_LINE_2
-	La clau es %s Per raons de seguretat hauries de canviar-la quant rebis aquest mail.
-NICK_SENDPASS_LINE_3
-	Si no saps per que aquest mail t'ha estat enviat, per favor ignora'l.
-NICK_SENDPASS_LINE_4
-	Per favor NO RESPONGUIS a aquest EMAIL!
-NICK_SENDPASS_LINE_5
-	Administradors de %s.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	La clau de %s ha estat enviada.
 
@@ -891,9 +888,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -944,17 +940,14 @@ NICK_ENTER_REG_CODE
 	A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration
 NICK_REG_MAIL_SUBJECT
 	Nickname Registration (%s)
-NICK_REG_MAIL_HEAD
+NICK_REG_MAIL
 	Hi,
-NICK_REG_MAIL_LINE_1
-	You have requested to register the following nickname %s.
-NICK_REG_MAIL_LINE_2
+	
+	You have requested to register the nickname %s on %s.
 	Please type " %R%s confirm %s " to complete registration.
-NICK_REG_MAIL_LINE_3
-	If you don't know why this mail is sent to you, please ignore it silently.
-NICK_REG_MAIL_LINE_4
-	PLEASE DON'T ANSWER TO THIS MAIL!
-NICK_REG_MAIL_LINE_5
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
 	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Passcode for %s is %s.
@@ -2040,12 +2033,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Standard responses
 MEMO_MAIL_SUBJECT
 	New memo
-MEMO_MAIL_TEXT1
+NICK_MAIL_TEXT
 	Hi %s
-MEMO_MAIL_TEXT2
+	
 	You've just received a new memo from %s. This is memo number %d.
-MEMO_MAIL_TEXT3
-	Memo Text:
+	
+	Memo text:
+	
+	%s
 
 ###########################################################################
 #

@@ -853,18 +853,15 @@ NICK_SENDPASS_UNAVAILABLE
 	Команда SENDPASS недоступна, так как включено шифрование паролей.
 NICK_SENDPASS_SUBJECT
 	Пароль для ника %s
-NICK_SENDPASS_HEAD
-	Доброго времени суток, многоуважаемый/ая!
-NICK_SENDPASS_LINE_1
-	Был получен запрос на восстановление пароля от вашего ника %s
-NICK_SENDPASS_LINE_2
-	Ваш пароль %s * Для большей безопасности, рекомендуется изменить его как можно скорее.
-NICK_SENDPASS_LINE_3
-	Если вы не запрашивали это письмо, просто проигнорируйте его.
-NICK_SENDPASS_LINE_4
-	ПОЖАЛУЙСТА, НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
-NICK_SENDPASS_LINE_5
-	Администрация сети %s.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	Пароль для ника %s был выслан на его email-адрес.
 
@@ -878,9 +875,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -925,18 +921,15 @@ NICK_ENTER_REG_CODE
 	Auth-код был выслан на %s, для завершения регистрации используйте команду %R%s confirm auth-код
 NICK_REG_MAIL_SUBJECT
 	Регистрация ника %s
-NICK_REG_MAIL_HEAD
-	Доброго времени суток, многоуважаемый/ая!
-NICK_REG_MAIL_LINE_1
-	Вы запросили регистрацию ника %s
-NICK_REG_MAIL_LINE_2
-	Для завершения процесса регистрации ника, воспользуйтесь командой %R%s CONFIRM %s
-NICK_REG_MAIL_LINE_3
-	Если вы не запрашивали это письмо - просто проигнорируйте его.
-NICK_REG_MAIL_LINE_4
-	ПОЖАЛУЙСТА, НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
-NICK_REG_MAIL_LINE_5
-	Администрация сети %s.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Пароль для ника %s - %s.
 NICK_FORCE_REG
@@ -1995,13 +1988,15 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Memo2Mail responses
 MEMO_MAIL_SUBJECT
 	Новое мемо-сообщение
-MEMO_MAIL_TEXT1
-	Здраствуйте %s.
-MEMO_MAIL_TEXT2
-	Вы получили новое мемо-сообщение от %s. Номер сообщения: %d.
-MEMO_MAIL_TEXT3
-	Текст сообщения:
+NICK_MAIL_TEXT
+	Hi %s
 	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
+
 # RSEND responses
 MEMO_RSEND_PLEASE_WAIT
 	Пожалуйста, подождите %d секунд перед повторным использованием команды RSEND.

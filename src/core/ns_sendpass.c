@@ -14,6 +14,8 @@
 
 #include "module.h"
 
+static bool SendPassMail(User *u, NickAlias *na, const std::string &pass);
+
 class CommandNSSendPass : public Command
 {
  public:
@@ -34,34 +36,14 @@ class CommandNSSendPass : public Command
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else
 		{
-			char buf[BUFSIZE];
 			std::string tmp_pass;
 			if (enc_decrypt(na->nc->pass,tmp_pass) == 1)
 			{
-				MailInfo *mail;
-
-				snprintf(buf, sizeof(buf), getstring(na, NICK_SENDPASS_SUBJECT), na->nick);
-				mail = MailBegin(u, na->nc, buf, Config.s_NickServ);
-				if (!mail)
-					return MOD_CONT;
-
-				fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_HEAD));
-				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_1), na->nick);
-				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_2), tmp_pass.c_str());
-				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_LINE_3));
-				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_LINE_4));
-				fprintf(mail->pipe, "\n\n");
-				fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_5), Config.NetworkName);
-				fprintf(mail->pipe, "\n.\n");
-
-				MailEnd(mail);
-
-				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SENDPASS on " << nick;
-				notice_lang(Config.s_NickServ, u, NICK_SENDPASS_OK, nick);
+				if (SendPassMail(u, na, tmp_pass))
+				{
+					Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SENDPASS on " << nick;
+					notice_lang(Config.s_NickServ, u, NICK_SENDPASS_OK, nick);
+				}
 			}
 			else
 				notice_lang(Config.s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
@@ -102,10 +84,21 @@ class NSSendPass : public Module
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
+
 	void OnNickServHelp(User *u)
 	{
 		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SENDPASS);
 	}
 };
+
+static bool SendPassMail(User *u, NickAlias *na, const std::string &pass)
+{
+	char subject[BUFSIZE], message[BUFSIZE];
+
+	snprintf(subject, sizeof(subject), getstring(na, NICK_SENDPASS_SUBJECT), na->nick);
+	snprintf(message, sizeof(message), getstring(na, NICK_SENDPASS), na->nick, pass.c_str(), Config.NetworkName);
+
+	return Mail(u, na->nc, Config.s_NickServ, subject, message);
+}
 
 MODULE_INIT(NSSendPass)

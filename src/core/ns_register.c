@@ -14,7 +14,7 @@
 
 #include "module.h"
 
-int do_sendregmail(User *u, NickRequest *nr);
+static bool SendRegmail(User *u, NickRequest *nr);
 
 class CommandNSConfirm : public Command
 {
@@ -279,7 +279,7 @@ class CommandNSRegister : public CommandNSConfirm
 			FOREACH_MOD(I_OnMakeNickRequest, OnMakeNickRequest(nr));
 			if (Config.NSEmailReg)
 			{
-				if (!do_sendregmail(u, nr))
+				if (SendRegmail(u, nr))
 				{
 					notice_lang(Config.s_NickServ, u, NICK_ENTER_REG_CODE, email, Config.s_NickServ);
 					Alog() << Config.s_NickServ << ": sent registration verification code to " << nr->email;
@@ -337,7 +337,7 @@ class CommandNSResend : public Command
 					notice_lang(Config.s_NickServ, u, MAIL_LATER);
 					return MOD_CONT;
 				}
-				if (!do_sendregmail(u, nr))
+				if (!SendRegmail(u, nr))
 				{
 					nr->lastmail = time(NULL);
 					notice_lang(Config.s_NickServ, u, NICK_REG_RESENT, nr->email);
@@ -375,6 +375,7 @@ class NSRegister : public Module
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
+
 	void OnNickServHelp(User *u)
 	{
 		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_REGISTER);
@@ -386,33 +387,14 @@ class NSRegister : public Module
 	}
 };
 
-/*************************************************************************/
-
-int do_sendregmail(User *u, NickRequest *nr)
+static bool SendRegmail(User *u, NickRequest *nr)
 {
-	MailInfo *mail = NULL;
-	char buf[BUFSIZE];
+	char subject[BUFSIZE], message[BUFSIZE];
 
-	if (!nr && !u)
-		return -1;
-	snprintf(buf, sizeof(buf), getstring(NICK_REG_MAIL_SUBJECT), nr->nick);
-	mail = MailRegBegin(u, nr, buf, Config.s_NickServ);
-	if (!mail)
-		return -1;
-	fprintf(mail->pipe, "%s", getstring(NICK_REG_MAIL_HEAD));
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_1), nr->nick);
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_2), Config.s_NickServ, nr->passcode.c_str());
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, "%s", getstring(NICK_REG_MAIL_LINE_3));
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, "%s", getstring(NICK_REG_MAIL_LINE_4));
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, getstring(NICK_REG_MAIL_LINE_5), Config.NetworkName);
-	fprintf(mail->pipe, "\n.\n");
-	MailEnd(mail);
-	return 0;
+	snprintf(subject, sizeof(subject), getstring(NICK_REG_MAIL_SUBJECT), nr->nick);
+	snprintf(message, sizeof(message), getstring(NICK_REG_MAIL), nr->nick, Config.NetworkName, Config.s_NickServ, nr->passcode.c_str(), Config.NetworkName);
+
+	return Mail(u, nr, Config.s_NickServ, subject, message);
 }
 
 MODULE_INIT(NSRegister)

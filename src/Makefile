@@ -9,7 +9,7 @@ INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/messages.h ../include/services.h \
 	../include/timers.h ../include/extern.h \
 	../include/modules.h ../include/slist.h ../include/hashcomp.h \
-	../include/threadengine.h
+	../include/threadengine.h ../include/mail.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'INSTDIR=${INSTDIR}' 'INSTALL=${INSTALL}' \
@@ -51,7 +51,7 @@ ircd.o:         ircd.c      $(INCLUDES)
 hostserv.o:     hostserv.c  $(INCLUDES)
 language.o:     language.c  $(INCLUDES)
 log.o:          log.c       $(INCLUDES)
-mail.o:         mail.c      $(INCLUDES)
+mail.o:         mail.cpp      $(INCLUDES)
 main.o:         main.c      $(INCLUDES)
 memory.o:       memory.c    $(INCLUDES)
 memoserv.o:     memoserv.c  $(INCLUDES)

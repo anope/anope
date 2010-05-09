@@ -14,6 +14,8 @@
 
 #include "module.h"
 
+static bool SendResetEmail(User *u, NickAlias *na);
+
 class CommandNSResetPass : public Command
 {
  public:
@@ -33,41 +35,11 @@ class CommandNSResetPass : public Command
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else
 		{
-			char buf[BUFSIZE], message[BUFSIZE];
-			snprintf(buf, sizeof(buf), getstring(na, NICK_RESETPASS_SUBJECT), na->nick);
-
-			MailInfo *mail = MailBegin(u, na->nc, buf, Config.s_NickServ);
-			if (!mail)
-				return MOD_CONT;
-
-			char passcode[20];
-			int min = 1, max = 62;
-			int chars[] = {
-				' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-				'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-				'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-				'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
-				'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-			};
-
-	 		int idx;
-			for (idx = 0; idx < 20; ++idx)
-				passcode[idx] = chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
-			passcode[idx] = '\0';
-
-			snprintf(message, sizeof(message), getstring(na, NICK_RESETPASS_MESSAGE), na->nick, Config.s_NickServ, passcode, Config.NetworkName);
-			fprintf(mail->pipe, "%s", message);
-			fprintf(mail->pipe, "\n.\n");
-			MailEnd(mail);
-
-			na->nc->Shrink("ns_resetpass_code");
-			na->nc->Shrink("ns_resetpass_time");
-
-			na->nc->Extend("ns_resetpass_code", new ExtensibleItemPointerArray<char>(sstrdup(passcode)));
-			na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(time(NULL)));
-
-			Alog() << Config.s_NickServ <<  ": " << u->GetMask() << " used RESETPASS on " << na->nick << " (" << na->nc->display << ")";
-			notice_lang(Config.s_NickServ, u, NICK_RESETPASS_COMPLETE, na->nick);
+			if (SendResetEmail(u, na))
+			{
+				Alog() << Config.s_NickServ <<  ": " << u->GetMask() << " used RESETPASS on " << na->nick << " (" << na->nc->display << ")";
+				notice_lang(Config.s_NickServ, u, NICK_RESETPASS_COMPLETE, na->nick);
+			}
 		}
 
 		return MOD_CONT;
@@ -110,14 +82,13 @@ class NSResetPass : public Module
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
-		time_t t;
-		char *c;
-
 		if (service == Config.s_NickServ && command == "CONFIRM" && !params.empty())
 		{
 			NickAlias *na = findnick(u->nick);
 			
-			if (na && na->nc->GetExtArray("ns_resetpass_code", c) && na->nc->GetExtRegular<time_t>("ns_resetpass_time", t))
+			time_t t;
+			std::string c;
+			if (na && na->nc->GetExtRegular("ns_resetpass_code", c) && na->nc->GetExtRegular("ns_resetpass_time", t))
 			{
 				if (t < time(NULL) - 3600)
 				{
@@ -166,5 +137,36 @@ class NSResetPass : public Module
 		return EVENT_CONTINUE;
 	}
 };
+
+static bool SendResetEmail(User *u, NickAlias *na)
+{
+	char subject[BUFSIZE], message[BUFSIZE], passcode[20];
+
+	snprintf(subject, sizeof(subject), getstring(na, NICK_RESETPASS_SUBJECT), na->nick);
+
+	int min = 1, max = 62;
+	int chars[] = {
+		' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+		'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+		'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+		'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+		'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+	};
+
+	int idx;
+	for (idx = 0; idx < 20; ++idx)
+		passcode[idx] = chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
+	passcode[idx] = '\0';
+
+	snprintf(message, sizeof(message), getstring(na, NICK_RESETPASS_MESSAGE), na->nick, Config.s_NickServ, passcode, Config.NetworkName);
+
+	na->nc->Shrink("ns_resetpass_code");
+	na->nc->Shrink("ns_resetpass_time");
+
+	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<std::string>(passcode));
+	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(time(NULL)));
+
+	return Mail(u, na->nc, Config.s_NickServ, subject, message);
+}
 
 MODULE_INIT(NSResetPass)

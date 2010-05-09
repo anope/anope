@@ -18,7 +18,7 @@
 /* *INDENT-OFF* */
 
 E void moduleAddMemoServCmds();
-static void new_memo_mail(NickCore *nc, Memo *m);
+static bool SendMemoMail(NickCore *nc, Memo *m);
 E void rsend_notify(User *u, Memo *m, const char *chan);
 
 /*************************************************************************/
@@ -300,7 +300,7 @@ void memo_send(User * u, const char *name, const char *text, int z)
 			/* if (MSNotifyAll) */
 			/* let's get out the mail if set in the nickcore - certus */
 			if (nc->HasFlag(NI_MEMO_MAIL))
-				new_memo_mail(nc, m);
+				SendMemoMail(nc, m);
 		} else {
 			Channel *c;
 
@@ -356,32 +356,17 @@ int delmemo(MemoInfo * mi, int num)
 
 /*************************************************************************/
 
-static void new_memo_mail(NickCore * nc, Memo * m)
+static bool SendMemoMail(NickCore *nc, Memo *m)
 {
-	MailInfo *mail = NULL;
+	char message[BUFSIZE];
 
-	if (!nc || !m)
-		return;
+	snprintf(message, sizeof(message), getstring(NICK_MAIL_TEXT), nc->display, m->sender.c_str(), m->number, m->text);
 
-	mail = MailMemoBegin(nc);
-	if (!mail) {
-		return;
-	}
-	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT1), nc->display);
-	fprintf(mail->pipe, "\n");
-	fprintf(mail->pipe, getstring(MEMO_MAIL_TEXT2), m->sender.c_str(),
-			m->number);
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, "%s", getstring(MEMO_MAIL_TEXT3));
-	fprintf(mail->pipe, "\n\n");
-	fprintf(mail->pipe, "%s", m->text);
-	fprintf(mail->pipe, "\n");
-	MailEnd(mail);
-	return;
+	return Mail(nc, getstring(MEMO_MAIL_SUBJECT), message);
 }
 
-
 /*************************************************************************/
+
 /* Send receipt notification to sender. */
 
 void rsend_notify(User * u, Memo * m, const char *chan)

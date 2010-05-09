@@ -869,18 +869,15 @@ NICK_SENDPASS_UNAVAILABLE
 	SENDPASS commando is onbeschikbaar omdat encryptie aanstaat.
 NICK_SENDPASS_SUBJECT
 	Nick wachtwoord (%s)
-NICK_SENDPASS_HEAD
-	Hoi,
-NICK_SENDPASS_LINE_1
-	Je hebt het wachtwoord van nick %s via e-mail aangevraagd.
-NICK_SENDPASS_LINE_2
-	Het wachtwoord is %s Wegens veiligheidsredenen kun je dit het beste zo snel mogelijk veranderen.
-NICK_SENDPASS_LINE_3
-	Als je niet weet waarom deze email gestuurd is, negeer deze dan.
-NICK_SENDPASS_LINE_4
-	ANTWOORD NIET OP DEZE E-MAIL!
-NICK_SENDPASS_LINE_5
-	%s beheerders.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	Wachtwoord %s is verstuurd.
 
@@ -893,9 +890,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 
@@ -941,18 +937,15 @@ NICK_ENTER_REG_CODE
 	Een verificatiecode is verstuurd naar %s. Type %R%s confirm <verificatiecode> om de registratie te voltooien.
 NICK_REG_MAIL_SUBJECT
 	Nickname Registratie (%s)
-NICK_REG_MAIL_HEAD
-	Hoi,
-NICK_REG_MAIL_LINE_1
-	Je hebt een aanvraag ingediend om de nickname %s te registreren.
-NICK_REG_MAIL_LINE_2
-	Type " %R%s confirm %s " om de registratie te voltooien.
-NICK_REG_MAIL_LINE_3
-	Als je niet weet waarom deze e-mail naar je gestuurd is, negeer deze dan.
-NICK_REG_MAIL_LINE_4
-	REAGEER NIET OP DEZE MAIL!
-NICK_REG_MAIL_LINE_5
-	%s administrators.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.	
 NICK_GETPASS_PASSCODE_IS
 	Verificatiecode voor %s is %s.
 NICK_FORCE_REG
@@ -2025,12 +2018,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Standard responses
 MEMO_MAIL_SUBJECT
 	Nieuwe memo
-MEMO_MAIL_TEXT1
-	Hoi %s
-MEMO_MAIL_TEXT2
-	Je hebt zojuist een memo ontvangen van %s. Het gaat om memo nummer %d.
-MEMO_MAIL_TEXT3
-	Inhoud van de memo:
+NICK_MAIL_TEXT
+	Hi %s
+	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
 
 ###########################################################################
 #

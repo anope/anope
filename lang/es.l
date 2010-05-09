@@ -870,18 +870,15 @@ NICK_SENDPASS_UNAVAILABLE
 	El comando SENDPASS no esta disponible por el uso de encriptacion.
 NICK_SENDPASS_SUBJECT
 	Clave para el Nickname (%s)
-NICK_SENDPASS_HEAD
-	Hola,
-NICK_SENDPASS_LINE_1
-	Tu has pedido recibir la clave para el nickname %s por e-mail.
-NICK_SENDPASS_LINE_2
-	La clave es %s Por razones de seguridad deberas cambiarla en cuanto recibas este mail.
-NICK_SENDPASS_LINE_3
-	Si no sabes porque este mail ha sido enviado a ti, por favor ignoralo.
-NICK_SENDPASS_LINE_4
-	POR FAVOR NO RESPONDER A ESTE EMAIL!
-NICK_SENDPASS_LINE_5
-	Administradores de %s.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	La clave de %s ha sido enviada.
 
@@ -895,9 +892,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -942,18 +938,15 @@ NICK_ENTER_REG_CODE
 	El password ha sido enviado a %s, tipea %R%s confirm <password> para completar el registro.
 NICK_REG_MAIL_SUBJECT
 	Registro de Nick (%s)
-NICK_REG_MAIL_HEAD
-	Hola,
-NICK_REG_MAIL_LINE_1
-	Tu has pedido registrar el nickname %s.
-NICK_REG_MAIL_LINE_2
-	Tipea " %R%s confirm %s " para completar el registro.
-NICK_REG_MAIL_LINE_3
-	Si no sabes por que has recibido este email, por favor ignorarlo.
-NICK_REG_MAIL_LINE_4
-	NO RESPONDAS A ESTE MAIL!
-NICK_REG_MAIL_LINE_5
-	Administradores de %s.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	El password para %s es %s.
 NICK_FORCE_REG
@@ -2032,12 +2025,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Standard responses
 MEMO_MAIL_SUBJECT
 	Nuevo memo
-MEMO_MAIL_TEXT1
-	Hola %s
-MEMO_MAIL_TEXT2
-	Acabas de recibir un nuevo memo de %s. Es el memo numero %d.
-MEMO_MAIL_TEXT3
-	Texto del Memo:
+NICK_MAIL_TEXT
+	Hi %s
+	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
 
 # Standard responses
 MEMO_RSEND_PLEASE_WAIT

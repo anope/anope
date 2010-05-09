@@ -901,6 +901,7 @@ struct Uplink;
 class ServerConfig;
 
 #include "extern.h"
+#include "mail.h"
 #include "servers.h"
 #include "config.h"
 

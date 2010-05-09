@@ -852,18 +852,15 @@ NICK_SENDPASS_UNAVAILABLE
 	Il comando SENDPASS non è disponibile perché è in uso la criptazione dei dati.
 NICK_SENDPASS_SUBJECT
 	Password del nick (%s)
-NICK_SENDPASS_HEAD
-	Salve,
-NICK_SENDPASS_LINE_1
-	Hai richiesto di ricevere via e-mail la password del nick %s.
-NICK_SENDPASS_LINE_2
-	La password è %s Per ragioni di sicurezza, ti invitiamo a cambiarla il più presto possibile con il comando "/ns set password".
-NICK_SENDPASS_LINE_3
-	Se non sai perché hai ricevuto questa mail, ignorala.
-NICK_SENDPASS_LINE_4
-	IMPORTANTE! Non rispondere a questa mail!
-NICK_SENDPASS_LINE_5
-	Gli amministratori di %s.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	La password di %s è stata inviata.
 
@@ -877,9 +874,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -924,18 +920,15 @@ NICK_ENTER_REG_CODE
 	Un codice di attivazione è stato inviato a %s. Digita %R%s CONFIRM <codice> per completare la registrazione.
 NICK_REG_MAIL_SUBJECT
 	Registrazione del nick (%s)
-NICK_REG_MAIL_HEAD
-	Salve,
-NICK_REG_MAIL_LINE_1
-	Hai richiesto la registrazione del nick %s.
-NICK_REG_MAIL_LINE_2
-	Digita " %R%s CONFIRM %s " (senza virgolette) per completare la registrazione.
-NICK_REG_MAIL_LINE_3
-	Se non sai perché hai ricevuto questa e-mail, ignorala.
-NICK_REG_MAIL_LINE_4
-	NON RISPONDERE A QUESTA MAIL!
-NICK_REG_MAIL_LINE_5
-	Gli amministratori di %s.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Il codice di attivazione per %s is %s.
 NICK_FORCE_REG
@@ -2000,12 +1993,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Memo2Mail responses
 MEMO_MAIL_SUBJECT
 	Nuovo memo
-MEMO_MAIL_TEXT1
-	Ciao %s
-MEMO_MAIL_TEXT2
-	Hai appena ricevuto un nuovo memo da %s. Questo è il memo numero %d.
-MEMO_MAIL_TEXT3
-	Testo del memo:
+NICK_MAIL_TEXT
+	Hi %s
+	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
 
 # RSEND responses
 MEMO_RSEND_PLEASE_WAIT

@@ -6,6 +6,7 @@ void Thread::Join()
 {
 	SetExitState();
 	WaitForSingleObject(Handle, INFINITE);
+	delete this;
 }
 
 /** Entry point for the thread

@@ -6,6 +6,7 @@ void Thread::Join()
 {
 	SetExitState();
 	pthread_join(Handle, NULL);
+	delete this;
 }
 
 /* Threadengine attributes used by this thread engine */
@@ -18,7 +19,7 @@ static void *entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
-	return parameter;
+	pthread_exit(0);
 }
 
 /** Threadengines constructor

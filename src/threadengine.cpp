@@ -12,7 +12,6 @@ Thread::Thread() : Exit(false)
  */
 Thread::~Thread()
 {
-	Join();
 }
 
 /** Sets the exit state as true informing the thread we want it to shut down

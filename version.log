@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2935"
+VERSION_BUILD="2943"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2943 - Added an Atheme to Anope database converter
 #Revision 2935 - Fixed unloading modules commands, fixes a crash introduced by the last commit
 #Revision 2931 - Always set mod_current_module and mod_current_module_name, fixes a few of the functions in modules.c relying on it.
 #Revision 2930 - Print an error if the TS6 SID isn't set/is set incorrectly, most people don't know how to work logfiles

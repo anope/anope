@@ -1,6 +1,7 @@
 Anope Version 1.8 - SVN
 -----------------------
 5/5   A Added an internal event called when a nick is requested          [  #00]
+5/9   A Added an Atheme to Anope database converter                      [  #00]
 4/15  F Fixed os_info to backup its database on Windows                  [  #00]
 4/15  F Fixed a potential crash in cs_clear ops                          [#1154]
 4/16  F Fixed missing TS6SID on FJOIN in inspircd12                      [  #00]

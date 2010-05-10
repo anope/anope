@@ -1050,7 +1050,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NOREJOIN, 'J', true));
 							continue;
 						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L', true));
 							continue;
 						case 'f':
 							ModeManager::AddChannelMode(new ChannelModeFlood('f', true));

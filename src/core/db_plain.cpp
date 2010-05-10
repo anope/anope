@@ -39,7 +39,6 @@ static const char endl = '\n';
  */
 static void ReadDatabase(Module *m = NULL)
 {
-	std::string buf;
 	EventReturn MOD_RESULT;
 	MDType Type = MD_NONE;
 
@@ -56,6 +55,7 @@ static void ReadDatabase(Module *m = NULL)
 	BotInfo *bi = NULL;
 	ChannelInfo *ci = NULL;
 
+	std::string buf;
 	while (std::getline(db, buf))
 	{
 		if (buf.empty())
@@ -87,7 +87,6 @@ static void ReadDatabase(Module *m = NULL)
 		if (MOD_RESULT == EVENT_STOP)
 			continue;
 
-		std::string mdbuf;
 		if (!params.empty())
 		{
 			if (params[0] == "NC")
@@ -198,12 +197,6 @@ struct LangInfo
 	int LanguageId;
 };
 
-struct ChannelModeInfo
-{
-	std::string Name;
-	ChannelModeName Value;
-};
-
 struct ChannelFlagInfo
 {
 	std::string Name;
@@ -243,42 +236,6 @@ LangInfo LangInfos[] = {
 	{"hu", LANG_HUN},
 	{"pl", LANG_PL},
 	{"", -1}
-};
-
-ChannelModeInfo ChannelModes[] = {
-	{"CMODE_BLOCKCOLOR", CMODE_BLOCKCOLOR},
-	{"CMODE_FLOOD", CMODE_FLOOD},
-	{"CMODE_INVITE", CMODE_INVITE},
-	{"CMODE_KEY", CMODE_KEY},
-	{"CMODE_LIMIT", CMODE_LIMIT},
-	{"CMODE_MODERATED", CMODE_MODERATED},
-	{"CMODE_NOEXTERNAL", CMODE_NOEXTERNAL},
-	{"CMODE_PRIVATE", CMODE_PRIVATE},
-	{"CMODE_REGISTERED", CMODE_REGISTERED},
-	{"CMODE_SECRET", CMODE_SECRET},
-	{"CMODE_TOPIC", CMODE_TOPIC},
-	{"CMODE_AUDITORIUM", CMODE_AUDITORIUM},
-	{"CMODE_SSL", CMODE_SSL},
-	{"CMODE_ADMINONLY", CMODE_ADMINONLY},
-	{"CMODE_NOCTCP", CMODE_NOCTCP},
-	{"CMODE_FILTER", CMODE_FILTER},
-	{"CMODE_NOKNOCK", CMODE_NOKNOCK},
-	{"CMODE_REDIRECT", CMODE_REDIRECT},
-	{"CMODE_REGMODERATED", CMODE_REGMODERATED},
-	{"CMODE_NONICK", CMODE_NONICK},
-	{"CMODE_OPERONLY", CMODE_OPERONLY},
-	{"CMODE_NONICK", CMODE_NONICK},
-	{"CMODE_REGISTEREDONLY", CMODE_REGISTEREDONLY},
-	{"CMODE_STRIPCOLOR", CMODE_STRIPCOLOR},
-	{"CMODE_NONOTICE", CMODE_NONOTICE},
-	{"CMODE_NOINVITE", CMODE_NOINVITE},
-	{"CMODE_ALLINVITE", CMODE_ALLINVITE},
-	{"CMODE_BLOCKCAPS", CMODE_BLOCKCAPS},
-	{"CMODE_PERM", CMODE_PERM},
-	{"CMODE_NICKFLOOD", CMODE_NICKFLOOD},
-	{"CMODE_JOINFLOOD", CMODE_JOINFLOOD},
-	{"CMODE_NOREJOIN", CMODE_NOREJOIN},
-	{"", static_cast<ChannelModeName>(-1)}
 };
 
 ChannelFlagInfo ChannelInfoFlags[] = {
@@ -740,8 +697,6 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params)
 	{
-		int i;
-
 		if (key == "FOUNDER")
 		{
 			ci->founder = findcore(params[0].c_str());
@@ -757,14 +712,14 @@ class DBPlain : public Module
 		else if (key == "LEVELS")
 		{
 			for (unsigned j = 0; j < params.size(); ++j, ++j)
-				for (i = 0; ChannelLevels[i].Level != -1; ++i)
+				for (int i = 0; ChannelLevels[i].Level != -1; ++i)
 					if (ChannelLevels[i].Name == params[j])
 						ci->levels[ChannelLevels[i].Level] = atoi(params[j + 1].c_str());
 		}
 		else if (key == "FLAGS")
 		{
 			for (unsigned j = 0; j < params.size(); ++j)
-				for (i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
+				for (int i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
 					if (ChannelInfoFlags[i].Name == params[j])
 						ci->SetFlag(ChannelInfoFlags[i].Flag);
 		}
@@ -830,16 +785,38 @@ class DBPlain : public Module
 			bool Set = key == "MLOCK_ON" ? true : false;
 
 			for (unsigned j = 0; j < params.size(); ++j)
-				for (i = 0; ChannelModes[i].Value != -1; ++i)
-					if (ChannelModes[i].Name == params[j])
-						ci->SetMLock(ChannelModes[i].Value, Set);
+			{
+				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+				{
+					if ((*it)->Class == MC_CHANNEL)
+					{
+						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+						if (cm->NameAsString == params[j])
+						{
+							ci->SetMLock(cm->Name, Set);
+						}
+					}
+				}
+			}
 		}
 		else if (key == "MLP")
 		{
 			for (unsigned j = 0; j < params.size(); ++j, ++j)
-				for (i = 0; ChannelModes[i].Value != -1; ++i)
-					if (ChannelModes[i].Name == params[j])
-						ci->SetMLock(ChannelModes[i].Value, true, params[j + 1]);
+			{
+				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+				{
+					if ((*it)->Class == MC_CHANNEL)
+					{
+						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+						if (cm->NameAsString == params[j])
+						{
+							ci->SetMLock(cm->Name, true, params[j + 1]);
+						}
+					}
+				}
+			}
 		}
 		else if (key == "MI")
 		{
@@ -868,7 +845,7 @@ class DBPlain : public Module
 			else if (params[0] == "FLAGS")
 			{
 				for (unsigned j = 1; j < params.size(); ++j)
-					for (i = 0; BotFlags[i].Flag != -1; ++i)
+					for (int i = 0; BotFlags[i].Flag != -1; ++i)
 						if (BotFlags[i].Name == params[j])
 							ci->botflags.SetFlag(BotFlags[i].Flag);
 			}
@@ -936,10 +913,7 @@ class DBPlain : public Module
 
 		db << "VER 1" << endl;
 
-		int i, j;
-		unsigned k;
-	
-		for (i = 0; i < 1024; ++i)
+		for (int i = 0; i < 1024; ++i)
 		{
 			for (NickRequest *nr = nrlists[i]; nr; nr = nr->next)
 			{
@@ -947,10 +921,9 @@ class DBPlain : public Module
 			}
 		}
 
-		NickCore *nc;
-		for (i = 0; i < 1024; ++i)
+		for (int i = 0; i < 1024; ++i)
 		{
-			for (nc = nclists[i]; nc; nc = nc->next)
+			for (NickCore *nc = nclists[i]; nc; nc = nc->next)
 			{
 				if (nc->HasFlag(NI_FORBIDDEN))
 				{
@@ -963,7 +936,7 @@ class DBPlain : public Module
 				{
 					db << "NC " << nc->display << " " << nc->pass << " ";
 				}
-				for (j = 0; LangInfos[j].LanguageId != -1; ++j)
+				for (int j = 0; LangInfos[j].LanguageId != -1; ++j)
 					if (nc->language ==  LangInfos[j].LanguageId)
 						db << LangInfos[j].Name;
 				db << " " << nc->memos.memomax << " " << nc->channelcount << endl;
@@ -984,7 +957,7 @@ class DBPlain : public Module
 				if (nc->FlagCount())
 				{
 					db << "MD FLAGS";
-					for (j = 0; NickCoreFlags[j].Flag != -1; ++j)
+					for (int j = 0; NickCoreFlags[j].Flag != -1; ++j)
 						if (nc->HasFlag(NickCoreFlags[j].Flag))
 							db << " " << NickCoreFlags[j].Name;
 					db << endl;
@@ -992,7 +965,7 @@ class DBPlain : public Module
 				if (!nc->memos.memos.empty())
 				{
 					MemoInfo *mi = &nc->memos;
-					for (k = 0; k < mi->memos.size(); ++k)
+					for (unsigned k = 0; k < mi->memos.size(); ++k)
 					{
 						db << "MD MI " << mi->memos[k]->number << " " << mi->memos[k]->time << " " << mi->memos[k]->sender;
 						if (mi->memos[k]->HasFlag(MF_UNREAD))
@@ -1010,10 +983,9 @@ class DBPlain : public Module
 			}
 		}
 
-		NickAlias *na;
-		for (i = 0; i < 1024; ++i)
+		for (int i = 0; i < 1024; ++i)
 		{
-			for (na = nalists[i]; na; na = na->next)
+			for (NickAlias *na = nalists[i]; na; na = na->next)
 			{
 				db << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
 				if (na->last_usermask)
@@ -1035,10 +1007,9 @@ class DBPlain : public Module
 			}
 		}
 
-		BotInfo *bi;
-		for (i = 0; i < 256; ++i)
+		for (int i = 0; i < 256; ++i)
 		{
-			for (bi = botlists[i]; bi; bi = bi->next)
+			for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
 			{
 				db << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->real << endl;
 				if (bi->FlagCount())
@@ -1067,10 +1038,9 @@ class DBPlain : public Module
 			}
 		}
 
-		ChannelInfo *ci;
-		for (i = 0; i < 256; ++i)
+		for (int i = 0; i < 256; ++i)
 		{
-			for (ci = chanlists[i]; ci; ci = ci->next)
+			for (ChannelInfo *ci = chanlists[i]; ci; ci = ci->next)
 			{
 				db << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
 				db << " " << ci->bantype << " " << ci->memos.memomax << endl;
@@ -1087,24 +1057,24 @@ class DBPlain : public Module
 				if (ci->last_topic)
 					db << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
 				db << "MD LEVELS";
-				for (j = 0; ChannelLevels[j].Level != -1; ++j)
+				for (int j = 0; ChannelLevels[j].Level != -1; ++j)
 					db << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
 				db << endl;
 				if (ci->FlagCount())
 				{
 					db << "MD FLAGS";
-					for (j = 0; ChannelInfoFlags[j].Flag != -1; ++j)
+					for (int j = 0; ChannelInfoFlags[j].Flag != -1; ++j)
 						if (ci->HasFlag(ChannelInfoFlags[j].Flag))
 							db << " " << ChannelInfoFlags[j].Name;
 					db << endl;
 					if (ci->HasFlag(CI_FORBIDDEN))
 						db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 				}
-				for (k = 0; k < ci->GetAccessCount(); ++k)
+				for (unsigned k = 0; k < ci->GetAccessCount(); ++k)
 					if (ci->GetAccess(k)->in_use)
 						db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " "
 						<< ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
-				for (k = 0; k < ci->GetAkickCount(); ++k)
+				for (unsigned k = 0; k < ci->GetAkickCount(); ++k)
 				{
 					db << "MD AKICK "
 					<< (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ")
@@ -1119,28 +1089,55 @@ class DBPlain : public Module
 				if (ci->GetMLockCount(true))
 				{
 					db << "MD MLOCK_ON";
-					for (j = 0; ChannelModes[j].Value != -1; ++j)
-						if (ci->HasMLock(ChannelModes[j].Value, true))
-							db << " " << ChannelModes[j].Name;
+					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+					{
+						if ((*it)->Class == MC_CHANNEL)
+						{
+							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+							if (ci->HasMLock(cm->Name, true))
+							{
+								db << " " << cm->NameAsString;
+							}
+						}
+					}
 					db << endl;
 				}
 				if (ci->GetMLockCount(false))
 				{
 					db << "MD MLOCK_OFF";
-					for (j = 0; ChannelModes[j].Value != -1; ++j)
-						if (ci->HasMLock(ChannelModes[j].Value, false))
-							db << " " << ChannelModes[j].Name;
+					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+					{
+						if ((*it)->Class == MC_CHANNEL)
+						{
+							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+							if (ci->HasMLock(cm->Name, false))
+							{
+								db << " " << cm->NameAsString;
+							}
+						}
+					}
 					db << endl;
 				}
 				std::string Param;
-				for (j = 0; ChannelModes[j].Value != -1; ++j)
-					if (ci->GetParam(ChannelModes[j].Value, Param))
-						db << "MD MLP " << ChannelModes[j].Name << " " << Param << endl;
+				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+				{
+					if ((*it)->Class == MC_CHANNEL)
+					{
+						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+						if (ci->GetParam(cm->Name, Param))
+						{
+							db << "MD MLP " << cm->NameAsString << " " << Param << endl;
+						}
+					}
+				}
 				if (!ci->memos.memos.empty())
 				{
 					MemoInfo *memos = &ci->memos;
 
-					for (k = 0; k < memos->memos.size(); ++k)
+					for (unsigned k = 0; k < memos->memos.size(); ++k)
 					{
 						db << "MD MI " << memos->memos[k]->number << " " << memos->memos[k]->time << " " << memos->memos[k]->sender;
 						if (memos->memos[k]->HasFlag(MF_UNREAD))
@@ -1159,7 +1156,7 @@ class DBPlain : public Module
 				if (ci->botflags.FlagCount())
 				{
 					db << "MD BI FLAGS";
-					for (j = 0; BotFlags[j].Flag != -1; ++j)
+					for (int j = 0; BotFlags[j].Flag != -1; ++j)
 						if (ci->botflags.HasFlag(BotFlags[j].Flag))
 							db << " " << BotFlags[j].Name;
 					db << endl;
@@ -1175,7 +1172,7 @@ class DBPlain : public Module
 					db << "MD BI FLOODSECS " << ci->floodsecs << endl;
 				if (ci->repeattimes)
 					db << "MD BI REPEATTIMES " << ci->repeattimes << endl;
-				for (k = 0; k < ci->GetBadWordCount(); ++k)
+				for (unsigned k = 0; k < ci->GetBadWordCount(); ++k)
 					db << "MD BI BADWORD "
 						<< (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "")
 						<< (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "")
@@ -1187,7 +1184,7 @@ class DBPlain : public Module
 			}
 		}
 
-		for (i = 0; i < akills.count; ++i)
+		for (int i = 0; i < akills.count; ++i)
 		{
 			Akill *ak = static_cast<Akill *>(akills.list[i]);
 			db << "OS AKILL " << ak->user << " " << ak->host << " " << ak->by << " " << ak->seton << " " << ak->expires << " :" << ak->reason << endl;
@@ -1195,23 +1192,23 @@ class DBPlain : public Module
 
 		db << "OS STATS " << maxusercnt << " " << maxusertime << endl;
 		SXLine *sx;
-		for (i = 0; i < sglines.count; ++i)
+		for (int i = 0; i < sglines.count; ++i)
 		{
 			sx = static_cast<SXLine *>(sglines.list[i]);
 			db << "OS SGLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " << sx->expires << " :" << sx->reason << endl;
 		}
-		for (i = 0; i < sqlines.count; ++i)
+		for (int i = 0; i < sqlines.count; ++i)
 		{
 			sx = static_cast<SXLine *>(sqlines.list[i]);
 			db << "OS SQLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " << sx->expires << " :" << sx->reason << endl;
 		}
-		for (i = 0; i < szlines.count; ++i)
+		for (int i = 0; i < szlines.count; ++i)
 		{
 			sx = static_cast<SXLine *>(szlines.list[i]);
 			db << "OS SZLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " << sx->expires << " :" << sx->reason << endl;
 		}
 
-		for (i = 0; i < nexceptions; i++)
+		for (int i = 0; i < nexceptions; i++)
 		{
 			db << "OS EXCEPTION " << exceptions[i].mask << " " << exceptions[i].limit << " " << exceptions[i].who << " " << exceptions[i].time << " " << exceptions[i].expires << " " << exceptions[i].reason << endl;
 		}

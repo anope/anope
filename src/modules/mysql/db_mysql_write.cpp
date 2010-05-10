@@ -2,8 +2,6 @@
 
 #include "db_mysql.h"
 
-static Module *me;
-
 static std::string BuildFlagsList(ChannelInfo *ci)
 {
 	std::string ret;
@@ -80,11 +78,16 @@ static std::string MakeMLock(ChannelInfo *ci, bool status)
 {
 	std::string ret;
 
-	for (int i = 0; ChannelModes[i].Mode != -1; ++i)
+	for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 	{
-		if (ci->HasMLock(ChannelModes[i].Mode, status))
+		if ((*it)->Class == MC_CHANNEL)
 		{
-			ret += " " + ChannelModes[i].Name;
+			ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+			if (ci->HasMLock(cm->Name, status))
+			{
+				ret += " " + cm->NameAsString;
+			}
 		}
 	}
 
@@ -108,12 +111,17 @@ static std::string GetMLockParams(ChannelInfo *ci)
 {
 	std::string ret;
 
-	for (int i = 0; ChannelModes[i].Mode != -1; ++i)
+	for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 	{
-		std::string param;
-		if (ci->GetParam(ChannelModes[i].Mode, param))
+		if ((*it)->Class == MC_CHANNEL)
 		{
-			ret += " " + ChannelModes[i].Name + " " + param;
+			ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+		
+			std::string param;
+			if (ci->GetParam(cm->Name, param))
+			{
+				ret += " " + cm->NameAsString + " " + param;
+			}
 		}
 	}
 
@@ -166,14 +174,14 @@ static BotInfo *CurBot = NULL;
 
 void Write(const std::string &data)
 {
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_extra` (data) VALUES(" << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
 
 void WriteMetadata(const std::string &key, const std::string &data)
 {
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_metadata` (name, value) VALUES(" << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
@@ -183,7 +191,7 @@ void WriteNickMetadata(const std::string &key, const std::string &data)
 	if (!CurNick)
 		throw CoreException("WriteNickMetadata without a nick to write");
 
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_ns_alias_metadata` (nick, name, value) VALUES(" << mysqlpp::quote << CurNick->nick << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
@@ -193,7 +201,7 @@ void WriteCoreMetadata(const std::string &key, const std::string &data)
 	if (!CurCore)
 		throw CoreException("WritCoreMetadata without a core to write");
 	
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_ns_core_metadata` (nick, name, value) VALUES(" << mysqlpp::quote << CurCore->display << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
@@ -203,7 +211,7 @@ void WriteChannelMetadata(const std::string &key, const std::string &data)
 	if (!CurChannel)
 		throw CoreException("WriteChannelMetadata without a channel to write");
 
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_cs_info_metadata` (channel, name, value) VALUES(" << mysqlpp::quote << CurChannel->name << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
@@ -213,14 +221,14 @@ void WriteBotMetadata(const std::string &key, const std::string &data)
 	if (!CurBot)
 		throw CoreException("WriteBotMetadata without a bot to write");
 	
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_bs_info_metadata` (botname, name, value) VALUES(" << mysqlpp::quote << CurBot->nick << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
 	ExecuteQuery(query);
 }
 
 static void SaveDatabases()
 {
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 
 	query << "TRUNCATE TABLE `anope_ns_core`";
 	ExecuteQuery(query);
@@ -382,7 +390,7 @@ static void SaveDatabases()
 class CommandSyncSQL : public Command
 {
  public:
-	CommandSyncSQL(const std::string &cname) : Command(cname, 0, 0, "operserv/sqlsync")
+	CommandSyncSQL(const ci::string &cname) : Command(cname, 0, 0, "operserv/sqlsync")
 	{
 	}
 
@@ -454,7 +462,7 @@ class DBMySQLWrite : public DBMySQL
 
 	EventReturn OnSaveDatabase()
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 
 		query << "TRUNCATE TABLE `anope_os_core`";
 		ExecuteQuery(query);
@@ -511,7 +519,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 
 		if (service == Config.s_NickServ)
 		{
@@ -685,28 +693,28 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnNickAddAccess(NickCore *nc, const std::string &entry)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_ns_access` (display, access) VALUES(" << mysqlpp::quote << nc->display << ", " << mysqlpp::quote << entry << ")";
 		ExecuteQuery(query);
 	}
 
 	void OnNickEraseAccess(NickCore *nc, const std::string &entry)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_ns_access` WHERE `display` = " << mysqlpp::quote << nc->display << " AND `access` = " << mysqlpp::quote << entry;
 		ExecuteQuery(query);
 	}
 
 	void OnNickClearAccess(NickCore *nc)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_ns_access` WHERE `display` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
 	}
 
 	void OnDelCore(NickCore *nc)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_cs_access` WHERE `display` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
 		query << "DELETE FROM `anope_cs_akick` WHERE `mask` = " << mysqlpp::quote << nc->display;
@@ -724,7 +732,7 @@ class DBMySQLWrite : public DBMySQL
 	void OnNickForbidden(NickAlias *na)
 	{
 		std::string flags = BuildFlagsList(na);
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_ns_alias` SET `flags` = '" << (!flags.empty() ? flags : "") << "' WHERE `nick` = " << mysqlpp::quote << na->nick;
 		ExecuteQuery(query);
 	}
@@ -736,7 +744,7 @@ class DBMySQLWrite : public DBMySQL
 	
 	void OnMakeNickRequest(NickRequest *nr)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_ns_request` (nick, passcode, password, email, requested) VALUES(" << mysqlpp::quote << nr->nick << ", ";
 		query << mysqlpp::quote << nr->passcode << ", " << mysqlpp::quote << nr->password << ", " << mysqlpp::quote << nr->email << ", '";
 		query << nr->requested << "')";
@@ -745,7 +753,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnDelNickRequest(NickRequest *nr)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_ns_request` WHERE `nick` = " << mysqlpp::quote << nr->nick;
 		ExecuteQuery(query);
 	}
@@ -753,7 +761,7 @@ class DBMySQLWrite : public DBMySQL
 	void OnNickRegister(NickAlias *na)
 	{
 		std::string flags = BuildFlagsList(na);
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_ns_alias` (nick, last_quit, last_realname, last_usermask, time_registered, last_seen, flags, display) VALUES(";
 		query << mysqlpp::quote << na->nick << ", " << mysqlpp::quote << (na->last_quit ? na->last_quit : "") << ", ";
 		query << mysqlpp::quote << (na->last_realname ? na->last_realname : "") << ", ";
@@ -776,7 +784,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnChangeCoreDisplay(NickCore *nc, const std::string &newdisplay)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_ns_core` SET `display` = " << mysqlpp::quote << newdisplay << " WHERE `display` = " << mysqlpp::quote << nc->display;
 		ExecuteQuery(query);
 		query << "UPDATE `anope_ns_alias` SET `display` = " << mysqlpp::quote << newdisplay << " WHERE `display` = " << mysqlpp::quote << nc->display;
@@ -795,35 +803,35 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnNickSuspend(NickAlias *na)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_ns_core` SET `flags` = '" << BuildFlagsList(na->nc) << "' WHERE `display` = " << mysqlpp::quote << na->nc->display;
 		ExecuteQuery(query);
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, User *u, NickAlias *na, int level)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" << level << ", " << mysqlpp::quote << na->nc->display << ", " << mysqlpp::quote << ci->name << ", " << time(NULL) << ", " << mysqlpp::quote << u->nick << ")"; 
 		ExecuteQuery(query);
 	}
 
 	void OnAccessDel(ChannelInfo *ci, User *u, NickCore *nc)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_cs_access` WHERE `display` = " << mysqlpp::quote << nc->display << " AND `channel` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 	}
 
 	void OnAccessChange(ChannelInfo *ci, User *u, NickAlias *na, int level)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" << level << ", " << mysqlpp::quote << na->nc->display << ", " << mysqlpp::quote << ci->name << ", " << time(NULL) << ", " << mysqlpp::quote << u->nick << ") ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)";
 		ExecuteQuery(query);
 	}
 
 	void OnAccessClear(ChannelInfo *ci, User *u)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_cs_access` WHERE `channel` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 	}
@@ -849,7 +857,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnChanForbidden(ChannelInfo *ci)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_cs_info` (name, time_registered, last_used, flags, forbidby, forbidreason) VALUES (";
 		query << mysqlpp::quote << ci->name << ", " << ci->time_registered << ", " << ci->last_used << ", '" << BuildFlagsList(ci) << "', " << mysqlpp::quote << ci->forbidby << ", " << mysqlpp::quote << ci->forbidreason << ")";
 		ExecuteQuery(query);
@@ -857,7 +865,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnDelChan(ChannelInfo *ci)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_cs_access` WHERE `channel` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		query << "DELETE FROM `anope_cs_akick` WHERE `channel` = " << mysqlpp::quote << ci->name;
@@ -874,7 +882,7 @@ class DBMySQLWrite : public DBMySQL
 	
 	void OnChanRegistered(ChannelInfo *ci)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		std::string flags = BuildFlagsList(ci), mlockon = GetMLockOn(ci), mlockoff = GetMLockOff(ci), mlockparams = GetMLockParams(ci);
 		query << "INSERT DELAYED INTO `anope_cs_info` (name, founder, successor, descr, url, email, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, entry_message, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES(";
 		query << mysqlpp::quote << ci->name << ", " << mysqlpp::quote << (ci->founder ? ci->founder->display : "") << ", ";
@@ -895,7 +903,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnChanSuspend(ChannelInfo *ci)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_cs_info` SET `flags` = '" << BuildFlagsList(ci) << "' WHERE `name` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		query << "UPDATE `anope_cs_info` SET `forbidby` = " << mysqlpp::quote << ci->forbidby << " WHERE `name` = " << mysqlpp::quote << ci->name;
@@ -906,7 +914,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_cs_akick` (channel, flags, mask, reason, creator, created, last_used) VALUES(";
 		query << mysqlpp::quote << ci->name << ", '";
 		if (ak->HasFlag(AK_ISNICK))
@@ -921,14 +929,14 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnAkickDel(ChannelInfo *ci, AutoKick *ak)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_cs_akick` WHERE `channel`= " << mysqlpp::quote << ci->name << " AND `mask` = " << mysqlpp::quote << (ak->HasFlag(AK_ISNICK) ? ak->nc->display : ak->mask);
 		ExecuteQuery(query);
 	}
 
 	void OnBotCreate(BotInfo *bi)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(";
 		query << mysqlpp::quote << bi->nick << ", " << mysqlpp::quote << bi->user << ", " << mysqlpp::quote << bi->host << ", ";
 		query << mysqlpp::quote << bi->real << ", '" << GetBotServFlags(bi) << "', " << bi->created << ", " << bi->chancount << ") ";
@@ -943,7 +951,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnBotDelete(BotInfo *bi)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_bs_core` WHERE `nick` = " << mysqlpp::quote << bi->nick;
 		ExecuteQuery(query);
 		query << "UPDATE `anope_cs_info` SET `botnick` = '' WHERE `botnick` = " << mysqlpp::quote << bi->nick;
@@ -952,7 +960,7 @@ class DBMySQLWrite : public DBMySQL
 
 	EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_cs_info` SET `botnick` = " << mysqlpp::quote << bi->nick << " WHERE `name` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		return EVENT_CONTINUE;
@@ -960,7 +968,7 @@ class DBMySQLWrite : public DBMySQL
 
 	EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_cs_info` SET `botnick` = '' WHERE `name` = " << mysqlpp::quote << ci->name;
 		ExecuteQuery(query);
 		return EVENT_CONTINUE;
@@ -968,7 +976,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_bs_badwords` (channel, word, type) VALUES(" << mysqlpp::quote << ci->name << ", " << mysqlpp::quote << bw->word << ", '";
 		switch (bw->type)
 		{
@@ -990,7 +998,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnBadWordDel(ChannelInfo *ci, BadWord *bw)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_bs_badwords` WHERE `channel` = " << mysqlpp::quote << ci->name << " AND `word` = " << mysqlpp::quote << bw->word << " AND `type` = '";
 		switch (bw->type)
 		{
@@ -1012,7 +1020,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnMemoSend(User *, NickCore *nc, Memo *m)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES(";
 		query << mysqlpp::quote << nc->display << ", " << m->number << ", '" << BuildFlagsList(m) << "', " << m->time << ", ";
 		query << mysqlpp::quote << m->sender << ", " << mysqlpp::quote << m->text << ", 'NICK')";
@@ -1021,7 +1029,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnMemoSend(User *, ChannelInfo *ci, Memo *m)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES(";
 		query << mysqlpp::quote << ci->name << ", " << m->number << ", '" << BuildFlagsList(m) << "', " << m->time << ", ";
 		query << mysqlpp::quote << m->sender << ", " << mysqlpp::quote << m->text << ", 'CHAN')";
@@ -1030,7 +1038,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnMemoDel(NickCore *nc, MemoInfo *mi, int number)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		if (number)
 			query << "DELETE FROM `anope_ms_info` WHERE `receiver` = " << mysqlpp::quote << nc->display << " AND `number` = " << number;
 		else
@@ -1040,7 +1048,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, int number)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		if (number)
 			query << "DELETE FROM `anope_ms_info` WHERE `receiver` = " << mysqlpp::quote << ci->name << " AND `number` = " << number;
 		else
@@ -1050,7 +1058,7 @@ class DBMySQLWrite : public DBMySQL
 
 	EventReturn OnAddAkill(User *, Akill *ak)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_os_akills` (user, host, xby, reason, seton, expire) VALUES(";
 		query << mysqlpp::quote << ak->user << ", " << mysqlpp::quote << ak->host << ", " << mysqlpp::quote << ak->by;
 		query << ", " << mysqlpp::quote << ak->reason << ", " << ak->seton << ", " << ak->expires << ")";
@@ -1060,7 +1068,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnDelAkill(User *, Akill *ak)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		if (ak)
 			query << "DELETE FROM `anope_os_akills` WHERE `host` = " << mysqlpp::quote << ak->host;
 		else
@@ -1070,7 +1078,7 @@ class DBMySQLWrite : public DBMySQL
 
 	EventReturn OnExceptionAdd(User *, Exception *ex)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_os_exceptions` (mask, slimit, who, reason, time, expires) VALUES(";
 		query << mysqlpp::quote << ex->mask << ", " << ex->limit << ", " << mysqlpp::quote << ex->who << ", ";
 		query << mysqlpp::quote << ex->reason << ", " << ex->time << ", " << ex->expires << ")";
@@ -1080,14 +1088,14 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnExceptionDel(User *, Exception *ex)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_os_exceptions` WHERE `mask` = " << mysqlpp::quote << ex->mask;
 		ExecuteQuery(query);
 	}
 
 	EventReturn OnAddSXLine(User *, SXLine *sx, SXLineType Type)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_os_sxlines` (type, mask, xby, reason, seton, expire) VALUES('";
 		query << (Type == SX_SGLINE ? "SGLINE" : (Type == SX_SQLINE ? "SQLINE" : "SZLINE")) << "', ";
 		query << mysqlpp::quote << sx->mask << ", " << mysqlpp::quote << sx->by << ", " << mysqlpp::quote << sx->reason;
@@ -1098,7 +1106,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnDelSXLine(User *, SXLine *sx, SXLineType Type)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		if (sx)
 		{
 			query << "DELETE FROM `anope_os_sxlines` WHERE `mask` = " << mysqlpp::quote << sx->mask << " AND `type` = '";

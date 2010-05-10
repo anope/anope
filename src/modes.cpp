@@ -14,6 +14,9 @@
 /* List of pairs of user/channels and their stacker info */
 std::list<std::pair<void *, StackerInfo *> > ModeManager::StackerObjects;
 
+/* List of all modes Anope knows about */
+std::list<Mode *> ModeManager::Modes;
+
 /* User modes */
 std::map<char, UserMode *> ModeManager::UserModesByChar;
 std::map<UserModeName, UserMode *> ModeManager::UserModesByName;
@@ -21,11 +24,8 @@ std::map<UserModeName, UserMode *> ModeManager::UserModesByName;
 std::map<char, ChannelMode *> ModeManager::ChannelModesByChar;
 std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
 /* Although there are two different maps for UserModes and ChannelModes
- * the pointers in each are the same. This is used to increase
- * efficiency.
+ * the pointers in each are the same. This is used to increase efficiency.
  */
-/* List of all modes Anope knows about */
-std::list<Mode *> ModeManager::Modes;
 
 /* Number of generic modes we support */
 unsigned GenericChannelModes = 0, GenericUserModes = 0;
@@ -99,10 +99,11 @@ void SetDefaultMLock()
 
 /** Default constructor
  * @param mClass The type of mode this is
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  * @param modeType The mode type
  */
-Mode::Mode(ModeClass mClass, char modeChar, ModeType modeType) : Class(mClass), ModeChar(modeChar), Type(modeType)
+Mode::Mode(ModeClass mClass, const std::string &mNameAsString, char modeChar, ModeType modeType) : Class(mClass), NameAsString(mNameAsString), ModeChar(modeChar), Type(modeType)
 {
 }
 
@@ -114,9 +115,10 @@ Mode::~Mode()
 
 /** Default constructor
  * @param mName The mode name
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-UserMode::UserMode(UserModeName mName, char modeChar) : Mode(MC_USER, modeChar, MODE_REGULAR), Name(mName)
+UserMode::UserMode(UserModeName mName, const std::string &mNameAsString, char modeChar) : Mode(MC_USER, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -128,18 +130,20 @@ UserMode::~UserMode()
 
 /** Default constructor
  * @param mName The mode name
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-UserModeParam::UserModeParam(UserModeName mName, char modeChar) : UserMode(mName, modeChar)
+UserModeParam::UserModeParam(UserModeName mName, const std::string &mNameAsString, char modeChar) : UserMode(mName, mNameAsString, modeChar)
 {
 	this->Type = MODE_PARAM;
 }
 
 /** Default constrcutor
  * @param mName The mode name
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-ChannelMode::ChannelMode(ChannelModeName mName, char modeChar) : Mode(MC_CHANNEL, modeChar, MODE_REGULAR), Name(mName)
+ChannelMode::ChannelMode(ChannelModeName mName, const std::string &mNameAsString, char modeChar) : Mode(MC_CHANNEL, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -151,9 +155,10 @@ ChannelMode::~ChannelMode()
 
 /** Default constructor
  * @param mName The mode name
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-ChannelModeList::ChannelModeList(ChannelModeName mName, char modeChar) : ChannelMode(mName, modeChar)
+ChannelModeList::ChannelModeList(ChannelModeName mName, const std::string &mNameAsString, char modeChar) : ChannelMode(mName, mNameAsString, modeChar)
 {
 	this->Type = MODE_LIST;
 }
@@ -166,10 +171,11 @@ ChannelModeList::~ChannelModeList()
 
 /** Default constructor
  * @param mName The mode name
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  * @param MinusArg true if the mode sends no arg when unsetting
  */
-ChannelModeParam::ChannelModeParam(ChannelModeName mName, char modeChar, bool MinusArg) : ChannelMode(mName, modeChar), MinusNoArg(MinusArg)
+ChannelModeParam::ChannelModeParam(ChannelModeName mName, const std::string &mNameAsString, char modeChar, bool MinusArg) : ChannelMode(mName, mNameAsString, modeChar), MinusNoArg(MinusArg)
 {
 	this->Type = MODE_PARAM;
 }
@@ -182,10 +188,11 @@ ChannelModeParam::~ChannelModeParam()
 
 /** Default constructor
  * @param mName The mode name
+ * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  * @param mSymbol The symbol for the mode, eg @ % +
  */
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol) : ChannelMode(mName, modeChar), Symbol(mSymbol)
+ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, const std::string &mNameAsString, char modeChar, char mSymbol) : ChannelMode(mName, mNameAsString, modeChar), Symbol(mSymbol)
 {
 	this->Type = MODE_STATUS;
 }

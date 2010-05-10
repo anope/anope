@@ -27,7 +27,7 @@ static std::vector<std::string> MakeVector(std::string buf)
 
 static void LoadDatabase()
 {
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	mysqlpp::StoreQueryResult qres;
 
 	query << "SELECT * FROM `anope_ns_core`";
@@ -270,12 +270,17 @@ static void LoadDatabase()
 				spacesepstream sep(SQLAssign(qres[i]["mlock_on"]));
 				while (sep.GetToken(buf))
 				{
-					for (int j = 0; ChannelModes[j].Mode != -1; ++j)
+					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 					{
-						if (buf == ChannelModes[j].Name)
+						if ((*it)->Class == MC_CHANNEL)
 						{
-							ci->SetMLock(ChannelModes[j].Mode, true);
-							break;
+							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+							if (buf == cm->NameAsString)
+							{
+								ci->SetMLock(cm->Name, true);
+								break;
+							}
 						}
 					}
 				}
@@ -286,12 +291,17 @@ static void LoadDatabase()
 				spacesepstream sep(SQLAssign(qres[i]["mlock_off"]));
 				while (sep.GetToken(buf))
 				{
-					for (int j = 0; ChannelModes[j].Mode != -1; ++j)
+					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 					{
-						if (buf == ChannelModes[j].Name)
+						if ((*it)->Class == MC_CHANNEL)
 						{
-							ci->SetMLock(ChannelModes[j].Mode, false);
-							break;
+							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+							if (buf == cm->NameAsString)
+							{
+								ci->SetMLock(cm->Name, false);
+								break;
+							}
 						}
 					}
 				}
@@ -302,13 +312,18 @@ static void LoadDatabase()
 				spacesepstream sep(SQLAssign(qres[i]["mlock_params"]));
 				while (sep.GetToken(buf))
 				{
-					for (int j = 0; ChannelModes[j].Mode != -1; ++j)
+					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 					{
-						if (buf == ChannelModes[j].Name)
+						if ((*it)->Class == MC_CHANNEL)
 						{
-							sep.GetToken(buf);
-							ci->SetMLock(ChannelModes[j].Mode, true, buf);
-							break;
+							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+							if (buf == cm->NameAsString)
+							{
+								sep.GetToken(buf);
+								ci->SetMLock(cm->Name, true, buf);
+								break;
+							}
 						}
 					}
 				}

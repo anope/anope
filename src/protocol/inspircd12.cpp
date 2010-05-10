@@ -1022,14 +1022,14 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							continue;
 						/* InspIRCd sends q and a here if they have no prefixes */
 						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '@'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '@'));
 							continue;
 						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT	, 'a', '@'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT	, "CMODE_PROTECT", 'a', '@'));
 							continue;
 						// XXX list modes needs a bit of a rewrite, we need to be able to support +g here
 						default:
-							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
 					}
 				}
 
@@ -1042,7 +1042,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode(new ChannelModeKey('k'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
 					}
 				}
 
@@ -1052,25 +1052,25 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'F':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NICKFLOOD, 'F', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NICKFLOOD, "CMODE_NICKFLOOD", 'F', true));
 							continue;
 						case 'J':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NOREJOIN, 'J', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NOREJOIN, "CMODE_NOREJOIN", 'J', true));
 							continue;
 						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, "CMODE_REDIRECT", 'L', true));
 							continue;
 						case 'f':
 							ModeManager::AddChannelMode(new ChannelModeFlood('f', true));
 							continue;
 						case 'j':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, 'j', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, "CMODE_JOINFLOOD", 'j', true));
 							continue;
 						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l', true));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
 					}
 				}
 
@@ -1080,79 +1080,83 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'A':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, 'A'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, "CMODE_ALLINVITE", 'A'));
 							continue;
 						case 'B':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCAPS, 'B'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCAPS, "CMODE_BLOCKCAPS", 'B'));
 							continue;
 						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, "CMODE_NOCTCP", 'C'));
 							continue;
 						case 'D':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_DELAYEDJOIN, 'D'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_DELAYEDJOIN, "CMODE_DELAYEDJOIN", 'D'));
 							continue;
 						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, "CMODE_FILTER", 'G'));
 							continue;
 						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, 'K'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, "CMODE_NOKNOCK", 'K'));
 							continue;
 						case 'M':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
 							continue;
 						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, 'N'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, "CMODE_NONICK", 'N'));
 							continue;
 						case 'O':
 							ModeManager::AddChannelMode(new ChannelModeOper('O'));
 							continue;
 						case 'P':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, 'P'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'P'));
 							continue;
 						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, 'Q'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, "CMODE_NOKICK", 'Q'));
 							continue;
 						case 'R':
+<<<<<<< HEAD
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
+=======
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
+>>>>>>> modes
 							continue;
 						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, 'S'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, "CMODE_STRIPCOLOR", 'S'));
 							continue;
 						case 'T':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'T'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, "CMODE_NONOTICE", 'T'));
 							continue;
 						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
 							continue;
 						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
 							continue;
 						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
 							continue;
 						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
 							continue;
 						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
 							continue;
 						case 'r':
 							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
 							continue;
 						case 's':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
 							continue;
 						case 't':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
 							continue;
 						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, 'u'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, "CMODE_AUDITORIUM", 'u'));
 							continue;
 						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
 					}
 				}
 			}
@@ -1169,64 +1173,64 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						switch (modebuf[t])
 						{
 							case 'h':
-								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
+								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, "UMODE_HELPOP", 'h'));
 								continue;
 							case 's':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
+								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, "UMODE_STRIPCOLOR", 'S'));
 								continue;
 							case 'B':
-								ModeManager::AddUserMode(new UserMode(UMODE_BOT, 'B'));
+								ModeManager::AddUserMode(new UserMode(UMODE_BOT, "UMODE_BOT", 'B'));
 								continue;
 							case 'G':
-								ModeManager::AddUserMode(new UserMode(UMODE_FILTER, 'G'));
+								ModeManager::AddUserMode(new UserMode(UMODE_FILTER, "UMODE_FILTER", 'G'));
 								continue;
 							case 'H':
-								ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, 'H'));
+								ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, "UMODE_HIDEOPER", 'H'));
 								continue;
 							case 'I':
-								ModeManager::AddUserMode(new UserMode(UMODE_PRIV, 'I'));
+								ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'I'));
 								continue;
 							case 'Q':
-								ModeManager::AddUserMode(new UserMode(UMODE_HIDDEN, 'Q'));
+								ModeManager::AddUserMode(new UserMode(UMODE_HIDDEN, "UMODE_HIDDEN", 'Q'));
 								continue;
 							case 'R':
-								ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
+								ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
 								continue;
 							case 'S':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
+								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, "UMODE_STRIPCOLOR", 'S'));
 								continue;
 							case 'W':
-								ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, 'W'));
+								ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, "UMODE_WHOIS", 'W'));
 								continue;
 							case 'c':
-								ModeManager::AddUserMode(new UserMode(UMODE_COMMONCHANS, 'c'));
+								ModeManager::AddUserMode(new UserMode(UMODE_COMMONCHANS, "UMODE_COMMONCHANS", 'c'));
 								continue;
 							case 'g':
-								ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
+								ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
 								continue;
 							case 'i':
-								ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
+								ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
 								continue;
 							case 'k':
-								ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'k'));
+								ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, "UMODE_PROTECTED", 'k'));
 								continue;
 							case 'o':
-								ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
+								ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
 								continue;
 							case 'r':
-								ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
+								ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
 								continue;
 							case 'w':
-								ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
+								ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
 								continue;
 							case 'x':
-								ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
+								ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
 								continue;
 							case 'd':
-								ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
+								ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'd'));
 								continue;
 							default:
-								ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
+								ModeManager::AddUserMode(new UserMode(UMODE_END, "", modebuf[t]));
 						}
 					}
 				}
@@ -1241,19 +1245,19 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modes[t])
 					{
 						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', chars[t]));
 							continue;
 						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', chars[t]));
 							continue;
 						case 'o':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', chars[t]));
 							continue;
 						case 'h':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', chars[t]));
 							continue;
 						case 'v':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', chars[t]));
 							continue;
 					}
 				}

@@ -76,9 +76,11 @@ enum ModeClass
  */
 class CoreExport Mode
 {
-  public:
+ public:
   	/* Class of mode this is */
 	ModeClass Class;
+	/* The mode name, as a string */
+	const std::string NameAsString;
 	/* Mode char for this */
 	char ModeChar;
 	/* Type of mode this is */
@@ -86,10 +88,11 @@ class CoreExport Mode
 
 	/** Default constructor
 	 * @param mClass The type of mode this is
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 * @param type The mode type
 	 */
-	Mode(ModeClass mClass, char modeChar, ModeType type);
+	Mode(ModeClass mClass, const std::string &mNameAsString, char modeChar, ModeType type);
 
 	/** Default destructor
 	 */
@@ -100,16 +103,16 @@ class CoreExport Mode
  */
 class CoreExport UserMode : public Mode
 {
-  public:
-
+ public:
 	/* Mode name */
 	UserModeName Name;
 
 	/** Default constructor
 	 * @param nName The mode name
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	UserMode(UserModeName mName, char modeChar);
+	UserMode(UserModeName mName, const std::string &mNameAsString, char modeChar);
 
 	/** Default destructor
 	 */
@@ -121,9 +124,10 @@ class UserModeParam : public UserMode
  public:
  	/** Default constructor
 	 * @param mName The mode name
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	UserModeParam(UserModeName mName, char modeChar);
+	UserModeParam(UserModeName mName, const std::string &mNameAsString, char modeChar);
 
 	/** Check if the param is valid
 	 * @param value The param
@@ -136,16 +140,16 @@ class UserModeParam : public UserMode
  */
 class CoreExport ChannelMode : public Mode
 {
-  public:
-
+ public:
 	/* Mode name */
 	ChannelModeName Name;
 
 	/** Default constructor
 	 * @param mName The mode name
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	ChannelMode(ChannelModeName mName, char modeChar);
+	ChannelMode(ChannelModeName mName, const std::string &mNameAsString, char modeChar);
 
 	/** Default destructor
 	 */
@@ -163,13 +167,13 @@ class CoreExport ChannelMode : public Mode
  */
 class CoreExport ChannelModeList : public ChannelMode
 {
-  public:
-
+ public:
 	/** Default constructor
 	 * @param mName The mode name
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	ChannelModeList(ChannelModeName mName, char modeChar);
+	ChannelModeList(ChannelModeName mName, const std::string &mNameAsString, char modeChar);
 
 	/** Default destructor
 	 */
@@ -199,14 +203,14 @@ class CoreExport ChannelModeList : public ChannelMode
 */
 class CoreExport ChannelModeParam : public ChannelMode
 {
-  public:
-
+ public:
 	/** Default constructor
 	 * @param mName The mode name
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 * @param MinusArg true if this mode sends no arg when unsetting
 	 */
-	ChannelModeParam(ChannelModeName mName, char modeChar, bool MinusArg = false);
+	ChannelModeParam(ChannelModeName mName, const std::string &mNameAsString, char modeChar, bool MinusArg = false);
 
 	/** Default destructor
 	 */
@@ -226,16 +230,17 @@ class CoreExport ChannelModeParam : public ChannelMode
 */
 class CoreExport ChannelModeStatus : public ChannelMode
 {
-  public:
+ public:
 	/* The symbol, eg @ % + */
 	char Symbol;
 
 	/** Default constructor
 	 * @param mName The mode name
+	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 * @param mSymbol The symbol for the mode, eg @ % +
 	 */
-	ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol);
+	ChannelModeStatus(ChannelModeName mName, const std::string &mNameAsString, char modeChar, char mSymbol);
 
 	/** Default destructor
 	 */
@@ -246,8 +251,8 @@ class CoreExport ChannelModeStatus : public ChannelMode
  */
 class CoreExport ChannelModeBan : public ChannelModeList
 {
-  public:
-	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, modeChar) { }
+ public:
+	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, "CMODE_BAN", modeChar) { }
 
 	void AddMask(Channel *chan, const char *mask);
 
@@ -258,8 +263,8 @@ class CoreExport ChannelModeBan : public ChannelModeList
  */
 class CoreExport ChannelModeExcept : public ChannelModeList
 {
-  public:
-	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, modeChar) { }
+ public:
+	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, "CMODE_EXCEPT", modeChar) { }
 
 	void AddMask(Channel *chan, const char *mask);
 
@@ -270,8 +275,8 @@ class CoreExport ChannelModeExcept : public ChannelModeList
  */
 class CoreExport ChannelModeInvite : public ChannelModeList
 {
-  public:
-	ChannelModeInvite(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, modeChar) { }
+ public:
+	ChannelModeInvite(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, "CMODE_INVITEOVERRIDE", modeChar) { }
 
 	void AddMask(Channel *chan, const char *mask);
 
@@ -283,8 +288,8 @@ class CoreExport ChannelModeInvite : public ChannelModeList
  */
 class CoreExport ChannelModeKey : public ChannelModeParam
 {
-  public:
-	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, modeChar) { }
+ public:
+	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, "CMODE_KEY", modeChar) { }
 
 	bool IsValid(const std::string &value);
 };
@@ -293,8 +298,8 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  */
 class ChannelModeFlood : public ChannelModeParam
 {
-  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+ public:
+	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, "CMODE_FLOOD", modeChar, minusNoArg) { }
 
 	bool IsValid(const std::string &value);
 };
@@ -304,8 +309,8 @@ class ChannelModeFlood : public ChannelModeParam
  */
 class CoreExport ChannelModeAdmin : public ChannelMode
 {
-  public:
-	ChannelModeAdmin(char modeChar) : ChannelMode(CMODE_ADMINONLY, modeChar) { }
+ public:
+	ChannelModeAdmin(char modeChar) : ChannelMode(CMODE_ADMINONLY, "CMODE_ADMINONLY", modeChar) { }
 
 	/* Opers only */
 	bool CanSet(User *u);
@@ -316,8 +321,8 @@ class CoreExport ChannelModeAdmin : public ChannelMode
  */
 class CoreExport ChannelModeOper : public ChannelMode
 {
-  public:
-	ChannelModeOper(char modeChar) : ChannelMode(CMODE_OPERONLY, modeChar) { }
+ public:
+	ChannelModeOper(char modeChar) : ChannelMode(CMODE_OPERONLY, "CMODE_OPERONLY", modeChar) { }
 
 	/* Opers only */
 	bool CanSet(User *u);
@@ -328,8 +333,8 @@ class CoreExport ChannelModeOper : public ChannelMode
  */
 class CoreExport ChannelModeRegistered : public ChannelMode
 {
-  public:
-	ChannelModeRegistered(char modeChar) : ChannelMode(CMODE_REGISTERED, modeChar) { }
+ public:
+	ChannelModeRegistered(char modeChar) : ChannelMode(CMODE_REGISTERED, "CMODE_REGISTERED", modeChar) { }
 
 	/* No one mlocks +r */
 	bool CanSet(User *u);
@@ -369,7 +374,7 @@ class StackerInfo
  */
 class CoreExport ModeManager
 {
-  protected:
+ protected:
 	/* List of pairs of user/channels and their stacker info */
 	static std::list<std::pair<void *, StackerInfo *> > StackerObjects;
 
@@ -413,7 +418,10 @@ class CoreExport ModeManager
 	 */
 	static void StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const std::string &Param, StackerType Type);
 
-  public:
+ public:
+	/* List of all modes Anope knows about */
+	static std::list<Mode *> Modes;
+
         /* User modes */
         static std::map<char, UserMode *> UserModesByChar;
         static std::map<UserModeName, UserMode *> UserModesByName;
@@ -421,11 +429,8 @@ class CoreExport ModeManager
         static std::map<char, ChannelMode *> ChannelModesByChar;
         static std::map<ChannelModeName, ChannelMode *> ChannelModesByName;
         /* Although there are two different maps for UserModes and ChannelModes
-         * the pointers in each are the same. This is used to increase
-         * efficiency.
-         */
-	/* List of all modes Anope knows about */
-	static std::list<Mode *> Modes;
+         * the pointers in each are the same. This is used to increase efficiency.
+	 */
 
         /** Add a user mode to Anope
          * @param um A UserMode or UserMode derived class

@@ -426,6 +426,17 @@ static void LoadNickAlias(const std::vector<std::string> &params)
 	Alog(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
 }
 
+static void LoadNickRequest(const std::vector<std::string> &params)
+{
+	NickRequest *nr = new NickRequest(params[0]);
+	nr->passcode = params[1];
+	nr->password = params[2];
+	nr->email = sstrdup(params[3].c_str());
+	nr->requested = atol(params[4].c_str());
+
+	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded nickrequest for " << nr->nick;
+}
+
 static void LoadBotInfo(const std::vector<std::string> &params)
 {
 	BotInfo *bi = findbot(params[0]);
@@ -600,6 +611,8 @@ class DBPlain : public Module
 			LoadNickCore(otherparams);
 		else if (key == "NA")
 			LoadNickAlias(otherparams);
+		else if (key == "NR")
+			LoadNickRequest(otherparams);
 		else if (key == "BI")
 			LoadBotInfo(otherparams);
 		else if (key == "CH")
@@ -916,6 +929,15 @@ class DBPlain : public Module
 
 		int i, j;
 		unsigned k;
+	
+		for (i = 0; i < 1024; ++i)
+		{
+			for (NickRequest *nr = nrlists[i]; nr; nr = nr->next)
+			{
+				db << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
+			}
+		}
+
 		NickCore *nc;
 		for (i = 0; i < 1024; ++i)
 		{

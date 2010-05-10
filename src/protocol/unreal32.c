@@ -1878,9 +1878,12 @@ int unreal_jointhrottle_mode_check(char *value)
     if (one && two) {
         param1 = atoi(one);
         param2 = atoi(two);
+        if ((param1 >= 1) && (param1 <= 255) && (param2 >= 1) && (param2 <= 999)) {
+            free(tempValue);
+            return 1;
+        }
     }
-    if ((param1 >= 1) && (param1 <= 255) && (param2 >= 1) && (param2 <= 999))
-        return 1;
+    free(tempValue);
     return 0;
 }
 

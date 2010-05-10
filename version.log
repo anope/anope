@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2946"
+VERSION_BUILD="2947"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2947 - Fixed a memory leak and use of uninitialized values in unreal_jointhrottle_mode_check. Note we don't even use this function currently.
 #Revision 2946 - Fixed bug #1161 - Fixed setting expiry times on akills in the atheme2anope database converter
 #Revision 2943 - Added an Atheme to Anope database converter
 #Revision 2935 - Fixed unloading modules commands, fixes a crash introduced by the last commit

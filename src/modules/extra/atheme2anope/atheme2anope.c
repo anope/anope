@@ -3,8 +3,7 @@
  *   (C) Copyright 2009, the Anope team (team@anope.org) 
  *
  *
- *   This program is free software; you can redistribute it and/or 
-modify
+ *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License (see it online
  *   at http://www.gnu.org/copyleft/gpl.html) as published by the Free
  *   Software Foundation;
@@ -63,7 +62,7 @@ int AnopeInit(int argc, char **argv)
 			CNicks, CChannels, CAkills);
 
 		quitmsg = calloc(50, 1);
-		sprintf(quitmsg, "%s", "Shutting down to convert databases...");
+		snprintf(quitmsg, 50, "Shutting down to convert databases...");
 
 		save_data = 1;
 		delayed_quit = 1;
@@ -550,7 +549,7 @@ void WriteAkill(char *line)
 {
 	char *tok;
 	Akill *entry;
-	time_t t = time(NULL), j;
+	time_t t = time(NULL);
 
 	tok = strtok(line, " ");
 
@@ -571,14 +570,10 @@ void WriteAkill(char *line)
 				if (!stricmp(tok, "0"))
 					entry->expires = 0;
 				else
-				{
-					j = (time_t)tok;
-					entry->expires = (t + j);
-				}
+					entry->expires = t + atol(tok);
 
 				tok = strtok(NULL, " ");
-				j = (time_t)tok;
-				entry->seton = j;
+				entry->seton = atol(tok);
 
 				tok = strtok(NULL, " ");
 				entry->user = sstrdup("*");

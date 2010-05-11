@@ -7,10 +7,10 @@ extern CoreExport bool MailValidate(const std::string &email);
 class MailThread : public Thread
 {
  private:
-	const std::string MailTo;
-	const std::string Addr;
-	const std::string Subject;
-	const std::string Message;
+	std::string MailTo;
+	std::string Addr;
+	std::string Subject;
+	std::string Message;
 	
 	bool Success;
  public:

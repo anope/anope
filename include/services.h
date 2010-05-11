@@ -91,6 +91,7 @@
 # define inet_ntop inet_ntop_
 # define MARK_DEPRECATED
 
+extern CoreExport const char *dlerror();
 extern CoreExport int inet_pton(int af, const char *src, void *dst);
 extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
 #endif

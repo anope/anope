@@ -80,7 +80,7 @@ class CoreExport Mode
   	/* Class of mode this is */
 	ModeClass Class;
 	/* The mode name, as a string */
-	const std::string NameAsString;
+	std::string NameAsString;
 	/* Mode char for this */
 	char ModeChar;
 	/* Type of mode this is */
@@ -119,7 +119,7 @@ class CoreExport UserMode : public Mode
 	virtual ~UserMode();
 };
 
-class UserModeParam : public UserMode
+class CoreExport UserModeParam : public UserMode
 {
  public:
  	/** Default constructor

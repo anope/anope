@@ -24,6 +24,7 @@ enum MDType
 	MD_NONE,
 	MD_NC,
 	MD_NA,
+	MD_NR,
 	MD_BI,
 	MD_CH
 };
@@ -99,6 +100,11 @@ static void ReadDatabase(Module *m = NULL)
 				na = findnick(params[2].c_str());
 				Type = MD_NA;
 			}
+			else if (params[0] == "NR")
+			{
+				nr = findrequestnick(params[1].c_str());
+				Type = MD_NR;
+			}
 			else if (params[0] == "BI")
 			{
 				bi = findbot(params[1]);
@@ -140,6 +146,22 @@ static void ReadDatabase(Module *m = NULL)
 						else
 						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, key, params));
+						}
+					}
+					catch (DatabaseException& ex)
+					{
+						Alog() << "[db_plain]: " << ex.GetReason();
+					}
+				}
+				else if (Type == MD_NR && nr)
+				{
+					try
+					{
+						if (m)
+							m->OnDatabaseReadMetadata(nr, key, params);
+						else
+						{
+							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nr, key, params));
 						}
 					}
 					catch (DatabaseException& ex)
@@ -918,6 +940,8 @@ class DBPlain : public Module
 			for (NickRequest *nr = nrlists[i]; nr; nr = nr->next)
 			{
 				db << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
+
+				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
 			}
 		}
 

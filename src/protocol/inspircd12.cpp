@@ -1113,11 +1113,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, "CMODE_NOKICK", 'Q'));
 							continue;
 						case 'R':
-<<<<<<< HEAD
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
-=======
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
->>>>>>> modes
 							continue;
 						case 'S':
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, "CMODE_STRIPCOLOR", 'S'));

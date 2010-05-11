@@ -26,7 +26,6 @@
 	typedef HMODULE ano_module_t;
 
 	#define dlopen(file, unused)		LoadLibrary(file)
-	E const char *dlerror();
 	#define dlsym(file, symbol)	(HMODULE)GetProcAddress(file, symbol)
 	#define dlclose(file)		FreeLibrary(file) ? 0 : 1
 	#define ano_modclearerr()		SetLastError(0)
@@ -633,6 +632,14 @@ class CoreExport Module
 	 */
 	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
 
+	/** Called when nickrequest metadata is read from the database
+	 * @param nr The nickrequest
+	 * @parm key The metadata key
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseReadMetadata(NickRequest *nr, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
 	/** Called when botinfo metadata is read from the database
 	 * @param bi The botinfo
 	 * @param key The metadata key
@@ -660,6 +667,12 @@ class CoreExport Module
 	 * @param na The nick alias
 	 */
 	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickAlias *na) { }
+
+	/** Called when we are wrting metadata for a nickrequest
+	 * @param WriteMetata A callback function used to insert the metadata
+	 * @param nr The nick request
+	 */
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickRequest *nr) { }
 
 	/** Called when we are writing metadata for a botinfo
 	 * @param WriteMetata A callback function used to insert the metadata

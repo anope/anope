@@ -289,7 +289,6 @@ void check_modes(Channel *c)
 	time_t t = time(NULL);
 	ChannelInfo *ci;
 	ChannelMode *cm;
-	ChannelModeParam *cmp;
 	std::map<char, ChannelMode *>::iterator it;
 	std::string param, ciparam;
 
@@ -340,7 +339,7 @@ void check_modes(Channel *c)
 			/* Add the eventual parameter and modify the Channel structure */
 			if (cm->Type == MODE_PARAM)
 			{
-				if (ci->GetParam(cmp->Name, param))
+				if (ci->GetParam(cm->Name, param))
 					c->SetMode(NULL, cm, param);
 			}
 			else
@@ -370,7 +369,7 @@ void check_modes(Channel *c)
 			/* Add the eventual parameter */
 			if (cm->Type == MODE_PARAM)
 			{
-				cmp = dynamic_cast<ChannelModeParam *>(cm);
+				ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
 
 				if (!cmp->MinusNoArg)
 				{

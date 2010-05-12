@@ -72,6 +72,22 @@ var installerQuestions = [
 
 var buildPackages = [
                                         {
+                                                        'name' : 'Microsoft Visual Studio 2010',
+                                                        'libpaths' : [
+                                                                     'Program Files\\Microsoft Visual Studio 10.0\\VC\\lib',
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
+                                                                     ],
+                                                        'incpaths' : [
+                                                                     'Program Files\\Microsoft Visual Studio 10.0\\VC\\include',
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Include'
+                                                                     ],
+                                                        'nmake' : [
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
+                                                                  ],
+                                                        'additional_switches' : [ '/w' ],
+                                                        'installedDrive' : 'C'
+                                        },
+                                        {
                                                         'name' : 'Microsoft Visual Studio 2008 (New PSDK)',
                                                         'libpaths' : [                                                                               
                                                                      'Program Files\\Microsoft Visual Studio 9.0\\VC\\Lib',
@@ -87,7 +103,7 @@ var buildPackages = [
                                                         'additional_switches' : [ '/w' ],
                                                         'installedDrive' : 'C'
                                         },
-					{
+                                        {
                                                         'name' : 'Microsoft Visual Studio 2008 (64bit) (New PSDK)',
                                                         'libpaths' : [
                                                                      'Program Files (x86)\\Microsoft Visual Studio 9.0\\VC\\Lib',
@@ -159,26 +175,7 @@ var buildPackages = [
                                                                         ],                                                                    
                                                         'additional_switches' : false,
 							'installedDrive' : 'C'
-                                        },
-
-                                        {
-                                                        'name' : 'Microsoft Visual Studio 98',
-                                                        'libpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Lib'
-                                                                         ],
-                                                        'incpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Include'
-                                                                         ],
-                                                        'nmake' : [
-                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Bin',
-                                                                                ''
-                                                                        ],
-                                                        'additional_switches' : [
-                                                                                                 '/QIfist'
-                                                                    	],
-							'installedDrive' : 'C'
                                         }
-                                        
                                 ];                  
                                                               
                                 

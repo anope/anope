@@ -82,6 +82,8 @@ int do_unassign(User * u)
     else if (!ci->bi)
         notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
     else {
+        alog("%s: %s!%s@%s unassigned bot %s from %s", s_BotServ, u->nick, u->username,
+             u->host, ci->bi->nick, ci->name);
         unassign(u, ci);
         notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
     }

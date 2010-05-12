@@ -106,6 +106,8 @@ int do_recover(User * u)
         if (res == 1) {
             char relstr[192];
 
+            alog("%s: %s!%s@%s used RECOVER on %s",
+                 s_NickServ, u->nick, u->username, u->host, u2->nick);
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
             collide(na, 0);
 
@@ -126,6 +128,8 @@ int do_recover(User * u)
             || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
             char relstr[192];
 
+            alog("%s: %s!%s@%s used RECOVER on %s",
+                 s_NickServ, u->nick, u->username, u->host, u2->nick);
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
             collide(na, 0);
 
@@ -137,6 +141,7 @@ int do_recover(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
         }
     }
+
     return MOD_CONT;
 }
 

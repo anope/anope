@@ -81,6 +81,8 @@ int do_getkey(User * u)
     } else if (!ci->c || !ci->c->key) {
         notice_lang(s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
     } else {
+        alog("%s: %s!%s@%s used GETKEY on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_GETKEY_KEY, chan, ci->c->key);
     }
 

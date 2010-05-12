@@ -109,9 +109,13 @@ int do_set(User * u)
         if ((bi = findbot(chan))) {
             if (!stricmp(value, "ON")) {
                 bi->flags |= BI_PRIVATE;
+                alog("%s: %s!%s@%s set PRIVATE on bot %s",
+                     s_BotServ, u->nick, u->username, u->host, bi->nick);
                 notice_lang(s_BotServ, u, BOT_SET_PRIVATE_ON, bi->nick);
             } else if (!stricmp(value, "OFF")) {
                 bi->flags &= ~BI_PRIVATE;
+                alog("%s: %s!%s@%s unset PRIVATE on bot %s",
+                     s_BotServ, u->nick, u->username, u->host, bi->nick);
                 notice_lang(s_BotServ, u, BOT_SET_PRIVATE_OFF, bi->nick);
             } else {
                 syntax_error(s_BotServ, u, "SET PRIVATE",
@@ -131,10 +135,14 @@ int do_set(User * u)
         if (!stricmp(option, "DONTKICKOPS")) {
             if (!stricmp(value, "ON")) {
                 ci->botflags |= BS_DONTKICKOPS;
+                alog("%s: %s!%s@%s set DONTKICKOPS on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_DONTKICKOPS_ON,
                             ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_DONTKICKOPS;
+                alog("%s: %s!%s@%s unset DONTKICKOPS on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_DONTKICKOPS_OFF,
                             ci->name);
             } else {
@@ -144,10 +152,14 @@ int do_set(User * u)
         } else if (!stricmp(option, "DONTKICKVOICES")) {
             if (!stricmp(value, "ON")) {
                 ci->botflags |= BS_DONTKICKVOICES;
+                alog("%s: %s!%s@%s set DONTKICKVOICES on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_DONTKICKVOICES_ON,
                             ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_DONTKICKVOICES;
+                alog("%s: %s!%s@%s unset DONTKICKVOICES on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_DONTKICKVOICES_OFF,
                             ci->name);
             } else {
@@ -157,9 +169,13 @@ int do_set(User * u)
         } else if (!stricmp(option, "FANTASY")) {
             if (!stricmp(value, "ON")) {
                 ci->botflags |= BS_FANTASY;
+                alog("%s: %s!%s@%s set FANTASY on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_FANTASY_ON, ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_FANTASY;
+                alog("%s: %s!%s@%s unset FANTASY on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_FANTASY_OFF, ci->name);
             } else {
                 syntax_error(s_BotServ, u, "SET FANTASY",
@@ -168,9 +184,13 @@ int do_set(User * u)
         } else if (!stricmp(option, "GREET")) {
             if (!stricmp(value, "ON")) {
                 ci->botflags |= BS_GREET;
+                alog("%s: %s!%s@%s set GREET on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_GREET_ON, ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_GREET;
+                alog("%s: %s!%s@%s unset GREET on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_GREET_OFF, ci->name);
             } else {
                 syntax_error(s_BotServ, u, "SET GREET",
@@ -181,9 +201,13 @@ int do_set(User * u)
                 ci->botflags |= BS_NOBOT;
                 if (ci->bi)
                     unassign(u, ci);
+                alog("%s: %s!%s@%s set NOBOT on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_NOBOT_ON, ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_NOBOT;
+                alog("%s: %s!%s@%s unset NOBOT on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_NOBOT_OFF, ci->name);
             } else {
                 syntax_error(s_BotServ, u, "SET NOBOT",
@@ -192,9 +216,13 @@ int do_set(User * u)
         } else if (!stricmp(option, "SYMBIOSIS")) {
             if (!stricmp(value, "ON")) {
                 ci->botflags |= BS_SYMBIOSIS;
+                alog("%s: %s!%s@%s set SYMBIOSIS on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_SYMBIOSIS_ON, ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_SYMBIOSIS;
+                alog("%s: %s!%s@%s unset SYMBIOSIS on %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_SET_SYMBIOSIS_OFF, ci->name);
             } else {
                 syntax_error(s_BotServ, u, "SET SYMBIOSIS",

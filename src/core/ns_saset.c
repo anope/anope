@@ -211,6 +211,8 @@ int do_saset_display(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
+    alog("%s: %s!%s@%s set the display of %s to: %s",
+         s_NickServ, u->nick, u->username, u->host, nc->display, param);
     change_core_display(nc, param);
     notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_CHANGED, nc->display);
 
@@ -273,10 +275,14 @@ int do_saset_url(User * u, NickCore * nc, char *param)
 
     if (param) {
         nc->url = sstrdup(param);
+        alog("%s: %s!%s@%s set the url of %s to: %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display, nc->url);
         notice_lang(s_NickServ, u, NICK_SASET_URL_CHANGED, nc->display,
                     param);
     } else {
         nc->url = NULL;
+        alog("%s: %s!%s@%s unset the url of %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_URL_UNSET, nc->display);
     }
     return MOD_CONT;
@@ -323,11 +329,15 @@ int do_saset_icq(User * u, NickCore * nc, char *param)
             notice_lang(s_NickServ, u, NICK_SASET_ICQ_INVALID, param);
         } else {
             nc->icq = tmp;
+            alog("%s: %s!%s@%s set the icq of %s to: %d",
+                 s_NickServ, u->nick, u->username, u->host, nc->display, nc->icq);
             notice_lang(s_NickServ, u, NICK_SASET_ICQ_CHANGED, nc->display,
                         param);
         }
     } else {
         nc->icq = 0;
+        alog("%s: %s!%s@%s unset the icq of %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_ICQ_UNSET, nc->display);
     }
     return MOD_CONT;
@@ -346,10 +356,14 @@ int do_saset_greet(User * u, NickCore * nc, char *param)
                  (end ? end : ""));
 
         nc->greet = sstrdup(buf);
+        alog("%s: %s!%s@%s set the greet of %s to: %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display, nc->greet);
         notice_lang(s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display,
                     buf);
     } else {
         nc->greet = NULL;
+        alog("%s: %s!%s@%s unset the greet of %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display);
     }
     return MOD_CONT;
@@ -360,21 +374,29 @@ int do_saset_kill(User * u, NickCore * nc, char *param)
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_KILLPROTECT;
         nc->flags &= ~(NI_KILL_QUICK | NI_KILL_IMMED);
+        alog("%s: %s!%s@%s set kill ON for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_KILL_ON, nc->display);
     } else if (stricmp(param, "QUICK") == 0) {
         nc->flags |= NI_KILLPROTECT | NI_KILL_QUICK;
         nc->flags &= ~NI_KILL_IMMED;
+        alog("%s: %s!%s@%s set kill QUICK for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display);
     } else if (stricmp(param, "IMMED") == 0) {
         if (NSAllowKillImmed) {
             nc->flags |= NI_KILLPROTECT | NI_KILL_IMMED;
             nc->flags &= ~NI_KILL_QUICK;
+            alog("%s: %s!%s@%s set kill IMMED for %s",
+                 s_NickServ, u->nick, u->username, u->host, nc->display);
             notice_lang(s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display);
         } else {
             notice_lang(s_NickServ, u, NICK_SASET_KILL_IMMED_DISABLED);
         }
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
+        alog("%s: %s!%s@%s set kill OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_KILL_OFF, nc->display);
     } else {
         syntax_error(s_NickServ, u, "SASET KILL",
@@ -388,9 +410,13 @@ int do_saset_secure(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_SECURE;
+        alog("%s: %s!%s@%s set secure ON for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_SECURE_ON, nc->display);
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~NI_SECURE;
+        alog("%s: %s!%s@%s set secure OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display);
     } else {
         syntax_error(s_NickServ, u, "SASET SECURE",
@@ -403,9 +429,13 @@ int do_saset_private(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_PRIVATE;
+        alog("%s: %s!%s@%s set private ON for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display);
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~NI_PRIVATE;
+        alog("%s: %s!%s@%s set private OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display);
     } else {
         syntax_error(s_NickServ, u, "SASET PRIVATE",
@@ -423,9 +453,13 @@ int do_saset_msg(User * u, NickCore * nc, char *param)
 
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_MSG;
+        alog("%s: %s!%s@%s set msg ON for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_MSG_ON, nc->display);
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~NI_MSG;
+        alog("%s: %s!%s@%s set msg OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_MSG_OFF, nc->display);
     } else {
         syntax_error(s_NickServ, u, "SASET MSG", NICK_SASET_MSG_SYNTAX);
@@ -436,6 +470,7 @@ int do_saset_msg(User * u, NickCore * nc, char *param)
 int do_saset_hide(User * u, NickCore * nc, char *param)
 {
     int flag, onmsg, offmsg;
+    char *param2;
 
     if (stricmp(param, "EMAIL") == 0) {
         flag = NI_HIDE_EMAIL;
@@ -458,18 +493,23 @@ int do_saset_hide(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
-    param = strtok(NULL, " ");
-    if (!param) {
+    param2 = strtok(NULL, " ");
+    if (!param2) {
         syntax_error(s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
-    } else if (stricmp(param, "ON") == 0) {
+    } else if (stricmp(param2, "ON") == 0) {
         nc->flags |= flag;
+        alog("%s: %s!%s@%s set hide %s ON for %s",
+             s_NickServ, u->nick, u->username, u->host, param, nc->display);
         notice_lang(s_NickServ, u, onmsg, nc->display, s_NickServ);
-    } else if (stricmp(param, "OFF") == 0) {
+    } else if (stricmp(param2, "OFF") == 0) {
         nc->flags &= ~flag;
+        alog("%s: %s!%s@%s set hide %s OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, param, nc->display);
         notice_lang(s_NickServ, u, offmsg, nc->display, s_NickServ);
     } else {
         syntax_error(s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
     }
+
     return MOD_CONT;
 }
 
@@ -482,9 +522,13 @@ int do_saset_noexpire(User * u, NickAlias * na, char *param)
     }
     if (stricmp(param, "ON") == 0) {
         na->status |= NS_NO_EXPIRE;
+        alog("%s: %s!%s@%s set noexpire ON for %s",
+             s_NickServ, u->nick, u->username, u->host, na->nick);
         notice_lang(s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick);
     } else if (stricmp(param, "OFF") == 0) {
         na->status &= ~NS_NO_EXPIRE;
+        alog("%s: %s!%s@%s set noexpire OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, na->nick);
         notice_lang(s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick);
     } else {
         syntax_error(s_NickServ, u, "SASET NOEXPIRE",
@@ -497,9 +541,13 @@ int do_saset_autoop(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags &= ~NI_AUTOOP;
+        alog("%s: %s!%s@%s set autoop ON for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
     } else if (stricmp(param, "OFF") == 0) {
 	nc->flags |= NI_AUTOOP;
+        alog("%s: %s!%s@%s set autoop OFF for %s",
+             s_NickServ, u->nick, u->username, u->host, nc->display);
         notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
     } else {
         syntax_error(s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
@@ -524,6 +572,8 @@ int do_saset_language(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
     nc->language = langlist[langnum];
+    alog("%s: %s!%s@%s set the language of %s to %s",
+         s_NickServ, u->nick, u->username, u->host, nc->display, getstring2(nc, LANG_NAME));
     notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED, nc->display, getstring2(nc, LANG_NAME));
 
     return MOD_CONT;

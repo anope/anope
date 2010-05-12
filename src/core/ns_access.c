@@ -140,6 +140,8 @@ int do_access(User * u)
         na->nc->access =
             srealloc(na->nc->access, sizeof(char *) * na->nc->accesscount);
         na->nc->access[na->nc->accesscount - 1] = sstrdup(mask);
+        alog("%s: %s!%s@%s added %s to their access list",
+             s_NickServ, u->nick, u->username, u->host, mask);
         notice_lang(s_NickServ, u, NICK_ACCESS_ADDED, mask);
 
     } else if (stricmp(cmd, "DEL") == 0) {
@@ -153,7 +155,8 @@ int do_access(User * u)
             notice_lang(s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask);
             return MOD_CONT;
         }
-
+        alog("%s: %s!%s@%s deleted %s from their access list",
+             s_NickServ, u->nick, u->username, u->host, mask);
         notice_lang(s_NickServ, u, NICK_ACCESS_DELETED, *access);
         free(*access);
         na->nc->accesscount--;

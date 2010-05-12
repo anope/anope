@@ -412,6 +412,8 @@ int do_set_desc(User * u, ChannelInfo * ci, char *param)
     if (ci->desc)
         free(ci->desc);
     ci->desc = sstrdup(param);
+    alog("%s: %s!%s@%s set description of %s to: %s",
+         s_ChanServ, u->nick, u->username, u->host, ci->name, ci->desc);
     notice_lang(s_ChanServ, u, CHAN_DESC_CHANGED, ci->name, param);
     return MOD_CONT;
 }
@@ -424,9 +426,13 @@ int do_set_url(User * u, ChannelInfo * ci, char *param)
         free(ci->url);
     if (param) {
         ci->url = sstrdup(param);
+        alog("%s: %s!%s@%s set url for %s to: %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name, ci->url);
         notice_lang(s_ChanServ, u, CHAN_URL_CHANGED, ci->name, param);
     } else {
         ci->url = NULL;
+        alog("%s: %s!%s@%s unset url for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_URL_UNSET, ci->name);
     }
     return MOD_CONT;
@@ -440,9 +446,13 @@ int do_set_email(User * u, ChannelInfo * ci, char *param)
         free(ci->email);
     if (param) {
         ci->email = sstrdup(param);
+        alog("%s: %s!%s@%s set email for %s to: %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name, ci->email);
         notice_lang(s_ChanServ, u, CHAN_EMAIL_CHANGED, ci->name, param);
     } else {
         ci->email = NULL;
+        alog("%s: %s!%s@%s unset email for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_EMAIL_UNSET, ci->name);
     }
     return MOD_CONT;
@@ -456,10 +466,14 @@ int do_set_entrymsg(User * u, ChannelInfo * ci, char *param)
         free(ci->entry_message);
     if (param) {
         ci->entry_message = sstrdup(param);
+        alog("%s: %s!%s@%s set entrymsg for %s to: %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name, ci->entry_message);
         notice_lang(s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name,
                     param);
     } else {
         ci->entry_message = NULL;
+        alog("%s: %s!%s@%s unset entrymsg for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_ENTRY_MSG_UNSET, ci->name);
     }
     return MOD_CONT;
@@ -553,6 +567,8 @@ int do_set_mlock(User * u, ChannelInfo * ci, char *param)
      * mode lock at all.
      */
     if (get_mlock_modes(ci, 0)) {
+        alog("%s: %s!%s@%s set mlock for %s to: %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name, get_mlock_modes(ci, 0));
         notice_lang(s_ChanServ, u, CHAN_MLOCK_CHANGED, ci->name,
                     get_mlock_modes(ci, 0));
     }
@@ -575,6 +591,8 @@ int do_set_bantype(User * u, ChannelInfo * ci, char *param)
         notice_lang(s_ChanServ, u, CHAN_SET_BANTYPE_INVALID, param);
     } else {
         ci->bantype = bantype;
+        alog("%s: %s!%s@%s set ban type for %s to: %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name, ci->bantype);
         notice_lang(s_ChanServ, u, CHAN_SET_BANTYPE_CHANGED, ci->name,
                     ci->bantype);
     }
@@ -587,9 +605,13 @@ int do_set_keeptopic(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_KEEPTOPIC;
+        alog("%s: %s!%s@%s set keeptopic ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_KEEPTOPIC;
+        alog("%s: %s!%s@%s set keeptopic OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET KEEPTOPIC",
@@ -604,9 +626,13 @@ int do_set_topiclock(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_TOPICLOCK;
+        alog("%s: %s!%s@%s set topiclock ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_TOPICLOCK;
+        alog("%s: %s!%s@%s set topiclock OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET TOPICLOCK",
@@ -621,9 +647,13 @@ int do_set_private(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_PRIVATE;
+        alog("%s: %s!%s@%s set private ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_PRIVATE;
+        alog("%s: %s!%s@%s set private OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET PRIVATE",
@@ -638,9 +668,13 @@ int do_set_secureops(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECUREOPS;
+        alog("%s: %s!%s@%s set secureops ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_SECUREOPS;
+        alog("%s: %s!%s@%s set secureops OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SECUREOPS",
@@ -655,9 +689,13 @@ int do_set_securefounder(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECUREFOUNDER;
+        alog("%s: %s!%s@%s set securefounder ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_SECUREFOUNDER;
+        alog("%s: %s!%s@%s set securefounder OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SECUREFOUNDER",
@@ -674,11 +712,15 @@ int do_set_restricted(User * u, ChannelInfo * ci, char *param)
         ci->flags |= CI_RESTRICTED;
         if (ci->levels[CA_NOJOIN] < 0)
             ci->levels[CA_NOJOIN] = 0;
+        alog("%s: %s!%s@%s set restricted ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_RESTRICTED;
         if (ci->levels[CA_NOJOIN] >= 0)
             ci->levels[CA_NOJOIN] = -2;
+        alog("%s: %s!%s@%s set restricted OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET RESTRICTED",
@@ -693,9 +735,13 @@ int do_set_secure(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECURE;
+        alog("%s: %s!%s@%s set secure ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SECURE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_SECURE;
+        alog("%s: %s!%s@%s set secure OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
@@ -710,13 +756,19 @@ int do_set_signkick(User * u, ChannelInfo * ci, char *param)
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SIGNKICK;
         ci->flags &= ~CI_SIGNKICK_LEVEL;
+        alog("%s: %s!%s@%s set signkick ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name);
     } else if (stricmp(param, "LEVEL") == 0) {
         ci->flags |= CI_SIGNKICK_LEVEL;
         ci->flags &= ~CI_SIGNKICK;
+        alog("%s: %s!%s@%s set signkick LEVEL for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~(CI_SIGNKICK | CI_SIGNKICK_LEVEL);
+        alog("%s: %s!%s@%s set signkick OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SIGNKICK",
@@ -731,9 +783,13 @@ int do_set_opnotice(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_OPNOTICE;
+        alog("%s: %s!%s@%s set opnotice ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_OPNOTICE;
+        alog("%s: %s!%s@%s set opnotice OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET OPNOTICE",
@@ -805,9 +861,13 @@ int do_set_peace(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_PEACE;
+        alog("%s: %s!%s@%s set peace ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_PEACE;
+        alog("%s: %s!%s@%s set peace OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
@@ -825,9 +885,13 @@ int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
     }
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_NO_EXPIRE;
+        alog("%s: %s!%s@%s set noexpire ON for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_NO_EXPIRE;
+        alog("%s: %s!%s@%s set noexpire OFF for %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET NOEXPIRE",

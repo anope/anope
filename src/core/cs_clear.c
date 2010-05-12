@@ -98,6 +98,8 @@ int do_clear(User * u)
             }
         }
 
+        alog("%s: %s!%s@%s cleared bans on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
     } else if (ircd->except && stricmp(what, "excepts") == 0) {
         char *av[2];
@@ -114,8 +116,10 @@ int do_clear(User * u)
                 free(av[1]);
             }
         }
-        notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
 
+        alog("%s: %s!%s@%s cleared excepts on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
+        notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
     } else if (ircd->invitemode && stricmp(what, "invites") == 0) {
         char *av[2];
         Entry *invite, *next;
@@ -131,6 +135,8 @@ int do_clear(User * u)
                 free(av[1]);
             }
         }
+        alog("%s: %s!%s@%s cleared invites on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
 
     } else if (stricmp(what, "modes") == 0) {
@@ -178,6 +184,8 @@ int do_clear(User * u)
             check_modes(c);
         }
 
+        alog("%s: %s!%s@%s cleared modes on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
     } else if (stricmp(what, "ops") == 0) {
         char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
@@ -236,6 +244,9 @@ int do_clear(User * u)
                 do_cmode(s_ChanServ, ac, av);
             }
         }
+
+        alog("%s: %s!%s@%s cleared ops on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
     } else if (ircd->halfop && stricmp(what, "hops") == 0) {
         char *av[4];
@@ -285,6 +296,8 @@ int do_clear(User * u)
                 }
             }
         }
+        alog("%s: %s!%s@%s cleared halfops on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
     } else if (stricmp(what, "voices") == 0) {
         char *av[4];
@@ -335,6 +348,8 @@ int do_clear(User * u)
                }
             }
         }
+        alog("%s: %s!%s@%s cleared voices on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
     } else if (stricmp(what, "users") == 0) {
         char *av[3];
@@ -354,6 +369,8 @@ int do_clear(User * u)
             free(av[1]);
             free(av[0]);
         }
+        alog("%s: %s!%s@%s cleared users on %s",
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_CLEARED_USERS, chan);
     } else {
         syntax_error(s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);

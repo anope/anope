@@ -195,11 +195,13 @@ int m_privmsg(char *source, char *receiver, char *msg)
                 && (stricmp(receiver, s_OperServAlias) == 0))) {
             if (!is_oper(u) && OSOpersOnly) {
                 notice_lang(s_OperServ, u, ACCESS_DENIED);
-                if (WallBadOS)
+                if (WallBadOS) {
                     anope_cmd_global(s_OperServ,
                                      "Denied access to %s from %s!%s@%s (non-oper)",
                                      s_OperServ, u->nick, u->username,
                                      u->host);
+                    alog("%s: %s (DENIED): %s", s_OperServ, u->nick, msg);
+                }
             } else {
                 operserv(u, msg);
             }

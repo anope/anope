@@ -112,27 +112,39 @@ int do_set_notify(User * u, MemoInfo * mi, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         u->na->nc->flags |= NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
+        alog("%s: %s!%s@%s set notify to ON",
+             s_MemoServ, u->nick, u->username, u->host);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_ON, s_MemoServ);
     } else if (stricmp(param, "LOGON") == 0) {
         u->na->nc->flags |= NI_MEMO_SIGNON;
         u->na->nc->flags &= ~NI_MEMO_RECEIVE;
+        alog("%s: %s!%s@%s set notify to LOGON",
+             s_MemoServ, u->nick, u->username, u->host);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, s_MemoServ);
     } else if (stricmp(param, "NEW") == 0) {
         u->na->nc->flags &= ~NI_MEMO_SIGNON;
         u->na->nc->flags |= NI_MEMO_RECEIVE;
+        alog("%s: %s!%s@%s set notify to NEW",
+             s_MemoServ, u->nick, u->username, u->host);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NEW, s_MemoServ);
     } else if (stricmp(param, "MAIL") == 0) {
         if (u->na->nc->email) {
             u->na->nc->flags |= NI_MEMO_MAIL;
+            alog("%s: %s!%s@%s set notify to MAIL",
+                 s_MemoServ, u->nick, u->username, u->host);
             notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
         } else {
             notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_INVALIDMAIL);
         }
     } else if (stricmp(param, "NOMAIL") == 0) {
         u->na->nc->flags &= ~NI_MEMO_MAIL;
+        alog("%s: %s!%s@%s set notify to NOMAIL",
+             s_MemoServ, u->nick, u->username, u->host);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
     } else if (stricmp(param, "OFF") == 0) {
         u->na->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE | NI_MEMO_MAIL);
+        alog("%s: %s!%s@%s set notify to OFF",
+             s_MemoServ, u->nick, u->username, u->host);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
     } else {
         syntax_error(s_MemoServ, u, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);
@@ -244,23 +256,41 @@ int do_set_limit(User * u, MemoInfo * mi, char *param)
     }
     mi->memomax = limit;
     if (limit > 0) {
-        if (!chan && na->nc == u->na->nc)
+        if (!chan && na->nc == u->na->nc) {
+            alog("%s: %s!%s@%s set their memo limit to %d",
+                 s_MemoServ, u->nick, u->username, u->host, limit);
             notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT, limit);
-        else
+        } else {
+            alog("%s: %s!%s@%s set the memo limit for %s to %d",
+                 s_MemoServ, u->nick, u->username, u->host,
+                 chan ? chan : user, limit);
             notice_lang(s_MemoServ, u, MEMO_SET_LIMIT,
                         chan ? chan : user, limit);
+        }
     } else if (limit == 0) {
-        if (!chan && na->nc == u->na->nc)
+        if (!chan && na->nc == u->na->nc) {
+            alog("%s: %s!%s@%s set their memo limit to 0",
+                 s_MemoServ, u->nick, u->username, u->host);
             notice_lang(s_MemoServ, u, MEMO_SET_YOUR_LIMIT_ZERO);
-        else
+        } else {
+            alog("%s: %s!%s@%s set the memo limit for %s to 0",
+                 s_MemoServ, u->nick, u->username, u->host,
+                 chan ? chan : user);
             notice_lang(s_MemoServ, u, MEMO_SET_LIMIT_ZERO,
                         chan ? chan : user);
+        }
     } else {
-        if (!chan && na->nc == u->na->nc)
+        if (!chan && na->nc == u->na->nc) {
+            alog("%s: %s!%s@%s unset their memo limit",
+                 s_MemoServ, u->nick, u->username, u->host);
             notice_lang(s_MemoServ, u, MEMO_UNSET_YOUR_LIMIT);
-        else
+        } else {
+            alog("%s: %s!%s@%s unset the memo limit for %s",
+                 s_MemoServ, u->nick, u->username, u->host,
+                 chan ? chan : user);
             notice_lang(s_MemoServ, u, MEMO_UNSET_LIMIT,
                         chan ? chan : user);
+        }
     }
     return MOD_CONT;
 }

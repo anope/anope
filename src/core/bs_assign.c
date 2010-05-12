@@ -95,6 +95,8 @@ int do_assign(User * u)
         if (ci->c && ci->c->usercount >= BSMinUsers) {
             bot_join(ci);
         }
+        alog("%s: %s!%s@%s assigned bot %s to %s", s_BotServ, u->nick, u->username,
+             u->host, bi->nick, ci->name);
         notice_lang(s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
         send_event(EVENT_BOT_ASSIGN, 2, ci->name, bi->nick);
     }

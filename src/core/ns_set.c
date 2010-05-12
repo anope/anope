@@ -191,6 +191,8 @@ int do_set_display(User * u, NickCore * nc, char *param)
     }
 
     change_core_display(nc, param);
+    alog("%s: %s!%s@%s set their display nick to %s",
+         s_NickServ, u->nick, u->username, u->host, nc->display);
     notice_lang(s_NickServ, u, NICK_SET_DISPLAY_CHANGED, nc->display);
 
     /* Enable nick tracking if enabled */
@@ -250,6 +252,8 @@ int do_set_language(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
     nc->language = langlist[langnum];
+    alog("%s: %s!%s@%s set their language to %s",
+         s_NickServ, u->nick, u->username, u->host, getstring2(nc, LANG_NAME));
     notice_lang(s_NickServ, u, NICK_SET_LANGUAGE_CHANGED);
     return MOD_CONT;
 }
@@ -261,9 +265,13 @@ int do_set_url(User * u, NickCore * nc, char *param)
 
     if (param) {
         nc->url = sstrdup(param);
+        alog("%s: %s!%s@%s set their url to %s",
+             s_NickServ, u->nick, u->username, u->host, nc->url);
         notice_lang(s_NickServ, u, NICK_SET_URL_CHANGED, param);
     } else {
         nc->url = NULL;
+        alog("%s: %s!%s@%s unset their url",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_URL_UNSET);
     }
     return MOD_CONT;
@@ -304,10 +312,14 @@ int do_set_icq(User * u, NickCore * nc, char *param)
             notice_lang(s_NickServ, u, NICK_SET_ICQ_INVALID, param);
         } else {
             nc->icq = tmp;
+            alog("%s: %s!%s@%s set their icq to %d",
+                 s_NickServ, u->nick, u->username, u->host, nc->icq);
             notice_lang(s_NickServ, u, NICK_SET_ICQ_CHANGED, param);
         }
     } else {
         nc->icq = 0;
+        alog("%s: %s!%s@%s unset their icq",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_ICQ_UNSET);
     }
     return MOD_CONT;
@@ -326,6 +338,8 @@ int do_set_greet(User * u, NickCore * nc, char *param)
                  (end ? end : ""));
 
         nc->greet = sstrdup(buf);
+        alog("%s: %s!%s@%s set their greet to %s",
+             s_NickServ, u->nick, u->username, u->host, nc->greet);
         notice_lang(s_NickServ, u, NICK_SET_GREET_CHANGED, buf);
     } else {
         nc->greet = NULL;
@@ -339,21 +353,29 @@ int do_set_kill(User * u, NickCore * nc, char *param)
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_KILLPROTECT;
         nc->flags &= ~(NI_KILL_QUICK | NI_KILL_IMMED);
+        alog("%s: %s!%s@%s set kill ON",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_KILL_ON);
     } else if (stricmp(param, "QUICK") == 0) {
         nc->flags |= NI_KILLPROTECT | NI_KILL_QUICK;
         nc->flags &= ~NI_KILL_IMMED;
+        alog("%s: %s!%s@%s set kill QUICK",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_KILL_QUICK);
     } else if (stricmp(param, "IMMED") == 0) {
         if (NSAllowKillImmed) {
             nc->flags |= NI_KILLPROTECT | NI_KILL_IMMED;
             nc->flags &= ~NI_KILL_QUICK;
+            alog("%s: %s!%s@%s set kill IMMED",
+                 s_NickServ, u->nick, u->username, u->host);
             notice_lang(s_NickServ, u, NICK_SET_KILL_IMMED);
         } else {
             notice_lang(s_NickServ, u, NICK_SET_KILL_IMMED_DISABLED);
         }
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
+        alog("%s: %s!%s@%s set kill OFF",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_KILL_OFF);
     } else {
         syntax_error(s_NickServ, u, "SET KILL",
@@ -367,9 +389,13 @@ int do_set_secure(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_SECURE;
+        alog("%s: %s!%s@%s set secure ON",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_SECURE_ON);
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~NI_SECURE;
+        alog("%s: %s!%s@%s set secure OFF",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_SECURE_OFF);
     } else {
         syntax_error(s_NickServ, u, "SET SECURE", NICK_SET_SECURE_SYNTAX);
@@ -381,9 +407,13 @@ int do_set_private(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_PRIVATE;
+        alog("%s: %s!%s@%s set private ON",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_PRIVATE_ON);
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~NI_PRIVATE;
+        alog("%s: %s!%s@%s set private OFF",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_PRIVATE_OFF);
     } else {
         syntax_error(s_NickServ, u, "SET PRIVATE",
@@ -401,9 +431,13 @@ int do_set_msg(User * u, NickCore * nc, char *param)
 
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_MSG;
+        alog("%s: %s!%s@%s set msg ON",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_MSG_ON);
     } else if (stricmp(param, "OFF") == 0) {
         nc->flags &= ~NI_MSG;
+        alog("%s: %s!%s@%s set msg OFF",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_MSG_OFF);
     } else {
         syntax_error(s_NickServ, u, "SET MSG", NICK_SET_MSG_SYNTAX);
@@ -414,6 +448,7 @@ int do_set_msg(User * u, NickCore * nc, char *param)
 int do_set_hide(User * u, NickCore * nc, char *param)
 {
     int flag, onmsg, offmsg;
+    char *param2;
 
     if (stricmp(param, "EMAIL") == 0) {
         flag = NI_HIDE_EMAIL;
@@ -436,18 +471,23 @@ int do_set_hide(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
-    param = strtok(NULL, " ");
-    if (!param) {
+    param2 = strtok(NULL, " ");
+    if (!param2) {
         syntax_error(s_NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
-    } else if (stricmp(param, "ON") == 0) {
+    } else if (stricmp(param2, "ON") == 0) {
         nc->flags |= flag;
+        alog("%s: %s!%s@%s set hide %s ON",
+             s_NickServ, u->nick, u->username, u->host, param);
         notice_lang(s_NickServ, u, onmsg, s_NickServ);
-    } else if (stricmp(param, "OFF") == 0) {
+    } else if (stricmp(param2, "OFF") == 0) {
         nc->flags &= ~flag;
+        alog("%s: %s!%s@%s set hide %s OFF",
+             s_NickServ, u->nick, u->username, u->host, param);
         notice_lang(s_NickServ, u, offmsg, s_NickServ);
     } else {
         syntax_error(s_NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
     }
+
     return MOD_CONT;
 }
 
@@ -460,9 +500,13 @@ int do_set_autoop(User *u, NickCore *nc, char *param) {
      **/
     if (stricmp(param, "ON") == 0) {
         nc->flags &= ~NI_AUTOOP;
+        alog("%s: %s!%s@%s set autoop ON",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_AUTOOP_ON);
     } else if (stricmp(param, "OFF") == 0) {
-	nc->flags |= NI_AUTOOP;
+        nc->flags |= NI_AUTOOP;
+        alog("%s: %s!%s@%s set autoop OFF",
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, NICK_SET_AUTOOP_OFF);
     } else {
         syntax_error(s_NickServ, u, "SET AUTOOP", NICK_SET_AUTOOP_SYNTAX);

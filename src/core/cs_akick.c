@@ -357,6 +357,8 @@ int do_akick(User * u)
                 cu = next;
             }
         }
+        alog("%s: %s!%s@%s added akick for %s to %s",
+              s_ChanServ, u->nick, u->username, u->host, mask, chan);
         notice_lang(s_ChanServ, u, CHAN_AKICK_ADDED, mask, chan);
 
         if (count)
@@ -397,6 +399,8 @@ int do_akick(User * u)
         }
 
         akick->flags |= AK_STUCK;
+        alog("%s: %s!%s@%s set STICK on akick %s on %s",
+             s_ChanServ, u->nick, u->username, u->host, akick->u.mask, ci->name);
         notice_lang(s_ChanServ, u, CHAN_AKICK_STUCK, akick->u.mask,
                     ci->name);
 
@@ -433,6 +437,8 @@ int do_akick(User * u)
         }
 
         akick->flags &= ~AK_STUCK;
+        alog("%s: %s!%s@%s unset STICK on akick %s on %s",
+             s_ChanServ, u->nick, u->username, u->host, akick->u.mask, ci->name);
         notice_lang(s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->u.mask,
                     ci->name);
 
@@ -463,9 +469,14 @@ int do_akick(User * u)
                                 ci->name);
                 }
             } else if (deleted == 1) {
+                alog("%s: %s!%s@%s deleted 1 akick on %s",
+                     s_ChanServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED_ONE,
                             ci->name);
             } else {
+                alog("%s: %s!%s@%s deleted %d akicks on %s",
+                     s_ChanServ, u->nick, u->username, u->host, deleted,
+                     ci->name);
                 notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED_SEVERAL,
                             deleted, ci->name);
             }
@@ -487,6 +498,8 @@ int do_akick(User * u)
                             chan);
                 return MOD_CONT;
             }
+            alog("%s: %s!%s@%s deleted akick %s on %s",
+                 s_ChanServ, u->nick, u->username, u->host, mask, chan);
             notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED, mask, chan);
             akick_del(u, akick);
             deleted = 1;
@@ -645,6 +658,8 @@ int do_akick(User * u)
         ci->akick = NULL;
         ci->akickcount = 0;
 
+        alog("%s: %s!%s@%s cleared akicks on %s",
+              s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name);
 
     } else {

@@ -106,6 +106,8 @@ int do_group(User * u)
                     notice_lang(s_HostServ, u, HOST_GROUP, na->nc->display,
                                 vHost);
                 }
+                alog("%s: %s!%s@%s grouped their vhost",
+                     s_HostServ, u->nick, u->username, u->host);
                 free(vHost);
                 if (vIdent)
                     free(vIdent);

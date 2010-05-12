@@ -91,6 +91,8 @@ int do_ghost(User * u)
             snprintf(buf, sizeof(buf), "GHOST command used by %s",
                      u->nick);
 
+            alog("%s: %s!%s@%s used GHOST on %s",
+                 s_NickServ, u->nick, u->username, u->host, u2->nick);
             kill_user(s_NickServ, nick, buf);
             notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
         } else {
@@ -108,11 +110,14 @@ int do_ghost(User * u)
             snprintf(buf, sizeof(buf), "GHOST command used by %s",
                      u->nick);
 
+            alog("%s: %s!%s@%s used GHOST on %s",
+                 s_NickServ, u->nick, u->username, u->host, u2->nick);
             kill_user(s_NickServ, nick, buf);
             notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);
         }
     }
+    
     return MOD_CONT;
 }

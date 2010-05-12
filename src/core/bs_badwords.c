@@ -143,7 +143,9 @@ int do_badwords(User * u)
         bw->in_use = 1;
         bw->word = sstrdup(word);
         bw->type = type;
-
+	
+        alog("%s: %s!%s@%s added badword \"%s\" to %s",
+             s_BotServ, u->nick, u->username, u->host, bw->word, ci->name);
         notice_lang(s_BotServ, u, BOT_BADWORDS_ADDED, bw->word, ci->name);
 
     } else if (stricmp(cmd, "DEL") == 0) {
@@ -169,9 +171,13 @@ int do_badwords(User * u)
                                 ci->name);
                 }
             } else if (deleted == 1) {
+                alog("%s: %s!%s@%s deleted 1 badword from %s",
+                     s_BotServ, u->nick, u->username, u->host, ci->name);
                 notice_lang(s_BotServ, u, BOT_BADWORDS_DELETED_ONE,
                             ci->name);
             } else {
+                alog("%s: %s!%s@%s deleted %d badwords from %s",
+                     s_BotServ, u->nick, u->username, u->host, deleted, ci->name);
                 notice_lang(s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL,
                             deleted, ci->name);
             }
@@ -187,6 +193,8 @@ int do_badwords(User * u)
                 return MOD_CONT;
             }
             bw = &ci->badwords[i];
+            alog("%s: %s!%s@%s deleted badword \"%s\" from %s",
+                 s_BotServ, u->nick, u->username, u->host,  bw->word, ci->name);
             notice_lang(s_BotServ, u, BOT_BADWORDS_DELETED, bw->word,
                         ci->name);
             if (bw->word)
@@ -266,6 +274,8 @@ int do_badwords(User * u)
         ci->badwords = NULL;
         ci->bwcount = 0;
 
+        alog("%s: %s!%s@%s cleared badwords on %s",
+             s_BotServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_BotServ, u, BOT_BADWORDS_CLEAR);
 
     } else {

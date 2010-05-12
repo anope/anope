@@ -91,6 +91,8 @@ int do_sendall(User * u)
         }                       /* /nc */
     }                           /* /i */
 
+    alog("%s: %s!%s@%s sent a mass memo",
+         s_MemoServ, u->nick, u->username, u->host);
     notice_lang(s_MemoServ, u, MEMO_MASS_SENT);
     return MOD_CONT;
 }

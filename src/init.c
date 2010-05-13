@@ -340,7 +340,6 @@ int init_primary(int ac, char **av)
 int init_secondary(int ac, char **av)
 {
 #ifndef _WIN32
-	int i;
 	int started_from_term = isatty(0) && isatty(1) && isatty(2);
 #endif
 
@@ -348,7 +347,9 @@ int init_secondary(int ac, char **av)
 	moduleAddMsgs();
 
 #ifndef _WIN32
-	if (!nofork) {
+	if (!nofork)
+	{
+		int i;
 		if ((i = fork()) < 0) {
 			perror("fork()");
 			return -1;
@@ -486,6 +487,30 @@ int init_secondary(int ac, char **av)
 			new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
 		if (Config.s_GlobalNoticer)
 			new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
+	}
+	else
+	{
+		/* If a botname was changed in the config, reflect it */
+		for (int i = 0; i < 256; ++i)
+		{
+			for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
+			{
+				if (bi->HasFlag(BI_OPERSERV) && bi->nick != Config.s_OperServ)
+					bi->ChangeNick(Config.s_OperServ);
+				else if (bi->HasFlag(BI_NICKSERV) && bi->nick != Config.s_NickServ)
+					bi->ChangeNick(Config.s_NickServ);
+				else if (bi->HasFlag(BI_CHANSERV) && bi->nick != Config.s_ChanServ)
+					bi->ChangeNick(Config.s_ChanServ);
+				else if (bi->HasFlag(BI_HOSTSERV) && bi->nick != Config.s_HostServ)
+					bi->ChangeNick(Config.s_HostServ);
+				else if (bi->HasFlag(BI_MEMOSERV) && bi->nick != Config.s_MemoServ)
+					bi->ChangeNick(Config.s_MemoServ);
+				else if (bi->HasFlag(BI_BOTSERV) && bi->nick != Config.s_BotServ)
+					bi->ChangeNick(Config.s_BotServ);
+				else if (bi->HasFlag(BI_GLOBAL) &&  bi->nick != Config.s_GlobalNoticer)
+					bi->ChangeNick(Config.s_GlobalNoticer);
+			}
+		}
 	}
 
 	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());

@@ -491,17 +491,17 @@ class DBMySQLWrite : public DBMySQL
 				}
 				else if (cmd == "URL")
 				{
-					query << "UPDATE `anope_ns_core` SET `url` = " << mysqlpp::quote << nc->url << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `url` = " << mysqlpp::quote << (nc->url ? nc->url : "") << " WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 				else if (cmd == "EMAIL")
 				{
-					query << "UPDATE `anope_ns_core` SET `email` = " << mysqlpp::quote << nc->email << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `email` = " << mysqlpp::quote << (nc->email ? nc->email : "") << " WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 				else if (cmd == "ICQ")
 				{
-					query << "UPDATE `anope_ns_core` SET `icq` = " << nc->icq << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `icq` = " << (nc->icq ? nc->icq : "") << " WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 				else if (cmd == "GREET")

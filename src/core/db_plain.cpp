@@ -53,6 +53,7 @@ static void ReadDatabase(Module *m = NULL)
 
 	NickCore *nc = NULL;
 	NickAlias *na = NULL;
+	NickRequest *nr = NULL;
 	BotInfo *bi = NULL;
 	ChannelInfo *ci = NULL;
 
@@ -550,7 +551,7 @@ class DBPlain : public Module
 			snprintf(newname, DatabaseFile.length() + 30, "backups/%s.%d%d%d", DatabaseFile.c_str(), tm->tm_year, tm->tm_mon, tm->tm_mday);
 
 			/* Backup already exists */
-			if (!stat(newname, &DBInfo))
+			if (IsFile(newname))
 			{
 				delete [] newname;
 				return;

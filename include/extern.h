@@ -36,6 +36,14 @@ E bool bad_password(User *u);
 E void sqline(const std::string &mask, const std::string &reason);
 E void common_unban(ChannelInfo *ci, const std::string &nick);
 
+E BotInfo *BotServ;
+E BotInfo *ChanServ;
+E BotInfo *Global;
+E BotInfo *HostServ;
+E BotInfo *MemoServ;
+E BotInfo *NickServ;
+E BotInfo *OperServ;
+
 /**** botserv.c ****/
 
 E BotInfo *botlists[256];

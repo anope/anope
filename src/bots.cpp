@@ -12,6 +12,14 @@
 #include "modules.h"
 #include "commands.h"
 
+BotInfo *BotServ = NULL;
+BotInfo *ChanServ = NULL;
+BotInfo *Global = NULL;
+BotInfo *HostServ = NULL;
+BotInfo *MemoServ = NULL;
+BotInfo *NickServ = NULL;
+BotInfo *OperServ = NULL;
+
 BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::string &nhost, const std::string &nreal)
 {
 	this->nick = nnick;
@@ -27,36 +35,43 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 	ci::string ci_nick(nnick.c_str());
 	if (Config.s_ChanServ && ci_nick == Config.s_ChanServ)
 	{
+		ChanServ = this;
 		this->cmdTable = CHANSERV;
 		this->SetFlag(BI_CHANSERV);
 	}
 	else if (Config.s_BotServ && ci_nick == Config.s_BotServ)
 	{
+		BotServ = this;
 		this->cmdTable = BOTSERV;
 		this->SetFlag(BI_BOTSERV);
 	}
 	else if (Config.s_HostServ && ci_nick == Config.s_HostServ)
 	{
+		HostServ = this;
 		this->cmdTable = HOSTSERV;
 		this->SetFlag(BI_HOSTSERV);
 	}
 	else if (Config.s_OperServ && ci_nick == Config.s_OperServ)
 	{
+		OperServ = this;
 		this->cmdTable = OPERSERV;
 		this->SetFlag(BI_OPERSERV);
 	}
 	else if (Config.s_MemoServ && ci_nick == Config.s_MemoServ)
 	{
+		MemoServ = this;
 		this->cmdTable = MEMOSERV;
 		this->SetFlag(BI_MEMOSERV);
 	}
 	else if (Config.s_NickServ && ci_nick == Config.s_NickServ)
 	{
+		NickServ = this;
 		this->cmdTable = NICKSERV;
 		this->SetFlag(BI_NICKSERV);
 	}
 	else if (Config.s_GlobalNoticer && ci_nick == Config.s_GlobalNoticer)
 	{
+		Global = this;
 		this->SetFlag(BI_GLOBAL);
 	}
 

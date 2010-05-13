@@ -506,7 +506,7 @@ class DBMySQLWrite : public DBMySQL
 				}
 				else if (cmd == "GREET")
 				{
-					query << "UPDATE `anope_ns_core` SET `greet` = " << mysqlpp::quote << nc->greet << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `greet` = " << mysqlpp::quote << (nc->greet ? nc->greet : "") << " WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 				else if (cmd == "KILL" || cmd == "SECURE" || cmd == "PRIVATE" || cmd == "MSG" || cmd == "HIDE" || cmd == "AUTOOP")

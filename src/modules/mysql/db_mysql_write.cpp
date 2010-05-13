@@ -111,7 +111,7 @@ static std::string GetMLockParams(ChannelInfo *ci)
 		std::string param;
 		if (ci->GetParam(ChannelModes[i].Mode, param))
 		{
-			ret += " " + param;
+			ret += " " + ChannelModes[i].Name + " " + param;
 		}
 	}
 
@@ -501,7 +501,7 @@ class DBMySQLWrite : public DBMySQL
 				}
 				else if (cmd == "ICQ")
 				{
-					query << "UPDATE `anope_ns_core` SET `icq` = " << (nc->icq ? nc->icq : "") << " WHERE `display` = " << mysqlpp::quote << nc->display;
+					query << "UPDATE `anope_ns_core` SET `icq` = " << (nc->icq ? nc->icq : 0) << " WHERE `display` = " << mysqlpp::quote << nc->display;
 					ExecuteQuery(query);
 				}
 				else if (cmd == "GREET")
@@ -542,17 +542,17 @@ class DBMySQLWrite : public DBMySQL
 				}
 				else if (params[1] == "URL")
 				{
-					query << "UPDATE `anope_cs_info` SET `url` = " << mysqlpp::quote << ci->url << " WHERE `name` = " << mysqlpp::quote << ci->name;
+					query << "UPDATE `anope_cs_info` SET `url` = " << mysqlpp::quote << (ci->url ? ci->url : "") << " WHERE `name` = " << mysqlpp::quote << ci->name;
 					ExecuteQuery(query);
 				}
 				else if (params[1] == "EMAIL")
 				{
-					query << "UPDATE `anope_cs_info` SET `email` = " << mysqlpp::quote << ci->email << " WHERE `name` = " << mysqlpp::quote << ci->name;
+					query << "UPDATE `anope_cs_info` SET `email` = " << mysqlpp::quote << (ci->email ? ci->email : "") << " WHERE `name` = " << mysqlpp::quote << ci->name;
 					ExecuteQuery(query);
 				}
 				else if (params[1] == "ENTRYMSG")
 				{
-					query << "UPDATE `anope_cs_info` SET `entry_message` = " << mysqlpp::quote << ci->entry_message << " WHERE `name` = " << mysqlpp::quote << ci->name;
+					query << "UPDATE `anope_cs_info` SET `entry_message` = " << mysqlpp::quote << (ci->entry_message ? ci->entry_message : "") << " WHERE `name` = " << mysqlpp::quote << ci->name;
 					ExecuteQuery(query);
 				}
 				else if (params[1] == "MLOCK")

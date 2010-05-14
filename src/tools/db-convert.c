@@ -418,7 +418,8 @@ int main(int argc, char *argv[])
 					<< ((nc->flags & NI_MEMO_MAIL    ) ? "MEMO_MAIL "    : "")
 					<< ((nc->flags & NI_HIDE_STATUS  ) ? "HIDE_STATUS "  : "")
 					<< ((nc->flags & NI_SUSPENDED    ) ? "SUSPENDED "    : "")
-					<< ((nc->flags & NI_AUTOOP       ) ? "AUTOOP "       : "")
+					// in 1.8, the AUTOOP flag was set to disable AUTOOP. Now we enable it. --DP
+					<< (!(nc->flags & NI_AUTOOP      ) ? "AUTOOP "       : "")
 					<< ((nc->flags & NI_FORBIDDEN    ) ? "FORBIDDEN "    : "") << std::endl;
 			if (nc->memos.memocount)
 			{

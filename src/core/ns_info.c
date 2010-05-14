@@ -156,7 +156,7 @@ class CommandNSInfo : public Command
 				CheckOptStr(optbuf, NI_SECURE, getstring(u, NICK_INFO_OPT_SECURE), na->nc);
 				CheckOptStr(optbuf, NI_PRIVATE, getstring(u, NICK_INFO_OPT_PRIVATE), na->nc);
 				CheckOptStr(optbuf, NI_MSG, getstring(u, NICK_INFO_OPT_MSG), na->nc);
-				CheckOptStr(optbuf, NI_AUTOOP, getstring(u, NICK_INFO_OPT_AUTOOP), na->nc, true);
+				CheckOptStr(optbuf, NI_AUTOOP, getstring(u, NICK_INFO_OPT_AUTOOP), na->nc);
 
 				notice_lang(Config.s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u, NICK_INFO_OPT_NONE) : optbuf.c_str());
 

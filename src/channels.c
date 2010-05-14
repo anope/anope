@@ -1499,7 +1499,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 
 	Alog(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
-	if (give_modes && !get_ignore(user->nick.c_str()) && (!user->Account() || !user->Account()->HasFlag(NI_AUTOOP)))
+	if (give_modes && !get_ignore(user->nick.c_str()) && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
 	{
 		if (owner && check_access(user, ci, CA_AUTOOWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);

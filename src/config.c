@@ -1550,7 +1550,6 @@ int read_config(int reload)
 		Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
 	}
 	else if (NSDefaults != "none") {
-		bool hadAutoop = false;
 		spacesepstream options(NSDefaults);
 		std::string option;
 		while (options.GetToken(option))
@@ -1568,9 +1567,8 @@ int read_config(int reload)
 			else if (option == "hidequit") Config.NSDefFlags.SetFlag(NI_HIDE_QUIT);
 			else if (option == "memosignon") Config.NSDefFlags.SetFlag(NI_MEMO_SIGNON);
 			else if (option == "memoreceive") Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
-			else if (option == "autoop") hadAutoop = true;
+			else if (option == "autoop") Config.NSDefFlags.SetFlag(NI_AUTOOP);
 		}
-		if (!hadAutoop) Config.NSDefFlags.SetFlag(NI_AUTOOP);
 	}
 
 	if (reload) {

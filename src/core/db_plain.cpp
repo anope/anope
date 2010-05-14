@@ -578,7 +578,6 @@ class DBPlain : public Module
 				delete [] newname;
 				return;
 			}
-			Alog() << "it.. doesnt exist?";
 
 			Alog(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname) != 0)

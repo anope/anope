@@ -52,6 +52,11 @@ static void ReadDatabase(Module *m = NULL)
 		return;
 	}
 
+	NickCore *nc = NULL;
+	NickAlias *na = NULL;
+	BotInfo *bi = NULL;
+	ChannelInfo *ci = NULL;
+
 	while (std::getline(db, buf))
 	{
 		if (buf.empty())
@@ -84,10 +89,6 @@ static void ReadDatabase(Module *m = NULL)
 			continue;
 
 		std::string mdbuf;
-		NickCore *nc;
-		NickAlias *na;
-		BotInfo *bi;
-		ChannelInfo *ci;
 		if (!params.empty())
 		{
 			if (params[0] == "NC")
@@ -116,7 +117,7 @@ static void ReadDatabase(Module *m = NULL)
 				params.erase(params.begin());
 				params.erase(params.begin());
 
-				if (nc && Type == MD_NC)
+				if (Type == MD_NC && nc)
 				{
 					try
 					{
@@ -132,7 +133,7 @@ static void ReadDatabase(Module *m = NULL)
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
 				}
-				else if (na && Type == MD_NA)
+				else if (Type == MD_NA && na)
 				{
 					try
 					{
@@ -148,7 +149,7 @@ static void ReadDatabase(Module *m = NULL)
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
 				}
-				else if (bi && Type == MD_BI)
+				else if (Type == MD_BI && bi)
 				{
 					try
 					{
@@ -164,7 +165,7 @@ static void ReadDatabase(Module *m = NULL)
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
 				}
-				else if (ci && Type == MD_CH)
+				else if (Type == MD_CH && ci)
 				{
 					try
 					{
@@ -571,6 +572,15 @@ class DBPlain : public Module
 			char *newname = new char[DatabaseFile.length() + 30];
 			snprintf(newname, DatabaseFile.length() + 30, "backups/%s.%d%d%d", DatabaseFile.c_str(), tm->tm_year, tm->tm_mon, tm->tm_mday);
 
+			/* Backup already exists */
+			if (!stat(newname, &DBInfo))
+			{
+				delete [] newname;
+				return;
+			}
+			Alog() << "it.. doesnt exist?";
+
+			Alog(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname) != 0)
 			{
 				ircdproto->SendGlobops(findbot(Config.s_OperServ), "Unable to backup database!");
@@ -578,6 +588,8 @@ class DBPlain : public Module
 	
 				if (!Config.NoBackupOkay)
 					quitting = 1;
+
+				delete [] newname;
 
 				return;
 			}

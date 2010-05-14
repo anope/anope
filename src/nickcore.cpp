@@ -14,7 +14,6 @@ NickCore::NickCore(const std::string &coredisplay)
 	next = prev = NULL;
 	display = email = greet = url = NULL;
 	ot = NULL;
-	pass[0] = '\0';
 	icq = 0;
 	language = channelcount = 0;
 	lastmail = 0;

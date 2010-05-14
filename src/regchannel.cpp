@@ -25,7 +25,6 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
 	next = prev = NULL;
-	name[0] = last_topic_setter[0] = '\0';
 	founder = successor = NULL;
 	desc = url = email = last_topic = forbidby = forbidreason = NULL;
 	last_topic_time = 0;

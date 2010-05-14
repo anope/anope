@@ -176,8 +176,8 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c)
 	if (!cmdTable || !c) {
 		return MOD_ERR_PARAMS;
 	}
-
-	index = CMD_HASH(c->name);
+	
+	index = CMD_HASH(c->name.c_str());
 
 	for (current = cmdTable[index]; current; current = current->next) {
 		if ((c->service) && (current->c) && (current->c->service)
@@ -283,7 +283,7 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
 		return MOD_ERR_PARAMS;
 	}
 
-	index = CMD_HASH(c->name);
+	index = CMD_HASH(c->name.c_str());
 	for (current = cmdTable[index]; current; current = current->next) {
 		if (stricmp(c->name.c_str(), current->name) == 0) {
 			if (!lastHash) {

@@ -432,12 +432,12 @@ private:
 
 		if (param == "ON")
 		{
-			nc->UnsetFlag(NI_AUTOOP);
+			nc->SetFlag(NI_AUTOOP);
 			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
 		}
 		else if (param == "OFF")
 		{
-			nc->SetFlag(NI_AUTOOP);
+			nc->UnsetFlag(NI_AUTOOP);
 			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
 		}
 		else

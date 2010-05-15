@@ -14,7 +14,6 @@
 #include "module.h"
 
 BotInfo *statserv = NULL;
-CommandHash *cmdTable[MAX_CMD_HASH];
 
 class CommandSSHelp : public Command
 {
@@ -40,8 +39,6 @@ class SSMain : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(cmdTable, new CommandSSHelp());
-
 		statserv = findbot("StatServ");
 		if (!statserv)
 		{
@@ -49,23 +46,19 @@ class SSMain : public Module
 			statserv = new BotInfo("StatServ", Config.ServiceUser, Config.ServiceHost, "Stats Service");
 		}
 		Alog() << "Done creating SS";
-		statserv->cmdTable = cmdTable;
+
+		this->AddCommand(statserv, new CommandSSHelp());
 	}
 
 	~SSMain()
 	{
-		CommandHash *current;
-		Command *c;
-		for (int i = 0; i < MAX_CMD_HASH; ++i)
-		{
-			for (current = cmdTable[i]; current; current = current->next)
-			{
-				for (c = current->c; c; c = c->next)
-					this->DelCommand(cmdTable, c->name.c_str());
-			}
-		}
 		if (statserv)
 		{
+			for (std::map<ci::string, Command *>::iterator it = statserv->Commands.begin(); it != statserv->Commands.end(); ++it)
+			{
+				this->DelCommand(statserv, it->second);
+			}
+
 			ircdproto->SendQuit(statserv, "Quit due to module unload.");
 			delete statserv;
 		}

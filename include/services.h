@@ -198,6 +198,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #endif
 
 /* Miscellaneous definitions. */
+#include "hashcomp.h"
 #include "defs.h"
 #include "slist.h"
 
@@ -352,12 +353,12 @@ class ChannelInfo;
 class Channel;
 class Server;
 struct EList;
+struct Session;
 
 typedef struct bandata_ BanData;
 typedef struct mailinfo_ MailInfo;
 typedef struct akill_ Akill;
 typedef struct exception_ Exception;
-typedef struct session_ Session;
 
 #include "extensible.h"
 #include "threadengine.h"
@@ -827,8 +828,11 @@ struct exception_ {
 
 /*************************************************************************/
 
-struct session_ {
-	Session *prev, *next;
+typedef unordered_map_namespace::unordered_map<std::string, Session *, hash_compare_std_string> session_map;
+extern CoreExport session_map SessionList;
+
+struct Session
+{
 	char *host;
 	int count;				  /* Number of clients with this host */
 	int hits;				   /* Number of subsequent kills for a host */
@@ -1054,6 +1058,7 @@ class CoreExport Alog
 	}
 };
 
+class Message; // XXX
 
 class CoreExport Anope
 {
@@ -1065,6 +1070,20 @@ class CoreExport Anope
 	 */
 	static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
 	inline static bool Match(const ci::string &str, const ci::string &mask) { return Match(str.c_str(), mask.c_str(), false); }
+
+	/** Add a message to Anope
+	 * @param name The message name as sent by the IRCd
+	 * @param func A callback function that will be called when this message is received
+	 * @return The new message object
+	 */
+	static Message *AddMessage(const std::string &name, int (*func)(const char *source, int ac, const char **av));
+
+	/** Deletes a message from Anope
+	 * XXX Im not sure what will happen if this function is called indirectly from message function pointed to by this message.. must check
+	 * @param m The message
+	 * @return true if the message was found and deleted, else false
+	 */
+	static bool DelMessage(Message *m);
 };
 
 /*************************************************************************/

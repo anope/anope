@@ -12,7 +12,7 @@
  */
 
 #include "services.h"
-#include "messages.h"
+#include "modules.h"
 #include "language.h"
 
 /*************************************************************************/
@@ -176,7 +176,7 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 				{
 					notice_lang(Config.s_OperServ, u, ACCESS_DENIED);
 					if (Config.WallBadOS)
-						ircdproto->SendGlobops(findbot(Config.s_OperServ), "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 				}
 				else
 					operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
@@ -318,20 +318,10 @@ int m_whois(const char *source, const char *who)
 }
 
 /* *INDENT-OFF* */
-void moduleAddMsgs() {
-	Message *m;
-	m = createMessage("STATS",	 m_stats); addCoreMessage(IRCD,m);
-	m = createMessage("TIME",	  m_time); addCoreMessage(IRCD,m);
-	m = createMessage("VERSION",   m_version); addCoreMessage(IRCD,m);
-}
-
-/*************************************************************************/
-
-Message *find_message(const char *name)
+void moduleAddMsgs()
 {
-	Message *m;
-	m = findMessage(IRCD, name);
-	return m;
+	Anope::AddMessage("STATS", m_stats);
+	Anope::AddMessage("TIME", m_time);
+	Anope::AddMessage("VERSION", m_version);
 }
 
-/*************************************************************************/

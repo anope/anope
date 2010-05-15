@@ -73,7 +73,7 @@ class CommandCSSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
+				ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set SUSPEND for channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
@@ -143,7 +143,7 @@ class CommandCSUnSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
+				ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set UNSUSPEND for channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
@@ -179,8 +179,8 @@ class CSSuspend : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSSuspend());
-		this->AddCommand(CHANSERV, new CommandCSUnSuspend());
+		this->AddCommand(ChanServ, new CommandCSSuspend());
+		this->AddCommand(ChanServ, new CommandCSUnSuspend());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

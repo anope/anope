@@ -8,6 +8,15 @@
  *
  */
 
+/* Hash maps used for users. Note UserListByUID will not be used on non-TS6 IRCds, and should never
+ * be assumed to have users
+ */
+typedef unordered_map_namespace::unordered_map<ci::string, User *, hash_compare_ci_string> user_map;
+typedef unordered_map_namespace::unordered_map<std::string, User *, hash_compare_std_string> user_uid_map;
+
+extern CoreExport user_map UserListByNick;
+extern CoreExport user_uid_map UserListByUID;
+
 struct ChannelContainer
 {
 	Channel *chan;
@@ -32,8 +41,6 @@ class CoreExport User : public Extensible
 	NickCore *nc; /* NickCore account the user is currently loggged in as */
 
  public: // XXX: exposing a tiny bit too much
-	User *next, *prev;
-
 	std::string nick;	/* User's current nick */
 
 	char *host;		/* User's real hostname 	*/

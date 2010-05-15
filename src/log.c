@@ -276,7 +276,7 @@ Alog::~Alog()
 	else if (Level == LOG_TERMINAL) // XXX dont use this yet unless you know we're at terminal and not daemonized
 		std::cout << buf.str() << std::endl;
 	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel)) {
-		ircdproto->SendPrivmsg(findbot(Config.s_GlobalNoticer), Config.LogChannel, "%s", buf.str().c_str());
+		ircdproto->SendPrivmsg(Global, Config.LogChannel, "%s", buf.str().c_str());
 	}
 	errno = errno_save;
 }

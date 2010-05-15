@@ -62,9 +62,9 @@ void memoserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_MemoServ), u->nick.c_str(), "PING %s", s);
+		ircdproto->SendCTCP(MemoServ, u->nick.c_str(), "PING %s", s);
 	} else {
-		mod_run_cmd(Config.s_MemoServ, u, MEMOSERV, cmd);
+		mod_run_cmd(MemoServ, u, cmd);
 	}
 }
 

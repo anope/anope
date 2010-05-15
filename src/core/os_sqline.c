@@ -121,7 +121,7 @@ class CommandOSSQLine : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SQLINE for %s (%s)", u->nick.c_str(), mask, buf);
+				ircdproto->SendGlobops(OperServ, "%s added an SQLINE for %s (%s)", u->nick.c_str(), mask, buf);
 			}
 
 			if (readonly)
@@ -322,7 +322,7 @@ class OSSQLine : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSQLine());
+		this->AddCommand(OperServ, new CommandOSSQLine());
 
 		if (!ircd->sqline)
 			throw ModuleException("Your IRCd does not support QLines.");

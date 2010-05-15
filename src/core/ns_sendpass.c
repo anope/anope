@@ -73,7 +73,7 @@ class NSSendPass : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSendPass());
+		this->AddCommand(NickServ, new CommandNSSendPass());
 
 		if (!Config.UseMail)
 			throw ModuleException("Not using mail, whut.");

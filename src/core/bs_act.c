@@ -75,7 +75,7 @@ class BSAct : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSAct());
+		this->AddCommand(BotServ, new CommandBSAct());
 
 		ModuleManager::Attach(I_OnBotServHelp, this);
 	}

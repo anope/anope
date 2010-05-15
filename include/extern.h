@@ -46,14 +46,14 @@ E BotInfo *OperServ;
 
 /**** botserv.c ****/
 
-E BotInfo *botlists[256];
-E int nbots;
 E void get_botserv_stats(long *nrec, long *memuse);
 E void bs_init();
 E void botserv(User *u, char *buf);
 E void botmsgs(User *u, BotInfo *bi, char *buf);
 E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
+E BotInfo *findbot(const char *nick);
 E BotInfo *findbot(const std::string &nick);
+E BotInfo *findbot(const ci::string &nick);
 
 /** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
  * @param uid The UID to search for
@@ -61,7 +61,6 @@ E BotInfo *findbot(const std::string &nick);
  */
 E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
-E void insert_bot(BotInfo * bi);
 
 E void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, const char *reason);
 E void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, const char *reason);
@@ -69,12 +68,11 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *
 
 /**** channels.c ****/
 
-E Channel *chanlist[1024];
-
 E void get_channel_stats(long *nrec, long *memuse);
+
 E Channel *findchan(const char *chan);
-E Channel *firstchan();
-E Channel *nextchan();
+E Channel *findchan(const std::string &chan);
+E Channel *findchan(const ci::string &chan);
 
 E void ChanSetInternalModes(Channel *c, int ac, const char **av);
 
@@ -112,12 +110,10 @@ E long get_memuse(EList *list);
 
 /**** chanserv.c ****/
 
-E ChannelInfo *chanlists[256];
 E LevelInfo levelinfo[];
 
 E void get_chanserv_stats(long *nrec, long *memuse);
 
-E void alpha_insert_chan(ChannelInfo * ci);
 E void reset_levels(ChannelInfo * ci);
 E void cs_init();
 E void chanserv(User * u, char *buf);
@@ -136,7 +132,9 @@ E void record_topic(const char *chan);
 E void restore_topic(const char *chan);
 E int check_topiclock(Channel * c, time_t topic_time);
 
+E ChannelInfo *cs_findchan(const char *chan);
 E ChannelInfo *cs_findchan(const std::string &chan);
+E ChannelInfo *cs_findchan(const ci::string &chan);
 E int check_access(User * user, ChannelInfo * ci, int what);
 E bool IsFounder(User *user, ChannelInfo *ci);
 E bool IsRealFounder(User *user, ChannelInfo *ci);
@@ -359,18 +357,11 @@ E std::map<ChannelModeName, std::string> DefMLockParams;
 E std::list<ChannelModeStatus *> BotModes;
 E void SetDefaultMLock();
 
-/**** modules.c ****/
-E void modules_unload_all(bool unload_proto);	/* Read warnings near function source */
-
 /**** nickserv.c ****/
 
-E NickAlias *nalists[1024];
-E NickCore *nclists[1024];
-E NickRequest *nrlists[1024];
 E NickRequest *findrequestnick(const char *nick);
-E void insert_requestnick(NickRequest * nr);
-E void alpha_insert_alias(NickAlias * na);
-E void insert_core(NickCore * nc);
+E NickRequest *findrequestnick(const std::string &nick);
+E NickRequest *findrequestnick(const ci::string &nick);
 E void get_aliases_stats(long *nrec, long *memuse);
 E void get_core_stats(long *nrec, long *memuse);
 E void change_core_display(NickCore * nc);
@@ -384,7 +375,10 @@ E void expire_nicks();
 E void expire_requests();
 E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
-E NickCore  *findcore(const char *nick);
+E NickAlias *findnick(const ci::string &nick);
+E NickCore *findcore(const char *nick);
+E NickCore *findcore(const std::string &nick);
+E NickCore *findcore(const ci::string &nick);
 E bool is_on_access(User *u, NickCore *nc);
 
 /**** operserv.c  ****/
@@ -462,9 +456,6 @@ E void notice_help(const char *source, User *dest, int message, ...); // MARK_DE
 E Exception *exceptions;
 E int16 nexceptions;
 
-E Session *sessionlist[1024];
-E int32 nsessions;
-
 E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
 
@@ -473,7 +464,7 @@ E void del_session(const char *host);
 
 E void expire_exceptions();
 
-E Session *findsession(const char *host);
+E Session *findsession(const std::string &host);
 
 E Exception *find_host_exception(const char *host);
 E Exception *find_hostip_exception(const char *host, const char *hostip);
@@ -501,20 +492,19 @@ E int32 TotalWritten;
 
 /**** users.c ****/
 
-E User *userlist[1024];
-
 E int32 opcnt;
 E uint32 maxusercnt, usercnt;
 E time_t maxusertime;
 
 E void get_user_stats(long *nusers, long *memuse);
-E User *finduser(const std::string &nick);
-E User *firstuser();
-E User *nextuser();
 
+E User *finduser(const char *nick);
+E User *finduser(const std::string &nick);
+E User *finduser(const ci::string &nick);
+E User *find_byuid(const char *uid);
+E User *find_byuid(const ci::string &uid);
 E User *find_byuid(const std::string &uid);
-E User *first_uid();
-E User *next_uid();
+
 E Server *findserver_uid(Server * s, const char *name);
 E char *TS6SID;
 

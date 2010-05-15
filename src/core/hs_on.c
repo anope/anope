@@ -66,7 +66,7 @@ class HSOn : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSOn());
+		this->AddCommand(HostServ, new CommandHSOn());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

@@ -92,7 +92,7 @@ class CSTBan : public Module
 	{
 		me = this;
 
-		this->AddCommand(CHANSERV, new CommandCSTBan());
+		this->AddCommand(ChanServ, new CommandCSTBan());
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);

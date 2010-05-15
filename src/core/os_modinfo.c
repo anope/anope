@@ -14,7 +14,7 @@
 
 #include "module.h"
 
-int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u);
+static int showModuleCmdLoaded(BotInfo *bi, const ci::string &mod_name, User *u);
 
 class CommandOSModInfo : public Command
 {
@@ -25,30 +25,27 @@ class CommandOSModInfo : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		const char *file = params[0].c_str();
+		const std::string file = params[0].c_str();
 		struct tm tm;
 		char timebuf[64];
-		Module *m;
-		int idx = 0;
 
-		m = findModule(file);
+		Module *m = FindModule(file.c_str());
 		if (m)
 		{
 			tm = *localtime(&m->created);
 			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 			notice_lang(Config.s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", timebuf);
-			for (idx = 0; idx < MAX_CMD_HASH; ++idx)
-			{
-				showModuleCmdLoaded(HOSTSERV[idx], m->name.c_str(), u);
-				showModuleCmdLoaded(OPERSERV[idx], m->name.c_str(), u);
-				showModuleCmdLoaded(NICKSERV[idx], m->name.c_str(), u);
-				showModuleCmdLoaded(CHANSERV[idx], m->name.c_str(), u);
-				showModuleCmdLoaded(BOTSERV[idx], m->name.c_str(), u);
-				showModuleCmdLoaded(MEMOSERV[idx], m->name.c_str(), u);
-			}
+			
+			showModuleCmdLoaded(HostServ, m->name.c_str(), u);
+			showModuleCmdLoaded(OperServ, m->name.c_str(), u);
+			showModuleCmdLoaded(NickServ, m->name.c_str(), u);
+			showModuleCmdLoaded(ChanServ, m->name.c_str(), u);
+			showModuleCmdLoaded(BotServ, m->name.c_str(), u);
+			showModuleCmdLoaded(MemoServ, m->name.c_str(), u);
 		}
 		else
-			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_INFO, file);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_INFO, file.c_str());
+
 		return MOD_CONT;
 	}
 
@@ -72,7 +69,7 @@ class OSModInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSModInfo());
+		this->AddCommand(OperServ, new CommandOSModInfo());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}
@@ -82,21 +79,21 @@ class OSModInfo : public Module
 	}
 };
 
-int showModuleCmdLoaded(CommandHash *cmdList, const char *mod_name, User *u)
+static int showModuleCmdLoaded(BotInfo *bi, const ci::string &mod_name, User *u)
 {
-	Command *c;
-	CommandHash *current;
+	if (!bi)
+		return 0;
+	
 	int display = 0;
 
-	for (current = cmdList; current; current = current->next)
+	for (std::map<ci::string, Command *>::iterator it = bi->Commands.begin(); it != bi->Commands.end(); ++it)
 	{
-		for (c = current->c; c; c = c->next)
+		Command *c = it->second;
+
+		if (c->module && c->module->name == mod_name)
 		{
-			if (c->mod_name && !stricmp(c->mod_name, mod_name))
-			{
-				notice_lang(Config.s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
-				++display;
-			}
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
+			++display;
 		}
 	}
 	return display;

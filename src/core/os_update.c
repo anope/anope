@@ -44,7 +44,7 @@ class OSUpdate : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSUpdate());
+		this->AddCommand(OperServ, new CommandOSUpdate());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

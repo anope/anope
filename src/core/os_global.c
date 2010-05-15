@@ -26,7 +26,7 @@ class CommandOSGlobal : public Command
 		const char *msg = params[0].c_str();
 
 		if (Config.WallOSGlobal)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 just used GLOBAL command.", u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, "\2%s\2 just used GLOBAL command.", u->nick.c_str());
 		oper_global(const_cast<char *>(u->nick.c_str()), "%s", msg);
 		return MOD_CONT;
 	}
@@ -52,7 +52,7 @@ class OSGlobal : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSGlobal());
+		this->AddCommand(OperServ, new CommandOSGlobal());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

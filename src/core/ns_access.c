@@ -171,7 +171,7 @@ class NSAccess : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSAccess());
+		this->AddCommand(NickServ, new CommandNSAccess());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

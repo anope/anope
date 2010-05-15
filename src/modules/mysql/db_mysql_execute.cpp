@@ -8,17 +8,12 @@ class FakeNickCore : public NickCore
  public:
  	FakeNickCore() : NickCore("-SQLUser")
 	{
-		if (this->next)
-			this->next->prev = this->prev;
-		if (this->prev)
-			this->prev->next = this->next;
-		else
-			nclists[HASH(this->display)] = this->next;
+		NickCoreList.erase(this->display);
 	}
 
 	~FakeNickCore()
 	{
-		insert_core(this);
+		NickCoreList[this->display] = this;
 		Users.clear();
 	}
 
@@ -39,23 +34,15 @@ class FakeUser : public User
 		this->vhost = NULL;
 		this->server = Me;
 
-		if (this->prev)
-			this->prev->next = this->next;
-		else
-			userlist[HASH(this->nick.c_str())] = this->next;
-		if (this->next)
-			this->next->prev = this->prev;
+		UserListByNick.erase("-SQLUser");
 		--usercnt;
 	}
 
 	~FakeUser()
 	{
-		User **list = &userlist[HASH(this->nick.c_str())];
-		this->next = *list;
-		if (*list)
-			(*list)->prev = this;
-		*list = this;
+		UserListByNick["-SQLUser"] = this;
 		++usercnt;
+
 		nc = NULL;
 	}
 
@@ -145,7 +132,7 @@ class SQLTimer : public Timer
 				// XXX this whole strtok thing needs to die
 				char *cmdbuf = sstrdup(qres[i]["command"].c_str());
 				char *cmd = strtok(cmdbuf, " ");
-				mod_run_cmd(bi->nick, u, bi->cmdTable, cmd);
+				mod_run_cmd(bi, u, cmd);
 				delete [] cmdbuf;
 
 				if (logout)

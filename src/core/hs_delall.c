@@ -70,7 +70,7 @@ class HSDelAll : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSDelAll());
+		this->AddCommand(HostServ, new CommandHSDelAll());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

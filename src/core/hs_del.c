@@ -63,7 +63,7 @@ class HSDel : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSDel());
+		this->AddCommand(HostServ, new CommandHSDel());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

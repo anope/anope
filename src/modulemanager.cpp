@@ -18,7 +18,7 @@ void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
 {
 	for (std::list<std::string>::iterator it = ModuleList.begin(); it != ModuleList.end(); ++it)
 	{
-		Module *m = findModule(it->c_str());
+		Module *m = FindModule(*it);
 		if (!m)
 			ModuleManager::LoadModule(*it, NULL);
 	}
@@ -79,16 +79,13 @@ static int moduleCopyFile(const char *name, const char *output)
 
 static bool IsOneOfModuleTypeLoaded(MODType mt)
 {
-	int idx = 0;
-	ModuleHash *current = NULL;
 	int pmods = 0;
 
-	for (idx = 0; idx != MAX_CMD_HASH; idx++)
+	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
 	{
-		for (current = MODULE_HASH[idx]; current; current = current->next)
+		if ((*it)->type == mt)
 		{
-			if (current->m->type == mt)
-				pmods++;
+			++pmods;
 		}
 	}
 
@@ -127,7 +124,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	if (modname.empty())
 		return MOD_ERR_PARAMS;
 
-	if (findModule(modname.c_str()) != NULL)
+	if (FindModule(modname) != NULL)
 		return MOD_ERR_EXISTS;
 
 	Alog(LOG_DEBUG) << "trying to load [" << modname <<  "]";
@@ -235,7 +232,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	if (u)
 	{
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s loaded module %s", u->nick.c_str(), modname.c_str());
+		ircdproto->SendGlobops(OperServ, "%s loaded module %s", u->nick.c_str(), modname.c_str());
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
 
 		/* If a user is loading this module, then the core databases have already been loaded
@@ -267,7 +264,7 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 
 	if (u)
 	{
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s unloaded module %s", u->nick.c_str(), m->name.c_str());
+		ircdproto->SendGlobops(OperServ, "%s unloaded module %s", u->nick.c_str(), m->name.c_str());
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
 
@@ -466,5 +463,23 @@ void ModuleManager::ClearCallBacks(Module *m)
 {
 	while (!m->CallBacks.empty())
 		delete m->CallBacks.front();
+}
+
+/** Unloading all modules, NEVER call this when Anope isn't shutting down.
+ * Ever.
+ * @param unload_proto true to unload the protocol module
+ */
+void ModuleManager::UnloadAll(bool unload_proto)
+{
+	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end();)
+	{
+		Module *m = *it++;
+
+		if (unload_proto || m->type != PROTOCOL)
+			DeleteModule(m);
+
+		if (Modules.empty())
+			break;
+	}
 }
 

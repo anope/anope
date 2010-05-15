@@ -66,7 +66,7 @@ class CSStatus : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSStatus());
+		this->AddCommand(ChanServ, new CommandCSStatus());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

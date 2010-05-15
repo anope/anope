@@ -53,47 +53,46 @@ class CommandHSList : public Command
 			}
 		}
 
-		for (int j = 0; j < 1024; ++j)
+		for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 		{
-			for (NickAlias *na = nalists[j]; na; na = na->next)
-			{
-				if (!na->hostinfo.HasVhost())
-					continue;
+			NickAlias *na = it->second;
 
-				if (!key.empty() && key[0] != '#')
+			if (!na->hostinfo.HasVhost())
+				continue;
+
+			if (!key.empty() && key[0] != '#')
+			{
+				if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key.c_str())) && display_counter < Config.NSListMax)
 				{
-					if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key.c_str())) && display_counter < Config.NSListMax)
-					{
-						++display_counter;
-						time_t time = na->hostinfo.GetTime();
-						tm = localtime(&time);
-						strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-						if (!na->hostinfo.GetIdent().empty())
-							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
-						else
-							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
-					}
+					++display_counter;
+					time_t time = na->hostinfo.GetTime();
+					tm = localtime(&time);
+					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
+					if (!na->hostinfo.GetIdent().empty())
+						notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+					else
+						notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 				}
-				else
-				{
-					/**
-					 * List the host if its in the display range, and not more
-					 * than NSListMax records have been displayed...
-					 **/
-					if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
-					{
-						++display_counter;
-						time_t time = na->hostinfo.GetTime();
-						tm = localtime(&time);
-						strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-						if (!na->hostinfo.GetIdent().empty())
-							notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
-						else
-							notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
-					}
-				}
-				++counter;
 			}
+			else
+			{
+				/**
+				 * List the host if its in the display range, and not more
+				 * than NSListMax records have been displayed...
+				 **/
+				if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
+				{
+					++display_counter;
+					time_t time = na->hostinfo.GetTime();
+					tm = localtime(&time);
+					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
+					if (!na->hostinfo.GetIdent().empty())
+						notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+					else
+						notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+				}
+			}
+			++counter;
 		}
 		if (!key.empty())
 			notice_lang(Config.s_HostServ, u, HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
@@ -123,7 +122,7 @@ class HSList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSList());
+		this->AddCommand(HostServ, new CommandHSList());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

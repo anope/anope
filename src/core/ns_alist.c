@@ -88,37 +88,35 @@ class CommandNSAList : public Command
 			notice_lang(Config.s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
-			int i, level;
+			int level;
 			int chan_count = 0;
 			int match_count = 0;
-			ChannelInfo *ci;
 
 			notice_lang(Config.s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick);
 
-			for (i = 0; i < 256; ++i)
+			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
 			{
-				for (ci = chanlists[i]; ci; ci = ci->next)
+				ChannelInfo *ci = it->second;
+
+				if ((level = get_access_level(ci, na)))
 				{
-					if ((level = get_access_level(ci, na)))
+					++chan_count;
+
+					if (min_level > level)
+						continue;
+
+					++match_count;
+
+					if ((ci->HasFlag(CI_XOP)) || level == ACCESS_FOUNDER)
 					{
-						++chan_count;
+						const char *xop;
 
-						if (min_level > level)
-							continue;
+						xop = get_xop_level(level);
 
-						++match_count;
-
-						if ((ci->HasFlag(CI_XOP)) || level == ACCESS_FOUNDER)
-						{
-							const char *xop;
-
-							xop = get_xop_level(level);
-
-							notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop, ci->desc ? ci->desc : "");
-						}
-						else
-							notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, ci->desc ? ci->desc : "");
+						notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop, ci->desc ? ci->desc : "");
 					}
+					else
+						notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, ci->desc ? ci->desc : "");
 				}
 			}
 
@@ -147,7 +145,7 @@ class NSAList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSAList());
+		this->AddCommand(NickServ, new CommandNSAList());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

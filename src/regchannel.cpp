@@ -23,7 +23,6 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
-	next = prev = NULL;
 	founder = successor = NULL;
 	desc = url = email = last_topic = forbidby = forbidreason = NULL;
 	last_topic_time = 0;
@@ -61,7 +60,8 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 		this->ttb[i] = 0;
 
 	reset_levels(this);
-	alpha_insert_chan(this);
+
+	RegisteredChannelList[this->name.c_str()] = this;
 }
 
 /** Default destructor, cleans up the channel complete and removes it from the internal list
@@ -84,12 +84,8 @@ ChannelInfo::~ChannelInfo()
 		this->c->ci = NULL;
 	}
 
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		chanlists[static_cast<unsigned char>(tolower(this->name[1]))] = this->next;
+	RegisteredChannelList.erase(this->name.c_str());
+
 	if (this->desc)
 		delete [] this->desc;
 	if (this->url)
@@ -654,7 +650,7 @@ bool ChannelInfo::CheckKick(User *user)
 		}
 
 		/* Join ChanServ */
-		ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
+		ircdproto->SendJoin(ChanServ, this->name.c_str(), this->c->creation_time);
 
 		/* Set a timer for this channel to part ChanServ later */
 		new ChanServTimer(this->c);

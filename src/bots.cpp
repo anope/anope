@@ -12,6 +12,8 @@
 #include "modules.h"
 #include "commands.h"
 
+botinfo_map BotList;
+
 BotInfo *BotServ = NULL;
 BotInfo *ChanServ = NULL;
 BotInfo *Global = NULL;
@@ -28,54 +30,39 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 	this->real = nreal;
 	this->lastmsg = this->created = time(NULL);
 	this->uid = ts6_uid_retrieve();
-	this->cmdTable = NULL;
-	++nbots;
 	this->chancount = 0;
 
 	ci::string ci_nick(nnick.c_str());
 	if (Config.s_ChanServ && ci_nick == Config.s_ChanServ)
 	{
 		ChanServ = this;
-		this->cmdTable = CHANSERV;
-		this->SetFlag(BI_CHANSERV);
 	}
 	else if (Config.s_BotServ && ci_nick == Config.s_BotServ)
 	{
 		BotServ = this;
-		this->cmdTable = BOTSERV;
-		this->SetFlag(BI_BOTSERV);
 	}
 	else if (Config.s_HostServ && ci_nick == Config.s_HostServ)
 	{
 		HostServ = this;
-		this->cmdTable = HOSTSERV;
-		this->SetFlag(BI_HOSTSERV);
 	}
 	else if (Config.s_OperServ && ci_nick == Config.s_OperServ)
 	{
 		OperServ = this;
-		this->cmdTable = OPERSERV;
-		this->SetFlag(BI_OPERSERV);
 	}
 	else if (Config.s_MemoServ && ci_nick == Config.s_MemoServ)
 	{
 		MemoServ = this;
-		this->cmdTable = MEMOSERV;
-		this->SetFlag(BI_MEMOSERV);
 	}
 	else if (Config.s_NickServ && ci_nick == Config.s_NickServ)
 	{
 		NickServ = this;
-		this->cmdTable = NICKSERV;
-		this->SetFlag(BI_NICKSERV);
 	}
 	else if (Config.s_GlobalNoticer && ci_nick == Config.s_GlobalNoticer)
 	{
 		Global = this;
-		this->SetFlag(BI_GLOBAL);
 	}
 
-	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
+	BotList[this->nick.c_str()] = this;
 
 	// If we're synchronised with the uplink already, call introduce_user() for this bot.
 	if (Me && Me->GetUplink()->IsSynced())
@@ -86,48 +73,38 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 
 BotInfo::~BotInfo()
 {
-	int i;
-	ChannelInfo *ci;
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	{
+		ChannelInfo *ci = it->second;
 
-	for (i = 0; i < 256; ++i)
-		for (ci = chanlists[i]; ci; ci = ci->next)
-			if (ci->bi == this)
-				ci->bi = NULL;
+		if (ci->bi == this)
+		{
+			ci->bi = NULL;
+		}
+	}
 
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		botlists[tolower(this->nick[0])] = this->next;
-
-	--nbots;
+	BotList.erase(this->nick.c_str());
 }
 
 
 void BotInfo::ChangeNick(const char *newnick)
 {
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		botlists[tolower(this->nick[0])] = this->next;
+	BotList.erase(this->nick.c_str());
 
 	this->nick = newnick;
 
-	insert_bot(this);
+	BotList[this->nick.c_str()] = this;
 }
 
 void BotInfo::RejoinAll()
 {
-	int i;
-	ChannelInfo *ci;
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	{
+		ChannelInfo *ci = it->second;
 
-	for (i = 0; i < 256; ++i)
-		for (ci = chanlists[i]; ci; ci = ci->next)
-			if (ci->bi == this && ci->c && (ci->c->users.size() >= Config.BSMinUsers))
-				bot_join(ci);
+		if (ci->bi == this && ci->c && ci->c->users.size() >= Config.BSMinUsers)
+			bot_join(ci);
+	}
 }
 
 void BotInfo::Assign(User *u, ChannelInfo *ci)

@@ -14,25 +14,13 @@
 #ifndef COMMAND_H_
 #define COMMAND_H_
 
-#define MAX_CMD_HASH 1024
-#define CMD_HASH(x)       (((x)[0]&31)<<5 | ((x)[1]&31))        /* Will gen a hash from a string :) */
+#include "services.h"
 
-#define HOSTSERV HS_cmdTable /* using HOSTSERV etc. looks nicer than HS_cmdTable for modules */
-#define BOTSERV BS_cmdTable
-#define MEMOSERV MS_cmdTable
-#define NICKSERV NS_cmdTable
-#define CHANSERV CS_cmdTable
-#define OPERSERV OS_cmdTable
+class Module;
+class BotInfo;
+class Command;
 
-#ifndef _WIN32
-#define MDE
-#else
-#ifndef MODULE_COMPILE
-#define MDE __declspec(dllexport)
-#else
-#define MDE __declspec(dllimport)
-#endif
-#endif
+typedef std::map<ci::string, Command *> CommandMap;
 
 /** The return value from commands.
  *  */
@@ -42,24 +30,9 @@ enum CommandReturn
 	MOD_STOP
 };
 
-class Command;
-
-extern MDE Command *lookup_cmd(Command *list, char *name);
-extern MDE void mod_help_cmd(char *service, User *u, CommandHash *cmdTable[], const char *cmd);
-extern MDE void mod_run_cmd(const std::string &service, User *u, CommandHash *cmdTable[], const char *cmd);
-
-struct CommandHash {
-	char *name;     /* Name of the command */
-	Command *c;     /* Actual command */
-	CommandHash *next; /* Next command */
-};
-
-extern MDE CommandHash *HOSTSERV[MAX_CMD_HASH];
-extern MDE CommandHash  *BOTSERV[MAX_CMD_HASH];
-extern MDE CommandHash *MEMOSERV[MAX_CMD_HASH];
-extern MDE CommandHash *NICKSERV[MAX_CMD_HASH];
-extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
-extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
+extern CoreExport Command *FindCommand(BotInfo *bi, const ci::string &cmd);
+extern CoreExport void mod_help_cmd(BotInfo *bi, User *u, const ci::string &cmd);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd);
 
 enum CommandFlag
 {
@@ -76,10 +49,19 @@ enum CommandFlag
 class CoreExport Command : public Flags<CommandFlag>
 {
  public:
+ 	/* Maximum paramaters accepted by this command */
 	size_t MaxParams;
+	/* Minimum parameters required to use this command */
 	size_t MinParams;
+	/* Command name */
 	ci::string name;
+	/* Permission needed to use this comand */
 	std::string permission;
+
+	/* Module which owns us */
+	Module *module;
+	/* Service this command is on */
+	BotInfo *service;
 
 	/** Create a new command.
 	 * @param sname The command name
@@ -114,12 +96,6 @@ class CoreExport Command : public Flags<CommandFlag>
 	 * @param reststr The permission required to successfully execute this command
 	 */
 	void SetPermission(const std::string &reststr);
-
-	/* Module related stuff */
-	int core;		  /* Can this command be deleted? */
-	char *mod_name; /* Name of the module who owns us, NULL for core's  */
-	char *service;  /* Service we provide this command for */
-	Command *next;
 };
 
 #endif

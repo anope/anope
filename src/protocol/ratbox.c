@@ -145,19 +145,19 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendSGLineDel(SXLine *sx)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
+		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", sx->mask);
 	}
 
 	void SendSGLine(SXLine *sx)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
+		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", sx->mask, sx->reason);
 	}
 
 	void SendAkillDel(Akill *ak)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
+		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", ak->user, ak->host);
 	}
 
@@ -175,7 +175,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendAkill(Akill *ak)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
+		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(ak->expires - time(NULL)), ak->user, ak->host, ak->reason);
 	}
 
@@ -811,33 +811,31 @@ int anope_event_error(const char *source, int ac, const char **av)
 
 void moduleAddIRCDMsgs()
 {
-	Message *m;
-
-	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
-	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
-	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);
-	m = createMessage("KICK",	  anope_event_kick); addCoreMessage(IRCD,m);
-	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
-	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("TMODE",	 anope_event_tmode); addCoreMessage(IRCD,m);
-	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
-	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("BMASK",	 anope_event_bmask); addCoreMessage(IRCD,m);
-	m = createMessage("UID",	   anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
-	m = createMessage("PASS",	  anope_event_pass); addCoreMessage(IRCD,m);
-	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
-	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
-	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);
-	m = createMessage("SQUIT",	 anope_event_squit); addCoreMessage(IRCD,m);
-	m = createMessage("TOPIC",	 anope_event_topic); addCoreMessage(IRCD,m);
-	m = createMessage("TB",		anope_event_tburst); addCoreMessage(IRCD,m);
-	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
-	m = createMessage("CAPAB",	 anope_event_capab); addCoreMessage(IRCD,m);
-	m = createMessage("SJOIN",	 anope_event_sjoin); addCoreMessage(IRCD,m);
-	m = createMessage("ERROR",	 anope_event_error); addCoreMessage(IRCD,m);
-	m = createMessage("SID",	   anope_event_sid); addCoreMessage(IRCD,m);
+	Anope::AddMessage("436", anope_event_436);
+	Anope::AddMessage("AWAY", anope_event_away);
+	Anope::AddMessage("JOIN", anope_event_join);
+	Anope::AddMessage("KICK", anope_event_kick);
+	Anope::AddMessage("KILL", anope_event_kill);
+	Anope::AddMessage("MODE", anope_event_mode);
+	Anope::AddMessage("TMODE", anope_event_tmode);
+	Anope::AddMessage("MOTD", anope_event_motd);
+	Anope::AddMessage("NICK", anope_event_nick);
+	Anope::AddMessage("BMASK", anope_event_bmask);
+	Anope::AddMessage("UID", anope_event_nick);
+	Anope::AddMessage("PART", anope_event_part);
+	Anope::AddMessage("PASS", anope_event_pass);
+	Anope::AddMessage("PING", anope_event_ping);
+	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
+	Anope::AddMessage("QUIT", anope_event_quit);
+	Anope::AddMessage("SERVER", anope_event_server);
+	Anope::AddMessage("SQUIT", anope_event_squit);
+	Anope::AddMessage("TOPIC", anope_event_topic);
+	Anope::AddMessage("TB", anope_event_tburst);
+	Anope::AddMessage("WHOIS", anope_event_whois);
+	Anope::AddMessage("CAPAB", anope_event_capab);
+	Anope::AddMessage("SJOIN", anope_event_sjoin);
+	Anope::AddMessage("ERROR", anope_event_error);
+	Anope::AddMessage("SID", anope_event_sid);
 }
 
 static void AddModes()

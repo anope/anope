@@ -115,8 +115,8 @@ class NSIdentify : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSIdentify("IDENTIFY"));
-		this->AddCommand(NICKSERV, new CommandNSIdentify("ID"));
+		this->AddCommand(NickServ, new CommandNSIdentify("IDENTIFY"));
+		this->AddCommand(NickServ, new CommandNSIdentify("ID"));
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

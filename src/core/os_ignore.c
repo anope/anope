@@ -137,7 +137,7 @@ class OSIgnore : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSIgnore());
+		this->AddCommand(OperServ, new CommandOSIgnore());
 
 		Implementation i[] = { I_OnOperServHelp, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 3);

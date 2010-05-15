@@ -136,9 +136,9 @@ void operserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_OperServ), u->nick.c_str(), "PING %s", s);
+		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "PING %s", s);
 	} else {
-		mod_run_cmd(Config.s_OperServ, u, OPERSERV, cmd);
+		mod_run_cmd(OperServ, u, cmd);
 	}
 }
 
@@ -373,7 +373,7 @@ void expire_akills()
 			continue;
 
 		if (Config.WallAkillExpire)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "AKILL on %s@%s has expired",
+			ircdproto->SendGlobops(OperServ, "AKILL on %s@%s has expired",
 							 ak->user, ak->host);
 		slist_delete(&akills, i);
 	}
@@ -426,9 +426,6 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 {
 	int deleted = 0, i;
 	SXLine *entry;
-	User *u2, *next;
-	char buf[BUFSIZE];
-	*buf = '\0';
 
 	/* Checks whether there is an SGLINE that already covers
 	 * the one we want to add, and whether there are SGLINEs
@@ -512,17 +509,20 @@ int add_sgline(User * u, const char *mask, const char *by, time_t expires,
 
 	ircdproto->SendSGLine(entry);
 
-	if (Config.KillonSGline && !ircd->sglineenforce) {
+	if (Config.KillonSGline && !ircd->sglineenforce)
+	{
+		char buf[BUFSIZE];
 		snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
-		u2 = firstuser();
-		while (u2) {
-			next = nextuser();
-			if (!is_oper(u2)) {
-				if (Anope::Match(u2->realname, entry->mask, false)) {
-					kill_user(Config.ServerName, u2->nick, buf);
-				}
+
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		{
+			User *u2 = it->second;
+			++it;
+
+			if (!is_oper(u2) && Anope::Match(u2->realname, entry->mask, false))
+			{
+				kill_user(Config.ServerName, u2->nick, buf);
 			}
-			u2 = next;
 		}
 	}
 	return deleted;
@@ -569,7 +569,7 @@ void expire_sglines()
 			continue;
 
 		if (Config.WallSGLineExpire)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SGLINE on \2%s\2 has expired",
+			ircdproto->SendGlobops(OperServ, "SGLINE on \2%s\2 has expired",
 							 sx->mask);
 		slist_delete(&sglines, i);
 	}
@@ -616,10 +616,7 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 			   const char *reason)
 {
 	int deleted = 0, i;
-	User *u2, *next;
 	SXLine *entry;
-	char buf[BUFSIZE];
-	*buf = '\0';
 
 	/* Checks whether there is an SQLINE that already covers
 	 * the one we want to add, and whether there are SQLINEs
@@ -707,17 +704,20 @@ int add_sqline(User * u, const char *mask, const char *by, time_t expires,
 
 	sqline(entry->mask, entry->reason);
 
-	if (Config.KillonSQline) {
+	if (Config.KillonSQline)
+	{
+		char buf[BUFSIZE];
 		snprintf(buf, (BUFSIZE - 1), "Q-Lined: %s", entry->reason);
-		u2 = firstuser();
-		while (u2) {
-			next = nextuser();
-			if (!is_oper(u2)) {
-				if (Anope::Match(u2->nick, entry->mask, false)) {
-					kill_user(Config.ServerName, u2->nick, buf);
-				}
+
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		{
+			User *u2 = it->second;
+			++it;
+			
+			if (!is_oper(u2) && Anope::Match(u2->nick, entry->mask, false))
+			{
+				kill_user(Config.ServerName, u2->nick, buf);
 			}
-			u2 = next;
 		}
 	}
 
@@ -797,7 +797,7 @@ void expire_sqlines()
 			continue;
 
 		if (Config.WallSQLineExpire)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SQLINE on \2%s\2 has expired",
+			ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired",
 							 sx->mask);
 
 		slist_delete(&sqlines, i);
@@ -974,7 +974,7 @@ void expire_szlines()
 			continue;
 
 		if (Config.WallSZLineExpire)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SZLINE on \2%s\2 has expired",
+			ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired",
 							 sx->mask);
 		slist_delete(&szlines, i);
 	}

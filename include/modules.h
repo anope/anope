@@ -104,52 +104,6 @@ do { \
 	} \
 } while(0);
 
-
-
-/** Priority types which can be returned from Module::Prioritize()
- */
-enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
-
-
-
-/*************************************************************************/
-
-#define IRCD IRCD_cmdTable
-#define MODULE_HASH Module_table
-#define EVENT EVENT_cmdTable
-#define EVENTHOOKS HOOK_cmdTable
-
-/**********************************************************************
- * Module Returns
- **********************************************************************/
-#define MOD_ERR_OK		  0
-#define MOD_ERR_MEMORY	  1
-#define MOD_ERR_PARAMS	  2
-#define MOD_ERR_EXISTS	  3
-#define MOD_ERR_NOEXIST	 4
-#define MOD_ERR_NOUSER	  5
-#define MOD_ERR_NOLOAD	  6
-#define MOD_ERR_NOUNLOAD	7
-#define MOD_ERR_SYNTAX	  8
-#define MOD_ERR_NODELETE	9
-#define MOD_ERR_UNKNOWN	 10
-#define MOD_ERR_FILE_IO	 11
-#define MOD_ERR_NOSERVICE   12
-#define MOD_ERR_NO_MOD_NAME 13
-
-/*************************************************************************/
-/* Macros to export the Module API functions/variables */
-#ifndef _WIN32
-#define MDE
-#else
-#ifndef MODULE_COMPILE
-#define MDE __declspec(dllexport)
-#else
-#define MDE __declspec(dllimport)
-#endif
-#endif
-/*************************************************************************/
-
 #if !defined(_WIN32)
 	#include <dlfcn.h>
 	/* Define these for systems without them */
@@ -169,26 +123,42 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 	const char *ano_moderr();
 #endif
 
-typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION,DATABASE } MODType;
-typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
+extern CoreExport Module *FindModule(const std::string &name);
+int protocol_module_init();
+extern CoreExport Message *createMessage(const char *name, int (*func)(const char *source, int ac, const char **av));
+std::vector<Message *> FindMessage(const std::string &name);
+extern CoreExport bool moduleMinVersion(int major,int minor,int patch,int build);
+
+enum ModuleReturn
+{
+	MOD_ERR_OK,
+	MOD_ERR_MEMORY,
+	MOD_ERR_PARAMS,
+	MOD_ERR_EXISTS,
+	MOD_ERR_NOEXIST,
+	MOD_ERR_NOUSER,
+	MOD_ERR_NOLOAD,
+	MOD_ERR_NOUNLOAD,
+	MOD_ERR_SYNTAX,
+	MOD_ERR_NODELETE,
+	MOD_ERR_UNKNOWN,
+	MOD_ERR_FILE_IO,
+	MOD_ERR_NOSERVICE,
+	MOD_ERR_NO_MOD_NAME
+};
+
+/** Priority types which can be returned from Module::Prioritize()
+ */
+enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
+enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE };
+
+struct Message;
+extern CoreExport std::multimap<std::string, Message *> MessageMap;
+class Module;
+extern CoreExport std::deque<Module *> Modules;
 
 /*************************************************************************/
 /* Structure for information about a *Serv command. */
-
-typedef struct ModuleLang_ ModuleLang;
-typedef struct ModuleHash_ ModuleHash;
-typedef struct Message_ Message;
-typedef struct MessageHash_ MessageHash;
-
-/*************************************************************************/
-
-extern MDE MessageHash *IRCD[MAX_CMD_HASH];
-extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
-
-struct ModuleLang_ {
-	int argc;
-	char **argv;
-};
 
 class Version
 {
@@ -247,15 +217,31 @@ class CoreExport Module
 	 */
 	std::list<CallBack *> CallBacks;
 
+	/** Handle for this module, obtained from dlopen()
+	 */
 	ano_module_t handle;
+
+	/** Time this module was created
+	 */
 	time_t created;
+
+	/** Version of this module
+	 */
 	std::string version;
+
+	/** Author of the module
+	 */
 	std::string author;
 
+	/** What type this module is
+	 */
 	MODType type;
 
-	MessageHash *msgList[MAX_CMD_HASH];
-	ModuleLang lang[NUM_LANGS];
+	struct ModuleLang
+	{
+		int argc;
+		char **argv;
+	} lang[NUM_LANGS];
 
 	/** Creates and initialises a new module.
 	 * @param loadernick The nickname of the user loading the module.
@@ -299,7 +285,7 @@ class CoreExport Module
 	 * compiled against
 	 * @return The version
 	 */
-	virtual Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
+	Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
 
 	/**
 	 * Allow a module to add a set of language strings to anope
@@ -334,20 +320,19 @@ class CoreExport Module
 
 	/**
 	 * Add a module provided command to the given service.
-	 * e.g. AddCommand(NICKSERV,c,MOD_HEAD);
-	 * @param cmdTable the services to add the command to
-	 * @param c the command to add
+	 * @param bi The service to add the command to
+	 * @param c The command to add
 	 * @return MOD_ERR_OK on successfully adding the command
 	 */
-	int AddCommand(CommandHash *cmdTable[], Command * c);
+	int AddCommand(BotInfo *bi, Command *c);
 
 	/**
 	 * Delete a command from the service given.
-	 * @param cmdTable the cmdTable for the services to remove the command from
-	 * @param name the name of the command to delete from the service
+	 * @param bi The service to remove the command from
+	 * @param c Thec command to delete
 	 * @return returns MOD_ERR_OK on success
 	 */
-	int DelCommand(CommandHash * cmdTable[], const char *name);
+	int DelCommand(BotInfo *bi, Command *c);
 
 	/** Called on NickServ HELP
 	 * @param u The user requesting help
@@ -434,13 +419,13 @@ class CoreExport Module
 	virtual void OnUserNickChange(User *u, const std::string &oldnick) { }
 
 	/** Called immediatly when a user tries to run a command
-	 * @param service The service
+	 * @param bi The bot the command is being run from
 	 * @param u The user
 	 * @param cmd The command
 	 * @param c The command class (if it exists)
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(const std::string &service, User *u, const char *cmd, Command *c) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(BotInfo *bi, User *u, const ci::string &cmd, Command *c) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
@@ -449,7 +434,7 @@ class CoreExport Module
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(User *u, BotInfo *service, const ci::string &command, const std::vector<ci::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
 	 * @param u The user executing the command
@@ -457,7 +442,7 @@ class CoreExport Module
 	 * @param command The command the user executed
 	 * @param params The parameters the user sent
 	 */
-	virtual void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { }
+	virtual void OnPostCommand(User *u, BotInfo *service, const ci::string &command, const std::vector<ci::string> &params) { }
 
 	/** Called after the core has finished loading the databases, but before
 	 * we connect to the server
@@ -714,9 +699,9 @@ class CoreExport Module
 	virtual EventReturn OnPreNickExpire(NickAlias *na) { return EVENT_CONTINUE; }
 
 	/** Called when a nick drops
-	 * @param nick The nick
+	 * @param na The nick
 	 */
-	virtual void OnNickExpire(const char *nick) { }
+	virtual void OnNickExpire(NickAlias *na) { }
 
 	/** Called when defcon level changes
 	 * @param level The level
@@ -1238,7 +1223,13 @@ class CoreExport ModuleManager
 	 */
 	static void ClearCallBacks(Module *m);
 
-private:
+	/** Unloading all modules, NEVER call this when Anope isn't shutting down.
+	 * Ever.
+	 * @param unload_proto true to unload the protocol module
+	 */
+	static void UnloadAll(bool unload_proto);
+
+ private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
 	 */
@@ -1267,51 +1258,10 @@ class CallBack : public Timer
 	}
 };
 
-struct ModuleHash_ {
-		char *name;
-		Module *m;
-		ModuleHash *next;
-};
-
-struct Message_ {
-	char *name;
+struct Message
+{
+	std::string name;
 	int (*func)(const char *source, int ac, const char **av);
-	int core;
-	Message *next;
 };
-
-struct MessageHash_ {
-		char *name;
-		Message *m;
-		MessageHash *next;
-};
-
-/*************************************************************************/
-/* Module Managment Functions */
-MDE Module *findModule(const char *name);	/* Find a module */
-
-int protocol_module_init();	/* Load the IRCD Protocol Module up*/
-
-/*************************************************************************/
-/*************************************************************************/
-/* Command Managment Functions */
-MDE Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
-
-/*************************************************************************/
-
-/* Message Managment Functions */
-MDE Message *createMessage(const char *name,int (*func)(const char *source, int ac, const char **av));
-Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
-MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
-MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
-int delMessage(MessageHash *msgTable[], Message *m);		/* Del a Message from a msg table */
-int destroyMessage(Message *m);					/* destroy a Message*/
-
-/*************************************************************************/
-
-MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
-
-/************************************************************************/
 
 #endif
-/* EOF */

@@ -67,7 +67,7 @@ class NSStatus : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSStatus());
+		this->AddCommand(NickServ, new CommandNSStatus());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

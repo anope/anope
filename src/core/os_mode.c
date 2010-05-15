@@ -32,10 +32,10 @@ class CommandOSMode : public Command
 			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 		else
 		{
-			c->SetModes(findbot(Config.s_OperServ), false, modes);
+			c->SetModes(OperServ, false, modes);
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used MODE %s on %s", u->nick.c_str(), modes, chan);
+				ircdproto->SendGlobops(OperServ, "%s used MODE %s on %s", u->nick.c_str(), modes, chan);
 		}
 		return MOD_CONT;
 	}
@@ -61,7 +61,7 @@ class OSMode : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSMode());
+		this->AddCommand(OperServ, new CommandOSMode());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

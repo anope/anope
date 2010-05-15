@@ -265,7 +265,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* nc_change was = 1, and there is no na->status */
 	void SendUnregisteredNick(User *u)
 	{
-		BotInfo *bi = findbot(Config.s_NickServ);
+		BotInfo *bi = NickServ;
 		u->RemoveMode(bi, UMODE_REGISTERED);
 		ircdproto->SendMode(bi, u, "+d 1");
 	}
@@ -299,7 +299,7 @@ class BahamutIRCdProto : public IRCDProto
 		u->Account()->Shrink("authenticationtoken");
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 
-		BotInfo *bi = findbot(Config.s_NickServ);
+		BotInfo *bi = NickServ;
 		u->SetMode(bi, UMODE_REGISTERED);
 		ircdproto->SendMode(bi, u, "+d %s", svidbuf);
 	}
@@ -734,36 +734,34 @@ bool ChannelModeFlood::IsValid(const std::string &value)
 	return false;
 }
 
-void moduleAddIRCDMsgs() {
-	Message *m;
-
-	/* now add the commands */
-	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
-	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
-	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);
-	m = createMessage("KICK",	  anope_event_kick); addCoreMessage(IRCD,m);
-	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
-	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
-	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
-	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
-	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
-	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);
-	m = createMessage("SQUIT",	 anope_event_squit); addCoreMessage(IRCD,m);
-	m = createMessage("TOPIC",	 anope_event_topic); addCoreMessage(IRCD,m);
-	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
-	m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
-	m = createMessage("CS",		anope_event_cs); addCoreMessage(IRCD,m);
-	m = createMessage("HS",		anope_event_hs); addCoreMessage(IRCD,m);
-	m = createMessage("MS",		anope_event_ms); addCoreMessage(IRCD,m);
-	m = createMessage("NS",		anope_event_ns); addCoreMessage(IRCD,m);
-	m = createMessage("OS",		anope_event_os); addCoreMessage(IRCD,m);
-	m = createMessage("SJOIN",	 anope_event_sjoin); addCoreMessage(IRCD,m);
-	m = createMessage("ERROR",	 anope_event_error); addCoreMessage(IRCD,m);
-	m = createMessage("BURST",	 anope_event_burst); addCoreMessage(IRCD,m);
+void moduleAddIRCDMsgs()
+{
+	Anope::AddMessage("436", anope_event_436);
+	Anope::AddMessage("AWAY", anope_event_away);
+	Anope::AddMessage("JOIN", anope_event_join);
+	Anope::AddMessage("KICK", anope_event_kick);
+	Anope::AddMessage("KILL", anope_event_kill);
+	Anope::AddMessage("MODE", anope_event_mode);
+	Anope::AddMessage("MOTD", anope_event_motd);
+	Anope::AddMessage("NICK", anope_event_nick);
+	Anope::AddMessage("PART", anope_event_part);
+	Anope::AddMessage("PING", anope_event_ping);
+	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
+	Anope::AddMessage("QUIT", anope_event_quit);
+	Anope::AddMessage("SERVER", anope_event_server);
+	Anope::AddMessage("SQUIT", anope_event_squit);
+	Anope::AddMessage("TOPIC", anope_event_topic);
+	Anope::AddMessage("WHOIS", anope_event_whois);
+	Anope::AddMessage("SVSMODE", anope_event_mode);
+	Anope::AddMessage("CAPAB", anope_event_capab);
+	Anope::AddMessage("CS", anope_event_cs);
+	Anope::AddMessage("HS", anope_event_hs);
+	Anope::AddMessage("MS", anope_event_ms);
+	Anope::AddMessage("NS", anope_event_ns);
+	Anope::AddMessage("OS", anope_event_os);
+	Anope::AddMessage("SJOIN", anope_event_sjoin);
+	Anope::AddMessage("ERROR", anope_event_error);
+	Anope::AddMessage("BURST", anope_event_burst);
 }
 
 static void AddModes()

@@ -113,7 +113,7 @@ class CommandOSSet : public Command
 			if (ircd->join2msg)
 			{
 				c = findchan(Config.LogChannel);
-				ircdproto->SendJoin(findbot(Config.s_GlobalNoticer), Config.LogChannel, c ? c->creation_time : time(NULL));
+				ircdproto->SendJoin(Global, Config.LogChannel, c ? c->creation_time : time(NULL));
 			}
 			LogChan = true;
 			Alog() << "Now sending log messages to " << Config.LogChannel;
@@ -123,7 +123,7 @@ class CommandOSSet : public Command
 		{
 			Alog() << "No longer sending log messages to a channel";
 			if (ircd->join2msg)
-				ircdproto->SendPart(findbot(Config.s_GlobalNoticer), findchan(Config.LogChannel), NULL);
+				ircdproto->SendPart(Global, findchan(Config.LogChannel), NULL);
 			LogChan = false;
 			notice_lang(Config.s_OperServ, u, OPER_SET_LOGCHAN_OFF);
 		}
@@ -155,14 +155,14 @@ class CommandOSSet : public Command
 			u->isSuperAdmin = 1;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_ON);
 			Alog() << Config.s_OperServ << ": " << u->nick << " is a SuperAdmin";
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick.c_str());
 		}
 		else if (setting == "OFF")
 		{
 			u->isSuperAdmin = 0;
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_OFF);
 			Alog() << Config.s_OperServ << ": " << u->nick << " is no longer a SuperAdmin";
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick.c_str());
 		}
 		else
 			notice_lang(Config.s_OperServ, u, OPER_SUPER_ADMIN_SYNTAX);
@@ -298,7 +298,7 @@ class OSSet : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSet());
+		this->AddCommand(OperServ, new CommandOSSet());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

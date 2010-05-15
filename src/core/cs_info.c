@@ -168,7 +168,7 @@ class CSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSInfo());
+		this->AddCommand(ChanServ, new CommandCSInfo());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

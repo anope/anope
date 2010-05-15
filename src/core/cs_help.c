@@ -46,7 +46,7 @@ class CommandCSHelp : public Command
 			}
 		}
 		else
-			mod_help_cmd(Config.s_ChanServ, u, CHANSERV, cmd.c_str());
+			mod_help_cmd(ChanServ, u, cmd.c_str());
 
 		return MOD_CONT;
 	}
@@ -71,7 +71,7 @@ class CSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSHelp());
+		this->AddCommand(ChanServ, new CommandCSHelp());
 	}
 };
 

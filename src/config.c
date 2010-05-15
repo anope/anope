@@ -474,13 +474,9 @@ static bool DoneOperTypes(ServerConfig *, const char *, bool)
 
 static bool InitOpers(ServerConfig *, const char *, bool)
 {
-	int i;
-	NickCore *nc;
+	for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+		it->second->ot = NULL;
 
-	for (i = 0; i < 1024; ++i)
-		for (nc = nclists[i]; nc; nc = nc->next)
-			nc->ot = NULL;
-	
 	Config.Opers.clear();
 
 	return true;

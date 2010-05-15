@@ -81,7 +81,7 @@ class BSSay : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSSay());
+		this->AddCommand(BotServ, new CommandBSSay());
 
 		ModuleManager::Attach(I_OnBotServHelp, this);
 	}

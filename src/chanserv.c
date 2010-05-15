@@ -19,7 +19,7 @@
 /*************************************************************************/
 /* *INDENT-OFF* */
 
-ChannelInfo *chanlists[256];
+registered_channel_map RegisteredChannelList;
 
 static int def_levels[][2] = {
 	{ CA_AUTOOP,					 5 },
@@ -195,51 +195,51 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 void get_chanserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	unsigned i, j;
-	ChannelInfo *ci;
 	std::string param;
 
-	for (i = 0; i < 256; i++) {
-		for (ci = chanlists[i]; ci; ci = ci->next) {
-			count++;
-			mem += sizeof(*ci);
-			if (ci->desc)
-				mem += strlen(ci->desc) + 1;
-			if (ci->url)
-				mem += strlen(ci->url) + 1;
-			if (ci->email)
-				mem += strlen(ci->email) + 1;
-			mem += ci->GetAccessCount() * sizeof(ChanAccess);
-			mem += ci->GetAkickCount() * sizeof(AutoKick);
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	{
+		ChannelInfo *ci = it->second;
 
-			if (ci->GetParam(CMODE_KEY, param))
-				mem += param.length() + 1;
+		count++;
+		mem += sizeof(*ci);
+		if (ci->desc)
+			mem += strlen(ci->desc) + 1;
+		if (ci->url)
+			mem += strlen(ci->url) + 1;
+		if (ci->email)
+			mem += strlen(ci->email) + 1;
+		mem += ci->GetAccessCount() * sizeof(ChanAccess);
+		mem += ci->GetAkickCount() * sizeof(AutoKick);
 
-			if (ci->GetParam(CMODE_FLOOD, param))
-				mem += param.length() + 1;
+		if (ci->GetParam(CMODE_KEY, param))
+			mem += param.length() + 1;
 
-			if (ci->GetParam(CMODE_REDIRECT, param))
-				mem += param.length() + 1;
+		if (ci->GetParam(CMODE_FLOOD, param))
+			mem += param.length() + 1;
 
-			if (ci->last_topic)
-				mem += strlen(ci->last_topic) + 1;
-			if (ci->entry_message)
-				mem += strlen(ci->entry_message) + 1;
-			if (ci->forbidby)
-				mem += strlen(ci->forbidby) + 1;
-			if (ci->forbidreason)
-				mem += strlen(ci->forbidreason) + 1;
-			if (ci->levels)
-				mem += sizeof(*ci->levels) * CA_SIZE;
-			mem += ci->memos.memos.size() * sizeof(Memo);
-			for (j = 0; j < ci->memos.memos.size(); j++) {
-				if (ci->memos.memos[j]->text)
-					mem += strlen(ci->memos.memos[j]->text) + 1;
-			}
-			if (ci->ttb)
-				mem += sizeof(*ci->ttb) * TTB_SIZE;
-			mem += ci->GetBadWordCount() * sizeof(BadWord);
+		if (ci->GetParam(CMODE_REDIRECT, param))
+			mem += param.length() + 1;
+
+		if (ci->last_topic)
+			mem += strlen(ci->last_topic) + 1;
+		if (ci->entry_message)
+			mem += strlen(ci->entry_message) + 1;
+		if (ci->forbidby)
+			mem += strlen(ci->forbidby) + 1;
+		if (ci->forbidreason)
+			mem += strlen(ci->forbidreason) + 1;
+		if (ci->levels)
+			mem += sizeof(*ci->levels) * CA_SIZE;
+		mem += ci->memos.memos.size() * sizeof(Memo);
+		for (unsigned j = 0; j < ci->memos.memos.size(); j++)
+		{
+			if (ci->memos.memos[j]->text)
+				mem += strlen(ci->memos.memos[j]->text) + 1;
 		}
+		if (ci->ttb)
+			mem += sizeof(*ci->ttb) * TTB_SIZE;
+		mem += ci->GetBadWordCount() * sizeof(BadWord);
 	}
 	*nrec = count;
 	*memuse = mem;
@@ -271,9 +271,9 @@ void chanserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(findbot(Config.s_ChanServ), u->nick.c_str(), "PING %s", s);
+		ircdproto->SendCTCP(ChanServ, u->nick.c_str(), "PING %s", s);
 	} else {
-		mod_run_cmd(Config.s_ChanServ, u, CHANSERV, cmd);
+		mod_run_cmd(ChanServ, u, cmd);
 	}
 }
 
@@ -632,15 +632,15 @@ void restore_topic(const char *chan)
 		c->topic_setter = whosends(ci)->nick;
 	}
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendJoin(findbot(Config.s_ChanServ), chan, c->creation_time);
+		if (whosends(ci) == ChanServ) {
+			ircdproto->SendJoin(ChanServ, chan, c->creation_time);
 			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+		if (whosends(ci) == ChanServ) {
+			ircdproto->SendPart(ChanServ, c, NULL);
 		}
 	}
 }
@@ -692,8 +692,8 @@ int check_topiclock(Channel * c, time_t topic_time)
 	}
 
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name.c_str(), c->creation_time);
+		if (whosends(ci) == ChanServ) {
+			ircdproto->SendJoin(ChanServ, c->name.c_str(), c->creation_time);
 			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 		}
 	}
@@ -701,8 +701,8 @@ int check_topiclock(Channel * c, time_t topic_time)
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 
 	if (ircd->join2set) {
-		if (whosends(ci) == findbot(Config.s_ChanServ)) {
-			ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+		if (whosends(ci) == ChanServ) {
+			ircdproto->SendPart(ChanServ, c, NULL);
 		}
 	}
 	return 1;
@@ -714,118 +714,113 @@ int check_topiclock(Channel * c, time_t topic_time)
 
 void expire_chans()
 {
-	ChannelInfo *ci, *next;
-	int i;
-	time_t now = time(NULL);
-
 	if (!Config.CSExpire)
 		return;
+	
+	time_t now = time(NULL);
 
-	for (i = 0; i < 256; i++) {
-		for (ci = chanlists[i]; ci; ci = next) {
-			next = ci->next;
-			if (!ci->c && now - ci->last_used >= Config.CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
-			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
-				if (MOD_RESULT == EVENT_STOP)
-					continue;
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end();)
+	{
+		ChannelInfo *ci = it->second;
+		++it;
 
-				char *chname = sstrdup(ci->name.c_str());
-				Alog() << "Expiring channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << " )";
-				delete ci;
-				FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
-				delete [] chname;
-			}
+		if (!ci->c && now - ci->last_used >= Config.CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
+		{
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
+			if (MOD_RESULT == EVENT_STOP)
+				continue;
+
+			char *chname = sstrdup(ci->name.c_str());
+			Alog() << "Expiring channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << " )";
+			delete ci;
+			FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
+			delete [] chname;
 		}
 	}
 }
 
 /*************************************************************************/
 
-/* Remove a (deleted or expired) nickname from all channel lists. */
-
+// XXX this is slightly inefficient
 void cs_remove_nick(const NickCore * nc)
 {
-	int i, j;
-	ChannelInfo *ci, *next;
+	int j;
 	ChanAccess *ca;
 	AutoKick *akick;
 
-	for (i = 0; i < 256; i++) {
-		for (ci = chanlists[i]; ci; ci = next) {
-			next = ci->next;
-			if (ci->founder == nc) {
-				if (ci->successor) {
-					NickCore *nc2 = ci->successor;
-					if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg) {
-						Alog() << Config.s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel", 
-						delete ci;
-						continue;
-					} else {
-						Alog() << Config.s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
-						ci->founder = nc2;
-						ci->successor = NULL;
-						nc2->channelcount++;
-					}
-				} else {
-					Alog() << Config.s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	{
+		ChannelInfo *ci = it->second;
 
-					if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
-					{
-						/* Maybe move this to delchan() ? */
-						if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
-						{
-							ci->c->RemoveMode(NULL, CMODE_REGISTERED);
-						}
-					}
-
+		if (ci->founder == nc) {
+			if (ci->successor) {
+				NickCore *nc2 = ci->successor;
+				if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg) {
+					Alog() << Config.s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel", 
 					delete ci;
 					continue;
+				} else {
+					Alog() << Config.s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
+					ci->founder = nc2;
+					ci->successor = NULL;
+					nc2->channelcount++;
 				}
+			} else {
+				Alog() << Config.s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
+
+				if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
+				{
+					/* Maybe move this to delchan() ? */
+					if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
+					{
+						ci->c->RemoveMode(NULL, CMODE_REGISTERED);
+					}
+				}
+
+				delete ci;
+				continue;
 			}
+		}
 
-			if (ci->successor == nc)
-				ci->successor = NULL;
+		if (ci->successor == nc)
+			ci->successor = NULL;
 
-			for (j = ci->GetAccessCount(); j > 0; --j)
-			{
-				ca = ci->GetAccess(j - 1);
+		for (j = ci->GetAccessCount(); j > 0; --j)
+		{
+			ca = ci->GetAccess(j - 1);
 
-				if (ca->in_use && ca->nc == nc)
-					ci->EraseAccess(j - 1);
-			}
+			if (ca->in_use && ca->nc == nc)
+				ci->EraseAccess(j - 1);
+		}
 
-			for (j = ci->GetAkickCount(); j > 0; --j)
-			{
-				akick = ci->GetAkick(j - 1);
-				if (akick->InUse && akick->HasFlag(AK_ISNICK) && akick->nc == nc)
-					ci->EraseAkick(akick);
-			}
+		for (j = ci->GetAkickCount(); j > 0; --j)
+		{
+			akick = ci->GetAkick(j - 1);
+			if (akick->InUse && akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+				ci->EraseAkick(akick);
 		}
 	}
 }
 
 /*************************************************************************/
 
-/* Return the ChannelInfo structure for the given channel, or NULL if the
- * channel isn't registered. */
+ChannelInfo *cs_findchan(const char *chan)
+{
+	return cs_findchan(ci::string(chan));
+}
 
 ChannelInfo *cs_findchan(const std::string &chan)
 {
-	ChannelInfo *ci;
+	return cs_findchan(ci::string(chan.c_str()));
+}
 
-	if (chan.empty()) 
-	{
-		Alog(LOG_DEBUG) << "cs_findchan() called with NULL values";
-		return NULL;
-	}
+ChannelInfo *cs_findchan(const ci::string &chan)
+{
+	registered_channel_map::const_iterator it = RegisteredChannelList.find(chan);
 
-	for (ci = chanlists[static_cast<unsigned char>(tolower(chan[1]))]; ci;
-		 ci = ci->next) {
-		if (ci::string(ci->name.c_str()) == chan)
-			return ci;
-	}
+	if (it != RegisteredChannelList.end())
+		return it->second;
 	return NULL;
 }
 
@@ -871,33 +866,6 @@ int check_access(User * user, ChannelInfo * ci, int what)
 /*************************************************************************/
 /*********************** ChanServ private routines ***********************/
 /*************************************************************************/
-
-/* Insert a channel alphabetically into the database. */
-
-void alpha_insert_chan(ChannelInfo * ci)
-{
-	ChannelInfo *ptr, *prev;
-
-	if (!ci)
-	{
-		Alog(LOG_DEBUG) << "alpha_insert_chan() called with NULL values";
-		return;
-	}
-
-	const char *chan = ci->name.c_str();
-
-	for (prev = NULL, ptr = chanlists[static_cast<unsigned char>(tolower(chan[1]))];
-		 ptr != NULL && stricmp(ptr->name.c_str(), chan) < 0;
-		 prev = ptr, ptr = ptr->next);
-	ci->prev = prev;
-	ci->next = ptr;
-	if (!prev)
-		chanlists[static_cast<unsigned char>(tolower(chan[1]))] = ci;
-	else
-		prev->next = ci;
-	if (ptr)
-		ptr->prev = ci;
-}
 
 /* Reset channel access level values to their default state. */
 
@@ -1204,7 +1172,7 @@ void ChanServTimer::Tick(time_t)
 	if (!c->users.empty())
 		return;
 	
-	ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+	ircdproto->SendPart(ChanServ, c, NULL);
 	
 	/* Now delete the channel as it is empty */
 	if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))

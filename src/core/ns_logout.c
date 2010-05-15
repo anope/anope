@@ -88,7 +88,7 @@ class NSLogout : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSLogout());
+		this->AddCommand(NickServ, new CommandNSLogout());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

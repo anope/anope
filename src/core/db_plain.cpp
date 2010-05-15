@@ -422,11 +422,11 @@ static void LoadBotInfo(const std::vector<std::string> &params)
 	BotInfo *bi = findbot(params[0]);
 	if (!bi)
 		bi = new BotInfo(params[0]);
-	bi->user = sstrdup(params[1].c_str());
-	bi->host = sstrdup(params[2].c_str());
+	bi->user = params[1];
+	bi->host = params[2];
 	bi->created = atol(params[3].c_str());
 	bi->chancount = atol(params[4].c_str());
-	bi->real = sstrdup(params[5].c_str());
+	bi->real = params[5];
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
 }
@@ -560,7 +560,7 @@ class DBPlain : public Module
 			Alog(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname) != 0)
 			{
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "Unable to backup database!");
+				ircdproto->SendGlobops(OperServ, "Unable to backup database!");
 				Alog() << "Unable to back up database!";
 	
 				if (!Config.NoBackupOkay)
@@ -698,20 +698,6 @@ class DBPlain : public Module
 			{
 				if (params[j] == "PRIVATE")
 					bi->SetFlag(BI_PRIVATE);
-				else if (params[j] == "CHANSERV")
-					bi->SetFlag(BI_CHANSERV);
-				else if (params[j] == "BOTSERV")
-					bi->SetFlag(BI_BOTSERV);
-				else if (params[j] == "HOSTSERV")
-					bi->SetFlag(BI_HOSTSERV);
-				else if (params[j] == "OPERSERV")
-					bi->SetFlag(BI_OPERSERV);
-				else if (params[j] == "MEMOSERV")
-					bi->SetFlag(BI_MEMOSERV);
-				else if (params[j] == "NICKSERV")
-					bi->SetFlag(BI_NICKSERV);
-				else if (params[j] == "GLOBAL")
-					bi->SetFlag(BI_GLOBAL);
 			}
 		}
 
@@ -936,277 +922,255 @@ class DBPlain : public Module
 
 		db << "VER 1" << endl;
 
-		for (int i = 0; i < 1024; ++i)
+		for (nickrequest_map::const_iterator it = NickRequestList.begin(); it != NickRequestList.end(); ++it)
 		{
-			for (NickRequest *nr = nrlists[i]; nr; nr = nr->next)
-			{
-				db << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
+			NickRequest *nr = it->second;
+			
+			db << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
 
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
-			}
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
 		}
 
-		for (int i = 0; i < 1024; ++i)
+		for (nickcore_map::const_iterator nit = NickCoreList.begin(); nit != NickCoreList.end(); ++nit)
 		{
-			for (NickCore *nc = nclists[i]; nc; nc = nc->next)
+			NickCore *nc = nit->second;
+
+			if (nc->HasFlag(NI_FORBIDDEN))
 			{
-				if (nc->HasFlag(NI_FORBIDDEN))
-				{
-					db << "NC " << nc->display << endl;
-					db << "MD FLAGS FORBIDDEN" << endl;
-					FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
-					continue;
-				}
-				else
-				{
-					db << "NC " << nc->display << " " << nc->pass << " ";
-				}
-				for (int j = 0; LangInfos[j].LanguageId != -1; ++j)
-					if (nc->language ==  LangInfos[j].LanguageId)
-						db << LangInfos[j].Name;
-				db << " " << nc->memos.memomax << " " << nc->channelcount << endl;
-
-				if (nc->email)
-					db << "MD EMAIL " << nc->email << endl;
-				if (nc->greet)
-					db << "MD GREET :" << nc->greet << endl;
-				if (nc->icq)
-					db << "MD ICQ :" << nc->icq << endl;
-				if (nc->url)
-					db << "MD URL :" << nc->url << endl;
-				if (!nc->access.empty())
-				{
-					for (std::vector<std::string>::iterator it = nc->access.begin(); it != nc->access.end(); ++it)
-						db << "MD ACCESS " << *it << endl;
-				}
-				if (nc->FlagCount())
-				{
-					db << "MD FLAGS";
-					for (int j = 0; NickCoreFlags[j].Flag != -1; ++j)
-						if (nc->HasFlag(NickCoreFlags[j].Flag))
-							db << " " << NickCoreFlags[j].Name;
-					db << endl;
-				}
-				if (!nc->memos.memos.empty())
-				{
-					MemoInfo *mi = &nc->memos;
-					for (unsigned k = 0; k < mi->memos.size(); ++k)
-					{
-						db << "MD MI " << mi->memos[k]->number << " " << mi->memos[k]->time << " " << mi->memos[k]->sender;
-						if (mi->memos[k]->HasFlag(MF_UNREAD))
-							db << " UNREAD";
-						if (mi->memos[k]->HasFlag(MF_RECEIPT))
-							db << " RECEIPT";
-						if (mi->memos[k]->HasFlag(MF_NOTIFYS))
-							db << " NOTIFYS";
-						db << " :" << mi->memos[k]->text << endl;
-					}
-				}
-
+				db << "NC " << nc->display << endl;
+				db << "MD FLAGS FORBIDDEN" << endl;
 				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
-
+				continue;
 			}
-		}
-
-		for (int i = 0; i < 1024; ++i)
-		{
-			for (NickAlias *na = nalists[i]; na; na = na->next)
+			else
 			{
-				db << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
-				if (na->last_usermask)
-					db << "MD LAST_USERMASK " << na->last_usermask << endl;
-				if (na->last_realname)
-					db << "MD LAST_REALNAME :" << na->last_realname << endl;
-				if (na->last_quit)
-					db << "MD LAST_QUIT :" << na->last_quit << endl;
-				if (na->HasFlag(NS_FORBIDDEN) || na->HasFlag(NS_NO_EXPIRE))
-				{
-					db << "MD FLAGS" << (na->HasFlag(NS_FORBIDDEN) ? " FORBIDDEN" : "") << (na->HasFlag(NS_NO_EXPIRE) ? " NOEXPIRE " : "") << endl;
-				}
-				if (na->hostinfo.HasVhost())
-				{
-					db << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
-				}
-
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
+				db << "NC " << nc->display << " " << nc->pass << " ";
 			}
-		}
+			for (int j = 0; LangInfos[j].LanguageId != -1; ++j)
+				if (nc->language ==  LangInfos[j].LanguageId)
+					db << LangInfos[j].Name;
+			db << " " << nc->memos.memomax << " " << nc->channelcount << endl;
 
-		for (int i = 0; i < 256; ++i)
-		{
-			for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
+			if (nc->email)
+				db << "MD EMAIL " << nc->email << endl;
+			if (nc->greet)
+				db << "MD GREET :" << nc->greet << endl;
+			if (nc->icq)
+				db << "MD ICQ :" << nc->icq << endl;
+			if (nc->url)
+				db << "MD URL :" << nc->url << endl;
+			if (!nc->access.empty())
 			{
-				db << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->real << endl;
-				if (bi->FlagCount())
-				{
-					db << "MD FLAGS";
-					if (bi->HasFlag(BI_PRIVATE))
-						db << " PRIVATE";
-					if (bi->HasFlag(BI_CHANSERV))
-						db << " CHANSERV";
-					else if (bi->HasFlag(BI_BOTSERV))
-						db << " BOTSERV";
-					else if (bi->HasFlag(BI_HOSTSERV))
-						db << " HOSTSERV";
-					else if (bi->HasFlag(BI_OPERSERV))
-						db << " OPERSERV";
-					else if (bi->HasFlag(BI_MEMOSERV))
-						db << " MEMOSERV";
-					else if (bi->HasFlag(BI_NICKSERV))
-						db << " NICKSERV";
-					else if (bi->HasFlag(BI_GLOBAL))
-						db << " GLOBAL";
-					db << endl;
-				}
-
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, bi));
+				for (std::vector<std::string>::iterator it = nc->access.begin(); it != nc->access.end(); ++it)
+					db << "MD ACCESS " << *it << endl;
 			}
-		}
-
-		for (int i = 0; i < 256; ++i)
-		{
-			for (ChannelInfo *ci = chanlists[i]; ci; ci = ci->next)
+			if (nc->FlagCount())
 			{
-				db << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
-				db << " " << ci->bantype << " " << ci->memos.memomax << endl;
-				if (ci->founder)
-					db << "MD FOUNDER " << ci->founder->display << endl;
-				if (ci->successor)
-					db << "MD SUCCESSOR " << ci->successor->display << endl;
-				if (ci->desc)
-					db << "MD DESC :" << ci->desc << endl;
-				if (ci->url)
-					db << "MD URL :" << ci->url << endl;
-				if (ci->email)
-					db << "MD EMAIL :" << ci->email << endl;
-				if (ci->last_topic)
-					db << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
-				db << "MD LEVELS";
-				for (int j = 0; ChannelLevels[j].Level != -1; ++j)
-					db << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
+				db << "MD FLAGS";
+				for (int j = 0; NickCoreFlags[j].Flag != -1; ++j)
+					if (nc->HasFlag(NickCoreFlags[j].Flag))
+						db << " " << NickCoreFlags[j].Name;
 				db << endl;
-				if (ci->FlagCount())
+			}
+			if (!nc->memos.memos.empty())
+			{
+				MemoInfo *mi = &nc->memos;
+				for (unsigned k = 0; k < mi->memos.size(); ++k)
 				{
-					db << "MD FLAGS";
-					for (int j = 0; ChannelInfoFlags[j].Flag != -1; ++j)
-						if (ci->HasFlag(ChannelInfoFlags[j].Flag))
-							db << " " << ChannelInfoFlags[j].Name;
-					db << endl;
-					if (ci->HasFlag(CI_FORBIDDEN))
-						db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
+					db << "MD MI " << mi->memos[k]->number << " " << mi->memos[k]->time << " " << mi->memos[k]->sender;
+					if (mi->memos[k]->HasFlag(MF_UNREAD))
+						db << " UNREAD";
+					if (mi->memos[k]->HasFlag(MF_RECEIPT))
+						db << " RECEIPT";
+					if (mi->memos[k]->HasFlag(MF_NOTIFYS))
+						db << " NOTIFYS";
+					db << " :" << mi->memos[k]->text << endl;
 				}
-				for (unsigned k = 0; k < ci->GetAccessCount(); ++k)
-					if (ci->GetAccess(k)->in_use)
-						db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " "
-						<< ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
-				for (unsigned k = 0; k < ci->GetAkickCount(); ++k)
-				{
-					db << "MD AKICK "
-					<< (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ")
-					<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ")
-					<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask)
-					<< " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime
-					<< " " << ci->last_used << " :";
-					if (!ci->GetAkick(k)->reason.empty())
-						db << ci->GetAkick(k)->reason;
-					db << endl;
-				}
-				if (ci->GetMLockCount(true))
-				{
-					db << "MD MLOCK_ON";
-					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-					{
-						if ((*it)->Class == MC_CHANNEL)
-						{
-							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+			}
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
 
-							if (ci->HasMLock(cm->Name, true))
-							{
-								db << " " << cm->NameAsString;
-							}
-						}
-					}
-					db << endl;
-				}
-				if (ci->GetMLockCount(false))
-				{
-					db << "MD MLOCK_OFF";
-					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-					{
-						if ((*it)->Class == MC_CHANNEL)
-						{
-							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+		}
 
-							if (ci->HasMLock(cm->Name, false))
-							{
-								db << " " << cm->NameAsString;
-							}
-						}
-					}
-					db << endl;
-				}
-				std::string Param;
+		for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
+		{
+			NickAlias *na = it->second;
+			
+			db << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
+			if (na->last_usermask)
+				db << "MD LAST_USERMASK " << na->last_usermask << endl;
+			if (na->last_realname)
+				db << "MD LAST_REALNAME :" << na->last_realname << endl;
+			if (na->last_quit)
+				db << "MD LAST_QUIT :" << na->last_quit << endl;
+			if (na->HasFlag(NS_FORBIDDEN) || na->HasFlag(NS_NO_EXPIRE))
+			{
+				db << "MD FLAGS" << (na->HasFlag(NS_FORBIDDEN) ? " FORBIDDEN" : "") << (na->HasFlag(NS_NO_EXPIRE) ? " NOEXPIRE " : "") << endl;
+			}
+			if (na->hostinfo.HasVhost())
+			{
+				db << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
+			}
+
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
+		}
+
+		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		{
+			BotInfo *bi = it->second;
+			
+			db << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->real << endl;
+			if (bi->FlagCount())
+			{
+				db << "MD FLAGS";
+				if (bi->HasFlag(BI_PRIVATE))
+					db << " PRIVATE";
+				db << endl;
+			}
+		}
+
+		for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(); cit != RegisteredChannelList.end(); ++cit)
+		{
+			ChannelInfo *ci = cit->second;
+
+			db << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
+			db << " " << ci->bantype << " " << ci->memos.memomax << endl;
+			if (ci->founder)
+				db << "MD FOUNDER " << ci->founder->display << endl;
+			if (ci->successor)
+				db << "MD SUCCESSOR " << ci->successor->display << endl;
+			if (ci->desc)
+				db << "MD DESC :" << ci->desc << endl;
+			if (ci->url)
+				db << "MD URL :" << ci->url << endl;
+			if (ci->email)
+				db << "MD EMAIL :" << ci->email << endl;
+			if (ci->last_topic)
+				db << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
+			db << "MD LEVELS";
+			for (int j = 0; ChannelLevels[j].Level != -1; ++j)
+				db << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
+			db << endl;
+			if (ci->FlagCount())
+			{
+				db << "MD FLAGS";
+				for (int j = 0; ChannelInfoFlags[j].Flag != -1; ++j)
+					if (ci->HasFlag(ChannelInfoFlags[j].Flag))
+						db << " " << ChannelInfoFlags[j].Name;
+				db << endl;
+				if (ci->HasFlag(CI_FORBIDDEN))
+					db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
+			}
+			for (unsigned k = 0; k < ci->GetAccessCount(); ++k)
+				if (ci->GetAccess(k)->in_use)
+					db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " "
+					<< ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+			for (unsigned k = 0; k < ci->GetAkickCount(); ++k)
+			{
+				db << "MD AKICK "
+				<< (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ")
+				<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ")
+				<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask)
+				<< " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime
+				<< " " << ci->last_used << " :";
+				if (!ci->GetAkick(k)->reason.empty())
+					db << ci->GetAkick(k)->reason;
+				db << endl;
+			}
+			if (ci->GetMLockCount(true))
+			{
+				db << "MD MLOCK_ON";
 				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 				{
 					if ((*it)->Class == MC_CHANNEL)
 					{
 						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
 
-						if (ci->GetParam(cm->Name, Param))
+						if (ci->HasMLock(cm->Name, true))
 						{
-							db << "MD MLP " << cm->NameAsString << " " << Param << endl;
+							db << " " << cm->NameAsString;
 						}
 					}
 				}
-				if (!ci->memos.memos.empty())
+				db << endl;
+			}
+			if (ci->GetMLockCount(false))
+			{
+				db << "MD MLOCK_OFF";
+				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
 				{
-					MemoInfo *memos = &ci->memos;
-
-					for (unsigned k = 0; k < memos->memos.size(); ++k)
+					if ((*it)->Class == MC_CHANNEL)
 					{
-						db << "MD MI " << memos->memos[k]->number << " " << memos->memos[k]->time << " " << memos->memos[k]->sender;
-						if (memos->memos[k]->HasFlag(MF_UNREAD))
-							db << " UNREAD";
-						if (memos->memos[k]->HasFlag(MF_RECEIPT))
-							db << " RECEIPT";
-						if (memos->memos[k]->HasFlag(MF_NOTIFYS))
-							db << " NOTIFYS";
-						db << " :" << memos->memos[k]->text << endl;
+						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+						if (ci->HasMLock(cm->Name, false))
+						{
+							db << " " << cm->NameAsString;
+						}
 					}
 				}
-				if (ci->entry_message)
-					db << "MD ENTRYMSG :" << ci->entry_message << endl;
-				if (ci->bi)
-					db << "MD BI NAME " << ci->bi->nick << endl;
-				if (ci->botflags.FlagCount())
-				{
-					db << "MD BI FLAGS";
-					for (int j = 0; BotFlags[j].Flag != -1; ++j)
-						if (ci->botflags.HasFlag(BotFlags[j].Flag))
-							db << " " << BotFlags[j].Name;
-					db << endl;
-				}
-				db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << endl;
-				if (ci->capsmin)
-					db << "MD BI CAPSMIN " << ci->capsmin << endl;
-				if (ci->capspercent)
-					db << "MD BI CAPSPERCENT " << ci->capspercent << endl;
-				if (ci->floodlines)
-					db << "MD BI FLOODLINES " << ci->floodlines << endl;
-				if (ci->floodsecs)
-					db << "MD BI FLOODSECS " << ci->floodsecs << endl;
-				if (ci->repeattimes)
-					db << "MD BI REPEATTIMES " << ci->repeattimes << endl;
-				for (unsigned k = 0; k < ci->GetBadWordCount(); ++k)
-					db << "MD BI BADWORD "
-						<< (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "")
-						<< (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "")
-						<< (ci->GetBadWord(k)->type == BW_START ? "START " : "")
-						<< (ci->GetBadWord(k)->type == BW_END ? "END " : "")
-						<< ":" << ci->GetBadWord(k)->word << endl;
-
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
+				db << endl;
 			}
+			std::string Param;
+			for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+			{
+				if ((*it)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+
+					if (ci->GetParam(cm->Name, Param))
+					{
+						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
+					}
+				}
+			}
+			if (!ci->memos.memos.empty())
+			{
+				MemoInfo *memos = &ci->memos;
+
+				for (unsigned k = 0; k < memos->memos.size(); ++k)
+				{
+					db << "MD MI " << memos->memos[k]->number << " " << memos->memos[k]->time << " " << memos->memos[k]->sender;
+					if (memos->memos[k]->HasFlag(MF_UNREAD))
+						db << " UNREAD";
+					if (memos->memos[k]->HasFlag(MF_RECEIPT))
+						db << " RECEIPT";
+					if (memos->memos[k]->HasFlag(MF_NOTIFYS))
+						db << " NOTIFYS";
+					db << " :" << memos->memos[k]->text << endl;
+				}
+			}
+			if (ci->entry_message)
+				db << "MD ENTRYMSG :" << ci->entry_message << endl;
+			if (ci->bi)
+				db << "MD BI NAME " << ci->bi->nick << endl;
+			if (ci->botflags.FlagCount())
+			{
+				db << "MD BI FLAGS";
+				for (int j = 0; BotFlags[j].Flag != -1; ++j)
+					if (ci->botflags.HasFlag(BotFlags[j].Flag))
+						db << " " << BotFlags[j].Name;
+				db << endl;
+			}
+			db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << endl;
+			if (ci->capsmin)
+				db << "MD BI CAPSMINS " << ci->capsmin << endl;
+			if (ci->capspercent)
+				db << "MD BI CAPSPERCENT " << ci->capspercent << endl;
+			if (ci->floodlines)
+				db << "MD BI FLOODLINES " << ci->floodlines << endl;
+			if (ci->floodsecs)
+				db << "MD BI FLOODSECS " << ci->floodsecs << endl;
+			if (ci->repeattimes)
+				db << "MD BI REPEATTIMES " << ci->repeattimes << endl;
+			for (unsigned k = 0; k < ci->GetBadWordCount(); ++k)
+				db << "MD BI BADWORD "
+					<< (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "")
+					<< (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "")
+					<< (ci->GetBadWord(k)->type == BW_START ? "START " : "")
+					<< (ci->GetBadWord(k)->type == BW_END ? "END " : "")
+					<< ":" << ci->GetBadWord(k)->word << endl;
+
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 		}
 
 		for (int i = 0; i < akills.count; ++i)

@@ -94,7 +94,7 @@ private:
 
 		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SASET PASSWORD on " << nc->display << " (e-mail: "<< (nc->email ? nc->email : "none")  << ")";
 		if (Config.WallSetpass)
-			ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display);
+			ircdproto->SendGlobops(NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display);
 		return MOD_CONT;
 	}
 
@@ -586,7 +586,7 @@ public:
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSASet());
+		this->AddCommand(NickServ, new CommandNSSASet());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

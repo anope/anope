@@ -160,7 +160,7 @@ class HSSet : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSSet());
+		this->AddCommand(HostServ, new CommandHSSet());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

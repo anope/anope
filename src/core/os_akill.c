@@ -131,7 +131,7 @@ class CommandOSAKill : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask, realreason.c_str(), buf);
+				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask, realreason.c_str(), buf);
 			}
 
 			if (readonly)
@@ -334,7 +334,7 @@ class OSAKill : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSAKill());
+		this->AddCommand(OperServ, new CommandOSAKill());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

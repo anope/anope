@@ -23,22 +23,22 @@ class CommandOSModUnLoad : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		const char *name = params[0].c_str();
+		const std::string mname = params[0].c_str();
 		int status;
 
-		Module *m = findModule(name);
+		Module *m = FindModule(mname);
 		if (!m)
 		{
-			notice_lang(Config.s_OperServ, u, OPER_MODULE_ISNT_LOADED, name);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_ISNT_LOADED, mname.c_str());
 			return MOD_CONT;
 		}
 
-		Alog() << "Trying to unload module [" << name << "]";
+		Alog() << "Trying to unload module [" << mname << "]";
 
 		status = ModuleManager::UnloadModule(m, u);
 
 		if (status != MOD_ERR_OK)
-			notice_lang(Config.s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
+			notice_lang(Config.s_OperServ, u, OPER_MODULE_REMOVE_FAIL, mname.c_str());
 
 		return MOD_CONT;
 	}
@@ -65,7 +65,7 @@ class OSModUnLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OPERSERV, new CommandOSModUnLoad());
+		this->AddCommand(OperServ, new CommandOSModUnLoad());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

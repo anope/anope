@@ -1,8 +1,6 @@
 #include "services.h"
 #include "pseudo.h"
 
-#define HASH(nick)       ((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
-
 /** Default constructor
  * @param display The display nick
  */
@@ -11,7 +9,6 @@ NickCore::NickCore(const std::string &coredisplay)
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	next = prev = NULL;
 	display = email = greet = url = NULL;
 	ot = NULL;
 	icq = 0;
@@ -20,12 +17,13 @@ NickCore::NickCore(const std::string &coredisplay)
 
 	this->display = sstrdup(coredisplay.c_str());
 	slist_init(&this->aliases);
-	insert_core(this); // till hashing is redone..
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
 		if (Config.NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
 			SetFlag(static_cast<NickCoreFlag>(t));
+	
+	NickCoreList[this->display] = this;
 }
 
 /** Default destructor
@@ -51,12 +49,7 @@ NickCore::~NickCore()
 	cs_remove_nick(this);
 
 	/* Remove the core from the list */
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		nclists[HASH(this->display)] = this->next;
+	NickCoreList.erase(this->display);
 
 	/* Log .. */
 	Alog() << Config.s_NickServ << ": deleting nickname group " << this->display;

@@ -23,8 +23,7 @@ class CommandMSStaff : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		NickCore *nc;
-		int i, z = 0;
+		int z = 0;
 		const char *text = params[0].c_str();
 
 		if (readonly)
@@ -33,14 +32,14 @@ class CommandMSStaff : public Command
 			return MOD_CONT;
 		}
 
-		for (i = 0; i < 1024; ++i)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 		{
-			for (nc = nclists[i]; nc; nc = nc->next)
-			{
-				if (nc->IsServicesOper())
-					memo_send(u, nc->display, text, z);
-			}
+			NickCore *nc = it->second;
+			
+			if (nc->IsServicesOper())
+				memo_send(u, nc->display, text, z);
 		}
+
 		return MOD_CONT;
 	}
 
@@ -64,7 +63,7 @@ class MSStaff : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSStaff());
+		this->AddCommand(MemoServ, new CommandMSStaff());
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}

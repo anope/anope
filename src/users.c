@@ -15,10 +15,11 @@
 #include "modules.h"
 #include "language.h"
 
-#define HASH(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
-User *userlist[1024];
-
-#define HASH2(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
+/* Hash maps used for users. Note UserListByUID will not be used on non-TS6 IRCds, and should never
+ * be assumed to have users
+ */
+user_map UserListByNick;
+user_uid_map UserListByUID;
 
 int32 opcnt = 0;
 uint32 usercnt = 0, maxusercnt = 0;
@@ -29,16 +30,12 @@ time_t maxusertime;
 
 User::User(const std::string &snick, const std::string &suid)
 {
-	User **list;
-
 	if (snick.empty())
 		throw "what the craq, empty nick passed to constructor";
 
 	// XXX: we should also duplicate-check here.
 
 	/* we used to do this by calloc, no more. */
-	this->next = NULL;
-	this->prev = NULL;
 	host = hostip = vhost = realname = NULL;
 	server = NULL;
 	nc = NULL;
@@ -47,13 +44,10 @@ User::User(const std::string &snick, const std::string &suid)
 
 	this->nick = snick;
 	this->uid = suid;
-	list = &userlist[HASH(this->nick)];
-	this->next = *list;
 
-	if (*list)
-		(*list)->prev = this;
-
-	*list = this;
+	UserListByNick[snick.c_str()] = this;
+	if (!suid.empty())
+		UserListByUID[suid] = this;
 
 	this->nc = NULL;
 
@@ -72,8 +66,6 @@ User::User(const std::string &snick, const std::string &suid)
 
 void User::SetNewNick(const std::string &newnick)
 {
-	User **list;
-
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
 	{
@@ -82,22 +74,11 @@ void User::SetNewNick(const std::string &newnick)
 
 	Alog(LOG_DEBUG) << this->nick << " changed nick to " << newnick;
 
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		userlist[HASH(this->nick)] = this->next;
-
-	if (this->next)
-		this->next->prev = this->prev;
+	UserListByNick.erase(this->nick.c_str());
 
 	this->nick = newnick;
-	list = &userlist[HASH(this->nick)];
-	this->next = *list;
-	this->prev = NULL;
 
-	if (*list)
-		(*list)->prev = this;
-	*list = this;
+	UserListByNick[this->nick.c_str()] = this;
 
 	OnAccess = false;
 	NickAlias *na = findnick(this->nick);
@@ -247,13 +228,10 @@ User::~User()
 	{
 		this->chans.front()->chan->DeleteUser(this);
 	}
-
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		userlist[HASH(this->nick)] = this->next;
-	if (this->next)
-		this->next->prev = this->prev;
+	
+	UserListByNick.erase(this->nick.c_str());
+	if (!this->uid.empty())
+		UserListByUID.erase(this->uid);
 
 	NickAlias *na = findnick(this->nick);
 	if (na)
@@ -529,58 +507,6 @@ void User::UpdateHost()
 	}
 }
 
-/*************************************************************************/
-
-/* Return statistics.  Pointers are assumed to be valid. */
-
-void get_user_stats(long *nusers, long *memuse)
-{
-	long count = 0, mem = 0;
-	int i;
-	User *user;
-
-	for (i = 0; i < 1024; i++) {
-		for (user = userlist[i]; user; user = user->next) {
-			count++;
-			mem += sizeof(*user);
-			if (user->host)
-				mem += strlen(user->host) + 1;
-			if (ircd->vhost) {
-				if (user->vhost)
-					mem += strlen(user->vhost) + 1;
-			}
-			if (user->realname)
-				mem += strlen(user->realname) + 1;
-			mem += user->server->GetName().length() + 1;
-			mem += (sizeof(ChannelContainer) * user->chans.size());
-		}
-	}
-	*nusers = count;
-	*memuse = mem;
-}
-
-/*************************************************************************/
-
-/* Find a user by nick.  Return NULL if user could not be found. */
-
-User *finduser(const std::string &nick)
-{
-	User *user;
-
-	Alog(LOG_DEBUG_3) << "finduser("<<  nick << ")";
-
-	if (isdigit(nick[0]) && ircd->ts6)
-		return find_byuid(nick);
-
-	ci::string ci_nick(nick.c_str());
-
-	user = userlist[HASH(nick)];
-	while (user && ci_nick != user->nick)
-		user = user->next;
-	Alog(LOG_DEBUG_3) << "finduser(" << nick << ") -> " << static_cast<void *>(user);
-	return user;
-}
-
 /** Check if the user has a mode
  * @param Name Mode name
  * @return true or false
@@ -768,79 +694,77 @@ bool User::IsProtected() const
 
 /*************************************************************************/
 
-/* Iterate over all users in the user list.  Return NULL at end of list. */
-
-static User *current;
-static int next_index;
-
-User *firstuser()
+void get_user_stats(long *nusers, long *memuse)
 {
-	next_index = 0;
-	current = NULL;
-	while (next_index < 1024 && current == NULL)
-		current = userlist[next_index++];
-	Alog(LOG_DEBUG) << "firstuser() returning " << (current ? current->nick : "NULL (end of list)");
-	return current;
+	long count = 0, mem = 0;
+
+	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+	{
+		User *user = it->second;
+
+		count++;
+		mem += sizeof(*user);
+		if (user->host)
+			mem += strlen(user->host) + 1;
+		if (ircd->vhost)
+		{
+			if (user->vhost)
+				mem += strlen(user->vhost) + 1;
+		}
+		if (user->realname)
+			mem += strlen(user->realname) + 1;
+		mem += user->server->GetName().length() + 1;
+		mem += (sizeof(ChannelContainer) * user->chans.size());
+	}
+	*nusers = count;
+	*memuse = mem;
 }
 
-User *nextuser()
+User *finduser(const char *nick)
 {
-	if (current)
-		current = current->next;
-	if (!current && next_index < 1024) {
-		while (next_index < 1024 && current == NULL)
-			current = userlist[next_index++];
-	}
-	Alog(LOG_DEBUG) << "nextuser() returning " << (current ? current->nick : "NULL (end of list)");
-	return current;
+	return finduser(ci::string(nick));
+}
+
+User *finduser(const std::string &nick)
+{
+	return finduser(ci::string(nick.c_str()));
+}
+
+User *finduser(const ci::string &nick)
+{
+	Alog(LOG_DEBUG_3) << "finduser("<<  nick << ")";
+
+	if (isdigit(nick[0]) && ircd->ts6)
+		return find_byuid(nick);
+
+	user_map::const_iterator it = UserListByNick.find(nick.c_str());
+
+	if (it != UserListByNick.end())
+		return it->second;
+	return NULL;
+}
+
+User *find_byuid(const char *uid)
+{
+	return find_byuid(std::string(uid));
+}
+
+User *find_byuid(const ci::string &uid)
+{
+	return find_byuid(std::string(uid.c_str()));
 }
 
 User *find_byuid(const std::string &uid)
 {
-	User *u, *next;
+	Alog(LOG_DEBUG_3) << "finduser_byuid(" << uid << ")";
 
-	u = first_uid();
-	while (u) {
-		next = next_uid();
-		if (u->GetUID() == uid) {
-			return u;
-		}
-		u = next;
-	}
+	user_uid_map::iterator it = UserListByUID.find(uid);
+
+	if (it != UserListByUID.end())
+		return it->second;
 	return NULL;
 }
 
-static User *current_uid;
-static int next_index_uid;
-
-User *first_uid()
-{
-	next_index_uid = 0;
-	current_uid = NULL;
-	while (next_index_uid < 1024 && current_uid == NULL) {
-		current_uid = userlist[next_index_uid++];
-	}
-	Alog(LOG_DEBUG_2) << "first_uid() returning "
-			<< (current_uid ? current_uid->nick : "NULL (end of list)") << " "
-			<< (current_uid ? current_uid->GetUID() : "");
-	return current_uid;
-}
-
-User *next_uid()
-{
-	if (current_uid)
-		current_uid = current_uid->next;
-	if (!current_uid && next_index_uid < 1024) {
-		while (next_index_uid < 1024 && current_uid == NULL)
-			current_uid = userlist[next_index_uid++];
-	}
-	Alog(LOG_DEBUG_2) << "next_uid() returning "
-			<< (current_uid ? current_uid->nick : "NULL (end of list)") << " "
-			<< (current_uid ? current_uid->GetUID() : "");
-	return current_uid;
-}
-
-/*************************************************************************/
 /*************************************************************************/
 
 /* Handle a server NICK command. */
@@ -1306,14 +1230,14 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				{
 					++opcnt;
 					if (Config.WallOper)
-						ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 is now an IRC operator.", user->nick.c_str());
+						ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", user->nick.c_str());
 				}
 				else
 					--opcnt;
 				break;
 			case UMODE_REGISTERED:
 				if (add && !user->IsIdentified())
-					user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+					user->RemoveMode(NickServ, UMODE_REGISTERED);
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:

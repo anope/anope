@@ -198,7 +198,7 @@ class CommandNSUngroup : public Command
 			if (user)
 			{
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+				user->RemoveMode(NickServ, UMODE_REGISTERED);
 			}
 		}
 
@@ -276,9 +276,9 @@ class NSGroup : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGroup());
-		this->AddCommand(NICKSERV, new CommandNSUngroup());
-		this->AddCommand(NICKSERV, new CommandNSGList());
+		this->AddCommand(NickServ, new CommandNSGroup());
+		this->AddCommand(NickServ, new CommandNSUngroup());
+		this->AddCommand(NickServ, new CommandNSGList());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

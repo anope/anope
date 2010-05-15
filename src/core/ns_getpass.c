@@ -34,7 +34,7 @@ class CommandNSGetPass : public Command
 			{
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETPASS on " << nick;
 				if (Config.WallGetpass)
-					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
 				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode.c_str());
 			}
 			else
@@ -50,7 +50,7 @@ class CommandNSGetPass : public Command
 			{
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETPASS on " << nick;
 				if (Config.WallGetpass)
-					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
 				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass.c_str());
 			}
 			else
@@ -80,7 +80,7 @@ class NSGetPass : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGetPass());
+		this->AddCommand(NickServ, new CommandNSGetPass());
 
 		std::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)

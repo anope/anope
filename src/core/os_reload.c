@@ -54,7 +54,7 @@ class OSReload : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSReload());
+		this->AddCommand(OperServ, new CommandOSReload());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

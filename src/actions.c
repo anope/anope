@@ -77,32 +77,26 @@ void kill_user(const std::string &source, const std::string &user, const std::st
  */
 void sqline(const std::string &mask, const std::string &reason)
 {
-	int i;
-	Channel *c, *next;
-
 	if (ircd->chansqline)
 	{
 		if (mask[0] == '#')
 		{
 			ircdproto->SendSQLine(mask, reason);
 
-			for (i = 0; i < 1024; ++i)
+			for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
 			{
-				for (c = chanlist[i]; c; c = next)
+				Channel *c = cit->second;
+
+				if (!Anope::Match(c->name, mask, false))
+					continue;
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 				{
-					next = c->next;
+					UserContainer *uc = *it;
+					++it;
 
-					if (!Anope::Match(c->name, mask, false))
+					if (is_oper(uc->user))
 						continue;
-					for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
-					{
-						UserContainer *uc = *it;
-						++it;
-
-						if (is_oper(uc->user))
-							continue;
-						c->Kick(NULL, uc->user, "%s", reason.c_str());
-					}
+					c->Kick(NULL, uc->user, "%s", reason.c_str());
 				}
 			}
 		}

@@ -56,7 +56,7 @@ class NSUpdate : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(NICKSERV, new CommandNSUpdate());
+		this->AddCommand(NickServ, new CommandNSUpdate());
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}
 	void OnNickServHelp(User *u)

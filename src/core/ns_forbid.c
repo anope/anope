@@ -72,7 +72,7 @@ class CommandNSForbid : public Command
 				ircdproto->SendSQLine(na->nick, reason ? reason : "Forbidden");
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick);
+				ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick);
 
 			Alog() << Config.s_NickServ << ": " << u->nick << " set FORBID for nick " << nick;
 			notice_lang(Config.s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
@@ -108,7 +108,7 @@ class NSForbid : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSForbid());
+		this->AddCommand(NickServ, new CommandNSForbid());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

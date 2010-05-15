@@ -23,34 +23,39 @@ class CommandBSBotList : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		int i, count = 0;
-		BotInfo *bi;
+		unsigned count = 0;
 
-		if (!nbots) {
+		if (BotList.empty())
+		{
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		for (i = 0; i < 256; i++) {
-			for (bi = botlists[i]; bi; bi = bi->next) {
-				if (!(bi->HasFlag(BI_PRIVATE))) {
-					if (!count)
-						notice_lang(Config.s_BotServ, u, BOT_BOTLIST_HEADER);
-					count++;
-					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str());
-				}
+		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		{
+			BotInfo *bi = it->second;
+			
+			if (!bi->HasFlag(BI_PRIVATE))
+			{
+				if (!count)
+					notice_lang(Config.s_BotServ, u, BOT_BOTLIST_HEADER);
+				count++;
+				u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str());
 			}
 		}
 
-		if (u->Account()->HasCommand("botserv/botlist") && count < nbots) {
+		if (u->Account()->HasCommand("botserv/botlist") && count < BotList.size())
+		{
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
-			for (i = 0; i < 256; i++) {
-				for (bi = botlists[i]; bi; bi = bi->next) {
-					if (bi->HasFlag(BI_PRIVATE)) {
-						u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str());
-						count++;
-					}
+			for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+			{
+				BotInfo *bi = it->second;
+				
+				if (bi->HasFlag(BI_PRIVATE))
+				{
+					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str());
+					count++;
 				}
 			}
 		}
@@ -59,6 +64,7 @@ class CommandBSBotList : public Command
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
 		else
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_FOOTER, count);
+
 		return MOD_CONT;
 	}
 
@@ -77,7 +83,7 @@ class BSBotList : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSBotList());
+		this->AddCommand(BotServ, new CommandBSBotList());
 
 		ModuleManager::Attach(I_OnBotServHelp, this);
 	}

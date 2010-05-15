@@ -104,8 +104,8 @@ class CSBan : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSBan("BAN"));
-		this->AddCommand(CHANSERV, new CommandCSBan("KB"));
+		this->AddCommand(ChanServ, new CommandCSBan("BAN"));
+		this->AddCommand(ChanServ, new CommandCSBan("KB"));
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

@@ -79,7 +79,7 @@ class CommandCSDrop : public Command
 		 */
 		if (Config.WallDrop) {
 			if ((level < ACCESS_FOUNDER) || (!IsRealFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER)))
-				ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan);
+				ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan);
 		}
 
 		notice_lang(Config.s_ChanServ, u, CHAN_DROPPED, chan);
@@ -113,7 +113,7 @@ class CSDrop : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSDrop());
+		this->AddCommand(ChanServ, new CommandCSDrop());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

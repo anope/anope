@@ -819,16 +819,17 @@ int nickIsServices(const char *tempnick, int bot)
 		found++;
 	else if (Config.s_GlobalNoticer && (stricmp(nick, Config.s_GlobalNoticer) == 0))
 		found++;
-	else if (Config.s_BotServ && bot) {
-		BotInfo *bi;
-		int i;
-		for (i = 0; i < 256; i++) {
-			for (bi = botlists[i]; bi; bi = bi->next) {
-				ci::string ci_bi_nick(bi->nick.c_str());
-				if (ci_bi_nick == nick) {
-					found++;
-					continue;
-				}
+	else if (Config.s_BotServ && bot)
+	{
+		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		{
+			BotInfo *bi = it->second;
+			
+			ci::string ci_bi_nick(bi->nick.c_str());
+			if (ci_bi_nick == nick)
+			{
+				found++;
+				break;
 			}
 		}
 	}

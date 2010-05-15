@@ -12,7 +12,6 @@
  */
 
 #include "services.h"
-#include "messages.h"
 #include "modules.h"
 
 /*************************************************************************/
@@ -283,14 +282,12 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 void process(const std::string &buffer)
 {
 	int retVal = 0;
-	Message *current = NULL;
 	char source[64];
 	char cmd[64];
 	char buf[512];			  /* Longest legal IRC command line */
 	char *s;
 	int ac;					 /* Parameters for the command */
 	const char **av;
-	Message *m;
 
 	/* zero out the buffers before we do much else */
 	*buf = '\0';
@@ -346,19 +343,21 @@ void process(const std::string &buffer)
 	}
 
 	/* Do something with the message. */
-	m = find_message(cmd);
-	if (m) {
-		if (m->func) {
-			retVal = m->func(source, ac, av);
-			if (retVal == MOD_CONT) {
-				current = m->next;
-				while (current && current->func && retVal == MOD_CONT) {
-					retVal = current->func(source, ac, av);
-					current = current->next;
-				}
-			}
+	std::vector<Message *> messages = FindMessage(cmd);
+
+	if (!messages.empty())
+	{
+		retVal = MOD_CONT;
+
+		for (std::vector<Message *>::iterator it = messages.begin(); retVal == MOD_CONT && it != messages.end(); ++it)
+		{
+			Message *m = *it;
+
+			if (m->func)
+				retVal = m->func(source, ac, av);
 		}
-	} else
+	}
+	else
 		Alog(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
 
 	/* Free argument list we created */

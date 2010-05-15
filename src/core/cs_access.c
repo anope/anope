@@ -573,8 +573,8 @@ class CSAccess : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSAccess());
-		this->AddCommand(CHANSERV, new CommandCSLevels());
+		this->AddCommand(ChanServ, new CommandCSAccess());
+		this->AddCommand(ChanServ, new CommandCSLevels());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

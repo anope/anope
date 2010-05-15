@@ -98,13 +98,6 @@ struct BotServFlagInfo
 
 BotServFlagInfo BotServFlags[] = {
 	{"PRIVATE", BI_PRIVATE},
-	{"CHANSERV", BI_CHANSERV},
-	{"BOTSERV", BI_BOTSERV},
-	{"HOSTSERV", BI_HOSTSERV},
-	{"OPERSERV", BI_OPERSERV},
-	{"MEMOSERV", BI_MEMOSERV},
-	{"NICKSERV", BI_NICKSERV},
-	{"GLOBAL", BI_GLOBAL},
 	{"", static_cast<BotFlag>(-1)}
 };
 

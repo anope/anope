@@ -141,7 +141,7 @@ class CSAppendTopic : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(CHANSERV, new CommandCSAppendTopic());
+		this->AddCommand(ChanServ, new CommandCSAppendTopic());
 
 		/* English (US) */
 		const char* langtable_en_us[] = {

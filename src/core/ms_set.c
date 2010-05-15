@@ -262,7 +262,7 @@ class MSSet : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(MEMOSERV, new CommandMSSet());
+		this->AddCommand(MemoServ, new CommandMSSet());
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}

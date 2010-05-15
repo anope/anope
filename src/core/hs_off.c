@@ -52,7 +52,7 @@ class HSOff : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSOff());
+		this->AddCommand(HostServ, new CommandHSOff());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

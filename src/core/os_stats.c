@@ -304,7 +304,7 @@ class OSStats : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSStats());
+		this->AddCommand(OperServ, new CommandOSStats());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

@@ -115,7 +115,7 @@ class MSList : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSList());
+		this->AddCommand(MemoServ, new CommandMSList());
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}

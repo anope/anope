@@ -34,8 +34,10 @@ class CommandOSStaff : public Command
 			if (na)
 			{
 				/* We have to loop all users as some may be logged into an account but not a nick */
-				for (User *u2 = firstuser(); u2; u2 = nextuser())
+				for (user_map::iterator uit = UserListByNick.begin(); uit != UserListByNick.end(); ++uit)
 				{
+					User *u2 = uit->second;
+
 					if (u2->Account() && u2->Account() == na->nc)
 					{
 						found = 1;
@@ -72,7 +74,7 @@ class OSStaff : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSStaff());
+		this->AddCommand(OperServ, new CommandOSStaff());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

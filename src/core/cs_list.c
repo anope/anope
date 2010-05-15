@@ -28,8 +28,7 @@ public:
 		const char *pattern = params[0].c_str();
 		int spattern_size;
 		char *spattern;
-		ChannelInfo *ci;
-		unsigned nchans, i;
+		unsigned nchans;
 		char buf[BUFSIZE];
 		bool is_servadmin = u->Account()->HasCommand("chanserv/list");
 		int count = 0, from = 0, to = 0, tofree = 0;
@@ -111,55 +110,56 @@ public:
 		snprintf(spattern, spattern_size, "#%s", pattern);
 
 		notice_lang(Config.s_ChanServ, u, CHAN_LIST_HEADER, pattern);
-		for (i = 0; i < 256; i++)
+
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
 		{
-			for (ci = chanlists[i]; ci; ci = ci->next)
+			ChannelInfo *ci = it->second;
+
+			if (!is_servadmin && ((ci->HasFlag(CI_PRIVATE))
+				|| (ci->HasFlag(CI_FORBIDDEN)) || (ci->HasFlag(CI_SUSPENDED))))
+				continue;
+			if (forbidden && !ci->HasFlag(CI_FORBIDDEN))
+				continue;
+			else if (suspended && !ci->HasFlag(CI_SUSPENDED))
+				continue;
+			else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
+				continue;
+
+			if ((stricmp(pattern, ci->name.c_str()) == 0)
+				  || (stricmp(spattern, ci->name.c_str()) == 0)
+				  || Anope::Match(ci->name, pattern, false)
+				  || Anope::Match(ci->name, spattern, false))
 			{
-				if (!is_servadmin && ((ci->HasFlag(CI_PRIVATE))
-					|| (ci->HasFlag(CI_FORBIDDEN)) || (ci->HasFlag(CI_SUSPENDED))))
-					continue;
-				if (forbidden && !ci->HasFlag(CI_FORBIDDEN))
-					continue;
-				else if (suspended && !ci->HasFlag(CI_SUSPENDED))
-					continue;
-				else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
-					continue;
-
-				if ((stricmp(pattern, ci->name.c_str()) == 0)
-					  || (stricmp(spattern, ci->name.c_str()) == 0)
-					  || Anope::Match(ci->name, pattern, false)
-					  || Anope::Match(ci->name, spattern, false))
+				if ((((count + 1 >= from) && (count + 1 <= to))
+					  || ((from == 0) && (to == 0)))
+					  && (++nchans <= Config.CSListMax))
 				{
-					if ((((count + 1 >= from) && (count + 1 <= to))
-						  || ((from == 0) && (to == 0)))
-						  && (++nchans <= Config.CSListMax))
+					char noexpire_char = ' ';
+					if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
+						noexpire_char = '!';
+
+					if (ci->HasFlag(CI_FORBIDDEN))
 					{
-						char noexpire_char = ' ';
-						if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
-							noexpire_char = '!';
-
-						if (ci->HasFlag(CI_FORBIDDEN))
-						{
-							snprintf(buf, sizeof(buf),
-								   "%-20s  [Forbidden]", ci->name.c_str());
-						}
-						else if (ci->HasFlag(CI_SUSPENDED))
-						{
-							snprintf(buf, sizeof(buf),
-								   "%-20s  [Suspended]", ci->name.c_str());
-						}
-						else
-						{
-							snprintf(buf, sizeof(buf), "%-20s  %s",
-								   ci->name.c_str(), ci->desc ? ci->desc : "");
-						}
-
-						u->SendMessage(Config.s_ChanServ, "  %c%s", noexpire_char, buf);
+						snprintf(buf, sizeof(buf),
+							   "%-20s  [Forbidden]", ci->name.c_str());
 					}
-					count++;
+					else if (ci->HasFlag(CI_SUSPENDED))
+					{
+						snprintf(buf, sizeof(buf),
+							   "%-20s  [Suspended]", ci->name.c_str());
+					}
+					else
+					{
+						snprintf(buf, sizeof(buf), "%-20s  %s",
+							   ci->name.c_str(), ci->desc ? ci->desc : "");
+					}
+
+					u->SendMessage(Config.s_ChanServ, "  %c%s", noexpire_char, buf);
 				}
+				count++;
 			}
 		}
+
 		notice_lang(Config.s_ChanServ, u, CHAN_LIST_END,
 				nchans > Config.CSListMax ? Config.CSListMax : nchans, nchans);
 		delete [] spattern;
@@ -188,7 +188,7 @@ public:
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSList());
+		this->AddCommand(ChanServ, new CommandCSList());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

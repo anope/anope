@@ -16,75 +16,36 @@
 #include "language.h"
 #include "hashcomp.h"
 
-/*************************************************************************/
-
-/**
- * Search the command table gieven for a command.
- * @param cmdTable the name of the command table to search
- * @param name the name of the command to look for
- * @return returns a pointer to the found command struct, or NULL
- */
-Command *findCommand(CommandHash * cmdTable[], const char *name)
+Command *FindCommand(BotInfo *bi, const ci::string &name)
 {
-	int idx;
-	CommandHash *current = NULL;
-	if (!cmdTable || !name) {
+	if (!bi || bi->Commands.empty() || name.empty())
 		return NULL;
-	}
+	
+	std::map<ci::string, Command *>::iterator it = bi->Commands.find(name);
 
-	idx = CMD_HASH(name);
+	if (it != bi->Commands.end())
+		return it->second;
 
-	for (current = cmdTable[idx]; current; current = current->next) {
-		if (stricmp(name, current->name) == 0) {
-			return current->c;
-		}
-	}
 	return NULL;
 }
 
-/**
- * Return the Command corresponding to the given name, or NULL if no such
- * command exists.
- * @param list Command struct
- * @param cmd Command to look up
- * @return Command Struct for the given cmd
- */
-Command *lookup_cmd(Command * list, char *cmd)
+void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 {
-	Command *c;
+	if (!bi || !u || cmd.empty())
+		return;
 
-	for (c = list; ; c++) {
-		if (stricmp(c->name.c_str(), cmd) == 0) {
-			return c;
-		}
-	}
-}
-
-/*************************************************************************/
-
-/**
- * Run the routine for the given command, if it exists and the user has
- * privilege to do so; if not, print an appropriate error message.
- * @param services Services Client
- * @param u User Struct
- * @param Command Hash Table
- * @param cmd Command
- * @return void
- */
-void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[], const char *cmd)
-{
-	Command *c = findCommand(cmdTable, cmd);
+	Command *c = FindCommand(bi, cmd);
 	int retVal = MOD_CONT;
 	ChannelInfo *ci;
-	EventReturn MOD_RESULT;
 
-	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(service, u, cmd, c));
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(bi, u, cmd, c));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
 	if (!c)
 	{
-		notice_lang(service, u, UNKNOWN_COMMAND_HELP, cmd, service.c_str());
+		notice_lang(bi->nick, u, UNKNOWN_COMMAND_HELP, cmd.c_str(), bi->nick.c_str());
 		return;
 	}
 
@@ -93,8 +54,8 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 		// Command requires registered users only
 		if (!u->IsIdentified())
 		{
-			notice_lang(service, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
-			Alog() << "Access denied for unregistered user " << u->nick << " with service " << service << " and command " << cmd;
+			notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
+			Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << cmd;
 			return;
 		}
 	}
@@ -131,11 +92,11 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 		return;
 	}
 
-	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name.c_str(), params));
+	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name, params));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (cmdTable == CHANSERV || cmdTable == BOTSERV))
+	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (bi == ChanServ || bi == BotServ))
 	{
 		if (ircdproto->IsChannelValid(params[0].c_str()))
 		{
@@ -143,29 +104,29 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 			{
 				if ((ci->HasFlag(CI_FORBIDDEN)) && (!c->HasFlag(CFLAG_ALLOW_FORBIDDEN)))
 				{
-					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name.c_str());
-					Alog() << "Access denied for user " << u->nick << " with service " << service
+					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
+					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick
 						<< " and command " << cmd << " because of FORBIDDEN channel " << ci->name;
 					return;
 				}
 				else if ((ci->HasFlag(CI_SUSPENDED)) && (!c->HasFlag(CFLAG_ALLOW_SUSPENDED)))
 				{
-					notice_lang(service, u, CHAN_X_FORBIDDEN, ci->name.c_str());
-					Alog() << "Access denied for user " << u->nick << " with service " << service 
+					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
+					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick
 						<<" and command " << cmd << " because of SUSPENDED channel " << ci->name;
 					return;
 				}
 			}
 			else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
 			{
-				notice_lang(service, u, CHAN_X_NOT_REGISTERED, params[0].c_str());
+				notice_lang(bi->nick, u, CHAN_X_NOT_REGISTERED, params[0].c_str());
 				return;
 			}
 		}
 		/* A user not giving a channel name for a param that should be a channel */
 		else
 		{
-			notice_lang(service, u, CHAN_X_INVALID, params[0].c_str());
+			notice_lang(bi->nick, u, CHAN_X_INVALID, params[0].c_str());
 			return;
 		}
 	}
@@ -175,8 +136,8 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 	{
 		if (!u->Account()->HasCommand(c->permission))
 		{
-			notice_lang(service, u, ACCESS_DENIED);
-			Alog() << "Access denied for user " << u->nick << " with service " << service << " and command " << cmd;
+			notice_lang(bi->nick, u, ACCESS_DENIED);
+			Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << cmd;
 			return;
 		}
 
@@ -190,8 +151,6 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
 	}
 }
 
-/*************************************************************************/
-
 /**
  * Prints the help message for a given command.
  * @param services Services Client
@@ -200,36 +159,38 @@ void mod_run_cmd(const std::string &service, User * u, CommandHash * cmdTable[],
  * @param cmd Command
  * @return void
  */
-void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[], const char *cmd)
+void mod_help_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 {
+	if (!bi || !u || cmd.empty())
+		return;
+	
 	spacesepstream tokens(cmd);
-	std::string token;
+	ci::string token;
 	tokens.GetToken(token);
 
-	Command *c = findCommand(cmdTable, token.c_str());
+	Command *c = FindCommand(bi, token);
 
 	ci::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining().c_str();
 
 	if (!c || !c->OnHelp(u, subcommand))
-		notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
+		notice_lang(bi->nick, u, NO_HELP_AVAILABLE, cmd.c_str());
 	else
 	{
-		u->SendMessage(service, " ");
+		u->SendMessage(bi->nick, " ");
 
 		/* Inform the user what permission is required to use the command */
 		if (!c->permission.empty())
-			notice_lang(service, u, COMMAND_REQUIRES_PERM, c->permission.c_str());
+			notice_lang(bi->nick, u, COMMAND_REQUIRES_PERM, c->permission.c_str());
 
 		/* User isn't identified and needs to be to use this command */
 		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
-			notice_lang(service, u, COMMAND_IDENTIFY_REQUIRED);
+			notice_lang(bi->nick, u, COMMAND_IDENTIFY_REQUIRED);
 		/* User doesn't have the proper permission to use this command */
 		else if (!c->permission.empty() && (!u->Account() || (!u->Account()->HasCommand(c->permission))))
-			notice_lang(service, u, COMMAND_CANNOT_USE);
+			notice_lang(bi->nick, u, COMMAND_CANNOT_USE);
 		/* User can use this command */
 		else
-			notice_lang(service, u, COMMAND_CAN_USE);
+			notice_lang(bi->nick, u, COMMAND_CAN_USE);
 	}
 }
 
-/*************************************************************************/

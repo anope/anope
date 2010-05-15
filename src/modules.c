@@ -14,17 +14,8 @@
 #include "language.h"
 #include "version.h"
 
-/**
- * Declare all the list's we want to use here
- **/
-CommandHash *HOSTSERV[MAX_CMD_HASH];
-CommandHash *BOTSERV[MAX_CMD_HASH];
-CommandHash *MEMOSERV[MAX_CMD_HASH];
-CommandHash *NICKSERV[MAX_CMD_HASH];
-CommandHash *CHANSERV[MAX_CMD_HASH];
-CommandHash *OPERSERV[MAX_CMD_HASH];
-MessageHash *IRCD[MAX_CMD_HASH];
-ModuleHash *MODULE_HASH[MAX_CMD_HASH];
+std::multimap<std::string, Message *> MessageMap;
+std::deque<Module *> Modules;
 
 char *mod_current_buffer = NULL;
 
@@ -64,7 +55,7 @@ int protocol_module_init()
 
 	if (ret == MOD_ERR_OK)
 	{
-		findModule(Config.IRCDModule)->SetType(PROTOCOL);
+		FindModule(Config.IRCDModule)->SetType(PROTOCOL);
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
@@ -80,32 +71,6 @@ int protocol_module_init()
 	}
 
 	return ret;
-}
-
-/**
- * Unload ALL loaded modules, no matter what kind of module it is.
- * Do NEVER EVER, and i mean NEVER (and if that isn't clear enough
- * yet, i mean: NEVER AT ALL) call this unless we're shutting down,
- * or we'll fuck up Anope badly (protocol handling won't work for
- * example). If anyone calls this function without a justified need
- * for it, i reserve the right to break their legs in a painful way.
- * And if that isn't enough discouragement, you'll wake up with your
- * both legs broken tomorrow ;) -GD
- */
-void modules_unload_all(bool unload_proto)
-{
-	int idx;
-	ModuleHash *mh, *next;
-
-	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-		mh = MODULE_HASH[idx];
-		while (mh) {
-			next = mh->next;
-			if (unload_proto || (mh->m->type != PROTOCOL))
-				ModuleManager::UnloadModule(mh->m, NULL);
-	   		mh = next;
-		}
-	}
 }
 
 void Module::InsertLanguage(int langNumber, int ac, const char **av)
@@ -130,204 +95,89 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
  * @param name the name of the module to find
  * @return a pointer to the module found, or NULL
  */
-Module *findModule(const char *name)
+Module *FindModule(const std::string &name)
 {
-	int idx;
-	ModuleHash *current = NULL;
-	if (!name) {
-		return NULL;
-	}
-	idx = CMD_HASH(name);
+	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
+	{
+		Module *m = *it;
 
-	for (current = MODULE_HASH[idx]; current; current = current->next) {
-		if (stricmp(name, current->name) == 0) {
-			return current->m;
+		if (m->name == name)
+		{
+			return m;
 		}
 	}
-	return NULL;
 
+	return NULL;
+}
+
+/** Add a message to Anope
+ * @param name The message name as sent by the IRCd
+ * @param func A callback function that will be called when this message is received
+ * @return The new message object
+ */
+Message *Anope::AddMessage(const std::string &name, int (*func)(const char *source, int ac, const char **av))
+{
+	Message *m = new Message;
+
+	m->name = name;
+	m->func = func;
+
+	MessageMap.insert(std::make_pair(m->name, m));
+
+	return m;
+}
+
+/** Deletes a message from Anope
+ * XXX Im not sure what will happen if this function is called indirectly from a message function pointed to by this message and there
+ * is more than one hook for this message.. must check
+ * @param m The message
+ * @return true if the message was found and deleted, else false
+ */
+bool Anope::DelMessage(Message *m)
+{
+	std::multimap<std::string, Message *>::iterator it = MessageMap.find(m->name);
+
+	if (it == MessageMap.end())
+	{
+		return false;
+	}
+
+	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(m->name);
+
+	for (; it != upper; ++it)
+	{
+		if (it->second == m)
+		{
+			delete m;
+			MessageMap.erase(it);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /*******************************************************************************
  * Command Functions
  *******************************************************************************/
 
-/** Add a command to a command table. Only for internal use.
- * only add if were unique, pos = 0;
- * if we want it at the "head" of that command, pos = 1
- * at the tail, pos = 2
- * @param cmdTable the table to add the command to
- * @param c the command to add
- * @return MOD_ERR_OK will be returned on success.
- */
-static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c)
+int Module::AddCommand(BotInfo *bi, Command *c)
 {
-	/* We can assume both param's have been checked by this point.. */
-	int index = 0;
-	CommandHash *current = NULL;
-	CommandHash *newHash = NULL;
-	CommandHash *lastHash = NULL;
-
-	if (!cmdTable || !c) {
+	if (!bi || !c)
 		return MOD_ERR_PARAMS;
+	
+	c->service = bi;
+
+	std::pair<std::map<ci::string, Command *>::iterator, bool> it = bi->Commands.insert(std::make_pair(c->name, c));
+
+	if (it.second != true)
+	{
+		Alog() << "Error creating command " << c->name << ". Command already exists!";
+		delete c;
+		return MOD_ERR_EXISTS;
 	}
 	
-	index = CMD_HASH(c->name.c_str());
-
-	for (current = cmdTable[index]; current; current = current->next) {
-		if ((c->service) && (current->c) && (current->c->service)
-			&& (!strcmp(c->service, current->c->service) == 0)) {
-			continue;
-		}
-		if ((stricmp(c->name.c_str(), current->name) == 0))
-		{
-			/* the cmd exists, throw an error */
-			return MOD_ERR_EXISTS;
-		}
-		lastHash = current;
-	}
-
-	newHash = new CommandHash;
-	newHash->next = NULL;
-	newHash->name = sstrdup(c->name.c_str());
-	newHash->c = c;
-
-	if (lastHash == NULL)
-		cmdTable[index] = newHash;
-	else
-		lastHash->next = newHash;
-
 	return MOD_ERR_OK;
-}
-
-int Module::AddCommand(CommandHash * cmdTable[], Command * c)
-{
-	int status;
-
-	if (!cmdTable || !c) {
-		return MOD_ERR_PARAMS;
-	}
-	c->core = 0;
-	if (!c->mod_name) {
-		c->mod_name = sstrdup(this->name.c_str());
-	}
-
-
-	if (cmdTable == HOSTSERV) {
-		if (Config.s_HostServ) {
-			c->service = sstrdup(Config.s_HostServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else if (cmdTable == BOTSERV) {
-		if (Config.s_BotServ) {
-			c->service = sstrdup(Config.s_BotServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else if (cmdTable == MEMOSERV) {
-		if (Config.s_MemoServ) {
-			c->service = sstrdup(Config.s_MemoServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else if (cmdTable == CHANSERV) {
-		if (Config.s_ChanServ) {
-			c->service = sstrdup(Config.s_ChanServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else if (cmdTable == NICKSERV) {
-		if (Config.s_NickServ) {
-			c->service = sstrdup(Config.s_NickServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else if (cmdTable == OPERSERV) {
-		if (Config.s_OperServ) {
-			c->service = sstrdup(Config.s_OperServ);
-		} else {
-			return MOD_ERR_NOSERVICE;
-		}
-	} else
-		c->service = sstrdup("Unknown");
-
-	status = internal_addCommand(this, cmdTable, c);
-	if (status != MOD_ERR_OK)
-	{
-		Alog() << "ERROR! [ "<< status << "]";
-	}
-	return status;
-}
-
-
-/** Remove a command from the command hash. Only for internal use.
- * @param cmdTable the command table to remove the command from
- * @param c the command to remove
- * @param mod_name the name of the module who owns the command
- * @return MOD_ERR_OK will be returned on success
- */
-static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char *mod_name)
-{
-	int index = 0;
-	CommandHash *current = NULL;
-	CommandHash *lastHash = NULL;
-	Command *tail = NULL, *last = NULL;
-
-	if (!c || !cmdTable) {
-		return MOD_ERR_PARAMS;
-	}
-
-	index = CMD_HASH(c->name.c_str());
-	for (current = cmdTable[index]; current; current = current->next) {
-		if (stricmp(c->name.c_str(), current->name) == 0) {
-			if (!lastHash) {
-				tail = current->c;
-				if (tail->next) {
-					while (tail) {
-						if (mod_name && tail->mod_name
-							&& (stricmp(mod_name, tail->mod_name) == 0)) {
-							if (last) {
-								last->next = tail->next;
-							} else {
-								current->c = tail->next;
-							}
-							return MOD_ERR_OK;
-						}
-						last = tail;
-						tail = tail->next;
-					}
-				} else {
-					cmdTable[index] = current->next;
-					delete [] current->name;
-					return MOD_ERR_OK;
-				}
-			} else {
-				tail = current->c;
-				if (tail->next) {
-					while (tail) {
-						if (mod_name && tail->mod_name
-							&& (stricmp(mod_name, tail->mod_name) == 0)) {
-							if (last) {
-								last->next = tail->next;
-							} else {
-								current->c = tail->next;
-							}
-							return MOD_ERR_OK;
-						}
-						last = tail;
-						tail = tail->next;
-					}
-				} else {
-					lastHash->next = current->next;
-					delete [] current->name;
-					return MOD_ERR_OK;
-				}
-			}
-		}
-		lastHash = current;
-	}
-	return MOD_ERR_NOEXIST;
 }
 
 /**
@@ -336,231 +186,37 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
  * @param name the name of the command to delete from the service
  * @return returns MOD_ERR_OK on success
  */
-int Module::DelCommand(CommandHash * cmdTable[], const char *dname)
+int Module::DelCommand(BotInfo *bi, Command *c)
 {
-	Command *c = NULL;
-	Command *cmd = NULL;
-	int status = 0;
-
-	c = findCommand(cmdTable, dname);
-	if (!c) {
+	if (!bi || !c)
+		return MOD_ERR_PARAMS;
+	
+	if (!bi->Commands.erase(c->name))
 		return MOD_ERR_NOEXIST;
-	}
 
-
-	for (cmd = c; cmd; cmd = cmd->next)
-	{
-		if (cmd->mod_name && cmd->mod_name == this->name)
-		{
-			status = internal_delCommand(cmdTable, cmd, this->name.c_str());
-		}
-	}
-	return status;
-}
-
-/*******************************************************************************
- * Message Functions
- *******************************************************************************/
-
- /**
-  * Create a new Message struct.
-  * @param name the name of the message
-  * @param func a pointer to the function to call when we recive this message
-  * @return a new Message object
-  **/
-Message *createMessage(const char *name,
-					   int (*func) (const char *source, int ac, const char **av))
-{
-	Message *m = NULL;
-	if (!name || !func) {
-		return NULL;
-	}
-	if (!(m = new Message)) {
-		fatal("Out of memory!");
-	}
-	m->name = sstrdup(name);
-	m->func = func;
-	m->core = 0;
-	m->next = NULL;
-	return m;
+	return MOD_ERR_OK;
 }
 
 /**
- * find a message in the given table.
- * Looks up the message <name> in the MessageHash given
- * @param MessageHash the message table to search for this command, will almost always be IRCD
- * @param name the name of the command were looking for
+ * Find a message in the message table
+ * @param name The name of the message were looking for
  * @return NULL if we cant find it, or a pointer to the Message if we can
  **/
-Message *findMessage(MessageHash * msgTable[], const char *name)
+std::vector<Message *> FindMessage(const std::string &name)
 {
-	int idx;
-	MessageHash *current = NULL;
-	if (!msgTable || !name) {
-		return NULL;
-	}
-	idx = CMD_HASH(name);
+	std::vector<Message *> messages;
 
-	for (current = msgTable[idx]; current; current = current->next) {
-		if (stricmp(name, current->name) == 0) {
-			return current->m;
-		}
-	}
-	return NULL;
-}
+	std::multimap<std::string, Message *>::iterator it = MessageMap.find(name);
 
-/**
- * Add a message to the MessageHash.
- * @param msgTable the MessageHash we want to add a message to
- * @param m the Message we want to add
- * @param pos the position we want to add the message to, E.G. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
- * @return MOD_ERR_OK on a successful add.
- **/
+	if (it == MessageMap.end())
+		return messages;
+	
+	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(name);
 
-int addMessage(MessageHash * msgTable[], Message * m, int pos)
-{
-	/* We can assume both param's have been checked by this point.. */
-	int index = 0;
-	MessageHash *current = NULL;
-	MessageHash *newHash = NULL;
-	MessageHash *lastHash = NULL;
-	Message *tail = NULL;
-	int match = 0;
+	for (; it != upper; ++it)
+		messages.push_back(it->second);
 
-	if (!msgTable || !m || (pos < 0 || pos > 2)) {
-		return MOD_ERR_PARAMS;
-	}
-
-	index = CMD_HASH(m->name);
-
-	for (current = msgTable[index]; current; current = current->next) {
-		match = stricmp(m->name, current->name);
-		if (match == 0) {	   /* the msg exist's we are a addHead */
-			if (pos == 1) {
-				m->next = current->m;
-				current->m = m;
-				Alog(LOG_DEBUG) << "existing msg: ("<< static_cast<void *>(m->next)
-					<< "), new msg (" << static_cast<void *>(m) << ")";
-				return MOD_ERR_OK;
-			} else if (pos == 2) {
-				tail = current->m;
-				while (tail->next)
-					tail = tail->next;
-				Alog(LOG_DEBUG) << "existing msg: ("<< static_cast<void *>(tail)
-					<< "), new msg (" << static_cast<void *>(m) << ")";
-				m->next = NULL;
-				return MOD_ERR_OK;
-			} else
-				return MOD_ERR_EXISTS;
-		}
-		lastHash = current;
-	}
-
-	if (!(newHash = new MessageHash)) {
-		fatal("Out of memory");
-	}
-	newHash->next = NULL;
-	newHash->name = sstrdup(m->name);
-	newHash->m = m;
-
-	if (lastHash == NULL)
-		msgTable[index] = newHash;
-	else
-		lastHash->next = newHash;
-	return MOD_ERR_OK;
-}
-
-/**
- * Add the given message (m) to the MessageHash marking it as a core command
- * @param msgTable the MessageHash we want to add to
- * @param m the Message we are adding
- * @return MOD_ERR_OK on a successful add.
- **/
-int addCoreMessage(MessageHash * msgTable[], Message * m)
-{
-	if (!msgTable || !m) {
-		return MOD_ERR_PARAMS;
-	}
-	m->core = 1;
-	return addMessage(msgTable, m, 0);
-}
-
-/**
- * remove the given message from the given message hash, for the given module
- * @param msgTable which MessageHash we are removing from
- * @param m the Message we want to remove
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int delMessage(MessageHash * msgTable[], Message * m)
-{
-	int index = 0;
-	MessageHash *current = NULL;
-	MessageHash *lastHash = NULL;
-	Message *tail = NULL, *last = NULL;
-
-	if (!m || !msgTable) {
-		return MOD_ERR_PARAMS;
-	}
-
-	index = CMD_HASH(m->name);
-
-	for (current = msgTable[index]; current; current = current->next) {
-		if (stricmp(m->name, current->name) == 0) {
-			if (!lastHash) {
-				tail = current->m;
-				if (tail->next) {
-					while (tail) {
-						if (last) {
-							last->next = tail->next;
-						} else {
-							current->m = tail->next;
-						}
-						return MOD_ERR_OK;
-					}
-				} else {
-					msgTable[index] = current->next;
-					delete [] current->name;
-					return MOD_ERR_OK;
-				}
-			} else {
-				tail = current->m;
-				if (tail->next) {
-					while (tail) {
-						if (last) {
-							last->next = tail->next;
-						} else {
-							current->m = tail->next;
-						}
-						return MOD_ERR_OK;
-					}
-				} else {
-					lastHash->next = current->next;
-					delete [] current->name;
-					return MOD_ERR_OK;
-				}
-			}
-		}
-		lastHash = current;
-	}
-	return MOD_ERR_NOEXIST;
-}
-
-/**
- * Destory a message, freeing its memory.
- * @param m the message to be destroyed
- * @return MOD_ERR_SUCCESS on success
- **/
-int destroyMessage(Message * m)
-{
-	if (!m) {
-		return MOD_ERR_PARAMS;
-	}
-	if (m->name) {
-		delete [] m->name;
-	}
-	m->func = NULL;
-	m->next = NULL;
-	return MOD_ERR_OK;
+	return messages;
 }
 
 /*******************************************************************************

@@ -18,11 +18,6 @@
 
 /*************************************************************************/
 
-BotInfo *botlists[256];		 /* Hash list of bots */
-int nbots = 0;
-
-/*************************************************************************/
-
 static UserData *get_user_data(Channel * c, User * u);
 
 static void check_ban(ChannelInfo * ci, User * u, int ttbtype);
@@ -44,18 +39,17 @@ void moduleAddBotServCmds() {
 void get_botserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	int i;
-	BotInfo *bi;
 
-	for (i = 0; i < 256; i++) {
-		for (bi = botlists[i]; bi; bi = bi->next) {
-			count++;
-			mem += sizeof(*bi);
-			mem += bi->nick.size() + 1;
-			mem += bi->user.size() + 1;
-			mem += bi->host.size() + 1;
-			mem += bi->real.size() + 1;
-		}
+	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+	{
+		BotInfo *bi = it->second;
+
+		count++;
+		mem += sizeof(*bi);
+		mem += bi->nick.size() + 1;
+		mem += bi->user.size() + 1;
+		mem += bi->host.size() + 1;
+		mem += bi->real.size() + 1;
 	}
 
 	*nrec = count;
@@ -90,9 +84,9 @@ void botserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			*s = 0;
 		}
-		ircdproto->SendCTCP(findbot(Config.s_BotServ), u->nick.c_str(), "PING %s", s);
+		ircdproto->SendCTCP(BotServ, u->nick.c_str(), "PING %s", s);
 	} else {
-		mod_run_cmd(Config.s_BotServ, u, BOTSERV, cmd);
+		mod_run_cmd(BotServ, u, cmd);
 	}
 
 }
@@ -106,7 +100,7 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
 	char *cmd = strtok(buf, " ");
 	char *s;
 
-	if (!cmd || !u)
+	if (!cmd || !u || !bi)
 		return;
 
 	if (!stricmp(cmd, "\1PING")) {
@@ -115,9 +109,9 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
 		}
 		ircdproto->SendCTCP(bi, u->nick.c_str(), "PING %s", s);
 	}
-	else if (cmd && bi->cmdTable)
+	else if (cmd && !bi->Commands.empty())
 	{
-		mod_run_cmd(bi->nick, u, bi->cmdTable, cmd);
+		mod_run_cmd(bi, u, cmd);
 	}
 }
 
@@ -134,7 +128,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 	char *cmd;
 	UserData *ud;
 	bool was_action = false;
-	Command *command;
 	std::string bbuf;
 
 	if (!u || !buf || !ci || !ci->c)
@@ -424,7 +417,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 			if (check_access(u, ci, CA_FANTASIA))
 			{
-				command = findCommand(CHANSERV, cmd);
+				Command *command = FindCommand(ChanServ, cmd);
 
 				/* Command exists and can not be called by fantasy */
 				if (command && !command->HasFlag(CFLAG_DISABLE_FANTASY))
@@ -459,53 +452,22 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
 /*************************************************************************/
 
-/* Inserts a bot in the bot list. I can't be much explicit mh? */
-
-void insert_bot(BotInfo *bi)
+BotInfo *findbot(const char *nick)
 {
-	BotInfo *ptr, *prev;
-
-	ci::string ci_bi_nick(bi->nick.c_str());
-	for (prev = NULL, ptr = botlists[tolower(bi->nick[0])];
-		 ptr != NULL && ci_bi_nick > ptr->nick.c_str();
-		 prev = ptr, ptr = ptr->next);
-	bi->prev = prev;
-	bi->next = ptr;
-	if (!prev)
-		botlists[tolower(bi->nick[0])] = bi;
-	else
-		prev->next = bi;
-	if (ptr)
-		ptr->prev = bi;
+	return findbot(ci::string(nick));
 }
-
-/*************************************************************************/
-/*************************************************************************/
 
 BotInfo *findbot(const std::string &nick)
 {
-	BotInfo *bi;
+	return findbot(ci::string(nick.c_str()));
+}
 
-	if (nick.empty())
-		return NULL;
+BotInfo *findbot(const ci::string &nick)
+{
+	botinfo_map::const_iterator it = BotList.find(nick);
 
-	ci::string ci_nick(nick.c_str());
-
-	/*
-	 * XXX Less than efficient, but we need to do this for good TS6 support currently. This *will* improve. -- w00t
-	 */
-	for (int i = 0; i < 256; i++)
-	{
-		for (bi = botlists[i]; bi; bi = bi->next)
-		{
-			if (ci_nick == bi->nick)
-				return bi;
-
-			if (ci_nick == bi->uid)
-				return bi;
-		}
-	}
-
+	if (it != BotList.end())
+		return it->second;
 	return NULL;
 }
 

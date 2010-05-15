@@ -15,8 +15,6 @@
 #include "services.h"
 #include "pseudo.h"
 
-#define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
-
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
 				 char *creator, time_t time);
 
@@ -40,21 +38,20 @@ void get_hostserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
 
-	for (int i = 0; i < 1024; ++i)
+	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 	{
-		for (NickAlias *na = nalists[i]; na; na = na->next)
-		{
-			if (!na->hostinfo.HasVhost())
-				continue;
+		NickAlias *na = it->second;
 
-			if (!na->hostinfo.GetIdent().empty())
-				mem += na->hostinfo.GetIdent().size();
-			if (!na->hostinfo.GetHost().empty())
-				mem += na->hostinfo.GetHost().size();
-			if (!na->hostinfo.GetCreator().empty())
-				mem += na->hostinfo.GetCreator().size();
-			++count;
-		}
+		if (!na->hostinfo.HasVhost())
+			continue;
+
+		if (!na->hostinfo.GetIdent().empty())
+			mem += na->hostinfo.GetIdent().size();
+		if (!na->hostinfo.GetHost().empty())
+			mem += na->hostinfo.GetHost().size();
+		if (!na->hostinfo.GetCreator().empty())
+			mem += na->hostinfo.GetCreator().size();
+		++count;
 	}
 
 	*nrec = count;
@@ -94,10 +91,10 @@ void hostserv(User * u, char *buf)
 		if (!(s = strtok(NULL, ""))) {
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_HostServ), u->nick.c_str(), "PING %s", s);
+		ircdproto->SendCTCP(HostServ, u->nick.c_str(), "PING %s", s);
 	} else {
 		if (ircd->vhost) {
-			mod_run_cmd(Config.s_HostServ, u, HOSTSERV, cmd);
+			mod_run_cmd(HostServ, u, cmd);
 		} else {
 			notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ);
 		}

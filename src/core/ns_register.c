@@ -369,9 +369,9 @@ class NSRegister : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSRegister());
-		this->AddCommand(NICKSERV, new CommandNSConfirm("CONFIRM", 1, 1));
-		this->AddCommand(NICKSERV, new CommandNSResend());
+		this->AddCommand(NickServ, new CommandNSRegister());
+		this->AddCommand(NickServ, new CommandNSConfirm("CONFIRM", 1, 1));
+		this->AddCommand(NickServ, new CommandNSResend());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

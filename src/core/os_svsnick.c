@@ -61,7 +61,7 @@ class CommandOSSVSNick : public Command
 		else
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick, newnick.c_str());
+			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick, newnick.c_str());
 			ircdproto->SendForceNickChange(u2, newnick.c_str(), time(NULL));
 		}
 		return MOD_CONT;
@@ -88,7 +88,7 @@ class OSSVSNick : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSVSNick());
+		this->AddCommand(OperServ, new CommandOSSVSNick());
 
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");

@@ -152,7 +152,6 @@ class CommandCSAKick : public Command
 		NickAlias *na = findnick(mask.c_str());
 		NickCore *nc = NULL;
 		AutoKick *akick;
-		int i;
 
 		if (!na)
 		{
@@ -197,42 +196,40 @@ class CommandCSAKick : public Command
 		}
 		else if ((ci->HasFlag(CI_PEACE)))
 		{
-			 char buf[BUFSIZE];
 			 /* Match against all currently online users with equal or
 			  * higher access. - Viper */
-			 for (i = 0; i < 1024; i++)
+			 for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			 {
-				for (User *u2 = userlist[i]; u2; u2 = u2->next)
+			 	User *u2 = it->second;
+				
+				if (IsFounder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci)))
 				{
-					if (IsFounder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci)))
+					if (match_usermask(mask.c_str(), u2))
 					{
-						if (match_usermask(mask.c_str(), u2))
-						{
-							notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-							return;
-						}
+						notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+						return;
 					}
 				}
-			}
+			 }
 
-
-			 /* Match against the lastusermask of all nickalias's with equal
-			  * or higher access. - Viper */
-			for (i = 0; i < 1024; i++)
+			/* Match against the lastusermask of all nickalias's with equal
+			 * or higher access. - Viper */
+			for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 			{
-				for (NickAlias *na2 = nalists[i]; na2; na2 = na2->next)
-				{
-					if (na2->HasFlag(NS_FORBIDDEN))
-						continue;
+				NickAlias *na2 = it->second;
+				
+				if (na2->HasFlag(NS_FORBIDDEN))
+					continue;
 
-					if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci) >= get_access(u, ci))))
+				if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci) >= get_access(u, ci))))
+				{
+					char buf[BUFSIZE];
+
+					snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
+					if (Anope::Match(buf, mask.c_str(), false))
 					{
-						snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
-						if (Anope::Match(buf, mask.c_str(), false))
-						{
-							notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-							return;
-						}
+						notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+						return;
 					}
 				}
 			 }
@@ -577,7 +574,7 @@ class CSAKick : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSAKick());
+		this->AddCommand(ChanServ, new CommandCSAKick());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

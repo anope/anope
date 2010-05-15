@@ -36,7 +36,7 @@ class DefConTimeout : public Timer
 			Config.DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
 			Alog() << "Defcon level timeout, returning to lvl " << level;
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), Config.s_OperServ, level);
+			ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), Config.s_OperServ, level);
 
 			if (Config.GlobalOnDefcon)
 			{
@@ -95,7 +95,7 @@ class CommandOSDEFCON : public Command
 		notice_lang(Config.s_OperServ, u, OPER_DEFCON_CHANGED, Config.DefConLevel);
 		defcon_sendlvls(u);
 		Alog() << "Defcon level changed to " << newLevel << " by Oper " << u->nick;
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
+		ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (Config.GlobalOnDefcon)
@@ -144,7 +144,7 @@ class OSDEFCON : public Module
 		Implementation i[] = { I_OnOperServHelp, I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, 9);
 
-		this->AddCommand(OPERSERV, new CommandOSDEFCON());
+		this->AddCommand(OperServ, new CommandOSDEFCON());
 
 		defconParseModeString(Config.DefConChanModes);
 	}
@@ -183,7 +183,7 @@ class OSDEFCON : public Module
 
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && cm && DefConModesOff.HasFlag(Name))
 		{
-			c->RemoveMode(findbot(Config.s_OperServ), Name, param);
+			c->RemoveMode(OperServ, Name, param);
 
 			return EVENT_STOP;
 		}
@@ -201,10 +201,10 @@ class OSDEFCON : public Module
 
 			if (GetDefConParam(Name, &param))
 			{
-				c->SetMode(findbot(Config.s_OperServ), Name, param);
+				c->SetMode(OperServ, Name, param);
 			}
 			else
-				c->SetMode(findbot(Config.s_OperServ), Name);
+				c->SetMode(OperServ, Name);
 
 			return EVENT_STOP;
 
@@ -293,9 +293,9 @@ class OSDEFCON : public Module
 			if (session && session->count > Config.DefConSessionLimit)
 			{
 				if (Config.SessionLimitExceeded)
-					ircdproto->SendMessage(findbot(Config.s_OperServ), u->nick.c_str(), Config.SessionLimitExceeded, u->host);
+					ircdproto->SendMessage(OperServ, u->nick.c_str(), Config.SessionLimitExceeded, u->host);
 				if (Config.SessionLimitDetailsLoc)
-					ircdproto->SendMessage(findbot(Config.s_OperServ), u->nick.c_str(), "%s", Config.SessionLimitDetailsLoc);
+					ircdproto->SendMessage(OperServ, u->nick.c_str(), "%s", Config.SessionLimitDetailsLoc);
 
 				kill_user(Config.s_OperServ, u->nick, "Session limit exceeded");
 				session->hits++;
@@ -304,7 +304,7 @@ class OSDEFCON : public Module
 					char akillmask[BUFSIZE];
 					snprintf(akillmask, sizeof(akillmask), "*@%s", u->host);
 					add_akill(NULL, akillmask, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
-					ircdproto->SendGlobops(findbot(Config.s_OperServ), "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
+					ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
 				}
 			}
 		}
@@ -330,7 +330,7 @@ class OSDEFCON : public Module
 	{
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES))
 		{
-			c->SetModes(findbot(Config.s_OperServ), false, Config.DefConChanModes);
+			c->SetModes(OperServ, false, Config.DefConChanModes);
 		}
 	}
 };
@@ -374,7 +374,7 @@ void runDefCon()
 			{
 				Alog() << "DEFCON: setting " << Config.DefConChanModes << " on all channels";
 				DefConModesSet = 1;
-				MassChannelModes(findbot(Config.s_OperServ), Config.DefConChanModes);
+				MassChannelModes(OperServ, Config.DefConChanModes);
 			}
 		}
 	}
@@ -388,7 +388,7 @@ void runDefCon()
 				if ((newmodes = defconReverseModes(Config.DefConChanModes)))
 				{
 					Alog() << "DEFCON: setting " << newmodes << " on all channels";
-					MassChannelModes(findbot(Config.s_OperServ), newmodes);
+					MassChannelModes(OperServ, newmodes);
 					delete [] newmodes;
 				}
 			}

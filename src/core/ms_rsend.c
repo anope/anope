@@ -79,7 +79,7 @@ class MSRSend : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSRSend());
+		this->AddCommand(MemoServ, new CommandMSRSend());
 
 		if (!Config.MSMemoReceipt)
 			throw ModuleException("Don't like memo reciepts, or something.");

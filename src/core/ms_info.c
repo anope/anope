@@ -208,7 +208,7 @@ class MSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSInfo());
+		this->AddCommand(MemoServ, new CommandMSInfo());
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}

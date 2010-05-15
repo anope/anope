@@ -23,7 +23,7 @@ class CommandOSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(Config.s_OperServ, u, OPERSERV, params[0].c_str());
+		mod_help_cmd(OperServ, u, params[0].c_str());
 		return MOD_CONT;
 	}
 
@@ -43,7 +43,7 @@ class OSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSHelp());
+		this->AddCommand(OperServ, new CommandOSHelp());
 	}
 };
 

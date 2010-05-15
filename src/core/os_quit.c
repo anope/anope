@@ -52,7 +52,7 @@ class OSQuit : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSQuit());
+		this->AddCommand(OperServ, new CommandOSQuit());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

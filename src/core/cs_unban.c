@@ -78,7 +78,7 @@ class CSUnban : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSUnban());
+		this->AddCommand(ChanServ, new CommandCSUnban());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

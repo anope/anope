@@ -8,6 +8,9 @@
  *
  */
 
+typedef unordered_map_namespace::unordered_map<ci::string, ChannelInfo *, hash_compare_ci_string> registered_channel_map;
+extern CoreExport registered_channel_map RegisteredChannelList;
+
 /** Flags used for the ChannelInfo class
  */
 enum ChannelInfoFlag
@@ -78,7 +81,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	~ChannelInfo();
 
-	ChannelInfo *next, *prev;
 	std::string name;		/* Channel name */
 	NickCore *founder;
 	NickCore *successor;		/* Who gets the channel if the founder

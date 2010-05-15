@@ -1,3 +1,14 @@
+class NickAlias;
+class NickCore;
+class NickRequest;
+
+typedef unordered_map_namespace::unordered_map<ci::string, NickAlias *, hash_compare_ci_string> nickalias_map;
+typedef unordered_map_namespace::unordered_map<ci::string, NickCore *, hash_compare_ci_string> nickcore_map;
+typedef unordered_map_namespace::unordered_map<ci::string, NickRequest *, hash_compare_ci_string> nickrequest_map;
+
+extern CoreExport nickalias_map NickAliasList;
+extern CoreExport nickcore_map NickCoreList;
+extern CoreExport nickrequest_map NickRequestList;
 
 /* NickServ nickname structures. */
 
@@ -76,7 +87,6 @@ class CoreExport NickRequest : public Extensible
 
 	~NickRequest();
 
-	NickRequest *next, *prev;
 	char *nick;
 	std::string passcode;
 	std::string password;
@@ -100,7 +110,6 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 	 */
 	~NickAlias();
 
-	NickAlias *next, *prev;
 	char *nick;				/* Nickname */
 	char *last_quit;			/* Last quit message */
 	char *last_realname;			/* Last realname */
@@ -134,8 +143,6 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 	/** Default destructor
 	 */
 	~NickCore();
-
-	NickCore *next, *prev;
 
 	std::list<User *> Users;
 

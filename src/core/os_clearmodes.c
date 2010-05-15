@@ -52,7 +52,7 @@ class CommandOSClearModes : public Command
 			}
 
 			if (Config.WallOSClearmodes)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CLEARMODES%s on %s", u->nick.c_str(), all ? " ALL" : "", chan);
+				ircdproto->SendGlobops(OperServ, "%s used CLEARMODES%s on %s", u->nick.c_str(), all ? " ALL" : "", chan);
 			if (all)
 			{
 				/* Clear mode +o */
@@ -177,7 +177,7 @@ class OSClearModes : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSClearModes());
+		this->AddCommand(OperServ, new CommandOSClearModes());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

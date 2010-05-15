@@ -544,7 +544,7 @@ class NSSet : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSet());
+		this->AddCommand(NickServ, new CommandNSSet());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

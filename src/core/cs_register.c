@@ -44,8 +44,6 @@ class CommandCSRegister : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_X_INVALID, chan);
 		else if ((ci = cs_findchan(chan)))
 			notice_lang(Config.s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
-		else if (!stricmp(chan, "#"))
-			notice_lang(Config.s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			notice_lang(Config.s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 		else if (Config.CSMaxReg && u->Account()->channelcount >= Config.CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
@@ -125,7 +123,7 @@ class CSRegister : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSRegister());
+		this->AddCommand(ChanServ, new CommandCSRegister());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

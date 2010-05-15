@@ -24,7 +24,7 @@ class CommandHSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(Config.s_HostServ, u, HOSTSERV, params[0].c_str());
+		mod_help_cmd(HostServ, u, params[0].c_str());
 		return MOD_CONT;
 	}
 
@@ -44,7 +44,7 @@ class HSHelp : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSHelp());
+		this->AddCommand(HostServ, new CommandHSHelp());
 	}
 };
 

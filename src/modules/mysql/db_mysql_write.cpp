@@ -230,51 +230,47 @@ static void SaveDatabases()
 {
 	mysqlpp::Query query(me->Con);
 
-	query << "TRUNCATE TABLE `anope_ns_core`";
-	ExecuteQuery(query);
 	query << "TRUNCATE TABLE `anope_ns_alias`";
 	ExecuteQuery(query);
 
-	for (int i = 0; i < 1024; ++i)
+	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 	{
-		for (NickAlias *na = nalists[i]; na; na = na->next)
-		{
-			me->OnNickRegister(na);
-		}
+		NickAlias *na = it->second;
+
+		me->OnNickRegister(na);
 	}
 
-	query << "TRUNCATE TABLE `anope_ns_access`";
+	query << "TRUNCATE TABLE `anope_ns_core`";
 	ExecuteQuery(query);
 	query << "TRUNCATE TABLE `anope_ms_info`";
 	ExecuteQuery(query);
-
-	for (int i = 0; i < 1024; ++i)
+	
+	for (nickcore_map::const_iterator nit = NickCoreList.begin(); nit != NickCoreList.end(); ++nit)
 	{
-		for (NickCore *nc = nclists[i]; nc; nc = nc->next)
+		NickCore *nc = nit->second;
+		
+		for (std::vector<std::string>::iterator it = nc->access.begin(); it != nc->access.end(); ++it)
 		{
-			for (std::vector<std::string>::iterator it = nc->access.begin(); it != nc->access.end(); ++it)
-			{
-				query << "INSERT DELAYED INTO `anope_ns_access` (display, access) VALUES(" << mysqlpp::quote << nc->display << ", " << mysqlpp::quote << *it << ")";
-				ExecuteQuery(query);
-			}
+			query << "INSERT DELAYED INTO `anope_ns_access` (display, access) VALUES(" << mysqlpp::quote << nc->display << ", " << mysqlpp::quote << *it << ")";
+			ExecuteQuery(query);
+		}
 
-			for (unsigned j = 0; j < nc->memos.memos.size(); ++j)
-			{
-				Memo *m = nc->memos.memos[j];
+		for (unsigned j = 0; j < nc->memos.memos.size(); ++j)
+		{
+			Memo *m = nc->memos.memos[j];
 
-				me->OnMemoSend(NULL, nc, m);
-			}
+			me->OnMemoSend(NULL, nc, m);
 		}
 	}
 
+
 	query << "TRUNCATE TABLE `anope_bs_core`";
 	ExecuteQuery(query);
-	for (int i = 0; i < 256; ++i)
+	
+	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
 	{
-		for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
-		{
-			me->OnBotCreate(bi);
-		}
+		BotInfo *bi = it->second;
+		me->OnBotCreate(bi);
 	}
 
 	query << "TRUNCATE TABLE `anope_cs_info`";
@@ -288,67 +284,54 @@ static void SaveDatabases()
 	query << "TRUNCATE TABLE `anope_cs_levels`";
 	ExecuteQuery(query);
 
-	for (int i = 0; i < 256; ++i)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
 	{
-		for (ChannelInfo *ci = chanlists[i]; ci; ci = ci->next)
+		ChannelInfo *ci = it->second;
+			
+		me->OnChanRegistered(ci);
+
+		for (unsigned j = 0; j < ci->GetBadWordCount(); ++j)
 		{
-			me->OnChanRegistered(ci);
+			BadWord *bw = ci->GetBadWord(j);
 
-			for (unsigned j = 0; j < ci->GetBadWordCount(); ++j)
-			{
-				BadWord *bw = ci->GetBadWord(j);
+			me->OnBadWordAdd(ci, bw);
+		}
 
-				if (bw->InUse)
-				{
-					me->OnBadWordAdd(ci, bw);
-				}
-			}
+		for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
+		{
+			ChanAccess *access = ci->GetAccess(j);
 
-			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
-			{
-				ChanAccess *access = ci->GetAccess(j);
+			query << "INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES('" << access->level << "', " << mysqlpp::quote << access->nc->display << ", " << mysqlpp::quote << ci->name << ", " << access->last_seen << ", " << mysqlpp::quote << access->creator << ") ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)";
+			ExecuteQuery(query);
+		}
 
-				if (access->in_use)
-				{
-					query << "INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES('" << access->level << "', " << mysqlpp::quote << access->nc->display << ", " << mysqlpp::quote << ci->name << ", " << access->last_seen << ", " << mysqlpp::quote << access->creator << ") ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)";
-					ExecuteQuery(query);
-				}
-			}
+		for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
+		{
+			AutoKick *ak = ci->GetAkick(j);
 
-			for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
-			{
-				AutoKick *ak = ci->GetAkick(j);
+			me->OnAkickAdd(ci, ak);
+		}
 
-				if (ak->InUse)
-				{
-					me->OnAkickAdd(ci, ak);
-				}
-			}
+		for (int k = 0; k < CA_SIZE; ++k)
+		{
+			query << "INSERT DELAYED INTO `anope_cs_levels` (channel, position, level) VALUES(" << mysqlpp::quote << ci->name << ", '" << k << "', '" << ci->levels[k] << "') ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)";
+			ExecuteQuery(query);
+		}
 
-			for (int k = 0; k < CA_SIZE; ++k)
-			{
-				query << "INSERT DELAYED INTO `anope_cs_levels` (channel, position, level) VALUES(" << mysqlpp::quote << ci->name << ", '" << k << "', '" << ci->levels[k] << "') ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)";
-				ExecuteQuery(query);
-			}
+		for (unsigned j = 0; j < ci->memos.memos.size(); ++j)
+		{
+			Memo *m = ci->memos.memos[j];
 
-			for (unsigned j = 0; j < ci->memos.memos.size(); ++j)
-			{
-				Memo *m = ci->memos.memos[j];
-
-				me->OnMemoSend(NULL, ci, m);
-			}
+			me->OnMemoSend(NULL, ci, m);
 		}
 	}
 
 	query << "TRUNCATE TABLE `anope_ns_request`";
 	ExecuteQuery(query);
 
-	for (int i = 0; i < 1024; i++)
+	for (nickrequest_map::const_iterator it = NickRequestList.begin(); it != NickRequestList.end(); ++it)
 	{
-		for (NickRequest *nr = nrlists[i]; nr; nr = nr->next)
-		{
-			me->OnMakeNickRequest(nr);
-		}
+		me->OnMakeNickRequest(it->second);
 	}
 
 	for (int i = 0; i < akills.count; ++i)
@@ -418,7 +401,7 @@ class DBMySQLWrite : public DBMySQL
 
 		ModuleManager::Attach(I_OnServerConnect, this);
 
-		this->AddCommand(OPERSERV, new CommandSyncSQL("SQLSYNC"));
+		this->AddCommand(OperServ, new CommandSyncSQL("SQLSYNC"));
 		
 		if (uplink_server)
 			OnServerConnect();
@@ -470,46 +453,35 @@ class DBMySQLWrite : public DBMySQL
 		query << maxusercnt << ", " << maxusertime << ", " << akills.count << ", " << sqlines.count << ", " << sglines.count << ", " << szlines.count << ")";
 		ExecuteQuery(query);
 
-		for (int i = 0; i < 1024; ++i)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 		{
-			for (NickCore *nc = nclists[i]; nc; nc = nc->next)
-			{
-				CurCore = nc;
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteCoreMetadata, nc));
-			}
+			CurCore = it->second;
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteCoreMetadata, CurCore));
 		}
 
-		for (int i = 0; i < 1024; ++i)
+		for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 		{
-			for (NickAlias *na = nalists[i]; na; na = na->next)
-			{
-				CurNick = na;
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteNickMetadata, na));
-			}
+			CurNick = it->second;
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteNickMetadata, CurNick));
 		}
 
-		for (int i = 0; i < 256; ++i)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
 		{
-			for (ChannelInfo *ci = chanlists[i]; ci; ci = ci->next)
-			{
-				CurChannel = ci;
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, ci));
-			}
+			CurChannel = it->second;
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, CurChannel));
 		}
 		
-		for (int i = 0; i < 256; ++i)
+		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
 		{
-			for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
-			{
-				CurBot = bi;
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, bi));
-				/* This is for the core bots, bots added by users are already handled by an event */
-				query << "INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(";
-				query << mysqlpp::quote << bi->nick << ", " << mysqlpp::quote << bi->user << ", " << mysqlpp::quote << bi->host;
-				query << ", " << mysqlpp::quote << bi->real << ", '" << GetBotServFlags(bi) << "', " << bi->created << ", ";
-				query << bi->chancount << ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(created)";
-				ExecuteQuery(query);
-			}
+			CurBot = it->second;
+			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
+
+			/* This is for the core bots, bots added by users are already handled by an event */
+			query << "INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(";
+			query << mysqlpp::quote << CurBot->nick << ", " << mysqlpp::quote << CurBot->user << ", " << mysqlpp::quote << CurBot->host;
+			query << ", " << mysqlpp::quote << CurBot->real << ", '" << GetBotServFlags(CurBot) << "', " << CurBot->created << ", ";
+			query << CurBot->chancount << ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(created)";
+			ExecuteQuery(query);
 		}
 
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));

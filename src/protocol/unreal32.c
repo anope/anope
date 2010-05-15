@@ -145,7 +145,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		BotInfo *bi = findbot(Config.s_HostServ);
+		BotInfo *bi = HostServ;
 		u->RemoveMode(bi, UMODE_CLOAK);
 		u->RemoveMode(bi, UMODE_VHOST);
 		ModeManager::ProcessModes();
@@ -418,14 +418,14 @@ class UnrealIRCdProto : public IRCDProto
 		u->Account()->Shrink("authenticationtoken");
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 
-		BotInfo *bi = findbot(Config.s_NickServ);
+		BotInfo *bi = NickServ;
 		u->SetMode(bi, UMODE_REGISTERED);
 		ircdproto->SendMode(bi, u, "+d %s", svidbuf);
 	}
 
 	void SendUnregisteredNick(User *u)
 	{
-		BotInfo *bi = findbot(Config.s_NickServ);
+		BotInfo *bi = NickServ;
 		u->RemoveMode(bi, UMODE_REGISTERED);
 		ircdproto->SendMode(bi, u, "+d 1");
 	}
@@ -1185,75 +1185,74 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-void moduleAddIRCDMsgs() {
-	Message *m;
-
-	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
-	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
-	m = createMessage("6",		anope_event_away); addCoreMessage(IRCD,m);
-	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);
-	m = createMessage("C",		anope_event_join); addCoreMessage(IRCD,m);
-	m = createMessage("KICK",	  anope_event_kick); addCoreMessage(IRCD,m);
-	m = createMessage("H",		anope_event_kick); addCoreMessage(IRCD,m);
-	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
-	m = createMessage(".",		anope_event_kill); addCoreMessage(IRCD,m);
-	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("G",		anope_event_gmode); addCoreMessage(IRCD,m);
-	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
-	m = createMessage("F",		anope_event_motd); addCoreMessage(IRCD,m);
-	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("&",		anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
-	m = createMessage("D",		anope_event_part); addCoreMessage(IRCD,m);
-	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
-	m = createMessage("8",		anope_event_ping); addCoreMessage(IRCD,m);
-	m = createMessage("PONG",       anope_event_pong); addCoreMessage(IRCD,m);
-	m = createMessage("9",          anope_event_pong); addCoreMessage(IRCD,m);
-	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-	m = createMessage("!",		anope_event_privmsg); addCoreMessage(IRCD,m);
-	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
-	m = createMessage(",",		anope_event_quit); addCoreMessage(IRCD,m);
-	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);
-	m = createMessage("'",		anope_event_server); addCoreMessage(IRCD,m);
-	m = createMessage("SQUIT",	 anope_event_squit); addCoreMessage(IRCD,m);
-	m = createMessage("-",		anope_event_squit); addCoreMessage(IRCD,m);
-	m = createMessage("TOPIC",	 anope_event_topic); addCoreMessage(IRCD,m);
-	m = createMessage(")",		anope_event_topic); addCoreMessage(IRCD,m);
-	m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("n",		anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("SVS2MODE",   anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("v",	   anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
-	m = createMessage("#",		anope_event_whois); addCoreMessage(IRCD,m);
-	m = createMessage("PROTOCTL",  anope_event_capab); addCoreMessage(IRCD,m);
-	m = createMessage("_",		anope_event_capab); addCoreMessage(IRCD,m);
-	m = createMessage("CHGHOST",   anope_event_chghost); addCoreMessage(IRCD,m);
-	m = createMessage("AL",		anope_event_chghost); addCoreMessage(IRCD,m);
-	m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
-	m = createMessage("AZ",		anope_event_chgident); addCoreMessage(IRCD,m);
-	m = createMessage("CHGNAME",   anope_event_chgname); addCoreMessage(IRCD,m);
-	m = createMessage("BK",		anope_event_chgname); addCoreMessage(IRCD,m);
-	m = createMessage("NETINFO",   anope_event_netinfo); addCoreMessage(IRCD,m);
-	m = createMessage("AO",	   anope_event_netinfo); addCoreMessage(IRCD,m);
-	m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
-	m = createMessage("AA",		anope_event_sethost); addCoreMessage(IRCD,m);
-	m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
-	m = createMessage("AD",		anope_event_setident); addCoreMessage(IRCD,m);
-	m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
-	m = createMessage("AE",		anope_event_setname); addCoreMessage(IRCD,m);
-	m = createMessage("ERROR", 	   anope_event_error); addCoreMessage(IRCD,m);
-	m = createMessage("5",		anope_event_error); addCoreMessage(IRCD,m);
-	m = createMessage("UMODE2",	anope_event_umode2); addCoreMessage(IRCD,m);
-	m = createMessage("|",		anope_event_umode2); addCoreMessage(IRCD,m);
-	m = createMessage("SJOIN",	  anope_event_sjoin); addCoreMessage(IRCD,m);
-	m = createMessage("~",		anope_event_sjoin); addCoreMessage(IRCD,m);
-	m = createMessage("SDESC",	  anope_event_sdesc); addCoreMessage(IRCD,m);
-	m = createMessage("AG",	   anope_event_sdesc); addCoreMessage(IRCD,m);
+void moduleAddIRCDMsgs()
+{
+	Anope::AddMessage("436", anope_event_436);
+	Anope::AddMessage("AWAY", anope_event_away);
+	Anope::AddMessage("6",	anope_event_away);
+	Anope::AddMessage("JOIN", anope_event_join);
+	Anope::AddMessage("C", anope_event_join);
+	Anope::AddMessage("KICK", anope_event_kick);
+	Anope::AddMessage("H",	anope_event_kick);
+	Anope::AddMessage("KILL", anope_event_kill);
+	Anope::AddMessage(".",	anope_event_kill);
+	Anope::AddMessage("MODE", anope_event_mode);
+	Anope::AddMessage("G",	anope_event_gmode);
+	Anope::AddMessage("MOTD", anope_event_motd);
+	Anope::AddMessage("F",	anope_event_motd);
+	Anope::AddMessage("NICK", anope_event_nick);
+	Anope::AddMessage("&",	anope_event_nick);
+	Anope::AddMessage("PART", anope_event_part);
+	Anope::AddMessage("D",	anope_event_part);
+	Anope::AddMessage("PING", anope_event_ping);
+	Anope::AddMessage("8",	anope_event_ping);
+	Anope::AddMessage("PONG", anope_event_pong);
+	Anope::AddMessage("9", anope_event_pong);
+	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
+	Anope::AddMessage("!",	anope_event_privmsg);
+	Anope::AddMessage("QUIT", anope_event_quit);
+	Anope::AddMessage(",",	anope_event_quit);
+	Anope::AddMessage("SERVER", anope_event_server);
+	Anope::AddMessage("'",	anope_event_server);
+	Anope::AddMessage("SQUIT", anope_event_squit);
+	Anope::AddMessage("-",	anope_event_squit);
+	Anope::AddMessage("TOPIC", anope_event_topic);
+	Anope::AddMessage(")",	anope_event_topic);
+	Anope::AddMessage("SVSMODE", anope_event_mode);
+	Anope::AddMessage("n",	anope_event_mode);
+	Anope::AddMessage("SVS2MODE", anope_event_mode);
+	Anope::AddMessage("v", anope_event_mode);
+	Anope::AddMessage("WHOIS", anope_event_whois);
+	Anope::AddMessage("#",	anope_event_whois);
+	Anope::AddMessage("PROTOCTL", anope_event_capab);
+	Anope::AddMessage("_",	anope_event_capab);
+	Anope::AddMessage("CHGHOST", anope_event_chghost);
+	Anope::AddMessage("AL", anope_event_chghost);
+	Anope::AddMessage("CHGIDENT", anope_event_chgident);
+	Anope::AddMessage("AZ", anope_event_chgident);
+	Anope::AddMessage("CHGNAME", anope_event_chgname);
+	Anope::AddMessage("BK", anope_event_chgname);
+	Anope::AddMessage("NETINFO", anope_event_netinfo);
+	Anope::AddMessage("AO", anope_event_netinfo);
+	Anope::AddMessage("SETHOST", anope_event_sethost);
+	Anope::AddMessage("AA", anope_event_sethost);
+	Anope::AddMessage("SETIDENT", anope_event_setident);
+	Anope::AddMessage("AD", anope_event_setident);
+	Anope::AddMessage("SETNAME", anope_event_setname);
+	Anope::AddMessage("AE", anope_event_setname);
+	Anope::AddMessage("ERROR", anope_event_error);
+	Anope::AddMessage("5", anope_event_error);
+	Anope::AddMessage("UMODE2", anope_event_umode2);
+	Anope::AddMessage("|",	anope_event_umode2);
+	Anope::AddMessage("SJOIN", anope_event_sjoin);
+	Anope::AddMessage("~", anope_event_sjoin);
+	Anope::AddMessage("SDESC", anope_event_sdesc);
+	Anope::AddMessage("AG", anope_event_sdesc);
 
 	/* The non token version of these is in messages.c */
-	m = createMessage("2",		 m_stats); addCoreMessage(IRCD,m);
-	m = createMessage(">",		 m_time); addCoreMessage(IRCD,m);
-	m = createMessage("+",		 m_version); addCoreMessage(IRCD,m);
+	Anope::AddMessage("2", m_stats);
+	Anope::AddMessage(">", m_time);
+	Anope::AddMessage("+", m_version);
 }
 
 /* Borrowed part of this check from UnrealIRCd */

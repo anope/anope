@@ -166,7 +166,13 @@ static void LoadDatabase()
 	{
 		for (size_t i = 0; i < qres.num_rows(); ++i)
 		{
-			BotInfo *bi = new BotInfo(SQLAssign(qres[i]["nick"]), SQLAssign(qres[i]["user"]), SQLAssign(qres[i]["host"]), SQLAssign(qres[i]["rname"]));
+			BotInfo *bi = findbot(SQLAssign(qres[i]["nick"]));
+			if (!bi)
+				bi = new BotInfo(SQLAssign(qres[i]["nick"]));
+			bi->user = SQLAssign(qres[i]["user"]);
+			bi->host = SQLAssign(qres[i]["host"]);
+			bi->real = SQLAssign(qres[i]["rname"]);
+
 			if (qres[i]["flags"].size())
 			{
 				spacesepstream sep(SQLAssign(qres[i]["flags"]));

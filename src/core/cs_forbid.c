@@ -78,12 +78,12 @@ class CommandCSForbid : public Command
 				if (is_oper(uc->user))
 					continue;
 
-				c->Kick(findbot(Config.s_ChanServ), uc->user, "%s", reason ? reason : getstring(uc->user->Account(), CHAN_FORBID_REASON));
+				c->Kick(ChanServ, uc->user, "%s", reason ? reason : getstring(uc->user->Account(), CHAN_FORBID_REASON));
 			}
 		}
 
 		if (Config.WallForbid)
-			ircdproto->SendGlobops(findbot(Config.s_ChanServ), "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		if (ircd->chansqline)
 		{
@@ -118,7 +118,7 @@ class CSForbid : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSForbid());
+		this->AddCommand(ChanServ, new CommandCSForbid());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

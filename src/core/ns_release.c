@@ -96,7 +96,7 @@ class NSRelease : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSRelease());
+		this->AddCommand(NickServ, new CommandNSRelease());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

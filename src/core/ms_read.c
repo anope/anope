@@ -124,7 +124,7 @@ class MSRead : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSRead());
+		this->AddCommand(MemoServ, new CommandMSRead());
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}

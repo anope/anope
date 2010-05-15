@@ -1,7 +1,7 @@
 
 all: services.h extern.h pseudo.h version.h
 
-version.h: Makefile version.sh services.h pseudo.h messages.h $(SRCS)
+version.h: Makefile version.sh services.h pseudo.h $(SRCS)
 	sh version.sh ../version.log $@
 
 services.h: sysconf.h config.h extern.h

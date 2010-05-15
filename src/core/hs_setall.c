@@ -158,7 +158,7 @@ class HSSetAll : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSSetAll());
+		this->AddCommand(HostServ, new CommandHSSetAll());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

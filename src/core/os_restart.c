@@ -51,7 +51,7 @@ class OSRestart : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(OPERSERV, new CommandOSRestart());
+		this->AddCommand(OperServ, new CommandOSRestart());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

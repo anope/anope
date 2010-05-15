@@ -114,7 +114,7 @@ class NSRecover : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSRecover());
+		this->AddCommand(NickServ, new CommandNSRecover());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

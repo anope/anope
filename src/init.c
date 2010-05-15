@@ -32,20 +32,17 @@ void introduce_user(const std::string &user)
 	lasttimes[LTSIZE - 1] = time(NULL);
 #undef LTSIZE
 	/* We make the bots go online */
-	BotInfo *bi;
-	int i;
 
 	/* XXX: it might be nice to have this inside BotInfo's constructor, or something? */
-	for (i = 0; i < 256; ++i)
+	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
 	{
-		for (bi = botlists[i]; bi; bi = bi->next)
+		BotInfo *bi = it->second;
+		
+		ci::string ci_bi_nick(bi->nick.c_str());
+		if (user.empty() || ci_bi_nick == user)
 		{
-			ci::string ci_bi_nick(bi->nick.c_str());
-			if (user.empty() || ci_bi_nick == user)
-			{
-				ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
-				ircdproto->SendSQLine(bi->nick, "Reserved for services");
-			}
+			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
+			ircdproto->SendSQLine(bi->nick, "Reserved for services");
 		}
 	}
 }
@@ -326,9 +323,35 @@ int init_primary(int ac, char **av)
 	}
 
 	/* Add IRCD Protocol Module; exit if there are errors */
-	if (protocol_module_init()) {
+	if (protocol_module_init())
 		return -1;
-	}
+
+	/* First thing, add our core bots internally. Before modules are loaded and before the database is read
+	 * This is used for modules adding commands and for the BotInfo* poiners in the command classes.
+	 * When these bots are loaded from the databases the proper user/host/rname are added.
+	 *
+	 * If a user renames a bot in the configuration file, the new bot gets created here, and the old bot
+	 * that is in the database gets created aswell, on its old nick. The old nick remains in all the channels
+	 * etc and the new bot becomes the new client to accept commands. The user can use /bs bot del later
+	 * if they want the old bot deleted.
+	 *
+	 * Note that it is important this is after loading the protocol module. The ircd struct must exist for
+	 * the ts6_ functions
+	 */
+	if (Config.s_OperServ)
+		new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
+	if (Config.s_NickServ)
+		new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
+	if (Config.s_ChanServ)
+		new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
+	if (Config.s_HostServ)
+		new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
+	if (Config.s_MemoServ)
+		new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
+	if (Config.s_BotServ)
+		new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
+	if (Config.s_GlobalNoticer)
+		new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
 
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config.EncModuleList);
@@ -438,49 +461,6 @@ int init_secondary(int ac, char **av)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
 	Alog() << "Databases loaded";
-
-	/* this is only used on the first run of Anope. */
-	if (!nbots)
-	{
-		if (Config.s_OperServ)
-			new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
-		if (Config.s_NickServ)
-			new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
-		if (Config.s_ChanServ)
-			new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
-		if (Config.s_HostServ)
-			new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
-		if (Config.s_MemoServ)
-			new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
-		if (Config.s_BotServ)
-			new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
-		if (Config.s_GlobalNoticer)
-			new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
-	}
-	else
-	{
-		/* If a botname was changed in the config, reflect it */
-		for (int i = 0; i < 256; ++i)
-		{
-			for (BotInfo *bi = botlists[i]; bi; bi = bi->next)
-			{
-				if (bi->HasFlag(BI_OPERSERV) && bi->nick != Config.s_OperServ)
-					bi->ChangeNick(Config.s_OperServ);
-				else if (bi->HasFlag(BI_NICKSERV) && bi->nick != Config.s_NickServ)
-					bi->ChangeNick(Config.s_NickServ);
-				else if (bi->HasFlag(BI_CHANSERV) && bi->nick != Config.s_ChanServ)
-					bi->ChangeNick(Config.s_ChanServ);
-				else if (bi->HasFlag(BI_HOSTSERV) && bi->nick != Config.s_HostServ)
-					bi->ChangeNick(Config.s_HostServ);
-				else if (bi->HasFlag(BI_MEMOSERV) && bi->nick != Config.s_MemoServ)
-					bi->ChangeNick(Config.s_MemoServ);
-				else if (bi->HasFlag(BI_BOTSERV) && bi->nick != Config.s_BotServ)
-					bi->ChangeNick(Config.s_BotServ);
-				else if (bi->HasFlag(BI_GLOBAL) &&  bi->nick != Config.s_GlobalNoticer)
-					bi->ChangeNick(Config.s_GlobalNoticer);
-			}
-		}
-	}
 
 	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
 

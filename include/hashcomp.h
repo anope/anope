@@ -15,6 +15,23 @@
 
 #include <string>
 
+#ifndef _WIN32
+	#ifdef HASHMAP_DEPRECATED /* If gcc ver > 4.3 */
+		/* GCC4.3+ has deprecated hash_map and uses tr1. But of course, uses a different include to MSVC. */
+		#include <tr1/unordered_map>
+		#define unordered_map_namespace std::tr1
+	#else
+		#include <ext/hash_map>
+		/* Oddball linux namespace for hash_map */
+		#define unordered_map_namespace __gnu_cxx
+		#define unordered_map hash_map
+	#endif
+#else
+	/* MSVC 2010+ has tr1. Though MSVC and GCC use different includes! */
+	#include <unordered_map>
+	#define unordered_map_namespace std::tr1
+#endif
+
 /*******************************************************
  * This file contains classes and templates that deal
  * with the comparison and hashing of 'irc strings'.
@@ -29,9 +46,6 @@
  * backwards compatible with other code which is not
  * aware of irc::string.
  *******************************************************/
-
-#ifndef LOWERMAP
-#define LOWERMAP
 
 /** A mapping of uppercase to lowercase, including scandinavian
  * 'oddities' as specified by RFC1459, e.g. { -> [, and | -> \
@@ -71,8 +85,6 @@ unsigned const char ascii_case_insensitive_map[256] = {
 	220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,     /* 220-239 */
 	240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255                          /* 240-255 */
 };
-
-#endif
 
 /** The irc namespace contains a number of helper classes.
  */
@@ -468,6 +480,42 @@ class spacesepstream : public sepstream
 	spacesepstream(const std::string &source) : sepstream(source, ' ') { }
 	spacesepstream(const ci::string &source) : sepstream(source, ' ') { }
 	spacesepstream(const char *source) : sepstream(source, ' ') { }
+};
+
+/** Class used to hash a std::string, given as the third argument to the unordered_map template
+ */
+class CoreExport hash_compare_std_string
+{
+ public:
+	/** Return a hash value for a string
+	 * @param s The string
+	 * @return The hash value
+	 */
+	size_t operator()(const std::string &s) const;
+};
+
+/** Class used to hash a ci::string, given as the third argument to the unordered_map template
+ */
+class CoreExport hash_compare_ci_string
+{
+ public:
+	/** Return a hash value for a string using case insensitivity
+	 * @param s The string
+	 * @return The hash value
+	 */
+	size_t operator()(const ci::string &s) const;
+};
+
+/** Class used to hash a irc::string, given as the third argument to the unordered_map template
+ */
+class CoreExport hash_compare_irc_string
+{
+ public:
+	/** Return a hash value for a string using RFC1459 case sensitivity rules
+	 * @param s The stirng
+	 * @return The hash value
+	 */
+	size_t operator()(const irc::string &s) const;
 };
 
 #endif

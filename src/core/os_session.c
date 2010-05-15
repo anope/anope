@@ -19,8 +19,7 @@ class CommandOSSession : public Command
  private:
 	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
-		Session *session;
-		int mincount, i;
+		int mincount;
 		const char *param = params[1].c_str();
 
 		if ((mincount = atoi(param)) <= 1)
@@ -29,13 +28,13 @@ class CommandOSSession : public Command
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_HEADER, mincount);
 			notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_COLHEAD);
-			for (i = 0; i < 1024; ++i)
+
+			for (session_map::const_iterator it = SessionList.begin(); it != SessionList.end(); ++it)
 			{
-				for (session = sessionlist[i]; session; session = session->next)
-				{
-					if (session->count >= mincount)
-						notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host);
-				}
+				Session *session = it->second;
+
+				if (session->count >= mincount)
+					notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host);
 			}
 		}
 
@@ -460,8 +459,8 @@ class OSSession : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSession());
-		this->AddCommand(OPERSERV, new CommandOSException());
+		this->AddCommand(OperServ, new CommandOSSession());
+		this->AddCommand(OperServ, new CommandOSException());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

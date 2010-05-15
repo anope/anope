@@ -19,25 +19,24 @@ class CommandBSInfo : public Command
  private:
 	void send_bot_channels(User * u, BotInfo * bi)
 	{
-		int i;
-		ChannelInfo *ci;
 		char buf[307], *end;
 
 		*buf = 0;
 		end = buf;
 
-		for (i = 0; i < 256; i++) {
-			for (ci = chanlists[i]; ci; ci = ci->next) {
-				if (ci->bi == bi) {
-					if (strlen(buf) + strlen(ci->name.c_str()) > 300) {
-						u->SendMessage(Config.s_BotServ, "%s", buf);
-						*buf = 0;
-						end = buf;
-					}
-					end +=
-						snprintf(end, sizeof(buf) - (end - buf), " %s ",
-								 ci->name.c_str());
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+		{
+			ChannelInfo *ci = it->second;
+
+			if (ci->bi == bi)
+			{
+				if (strlen(buf) + strlen(ci->name.c_str()) > 300)
+				{
+					u->SendMessage(Config.s_BotServ, "%s", buf);
+					*buf = 0;
+					end = buf;
 				}
+				end += snprintf(end, sizeof(buf) - (end - buf), " %s ", ci->name.c_str());
 			}
 		}
 
@@ -251,7 +250,7 @@ class BSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSInfo());
+		this->AddCommand(BotServ, new CommandBSInfo());
 
 		ModuleManager::Attach(I_OnBotServHelp, this);
 	}

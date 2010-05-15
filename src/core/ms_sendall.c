@@ -23,8 +23,7 @@ class CommandMSSendAll : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		int i, z = 1;
-		NickCore *nc;
+		int z = 1;
 		const char *text = params[0].c_str();
 
 		if (readonly)
@@ -33,14 +32,15 @@ class CommandMSSendAll : public Command
 			return MOD_CONT;
 		}
 
-		for (i = 0; i < 1024; ++i)
+		NickAlias *na = findnick(u->nick);
+
+		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 		{
-			for (nc = nclists[i]; nc; nc = nc->next)
-			{
-				if (stricmp(u->nick.c_str(), nc->display))
-					memo_send(u, nc->display, text, z);
-			} /* /nc */
-		} /* /i */
+			NickCore *nc = it->second;
+			
+			if ((na && na->nc == nc) || stricmp(u->nick.c_str(), nc->display))
+				memo_send(u, nc->display, text, z);
+		}
 
 		notice_lang(Config.s_MemoServ, u, MEMO_MASS_SENT);
 		return MOD_CONT;
@@ -66,7 +66,7 @@ class MSSendAll : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSSendAll());
+		this->AddCommand(MemoServ, new CommandMSSendAll());
 
 		ModuleManager::Attach(I_OnMemoServHelp, this);
 	}

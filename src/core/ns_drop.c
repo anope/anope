@@ -42,7 +42,7 @@ class CommandNSDrop : public Command
 				if ((nr = findrequestnick(nick)) && u->Account()->IsServicesOper())
 				{
 					if (Config.WallDrop)
-						ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
+						ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
 					Alog() << Config.s_NickServ << ": " << u->GetMask() << " dropped nickname " << nr->nick << " (e-mail: " << nr->email << ")";
 					delete nr;
 					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
@@ -79,7 +79,7 @@ class CommandNSDrop : public Command
 			if (!is_mine)
 			{
 				if (Config.WallDrop)
-					ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
 				notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 			}
 			else
@@ -115,7 +115,7 @@ class NSDrop : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSDrop());
+		this->AddCommand(NickServ, new CommandNSDrop());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

@@ -69,7 +69,7 @@ class NSResetPass : public Module
 		if (!Config.UseMail)
 			throw ModuleException("Not using mail.");
 
-		this->AddCommand(NICKSERV, new CommandNSResetPass());
+		this->AddCommand(NickServ, new CommandNSResetPass());
 
 		Implementation i[] = { I_OnNickServHelp, I_OnPreCommand };
 		ModuleManager::Attach(i, this, 2);

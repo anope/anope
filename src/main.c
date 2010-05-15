@@ -204,8 +204,8 @@ void do_restart_services()
 	delete UplinkSock;
 	close_log();
 	/* First don't unload protocol module, then do so */
-	modules_unload_all(false);
-	modules_unload_all(true);
+	ModuleManager::UnloadAll(false);
+	ModuleManager::UnloadAll(true);
 	chdir(binary_dir.c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
 	if (!readonly) {
@@ -225,8 +225,6 @@ void do_restart_services()
 
 static void services_shutdown()
 {
-	User *u, *next;
-
 	FOREACH_MOD(I_OnPreShutdown, OnPreShutdown());
 
 	if (!quitmsg)
@@ -235,11 +233,10 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
-		u = firstuser();
-		while (u) {
-			next = nextuser();
-			delete u;
-			u = next;
+
+		while (!UserListByNick.empty())
+		{
+			delete UserListByNick.begin()->second;
 		}
 	}
 	/* Process to send the last bits of information before disconnecting */
@@ -247,8 +244,8 @@ static void services_shutdown()
 	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	/* First don't unload protocol module, then do so */
-	modules_unload_all(false);
-	modules_unload_all(true);
+	ModuleManager::UnloadAll(false);
+	ModuleManager::UnloadAll(true);
 	/* just in case they weren't all removed at least run once */
 	ModuleRunTimeDirCleanUp();
 }

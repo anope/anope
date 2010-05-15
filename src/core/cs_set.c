@@ -557,7 +557,7 @@ class CommandCSSet : public Command
 					/* Give them ChanServ
 					 * Yes, this works fine with no Config.s_BotServ
 					 */
-					findbot(Config.s_ChanServ)->Assign(NULL, ci);
+					ChanServ->Assign(NULL, ci);
 				}
 
 				/* Set the perm mode */
@@ -587,7 +587,7 @@ class CommandCSSet : public Command
 				if (!cm && !Config.s_BotServ && ci->bi)
 				{
 					/* Unassign bot */
-					findbot(Config.s_ChanServ)->UnAssign(NULL, ci);	
+					ChanServ->UnAssign(NULL, ci);	
 				}
 
 				if (ci->c && ci->c->users.empty())
@@ -700,7 +700,7 @@ class CommandCSSet : public Command
 			DoSetOpNotice(u, ci, param);
 		else if (cmd == "XOP")
 		{
-			if (!findModule("cs_xop"))
+			if (!FindModule("cs_xop"))
 				notice_lang(Config.s_ChanServ, u, CHAN_XOP_NOT_AVAILABLE, cmd.c_str());
 			else
 				DoSetXOP(u, ci, param);
@@ -826,7 +826,7 @@ class CSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSSet());
+		this->AddCommand(ChanServ, new CommandCSSet());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

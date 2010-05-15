@@ -55,32 +55,28 @@ class CommandOSUserList : public Command
 		}
 		else
 		{
-			char mask[BUFSIZE];
-			int i;
-			User *u2;
-
 			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER);
 
-			for (i = 0; i < 1024; ++i)
+			for (user_map::const_iterator uit = UserListByNick.begin(); uit != UserListByNick.end(); ++uit)
 			{
-				for (u2 = userlist[i]; u2; u2 = u2->next)
+				User *u2 = uit->second;
+
+				if (pattern)
 				{
-					if (pattern)
+					char mask[BUFSIZE];
+					snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+					if (!Anope::Match(mask, pattern, false))
+						continue;
+					if (!Modes.empty())
 					{
-						snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
-						if (!Anope::Match(mask, pattern, false))
-							continue;
-						if (!Modes.empty())
+						for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
 						{
-							for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
-							{
-								if (!u2->HasMode(*it))
-									continue;
-							}
+							if (!u2->HasMode(*it))
+								continue;
 						}
 					}
-					notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 				}
+				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 			}
 		}
 
@@ -104,7 +100,7 @@ class OSUserList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSUserList());
+		this->AddCommand(OperServ, new CommandOSUserList());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

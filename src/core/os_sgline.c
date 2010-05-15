@@ -135,7 +135,7 @@ class CommandOSSGLine : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SGLINE for %s (%s)", u->nick.c_str(), cmask, buf);
+				ircdproto->SendGlobops(OperServ, "%s added an SGLINE for %s (%s)", u->nick.c_str(), cmask, buf);
 			}
 
 			if (readonly)
@@ -336,7 +336,7 @@ class OSSGLine : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSSGLine());
+		this->AddCommand(OperServ, new CommandOSSGLine());
 
 		if (!ircd->sgline)
 			throw ModuleException("Your IRCd does not support SGLine");

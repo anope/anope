@@ -50,14 +50,7 @@
 
 /*************************************************************************/
 
-/* I'm sure there is a better way to hash the list of hosts for which we are
- * storing session information. This should be sufficient for the mean time.
- * -TheShadow */
-
-#define HASH(host)	  (((host)[0]&31)<<5 | ((host)[1]&31))
-
-Session *sessionlist[1024];
-int32 nsessions = 0;
+session_map SessionList;
 
 Exception *exceptions = NULL;
 int16 nexceptions = 0;
@@ -68,19 +61,17 @@ int16 nexceptions = 0;
 
 void get_session_stats(long *nrec, long *memuse)
 {
-	Session *session;
-	long mem;
-	int i;
+	long mem = sizeof(Session) * SessionList.size();
 
-	mem = sizeof(Session) * nsessions;
-	for (i = 0; i < 1024; i++) {
-		for (session = sessionlist[i]; session; session = session->next) {
-			mem += strlen(session->host) + 1;
-		}
+	for (session_map::const_iterator it = SessionList.begin(); it != SessionList.end(); ++it)
+	{
+		Session *session = it->second;
+
+		mem += strlen(session->host) + 1;
 	}
 
-	*nrec = nsessions;
 	*memuse = mem;
+	*nrec = SessionList.size();
 }
 
 void get_exception_stats(long *nrec, long *memuse)
@@ -101,23 +92,12 @@ void get_exception_stats(long *nrec, long *memuse)
 /********************* Internal Session Functions ************************/
 /*************************************************************************/
 
-Session *findsession(const char *host)
+Session *findsession(const std::string &host)
 {
-	Session *session;
-	int i;
+	session_map::const_iterator it = SessionList.find(host);
 
-	if (!host) {
-		return NULL;
-	}
-
-	for (i = 0; i < 1024; i++) {
-		for (session = sessionlist[i]; session; session = session->next) {
-			if (stricmp(host, session->host) == 0) {
-				return session;
-			}
-		}
-	}
-
+	if (it != SessionList.end())
+		return it->second;
 	return NULL;
 }
 
@@ -128,7 +108,7 @@ Session *findsession(const char *host)
 
 int add_session(const char *nick, const char *host, char *hostip)
 {
-	Session *session, **list;
+	Session *session;
 	Exception *exception;
 	int sessionlimit = 0;
 
@@ -141,9 +121,9 @@ int add_session(const char *nick, const char *host, char *hostip)
 
 		if (sessionlimit != 0 && session->count >= sessionlimit) {
 			if (Config.SessionLimitExceeded)
-				ircdproto->SendMessage(findbot(Config.s_OperServ), nick, Config.SessionLimitExceeded, host);
+				ircdproto->SendMessage(OperServ, nick, Config.SessionLimitExceeded, host);
 			if (Config.SessionLimitDetailsLoc)
-				ircdproto->SendMessage(findbot(Config.s_OperServ), nick, "%s", Config.SessionLimitDetailsLoc);
+				ircdproto->SendMessage(OperServ, nick, "%s", Config.SessionLimitDetailsLoc);
 
 			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
 			 * decremented in do_quit, which caused problems and fixed here
@@ -161,7 +141,7 @@ int add_session(const char *nick, const char *host, char *hostip)
 				snprintf(akillmask, sizeof(akillmask), "*@%s", host);
 				add_akill(NULL, akillmask, Config.s_OperServ, 
 						time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
-				ircdproto->SendGlobops(findbot(Config.s_OperServ),
+				ircdproto->SendGlobops(OperServ,
 						"Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
 			}
 			return 0;
@@ -171,25 +151,18 @@ int add_session(const char *nick, const char *host, char *hostip)
 		}
 	}
 
-	nsessions++;
 	session = new Session;
 	session->host = sstrdup(host);
-	list = &sessionlist[HASH(session->host)];
-	session->prev = NULL;
-	session->next = *list;
-	if (*list)
-		(*list)->prev = session;
-	*list = session;
 	session->count = 1;
 	session->hits = 0;
+
+	SessionList[session->host] = session;
 
 	return 1;
 }
 
 void del_session(const char *host)
 {
-	Session *session;
-
 	if (!Config.LimitSessions) {
 		Alog(LOG_DEBUG) << "del_session called when LimitSessions is disabled";
 		return;
@@ -202,12 +175,12 @@ void del_session(const char *host)
 
 	Alog(LOG_DEBUG_2) << "del_session() called";
 
-	session = findsession(host);
+	Session *session = findsession(host);
 
 	if (!session) {
 		if (debug) 
 		{
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "WARNING: Tried to delete non-existant session: \2%s", host);
+			ircdproto->SendGlobops(OperServ, "WARNING: Tried to delete non-existant session: \2%s", host);
 			Alog(LOG_DEBUG) << "session: Tried to delete non-existant session: " << host;
 		}
 		return;
@@ -218,19 +191,12 @@ void del_session(const char *host)
 		return;
 	}
 
-	if (session->prev)
-		session->prev->next = session->next;
-	else
-		sessionlist[HASH(session->host)] = session->next;
-	if (session->next)
-		session->next->prev = session->prev;
+	SessionList.erase(session->host);
 
 	Alog(LOG_DEBUG_2) << "del_session(): free session structure";
 
 	delete [] session->host;
 	delete session;
-
-	nsessions--;
 
 	Alog(LOG_DEBUG_2) << "del_session() done";
 }
@@ -249,7 +215,7 @@ void expire_exceptions()
 		if (exceptions[i].expires == 0 || exceptions[i].expires > now)
 			continue;
 		if (Config.WallExceptionExpire)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ),
+			ircdproto->SendGlobops(OperServ,
 							 "Session limit exception for %s has expired.",
 							 exceptions[i].mask);
 		delete [] exceptions[i].mask;

@@ -28,8 +28,6 @@ class CommandOSNOOP : public Command
 
 		if (cmd == "SET")
 		{
-			User *u2;
-			User *u3 = NULL;
 			std::string reason;
 
 			/* Remove the O:lines */
@@ -37,13 +35,15 @@ class CommandOSNOOP : public Command
 
 			reason = "NOOP command used by " + u->nick;
 			if (Config.WallOSNoOp)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server);
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server);
 			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
 
 			/* Kill all the IRCops of the server */
-			for (u2 = firstuser(); u2; u2 = u3)
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 			{
-				u3 = nextuser();
+				User *u2 = it->second;
+				++it;
+
 				if (u2 && is_oper(u2) && Anope::Match(u2->server->GetName(), server, true))
 					kill_user(Config.s_OperServ, u2->nick.c_str(), reason.c_str());
 			}
@@ -79,7 +79,7 @@ class OSNOOP : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSNOOP());
+		this->AddCommand(OperServ, new CommandOSNOOP());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

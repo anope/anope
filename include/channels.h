@@ -8,6 +8,9 @@
  *
  */
 
+typedef unordered_map_namespace::unordered_map<ci::string, Channel *, hash_compare_ci_string> channel_map;
+extern CoreExport channel_map ChannelList;
+
 struct UserData
 {
 	UserData()
@@ -72,7 +75,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	~Channel();
 
-	Channel *next, *prev;
 	std::string name;	       /* Channel name */
 	ChannelInfo *ci;			/* Corresponding ChannelInfo */
 	time_t creation_time;	   /* When channel was created */

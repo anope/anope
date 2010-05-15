@@ -375,10 +375,10 @@ class CSModes : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSOp());
-		this->AddCommand(CHANSERV, new CommandCSDeOp());
-		this->AddCommand(CHANSERV, new CommandCSVoice());
-		this->AddCommand(CHANSERV, new CommandCSDeVoice());
+		this->AddCommand(ChanServ, new CommandCSOp());
+		this->AddCommand(ChanServ, new CommandCSDeOp());
+		this->AddCommand(ChanServ, new CommandCSVoice());
+		this->AddCommand(ChanServ, new CommandCSDeVoice());
 
 		if (Me && Me->IsSynced())
 			OnUplinkSync();
@@ -393,31 +393,31 @@ class CSModes : public Module
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{
-			this->AddCommand(CHANSERV, new CommandCSOwner());
-			this->AddCommand(CHANSERV, new CommandCSDeOwner());
+			this->AddCommand(ChanServ, new CommandCSOwner());
+			this->AddCommand(ChanServ, new CommandCSDeOwner());
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
 		{
-			this->AddCommand(CHANSERV, new CommandCSProtect());
-			this->AddCommand(CHANSERV, new CommandCSDeProtect());
+			this->AddCommand(ChanServ, new CommandCSProtect());
+			this->AddCommand(ChanServ, new CommandCSDeProtect());
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 		{
-			this->AddCommand(CHANSERV, new CommandCSHalfOp());
-			this->AddCommand(CHANSERV, new CommandCSDeHalfOp());
+			this->AddCommand(ChanServ, new CommandCSHalfOp());
+			this->AddCommand(ChanServ, new CommandCSDeHalfOp());
 		}
 	}
 
 	void OnServerDisconnect()
 	{
-		this->DelCommand(CHANSERV, "OWNER");
-		this->DelCommand(CHANSERV, "DEOWNER");
-		this->DelCommand(CHANSERV, "PROTECT");
-		this->DelCommand(CHANSERV, "DEPROTECT");
-		this->DelCommand(CHANSERV, "HALFOP");
-		this->DelCommand(CHANSERV, "DEHALFOP");
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "OWNER"));
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEOWNER"));
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "PROTECT"));
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEPROTECT"));
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "HALFOP"));
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEHALFOP"));
 	}
 
 	void OnChanServHelp(User *u)

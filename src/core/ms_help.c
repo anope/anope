@@ -24,7 +24,7 @@ class CommandMSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(Config.s_MemoServ, u, MEMOSERV, params[0].c_str());
+		mod_help_cmd(MemoServ, u, params[0].c_str());
 		return MOD_CONT;
 	}
 
@@ -44,7 +44,7 @@ class MSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MEMOSERV, new CommandMSHelp());
+		this->AddCommand(MemoServ, new CommandMSHelp());
 	}
 };
 

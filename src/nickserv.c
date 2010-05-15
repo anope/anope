@@ -17,11 +17,9 @@
 
 /*************************************************************************/
 
-#define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
-
-NickAlias *nalists[1024];
-NickCore *nclists[1024];
-NickRequest *nrlists[1024];
+nickalias_map NickAliasList;
+nickcore_map NickCoreList;
+nickrequest_map NickRequestList;
 
 static std::map<std::string, NickServCollide *> NickServCollides;
 static std::map<std::string, NickServRelease *> NickServReleases;
@@ -93,24 +91,21 @@ void moduleAddNickServCmds()
 void get_aliases_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	int i;
-	NickAlias *na;
 
-	for (i = 0; i < 1024; i++)
+	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 	{
-		for (na = nalists[i]; na; na = na->next)
-		{
-			count++;
-			mem += sizeof(*na);
-			if (na->nick)
-				mem += strlen(na->nick) + 1;
-			if (na->last_usermask)
-				mem += strlen(na->last_usermask) + 1;
-			if (na->last_realname)
-				mem += strlen(na->last_realname) + 1;
-			if (na->last_quit)
-				mem += strlen(na->last_quit) + 1;
-		}
+		NickAlias *na = it->second;
+			
+		count++;
+		mem += sizeof(*na);
+		if (na->nick)
+			mem += strlen(na->nick) + 1;
+		if (na->last_usermask)
+			mem += strlen(na->last_usermask) + 1;
+		if (na->last_realname)
+			mem += strlen(na->last_realname) + 1;
+		if (na->last_quit)
+			mem += strlen(na->last_quit) + 1;
 	}
 	*nrec = count;
 	*memuse = mem;
@@ -123,40 +118,38 @@ void get_aliases_stats(long *nrec, long *memuse)
 void get_core_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	unsigned i, j;
-	NickCore *nc;
+	unsigned j;
 
-	for (i = 0; i < 1024; i++)
+	for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 	{
-		for (nc = nclists[i]; nc; nc = nc->next)
+		NickCore *nc = it->second;
+
+		count++;
+		mem += sizeof(*nc);
+
+		if (nc->display)
+			mem += strlen(nc->display) + 1;
+		if (!nc->pass.empty())
+			mem += (nc->pass.capacity() + (2 * sizeof(size_t)) + (2 * sizeof(void*)));
+		if (nc->url)
+			mem += strlen(nc->url) + 1;
+		if (nc->email)
+			mem += strlen(nc->email) + 1;
+		if (nc->greet)
+			mem += strlen(nc->greet) + 1;
+
+		mem += sizeof(std::string) * nc->access.size();
+		for (j = 0; j < nc->access.size(); ++j)
+			mem += nc->GetAccess(j).length() + 1;
+
+		mem += nc->memos.memos.size() * sizeof(Memo);
+		for (j = 0; j < nc->memos.memos.size(); j++)
 		{
-			count++;
-			mem += sizeof(*nc);
-
-			if (nc->display)
-				mem += strlen(nc->display) + 1;
-			if (!nc->pass.empty())
-				mem += (nc->pass.capacity() + (2 * sizeof(size_t)) + (2 * sizeof(void*)));
-			if (nc->url)
-				mem += strlen(nc->url) + 1;
-			if (nc->email)
-				mem += strlen(nc->email) + 1;
-			if (nc->greet)
-				mem += strlen(nc->greet) + 1;
-
-			mem += sizeof(std::string) * nc->access.size();
-			for (j = 0; j < nc->access.size(); ++j)
-				mem += nc->GetAccess(j).length() + 1;
-
-			mem += nc->memos.memos.size() * sizeof(Memo);
-			for (j = 0; j < nc->memos.memos.size(); j++)
-			{
-				if (nc->memos.memos[j]->text)
-					mem += strlen(nc->memos.memos[j]->text) + 1;
-			}
-
-			mem += sizeof(void *) * nc->aliases.count;
+			if (nc->memos.memos[j]->text)
+				mem += strlen(nc->memos.memos[j]->text) + 1;
 		}
+
+		mem += sizeof(void *) * nc->aliases.count;
 	}
 	*nrec = count;
 	*memuse = mem;
@@ -192,11 +185,11 @@ void nickserv(User * u, char *buf)
 		{
 			s = "";
 		}
-		ircdproto->SendCTCP(findbot(Config.s_NickServ), u->nick.c_str(), "PING %s", s);
+		ircdproto->SendCTCP(NickServ, u->nick.c_str(), "PING %s", s);
 	}
 	else
 	{
-		mod_run_cmd(Config.s_NickServ, u, NICKSERV, cmd);
+		mod_run_cmd(NickServ, u, cmd);
 	}
 
 }
@@ -293,138 +286,111 @@ int validate_user(User * u)
 
 void expire_nicks()
 {
-	int i;
-	NickAlias *na, *next;
 	time_t now = time(NULL);
-	char *tmpnick;
 
-	for (i = 0; i < 1024; i++)
+	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end();)
 	{
-		for (na = nalists[i]; na; na = next)
+		NickAlias *na = it->second;
+		++it;
+		
+		User *u = finduser(na->nick);
+		if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified() : u->IsRecognized()))
 		{
-			next = na->next;
+			Alog(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
+			na->last_seen = now;
+			continue;
+		}
 
-			User *u = finduser(na->nick);
-			if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified() : u->IsRecognized()))
-			{
-				Alog(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
-				na->last_seen = now;
+		if (Config.NSExpire && now - na->last_seen >= Config.NSExpire
+		        && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE)
+		        && !na->nc->HasFlag(NI_SUSPENDED))
+		{
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
+			if (MOD_RESULT == EVENT_STOP)
 				continue;
-			}
-
-			if (Config.NSExpire && now - na->last_seen >= Config.NSExpire
-			        && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE)
-			        && !na->nc->HasFlag(NI_SUSPENDED))
-			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
-				if (MOD_RESULT == EVENT_STOP)
-					continue;
-				Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: "
-					<< (na->nc->email ? na->nc->email : "none") << ")";
-				tmpnick = sstrdup(na->nick);
-				delete na;
-				FOREACH_MOD(I_OnNickExpire, OnNickExpire(tmpnick));
-				delete [] tmpnick;
-			}
+			Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: "
+				<< (na->nc->email ? na->nc->email : "none") << ")";
+			FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
+			delete na;
 		}
 	}
 }
 
 void expire_requests()
 {
-	int i;
-	NickRequest *nr, *next;
 	time_t now = time(NULL);
-	for (i = 0; i < 1024; i++)
+
+	for (nickrequest_map::const_iterator it = NickRequestList.begin(); it != NickRequestList.end(); ++it)
 	{
-		for (nr = nrlists[i]; nr; nr = next)
+		NickRequest *nr = it->second;
+		
+		if (Config.NSRExpire && now - nr->requested >= Config.NSRExpire)
 		{
-			next = nr->next;
-			if (Config.NSRExpire && now - nr->requested >= Config.NSRExpire)
-			{
-				Alog() << "Request for nick " << nr->nick << " expiring";
-				delete nr;
-			}
+			Alog() << "Request for nick " << nr->nick << " expiring";
+			delete nr;
 		}
 	}
 }
 
 /*************************************************************************/
-/*************************************************************************/
-/* Return the NickRequest structire for the given nick, or NULL */
 
 NickRequest *findrequestnick(const char *nick)
 {
-	NickRequest *nr;
+	return findrequestnick(ci::string(nick));
+}
 
-	if (!*nick || !nick)
-	{
-		Alog(LOG_DEBUG) << "findrequestnick() called with NULL values";
-		return NULL;
-	}
+NickRequest *findrequestnick(const std::string &nick)
+{
+	return findrequestnick(ci::string(nick.c_str()));
+}
 
-	for (nr = nrlists[HASH(nick)]; nr; nr = nr->next)
-	{
-		if (stricmp(nr->nick, nick) == 0)
-		{
-			return nr;
-		}
-	}
+NickRequest *findrequestnick(const ci::string &nick)
+{
+	nickrequest_map::const_iterator it = NickRequestList.find(nick);
+
+	if (it != NickRequestList.end())
+		return it->second;
 	return NULL;
 }
 
-/* Return the NickAlias structure for the given nick, or NULL if the nick
- * isn't registered. */
-
 NickAlias *findnick(const char *nick)
 {
-	NickAlias *na;
-
-	if (!nick || !*nick)
-	{
-		Alog(LOG_DEBUG) << "findnick() called with NULL values";
-		return NULL;
-	}
-
-	for (na = nalists[HASH(nick)]; na; na = na->next)
-	{
-		if (stricmp(na->nick, nick) == 0)
-		{
-			return na;
-		}
-	}
-	return NULL;
+	return findnick(ci::string(nick));
 }
 
 NickAlias *findnick(const std::string &nick)
 {
-	return findnick(nick.c_str());
+	return findnick(ci::string(nick.c_str()));
+}
+
+NickAlias *findnick(const ci::string &nick)
+{
+	nickalias_map::const_iterator it = NickAliasList.find(nick);
+
+	if (it != NickAliasList.end())
+		return it->second;
+	return NULL;
 }
 
 /*************************************************************************/
 
-/* Return the NickCore structure for the given nick, or NULL if the core
- * doesn't exist. */
-
 NickCore *findcore(const char *nick)
 {
-	NickCore *nc;
+	return findcore(ci::string(nick));
+}
 
-	if (!nick || !*nick)
-	{
-		Alog(LOG_DEBUG) << "findcore() called with NULL values";
-		return NULL;
-	}
+NickCore *findcore(const std::string &nick)
+{
+	return findcore(ci::string(nick.c_str()));
+}
 
-	for (nc = nclists[HASH(nick)]; nc; nc = nc->next)
-	{
-		if (stricmp(nc->display, nick) == 0)
-		{
-			return nc;
-		}
-	}
+NickCore *findcore(const ci::string &nick)
+{
+	nickcore_map::const_iterator it = NickCoreList.find(nick);
 
+	if (it != NickCoreList.end())
+		return it->second;
 	return NULL;
 }
 
@@ -497,78 +463,6 @@ bool is_on_access(User *u, NickCore *nc)
 
 /*************************************************************************/
 
-/* Insert a nick alias alphabetically into the database. */
-
-void alpha_insert_alias(NickAlias * na)
-{
-	NickAlias *ptr, *prev;
-	char *nick;
-	int index;
-
-	if (!na)
-	{
-		Alog(LOG_DEBUG) << "alpha_insert_alias called with NULL values";
-		return;
-	}
-
-	nick = na->nick;
-	index = HASH(nick);
-
-	for (prev = NULL, ptr = nalists[index];
-	        ptr && stricmp(ptr->nick, nick) < 0; prev = ptr, ptr = ptr->next);
-	na->prev = prev;
-	na->next = ptr;
-	if (!prev)
-		nalists[index] = na;
-	else
-		prev->next = na;
-	if (ptr)
-		ptr->prev = na;
-}
-
-/*************************************************************************/
-
-/* Insert a nick core into the database. */
-
-void insert_core(NickCore * nc)
-{
-	int index;
-
-	if (!nc)
-	{
-		Alog(LOG_DEBUG) << "insert_core called with NULL values";
-		return;
-	}
-
-	index = HASH(nc->display);
-
-	nc->prev = NULL;
-	nc->next = nclists[index];
-	if (nc->next)
-		nc->next->prev = nc;
-	nclists[index] = nc;
-}
-
-/*************************************************************************/
-void insert_requestnick(NickRequest * nr)
-{
-	int index = HASH(nr->nick);
-	if (!nr)
-	{
-		Alog(LOG_DEBUG) << "insert_requestnick called with NULL values";
-		return;
-	}
-
-
-	nr->prev = NULL;
-	nr->next = nrlists[index];
-	if (nr->next)
-		nr->next->prev = nr;
-	nrlists[index] = nr;
-}
-
-/*************************************************************************/
-
 /* Sets nc->display to newdisplay. If newdisplay is NULL, it will change
  * it to the first alias in the list.
  */
@@ -576,32 +470,17 @@ void insert_requestnick(NickRequest * nr)
 
 void change_core_display(NickCore * nc, const char *newdisplay)
 {
-	/*
-	       if (!newdisplay) {
-			NickAlias *na;
-
-			if (nc->aliases.count <= 0)
-				return;
-
-			na = static_cast<NickAlias *>(nc->aliases.list[0]);
-			newdisplay = na->nick;
-		}
-	*/
 	/* Log ... */
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
 	Alog() << Config.s_NickServ << ": changing " << nc->display << " nickname group display to " << newdisplay;
 
 	/* Remove the core from the list */
-	if (nc->next)
-		nc->next->prev = nc->prev;
-	if (nc->prev)
-		nc->prev->next = nc->next;
-	else
-		nclists[HASH(nc->display)] = nc->next;
+	NickCoreList.erase(nc->display);
 
 	delete [] nc->display;
 	nc->display = sstrdup(newdisplay);
-	insert_core(nc);
+
+	NickCoreList[nc->display] = nc;
 }
 
 void change_core_display(NickCore * nc)

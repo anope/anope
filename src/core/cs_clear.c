@@ -171,7 +171,7 @@ class CSClear : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSClear());
+		this->AddCommand(ChanServ, new CommandCSClear());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

@@ -43,9 +43,9 @@ class CommandOSKick : public Command
 			return MOD_CONT;
 		}
 
-		c->Kick(findbot(Config.s_OperServ), u2, "%s (%s)", u->nick.c_str(), s);
+		c->Kick(OperServ, u2, "%s (%s)", u->nick.c_str(), s);
 		if (Config.WallOSKick)
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan);
+			ircdproto->SendGlobops(OperServ, "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan);
 		return MOD_CONT;
 	}
 
@@ -70,7 +70,7 @@ class OSKick : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSKick());
+		this->AddCommand(OperServ, new CommandOSKick());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

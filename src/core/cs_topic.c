@@ -55,14 +55,14 @@ class CommandCSTopic : public Command
 
 			if (!check_access(u, ci, CA_TOPIC))
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
-			if (ircd->join2set && whosends(ci) == findbot(Config.s_ChanServ))
+			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
-				ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name.c_str(), c->creation_time);
+				ircdproto->SendJoin(ChanServ, c->name.c_str(), c->creation_time);
 				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ);
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic ? topic : "");
-			if (ircd->join2set && whosends(ci) == findbot(Config.s_ChanServ))
-				ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+			if (ircd->join2set && whosends(ci) == ChanServ)
+				ircdproto->SendPart(ChanServ, c, NULL);
 		}
 		return MOD_CONT;
 	}
@@ -88,7 +88,7 @@ class CSTopic : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSTopic());
+		this->AddCommand(ChanServ, new CommandCSTopic());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

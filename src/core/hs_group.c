@@ -56,7 +56,7 @@ class HSGroup : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(HOSTSERV, new CommandHSGroup());
+		this->AddCommand(HostServ, new CommandHSGroup());
 
 		ModuleManager::Attach(I_OnHostServHelp, this);
 	}

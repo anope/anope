@@ -89,8 +89,8 @@ class CSKick : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSKick("KICK"));
-		this->AddCommand(CHANSERV, new CommandCSKick("K"));
+		this->AddCommand(ChanServ, new CommandCSKick("KICK"));
+		this->AddCommand(ChanServ, new CommandCSKick("K"));
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

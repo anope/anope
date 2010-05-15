@@ -84,7 +84,7 @@ class CSInvite : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(CHANSERV, new CommandCSInvite());
+		this->AddCommand(ChanServ, new CommandCSInvite());
 
 		ModuleManager::Attach(I_OnChanServHelp, this);
 	}

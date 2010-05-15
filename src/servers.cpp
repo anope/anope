@@ -80,7 +80,7 @@ Server::Server(Server *uplink, const std::string &name, unsigned int hops, const
 		if (LogChan && ircd->join2msg)
 		{
 			/* XXX might desync */
-			ircdproto->SendJoin(findbot(Config.s_GlobalNoticer), Config.LogChannel, time(NULL));
+			ircdproto->SendJoin(Global, Config.LogChannel, time(NULL));
 		}
 	}
 }
@@ -93,12 +93,12 @@ Server::~Server()
 
 	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
 	{
-		User *nextu;
 		time_t t = time(NULL);
 
-		for (User *u = firstuser(); u; u = nextu)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 		{
-			nextu = nextuser();
+			User *u = it->second;
+			++it;
 
 			if (u->server == this)
 			{
@@ -402,7 +402,7 @@ void do_squit(const char *source, int ac, const char **av)
 	if (s->HasFlag(SERVER_JUPED))
 	{
 		snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s", s->GetName().c_str());
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), buf);
+		ircdproto->SendGlobops(OperServ, buf);
 	}
 
 	snprintf(buf, sizeof(buf), "%s %s", s->GetName().c_str(), s->GetUplink()->GetName().c_str());

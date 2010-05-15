@@ -83,7 +83,7 @@ class CommandOSChanKill : public Command
 					check_akill(uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->host, NULL, NULL);
 				}
 				if (Config.WallOSAkill)
-					ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel, realreason.c_str());
+					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel, realreason.c_str());
 			}
 			else
 				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
@@ -113,7 +113,7 @@ class OSChanKill : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSChanKill());
+		this->AddCommand(OperServ, new CommandOSChanKill());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

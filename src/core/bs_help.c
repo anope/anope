@@ -25,7 +25,7 @@ class CommandBSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		mod_help_cmd(Config.s_BotServ, u, BOTSERV, params[0].c_str());
+		mod_help_cmd(findbot(Config.s_BotServ), u, params[0].c_str());
 		return MOD_CONT;
 	}
 
@@ -46,7 +46,7 @@ class BSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSHelp());
+		this->AddCommand(BotServ, new CommandBSHelp());
 	}
 };
 

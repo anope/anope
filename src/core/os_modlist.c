@@ -23,7 +23,6 @@ class CommandOSModList : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		int idx;
 		int count = 0;
 		int showCore = 0;
 		int showThird = 1;
@@ -34,7 +33,6 @@ class CommandOSModList : public Command
 		int showDB = 1;
 
 		ci::string param = params.size() ? params[0] : "";
-		ModuleHash *current = NULL;
 
 		char core[] = "Core";
 		char third[] = "3rd";
@@ -120,61 +118,60 @@ class CommandOSModList : public Command
 
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST_HEADER);
 
-		for (idx = 0; idx != MAX_CMD_HASH; ++idx)
+		for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
 		{
-			for (current = MODULE_HASH[idx]; current; current = current->next)
+			Module *m = *it;
+
+			switch (m->type)
 			{
-				switch (current->m->type)
-				{
-					case CORE:
-						if (showCore)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), core);
-							++count;
-						}
-						break;
-					case THIRD:
-						if (showThird)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), third);
-							++count;
-						}
-						break;
-					case PROTOCOL:
-						if (showProto)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), proto);
-							++count;
-						}
-						break;
-					case SUPPORTED:
-						if (showSupported)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), supported);
-							++count;
-						}
-						break;
-					case QATESTED:
-						if (showQA)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), qa);
-							++count;
-						}
-						break;
-					case ENCRYPTION:
-						if (showEnc)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), enc);
-							++count;
-						}
-						break;
-					case DATABASE:
-						if (showDB)
-						{
-							notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, current->name, current->m->version.c_str(), db);
-							++count;
-						}
-				}
+				case CORE:
+					if (showCore)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), core);
+						++count;
+					}
+					break;
+				case THIRD:
+					if (showThird)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), third);
+						++count;
+					}
+					break;
+				case PROTOCOL:
+					if (showProto)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), proto);
+						++count;
+					}
+					break;
+				case SUPPORTED:
+					if (showSupported)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), supported);
+						++count;
+					}
+					break;
+				case QATESTED:
+					if (showQA)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), qa);
+						++count;
+					}
+					break;
+				case ENCRYPTION:
+					if (showEnc)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), enc);
+						++count;
+					}
+					break;
+				case DATABASE:
+					if (showDB)
+					{
+						notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), db);
+						++count;
+					}
 			}
 		}
 		if (!count)
@@ -201,7 +198,7 @@ class OSModList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSModList());
+		this->AddCommand(OperServ, new CommandOSModList());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

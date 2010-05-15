@@ -79,7 +79,7 @@ class CommandNSSuspend : public Command
 			}
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick);
+				ircdproto->SendGlobops(NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick);
 
 			Alog() << Config.s_NickServ << ": " << u->nick << " set SUSPEND for nick " << nick;
 			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
@@ -147,7 +147,7 @@ class CommandNSUnSuspend : public Command
 			na->nc->UnsetFlag(NI_SUSPENDED);
 
 			if (Config.WallForbid)
-				ircdproto->SendGlobops(findbot(Config.s_NickServ), "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick);
+				ircdproto->SendGlobops(NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick);
 
 			Alog() << Config.s_NickServ << ": " << u->nick << " set UNSUSPEND for nick " << nick;
 			notice_lang(Config.s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
@@ -183,8 +183,8 @@ class NSSuspend : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSSuspend());
-		this->AddCommand(NICKSERV, new CommandNSUnSuspend());
+		this->AddCommand(NickServ, new CommandNSSuspend());
+		this->AddCommand(NickServ, new CommandNSUnSuspend());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

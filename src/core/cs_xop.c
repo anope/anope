@@ -540,9 +540,9 @@ class CSXOP : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(CHANSERV, new CommandCSSOP());
-		this->AddCommand(CHANSERV, new CommandCSAOP());
-		this->AddCommand(CHANSERV, new CommandCSVOP());
+		this->AddCommand(ChanServ, new CommandCSSOP());
+		this->AddCommand(ChanServ, new CommandCSAOP());
+		this->AddCommand(ChanServ, new CommandCSVOP());
 
 		if (Me && Me->IsSynced())
 			OnUplinkSync();
@@ -556,15 +556,15 @@ class CSXOP : public Module
 	void OnUplinkSync()
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			this->AddCommand(CHANSERV, new CommandCSQOP());
+			this->AddCommand(ChanServ, new CommandCSQOP());
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-			this->AddCommand(CHANSERV, new CommandCSHOP());
+			this->AddCommand(ChanServ, new CommandCSHOP());
 	}
 
 	void OnServerDisconnect()
 	{
-		this->DelCommand(CHANSERV, "QOP");
-		this->DelCommand(CHANSERV, "HOP");
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "QOP"));
+		this->DelCommand(ChanServ, FindCommand(ChanServ, "HOP"));
 	}
 
 	void OnChanServHelp(User *u)

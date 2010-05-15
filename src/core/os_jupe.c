@@ -42,7 +42,7 @@ class CommandOSJupe : public Command
 			ircdproto->SendServer(juped_server);
 
 			if (Config.WallOSJupe)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver);
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver);
 		}
 		return MOD_CONT;
 	}
@@ -68,7 +68,7 @@ class OSJupe : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSJupe());
+		this->AddCommand(OperServ, new CommandOSJupe());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

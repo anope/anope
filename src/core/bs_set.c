@@ -185,7 +185,7 @@ class BSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSSet());
+		this->AddCommand(BotServ, new CommandBSSet());
 
 		ModuleManager::Attach(I_OnBotServHelp, this);
 	}

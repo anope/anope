@@ -127,20 +127,17 @@ class NSMaxEmail : public Module
 
 int count_email_in_use(const char *email, User * u)
 {
-	NickCore *nc;
-	int i;
 	int count = 0;
 
 	if (!email)
 		return 0;
 
-	for (i = 0; i < 1024; ++i)
+	for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 	{
-		for (nc = nclists[i]; nc; nc = nc->next)
-		{
-			if (!(u->Account() && u->Account() == nc) && nc->email && !stricmp(nc->email, email))
-				++count;
-		}
+		NickCore *nc = it->second;
+
+		if (!(u->Account() && u->Account() == nc) && nc->email && !stricmp(nc->email, email))
+			++count;
 	}
 
 	return count;

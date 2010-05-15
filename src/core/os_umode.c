@@ -41,13 +41,13 @@ class CommandOSUMode : public Command
 			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
 		else
 		{
-			u2->SetModes(findbot(Config.s_OperServ), modes);
+			u2->SetModes(OperServ, modes);
 
 			notice_lang(Config.s_OperServ, u, OPER_UMODE_SUCCESS, nick);
 			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick.c_str());
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "\2%s\2 used UMODE on %s", u->nick.c_str(), nick);
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used UMODE on %s", u->nick.c_str(), nick);
 		}
 		return MOD_CONT;
 	}
@@ -73,7 +73,7 @@ class OSUMode : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSUMode());
+		this->AddCommand(OperServ, new CommandOSUMode());
 
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");

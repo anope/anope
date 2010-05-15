@@ -63,7 +63,7 @@ class BSUnassign : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(BOTSERV, new CommandBSUnassign);
+		this->AddCommand(BotServ, new CommandBSUnassign);
 
 		ModuleManager::Attach(I_OnBotServHelp, this);
 	}

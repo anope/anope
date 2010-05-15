@@ -38,9 +38,9 @@ class CommandOSChanList : public Command
 		{
 			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
 
-			for (UChannelList::iterator it = u2->chans.begin(); it != u2->chans.end(); ++it)
+			for (UChannelList::iterator uit = u2->chans.begin(); uit != u2->chans.end(); ++uit)
 			{
-				ChannelContainer *cc = *it;
+				ChannelContainer *cc = *uit;
 
 				if (!Modes.empty())
 				{
@@ -56,27 +56,24 @@ class CommandOSChanList : public Command
 		}
 		else
 		{
-			int i;
-			Channel *c;
-
 			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER);
 
-			for (i = 0; i < 1024; ++i)
+			for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
 			{
-				for (c = chanlist[i]; c; c = c->next)
+				Channel *c = cit->second;
+				
+				if (pattern && !Anope::Match(c->name, pattern, false))
+					continue;
+				if (!Modes.empty())
 				{
-					if (pattern && !Anope::Match(c->name, pattern, false))
-						continue;
-					if (!Modes.empty())
+					for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
 					{
-						for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
-						{
-							if (!c->HasMode(*it))
-								continue;
-						}
+						if (!c->HasMode(*it))
+							continue;
 					}
-					notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
 				}
+
+				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
 			}
 		}
 
@@ -100,7 +97,7 @@ class OSChanList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSChanList());
+		this->AddCommand(OperServ, new CommandOSChanList());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

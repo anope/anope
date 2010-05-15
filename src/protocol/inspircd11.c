@@ -97,7 +97,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 		send_cmd(Config.s_OperServ, "CHGHOST %s %s", nick, vhost);
 	}
 	else
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST not loaded!");
+		ircdproto->SendGlobops(OperServ, "CHGHOST not loaded!");
 }
 
 int anope_event_idle(const char *source, int ac, const char **av)
@@ -264,7 +264,7 @@ class InspIRCdProto : public IRCDProto
 			}
 			send_cmd(Config.s_OperServ, "CHGIDENT %s %s", nick, vIdent);
 		} else {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT not loaded!");
+			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
 		}
 	}
 
@@ -295,7 +295,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSMODE +- */
 	void SendUnregisteredNick(User *u)
 	{
-		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -1080,13 +1080,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SVSHOLD missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chghostmod) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chgidentmod) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
 		}
 		ircd->svshold = has_svsholdmod;
 	}
@@ -1102,40 +1102,39 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 }
 
 
-void moduleAddIRCDMsgs() {
-	Message *m;
-
-	m = createMessage("ENDBURST",  anope_event_endburst); addCoreMessage(IRCD, m);
-	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
-	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
-	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);
-	m = createMessage("KICK",	  anope_event_kick); addCoreMessage(IRCD,m);
-	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
-	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
-	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("CAPAB",	 anope_event_capab); addCoreMessage(IRCD,m);
-	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
-	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
-	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
-	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);
-	m = createMessage("SQUIT",	 anope_event_squit); addCoreMessage(IRCD,m);
-	m = createMessage("RSQUIT",	anope_event_rsquit); addCoreMessage(IRCD,m);
-	m = createMessage("TOPIC",	 anope_event_topic); addCoreMessage(IRCD,m);
-	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
-	m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
-	m = createMessage("FHOST",	 anope_event_chghost); addCoreMessage(IRCD,m);
-	m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
-	m = createMessage("FNAME",	 anope_event_chgname); addCoreMessage(IRCD,m);
-	m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
-	m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
-	m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
-	m = createMessage("FJOIN",	 anope_event_fjoin); addCoreMessage(IRCD,m);
-	m = createMessage("FMODE",	 anope_event_fmode); addCoreMessage(IRCD,m);
-	m = createMessage("FTOPIC",	anope_event_ftopic); addCoreMessage(IRCD,m);
-	m = createMessage("OPERTYPE",  anope_event_opertype); addCoreMessage(IRCD,m);
-	m = createMessage("IDLE",	  anope_event_idle); addCoreMessage(IRCD,m);
+void moduleAddIRCDMsgs()
+{
+	Anope::AddMessage("ENDBURST", anope_event_endburst);
+	Anope::AddMessage("436", anope_event_436);
+	Anope::AddMessage("AWAY", anope_event_away);
+	Anope::AddMessage("JOIN", anope_event_join);
+	Anope::AddMessage("KICK", anope_event_kick);
+	Anope::AddMessage("KILL", anope_event_kill);
+	Anope::AddMessage("MODE", anope_event_mode);
+	Anope::AddMessage("MOTD", anope_event_motd);
+	Anope::AddMessage("NICK", anope_event_nick);
+	Anope::AddMessage("CAPAB",anope_event_capab);
+	Anope::AddMessage("PART", anope_event_part);
+	Anope::AddMessage("PING", anope_event_ping);
+	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
+	Anope::AddMessage("QUIT", anope_event_quit);
+	Anope::AddMessage("SERVER", anope_event_server);
+	Anope::AddMessage("SQUIT", anope_event_squit);
+	Anope::AddMessage("RSQUIT", anope_event_rsquit);
+	Anope::AddMessage("TOPIC", anope_event_topic);
+	Anope::AddMessage("WHOIS", anope_event_whois);
+	Anope::AddMessage("SVSMODE", anope_event_mode);
+	Anope::AddMessage("FHOST", anope_event_chghost);
+	Anope::AddMessage("CHGIDENT", anope_event_chgident);
+	Anope::AddMessage("FNAME", anope_event_chgname);
+	Anope::AddMessage("SETHOST", anope_event_sethost);
+	Anope::AddMessage("SETIDENT", anope_event_setident);
+	Anope::AddMessage("SETNAME", anope_event_setname);
+	Anope::AddMessage("FJOIN", anope_event_fjoin);
+	Anope::AddMessage("FMODE", anope_event_fmode);
+	Anope::AddMessage("FTOPIC", anope_event_ftopic);
+	Anope::AddMessage("OPERTYPE", anope_event_opertype);
+	Anope::AddMessage("IDLE", anope_event_idle);
 }
 
 bool ChannelModeFlood::IsValid(const std::string &value)

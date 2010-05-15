@@ -52,7 +52,7 @@ class OSShutdown : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSShutdown());
+		this->AddCommand(OperServ, new CommandOSShutdown());
 
 		ModuleManager::Attach(I_OnOperServHelp, this);
 	}

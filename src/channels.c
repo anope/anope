@@ -15,11 +15,7 @@
 #include "language.h"
 #include "modules.h"
 
-Channel *chanlist[1024];
-
-#define HASH(chan)	((chan)[1] ? ((chan)[1]&31)<<5 | ((chan)[2]&31) : 0)
-
-/*************************************************************************/
+channel_map ChannelList;
 
 /** Default constructor
  * @param name The channel name
@@ -27,18 +23,12 @@ Channel *chanlist[1024];
  */
 Channel::Channel(const std::string &name, time_t ts)
 {
-	Channel **list;
-
 	if (name.empty())
 		throw CoreException("A channel without a name ?");
 
 	this->name = name;
-	list = &chanlist[HASH(this->name)];
-	this->prev = NULL;
-	this->next = *list;
-	if (*list)
-		(*list)->prev = this;
-	*list = this;
+
+	ChannelList[this->name.c_str()] = this;
 
 	this->creation_time = ts;
 	this->topic = NULL;
@@ -102,12 +92,7 @@ Channel::~Channel()
 		}
 	}
 
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		chanlist[HASH(this->name)] = this->next;
+	ChannelList.erase(this->name.c_str());
 }
 
 void Channel::Sync()
@@ -1051,61 +1036,23 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 
 /*************************************************************************/
 
-/* Return the Channel structure corresponding to the named channel, or NULL
- * if the channel was not found.  chan is assumed to be non-NULL and valid
- * (i.e. pointing to a channel name of 2 or more characters). */
-
 Channel *findchan(const char *chan)
 {
-	Channel *c;
+	return findchan(ci::string(chan));
+}
 
-	if (!chan || !*chan)
-	{
-		Alog(LOG_DEBUG) << "findchan() called with NULL values";
-		return NULL;
-	}
+Channel *findchan(const std::string &chan)
+{
+	return findchan(ci::string(chan.c_str()));
+}
 
-	c = chanlist[HASH(chan)];
-	while (c)
-	{
-		if (stricmp(c->name.c_str(), chan) == 0)
-		{
-			Alog(LOG_DEBUG_3) << "findchan(" << chan << ") -> " << static_cast<void *>(c);
-			return c;
-		}
-		c = c->next;
-	}
+Channel *findchan(const ci::string &chan)
+{
+	channel_map::const_iterator it = ChannelList.find(chan);
+
+	if (it != ChannelList.end())
+		return it->second;
 	return NULL;
-}
-
-/*************************************************************************/
-
-/* Iterate over all channels in the channel list.  Return NULL at end of
- * list.
- */
-
-static Channel *current;
-static int next_index;
-
-Channel *firstchan()
-{
-	next_index = 0;
-	while (next_index < 1024 && current == NULL)
-		current = chanlist[next_index++];
-	Alog(LOG_DEBUG_3) << "firstchan() returning " << (current ? current->name : "NULL (end of list)");
-	return current;
-}
-
-Channel *nextchan()
-{
-	if (current)
-		current = current->next;
-	if (!current && next_index < 1024) {
-		while (next_index < 1024 && current == NULL)
-			current = chanlist[next_index++];
-	}
-	Alog(LOG_DEBUG_3) << "nextchan() returning " << (current ? current->name : "NULL (end of list)");
-	return current;
 }
 
 /*************************************************************************/
@@ -1115,40 +1062,39 @@ Channel *nextchan()
 void get_channel_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	Channel *chan;
 	BanData *bd;
-	int i;
 	std::string buf;
 
-	for (i = 0; i < 1024; i++) {
-		for (chan = chanlist[i]; chan; chan = chan->next) {
-			count++;
-			mem += sizeof(*chan);
-			if (chan->topic)
-				mem += strlen(chan->topic) + 1;
-			if (chan->GetParam(CMODE_KEY, buf))
-				mem += buf.length() + 1;
-			if (chan->GetParam(CMODE_FLOOD, buf))
-				mem += buf.length() + 1;
-			if (chan->GetParam(CMODE_REDIRECT, buf))
-				mem += buf.length() + 1;
-			mem += get_memuse(chan->bans);
-			if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-				mem += get_memuse(chan->excepts);
-			if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
-				mem += get_memuse(chan->invites);
-			for (CUserList::iterator it = chan->users.begin(); it != chan->users.end(); ++it)
-			{
-				mem += sizeof(*it);
-				mem += sizeof((*it)->ud);
-				if ((*it)->ud.lastline)
-					mem += strlen((*it)->ud.lastline) + 1;
-			}
-			for (bd = chan->bd; bd; bd = bd->next) {
-				if (bd->mask)
-					mem += strlen(bd->mask) + 1;
-				mem += sizeof(*bd);
-			}
+	for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
+	{
+		Channel *chan = cit->second;
+
+		count++;
+		mem += sizeof(*chan);
+		if (chan->topic)
+			mem += strlen(chan->topic) + 1;
+		if (chan->GetParam(CMODE_KEY, buf))
+			mem += buf.length() + 1;
+		if (chan->GetParam(CMODE_FLOOD, buf))
+			mem += buf.length() + 1;
+		if (chan->GetParam(CMODE_REDIRECT, buf))
+			mem += buf.length() + 1;
+		mem += get_memuse(chan->bans);
+		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
+			mem += get_memuse(chan->excepts);
+		if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
+			mem += get_memuse(chan->invites);
+		for (CUserList::iterator it = chan->users.begin(); it != chan->users.end(); ++it)
+		{
+			mem += sizeof(*it);
+			mem += sizeof((*it)->ud);
+			if ((*it)->ud.lastline)
+				mem += strlen((*it)->ud.lastline) + 1;
+		}
+		for (bd = chan->bd; bd; bd = bd->next) {
+			if (bd->mask)
+				mem += strlen(bd->mask) + 1;
+			mem += sizeof(*bd);
 		}
 	}
 	*nrec = count;
@@ -1542,10 +1488,10 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
  */
 void MassChannelModes(BotInfo *bi, const std::string &modes)
 {
-	Channel *c;
-
-	for (c = firstchan(); c; c = nextchan())
+	for (channel_map::const_iterator it = ChannelList.begin(); it != ChannelList.end(); ++it)
 	{
+		Channel *c = it->second;
+
 		if (c->bouncy_modes)
 			return;
 		c->SetModes(bi, false, modes.c_str());
@@ -1556,9 +1502,10 @@ void MassChannelModes(BotInfo *bi, const std::string &modes)
 
 void restore_unsynced_topics()
 {
-	Channel *c;
+	for (channel_map::const_iterator it = ChannelList.begin(); it != ChannelList.end(); ++it)
+	{
+		Channel *c = it->second;
 
-	for (c = firstchan(); c; c = nextchan()) {
 		if (!(c->topic_sync))
 			restore_topic(c->name.c_str());
 	}

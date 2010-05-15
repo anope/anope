@@ -193,8 +193,8 @@ class OSInfo : public Module
 		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(NICKSERV, new CommandNSOInfo());
-		this->AddCommand(CHANSERV, new CommandCSOInfo());
+		this->AddCommand(NickServ, new CommandNSOInfo());
+		this->AddCommand(ChanServ, new CommandCSOInfo());
 
 		const char* langtable_en_us[] = {
 			/* OINFO_SYNTAX */
@@ -415,27 +415,20 @@ class OSInfo : public Module
 
 	~OSInfo()
 	{
-		int i;
-		NickCore *nc;
-		ChannelInfo *ci;
-
 		OnSaveDatabase();
 
-		for (i = 0; i < 1024; ++i)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 		{
-			/* Remove the nick Cores */
-			for (nc = nclists[i]; nc; nc = nc->next)
-			{
-				nc->Shrink("os_info");
-			}
+			NickCore *nc = it->second;
+
+			nc->Shrink("os_info");
 		}
 
-		for (i = 0; i < 256; ++i)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
 		{
-			for (ci = chanlists[i]; ci; ci = ci->next)
-			{
-				ci->Shrink("os_info");
-			}
+			ChannelInfo *ci = it->second;
+
+			ci->Shrink("os_info");
 		}
 	}
 

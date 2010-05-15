@@ -378,10 +378,10 @@ class HSRequest : public Module
 	{
 		me = this;
 
-		this->AddCommand(HOSTSERV, new CommandHSRequest());
-		this->AddCommand(HOSTSERV, new CommandHSActivate());
-		this->AddCommand(HOSTSERV, new CommandHSReject());
-		this->AddCommand(HOSTSERV, new CommandHSWaiting());
+		this->AddCommand(HostServ, new CommandHSRequest());
+		this->AddCommand(HostServ, new CommandHSActivate());
+		this->AddCommand(HostServ, new CommandHSReject());
+		this->AddCommand(HostServ, new CommandHSWaiting());
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);
@@ -670,7 +670,7 @@ class HSRequest : public Module
 				if (!key.empty() && key == "+req")
 				{
 					std::vector<ci::string> emptyParams;
-					Command *c = findCommand(HOSTSERV, "WAITING");
+					Command *c = FindCommand(HostServ, "WAITING");
 					c->Execute(u, emptyParams);
 					return EVENT_STOP;
 				}

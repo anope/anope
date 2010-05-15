@@ -210,7 +210,7 @@ class NSInfo : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSInfo());
+		this->AddCommand(NickServ, new CommandNSInfo());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

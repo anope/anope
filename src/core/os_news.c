@@ -396,9 +396,9 @@ class OSNews : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(OPERSERV, new CommandOSLogonNews());
-		this->AddCommand(OPERSERV, new CommandOSOperNews());
-		this->AddCommand(OPERSERV, new CommandOSRandomNews());
+		this->AddCommand(OperServ, new CommandOSLogonNews());
+		this->AddCommand(OperServ, new CommandOSOperNews());
+		this->AddCommand(OperServ, new CommandOSRandomNews());
 
 		Implementation i[] = { I_OnOperServHelp, I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 5);

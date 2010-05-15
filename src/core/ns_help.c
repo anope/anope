@@ -34,7 +34,7 @@ class CommandNSHelp : public Command
 				u->SendMessage(Config.s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
 		}
 		else
-			mod_help_cmd(Config.s_NickServ, u, NICKSERV, cmd.c_str());
+			mod_help_cmd(NickServ, u, cmd.c_str());
 
 		return MOD_CONT;
 	}
@@ -60,7 +60,7 @@ class NSHelp : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSHelp());
+		this->AddCommand(NickServ, new CommandNSHelp());
 	}
 };
 

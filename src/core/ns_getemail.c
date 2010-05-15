@@ -29,29 +29,30 @@ class CommandNSGetEMail : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ci::string email = params[0];
-		int i, j = 0;
-		NickCore *nc;
+		int j = 0;
 
 		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
-		for (i = 0; i < 1024; ++i)
+
+		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
 		{
-			for (nc = nclists[i]; nc; nc = nc->next)
+			NickCore *nc = it->second;
+
+			if (nc->email)
 			{
-				if (nc->email)
+				if (nc->email == email)
 				{
-					if (nc->email == email)
-					{
-						++j;
-						notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
-					}
+					++j;
+					notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
 				}
 			}
 		}
+
 		if (j <= 0)
 		{
 			notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
 			return MOD_CONT;
 		}
+
 		return MOD_CONT;
 	}
 
@@ -76,7 +77,7 @@ class NSGetEMail : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
-		this->AddCommand(NICKSERV, new CommandNSGetEMail());
+		this->AddCommand(NickServ, new CommandNSGetEMail());
 
 		ModuleManager::Attach(I_OnNickServHelp, this);
 	}

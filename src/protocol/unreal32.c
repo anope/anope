@@ -14,7 +14,7 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
 
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",		/* ircd name */

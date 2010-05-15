@@ -188,6 +188,8 @@ void write_version(FILE * fd, const char *input)
 			until_eof = 1;
 	}
 
+	if (fdin)
+		fclose(fdin);
 }
 
 void parse_line(FILE * fd, char *line)

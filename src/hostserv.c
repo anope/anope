@@ -11,9 +11,9 @@
  *
  */
 
-/*************************************************************************/
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
+#include "language.h"
 
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
 				 char *creator, time_t time);

@@ -14,6 +14,8 @@
 
 #include "module.h"
 
+#define lenof(a)        (sizeof(a) / sizeof(*(a)))
+
 /* List of messages for each news type.  This simplifies message sending. */
 
 #define MSG_SYNTAX	0

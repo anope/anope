@@ -12,7 +12,6 @@
  */
 
 #include "services.h"
-#include "pseudo.h"
 
 static FILE *logfile;
 

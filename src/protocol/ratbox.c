@@ -12,7 +12,7 @@
  */
 
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
 
 static char *TS6UPLINK = NULL; // XXX is this needed?
 

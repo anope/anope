@@ -1,5 +1,5 @@
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
 
 /** Default constructor
  * @param display The display nick

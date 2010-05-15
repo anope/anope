@@ -14,9 +14,8 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "pseudo.h"
-
-/*************************************************************************/
+#include "modules.h"
+#include "language.h"
 
 static UserData *get_user_data(Channel * c, User * u);
 

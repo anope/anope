@@ -13,9 +13,8 @@
  */
 
 #include "services.h"
-#include "pseudo.h"
-
-/*************************************************************************/
+#include "modules.h"
+#include "language.h"
 
 nickalias_map NickAliasList;
 nickcore_map NickCoreList;

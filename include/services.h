@@ -34,9 +34,9 @@
 # define u_int32_t uint32_t
 # define u_int64_t uint64_t
 
-#  ifndef INADDR_NONE
-#   define INADDR_NONE (-1)
-#  endif
+# ifndef INADDR_NONE
+#  define INADDR_NONE (-1)
+# endif
 #endif
 
 
@@ -96,6 +96,13 @@ extern CoreExport int inet_pton(int af, const char *src, void *dst);
 extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
 #endif
 
+/* Telling compilers about printf()-like functions: */
+#ifdef __GNUC__
+# define FORMAT(type,fmt,start) __attribute__((format(type,fmt,start)))
+#else
+# define FORMAT(type,fmt,start)
+#endif
+
 #ifdef HAVE_GETTIMEOFDAY
 # include <sys/time.h>
 #endif
@@ -140,10 +147,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 #undef toupper
 #define tolower tolower_
 #define toupper toupper_
-
-/* We also have our own encrypt(). */
-#define encrypt encrypt_
-
 
 #ifdef __WINS__
 #ifndef BKCHECK
@@ -199,7 +202,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 
 /* Miscellaneous definitions. */
 #include "hashcomp.h"
-#include "defs.h"
 #include "slist.h"
 
 /* Pull in the various bits of STL */

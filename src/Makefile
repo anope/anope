@@ -4,8 +4,8 @@ OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o comm
 		nickcore.o nickserv.o operserv.o process.o protocol.o regchannel.o send.o servers.o sessions.o slist.o \
 		sockets.o threadengine.o threadengine_pthread.o timers.o opertype.o users.o wildcard.o
 
-INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
-	../include/pseudo.h ../include/sysconf.h ../include/config.h \
+INCLUDES = ../include/commands.h ../include/language.h \
+	../include/sysconf.h ../include/config.h \
 	../include/services.h ../include/regchannel.h \
 	../include/timers.h ../include/extern.h \
 	../include/modules.h ../include/slist.h ../include/hashcomp.h \

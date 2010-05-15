@@ -12,7 +12,8 @@
  */
 
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
+
 Uplink *uplink_server;
 
 extern void moduleAddMsgs();
@@ -194,13 +195,13 @@ int init_primary(int ac, char **av)
 
 	if (GetCommandLineArgument("version", 'v'))
 	{
-		Alog(LOG_TERMINAL) << "Anope-" << version_number << version_flags << " -- " << version_build;
+		Alog(LOG_TERMINAL) << "Anope-" << version_number << " -- " << version_build;
 		return -1;
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
-		Alog(LOG_TERMINAL) << "Anope-" << version_number << version_flags << " -- " << version_build;
+		Alog(LOG_TERMINAL) << "Anope-" << version_number << " -- " << version_build;
 		Alog(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
 		Alog(LOG_TERMINAL) << "Usage ./" << SERVICES_BIN << " [options] ...";
 		Alog(LOG_TERMINAL) << "-c, --config=filename.conf";

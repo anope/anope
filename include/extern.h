@@ -223,7 +223,6 @@ E const char version_number[];
 E const char version_number_dotted[];
 E const char version_build[];
 E char *version_protocol;
-E const char version_flags[];
 
 E std::string services_dir;
 E std::string log_filename;

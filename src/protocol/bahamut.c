@@ -14,7 +14,7 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
 
 IRCDVar myIrcd[] = {
 	{"Bahamut 1.8.x", /* ircd name */

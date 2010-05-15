@@ -1,16 +1,13 @@
 
-all: services.h extern.h pseudo.h version.h
+all: services.h extern.h version.h
 
-version.h: Makefile version.sh services.h pseudo.h $(SRCS)
+version.h: Makefile version.sh services.h $(SRCS)
 	sh version.sh ../version.log $@
 
 services.h: sysconf.h config.h extern.h
 	touch $@
 
 extern.h: slist.h
-	touch $@
-
-pseudo.h: commands.h timers.h slist.h
 	touch $@
 
 clean:

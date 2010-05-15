@@ -14,10 +14,8 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "pseudo.h"
-
-/*************************************************************************/
-/* *INDENT-OFF* */
+#include "modules.h"
+#include "language.h"
 
 registered_channel_map RegisteredChannelList;
 

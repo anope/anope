@@ -57,16 +57,6 @@ cat >$VERSIONH <<EOF
 #define VERSION_STRING "$VERSION"
 #define VERSION_STRING_DOTTED "$VERSIONDOTTED"
 
-#if defined(_WIN32)
-# if _MSC_VER >= 1400
-#  define VER_OS "W"
-# else
-#  define VER_OS "w"
-# endif
-#else
-# define VER_OS
-#endif
-
 #endif
 
 EOF

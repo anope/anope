@@ -198,6 +198,12 @@ void do_restart_services()
 
 	if (!quitmsg)
 		quitmsg = "Restarting";
+	/* Send a quit for all of our bots */
+	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+	{
+		/* Don't use quitmsg here, it may contain information you don't want people to see */
+		ircdproto->SendQuit(it->second, "Restarting");
+	}
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
 	/* Process to send the last bits of information before disconnecting */
 	socketEngine.Process();
@@ -232,6 +238,13 @@ static void services_shutdown()
 	Alog() << quitmsg;
 	if (started && UplinkSock)
 	{
+		/* Send a quit for all of our bots */
+		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		{
+			/* Don't use quitmsg here, it may contain information you don't want people to see */
+			ircdproto->SendQuit(it->second, "Shutting down");
+		}
+
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
 
 		while (!UserListByNick.empty())

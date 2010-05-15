@@ -513,7 +513,7 @@ void User::UpdateHost()
  */
 const bool User::HasMode(UserModeName Name) const
 {
-	return modes[Name];
+	return modes.HasFlag(Name);
 }
 
 /** Set a mode internally on the user, the IRCd is not informed
@@ -525,7 +525,7 @@ void User::SetModeInternal(UserMode *um, const std::string &Param)
 	if (!um)
 		return;
 
-	modes[um->Name] = true;
+	modes.SetFlag(um->Name);
 	if (!Param.empty())
 	{
 		Params.insert(std::make_pair(um->Name, Param));
@@ -542,7 +542,7 @@ void User::RemoveModeInternal(UserMode *um)
 	if (!um)
 		return;
 
-	modes[um->Name] = false;
+	modes.UnsetFlag(um->Name);
 	std::map<UserModeName, std::string>::iterator it = Params.find(um->Name);
 	if (it != Params.end())
 	{
@@ -619,16 +619,16 @@ void User::RemoveMode(BotInfo *bi, char ModeChar)
 
 /** Set a string of modes on a user
  * @param bi The client setting the mode
- * @param modes The modes
+ * @param umodes The modes
  */
-void User::SetModes(BotInfo *bi, const char *modes, ...)
+void User::SetModes(BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
 	std::string modebuf, sbuf;
 	int add = -1;
-	va_start(args, modes);
-	vsnprintf(buf, BUFSIZE - 1, modes, args);
+	va_start(args, umodes);
+	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
 	spacesepstream sep(buf);

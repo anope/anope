@@ -6,7 +6,7 @@ OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o comm
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
-	../include/services.h \
+	../include/services.h ../include/regchannel.h \
 	../include/timers.h ../include/extern.h \
 	../include/modules.h ../include/slist.h ../include/hashcomp.h \
 	../include/threadengine.h ../include/mail.h

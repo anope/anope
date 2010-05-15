@@ -30,9 +30,9 @@ std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
 /* Number of generic modes we support */
 unsigned GenericChannelModes = 0, GenericUserModes = 0;
 /* Default mlocked modes on */
-std::bitset<128> DefMLockOn;
+Flags<ChannelModeName> DefMLockOn;
 /* Default mlocked modes off */
-std::bitset<128> DefMLockOff;
+Flags<ChannelModeName> DefMLockOff;
 /* Map for default mlocked mode parameters */
 std::map<ChannelModeName, std::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
@@ -42,10 +42,10 @@ std::list<ChannelModeStatus *> BotModes;
  */
 void SetDefaultMLock()
 {
-	DefMLockOn.reset();
-	DefMLockOff.reset();
+	DefMLockOn.ClearFlags();
+	DefMLockOff.ClearFlags();
 	DefMLockParams.clear();
-	std::bitset<128> *ptr = NULL;
+	Flags<ChannelModeName> *ptr = NULL;
 
 	std::string modes, param;
 	spacesepstream sep(Config.MLock);
@@ -66,9 +66,9 @@ void SetDefaultMLock()
 
 			if (cm && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM))
 			{
-				ptr->set(cm->Name);
+				ptr->SetFlag(cm->Name);
 
-				if (*ptr == DefMLockOn && cm->Type == MODE_PARAM)
+				if (ptr == &DefMLockOn && cm->Type == MODE_PARAM)
 				{
 					if (sep.GetToken(param))
 					{
@@ -77,7 +77,7 @@ void SetDefaultMLock()
 					else
 					{
 						Alog() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
-						ptr->set(cm->Name, false);
+						ptr->UnsetFlag(cm->Name);
 					}
 				}
 			}

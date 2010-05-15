@@ -271,7 +271,7 @@ bool Channel::HasUserStatus(User *u, ChannelModeName Name)
  */
 bool Channel::HasMode(ChannelModeName Name)
 {
-	return modes[Name];
+	return modes.HasFlag(Name);
 }
 
 /** Set a mode internally on a channel, this is not sent out to the IRCd
@@ -334,7 +334,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		return;
 	}
 
-	modes[cm->Name] = true;
+	modes.SetFlag(cm->Name);
 
 	if (!param.empty())
 	{
@@ -476,7 +476,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		return;
 	}
 
-	modes[cm->Name] = false;
+	modes.UnsetFlag(cm->Name);
 
 	if (cm->Type == MODE_PARAM)
 	{
@@ -719,7 +719,7 @@ void Channel::ClearModes(BotInfo *bi)
 		}
 	}
 
-	modes.reset();
+	modes.ClearFlags();
 }
 
 /** Clear all the bans from the channel

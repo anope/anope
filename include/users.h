@@ -36,7 +36,7 @@ class CoreExport User : public Extensible
 	std::string ident;
 	std::string uid;
 	bool OnAccess;	/* If the user is on the access list of the nick theyre on */
-	std::bitset<128> modes; /* Bitset of mode names the user has set on them */
+	Flags<UserModeName> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, std::string> Params; /* Map of user modes and the params this user has */
 	NickCore *nc; /* NickCore account the user is currently loggged in as */
 
@@ -254,9 +254,9 @@ class CoreExport User : public Extensible
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the mode
-	 * @param modes The modes
+	 * @param umodes The modes
 	 */
-	void SetModes(BotInfo *bi, const char *modes, ...);
+	void SetModes(BotInfo *bi, const char *umodes, ...);
 
 	/** Find the channel container for Channel c that the user is on
 	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel

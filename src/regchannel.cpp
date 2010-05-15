@@ -421,9 +421,9 @@ void ChannelInfo::CleanBadWords()
 const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
 {
 	if (status)
-		return mlock_on[Name];
+		return mlock_on.HasFlag(Name);
 	else
-		return mlock_off[Name];
+		return mlock_off.HasFlag(Name);
 }
 
 /** Set a mlock
@@ -434,8 +434,6 @@ const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
  */
 bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string param)
 {
-	size_t value = Name;
-
 	if (!status && !param.empty())
 		throw CoreException("Was told to mlock a mode negatively with a param?");
 
@@ -445,8 +443,8 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
 		return false;
 
 	/* First, remove this everywhere */
-	mlock_on[value] = false;
-	mlock_off[value] = false;
+	mlock_on.UnsetFlag(Name);
+	mlock_off.UnsetFlag(Name);
 
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 	if (it != Params.end())
@@ -455,9 +453,9 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
 	}
 
 	if (status)
-		mlock_on[value] = true;
+		mlock_on.SetFlag(Name);
 	else
-		mlock_off[value] = true;
+		mlock_off.SetFlag(Name);
 	
 	if (status && !param.empty())
 	{
@@ -473,15 +471,13 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
  */
 bool ChannelInfo::RemoveMLock(ChannelModeName Name)
 {
-	size_t value = Name;
-
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(Name));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
-	mlock_on[value] = false;
-	mlock_off[value] = false;
+	mlock_on.UnsetFlag(Name);
+	mlock_off.UnsetFlag(Name);
 	
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 	if (it != Params.end())
@@ -496,8 +492,8 @@ bool ChannelInfo::RemoveMLock(ChannelModeName Name)
  */
 void ChannelInfo::ClearMLock()
 {
-	mlock_on.reset();
-	mlock_off.reset();
+	mlock_on.ClearFlags();
+	mlock_off.ClearFlags();
 }
 
 /** Get the number of mlocked modes for this channel
@@ -507,9 +503,9 @@ void ChannelInfo::ClearMLock()
 const size_t ChannelInfo::GetMLockCount(bool status) const
 {
 	if (status)
-		return mlock_on.count();
+		return mlock_on.FlagCount();
 	else
-		return mlock_off.count();
+		return mlock_off.FlagCount();
 }
 
 /** Get a param from the channel

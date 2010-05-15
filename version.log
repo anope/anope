@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2950"
+VERSION_BUILD="2961"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2961 - Fixed bug with r2952 (%s was used rather than %d)
 #Revision 2952 - Added a tonne of alog()s to log all stateful commands
 #Revision 2950 - Added support for building with Microsoft Visual Studio 2010 and removed support for Microsoft Visual Studio 98
 #Revision 2947 - Fixed a memory leak and use of uninitialized values in unreal_jointhrottle_mode_check. Note we don't even use this function currently.

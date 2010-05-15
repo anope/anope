@@ -591,7 +591,7 @@ int do_set_bantype(User * u, ChannelInfo * ci, char *param)
         notice_lang(s_ChanServ, u, CHAN_SET_BANTYPE_INVALID, param);
     } else {
         ci->bantype = bantype;
-        alog("%s: %s!%s@%s set ban type for %s to: %s",
+        alog("%s: %s!%s@%s set ban type for %s to: %d",
              s_ChanServ, u->nick, u->username, u->host, ci->name, ci->bantype);
         notice_lang(s_ChanServ, u, CHAN_SET_BANTYPE_CHANGED, ci->name,
                     ci->bantype);

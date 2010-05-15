@@ -105,9 +105,13 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if(DEFAULT_LIBRARY_DIRS)
     remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
   endif(DEFAULT_LIBRARY_DIRS)
+  # Create a temporary file to test for the default include directories
+  FILE(WRITE empty.cpp "")
   # Next, we look for the compiler's default include directories
   # Run the command to find the default include directories
-  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_SOURCE_DIR}/empty.c ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_SOURCE_DIR}/empty.cpp ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
+  # Remove the empty file, it is no longer needed
+  FILE(REMOVE empty.cpp)
   # Convert the new lines to semicolons
   string(REGEX REPLACE "\n" ";" LINES ${LINES})
   # Temporary variable saying if we are in the search list or not

@@ -106,7 +106,9 @@ ChannelInfo::~ChannelInfo()
 		delete [] this->forbidby;
 	if (this->forbidreason)
 		delete [] this->forbidreason;
+	this->ClearAccess();
 	this->ClearAkick();
+	this->ClearBadWords();
 	if (this->levels)
 		delete [] this->levels;
 

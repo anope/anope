@@ -1522,6 +1522,8 @@ CHAN_LEVELS_RANGE
 	Level must be between %d and %d inclusive.
 CHAN_LEVELS_CHANGED
 	Level for %s on channel %s changed to %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Setting %s not known.  Type %R%s HELP LEVELS DESC for a list of valid settings.
 CHAN_LEVELS_DISABLED

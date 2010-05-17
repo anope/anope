@@ -1996,6 +1996,9 @@ CHAN_LEVELS_CHANGED
 	Wymagany poziom dla %s
 	na kanale %s zmieniono teraz na %d.
 
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
+
 CHAN_LEVELS_UNKNOWN
 	Nieznane ustawienie %s.
 	Napisz %R%s HELP LEVELS DESC, aby uzyskaæ listê dostêpnych mo¿liwo¶ci.
@@ -5852,7 +5855,7 @@ CHAN_HELP_AKICK
 	Polecenie AKICK CLEAR usuwa wszystkie wpisy z listy.
 
 CHAN_HELP_LEVELS
-	Sk³adnia: LEVELS kana³ SET typ poziom
+	Sk³adnia: LEVELS kana³ SET typ [poziom|FOUNDER]
 	          LEVELS kana³ {DIS | DISABLE} typ
 	          LEVELS kana³ LIST
 	          LEVELS kana³ RESET

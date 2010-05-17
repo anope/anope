@@ -1555,6 +1555,8 @@ CHAN_LEVELS_RANGE
 	Ο βαθμός πρέπει να είναι μεταξύ %d και %d.
 CHAN_LEVELS_CHANGED
 	Ο βαθμός για τον %s στο κανάλι %s άλλξε σε %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Η επιλογή %s δεν είναι γνωστή.  Γράψε %R%s HELP LEVELS DESC για τη λίστα με τισ αναλυτικές επιλογές.
 CHAN_LEVELS_DISABLED
@@ -4860,10 +4862,10 @@ CHAN_HELP_AKICK
 	λίστα akick.
 
 CHAN_HELP_LEVELS
-	Σύνταξη: LEVELS κανάλι SET τύπος βαθμός
-	        LEVELS κανάλι {DIS | DISABLE} τύπος
-	    LEVELS κανάλι LIST
-	        LEVELS κανάλι RESET
+	Σύνταξη: LEVELS κανάλι SET τύπος [βαθμός|FOUNDER]
+	         LEVELS κανάλι {DIS | DISABLE} τύπος
+	         LEVELS κανάλι LIST
+	         LEVELS κανάλι RESET
 	
 	The LEVELS command allows fine control over the meaning of
 	the numeric access levels used for channels.  With this

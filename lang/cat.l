@@ -1553,6 +1553,8 @@ CHAN_LEVELS_RANGE
 	El nivell ha d'estar entre %d i %d inclosos.
 CHAN_LEVELS_CHANGED
 	Nivell per a %s en el canal %s cambiat a %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Opció %s no coneguda. Escriu %R%s HELP LEVELS DESC per a una llista de opcións valides.
 CHAN_LEVELS_DISABLED
@@ -4909,7 +4911,7 @@ CHAN_HELP_AKICK
 	de la llista de akicks.
 
 CHAN_HELP_LEVELS
-	Sintàxi: LEVELS canal SET tipo nivell
+	Sintàxi: LEVELS canal SET tipo [nivell|FOUNDER]
 	        LEVELS canal {DIS | DISABLE} tipo
 	        LEVELS canal LIST
 	        LEVELS canal RESET

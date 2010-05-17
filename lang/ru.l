@@ -1522,6 +1522,8 @@ CHAN_LEVELS_RANGE
 	Уровень должен быть числом между %d и %d включительно.
 CHAN_LEVELS_CHANGED
 	Уровень доступа к %s на канале %s изменен на %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Неизвестный пункт %s. Для получения списка всех доступных значений см. %R%s HELP LEVELS DESC
 CHAN_LEVELS_DISABLED
@@ -4839,7 +4841,7 @@ CHAN_HELP_AKICK
 	Команда AKICK CLEAR полностью очищает список автокиков канала.
 
 CHAN_HELP_LEVELS
-	Синтаксис: LEVELS #канал SET тип уровень
+	Синтаксис: LEVELS #канал SET тип [уровень|FOUNDER]
 	           LEVELS #канал {DIS | DISABLE} тип
 	           LEVELS #канал LIST
 	           LEVELS #канал RESET

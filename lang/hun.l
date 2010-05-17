@@ -1548,6 +1548,8 @@ CHAN_LEVELS_RANGE
 	A szintnek kizárólag %d és %d között kell lennie.
 CHAN_LEVELS_CHANGED
 	%s szintjének új értéke a (%s) csatornán: %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	%s beállítás nem ismert. Írd be %R%s HELP LEVELS DESC
 	az érvényes beállítások listájának megtekintéséhez.  
@@ -4790,7 +4792,7 @@ CHAN_HELP_AKICK
 	törölhetõ.
 	
 CHAN_HELP_LEVELS
-	Syntax:	LEVELS #szoba SET típus szint
+	Syntax:	LEVELS #szoba SET típus [szint|FOUNDER]
 			LEVELS #szoba {DIS | DISABLE} típus
 			LEVELS #szoba LIST
 			LEVELS #szoba RESET

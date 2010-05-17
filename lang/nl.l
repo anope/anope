@@ -1542,6 +1542,8 @@ CHAN_LEVELS_RANGE
 	Niveau moet tussen de %d en %d inclusief zijn.
 CHAN_LEVELS_CHANGED
 	Niveau voor %s op kanaal %s veranderd in %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Instelling %s onbekend.  Type %R%s HELP LEVELS DESC voor een lijst van geldige instellingen.
 CHAN_LEVELS_DISABLED
@@ -4844,7 +4846,7 @@ CHAN_HELP_AKICK
 	The AKICK CLEAR commando maakt de AutoKick lijst leeg.
 
 CHAN_HELP_LEVELS
-	Gebruik: LEVELS kanaal SET type niveau
+	Gebruik: LEVELS kanaal SET type [niveau|FOUNDER]
 	         LEVELS kanaal {DIS | DISABLE} type
 	         LEVELS kanaal LIST
 	         LEVELS kanaal RESET

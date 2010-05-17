@@ -1549,6 +1549,8 @@ CHAN_LEVELS_RANGE
 	Level %d ile %d arasýnda olmalýdýr.
 CHAN_LEVELS_CHANGED
 	%s için level %s kanalýnda %d olarak deðiþtirildi.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Varolmayan ayar: %s. Geçerli ayar listesi için %R%s HELP LEVELS DESC yazýnýz.
 CHAN_LEVELS_DISABLED
@@ -4831,7 +4833,7 @@ CHAN_HELP_AKICK
 	siler.
 
 CHAN_HELP_LEVELS
-	Kullanýmý:  LEVELS kanaladý SET tip seviye
+	Kullanýmý:  LEVELS kanaladý SET tip [seviye|FOUNDER]
 	            LEVELS kanaladý {DIS | DISABLE} tip
 	            LEVELS kanaladý LIST
 	            LEVELS kanaladý RESET

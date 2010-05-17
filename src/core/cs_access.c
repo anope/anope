@@ -456,12 +456,18 @@ class CommandCSLevels : public Command
 		else if (cmd == "SET") {
 			level = strtol(s, &error, 10);
 
+			if (!stricmp(s, "FOUNDER"))
+			{
+				level = ACCESS_FOUNDER;
+				*error = '\0';
+			}
+
 			if (*error != '\0') {
 				this->OnSyntaxError(u, "SET");
 				return MOD_CONT;
 			}
 
-			if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER) {
+			if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER) {
 				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RANGE,
 							ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 				return MOD_CONT;
@@ -473,8 +479,11 @@ class CommandCSLevels : public Command
 
 					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set level " << levelinfo[i].name
 						<< " on channel " << ci->name << " to " << level;
-					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED,
-								levelinfo[i].name, chan, level);
+					if (level == ACCESS_FOUNDER)
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name, ci->name.c_str());
+					else
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED,
+								levelinfo[i].name, ci->name.c_str(), level);
 					return MOD_CONT;
 				}
 			}

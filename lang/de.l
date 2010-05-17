@@ -1560,6 +1560,8 @@ CHAN_LEVELS_RANGE
 	Der Level kann nur zwischen %d und einschliesslich %d liegen.
 CHAN_LEVELS_CHANGED
 	Der Level für %s für den Channel %s wurde geändert auf %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Einstellung %s ist unbekannt.  Tippe %R%s HELP LEVELS DESC für eine ausführliche Einstellungsliste.
 CHAN_LEVELS_DISABLED
@@ -4939,7 +4941,7 @@ CHAN_HELP_AKICK
 	Der AutoKick-Liste.
 
 CHAN_HELP_LEVELS
-	Syntax: LEVELS channel SET Typ Level
+	Syntax: LEVELS channel SET Typ [Level|FOUNDER]
 	        LEVELS channel {DIS | DISABLE} Typ
 	        LEVELS channel LIST
 	        LEVELS channel RESET

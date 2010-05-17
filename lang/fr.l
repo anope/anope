@@ -1560,6 +1560,8 @@ CHAN_LEVELS_RANGE
 	Le niveau doit être compris entre %d et %d inclus.
 CHAN_LEVELS_CHANGED
 	Le niveau pour %s du channel %s est maintenant de %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	L'option %s est inconnue.  Tapez %R%s HELP LEVELS DESC pour une 
 	liste d'options valides.
@@ -4941,7 +4943,7 @@ CHAN_HELP_AKICK
 	de la liste de kicks automatiques.
 
 CHAN_HELP_LEVELS
-	Syntaxe: LEVELS canal SET type level
+	Syntaxe: LEVELS canal SET type [level|FOUNDER]
 	         LEVELS canal {DIS | DISABLE} type
 	         LEVELS canal LIST
 	         LEVELS canal RESET

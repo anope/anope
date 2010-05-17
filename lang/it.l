@@ -1525,6 +1525,8 @@ CHAN_LEVELS_RANGE
 	Il livello deve essere compreso tra %d e %d (inclusi).
 CHAN_LEVELS_CHANGED
 	Il livello di %s sul canale %s è stato modificato a %d.
+CHAN_LEVELS_CHANGED_FOUNDER
+	Level for %s on channel %s changed to founder only.
 CHAN_LEVELS_UNKNOWN
 	Impostazione %s sconosciuta. Digita %R%s HELP LEVELS DESC per una lista delle impostazioni valide.
 CHAN_LEVELS_DISABLED
@@ -4773,7 +4775,7 @@ CHAN_HELP_AKICK
 	Il comando AKICK CLEAR svuota la lista AutoKick.
 
 CHAN_HELP_LEVELS
-	Sintassi: LEVELS canale SET tipo livello
+	Sintassi: LEVELS canale SET tipo [livello|FOUNDER]
 	          LEVELS canale {DIS | DISABLE} tipo
 	          LEVELS canale LIST
 	          LEVELS canale RESET

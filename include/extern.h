@@ -81,6 +81,7 @@ E User *nc_on_chan(Channel * c, NickCore * nc);
 E char *chan_get_modes(Channel * chan, int complete, int plus);
 
 E int get_access_level(ChannelInfo * ci, NickAlias * na);
+E int get_access_level(ChannelInfo *ci, NickCore *nc);
 E const char *get_xop_level(int level);
 
 E void do_cmode(const char *source, int ac, const char **av);
@@ -262,6 +263,7 @@ E char *sstrdup(const char *s);
 
 E void ms_init();
 E void memoserv(User * u, char *buf);
+E void rsend_notify(User *u, Memo *m, const char *chan);
 E void check_memos(User * u);
 E MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid);
 E void memo_send(User * u, const char *name, const char *text, int z);
@@ -301,10 +303,6 @@ E time_t dotime(const char *s);
 E const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds);
 E const char *expire_left(NickCore *nc, char *buf, int len, time_t expires);
 E int doValidHost(const char *host, int type);
-
-typedef int (*range_callback_t) (User * u, int num, va_list args);
-E int process_numlist(const char *numstr, int *count_ret,
-					  range_callback_t callback, User * u, ...);
 
 E int isValidHost(const char *host, int type);
 E int isvalidchar(const char c);

@@ -14,8 +14,46 @@
 
 #include "module.h"
 
-int list_memo_callback(User *u, int num, va_list args);
-int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, const char *chan);
+class MemoListCallback : public NumberList
+{
+	User *u;
+	ChannelInfo *ci;
+	MemoInfo *mi;
+	bool SentHeader;
+ public:
+	MemoListCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list), u(_u), ci(_ci), mi(_mi), SentHeader(false)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > mi->memos.size())
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			if (ci)
+				notice_lang(Config.s_MemoServ, u, MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config.s_MemoServ, ci->name.c_str());
+			else
+				notice_lang(Config.s_MemoServ, u, MEMO_LIST_MEMOS, u->nick.c_str(), Config.s_MemoServ);
+
+			notice_lang(Config.s_MemoServ, u, MEMO_LIST_HEADER);
+		}
+
+		DoList(u, ci, mi, Number - 1);
+	}
+
+	static void DoList(User *u, ChannelInfo *ci, MemoInfo *mi, unsigned index)
+	{
+		Memo *m = mi->memos[index];
+		struct tm tm = *localtime(&m->time);
+		char timebuf[64];
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
+		timebuf[sizeof(timebuf) - 1] = 0;   /* just in case */
+		notice_lang(Config.s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender.c_str(), timebuf);
+	}
+};
 
 class CommandMSList : public Command
 {
@@ -63,9 +101,8 @@ class CommandMSList : public Command
 		}
 		else
 		{
-			int sent_header = 0;
 			if (!param.empty() && isdigit(param[0]))
-				process_numlist(param.c_str(), NULL, list_memo_callback, u, mi, &sent_header, chan.empty() ? NULL : chan.c_str());
+				(new MemoListCallback(u, ci, mi, param.c_str()))->Process();
 			else
 			{
 				if (!param.empty())
@@ -84,11 +121,25 @@ class CommandMSList : public Command
 						return MOD_CONT;
 					}
 				}
+
+				bool SentHeader = false;
+
 				for (i = 0; i < mi->memos.size(); ++i)
 				{
 					if (!param.empty() && !(mi->memos[i]->HasFlag(MF_UNREAD)))
 						continue;
-					list_memo(u, i, mi, &sent_header, !param.empty(), chan.empty() ? NULL : chan.c_str());
+
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						if (ci)
+							notice_lang(Config.s_MemoServ, u, !param.empty() ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config.s_MemoServ, ci->name.c_str());
+						else
+							notice_lang(Config.s_MemoServ, u, !param.empty() ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config.s_MemoServ);
+						notice_lang(Config.s_MemoServ, u, MEMO_LIST_HEADER);
+					}
+
+					MemoListCallback::DoList(u, ci, mi, i);
 				}
 			}
 		}
@@ -124,63 +175,5 @@ class MSList : public Module
 		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_LIST);
 	}
 };
-
-/**
- * list memno callback function
- * @param u User Struct
- * @param int Memo number
- * @param va_list List of arguements
- * @return result form list_memo()
- */
-int list_memo_callback(User *u, int num, va_list args)
-{
-	MemoInfo *mi = va_arg(args, MemoInfo *);
-	int *sent_header = va_arg(args, int *);
-	const char *chan = va_arg(args, const char *);
-	int i;
-
-	for (i = 0; i < mi->memos.size(); ++i)
-	{
-		if (mi->memos[i]->number == num)
-			break;
-	}
-	/* Range checking done by list_memo() */
-	return list_memo(u, i, mi, sent_header, 0, chan);
-}
-
-/**
- * Display a single memo entry, possibly printing the header first.
- * @param u User Struct
- * @param int Memo index
- * @param mi MemoInfo Struct
- * @param send_header If we are to send the headers
- * @param newi If we are listing new memos
- * @param chan Channel name
- * @return MOD_CONT
- */
-int list_memo(User *u, int index, MemoInfo *mi, int *sent_header, int newi, const char *chan)
-{
-	Memo *m;
-	char timebuf[64];
-	struct tm tm;
-
-	if (index < 0 || index >= mi->memos.size())
-		return 0;
-	if (!*sent_header)
-	{
-		if (chan)
-			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, chan, Config.s_MemoServ, chan);
-		else
-			notice_lang(Config.s_MemoServ, u, newi ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config.s_MemoServ);
-		notice_lang(Config.s_MemoServ, u, MEMO_LIST_HEADER);
-		*sent_header = 1;
-	}
-	m = mi->memos[index];
-	tm = *localtime(&m->time);
-	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
-	timebuf[sizeof(timebuf) - 1] = 0;   /* just in case */
-	notice_lang(Config.s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender.c_str(), timebuf);
-	return 1;
-}
 
 MODULE_INIT(MSList)

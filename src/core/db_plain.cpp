@@ -1061,9 +1061,8 @@ class DBPlain : public Module
 					db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 			}
 			for (unsigned k = 0; k < ci->GetAccessCount(); ++k)
-				if (ci->GetAccess(k)->in_use)
-					db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " "
-					<< ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+				db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " "
+				<< ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0; k < ci->GetAkickCount(); ++k)
 			{
 				db << "MD AKICK "

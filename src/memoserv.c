@@ -20,7 +20,6 @@
 
 E void moduleAddMemoServCmds();
 static bool SendMemoMail(NickCore *nc, Memo *m);
-E void rsend_notify(User *u, Memo *m, const char *chan);
 
 /*************************************************************************/
 

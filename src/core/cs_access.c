@@ -14,116 +14,151 @@
 
 #include "module.h"
 
-static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm, int uacc)
+class AccessListCallback : public NumberList
 {
-	if (!access->in_use)
-		return 0;
-	if (uacc <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+ protected:
+	User *u;
+	ChannelInfo *ci;
+	bool SentHeader;
+ public:
+	AccessListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), SentHeader(false)
 	{
-		(*perm)++;
-		return 0;
-	}
-	NickCore *nc = access->nc;
-	access->nc = NULL;
-	access->in_use = 0;
-
-	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nc));
-
-	return 1;
-}
-
-static int access_del_callback(User * u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *last = va_arg(args, int *);
-	int *perm = va_arg(args, int *);
-	int uacc = va_arg(args, int);
-	if (num < 1 || num > ci->GetAccessCount())
-		return 0;
-	*last = num;
-	return access_del(u, ci, ci->GetAccess(num - 1), perm, uacc);
-}
-
-
-static int access_list(User * u, int index, ChannelInfo * ci, int *sent_header)
-{
-	ChanAccess *access = ci->GetAccess(index);
-	const char *xop;
-
-	if (!access->in_use)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-		*sent_header = 1;
 	}
 
-	if (ci->HasFlag(CI_XOP))
+	~AccessListCallback()
 	{
-		xop = get_xop_level(access->level);
-		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, index + 1, xop, access->nc->display);
+		if (SentHeader)
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+		else
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
 	}
-	else
-		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_AXS_FORMAT, index + 1, access->level, access->nc->display);
-	return 1;
-}
 
-static int access_list_callback(User * u, int num, va_list args)
+	virtual void HandleNumber(unsigned Number)
+	{
+		if (Number > ci->GetAccessCount())
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+		}
+
+		DoList(u, ci, Number - 1, ci->GetAccess(Number - 1));
+	}
+
+	static void DoList(User *u, ChannelInfo *ci, unsigned Number, ChanAccess *access)
+	{
+		if (ci->HasFlag(CI_XOP))
+		{
+			const char *xop = get_xop_level(access->level);
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_XOP_FORMAT, Number + 1, xop, access->nc->display);
+		}
+		else
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_AXS_FORMAT, Number + 1, access->level, access->nc->display);
+	}
+};
+
+class AccessViewCallback : public AccessListCallback
 {
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *sent_header = va_arg(args, int *);
-	if (num < 1 || num > ci->GetAccessCount())
-		return 0;
-	return access_list(u, num - 1, ci, sent_header);
-}
+ public:
+	AccessViewCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : AccessListCallback(_u, _ci, numlist)
+	{
+	}
 
-static int access_view(User *u, int index, ChannelInfo *ci, int *sent_header)
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > ci->GetAccessCount())
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+		}
+
+		DoList(u, ci, Number - 1, ci->GetAccess(Number - 1));
+	}
+
+	static void DoList(User *u, ChannelInfo *ci, unsigned Number, ChanAccess *access)
+	{
+		char timebuf[64];
+		struct tm tm;
+
+		memset(&timebuf, 0, sizeof(timebuf));
+		if (ci->c && u->Account() && nc_on_chan(ci->c, u->Account()))
+			snprintf(timebuf, sizeof(timebuf), "Now");
+		else if (access->last_seen == 0)
+			snprintf(timebuf, sizeof(timebuf), "Never");
+		else
+		{
+			tm = *localtime(&access->last_seen);
+			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
+		}
+
+		if (ci->HasFlag(CI_XOP))
+		{
+			const char *xop = get_xop_level(access->level);
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop, access->nc->display, access->creator.c_str(), timebuf);
+		}
+		else
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->nc->display, access->creator.c_str(), timebuf);
+	}
+};
+
+class AccessDelCallback : public NumberList
 {
-	ChanAccess *access = ci->GetAccess(index);
-	const char *xop;
-	char timebuf[64];
-	tm tm;
-
-	if (!access || !access->in_use)
-		return 0;
-
-	if (!*sent_header)
+	User *u;
+	ChannelInfo *ci;
+	unsigned Deleted;
+	std::string Nicks;
+	bool Denied;
+ public:
+	AccessDelCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), Deleted(0), Denied(false)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-		*sent_header = 1;
 	}
 
-	memset(&timebuf, 0, sizeof(timebuf));
-	if (ci->c && u->Account() && nc_on_chan(ci->c, u->Account()))
-		sprintf(timebuf, "Now");
-	else if (access->last_seen == 0)
-		sprintf(timebuf, "Never");
-	else
+	~AccessDelCallback()
 	{
-		tm = *localtime(&access->last_seen);
-		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
+		if (Denied && !Deleted)
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+		else if (!Deleted)
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+		else
+		{
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of user" << (Deleted == 1 ? " " : "s ") << Nicks << " on " << ci->name;
+
+			if (Deleted == 1)
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name.c_str());
+			else
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL, Deleted, ci->name.c_str());
+		}
 	}
 
-	if (ci->HasFlag(CI_XOP))
+	void HandleNumber(unsigned Number)
 	{
-		xop = get_xop_level(access->level);
-		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_VIEW_XOP_FORMAT, index + 1, xop, access->nc->display, access->creator.c_str(), timebuf);
+		if (Number > ci->GetAccessCount())
+			return;
+
+		ChanAccess *access = ci->GetAccess(Number - 1);
+
+		if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+		{
+			Denied = true;
+			return;
+		}
+
+		++Deleted;
+		if (!Nicks.empty())
+			Nicks += ", " + std::string(access->nc->display);
+		else
+			Nicks = access->nc->display;
+		
+		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access->nc));
+
+		ci->EraseAccess(Number - 1);
 	}
-	else
-		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_VIEW_AXS_FORMAT, index + 1, access->level, access->nc->display, access->creator.c_str(), timebuf);
-
-	return 1;
-}
-
-static int access_view_callback(User *u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *sent_header = va_arg(args, int *);
-	if (num < 1 || num > ci->GetAccessCount())
-		return 0;
-	return access_view(u, num - 1, ci, sent_header);
-}
+};
 
 class CommandCSAccess : public Command
 {
@@ -224,7 +259,7 @@ class CommandCSAccess : public Command
 				}
 				access->level = level;
 
-				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na, level));
+				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
 
 				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
 					<< access->level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
@@ -238,10 +273,9 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			std::string usernick = u->nick;
-			ci->AddAccess(nc, level, usernick);
+			ci->AddAccess(nc, level, u->nick);
 
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na, level));
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
 
 			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
 				<< level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
@@ -249,7 +283,6 @@ class CommandCSAccess : public Command
 		}
 		else if (cmd == "DEL")
 		{
-			int deleted;
 			if (readonly)
 			{
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
@@ -264,31 +297,7 @@ class CommandCSAccess : public Command
 
 			/* Special case: is it a number/list?  Only do search if it isn't. */
 			if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
-			{
-				int count, last = -1, perm = 0;
-				deleted = process_numlist(nick, &count, access_del_callback, u, ci, &last, &perm, get_access(u, ci));
-				if (!deleted)
-				{
-					if (perm)
-						notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-					else if (count == 1)
-					{
-						last = atoi(nick);
-						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_SUCH_ENTRY, last, ci->name.c_str());
-					}
-					else
-						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
-				}
-				else
-				{
-					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci)
-						<< ") deleted access of user" << (deleted == 1 ? " " : "s ") << nick << " on " << chan;
-					if (deleted == 1)
-						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name.c_str());
-					else
-						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED_SEVERAL, deleted, ci->name.c_str());
-				}
-			}
+				(new AccessDelCallback(u, ci, nick))->Process();
 			else
 			{
 				na = findnick(nick);
@@ -297,16 +306,25 @@ class CommandCSAccess : public Command
 					notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
 					return MOD_CONT;
 				}
+
 				nc = na->nc;
-				access = ci->GetAccess(nc);
-				if (!access)
+
+				for (i = 0; i < ci->GetAccessCount(); ++i)
+				{
+					access = ci->GetAccess(i);
+
+					if (access->nc == nc)
+						break;
+				}
+
+				if (i == ci->GetAccessCount())
 				{
 					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
 					return MOD_CONT;
 				}
+
 				if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 				{
-					deleted = 0;
 					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				}
 				else
@@ -314,76 +332,81 @@ class CommandCSAccess : public Command
 					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name.c_str());
 					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci)
 						<< ") deleted access of " << na->nick << " (group " << access->nc->display << ") on " << chan;
-					access->nc = NULL;
-					access->in_use = 0;
-					deleted = 1;
-				}
-			}
-
-			if (deleted)
-			{
-				/* We'll free the access entries no longer in use... */
-				ci->CleanAccess();
-
-				/* Only call this event if na exists (if they deleted by user, not numlist).
-				 * The callback for deleting by numlist will call this event otherwise - Adam */
-				if (na)
-				{
 					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
+
+					ci->EraseAccess(i);
 				}
 			}
 		}
 		else if (cmd == "LIST")
 		{
-			int sent_header = 0;
-
 			if (!ci->GetAccessCount())
 			{
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
 			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
-				process_numlist(nick, NULL, access_list_callback, u, ci, &sent_header);
+				(new AccessListCallback(u, ci, nick))->Process();
 			else
 			{
+				bool SentHeader = false;
+
 				for (i = 0; i < ci->GetAccessCount(); i++)
 				{
 					access = ci->GetAccess(i);
+
 					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
 						continue;
-					access_list(u, i, ci, &sent_header);
+
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					}
+
+					AccessListCallback::DoList(u, ci, i, access);
 				}
+
+				if (SentHeader)
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+				else
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
 			}
-			if (!sent_header)
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
-			else
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
 		}
 		else if (cmd == "VIEW")
 		{
-			int sent_header = 0;
-
 			if (!ci->GetAccessCount())
 			{
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
 				return MOD_CONT;
 			}
 			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
-				process_numlist(nick, NULL, access_view_callback, u, ci, &sent_header);
+				(new AccessViewCallback(u, ci, nick))->Process();
 			else
 			{
+				bool SentHeader = false;
+
 				for (i = 0; i < ci->GetAccessCount(); ++i)
 				{
 					access = ci->GetAccess(i);
+
 					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
 						continue;
-					access_view(u, i, ci, &sent_header);
+
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					}
+
+					AccessViewCallback::DoList(u, ci, i, access);
 				}
+
+				if (SentHeader)
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+				else
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
 			}
-			if (!sent_header)
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
-			else
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
 		}
 		else if (cmd == "CLEAR")
 		{

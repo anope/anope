@@ -530,7 +530,6 @@ enum AccessLevel
 /* Access levels for users. */
 struct ChanAccess
 {
-	uint16 in_use;	/* 1 if this entry is in use, else 0 */
 	int16 level;
 	NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
 	time_t last_seen;
@@ -551,7 +550,6 @@ enum AutoKickFlag
 class AutoKick : public Flags<AutoKickFlag>
 {
  public:
- 	bool InUse;
 	/* Only one of these can be in use */
 	std::string mask;
 	NickCore *nc;
@@ -579,7 +577,6 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct BadWord
 {
-	bool InUse;
 	std::string word;
 	BadWordType type;
 };
@@ -1162,6 +1159,31 @@ class ChanServTimer : public Timer
 	 * @param The current time
 	 */
 	void Tick(time_t);
+};
+
+/** A class to process numbered lists (passed to most DEL commands).
+ * The function HandleNumber is called for every number in the list. Note that
+ * it *always* gets called in descending order. This is so deleting the index passed
+ * to the function from an array will not cause the other indexes passed to the function
+ * to be incorrect. This keeps us from having to have an 'in use' flag on everything.
+ */
+class NumberList
+{
+ private:
+	std::set<unsigned> numbers;
+ public:
+	/** Processes a numbered list
+	 * @param list The list
+	 */
+	NumberList(const std::string &list);
+
+	virtual ~NumberList();
+
+	void Process();
+
+	virtual void HandleNumber(unsigned Number);
+
+	virtual bool InvalidRange(const std::string &list);
 };
 
 #endif	/* SERVICES_H */

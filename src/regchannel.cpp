@@ -138,7 +138,6 @@ ChannelInfo::~ChannelInfo()
 void ChannelInfo::AddAccess(NickCore *nc, int16 level, const std::string &creator, int32 last_seen)
 {
 	ChanAccess *new_access = new ChanAccess();
-	new_access->in_use = 1;
 	new_access->nc = nc;
 	new_access->level = level;
 	new_access->last_seen = last_seen;
@@ -181,7 +180,7 @@ ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
 		return NULL;
 
 	for (unsigned i = 0; i < access.size(); i++)
-		if (access[i]->in_use && access[i]->nc == nc && (level ? access[i]->level == level : true))
+		if (access[i]->nc == nc && (level ? access[i]->level == level : true))
 			return access[i];
 
 	return NULL;
@@ -210,25 +209,16 @@ void ChannelInfo::EraseAccess(unsigned index)
 	access.erase(access.begin() + index);
 }
 
-/** Cleans the channel access list
- *
- * Cleans up the access list so it no longer contains entries no longer in use.
- */
-void ChannelInfo::CleanAccess()
-{
-	for (unsigned j = access.size(); j > 0; --j)
-		if (!access[j - 1]->in_use)
-			EraseAccess(j - 1);
-}
-
 /** Clear the entire channel access list
  *
  * Clears the entire access list by deleting every item and then clearing the vector.
  */
 void ChannelInfo::ClearAccess()
 {
-	while (access.begin() != access.end())
+	while (!access.empty())
+	{
 		EraseAccess(0);
+	}
 }
 
 /** Add an akick entry to the channel by NickCore
@@ -245,7 +235,6 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 		return NULL;
 
 	AutoKick *autokick = new AutoKick();
-	autokick->InUse = true;
 	autokick->SetFlag(AK_ISNICK);
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -254,8 +243,6 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 	autokick->last_used = lu;
 
 	akick.push_back(autokick);
-
-	FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(this, autokick));
 
 	return autokick;
 }
@@ -272,15 +259,12 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->mask = mask;
-	autokick->InUse = true;
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;
 	autokick->last_used = lu;
 
 	akick.push_back(autokick);
-
-	FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(this, autokick));
 
 	return autokick;
 }
@@ -306,38 +290,25 @@ const unsigned ChannelInfo::GetAkickCount() const
 }
 
 /** Erase an entry from the channel akick list
- * @param akick The akick
+ * @param index The index of the akick
  */
-void ChannelInfo::EraseAkick(AutoKick *autokick)
+void ChannelInfo::EraseAkick(unsigned index)
 {
-	std::vector<AutoKick *>::iterator it = std::find(akick.begin(), akick.end(), autokick);
-
-	if (it != akick.end())
-	{
-		FOREACH_MOD(I_OnAkickDel, OnAkickDel(this, *it));
-
-		delete *it;
-		akick.erase(it);
-	}
+	if (akick.empty() || index > akick.size())
+		return;
+	
+	delete akick[index];
+	akick.erase(akick.begin() + index);
 }
 
 /** Clear the whole akick list
  */
 void ChannelInfo::ClearAkick()
 {
-	for (unsigned i = akick.size(); i > 0; --i)
+	while (!akick.empty())
 	{
-		EraseAkick(akick[i - 1]);
+		EraseAkick(0);
 	}
-}
-
-/** Clean all of the nonused entries from the akick list
- */
-void ChannelInfo::CleanAkick()
-{
-	for (unsigned i = akick.size(); i > 0; --i)
-		if (!akick[i - 1]->InUse)
-			EraseAkick(akick[i - 1]);
 }
 
 /** Add a badword to the badword list
@@ -348,7 +319,6 @@ void ChannelInfo::CleanAkick()
 BadWord *ChannelInfo::AddBadWord(const std::string &word, BadWordType type)
 {
 	BadWord *bw = new BadWord;
-	bw->InUse = true;
 	bw->word = word;
 	bw->type = type;
 
@@ -380,37 +350,25 @@ const unsigned ChannelInfo::GetBadWordCount() const
 }
 
 /** Remove a badword
- * @param badword The badword
+ * @param index The index of the badword
  */
-void ChannelInfo::EraseBadWord(BadWord *badword)
+void ChannelInfo::EraseBadWord(unsigned index)
 {
-	std::vector<BadWord *>::iterator it = std::find(badwords.begin(), badwords.end(), badword);
-
-	if (it != badwords.end())
-	{
-		FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, *it));
-		delete *it;
-		badwords.erase(it);
-	}
+	if (badwords.empty() || index >= badwords.size())
+		return;
+	
+	delete badwords[index];
+	badwords.erase(badwords.begin() + index);
 }
 
 /** Clear all badwords from the channel
  */
 void ChannelInfo::ClearBadWords()
 {
-	for (unsigned i = badwords.size(); i > 0; --i)
+	while (!badwords.empty())
 	{
-		EraseBadWord(badwords[i - 1]);
+		EraseBadWord(0);
 	}
-}
-
-/** Clean all of the nonused entries from the badwords list
- */
-void ChannelInfo::CleanBadWords()
-{
-	for (unsigned i = badwords.size(); i > 0; --i)
-		if (!badwords[i - 1]->InUse)
-			EraseBadWord(badwords[i - 1]);
 }
 
 /** Check if a mode is mlocked
@@ -597,9 +555,6 @@ bool ChannelInfo::CheckKick(User *user)
 		for (unsigned j = 0; j < this->GetAkickCount(); ++j)
 		{
 			autokick = this->GetAkick(j);
-
-			if (!autokick->InUse)
-				continue;
 
 			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc)
 				|| (!autokick->HasFlag(AK_ISNICK)

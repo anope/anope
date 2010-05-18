@@ -790,18 +790,18 @@ class CoreExport Module
 	/** Called when access is changed
 	 * @param ci The channel
 	 * @param u The user who changed the access
-	 * @param na The nick whos access was changed
+	 * @param nc The nick whos access was changed
 	 * @param level The level of the new access
 	 */
-	virtual void OnAccessChange(ChannelInfo *ci, User *u, NickAlias *na, int level) { }
+	virtual void OnAccessChange(ChannelInfo *ci, User *u, NickCore *nc, int level) { }
 
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param u The user who added the access
-	 * @para na The nick who was added to access
+	 * @para nc The nick who was added to access
 	 * @param level The level they were added at
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, User *u, NickAlias *na, int level) { }
+	virtual void OnAccessAdd(ChannelInfo *ci, User *u, NickCore *nc, int level) { }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel
@@ -858,16 +858,18 @@ class CoreExport Module
 	virtual void OnChannelDelete(Channel *c) { }
 
 	/** Called after adding an akick to a channel
+	 * @param u The user adding the akick
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickAdd(ChannelInfo *ci, AutoKick *ak) { }
+	virtual void OnAkickAdd(User *u, ChannelInfo *ci, AutoKick *ak) { }
 
 	/** Called before removing an akick from a channel
+	 * @param u The user removing the akick
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickDel(ChannelInfo *ci, AutoKick *ak) { }
+	virtual void OnAkickDel(User *u, ChannelInfo *ci, AutoKick *ak) { }
 
 	/** Called when a user requests info for a channel
 	 * @param u The user requesting info

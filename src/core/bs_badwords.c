@@ -14,40 +14,106 @@
 
 #include "module.h"
 
-int badwords_del_callback(User * u, int num, va_list args);
-int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header);
-int badwords_list_callback(User * u, int num, va_list args);
+class BadwordsListCallback : public NumberList
+{
+	User *u;
+	ChannelInfo *ci;
+	bool SentHeader;
+ public:
+	BadwordsListCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list), u(_u), ci(_ci), SentHeader(false)
+	{
+	}
+
+	~BadwordsListCallback()
+	{
+		if (!SentHeader)
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > ci->GetBadWordCount())
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
+		}
+
+		DoList(u, ci, Number - 1, ci->GetBadWord(Number - 1));
+	}
+
+	static void DoList(User *u, ChannelInfo *ci, unsigned Number, BadWord *bw)
+	{
+		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), ((bw->type == BW_SINGLE) ? "(SINGLE)" : ((bw->type == BW_START) ? "(START)" : ((bw->type == BW_END) ? "(END)" : ""))));
+	}
+};
+
+class BadwordsDelCallback : public NumberList
+{
+	User *u;
+	ChannelInfo *ci;
+	unsigned Deleted;
+ public:
+	BadwordsDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list), u(_u), ci(_ci), Deleted(0)
+	{
+	}
+
+	~BadwordsDelCallback()
+	{
+		if (!Deleted)
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+		else if (Deleted == 1)
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_ONE, ci->name.c_str());
+		else
+			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL, Deleted, ci->name.c_str());
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > ci->GetBadWordCount())
+			return;
+
+		++Deleted;
+		ci->EraseBadWord(Number - 1);
+	}
+};
 
 class CommandBSBadwords : public Command
 {
  private:
 	CommandReturn DoList(User *u, ChannelInfo *ci, const ci::string &word)
 	{
-		int sent_header = 0;
-
 		if (!ci->GetBadWordCount())
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
-			return MOD_CONT;
 		}
-		if (!word.empty() && strspn(word.c_str(), "1234567890,-") == word.length())
-		{
-			process_numlist(word.c_str(), NULL, badwords_list_callback, u, ci, &sent_header);
-		}
+		else if (!word.empty() && strspn(word.c_str(), "1234567890,-") == word.length())
+			(new BadwordsListCallback(u, ci, word.c_str()))->Process();
 		else
 		{
+			bool SentHeader = false;
+			
 			for (unsigned i = 0; i < ci->GetBadWordCount(); i++)
 			{
-				BadWord *badword = ci->GetBadWord(i);
+				BadWord *bw = ci->GetBadWord(i);
 
-				if (!word.empty() && !Anope::Match(badword->word, word.c_str(), false))
+				if (!word.empty() && !Anope::Match(bw->word, word.c_str(), false))
 					continue;
 
-				badwords_list(u, i, ci, &sent_header);
+				if (!SentHeader)
+				{
+					SentHeader = true;
+					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
+				}
+
+				BadwordsListCallback::DoList(u, ci, i, bw);
 			}
+
+			if (!SentHeader)
+				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 		}
-		if (!sent_header)
-			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -102,33 +168,7 @@ class CommandBSBadwords : public Command
 	{
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && strspn(word.c_str(), "1234567890,-") == word.length())
-		{
-			int count, deleted, last = -1;
-			deleted = process_numlist(word.c_str(), &count, badwords_del_callback, u, ci, &last);
-			
-			if (!deleted)
-			{
-				if (count == 1)
-				{
-					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_SUCH_ENTRY, last, ci->name.c_str());
-				}
-				else
-				{
-					notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
-				}
-			}
-			else if (deleted == 1)
-			{
-				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_ONE, ci->name.c_str());
-			}
-			else
-			{
-				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL, deleted, ci->name.c_str());
-			}
-
-			if (deleted)
-				ci->CleanBadWords();
-		}
+			(new BadwordsDelCallback(u, ci, word.c_str()))->Process();
 		else
 		{
 			unsigned i;
@@ -148,7 +188,7 @@ class CommandBSBadwords : public Command
 				return MOD_CONT;
 			}
 			
-			ci->EraseBadWord(badword);
+			ci->EraseBadWord(i);
 
 			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
 		}
@@ -238,49 +278,5 @@ class BSBadwords : public Module
 		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BADWORDS);
 	}
 };
-
-int badwords_del_callback(User * u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *last = va_arg(args, int *);
-
-	*last = num;
-
-	if (num < 1 || num > ci->GetBadWordCount())
-		return 0;
-
-	ci->GetBadWord(num - 1)->InUse = false;
-
-	return 1;
-}
-
-int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header)
-{
-	BadWord *bw = ci->GetBadWord(index);
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
-		*sent_header = 1;
-	}
-
-	notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_FORMAT, index + 1, bw->word.c_str(),
-		((bw->type == BW_SINGLE) ? "(SINGLE)" : ((bw->type == BW_START) ? "(START)"
-		: ((bw->type == BW_END) ? "(END)" : "")))
-	);
-
-	return 1;
-}
-
-int badwords_list_callback(User * u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *sent_header = va_arg(args, int *);
-
-	if (num < 1 || num > ci->GetBadWordCount())
-		return 0;
-
-	return badwords_list(u, num - 1, ci, sent_header);
-}
 
 MODULE_INIT(BSBadwords)

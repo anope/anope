@@ -14,6 +14,121 @@
 
 #include "module.h"
 
+class ExceptionDelCallback : public NumberList
+{
+ protected:
+	User *u;
+	unsigned Deleted;
+ public:
+	ExceptionDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	{
+	}
+
+	~ExceptionDelCallback()
+	{
+		if (!Deleted)
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+		else if (Deleted == 1)
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED_ONE);
+		else
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED_SEVERAL, Deleted);
+	}
+
+	virtual void HandleNumber(unsigned Number)
+	{
+		if (Number > nexceptions)
+			return;
+
+		++Deleted;
+
+		DoDel(u, Number - 1);
+	}
+
+	static void DoDel(User *u, unsigned index)
+	{
+		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(u, &exceptions[index]));
+
+		delete [] exceptions[index].mask;
+		delete [] exceptions[index].reason;
+		--nexceptions;
+		memmove(exceptions + index, exceptions + index + 1, sizeof(Exception) * (nexceptions - index));
+		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
+	}
+};
+
+class ExceptionListCallback : public NumberList
+{
+ protected:
+ 	User *u;
+	bool SentHeader;
+ public:
+	ExceptionListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	{
+	}
+
+	virtual void HandleNumber(unsigned Number)
+	{
+		if (Number > nexceptions)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
+		}
+
+		DoList(u, Number - 1);
+	}
+
+	static void DoList(User *u, unsigned index)
+	{
+		if (index >= nexceptions)
+			return;
+
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index].limit, exceptions[index].mask);
+	}
+};
+
+class ExceptionViewCallback : public ExceptionListCallback
+{
+ public:
+	ExceptionViewCallback(User *_u, const std::string &numlist) : ExceptionListCallback(_u, numlist)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > nexceptions)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+		}
+
+		DoList(u, Number - 1);
+	}
+
+	static void DoList(User *u, unsigned index)
+	{
+		if (index >= nexceptions)
+			return;
+
+		char timebuf[32], expirebuf[256];
+		struct tm tm;
+		time_t t = time(NULL);
+
+		tm = *localtime(exceptions[index].time ? &exceptions[index].time : &t);
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
+
+		expire_left(u->Account(), expirebuf, sizeof(expirebuf), exceptions[index].expires);
+
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
+	}
+};
+
 class CommandOSSession : public Command
 {
  private:
@@ -91,93 +206,6 @@ class CommandOSSession : public Command
 	}
 };
 
-static int exception_del(User *u, const int index)
-{
-	if (index < 0 || index >= nexceptions)
-		return 0;
-	
-	FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(u, &exceptions[index]));
-
-	delete [] exceptions[index].mask;
-	delete [] exceptions[index].reason;
-	--nexceptions;
-	memmove(exceptions + index, exceptions + index + 1, sizeof(Exception) * (nexceptions - index));
-	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
-
-	return 1;
-}
-
-/* We use the "num" property to keep track of the position of each exception
- * when deleting using ranges. This is because an exception's position changes
- * as others are deleted. The positions will be recalculated once the process
- * is complete. -TheShadow
- */
-
-static int exception_del_callback(User *u, int num, va_list args)
-{
-	int i;
-	int *last = va_arg(args, int *);
-
-	*last = num;
-	for (i = 0; i < nexceptions; ++i)
-		if (num - 1 == exceptions[i].num)
-			break;
-
-	if (i < nexceptions)
-		return exception_del(u, i);
-	else
-		return 0;
-}
-
-static int exception_list(User *u, const int index, int *sent_header)
-{
-	if (index < 0 || index >= nexceptions)
-		return 0;
-	if (!*sent_header) {
-		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
-		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
-		*sent_header = 1;
-	}
-	notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index].limit, exceptions[index].mask);
-	return 1;
-}
-
-static int exception_list_callback(User *u, int num, va_list args)
-{
-	int *sent_header = va_arg(args, int *);
-
-	return exception_list(u, num - 1, sent_header);
-}
-
-static int exception_view(User *u, const int index, int *sent_header)
-{
-	char timebuf[32], expirebuf[256];
-	struct tm tm;
-	time_t t = time(NULL);
-
-	if (index < 0 || index >= nexceptions)
-		return 0;
-	if (!*sent_header) {
-		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
-		*sent_header = 1;
-	}
-
-	tm = *localtime(exceptions[index].time ? &exceptions[index].time : &t);
-	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-
-	expire_left(u->Account(), expirebuf, sizeof(expirebuf), exceptions[index].expires);
-
-	notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
-	return 1;
-}
-
-static int exception_view_callback(User *u, int num, va_list args)
-{
-	int *sent_header = va_arg(args, int *);
-
-	return exception_view(u, num - 1, sent_header);
-}
-
 class CommandOSException : public Command
 {
  private:
@@ -187,12 +215,6 @@ class CommandOSException : public Command
 		char reason[BUFSIZE];
 		unsigned last_param = 3;
 		int x;
-
-		if (nexceptions >= 32767)
-		{
-			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_TOO_MANY);
-			return MOD_CONT;
-		}
 
 		mask = params.size() > 1 ? params[1].c_str() : NULL;
 		if (mask && *mask == '+')
@@ -267,21 +289,7 @@ class CommandOSException : public Command
 		}
 
 		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
-		{
-			int count, deleted, last = -1;
-			deleted = process_numlist(mask, &count, exception_del_callback, u, &last);
-			if (!deleted)
-			{
-				if (count == 1)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_SUCH_ENTRY, last);
-				else
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
-			}
-			else if (deleted == 1)
-				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED_ONE);
-			else
-				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED_SEVERAL, deleted);
-		}
+			(new ExceptionDelCallback(u, mask))->Process();
 		else
 		{
 			int deleted = 0;
@@ -290,7 +298,7 @@ class CommandOSException : public Command
 			{
 				if (!stricmp(mask, exceptions[i].mask))
 				{
-					exception_del(u, i);
+					ExceptionDelCallback::DoDel(u, i);
 					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED, mask);
 					deleted = 1;
 					break;
@@ -367,44 +375,67 @@ class CommandOSException : public Command
 
 	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
-		int sent_header = 0, i;
+		int i;
 		expire_exceptions();
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
-			process_numlist(mask, NULL, exception_list_callback, u, &sent_header);
+			(new ExceptionListCallback(u, mask))->Process();
 		else
 		{
+			bool SentHeader = false;
+
 			for (i = 0; i < nexceptions; ++i)
 			{
 				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
-					exception_list(u, i, &sent_header);
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+						notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
+					}
+
+					ExceptionListCallback::DoList(u, i);
+				}
 			}
+
+			if (!SentHeader)
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 		}
-		if (!sent_header)
-			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 
 		return MOD_CONT;
 	}
 
 	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
-		int sent_header = 0, i;
+		int i;
 		expire_exceptions();
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
-			process_numlist(mask, NULL, exception_view_callback, u, &sent_header);
+			(new ExceptionViewCallback(u, mask))->Process();
 		else
 		{
+			bool SentHeader = false;
+
 			for (i = 0; i < nexceptions; ++i)
 			{
 				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
-					exception_view(u, i, &sent_header);
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+					}
+
+					ExceptionViewCallback::DoList(u, i);
+				}
 			}
+
+			if (!SentHeader)
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 		}
-		if (!sent_header)
-			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
 
 		return MOD_CONT;
 	}

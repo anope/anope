@@ -14,10 +14,6 @@
 
 #include "module.h"
 
-int xop_del_callback(User *u, int num, va_list args);
-int xop_list_callback(User *u, int num, va_list args);
-int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, int xmsg);
-
 enum
 {
 	XOP_AOP,
@@ -114,6 +110,89 @@ int xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	 CHAN_QOP_CLEAR}
 };
 
+class XOPListCallback : public NumberList
+{
+	User *u;
+	ChannelInfo *ci;
+	int level;
+	int *messages;
+	bool SentHeader;
+ public:
+	XOPListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist, int _level, int *_messages) : NumberList(numlist), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > ci->GetAccessCount())
+			return;
+
+		ChanAccess *access = ci->GetAccess(Number - 1);
+		
+		if (level != access->level)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_HEADER], ci->name.c_str());
+		}
+
+		DoList(u, ci, access, Number - 1, level, messages);
+	}
+
+	static void DoList(User *u, ChannelInfo *ci, ChanAccess *access, unsigned index, int level, int *messages)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index, access->nc->display);
+	}
+};
+
+class XOPDelCallback : public NumberList
+{
+	User *u;
+	ChannelInfo *ci;
+	int *messages;
+	unsigned Deleted;
+	std::string Nicks;
+ public:
+	XOPDelCallback(User *_u, ChannelInfo *_ci, int *_messages, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), messages(_messages), Deleted(0)
+	{
+	}
+
+	~XOPDelCallback()
+	{
+		if (!Deleted)
+			 notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
+		else
+		{
+			 Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of users " << Nicks << " on " << ci->name;
+
+			if (Deleted == 1)
+				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name.c_str());
+			else
+				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_SEVERAL], Deleted, ci->name.c_str());
+		}
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > ci->GetAccessCount())
+			return;
+
+		ChanAccess *access = ci->GetAccess(Number - 1);
+
+		++Deleted;
+		if (!Nicks.empty())
+			Nicks += ", " + std::string(access->nc->display);
+		else
+			Nicks = access->nc->display;
+
+		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access->nc));
+
+		ci->EraseAccess(Number - 1);
+	}
+};
+
 class XOPBase : public Command
 {
  private:
@@ -178,8 +257,7 @@ class XOPBase : public Command
 
 		if (!change)
 		{
-			std::string usernick = u->nick;
-			ci->AddAccess(nc, level, usernick);
+			ci->AddAccess(nc, level, u->nick);
 		}
 		else
 		{
@@ -194,12 +272,12 @@ class XOPBase : public Command
 
 		if (!change)
 		{
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, na, level));
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
 			notice_lang(Config.s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name.c_str());
 		}
 		else
 		{
-			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na, level));
+			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
 			notice_lang(Config.s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name.c_str());
 		}
 
@@ -210,8 +288,6 @@ class XOPBase : public Command
 	{
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 		ChanAccess *access;
-
-		int deleted;
 
 		if (!nick)
 		{
@@ -241,26 +317,7 @@ class XOPBase : public Command
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
-		{
-			int count, last = -1, perm = 0;
-			deleted = process_numlist(nick, &count, xop_del_callback, u, ci, &last, &perm, ulev, level);
-			if (!deleted)
-			{
-				if (perm)
-					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-				else if (count == 1)
-				{
-					last = atoi(nick);
-					notice_lang(Config.s_ChanServ, u, messages[XOP_NO_SUCH_ENTRY], last, ci->name.c_str());
-				}
-				else
-					notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
-			}
-			else if (deleted == 1)
-				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name.c_str());
-			else
-				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_SEVERAL], deleted, ci->name.c_str());
-		}
+			(new XOPDelCallback(u, ci, messages, nick))->Process();
 		else
 		{
 			NickAlias *na = findnick(nick);
@@ -270,9 +327,17 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 			NickCore *nc = na->nc;
-			access = ci->GetAccess(nc, level);
 
-			if (!access)
+			unsigned i;
+			for (i = 0; i < ci->GetAccessCount(); ++i)
+			{
+				access = ci->GetAccess(nc, level);
+
+				if (access->nc == nc)
+					break;
+			}
+
+			if (i == ci->GetAccessCount())
 			{
 				notice_lang(Config.s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name.c_str());
 				return MOD_CONT;
@@ -280,26 +345,18 @@ class XOPBase : public Command
 
 			if (ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				deleted = 0;
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			}
 			else
 			{
+				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of user " << access->nc->display << " on " << ci->name;
+
 				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED], access->nc->display, ci->name.c_str());
-				access->nc = NULL;
-				access->in_use = 0;
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 
-				deleted = 1;
+				ci->EraseAccess(i);
 			}
-		}
-		if (deleted)
-		{
-			/* If the patch provided in bug #706 is applied, this should be placed
-			 * before sending the events! */
-			/* We'll free the access entries no longer in use... */
-			ci->CleanAccess();
 		}
 
 		return MOD_CONT;
@@ -307,7 +364,6 @@ class XOPBase : public Command
 
 	CommandReturn DoList(User *u, const std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
-		int sent_header = 0;
 		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
 
 		if (!get_access(u, ci) && !u->Account()->HasCommand("chanserv/access/list"))
@@ -323,19 +379,30 @@ class XOPBase : public Command
 		}
 
 		if (nick && strspn(nick, "1234567890,-") == strlen(nick))
-			process_numlist(nick, NULL, xop_list_callback, u, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
+			(new XOPListCallback(u, ci, nick, level, messages))->Process();
 		else
 		{
+			bool SentHeader = false;
+
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
+
 				if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
 					continue;
-				xop_list(u, i, ci, &sent_header, level, messages[XOP_LIST_HEADER]);
+
+				if (!SentHeader)
+				{
+					SentHeader = true;
+					notice_lang(Config.s_ChanServ, u, messages[XOP_LIST_HEADER], ci->name.c_str());
+				}
+
+				XOPListCallback::DoList(u, ci, access, i, level, messages);
 			}
+
+			if (!SentHeader)
+				notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
 		}
-		if (!sent_header)
-			notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -363,7 +430,7 @@ class XOPBase : public Command
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
 			ChanAccess *access = ci->GetAccess(i - 1);
-			if (access->in_use && access->level == level)
+			if (access->level == level)
 				ci->EraseAccess(i - 1);
 		}
 
@@ -579,72 +646,5 @@ class CSXOP : public Module
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_VOP);
 	}
 };
-
-/* `last' is set to the last index this routine was called with
- * `perm' is incremented whenever a permission-denied error occurs
- */
-int xop_del(User *u, ChannelInfo *ci, ChanAccess *access, int *perm, int uacc, int xlev)
-{
-	if (!access->in_use || access->level != xlev)
-		return 0;
-	if (uacc <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-	{
-		++(*perm);
-		return 0;
-	}
-	NickCore *nc = access->nc;
-	access->nc = NULL;
-	access->in_use = 0;
-
-	FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, nc));
-
-	return 1;
-}
-
-int xop_del_callback(User *u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *last = va_arg(args, int *);
-	int *perm = va_arg(args, int *);
-	int uacc = va_arg(args, int);
-	int xlev = va_arg(args, int);
-
-	if (num < 1 || num > ci->GetAccessCount())
-		return 0;
-	*last = num;
-
-	return xop_del(u, ci, ci->GetAccess(num - 1), perm, uacc, xlev);
-}
-
-
-int xop_list(User *u, int index, ChannelInfo *ci, int *sent_header, int xlev, int xmsg)
-{
-	ChanAccess *access = ci->GetAccess(index);
-
-	if (!access->in_use || access->level != xlev)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_ChanServ, u, xmsg, ci->name.c_str());
-		*sent_header = 1;
-	}
-
-	notice_lang(Config.s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index + 1, access->nc->display);
-	return 1;
-}
-
-int xop_list_callback(User *u, int num, va_list args)
-{
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-	int *sent_header = va_arg(args, int *);
-	int xlev = va_arg(args, int);
-	int xmsg = va_arg(args, int);
-
-	if (num < 1 || num > ci->GetAccessCount())
-		return 0;
-
-	return xop_list(u, num - 1, ci, sent_header, xlev, xmsg);
-}
 
 MODULE_INIT(CSXOP)

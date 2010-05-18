@@ -14,9 +14,42 @@
 
 #include "module.h"
 
-int read_memo_callback(User *u, int num, va_list args);
-int read_memo(User *u, int index, MemoInfo *mi, const char *chan);
-extern void rsend_notify(User *u, Memo *m, const char *chan);
+class MemoListCallback : public NumberList
+{
+	User *u;
+	MemoInfo *mi;
+ public:
+	MemoListCallback(User *_u, MemoInfo *_mi, const std::string &numlist) : NumberList(numlist), u(_u), mi(_mi)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > mi->memos.size())
+			return;
+
+		MemoListCallback::DoRead(u, mi, NULL, Number - 1);
+	}
+
+	static void DoRead(User *u, MemoInfo *mi, ChannelInfo *ci, unsigned index)
+	{
+		Memo *m = mi->memos[index];
+		struct tm tm = *localtime(&m->time);
+		char timebuf[64];
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
+		timebuf[sizeof(timebuf) - 1] = 0;
+		if (ci)
+			notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, ci->name.c_str(), m->number);
+		else
+			notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, m->number);
+		notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text);
+		m->UnsetFlag(MF_UNREAD);
+
+		/* Check if a receipt notification was requested */
+		if (m->HasFlag(MF_RECEIPT))
+			rsend_notify(u, m, ci ? ci->name.c_str() : NULL);
+	}
+};
 
 class CommandMSRead : public Command
 {
@@ -28,9 +61,9 @@ class CommandMSRead : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		MemoInfo *mi;
-		ChannelInfo *ci;
+		ChannelInfo *ci = NULL;
 		ci::string numstr = params.size() ? params[0] : "", chan;
-		int num, count;
+		int num;
 
 		if (!numstr.empty() && numstr[0] == '#')
 		{
@@ -73,7 +106,7 @@ class CommandMSRead : public Command
 				{
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 					{
-						read_memo(u, i, mi, !chan.empty() ? chan.c_str() : NULL);
+						MemoListCallback::DoRead(u, mi, ci, i);
 						++readcount;
 					}
 				}
@@ -88,17 +121,11 @@ class CommandMSRead : public Command
 			else if (numstr == "LAST")
 			{
 				for (i = 0; i < mi->memos.size() - 1; ++i);
-				read_memo(u, i, mi, !chan.empty() ? chan.c_str() : NULL);
+				MemoListCallback::DoRead(u, mi, ci, i);
 			}
 			else /* number[s] */
 			{
-				if (!process_numlist(numstr.c_str(), &count, read_memo_callback, u, mi, !chan.empty() ? chan.c_str() : NULL))
-				{
-					if (count == 1)
-						notice_lang(Config.s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);
-					else
-						notice_lang(Config.s_MemoServ, u, MEMO_LIST_NOT_FOUND, numstr.c_str());
-				}
+				(new MemoListCallback(u, mi, numstr.c_str()))->Process();
 			}
 		}
 		return MOD_CONT;
@@ -133,61 +160,5 @@ class MSRead : public Module
 		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_READ);
 	}
 };
-
-/**
- * Read a memo callback function
- * @param u User Struct
- * @param int Index number
- * @param va_list variable arguements
- * @return result of read_memo()
- */
-int read_memo_callback(User *u, int num, va_list args)
-{
-	MemoInfo *mi = va_arg(args, MemoInfo *);
-	const char *chan = va_arg(args, const char *);
-	int i;
-
-	for (i = 0; i < mi->memos.size(); ++i)
-	{
-		if (mi->memos[i]->number == num)
-			break;
-	}
-	/* Range check done in read_memo */
-	return read_memo(u, i, mi, chan);
-}
-
-/**
- * Read a memo
- * @param u User Struct
- * @param int Index number
- * @param mi MemoInfo struct
- * @param chan Channel Name
- * @return 1 on success, 0 if failed
- */
-int read_memo(User *u, int index, MemoInfo *mi, const char *chan)
-{
-	Memo *m;
-	char timebuf[64];
-	struct tm tm;
-
-	if (index < 0 || index >= mi->memos.size())
-		return 0;
-	m = mi->memos[index];
-	tm = *localtime(&m->time);
-	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
-	timebuf[sizeof(timebuf) - 1] = 0;
-	if (chan)
-		notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, chan, m->number);
-	else
-		notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, m->number);
-	notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text);
-	m->UnsetFlag(MF_UNREAD);
-
-	/* Check if a receipt notification was requested */
-	if (m->HasFlag(MF_RECEIPT))
-		rsend_notify(u, m, chan);
-
-	return 1;
-}
 
 MODULE_INIT(MSRead)

@@ -788,15 +788,15 @@ void cs_remove_nick(const NickCore * nc)
 		{
 			ca = ci->GetAccess(j - 1);
 
-			if (ca->in_use && ca->nc == nc)
+			if (ca->nc == nc)
 				ci->EraseAccess(j - 1);
 		}
 
 		for (j = ci->GetAkickCount(); j > 0; --j)
 		{
 			akick = ci->GetAkick(j - 1);
-			if (akick->InUse && akick->HasFlag(AK_ISNICK) && akick->nc == nc)
-				ci->EraseAkick(akick);
+			if (akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+				ci->EraseAkick(j - 1);
 		}
 	}
 }
@@ -1054,6 +1054,22 @@ int get_access_level(ChannelInfo * ci, NickAlias * na)
 		return access->level;
 }
 
+int get_access_level(ChannelInfo *ci, NickCore *nc)
+{
+	if (!ci || !nc)
+		return 0;
+	
+	if (nc == ci->founder)
+		return ACCESS_FOUNDER;
+	
+	ChanAccess *access = ci->GetAccess(nc);
+
+	if (!access)
+		return 0;
+	else
+		return access->level;
+}
+
 const char *get_xop_level(int level)
 {
 	ChannelMode *halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
@@ -1091,7 +1107,7 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
-		if (!akick->InUse || akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
+		if (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
 			continue;
 
 		if (Anope::Match(akick->mask, mask, false))
@@ -1146,7 +1162,7 @@ void stick_all(ChannelInfo * ci)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
-		if (!akick->InUse || (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK)))
+		if (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
 			continue;
 
 		ci->c->SetMode(NULL, CMODE_BAN, akick->mask.c_str());

@@ -14,7 +14,33 @@
 
 #include "module.h"
 
-int del_memo_callback(User *u, int num, va_list args);
+class MemoDelCallback : public NumberList
+{
+	User *u;
+	ChannelInfo *ci;
+	MemoInfo *mi;
+ public:
+	MemoDelCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list), u(_u), ci(_ci), mi(_mi)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		if (Number > mi->memos.size())
+			return;
+
+		if (ci)
+		{
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, Number - 1));
+		}
+		else
+		{
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, Number - 1));
+		}
+
+		delmemo(mi, Number - 1);
+	}
+};
 
 class CommandMSDel : public Command
 {
@@ -28,10 +54,8 @@ class CommandMSDel : public Command
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
 		ci::string numstr = params.size() ? params[0] : "", chan;
-		int last, last0;
 		unsigned i;
-		char buf[BUFSIZE], *end;
-		int delcount, count, left;
+		int last;
 
 		if (!numstr.empty() && numstr[0] == '#')
 		{
@@ -71,37 +95,7 @@ class CommandMSDel : public Command
 		else
 		{
 			if (isdigit(numstr[0]))
-			{
-				/* Delete a specific memo or memos. */
-				last = -1; /* Last memo deleted */
-				last0 = -1; /* Beginning of range of last memos deleted */
-				end = buf;
-				left = sizeof(buf);
-				delcount = process_numlist(numstr.c_str(), &count, del_memo_callback, u, mi, &last, &last0, &end, &left, ci);
-				if (last != -1)
-				{
-					/* Some memos got deleted; tell them which ones. */
-					if (delcount > 1)
-					{
-						if (last0 != last)
-							end += snprintf(end, sizeof(buf) - (end - buf), ",%d-%d", last0, last);
-						else
-							end += snprintf(end, sizeof(buf) - (end - buf), ",%d", last);
-						/* "buf+1" here because *buf == ',' */
-						notice_lang(Config.s_MemoServ, u, MEMO_DELETED_SEVERAL, buf + 1);
-					}
-					else
-						notice_lang(Config.s_MemoServ, u, MEMO_DELETED_ONE, last);
-				}
-				else
-				{
-					/* No memos were deleted.  Tell them so. */
-					if (count == 1)
-						notice_lang(Config.s_MemoServ, u, MEMO_DOES_NOT_EXIST, atoi(numstr.c_str()));
-					else
-						notice_lang(Config.s_MemoServ, u, MEMO_DELETED_NONE);
-				}
-			}
+				(new MemoDelCallback(u, ci, mi, numstr.c_str()))->Process();
 			else if (numstr == "LAST")
 			{
 				/* Delete last memo. */

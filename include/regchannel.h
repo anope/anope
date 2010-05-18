@@ -161,12 +161,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	void EraseAccess(unsigned index);
 
-	/** Cleans the channel access list
-	 *
-	 * Cleans up the access list so it no longer contains entries no longer in use.
-	 */
-	void CleanAccess();
-
 	/** Clear the entire channel access list
 	 *
 	 * Clears the entire access list by deleting every item and then clearing the vector.
@@ -203,17 +197,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	const unsigned GetAkickCount() const;
 
 	/** Erase an entry from the channel akick list
-	 * @param akick The akick
+	 * @param index The index of the akick
 	 */
-	void EraseAkick(AutoKick *akick);
+	void EraseAkick(unsigned index);
 
 	/** Clear the whole akick list
 	 */
 	void ClearAkick();
-
-	/** Clean all of the nonused entries from the akick list
-	 */
-	void CleanAkick();
 
 	/** Add a badword to the badword list
 	 * @param word The badword
@@ -234,17 +224,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	const unsigned GetBadWordCount() const;
 
 	/** Remove a badword
-	 * @param badword The badword
+	 * @param index The index of the badword
 	 */
-	void EraseBadWord(BadWord *badword);
+	void EraseBadWord(unsigned index);
 
 	/** Clear all badwords from the channel
 	 */
 	void ClearBadWords();
-
-	/** Clean all of the nonused entries from the badwords list
-	 */
-	void CleanBadWords();
 
 	/** Check if a mode is mlocked
 	 * @param Name The mode

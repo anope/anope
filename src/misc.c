@@ -223,83 +223,83 @@ const char *merge_args(int argc, char **argv)
 }
 
 /*************************************************************************/
-/**
- * Process a string containing a number/range list in the form
- * "n1[-n2][,n3[-n4]]...", calling a caller-specified routine for each
- * number in the list.  If the callback returns -1, stop immediately.
- * Returns the sum of all nonnegative return values from the callback.
- * If `count' is non-NULL, it will be set to the total number of times the
- * callback was called.
- *
- * The callback should be of type range_callback_t, which is defined as:
- *	int (*range_callback_t)(User *u, int num, va_list args)
- * @param numstr
- * @param count_ret
- * @param callback Call back function
- * @param u User Struct
- * @param ... various args
- * @return int
- */
-int process_numlist(const char *numstr, int *count_ret,
-					range_callback_t callback, User * u, ...)
+
+NumberList::NumberList(const std::string &list)
 {
-	int n1, n2, i;
-	int res = 0, retval = 0, count = 0;
-	va_list args, preserve;
+	commasepstream sep(list);
+	std::string token;
 
-	if (!numstr || !*numstr) {
-		return -1;
-	}
+	sep.GetToken(token);
+	if (token.empty())
+		token = list;
+	do
+	{
+		char *h = strchr(token.c_str(), '-');
 
-	va_start(args, u);
-
-	/*
-	 * This algorithm ignores invalid characters, ignores a dash
-	 * when it precedes a comma, and ignores everything from the
-	 * end of a valid number or range to the next comma or null.
-	 */
-	for (;;) {
-		n1 = n2 = strtol(numstr, const_cast<char **>(&numstr), 10);
-		numstr += strcspn(numstr, "0123456789,-");
-		if (*numstr == '-') {
-			numstr++;
-			numstr += strcspn(numstr, "0123456789,");
-			if (isdigit(*numstr)) {
-				n2 = strtol(numstr, const_cast<char **>(&numstr), 10);
-				numstr += strcspn(numstr, "0123456789,-");
+		if (!h)
+		{
+			errno = 0;
+			unsigned num = strtol(token.c_str(), NULL, 10);
+			if (!errno)
+			{
+				numbers.insert(num);
+			}
+			else
+			{
+				if (!this->InvalidRange(list))
+				{
+					delete this;
+					return;
+				}
 			}
 		}
-		for (i = n1; i <= n2 && i >= 0; i++) {
-			VA_COPY(preserve, args);
-			res = callback(u, i, preserve);
-			va_end(preserve);
-			count++;
-			if (res < 0)
-				break;
-			retval += res;
-			if (count >= 32767) {
-				if (count_ret)
-					*count_ret = count;
-				return retval;
-			}
-		}
-		if (res < -1)
-			break;
-		numstr += strcspn(numstr, ",");
-		if (*numstr)
-			numstr++;
 		else
-			break;
-	}
-	if (count_ret)
-		*count_ret = count;
-
-	va_end(args);
-
-	return retval;
+		{
+			*h++ = '\0';
+			errno = 0;
+			unsigned num1 = strtol(token.c_str(), NULL, 10);
+			unsigned num2 = strtol(h, NULL, 10);
+			if (!errno)
+			{
+				for (unsigned i = num1; i <= num2; ++i)
+				{
+					numbers.insert(i);
+				}
+			}
+			else
+			{
+				if (!this->InvalidRange(list))
+				{
+					delete this;
+					return;
+				}
+			}
+		}
+	} while (sep.GetToken(token));
 }
 
-/*************************************************************************/
+NumberList::~NumberList()
+{
+}
+
+void NumberList::Process()
+{
+	for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(); it != numbers.rend(); ++it)
+	{
+		this->HandleNumber(*it);
+	}
+	
+	delete this;
+}
+
+void NumberList::HandleNumber(unsigned)
+{
+}
+
+bool NumberList::InvalidRange(const std::string &)
+{
+	return true;
+}
 
 /**
  * dotime:  Return the number of seconds corresponding to the given time

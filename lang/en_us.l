@@ -879,13 +879,13 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	You have requested to receive the password of nickname %s by e-mail.
 NICK_SENDPASS_LINE_2
-	The password is %s for security purposes, you should change it as soon as you receive this mail.
+	The password is %s. For security reasons, you should change it as soon as possible.
 NICK_SENDPASS_LINE_3
-	If you don't know why this mail is sent to you, please ignore it silently.
+	If you don't know why this email has been sent to you, please ignore it.
 NICK_SENDPASS_LINE_4
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	This mailbox is not monitored. Replies to this e-mail will NOT be responded to.
 NICK_SENDPASS_LINE_5
-	%s administrators.
+	Thanks for using %s
 NICK_SENDPASS_OK
 	Password of %s has been sent.
 
@@ -935,15 +935,15 @@ NICK_REG_MAIL_SUBJECT
 NICK_REG_MAIL_HEAD
 	Hi,
 NICK_REG_MAIL_LINE_1
-	You have requested to register the following nickname %s.
+	You have requested to register the nickname "%s".
 NICK_REG_MAIL_LINE_2
-	Please type " %R%s confirm %s " to complete registration.
+	Please type " %R%s confirm %s " into your IRC client to complete the registration.
 NICK_REG_MAIL_LINE_3
-	If you don't know why this mail is sent to you, please ignore it silently.
+	If you don't know why this mail has been sent to you, please ignore it.
 NICK_REG_MAIL_LINE_4
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	This mailbox is not monitored. Replies to this e-mail will NOT get responded to.
 NICK_REG_MAIL_LINE_5
-	%s administrators.
+	Thanks for using %s
 NICK_GETPASS_PASSCODE_IS
 	Passcode for %s is %s.
 NICK_FORCE_REG
@@ -1680,13 +1680,13 @@ CHAN_SENDPASS_HEAD
 CHAN_SENDPASS_LINE_1
 	You have requested to receive the password of channel %s by e-mail.
 CHAN_SENDPASS_LINE_2
-	The password is %s. For security reasons, you should change it as soon as you receive this mail.
+	The password is %s. For security reasons, you should change it as soon as possible.
 CHAN_SENDPASS_LINE_3
-	If you don't know why this mail is sent to you, please ignore it silently.
+	If you don't know why this mail has been sent to you, please ignore it.
 CHAN_SENDPASS_LINE_4
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	This mailbox is not monitored. Replies to this e-mail will NOT be responded to.
 CHAN_SENDPASS_LINE_5
-	%s administrators.
+	Thanks for using %s
 CHAN_SENDPASS_OK
 	Password of %s has been sent.
 
@@ -1970,9 +1970,9 @@ MEMO_MAIL_SUBJECT
 MEMO_MAIL_TEXT1
 	Hi %s
 MEMO_MAIL_TEXT2
-	You've just received a new memo from %s. This is memo number %d.
+	You have just received a new memo from %s. This is memo number %d.
 MEMO_MAIL_TEXT3
-	Memo Text:
+	The text of the memo is:
 
 # RSEND responses
 MEMO_RSEND_PLEASE_WAIT

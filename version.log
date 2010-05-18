@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2963"
+VERSION_BUILD="2966"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2966 - Fixed English in e-mail messages
 #Revision 2962 - Fixed bug with r2952 (%s was used rather than %d)
 #Revision 2952 - Added a tonne of alog()s to log all stateful commands
 #Revision 2950 - Added support for building with Microsoft Visual Studio 2010 and removed support for Microsoft Visual Studio 98

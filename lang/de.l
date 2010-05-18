@@ -1054,6 +1054,8 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
 CHAN_ACCESS_VIEW_XOP_FORMAT
 	  %3d   %s   %s
 	    by %s, last seen %s

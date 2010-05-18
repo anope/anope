@@ -224,7 +224,7 @@ class CommandCSAKick : public Command
 			 {
 			 	User *u2 = it->second;
 				
-				if (IsFounder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci)))
+				if (check_access(u2, ci, CA_FOUNDER) || (get_access(u2, ci) >= get_access(u, ci)))
 				{
 					if (match_usermask(mask.c_str(), u2))
 					{

@@ -421,7 +421,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -612,7 +612,7 @@ class CSXOP : public Module
 		this->AddCommand(ChanServ, new CommandCSVOP());
 
 		if (Me && Me->IsSynced())
-			OnUplinkSync();
+			OnUplinkSync(NULL);
 
 		Implementation i[] = {
 			I_OnUplinkSync, I_OnServerDisconnect, I_OnChanServHelp
@@ -620,7 +620,7 @@ class CSXOP : public Module
 		ModuleManager::Attach(i, this, 3);
 	}
 
-	void OnUplinkSync()
+	void OnUplinkSync(Server *)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 			this->AddCommand(ChanServ, new CommandCSQOP());

@@ -645,14 +645,14 @@ class CommandCSSet : public Command
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "FOUNDER")
 		{
-			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)))
+			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)))
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			else
 				DoSetFounder(u, ci, param);
 		}
 		else if (cmd == "SUCCESSOR")
 		{
-			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)))
+			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)))
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			else
 				DoSetSuccessor(u, ci, param);
@@ -681,7 +681,7 @@ class CommandCSSet : public Command
 			DoSetSecureOps(u, ci, param);
 		else if (cmd == "SECUREFOUNDER")
 		{
-			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsRealFounder(u, ci) : !IsFounder(u, ci)))
+			if (!is_servadmin && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)))
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 			else
 				DoSetSecureFounder(u, ci, param);

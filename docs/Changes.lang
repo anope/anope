@@ -11,6 +11,7 @@ Anope Version 1.9.3
     NICK_REG_MAIL
     NICK_MAIL_TEXT
     NICK_SENDPASS
+    CHAN_LEVEL_FOUNDER
 
 *** Mod Strings:
     NICK_GLIST_REPLY

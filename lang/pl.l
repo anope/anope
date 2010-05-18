@@ -1332,6 +1332,9 @@ CHAN_LEVEL_OWNER
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
 
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
+
 # Automatic responses
 CHAN_IS_REGISTERED
 	Ten kana³ zosta³ zarejestrowany z %s.

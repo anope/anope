@@ -416,7 +416,7 @@ class CommandCSAccess : public Command
 				return MOD_CONT;
 			}
 
-			if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
+			if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				return MOD_CONT;
@@ -474,7 +474,7 @@ class CommandCSLevels : public Command
 			this->OnSyntaxError(u, cmd);
 		else if (ci->HasFlag(CI_XOP))
 			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_XOP);
-		else if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
+		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "SET") {
 			level = strtol(s, &error, 10);
@@ -514,16 +514,20 @@ class CommandCSLevels : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, Config.s_ChanServ);
 
 		} else if (cmd == "DIS" || cmd == "DISABLE") {
-			for (i = 0; levelinfo[i].what >= 0; i++) {
-				if (stricmp(levelinfo[i].name, what) == 0) {
-					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
-					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
-
-					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name
-						<< " on channel " << ci->name;
-					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED,
-								levelinfo[i].name, chan);
-					return MOD_CONT;
+			/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
+			if (stricmp(what, "FOUNDER"))
+			{
+				for (i = 0; levelinfo[i].what >= 0; i++) {
+					if (stricmp(levelinfo[i].name, what) == 0) {
+						ci->levels[levelinfo[i].what] = ACCESS_INVALID;
+						FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
+	
+						Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name
+							<< " on channel " << ci->name;
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED,
+									levelinfo[i].name, chan);
+						return MOD_CONT;
+					}
 				}
 			}
 

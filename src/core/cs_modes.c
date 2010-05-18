@@ -381,7 +381,7 @@ class CSModes : public Module
 		this->AddCommand(ChanServ, new CommandCSDeVoice());
 
 		if (Me && Me->IsSynced())
-			OnUplinkSync();
+			OnUplinkSync(NULL);
 
 		Implementation i[] = {
 			I_OnUplinkSync, I_OnServerDisconnect, I_OnChanServHelp
@@ -389,7 +389,7 @@ class CSModes : public Module
 		ModuleManager::Attach(i, this, 3);
 	}
 
-	void OnUplinkSync()
+	void OnUplinkSync(Server *)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{

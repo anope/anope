@@ -621,8 +621,9 @@ struct BadWord
 #define CA_AUTOOWNER			36
 #define CA_OWNER			37
 #define CA_OWNERME			38
+#define CA_FOUNDER			39
 
-#define CA_SIZE		39
+#define CA_SIZE		40
 
 /* BotServ SET flags */
 enum BotServFlag

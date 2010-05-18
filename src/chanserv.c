@@ -59,6 +59,7 @@ static int def_levels[][2] = {
 	{ CA_AUTOOWNER,		ACCESS_QOP },
 	{ CA_OWNER,		ACCESS_FOUNDER },
 	{ CA_OWNERME,		ACCESS_QOP },
+	{ CA_FOUNDER,		ACCESS_QOP },
 	{ -1 }
 };
 
@@ -103,6 +104,7 @@ LevelInfo levelinfo[] = {
 	{ CA_AUTOOWNER,		"AUTOOWNER",	CHAN_LEVEL_AUTOOWNER },
 	{ CA_OWNER,		"OWNER",	CHAN_LEVEL_OWNER },
 	{ CA_OWNERME,		"OWNERME",	CHAN_LEVEL_OWNERME },
+	{ CA_FOUNDER,		"FOUNDER",	CHAN_LEVEL_FOUNDER },
 		{ -1 }
 };
 int levelinfo_maxwidth = 0;
@@ -466,111 +468,6 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 
 /*************************************************************************/
 
-/* Check whether a user should be opped on a channel, and if so, do it.
- * Return 1 if the user was opped, 0 otherwise.  (Updates the channel's
- * last used time if the user was opped.) */
-
-int check_should_op(User * user, char *chan)
-{
-	ChannelInfo *ci = cs_findchan(chan);
-
-	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
-		return 0;
-
-	if ((ci->HasFlag(CI_SECURE)) && !user->IsIdentified())
-		return 0;
-
-	if (check_access(user, ci, CA_AUTOOP))
-	{
-		ci->c->SetMode(NULL, CMODE_OP, user->nick);
-		return 1;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
-/* Check whether a user should be voiced on a channel, and if so, do it.
- * Return 1 if the user was voiced, 0 otherwise. */
-
-int check_should_voice(User * user, char *chan)
-{
-	ChannelInfo *ci = cs_findchan(chan);
-
-	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
-		return 0;
-
-	if ((ci->HasFlag(CI_SECURE)) && !user->IsIdentified())
-		return 0;
-
-	if (check_access(user, ci, CA_AUTOVOICE))
-	{
-		ci->c->SetMode(NULL, CMODE_VOICE, user->nick);
-		return 1;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
-int check_should_halfop(User * user, char *chan)
-{
-	ChannelInfo *ci = cs_findchan(chan);
-
-	if (!ci || (ci->HasFlag(CI_FORBIDDEN)) || *chan == '+')
-		return 0;
-
-	if (check_access(user, ci, CA_AUTOHALFOP))
-	{
-		ci->c->SetMode(NULL, CMODE_HALFOP, user->nick);
-		return 1;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
-int check_should_owner(User * user, char *chan)
-{
-	ChannelInfo *ci = cs_findchan(chan);
-
-	if (!ci || !ci->c || ci->HasFlag(CI_FORBIDDEN) || *chan == '+')
-		return 0;
-
-	if ((ci->HasFlag(CI_SECUREFOUNDER) && IsRealFounder(user, ci))
-		|| (!ci->HasFlag(CI_SECUREFOUNDER) && IsFounder(user, ci))) {
-		ci->c->SetMode(NULL, CMODE_OP, user->nick);
-		ci->c->SetMode(NULL, CMODE_OWNER, user->nick);
-		return 1;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
-int check_should_protect(User * user, char *chan)
-{
-	ChannelInfo *ci = cs_findchan(chan);
-
-	if (!ci || !ci->c || ci->HasFlag(CI_FORBIDDEN) || *chan == '+')
-		return 0;
-
-	if (check_access(user, ci, CA_AUTOPROTECT))
-	{
-		ci->c->SetMode(NULL, CMODE_OWNER, user->nick);
-		ci->c->SetMode(NULL, CMODE_PROTECT, user->nick);
-		return 1;
-	}
-
-	return 0;
-}
-
-/*************************************************************************/
-
 /* Record the current channel topic in the ChannelInfo structure. */
 
 void record_topic(const char *chan)
@@ -846,15 +743,20 @@ int check_access(User * user, ChannelInfo * ci, int what)
 	if (level > 0)
 		ci->last_used = time(NULL);
 
+	/* Superadmin always wins. Always. */
+	if (user->isSuperAdmin)
+		return (what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1);
+	/* If the access of the level we are checking is disabled, they *always* get denied */
 	if (limit == ACCESS_INVALID)
 		return 0;
-	if (limit > ACCESS_FOUNDER)
-		return 1;
-	if (limit == ACCESS_FOUNDER)
-		return (what == CA_AUTODEOP || what == CA_NOJOIN ? !IsRealFounder(user, ci) : IsRealFounder(user, ci));
+	/* If the level of the user is >= the level for "founder" of this channel and "founder" isn't disabled, they can do anything */
+	if (ci->levels[CA_FOUNDER] != ACCESS_INVALID && level >= ci->levels[CA_FOUNDER])
+		return (what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1);
+
 	/* Hacks to make flags work */
 	if (what == CA_AUTODEOP && (ci->HasFlag(CI_SECUREOPS)) && level == 0)
 		return 1;
+
 	if (what == CA_AUTODEOP || what == CA_NOJOIN)
 		return level <= ci->levels[what];
 	else
@@ -886,43 +788,12 @@ void reset_levels(ChannelInfo * ci)
 
 /*************************************************************************/
 
-/** Is the user a channel founder? (owner)
- * @param user The user
- * @param ci The channel
- * @return true or false
- */
-bool IsFounder(User *user, ChannelInfo *ci)
-{
-	ChanAccess *access = NULL;
-
-	if (!user || !ci)
-		return false;
-
-	if (IsRealFounder(user, ci))
-		return true;
-
-	if (user->Account())
-		access = ci->GetAccess(user->Account());
-	else
-	{
-		NickAlias *na = findnick(user->nick);
-		if (na)
-			access = ci->GetAccess(na->nc);
-	}
-
-	/* If they're QOP+ and theyre identified or theyre recognized and the channel isn't secure */
-	if (access && access->level >= ACCESS_QOP && (user->Account() || (user->IsRecognized() && !(ci->HasFlag(CI_SECURE)))))
-		return true;
-
-	return false;
-}
-
 /** Is the user the real founder?
  * @param user The user
  * @param ci The channel
  * @return true or false
  */
-bool IsRealFounder(User *user, ChannelInfo *ci)
+bool IsFounder(User *user, ChannelInfo *ci)
 {
 	if (!user || !ci)
 		return false;

@@ -166,6 +166,7 @@ int Module::AddCommand(BotInfo *bi, Command *c)
 	if (!bi || !c)
 		return MOD_ERR_PARAMS;
 	
+	c->module = this;
 	c->service = bi;
 
 	std::pair<std::map<ci::string, Command *>::iterator, bool> it = bi->Commands.insert(std::make_pair(c->name, c));

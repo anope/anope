@@ -779,40 +779,6 @@ void del_ns_timeout(NickAlias * na, int type)
 		NickServRelease::ClearTimers(na);
 }
 
-/** Set the correct oper type for a nickcore
- * @param nc The nick core
- */
-void SetOperType(NickCore *nc)
-{
-	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
-	{
-		std::string nick = it->first;
-		std::string type = it->second;
-
-		NickAlias *na = findnick(nick);
-
-		if (!na)
-		{
-			/* Nonexistant nick */
-			continue;
-		}
-
-		if (na->nc == nc)
-		{
-			 for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); ++tit)
-			 {
-				 OperType *ot = *tit;
-
-				 if (ot->GetName() == type)
-				 {
-					 nc->ot = ot;
-					 Alog() << Config.s_OperServ << ": Tied oper " << nc->display << " to type " << type;
-				 }
-			 }
-		}
-	}
-}
-
 /*************************************************************************/
 /*********************** NickServ command routines ***********************/
 /*************************************************************************/

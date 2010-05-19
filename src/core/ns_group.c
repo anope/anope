@@ -74,7 +74,7 @@ class CommandNSGroup : public Command
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
-			Alog() << Config.s_NickServ << ": " << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " tried to use GROUP for SUSPENDED nick " << target->nick;
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, target->nick);
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))

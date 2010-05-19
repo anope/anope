@@ -52,6 +52,26 @@ NickAlias::NickAlias(const std::string &nickname, NickCore *nickcore)
 	this->nc = nickcore;
 	slist_add(&nc->aliases, this);
 	alpha_insert_alias(this);
+
+	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
+	{
+		if (nc->ot)
+			break;
+		if (it->first != this->nick)
+			continue;
+
+		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); tit++)
+		{	
+			OperType *ot = *tit;
+
+			if (ot->GetName() == it->second)
+			{
+				Alog() << "Tied oper " << nc->display << " to type " << ot->GetName();
+				nc->ot = ot;
+				break;
+			}
+		}
+	}
 }
 
 /** Default destructor

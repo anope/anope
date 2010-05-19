@@ -395,11 +395,6 @@ E NickAlias *findnick(const std::string &nick);
 E NickCore  *findcore(const char *nick);
 E bool is_on_access(User *u, NickCore *nc);
 
-/** Set the correct oper type for a nickcore
- * @param nc The nick core
- */
-E void SetOperType(NickCore *nc);
-
 /**** operserv.c  ****/
 
 E SList akills, sglines, sqlines, szlines;

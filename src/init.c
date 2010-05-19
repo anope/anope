@@ -437,39 +437,6 @@ int init_secondary(int ac, char **av)
 	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
 	Alog() << "Databases loaded";
 
-	// XXX: this is duplicated in type loading.
-	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
-	{
-		std::string nick = it->first;
-		std::string type = it->second;
-
-		NickAlias *na = findnick(nick);
-		if (!na)
-		{
-			// Nonexistant nick
-			Alog() << "Oper nick '" << nick << "' is not registered";
-			continue;
-		}
-
-		if (!na->nc)
-		{
-			// Nick with no core (wtf?)
-			abort();
-		}
-
-		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); tit++)
-		{
-			OperType *ot = *tit;
-			if (ot->GetName() == type)
-			{
-				Alog() << "Tied oper " << na->nc->display << " to type " << type;
-				na->nc->ot = ot;
-			}
-		}
-	}
-	// END DUPLICATION
-
-
 	/* this is only used on the first run of Anope. */
 	if (!nbots)
 	{

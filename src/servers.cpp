@@ -272,6 +272,7 @@ void Server::Sync(bool SyncLinks)
 	{
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 		ircdproto->SendEOB();
+		Me->UnsetFlag(SERVER_SYNCING);
 	}
 
 	Alog() << "Server " << GetName() << " is done syncing";

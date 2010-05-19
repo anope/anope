@@ -309,7 +309,7 @@ static void SaveDatabases()
 		{
 			AutoKick *ak = ci->GetAkick(j);
 
-			me->OnAkickAdd(ci, ak);
+			me->OnAkickAdd(NULL, ci, ak);
 		}
 
 		for (int k = 0; k < CA_SIZE; ++k)
@@ -810,7 +810,7 @@ class DBMySQLWrite : public DBMySQL
 
 	void OnLevelChange(User *u, ChannelInfo *ci, int pos, int what)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 
 		if (pos >= 0)
 		{

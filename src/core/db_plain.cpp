@@ -793,39 +793,20 @@ class DBPlain : public Module
 		{
 			bool Set = key == "MLOCK_ON" ? true : false;
 
-			for (unsigned j = 0; j < params.size(); ++j)
-			{
-				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-				{
-					if ((*it)->Class == MC_CHANNEL)
-					{
-						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
-
-						if (cm->NameAsString == params[j])
-						{
-							ci->SetMLock(cm->Name, Set);
-						}
-					}
-				}
-			}
+			/* For now store mlock in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
+			ci->Extend(Set ? "db_mlock_modes_on" : "db_mlock_modes_off", new ExtensibleItemRegular<std::vector<std::string> >(params));
 		}
 		else if (key == "MLP")
 		{
+			std::vector<std::pair<std::string, std::string> > mlp;
+
 			for (unsigned j = 0; j < params.size(); ++j, ++j)
 			{
-				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-				{
-					if ((*it)->Class == MC_CHANNEL)
-					{
-						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
-
-						if (cm->NameAsString == params[j])
-						{
-							ci->SetMLock(cm->Name, true, params[j + 1]);
-						}
-					}
-				}
+				mlp.push_back(std::make_pair(params[j], params[j + 1]));
 			}
+
+			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
+			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<std::string, std::string> > >(mlp));
 		}
 		else if (key == "MI")
 		{

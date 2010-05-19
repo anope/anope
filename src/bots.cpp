@@ -66,6 +66,7 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 
 	// If we're synchronised with the uplink already, call introduce_user() for this bot.
 	if (Me && Me->GetUplink()->IsSynced())
+	{
 		ircdproto->SendClientIntroduction(this->nick, this->user, this->host, this->real, ircd->pseudoclient_mode, this->uid);
 		ircdproto->SendSQLine(this->nick, "Reserved for services");
 	}

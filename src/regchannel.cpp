@@ -371,6 +371,79 @@ void ChannelInfo::ClearBadWords()
 	}
 }
 
+/** Loads MLocked modes from extensible. This is used from database loading because Anope doesn't know what modes exist
+ * until after it connects to the IRCd.
+ */
+void ChannelInfo::LoadMLock()
+{
+	std::vector<std::string> modenames;
+	
+	if (this->GetExtRegular("db_mlock_modes_on", modenames))
+	{
+		for (std::vector<std::string>::iterator it = modenames.begin(); it != modenames.end(); ++it)
+		{
+			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(); mit != ModeManager::Modes.end(); ++mit)
+			{
+				if ((*mit)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+
+					if (cm->NameAsString == *it)
+					{
+						this->SetMLock(cm->Name, true);
+					}
+				}
+			}
+		}
+
+		this->Shrink("db_mlock_modes_on");
+	}
+
+	if (this->GetExtRegular("db_mlock_modes_off", modenames))
+	{
+		for (std::vector<std::string>::iterator it = modenames.begin(); it != modenames.end(); ++it)
+		{
+			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(); mit != ModeManager::Modes.end(); ++mit)
+			{
+				if ((*mit)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+
+					if (cm->NameAsString == *it)
+					{
+						this->SetMLock(cm->Name, false);
+					}
+				}
+			}
+		}
+
+		this->Shrink("db_mlock_modes_off");
+	}
+
+	std::vector<std::pair<std::string, std::string> > params;
+
+	if (this->GetExtRegular("db_mlp", params))
+	{
+		for (std::vector<std::pair<std::string, std::string> >::iterator it = params.begin(); it != params.end(); ++it)
+		{
+			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(); mit != ModeManager::Modes.end(); ++mit)
+			{
+				if ((*mit)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+
+					if (cm->NameAsString == it->first)
+					{
+						this->SetMLock(cm->Name, true, it->second);
+					}
+				}
+			}
+		}
+
+		this->Shrink("db_mlp");
+	}
+}
+
 /** Check if a mode is mlocked
  * @param Name The mode
  * @param status True to check mlock on, false for mlock off

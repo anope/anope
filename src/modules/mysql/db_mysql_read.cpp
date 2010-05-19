@@ -272,67 +272,37 @@ static void LoadDatabase()
 			ci->bantype = atoi(qres[i]["bantype"].c_str());
 			if (qres[i]["mlock_on"].size())
 			{
+				std::vector<std::string> modes;
 				std::string buf;
+
 				spacesepstream sep(SQLAssign(qres[i]["mlock_on"]));
 				while (sep.GetToken(buf))
-				{
-					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-					{
-						if ((*it)->Class == MC_CHANNEL)
-						{
-							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+					modes.push_back(buf);
 
-							if (buf == cm->NameAsString)
-							{
-								ci->SetMLock(cm->Name, true);
-								break;
-							}
-						}
-					}
-				}
+				ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<std::string> >(modes));
 			}
 			if (qres[i]["mlock_off"].size())
 			{
+				std::vector<std::string> modes;
 				std::string buf;
+
 				spacesepstream sep(SQLAssign(qres[i]["mlock_off"]));
 				while (sep.GetToken(buf))
-				{
-					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-					{
-						if ((*it)->Class == MC_CHANNEL)
-						{
-							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+					modes.push_back(buf);
 
-							if (buf == cm->NameAsString)
-							{
-								ci->SetMLock(cm->Name, false);
-								break;
-							}
-						}
-					}
-				}
+				ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<std::string> >(modes));
 			}
 			if (qres[i]["mlock_params"].size())
 			{
-				std::string buf;
-				spacesepstream sep(SQLAssign(qres[i]["mlock_params"]));
-				while (sep.GetToken(buf))
-				{
-					for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
-					{
-						if ((*it)->Class == MC_CHANNEL)
-						{
-							ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+				std::vector<std::pair<std::string, std::string> > mlp;
+				std::string buf, buf2;
 
-							if (buf == cm->NameAsString)
-							{
-								sep.GetToken(buf);
-								ci->SetMLock(cm->Name, true, buf);
-								break;
-							}
-						}
-					}
-				}
+				spacesepstream sep(SQLAssign(qres[i]["mlock_params"]));
+
+				while (sep.GetToken(buf) && sep.GetToken(buf2))
+					mlp.push_back(std::make_pair(buf, buf2));
+
+				ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<std::string, std::string> > >(mlp));
 			}
 			if (qres[i]["entry_message"].size())
 				ci->entry_message = sstrdup(qres[i]["entry_message"].c_str());

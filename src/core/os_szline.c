@@ -176,7 +176,7 @@ class CommandOSSZLine : public Command
 				return MOD_CONT;
 			}
 
-			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(sglines.list[res]), SX_SZLINE));
+			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(szlines.list[res]), SX_SZLINE));
 			slist_delete(&szlines, res);
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED, mask);
 		}

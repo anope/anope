@@ -169,6 +169,9 @@ int do_bot(User * u)
             anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
                                ircd->botserv_bot_mode);
 
+            alog("%s: %s!%s@%s added bot %s!%s@%s (%s) to the bot list",
+                 s_BotServ, u->nick, u->username, u->host, bi->nick, bi->user,
+                 bi->host, bi->real);
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
                         bi->host, bi->real);
 
@@ -310,6 +313,9 @@ int do_bot(User * u)
                 bot_rejoin_all(bi);
             }
 
+            alog("%s: %s!%s@%s changed bot %s to: %s!%s@%s (%s)",
+                 s_BotServ, u->nick, u->username, u->host, oldnick, bi->nick, bi->user,
+                 bi->host, bi->real);
             notice_lang(s_BotServ, u, BOT_BOT_CHANGED, oldnick, bi->nick,
                         bi->user, bi->host, bi->real);
 
@@ -334,6 +340,8 @@ int do_bot(User * u)
             }
             delbot(bi);
 
+            alog("%s: %s!%s@%s deleted bot %s from the bot list",
+                 s_BotServ, u->nick, u->username, u->host, nick);
             notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
         }
     } else

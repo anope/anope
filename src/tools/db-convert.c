@@ -100,57 +100,56 @@ static std::string GetLevelName(int level)
 void process_mlock_modes(std::ofstream &fs, size_t m, const std::string &ircd)
 {
 	/* this is the same in all protocol modules */
-		if (m &        0x1) fs << " INVITE";        // CMODE_i
-		if (m &        0x2) fs << " MODERATED";     // CMODE_m
-		if (m &        0x4) fs << " NOEXTERNAL";    // CMODE_n
-		if (m &        0x8) fs << " PRIVATE";       // CMODE_p
-		if (m &       0x10) fs << " SECRET";        // CMODE_s
-		if (m &       0x20) fs << " TOPIC";         // CMODE_t
-		if (m &       0x40) fs << " KEY";           // CMODE_k
-		if (m &       0x80) fs << " LIMIT";         // CMODE_l
-		if (m &      0x200) fs << " REGISTERED";    // CMODE_r
+		if (m &        0x1) fs << " CMODE_INVITE";        // CMODE_i
+		if (m &        0x2) fs << " CMODE_MODERATED";     // CMODE_m
+		if (m &        0x4) fs << " CMODE_NOEXTERNAL";    // CMODE_n
+		if (m &        0x8) fs << " CMODE_PRIVATE";       // CMODE_p
+		if (m &       0x10) fs << " CMODE_SECRET";        // CMODE_s
+		if (m &       0x20) fs << " CMODE_TOPIC";         // CMODE_t
+		if (m &       0x40) fs << " CMODE_KEY";           // CMODE_k
+		if (m &       0x80) fs << " CMODE_LIMIT";         // CMODE_l
+		if (m &      0x200) fs << " CMODE_REGISTERED";    // CMODE_r
 
 	if (ircd == "unreal" || ircd == "inspircd")
 	{
-		if (m &      0x100) fs << " REGISTEREDONLY"; // CMODE_R
-		if (m &      0x400) fs << " BLOCKCOLOR";     // CMODE_c
-		if (m &     0x2000) fs << " NOKNOCK";        // CMODE_K
-		if (m &     0x4000) fs << " REDIRECT";       // CMODE_L
-		if (m &     0x8000) fs << " OPERONLY";       // CMODE_O
-		if (m &    0x10000) fs << " NOKICK";         // CMODE_Q
-		if (m &    0x20000) fs << " STRIPCOLOR";     // CMODE_S
-		if (m &    0x80000) fs << " FLOOD";          // CMODE_f
-		if (m &   0x100000) fs << " FILTER";         // CMODE_G
-		if (m &   0x200000) fs << " NOCTCP";         // CMODE_C
-		if (m &   0x400000) fs << " AUDITORIUM";     // CMODE_u
-		if (m &   0x800000) fs << " SSL";            // CMODE_z
-		if (m &  0x1000000) fs << " NONICK";         // CMODE_N
-		if (m &  0x4000000) fs << " REGMODERATED";   // CMODE_M
+		if (m &      0x100) fs << " CMODE_REGISTEREDONLY"; // CMODE_R
+		if (m &      0x400) fs << " CMODE_BLOCKCOLOR";     // CMODE_c
+		if (m &     0x2000) fs << " CMODE_NOKNOCK";        // CMODE_K
+		if (m &     0x4000) fs << " CMODE_REDIRECT";       // CMODE_L
+		if (m &     0x8000) fs << " CMODE_OPERONLY";       // CMODE_O
+		if (m &    0x10000) fs << " CMODE_NOKICK";         // CMODE_Q
+		if (m &    0x20000) fs << " CMODE_STRIPCOLOR";     // CMODE_S
+		if (m &    0x80000) fs << " CMODE_FLOOD";          // CMODE_f
+		if (m &   0x100000) fs << " CMODE_FILTER";         // CMODE_G
+		if (m &   0x200000) fs << " CMODE_NOCTCP";         // CMODE_C
+		if (m &   0x400000) fs << " CMODE_AUDITORIUM";     // CMODE_u
+		if (m &   0x800000) fs << " CMODE_SSL";            // CMODE_z
+		if (m &  0x1000000) fs << " CMODE_NONICK";         // CMODE_N
+		if (m &  0x4000000) fs << " CMODE_REGMODERATED";   // CMODE_M
 	}
 
 	if (ircd == "unreal")
 	{
-		if (m &      0x800) fs << " ADMINONLY";       // CMODE_A
-		if (m &     0x1000) fs << "";                 // old CMODE_H (removed in 3.2)
-		if (m &    0x40000) fs << " NOINVITE";        // CMODE_f
-		if (m &  0x2000000) fs << " NONOTICE";        // CMODE_T
-		if (m &  0x8000000) fs << " JOINFLOOD";       // CMODE_j
+		if (m &      0x800) fs << " CMODE_ADMINONLY";       // CMODE_A
+		if (m &    0x40000) fs << " CMODE_NOINVITE";        // CMODE_f
+		if (m &  0x2000000) fs << " CMODE_NONOTICE";        // CMODE_T
+		if (m &  0x8000000) fs << " CMODE_JOINFLOOD";       // CMODE_j
 	} // if (unreal)
 	if (ircd == "inspircd" )
 	{
-		if (m &      0x800) fs << " ALLINVITE";        // CMODE_A
-		if (m &     0x1000) fs << " NONOTICE";         // CMODE_T
+		if (m &      0x800) fs << " CMODE_ALLINVITE";        // CMODE_A
+		if (m &     0x1000) fs << " CMODE_NONOTICE";         // CMODE_T
 		/* for some reason, there is no CMODE_P in 1.8.x and no CMODE_V in the 1.9.1 protocol module
 		   we are ignoring this flag until we find a solution for this problem, 
 		   so the +V/+P mlock mode is lost on convert 
 		   anope 1.8: if (m &    0x40000) fs << " NOINVITE";         // CMODE_V
 		   anope 1.9: if (m &    0x40000) fs << " PERM";             // CMODE_P
 		*/
-		if (m &  0x2000000) fs << " JOINFLOOD";        // CMODE_j
-		if (m &  0x8000000) fs << " BLOCKCAPS";        // CMODE_B
-		if (m & 0x10000000) fs << " NICKFLOOD";        // CMODE_F
-		if (m & 0x20000000) fs << "";                  // CMODE_g (mode +g <badword>) ... can't be mlocked in older version
-		if (m & 0x40000000) fs << "";                  // CMODE_J (mode +J [seconds] ... can't be mlocked in older versions
+		if (m &  0x2000000) fs << " CMODE_JOINFLOOD";        // CMODE_j
+		if (m &  0x8000000) fs << " CMODE_BLOCKCAPS";        // CMODE_B
+		if (m & 0x10000000) fs << " CMODE_NICKFLOOD";        // CMODE_F
+		//if (m & 0x20000000) fs << "";                  // CMODE_g (mode +g <badword>) ... can't be mlocked in older version
+		//if (m & 0x40000000) fs << "";                  // CMODE_J (mode +J [seconds] ... can't be mlocked in older versions
 	} // if (inspircd)
 }
 

@@ -172,7 +172,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		Allow = true;
 	else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && ci->c->HasUserStatus(u, CMODE_VOICE))
 		Allow = true;
-	
+
 	if (buf && !check_access(u, ci, CA_NOKICK) && Allow)
 	{
 		/* Bolds kicker */
@@ -222,7 +222,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 			 * percentage of caps to kick for; the rest is ignored. -GD
 			 */
 
-			if (i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent) {
+			if (i && l && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent) {
 				check_ban(ci, u, TTB_CAPS);
 				bot_kick(ci, u, BOT_REASON_CAPS);
 				return;
@@ -664,7 +664,7 @@ static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 
 	if (!bd)
 		return;
-	
+
 	/* Don't ban ulines */
 	if (is_ulined(u->server->name))
 		return;

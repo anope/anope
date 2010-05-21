@@ -1168,7 +1168,7 @@ class DBPlain : public Module
 				}
 				db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << endl;
 				if (ci->capsmin)
-					db << "MD BI CAPSMINS " << ci->capsmin << endl;
+					db << "MD BI CAPSMIN " << ci->capsmin << endl;
 				if (ci->capspercent)
 					db << "MD BI CAPSPERCENT " << ci->capspercent << endl;
 				if (ci->floodlines)

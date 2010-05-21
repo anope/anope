@@ -57,7 +57,7 @@ NickAlias::NickAlias(const std::string &nickname, NickCore *nickcore)
 	{
 		if (nc->ot)
 			break;
-		if (!stricmp(it->first.c_str(), this->nick))
+		if (stricmp(it->first.c_str(), this->nick))
 			continue;
 
 		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); tit++)

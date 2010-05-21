@@ -211,7 +211,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (this->IsIdentified() || (!this->nc->HasFlag(NI_SECURE) && IsRecognized())))
+	if (na && (this->IsIdentified() || (!na->nc->HasFlag(NI_SECURE) && this->IsRecognized())))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;

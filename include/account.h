@@ -11,11 +11,16 @@ enum NickNameFlag
 	NS_FORBIDDEN,
 	/* Nick never expires */
 	NS_NO_EXPIRE,
-	/* Nick is being held after a kill */
-	NS_KILL_HELD,
-	/* SVSNICK has been sent but nick has not yet changed.
-	 * An enforcer will be introduced when it does change. */
-	NS_GUESTED,
+	/* This nick is being held after a kill by an enforcer client
+	 * or is being SVSHeld. Used by ns_release to determin if something
+	 * should be allowed to be released
+	 */
+	NS_HELD,
+	/* We are taking over this nick, either by SVSNICK or KILL.
+	 * We are waiting for the confirmation of either of these actions to
+	 * proceed. This is checked in NickAlias::OnCancel
+	 */
+	NS_COLLIDED,
 
 	NS_END
 };
@@ -106,6 +111,18 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 	time_t last_seen;			/* When it was seen online for the last time */
 	NickCore *nc;				/* I'm an alias of this */
 	HostInfo hostinfo;
+
+	/** Release a nick
+	 * See the comment in users.cpp
+	 */
+	void Release();
+
+	/** This function is called when a user on this nick either disconnects or changes nick.
+	 * Note that the user isnt necessarially identified to this nick
+	 * See the comment in users.cpp
+	 * @param u The user
+	 */
+	void OnCancel(User *u);
 };
 
 class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>

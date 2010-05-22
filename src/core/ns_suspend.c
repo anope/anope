@@ -70,11 +70,12 @@ class CommandNSSuspend : public Command
 					if (na2->last_quit)
 						delete [] na2->last_quit;
 					na2->last_quit = sstrdup(reason);
-					/* removes nicktracking */
+
 					if ((u2 = finduser(na2->nick)))
+					{
 						u2->Logout();
-					/* force guestnick */
-					collide(na2, 0);
+						u2->Collide(na2);
+					}
 				}
 			}
 

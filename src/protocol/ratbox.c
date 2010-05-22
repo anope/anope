@@ -209,7 +209,6 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		EnforceQlinedNick(nick, NULL);
 		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick.c_str(), static_cast<long>(time(NULL)), modes, user.c_str(), host.c_str(), uid.c_str(), real.c_str());
-		SendSQLine(nick, "Reserved for services");
 	}
 
 	void SendPartInternal(BotInfo *bi, const char *chan, const char *buf)

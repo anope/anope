@@ -1159,65 +1159,52 @@ class CoreExport Anope
  */
 class NickServCollide : public Timer
 {
- public:
-	/* NickAlias of the nick who were kicking off */
-	NickAlias *na;
-	/* Return for the std::map::insert */
-	std::pair<std::map<NickAlias *, NickServCollide *>::iterator, bool> it;
+	/* The nick */
+	std::string nick;
 
+ public:
 	/** Default constructor
-	 * @param nickalias The nick alias were kicking off
+	 * @param _nick The nick were colliding
 	 * @param delay How long to delay before kicking the user off the nick
 	 */
-	NickServCollide(NickAlias *nickalias, time_t delay);
+	NickServCollide(const std::string &_nick, time_t delay);
 
 	/** Default destructor
 	 */
-	~NickServCollide();
+	virtual ~NickServCollide();
 
 	/** Called when the delay is up
 	 * @param t The current time
 	 */
 	void Tick(time_t t);
-
-	/** Clear all timers for a nick
-	 * @param na The nick to remove the timers for
-	 */
-	static void ClearTimers(NickAlias *na);
 };
 
 /** Timers for releasing nicks to be available for use
  */
 class NickServRelease : public Timer
 {
- public:
 	/* The nick */
- 	NickAlias *na;
+	std::string nick;
+
+ public:
 	/* The uid of the services enforcer client (used for TS6 ircds) */
 	std::string uid;
-	/* Return for std::map::insert */
-	std::pair<std::map<NickAlias *, NickServRelease *>::iterator, bool> it;
 
 	/** Default constructor
-	 * @param nickalias The nick
+	 * @param _nick The nick
+	 * @param _uid the uid of the enforcer, if any
 	 * @param delay The delay before the nick is released
 	 */
-	NickServRelease(NickAlias *nickalias, time_t delay);
+	NickServRelease(const std::string &_nick, const std::string &_uid, time_t delay);
 
 	/** Default destructor
 	 */
-	~NickServRelease();
+	virtual ~NickServRelease();
 
 	/** Called when the delay is up
 	 * @param t The current time
 	 */
 	void Tick(time_t t);
-
-	/** Clear all timers for a nick
-	 * @param na The nick to remove the timers for
-	 * @param dorelase true to actually call release(), false to just remove the timers
-	 */
-	static void ClearTimers(NickAlias *na, bool dorelease = false);
 };
 
 /** A timer used to keep the BotServ bot/ChanServ in the channel

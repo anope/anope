@@ -14,6 +14,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "language.h"
 
 #define HASH(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
 User *userlist[1024];
@@ -223,13 +224,11 @@ void User::SetRealname(const std::string &srealname)
 
 User::~User()
 {
-	char *srealname;
-
 	Alog(LOG_DEBUG_2) << "User::~User() called";
 
 	if (Config.LogUsers)
 	{
-		srealname = normalizeBuffer(this->realname);
+		const char *srealname = normalizeBuffer(this->realname);
 
 		Alog() << "LOGUSERS: " << this->GetMask() << (ircd->vhost ? " => " : " ")
 			<< (ircd->vhost ? this->GetDisplayedHost() : "")
@@ -244,6 +243,22 @@ User::~User()
 
 	if (is_oper(this))
 		opcnt--;
+	
+	while (!this->chans.empty())
+	{
+		this->chans.front()->chan->DeleteUser(this);
+	}
+	
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		userlist[HASH(this->nick)] = this->next;
+	if (this->next)
+		this->next->prev = this->prev;
+
+	NickAlias *na = findnick(this->nick);
+	if (na)
+		na->OnCancel(this);
 
 	Alog(LOG_DEBUG_2) << "User::~User(): free user data";
 
@@ -256,26 +271,6 @@ User::~User()
 		delete [] this->realname;
 	if (this->hostip)
 		delete [] this->hostip;
-
-	Alog(LOG_DEBUG_2) << "User::~User(): remove from channels";
-
-	while (!this->chans.empty())
-	{
-		this->chans.front()->chan->DeleteUser(this);
-	}
-	
-	/* Cancel pending nickname enforcers, etc */
-	cancel_user(this);
-
-	Alog(LOG_DEBUG_2) << "User::~User(): delete from list";
-
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		userlist[HASH(this->nick)] = this->next;
-
-	if (this->next)
-		this->next->prev = this->prev;
 
 	Alog(LOG_DEBUG_2) << "User::~User() done";
 }
@@ -312,6 +307,88 @@ void User::SendMessage(const std::string &source, const std::string &msg)
 	else
 	{
 		ircdproto->SendNotice(findbot(source), this->nick.c_str(), "%s", msg.c_str());
+	}
+}
+
+/** Collides a nick.
+ *
+ * First, it marks the nick (if the user is on a registered nick, we don't use it without but it could be)
+ * as COLLIDED, this is checked in NickAlias::OnCancel.
+ *
+ * Then it does one of two things.
+ *
+ * 1. This will force change the users nick to the guest nick. This gets processed by the IRCd and comes
+ *    back to call do_nick. do_nick changes the nick of the use to the new one, then calls NickAlias::OnCancel
+ *    with the users old nick's nickalias (if there is one).
+ *
+ * 2. Calls kill_user, which will either delete the user immediatly or kill them, wait for the QUIT,
+ *    then delete the user then. Users destructor then calls NickAlias::OnCancel
+ *
+ * NickAlias::OnCancel checks for NS_COLLIDED, it then does one of two things.
+ *
+ * 1. If supported, we send a SVSHold for the user. We are done here, the IRCds expires this at the time we give it.
+ *
+ * 2. We create a new client with SendClientIntroduction(). Note that is it important that this is called either after the
+ *    user has been removed from our internal list of user or after the users nick has been updated completely internally.
+ *    This is beacuse SendClientIntroduction will destroy any users we think are currently on the nickname (which causes a
+ *    lot of problems, eg, deleting the user which recalls OnCancel), whether they really are or not. We then create a
+ *    release timer for this new client that waits and later on sends a QUIT for the client. Release timers are never used
+ *    for SVSHolds. Ever.
+ *
+ *
+ *  Note that now for the timers we only store the users name, not the NickAlias* pointer. We never remove timers when
+ *  a user changes nick or a nick is deleted, the timers must assume that either of these may have happend.
+ *
+ *  Storing NickAlias* pointers caused quite a problem, some of which are:
+ *
+ *  Having a valid timer alive that calls User::Collide would either:
+ *
+ *  1. Kill the user, causing users destructor to cancel all timers for the nick (as it should, it has no way of knowing
+ *     if we are in a timer or not) which would delete the currently active timer while it was running, causing TimerManager
+ *     to explode.
+ *
+ *  2. Force a user off of their nick, this would call NickAlias::Cancel before updating the user internally (to cancel the
+ *     current nicks timers, granted we could have easially saved this and called it after) which could possibly try to
+ *     introduce an enforcer nick. We would then check to see if the nick is already in use (it is, internally) and send
+ *     a kill for that nick. That may in turn delete the user immediatly, calling users destructor, which would attempt to
+ *     delete the timer, causing TimerManager to explode.
+ *
+ *     Additionally, if we marked the timer as "in use" so that calling the ClearTimer function wouldn't delete them, users
+ *     destructor would then call NickAlias::OnCancel, which would (at this point, it was unsetting GUESTED after introducing
+ *     the new client) introduce the same new client again, without actually deleting the originial user, causing an infinite
+ *     loop.
+ *
+ *     This is why we remove NS_GUESTED first in NickAlias::OnCancel before introducing a new client, although this should
+ *     not happen anymore. If I must emphasize this again, users need to be GONE from the internal list before calling
+ *     NickAlias::OnCancel. NickAlias::OnCancel intentionally reffers to this->nick, not the user passed to it. They *can*
+ *     (but not always) be different, depending if the user changed nicks or disconnected.
+ *
+ *
+ *  Adam
+ */
+void User::Collide(NickAlias *na)
+{
+	if (na)
+		na->SetFlag(NS_COLLIDED);
+
+	if (ircd->svsnick)
+	{
+		std::string guestnick;
+
+		do
+		{
+			char randbuf[17];
+			snprintf(randbuf, sizeof(randbuf), "%d", getrandom16());
+			guestnick = std::string(Config.NSGuestNickPrefix) + std::string(randbuf);
+		}
+		while (finduser(guestnick.c_str()));
+
+		notice_lang(Config.s_NickServ, this, FORCENICKCHANGE_CHANGING, guestnick.c_str());
+		ircdproto->SendForceNickChange(this, guestnick.c_str(), time(NULL));
+	}
+	else
+	{
+		kill_user(Config.s_NickServ, this->nick, "Services nickname-enforcer kill");
 	}
 }
 
@@ -749,7 +826,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	NickAlias *old_na;		  /* Old nick rec */
 	int nc_changed = 1;		 /* Did nick core change? */
 	char *logrealname;
-	std::string oldnick;		/* stores the old nick of the user, so we can pass it to OnUserNickChange */
 
 	if (!*source) {
 		char ipbuf[16];
@@ -875,15 +951,18 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user->my_signon = time(NULL);
 
 			old_na = findnick(user->nick);
-			if (old_na) {
+			if (old_na)
+			{
 				if (user->IsRecognized())
 					old_na->last_seen = time(NULL);
-				cancel_user(user);
 			}
 
-			oldnick = user->nick;
+			std::string oldnick = user->nick;
 			user->SetNewNick(nick);
 			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick.c_str()));
+
+			if (old_na)
+				old_na->OnCancel(user);
 
 			if ((old_na ? old_na->nc : NULL) == user->Account())
 				nc_changed = 0;

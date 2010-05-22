@@ -274,6 +274,7 @@ class CommandBSBot : public Command
 				bi->uid = ts6_uid_retrieve();
 			}
 			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
+			ircdproto->SendSQLine(bi->nick, "Reserved for services");
 			bi->RejoinAll();
 		}
 

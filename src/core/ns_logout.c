@@ -15,9 +15,6 @@
 
 #include "module.h"
 
-#define TO_COLLIDE 0 /* Collide the user with this nick */
-#define TO_RELEASE 1 /* Release a collided nick */
-
 class CommandNSLogout : public Command
 {
  public:
@@ -44,7 +41,6 @@ class CommandNSLogout : public Command
 
 			if (nick && !param.empty() && param == "REVALIDATE")
 			{
-				cancel_user(u2);
 				validate_user(u2);
 			}
 
@@ -56,10 +52,6 @@ class CommandNSLogout : public Command
 				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
 			else
 				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
-
-			/* Clear any timers again */
-			if (na && u->Account()->HasFlag(NI_KILLPROTECT))
-				del_ns_timeout(na, TO_COLLIDE);
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
 			ircdproto->SendUnregisteredNick(u2);

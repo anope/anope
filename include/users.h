@@ -130,6 +130,7 @@ class CoreExport User : public Extensible
 	/** Get the full mask ( nick!ident@realhost ) of a user
 	 */
 	const std::string GetMask();
+
 	/** Updates the realname of the user record.
 	 */
 	void SetRealname(const std::string &realname);
@@ -142,6 +143,12 @@ class CoreExport User : public Extensible
 	 */
 	virtual void SendMessage(const std::string &source, const char *fmt, ...);
 	virtual void SendMessage(const std::string &source, const std::string &msg);
+
+	/** Collide a nick
+	 * See the comment in users.cpp
+	 * @param na The nick
+	 */
+	void Collide(NickAlias *na);
 
 	/** Check if the user should become identified because
 	 * their svid matches the one stored in their nickcore

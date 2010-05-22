@@ -35,14 +35,14 @@ class CommandNSRelease : public Command
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!(na->HasFlag(NS_KILL_HELD)))
+		else if (!(na->HasFlag(NS_HELD)))
 			notice_lang(Config.s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
-				release(na, 0);
+				na->Release();
 				notice_lang(Config.s_NickServ, u, NICK_RELEASED);
 			}
 			else
@@ -60,7 +60,7 @@ class CommandNSRelease : public Command
 		{
 			if (u->Account() == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
 			{
-				release(na, 0);
+				na->Release();
 				notice_lang(Config.s_NickServ, u, NICK_RELEASED);
 			}
 			else

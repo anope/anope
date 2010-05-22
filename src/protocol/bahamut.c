@@ -261,7 +261,6 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		EnforceQlinedNick(nick, Config.s_BotServ);
 		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick.c_str(), static_cast<long>(time(NULL)), modes, user.c_str(), host.c_str(), Config.ServerName, real.c_str());
-		SendSQLine(nick, "Reserved for services");
 	}
 
 	/* SVSMODE +d */

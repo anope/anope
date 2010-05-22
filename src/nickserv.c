@@ -24,106 +24,60 @@ NickAlias *nalists[1024];
 NickCore *nclists[1024];
 NickRequest *nrlists[1024];
 
-unsigned int guestnum;		  /* Current guest number */
+static std::map<std::string, NickServCollide *> NickServCollides;
+static std::map<std::string, NickServRelease *> NickServReleases;
 
-#define TO_COLLIDE   0		  /* Collide the user with this nick */
-#define TO_RELEASE   1		  /* Release a collided nick */
-
-/*************************************************************************/
-
-static std::map<NickAlias *, NickServCollide *> NickServCollides;
-static std::map<NickAlias *, NickServRelease *> NickServReleases;
-
-NickServCollide::NickServCollide(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+NickServCollide::NickServCollide(const std::string &_nick, time_t delay) : Timer(delay), nick(_nick)
 {
 	/* Erase the current collide and use the new one */
-	std::map<NickAlias *, NickServCollide *>::iterator nit = NickServCollides.find(nickalias);
+	std::map<std::string, NickServCollide *>::iterator nit = NickServCollides.find(nick);
 	if (nit != NickServCollides.end())
 	{
 		delete nit->second;
 	}
 
-	it = NickServCollides.insert(std::make_pair(nickalias, this));
+	NickServCollides.insert(std::make_pair(nick, this));
 }
 
 NickServCollide::~NickServCollide()
 {
-	if (it.second)
-	{
-		NickServCollides.erase(it.first);
-	}
+	NickServCollides.erase(nick);
 }
 
 void NickServCollide::Tick(time_t ctime)
 {
 	/* If they identified or don't exist anymore, don't kill them. */
-	User *u = finduser(na->nick);
-	if (!u || u->Account() == na->nc || u->my_signon > this->GetSetTime())
+	User *u = finduser(nick);
+	NickAlias *na = findnick(nick);
+	if (!u || !na || u->Account() == na->nc || u->my_signon > this->GetSetTime())
 		return;
-
-	/* The RELEASE timeout will always add to the beginning of the
-	 * list, so we won't see it.  Which is fine because it can't be
-	 * triggered yet anyway. */
-	collide(na, 1);
+	
+	u->Collide(na);
 }
 
-void NickServCollide::ClearTimers(NickAlias *na)
-{
-	std::map<NickAlias *, NickServCollide *>::iterator i = NickServCollides.find(na);
-
-	if (i != NickServCollides.end())
-	{
-		delete i->second;
-	}
-}
-
-NickServRelease::NickServRelease(NickAlias *nickalias, time_t delay) : Timer(delay), na(nickalias)
+NickServRelease::NickServRelease(const std::string &_nick, const std::string &_uid, time_t delay) : Timer(delay), nick(_nick), uid(_uid)
 {
 	/* Erase the current release timer and use the new one */
-	std::map<NickAlias *, NickServRelease *>::iterator nit = NickServReleases.find(nickalias);
+	std::map<std::string, NickServRelease *>::iterator nit = NickServReleases.find(nick);
 	if (nit != NickServReleases.end())
 	{
 		delete nit->second;
 	}
 
-	it = NickServReleases.insert(std::make_pair(nickalias, this));
+	NickServReleases.insert(std::make_pair(nick, this));
 }
 
 NickServRelease::~NickServRelease()
 {
-	if (it.second)
-	{
-		NickServReleases.erase(it.first);
-	}
+	NickServReleases.erase(nick);
 }
 
 void NickServRelease::Tick(time_t ctime)
 {
-	if (ircd->svshold)
-	{
-		ircdproto->SendSVSHoldDel(na->nick);
-	}
-	else
-	{
-		if (ircd->ts6 && !uid.empty())
-			ircdproto->SendQuit(uid.c_str(), NULL);
-		else
-			ircdproto->SendQuit(na->nick, NULL);
-	}
-	na->UnsetFlag(NS_KILL_HELD);
-}
+	NickAlias *na = findnick(nick);
 
-void NickServRelease::ClearTimers(NickAlias *na, bool dorelease)
-{
-	std::map<NickAlias *, NickServRelease *>::iterator i = NickServReleases.find(na);
-
-	if (i != NickServReleases.end())
-	{
-		if (dorelease)
-			release(na, 1);
-
-		delete i->second;
-	}
+	if (na)
+		na->Release();
 }
 
 /*************************************************************************/
@@ -217,9 +171,6 @@ void get_core_stats(long *nrec, long *memuse)
 void ns_init()
 {
 	moduleAddNickServCmds();
-	guestnum = time(NULL);
-	while (guestnum > 9999999)
-		guestnum -= 10000000;
 }
 
 /*************************************************************************/
@@ -265,11 +216,11 @@ int validate_user(User * u)
 {
 	NickAlias *na;
 	NickRequest *nr;
-	NickServCollide *t;
 
 	if ((nr = findrequestnick(u->nick.c_str())))
 	{
 		notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
+		return 0;
 	}
 
 	if (!(na = findnick(u->nick)))
@@ -278,14 +229,14 @@ int validate_user(User * u)
 	if (na->HasFlag(NS_FORBIDDEN))
 	{
 		notice_lang(Config.s_NickServ, u, NICK_MAY_NOT_BE_USED);
-		collide(na, 0);
+		u->Collide(na);
 		return 0;
 	}
 
 	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
 		notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
-		collide(na, 0);
+		u->Collide(na);
 		return 0;
 	}
 
@@ -315,59 +266,21 @@ int validate_user(User * u)
 		if (na->nc->HasFlag(NI_KILL_IMMED))
 		{
 			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_NOW);
-			collide(na, 0);
+			u->Collide(na);
 		}
 		else if (na->nc->HasFlag(NI_KILL_QUICK))
 		{
 			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
-			t = new NickServCollide(na, 20);
+			new NickServCollide(na->nick, 20);
 		}
 		else
 		{
 			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
-			t = new NickServCollide(na, 60);
+			new NickServCollide(na->nick, 60);
 		}
 	}
 
 	return 0;
-}
-
-/*************************************************************************/
-
-/* Cancel validation flags for a nick (i.e. when the user with that nick
- * signs off or changes nicks).  Also cancels any impending collide. */
-
-void cancel_user(User * u)
-{
-	NickAlias *na = findnick(u->nick);
-	NickServRelease *t;
-	std::string uid;
-
-	if (na)
-	{
-		if (na->HasFlag(NS_GUESTED))
-		{
-			if (ircd->svshold)
-			{
-				ircdproto->SendSVSHold(na->nick);
-			}
-			else if (ircd->svsnick)
-			{
-				uid = ts6_uid_retrieve();
-				ircdproto->SendClientIntroduction(u->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid);
-				t = new NickServRelease(na, Config.NSReleaseTimeout);
-				t->uid = uid;
-			}
-			else
-			{
-				ircdproto->SendSVSKill(findbot(Config.s_NickServ), u, "Please do not use a registered nickname without identifying");
-			}
-			na->SetFlag(NS_KILL_HELD);
-			na->UnsetFlag(NS_GUESTED);
-		}
-
-		NickServCollide::ClearTimers(na);
-	}
 }
 
 /*************************************************************************/
@@ -698,86 +611,6 @@ void change_core_display(NickCore * nc)
 	change_core_display(nc,na->nick);
 }
 
-
-/*************************************************************************/
-
-/* Collide a nick.
- *
- * When connected to a network using DALnet servers, version 4.4.15 and above,
- * Services is now able to force a nick change instead of killing the user.
- * The new nick takes the form "Guest######". If a nick change is forced, we
- * do not introduce the enforcer nick until the user's nick actually changes.
- * This is watched for and done in cancel_user(). -TheShadow
- */
-
-void collide(NickAlias * na, int from_timeout)
-{
-	if (!from_timeout)
-		NickServCollide::ClearTimers(na);
-
-	/* Old system was unsure since there can be more than one collide
-	 * per second. So let use another safer method.
-	 *		  --lara
-	 */
-	/* So you should check the length of Config.NSGUestNickPrefix, eh Lara?
-	 *		  --Certus
-	 */
-
-	if (ircd->svsnick)
-	{
-		User *u = finduser(na->nick);
-		if (!u)
-			return;
-
-		std::string guestnick;
-		/* We need to make sure the guestnick is free -- heinz */
-		do
-		{
-			char randbuf[17];
-			snprintf(randbuf, sizeof(randbuf), "%d", getrandom16());
-			guestnick = Config.NSGuestNickPrefix;
-			guestnick += randbuf;
-		}
-		while (finduser(guestnick.c_str()));
-		notice_lang(Config.s_NickServ, finduser(na->nick), FORCENICKCHANGE_CHANGING, guestnick.c_str());
-		ircdproto->SendForceNickChange(u, guestnick.c_str(), time(NULL));
-		na->SetFlag(NS_GUESTED);
-	}
-	else
-	{
-		kill_user(Config.s_NickServ, na->nick, "Services nickname-enforcer kill");
-	}
-}
-
-/*************************************************************************/
-
-/* Release hold on a nick. */
-
-void release(NickAlias * na, int from_timeout)
-{
-	if (!from_timeout)
-		NickServRelease::ClearTimers(na);
-
-	if (ircd->svshold)
-	{
-		ircdproto->SendSVSHoldDel(na->nick);
-	}
-	else
-	{
-		ircdproto->SendQuit(na->nick, NULL);
-	}
-	na->UnsetFlag(NS_KILL_HELD);
-}
-
-/*************************************************************************/
-
-void del_ns_timeout(NickAlias * na, int type)
-{
-	if (type == TO_COLLIDE)
-		NickServCollide::ClearTimers(na);
-	else if (type == TO_RELEASE)
-		NickServRelease::ClearTimers(na);
-}
 
 /*************************************************************************/
 /*********************** NickServ command routines ***********************/

@@ -197,9 +197,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
 	{
-		EnforceQlinedNick(nick, Config.s_BotServ);
+		EnforceQlinedNick(nick, Config.ServerName);
 		send_cmd(NULL, "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config.ServerName, modes, host.c_str(), myIrcd->nickip ? " *" : " ", real.c_str());
-		SendSQLine(nick, "Reserved for services");
 	}
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)

@@ -300,7 +300,7 @@ int m_whois(const char *source, const char *who)
 			ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);
 			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
 		}
-		else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_KILL_HELD))
+		else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_HELD))
 		{
 			/* We have a nick enforcer client here that we need to respond to.
 			 * We can't just say it doesn't exist here, even tho it does for

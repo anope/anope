@@ -65,7 +65,7 @@ class CommandNSForbid : public Command
 			if (curr)
 			{
 				notice_lang(Config.s_NickServ, curr, FORCENICKCHANGE_NOW);
-				collide(na, 0);
+				curr->Collide(na);
 			}
 
 

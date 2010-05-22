@@ -15,9 +15,6 @@
 
 #include "module.h"
 
-#define TO_COLLIDE 0 /* Collide the user with this nick */
-#define TO_RELEASE 1 /* Release a collided nick */
-
 class CommandNSIdentify : public Command
 {
  public:
@@ -94,10 +91,6 @@ class CommandNSIdentify : public Command
 
 			if (u->IsIdentified())
 				check_memos(u);
-
-			/* Clear any timers */
-			if (na->nc->HasFlag(NI_KILLPROTECT))
-				del_ns_timeout(na, TO_COLLIDE);
 		}
 		return MOD_CONT;
 	}

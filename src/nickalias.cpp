@@ -80,10 +80,6 @@ NickAlias::~NickAlias()
 {
 	User *u = NULL;
 
-	/* First thing to do: remove any timeout belonging to the nick we're deleting */
-	NickServCollide::ClearTimers(this);
-	NickServRelease::ClearTimers(this, true);
-
 	FOREACH_MOD(I_OnDelNick, OnDelNick(this));
 
 	/* Second thing to do: look for an user using the alias
@@ -128,5 +124,51 @@ NickAlias::~NickAlias()
 		delete [] this->last_realname;
 	if (this->last_quit)
 		delete [] this->last_quit;
+}
+
+/** Release a nick from being held. This can be called from the core (ns_release)
+ * or from a timer used when forcing clients off of nicks. Note that if this is called
+ * from a timer, ircd->svshold is NEVER true
+ */
+void NickAlias::Release()
+{
+	if (this->HasFlag(NS_HELD))
+	{
+		if (ircd->svshold)
+		{
+			ircdproto->SendSVSHoldDel(this->nick);
+		}
+		else
+		{
+			ircdproto->SendQuit(this->nick, NULL);
+		}
+	
+		this->UnsetFlag(NS_HELD);
+	}
+}
+
+/** Called when a user gets off this nick
+ * See the comment in users.cpp for User::Collide()
+ * @param u The user
+ */
+void NickAlias::OnCancel(User *)
+{
+	if (this->HasFlag(NS_COLLIDED))
+	{
+		this->SetFlag(NS_HELD);
+		this->UnsetFlag(NS_COLLIDED);
+
+		if (ircd->svshold)
+		{
+			ircdproto->SendSVSHold(this->nick);
+		}
+		else
+		{
+			std::string uid = (ircd->ts6 ? ts6_uid_retrieve() : "");
+
+			ircdproto->SendClientIntroduction(this->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid);
+			new NickServRelease(this->nick, uid, Config.NSReleaseTimeout);
+		}
+	}
 }
 

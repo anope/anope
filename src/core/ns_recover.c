@@ -49,7 +49,7 @@ class CommandNSRecover : public Command
 				char relstr[192];
 
 				notice_lang(Config.s_NickServ, u2, FORCENICKCHANGE_NOW);
-				collide(na, 0);
+				u2->Collide(na);
 
 				/* Convert Config.NSReleaseTimeout seconds to string format */
 				duration(na->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
@@ -74,7 +74,7 @@ class CommandNSRecover : public Command
 				char relstr[192];
 
 				notice_lang(Config.s_NickServ, u2, FORCENICKCHANGE_NOW);
-				collide(na, 0);
+				u2->Collide(na);
 
 				/* Convert Config.NSReleaseTimeout seconds to string format */
 				duration(na->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);

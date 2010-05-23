@@ -12,7 +12,7 @@ VERSION_EXTRA="-svn"
 VERSION_BUILD="2976"
 
 # $Log$ # Changes since the 1.8.4 Release
-#Revision 2976 - Added an internal events called when nick is ghosted and when nick is recovered
+#Revision 2976 - Added internal events called when nick is ghosted and when nick is recovered
 #Revision 2969 - Extension to r2952 adding logging for BS BOT
 #Revision 2966 - Fixed English in e-mail messages
 #Revision 2962 - Fixed bug with r2952 (%s was used rather than %d)

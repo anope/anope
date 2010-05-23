@@ -510,6 +510,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
     int status = 0;             /* Status to apply */
     char mask[USERMAX + HOSTMAX + 2];
     char *logrealname;
+    char *oldnick;
 
     if (!*source) {
         char ipbuf[16];
@@ -743,8 +744,10 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                 cancel_user(user);
             }
 
+            oldnick = sstrdup(user->nick);
             change_user_nick(user, nick);
-            send_event(EVENT_CHANGE_NICK, 1, nick);
+            send_event(EVENT_CHANGE_NICK, 2, nick, oldnick);
+            free(oldnick);
 
             if ((old_na ? old_na->nc : NULL) ==
                 (user->na ? user->na->nc : NULL))

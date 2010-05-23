@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2976"
+VERSION_BUILD="2978"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 2978 - Added param to EVENT_CHANGE_NICK for old nickname
 #Revision 2976 - Added internal events called when nick is ghosted and when nick is recovered
 #Revision 2969 - Extension to r2952 adding logging for BS BOT
 #Revision 2966 - Fixed English in e-mail messages

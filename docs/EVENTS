@@ -280,7 +280,9 @@ Anope Internal Events
 
     EVENT_CHANGE_NICK
         A user has just changed it's nick.
-        av[0]  The new nickname of the user.
+        av[0]  The new nickname of the user. Event is called after the user has been changed
+               to this nickname.
+        av[1]  The old nickname of the user.
 
     EVENT_CONNECT
         This event is emitted when the connection to our uplink hub is being

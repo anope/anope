@@ -106,6 +106,7 @@ int do_recover(User * u)
         if (res == 1) {
             char relstr[192];
 
+            send_event(EVENT_NICK_RECOVERED, 3, EVENT_START, u->nick, nick);
             alog("%s: %s!%s@%s used RECOVER on %s",
                  s_NickServ, u->nick, u->username, u->host, u2->nick);
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
@@ -115,6 +116,7 @@ int do_recover(User * u)
             duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
 
             notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
+            send_event(EVENT_NICK_RECOVERED, 3, EVENT_STOP, u->nick, nick);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
@@ -128,6 +130,7 @@ int do_recover(User * u)
             || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
             char relstr[192];
 
+            send_event(EVENT_NICK_RECOVERED, 3, EVENT_START, u->nick, nick);
             alog("%s: %s!%s@%s used RECOVER on %s",
                  s_NickServ, u->nick, u->username, u->host, u2->nick);
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
@@ -137,6 +140,7 @@ int do_recover(User * u)
             duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
 
             notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
+            send_event(EVENT_NICK_RECOVERED, 3, EVENT_STOP, u->nick, nick);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);
         }

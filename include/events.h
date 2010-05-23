@@ -48,6 +48,8 @@
 #define EVENT_NICK_EXPIRE "nick_expire"
 #define EVENT_CHANGE_NICK "change_nick"
 #define EVENT_USER_LOGOFF "user_logoff"
+#define EVENT_NICK_GHOSTED "nick_ghosted"
+#define EVENT_NICK_RECOVERED "nick_recovered"
 #define EVENT_GROUP "nick_group"
 #define EVENT_NICK_IDENTIFY "nick_id"
 #define EVENT_SERVER_SQUIT "server_squit"

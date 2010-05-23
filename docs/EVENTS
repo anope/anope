@@ -342,6 +342,14 @@ Anope Internal Events
         A user's nick has just been forbidden.
         av[0]  The nickname that has just been forbidden.
 
+    EVENT_NICK_GHOSTED
+        A user has just been ghosted.
+        av[0]  EVENT_START or EVENT_STOP. EVENT_START when the user is about
+               to be removed from the network, EVENT_STOP when this has been
+               done.
+        av[1]  The nickname of the user doing the ghosting.
+        av[2]  The nickname being ghosted.
+
     EVENT_NICK_IDENTIFY
         A user has just identified for it's nickname with NickServ.
         av[0]  The nickname of the user that just identified.
@@ -349,6 +357,13 @@ Anope Internal Events
     EVENT_NICK_LOGOUT
         A user has just (been) logged out.
         av[0]  The nickname of the user that has (been) logged out.
+
+    EVENT_NICK_RECOVERED
+        A user's nickname has just been recovered.
+        av[0]  EVENT_START or EVENT_STOP. EVENT_START when the user is about
+               to be recovered, EVENT_STOP when this has been done.
+        av[1]  The nickname of the user doing the recovery.
+        av[2]  The nickname being recovered.
 
     EVENT_NICK_REGISTERED
         A new user has just registered it's nickname. This event is being

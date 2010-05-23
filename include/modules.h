@@ -893,6 +893,14 @@ class CoreExport Module
 	 */
 	virtual void OnAccessClear(ChannelInfo *ci, User *u) { }
 
+	/** Called when a level for a channel is changed
+	 * @param u The user changing the level
+	 * @param ci The channel the level was changed on
+	 * @param pos The level position, can be -1 for resetting levels
+	 * @param what The new level
+	 */
+	virtual void OnLevelChange(User *u, ChannelInfo *ci, int pos, int what) { }
+
 	/** Called when a channel is dropped
 	 * @param chname The channel name
 	 */
@@ -1156,7 +1164,7 @@ enum Implementation
 
 		/* ChanServ */
 		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
-		I_OnAccessDel, I_OnAccessClear, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
+		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
 
 		/* BotServ */

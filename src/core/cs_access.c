@@ -476,7 +476,7 @@ class CommandCSLevels : public Command
 			for (i = 0; levelinfo[i].what >= 0; i++) {
 				if (stricmp(levelinfo[i].name, what) == 0) {
 					ci->levels[levelinfo[i].what] = level;
-
+					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, level));
 					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set level " << levelinfo[i].name
 						<< " on channel " << ci->name << " to " << level;
 					if (level == ACCESS_FOUNDER)
@@ -494,6 +494,7 @@ class CommandCSLevels : public Command
 			for (i = 0; levelinfo[i].what >= 0; i++) {
 				if (stricmp(levelinfo[i].name, what) == 0) {
 					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
+					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
 
 					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name
 						<< " on channel " << ci->name;
@@ -540,6 +541,7 @@ class CommandCSLevels : public Command
 
 		} else if (cmd == "RESET") {
 			reset_levels(ci);
+			FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
 
 			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " reset levels definitions on channel " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RESET, chan);

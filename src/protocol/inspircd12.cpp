@@ -689,7 +689,17 @@ int anope_event_squit(const char *source, int ac, const char **av)
 
 int anope_event_rsquit(const char *source, int ac, const char **av)
 {
+	/* On InspIRCd we must send a SQUIT when we recieve RSQUIT for a server we have juped */
+	Server *s = findserver(servlist, av[0]);
+	if (!s)
+		s = findserver_uid(servlist, av[0]);
+	if (s && s->HasFlag(SERVER_JUPED))
+	{
+		send_cmd(TS6SID, "SQUIT %s :%s", s->suid, ac > 1 ? av[1] : "");
+	}
+
 	do_squit(source, ac, av);
+
 	return MOD_CONT;
 }
 

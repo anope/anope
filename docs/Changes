@@ -27,6 +27,7 @@ F A bad pointer passed to the OnDelEvent which could cause some 3rd party module
 F CS FORBID allows to you forbid unregistered channels
 F The -nothird command line option to work
 F ms_rsend to really work
+F SQUITing juped servers on InspIRCd1.2+
 
 Anope Version 1.9.1
 --------------------

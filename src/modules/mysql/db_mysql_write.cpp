@@ -237,6 +237,8 @@ static void SaveDatabases()
 
 	query << "TRUNCATE TABLE `anope_ns_access`";
 	ExecuteQuery(query);
+	query << "TRUNCATE TABLE `anope_ms_info`";
+	ExecuteQuery(query);
 
 	for (int i = 0; i < 1024; ++i)
 	{
@@ -348,11 +350,11 @@ static void SaveDatabases()
 		me->OnAddAkill(NULL, ak);
 	}
 
-	for (int i = 0; i < szlines.count; ++i)
+	for (int i = 0; i < sglines.count; ++i)
 	{
-		SXLine *x = static_cast<SXLine *>(szlines.list[i]);
+		SXLine *x = static_cast<SXLine *>(sglines.list[i]);
 
-		me->OnAddSXLine(NULL, x, SX_SZLINE);
+		me->OnAddSXLine(NULL, x, SX_SGLINE);
 	}
 
 	for (int i = 0; i < sqlines.count; ++i)

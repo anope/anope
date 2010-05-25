@@ -16,7 +16,6 @@ NickCore::NickCore(const std::string &coredisplay)
 	lastmail = 0;
 
 	this->display = sstrdup(coredisplay.c_str());
-	slist_init(&this->aliases);
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)

@@ -23,10 +23,8 @@ class CommandHSDelAll : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		int i;
 		const char *nick = params[0].c_str();
 		NickAlias *na;
-		NickCore *nc;
 		if ((na = findnick(nick)))
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
@@ -35,10 +33,10 @@ class CommandHSDelAll : public Command
 				return MOD_CONT;
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
-			nc = na->nc;
-			for (i = 0; i < nc->aliases.count; ++i)
+			NickCore *nc = na->nc;
+			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
 			{
-				na = static_cast<NickAlias *>(nc->aliases.list[i]);
+				na = *it;
 				na->hostinfo.RemoveVhost();
 			}
 			Alog() << "vHosts for all nicks in group \002" << nc->display << "\002 deleted by oper \002" << u->nick << "\002";

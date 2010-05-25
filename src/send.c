@@ -32,6 +32,15 @@ void send_cmd(const char *source, const char *fmt, ...)
 
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
+	if (!UplinkSock)
+	{
+		if (source)
+			Alog(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
+		else
+			Alog(LOG_DEBUG) << "Attemtped to send \"" << buf << "\" with UplinkSock NULL";
+		return;
+	}
+
 	if (source)
 	{
 		UplinkSock->Write(":%s %s", source, buf);
@@ -58,6 +67,15 @@ void send_cmd(const std::string &source, const char *fmt, ...)
 	va_start(args, fmt);
 
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
+
+	if (!UplinkSock)
+	{
+		if (!source.empty())
+			Alog(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
+		else
+			Alog(LOG_DEBUG) << "Attemtped to send " << buf << "\" with UplinkSock NULL";
+		return;
+	}
 
 	if (!source.empty())
 	{

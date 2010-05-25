@@ -15,27 +15,10 @@
 #include "modules.h"
 #include "language.h"
 
-/*************************************************************************/
-
-/* AKILL, SGLINE, SQLINE and SZLINE lists */
-SList akills, sglines, sqlines, szlines;
-
-/*************************************************************************/
-
-static int is_akill_entry_equal(SList * slist, void *item1, void *item2);
-static void free_akill_entry(SList * slist, void *item);
-static int is_sgline_entry_equal(SList * slist, void *item1, void *item2);
-static void free_sgline_entry(SList * slist, void *item);
-static int is_sqline_entry_equal(SList * slist, void *item1, void *item2);
-static void free_sqline_entry(SList * slist, void *item);
-static int is_szline_entry_equal(SList * slist, void *item1, void *item2);
-static void free_szline_entry(SList * slist, void *item);
-
-/* News items */
 std::vector<NewsItem *> News;
 
 std::vector<std::bitset<32> > DefCon;
-int DefConModesSet = 0;
+bool DefConModesSet = false;
 /* Defcon modes mlocked on */
 Flags<ChannelModeName> DefConModesOn;
 /* Defcon modes mlocked off */
@@ -43,20 +26,53 @@ Flags<ChannelModeName> DefConModesOff;
 /* Map of Modesa and Params for DefCon */
 std::map<ChannelModeName, std::string> DefConModesOnParams;
 
+XLineManager *SGLine, *SZLine, *SQLine, *SNLine;
+
+void os_init()
+{
+	ModuleManager::LoadModuleList(Config.OperServCoreModules);
+
+	/* Yes, these are in this order for a reason. Most violent->least violent. */
+	XLineManager::RegisterXLineManager(SGLine = new SGLineManager());
+	XLineManager::RegisterXLineManager(SZLine = new SZLineManager());
+	XLineManager::RegisterXLineManager(SQLine = new SQLineManager());
+	XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
+}
+
+void operserv(User * u, char *buf)
+{
+	const char *cmd, *s;
+
+	Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  buf;
+
+	cmd = strtok(buf, " ");
+	if (!cmd)
+		return;
+	else if (!stricmp(cmd, "\1PING")) {
+		if (!(s = strtok(NULL, ""))) {
+			s = "";
+		}
+		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "PING %s", s);
+	}
+	else {
+		mod_run_cmd(OperServ, u, cmd);
+	}
+}
+
 bool SetDefConParam(ChannelModeName Name, std::string &buf)
 {
 	return DefConModesOnParams.insert(std::make_pair(Name, buf)).second;
 }
 
-bool GetDefConParam(ChannelModeName Name, std::string *buf)
+bool GetDefConParam(ChannelModeName Name, std::string &buf)
 {
 	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
 
-	buf->clear();
+	buf.clear();
 
 	if (it != DefConModesOnParams.end())
 	{
-		*buf = it->second;
+		buf = it->second;
 		return true;
 	}
 
@@ -72,947 +88,6 @@ void UnsetDefConParam(ChannelModeName Name)
 		DefConModesOnParams.erase(it);
 	}
 }
-
-/*************************************************************************/
-
-void moduleAddOperServCmds();
-/*************************************************************************/
-
-/* Options for the lists */
-SListOpts akopts = { 0, NULL, &is_akill_entry_equal, &free_akill_entry };
-
-SListOpts sgopts = { 0, NULL, &is_sgline_entry_equal, &free_sgline_entry };
-SListOpts sqopts =
-	{ SLISTF_SORT, NULL, &is_sqline_entry_equal, &free_sqline_entry };
-SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
-
-/*************************************************************************/
-/* *INDENT-OFF* */
-void moduleAddOperServCmds() {
-	ModuleManager::LoadModuleList(Config.OperServCoreModules);
-}
-
-/* *INDENT-ON* */
-/*************************************************************************/
-/*************************************************************************/
-
-/* OperServ initialization. */
-
-void os_init()
-{
-	moduleAddOperServCmds();
-
-	slist_init(&akills);
-	akills.opts = &akopts;
-
-	if (ircd->sgline) {
-		slist_init(&sglines);
-		sglines.opts = &sgopts;
-	}
-	if (ircd->sqline) {
-		slist_init(&sqlines);
-		sqlines.opts = &sqopts;
-	}
-	if (ircd->szline) {
-		slist_init(&szlines);
-		szlines.opts = &szopts;
-	}
-}
-
-/*************************************************************************/
-
-/* Main OperServ routine. */
-
-void operserv(User * u, char *buf)
-{
-	const char *cmd;
-	const char *s;
-
-	Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  buf;
-
-	cmd = strtok(buf, " ");
-	if (!cmd) {
-		return;
-	} else if (stricmp(cmd, "\1PING") == 0) {
-		if (!(s = strtok(NULL, ""))) {
-			s = "";
-		}
-		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "PING %s", s);
-	} else {
-		mod_run_cmd(OperServ, u, cmd);
-	}
-}
-
-/*************************************************************************/
-/*********************** OperServ command functions **********************/
-/*******************************
- * ******************************************/
-
-/*************************************************************************/
-
-
-void server_global(Server *s, const std::string &message)
-{
-	/* Do not send the notice to ourselves our juped servers */
-	if (s != Me && !s->HasFlag(SERVER_JUPED))
-		notice_server(Config.s_GlobalNoticer, s, "%s", message.c_str());
-
-	if (s->GetLinks())
-	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
-		{
-			server_global(*it, message);
-		}
-	}
-}
-
-void oper_global(char *nick, const char *fmt, ...)
-{
-	va_list args;
-	char msg[2048];			 /* largest valid message is 512, this should cover any global */
-
-	va_start(args, fmt);
-	vsnprintf(msg, sizeof(msg), fmt, args);
-	va_end(args);
-
-	/* I don't like the way this is coded... */
-	if (nick && !Config.AnonymousGlobal)
-	{
-		std::string rmsg = std::string("[") + nick + std::string("] ") + msg;
-		server_global(Me->GetUplink(), rmsg.c_str());
-	}
-	else
-		server_global(Me->GetUplink(), msg);
-
-}
-
-/**************************************************************************/
-
-/* Adds an AKILL to the list. Returns >= 0 on success, -1 if it fails, -2
- * if only the expiry time was changed.
- * The success result is the number of AKILLs that were deleted to successfully add one.
- */
-
-int add_akill(User * u, const char *mask, const char *by, const time_t expires,
-			  const char *reason)
-{
-	int deleted = 0, i;
-	char *user, *mask2, *host;
-	Akill *entry;
-
-	if (!mask) {
-		return -1;
-	}
-
-	/* Checks whether there is an AKILL that already covers
-	 * the one we want to add, and whether there are AKILLs
-	 * that would be covered by this one. The masks AND the
-	 * expiry times are used to determine this, because some
-	 * AKILLs may become useful when another one expires.
-	 * If so, warn the user in the first case and cleanup
-	 * the useless AKILLs in the second.
-	 */
-
-	if (akills.count > 0) {
-
-		for (i = akills.count - 1; i >= 0; i--) {
-			char amask[BUFSIZE];
-
-			entry = static_cast<Akill *>(akills.list[i]);
-
-			if (!entry)
-				continue;
-
-			snprintf(amask, sizeof(amask), "%s@%s", entry->user,
-					 entry->host);
-
-			if (!stricmp(amask, mask)) {
-				/* We change the AKILL expiry time if its current one is less than the new.
-				 * This is preferable to be sure we don't change an important AKILL
-				 * accidentely.
-				 */
-				if (entry->expires >= expires || entry->expires == 0) {
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_AKILL_EXISTS,
-									mask);
-					return -1;
-				} else {
-					entry->expires = expires;
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_AKILL_CHANGED,
-									amask);
-					return -2;
-				}
-			}
-
-			if (Anope::Match(mask, amask, false)
-				&& (entry->expires >= expires || entry->expires == 0)) {
-				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_AKILL_ALREADY_COVERED,
-								mask, amask);
-				return -1;
-			}
-
-			if (Anope::Match(amask, mask, false)
-				&& (entry->expires <= expires || expires == 0)) {
-				slist_delete(&akills, i);
-				deleted++;
-			}
-		}
-
-	}
-
-	/* We can now check whether the list is full or not. */
-	if (slist_full(&akills)) {
-		if (u)
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_REACHED_LIMIT,
-						akills.limit);
-		return -1;
-	}
-
-	/* We can now (really) add the AKILL. */
-	mask2 = sstrdup(mask);
-	host = strchr(mask2, '@');
-
-	if (!host) {
-		delete [] mask2;
-		return -1;
-	}
-
-	user = mask2;
-	*host = 0;
-	host++;
-
-	entry = new Akill;
-
-	if (!entry) {
-		delete [] mask2;
-		return -1;
-	}
-
-	entry->user = sstrdup(user);
-	entry->host = sstrdup(host);
-	entry->by = sstrdup(by);
-	entry->reason = sstrdup(reason);
-	entry->seton = time(NULL);
-	entry->expires = expires;
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, entry));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete entry;
-		return -1;
-	}
-
-	slist_add(&akills, entry);
-
-	if (Config.AkillOnAdd)
-		ircdproto->SendAkill(entry);
-
-	delete [] mask2;
-
-	return deleted;
-}
-
-/* Does the user match any AKILLs? */
-
-int check_akill(const char *nick, const char *username, const char *host,
-				const char *vhost, const char *ip)
-{
-	int i;
-	Akill *ak;
-
-	if (akills.count == 0)
-		return 0;
-
-	for (i = 0; i < akills.count; i++) {
-		ak = static_cast<Akill *>(akills.list[i]);
-		if (!ak)
-			continue;
-		if (Anope::Match(username, ak->user, false)
-			&& Anope::Match(host, ak->host, false)) {
-			ircdproto->SendAkill(ak);
-			return 1;
-		}
-		if (ircd->vhost) {
-			if (vhost) {
-				if (Anope::Match(username, ak->user, false)
-					&& Anope::Match(vhost, ak->host, false)) {
-					ircdproto->SendAkill(ak);
-					return 1;
-				}
-			}
-		}
-		if (ircd->nickip) {
-			if (ip) {
-				if (Anope::Match(username, ak->user, false)
-					&& Anope::Match(ip, ak->host, false)) {
-					ircdproto->SendAkill(ak);
-					return 1;
-				}
-			}
-		}
-
-	}
-
-	return 0;
-}
-
-/* Delete any expired autokills. */
-
-void expire_akills()
-{
-	int i;
-	time_t now = time(NULL);
-	Akill *ak;
-
-	for (i = akills.count - 1; i >= 0; i--) {
-		ak = static_cast<Akill *>(akills.list[i]);
-
-		if (!ak->expires || ak->expires > now)
-			continue;
-
-		if (Config.WallAkillExpire)
-			ircdproto->SendGlobops(OperServ, "AKILL on %s@%s has expired",
-							 ak->user, ak->host);
-		slist_delete(&akills, i);
-	}
-}
-
-static void free_akill_entry(SList * slist, void *item)
-{
-	Akill *ak = static_cast<Akill *>(item);
-
-	/* Remove the AKILLs from all the servers */
-	ircdproto->SendAkillDel(ak);
-
-	/* Free the structure */
-	delete [] ak->user;
-	delete [] ak->host;
-	delete [] ak->by;
-	delete [] ak->reason;
-	delete ak;
-}
-
-/* item1 is not an Akill pointer, but a char
- */
-
-static int is_akill_entry_equal(SList * slist, void *item1, void *item2)
-{
-	char *ak1 = static_cast<char *>(item1), buf[BUFSIZE];
-	Akill *ak2 = static_cast<Akill *>(item2);
-
-	if (!ak1 || !ak2)
-		return 0;
-
-	snprintf(buf, sizeof(buf), "%s@%s", ak2->user, ak2->host);
-
-	if (!stricmp(ak1, buf))
-		return 1;
-	else
-		return 0;
-}
-
-
-/*************************************************************************/
-
-/* Adds an SGLINE to the list. Returns >= 0 on success, -1 if it failed, -2 if
- * only the expiry time changed.
- * The success result is the number of SGLINEs that were deleted to successfully add one.
- */
-
-int add_sgline(User * u, const char *mask, const char *by, time_t expires,
-			   const char *reason)
-{
-	int deleted = 0, i;
-	SXLine *entry;
-
-	/* Checks whether there is an SGLINE that already covers
-	 * the one we want to add, and whether there are SGLINEs
-	 * that would be covered by this one.
-	 * If so, warn the user in the first case and cleanup
-	 * the useless SGLINEs in the second.
-	 */
-
-	if (!mask) {
-		return -1;
-	}
-
-	if (sglines.count > 0) {
-
-		for (i = sglines.count - 1; i >= 0; i--) {
-			entry = static_cast<SXLine *>(sglines.list[i]);
-
-			if (!entry)
-				continue;
-
-			if (!stricmp(entry->mask, mask)) {
-				if (entry->expires >= expires || entry->expires == 0) {
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_SGLINE_EXISTS,
-									mask);
-					return -1;
-				} else {
-					entry->expires = expires;
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_SGLINE_CHANGED,
-									entry->mask);
-					return -2;
-				}
-			}
-
-			if (Anope::Match(mask, entry->mask, false )
-				&& (entry->expires >= expires || entry->expires == 0)) {
-				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_SGLINE_ALREADY_COVERED,
-								mask, entry->mask);
-				return -1;
-			}
-
-			if (Anope::Match(entry->mask, mask, false)
-				&& (entry->expires <= expires || expires == 0)) {
-				slist_delete(&sglines, i);
-				deleted++;
-			}
-		}
-
-	}
-
-	/* We can now check whether the list is full or not. */
-	if (slist_full(&sglines)) {
-		if (u)
-			notice_lang(Config.s_OperServ, u, OPER_SGLINE_REACHED_LIMIT,
-						sglines.limit);
-		return -1;
-	}
-
-	/* We can now (really) add the SGLINE. */
-	entry = new SXLine;
-	if (!entry)
-		return -1;
-
-	entry->mask = sstrdup(mask);
-	entry->by = sstrdup(by);
-	entry->reason = sstrdup(reason);
-	entry->seton = time(NULL);
-	entry->expires = expires;
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddSXLine, OnAddSXLine(u, entry, SX_SGLINE));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete entry;
-		return -1;
-	}
-
-	slist_add(&sglines, entry);
-
-	ircdproto->SendSGLine(entry);
-
-	if (Config.KillonSGline && !ircd->sglineenforce)
-	{
-		char buf[BUFSIZE];
-		snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
-
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-		{
-			User *u2 = it->second;
-			++it;
-
-			if (!is_oper(u2) && Anope::Match(u2->realname, entry->mask, false))
-			{
-				kill_user(Config.ServerName, u2->nick, buf);
-			}
-		}
-	}
-	return deleted;
-}
-
-/* Does the user match any SGLINEs? */
-
-int check_sgline(const char *nick, const char *realname)
-{
-	int i;
-	SXLine *sx;
-
-	if (sglines.count == 0)
-		return 0;
-
-	for (i = 0; i < sglines.count; i++) {
-		sx = static_cast<SXLine *>(sglines.list[i]);
-		if (!sx)
-			continue;
-
-		if (Anope::Match(realname, sx->mask, false)) {
-			ircdproto->SendSGLine(sx);
-			/* We kill nick since s_sgline can't */
-			ircdproto->SendSVSKill(NULL, finduser(nick), "G-Lined: %s", sx->reason);
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-/* Delete any expired SGLINEs. */
-
-void expire_sglines()
-{
-	int i;
-	time_t now = time(NULL);
-	SXLine *sx;
-
-	for (i = sglines.count - 1; i >= 0; i--) {
-		sx = static_cast<SXLine *>(sglines.list[i]);
-
-		if (!sx->expires || sx->expires > now)
-			continue;
-
-		if (Config.WallSGLineExpire)
-			ircdproto->SendGlobops(OperServ, "SGLINE on \2%s\2 has expired",
-							 sx->mask);
-		slist_delete(&sglines, i);
-	}
-}
-
-static void free_sgline_entry(SList * slist, void *item)
-{
-	SXLine *sx = static_cast<SXLine *>(item);
-
-	/* Remove the SGLINE from all the servers */
-	ircdproto->SendSGLineDel(sx);
-
-	/* Free the structure */
-	delete [] sx->mask;
-	delete [] sx->by;
-	delete [] sx->reason;
-	delete sx;
-}
-
-/* item1 is not an SXLine pointer, but a char */
-
-static int is_sgline_entry_equal(SList * slist, void *item1, void *item2)
-{
-	char *sx1 = static_cast<char *>(item1);
-	SXLine *sx2 = static_cast<SXLine *>(item2);
-
-	if (!sx1 || !sx2)
-		return 0;
-
-	if (!stricmp(sx1, sx2->mask))
-		return 1;
-	else
-		return 0;
-}
-
-/*************************************************************************/
-
-/* Adds an SQLINE to the list. Returns >= 0 on success, -1 if it failed, -2 if
- * only the expiry time changed.
- * The success result is the number of SQLINEs that were deleted to successfully add one.
- */
-
-int add_sqline(User * u, const char *mask, const char *by, time_t expires,
-			   const char *reason)
-{
-	int deleted = 0, i;
-	SXLine *entry;
-
-	/* Checks whether there is an SQLINE that already covers
-	 * the one we want to add, and whether there are SQLINEs
-	 * that would be covered by this one.
-	 * If so, warn the user in the first case and cleanup
-	 * the useless SQLINEs in the second.
-	 */
-
-	if (!mask) {
-		return -1;
-	}
-
-	if (sqlines.count > 0) {
-
-		for (i = sqlines.count - 1; i >= 0; i--) {
-			entry = static_cast<SXLine *>(sqlines.list[i]);
-
-			if (!entry)
-				continue;
-
-			if ((*mask == '#' && *entry->mask != '#') ||
-				(*mask != '#' && *entry->mask == '#'))
-				continue;
-
-			if (!stricmp(entry->mask, mask)) {
-				if (entry->expires >= expires || entry->expires == 0) {
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_SQLINE_EXISTS,
-									mask);
-					return -1;
-				} else {
-					entry->expires = expires;
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_SQLINE_CHANGED,
-									entry->mask);
-					return -2;
-				}
-			}
-
-			if (Anope::Match(mask, entry->mask, false)
-				&& (entry->expires >= expires || entry->expires == 0)) {
-				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_SQLINE_ALREADY_COVERED,
-								mask, entry->mask);
-				return -1;
-			}
-
-			if (Anope::Match(entry->mask, mask, false)
-				&& (entry->expires <= expires || expires == 0)) {
-				slist_delete(&sqlines, i);
-				deleted++;
-			}
-		}
-
-	}
-
-	/* We can now check whether the list is full or not. */
-	if (slist_full(&sqlines)) {
-		if (u)
-			notice_lang(Config.s_OperServ, u, OPER_SQLINE_REACHED_LIMIT,
-						sqlines.limit);
-		return -1;
-	}
-
-	/* We can now (really) add the SQLINE. */
-	entry = new SXLine;
-	if (!entry)
-		return -1;
-
-	entry->mask = sstrdup(mask);
-	entry->by = sstrdup(by);
-	entry->reason = sstrdup(reason);
-	entry->seton = time(NULL);
-	entry->expires = expires;
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddSXLine, OnAddSXLine(u, entry, SX_SQLINE));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete entry;
-		return -1;
-	}
-
-	slist_add(&sqlines, entry);
-
-	sqline(entry->mask, entry->reason);
-
-	if (Config.KillonSQline)
-	{
-		char buf[BUFSIZE];
-		snprintf(buf, (BUFSIZE - 1), "Q-Lined: %s", entry->reason);
-
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-		{
-			User *u2 = it->second;
-			++it;
-			
-			if (!is_oper(u2) && Anope::Match(u2->nick, entry->mask, false))
-			{
-				kill_user(Config.ServerName, u2->nick, buf);
-			}
-		}
-	}
-
-	return deleted;
-}
-
-/* Does the user match any SQLINEs? */
-
-int check_sqline(const char *nick, int nick_change)
-{
-	int i;
-	SXLine *sx;
-	char reason[300];
-
-	if (sqlines.count == 0)
-		return 0;
-
-	for (i = 0; i < sqlines.count; i++) {
-		sx = static_cast<SXLine *>(sqlines.list[i]);
-		if (!sx)
-			continue;
-
-		if (ircd->chansqline) {
-			if (*sx->mask == '#')
-				continue;
-		}
-
-		if (Anope::Match(nick, sx->mask, false)) {
-			sqline(sx->mask, sx->reason);
-			/* We kill nick since s_sqline can't */
-			snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
-			kill_user(Config.s_OperServ, nick, reason);
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-int check_chan_sqline(const char *chan)
-{
-	int i;
-	SXLine *sx;
-
-	if (sqlines.count == 0)
-		return 0;
-
-	for (i = 0; i < sqlines.count; i++) {
-		sx = static_cast<SXLine *>(sqlines.list[i]);
-		if (!sx)
-			continue;
-
-		if (*sx->mask != '#')
-			continue;
-
-		if (Anope::Match(chan, sx->mask, false)) {
-			sqline(sx->mask, sx->reason);
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-/* Delete any expired SQLINEs. */
-
-void expire_sqlines()
-{
-	int i;
-	time_t now = time(NULL);
-	SXLine *sx;
-
-	for (i = sqlines.count - 1; i >= 0; i--) {
-		sx = static_cast<SXLine *>(sqlines.list[i]);
-
-		if (!sx->expires || sx->expires > now)
-			continue;
-
-		if (Config.WallSQLineExpire)
-			ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired",
-							 sx->mask);
-
-		slist_delete(&sqlines, i);
-	}
-}
-
-static void free_sqline_entry(SList * slist, void *item)
-{
-	SXLine *sx = static_cast<SXLine *>(item);
-
-	/* Remove the SQLINE from all the servers */
-	ircdproto->SendSQLineDel(sx->mask);
-
-	/* Free the structure */
-	delete [] sx->mask;
-	delete [] sx->by;
-	delete [] sx->reason;
-	delete sx;
-}
-
-/* item1 is not an SXLine pointer, but a char */
-
-static int is_sqline_entry_equal(SList * slist, void *item1, void *item2)
-{
-	char *sx1 = static_cast<char *>(item1);
-	SXLine *sx2 = static_cast<SXLine *>(item2);
-
-	if (!sx1 || !sx2)
-		return 0;
-
-	if (!stricmp(sx1, sx2->mask))
-		return 1;
-	else
-		return 0;
-}
-
-/*************************************************************************/
-
-/* Adds an SZLINE to the list. Returns >= 0 on success, -1 on error, -2 if
- * only the expiry time changed.
- * The success result is the number of SZLINEs that were deleted to successfully add one.
- */
-
-int add_szline(User * u, const char *mask, const char *by, time_t expires,
-			   const char *reason)
-{
-	int deleted = 0, i;
-	SXLine *entry;
-
-	if (!mask) {
-		return -1;
-	}
-
-	/* Checks whether there is an SZLINE that already covers
-	 * the one we want to add, and whether there are SZLINEs
-	 * that would be covered by this one.
-	 * If so, warn the user in the first case and cleanup
-	 * the useless SZLINEs in the second.
-	 */
-
-	if (szlines.count > 0) {
-
-		for (i = szlines.count - 1; i >= 0; i--) {
-			entry = static_cast<SXLine *>(szlines.list[i]);
-
-			if (!entry)
-				continue;
-
-			if (!stricmp(entry->mask, mask)) {
-				if (entry->expires >= expires || entry->expires == 0) {
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_SZLINE_EXISTS,
-									mask);
-					return -1;
-				} else {
-					entry->expires = expires;
-					if (u)
-						notice_lang(Config.s_OperServ, u, OPER_SZLINE_EXISTS,
-									mask);
-					return -2;
-				}
-			}
-
-			if (Anope::Match(mask, entry->mask, false)) {
-				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_SZLINE_ALREADY_COVERED,
-								mask, entry->mask);
-				return -1;
-			}
-
-			if (Anope::Match(entry->mask, mask, false)) {
-				slist_delete(&szlines, i);
-				deleted++;
-			}
-		}
-
-	}
-
-	/* We can now check whether the list is full or not. */
-	if (slist_full(&szlines)) {
-		if (u)
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_REACHED_LIMIT,
-						szlines.limit);
-		return -1;
-	}
-
-	/* We can now (really) add the SZLINE. */
-	entry = new SXLine;
-	if (!entry)
-		return -1;
-
-	entry->mask = sstrdup(mask);
-	entry->by = sstrdup(by);
-	entry->reason = sstrdup(reason);
-	entry->seton = time(NULL);
-	entry->expires = expires;
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddSXLine, OnAddSXLine(u, entry, SX_SZLINE));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete entry;
-		return -1;
-	}
-
-	slist_add(&szlines, entry);
-	ircdproto->SendSZLine(entry);
-
-	return deleted;
-}
-
-/* Check and enforce any Zlines that we have */
-int check_szline(const char *nick, char *ip)
-{
-	int i;
-	SXLine *sx;
-
-	if (szlines.count == 0) {
-		return 0;
-	}
-
-	if (!ip) {
-		return 0;
-	}
-
-	for (i = 0; i < szlines.count; i++) {
-		sx = static_cast<SXLine *>(szlines.list[i]);
-		if (!sx) {
-			continue;
-		}
-
-		if (Anope::Match(ip, sx->mask, false)) {
-			ircdproto->SendSZLine(sx);
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-
-/* Delete any expired SZLINEs. */
-
-void expire_szlines()
-{
-	int i;
-	time_t now = time(NULL);
-	SXLine *sx;
-
-	for (i = szlines.count - 1; i >= 0; i--) {
-		sx = static_cast<SXLine *>(szlines.list[i]);
-
-		if (!sx->expires || sx->expires > now)
-			continue;
-
-		if (Config.WallSZLineExpire)
-			ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired",
-							 sx->mask);
-		slist_delete(&szlines, i);
-	}
-}
-
-static void free_szline_entry(SList * slist, void *item)
-{
-	SXLine *sx = static_cast<SXLine *>(item);
-
-	/* Remove the SZLINE from all the servers */
-	ircdproto->SendSZLineDel(sx);
-
-	/* Free the structure */
-	delete [] sx->mask;
-	delete [] sx->by;
-	delete [] sx->reason;
-	delete sx;
-}
-
-/* item1 is not an SXLine pointer, but a char
- */
-
-static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
-{
-	char *sx1 = static_cast<char *>(item1);
-	SXLine *sx2 = static_cast<SXLine *>(item2);
-
-	if (!sx1 || !sx2)
-		return 0;
-
-	if (!stricmp(sx1, sx2->mask))
-		return 1;
-	else
-		return 0;
-}
-
-/*************************************************************************/
 
 /** Check if a certain defcon option is currently in affect
  * @param Level The level
@@ -1051,5 +126,703 @@ void AddDefCon(int level, DefconLevel Level)
 void DelDefCon(int level, DefconLevel Level)
 {
 	DefCon[level][Level] = false;
+}
+
+void server_global(Server *s, const std::string &message)
+{
+	/* Do not send the notice to ourselves our juped servers */
+	if (s != Me && !s->HasFlag(SERVER_JUPED))
+		notice_server(Config.s_GlobalNoticer, s, "%s", message.c_str());
+
+	if (s->GetLinks())
+	{
+		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
+		{
+			server_global(*it, message);
+		}
+	}
+}
+
+void oper_global(char *nick, const char *fmt, ...)
+{
+	va_list args;
+	char msg[2048];			 /* largest valid message is 512, this should cover any global */
+
+	va_start(args, fmt);
+	vsnprintf(msg, sizeof(msg), fmt, args);
+	va_end(args);
+
+	if (nick && !Config.AnonymousGlobal)
+	{
+		std::string rmsg = std::string("[") + nick + std::string("] ") + msg;
+		server_global(Me->GetUplink(), rmsg.c_str());
+	}
+	else
+		server_global(Me->GetUplink(), msg);
+
+}
+
+/**************************************************************************/
+
+/* List of XLine managers we check users against in XLineManager::CheckAll */
+std::list<XLineManager *> XLineManager::XLineManagers;
+
+XLine::XLine(const ci::string &mask, const std::string &reason) : Mask(mask), Reason(reason)
+{
+	Expires = Created = 0;
+}
+
+XLine::XLine(const ci::string &mask, const ci::string &by, const time_t expires, const std::string &reason) : Mask(mask), By(by), Created(time(NULL)), Expires(expires), Reason(reason)
+{
+}
+
+ci::string XLine::GetNick() const
+{
+	size_t nick_t = Mask.find('!');
+
+	if (nick_t == ci::string::npos)
+		return "";
+
+	return Mask.substr(0, nick_t - 1);
+}
+
+ci::string XLine::GetUser() const
+{
+	size_t user_t = Mask.find('!'), host_t = Mask.find('@');
+
+	if (user_t == ci::string::npos)
+	{
+		return Mask.substr(0, host_t);
+	}
+	else if (host_t != ci::string::npos)
+	{
+		return Mask.substr((user_t != ci::string::npos ? user_t + 1 : 0), host_t);
+	}
+	else
+	{
+		return "";
+	}
+}
+
+ci::string XLine::GetHost() const
+{
+	size_t host_t = Mask.find('@');
+
+	if (host_t == ci::string::npos)
+	{
+		return Mask;
+	}
+	else
+	{
+		return Mask.substr(host_t + 1);
+	}
+}
+
+/** Constructor
+ */
+XLineManager::XLineManager()
+{
+}
+
+/** Destructor
+ * Clears all XLines in this XLineManager
+ */
+XLineManager::~XLineManager()
+{
+	Clear();
+}
+
+ /** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
+  * It is important XLineManagers are registered in the proper order. Eg, if you had one akilling
+  * clients and one handing them free olines, you would want the akilling one first. This way if a client
+  * matches an entry on both of the XLineManagers, they would be akilled.
+  * @param xlm THe XLineManager
+  */
+void XLineManager::RegisterXLineManager(XLineManager *xlm)
+{
+	XLineManagers.push_back(xlm);
+}
+
+/** Unregister a XLineManager
+ * @param xlm The XLineManager
+ */
+void XLineManager::UnregisterXLineManager(XLineManager *xlm)
+{
+	std::list<XLineManager *>::iterator it = std::find(XLineManagers.begin(), XLineManagers.end(), xlm);
+
+	if (it != XLineManagers.end())
+	{
+		XLineManagers.erase(it);
+	}
+}
+
+/* Check a user against all known XLineManagers
+ * @param u The user
+ * @return A pair of the XLineManager the user was found in and the XLine they matched, both may be NULL for no match
+ */
+std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
+{
+	std::pair<XLineManager *, XLine *> ret(NULL, NULL);
+
+	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(); it != XLineManagers.end(); ++it)
+	{
+		XLineManager *xlm = *it;
+
+		XLine *x = xlm->Check(u);
+
+		if (x)
+		{
+			ret.first = xlm;
+			ret.second = x;;
+			break;
+		}
+	}
+
+	return ret;
+}
+
+/** Get the number of XLines in this XLineManager
+ * @return The number of XLines
+ */
+const size_t XLineManager::GetCount() const
+{
+	return XLines.size();
+}
+
+/** Get the XLine list
+  * @return The list
+  */
+const std::deque<XLine *>& XLineManager::GetList() const
+{
+	return XLines;
+}
+
+/** Add an entry to this XLineManager
+ * @param x The entry
+ */
+void XLineManager::AddXLine(XLine *x)
+{
+	XLines.push_back(x);
+}
+
+/** Delete an entry from this XLineManager
+ * @param x The entry
+ * @return true if the entry was found and deleted, else false
+ */
+bool XLineManager::DelXLine(XLine *x)
+{
+	std::deque<XLine *>::iterator it = std::find(XLines.begin(), XLines.end(), x);
+
+	if (it != XLines.end())
+	{
+		delete x;
+		XLines.erase(it);
+
+		return true;
+	}
+
+	return false;
+}
+
+/** Gets an entry by index
+  * @param index The index
+  * @return The XLine, or NULL if the index is out of bounds
+  */
+XLine *XLineManager::GetEntry(unsigned index) const
+{
+	if (index >= XLines.size())
+		return NULL;
+	
+	return XLines[index];
+}
+
+/** Clear the XLine list
+ */
+void XLineManager::Clear()
+{
+	for (std::deque<XLine *>::iterator it = XLines.begin(); it != XLines.end(); ++it)
+	{
+		delete *it;
+	}
+	XLines.clear();
+}
+
+/** Add an entry to this XLine Manager
+ * @param bi The bot error replies should be sent from
+ * @param u The user adding the XLine
+ * @param mask The mask of the XLine
+ * @param expires When this should expire
+ * @param reaosn The reason
+ * @return A pointer to the XLine
+ */
+XLine *XLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+{
+	return NULL;
+}
+
+/** Delete an XLine, eg, remove it from the IRCd.
+ * @param x The xline
+ */
+void XLineManager::Del(XLine *x)
+{
+}
+
+/** Checks if a mask can/should be added to the XLineManager
+ * @param mask The mask
+ * @param expires When the mask would expire
+ * @return A pair of int and XLine*.
+ * 1 - Mask already exists
+ * 2 - Mask already exists, but the expiry time was changed
+ * 3 - Mask is already covered by another mask
+ * In each case the XLine it matches/is covered by is returned in XLine*
+ */
+std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expires)
+{
+	std::pair<int, XLine *> ret(0, NULL);
+
+	for (unsigned i = 0; i < GetCount(); ++i)
+	{
+		XLine *x = GetEntry(i);
+		ret.second = x;
+
+		if (x->Mask == mask)
+		{
+			if (x->Expires == 0 || x->Expires >= expires)
+			{
+				ret.first = 1;
+				break;
+			}
+			else
+			{
+				x->Expires = expires;
+
+				ret.first = 2;
+				break;
+			}
+		}
+		else if (Anope::Match(mask, x->Mask) && (x->Expires == 0 || x->Expires >= expires))
+		{
+			ret.first = 3;
+			break;
+		}
+		else if (Anope::Match(x->Mask, mask) && (expires == 0 || x->Expires <= expires))
+		{
+			this->DelXLine(x);
+			--i;
+		}
+	}
+
+	return ret;
+}
+
+/** Checks if this list has an entry
+ * @param mask The mask
+ * @return The XLine the user matches, or NULL
+ */
+XLine *XLineManager::HasEntry(const ci::string &mask) const
+{
+	for (unsigned i = 0; i < XLines.size(); ++i)
+	{
+		XLine *x = XLines[i];
+
+		if (x->Mask == mask)
+		{
+			return x;
+		}
+	}
+
+	return NULL;
+}
+
+/** Check a user against all of the xlines in this XLineManager
+ * @param u The user
+ * @return The xline the user marches, if any. Also calls OnMatch()
+ */
+XLine *XLineManager::Check(User *u)
+{
+	const time_t now = time(NULL);
+
+	for (std::deque<XLine *>::iterator it = XLines.begin(); it != XLines.end(); ++it)
+	{
+		XLine *x = *it;
+
+		if (x->Expires && x->Expires < now)
+		{
+			OnExpire(x);
+			delete x;
+			it = XLines.erase(it);
+			--it;
+			continue;
+		}
+
+		if (!x->GetNick().empty() && !Anope::Match(u->nick.c_str(), x->GetNick()))
+			continue;
+
+		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent().c_str(), x->GetUser()))
+			continue;
+
+		if (x->GetNick().empty() && x->GetUser().empty() || ((u->hostip && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost.c_str(), x->GetHost())) || (u->vhost && Anope::Match(u->vhost, x->GetHost()))))
+		{
+			OnMatch(u, x);
+			return x;
+		}
+	}
+
+	return NULL;
+}
+
+/** Called when a user matches a xline in this XLineManager
+ * @param u The user
+ * @param x The XLine they match
+ */
+void XLineManager::OnMatch(User *u, XLine *x)
+{
+}
+
+/** Called when an XLine expires
+ * @param x The xline
+ */
+void XLineManager::OnExpire(XLine *x)
+{
+}
+
+XLine *SGLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+{
+	if (mask.find('!') != ci::string::npos)
+	{
+		if (bi && u)
+			notice_lang(bi->nick.c_str(), u, OPER_AKILL_NO_NICK);
+		return NULL;
+	}
+
+	if (mask.find('@') == ci::string::npos)
+	{
+		if (bi && u)
+			notice_lang(bi->nick.c_str(), u, BAD_USERHOST_MASK);
+		return NULL;
+	}
+
+	if (strspn(mask.c_str(), "~@.*?") == mask.length())
+	{
+		if (bi && u)
+			notice_lang(bi->nick.c_str(), u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		return NULL;
+	}
+
+	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
+	if (canAdd.first)
+	{
+		if (bi && u)
+		{
+			if (canAdd.first == 1)
+				notice_lang(bi->nick.c_str(), u, OPER_AKILL_EXISTS, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 2)
+				notice_lang(bi->nick.c_str(), u, OPER_AKILL_CHANGED, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 3)
+				notice_lang(bi->nick.c_str(), u, OPER_AKILL_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+		}
+
+		return canAdd.second;
+	}
+
+	std::string realreason = reason;
+	if (u && Config.AddAkiller)
+		realreason = "[" + u->nick + "]" + reason;
+	
+	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, realreason);
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, x));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete x;
+		return NULL;
+	}
+	
+	this->AddXLine(x);
+
+	if (Config.AkillOnAdd)
+		ircdproto->SendAkill(x);
+	
+	return x;
+}
+
+void SGLineManager::Del(XLine *x)
+{
+	ircdproto->SendAkillDel(x);
+}
+
+void SGLineManager::OnMatch(User *u, XLine *x)
+{
+	ircdproto->SendAkill(x);
+}
+
+void SGLineManager::OnExpire(XLine *x)
+{
+	if (Config.WallAkillExpire)
+		ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
+}
+
+XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+{
+	if (!mask.empty() && strspn(mask.c_str(), "*?") == mask.length())
+	{
+		if (bi && u)
+			notice_lang(bi->nick.c_str(), u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		return NULL;
+	}
+
+	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
+	if (canAdd.first)
+	{
+		if (bi && u)
+		{
+			if (canAdd.first == 1)
+				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_EXISTS, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 2)
+				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_CHANGED, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 3)
+				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+		}
+		
+		return canAdd.second;
+	}
+
+	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, reason);
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SNLINE));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete x;
+		return NULL;
+	}
+
+	this->AddXLine(x);
+
+	if (Config.KillonSNline && !ircd->sglineenforce)
+	{
+		std::string rreason = "G-Lined: " + reason;
+
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		{
+			User *user = it->second;
+			++it;
+
+			if (!is_oper(user) && Anope::Match(user->realname, x->Mask))
+			{
+				kill_user(Config.ServerName, user->nick, rreason.c_str());
+			}
+		}
+	}
+
+	return x;
+}
+
+void SNLineManager::Del(XLine *x)
+{
+	ircdproto->SendSGLineDel(x);
+}
+
+void SNLineManager::OnMatch(User *u, XLine *x)
+{
+	ircdproto->SendSGLine(x);
+
+	std::string reason = "G-Lined: " + x->Reason;
+	kill_user(Config.s_OperServ, u->nick, reason.c_str());
+}
+
+void SNLineManager::OnExpire(XLine *x)
+{
+	if (Config.WallSNLineExpire)
+		ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
+}
+
+XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+{
+	if (strspn(mask.c_str(), "*") == mask.length())
+	{
+		if (bi && u)
+			notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		return NULL;
+	}
+
+	if (mask[0] == '#' && !ircd->chansqline)
+	{
+		if (bi && u)
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
+		return NULL;
+	}
+
+	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
+	if (canAdd.first)
+	{
+		if (bi && u)
+		{
+			if (canAdd.first == 1)
+				notice_lang(bi->nick.c_str(), u, OPER_SQLINE_EXISTS, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 2)
+				notice_lang(bi->nick.c_str(), u, OPER_SQLINE_CHANGED, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 3)
+				notice_lang(bi->nick.c_str(), u, OPER_SQLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+		}
+
+		return canAdd.second;
+	}
+
+	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, reason);
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SQLINE));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete x;
+		return NULL;
+	}
+
+	this->AddXLine(x);
+
+	if (Config.KillonSQline)
+	{
+		std::string rreason = "Q-Lined: " + reason;
+
+		if (mask[0] == '#')
+		{
+			for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
+			{
+				Channel *c = cit->second;
+
+				if (!Anope::Match(c->name.c_str(), mask))
+					continue;
+				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+				{
+					UserContainer *uc = *it;
+					++it;
+
+					if (is_oper(uc->user))
+						continue;
+					c->Kick(NULL, uc->user, "%s", reason.c_str());
+				}
+			}
+		}
+		else
+		{
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			{
+				User *user = it->second;
+				++it;
+
+				if (!is_oper(user) && Anope::Match(user->nick.c_str(), x->Mask))
+				{
+					kill_user(Config.ServerName, user->nick, rreason.c_str());
+				}
+			}
+		}
+	}
+
+	ircdproto->SendSQLine(x);
+
+	return x;
+}
+
+void SQLineManager::Del(XLine *x)
+{
+	ircdproto->SendSQLineDel(x);
+}
+
+void SQLineManager::OnMatch(User *u, XLine *x)
+{
+	ircdproto->SendSQLine(x);
+
+	char reason[300];
+	snprintf(reason, sizeof(reason), "Q-Lined: %s", x->Reason.c_str());
+	kill_user(Config.s_OperServ, u->nick, reason);
+}
+
+void SQLineManager::OnExpire(XLine *x)
+{
+	if (Config.WallSQLineExpire)
+		ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired", x->Mask.c_str());
+}
+
+bool SQLineManager::Check(Channel *c)
+{
+	if (ircd->chansqline && SQLine)
+	{
+		for (std::deque<XLine *>::const_iterator it = SGLine->GetList().begin(); it != SGLine->GetList().end(); ++it)
+		{
+			XLine *x = *it;
+
+			if (Anope::Match(c->name.c_str(), x->Mask))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+XLine *SZLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+{
+	if (mask.find('!') != ci::string::npos || mask.find('@') != ci::string::npos)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_ONLY_IPS);
+		return NULL;
+	}
+
+	if (strspn(mask.c_str(), "*?") == mask.length())
+	{
+		notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		return NULL;
+	}
+
+	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
+	if (canAdd.first)
+	{
+		if (bi && u)
+		{
+			if (canAdd.first == 1)
+				notice_lang(bi->nick.c_str(), u, OPER_SZLINE_EXISTS, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 2)
+				notice_lang(bi->nick.c_str(), u, OPER_SZLINE_CHANGED, canAdd.second->Mask.c_str());
+			else if (canAdd.first == 3)
+				notice_lang(bi->nick.c_str(), u, OPER_SZLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+		}
+
+		return canAdd.second;
+	}
+
+	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, reason);
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SZLINE));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		delete x;
+		return NULL;
+	}
+
+	this->AddXLine(x);
+
+	ircdproto->SendSZLine(x);
+
+	return x;
+}
+
+void SZLineManager::Del(XLine *x)
+{
+	ircdproto->SendSZLineDel(x);
+}
+
+void SZLineManager::OnMatch(User *u, XLine *x)
+{
+	ircdproto->SendSZLine(x);
+}
+
+void SZLineManager::OnExpire(XLine *x)
+{
+	if (Config.WallSZLineExpire)
+		ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 

@@ -23,7 +23,7 @@ IRCDVar myIrcd[] = {
 	 "+ao",					 /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 1,						 /* Vhost  */
-	 1,						 /* Supports SGlines	 */
+	 1,						 /* Supports SNlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
 	 3,						 /* Number of server args */
@@ -133,9 +133,9 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(NULL, "f %s %s", server, set ? "+" : "-");
 	}
 
-	void SendAkillDel(Akill *ak)
+	void SendAkillDel(XLine *x)
 	{
-		send_cmd(NULL, "BD - G %s %s %s", ak->user, ak->host, Config.s_OperServ);
+		send_cmd(NULL, "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config.s_OperServ);
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
@@ -153,12 +153,12 @@ class UnrealIRCdProto : public IRCDProto
 		ModeManager::ProcessModes();
 	}
 
-	void SendAkill(Akill *ak)
+	void SendAkill(XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = ak->expires - time(NULL);
+		time_t timeleft = x->Expires - time(NULL);
 		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(NULL, "BD + G %s %s %s %ld %ld :%s", ak->user, ak->host, ak->by, static_cast<long>(time(NULL) + timeleft), static_cast<long>(ak->expires), ak->reason);
+		send_cmd(NULL, "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL) + timeleft), static_cast<long>(x->Expires), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
@@ -228,31 +228,21 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* unsqline
-	**	parv[0] = sender
-	**	parv[1] = nickmask
 	*/
-	void SendSQLineDel(const std::string &user)
+	void SendSQLineDel(XLine *x)
 	{
-		if (user.empty())
-			return;
-		send_cmd(NULL, "d %s", user.c_str());
+		send_cmd(NULL, "d %s", x->Mask.c_str());
 	}
 
 
 	/* SQLINE */
 	/*
-	**	parv[0] = sender
-	**	parv[1] = nickmask
-	**	parv[2] = reason
-	**
 	** - Unreal will translate this to TKL for us
 	**
 	*/
-	void SendSQLine(const std::string &mask, const std::string &reason)
+	void SendSQLine(XLine *x)
 	{
-		if (mask.empty() || reason.empty())
-			return;
-		send_cmd(NULL, "c %s :%s", mask.c_str(), reason.c_str());
+		send_cmd(NULL, "c %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/*
@@ -309,33 +299,33 @@ class UnrealIRCdProto : public IRCDProto
 	/*
 	 * SVSNLINE - :realname mask
 	*/
-	void SendSGLineDel(SXLine *sx)
+	void SendSGLineDel(XLine *x)
 	{
-		send_cmd(NULL, "BR - :%s", sx->mask);
+		send_cmd(NULL, "BR - :%s", x->Mask.c_str());
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(SXLine *sx)
+	void SendSZLineDel(XLine *x)
 	{
-		send_cmd(NULL, "BD - Z * %s %s", sx->mask, Config.s_OperServ);
+		send_cmd(NULL, "BD - Z * %s %s", x->Mask.c_str(), Config.s_OperServ);
 	}
 
 	/* SZLINE */
-	void SendSZLine(SXLine *sx)
+	void SendSZLine(XLine *x)
 	{
-		send_cmd(NULL, "BD + Z * %s %s %ld %ld :%s", sx->mask, sx->by, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), sx->reason);
+		send_cmd(NULL, "BD + Z * %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SGLINE */
 	/*
 	 * SVSNLINE + reason_where_is_space :realname mask with spaces
 	*/
-	void SendSGLine(SXLine *sx)
+	void SendSGLine(XLine *x)
 	{
 		char edited_reason[BUFSIZE];
-		strlcpy(edited_reason, sx->reason, BUFSIZE);
+		strlcpy(edited_reason, x->Reason.c_str(), BUFSIZE);
 		strnrepl(edited_reason, BUFSIZE, " ", "_");
-		send_cmd(NULL, "BR + %s :%s", edited_reason, sx->mask);
+		send_cmd(NULL, "BR + %s :%s", edited_reason, x->Mask.c_str());
 	}
 
 	/* SVSMODE -b */

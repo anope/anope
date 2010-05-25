@@ -2571,22 +2571,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Varsayýlan AKILL zaman aþýmý: 1 dakika
 OPER_STATS_AKILL_EXPIRE_NONE
 	Varsayýlan AKILL zaman aþýmý: zaman aþýmý yok
-OPER_STATS_SGLINE_COUNT
-	Þu anki SGLINE sayýsý: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Varsayýlan SGLINE zaman aþýmý süresi: %d gün
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Varsayýlan SGLINE zaman aþýmý süresi: 1 gün
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Varsayýlan SGLINE zaman aþýmý süresi: %d saat
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Varsayýlan SGLINE zaman aþýmý süresi: 1 saat
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Varsayýlan SGLINE zaman aþýmý süresi: %d dakika
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Varsayýlan SGLINE zaman aþýmý süresi: 1 dakika
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Varsayýlan SGLINE zaman aþýmý süresi: Zaman aþýmý yok
+OPER_STATS_SNLINE_COUNT
+	Þu anki SNLINE sayýsý: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Varsayýlan SNLINE zaman aþýmý süresi: %d gün
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Varsayýlan SNLINE zaman aþýmý süresi: 1 gün
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Varsayýlan SNLINE zaman aþýmý süresi: %d saat
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Varsayýlan SNLINE zaman aþýmý süresi: 1 saat
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Varsayýlan SNLINE zaman aþýmý süresi: %d dakika
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Varsayýlan SNLINE zaman aþýmý süresi: 1 dakika
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Varsayýlan SNLINE zaman aþýmý süresi: Zaman aþýmý yok
 OPER_STATS_SQLINE_COUNT
 	Su anki SQLINE sayisi: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2714,49 +2714,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	AKILL listesi temizlendi.
 
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+zamanaþýmý] {mask | kayýt-sýrasý} [sebep]]
-OPER_SGLINE_UNSUPPORTED
-	SGLINE bu networkte mevcut deðil.
-OPER_SGLINE_EXISTS
-	%s zaten SGLINE listesinde.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+zamanaþýmý] {mask | kayýt-sýrasý} [sebep]]
+OPER_SNLINE_UNSUPPORTED
+	SNLINE bu networkte mevcut deðil.
+OPER_SNLINE_EXISTS
+	%s zaten SNLINE listesinde.
+OPER_SNLINE_ALREADY_COVERED
 	%s zaten %s tarafýndan deðiþtirildi.
-OPER_SGLINE_REACHED_LIMIT
-	Sadece %d kiþi SGLINE listesinde olabilir.
-OPER_SGLINE_ADDED
-	%s SGLINE listesinde eklendi.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Sadece %d kiþi SNLINE listesinde olabilir.
+OPER_SNLINE_ADDED
+	%s SNLINE listesinde eklendi.
+OPER_SNLINE_CHANGED
 	%s nickinin zaman aþýmý süresi deðiþtirildi.
-OPER_SGLINE_NOT_FOUND
-	%s SGLINE listesinde bulunamadý.
-OPER_SGLINE_NO_MATCH
-	SGLINE listesinde uyuþan kayýt bulunamadý.
-OPER_SGLINE_DELETED
-	%s SGLINE listesinden silindi.
-OPER_SGLINE_DELETED_ONE
-	SGLINE listesinden 1 kayýt silindi.
-OPER_SGLINE_DELETED_SEVERAL
-	SGLINE listesinden %d kayýt silindi.
-OPER_SGLINE_LIST_EMPTY
-	SGLINE listesi boþ.
-OPER_SGLINE_LIST_HEADER
-	Þu anki SGLINE listesi:
+OPER_SNLINE_NOT_FOUND
+	%s SNLINE listesinde bulunamadý.
+OPER_SNLINE_NO_MATCH
+	SNLINE listesinde uyuþan kayýt bulunamadý.
+OPER_SNLINE_DELETED
+	%s SNLINE listesinden silindi.
+OPER_SNLINE_DELETED_ONE
+	SNLINE listesinden 1 kayýt silindi.
+OPER_SNLINE_DELETED_SEVERAL
+	SNLINE listesinden %d kayýt silindi.
+OPER_SNLINE_LIST_EMPTY
+	SNLINE listesi boþ.
+OPER_SNLINE_LIST_HEADER
+	Þu anki SNLINE listesi:
 	  No   Mask                              Sebep
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Þu anki SGLINE listesi:
+OPER_SNLINE_VIEW_HEADER
+	Þu anki SNLINE listesi:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (by %s on %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	SGLINE listesi temizlendi.
+OPER_SNLINE_CLEAR
+	SNLINE listesi temizlendi.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5414,8 +5414,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Ayni ip'deki tum kullanicilari kill'ler.
 OPER_HELP_CMD_AKILL
 	    AKILL       AKILL listesini düzenler
-OPER_HELP_CMD_SGLINE
-	    SGLINE      SGLINE listesini düzenler
+OPER_HELP_CMD_SNLINE
+	    SNLINE      SNLINE listesini düzenler
 OPER_HELP_CMD_SQLINE
 	    SQLINE      SQLINE listesini düzenler
 OPER_HELP_CMD_SZLINE
@@ -5617,50 +5617,50 @@ OPER_HELP_AKILL
 	
 	Servis operatörlerinin Kullanýmýyla sýnýrlýdýr.
 
-OPER_HELP_SGLINE
-	Kullanýmý: SGLINE ADD [+zamanaþýmý] mask:sebep
-	         SGLINE DEL {mask | kayýt-no | liste}
-	           SGLINE LIST [mask | liste]
-	           SGLINE VIEW [mask | liste]
-	           SGLINE CLEAR
+OPER_HELP_SNLINE
+	Kullanýmý: SNLINE ADD [+zamanaþýmý] mask:sebep
+	         SNLINE DEL {mask | kayýt-no | liste}
+	           SNLINE LIST [mask | liste]
+	           SNLINE VIEW [mask | liste]
+	           SNLINE CLEAR
 	
-	Servis operatörlerinin SGLINE listesi oluþturmalarýný saðlar.
-	Eðer SGLINE listesindeki bir kullanýcý gerçek ismi(realname)
+	Servis operatörlerinin SNLINE listesi oluþturmalarýný saðlar.
+	Eðer SNLINE listesindeki bir kullanýcý gerçek ismi(realname)
 	servera baðlanmaya çalýþan bir kullanýcýnýnkiyle uyuþuyorsa
 	o kullanýcýnýn servera baðlanmasý engellenir.
 	
-	SGLINE ADD komutu belirtilen realname(gerçek isim) mask ýný
-	SGLINE listesine bir sebeple(belirtilmesi zorunludur) 
+	SNLINE ADD komutu belirtilen realname(gerçek isim) mask ýný
+	SNLINE listesine bir sebeple(belirtilmesi zorunludur) 
 	birlikte ekler.
 	zamanaþýmý zaman belirleyici olarak tanýmlanýr ve þunlar birini
 	takip etmelidir: d (gün), h (saat), veya m (dakika). 1h30m
 	þeklindeki kombinasyonlar kullanýlamaz. Eðer zaman tanýmlayýcý öðe
 	konulmazsa varsayýlan olarak gün kabul edilir (yani +30 un manasý
-	30 gündür). Zaman aþýmýna uðramayacak bir SGLINE eklemek için +0
+	30 gündür). Zaman aþýmýna uðramayacak bir SNLINE eklemek için +0
 	kullanýn.  Eklenecek realname mask ý + ile baþlýyorsa, o zaman
 	zaman aþýmý süresi varsayýlanla ayný olsa bile belirtilmelidir.
-	Mevcut SGLINE varsayýlan zaman aþýmý süresi STATS AKILL komutuyla
+	Mevcut SNLINE varsayýlan zaman aþýmý süresi STATS AKILL komutuyla
 	bulunabilir.
 	Not: realname maský boþluk içerebileceðinden bunla sebep arasýnda iki
 	nokta üstüste(:) kullanýlmalýdýr.
 	
-	SGLINE DEL komutu belirtilen maský(eðer listede mevcutsa) SGLINE 
+	SNLINE DEL komutu belirtilen maský(eðer listede mevcutsa) SNLINE 
 	listesinden siler. eðer bir kayýt numaralarý listesi belirtilmiþse
 	o kayýtlar silinir. (Aþaðýdaki LIST için verilmiþ örneði inceleyin.)
 	
-	SGLINE LIST komutu SGLINE listesini görüntüler. Eðer bir yýldýzlý
+	SNLINE LIST komutu SNLINE listesini görüntüler. Eðer bir yýldýzlý
 	mask verilmiþse, sadece o maskla uyuþan kayýtlarý içeren bir liste
 	görüntülenir.  Eðer bir kayýt numaralarý listesi belirtilmiþse,
 	sadece o kayýtlar görüntülenir; örneðin:
 	
-	   SGLINE LIST 2-5,7-9
-	      2 den 5 e 7 den 9 a kadar olan SGLINE kayýtlarýný listeler.
+	   SNLINE LIST 2-5,7-9
+	      2 den 5 e 7 den 9 a kadar olan SNLINE kayýtlarýný listeler.
 	      
-	SGLINE VIEW komutu SGLINE LIST komutunun daha açýklayýcý bilgi 
-	veren þeklidir, ve SGLINE ý kimin eklediðini, eklendiði tarihi, ve
+	SNLINE VIEW komutu SNLINE LIST komutunun daha açýklayýcý bilgi 
+	veren þeklidir, ve SNLINE ý kimin eklediðini, eklendiði tarihi, ve
 	ne zaman sona ereceðini realname ve sebeple birlikte gösterir.
 	
-	SGLINE CLEAR komutu SGLINE listesindeki tüm kayýtlarý siler.
+	SNLINE CLEAR komutu SNLINE listesindeki tüm kayýtlarý siler.
 	
 	Servis operatörlerinin Kullanýmýyla sýnýrlýdýr.
 

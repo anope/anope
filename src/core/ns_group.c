@@ -80,7 +80,7 @@ class CommandNSGroup : public Command
 			notice_lang(Config.s_NickServ, u, NICK_GROUP_SAME, target->nick);
 		else if (na && na->nc != u->Account())
 			notice_lang(Config.s_NickServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
-		else if (Config.NSMaxAliases && (target->nc->aliases.count >= Config.NSMaxAliases) && !target->nc->IsServicesOper())
+		else if (Config.NSMaxAliases && (target->nc->aliases.size() >= Config.NSMaxAliases) && !target->nc->IsServicesOper())
 			notice_lang(Config.s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick, Config.s_NickServ, Config.s_NickServ);
 		else if (enc_check_password(pass, target->nc->pass) != 1)
 		{
@@ -163,7 +163,7 @@ class CommandNSUngroup : public Command
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 		NickAlias *na = nick ? findnick(nick) : findnick(u->nick);
 
-		if (u->Account()->aliases.count == 1)
+		if (u->Account()->aliases.size() == 1)
 			notice_lang(Config.s_NickServ, u, NICK_UNGROUP_ONE_NICK);
 		else if (!na)
 			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick ? nick : u->nick.c_str());
@@ -173,14 +173,19 @@ class CommandNSUngroup : public Command
 		{
 			NickCore *oldcore = na->nc;
 
-			slist_remove(&oldcore->aliases, na);
+			std::list<NickAlias *>::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
+			if (it != oldcore->aliases.end())
+			{
+				oldcore->aliases.erase(it);
+			}
+			
 			if (!stricmp(oldcore->display, na->nick))
 			{
 				change_core_display(oldcore);
 			}
 
 			na->nc = new NickCore(na->nick);
-			slist_add(&na->nc->aliases, na);
+			na->nc->aliases.push_back(na);
 
 			na->nc->pass = oldcore->pass;
 			if (oldcore->email)
@@ -224,7 +229,6 @@ class CommandNSGList : public Command
 		const char *nick = params.size() ? params[0].c_str() : NULL;
 
 		NickCore *nc = u->Account();
-		int i;
 
 		if (nick && (stricmp(nick, u->nick.c_str()) && !u->Account()->IsServicesOper()))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED, Config.s_NickServ);
@@ -238,9 +242,9 @@ class CommandNSGList : public Command
 			int wont_expire;
 
 			notice_lang(Config.s_NickServ, u, nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display);
-			for (i = 0; i < nc->aliases.count; ++i)
+			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
 			{
-				NickAlias *na2 = static_cast<NickAlias *>(nc->aliases.list[i]);
+				NickAlias *na2 = *it;
 				
 				if (!(wont_expire = na2->HasFlag(NS_NO_EXPIRE)))
 				{
@@ -250,7 +254,7 @@ class CommandNSGList : public Command
 				}
 				notice_lang(Config.s_NickServ, u, wont_expire ? NICK_GLIST_REPLY_NOEXPIRE : NICK_GLIST_REPLY, na2->nick, buf);
 			}
-			notice_lang(Config.s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.count);
+			notice_lang(Config.s_NickServ, u, NICK_GLIST_FOOTER, nc->aliases.size());
 		}
 		return MOD_CONT;
 	}

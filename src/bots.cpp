@@ -68,7 +68,8 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 	if (Me && Me->GetUplink()->IsSynced())
 	{
 		ircdproto->SendClientIntroduction(this->nick, this->user, this->host, this->real, ircd->pseudoclient_mode, this->uid);
-		ircdproto->SendSQLine(this->nick, "Reserved for services");
+		XLine x(this->nick.c_str(), "Reserved for services");
+		ircdproto->SendSQLine(&x);
 	}
 }
 

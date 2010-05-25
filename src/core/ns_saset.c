@@ -20,8 +20,6 @@ private:
 	CommandReturn DoSetDisplay(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		ci::string param = params.size() > 2 ? params[2] : "";
-		int i;
-		NickAlias *na;
 
 		if (param.empty())
 		{
@@ -30,17 +28,9 @@ private:
 		}
 
 		/* First check whether param is a valid nick of the group */
-		for (i = 0; i < nc->aliases.count; ++i)
-		{
-			na = static_cast<NickAlias *>(nc->aliases.list[i]);
-			if (na->nick == param)
-			{
-				param = na->nick;   /* Because case may differ */
-				break;
-			}
-		}
+		NickAlias *na = findnick(param);
 
-		if (i == nc->aliases.count)
+		if (!na || na->nc != nc)
 		{
 			notice_lang(Config.s_NickServ, u, NICK_SASET_DISPLAY_INVALID, nc->display);
 			return MOD_CONT;

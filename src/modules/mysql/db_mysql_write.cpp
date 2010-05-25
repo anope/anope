@@ -235,9 +235,7 @@ static void SaveDatabases()
 
 	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 	{
-		NickAlias *na = it->second;
-
-		me->OnNickRegister(na);
+		me->OnNickRegister(it->second);
 	}
 
 	query << "TRUNCATE TABLE `anope_ns_core`";
@@ -269,8 +267,7 @@ static void SaveDatabases()
 	
 	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
 	{
-		BotInfo *bi = it->second;
-		me->OnBotCreate(bi);
+		me->OnBotCreate(it->second);
 	}
 
 	query << "TRUNCATE TABLE `anope_cs_info`";
@@ -311,7 +308,7 @@ static void SaveDatabases()
 
 			me->OnAkickAdd(NULL, ci, ak);
 		}
-
+		
 		for (int k = 0; k < CA_SIZE; ++k)
 		{
 			query << "INSERT DELAYED INTO `anope_cs_levels` (channel, position, level) VALUES(" << mysqlpp::quote << ci->name << ", '" << k << "', '" << ci->levels[k] << "') ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)";
@@ -334,32 +331,36 @@ static void SaveDatabases()
 		me->OnMakeNickRequest(it->second);
 	}
 
-	for (int i = 0; i < akills.count; ++i)
+	if (SGLine)
 	{
-		Akill *ak = static_cast<Akill *>(akills.list[i]);
-
-		me->OnAddAkill(NULL, ak);
+		for (unsigned i = 0; i < SGLine->GetCount(); ++i)
+		{
+			me->OnAddAkill(NULL, SGLine->GetEntry(i));
+		}
 	}
 
-	for (int i = 0; i < sglines.count; ++i)
+	if (SZLine)
 	{
-		SXLine *x = static_cast<SXLine *>(sglines.list[i]);
-
-		me->OnAddSXLine(NULL, x, SX_SGLINE);
+		for (unsigned i = 0; i < SZLine->GetCount(); ++i)
+		{
+			me->OnAddXLine(NULL, SZLine->GetEntry(i), X_SZLINE);
+		}
 	}
 
-	for (int i = 0; i < sqlines.count; ++i)
+	if (SQLine)
 	{
-		SXLine *x = static_cast<SXLine *>(sqlines.list[i]);
-
-		me->OnAddSXLine(NULL, x, SX_SQLINE);
+		for (unsigned i = 0; i < SQLine->GetCount(); ++i)
+		{
+			me->OnAddXLine(NULL, SQLine->GetEntry(i), X_SQLINE);
+		}
 	}
 
-	for (int i = 0; i < szlines.count; ++i)
+	if (SNLine)
 	{
-		SXLine *x = static_cast<SXLine *>(szlines.list[i]);
-		
-		me->OnAddSXLine(NULL, x, SX_SZLINE);
+		for (unsigned i = 0; i < SNLine->GetCount(); ++i)
+		{
+			me->OnAddXLine(NULL, SNLine->GetEntry(i), X_SNLINE);
+		}
 	}
 
 	for (int i = 0; i < nexceptions; ++i)
@@ -433,7 +434,7 @@ class DBMySQLWrite : public DBMySQL
 			I_OnMemoSend, I_OnMemoDel,
 			/* OperServ */
 			I_OnOperServHelp, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
-			I_OnAddSXLine, I_OnDelSXLine
+			I_OnAddXLine, I_OnDelXLine
 		};
 		ModuleManager::Attach(i, this, 40);
 	}
@@ -450,7 +451,7 @@ class DBMySQLWrite : public DBMySQL
 		query << "TRUNCATE TABLE `anope_os_core`";
 		ExecuteQuery(query);
 		query << "INSERT DELAYED INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, sglines_count, sqlines_count, szlines_count) VALUES(";
-		query << maxusercnt << ", " << maxusertime << ", " << akills.count << ", " << sqlines.count << ", " << sglines.count << ", " << szlines.count << ")";
+		query << maxusercnt << ", " << maxusertime << ", " << (SGLine ? SGLine->GetCount() : 0) << ", " << (SQLine ? SQLine->GetCount() : 0) << ", " << (SNLine ? SNLine->GetCount() : 0) << ", " << (SZLine ? SZLine->GetCount() : 0) << ")";
 		ExecuteQuery(query);
 
 		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
@@ -1028,21 +1029,21 @@ class DBMySQLWrite : public DBMySQL
 		ExecuteQuery(query);
 	}
 
-	EventReturn OnAddAkill(User *, Akill *ak)
+	EventReturn OnAddAkill(User *, XLine *ak)
 	{
 		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_os_akills` (user, host, xby, reason, seton, expire) VALUES(";
-		query << mysqlpp::quote << ak->user << ", " << mysqlpp::quote << ak->host << ", " << mysqlpp::quote << ak->by;
-		query << ", " << mysqlpp::quote << ak->reason << ", " << ak->seton << ", " << ak->expires << ")";
+		query << mysqlpp::quote << ak->GetUser().c_str() << ", " << mysqlpp::quote << ak->GetHost().c_str() << ", " << mysqlpp::quote << ak->By.c_str();
+		query << ", " << mysqlpp::quote << ak->Reason << ", " << ak->Created << ", " << ak->Expires << ")";
 		ExecuteQuery(query);
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelAkill(User *, Akill *ak)
+	void OnDelAkill(User *, XLine *ak)
 	{
 		mysqlpp::Query query(me->Con);
 		if (ak)
-			query << "DELETE FROM `anope_os_akills` WHERE `host` = " << mysqlpp::quote << ak->host;
+			query << "DELETE FROM `anope_os_akills` WHERE `host` = " << mysqlpp::quote << ak->GetHost().c_str();
 		else
 			query << "TRUNCATE TABLE `anope_os_akills`";
 		ExecuteQuery(query);
@@ -1065,27 +1066,27 @@ class DBMySQLWrite : public DBMySQL
 		ExecuteQuery(query);
 	}
 
-	EventReturn OnAddSXLine(User *, SXLine *sx, SXLineType Type)
+	EventReturn OnAddXLine(User *, XLine *x, XLineType Type)
 	{
 		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_os_sxlines` (type, mask, xby, reason, seton, expire) VALUES('";
-		query << (Type == SX_SGLINE ? "SGLINE" : (Type == SX_SQLINE ? "SQLINE" : "SZLINE")) << "', ";
-		query << mysqlpp::quote << sx->mask << ", " << mysqlpp::quote << sx->by << ", " << mysqlpp::quote << sx->reason;
-		query << ", " << sx->seton << ", " << sx->expires << ")";
+		query << (Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) << "', ";
+		query << mysqlpp::quote << x->Mask.c_str() << ", " << mysqlpp::quote << x->By.c_str() << ", " << mysqlpp::quote << x->Reason;
+		query << ", " << x->Created << ", " << x->Expires << ")";
 		ExecuteQuery(query);
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelSXLine(User *, SXLine *sx, SXLineType Type)
+	void OnDelXLine(User *, XLine *x, XLineType Type)
 	{
 		mysqlpp::Query query(me->Con);
-		if (sx)
+		if (x)
 		{
-			query << "DELETE FROM `anope_os_sxlines` WHERE `mask` = " << mysqlpp::quote << sx->mask << " AND `type` = '";
-			query << (Type == SX_SGLINE ? "SGLINE" : (Type == SX_SQLINE ? "SQLINE" : "SZLINE")) << "'";
+			query << "DELETE FROM `anope_os_xlines` WHERE `mask` = " << mysqlpp::quote << x->Mask.c_str() << " AND `type` = '";
+			query << (Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) << "'";
 		}
 		else
-			query << "DELETE FROM `anope_os_sxlines` WHERE `type` = '" << (Type == SX_SGLINE ? "SGLINE" : (Type == SX_SQLINE ? "SQLINE" : "SZLINE")) << "'";
+			query << "DELETE FROM `anope_os_xlines` WHERE `type` = '" << (Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) << "'";
 		ExecuteQuery(query);
 	}
 };

@@ -2596,22 +2596,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Temps d'échéance des AKILLs par défaut: 1 minute
 OPER_STATS_AKILL_EXPIRE_NONE
 	Temps d'échéance des AKILLs par défaut: Pas d'échéance
-OPER_STATS_SGLINE_COUNT
-	Nombre de SGLINEs actuel: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Temps d'échéance des SGLINEs par défaut: %d jours
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Temps d'échéance des SGLINEs par défaut: 1 jour
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Temps d'échéance des SGLINEs par défaut: %d heures
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Temps d'échéance des SGLINEs par défaut: 1 heure
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Temps d'échéance des SGLINEs par défaut: %d minutes
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Temps d'échéance des SGLINEs par défaut: 1 minute
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Temps d'échéance des SGLINEs par défaut: Pas d'échéance
+OPER_STATS_SNLINE_COUNT
+	Nombre de SNLINEs actuel: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Temps d'échéance des SNLINEs par défaut: %d jours
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Temps d'échéance des SNLINEs par défaut: 1 jour
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Temps d'échéance des SNLINEs par défaut: %d heures
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Temps d'échéance des SNLINEs par défaut: 1 heure
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Temps d'échéance des SNLINEs par défaut: %d minutes
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Temps d'échéance des SNLINEs par défaut: 1 minute
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Temps d'échéance des SNLINEs par défaut: Pas d'échéance
 OPER_STATS_SQLINE_COUNT
 	Nombre de SQLINEs actuel: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2739,49 +2739,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	La liste d'AKILL a été vidée.
 
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#canal} [raison]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+échéance] {masque | liste d'entrées} [raison]]
-OPER_SGLINE_UNSUPPORTED
-	Désolé, SGLINE n'est pas disponible sur ce réseau.
-OPER_SGLINE_EXISTS
-	%s existe déjà sur la liste de SGLINEs.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+échéance] {masque | liste d'entrées} [raison]]
+OPER_SNLINE_UNSUPPORTED
+	Désolé, SNLINE n'est pas disponible sur ce réseau.
+OPER_SNLINE_EXISTS
+	%s existe déjà sur la liste de SNLINEs.
+OPER_SNLINE_ALREADY_COVERED
 	%s est déjà couvert par %s.
-OPER_SGLINE_REACHED_LIMIT
-	Désolé, vous ne pouvez avoir que %d SGLINEs.
-OPER_SGLINE_ADDED
-	%s ajouté à la liste de SGLINEs.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Désolé, vous ne pouvez avoir que %d SNLINEs.
+OPER_SNLINE_ADDED
+	%s ajouté à la liste de SNLINEs.
+OPER_SNLINE_CHANGED
 	L'échéance de %s a été changée.
-OPER_SGLINE_NOT_FOUND
-	%s introuvable sur la liste de SGLINEs.
-OPER_SGLINE_NO_MATCH
-	Aucune entrée correspondante sur la liste de SGLINEs.
-OPER_SGLINE_DELETED
-	%s supprimé de la liste de SGLINEs.
-OPER_SGLINE_DELETED_ONE
-	1 entrée supprimée de la liste de SGLINEs.
-OPER_SGLINE_DELETED_SEVERAL
-	%d entrées supprimées de la liste de SGLINEs.
-OPER_SGLINE_LIST_EMPTY
-	La liste de SGLINEs est vide.
-OPER_SGLINE_LIST_HEADER
-	Liste de SGLINEs actuelle:
+OPER_SNLINE_NOT_FOUND
+	%s introuvable sur la liste de SNLINEs.
+OPER_SNLINE_NO_MATCH
+	Aucune entrée correspondante sur la liste de SNLINEs.
+OPER_SNLINE_DELETED
+	%s supprimé de la liste de SNLINEs.
+OPER_SNLINE_DELETED_ONE
+	1 entrée supprimée de la liste de SNLINEs.
+OPER_SNLINE_DELETED_SEVERAL
+	%d entrées supprimées de la liste de SNLINEs.
+OPER_SNLINE_LIST_EMPTY
+	La liste de SNLINEs est vide.
+OPER_SNLINE_LIST_HEADER
+	Liste de SNLINEs actuelle:
 	  Num   Masque                            Raison
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Liste de SGLINEs actuelle:
+OPER_SNLINE_VIEW_HEADER
+	Liste de SNLINEs actuelle:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (par %s le %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	La liste de SGLINEs a été vidée.
+OPER_SNLINE_CLEAR
+	La liste de SNLINEs a été vidée.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5542,8 +5542,8 @@ OPER_HELP_CMD_KILLCLONES
 	                certain nom d'hôte
 OPER_HELP_CMD_AKILL
 	    AKILL       Contrôle la liste des AKILLs
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Contrôle la liste des SGLINEs
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Contrôle la liste des SNLINEs
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Contrôle la liste des SQLINEs
 OPER_HELP_CMD_SZLINE
@@ -5759,52 +5759,52 @@ OPER_HELP_AKILL
 	
 	Réservé aux opérateurs des Services.
 
-OPER_HELP_SGLINE
-	Syntaxe: SGLINE ADD [+échéance] masque:raison
-	         SGLINE DEL {masque | numéro d'entrée | liste}
-	         SGLINE LIST [masque | liste]
-	         SGLINE VIEW [masque | liste]
-	         SGLINE CLEAR
+OPER_HELP_SNLINE
+	Syntaxe: SNLINE ADD [+échéance] masque:raison
+	         SNLINE DEL {masque | numéro d'entrée | liste}
+	         SNLINE LIST [masque | liste]
+	         SNLINE VIEW [masque | liste]
+	         SNLINE CLEAR
 	
 	Permet aux OPérateurs des Services de manipuler la liste
-	de SGLINEs. Si un utilisateur ayant un vrai nom correspondant 
-	à un masque de SGLINE tente de se connecter, les Services ne
+	de SNLINEs. Si un utilisateur ayant un vrai nom correspondant 
+	à un masque de SNLINE tente de se connecter, les Services ne
 	lui permettront pas de continuer sa session IRC.
 	
-	SGLINE ADD ajoute le masque de vrai nom donné à la liste 
-	de SGLINEs pour la raison précisée (qui doit être donnée).
+	SNLINE ADD ajoute le masque de vrai nom donné à la liste 
+	de SNLINEs pour la raison précisée (qui doit être donnée).
 	échéance est un nombre entier suivi par un d (jours), h
 	(heures), ou m (minutes). Les combinaisons (telles que
 	1h30m) ne sont pas permises. Si l'unité n'est pas incluse,
 	la valeur est en jours par défaut (donc +30 est équivalent
-	à 30 jours). Pour ajouter une SGLINE qui n'expire pas, utilisez
+	à 30 jours). Pour ajouter une SNLINE qui n'expire pas, utilisez
 	+0. Si le masque de vrai nom à ajouter commence par un +,
 	une échéance doit être donnée, même si c'est la même que
-	celle par défaut. L'échéance par défaut pour les SGLINEs peut 
+	celle par défaut. L'échéance par défaut pour les SNLINEs peut 
 	être consultée par la commande STATS AKILL.
 	Note: puisque le masque de vrai nom peut contenir des espaces,
 	le séparateur entre lui et la raison est le signe deux points.
 	
-	La commande SGLINE DEL supprime le masque donné de la liste
-	de SGLINEs s'il existe. Si une liste de numéros d'entrées
+	La commande SNLINE DEL supprime le masque donné de la liste
+	de SNLINEs s'il existe. Si une liste de numéros d'entrées
 	est donnée, ces entrées sont supprimées. (Voyez l'exemple
 	pour LIST ci-dessous.)
 	
-	La commande SGLINE LIST affiche la liste des SGLINEs. Si un
+	La commande SNLINE LIST affiche la liste des SNLINEs. Si un
 	masque joker est donné, seules les entrées correspondantes
 	au masque sont affichées. Si une liste de numéros d'entrées
 	est donnée, seules ces entrées sont affichées, par exemple:
 
-	   SGLINE LIST 2-5,7-9
-	      Liste les entrées de la liste de SGLINEs numéro 2 à 5 
+	   SNLINE LIST 2-5,7-9
+	      Liste les entrées de la liste de SNLINEs numéro 2 à 5 
 	      et 7 à 9.
 	      
-	SGLINE VIEW est une version plus détaillée de SGLINE LIST, 
-	et affichera par qui et quand a été ajoutée une SGLINE et
+	SNLINE VIEW est une version plus détaillée de SNLINE LIST, 
+	et affichera par qui et quand a été ajoutée une SNLINE et
 	sa date d'expiration, en plus du masque de vrai nom et de la 
 	raison. 
 	
-	SGLINE CLEAR vide toutes les entrées de la liste de SGLINEs.
+	SNLINE CLEAR vide toutes les entrées de la liste de SNLINEs.
 	
 	Réservé aux OPérateurs des Services.
 

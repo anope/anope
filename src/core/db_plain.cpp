@@ -458,31 +458,42 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 		maxusercnt = atol(params[1].c_str());
 		maxusertime = strtol(params[2].c_str(), NULL, 10);
 	}
-	else if (params[0] == "SGLINE" || params[0] == "SQLINE" || params[0] == "SZLINE")
+	else if (params[0] == "SNLINE" || params[0] == "SQLINE" || params[0] == "SZLINE")
 	{
-		SXLine *sx = new SXLine;
-		sx->mask = sstrdup(params[1].c_str());
-		sx->by = sstrdup(params[2].c_str());
-		sx->seton = atol(params[3].c_str());
-		sx->expires = atol(params[4].c_str());
-		sx->reason = sstrdup(params[5].c_str());
-		if (params[0] == "SGLINE")
-			slist_add(&sglines, sx);
-		else if (params[0] == "SQLINE")
-			slist_add(&sqlines, sx);
-		else if (params[0] == "SZLINE")
-			slist_add(&szlines, sx);
+		ci::string mask = params[1].c_str();
+		ci::string by = params[2].c_str();
+		time_t seton = atol(params[3].c_str());
+		time_t expires = atol(params[4].c_str());
+		std::string reason = params[5];
+
+		XLine *x = NULL;
+		if (params[0] == "SNLINE" && SNLine)
+			x = SNLine->Add(NULL, NULL, mask, expires, reason);
+		else if (params[0] == "SQLINE" && SQLine)
+			x = SQLine->Add(NULL, NULL, mask, expires, reason);
+		else if (params[0] == "SZLINE" && SZLine)
+			x = SZLine->Add(NULL, NULL, mask, expires, reason);
+		if (x)
+		{
+			x->By = by;
+			x->Created = seton;
+		}
 	}
-	else if (params[0] == "AKILL")
+	else if (params[0] == "AKILL" && SGLine)
 	{
-		Akill *ak = new Akill;
-		ak->user = sstrdup(params[1].c_str());
-		ak->host = sstrdup(params[2].c_str());
-		ak->by = sstrdup(params[3].c_str());
-		ak->seton = atol(params[4].c_str());
-		ak->expires = atol(params[5].c_str());
-		ak->reason = sstrdup(params[6].c_str());
-		slist_add(&akills, ak);
+		ci::string user = params[1].c_str();
+		ci::string host = params[2].c_str();
+		ci::string by = params[3].c_str();
+		time_t seton = atol(params[4].c_str());
+		time_t expires = atol(params[5].c_str());
+		std::string reason = params[6];
+
+		XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
+		if (x)
+		{
+			x->By = by;
+			x->Created = seton;
+		}
 	}
 	else if (params[0] == "EXCEPTION")
 	{
@@ -1133,7 +1144,7 @@ class DBPlain : public Module
 			}
 			db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << endl;
 			if (ci->capsmin)
-				db << "MD BI CAPSMINS " << ci->capsmin << endl;
+				db << "MD BI CAPSMIN " << ci->capsmin << endl;
 			if (ci->capspercent)
 				db << "MD BI CAPSPERCENT " << ci->capspercent << endl;
 			if (ci->floodlines)
@@ -1153,28 +1164,42 @@ class DBPlain : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 		}
 
-		for (int i = 0; i < akills.count; ++i)
+		db << "OS STATS " << maxusercnt << " " << maxusertime << endl;
+
+		if (SGLine)
 		{
-			Akill *ak = static_cast<Akill *>(akills.list[i]);
-			db << "OS AKILL " << ak->user << " " << ak->host << " " << ak->by << " " << ak->seton << " " << ak->expires << " :" << ak->reason << endl;
+			for (unsigned i = 0; i < SGLine->GetCount(); ++i)
+			{
+				XLine *x = SGLine->GetEntry(i);
+				db << "OS AKILL " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+			}
 		}
 
-		db << "OS STATS " << maxusercnt << " " << maxusertime << endl;
-		SXLine *sx;
-		for (int i = 0; i < sglines.count; ++i)
+		if (SNLine)
 		{
-			sx = static_cast<SXLine *>(sglines.list[i]);
-			db << "OS SGLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " << sx->expires << " :" << sx->reason << endl;
+			for (unsigned i = 0; i < SNLine->GetCount(); ++i)
+			{
+				XLine *x = SNLine->GetEntry(i);
+				db << "OS SNLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+			}
 		}
-		for (int i = 0; i < sqlines.count; ++i)
+
+		if (SQLine)
 		{
-			sx = static_cast<SXLine *>(sqlines.list[i]);
-			db << "OS SQLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " << sx->expires << " :" << sx->reason << endl;
+			for (unsigned i = 0; i < SQLine->GetCount(); ++i)
+			{
+				XLine *x = SQLine->GetEntry(i);
+				db << "OS SQLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+			}
 		}
-		for (int i = 0; i < szlines.count; ++i)
+
+		if (SZLine)
 		{
-			sx = static_cast<SXLine *>(szlines.list[i]);
-			db << "OS SZLINE " << sx->mask << " " << sx->by << " " << sx->seton << " " << sx->expires << " :" << sx->reason << endl;
+			for (unsigned i = 0; i < SZLine->GetCount(); ++i)
+			{
+				XLine *x = SZLine->GetEntry(i);
+				db << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+			}
 		}
 
 		for (int i = 0; i < nexceptions; i++)

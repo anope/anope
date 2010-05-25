@@ -40,7 +40,7 @@ IRCDVar myIrcd[] = {
 	 "+ao",					 /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 1,						 /* Vhost  */
-	 1,						 /* Supports SGlines	 */
+	 1,						 /* Supports SNlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
 	 4,						 /* Number of server args */
@@ -119,9 +119,9 @@ void inspircd_cmd_pass(const char *pass)
 
 class InspIRCdProto : public IRCDProto
 {
-	void SendAkillDel(Akill *ak)
+	void SendAkillDel(XLine *x)
 	{
-		send_cmd(Config.s_OperServ, "GLINE %s@%s", ak->user, ak->host);
+		send_cmd(Config.s_OperServ, "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
@@ -142,13 +142,13 @@ class InspIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(Akill *ak)
+	void SendAkill(XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = ak->expires - time(NULL);
+		time_t timeleft = x->Expires - time(NULL);
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd(Config.ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", ak->user, ak->host, ak->by, static_cast<long>(time(NULL)), static_cast<long>(timeleft), ak->reason);
+		send_cmd(Config.ServerName, "ADDLINE G %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
@@ -214,19 +214,15 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const std::string &user)
+	void SendSQLineDel(XLine *x)
 	{
-		if (user.empty())
-			return;
-		send_cmd(Config.s_OperServ, "QLINE %s", user.c_str());
+		send_cmd(Config.s_OperServ, "QLINE %s", x->Mask.c_str());
 	}
 
 	/* SQLINE */
-	void SendSQLine(const std::string &mask, const std::string &reason)
+	void SendSQLine(XLine *x)
 	{
-		if (mask.empty() || reason.empty())
-			return;
-		send_cmd(Config.ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask.c_str(), Config.s_OperServ, static_cast<long>(time(NULL)), reason.c_str());
+		send_cmd(Config.ServerName, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config.s_OperServ, static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -281,15 +277,15 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(SXLine *sx)
+	void SendSZLineDel(XLine *x)
 	{
-		send_cmd(Config.s_OperServ, "ZLINE %s", sx->mask);
+		send_cmd(Config.s_OperServ, "ZLINE %s", x->Mask.c_str());
 	}
 
 	/* SZLINE */
-	void SendSZLine(SXLine *sx)
+	void SendSZLine(XLine *x)
 	{
-		send_cmd(Config.ServerName, "ADDLINE Z %s %s %ld 0 :%s", sx->mask, sx->by, static_cast<long>(time(NULL)), sx->reason);
+		send_cmd(Config.ServerName, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SVSMODE +- */

@@ -23,11 +23,10 @@ class CommandNSSuspend : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		NickAlias *na, *na2;
+		NickAlias *na;
 		User *u2;
 		const char *nick = params[0].c_str();
 		const char *reason = params[1].c_str();
-		int i;
 
 		if (readonly)
 		{
@@ -61,9 +60,10 @@ class CommandNSSuspend : public Command
 			na->nc->UnsetFlag(NI_KILL_QUICK);
 			na->nc->UnsetFlag(NI_KILL_IMMED);
 
-			for (i = 0; i < na->nc->aliases.count; ++i)
+			for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(); it != na->nc->aliases.end(); ++it)
 			{
-				na2 = static_cast<NickAlias *>(na->nc->aliases.list[i]);
+				NickAlias *na2 = *it;
+
 				if (na2->nc == na->nc)
 				{
 					if (na2->last_quit)

@@ -148,7 +148,7 @@ void get_core_stats(long *nrec, long *memuse)
 				mem += strlen(nc->memos.memos[j]->text) + 1;
 		}
 
-		mem += sizeof(void *) * nc->aliases.count;
+		mem += sizeof(NickAlias *) * nc->aliases.size();
 	}
 	*nrec = count;
 	*memuse = mem;
@@ -485,9 +485,9 @@ void change_core_display(NickCore * nc, const char *newdisplay)
 void change_core_display(NickCore * nc)
 {
 	NickAlias *na;
-	if (nc->aliases.count <= 0)
+	if (nc->aliases.empty())
 		return;
-	na = static_cast<NickAlias *>(nc->aliases.list[0]);
+	na = nc->aliases.front();
 	change_core_display(nc,na->nick);
 }
 

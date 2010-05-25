@@ -2546,22 +2546,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Standard Auslaufzeit von AKILLs: 1 Minute
 OPER_STATS_AKILL_EXPIRE_NONE
 	Standard Auslaufzeit von AKILLs: Kein Auslauf, permanent
-OPER_STATS_SGLINE_COUNT
-	Aktuelle Anzahl von SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Standard Auslaufzeit von SGLINEs: %d Tage
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Standard Auslaufzeit von SGLINEs: 1 Tag
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Standard Auslaufzeit von SGLINEs: %d Stunden
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Standard Auslaufzeit von SGLINEs: 1 Stunde
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Standard Auslaufzeit von SGLINEs: %d Minuten
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Standard Auslaufzeit von SGLINEs: 1 Minute
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Standard Auslaufzeit von SGLINEs: Kein Auslauf, permanent
+OPER_STATS_SNLINE_COUNT
+	Aktuelle Anzahl von SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Standard Auslaufzeit von SNLINEs: %d Tage
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Standard Auslaufzeit von SNLINEs: 1 Tag
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Standard Auslaufzeit von SNLINEs: %d Stunden
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Standard Auslaufzeit von SNLINEs: 1 Stunde
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Standard Auslaufzeit von SNLINEs: %d Minuten
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Standard Auslaufzeit von SNLINEs: 1 Minute
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Standard Auslaufzeit von SNLINEs: Kein Auslauf, permanent
 OPER_STATS_SQLINE_COUNT
 	Aktuelle Anzahl von SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2687,49 +2687,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	Die AKILL-Liste wurde geleert.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+Zeit] {Channel} [Grund]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmask | entry-liste}[:Grund]]
-OPER_SGLINE_UNSUPPORTED
-	SGLINE ist in diesem Netz nicht verfügbar.
-OPER_SGLINE_EXISTS
-	%s existiert bereits auf der SGLINE-Liste.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmask | entry-liste}[:Grund]]
+OPER_SNLINE_UNSUPPORTED
+	SNLINE ist in diesem Netz nicht verfügbar.
+OPER_SNLINE_EXISTS
+	%s existiert bereits auf der SNLINE-Liste.
+OPER_SNLINE_ALREADY_COVERED
 	%s wird bereits durch %s getroffen.
-OPER_SGLINE_REACHED_LIMIT
-	Du kannst nur %d SGLINE's haben.
-OPER_SGLINE_ADDED
-	%s wurde zur SGLINE-Liste hinzugefügt.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Du kannst nur %d SNLINE's haben.
+OPER_SNLINE_ADDED
+	%s wurde zur SNLINE-Liste hinzugefügt.
+OPER_SNLINE_CHANGED
 	Auslaufzeit von %s geändert.
-OPER_SGLINE_NOT_FOUND
-	%s wurde nicht auf der SGLINE-Liste gefunden.
-OPER_SGLINE_NO_MATCH
-	Keine entsprechenden Einträge auf der SGLINE-Liste.
-OPER_SGLINE_DELETED
-	%s wurde von der SGLINE-Liste entfernt.
-OPER_SGLINE_DELETED_ONE
-	Es wurde 1 Eintrag aus der SGLINE-Liste entfernt.
-OPER_SGLINE_DELETED_SEVERAL
-	Es wurden %d Einträge aus der SGLINE-Liste entfernt.
-OPER_SGLINE_LIST_EMPTY
-	Die SGLINE-Liste ist leer.
-OPER_SGLINE_LIST_HEADER
-	Aktuelle SGLINE-Liste:
+OPER_SNLINE_NOT_FOUND
+	%s wurde nicht auf der SNLINE-Liste gefunden.
+OPER_SNLINE_NO_MATCH
+	Keine entsprechenden Einträge auf der SNLINE-Liste.
+OPER_SNLINE_DELETED
+	%s wurde von der SNLINE-Liste entfernt.
+OPER_SNLINE_DELETED_ONE
+	Es wurde 1 Eintrag aus der SNLINE-Liste entfernt.
+OPER_SNLINE_DELETED_SEVERAL
+	Es wurden %d Einträge aus der SNLINE-Liste entfernt.
+OPER_SNLINE_LIST_EMPTY
+	Die SNLINE-Liste ist leer.
+OPER_SNLINE_LIST_HEADER
+	Aktuelle SNLINE-Liste:
 	  Nummer   Maske                             Grund
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Aktuelle SGLINE-Liste:
+OPER_SNLINE_VIEW_HEADER
+	Aktuelle SNLINE-Liste:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (von %s am %s, %s)
 	      %s
-OPER_SGLINE_CLEAR
-	Die SGLINE-Liste wurde geleert.
+OPER_SNLINE_CLEAR
+	Die SNLINE-Liste wurde geleert.
 
 # SZLINE responses
 OPER_SQLINE_SYNTAX
@@ -5555,8 +5555,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES   Alle User mit einem bestimmten Host killen
 OPER_HELP_CMD_AKILL
 	    AKILL        Die AutoKill-Liste bearbeiten
-OPER_HELP_CMD_SGLINE
-	    SGLINE       Die SGLINE-Liste bearbeiten
+OPER_HELP_CMD_SNLINE
+	    SNLINE       Die SNLINE-Liste bearbeiten
 OPER_HELP_CMD_SQLINE
 	    SQLINE       Die SQLINE-Liste bearbeiten
 OPER_HELP_CMD_SZLINE
@@ -5765,21 +5765,21 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR entfernt alle Einträge aus der AKILL-Liste.
 	
-OPER_HELP_SGLINE
-	Syntax: SGLINE ADD [+Zeit] Maske:Grund
-	    SGLINE DEL {Maske | entry-num | Liste}
-	        SGLINE LIST [Maske | Liste]
-	        SGLINE VIEW [Maske | Liste]
-	        SGLINE CLEAR
+OPER_HELP_SNLINE
+	Syntax: SNLINE ADD [+Zeit] Maske:Grund
+	    SNLINE DEL {Maske | entry-num | Liste}
+	        SNLINE LIST [Maske | Liste]
+	        SNLINE VIEW [Maske | Liste]
+	        SNLINE CLEAR
 	
-	Erlaubt Services Operatoren die SGLINE-Liste zu
+	Erlaubt Services Operatoren die SNLINE-Liste zu
 	bearbeiten. Versucht ein User dessen Realname auf 
-	einen Eintrag in der SGLINE-Liste trifft zu verbinden,
+	einen Eintrag in der SNLINE-Liste trifft zu verbinden,
 	werden die Services ihn die verbindung auf das IRC Netz
 	nicht ausführen lassen.
 	
-	SGLINE ADD fügt die angegebene Realnamen-Maske mit 
-	dem Grund (muss angegeben werden) zur SGLINE-Liste 
+	SNLINE ADD fügt die angegebene Realnamen-Maske mit 
+	dem Grund (muss angegeben werden) zur SNLINE-Liste 
 	hinzu. Mit Hilfe von Zeit lässt sich eine bestimmte
 	Auslaufzeit dieses Eintrags definieren.
 	Zeit wird durch eine Ganzzahl angegeben, gefolgt von
@@ -5787,39 +5787,39 @@ OPER_HELP_SGLINE
 	d  (Tage), h (Stunden), oder m (Minuten). Kombinationen
 	(wie zum Beispiel 1h30m) sind nicht zulässig.  Wird kein
 	Buchstabe angegeben, wird von Tagen ausgegangen (also +30 
-	bedeutet dann z.B. 30 Tage). Um einen SGLINE-Eintrag zu
+	bedeutet dann z.B. 30 Tage). Um einen SNLINE-Eintrag zu
 	erstellen, der nicht ausläuft, benutze +0. Beginnt
 	die Realnamen-Maske mit einem +, an, muss eine 
 	Auslaufzeit (expiry) definiert werden, auch wenn es die 
 	Standard-Zeit ist. Die Standard-Auslaufzeit für eine
-	SGLINE kann man unter STATS AKILL finden.
+	SNLINE kann man unter STATS AKILL finden.
 	
 	Beachte: Da die Realnamen-Maske Leerzeichen enthalten kann,
 	ist das Trennzeichen zwischen der Maske und dem Grund
 	ein Doppelpunkt.
 
-	Das SGLINE DEL Befehl entfernt die angegebene Maske
-	von der SGLINE-Liste, sofern ein solcher Eintag existiert.
+	Das SNLINE DEL Befehl entfernt die angegebene Maske
+	von der SNLINE-Liste, sofern ein solcher Eintag existiert.
 	Wird eine Liste von Nummern angegeben, werden diese
 	Einträge entfernt. (Siehe das Beispiel für LIST weiter
 	unten.)
 	
-	Mit Hilfe von SGLINE LIST wird die SGLINE-Liste 
+	Mit Hilfe von SNLINE LIST wird die SNLINE-Liste 
 	angezeigt. Werden Platzhalter (Wildcards) in der Maske
 	angegeben, werden nur die entsprechenden Einträge
 	angezeigt. Die Ausgabe lässt sich ebenfalls durch einen
 	Zahlenbereich begrenzen, wie das Beispiel zeigt:
 	
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      Zeigt nur die Einträge 2 bis 5 und 7 bis 9.
 	
-	SGLINE VIEW ist eine ausführlichere Version des 
-	SGLINE LIST Befehls und zeigt zusätzlich, wer einen 
+	SNLINE VIEW ist eine ausführlichere Version des 
+	SNLINE LIST Befehls und zeigt zusätzlich, wer einen 
 	Eintrag wann erstellt hat, wann er ausläuft und 
 	natürlich die user@host Maske mit dem Grund.
 	
-	SGLINE CLEAR entfernt alle Einträge aus der 
-	SGLINE-Liste.
+	SNLINE CLEAR entfernt alle Einträge aus der 
+	SNLINE-Liste.
 
 OPER_HELP_SQLINE
 	Syntax: SQLINE ADD [+Zeit] Maske Grund
@@ -5838,7 +5838,7 @@ OPER_HELP_SQLINE
 	die dieses Feature unterstützen).
 	
 	SQLINE ADD fügt den angegeben Nicknamen mit dem Grund (muss
-	angegeben werden) zur SGLINE-Liste hinzu. ^_Zeit^_ wird
+	angegeben werden) zur SNLINE-Liste hinzu. ^_Zeit^_ wird
 	durch eine Ganzzahl angegeben, gefolgt von einem Buchstaben: 
 	d (Tage), h (Stunden), oder m (Minuten).
 	Kombinationen sind nicht erlaubt. Wird kein Buchstabe angegeben,

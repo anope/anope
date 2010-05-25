@@ -46,7 +46,7 @@ class CommandOSStats : public Command
 	{
 		int timeout;
 		/* AKILLs */
-		notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_COUNT, akills.count);
+		notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_COUNT, SGLine->GetCount());
 		timeout = Config.AutokillExpiry + 59;
 		if (timeout >= 172800)
 			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_DAYS, timeout / 86400);
@@ -62,30 +62,30 @@ class CommandOSStats : public Command
 			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_MIN);
 		else
 			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_NONE);
-		if (ircd->sgline)
+		if (ircd->snline)
 		{
-			/* SGLINEs */
-			notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_COUNT, sglines.count);
-			timeout = Config.SGLineExpiry + 59;
+			/* SNLINEs */
+			notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_COUNT, SNLine->GetCount());
+			timeout = Config.SNLineExpiry + 59;
 			if (timeout >= 172800)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_DAYS, timeout / 86400);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_DAY);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_HOURS, timeout / 3600);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_HOUR);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_MINS, timeout / 60);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_MIN);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_MIN);
 			else
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_NONE);
+				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_NONE);
 		}
 		if (ircd->sqline)
 		{
 			/* SQLINEs */
-			notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_COUNT, sqlines.count);
+			notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_COUNT, SQLine->GetCount());
 			timeout = Config.SQLineExpiry + 59;
 			if (timeout >= 172800)
 				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAYS, timeout / 86400);
@@ -105,7 +105,7 @@ class CommandOSStats : public Command
 		if (ircd->szline)
 		{
 			/* SZLINEs */
-			notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_COUNT, szlines.count);
+			notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_COUNT, SZLine->GetCount());
 			timeout = Config.SZLineExpiry + 59;
 			if (timeout >= 172800)
 				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAYS, timeout / 86400);
@@ -316,64 +316,74 @@ class OSStats : public Module
 
 void get_operserv_stats(long *nrec, long *memuse)
 {
-	int i;
+	unsigned i;
 	long mem = 0, count = 0, mem2 = 0, count2 = 0;
-	Akill *ak;
-	SXLine *sx;
+	XLine *x;
 
-	count += akills.count;
-	mem += akills.capacity;
-	mem += akills.count * sizeof(Akill);
+	count += SGLine->GetCount();
+	mem += SGLine->GetCount() * sizeof(XLine);
 
-	for (i = 0; i < akills.count; ++i)
+	for (i = 0; i < SGLine->GetCount(); ++i)
 	{
-		ak = static_cast<Akill *>(akills.list[i]);
-		mem += strlen(ak->user) + 1;
-		mem += strlen(ak->host) + 1;
-		mem += strlen(ak->by) + 1;
-		mem += strlen(ak->reason) + 1;
+		x = SGLine->GetEntry(i);
+
+		mem += x->GetNick().length() + 1;
+		mem += x->GetUser().length() + 1;
+		mem += x->GetHost().length() + 1;
+		mem += x->Mask.length() + 1;
+		mem += x->By.length() + 1;
+		mem += x->Reason.length() + 1;
 	}
 
-	if (ircd->sgline)
+	if (ircd->snline)
 	{
-		count += sglines.count;
-		mem += sglines.capacity;
-		mem += sglines.count * sizeof(SXLine);
+		count += SNLine->GetCount();
+		mem += SNLine->GetCount() * sizeof(XLine);
 
-		for (i = 0; i < sglines.count; ++i)
+		for (i = 0; i < SNLine->GetCount(); ++i)
 		{
-			sx = static_cast<SXLine *>(sglines.list[i]);
-			mem += strlen(sx->mask) + 1;
-			mem += strlen(sx->by) + 1;
-			mem += strlen(sx->reason) + 1;
+			x = SNLine->GetEntry(i);
+
+			mem += x->GetNick().length() + 1;
+			mem += x->GetUser().length() + 1;
+			mem += x->GetHost().length() + 1;
+			mem += x->Mask.length() + 1;
+			mem += x->By.length() + 1;
+			mem += x->Reason.length() + 1;
 		}
 	}
 	if (ircd->sqline)
 	{
-		count += sqlines.count;
-		mem += sqlines.capacity;
-		mem += sqlines.count * sizeof(SXLine);
+		count += SQLine->GetCount();
+		mem += SGLine->GetCount() * sizeof(XLine);
 
-		for (i = 0; i < sqlines.count; ++i)
+		for (i = 0; i < SQLine->GetCount(); ++i)
 		{
-			sx = static_cast<SXLine *>(sqlines.list[i]);
-			mem += strlen(sx->mask) + 1;
-			mem += strlen(sx->by) + 1;
-			mem += strlen(sx->reason) + 1;
+			x = SNLine->GetEntry(i);
+
+			mem += x->GetNick().length() + 1;
+			mem += x->GetUser().length() + 1;
+			mem += x->GetHost().length() + 1;
+			mem += x->Mask.length() + 1;
+			mem += x->By.length() + 1;
+			mem += x->Reason.length() + 1;
 		}
 	}
 	if (ircd->szline)
 	{
-		count += szlines.count;
-		mem += szlines.capacity;
-		mem += szlines.count * sizeof(SXLine);
-
-		for (i = 0; i < szlines.count; ++i)
+		count += SZLine->GetCount();
+		mem += SZLine->GetCount() * sizeof(XLine);
+		
+		for (i = 0; i < SZLine->GetCount(); ++i)
 		{
-			sx = static_cast<SXLine *>(szlines.list[i]);
-			mem += strlen(sx->mask) + 1;
-			mem += strlen(sx->by) + 1;
-			mem += strlen(sx->reason) + 1;
+			x = SZLine->GetEntry(i);
+
+			mem += x->GetNick().length() + 1;
+			mem += x->GetUser().length() + 1;
+			mem += x->GetHost().length() + 1;
+			mem += x->Mask.length() + 1;
+			mem += x->By.length() + 1;
+			mem += x->Reason.length() + 1;
 		}
 	}
 

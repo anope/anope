@@ -87,7 +87,8 @@ class CommandCSForbid : public Command
 
 		if (ircd->chansqline)
 		{
-			ircdproto->SendSQLine(ci->name, reason ? reason : "Forbidden");
+			XLine x(chan, "Forbidden");
+			ircdproto->SendSQLine(&x);
 		}
 
 		Alog() << Config.s_ChanServ << ": " << u->nick << " set FORBID for channel " << ci->name;

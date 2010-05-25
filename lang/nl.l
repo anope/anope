@@ -2548,22 +2548,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Standaard AKILL verloop tijd: 1 minuut
 OPER_STATS_AKILL_EXPIRE_NONE
 	Standaard AKILL verloop tijd: Verloopt niet
-OPER_STATS_SGLINE_COUNT
-	Huidig aantal SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Standaard SGLINE verloop tijd: %d dagen
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Standaard SGLINE verloop tijd: 1 dag
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Standaard SGLINE verloop tijd: %d uur
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Standaard SGLINE verloop tijd: 1 uur
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Standaard SGLINE verloop tijd: %d minuten
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Standaard SGLINE verloop tijd: 1 minuut
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Standaard SGLINE verloop tijd: Verloopt niet
+OPER_STATS_SNLINE_COUNT
+	Huidig aantal SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Standaard SNLINE verloop tijd: %d dagen
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Standaard SNLINE verloop tijd: 1 dag
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Standaard SNLINE verloop tijd: %d uur
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Standaard SNLINE verloop tijd: 1 uur
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Standaard SNLINE verloop tijd: %d minuten
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Standaard SNLINE verloop tijd: 1 minuut
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Standaard SNLINE verloop tijd: Verloopt niet
 OPER_STATS_SQLINE_COUNT
 	Huidig aantal SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2687,49 +2687,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	De AKILL lijst is leeggemaakt.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+verloop] {mask | toegangslijst}[:reden]]
-OPER_SGLINE_UNSUPPORTED
-	Sorry, SGLINE is niet beschikbaar op dit netwerk.
-OPER_SGLINE_EXISTS
-	%s bestaat al op de SGLINE lijst.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+verloop] {mask | toegangslijst}[:reden]]
+OPER_SNLINE_UNSUPPORTED
+	Sorry, SNLINE is niet beschikbaar op dit netwerk.
+OPER_SNLINE_EXISTS
+	%s bestaat al op de SNLINE lijst.
+OPER_SNLINE_ALREADY_COVERED
 	%s is al gedekt door %s.
-OPER_SGLINE_REACHED_LIMIT
-	Sorry, je kan maar %d SGLINEs hebben.
-OPER_SGLINE_ADDED
-	%s toegevoegd aan de SGLINE lijst.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Sorry, je kan maar %d SNLINEs hebben.
+OPER_SNLINE_ADDED
+	%s toegevoegd aan de SNLINE lijst.
+OPER_SNLINE_CHANGED
 	Verlooptijd van %s veranderd.
-OPER_SGLINE_NOT_FOUND
-	%s niet gevonden op de SGLINE lijst.
-OPER_SGLINE_NO_MATCH
-	Geen overeenkomsten op de SGLINE lijst.
-OPER_SGLINE_DELETED
-	%s verwijderd van de SGLINE lijst.
-OPER_SGLINE_DELETED_ONE
-	1 SGLINE verwijderd van de SGLINE lijst.
-OPER_SGLINE_DELETED_SEVERAL
-	%d SGLINEs verwijderd van de SGLINE lijst.
-OPER_SGLINE_LIST_EMPTY
-	SGLINE lijst is leeg.
-OPER_SGLINE_LIST_HEADER
-	Huidige SGLINE lijst:
+OPER_SNLINE_NOT_FOUND
+	%s niet gevonden op de SNLINE lijst.
+OPER_SNLINE_NO_MATCH
+	Geen overeenkomsten op de SNLINE lijst.
+OPER_SNLINE_DELETED
+	%s verwijderd van de SNLINE lijst.
+OPER_SNLINE_DELETED_ONE
+	1 SNLINE verwijderd van de SNLINE lijst.
+OPER_SNLINE_DELETED_SEVERAL
+	%d SNLINEs verwijderd van de SNLINE lijst.
+OPER_SNLINE_LIST_EMPTY
+	SNLINE lijst is leeg.
+OPER_SNLINE_LIST_HEADER
+	Huidige SNLINE lijst:
 	  Nr    Mask                              Reden
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Huidige SGLINE lijst:
+OPER_SNLINE_VIEW_HEADER
+	Huidige SNLINE lijst:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (door %s op %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	De SGLINE lijst is leeggemaakt.
+OPER_SNLINE_CLEAR
+	De SNLINE lijst is leeggemaakt.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5440,8 +5440,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Kill alle gebruikers met een bepaalde hostmask
 OPER_HELP_CMD_AKILL
 	    AKILL       Beheer de AKILL lijst
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Beheer de SGLINE lijst
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Beheer de SNLINE lijst
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Beheer de SQLINE lijst
 OPER_HELP_CMD_SZLINE
@@ -5645,50 +5645,50 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR maakt de AKILL lijst leeg.
 	
-OPER_HELP_SGLINE
-	Gebruik: SGLINE ADD [+verlooptijd] mask reden
-	         SGLINE DEL {mask | entry-nr | lijst}
-	         SGLINE LIST [mask | lijst]
-	         SGLINE VIEW [mask | lijst]
-	         SGLINE CLEAR
+OPER_HELP_SNLINE
+	Gebruik: SNLINE ADD [+verlooptijd] mask reden
+	         SNLINE DEL {mask | entry-nr | lijst}
+	         SNLINE LIST [mask | lijst]
+	         SNLINE VIEW [mask | lijst]
+	         SNLINE CLEAR
 	
-	Stelt Services operators in staat de SGLINE lijst te beheren.
-	Als een gebruiker die overeenkomt met een SGLINE mask probeert
+	Stelt Services operators in staat de SNLINE lijst te beheren.
+	Als een gebruiker die overeenkomt met een SNLINE mask probeert
 	te verbinden zullen Services deze gebruiker niet toestaan zijn
 	of haar IRC sessie voort te zetten.
 	
-	SGLINE ADD voeg het gegeven user@host mask toe aan de SGLINE
+	SNLINE ADD voeg het gegeven user@host mask toe aan de SNLINE
 	lijst met de gegeven reden (die moet worden gegeven).
 	verlooptijd wordt gespecificeerd als een getal waarachter d 
 	(dagen), h (uur), of m (minuten) geplaatst wordt. Combinaties
 	(zoals 1h30m) zijn niet toegestaan. Als er geen d, h of m wordt 
 	meegegeven, is het standaard dagen (dus +30 zelfstandig betekent
-	30 dagen). Om een SGLINE die niet verloopt toe te voegen, gebruik je
+	30 dagen). Om een SNLINE die niet verloopt toe te voegen, gebruik je
 	+0. Als de usermask die toegevoegd moet worden met een + begint,
 	is een verlooptijd verplicht, zelfs als die overeenkomt met de
 	standaard verlooptijd. De huidige standaard verlooptijd voor een
-	SGLINE kan gevonden worden met het STATS AKILL commando.
+	SNLINE kan gevonden worden met het STATS AKILL commando.
 	
-	Het SGLINE DEL commando verwijdert het gegeven mask van de SGLINE
+	Het SNLINE DEL commando verwijdert het gegeven mask van de SNLINE
 	lijst als deze erop staat. Als er een lijst van entry-nummers
 	is opgegeven zullen die verwijderd worden. (Zie het voorbeeld voor
 	LIST hier onder.)
 	
-	Her SGLINE LIST commando geeft de SGLINE lijst weer.
-	Als een mask met een * is gegeven zullen alleen de SGLINEs die
+	Her SNLINE LIST commando geeft de SNLINE lijst weer.
+	Als een mask met een * is gegeven zullen alleen de SNLINEs die
 	overeenkomen met het mask worden weergegeven. Als een lijst van
 	entry-nummers is gegeven worden alleen die weergegeven.
 	Bijvoorbeeld:
 
-	   SGLINE LIST 2-5,7-9
-	      Geeft SGLINEs 2 t/m 5 en 7 t/m 9 weer.
+	   SNLINE LIST 2-5,7-9
+	      Geeft SNLINEs 2 t/m 5 en 7 t/m 9 weer.
 	      
-	SGLINE VIEW is een versie van SGLINE LIST die meer informatie
-	geeft: de naam van degene die de SGLINE toe heeft gevoegd, de datum
+	SNLINE VIEW is een versie van SNLINE LIST die meer informatie
+	geeft: de naam van degene die de SNLINE toe heeft gevoegd, de datum
 	waarop dit gebeurde, waneer deze verloopt, en de user@host mask
 	en de reden.
 	
-	SGLINE CLEAR maakt de SGLINE lijst leeg.
+	SNLINE CLEAR maakt de SNLINE lijst leeg.
 
 OPER_HELP_SQLINE
 	Gebruik: SQLINE ADD [+verlooptijd] mask reden

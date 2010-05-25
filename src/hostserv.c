@@ -177,9 +177,9 @@ void HostServSyncVhosts(NickAlias *na)
 	if (!na || !na->hostinfo.HasVhost())
 		return;
 
-	for (int i = 0; i < na->nc->aliases.count; i++)
+	for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(); it != na->nc->aliases.end(); ++it)
 	{
-		NickAlias *nick = static_cast<NickAlias *>(na->nc->aliases.list[i]);
+		NickAlias *nick = *it;
 		nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
 	}
 }

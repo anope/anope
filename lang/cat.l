@@ -2575,22 +2575,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Temps d'expiració per defecte de AKILL: 1 minut
 OPER_STATS_AKILL_EXPIRE_NONE
 	Temps d'expiració per defecte de AKILL: Sense expiració
-OPER_STATS_SGLINE_COUNT
-	Numero actual de SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Temps d'expiració per defecte de SGLINE: %d dies
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Temps d'expiració per defecte de SGLINE: 1 dia
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Temps d'expiració per defecte de SGLINE: %d hores
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Temps d'expiració per defecte de SGLINE: 1 hora
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Temps d'expiració per defecte de SGLINE: %d minuts
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Temps d'expiració per defecte de SGLINE: 1 minut
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Temps d'expiració per defecte de SGLINE: Sense expiració
+OPER_STATS_SNLINE_COUNT
+	Numero actual de SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Temps d'expiració per defecte de SNLINE: %d dies
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Temps d'expiració per defecte de SNLINE: 1 dia
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Temps d'expiració per defecte de SNLINE: %d hores
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Temps d'expiració per defecte de SNLINE: 1 hora
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Temps d'expiració per defecte de SNLINE: %d minuts
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Temps d'expiració per defecte de SNLINE: 1 minut
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Temps d'expiració per defecte de SNLINE: Sense expiració
 OPER_STATS_SQLINE_COUNT
 	Numero actual de SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2718,49 +2718,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	La llista de AKILLs ha estat netegada.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiració] {mascara | llista}[:raó]]
-OPER_SGLINE_UNSUPPORTED
-	Ho sento, SGLINE no esta disponible en aquesta xarxa.
-OPER_SGLINE_EXISTS
-	%s ja existeix a la llista de SGLINEs.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiració] {mascara | llista}[:raó]]
+OPER_SNLINE_UNSUPPORTED
+	Ho sento, SNLINE no esta disponible en aquesta xarxa.
+OPER_SNLINE_EXISTS
+	%s ja existeix a la llista de SNLINEs.
+OPER_SNLINE_ALREADY_COVERED
 	%s ja esta cobert per %s.
-OPER_SGLINE_REACHED_LIMIT
-	Ho sento, sols pots tenir %d SGLINEs.
-OPER_SGLINE_ADDED
-	%s afegit a la llista de SGLINEs.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Ho sento, sols pots tenir %d SNLINEs.
+OPER_SNLINE_ADDED
+	%s afegit a la llista de SNLINEs.
+OPER_SNLINE_CHANGED
 	Temps d'expiració per a %s canviat.
-OPER_SGLINE_NOT_FOUND
-	%s no trobat a a la llista de SGLINEs.
-OPER_SGLINE_NO_MATCH
-	No existeixen instàncies similars a la llista de SGLINEs.
-OPER_SGLINE_DELETED
-	%s esborrat de la llista de SGLINEs.
-OPER_SGLINE_DELETED_ONE
-	1 instància esborrada de la llista de SGLINEs.
-OPER_SGLINE_DELETED_SEVERAL
-	%d instàncies esborrades de la llista de SGLINEs.
-OPER_SGLINE_LIST_EMPTY
-	La llista de SGLINEs esta buida.
-OPER_SGLINE_LIST_HEADER
-	Llista actual de SGLINEs:
+OPER_SNLINE_NOT_FOUND
+	%s no trobat a a la llista de SNLINEs.
+OPER_SNLINE_NO_MATCH
+	No existeixen instàncies similars a la llista de SNLINEs.
+OPER_SNLINE_DELETED
+	%s esborrat de la llista de SNLINEs.
+OPER_SNLINE_DELETED_ONE
+	1 instància esborrada de la llista de SNLINEs.
+OPER_SNLINE_DELETED_SEVERAL
+	%d instàncies esborrades de la llista de SNLINEs.
+OPER_SNLINE_LIST_EMPTY
+	La llista de SNLINEs esta buida.
+OPER_SNLINE_LIST_HEADER
+	Llista actual de SNLINEs:
 	  Num   Mascara                           Raó
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Llista actual de SGLINEs:
+OPER_SNLINE_VIEW_HEADER
+	Llista actual de SNLINEs:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (per %s en %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	La llista de SGLINEs ha estat netegada.
+OPER_SNLINE_CLEAR
+	La llista de SNLINEs ha estat netegada.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5516,8 +5516,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Mata tots els usuaris en un host
 OPER_HELP_CMD_AKILL
 	    AKILL       Manipula la llista AKILL
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Manipula la llista SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Manipula la llista SNLINE
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Manipula la llista SQLINE
 OPER_HELP_CMD_SZLINE
@@ -5726,56 +5726,56 @@ OPER_HELP_AKILL
 	
 	Limitat a operadors de serveis.
 	
-OPER_HELP_SGLINE
-	Sintàxi: SGLINE ADD [+expiració] mascara:raó
-	         SGLINE DEL {mascara | nom | llista}
-	         SGLINE LIST [mascara | llista]
-	         SGLINE VIEW [mascara | llista]
-	         SGLINE CLEAR
+OPER_HELP_SNLINE
+	Sintàxi: SNLINE ADD [+expiració] mascara:raó
+	         SNLINE DEL {mascara | nom | llista}
+	         SNLINE LIST [mascara | llista]
+	         SNLINE VIEW [mascara | llista]
+	         SNLINE CLEAR
 	
 	Permet als operadors de serveis manipular la llista
-	de SGLINES. Si un usuari amb un nom real concordant
-	amb una mascara SGLINE s'intenta connectar, els serveis
+	de SNLINES. Si un usuari amb un nom real concordant
+	amb una mascara SNLINE s'intenta connectar, els serveis
 	l'impediran aconseguir una sessió d'IRC.
 	
-	SGLINE ADD afegeix la mascara de nom real especificada a la
-	llista de SGLINES per la raó especificada (obligatori). 
+	SNLINE ADD afegeix la mascara de nom real especificada a la
+	llista de SNLINES per la raó especificada (obligatori). 
 	expiració es especificada com un sencer
 	seguit de d (dies), h (hores), o m
 	(minuts).  Combinacions (com 1h30m) no estan
 	permesses. Si l'especificació de la unitat no es
 	especificada, per defecte són dies (és a dir +30 nomès
-	significa 30 dies). Per afegir una SGLINE que no caduqui,
+	significa 30 dies). Per afegir una SNLINE que no caduqui,
 	utilitza +0. Si la mascara de nom real especificada comença amb
 	+, el temp d'expiració ha de ser especificat, encara que sigui
 	el mateix que el per defecte. El temps actual d'expiració
-	per defecte per SGLINES pot ser consultat amb la comanda
+	per defecte per SNLINES pot ser consultat amb la comanda
 	STATS AKILL.
 	Nota: Ja que la mascara de nom real pot contenir
 	espais, el separador entre aquest i la raó es un signe de
 	dos punts.
 	
-	La comanda SGLINE DEL esborra la mascara especificada de la
-	llista de SGLINES si esta present. Si s'especifica una llista de
+	La comanda SNLINE DEL esborra la mascara especificada de la
+	llista de SNLINES si esta present. Si s'especifica una llista de
 	instàncies, aquestes instàncies son esborrades. (Veure 
 	l'exemple per LIST especificat més endavant.)
 	
-	La comanda SGLINE LIST mostra la llista de SGLINES. Si
+	La comanda SNLINE LIST mostra la llista de SNLINES. Si
 	s'especifica una mascara, nomès les instàncies concordant amb
 	la mascara són mostrades. Si s'especifica una llista de instàncies,
 	nomès aquestes instàncies son mostrades; per exemple:
 	
-	   SGLINE LIST 2-5,7-9
-	      Llista instàncies de SGLINES enumerades de 2 a 5 i de 7 
+	   SNLINE LIST 2-5,7-9
+	      Llista instàncies de SNLINES enumerades de 2 a 5 i de 7 
 	      a 9.
 	      
-	SGLINE VIEW es una versió més verbal que SGLINE LIST,
-	i mostrara qui va fegir la SGLINE, la data en la que va
+	SNLINE VIEW es una versió més verbal que SNLINE LIST,
+	i mostrara qui va fegir la SNLINE, la data en la que va
 	ser afegida, i quan caducara, a més de la mascara de nom real
 	i la raó.
 	
-	SGLINE CLEAR neteja totes les instàncies de la llista de
-	SGLINES.
+	SNLINE CLEAR neteja totes les instàncies de la llista de
+	SNLINES.
 	
 	Limitat a operadors de serveis.
 

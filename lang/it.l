@@ -2502,22 +2502,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Durata di default delle AKILL: 1 minuto
 OPER_STATS_AKILL_EXPIRE_NONE
 	Durata di default delle AKILL: infinita
-OPER_STATS_SGLINE_COUNT
-	Numero attuale di SGLINE: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Durata di default delle SGLINE: %d giorni
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Durata di default delle SGLINE: 1 giorno
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Durata di default delle SGLINE: %d ore
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Durata di default delle SGLINE: 1 ora
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Durata di default delle SGLINE: %d minuti
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Durata di default delle SGLINE: 1 minuto
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Durata di default delle SGLINE: infinita
+OPER_STATS_SNLINE_COUNT
+	Numero attuale di SNLINE: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Durata di default delle SNLINE: %d giorni
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Durata di default delle SNLINE: 1 giorno
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Durata di default delle SNLINE: %d ore
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Durata di default delle SNLINE: 1 ora
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Durata di default delle SNLINE: %d minuti
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Durata di default delle SNLINE: 1 minuto
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Durata di default delle SNLINE: infinita
 OPER_STATS_SQLINE_COUNT
 	Numero attuale di SQLINE: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2642,46 +2642,46 @@ OPER_AKILL_CLEAR
 	La lista AKILL è stata svuotata.
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+scadenza] {#canale} [motivo]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+durata] {mask | numero-lista}[:motivo]]
-OPER_SGLINE_UNSUPPORTED
-	Spiacente, SGLINE non è disponibile su questa rete.
-OPER_SGLINE_EXISTS
-	%s è già presente nella lista SGLINE.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+durata] {mask | numero-lista}[:motivo]]
+OPER_SNLINE_UNSUPPORTED
+	Spiacente, SNLINE non è disponibile su questa rete.
+OPER_SNLINE_EXISTS
+	%s è già presente nella lista SNLINE.
+OPER_SNLINE_ALREADY_COVERED
 	%s è già coperto da %s.
-OPER_SGLINE_REACHED_LIMIT
-	Spiacente, puoi avere un massimo di %d SGLINE.
-OPER_SGLINE_ADDED
-	%s aggiunto alla lista SGLINE.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Spiacente, puoi avere un massimo di %d SNLINE.
+OPER_SNLINE_ADDED
+	%s aggiunto alla lista SNLINE.
+OPER_SNLINE_CHANGED
 	Durata di %s modificata.
-OPER_SGLINE_NOT_FOUND
-	%s non trovato nella lista SGLINE.
-OPER_SGLINE_NO_MATCH
-	Nessun record corrispondente nella lista SGLINE.
-OPER_SGLINE_DELETED
-	%s eliminato dalla lista SGLINE.
-OPER_SGLINE_DELETED_ONE
-	Eliminato 1 record dalla lista SGLINE.
-OPER_SGLINE_DELETED_SEVERAL
-	Eliminati %d record dalla lista SGLINE.
-OPER_SGLINE_LIST_EMPTY
-	La lista SGLINE è vuota.
-OPER_SGLINE_LIST_HEADER
-	Lista SGLINE attuale:
+OPER_SNLINE_NOT_FOUND
+	%s non trovato nella lista SNLINE.
+OPER_SNLINE_NO_MATCH
+	Nessun record corrispondente nella lista SNLINE.
+OPER_SNLINE_DELETED
+	%s eliminato dalla lista SNLINE.
+OPER_SNLINE_DELETED_ONE
+	Eliminato 1 record dalla lista SNLINE.
+OPER_SNLINE_DELETED_SEVERAL
+	Eliminati %d record dalla lista SNLINE.
+OPER_SNLINE_LIST_EMPTY
+	La lista SNLINE è vuota.
+OPER_SNLINE_LIST_HEADER
+	Lista SNLINE attuale:
 	  Num   Mask                              Motivo
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Lista SGLINE attuale:
+OPER_SNLINE_VIEW_HEADER
+	Lista SNLINE attuale:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (by %s on %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	La lista SGLINE è stata svuotata.
+OPER_SNLINE_CLEAR
+	La lista SNLINE è stata svuotata.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5365,8 +5365,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Killa tutti gli utenti da un certo host
 OPER_HELP_CMD_AKILL
 	    AKILL       Manipola la lista AKILL
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Manipola la lista SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Manipola la lista SNLINE
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Manipola la lista SQLINE
 OPER_HELP_CMD_SZLINE
@@ -5564,51 +5564,51 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR svuota la lista AKILL.
 	
-OPER_HELP_SGLINE
-	Sintassi: SGLINE ADD [+durata] mask:motivo
-	          SGLINE DEL {mask | numero | lista}
-	          SGLINE LIST [mask | lista]
-	          SGLINE VIEW [mask | lista]
-	          SGLINE CLEAR
+OPER_HELP_SNLINE
+	Sintassi: SNLINE ADD [+durata] mask:motivo
+	          SNLINE DEL {mask | numero | lista}
+	          SNLINE LIST [mask | lista]
+	          SNLINE VIEW [mask | lista]
+	          SNLINE CLEAR
 	
-	Permette ai Services operator di manipolare la lista SGLINE.
-	Se un utente che si trova nella lista SGLINE cerca di connettersi,
+	Permette ai Services operator di manipolare la lista SNLINE.
+	Se un utente che si trova nella lista SNLINE cerca di connettersi,
 	i Services non gli permetterano di proseguire la sua sessione
 	su IRC.
 	
-	SGLINE ADD aggiunge la mask di realname specificata alla lista
+	SNLINE ADD aggiunge la mask di realname specificata alla lista
 	sgline per il motivo specificato (che deve essere indicato).
 	durata  è specifcato come un intero seguito da una lettera,
 	che può essere d (giorni), h (ore), o m (minuti). Le
 	combinazioni (ad esempio 1h30m) non sono permesse. Se non
 	viene specificata una unità, il valore viene inteso in giorni
-	(quindi +30 significa 30 giorni). Per aggiungere una SGLINE
+	(quindi +30 significa 30 giorni). Per aggiungere una SNLINE
 	senza scadenza, bisogna usare +0. Se la usermask indicata
 	inizia con un +, la durata deve essere indicata esplicitamente,
 	anche se è la stessa di default. La durata di default per le
-	SGLINE può essere trovata con il comando STATS AKILL.
+	SNLINE può essere trovata con il comando STATS AKILL.
 	Nota: poiché la mask di realname può contenere spazi, il
 	separatore tra la mask e il motivo è un duepunti.
 	
-	Il comando SGLINE DEL rimuove la mask specificata dalla lista
-	SGLINE, se è presente. Se viene indicata una lista di numeri,
+	Il comando SNLINE DEL rimuove la mask specificata dalla lista
+	SNLINE, se è presente. Se viene indicata una lista di numeri,
 	verrano rimossi i record corrispondenti (vedi l'esempio di
 	LIST).
 	
-	Il comando SGLINE LIST mostra la lista SGLINE. Se viene usata
+	Il comando SNLINE LIST mostra la lista SNLINE. Se viene usata
 	una wildcard nella mask, solo i record che corrispondono alla
 	mask vengono mostrati. Se viene indicata una lista di numeri,
 	soltanto quei record vengono mostrati, ad esempio:
 	
-	   SGLINE LIST 2-5,7-9
-	      Mostra i record della lista SGLINE che hanno numeri da 2
+	   SNLINE LIST 2-5,7-9
+	      Mostra i record della lista SNLINE che hanno numeri da 2
 	      a 5 e da 7 a 9.
 	
-	SGLINE VIEW mostra più informazioni di SGLINE LIST, e indica
-	chi ha aggiunto una SGLINE, quando è stata aggiunta, e quando
+	SNLINE VIEW mostra più informazioni di SNLINE LIST, e indica
+	chi ha aggiunto una SNLINE, quando è stata aggiunta, e quando
 	scade, oltre alla mask di realname e al motivo.
 	
-	SGLINE CLEAR svuota la lista SGLINE.
+	SNLINE CLEAR svuota la lista SNLINE.
 
 OPER_HELP_SQLINE
 	Sintassi: SQLINE ADD [+durata] mask motivo
@@ -5666,7 +5666,7 @@ OPER_HELP_SZLINE
 	          SZLINE CLEAR
 	
 	Permette ai Services operator di manipolare la lista SZLINE.
-	Se un utente il cui IP si trova nella lista SGLINE cerca di
+	Se un utente il cui IP si trova nella lista SNLINE cerca di
 	connettersi, i Services non gli permetterano di proseguire
 	la sua sessione su IRC (sia che l'IP abbia un host alfa-
 	numerico corrispondente o meno).

@@ -69,7 +69,10 @@ class CommandNSDrop : public Command
 				notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
 
 			if (ircd->sqline && (na->HasFlag(NS_FORBIDDEN)))
-				ircdproto->SendSQLineDel(na->nick);
+			{
+				XLine x(na->nick);
+				ircdproto->SendSQLineDel(&x);
+			}
 
 			Alog() << Config.s_NickServ << ": " << u->GetMask() << " dropped nickname " << na->nick << " (group " << na->nc->display << ") (e-mail: " << (na->nc->email ? na->nc->email : "none") << ")";
 			delete na;

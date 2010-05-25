@@ -155,16 +155,6 @@ extern void expire_all()
 	expire_nicks();
 	expire_chans();
 	expire_requests();
-	expire_akills();
-	if (ircd->sgline) {
-		expire_sglines();
-	}
-	if (ircd->sqline) {
-		expire_sqlines();
-	}
-	if (ircd->szline) {
-		expire_szlines();
-	}
 	expire_exceptions();
 
 	FOREACH_MOD(I_OnDatabaseExpire, OnDatabaseExpire());

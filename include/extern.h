@@ -17,7 +17,6 @@
 #define E extern CoreExport
 #define EI extern DllExport
 
-#include "slist.h"
 #include "hashcomp.h"
 
 E void ModuleRunTimeDirCleanUp();
@@ -33,7 +32,6 @@ E IRCDProto *ircdproto;
 
 E void kill_user(const std::string &source, const std::string &user, const std::string &reason);
 E bool bad_password(User *u);
-E void sqline(const std::string &mask, const std::string &reason);
 E void common_unban(ChannelInfo *ci, const std::string &nick);
 
 E BotInfo *BotServ;
@@ -372,50 +370,6 @@ E NickCore *findcore(const std::string &nick);
 E NickCore *findcore(const ci::string &nick);
 E bool is_on_access(User *u, NickCore *nc);
 
-/**** operserv.c  ****/
-
-E SList akills, sglines, sqlines, szlines;
-
-E int DefConModesSet;
-E Flags<ChannelModeName> DefConModesOn;
-E Flags<ChannelModeName> DefConModesOff;
-E std::map<ChannelModeName, std::string> DefConModesOnParams;
-E bool SetDefConParam(ChannelModeName, std::string &);
-E bool GetDefConParam(ChannelModeName, std::string *);
-E void UnsetDefConParam(ChannelModeName);
-
-E void operserv(User *u, char *buf);
-E void os_init();
-
-E int add_akill(User *u, const char *mask, const char *by, const time_t expires, const char *reason);
-E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
-E void expire_akills();
-E void oper_global(char *nick, const char *fmt, ...);
-
-E int add_sgline(User *u, const char *mask, const char *by, time_t expires, const char *reason);
-E int check_sgline(const char *nick, const char *realname);
-E void expire_sglines();
-
-E int add_sqline(User *u, const char *mask, const char *by, time_t expires, const char *reason);
-E int check_sqline(const char *nick, int nick_change);
-E void expire_sqlines();
-E int check_chan_sqline(const char *chan);
-
-E int add_szline(User * u, const char *mask, const char *by,
-				 time_t expires, const char *reason);
-E void expire_szlines();
-E int check_szline(const char *nick, char *ip);
-
-E void server_global(Server *s, const std::string &message);
-
-E std::vector<NewsItem *> News;
-
-E bool CheckDefCon(DefconLevel Level);
-E bool CheckDefCon(int level, DefconLevel Level);
-E void AddDefCon(int level, DefconLevel Level);
-E void DelDefCon(int level, DefconLevel Level);
-E std::vector<std::bitset<32> > DefCon;
-
 /**** process.c ****/
 
 E int allow_ignore;
@@ -462,19 +416,6 @@ E Exception *find_hostip_exception(const char *host, const char *hostip);
 E int exception_add(User * u, const char *mask, const int limit,
 						 const char *reason, const char *who,
 						 const time_t expires);
-
-/**** slist.c ****/
-E int slist_add(SList *slist, void *item);
-E void slist_clear(SList *slist, int free);
-E int slist_delete(SList *slist, int index);
-E int slist_delete_range(SList *slist, const char *range, slist_delcheckcb_t cb, ...);
-E int slist_enum(SList *slist, const char *range, slist_enumcb_t cb, ...);
-E int slist_full(SList *slist);
-E int slist_indexof(SList *slist, void *item);
-E void slist_init(SList *slist);
-E void slist_pack(SList *slist);
-E int slist_remove(SList *slist, void *item);
-E int slist_setcapacity(SList *slist, int16 capacity);
 
 /**** sockets.cpp ****/
 E SocketEngine socketEngine;

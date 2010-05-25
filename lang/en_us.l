@@ -2497,22 +2497,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Default AKILL expiry time: 1 minute
 OPER_STATS_AKILL_EXPIRE_NONE
 	Default AKILL expiry time: No expiration
-OPER_STATS_SGLINE_COUNT
-	Current number of SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Default SGLINE expiry time: %d days
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Default SGLINE expiry time: 1 day
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Default SGLINE expiry time: %d hours
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Default SGLINE expiry time: 1 hour
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Default SGLINE expiry time: %d minutes
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Default SGLINE expiry time: 1 minute
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Default SGLINE expiry time: No expiration
+OPER_STATS_SNLINE_COUNT
+	Current number of SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Default SNLINE expiry time: %d days
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Default SNLINE expiry time: 1 day
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Default SNLINE expiry time: %d hours
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Default SNLINE expiry time: 1 hour
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Default SNLINE expiry time: %d minutes
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Default SNLINE expiry time: 1 minute
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Default SNLINE expiry time: No expiration
 OPER_STATS_SQLINE_COUNT
 	Current number of SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2635,46 +2635,46 @@ OPER_AKILL_CLEAR
 	The AKILL list has been cleared.
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]
-OPER_SGLINE_UNSUPPORTED
-	Sorry, SGLINE is not available on this network.
-OPER_SGLINE_EXISTS
-	%s already exists on the SGLINE list.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]
+OPER_SNLINE_UNSUPPORTED
+	Sorry, SNLINE is not available on this network.
+OPER_SNLINE_EXISTS
+	%s already exists on the SNLINE list.
+OPER_SNLINE_ALREADY_COVERED
 	%s is already covered by %s.
-OPER_SGLINE_REACHED_LIMIT
-	Sorry, you can only have %d SGLINEs.
-OPER_SGLINE_ADDED
-	%s added to the SGLINE list.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Sorry, you can only have %d SNLINEs.
+OPER_SNLINE_ADDED
+	%s added to the SNLINE list.
+OPER_SNLINE_CHANGED
 	Expiry time of %s changed.
-OPER_SGLINE_NOT_FOUND
-	%s not found on the SGLINE list.
-OPER_SGLINE_NO_MATCH
-	No matching entries on the SGLINE list.
-OPER_SGLINE_DELETED
-	%s deleted from the SGLINE list.
-OPER_SGLINE_DELETED_ONE
-	Deleted 1 entry from the SGLINE list.
-OPER_SGLINE_DELETED_SEVERAL
-	Deleted %d entries from the SGLINE list.
-OPER_SGLINE_LIST_EMPTY
-	SGLINE list is empty.
-OPER_SGLINE_LIST_HEADER
-	Current SGLINE list:
+OPER_SNLINE_NOT_FOUND
+	%s not found on the SNLINE list.
+OPER_SNLINE_NO_MATCH
+	No matching entries on the SNLINE list.
+OPER_SNLINE_DELETED
+	%s deleted from the SNLINE list.
+OPER_SNLINE_DELETED_ONE
+	Deleted 1 entry from the SNLINE list.
+OPER_SNLINE_DELETED_SEVERAL
+	Deleted %d entries from the SNLINE list.
+OPER_SNLINE_LIST_EMPTY
+	SNLINE list is empty.
+OPER_SNLINE_LIST_HEADER
+	Current SNLINE list:
 	  Num   Mask                              Reason
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Current SGLINE list:
+OPER_SNLINE_VIEW_HEADER
+	Current SNLINE list:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (by %s on %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	The SGLINE list has been cleared.
+OPER_SNLINE_CLEAR
+	The SNLINE list has been cleared.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5287,8 +5287,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Kill all users that have a certain host
 OPER_HELP_CMD_AKILL
 	    AKILL       Manipulate the AKILL list
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Manipulate the SGLINE list
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Manipulate the SNLINE list
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Manipulate the SQLINE list
 OPER_HELP_CMD_SZLINE
@@ -5488,51 +5488,51 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR clears all entries of the AKILL list.
 	
-OPER_HELP_SGLINE
-	Syntax: SGLINE ADD [+expiry] mask:reason
-	    SGLINE DEL {mask | entry-num | list}
-	        SGLINE LIST [mask | list]
-	        SGLINE VIEW [mask | list]
-	        SGLINE CLEAR
+OPER_HELP_SNLINE
+	Syntax: SNLINE ADD [+expiry] mask:reason
+	    SNLINE DEL {mask | entry-num | list}
+	        SNLINE LIST [mask | list]
+	        SNLINE VIEW [mask | list]
+	        SNLINE CLEAR
 	
-	Allows Services operators to manipulate the SGLINE list.  If
-	a user with a realname matching an SGLINE mask attempts to 
+	Allows Services operators to manipulate the SNLINE list.  If
+	a user with a realname matching an SNLINE mask attempts to 
 	connect, Services will not allow it to pursue his IRC
 	session.
 	
-	SGLINE ADD adds the given realname mask to the SGLINE
+	SNLINE ADD adds the given realname mask to the SNLINE
 	list for the given reason (which must be given).
 	expiry is specified as an integer followed by one of d 
 	(days), h (hours), or m (minutes).  Combinations (such as 
 	1h30m) are not permitted.  If a unit specifier is not 
 	included, the default is days (so +30 by itself means 30 
-	days).  To add an SGLINE which does not expire, use +0.  If the
+	days).  To add an SNLINE which does not expire, use +0.  If the
 	realname mask to be added starts with a +, an expiry time must
 	be given, even if it is the same as the default.  The
-	current SGLINE default expiry time can be found with the
+	current SNLINE default expiry time can be found with the
 	STATS AKILL command.
 	Note: because the realname mask may contain spaces, the
 	separator between it and the reason is a colon.
 	
-	The SGLINE DEL command removes the given mask from the
-	SGLINE list if it is present.  If a list of entry numbers is 
+	The SNLINE DEL command removes the given mask from the
+	SNLINE list if it is present.  If a list of entry numbers is 
 	given, those entries are deleted.  (See the example for LIST 
 	below.)
 	
-	The SGLINE LIST command displays the SGLINE list.  
+	The SNLINE LIST command displays the SNLINE list.  
 	If a wildcard mask is given, only those entries matching the
 	mask are displayed.  If a list of entry numbers is given,
 	only those entries are shown; for example:
 
-	   SGLINE LIST 2-5,7-9
-	      Lists SGLINE entries numbered 2 through 5 and 7 
+	   SNLINE LIST 2-5,7-9
+	      Lists SNLINE entries numbered 2 through 5 and 7 
 	      through 9.
 	      
-	SGLINE VIEW is a more verbose version of SGLINE LIST, and 
-	will show who added an SGLINE, the date it was added, and when 
+	SNLINE VIEW is a more verbose version of SNLINE LIST, and 
+	will show who added an SNLINE, the date it was added, and when 
 	it expires, as well as the realname mask and reason.
 	
-	SGLINE CLEAR clears all entries of the SGLINE list.
+	SNLINE CLEAR clears all entries of the SNLINE list.
 
 OPER_HELP_SQLINE
 	Syntax: SQLINE ADD [+expiry] mask reason

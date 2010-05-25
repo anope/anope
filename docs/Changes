@@ -6,6 +6,7 @@ A Added official support for InspIRCd 2.0
 A Prevent negaitve mode changes, kicks, bans, and autokicks from affecting people with the 'god' user mode (On UnrealIRCd, usermode +q)
 A Added nickserv/auxpex permission
 A Added nickserv ungroup command
+A Renamed the SGLINE to be SNLINE
 
 Anope Version 1.9.2
 --------------------

@@ -69,7 +69,10 @@ class CommandNSForbid : public Command
 
 
 			if (ircd->sqline)
-				ircdproto->SendSQLine(na->nick, reason ? reason : "Forbidden");
+			{
+				XLine x(na->nick, reason ? reason : "Forbidden");
+				ircdproto->SendSQLine(&x);
+			}
 
 			if (Config.WallForbid)
 				ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick);

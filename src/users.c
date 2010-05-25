@@ -849,19 +849,10 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		if (MOD_RESULT == EVENT_STOP)
 			return finduser(nick);
 
-		check_akill(nick, username, host, vhost, ipbuf);
-
-		if (ircd->sgline)
-			check_sgline(nick, realname);
-
-		if (ircd->sqline)
-			check_sqline(nick, 0);
-
-		if (ircd->szline && ircd->nickip)
-			check_szline(nick, ipbuf);
-
 		if (Config.LimitSessions && !serv->IsULined())
 			add_session(nick, host, ipbuf);
+
+		XLineManager::CheckAll(user);
 
 		/* User is no longer connected, return */
 		if (!finduser(nick))
@@ -937,7 +928,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 			if (ircd->sqline)
 			{
-				if (!is_oper(user) && check_sqline(user->nick.c_str(), 1))
+				if (!is_oper(user) && SQLine->Check(user))
 					return NULL;
 			}
 		}

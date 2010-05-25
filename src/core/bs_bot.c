@@ -242,7 +242,8 @@ class CommandBSBot : public Command
 			the old nick. */
 			if (ircd->sqline)
 			{
-				ircdproto->SendSQLineDel(bi->nick);
+				XLine x(bi->nick.c_str());
+				ircdproto->SendSQLineDel(&x);
 			}
 
 			/* We check whether user with this nick is online, and kill it if so */
@@ -251,9 +252,11 @@ class CommandBSBot : public Command
 
 		if (user)
 			ircdproto->SendQuit(bi, "Quit: Be right back");
-		else {
+		else
+		{
 			ircdproto->SendChangeBotNick(bi, nick);
-			ircdproto->SendSQLine(bi->nick, "Reserved for services");
+			XLine x(bi->nick.c_str(), "Reserved for services");
+			ircdproto->SendSQLine(&x);
 		}
 
 		if (bi->nick != nick)
@@ -273,7 +276,8 @@ class CommandBSBot : public Command
 				bi->uid = ts6_uid_retrieve();
 			}
 			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
-			ircdproto->SendSQLine(bi->nick, "Reserved for services");
+			XLine x(bi->nick.c_str(), "Reserved for services");
+			ircdproto->SendSQLine(&x);
 			bi->RejoinAll();
 		}
 
@@ -309,7 +313,8 @@ class CommandBSBot : public Command
 		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
 
 		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick.c_str());
-		ircdproto->SendSQLineDel(bi->nick);
+		XLine x(bi->nick.c_str());
+		ircdproto->SendSQLineDel(&x);
 
 		delete bi;
 		notice_lang(Config.s_BotServ, u, BOT_BOT_DELETED, nick);

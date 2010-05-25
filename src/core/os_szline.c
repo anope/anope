@@ -14,24 +14,122 @@
 
 #include "module.h"
 
-int szline_view_callback(SList *slist, int number, void *item, va_list args);
-int szline_list_callback(SList *slist, int number, void *item, va_list args);
-int szline_view(int number, SXLine *sx, User *u, int *sent_header);
-int szline_list(int number, SXLine *sx, User *u, int *sent_header);
-
-static int sxline_del_callback(SList *slist, void *item, va_list args)
+class SZLineDelCallback : public NumberList
 {
-	User *u = va_arg(args, User *);
-	FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(item), SX_SZLINE));
-	return 1;
-}
+	User *u;
+	unsigned Deleted;
+ public:
+	SZLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	{
+	}
+
+	~SZLineDelCallback()
+	{
+		if (!Deleted)
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
+		else if (Deleted == 0)
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_ONE);
+		else
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, Deleted);
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SZLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		++Deleted;
+		DoDel(u, x);
+	}
+
+	static void DoDel(User *u, XLine *x)
+	{
+		SZLine->DelXLine(x);
+	}
+};
+
+class SZLineListCallback : public NumberList
+{
+ protected:
+	User *u;
+	bool SentHeader;
+ public:
+	SZLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	{
+	}
+
+	~SZLineListCallback()
+	{
+		if (!SentHeader)
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
+	}
+
+	virtual void HandleNumber(unsigned Number)
+	{
+		XLine *x = SZLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
+		}
+
+		DoList(u, x, Number);
+	}
+
+	static void DoList(User *u, XLine *x, unsigned Number)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+	}
+};
+
+class SZLineViewCallback : public SZLineListCallback
+{
+ public:
+	SZLineViewCallback(User *_u, const std::string &numlist) : SZLineListCallback(_u, numlist)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SZLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
+		}
+
+		DoList(u, x, Number);
+	}
+
+	static void DoList(User *u, XLine *x, unsigned Number)
+	{
+		char timebuf[32], expirebuf[256];
+		struct tm tm;
+
+		tm = *localtime(&x->Created);
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
+		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf,
+expirebuf, x->Reason.c_str());
+	}
+};
+
 
 class CommandOSSZLine : public Command
 {
  private:
 	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
-		int deleted = 0;
 		unsigned last_param = 2;
 		const char *expiry, *mask;
 		char reason[BUFSIZE];
@@ -70,25 +168,11 @@ class CommandOSSZLine : public Command
 		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
 		if (mask && *reason)
 		{
-			/* We first do some sanity check on the proposed mask. */
+			XLine *x = SZLine->Add(OperServ, u, mask, expires, reason);
 
-			if (strchr(mask, '!') || strchr(mask, '@'))
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_ONLY_IPS);
+			if (!x)
 				return MOD_CONT;
-			}
 
-			if (strspn(mask, "*?") == strlen(mask))
-			{
-				notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
-				return MOD_CONT;
-			}
-
-			deleted = add_szline(u, mask, u->nick.c_str(), expires, reason);
-			if (deleted < 0)
-				return MOD_CONT;
-			else if (deleted)
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, deleted);
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_ADDED, mask);
 
 			if (Config.WallOSSZLine)
@@ -136,48 +220,36 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res = 0;
-
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
-
-		if (!mask)
-		{
-			this->OnSyntaxError(u, "DEL");
-			return MOD_CONT;
-		}
-
-		if (!szlines.count)
+		if (SZLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
+		const ci::string mask = params.size() > 1 ? params[1].c_str() : "";
+
+		if (mask.empty())
 		{
-			/* Deleting a range */
-			res = slist_delete_range(&szlines, mask, sxline_del_callback);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
-				return MOD_CONT;
-			}
-			else if (res == 1)
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_ONE);
-			else
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, res);
+			this->OnSyntaxError(u, "DEL");
+			return MOD_CONT;
 		}
+
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new SZLineDelCallback(u, mask.c_str()))->Process();
 		else
 		{
-			if ((res = slist_indexof(&szlines, const_cast<char *>(mask))) == -1)
+			XLine *x = SZLine->HasEntry(mask);
+
+			if (!x)
 			{
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
-			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(szlines.list[res]), SX_SZLINE));
-			slist_delete(&szlines, res);
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED, mask);
+			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SZLINE));
+
+			SZLineDelCallback::DoDel(u, x);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED, mask.c_str());
 		}
 
 		if (readonly)
@@ -188,39 +260,37 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res, sent_header = 0;
-
-		if (!szlines.count)
+		if (SZLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
+		const ci::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
-		{
-			res = slist_enum(&szlines, mask, &szline_list_callback, u, &sent_header);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
-				return MOD_CONT;
-			}
-		}
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new SZLineListCallback(u, mask.c_str()))->Process();
 		else
 		{
-			int i;
-			char *amask;
+			bool SentHeader = false;
 
-			for (i = 0; i < szlines.count; ++i)
+			for (unsigned i = 0; i < SZLine->GetCount(); ++i)
 			{
-				amask = (static_cast<SXLine *>(szlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
-					szline_list(i + 1, static_cast<SXLine *>(szlines.list[i]), u, &sent_header);
+				XLine *x = SZLine->GetEntry(i);
+
+				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
+					}
+
+					SZLineListCallback::DoList(u, x, i);
+				}
 			}
 
-			if (!sent_header)
+			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		}
 
@@ -229,39 +299,37 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res, sent_header = 0;
-
-		if (!szlines.count)
+		if (SZLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
+		const ci::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
-		{
-			res = slist_enum(&szlines, mask, &szline_view_callback, u, &sent_header);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
-				return MOD_CONT;
-			}
-		}
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new SZLineViewCallback(u, mask.c_str()))->Process();
 		else
 		{
-			int i;
-			char *amask;
+			bool SentHeader = false;
 
-			for (i = 0; i < szlines.count; ++i)
+			for (unsigned i = 0; i < SZLine->GetCount(); ++i)
 			{
-				amask = (static_cast<SXLine *>(szlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
-					szline_view(i + 1, static_cast<SXLine *>(szlines.list[i]), u, &sent_header);
+				XLine *x = SZLine->GetEntry(i);
+
+				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
+					}
+
+					SZLineViewCallback::DoList(u, x, i);
+				}
 			}
 
-			if (!sent_header)
+			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		}
 
@@ -270,8 +338,8 @@ class CommandOSSZLine : public Command
 
 	CommandReturn DoClear(User *u)
 	{
-		FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, NULL, SX_SZLINE));
-		slist_clear(&szlines, 1);
+		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SZLINE));
+		SZLine->Clear();
 		notice_lang(Config.s_OperServ, u, OPER_SZLINE_CLEAR);
 
 		return MOD_CONT;
@@ -333,62 +401,5 @@ class OSSZLine : public Module
 		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SZLINE);
 	}
 };
-
-int szline_view(int number, SXLine *sx, User *u, int *sent_header)
-{
-	char timebuf[32], expirebuf[256];
-	struct tm tm;
-
-	if (!sx)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
-		*sent_header = 1;
-	}
-
-	tm = *localtime(&sx->seton);
-	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-	expire_left(u->Account(), expirebuf, sizeof(expirebuf), sx->expires);
-	notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
-
-	return 1;
-}
-
-/* Callback for enumeration purposes */
-int szline_view_callback(SList *slist, int number, void *item, va_list args)
-{
-	User *u = va_arg(args, User *);
-	int *sent_header = va_arg(args, int *);
-
-	return szline_view(number, static_cast<SXLine *>(item), u, sent_header);
-}
-
-/* Callback for enumeration purposes */
-int szline_list_callback(SList *slist, int number, void *item, va_list args)
-{
-	User *u = va_arg(args, User *);
-	int *sent_header = va_arg(args, int *);
-
-	return szline_list(number, static_cast<SXLine *>(item), u, sent_header);
-}
-
-/* Lists an SZLINE entry, prefixing it with the header if needed */
-int szline_list(int number, SXLine *sx, User *u, int *sent_header)
-{
-	if (!sx)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
-		*sent_header = 1;
-	}
-
-	notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_FORMAT, number, sx->mask, sx->reason);
-
-	return 1;
-}
 
 MODULE_INIT(OSSZLine)

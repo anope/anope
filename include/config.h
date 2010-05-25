@@ -623,16 +623,16 @@ class ServerConfig
 		time_t AutokillExpiry;
 		/* Default expiry time for chan kills */
 		time_t ChankillExpiry;
-		/* Default expiry time for SGLine Expire */
-		time_t SGLineExpiry;
+		/* Default expiry time for SNLine Expire */
+		time_t SNLineExpiry;
 		/* Default expiry time for SQLines */
 		time_t SQLineExpiry;
 		/* Default expiry time for SZLine */
 		time_t SZLineExpiry;
 		/* Actually akill the user when the akill is added */
 		bool AkillOnAdd;
-		/* Kill users on SGline */
-		bool KillonSGline;
+		/* Kill users on SNLine */
+		bool KillonSNline;
 		/* Kill users on SQline */
 		bool KillonSQline;
 		/* Send a WALLOPS/GLOBOPS when a user opers */
@@ -649,8 +649,8 @@ class ServerConfig
 		bool WallOSKick;
 		/* Send a WALLOPS/GLOBOPS when someone uses the AKILL command */
 		bool WallOSAkill;
-		/* Send a WALLOPS/GLOBOPS when someone uses the SGLINE command */
-		bool WallOSSGLine;
+		/* Send a WALLOPS/GLOBOPS when someone uses the SNLINE command */
+		bool WallOSSNLine;
 		/* Send a WALLOPS/GLOBOPS when someone uses the SQLINE command */
 		bool WallOSSQLine;
 		/* Send a WALLOPS/GLOBOPS when someone uses the SZLINE command */
@@ -661,8 +661,8 @@ class ServerConfig
 		bool WallOSJupe;
 		/* Send a WALLOPS/GLOBOPS when an akill expires */
 		bool WallAkillExpire;
-		/* Send a WALLOPS/GLOBOPS when SGLines expire */
-		bool WallSGLineExpire;
+		/* Send a WALLOPS/GLOBOPS when SNLines expire */
+		bool WallSNLineExpire;
 		/* Send a WALLOPS/GLOBOPS when SQLines expire */
 		bool WallSQLineExpire;
 		/* Send a WALLOPS/GLOBOPS when SZLines expire */

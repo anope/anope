@@ -3309,29 +3309,29 @@ OPER_STATS_AKILL_EXPIRE_MIN
 OPER_STATS_AKILL_EXPIRE_NONE
 	Domy¶lny czas wygasania AKILL: nie wygasa
 
-OPER_STATS_SGLINE_COUNT
-	Aktualna ilo¶æ wpisów SGLINE: %d
+OPER_STATS_SNLINE_COUNT
+	Aktualna ilo¶æ wpisów SNLINE: %d
 
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Domy¶lny czas wygasania SGLINE: %d dni
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Domy¶lny czas wygasania SNLINE: %d dni
 
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Domy¶lny czas wygasania SGLINE: 1 dzieñ
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Domy¶lny czas wygasania SNLINE: 1 dzieñ
 
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Domy¶lny czas wygasania SGLINE: %d godzin(y)
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Domy¶lny czas wygasania SNLINE: %d godzin(y)
 
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Domy¶lny czas wygasania SGLINE: 1 godzina
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Domy¶lny czas wygasania SNLINE: 1 godzina
 
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Domy¶lny czas wygasania SGLINE: %d minut(y)
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Domy¶lny czas wygasania SNLINE: %d minut(y)
 
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Domy¶lny czas wygasania SGLINE: 1 minuta
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Domy¶lny czas wygasania SNLINE: 1 minuta
 
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Domy¶lny czas wygasania SGLINE: nie wygasa
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Domy¶lny czas wygasania SNLINE: nie wygasa
 
 OPER_STATS_SQLINE_COUNT
 	Aktualna ilo¶æ wpisów SQLINE: %d
@@ -3500,63 +3500,63 @@ OPER_AKILL_CLEAR
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+czas-trwania] {#kana³} [powód]
 
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+czas-trwania] {maska | pozycja} [powód]]
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+czas-trwania] {maska | pozycja} [powód]]
 
-OPER_SGLINE_UNSUPPORTED
-	Komenda SGLINE nie jest dostêpna w tej sieci.
+OPER_SNLINE_UNSUPPORTED
+	Komenda SNLINE nie jest dostêpna w tej sieci.
 
-OPER_SGLINE_EXISTS
-	%s ju¿ istnieje na li¶cie SGLINE.
+OPER_SNLINE_EXISTS
+	%s ju¿ istnieje na li¶cie SNLINE.
 
-OPER_SGLINE_ALREADY_COVERED
+OPER_SNLINE_ALREADY_COVERED
 	%s ju¿ jest obejmowane przez %s.
 
-OPER_SGLINE_REACHED_LIMIT
-	Mo¿esz mieæ tylko %d wpisów na li¶cie SGLINE.
+OPER_SNLINE_REACHED_LIMIT
+	Mo¿esz mieæ tylko %d wpisów na li¶cie SNLINE.
 
-OPER_SGLINE_ADDED
-	%s dodano do listy SGLINE.
+OPER_SNLINE_ADDED
+	%s dodano do listy SNLINE.
 
-OPER_SGLINE_CHANGED
+OPER_SNLINE_CHANGED
 	Zmieniono czas wygasania %s.
 
-OPER_SGLINE_NOT_FOUND
-	%s nie znaleziono na li¶cie SGLINE.
+OPER_SNLINE_NOT_FOUND
+	%s nie znaleziono na li¶cie SNLINE.
 
-OPER_SGLINE_NO_MATCH
-	Nie znaleziono pasuj±cych wpisów na li¶cie SGLINE.
+OPER_SNLINE_NO_MATCH
+	Nie znaleziono pasuj±cych wpisów na li¶cie SNLINE.
 
-OPER_SGLINE_DELETED
-	%s usuniêto z listy SGLINE.
+OPER_SNLINE_DELETED
+	%s usuniêto z listy SNLINE.
 
-OPER_SGLINE_DELETED_ONE
-	Usuniêto 1 wpis z listy SGLINE.
+OPER_SNLINE_DELETED_ONE
+	Usuniêto 1 wpis z listy SNLINE.
 
-OPER_SGLINE_DELETED_SEVERAL
-	Usuniêto %d wpisy(ów) z listy SGLINE.
+OPER_SNLINE_DELETED_SEVERAL
+	Usuniêto %d wpisy(ów) z listy SNLINE.
 
-OPER_SGLINE_LIST_EMPTY
-	Lista SGLINE jest pusta.
+OPER_SNLINE_LIST_EMPTY
+	Lista SNLINE jest pusta.
 
-OPER_SGLINE_LIST_HEADER
-	Aktualna lista SGLINE:
+OPER_SNLINE_LIST_HEADER
+	Aktualna lista SNLINE:
 	  Nr    Maska                             Powód
 
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
 
-OPER_SGLINE_VIEW_HEADER
-	Aktualna lista SGLINE:
+OPER_SNLINE_VIEW_HEADER
+	Aktualna lista SNLINE:
 
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (przez %s na %s; %s)
 	      %s
 
-OPER_SGLINE_CLEAR
-	Lista SGLINE zosta³a wyczyszczona.
+OPER_SNLINE_CLEAR
+	Lista SNLINE zosta³a wyczyszczona.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -6452,8 +6452,8 @@ OPER_HELP_CMD_KILLCLONES
 OPER_HELP_CMD_AKILL
 	    AKILL       Zarz±dza list± AKILL
 
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Zarz±dza list± SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Zarz±dza list± SNLINE
 
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Zarz±dza list± SQLINE
@@ -6655,19 +6655,19 @@ OPER_HELP_AKILL
 	AKILL CLEAR usuwa wszystkie wpisy z listy AKILL.
 	
 
-OPER_HELP_SGLINE
-	Sk³adnia: SGLINE ADD [+czas-trwania] maska powód
-	          SGLINE DEL {maska | numer-wpisu | lista}
-	          SGLINE LIST [maska | lista]
-	          SGLINE VIEW [maska | lista]
-	          SGLINE CLEAR
+OPER_HELP_SNLINE
+	Sk³adnia: SNLINE ADD [+czas-trwania] maska powód
+	          SNLINE DEL {maska | numer-wpisu | lista}
+	          SNLINE LIST [maska | lista]
+	          SNLINE VIEW [maska | lista]
+	          SNLINE CLEAR
 	
-	Pozwala operatorom serwisów na zarz±dzanie list± SGLINE.
+	Pozwala operatorom serwisów na zarz±dzanie list± SNLINE.
 	Je¶li u¿ytkownik z realname pasuj±cym do maski na li¶cie
 	pod³±czy siê do sieci serwisy natychmiast go roz³±cz±.
 	
-	SGLINE ADD dodaje wskazan± maskê realname oraz 
-	powód (który musi zostaæ podany) na listê SGLINE.
+	SNLINE ADD dodaje wskazan± maskê realname oraz 
+	powód (który musi zostaæ podany) na listê SNLINE.
 	Podaj±c czas mo¿na stosowaæ jednostki: s dla sekund,
 	m dla minut, h dla godzin oraz d dla dni.
 	Kombinacja tych jednostek nie jest mo¿liwa. Domy¶ln±
@@ -6679,22 +6679,22 @@ OPER_HELP_SGLINE
 	Uwaga: realname mo¿e zawieraæ spacje, dlatego
 	separatorem pomiêdzy mask± i powodem jest dwukropek.
 	
-	SGLINE DEL usuwa wskazane wpisy z listy SGLINE.
+	SNLINE DEL usuwa wskazane wpisy z listy SNLINE.
 	Jako argument przyjmuje maskê, numer wpisu lub
 	listê (przyk³ad poni¿ej dla polecenia LIST).
 	
-	SGLINE LIST wy¶wietla zawarto¶æ listy SGLINE. Je¶li
+	SNLINE LIST wy¶wietla zawarto¶æ listy SNLINE. Je¶li
 	zostanie podana maska tylko pasuj±ce wpisy zostan±
 	pokazane. Mo¿na tak¿e u¿yæ listy, przyk³ad:
 
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      Listuje wpisy od 2 do 5 oraz od 7 do 9.
 	
-	SGLINE VIEW zwraca wiêcej szczegó³ów ni¿ SGLINE LIST.
-	Wy¶wietla informacje o dodaj±cym SGLINE, datê dodania,
+	SNLINE VIEW zwraca wiêcej szczegó³ów ni¿ SNLINE LIST.
+	Wy¶wietla informacje o dodaj±cym SNLINE, datê dodania,
 	datê wyga¶niêcia, maskê oraz powód.
 	
-	SGLINE CLEAR usuwa wszystkie wpisy z listy.
+	SNLINE CLEAR usuwa wszystkie wpisy z listy.
 
 OPER_HELP_SQLINE
 	Sk³adnia: SQLINE ADD [+czas-trwania] maska powód

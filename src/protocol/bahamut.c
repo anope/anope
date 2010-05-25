@@ -23,7 +23,7 @@ IRCDVar myIrcd[] = {
 	 "+o",					  /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 0,						 /* Vhost  */
-	 1,						 /* Supports SGlines	 */
+	 1,						 /* Supports SNlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
 	 3,						 /* Number of server args */
@@ -141,35 +141,33 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(const std::string &mask, const std::string &reason)
+	void SendSQLine(XLine *x)
 	{
-		if (mask.empty() || reason.empty())
-			return;
-		send_cmd(NULL, "SQLINE %s :%s", mask.c_str(), reason.c_str());
+		send_cmd(NULL, "SQLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
-	/* UNSGLINE */
-	void SendSGLineDel(SXLine *sx)
+	/* UNSLINE */
+	void SendSGLineDel(XLine *x)
 	{
-		send_cmd(NULL, "UNSGLINE 0 :%s", sx->mask);
+		send_cmd(NULL, "UNSGLINE 0 :%s", x->Mask.c_str());
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(SXLine *sx)
+	void SendSZLineDel(XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd(NULL, "UNSZLINE 0 %s", sx->mask);
+		send_cmd(NULL, "UNSZLINE 0 %s", x->Mask.c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd(NULL, "RAKILL %s *", sx->mask);
+		send_cmd(NULL, "RAKILL %s *", x->Mask.c_str());
 	}
 
 	/* SZLINE */
-	void SendSZLine(SXLine *sx)
+	void SendSZLine(XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd(NULL, "SZLINE %s :%s", sx->mask, sx->reason);
+		send_cmd(NULL, "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd(NULL, "AKILL %s * %d %s %ld :%s", sx->mask, 172800, sx->by, static_cast<long>(time(NULL)), sx->reason);
+		send_cmd(NULL, "AKILL %s * %d %s %ld :%s", x->Mask.c_str(), 172800, x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SVSNOOP */
@@ -179,15 +177,15 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SGLINE */
-	void SendSGLine(SXLine *sx)
+	void SendSGLine(XLine *x)
 	{
-		send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(sx->mask)), sx->mask, sx->reason);
+		send_cmd(NULL, "SGLINE %d :%s:%s", x->Mask.length(), x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/* RAKILL */
-	void SendAkillDel(Akill *ak)
+	void SendAkillDel(XLine *x)
 	{
-		send_cmd(NULL, "RAKILL %s %s", ak->host, ak->user);
+		send_cmd(NULL, "RAKILL %s %s", x->GetHost().c_str(), x->GetUser().c_str());
 	}
 
 	/* TOPIC */
@@ -197,11 +195,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const std::string &user)
+	void SendSQLineDel(XLine *x)
 	{
-		if (user.empty())
-			return;
-		send_cmd(NULL, "UNSQLINE %s", user.c_str());
+		send_cmd(NULL, "UNSQLINE %s", x->Mask.c_str());
 	}
 
 	/* JOIN - SJOIN */
@@ -210,12 +206,12 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel);
 	}
 
-	void SendAkill(Akill *ak)
+	void SendAkill(XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = ak->expires - time(NULL);
+		time_t timeleft = x->Expires - time(NULL);
 		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", ak->host, ak->user, static_cast<int>(timeleft), ak->by, static_cast<long>(time(NULL)), ak->reason);
+		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/*

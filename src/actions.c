@@ -70,46 +70,6 @@ void kill_user(const std::string &source, const std::string &user, const std::st
 /*************************************************************************/
 
 /**
- * Check and enforce SQlines
- * @param mask of the sqline
- * @param reason for the sqline
- * @return void
- */
-void sqline(const std::string &mask, const std::string &reason)
-{
-	if (ircd->chansqline)
-	{
-		if (mask[0] == '#')
-		{
-			ircdproto->SendSQLine(mask, reason);
-
-			for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
-			{
-				Channel *c = cit->second;
-
-				if (!Anope::Match(c->name, mask, false))
-					continue;
-				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
-				{
-					UserContainer *uc = *it;
-					++it;
-
-					if (is_oper(uc->user))
-						continue;
-					c->Kick(NULL, uc->user, "%s", reason.c_str());
-				}
-			}
-		}
-		else
-			ircdproto->SendSQLine(mask, reason);
-	}
-	else
-		ircdproto->SendSQLine(mask, reason);
-}
-
-/*************************************************************************/
-
-/**
  * Unban the nick from a channel
  * @param ci channel info for the channel
  * @param nick to remove the ban for

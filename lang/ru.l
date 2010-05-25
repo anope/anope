@@ -2495,22 +2495,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Время истечения AKILL'а по-умолчанию  : 1 минута
 OPER_STATS_AKILL_EXPIRE_NONE
 	Время истечения AKILL'а по-умолчанию  : никогда
-OPER_STATS_SGLINE_COUNT
-	Текущее количество SGLINE'ов          : %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Время истечения SGLINE'а по-умолчанию : %d дней
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Время истечения SGLINE'а по-умолчанию : 1 день
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Время истечения SGLINE'а по-умолчанию : %d часов
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Время истечения SGLINE'а по-умолчанию : 1 час
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Время истечения SGLINE'а по-умолчанию : %d минут
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Время истечения SGLINE'а по-умолчанию : 1 минута
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Время истечения SGLINE'а по-умолчанию : никогда
+OPER_STATS_SNLINE_COUNT
+	Текущее количество SNLINE'ов          : %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Время истечения SNLINE'а по-умолчанию : %d дней
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Время истечения SNLINE'а по-умолчанию : 1 день
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Время истечения SNLINE'а по-умолчанию : %d часов
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Время истечения SNLINE'а по-умолчанию : 1 час
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Время истечения SNLINE'а по-умолчанию : %d минут
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Время истечения SNLINE'а по-умолчанию : 1 минута
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Время истечения SNLINE'а по-умолчанию : никогда
 OPER_STATS_SQLINE_COUNT
 	Текущее количество SQLINE'ов          : %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2632,46 +2632,46 @@ OPER_AKILL_CLEAR
 	Список AKILL'ов полностью очищен.
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+срок_истечения] {#канал} [причина]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD|DEL|LIST|VIEW|CLEAR} [[+срок_истечения] {маска | номер_записи}[:причина]]
-OPER_SGLINE_UNSUPPORTED
-	SGLINE-возможности сервисов в вашей сети недоступны.
-OPER_SGLINE_EXISTS
-	Запись вида %s уже содержится в списке SGLINE'ов.
-OPER_SGLINE_ALREADY_COVERED
-	Указанная маска вида %s совпадает с одной из масок в списке SGLINE'ов: %s.
-OPER_SGLINE_REACHED_LIMIT
-	Количество записей в SGLINE-списке не может превышать %d.
-OPER_SGLINE_ADDED
-	Запись вида %s успешно добавлена в список SGLINE'ов.
-OPER_SGLINE_CHANGED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD|DEL|LIST|VIEW|CLEAR} [[+срок_истечения] {маска | номер_записи}[:причина]]
+OPER_SNLINE_UNSUPPORTED
+	SNLINE-возможности сервисов в вашей сети недоступны.
+OPER_SNLINE_EXISTS
+	Запись вида %s уже содержится в списке SNLINE'ов.
+OPER_SNLINE_ALREADY_COVERED
+	Указанная маска вида %s совпадает с одной из масок в списке SNLINE'ов: %s.
+OPER_SNLINE_REACHED_LIMIT
+	Количество записей в SNLINE-списке не может превышать %d.
+OPER_SNLINE_ADDED
+	Запись вида %s успешно добавлена в список SNLINE'ов.
+OPER_SNLINE_CHANGED
 	Срок истечения записи %s успешно изменен.
-OPER_SGLINE_NOT_FOUND
-	Запись вида %s в списке SGLINE'ов не обнаружена.
-OPER_SGLINE_NO_MATCH
+OPER_SNLINE_NOT_FOUND
+	Запись вида %s в списке SNLINE'ов не обнаружена.
+OPER_SNLINE_NO_MATCH
 	Совпадающих записей не обнаружено.
-OPER_SGLINE_DELETED
-	Запись вида %s успешно удалена из списка SGLINE'ов.
-OPER_SGLINE_DELETED_ONE
-	Удалена 1 запись из спика SGLINE'ов.
-OPER_SGLINE_DELETED_SEVERAL
-	Удалено %d записей из списка SGLINE'ов.
-OPER_SGLINE_LIST_EMPTY
-	Список SGLINE'ов пуст.
-OPER_SGLINE_LIST_HEADER
-	Текущий список SGLINE'ов:
+OPER_SNLINE_DELETED
+	Запись вида %s успешно удалена из списка SNLINE'ов.
+OPER_SNLINE_DELETED_ONE
+	Удалена 1 запись из спика SNLINE'ов.
+OPER_SNLINE_DELETED_SEVERAL
+	Удалено %d записей из списка SNLINE'ов.
+OPER_SNLINE_LIST_EMPTY
+	Список SNLINE'ов пуст.
+OPER_SNLINE_LIST_HEADER
+	Текущий список SNLINE'ов:
 	  No.   Маска                             Причина
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Текущий список SGLINE'ов:
+OPER_SNLINE_VIEW_HEADER
+	Текущий список SNLINE'ов:
 # номер, маска, создатель, когда, истекает, причина
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (от %s в %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	Список SGLINE'ов полностью очищен.
+OPER_SNLINE_CLEAR
+	Список SNLINE'ов полностью очищен.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5439,8 +5439,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Отключить всех пользователей с определенного хоста
 OPER_HELP_CMD_AKILL
 	    AKILL       Управление списком AKILL'ов
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Управление списком SGLINE'ов
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Управление списком SNLINE'ов
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Управление списком SQLINE'ов
 OPER_HELP_CMD_SZLINE
@@ -5651,54 +5651,54 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR позволяет  полностью  очистить  список AKILL'ов.
 	
-OPER_HELP_SGLINE
-	Синтаксис: SGLINE ADD [+срок_истечения] маска:причина
-	           SGLINE DEL {маска | номер_записи | список_записей}
-	           SGLINE LIST [маска | список_записей]
-	           SGLINE VIEW [маска | список_записей]
-	           SGLINE CLEAR
+OPER_HELP_SNLINE
+	Синтаксис: SNLINE ADD [+срок_истечения] маска:причина
+	           SNLINE DEL {маска | номер_записи | список_записей}
+	           SNLINE LIST [маска | список_записей]
+	           SNLINE VIEW [маска | список_записей]
+	           SNLINE CLEAR
 	
-	Позволяет Операторам сервисов управлять списком сервисных SGLINE'ов.
-	SGLINE-запись позволяет вам поставить глобальный бан на определенный
+	Позволяет Операторам сервисов управлять списком сервисных SNLINE'ов.
+	SNLINE-запись позволяет вам поставить глобальный бан на определенный
 	RealName  aka  GECOS.  Любой  пользователь,  реальное имя которого
-	попадет под маску какой-либо записи в SGLINE-списке, будет сразу же
+	попадет под маску какой-либо записи в SNLINE-списке, будет сразу же
 	отключен от сети и в дальнейшем, сервисы не позволят ему подключится.
 	
-	Команда SGLINE ADD добавляет маску реального имени с указанной
-	причиной в список SGLINE'ов (наличие причины - обязательно).
+	Команда SNLINE ADD добавляет маску реального имени с указанной
+	причиной в список SNLINE'ов (наличие причины - обязательно).
 	Значение срока истечения - это целое число, которое может быть
 	одним из: d (дней), h (часов), или m (минут). Такие сочетания
 	как 1h30m - недопустимы. Если единица измерения не указана, то
 	по-умолчанию, она будет принята за "d" - "дни" (таким образом,
-	+30 будет означать 30 дней). Чтобы добавить постоянный SGLINE,
+	+30 будет означать 30 дней). Чтобы добавить постоянный SNLINE,
 	используйте время истечения равным +0. Помните, что если в качестве
 	первого  символа  второго параметра указан знак "+" - вы должны
 	обозначить  сроки  истечения  записи, даже  если это будет значение
 	по-умочанию.
-	Текущее время истечения SGLINE'а по-умолчанию, можно узнать с помощью
+	Текущее время истечения SNLINE'а по-умолчанию, можно узнать с помощью
 	команды STATS AKILL.
 	Примечание: так  как  строки реальных имен  могут содержать пробелы,
 	разделителем между маской реального имени и причиной будет двоеточие.
 	
-	Команда  SGLINE DEL  удаляет указанную маску из списка SGLINE'ов.
-	В качестве параметра вы можете указать не только маску SGLINE'а, но
+	Команда  SNLINE DEL  удаляет указанную маску из списка SNLINE'ов.
+	В качестве параметра вы можете указать не только маску SNLINE'а, но
 	и  конкретный  номер записи  или  список  записей  (см. примеры
 	использования команды LIST ниже).
 	
-	Команда SGLINE LIST показывает текущий список SGLINE'ов.
+	Команда SNLINE LIST показывает текущий список SNLINE'ов.
 	В качестве дополнительного параметра, вы можете указать символьную
 	маску, что  позволит  вам  получить  список с конкретными записями,
 	попадающими под эту маску, или же, вы можете указать список записей.
 	Например:
 	
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      отобразит все записи с 2-ой по 5-ю и с 7-ой по 9-ю.
 	
-	SGLINE VIEW более подробная версия  SGLINE LIST, она покажет кто
-	добавил SGLINE, время установки SGLINE'а, когда он истекает, ну и,
-	конечно же, маску реального имени и причину SGLINE'а.
+	SNLINE VIEW более подробная версия  SNLINE LIST, она покажет кто
+	добавил SNLINE, время установки SNLINE'а, когда он истекает, ну и,
+	конечно же, маску реального имени и причину SNLINE'а.
 	
-	SGLINE CLEAR позволяет  полностью  очистить  список SGLINE'ов.
+	SNLINE CLEAR позволяет  полностью  очистить  список SNLINE'ов.
 
 OPER_HELP_SQLINE
 	Синтаксис: SQLINE ADD [+срок_истечения] маска причина

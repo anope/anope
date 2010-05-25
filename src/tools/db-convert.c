@@ -969,7 +969,7 @@ int main(int argc, char *argv[])
 			fs << "OS AKILL " << user << " " << host << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
 			free(user); free(host); free(by); free(reason);
 		}
-		/* SGLINES */
+		/* SNLINES */
 		read_int16(&capacity, f);
 		for (i = 0; i < capacity; i++) 
 		{
@@ -978,7 +978,7 @@ int main(int argc, char *argv[])
 			SAFE(read_string(&reason, f));
 			SAFE(read_int32(&seton, f));
 			SAFE(read_int32(&expires, f));
-			fs << "OS SGLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
+			fs << "OS SNLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
 			free(mask); free(by); free(reason);
 		}
 		/* SQLINES */

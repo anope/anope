@@ -14,24 +14,122 @@
 
 #include "module.h"
 
-int sqline_view_callback(SList *slist, int number, void *item, va_list args);
-int sqline_list_callback(SList *slist, int number, void *item, va_list args);
-int sqline_view(int number, SXLine *sx, User *u, int *sent_header);
-int sqline_list(int number, SXLine *sx, User *u, int *sent_header);
-
-static int sxline_del_callback(SList *slist, void *item, va_list args)
+class SQLineDelCallback : public NumberList
 {
-	User *u = va_arg(args, User *);
-	FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(item), SX_SQLINE));
-	return 1;
-}
+	User *u;
+	unsigned Deleted;
+ public:
+	SQLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	{
+	}
+
+	~SQLineDelCallback()
+	{
+		if (!Deleted)
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
+		else if (Deleted == 0)
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_ONE);
+		else
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, Deleted);
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SQLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		++Deleted;
+		DoDel(u, x);
+	}
+
+	static void DoDel(User *u, XLine *x)
+	{
+		SQLine->DelXLine(x);
+	}
+};
+
+class SQLineListCallback : public NumberList
+{
+ protected:
+	User *u;
+	bool SentHeader;
+ public:
+	SQLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	{
+	}
+
+	~SQLineListCallback()
+	{
+		if (!SentHeader)
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
+	}
+
+	virtual void HandleNumber(unsigned Number)
+	{
+		XLine *x = SQLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_HEADER);
+		}
+
+		DoList(u, x, Number);
+	}
+
+	static void DoList(User *u, XLine *x, unsigned Number)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+	}
+};
+
+class SQLineViewCallback : public SQLineListCallback
+{
+ public:
+	SQLineViewCallback(User *_u, const std::string &numlist) : SQLineListCallback(_u, numlist)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SQLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_HEADER);
+		}
+
+		DoList(u, x, Number);
+	}
+
+	static void DoList(User *u, XLine *x, unsigned Number)
+	{
+		char timebuf[32], expirebuf[256];
+		struct tm tm;
+
+		tm = *localtime(&x->Created);
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
+		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
+		notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, 
+expirebuf, x->Reason.c_str());
+	}
+};
+
 
 class CommandOSSQLine : public Command
 {
  private:
 	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
-		int deleted = 0;
 		unsigned last_param = 2;
 		const char *expiry, *mask;
 		char reason[BUFSIZE];
@@ -70,25 +168,11 @@ class CommandOSSQLine : public Command
 		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
 		if (mask && *reason)
 		{
-			/* We first do some sanity check on the proposed mask. */
-			if (strspn(mask, "*") == strlen(mask))
-			{
-				notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
+			XLine *x = SQLine->Add(OperServ, u, mask, expires, reason);
+			
+			if (!x)
 				return MOD_CONT;
-			}
 
-			/* Channel SQLINEs are only supported on Bahamut servers */
-			if (*mask == '#' && !ircd->chansqline)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
-				return MOD_CONT;
-			}
-
-			deleted = add_sqline(u, mask, u->nick.c_str(), expires, reason);
-			if (deleted < 0)
-				return MOD_CONT;
-			else if (deleted)
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, deleted);
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_ADDED, mask);
 
 			if (Config.WallOSSQLine)
@@ -136,47 +220,36 @@ class CommandOSSQLine : public Command
 
 	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res = 0;
-
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
-
-		if (!mask)
-		{
-			this->OnSyntaxError(u, "DEL");
-			return MOD_CONT;
-		}
-
-		if (!sqlines.count)
+		if (SQLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
+		const ci::string mask = params.size() > 1 ? params[1] : "";
+
+		if (mask.empty())
 		{
-			/* Deleting a range */
-			res = slist_delete_range(&sqlines, mask, sxline_del_callback);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
-				return MOD_CONT;
-			}
-			else if (res == 1)
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_ONE);
-			else
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, res);
+			this->OnSyntaxError(u, "DEL");
+			return MOD_CONT;
 		}
-		else {
-			if ((res = slist_indexof(&sqlines, const_cast<char *>(mask))) == -1)
+
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new SQLineDelCallback(u, mask.c_str()))->Process();
+		else
+		{
+			XLine *x = SQLine->HasEntry(mask);
+
+			if (!x)
 			{
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
-			FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, static_cast<SXLine *>(sqlines.list[res]), SX_SQLINE));
-			slist_delete(&sqlines, res);
-			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED, mask);
+			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SQLINE));
+
+			SQLineDelCallback::DoDel(u, x);
+			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED, mask.c_str());
 		}
 
 		if (readonly)
@@ -187,39 +260,37 @@ class CommandOSSQLine : public Command
 
 	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res, sent_header = 0;
-
-		if (!sqlines.count)
+		if (SQLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
+		const ci::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
-		{
-			res = slist_enum(&sqlines, mask, &sqline_list_callback, u, &sent_header);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
-				return MOD_CONT;
-			}
-		}
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new SQLineListCallback(u, mask.c_str()))->Process();
 		else
 		{
-			int i;
-			char *amask;
+			bool SentHeader = false;
 
-			for (i = 0; i < sqlines.count; ++i)
+			for (unsigned i = 0; i < SQLine->GetCount(); ++i)
 			{
-				amask = (static_cast<SXLine *>(sqlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
-					sqline_list(i + 1, static_cast<SXLine *>(sqlines.list[i]), u, &sent_header);
+				XLine *x = SQLine->GetEntry(i);
+
+				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_HEADER);
+					}
+
+					SQLineListCallback::DoList(u, x, i);
+				}
 			}
 
-			if (!sent_header)
+			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 			else
 				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "SQLine");
@@ -230,39 +301,37 @@ class CommandOSSQLine : public Command
 
 	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res, sent_header = 0;
-
-		if (!sqlines.count)
+		if (SQLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
+		const ci::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
-		{
-			res = slist_enum(&sqlines, mask, &sqline_view_callback, u, &sent_header);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
-				return MOD_CONT;
-			}
-		}
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new SQLineViewCallback(u, mask.c_str()))->Process();
 		else
 		{
-			int i;
-			char *amask;
+			bool SentHeader = false;
 
-			for (i = 0; i < sqlines.count; ++i)
+			for (unsigned i = 0; i < SQLine->GetCount(); ++i)
 			{
-				amask = (static_cast<SXLine *>(sqlines.list[i]))->mask;
-				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
-					sqline_view(i + 1, static_cast<SXLine *>(sqlines.list[i]), u, &sent_header);
+				XLine *x = SQLine->GetEntry(i);
+
+				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_HEADER);
+					}
+
+					SQLineViewCallback::DoList(u, x, i);
+				}
 			}
 
-			if (!sent_header)
+			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
 		}
 
@@ -271,8 +340,8 @@ class CommandOSSQLine : public Command
 
 	CommandReturn DoClear(User *u)
 	{
-		FOREACH_MOD(I_OnDelSXLine, OnDelSXLine(u, NULL, SX_SQLINE));
-		slist_clear(&sqlines, 1);
+		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SQLINE));
+		SGLine->Clear();
 		notice_lang(Config.s_OperServ, u, OPER_SQLINE_CLEAR);
 
 		return MOD_CONT;
@@ -334,62 +403,5 @@ class OSSQLine : public Module
 		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SQLINE);
 	}
 };
-
-int sqline_view(int number, SXLine *sx, User *u, int *sent_header)
-{
-	char timebuf[32], expirebuf[256];
-	struct tm tm;
-
-	if (!sx)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_HEADER);
-		*sent_header = 1;
-	}
-
-	tm = *localtime(&sx->seton);
-	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-	expire_left(u->Account(), expirebuf, sizeof(expirebuf), sx->expires);
-	notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_FORMAT, number, sx->mask, sx->by, timebuf, expirebuf, sx->reason);
-
-	return 1;
-}
-
-/* Callback for enumeration purposes */
-int sqline_view_callback(SList *slist, int number, void *item, va_list args)
-{
-	User *u = va_arg(args, User *);
-	int *sent_header = va_arg(args, int *);
-
-	return sqline_view(number, static_cast<SXLine *>(item), u, sent_header);
-}
-
-/* Lists an SQLINE entry, prefixing it with the header if needed */
-int sqline_list(int number, SXLine *sx, User *u, int *sent_header)
-{
-	if (!sx)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_HEADER);
-		*sent_header = 1;
-	}
-
-	notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_FORMAT, number, sx->mask, sx->reason);
-
-	return 1;
-}
-
-/* Callback for enumeration purposes */
-int sqline_list_callback(SList *slist, int number, void *item, va_list args)
-{
-	User *u = va_arg(args, User *);
-	int *sent_header = va_arg(args, int *);
-
-	return sqline_list(number, static_cast<SXLine *>(item), u, sent_header);
-}
 
 MODULE_INIT(OSSQLine)

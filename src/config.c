@@ -738,11 +738,11 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&Config.LogMaxUsers), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&Config.AutokillExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&Config.ChankillExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "sglineexpiry", "0", new ValueContainerTime(&Config.SGLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "snlineexpiry", "0", new ValueContainerTime(&Config.SNLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&Config.SQLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&Config.SZLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&Config.AkillOnAdd), DT_BOOLEAN, NoValidation},
-		{"operserv", "killonsgline", "no", new ValueContainerBool(&Config.KillonSGline), DT_BOOLEAN, NoValidation},
+		{"operserv", "killonsnline", "no", new ValueContainerBool(&Config.KillonSNline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&Config.KillonSQline), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&Config.LimitSessions), DT_BOOLEAN, NoValidation},
@@ -1633,8 +1633,8 @@ int read_config(int reload)
 		}
 	}
 
-	Config.WallOper = Config.WallBadOS = Config.WallOSGlobal = Config.WallOSMode = Config.WallOSClearmodes = Config.WallOSKick = Config.WallOSAkill = Config.WallOSSGLine = Config.WallOSSQLine =
-	Config.WallOSSZLine = Config.WallOSNoOp = Config.WallOSJupe = Config.WallAkillExpire = Config.WallSGLineExpire = Config.WallSQLineExpire = Config.WallSZLineExpire = Config.WallExceptionExpire = Config.WallGetpass = Config.WallSetpass = Config.WallForbid =
+	Config.WallOper = Config.WallBadOS = Config.WallOSGlobal = Config.WallOSMode = Config.WallOSClearmodes = Config.WallOSKick = Config.WallOSAkill = Config.WallOSSNLine = Config.WallOSSQLine =
+	Config.WallOSSZLine = Config.WallOSNoOp = Config.WallOSJupe = Config.WallAkillExpire = Config.WallSNLineExpire = Config.WallSQLineExpire = Config.WallSZLineExpire = Config.WallExceptionExpire = Config.WallGetpass = Config.WallSetpass = Config.WallForbid =
 	Config.WallDrop = false;
 	if (!OSNotifications.empty()) {
 		spacesepstream notifications(OSNotifications);
@@ -1647,13 +1647,13 @@ int read_config(int reload)
 			else if (notice == "osclearmodes") Config.WallOSClearmodes = true;
 			else if (notice == "oskick") Config.WallOSKick = true;
 			else if (notice == "osakill") Config.WallOSAkill = true;
-			else if (notice == "ossgline") Config.WallOSSGLine = true;
+			else if (notice == "ossnline") Config.WallOSSNLine = true;
 			else if (notice == "ossqline") Config.WallOSSQLine = true;
 			else if (notice == "osszline") Config.WallOSSZLine = true;
 			else if (notice == "osnoop") Config.WallOSNoOp = true;
 			else if (notice == "osjupe") Config.WallOSJupe = true;
 			else if (notice == "akillexpire") Config.WallAkillExpire = true;
-			else if (notice == "sglineexpire") Config.WallSGLineExpire = true;
+			else if (notice == "snlineexpire") Config.WallSNLineExpire = true;
 			else if (notice == "sqlineexpire") Config.WallSQLineExpire = true;
 			else if (notice == "szlineexpire") Config.WallSZLineExpire = true;
 			else if (notice == "exceptionexpire") Config.WallExceptionExpire = true;

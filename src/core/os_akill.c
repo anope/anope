@@ -14,24 +14,123 @@
 
 #include "module.h"
 
-int akill_view_callback(SList *slist, int number, void *item, va_list args);
-int akill_list_callback(SList *slist, int number, void *item, va_list args);
-int akill_view(int number, Akill *ak, User *u, int *sent_header);
-int akill_list(int number, Akill *ak, User *u, int *sent_header);
-
-static int akill_del_callback(SList *slist, void *item, va_list args)
+class AkillDelCallback : public NumberList
 {
-	User *u = va_arg(args, User *);
-	FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, static_cast<Akill *>(item)));
-	return 1;
-}
+	User *u;
+	unsigned Deleted;
+ public:
+	AkillDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	{
+	}
+	
+	~AkillDelCallback()
+	{
+		if (!Deleted)
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
+		else if (Deleted == 1)
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_ONE);
+		else
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, Deleted);
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SGLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		++Deleted;
+		DoDel(u, x);
+	}
+
+	static void DoDel(User *u, XLine *x)
+	{
+		SGLine->DelXLine(x);
+	}
+};
+
+class AkillListCallback : public NumberList
+{
+ protected:
+	User *u;
+	bool SentHeader;
+ public:
+	AkillListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	{
+	}
+
+	~AkillListCallback()
+	{
+		if (!SentHeader)
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
+		else
+			notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SGLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_HEADER);
+		}
+
+		DoList(u, x, Number);
+	}
+	
+	static void DoList(User *u, XLine *x, unsigned Number)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+	}
+};
+
+class AkillViewCallback : public AkillListCallback
+{
+ public:
+	AkillViewCallback(User *_u, const std::string &numlist) : AkillListCallback(_u, numlist)
+	{
+	}
+
+	void HandleNumber(unsigned Number)
+	{
+		XLine *x = SGLine->GetEntry(Number - 1);
+
+		if (!x)
+			return;
+
+		if (!SentHeader)
+		{
+			SentHeader = true;
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_HEADER);
+		}
+
+		DoList(u, x, Number);
+	}
+
+	static void DoList(User *u, XLine *x, unsigned Number)
+	{
+		char timebuf[32], expirebuf[256];
+		struct tm tm;
+
+		tm = *localtime(&x->Created);
+		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
+		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
+
+		notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf, x->Reason.c_str());
+	}
+};
 
 class CommandOSAKill : public Command
 {
  private:
 	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
 	{
-		int deleted = 0;
 		unsigned last_param = 2;
 		const char *expiry, *mask;
 		char reason[BUFSIZE];
@@ -68,37 +167,13 @@ class CommandOSAKill : public Command
 			return MOD_CONT;
 		}
 		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
-		if (mask && *reason) {
-			/* We first do some sanity check on the proposed mask. */
-			if (strchr(mask, '!'))
-			{
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_NICK);
-				return MOD_CONT;
-			}
+		if (mask && *reason)
+		{
+			XLine *x = SGLine->Add(OperServ, u, mask, expires, reason);
 
-			if (!strchr(mask, '@'))
-			{
-				notice_lang(Config.s_OperServ, u, BAD_USERHOST_MASK);
+			if (!x)
 				return MOD_CONT;
-			}
 
-			if (mask && strspn(mask, "~@.*?") == strlen(mask))
-			{
-				notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
-				return MOD_CONT;
-			}
-
-			std::string realreason;
-			if (Config.AddAkiller)
-				realreason = "[" + u->nick + "] " + std::string(reason);
-			else
-				realreason = reason;
-
-			deleted = add_akill(u, mask, u->nick.c_str(), expires, realreason.c_str());
-			if (deleted < 0)
-				return MOD_CONT;
-			else if (deleted)
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, deleted);
 			notice_lang(Config.s_OperServ, u, OPER_AKILL_ADDED, mask);
 
 			if (Config.WallOSAkill)
@@ -131,7 +206,7 @@ class CommandOSAKill : public Command
 					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask, realreason.c_str(), buf);
+				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask, reason, buf);
 			}
 
 			if (readonly)
@@ -145,49 +220,36 @@ class CommandOSAKill : public Command
 
 	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res = 0;
+		const ci::string mask = params.size() > 1 ? params[0] : "";
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
-
-		if (!mask)
+		if (mask.empty())
 		{
 			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
-		if (!akills.count)
+		if (SGLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
-		{
-			/* Deleting a range */
-			res = slist_delete_range(&akills, mask, akill_del_callback, u);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
-				return MOD_CONT;
-			}
-			else if (res == 1)
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_ONE);
-			else
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, res);
-		}
+		if (isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new AkillDelCallback(u, mask.c_str()))->Process();
 		else
 		{
-			if ((res = slist_indexof(&akills, const_cast<void *>(static_cast<const void *>(mask)))) == -1) // XXX: possibly unsafe cast
+			XLine *x = SGLine->HasEntry(mask);
+
+			if (!x)
 			{
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NOT_FOUND, mask);
+				notice_lang(Config.s_OperServ, u, OPER_AKILL_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
-			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, static_cast<Akill *>(akills.list[res])));
+			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, x));
 
-			slist_delete(&akills, res);
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED, mask);
+			AkillDelCallback::DoDel(u, x);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED, mask.c_str());
 		}
 
 		if (readonly)
@@ -198,41 +260,37 @@ class CommandOSAKill : public Command
 
 	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res, sent_header = 0;
-
-		if (!akills.count)
+		if (SGLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
+		const ci::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
-		{
-			res = slist_enum(&akills, mask, &akill_list_callback, u, &sent_header);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
-				return MOD_CONT;
-			}
-			else
-				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
-		}
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new AkillListCallback(u, mask.c_str()))->Process();
 		else
 		{
-			int i;
-			char amask[BUFSIZE];
+			bool SentHeader = false;
 
-			for (i = 0; i < akills.count; ++i)
+			for (unsigned i = 0; i < SGLine->GetCount(); ++i)
 			{
-				snprintf(amask, sizeof(amask), "%s@%s", (static_cast<Akill *>(akills.list[i]))->user, (static_cast<Akill *>(akills.list[i]))->host);
-				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
-					akill_list(i + 1, static_cast<Akill *>(akills.list[i]), u, &sent_header);
+				XLine *x = SGLine->GetEntry(i);
+
+				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_HEADER);
+					}
+
+					AkillListCallback::DoList(u, x, i);
+				}
 			}
 
-			if (!sent_header)
+			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 			else
 				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
@@ -243,39 +301,37 @@ class CommandOSAKill : public Command
 
 	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
 	{
-		const char *mask;
-		int res, sent_header = 0;
-
-		if (!akills.count)
+		if (SGLine->GetList().empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
+		const ci::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask || (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)))
-		{
-			res = slist_enum(&akills, mask, &akill_view_callback, u, &sent_header);
-			if (!res)
-			{
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
-				return MOD_CONT;
-			}
-		}
+		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+			(new AkillViewCallback(u, mask.c_str()))->Process();
 		else
 		{
-			int i;
-			char amask[BUFSIZE];
+			bool SentHeader = false;
 
-			for (i = 0; i < akills.count; ++i)
+			for (unsigned i = 0; i < SGLine->GetCount(); ++i)
 			{
-				snprintf(amask, sizeof(amask), "%s@%s", (static_cast<Akill *>(akills.list[i]))->user, (static_cast<Akill *>(akills.list[i]))->host);
-				if (!stricmp(mask, amask) || Anope::Match(amask, mask, false))
-					akill_view(i + 1, static_cast<Akill *>(akills.list[i]), u, &sent_header);
+				XLine *x = SGLine->GetEntry(i);
+
+				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				{
+					if (!SentHeader)
+					{
+						SentHeader = true;
+						notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_HEADER);
+					}
+
+					AkillViewCallback::DoList(u, x, i);
+				}
 			}
 
-			if (!sent_header)
+			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
 		}
 
@@ -285,7 +341,7 @@ class CommandOSAKill : public Command
 	CommandReturn DoClear(User *u)
 	{
 		FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, NULL));
-		slist_clear(&akills, 1);
+		SGLine->Clear();
 		notice_lang(Config.s_OperServ, u, OPER_AKILL_CLEAR);
 
 		return MOD_CONT;
@@ -343,67 +399,5 @@ class OSAKill : public Module
 		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_AKILL);
 	}
 };
-
-int akill_view(int number, Akill *ak, User *u, int *sent_header)
-{
-	char mask[BUFSIZE];
-	char timebuf[32], expirebuf[256];
-	struct tm tm;
-
-	if (!ak)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_HEADER);
-		*sent_header = 1;
-	}
-
-	snprintf(mask, sizeof(mask), "%s@%s", ak->user, ak->host);
-	tm = *localtime(&ak->seton);
-	strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-	expire_left(u->Account(), expirebuf, sizeof(expirebuf), ak->expires);
-	notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, number, mask, ak->by, timebuf, expirebuf, ak->reason);
-
-	return 1;
-}
-
-/* Lists an AKILL entry, prefixing it with the header if needed */
-int akill_list_callback(SList *slist, int number, void *item, va_list args)
-{
-	User *u = va_arg(args, User *);
-	int *sent_header = va_arg(args, int *);
-
-	return akill_list(number, static_cast<Akill *>(item), u, sent_header);
-}
-
-/* Callback for enumeration purposes */
-int akill_view_callback(SList *slist, int number, void *item, va_list args)
-{
-	User *u = va_arg(args, User *);
-	int *sent_header = va_arg(args, int *);
-
-	return akill_view(number, static_cast<Akill *>(item), u, sent_header);
-}
-
-/* Lists an AKILL entry, prefixing it with the header if needed */
-int akill_list(int number, Akill *ak, User *u, int *sent_header)
-{
-	char mask[BUFSIZE];
-
-	if (!ak)
-		return 0;
-
-	if (!*sent_header)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_HEADER);
-		*sent_header = 1;
-	}
-
-	snprintf(mask, sizeof(mask), "%s@%s", ak->user, ak->host);
-	notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_FORMAT, number, mask, ak->reason);
-
-	return 1;
-}
 
 MODULE_INIT(OSAKill)

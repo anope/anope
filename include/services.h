@@ -202,7 +202,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 
 /* Miscellaneous definitions. */
 #include "hashcomp.h"
-#include "slist.h"
 
 /* Pull in the various bits of STL */
 #include <iostream>
@@ -359,7 +358,6 @@ struct Session;
 
 typedef struct bandata_ BanData;
 typedef struct mailinfo_ MailInfo;
-typedef struct akill_ Akill;
 typedef struct exception_ Exception;
 
 #include "extensible.h"
@@ -381,7 +379,7 @@ struct ircdvars_ {
 	const char *botchanumode;			/* Modes set when botserv joins a channel */
 	int svsnick;				/* Supports SVSNICK		*/
 	int vhost;				/* Supports vhost		*/
-	int sgline;				/* Supports SGline		*/
+	int snline;				/* Supports SNline		*/
 	int sqline;				/* Supports SQline		*/
 	int szline;				/* Supports SZline		*/
 	int numservargs;			/* Number of Server Args	*/
@@ -780,39 +778,6 @@ struct mailinfo_ {
 
 /*************************************************************************/
 
-struct akill_ {
-	char *user;			/* User part of the AKILL */
-	char *host;			/* Host part of the AKILL */
-
-	char *by;			/* Who set the akill */
-	char *reason;		/* Why they got akilled */
-
-	time_t seton;		/* When it was set */
-	time_t expires;		/* When it expires */
-};
-
-/*************************************************************************/
-
-/* Structure for OperServ SGLINE and SZLINE commands */
-
-enum SXLineType
-{
-	SX_SGLINE,
-	SX_SQLINE,
-	SX_SZLINE
-};
-
-struct SXLine {
-	char *mask;
-	char *by;
-	char *reason;
-	time_t seton;
-	time_t expires;
-};
-
-
-/************************************************************************/
-
 struct exception_ {
 	char *mask;				 /* Hosts to which this exception applies */
 	int limit;				  /* Session limit for exception */
@@ -906,6 +871,7 @@ struct Uplink;
 class ServerConfig;
 
 #include "extern.h"
+#include "operserv.h"
 #include "mail.h"
 #include "servers.h"
 #include "config.h"
@@ -933,8 +899,8 @@ class CoreExport IRCDProto
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendTopic(BotInfo *, Channel *, const char *, const char *) = 0;
 		virtual void SendVhostDel(User *) { }
-		virtual void SendAkill(Akill *) = 0;
-		virtual void SendAkillDel(Akill *) = 0;
+		virtual void SendAkill(XLine *) = 0;
+		virtual void SendAkillDel(XLine *) = 0;
 		virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
@@ -959,11 +925,11 @@ class CoreExport IRCDProto
 		virtual void SendPing(const char *servname, const char *who);
 		virtual void SendPong(const char *servname, const char *who);
 		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
-		virtual void SendSQLineDel(const std::string &) = 0;
+		virtual void SendSQLineDel(XLine *x) = 0;
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
 		virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
 		virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
-		virtual void SendSQLine(const std::string &, const std::string &) = 0;
+		virtual void SendSQLine(XLine *x) = 0;
 		virtual void SendSquit(const char *servname, const char *message);
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
@@ -972,10 +938,10 @@ class CoreExport IRCDProto
 		virtual void SendConnect() = 0;
 		virtual void SendSVSHold(const char *) { }
 		virtual void SendSVSHoldDel(const char *) { }
-		virtual void SendSGLineDel(SXLine *) { }
-		virtual void SendSZLineDel(SXLine *) { }
-		virtual void SendSZLine(SXLine *) { }
-		virtual void SendSGLine(SXLine *) { }
+		virtual void SendSGLineDel(XLine *) { }
+		virtual void SendSZLineDel(XLine *) { }
+		virtual void SendSZLine(XLine *) { }
+		virtual void SendSGLine(XLine *) { }
 		virtual void SendBanDel(Channel *, const std::string &) { }
 		virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
 		virtual void SendUnregisteredNick(User *) { }
@@ -1064,8 +1030,8 @@ class CoreExport Anope
 {
  public:
 	/** Check whether two strings match.
-	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param str The string to check against the pattern (e.g. foobar)
+	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
 	static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
@@ -1162,7 +1128,7 @@ class ChanServTimer : public Timer
 	void Tick(time_t);
 };
 
-/** A class to process numbered lists (passed to most DEL commands).
+/** A class to process numbered lists (passed to most DEL/LIST/VIEW commands).
  * The function HandleNumber is called for every number in the list. Note that
  * it *always* gets called in descending order. This is so deleting the index passed
  * to the function from an array will not cause the other indexes passed to the function
@@ -1178,12 +1144,25 @@ class NumberList
 	 */
 	NumberList(const std::string &list);
 
+	/** Destructor, does nothing
+	 */
 	virtual ~NumberList();
 
+	/** Should be called after the constructors are done running. This calls the callbacks.
+	 */
 	void Process();
 
+	/** Called with a number from the list
+	 * @param Number The number
+	 */
 	virtual void HandleNumber(unsigned Number);
 
+	/** Called when there is an error with the numbered list
+	 * Return false to immediatly stop processing the list and return
+	 * This is all done before we start calling HandleNumber, so no numbers will have been processed yet
+	 * @param The list
+	 * @return false to stop processing
+	 */
 	virtual bool InvalidRange(const std::string &list);
 };
 

@@ -161,7 +161,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 
 	/* Unsaved data */
 	time_t lastmail;			/* Last time this nick record got a mail */
-	SList aliases;				/* List of aliases */
+	std::list<NickAlias *> aliases;		/* List of aliases */
 
 	/** Check whether this opertype has access to run the given command string.
 	  * @param cmdstr The string to check, e.g. botserv/set/private.

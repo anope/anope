@@ -272,7 +272,6 @@ void memo_send(User * u, const char *name, const char *text, int z)
 		if (z == 0 || z == 3)
 			notice_lang(Config.s_MemoServ, u, MEMO_SENT, name);
 		if (!ischan) {
-			NickAlias *na;
 			NickCore *nc = (findnick(name))->nc;
 
 			FOREACH_MOD(I_OnMemoSend, OnMemoSend(u, nc, m));
@@ -280,10 +279,10 @@ void memo_send(User * u, const char *name, const char *text, int z)
 			if (Config.MSNotifyAll) {
 				if ((nc->HasFlag(NI_MEMO_RECEIVE))
 					&& get_ignore(name) == NULL) {
-					int i;
 
-					for (i = 0; i < nc->aliases.count; i++) {
-						na = static_cast<NickAlias *>(nc->aliases.list[i]);
+					for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
+					{
+						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
 							notice_lang(Config.s_MemoServ, user,

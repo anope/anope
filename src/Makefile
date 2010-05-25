@@ -1,14 +1,14 @@
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o command.o commands.o compat.o \
 		config.o configreader.o encrypt.o hashcomp.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modes.o modules.o module.o modulemanager.o nickalias.o \
-		nickcore.o nickserv.o operserv.o process.o protocol.o regchannel.o send.o servers.o sessions.o slist.o \
+		nickcore.o nickserv.o operserv.o process.o protocol.o regchannel.o send.o servers.o sessions.o \
 		sockets.o threadengine.o threadengine_pthread.o timers.o opertype.o users.o wildcard.o
 
 INCLUDES = ../include/commands.h ../include/language.h \
 	../include/sysconf.h ../include/config.h \
 	../include/services.h ../include/regchannel.h \
 	../include/timers.h ../include/extern.h \
-	../include/modules.h ../include/slist.h ../include/hashcomp.h \
+	../include/modules.h ../include/operserv.h ../include/hashcomp.h \
 	../include/threadengine.h ../include/mail.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \

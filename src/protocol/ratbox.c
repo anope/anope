@@ -23,7 +23,7 @@ IRCDVar myIrcd[] = {
 	 "+o",					  /* Channel Umode used by Botserv bots */
 	 0,						 /* SVSNICK */
 	 0,						 /* Vhost  */
-	 1,						 /* Supports SGlines	 */
+	 1,						 /* Supports SNlines	 */
 	 1,						 /* Supports SQlines	 */
 	 0,						 /* Supports SZlines	 */
 	 3,						 /* Number of server args */
@@ -136,36 +136,32 @@ class RatboxProto : public IRCDTS6Proto
 			send_cmd(TS6SID, "OPERWALL :%s", buf);
 	}
 
-	void SendSQLine(const std::string &mask, const std::string &reason)
+	void SendSQLine(XLine *x)
 	{
-		if (mask.empty() || reason.empty())
-			return;
-		send_cmd(TS6SID, "RESV * %s :%s", mask.c_str(), reason.c_str());
+		send_cmd(TS6SID, "RESV * %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
-	void SendSGLineDel(SXLine *sx)
+	void SendSGLineDel(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", sx->mask);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
-	void SendSGLine(SXLine *sx)
+	void SendSGLine(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", sx->mask, sx->reason);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
-	void SendAkillDel(Akill *ak)
+	void SendAkillDel(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", ak->user, ak->host);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
-	void SendSQLineDel(const std::string &user)
+	void SendSQLineDel(XLine *x)
 	{
-		if (user.empty())
-			return;
-		send_cmd(TS6SID, "UNRESV * %s", user.c_str());
+		send_cmd(TS6SID, "UNRESV * %s", x->Mask.c_str());
 	}
 
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
@@ -173,10 +169,10 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, user->uid.c_str());
 	}
 
-	void SendAkill(Akill *ak)
+	void SendAkill(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(ak->expires - time(NULL)), ak->user, ak->host, ak->reason);
+		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)

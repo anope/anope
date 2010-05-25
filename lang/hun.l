@@ -2540,22 +2540,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Alap AKILL lejárati idõ: 1 perc
 OPER_STATS_AKILL_EXPIRE_NONE
 	Alap AKILL lejárati idõ: Nem elévülõ
-OPER_STATS_SGLINE_COUNT
-	Aktuális SGLINEok száma: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Alap SGLINE lejárati idõ: %d nap
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Alap SGLINE lejárati idõ: 1 nap
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Alap SGLINE lejárati idõ: %d óra
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Alap SGLINE lejárati idõ: 1 óra
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Alap SGLINE lejárati idõ: %d perc
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Alap SGLINE lejárati idõ: 1 perc
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Alap SGLINE lejárati ido: Nem elévülõ
+OPER_STATS_SNLINE_COUNT
+	Aktuális SNLINEok száma: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Alap SNLINE lejárati idõ: %d nap
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Alap SNLINE lejárati idõ: 1 nap
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Alap SNLINE lejárati idõ: %d óra
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Alap SNLINE lejárati idõ: 1 óra
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Alap SNLINE lejárati idõ: %d perc
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Alap SNLINE lejárati idõ: 1 perc
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Alap SNLINE lejárati ido: Nem elévülõ
 OPER_STATS_SQLINE_COUNT
 	Aktuális SQLINEok száma : %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2681,46 +2681,46 @@ OPER_AKILL_CLEAR
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+lejárat] {#szoba} [indok]
 
-# SGLINE válaszok
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[ +lejárat] {maszk| sorszám }[:Indok]]
-OPER_SGLINE_UNSUPPORTED
-	SGLINE nem használható ezen a hálózaton.
-OPER_SGLINE_EXISTS
-	%s már szerepel az SGLINE listán.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE válaszok
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[ +lejárat] {maszk| sorszám }[:Indok]]
+OPER_SNLINE_UNSUPPORTED
+	SNLINE nem használható ezen a hálózaton.
+OPER_SNLINE_EXISTS
+	%s már szerepel az SNLINE listán.
+OPER_SNLINE_ALREADY_COVERED
 	%s társítva van %s által.
-OPER_SGLINE_REACHED_LIMIT
-	Te csak %d számú SGLINE-t jegyezhetsz.
-OPER_SGLINE_ADDED
-	%s hozzáadva a SGLINE listához.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Te csak %d számú SNLINE-t jegyezhetsz.
+OPER_SNLINE_ADDED
+	%s hozzáadva a SNLINE listához.
+OPER_SNLINE_CHANGED
 	Lejárati idõ megváltozott: %s .
-OPER_SGLINE_NOT_FOUND
-	%s nincs a SGLINE listán.
-OPER_SGLINE_NO_MATCH
-	Nincs ilyen bejegyzés az SGLINE listán.
-OPER_SGLINE_DELETED
-	%s törölve az SGLINE listáról.
-OPER_SGLINE_DELETED_ONE
-	Törölve 1 bejegyzés a SGLINE listáról.
-OPER_SGLINE_DELETED_SEVERAL
-	Törölve %d bejegyzés a SGLINE listáról.
-OPER_SGLINE_LIST_EMPTY
-	SGLINE lista üres.
-OPER_SGLINE_LIST_HEADER
-	Aktuális SGLINE lista:
+OPER_SNLINE_NOT_FOUND
+	%s nincs a SNLINE listán.
+OPER_SNLINE_NO_MATCH
+	Nincs ilyen bejegyzés az SNLINE listán.
+OPER_SNLINE_DELETED
+	%s törölve az SNLINE listáról.
+OPER_SNLINE_DELETED_ONE
+	Törölve 1 bejegyzés a SNLINE listáról.
+OPER_SNLINE_DELETED_SEVERAL
+	Törölve %d bejegyzés a SNLINE listáról.
+OPER_SNLINE_LIST_EMPTY
+	SNLINE lista üres.
+OPER_SNLINE_LIST_HEADER
+	Aktuális SNLINE lista:
 	  Szám   Maszk                              Indok
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Aktuális SGLINE lista:
+OPER_SNLINE_VIEW_HEADER
+	Aktuális SNLINE lista:
 # szám, mask, set-by, set-idõ, lejárat, indok
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (%s által, ekkor: %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	Az SGLINE lista törölve.
+OPER_SNLINE_CLEAR
+	Az SNLINE lista törölve.
 
 # SQLINE válaszok
 OPER_SQLINE_SYNTAX
@@ -5369,8 +5369,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Killeli az összes klónt a hosztról
 OPER_HELP_CMD_AKILL
 	    AKILL       Szerkeszti az AKILL listát
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Szerkeszti az SGLINE listát
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Szerkeszti az SNLINE listát
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Szerkeszti az SQLINE listát
 OPER_HELP_CMD_SZLINE
@@ -5570,19 +5570,19 @@ OPER_HELP_AKILL
 	
 	Korlátozva Szervíz operatornak.
 	
-OPER_HELP_SGLINE
-	Syntax: SGLINE ADD [+lejárat] maszk:indok
-	    SGLINE DEL {maszk | sor-szám | list}
-	        SGLINE LIST [maszk | list]
-	        SGLINE VIEW [maszk | list]
-	        SGLINE CLEAR
+OPER_HELP_SNLINE
+	Syntax: SNLINE ADD [+lejárat] maszk:indok
+	    SNLINE DEL {maszk | sor-szám | list}
+	        SNLINE LIST [maszk | list]
+	        SNLINE VIEW [maszk | list]
+	        SNLINE CLEAR
 	
 	Lehetõséget ad a szervíz opoknak, hogy karbantartsák az
-	SGLINE listát.  Ha egy felhasználó egy valós névvel akar
-	csatlakozni , ami szerepel az SGLINE listán akkor szervíz
+	SNLINE listát.  Ha egy felhasználó egy valós névvel akar
+	csatlakozni , ami szerepel az SNLINE listán akkor szervíz
 	nem fogja engedélyezni részére a csatlakozást. 
 	
-	SGLINE ADD hozzáadja a valósnévmaszkot az SGLINE listára
+	SNLINE ADD hozzáadja a valósnévmaszkot az SNLINE listára
 	a megadott indokkal (amit meg is kell adni).	
 	Az elévülést egész számmot kovet egy idoparaméter d (nap),
 	h (óra), m (perc).Ezek kombinálása nem lehetséges(1h30m).
@@ -5590,25 +5590,25 @@ OPER_HELP_SGLINE
 	(+30 az 30 napot jelent).Ha +0-át adsz meg akkor nem 
 	elévülo lesz.Ha a usermaszk + -al kezdodik akkor elévülést
 	meg kell adni akkor is ha megegyezik az alapértelmezéssel.
-	Az SGLINE jelenlegi alapértelmezett elévülési ideje 
+	Az SNLINE jelenlegi alapértelmezett elévülési ideje 
 	megnézheto a STATS AKILL paranccsal.
 	Jegyzet: a valósnév maszkja tartalmazhat szóközt ezért
 	közte és az indok között az elválasztó karakter a vesszõ.
-	SGLINE DEL eltávolítja a megadott maszkot az SGLINE listáról,
+	SNLINE DEL eltávolítja a megadott maszkot az SNLINE listáról,
 	ha jelen van.Ha bejegyzés sorszámot adsz meg akkor azok fognak
 	törlodni.	(Lásd a példa alább)
-	SGLINE LIST kiirja az összes SGLINE bejegyzést; ha
+	SNLINE LIST kiirja az összes SNLINE bejegyzést; ha
 	egy tetszõleges maszk meg van adva, a lista korlátozva lesz
 	azokra a bejegyzésekre, amelyekre ráillik a maszk. Példa:
 		
-	   SGLINE LIST 2-5,7-9
-	      Listázza a SGLINE-okat 2-töl 5-ig és 7-tõl 9-ig az 
-	      SGLINE listáról
+	   SNLINE LIST 2-5,7-9
+	      Listázza a SNLINE-okat 2-töl 5-ig és 7-tõl 9-ig az 
+	      SNLINE listáról
 	      
-	SGLINE VIEW részletesebb verziója a SGLINE LIST-nek,
-	és megmutatja, ki készítette a SGLINE bejegyzéseket,
+	SNLINE VIEW részletesebb verziója a SNLINE LIST-nek,
+	és megmutatja, ki készítette a SNLINE bejegyzéseket,
 	és mikor jár le, mint a maszkot és az indokot.
-	SGLINE CLEAR törli az SGLINE bejegyzéseket.
+	SNLINE CLEAR törli az SNLINE bejegyzéseket.
 	
 	Korlátozva Szervíz operatornak.
 	
@@ -5650,7 +5650,7 @@ OPER_HELP_SQLINE
 	      SQLINE listáról
 	      
 	SQLINE VIEW részletesebb verziója a SQLINE LIST-nek,
-	és megmutatja, ki készítette a SGLINE bejegyzéseket,
+	és megmutatja, ki készítette a SNLINE bejegyzéseket,
 	és mikor jár le, mint a maszkot és az indokot.
 	SQLINE CLEAR törli az SQLINE bejegyzéseket.
 	

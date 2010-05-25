@@ -603,6 +603,12 @@ bool ChannelInfo::CheckKick(User *user)
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
 	if (user->server->IsULined())
 		return false;
+	
+	if (!do_kick && user->IsProtected())
+		return false;
+	
+	if (ircd->chansqline && SQLineManager::Check(this->c))
+		do_kick = true;
 
 	if (!is_oper(user) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
 	{
@@ -612,9 +618,6 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 	}
 
-	if (!do_kick && user->IsProtected())
-		return false;
-	
 	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
 		return false;
 

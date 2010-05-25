@@ -140,10 +140,10 @@ int add_session(const char *nick, const char *host, char *hostip)
 			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill) {
 				char akillmask[BUFSIZE];
 				snprintf(akillmask, sizeof(akillmask), "*@%s", host);
-				add_akill(NULL, akillmask, Config.s_OperServ, 
-						time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
-				ircdproto->SendGlobops(OperServ,
-						"Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
+				XLine *x = new XLine(ci::string("*@") + host, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
+				if (x)
+					x->By = Config.s_OperServ;
+				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
 			}
 			return 0;
 		} else {

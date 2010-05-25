@@ -226,6 +226,7 @@ const char *merge_args(int argc, char **argv)
 
 NumberList::NumberList(const std::string &list)
 {
+	char *error;
 	commasepstream sep(list);
 	std::string token;
 
@@ -238,9 +239,8 @@ NumberList::NumberList(const std::string &list)
 
 		if (!h)
 		{
-			errno = 0;
-			unsigned num = strtol(token.c_str(), NULL, 10);
-			if (!errno)
+			unsigned num = strtol(token.c_str(), &error, 10);
+			if (*error == '\0')
 			{
 				numbers.insert(num);
 			}
@@ -255,11 +255,11 @@ NumberList::NumberList(const std::string &list)
 		}
 		else
 		{
+			char *error2;
 			*h++ = '\0';
-			errno = 0;
-			unsigned num1 = strtol(token.c_str(), NULL, 10);
-			unsigned num2 = strtol(h, NULL, 10);
-			if (!errno)
+			unsigned num1 = strtol(token.c_str(), &error, 10);
+			unsigned num2 = strtol(h, &error2, 10);
+			if (*error == '\0' && *error2 == '\0')
 			{
 				for (unsigned i = num1; i <= num2; ++i)
 				{

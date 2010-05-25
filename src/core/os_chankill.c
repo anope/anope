@@ -26,7 +26,6 @@ class CommandOSChanKill : public Command
 		const char *expiry, *channel;
 		char reason[BUFSIZE];
 		time_t expires;
-		char *mask = new char[Config.UserLen + Config.HostLen + 2];
 		unsigned last_param = 1;
 		Channel *c;
 
@@ -46,7 +45,6 @@ class CommandOSChanKill : public Command
 		if (expires != 0 && expires < 60)
 		{
 			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
-			delete [] mask;
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -55,7 +53,6 @@ class CommandOSChanKill : public Command
 		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(u, "");
-			delete [] mask;
 			return MOD_CONT;
 		}
 		snprintf(reason, sizeof(reason), "%s%s", params[last_param].c_str(), (params.size() > last_param + 1 ? params[last_param + 1].c_str() : ""));
@@ -77,10 +74,8 @@ class CommandOSChanKill : public Command
 					if (is_oper(uc->user))
 						continue;
 
-					strlcpy(mask, "*@", Config.UserLen + Config.HostLen + 2); /* Use *@" for the akill's, */
-					strlcat(mask, uc->user->host, Config.UserLen + Config.HostLen + 2);
-					add_akill(NULL, mask, Config.s_OperServ, expires, realreason.c_str());
-					check_akill(uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->host, NULL, NULL);
+					SGLine->Add(OperServ, u, ci::string("*@") + uc->user->host, expires, realreason);
+					SGLine->Check(uc->user);
 				}
 				if (Config.WallOSAkill)
 					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel, realreason.c_str());
@@ -88,7 +83,6 @@ class CommandOSChanKill : public Command
 			else
 				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
 		}
-		delete [] mask;
 		return MOD_CONT;
 	}
 

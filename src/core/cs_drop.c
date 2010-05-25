@@ -66,7 +66,8 @@ class CommandCSDrop : public Command
 
 		if (ircd->chansqline && (ci->HasFlag(CI_FORBIDDEN)))
 		{
-			ircdproto->SendSQLineDel(ci->name.c_str());
+			XLine x(ci->name.c_str());
+			ircdproto->SendSQLineDel(&x);
 		}
 
 		Alog() << Config.s_ChanServ << ": Channel " << ci->name << " dropped by " << u->GetMask() << " (founder: "

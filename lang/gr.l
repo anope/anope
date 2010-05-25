@@ -2578,22 +2578,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Εξαρχής χρόνος λήξης AKILL: 1 λεπτό
 OPER_STATS_AKILL_EXPIRE_NONE
 	Εξαρχής χρόνος λήξης AKILL: Δεν λήγει ποτέ
-OPER_STATS_SGLINE_COUNT
-	Ως τώρα υπάρχουν SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Εξαρχής χρόνος λήξης SGLINE: %d μέρες
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Εξαρχής χρόνος λήξης SGLINE: 1 μέρα
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Εξαρχής χρόνος λήξης SGLINE: %d ώρες
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Εξαρχής χρόνος λήξης SGLINE: 1 ώρα
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Εξαρχής χρόνος λήξης SGLINE: %d λεπτά
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Εξαρχής χρόνος λήξης SGLINE: 1 λεπτό
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Εξαρχής χρόνος λήξης SGLINE: Δεν λήγει ποτέ
+OPER_STATS_SNLINE_COUNT
+	Ως τώρα υπάρχουν SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Εξαρχής χρόνος λήξης SNLINE: %d μέρες
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Εξαρχής χρόνος λήξης SNLINE: 1 μέρα
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Εξαρχής χρόνος λήξης SNLINE: %d ώρες
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Εξαρχής χρόνος λήξης SNLINE: 1 ώρα
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Εξαρχής χρόνος λήξης SNLINE: %d λεπτά
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Εξαρχής χρόνος λήξης SNLINE: 1 λεπτό
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Εξαρχής χρόνος λήξης SNLINE: Δεν λήγει ποτέ
 OPER_STATS_SQLINE_COUNT
 	Ως τώρα υπάρχουν SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2721,49 +2721,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	Η λίστα AKILL καθαρίστηκε.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]
-OPER_SGLINE_UNSUPPORTED
-	Συγνώμη, η εντολή SGLINE δεν είναι διαθέσιμη σε αυτό το δίκτυο.
-OPER_SGLINE_EXISTS
-	%s υπάρχει ήδη στην λίστα SGLINE.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]
+OPER_SNLINE_UNSUPPORTED
+	Συγνώμη, η εντολή SNLINE δεν είναι διαθέσιμη σε αυτό το δίκτυο.
+OPER_SNLINE_EXISTS
+	%s υπάρχει ήδη στην λίστα SNLINE.
+OPER_SNLINE_ALREADY_COVERED
 	%s έχει ήδη καλυφθεί από τον %s.
-OPER_SGLINE_REACHED_LIMIT
-	Συγνώμη, μπορείς να έχεις μόνο %d SGLINEs.
-OPER_SGLINE_ADDED
-	%s προσθέθηκε στην λίστα SGLINE.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Συγνώμη, μπορείς να έχεις μόνο %d SNLINEs.
+OPER_SNLINE_ADDED
+	%s προσθέθηκε στην λίστα SNLINE.
+OPER_SNLINE_CHANGED
 	Το χρονικό όριο του/της %s άλλαξε.
-OPER_SGLINE_NOT_FOUND
-	%s δεν βρέθηκε στην λίστα SGLINE.
-OPER_SGLINE_NO_MATCH
-	Δεν βρέθηκαν θέσεις στην λίστα SGLINE.
-OPER_SGLINE_DELETED
-	%s διαγράφηκε από την λίστα SGLINE.
-OPER_SGLINE_DELETED_ONE
-	Διαγράφηκε 1 θέση από την λίστα SGLINE.
-OPER_SGLINE_DELETED_SEVERAL
-	Διαγράφηκαν %d θέσεις από την λίστα SGLINE.
-OPER_SGLINE_LIST_EMPTY
-	Η λίστα SGLINE είναι άδεια.
-OPER_SGLINE_LIST_HEADER
-	Η έως τώρα λίστα SGLINE είναι οι εξης:
+OPER_SNLINE_NOT_FOUND
+	%s δεν βρέθηκε στην λίστα SNLINE.
+OPER_SNLINE_NO_MATCH
+	Δεν βρέθηκαν θέσεις στην λίστα SNLINE.
+OPER_SNLINE_DELETED
+	%s διαγράφηκε από την λίστα SNLINE.
+OPER_SNLINE_DELETED_ONE
+	Διαγράφηκε 1 θέση από την λίστα SNLINE.
+OPER_SNLINE_DELETED_SEVERAL
+	Διαγράφηκαν %d θέσεις από την λίστα SNLINE.
+OPER_SNLINE_LIST_EMPTY
+	Η λίστα SNLINE είναι άδεια.
+OPER_SNLINE_LIST_HEADER
+	Η έως τώρα λίστα SNLINE είναι οι εξης:
 	  Νου   Μάσκα                              Λόγος
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Current SGLINE list:
+OPER_SNLINE_VIEW_HEADER
+	Current SNLINE list:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (by %s on %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	Η λίστα SGLINE καθαρίστηκε.
+OPER_SNLINE_CLEAR
+	Η λίστα SNLINE καθαρίστηκε.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -5456,8 +5456,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Σκοτώνει όλους τους χρήστες που έχουν το ίδιο host
 OPER_HELP_CMD_AKILL
 	    AKILL       Προσθέτει ip κλπ στην λίστα AKILL
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Προσθέτει ip στην λίστα SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Προσθέτει ip στην λίστα SNLINE
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Προσθέτει ip στην λίστα SQLINE
 OPER_HELP_CMD_SZLINE
@@ -5658,50 +5658,50 @@ OPER_HELP_AKILL
 
 	Μόνο για τους Services operators.	
 	    
-OPER_HELP_SGLINE
-	Σύνταξη: SGLINE ADD [+expiry] μάσκα:λόγος
-	    SGLINE DEL {μάσκα | θέσεις-νούμερα | λίστα}
-	        SGLINE LIST [μάσκα | λίστα]
-	        SGLINE VIEW [μάσκα | λίστα]
-	        SGLINE CLEAR
+OPER_HELP_SNLINE
+	Σύνταξη: SNLINE ADD [+expiry] μάσκα:λόγος
+	    SNLINE DEL {μάσκα | θέσεις-νούμερα | λίστα}
+	        SNLINE LIST [μάσκα | λίστα]
+	        SNLINE VIEW [μάσκα | λίστα]
+	        SNLINE CLEAR
 	
-	Οι Services operators μπορούν να αλλάξουν την λίστα SGLINE.  Αν
-	ο χρήστης με το πραγματικό όνομα ταιριάζει με την SGLINE μάσκα,τα 
+	Οι Services operators μπορούν να αλλάξουν την λίστα SNLINE.  Αν
+	ο χρήστης με το πραγματικό όνομα ταιριάζει με την SNLINE μάσκα,τα 
 	Services δεν θα τον αφήσουν να συνδεθεί.
 	    
-	Η εντολή SGLINE ADD προσθέτει μια πραγματική μάσκα στην λίστα SGLINE
+	Η εντολή SNLINE ADD προσθέτει μια πραγματική μάσκα στην λίστα SNLINE
 	με κάποιον λόγο τον οποίο πρέπει να τον δώσετε.
 	Το expiry είναι συγκεκριμένο και επιλέγεται από τα επόμενα, d 
 	(μέρες), h (ώρες), ή m (λεπτά).  Συνδιασμοί (όπως 
 	1h30m) δεν επιτρέπονται .  Αν δεν δώσετε το χρόνο 
 	από default θα είναι σε μέρες (θα είναι +30 που σημαίνει 30 
-	μέρες).  Για να προσθέσετε ένα SGLINE που να μην λήγει, χρησιμοποιείστε +0.
+	μέρες).  Για να προσθέσετε ένα SNLINE που να μην λήγει, χρησιμοποιείστε +0.
 	usermask ξεκινάει με +, ο χρόνος λήξης θα πρέπει να δίνετε
 	ακόμα και αν είναι ίδιος με τον default.  Ο
-	συγκεκριμένος χρόνος λήξης της εντολής SGLINE μπορεί να βρεθεί με την εντολή
+	συγκεκριμένος χρόνος λήξης της εντολής SNLINE μπορεί να βρεθεί με την εντολή
 	STATS AKILL.
 	Σημείωση: επειδή το πραγματικό όνομα-μάσκα μπορεί να περιέχει κενά,
 	διαχωριστικά μεταξύ τους να είστε προσεκτικοί στο λόγο.
 	
-	Η εντολή SGLINE DEL αφαιρεί μία μάσκα από την λίστα
-	SGLINE list αν υπάρχει.  Αν η λίστα με τις θέσεις-νούμερα δίνετε, 
+	Η εντολή SNLINE DEL αφαιρεί μία μάσκα από την λίστα
+	SNLINE list αν υπάρχει.  Αν η λίστα με τις θέσεις-νούμερα δίνετε, 
 	αυτές διαγράφονται.  (Δές το παράδειγμα LIST.) 
 	    
-	Η εντολή SGLINE LIST εμφανίζει την λίστα με τα SGLINE.  
+	Η εντολή SNLINE LIST εμφανίζει την λίστα με τα SNLINE.  
 	Αν δίνεται μια συγκεκριμένη μάσκα, θα εμφανιστούν οι θέσεις που αντιστοιχούν σε
 	αυτή τη μάσκα
 	Αν δίνετε η λίστα με τις θέσεις-νούμερα μπορείτε να τις δείτε και αλλιώς,
 	παράδειγμα:
 
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      Εμφανίζει τις θέσεις με τα νούμερα 2 εως 5 και 7 
-	      εως 9 της λίστας SGLINE.
+	      εως 9 της λίστας SNLINE.
 	      
-	Η εντολή SGLINE VIEW είναι πιο βελτιωμένη από την SGLINE LIST, και 
-	εμφανίζει ποιος έβαλε το κάθε SGLINE, την ημερομηνία που μπήκε, και πότε 
+	Η εντολή SNLINE VIEW είναι πιο βελτιωμένη από την SNLINE LIST, και 
+	εμφανίζει ποιος έβαλε το κάθε SNLINE, την ημερομηνία που μπήκε, και πότε 
 	λήγει, και φυσικά τη realname μάσκα και τον λόγο.
 	
-	Η εντολή SGLINE CLEAR καθαρίζει όλες τις θέσεις από την λίστα SGLINE.
+	Η εντολή SNLINE CLEAR καθαρίζει όλες τις θέσεις από την λίστα SNLINE.
 	
 	Μόνο για τους Services operators.
 

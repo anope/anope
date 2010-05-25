@@ -713,13 +713,13 @@ class CoreExport Module
 	 * @param ak The akill
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddAkill(User *u, Akill *ak) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddAkill(User *u, XLine *ak) { return EVENT_CONTINUE; }
 
 	/** Called before an akill is deleted
 	 * @param u The user removing the akill
 	 * @param ak The akill, can be NULL for all akills!
 	 */
-	virtual void OnDelAkill(User *u, Akill *ak) { }
+	virtual void OnDelAkill(User *u, XLine *ak) { }
 
 	/** Called after an exception has been added
 	 * @param u The user who added it
@@ -734,20 +734,20 @@ class CoreExport Module
 	 */
 	virtual void OnExceptionDel(User *u, Exception *ex) { }
 
-	/** Called before a SXLine is added
-	 * @param u The user adding the SXLine
-	 * @param sx The SXLine
-	 * @param Type The type of SXLine this is
+	/** Called before a XLine is added
+	 * @param u The user adding the XLine
+	 * @param sx The XLine
+	 * @param Type The type of XLine this is
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddSXLine(User *u, SXLine *sx, SXLineType Type) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddXLine(User *u, XLine *x, XLineType Type) { return EVENT_CONTINUE; }
 
-	/** Called before a SXLine is deleted
-	 * @param u The user deleting the SXLine
-	 * @param sx The SXLine, can be NULL for all SXLines
-	 * @param Type The type of SXLine this is
+	/** Called before a XLine is deleted
+	 * @param u The user deleting the XLine
+	 * @param sx The XLine, can be NULL for all XLines
+	 * @param Type The type of XLine this is
 	 */
-	virtual void OnDelSXLine(User *u, SXLine *sx, SXLineType Type) { }
+	virtual void OnDelXLine(User *u, XLine *x, XLineType Type) { }
 
 	/** Called when a server quits
 	 * @param server The server
@@ -1118,7 +1118,7 @@ enum Implementation
 
 		/* OperServ */
 		I_OnOperServHelp, I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
-		I_OnAddSXLine, I_OnDelSXLine,
+		I_OnAddXLine, I_OnDelXLine,
 
 		/* Database */
 		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase,

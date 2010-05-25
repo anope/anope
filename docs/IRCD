@@ -85,7 +85,7 @@ How To Add IRCd Support
     6) VHOST: Can a user's host be changed on the fly? Enabling this allow
                HostServ online. Use 1 for yes, 0 for no.
 
-    7) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
+    7) SNLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
                 0 for no.
 
     8) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
@@ -172,7 +172,7 @@ How To Add IRCd Support
     35) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    36) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
+    36) SGline Enforce: Does the IRCd enforce SNLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
     37) Vhost Character: The character used to represent the vHost mode, if

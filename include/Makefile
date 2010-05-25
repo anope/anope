@@ -7,9 +7,6 @@ version.h: Makefile version.sh services.h $(SRCS)
 services.h: sysconf.h config.h extern.h
 	touch $@
 
-extern.h: slist.h
-	touch $@
-
 clean:
 	(rm -f language.h)
 

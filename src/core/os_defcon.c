@@ -160,12 +160,10 @@ class OSDEFCON : public Module
 		{
 			if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
 			{
-				std::string mask = "*@" + std::string(u->host);
-				Alog() << "DEFCON: adding akill for " << mask;
-				add_akill(NULL, mask.c_str(), Config.s_OperServ,
-					time(NULL) + Config.DefConAKILL,
-					Config.DefConAkillReason ? Config.DefConAkillReason :
-					"DEFCON AKILL");
+				Alog() << "DEFCON: adding akill for *@" << u->host;
+				XLine *x = SGLine->Add(NULL, NULL, ci::string("*@") + u->host, time(NULL) + Config.DefConAKILL, Config.DefConAkillReason ? Config.DefConAkillReason : "DEFCON AKILL");
+				if (x)
+					x->By = Config.s_OperServ;
 			}
 
 			if (CheckDefCon(DEFCON_NO_NEW_CLIENTS) || CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
@@ -199,7 +197,7 @@ class OSDEFCON : public Module
 		{
 			std::string param;
 
-			if (GetDefConParam(Name, &param))
+			if (GetDefConParam(Name, param))
 			{
 				c->SetMode(OperServ, Name, param);
 			}
@@ -301,10 +299,8 @@ class OSDEFCON : public Module
 				session->hits++;
 				if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
 				{
-					char akillmask[BUFSIZE];
-					snprintf(akillmask, sizeof(akillmask), "*@%s", u->host);
-					add_akill(NULL, akillmask, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
-					ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
+					SGLine->Add(NULL, NULL, ci::string("*@") + u->host, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
+					ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host);
 				}
 			}
 		}
@@ -373,18 +369,18 @@ void runDefCon()
 			if (Config.DefConChanModes[0] == '+' || Config.DefConChanModes[0] == '-')
 			{
 				Alog() << "DEFCON: setting " << Config.DefConChanModes << " on all channels";
-				DefConModesSet = 1;
+				DefConModesSet = true;
 				MassChannelModes(OperServ, Config.DefConChanModes);
 			}
 		}
 	}
 	else
 	{
-		if (Config.DefConChanModes && (DefConModesSet != 0))
+		if (Config.DefConChanModes && DefConModesSet)
 		{
 			if (Config.DefConChanModes[0] == '+' || Config.DefConChanModes[0] == '-')
 			{
-				DefConModesSet = 0;
+				DefConModesSet = false;
 				if ((newmodes = defconReverseModes(Config.DefConChanModes)))
 				{
 					Alog() << "DEFCON: setting " << newmodes << " on all channels";

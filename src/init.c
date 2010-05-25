@@ -43,7 +43,8 @@ void introduce_user(const std::string &user)
 		if (user.empty() || ci_bi_nick == user)
 		{
 			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
-			ircdproto->SendSQLine(bi->nick, "Reserved for services");
+			XLine x(bi->nick.c_str(), "Reserved for services");
+			ircdproto->SendSQLine(&x);
 		}
 	}
 }

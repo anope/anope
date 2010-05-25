@@ -42,7 +42,7 @@ NickAlias::NickAlias(const std::string &nickname, NickCore *nickcore)
 	
 	this->nick = sstrdup(nickname.c_str());
 	this->nc = nickcore;
-	slist_add(&nc->aliases, this);
+	nc->aliases.push_back(this);
 
 	NickAliasList[this->nick] = this;
 
@@ -88,8 +88,12 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		slist_remove(&this->nc->aliases, this);
-		if (this->nc->aliases.count == 0)
+		std::list<NickAlias *>::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
+		if (it != this->nc->aliases.end())
+		{
+			nc->aliases.erase(it);
+		}
+		if (this->nc->aliases.empty())
 		{
 			delete this->nc;
 			this->nc = NULL;

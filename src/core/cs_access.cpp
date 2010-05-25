@@ -21,7 +21,7 @@ class AccessListCallback : public NumberList
 	ChannelInfo *ci;
 	bool SentHeader;
  public:
-	AccessListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), SentHeader(false)
+	AccessListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist, false), u(_u), ci(_ci), SentHeader(false)
 	{
 	}
 
@@ -114,7 +114,7 @@ class AccessDelCallback : public NumberList
 	std::string Nicks;
 	bool Denied;
  public:
-	AccessDelCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), Deleted(0), Denied(false)
+	AccessDelCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), Deleted(0), Denied(false)
 	{
 	}
 

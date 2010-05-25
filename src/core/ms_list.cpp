@@ -21,7 +21,7 @@ class MemoListCallback : public NumberList
 	MemoInfo *mi;
 	bool SentHeader;
  public:
-	MemoListCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list), u(_u), ci(_ci), mi(_mi), SentHeader(false)
+	MemoListCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list, false), u(_u), ci(_ci), mi(_mi), SentHeader(false)
 	{
 	}
 

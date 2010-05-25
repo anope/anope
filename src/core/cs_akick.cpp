@@ -52,7 +52,7 @@ class AkickListCallback : public NumberList
 	ChannelInfo *ci;
 	bool SentHeader;
  public:
-	AkickListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), SentHeader(false)
+	AkickListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist, false), u(_u), ci(_ci), SentHeader(false)
 	{
 	}
 
@@ -141,7 +141,7 @@ class AkickDelCallback : public NumberList
 	ChannelInfo *ci;
 	unsigned Deleted;
  public:
-	AkickDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list), u(_u), ci(_ci), Deleted(0)
+	AkickDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
 	{
 	}
 

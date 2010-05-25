@@ -20,7 +20,7 @@ class ExceptionDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	ExceptionDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	ExceptionDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -62,7 +62,7 @@ class ExceptionListCallback : public NumberList
  	User *u;
 	bool SentHeader;
  public:
-	ExceptionListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	ExceptionListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 

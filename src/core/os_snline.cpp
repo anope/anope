@@ -21,7 +21,7 @@ class SNLineDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	SNLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	SNLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -58,7 +58,7 @@ class SNLineListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	SNLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	SNLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
@@ -81,7 +81,7 @@ class SNLineListCallback : public NumberList
 			notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(u, x, Number - 1);
 	}
 
 	static void DoList(User *u, XLine *x, unsigned Number)
@@ -110,7 +110,7 @@ class SNLineViewCallback : public SNLineListCallback
 			notice_lang(Config.s_OperServ, u, OPER_SNLINE_VIEW_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(u, x, Number - 1);
 	}
 
 	static void DoList(User *u, XLine *x, unsigned Number)

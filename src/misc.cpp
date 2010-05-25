@@ -224,7 +224,7 @@ const char *merge_args(int argc, char **argv)
 
 /*************************************************************************/
 
-NumberList::NumberList(const std::string &list)
+NumberList::NumberList(const std::string &list, bool descending) : desc(descending)
 {
 	char *error;
 	commasepstream sep(list);
@@ -284,9 +284,19 @@ NumberList::~NumberList()
 
 void NumberList::Process()
 {
-	for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(); it != numbers.rend(); ++it)
+	if (this->desc)
 	{
-		this->HandleNumber(*it);
+		for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(); it != numbers.rend(); ++it)
+		{
+			this->HandleNumber(*it);
+		}
+	}
+	else
+	{
+		for (std::set<unsigned>::iterator it = numbers.begin(); it != numbers.end(); ++it)
+		{
+			this->HandleNumber(*it);
+		}
 	}
 	
 	delete this;

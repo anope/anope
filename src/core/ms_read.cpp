@@ -19,7 +19,7 @@ class MemoListCallback : public NumberList
 	User *u;
 	MemoInfo *mi;
  public:
-	MemoListCallback(User *_u, MemoInfo *_mi, const std::string &numlist) : NumberList(numlist), u(_u), mi(_mi)
+	MemoListCallback(User *_u, MemoInfo *_mi, const std::string &numlist) : NumberList(numlist, false), u(_u), mi(_mi)
 	{
 	}
 

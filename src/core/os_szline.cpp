@@ -19,7 +19,7 @@ class SZLineDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	SZLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	SZLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -56,7 +56,7 @@ class SZLineListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	SZLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	SZLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
@@ -79,7 +79,7 @@ class SZLineListCallback : public NumberList
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(u, x, Number - 1);
 	}
 
 	static void DoList(User *u, XLine *x, unsigned Number)
@@ -108,7 +108,7 @@ class SZLineViewCallback : public SZLineListCallback
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(u, x, Number - 1);
 	}
 
 	static void DoList(User *u, XLine *x, unsigned Number)

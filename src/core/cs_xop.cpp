@@ -118,7 +118,7 @@ class XOPListCallback : public NumberList
 	int *messages;
 	bool SentHeader;
  public:
-	XOPListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist, int _level, int *_messages) : NumberList(numlist), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
+	XOPListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist, int _level, int *_messages) : NumberList(numlist, false), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
 	{
 	}
 
@@ -155,7 +155,7 @@ class XOPDelCallback : public NumberList
 	unsigned Deleted;
 	std::string Nicks;
  public:
-	XOPDelCallback(User *_u, ChannelInfo *_ci, int *_messages, const std::string &numlist) : NumberList(numlist), u(_u), ci(_ci), messages(_messages), Deleted(0)
+	XOPDelCallback(User *_u, ChannelInfo *_ci, int *_messages, const std::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), messages(_messages), Deleted(0)
 	{
 	}
 

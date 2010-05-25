@@ -19,7 +19,7 @@ class SQLineDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	SQLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	SQLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -41,7 +41,7 @@ class SQLineDelCallback : public NumberList
 			return;
 
 		++Deleted;
-		DoDel(u, x);
+		DoDel(u, x - 1);
 	}
 
 	static void DoDel(User *u, XLine *x)
@@ -56,7 +56,7 @@ class SQLineListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	SQLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	SQLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
@@ -79,7 +79,7 @@ class SQLineListCallback : public NumberList
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_LIST_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(u, x, Number - 1);
 	}
 
 	static void DoList(User *u, XLine *x, unsigned Number)

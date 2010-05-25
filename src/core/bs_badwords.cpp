@@ -20,7 +20,7 @@ class BadwordsListCallback : public NumberList
 	ChannelInfo *ci;
 	bool SentHeader;
  public:
-	BadwordsListCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list), u(_u), ci(_ci), SentHeader(false)
+	BadwordsListCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list, false), u(_u), ci(_ci), SentHeader(false)
 	{
 	}
 
@@ -56,7 +56,7 @@ class BadwordsDelCallback : public NumberList
 	ChannelInfo *ci;
 	unsigned Deleted;
  public:
-	BadwordsDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list), u(_u), ci(_ci), Deleted(0)
+	BadwordsDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
 	{
 	}
 

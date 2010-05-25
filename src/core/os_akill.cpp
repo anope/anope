@@ -19,7 +19,7 @@ class AkillDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	AkillDelCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), Deleted(0)
+	AkillDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 	
@@ -56,7 +56,7 @@ class AkillListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	AkillListCallback(User *_u, const std::string &numlist) : NumberList(numlist), u(_u), SentHeader(false)
+	AkillListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 

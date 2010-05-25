@@ -1130,19 +1130,23 @@ class ChanServTimer : public Timer
 
 /** A class to process numbered lists (passed to most DEL/LIST/VIEW commands).
  * The function HandleNumber is called for every number in the list. Note that
- * it *always* gets called in descending order. This is so deleting the index passed
- * to the function from an array will not cause the other indexes passed to the function
- * to be incorrect. This keeps us from having to have an 'in use' flag on everything.
+ * if descending is true it gets called in descending order. This is so deleting
+ * the index passed to the function from an array will not cause the other indexes
+ * passed to the function to be incorrect. This keeps us from having to have an
+ * 'in use' flag on everything.
  */
 class NumberList
 {
  private:
 	std::set<unsigned> numbers;
+
+	bool desc;
  public:
 	/** Processes a numbered list
 	 * @param list The list
+	 * @param descending True to make HandleNumber get called with numbers in descending order
 	 */
-	NumberList(const std::string &list);
+	NumberList(const std::string &list, bool descending);
 
 	/** Destructor, does nothing
 	 */
@@ -1160,7 +1164,7 @@ class NumberList
 	/** Called when there is an error with the numbered list
 	 * Return false to immediatly stop processing the list and return
 	 * This is all done before we start calling HandleNumber, so no numbers will have been processed yet
-	 * @param The list
+	 * @param list The list
 	 * @return false to stop processing
 	 */
 	virtual bool InvalidRange(const std::string &list);

@@ -20,7 +20,7 @@ class MemoDelCallback : public NumberList
 	ChannelInfo *ci;
 	MemoInfo *mi;
  public:
-	MemoDelCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list), u(_u), ci(_ci), mi(_mi)
+	MemoDelCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list, true), u(_u), ci(_ci), mi(_mi)
 	{
 	}
 

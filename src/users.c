@@ -418,20 +418,22 @@ void User::CheckAuthenticationToken(const char *svid)
 /** Auto identify the user to the given accountname.
  * @param account Display nick of account
  */
-void User::AutoID(const char *account)
+void User::AutoID(const std::string &account)
 {
-	NickCore *tnc;
-	NickAlias *na;
+	NickCore *core = findcore(account.c_str());
 
-	if ((tnc = findcore(account)))
+	if (core)
 	{
-		if ((na = findnick(this->nick)) && na->nc == tnc)
+		this->Login(core);
+
+		NickAlias *na = findnick(this->nick);
+		if (na && na->nc == core)
 		{
 			if (na->last_realname)
 				delete [] na->last_realname;
 			na->last_realname = sstrdup(this->realname);
 			na->last_seen = time(NULL);
-			this->Login(na->nc);
+			this->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 			this->UpdateHost();
 			check_memos(this);
 

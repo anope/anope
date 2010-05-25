@@ -159,7 +159,7 @@ class CoreExport User : public Extensible
 	/** Auto identify the user to the given accountname.
 	 * @param account Display nick of account
 	 */
-	void AutoID(const char *acc);
+	void AutoID(const std::string &account);
 
 	/** Login the user to a NickCore
 	 * @param core The account the user is useing

@@ -1,5 +1,4 @@
-# Find all the *.c and *.cpp files within the current source directory, and sort the list
-file(GLOB MODULES_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
+# Find all the *.cpp files within the current source directory, and sort the list
 file(GLOB MODULES_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(MODULES_SRCS ${MODULES_SRCS_C} ${MODULES_SRCS_CPP})
 sort_list(MODULES_SRCS)

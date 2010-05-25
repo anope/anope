@@ -8,8 +8,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'\
 	   'MAKEBIN=${MAKEBIN}'
 
-OBJECTS= $(SRCS:.c=.so)
-OBJECTS+= $(SRCS:.cpp=.so)
+OBJECTS= $(SRCS:.cpp=.so)
 CDEFS= -rdynamic -Wall
 
 all: modules subs
@@ -21,10 +20,7 @@ install:
 
 distclean: clean spotless
 
-.SUFFIXES: .c .cpp .so
-
-.c.so:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $@ $<
+.SUFFIXES: .cpp .so
 
 .cpp.so:
 	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -o $@ $<

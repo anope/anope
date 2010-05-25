@@ -21,7 +21,7 @@ if test "${with_instdir+set}" != set; then
   exit 0
 fi
 
-AC_CONFIG_SRCDIR([src/actions.c])
+AC_CONFIG_SRCDIR([src/actions.cpp])
 AC_CONFIG_HEADER(include/sysconf.h)
 AC_PROG_CC
 if test "$ac_cv_c_compiler_gnu" = "yes"; then

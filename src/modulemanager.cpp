@@ -48,6 +48,9 @@ static int moduleCopyFile(const char *name, const char *output)
 	strlcat(input, name, sizeof(input));
 	strlcat(input, MODULE_EXT, sizeof(input));
 
+	if ((source = fopen(input, "rb")) == NULL)
+		return MOD_ERR_NOEXIST;
+
 #ifndef _WIN32
 	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)
 		return MOD_ERR_FILE_IO;
@@ -58,16 +61,6 @@ static int moduleCopyFile(const char *name, const char *output)
 
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
-	/* Linux/UNIX should ignore the b param, why do we still have seperate
-	 * calls for it here? -GD
-	 */
-#ifndef _WIN32
-	if ((source = fopen(input, "r")) == NULL) {
-#else
-	if ((source = fopen(input, "rb")) == NULL) {
-#endif
-		return MOD_ERR_NOEXIST;
-	}
 #ifndef _WIN32
 	if ((target = fdopen(srcfp, "w")) == NULL) {
 #else

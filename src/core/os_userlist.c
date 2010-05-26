@@ -53,7 +53,6 @@ class CommandOSUserList : public Command
 
 				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
 			}
-			u->SendMessage(Config.s_OperServ, "total %d", c->users.size());
 		}
 		else
 		{

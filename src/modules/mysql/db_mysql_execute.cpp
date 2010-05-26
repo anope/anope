@@ -42,7 +42,7 @@ class FakeUser : public User
 		if (this->prev)
 			this->prev->next = this->next;
 		else
-			userlist[HASH(this->nick)] = this->next;
+			userlist[HASH(this->nick.c_str())] = this->next;
 		if (this->next)
 			this->next->prev = this->prev;
 		--usercnt;
@@ -52,7 +52,7 @@ class FakeUser : public User
 	{
 		this->server = serv_uplink; // XXX Need a good way to set this to ourself
 
-		User **list = &userlist[HASH(this->nick)];
+		User **list = &userlist[HASH(this->nick.c_str())];
 		this->next = *list;
 		if (*list)
 			(*list)->prev = this;

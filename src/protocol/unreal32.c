@@ -1328,8 +1328,8 @@ static void AddModes()
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%'));
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&'));
-	/* Unreal sends +q as * */
+	/* Unreal sends +q as * and +a as ~ */
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '~'));
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '*'));
 
 	/* Add user modes */

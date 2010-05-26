@@ -1,7 +1,6 @@
 /* RequiredLibraries: mysqlpp */
 
 #include "db_mysql.h"
-#define HASH(nick)      (((nick)[0]&31)<<5 | ((nick)[1]&31))
 
 class FakeNickCore : public NickCore
 {

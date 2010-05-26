@@ -74,7 +74,7 @@ class CommandMSList : public Command
 			chan = param;
 			param = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan.c_str())))
+			if (!(ci = cs_findchan(chan)))
 			{
 				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;

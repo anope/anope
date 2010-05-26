@@ -218,7 +218,6 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 int m_stats(const char *source, int ac, const char **av)
 {
 	User *u;
-	NickCore *nc;
 
 	if (ac < 1)
 		return MOD_CONT;
@@ -248,7 +247,8 @@ int m_stats(const char *source, int ac, const char **av)
 			{
 				std::string nick = it->first, type = it->second;
 
-				if ((nc = findcore(nick.c_str())))
+				NickCore *nc = findcore(nick);
+				if (nc)
 					ircdproto->SendNumeric(Config.ServerName, 243, source, "O * * %s %s 0", nick.c_str(), type.c_str());
 			}
 

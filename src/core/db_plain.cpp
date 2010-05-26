@@ -93,17 +93,17 @@ static void ReadDatabase(Module *m = NULL)
 		{
 			if (params[0] == "NC")
 			{
-				nc = findcore(params[1].c_str());
+				nc = findcore(params[1]);
 				Type = MD_NC;
 			}
 			else if (params[0] == "NA")
 			{
-				na = findnick(params[2].c_str());
+				na = findnick(params[2]);
 				Type = MD_NA;
 			}
 			else if (params[0] == "NR")
 			{
-				nr = findrequestnick(params[1].c_str());
+				nr = findrequestnick(params[1]);
 				Type = MD_NR;
 			}
 			else if (params[0] == "BI")
@@ -390,7 +390,7 @@ static void LoadNickCore(const std::vector<std::string> &params)
 
 static void LoadNickAlias(const std::vector<std::string> &params)
 {
-	NickCore *nc = findcore(params[0].c_str());
+	NickCore *nc = findcore(params[0]);
 	if (!nc)
 	{
 		Alog() << "[db_plain]: Unable to find core " << params[0];
@@ -719,7 +719,7 @@ class DBPlain : public Module
 	{
 		if (key == "FOUNDER")
 		{
-			ci->founder = findcore(params[0].c_str());
+			ci->founder = findcore(params[0]);
 			if (!ci->founder)
 			{
 				std::stringstream reason;
@@ -728,7 +728,7 @@ class DBPlain : public Module
 			}
 		}
 		else if (key == "SUCCESSOR")
-			ci->successor = findcore(params[0].c_str());
+			ci->successor = findcore(params[0]);
 		else if (key == "LEVELS")
 		{
 			for (unsigned j = 0; j < params.size(); ++j, ++j)
@@ -762,7 +762,7 @@ class DBPlain : public Module
 		}
 		else if (key == "ACCESS")
 		{
-			NickCore *nc = findcore(params[0].c_str());
+			NickCore *nc = findcore(params[0]);
 			if (!nc)
 			{
 				std::stringstream reason;
@@ -781,7 +781,7 @@ class DBPlain : public Module
 			NickCore *nc = NULL;
 			if (Nick)
 			{
-				nc = findcore(params[2].c_str());
+				nc = findcore(params[2]);
 				if (!nc)
 				{
 					std::stringstream reason;

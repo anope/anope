@@ -41,7 +41,7 @@ class CommandCSUnban : public Command
 
 		u2 = u;
 		if (params.size() > 1)
-			u2 = finduser(params[1].c_str());
+			u2 = finduser(params[1]);
 
 		if (!u2)
 		{

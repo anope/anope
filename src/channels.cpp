@@ -1155,13 +1155,13 @@ void do_join(const char *source, int ac, const char **av)
 				std::string channame = cc->chan->name;
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
 				cc->chan->DeleteUser(user);
-				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame.c_str()), channame, ""));
+				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame), channame, ""));
 			}
 			user->chans.clear();
 			continue;
 		}
 
-		chan = findchan(buf.c_str());
+		chan = findchan(buf);
 
 		/* Channel doesn't exist, create it */
 		if (!chan)
@@ -1256,7 +1256,7 @@ void do_part(const char *source, int ac, const char **av)
 	ci::string buf;
 	while (sep.GetToken(buf))
 	{
-		Channel *c = findchan(buf.c_str());
+		Channel *c = findchan(buf);
 		
 		if (!c)
 		{
@@ -1270,7 +1270,7 @@ void do_part(const char *source, int ac, const char **av)
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c));
 			std::string ChannelName = c->name;
 			c->DeleteUser(user);
-			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName.c_str()), ChannelName, av[1] ? av[1] : ""));
+			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName), ChannelName, av[1] ? av[1] : ""));
 		}
 		else
 			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for " << c->name << ", but " << user->nick << " isn't in " << c->name << "?";

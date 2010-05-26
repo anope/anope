@@ -29,7 +29,7 @@ class CommandNSGroup : public Command
 		std::string pass = params[1].c_str();
 		std::list<std::pair<std::string, std::string> >::iterator it;
 
-		if (Config.NSEmailReg && findrequestnick(u->nick.c_str()))
+		if (Config.NSEmailReg && findrequestnick(u->nick))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_REQUESTED);
 			return MOD_CONT;

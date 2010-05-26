@@ -358,7 +358,7 @@ void User::Collide(NickAlias *na)
 			snprintf(randbuf, sizeof(randbuf), "%d", getrandom16());
 			guestnick = std::string(Config.NSGuestNickPrefix) + std::string(randbuf);
 		}
-		while (finduser(guestnick.c_str()));
+		while (finduser(guestnick));
 
 		notice_lang(Config.s_NickServ, this, FORCENICKCHANGE_CHANGING, guestnick.c_str());
 		ircdproto->SendForceNickChange(this, guestnick.c_str(), time(NULL));
@@ -737,7 +737,7 @@ User *finduser(const ci::string &nick)
 	if (isdigit(nick[0]) && ircd->ts6)
 		return find_byuid(nick);
 
-	user_map::const_iterator it = UserListByNick.find(nick.c_str());
+	user_map::const_iterator it = UserListByNick.find(nick);
 
 	if (it != UserListByNick.end())
 		return it->second;

@@ -64,7 +64,7 @@ class CommandCSForbid : public Command
 		if (reason)
 			ci->forbidreason = sstrdup(reason);
 
-		if ((c = findchan(ci->name.c_str())))
+		if ((c = findchan(ci->name)))
 		{
 			/* Before banning everyone, it might be prudent to clear +e and +I lists..
 			 * to prevent ppl from rejoining.. ~ Viper */

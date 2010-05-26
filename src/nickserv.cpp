@@ -208,7 +208,7 @@ int validate_user(User * u)
 	NickAlias *na;
 	NickRequest *nr;
 
-	if ((nr = findrequestnick(u->nick.c_str())))
+	if ((nr = findrequestnick(u->nick)))
 	{
 		notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 		return 0;

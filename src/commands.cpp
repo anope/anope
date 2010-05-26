@@ -100,7 +100,7 @@ void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 	{
 		if (ircdproto->IsChannelValid(params[0].c_str()))
 		{
-			if ((ci = cs_findchan(params[0].c_str())))
+			if ((ci = cs_findchan(params[0])))
 			{
 				if ((ci->HasFlag(CI_FORBIDDEN)) && (!c->HasFlag(CFLAG_ALLOW_FORBIDDEN)))
 				{

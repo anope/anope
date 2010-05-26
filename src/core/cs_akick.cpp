@@ -171,7 +171,7 @@ class CommandCSAKick : public Command
 	{
 		ci::string mask = params[2];
 		ci::string reason = params.size() > 3 ? params[3] : "";
-		NickAlias *na = findnick(mask.c_str());
+		NickAlias *na = findnick(mask);
 		NickCore *nc = NULL;
 		AutoKick *akick;
 
@@ -300,7 +300,7 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		na = findnick(mask.c_str());
+		na = findnick(mask);
 		nc = (na ? na->nc : NULL);
 
 		for (i = 0; i < ci->GetAkickCount(); ++i)
@@ -340,7 +340,7 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		na = findnick(mask.c_str());
+		na = findnick(mask);
 		nc = (na ? na->nc : NULL);
 
 		for (i = 0; i < ci->GetAkickCount(); ++i)
@@ -380,7 +380,7 @@ class CommandCSAKick : public Command
 			(new AkickDelCallback(u, ci, mask.c_str()))->Process();
 		else
 		{
-		        NickAlias *na = findnick(mask.c_str());
+		        NickAlias *na = findnick(mask);
 		        NickCore *nc = (na ? na->nc : NULL);
 
 			for (i = 0; i < ci->GetAkickCount(); ++i)
@@ -530,7 +530,7 @@ class CommandCSAKick : public Command
 		ci::string cmd = params[1];
 		ci::string mask = params.size() > 2 ? params[2] : "";
 
-		ChannelInfo *ci = cs_findchan(chan.c_str());
+		ChannelInfo *ci = cs_findchan(chan);
 
 		if (mask.empty() && (cmd == "ADD" || cmd == "STICK" || cmd == "UNSTICK" || cmd == "DEL"))
 			this->OnSyntaxError(u, cmd);

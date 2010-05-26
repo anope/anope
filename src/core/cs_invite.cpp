@@ -46,7 +46,7 @@ class CommandCSInvite : public Command
 			u2 = u;
 		else
 		{
-			if (!(u2 = finduser(params[1].c_str())))
+			if (!(u2 = finduser(params[1])))
 			{
 				notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, params[1].c_str());
 				return MOD_CONT;

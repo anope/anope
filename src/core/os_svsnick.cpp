@@ -54,9 +54,9 @@ class CommandOSSVSNick : public Command
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
 			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (finduser(newnick.c_str()))
+		else if (finduser(newnick))
 			notice_lang(Config.s_OperServ, u, NICK_X_IN_USE, newnick.c_str());
-		else if ((na = findnick(newnick.c_str())) && (na->HasFlag(NS_FORBIDDEN)))
+		else if ((na = findnick(newnick)) && (na->HasFlag(NS_FORBIDDEN)))
 			notice_lang(Config.s_OperServ, u, NICK_X_FORBIDDEN, newnick.c_str());
 		else
 		{

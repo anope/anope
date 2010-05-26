@@ -23,7 +23,7 @@ class CommandBSAct : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0].c_str());
+		ChannelInfo *ci = cs_findchan(params[0]);
 		ci::string message = params[1];
 
 		if (!check_access(u, ci, CA_SAY))

@@ -83,7 +83,7 @@ class CommandMSSet : public Command
 			p1 = p2;
 			p2 = p3;
 			p3 = params.size() > 4 ? params[4] : "";
-			if (!(ci = cs_findchan(chan.c_str())))
+			if (!(ci = cs_findchan(chan)))
 			{
 				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
@@ -100,7 +100,7 @@ class CommandMSSet : public Command
 			if (!p2.empty() && p2 != "HARD" && chan.empty())
 			{
 				NickAlias *na;
-				if (!(na = findnick(p1.c_str())))
+				if (!(na = findnick(p1)))
 				{
 					notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, p1.c_str());
 					return MOD_CONT;

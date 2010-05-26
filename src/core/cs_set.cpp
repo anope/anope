@@ -20,7 +20,7 @@ class CommandCSSet : public Command
  private:
 	CommandReturn DoSetFounder(User * u, ChannelInfo * ci, const ci::string &param)
 	{
-		NickAlias *na = findnick(param.c_str());
+		NickAlias *na = findnick(param);
 		NickCore *nc, *nc0 = ci->founder;
 
 		if (!na)
@@ -63,7 +63,7 @@ class CommandCSSet : public Command
 
 		if (!param.empty())
 		{
-			na = findnick(param.c_str());
+			na = findnick(param);
 
 			if (!na)
 			{

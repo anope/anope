@@ -29,7 +29,7 @@ class CommandNSResetPass : public Command
 
 		if (Config.RestrictMail && !u->Account()->HasCommand("nickserv/resetpass"))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
-		if (!(na = findnick(params[0].c_str())))
+		if (!(na = findnick(params[0])))
 			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, params[0].c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);

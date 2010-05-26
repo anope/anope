@@ -59,7 +59,7 @@ class CommandCSSuspend : public Command
 			if (reason)
 				ci->forbidreason = sstrdup(reason);
 
-			if ((c = findchan(ci->name.c_str())))
+			if ((c = findchan(ci->name)))
 			{
 				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
 				{

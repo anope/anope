@@ -499,7 +499,7 @@ class DBMySQLWrite : public DBMySQL
 			if (u->Account() && ((command == "SET" && !params.empty()) || (command == "SASET" && u->Account()->HasCommand("nickserv/saset") && params.size() > 1)))
 			{
 				ci::string cmd = (command == "SET" ? params[0] : params[1]);
-				NickCore *nc = (command == "SET" ? u->Account() : findcore(params[0].c_str()));
+				NickCore *nc = (command == "SET" ? u->Account() : findcore(params[0]));
 				if (!nc)
 					return;
 				if (cmd == "PASSWORD" && params.size() > 1)
@@ -543,7 +543,7 @@ class DBMySQLWrite : public DBMySQL
 		{
 			if (command == "SET" && u->Account() && params.size() > 1)
 			{
-				ChannelInfo *ci = cs_findchan(params[0].c_str());
+				ChannelInfo *ci = cs_findchan(params[0]);
 				if (!ci)
 					return;
 				if (!u->Account()->HasPriv("chanserv/set") && check_access(u, ci, CA_SET))
@@ -603,7 +603,7 @@ class DBMySQLWrite : public DBMySQL
 		{
 			if (command == "KICK" && params.size() > 2)
 			{
-				ChannelInfo *ci = cs_findchan(params[0].c_str());
+				ChannelInfo *ci = cs_findchan(params[0]);
 				if (!ci)
 					return;
 				if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
@@ -641,12 +641,12 @@ class DBMySQLWrite : public DBMySQL
 			}
 			else if (command == "SET" && params.size() > 2)
 			{
-				ChannelInfo *ci = cs_findchan(params[0].c_str());
+				ChannelInfo *ci = cs_findchan(params[0]);
 				if (ci && !check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
 					return;
 				BotInfo *bi = NULL;
 				if (!ci)
-					bi = findbot(params[0].c_str());
+					bi = findbot(params[0]);
 				if (bi && params[1] == "PRIVATE" && u->Account()->HasPriv("botserv/set/private"))
 				{
 					query << "UPDATE `anope_bs_core` SET `flags` = '" << GetBotServFlags(bi) << "' WHERE `nick` = " << mysqlpp::quote << bi->nick;

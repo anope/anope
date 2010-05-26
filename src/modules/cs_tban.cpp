@@ -181,7 +181,7 @@ class TempBan : public CallBack
 		{
 			Channel *c;
 
-			if ((c = findchan(chan.c_str())) && c->ci)
+			if ((c = findchan(chan)) && c->ci)
 			{
 				c->RemoveMode(NULL, CMODE_BAN, mask);
 			}

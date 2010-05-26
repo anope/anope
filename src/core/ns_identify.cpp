@@ -29,9 +29,9 @@ class CommandNSIdentify : public Command
 		NickRequest *nr;
 		int res;
 
-		if (!(na = findnick(u->nick.c_str())))
+		if (!(na = findnick(u->nick)))
 		{
-			if ((nr = findrequestnick(u->nick.c_str())))
+			if ((nr = findrequestnick(u->nick)))
 				notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 			else
 				notice_lang(Config.s_NickServ, u, NICK_NOT_REGISTERED);

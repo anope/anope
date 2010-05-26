@@ -94,10 +94,9 @@ class CommandNSConfirm : public Command
 
 	CommandReturn DoConfirm(User *u, const std::vector<ci::string> &params)
 	{
-		NickRequest *nr = NULL;
 		std::string passcode = !params.empty() ? params[0].c_str() : "";
 
-		nr = findrequestnick(u->nick.c_str());
+		NickRequest *nr = findrequestnick(u->nick);
 
 		if (Config.NSEmailReg)
 		{
@@ -113,7 +112,7 @@ class CommandNSConfirm : public Command
 				{
 					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
 					   of the user they are trying to validate, and push that user through regardless of passcode */
-					nr = findrequestnick(passcode.c_str());
+					nr = findrequestnick(passcode);
 					if (nr)
 					{
 						ActuallyConfirmNick(u, nr, true);
@@ -206,7 +205,7 @@ class CommandNSRegister : public CommandNSConfirm
 			return MOD_CONT;
 		}
 
-		if ((anr = findrequestnick(u->nick.c_str())))
+		if ((anr = findrequestnick(u->nick)))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_REQUESTED);
 			return MOD_CONT;
@@ -247,7 +246,7 @@ class CommandNSRegister : public CommandNSConfirm
 			this->OnSyntaxError(u, "");
 		else if (time(NULL) < u->lastnickreg + Config.NSRegDelay)
 			notice_lang(Config.s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + Config.NSRegDelay) - time(NULL));
-		else if ((na = findnick(u->nick.c_str())))
+		else if ((na = findnick(u->nick)))
 		{
 			/* i.e. there's already such a nick regged */
 			if (na->HasFlag(NS_FORBIDDEN))
@@ -330,7 +329,7 @@ class CommandNSResend : public Command
 		NickRequest *nr = NULL;
 		if (Config.NSEmailReg)
 		{
-			if ((nr = findrequestnick(u->nick.c_str())))
+			if ((nr = findrequestnick(u->nick)))
 			{
 				if (time(NULL) < nr->lastmail + Config.NSResendDelay)
 				{

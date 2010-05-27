@@ -376,7 +376,7 @@ class CommandCSAKick : public Command
 		}
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
-		if (isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == strlen(mask.c_str()))
+		if (isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
 			(new AkickDelCallback(u, ci, mask.c_str()))->Process();
 		else
 		{
@@ -415,7 +415,7 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == strlen(mask.c_str()))
+		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
 			(new AkickListCallback(u, ci, mask.c_str()))->Process();
 		else
 		{
@@ -457,7 +457,7 @@ class CommandCSAKick : public Command
 		        return;
 		}
 
-		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == strlen(mask.c_str()))
+		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
 			(new AkickViewCallback(u, ci, mask.c_str()))->Process();
 		else
 		{

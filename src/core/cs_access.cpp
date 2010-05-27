@@ -162,6 +162,225 @@ class AccessDelCallback : public NumberList
 
 class CommandCSAccess : public Command
 {
+	CommandReturn DoAdd(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		const ci::string nick = params[2];
+		int level = atoi(params[3].c_str());
+		int ulev = get_access(u, ci);
+
+		if (level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
+		{
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+
+		if (!level)
+		{
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_NONZERO);
+			return MOD_CONT;
+		}
+		else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
+		{
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			return MOD_CONT;
+		}
+
+		NickAlias *na = findnick(nick.c_str());
+		if (!na)
+		{
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
+			return MOD_CONT;
+		}
+		else if (na->HasFlag(NS_FORBIDDEN))
+		{
+			notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, nick.c_str());
+			return MOD_CONT;
+		}
+
+		NickCore *nc = na->nc;
+		ChanAccess *access = ci->GetAccess(nc);
+		if (access)
+		{
+			/* Don't allow lowering from a level >= ulev */
+			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
+			{
+				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+				return MOD_CONT;
+			}
+			if (access->level == level)
+			{
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display, ci->name.c_str(), level);
+				return MOD_CONT;
+			}
+			access->level = level;
+
+			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
+
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level " << access->level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, ci->name.c_str(), level);
+			return MOD_CONT;
+		}
+
+		if (ci->GetAccessCount() >= Config.CSAccessMax)
+		{
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT, Config.CSAccessMax);
+			return MOD_CONT;
+		}
+
+		ci->AddAccess(nc, level, u->nick);
+
+		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
+
+		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level " << level << " to " << na->nick << " (group " << nc->display << ") on channel " << 
+ci->name;
+		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name.c_str(), level);
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoDel(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		const ci::string nick = params[2];
+
+		if (!ci->GetAccessCount())
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+		else if (isdigit(*nick.c_str()) && strspn(nick.c_str(), "1234567890,-") == nick.length())
+			(new AccessDelCallback(u, ci, nick.c_str()))->Process();
+		else
+		{
+			NickAlias *na = findnick(nick);
+			if (!na)
+			{
+				notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+				return MOD_CONT;
+			}
+
+			NickCore *nc = na->nc;
+
+			unsigned i;
+			ChanAccess *access = NULL;
+			for (i = 0; i < ci->GetAccessCount(); ++i)
+			{
+				access = ci->GetAccess(i);
+
+				if (access->nc == nc)
+					break;
+			}
+
+			if (i == ci->GetAccessCount())
+			{
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
+			}
+			else if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			{
+				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			}
+			else
+			{
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name.c_str());
+				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of " << na->nick << " (group " << access->nc->display << ") on " << ci->name;
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
+
+				ci->EraseAccess(i);
+			}
+		}
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoList(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		const ci::string nick = params.size() > 2 ? params[2] : "";
+
+		if (!ci->GetAccessCount())
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+		else if (!nick.empty() && strspn(nick.c_str(), "1234567890,-") == nick.length())
+			(new AccessListCallback(u, ci, nick.c_str()))->Process();
+		else
+		{
+			bool SentHeader = false;
+
+			for (unsigned i = 0; i < ci->GetAccessCount(); i++)
+			{
+				ChanAccess *access = ci->GetAccess(i);
+
+				if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
+					continue;
+
+				if (!SentHeader)
+				{
+					SentHeader = true;
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+				}
+
+				AccessListCallback::DoList(u, ci, i, access);
+			}
+
+			if (SentHeader)
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+			else
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+		}
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoView(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		const ci::string nick = params.size() > 2 ? params[2] : "";
+
+		if (!ci->GetAccessCount())
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+		else if (!nick.empty() && strspn(nick.c_str(), "1234567890,-") == nick.length())
+			(new AccessViewCallback(u, ci, nick.c_str()))->Process();
+		else
+		{
+			bool SentHeader = false;
+
+			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
+			{
+				ChanAccess *access = ci->GetAccess(i);
+
+				if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
+					continue;
+
+				if (!SentHeader)
+				{
+					SentHeader = true;
+					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+				}
+
+				AccessViewCallback::DoList(u, ci, i, access);
+			}
+
+			if (SentHeader)
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+			else
+				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+		}
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoClear(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
+		{
+			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+		}
+		else
+		{
+			ci->ClearAccess();
+
+			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
+
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name.c_str());
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << " cleared access list on " << ci->name;
+		}
+
+		return MOD_CONT;
+	}
+
  public:
 	CommandCSAccess() : Command("ACCESS", 2, 4)
 	{
@@ -175,12 +394,7 @@ class CommandCSAccess : public Command
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
 
 		ChannelInfo *ci = cs_findchan(chan);
-		NickAlias *na = NULL;
-		NickCore *nc;
-		ChanAccess *access;
 
-		unsigned i;
-		int level = 0, ulev;
 		bool is_list = cmd == "LIST" || cmd == "VIEW";
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
@@ -202,235 +416,35 @@ class CommandCSAccess : public Command
 				 (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->Account()->HasPriv("chanserv/access/modify"))
 				))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+		else if (readonly && (cmd == "ADD" || cmd == "DEL" || cmd == "CLEAR"))
+		{
+			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
+		}
 		else if (cmd == "ADD")
 		{
-			if (readonly)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
-				return MOD_CONT;
-			}
-
-			level = atoi(s);
-			ulev = get_access(u, ci);
-
-			if (level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
-			{
-				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-				return MOD_CONT;
-			}
-
-			if (!level)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_NONZERO);
-				return MOD_CONT;
-			}
-			else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
-				return MOD_CONT;
-			}
-
-			na = findnick(nick);
-			if (!na)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NICKS_ONLY);
-				return MOD_CONT;
-			}
-			else if (na->HasFlag(NS_FORBIDDEN))
-			{
-				notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, nick);
-				return MOD_CONT;
-			}
-
-			nc = na->nc;
-			access = ci->GetAccess(nc);
-			if (access)
-			{
-				/* Don't allow lowering from a level >= ulev */
-				if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
-				{
-					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-					return MOD_CONT;
-				}
-				if (access->level == level)
-				{
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display, chan, level);
-					return MOD_CONT;
-				}
-				access->level = level;
-
-				FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
-
-				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
-					<< access->level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display, chan, level);
-				return MOD_CONT;
-			}
-
-			if (ci->GetAccessCount() >= Config.CSAccessMax)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT, Config.CSAccessMax);
-				return MOD_CONT;
-			}
-
-			ci->AddAccess(nc, level, u->nick);
-
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
-
-			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level "
-				<< level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
-			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name.c_str(), level);
+			this->DoAdd(u, ci, params);
 		}
 		else if (cmd == "DEL")
 		{
-			if (readonly)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
-				return MOD_CONT;
-			}
-
-			if (!ci->GetAccessCount())
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
-				return MOD_CONT;
-			}
-
-			/* Special case: is it a number/list?  Only do search if it isn't. */
-			if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
-				(new AccessDelCallback(u, ci, nick))->Process();
-			else
-			{
-				na = findnick(nick);
-				if (!na)
-				{
-					notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
-					return MOD_CONT;
-				}
-
-				nc = na->nc;
-
-				for (i = 0; i < ci->GetAccessCount(); ++i)
-				{
-					access = ci->GetAccess(i);
-
-					if (access->nc == nc)
-						break;
-				}
-
-				if (i == ci->GetAccessCount())
-				{
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick, chan);
-					return MOD_CONT;
-				}
-
-				if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				{
-					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-				}
-				else
-				{
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name.c_str());
-					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci)
-						<< ") deleted access of " << na->nick << " (group " << access->nc->display << ") on " << chan;
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
-
-					ci->EraseAccess(i);
-				}
-			}
+			this->DoDel(u, ci, params);
 		}
 		else if (cmd == "LIST")
 		{
-			if (!ci->GetAccessCount())
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
-				return MOD_CONT;
-			}
-			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
-				(new AccessListCallback(u, ci, nick))->Process();
-			else
-			{
-				bool SentHeader = false;
-
-				for (i = 0; i < ci->GetAccessCount(); i++)
-				{
-					access = ci->GetAccess(i);
-
-					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
-						continue;
-
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-					}
-
-					AccessListCallback::DoList(u, ci, i, access);
-				}
-
-				if (SentHeader)
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
-				else
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
-			}
+			this->DoList(u, ci, params);
 		}
 		else if (cmd == "VIEW")
 		{
-			if (!ci->GetAccessCount())
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, chan);
-				return MOD_CONT;
-			}
-			if (nick && strspn(nick, "1234567890,-") == strlen(nick))
-				(new AccessViewCallback(u, ci, nick))->Process();
-			else
-			{
-				bool SentHeader = false;
-
-				for (i = 0; i < ci->GetAccessCount(); ++i)
-				{
-					access = ci->GetAccess(i);
-
-					if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
-						continue;
-
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-					}
-
-					AccessViewCallback::DoList(u, ci, i, access);
-				}
-
-				if (SentHeader)
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
-				else
-					notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NO_MATCH, chan);
-			}
+			this->DoView(u, ci, params);
 		}
 		else if (cmd == "CLEAR")
 		{
-			if (readonly)
-			{
-				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
-				return MOD_CONT;
-			}
-
-			if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
-			{
-				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-				return MOD_CONT;
-			}
-
-			ci->ClearAccess();
-
-			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
-
-			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name.c_str());
-			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << " cleared access list on " << chan;
+			this->DoClear(u, ci, params);
 		}
 		else
+		{
 			this->OnSyntaxError(u, "");
+		}
+
 		return MOD_CONT;
 	}
 
@@ -450,6 +464,122 @@ class CommandCSAccess : public Command
 
 class CommandCSLevels : public Command
 {
+	CommandReturn DoSet(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		const ci::string what = params[2];
+		const ci::string lev = params[3];
+
+		char *error;
+		int level = strtol(lev.c_str(), &error, 10);
+
+		if (lev == "FONDER")
+		{
+			level = ACCESS_FOUNDER;
+			*error = '\0';
+		}
+
+		if (*error != '\0')
+		{
+			this->OnSyntaxError(u, "SET");
+		}
+		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
+		{
+			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+		}
+		else
+		{
+			for (int i = 0; levelinfo[i].what >= 0; i++)
+			{
+				if (levelinfo[i].name == what)
+				{
+					ci->levels[levelinfo[i].what] = level;
+					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, level));
+					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set level " << levelinfo[i].name << " on channel " << ci->name << " to " << level;
+					if (level == ACCESS_FOUNDER)
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name, ci->name.c_str());
+					else
+						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED, levelinfo[i].name, ci->name.c_str(), level);
+					return MOD_CONT;
+				}
+			}
+		}
+
+
+		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what.c_str(), Config.s_ChanServ);
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoDisable(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		const ci::string what = params[2];
+
+		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
+		if (what != "FOUNDER")
+		{
+			for (int i = 0; levelinfo[i].what >= 0; i++)
+			{
+				if (levelinfo[i].name == what)
+				{
+					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
+					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
+	
+					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name << " on channel " << ci->name;
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED, levelinfo[i].name, ci->name.c_str());
+					return MOD_CONT;
+				}
+			}
+		}
+
+		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what.c_str(), Config.s_ChanServ);
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoList(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, ci->name.c_str());
+
+		if (!levelinfo_maxwidth)
+		{
+			for (int i = 0; levelinfo[i].what >= 0; i++) {
+				int len = strlen(levelinfo[i].name);
+				if (len > levelinfo_maxwidth)
+					levelinfo_maxwidth = len;
+			}
+		}
+
+		for (int i = 0; levelinfo[i].what >= 0; i++) {
+			int j = ci->levels[levelinfo[i].what];
+
+			if (j == ACCESS_INVALID) {
+				j = levelinfo[i].what;
+
+				if (j == CA_AUTOOP || j == CA_AUTODEOP || j == CA_AUTOVOICE
+					|| j == CA_NOJOIN) {
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name);
+				} else {
+					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name);
+				}
+			} else if (j == ACCESS_FOUNDER) {
+				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name);
+			} else {
+				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_NORMAL, levelinfo_maxwidth, levelinfo[i].name, j);
+			}
+		}
+
+		return MOD_CONT;
+	}
+
+	CommandReturn DoReset(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	{
+		reset_levels(ci);
+		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
+		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " reset levels definitions on channel " << ci->name;
+		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RESET, ci->name.c_str());
+		return MOD_CONT;
+	}
+
  public:
 	CommandCSLevels() : Command("LEVELS", 2, 4)
 	{
@@ -461,11 +591,8 @@ class CommandCSLevels : public Command
 		ci::string cmd = params[1];
 		const char *what = params.size() > 2 ? params[2].c_str() : NULL;
 		const char *s = params.size() > 3 ? params[3].c_str() : NULL;
-		char *error;
 
 		ChannelInfo *ci = cs_findchan(chan);
-		int level;
-		int i;
 
 		/* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only
 		 * one; else, we want none.
@@ -476,105 +603,27 @@ class CommandCSLevels : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_XOP);
 		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		else if (cmd == "SET") {
-			level = strtol(s, &error, 10);
-
-			if (!stricmp(s, "FOUNDER"))
-			{
-				level = ACCESS_FOUNDER;
-				*error = '\0';
-			}
-
-			if (*error != '\0') {
-				this->OnSyntaxError(u, "SET");
-				return MOD_CONT;
-			}
-
-			if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER) {
-				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RANGE,
-							ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
-				return MOD_CONT;
-			}
-
-			for (i = 0; levelinfo[i].what >= 0; i++) {
-				if (stricmp(levelinfo[i].name, what) == 0) {
-					ci->levels[levelinfo[i].what] = level;
-					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, level));
-					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " set level " << levelinfo[i].name
-						<< " on channel " << ci->name << " to " << level;
-					if (level == ACCESS_FOUNDER)
-						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name, ci->name.c_str());
-					else
-						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_CHANGED,
-								levelinfo[i].name, ci->name.c_str(), level);
-					return MOD_CONT;
-				}
-			}
-
-			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, Config.s_ChanServ);
-
-		} else if (cmd == "DIS" || cmd == "DISABLE") {
-			/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
-			if (stricmp(what, "FOUNDER"))
-			{
-				for (i = 0; levelinfo[i].what >= 0; i++) {
-					if (stricmp(levelinfo[i].name, what) == 0) {
-						ci->levels[levelinfo[i].what] = ACCESS_INVALID;
-						FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
-	
-						Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name
-							<< " on channel " << ci->name;
-						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED,
-									levelinfo[i].name, chan);
-						return MOD_CONT;
-					}
-				}
-			}
-
-			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, Config.s_ChanServ);
-		} else if (cmd == "LIST") {
-			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, chan);
-
-			if (!levelinfo_maxwidth) {
-				for (i = 0; levelinfo[i].what >= 0; i++) {
-					int len = strlen(levelinfo[i].name);
-					if (len > levelinfo_maxwidth)
-						levelinfo_maxwidth = len;
-				}
-			}
-
-			for (i = 0; levelinfo[i].what >= 0; i++) {
-				int j = ci->levels[levelinfo[i].what];
-
-				if (j == ACCESS_INVALID) {
-					j = levelinfo[i].what;
-
-					if (j == CA_AUTOOP || j == CA_AUTODEOP || j == CA_AUTOVOICE
-						|| j == CA_NOJOIN) {
-						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED,
-									levelinfo_maxwidth, levelinfo[i].name);
-					} else {
-						notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED,
-									levelinfo_maxwidth, levelinfo[i].name);
-					}
-				} else if (j == ACCESS_FOUNDER) {
-					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_FOUNDER,
-								levelinfo_maxwidth, levelinfo[i].name);
-				} else {
-					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_NORMAL,
-								levelinfo_maxwidth, levelinfo[i].name, j);
-				}
-			}
-
-		} else if (cmd == "RESET") {
-			reset_levels(ci);
-			FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
-
-			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " reset levels definitions on channel " << ci->name;
-			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RESET, chan);
-		} else {
+		else if (cmd == "SET")
+		{
+			this->DoSet(u, ci, params);
+		}
+		else if (cmd == "DIS" || cmd == "DISABLE")
+		{
+			this->DoDisable(u, ci, params);
+		}
+		else if (cmd == "LIST")
+		{
+			this->DoList(u, ci, params);
+		}
+		else if (cmd == "RESET")
+		{
+			this->DoReset(u, ci, params);
+		}
+		else
+		{
 			this->OnSyntaxError(u, "");
 		}
+
 		return MOD_CONT;
 	}
 

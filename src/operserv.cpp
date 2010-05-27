@@ -461,7 +461,7 @@ XLine *XLineManager::Check(User *u)
 		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent().c_str(), x->GetUser()))
 			continue;
 
-		if (x->GetNick().empty() && x->GetUser().empty() || ((u->hostip && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost.c_str(), x->GetHost())) || (u->vhost && Anope::Match(u->vhost, x->GetHost()))))
+		if (x->GetHost().empty() || ((u->hostip && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost.c_str(), x->GetHost())) || (u->vhost && Anope::Match(u->vhost, x->GetHost()))))
 		{
 			OnMatch(u, x);
 			return x;

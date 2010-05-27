@@ -149,7 +149,7 @@ class CommandBSBadwords : public Command
 		{
 			BadWord *bw = ci->GetBadWord(i);
 
-			if (!bw->word.empty() && (Config.BSCaseSensitive && !stricmp(bw->word.c_str(), realword.c_str())
+			if (!bw->word.empty() && ((Config.BSCaseSensitive && !stricmp(bw->word.c_str(), realword.c_str()))
 				|| (!Config.BSCaseSensitive && bw->word == realword.c_str())))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());

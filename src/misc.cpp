@@ -235,9 +235,9 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 		token = list;
 	do
 	{
-		char *h = strchr(token.c_str(), '-');
+		size_t t = token.find('-');
 
-		if (!h)
+		if (t == std::string::npos)
 		{
 			unsigned num = strtol(token.c_str(), &error, 10);
 			if (*error == '\0')
@@ -256,9 +256,8 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 		else
 		{
 			char *error2;
-			*h++ = '\0';
-			unsigned num1 = strtol(token.c_str(), &error, 10);
-			unsigned num2 = strtol(h, &error2, 10);
+			unsigned num1 = strtol(token.substr(0, t).c_str(), &error, 10);
+			unsigned num2 = strtol(token.substr(t + 1).c_str(), &error2, 10);
 			if (*error == '\0' && *error2 == '\0')
 			{
 				for (unsigned i = num1; i <= num2; ++i)

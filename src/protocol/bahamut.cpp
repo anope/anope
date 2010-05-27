@@ -179,7 +179,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* SGLINE */
 	void SendSGLine(XLine *x)
 	{
-		send_cmd(NULL, "SGLINE %d :%s:%s", x->Mask.length(), x->Mask.c_str(), x->Reason.c_str());
+		send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(x->Mask.length()), x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/* RAKILL */

@@ -176,9 +176,10 @@ class CoreExport User : public Extensible
 	virtual NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
+	 * @param CheckNick True to check if the user is identified to the nickname they are on too
 	 * @return true or false
 	 */
-	virtual const bool IsIdentified() const;
+	virtual const bool IsIdentified(bool CheckNick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
 	 * @return true or false

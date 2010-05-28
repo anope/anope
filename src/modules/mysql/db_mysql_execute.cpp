@@ -67,7 +67,7 @@ class FakeUser : public User
 	void SendMessage(const std::string &, const std::string &) { }
 
 	NickCore *Account() const { return nc; }
-	const bool IsIdentified() const { return nc ? true : false; }
+	const bool IsIdentified(bool) const { return nc ? true : false; }
 } SQLUser;
 
 class SQLTimer : public Timer

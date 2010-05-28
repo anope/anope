@@ -212,7 +212,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (this->IsIdentified() || (!na->nc->HasFlag(NI_SECURE) && this->IsRecognized())))
+	if (na && (this->IsIdentified(true) || (!na->nc->HasFlag(NI_SECURE) && this->IsRecognized())))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;
@@ -477,11 +477,24 @@ NickCore *User::Account() const
 }
 
 /** Check if the user is identified for their nick
+ * @param CheckNick True to check if the user is identified to the nickname they are on too
  * @return true or false
  */
-const bool User::IsIdentified() const
+const bool User::IsIdentified(bool CheckNick) const
 {
-	return nc;
+	if (CheckNick && this->nc)
+	{
+		NickAlias *na = findnick(this->nc->display);
+
+		if (na && na->nc == this->nc)
+		{
+			return this->nc;
+		}
+		
+		return NULL;
+	}
+
+	return this->nc;
 }
 
 /** Check if the user is recognized for their nick (on the nicks access list)
@@ -498,7 +511,11 @@ void User::UpdateHost()
 {
 	NickAlias *na = findnick(this->nick);
 
-	if (na && ((this->nc && na->nc == this->nc) || (!na->nc->HasFlag(NI_SECURE) && IsRecognized())))
+	OnAccess = false;
+	if (na)
+		OnAccess = is_on_access(this, na->nc);
+
+	if (na && (this->IsIdentified(true) || (!na->nc->HasFlag(NI_SECURE) && this->IsRecognized())))
 	{
 		if (na->last_usermask)
 			delete [] na->last_usermask;
@@ -506,10 +523,6 @@ void User::UpdateHost()
 		std::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
 		na->last_usermask = sstrdup(last_usermask.c_str());
 	}
-
-	OnAccess = false;
-	if (na && this->host)
-		OnAccess = is_on_access(this, na->nc);
 }
 
 /*************************************************************************/
@@ -824,11 +837,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 {
 	User *user = NULL;
 
-	char *tmp = NULL;
-	NickAlias *old_na;		  /* Old nick rec */
-	int nc_changed = 1;		 /* Did nick core change? */
-	char *logrealname;
-
 	if (!*source) {
 		char ipbuf[16];
 		struct in_addr addr;
@@ -851,22 +859,25 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		}
 
 
-		if (Config.LogUsers) {
-	/**
-	 * Ugly swap routine for Flop's bug :)   XXX
- 	 **/
-			if (realname) {
-				tmp = const_cast<char *>(strchr(realname, '%'));
-				while (tmp) {
+		if (Config.LogUsers)
+		{
+			/**
+			 * Ugly swap routine for Flop's bug :)   XXX
+			 **/
+			if (realname)
+			{
+				char *tmp = const_cast<char *>(strchr(realname, '%'));
+				while (tmp)
+				{
 					*tmp = '-';
 					tmp = const_cast<char *>(strchr(realname, '%'));
 				}
 			}
-			logrealname = normalizeBuffer(realname);
+			const char *logrealname = normalizeBuffer(realname);
 
-	/**
-	 * End of ugly swap
-	 **/
+			/**
+			 * End of ugly swap
+			 **/
 			Alog() << "LOGUSERS: " << nick << " (" << username << "@" << host
 				<< (ircd->nickvhost && vhost ? " => " : "")
 				<< (ircd->nickvhost && vhost ? vhost : "") << ") (" << logrealname << ") "
@@ -918,7 +929,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			return NULL;
 
 		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
-	} else {
+	}
+	else
+	{
 		/* An old user changing nicks. */
 		if (ircd->ts6)
 			user = find_byuid(source);
@@ -933,8 +946,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		user->isSuperAdmin = 0; /* Dont let people nick change and stay SuperAdmins */
 		Alog(LOG_DEBUG) << source << " changes nick to " <<  nick;
 
-		if (Config.LogUsers) {
-			logrealname = normalizeBuffer(user->realname);
+		if (Config.LogUsers)
+		{
+			const char *logrealname = normalizeBuffer(user->realname);
 			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host
 				<< (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" 
 				<< logrealname << ") " << "changed nick to " << nick << " (" << user->server->name << ").";
@@ -944,20 +958,19 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 		user->timestamp = ts;
 
-		if (stricmp(nick, user->nick.c_str()) == 0) {
+		if (stricmp(nick, user->nick.c_str()) == 0)
+		{
 			/* No need to redo things */
 			user->SetNewNick(nick);
-			nc_changed = 0;
-		} else {
+		}
+		else
+		{
 			/* Update this only if nicks aren't the same */
 			user->my_signon = time(NULL);
 
-			old_na = findnick(user->nick);
-			if (old_na)
-			{
-				if (user->IsRecognized())
-					old_na->last_seen = time(NULL);
-			}
+			NickAlias *old_na = findnick(user->nick);
+			if (old_na && (old_na->nc == user->Account() || user->IsRecognized()))
+				old_na->last_seen = time(NULL);
 
 			std::string oldnick = user->nick;
 			user->SetNewNick(nick);
@@ -966,25 +979,11 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (old_na)
 				old_na->OnCancel(user);
 
-			if ((old_na ? old_na->nc : NULL) == user->Account())
-				nc_changed = 0;
-
-			if (!nc_changed)
+			NickAlias *na = findnick(user->nick);
+			/* If the new nick isnt registerd or its registerd and not yours */
+			if (!na || (old_na && na->nc != old_na->nc))
 			{
-				NickAlias *tmpcore = findnick(user->nick);
-
-				/* If the new nick isnt registerd or its registerd and not yours */
-				if (!tmpcore || (old_na && tmpcore->nc != old_na->nc))
-				{
-					ircdproto->SendUnregisteredNick(user);
-				}
-			}
-			else
-			{
-				if (!user->IsIdentified() || !user->IsRecognized())
-				{
-					ircdproto->SendUnregisteredNick(user);
-				}
+				ircdproto->SendUnregisteredNick(user);
 			}
 		}
 
@@ -1001,26 +1000,23 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	 */
 	if (!(ircd->b_delay_auth && user->server->sync == SSYNC_IN_PROGRESS))
 	{
-		NickAlias *ntmp = findnick(user->nick);
-		if (ntmp && user->Account() == ntmp->nc)
-		{
-			nc_changed = 0;
-		}
+		NickAlias *na = findnick(user->nick);
 
-		if (!ntmp || ntmp->nc != user->Account() || nc_changed)
+		if (!na || na->nc != user->Account())
 		{
 			if (validate_user(user))
 				check_memos(user);
 		}
 		else
 		{
-			ntmp->last_seen = time(NULL);
+			na->last_seen = time(NULL);
 			user->UpdateHost();
+			do_on_id(user);
 			ircdproto->SetAutoIdentificationToken(user);
 			Alog() << Config.s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
 		}
 
-		/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
+		/* Bahamut sets -r on every nick changes */
 		if (ircd->check_nick_id)
 		{
 			if (user->IsIdentified())
@@ -1071,7 +1067,7 @@ void do_quit(const char *source, int ac, const char **av)
 	}
 	Alog(LOG_DEBUG) << source << " quits";
 	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN)
-		&& !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified())) {
+		&& !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
 			delete [] na->last_quit;
@@ -1103,7 +1099,7 @@ void do_kill(const std::string &nick, const std::string &msg)
 		return;
 	}
 	Alog(LOG_DEBUG) << nick << " killed";
-	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified())) 
+	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true))) 
 	{
 		na->last_seen = time(NULL);
 		if (na->last_quit)

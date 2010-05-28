@@ -192,7 +192,7 @@ void User::SetRealname(const std::string &srealname)
 	this->realname = sstrdup(srealname.c_str());
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (this->IsIdentified(true) || (!na->nc->HasFlag(NI_SECURE) && this->IsRecognized())))
+	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
 	{
 		if (na->last_realname)
 			delete [] na->last_realname;
@@ -477,10 +477,21 @@ const bool User::IsIdentified(bool CheckNick) const
 }
 
 /** Check if the user is recognized for their nick (on the nicks access list)
+ * @param CheckSecure Only returns true if the user has secure off
  * @return true or false
  */
-const bool User::IsRecognized() const
+const bool User::IsRecognized(bool CheckSecure) const
 {
+	if (CheckSecure && OnAccess)
+	{
+		NickAlias *na = findnick(this->nick);
+
+		if (!na || !na->nc->HasFlag(NI_SECURE))
+		{
+			return false;
+		}
+	}
+
 	return OnAccess;
 }
 
@@ -497,7 +508,7 @@ void User::UpdateHost()
 	if (na)
 		OnAccess = is_on_access(this, na->nc);
 
-	if (na && (this->IsIdentified(true) || (!na->nc->HasFlag(NI_SECURE) && this->IsRecognized())))
+	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
 	{
 		if (na->last_usermask)
 			delete [] na->last_usermask;

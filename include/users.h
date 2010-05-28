@@ -188,9 +188,10 @@ class CoreExport User : public Extensible
 	virtual const bool IsIdentified(bool CheckNick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
+	 * @param CheckSecure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	virtual const bool IsRecognized() const;
+	virtual const bool IsRecognized(bool CheckSecure = false) const;
 
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */

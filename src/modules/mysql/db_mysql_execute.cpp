@@ -52,6 +52,7 @@ class FakeUser : public User
 
 	NickCore *Account() const { return nc; }
 	const bool IsIdentified(bool) const { return nc ? true : false; }
+	const bool IsRecognized(bool) const { return true; }
 } SQLUser;
 
 class SQLTimer : public Timer
@@ -155,7 +156,7 @@ class DBMySQLExecute : public DBMySQL
 	
 	~DBMySQLExecute()
 	{
-		TimerManager::DelTimer(_SQLTimer);
+		delete _SQLTimer;
 	}
 };
 

@@ -509,6 +509,9 @@ const bool User::IsRecognized() const
  */
 void User::UpdateHost()
 {
+	if (!this->host)
+		return;
+
 	NickAlias *na = findnick(this->nick);
 
 	OnAccess = false;

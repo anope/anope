@@ -160,6 +160,11 @@ class CommandNSAccess : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_ACCESS);
+	}
 };
 
 class NSAccess : public Module
@@ -172,12 +177,6 @@ class NSAccess : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSAccess());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_ACCESS);
 	}
 };
 

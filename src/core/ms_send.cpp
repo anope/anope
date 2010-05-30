@@ -40,6 +40,11 @@ class CommandMSSend : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SEND);
+	}
 };
 
 class MSSend : public Module
@@ -51,12 +56,6 @@ class MSSend : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSSend());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SEND);
 	}
 };
 

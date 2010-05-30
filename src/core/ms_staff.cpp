@@ -53,6 +53,11 @@ class CommandMSStaff : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "STAFF", MEMO_STAFF_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_STAFF);
+	}
 };
 
 class MSStaff : public Module
@@ -64,12 +69,6 @@ class MSStaff : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSStaff());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_STAFF);
 	}
 };
 

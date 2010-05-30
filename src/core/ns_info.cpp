@@ -199,6 +199,11 @@ class CommandNSInfo : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_INFO);
+	}
 };
 
 class NSInfo : public Module
@@ -211,12 +216,6 @@ class NSInfo : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSInfo());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_INFO);
 	}
 };
 

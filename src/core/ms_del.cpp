@@ -152,6 +152,11 @@ class CommandMSDel : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_DEL);
+	}
 };
 
 class MSDel : public Module
@@ -162,61 +167,7 @@ class MSDel : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MemoServ, new CommandMSDel());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_DEL);
 	}
 };
-
-/**
- * Delete a single memo from a MemoInfo. callback function
- * @param u User Struct
- * @param int Number
- * @param va_list Variable Arguemtns
- * @return 1 if successful, 0 if it fails
- */
-int del_memo_callback(User *u, int num, va_list args)
-{
-	MemoInfo *mi = va_arg(args, MemoInfo *);
-	int *last = va_arg(args, int *);
-	int *last0 = va_arg(args, int *);
-	char **end = va_arg(args, char **);
-	int *left = va_arg(args, int *);
-	ChannelInfo *ci = va_arg(args, ChannelInfo *);
-
-	if (ci)
-	{
-		FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, num));
-	}
-	else
-	{
-		FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, num));
-	}
-	if (delmemo(mi, num))
-	{
-		if (num != (*last) + 1)
-		{
-			if (*last != -1)
-			{
-				int len;
-				if (*last0 != *last)
-					len = snprintf(*end, *left, ",%d-%d", *last0, *last);
-				else
-					len = snprintf(*end, *left, ",%d", *last);
-				*end += len;
-				*left -= len;
-			}
-			*last0 = num;
-		}
-		*last = num;
-		return 1;
-	}
-	else
-		return 0;
-}
 
 MODULE_INIT(MSDel)

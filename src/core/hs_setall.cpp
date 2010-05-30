@@ -147,6 +147,11 @@ class CommandHSSetAll : public Command
 	{
 		syntax_error(Config.s_HostServ, u, "SETALL", HOST_SETALL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_SETALL);
+	}
 };
 
 class HSSetAll : public Module
@@ -159,12 +164,6 @@ class HSSetAll : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSSetAll());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_SETALL);
 	}
 };
 

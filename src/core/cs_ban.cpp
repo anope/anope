@@ -93,6 +93,11 @@ class CommandCSBan : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_BAN);
+	}
 };
 
 
@@ -106,12 +111,6 @@ class CSBan : public Module
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSBan("BAN"));
 		this->AddCommand(ChanServ, new CommandCSBan("KB"));
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_BAN);
 	}
 };
 

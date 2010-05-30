@@ -63,6 +63,11 @@ class CommandOSStaff : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_STAFF);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_STAFF);
+	}
 };
 
 class OSStaff : public Module
@@ -75,12 +80,6 @@ class OSStaff : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSStaff());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_STAFF);
 	}
 };
 

@@ -31,7 +31,8 @@ class CommandMSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_HEADER);
-		FOREACH_MOD(I_OnMemoServHelp, OnMemoServHelp(u));
+		for (CommandMap::const_iterator it = NickServ->Commands.begin(); it != NickServ->Commands.end(); ++it)
+			it->second->OnServHelp(u);
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_FOOTER, Config.s_ChanServ);
 	}
 };

@@ -55,6 +55,11 @@ class CommandCSStatus : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_STATUS);
+	}
 };
 
 class CSStatus : public Module
@@ -65,14 +70,6 @@ class CSStatus : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-
-		this->AddCommand(ChanServ, new CommandCSStatus());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_STATUS);
 	}
 };
 

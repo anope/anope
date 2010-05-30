@@ -55,6 +55,11 @@ class CommandNSResetPass : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "RESETPASS", NICK_RESETPASS_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RESETPASS);
+	}
 };
 
 class NSResetPass : public Module
@@ -71,13 +76,7 @@ class NSResetPass : public Module
 
 		this->AddCommand(NickServ, new CommandNSResetPass());
 
-		Implementation i[] = { I_OnNickServHelp, I_OnPreCommand };
-		ModuleManager::Attach(i, this, 2);
-	}
-
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RESETPASS);
+		ModuleManager::Attach(I_OnPreCommand, this);
 	}
 
 	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)

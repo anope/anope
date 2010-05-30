@@ -141,6 +141,11 @@ class CommandMSRead : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_READ);
+	}
 };
 
 class MSRead : public Module
@@ -152,12 +157,6 @@ class MSRead : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSRead());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_READ);
 	}
 };
 

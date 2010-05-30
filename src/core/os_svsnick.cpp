@@ -77,6 +77,11 @@ class CommandOSSVSNick : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "SVSNICK", OPER_SVSNICK_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SVSNICK);
+	}
 };
 
 class OSSVSNick : public Module
@@ -92,12 +97,6 @@ class OSSVSNick : public Module
 
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SVSNICK);
 	}
 };
 

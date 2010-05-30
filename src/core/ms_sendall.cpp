@@ -56,6 +56,11 @@ class CommandMSSendAll : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
+	}
 };
 
 class MSSendAll : public Module
@@ -67,12 +72,6 @@ class MSSendAll : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSSendAll());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
 	}
 };
 

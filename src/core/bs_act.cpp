@@ -65,6 +65,11 @@ class CommandBSAct : public Command
 		notice_help(Config.s_BotServ, u, BOT_HELP_ACT);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_ACT);
+	}
 };
 
 class BSAct : public Module
@@ -76,12 +81,6 @@ class BSAct : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(BotServ, new CommandBSAct());
-
-		ModuleManager::Attach(I_OnBotServHelp, this);
-	}
-	void OnBotServHelp(User *u)
-	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_ACT);
 	}
 };
 

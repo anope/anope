@@ -380,6 +380,11 @@ class CommandOSAKill : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_AKILL);
+	}
 };
 
 class OSAKill : public Module
@@ -391,12 +396,6 @@ class OSAKill : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(OperServ, new CommandOSAKill());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_AKILL);
 	}
 };
 

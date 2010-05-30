@@ -112,6 +112,11 @@ class CommandCSRegister : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}
+
+	void OnSyntaxError(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
+	}
 };
 
 class CSRegister : public Module
@@ -124,12 +129,6 @@ class CSRegister : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(ChanServ, new CommandCSRegister());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
 	}
 };
 

@@ -30,7 +30,8 @@ class CommandOSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP);
-		FOREACH_MOD(I_OnOperServHelp, OnOperServHelp(u));
+		for (CommandMap::const_iterator it = NickServ->Commands.begin(); it != NickServ->Commands.end(); ++it)
+			it->second->OnServHelp(u);
 		notice_help(Config.s_OperServ, u, OPER_HELP_LOGGED);
 	}
 };

@@ -293,6 +293,11 @@ class CommandOSStats : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_STATS);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_STATS);
+	}
 };
 
 class OSStats : public Module
@@ -305,12 +310,6 @@ class OSStats : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSStats());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_STATS);
 	}
 };
 

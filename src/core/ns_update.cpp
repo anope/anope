@@ -46,6 +46,11 @@ class CommandNSUpdate : public Command
 		notice_help(Config.s_NickServ, u, NICK_HELP_UPDATE);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UPDATE);
+	}
 };
 
 class NSUpdate : public Module
@@ -57,11 +62,6 @@ class NSUpdate : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(NickServ, new CommandNSUpdate());
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UPDATE);
 	}
 };
 

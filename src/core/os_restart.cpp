@@ -41,6 +41,11 @@ class CommandOSRestart : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_RESTART);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RESTART);
+	}
 };
 
 class OSRestart : public Module
@@ -52,12 +57,6 @@ class OSRestart : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(OperServ, new CommandOSRestart());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RESTART);
 	}
 };
 

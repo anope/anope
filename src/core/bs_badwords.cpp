@@ -259,6 +259,11 @@ class CommandBSBadwords : public Command
 	{
 		syntax_error(Config.s_BotServ, u, "BADWORDS", BOT_BADWORDS_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BADWORDS);
+	}
 };
 
 class BSBadwords : public Module
@@ -270,12 +275,6 @@ class BSBadwords : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(BotServ, new CommandBSBadwords);
-
-		ModuleManager::Attach(I_OnBotServHelp, this);
-	}
-	void OnBotServHelp(User *u)
-	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BADWORDS);
 	}
 };
 

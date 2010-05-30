@@ -206,6 +206,11 @@ class CommandNSList : public Command
 		else
 			syntax_error(Config.s_NickServ, u, "LIST", NICK_LIST_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LIST);
+	}
 };
 
 class NSList : public Module
@@ -218,12 +223,6 @@ class NSList : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSList());
-		
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LIST);
 	}
 };
 

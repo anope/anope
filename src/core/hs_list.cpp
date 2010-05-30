@@ -111,6 +111,11 @@ class CommandHSList : public Command
 		notice_help(Config.s_HostServ, u, HOST_HELP_LIST);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_LIST);
+	}
 };
 
 class HSList : public Module
@@ -123,12 +128,6 @@ class HSList : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSList());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_LIST);
 	}
 };
 

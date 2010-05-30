@@ -79,6 +79,11 @@ class CommandCSKick : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_KICK);
+	}
 };
 
 class CSKick : public Module
@@ -91,12 +96,6 @@ class CSKick : public Module
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSKick("KICK"));
 		this->AddCommand(ChanServ, new CommandCSKick("K"));
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_KICK);
 	}
 };
 

@@ -161,6 +161,11 @@ class CommandCSClear : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
+	}
 };
 
 class CSClear : public Module
@@ -172,12 +177,6 @@ class CSClear : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSClear());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
 	}
 };
 

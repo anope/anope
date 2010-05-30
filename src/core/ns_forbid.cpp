@@ -100,6 +100,11 @@ class CommandNSForbid : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "FORBID", Config.ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_FORBID);
+	}
 };
 
 class NSForbid : public Module
@@ -112,12 +117,6 @@ class NSForbid : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSForbid());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_FORBID);
 	}
 };
 

@@ -89,6 +89,11 @@ class CommandOSUserList : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_USERLIST);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_USERLIST);
+	}
 };
 
 class OSUserList : public Module
@@ -101,12 +106,6 @@ class OSUserList : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSUserList());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_USERLIST);
 	}
 };
 

@@ -45,6 +45,11 @@ class CommandHSGroup : public Command
 		notice_help(Config.s_HostServ, u, HOST_HELP_GROUP);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_GROUP);
+	}
 };
 
 class HSGroup : public Module
@@ -57,12 +62,6 @@ class HSGroup : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSGroup());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_GROUP);
 	}
 };
 

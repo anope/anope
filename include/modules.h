@@ -334,36 +334,6 @@ class CoreExport Module
 	 */
 	int DelCommand(BotInfo *bi, Command *c);
 
-	/** Called on NickServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnNickServHelp(User *u) { }
-
-	/** Called on ChanServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnChanServHelp(User *u) { }
-
-	/** Called on Botserv HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnBotServHelp(User *u) { }
-
-	/** Called on HostServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnHostServHelp(User *u) { }
-
-	/** Called on OperServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnOperServHelp(User *u) { }
-
-	/** Called on MemoServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnMemoServHelp(User *u) { }
-
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
 	 * @param target The user that has been kicked.
@@ -1091,34 +1061,34 @@ enum Implementation
 {
 	I_BEGIN,
 		/* NickServ */
-		I_OnNickServHelp, I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
+		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 		I_OnNickInfo,
 
 		/* ChanServ */
-		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
+		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
 		I_OnChanInfo,
 
 		/* BotServ */
-		I_OnBotServHelp, I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
+		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
 
 		/* HostServ */
-		I_OnHostServHelp, I_OnSetVhost, I_OnDeleteVhost,
+		I_OnSetVhost, I_OnDeleteVhost,
 
 		/* MemoServ */
-		I_OnMemoServHelp, I_OnMemoSend, I_OnMemoDel,
+		I_OnMemoSend, I_OnMemoDel,
 
 		/* Users */
 		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
 		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */
-		I_OnOperServHelp, I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
+		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
 		I_OnAddXLine, I_OnDelXLine,
 
 		/* Database */

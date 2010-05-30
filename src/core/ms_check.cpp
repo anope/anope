@@ -85,6 +85,11 @@ class CommandMSCheck : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CHECK);
+	}
 };
 
 class MSCheck : public Module
@@ -96,12 +101,6 @@ class MSCheck : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSCheck());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CHECK);
 	}
 };
 

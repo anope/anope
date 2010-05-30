@@ -125,6 +125,11 @@ class CommandOSDEFCON : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
 	}
+	
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_DEFCON);
+	}
 };
 
 class OSDEFCON : public Module
@@ -141,17 +146,12 @@ class OSDEFCON : public Module
 			throw ModuleException("Invalid configuration settings");
 		}
 
-		Implementation i[] = { I_OnOperServHelp, I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
-		ModuleManager::Attach(i, this, 9);
+		Implementation i[] = { I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
+		ModuleManager::Attach(i, this, 8);
 
 		this->AddCommand(OperServ, new CommandOSDEFCON());
 
 		defconParseModeString(Config.DefConChanModes);
-	}
-
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_DEFCON);
 	}
 
 	EventReturn OnPreUserConnect(User *u)

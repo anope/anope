@@ -62,6 +62,11 @@ class CommandOSUMode : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_UMODE);
+	}
 };
 
 class OSUMode : public Module
@@ -77,12 +82,6 @@ class OSUMode : public Module
 
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_UMODE);
 	}
 };
 

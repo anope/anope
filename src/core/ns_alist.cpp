@@ -134,6 +134,11 @@ class CommandNSAList : public Command
 
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_ALIST);
+	}
 };
 
 class NSAList : public Module
@@ -146,12 +151,6 @@ class NSAList : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSAList());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_ALIST);
 	}
 };
 

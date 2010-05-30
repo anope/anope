@@ -812,6 +812,11 @@ class CommandCSSet : public Command
 
 		syntax_error(Config.s_ChanServ, u, command.c_str(), reply);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET);
+	}
 };
 
 class CSSet : public Module
@@ -823,12 +828,6 @@ class CSSet : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSSet());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET);
 	}
 };
 

@@ -74,6 +74,11 @@ class CommandCSInvite : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "INVITE", CHAN_INVITE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_INVITE);
+	}
 };
 
 class CSInvite : public Module
@@ -85,12 +90,6 @@ class CSInvite : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSInvite());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_INVITE);
 	}
 };
 

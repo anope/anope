@@ -42,7 +42,8 @@ class CommandNSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP);
-		FOREACH_MOD(I_OnNickServHelp, OnNickServHelp(u));
+		for (CommandMap::const_iterator it = NickServ->Commands.begin(); it != NickServ->Commands.end(); ++it)
+			it->second->OnServHelp(u);
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP);
 		if (Config.NSExpire >= 86400)

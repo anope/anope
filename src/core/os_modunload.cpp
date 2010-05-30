@@ -53,6 +53,11 @@ class CommandOSModUnLoad : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
+	}
 };
 
 class OSModUnLoad : public Module
@@ -66,12 +71,6 @@ class OSModUnLoad : public Module
 		this->SetPermanent(true);
 
 		this->AddCommand(OperServ, new CommandOSModUnLoad());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
 	}
 };
 

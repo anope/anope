@@ -156,6 +156,11 @@ class CommandMSList : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
 	}
+
+	void OnServCommand(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_LIST);
+	}
 };
 
 class MSList : public Module
@@ -167,12 +172,6 @@ class MSList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSList());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_LIST);
 	}
 };
 

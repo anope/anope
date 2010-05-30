@@ -378,6 +378,11 @@ class CommandOSSZLine : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SZLINE);
+	}
 };
 
 class OSSZLine : public Module
@@ -393,12 +398,6 @@ class OSSZLine : public Module
 
 		if (!ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SZLINE);
 	}
 };
 

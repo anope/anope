@@ -178,6 +178,11 @@ public:
 	{
 		syntax_error(Config.s_ChanServ, u, "LIST", CHAN_LIST_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LIST);
+	}
 };
 
 class CSList : public Module
@@ -189,12 +194,6 @@ public:
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSList());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LIST);
 	}
 };
 

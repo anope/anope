@@ -78,6 +78,11 @@ class CoreExport Command : public Flags<CommandFlag>
 	 */
 	virtual CommandReturn Execute(User *u, const std::vector<ci::string> &);
 
+	/** Called when HELP is requsted for the client this command is on.
+	 * @param u The user requesting help
+	 */
+	virtual void OnServHelp(User *u);
+
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
 	 * @param u The user requesting help
 	 * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of 

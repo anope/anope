@@ -86,6 +86,11 @@ class CommandOSChanList : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_CHANLIST);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CHANLIST);
+	}
 };
 
 class OSChanList : public Module
@@ -98,12 +103,6 @@ class OSChanList : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSChanList());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CHANLIST);
 	}
 };
 

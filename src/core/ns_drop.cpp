@@ -107,6 +107,11 @@ class CommandNSDrop : public Command
 
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_DROP);
+	}
 };
 
 class NSDrop : public Module
@@ -119,12 +124,6 @@ class NSDrop : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSDrop());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_DROP);
 	}
 };
 

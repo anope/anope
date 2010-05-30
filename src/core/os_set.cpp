@@ -287,6 +287,11 @@ class CommandOSSet : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "SET", OPER_SET_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SET);
+	}
 };
 
 class OSSet : public Module
@@ -299,12 +304,6 @@ class OSSet : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSSet());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SET);
 	}
 };
 

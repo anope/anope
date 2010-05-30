@@ -59,6 +59,11 @@ class CommandOSOLine : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_OLINE);
+	}
 };
 
 class OSOLine : public Module
@@ -74,12 +79,6 @@ class OSOLine : public Module
 
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_OLINE);
 	}
 };
 

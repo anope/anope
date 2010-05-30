@@ -41,6 +41,11 @@ class CommandHSOff : public Command
 		notice_help(Config.s_HostServ, u, HOST_HELP_OFF);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_OFF);
+	}
 };
 
 class HSOff : public Module
@@ -53,12 +58,6 @@ class HSOff : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSOff());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_OFF);
 	}
 };
 

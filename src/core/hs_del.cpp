@@ -52,6 +52,11 @@ class CommandHSDel : public Command
 	{
 		syntax_error(Config.s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DEL);
+	}
 };
 
 class HSDel : public Module
@@ -64,12 +69,6 @@ class HSDel : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSDel());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DEL);
 	}
 };
 

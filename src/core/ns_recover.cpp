@@ -103,6 +103,11 @@ class CommandNSRecover : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RECOVER);
+	}
 };
 
 class NSRecover : public Module
@@ -115,12 +120,6 @@ class NSRecover : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSRecover());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RECOVER);
 	}
 };
 

@@ -56,6 +56,11 @@ class CommandNSStatus : public Command
 		notice_help(Config.s_NickServ, u, NICK_HELP_STATUS);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_STATUS);
+	}
 };
 
 class NSStatus : public Module
@@ -68,12 +73,6 @@ class NSStatus : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSStatus());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_STATUS);
 	}
 };
 

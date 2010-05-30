@@ -398,6 +398,11 @@ class CommandOSSNLine : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "SNLINE", OPER_SNLINE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SNLINE);
+	}
 };
 
 class OSSNLine : public Module
@@ -414,12 +419,6 @@ class OSSNLine : public Module
 
 		if (!ircd->snline)
 			throw ModuleException("Your IRCd does not support SNLine");
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SNLINE);
 	}
 };
 

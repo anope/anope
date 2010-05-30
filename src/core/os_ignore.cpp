@@ -127,6 +127,11 @@ class CommandOSIgnore : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_IGNORE);
+	}
 };
 
 class OSIgnore : public Module
@@ -139,15 +144,10 @@ class OSIgnore : public Module
 		this->SetType(CORE);
 		this->AddCommand(OperServ, new CommandOSIgnore());
 
-		Implementation i[] = { I_OnOperServHelp, I_OnDatabaseRead, I_OnDatabaseWrite };
-		ModuleManager::Attach(i, this, 3);
+		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite };
+		ModuleManager::Attach(i, this, 2);
 	}
-
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_IGNORE);
-	}
-
+	
 	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
 	{
 		std::string buf;

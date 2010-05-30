@@ -251,6 +251,11 @@ class CommandMSSet : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "SET", MEMO_SET_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SET);
+	}
 };
 
 class MSSet : public Module
@@ -263,12 +268,6 @@ class MSSet : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(MemoServ, new CommandMSSet());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SET);
 	}
 };
 

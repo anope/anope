@@ -176,6 +176,11 @@ class CommandBSSet : public Command
 	{
 		syntax_error(Config.s_BotServ, u, "SET", BOT_SET_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_SET);
+	}
 };
 class BSSet : public Module
 {
@@ -186,12 +191,6 @@ class BSSet : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(BotServ, new CommandBSSet());
-
-		ModuleManager::Attach(I_OnBotServHelp, this);
-	}
-	void OnBotServHelp(User *u)
-	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_SET);
 	}
 };
 

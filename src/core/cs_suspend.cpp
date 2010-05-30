@@ -98,6 +98,11 @@ class CommandCSSuspend : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "SUSPEND", Config.ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
+	}
 };
 
 class CommandCSUnSuspend : public Command
@@ -168,6 +173,11 @@ class CommandCSUnSuspend : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
+	}
 };
 
 class CSSuspend : public Module
@@ -181,13 +191,6 @@ class CSSuspend : public Module
 
 		this->AddCommand(ChanServ, new CommandCSSuspend());
 		this->AddCommand(ChanServ, new CommandCSUnSuspend());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
 	}
 };
 

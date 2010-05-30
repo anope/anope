@@ -69,6 +69,11 @@ class CommandNSGetPass : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GETPASS);
+	}
 };
 
 class NSGetPass : public Module
@@ -85,12 +90,6 @@ class NSGetPass : public Module
 		std::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GETPASS);
 	}
 };
 

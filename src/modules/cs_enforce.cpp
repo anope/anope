@@ -216,6 +216,11 @@ class CommandCSEnforce : public Command
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
+	}
 };
 
 class CSEnforce : public Module
@@ -438,12 +443,6 @@ class CSEnforce : public Module
 		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		this->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
 	}
 };
 

@@ -166,6 +166,11 @@ class CommandOSClearModes : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
+	}
 };
 
 class OSClearModes : public Module
@@ -178,12 +183,6 @@ class OSClearModes : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSClearModes());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
 	}
 };
 

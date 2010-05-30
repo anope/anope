@@ -158,6 +158,11 @@ class CommandCSInfo : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "INFO", CHAN_INFO_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_INFO);
+	}
 };
 
 class CSInfo : public Module
@@ -169,12 +174,6 @@ class CSInfo : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSInfo());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_INFO);
 	}
 };
 

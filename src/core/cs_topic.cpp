@@ -77,6 +77,11 @@ class CommandCSTopic : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
+	}
 };
 
 class CSTopic : public Module
@@ -89,12 +94,6 @@ class CSTopic : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(ChanServ, new CommandCSTopic());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
 	}
 };
 

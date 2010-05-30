@@ -59,6 +59,11 @@ class CommandOSKick : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_KICK);
+	}
 };
 
 class OSKick : public Module
@@ -71,12 +76,6 @@ class OSKick : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSKick());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_KICK);
 	}
 };
 

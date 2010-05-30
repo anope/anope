@@ -637,6 +637,12 @@ class CommandCSLevels : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
+	}
 };
 
 
@@ -651,13 +657,6 @@ class CSAccess : public Module
 
 		this->AddCommand(ChanServ, new CommandCSAccess());
 		this->AddCommand(ChanServ, new CommandCSLevels());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
 	}
 };
 

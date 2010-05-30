@@ -31,7 +31,8 @@ class CommandHSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP, Config.s_HostServ);
-		FOREACH_MOD(I_OnHostServHelp, OnHostServHelp(u));
+		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
+			it->second->OnServHelp(u);
 	}
 };
 

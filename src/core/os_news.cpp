@@ -339,6 +339,11 @@ class CommandOSLogonNews : public NewsBase
 	{
 		syntax_error(Config.s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
+	}
 };
 
 class CommandOSOperNews : public NewsBase
@@ -362,6 +367,11 @@ class CommandOSOperNews : public NewsBase
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
 	}
 };
 
@@ -387,6 +397,11 @@ class CommandOSRandomNews : public NewsBase
 	{
 		syntax_error(Config.s_OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
+	}
 };
 
 class OSNews : public Module
@@ -402,8 +417,8 @@ class OSNews : public Module
 		this->AddCommand(OperServ, new CommandOSOperNews());
 		this->AddCommand(OperServ, new CommandOSRandomNews());
 
-		Implementation i[] = { I_OnOperServHelp, I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
-		ModuleManager::Attach(i, this, 5);
+		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
+		ModuleManager::Attach(i, this, 4);
 	}
 
 	~OSNews()
@@ -411,13 +426,6 @@ class OSNews : public Module
 		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
 			delete *it;
 		News.clear();
-	}
-
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)

@@ -73,6 +73,11 @@ class CommandBSBotList : public Command
 		notice_help(Config.s_BotServ, u, BOT_HELP_BOTLIST);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BOTLIST);
+	}
 };
 
 class BSBotList : public Module
@@ -84,12 +89,6 @@ class BSBotList : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(BotServ, new CommandBSBotList());
-
-		ModuleManager::Attach(I_OnBotServHelp, this);
-	}
-	void OnBotServHelp(User *u)
-	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BOTLIST);
 	}
 };
 

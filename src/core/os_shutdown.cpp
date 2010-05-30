@@ -41,6 +41,11 @@ class CommandOSShutdown : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_SHUTDOWN);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SHUTDOWN);
+	}
 };
 
 class OSShutdown : public Module
@@ -53,12 +58,6 @@ class OSShutdown : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSShutdown());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SHUTDOWN);
 	}
 };
 

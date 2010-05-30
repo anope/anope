@@ -41,6 +41,11 @@ class CommandOSQuit : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_QUIT);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_QUIT);
+	}
 };
 
 class OSQuit : public Module
@@ -53,12 +58,6 @@ class OSQuit : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSQuit());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_QUIT);
 	}
 };
 

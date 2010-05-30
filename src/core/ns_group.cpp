@@ -149,6 +149,11 @@ class CommandNSGroup : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "GROUP", NICK_GROUP_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GROUP);
+	}
 };
 
 class CommandNSUngroup : public Command
@@ -215,6 +220,11 @@ class CommandNSUngroup : public Command
 		notice_help(Config.s_NickServ, u, NICK_HELP_UNGROUP);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UNGROUP);
+	}
 };
 
 class CommandNSGList : public Command
@@ -269,6 +279,11 @@ class CommandNSGList : public Command
 
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GLIST);
+	}
 };
 
 class NSGroup : public Module
@@ -283,15 +298,6 @@ class NSGroup : public Module
 		this->AddCommand(NickServ, new CommandNSGroup());
 		this->AddCommand(NickServ, new CommandNSUngroup());
 		this->AddCommand(NickServ, new CommandNSGList());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GROUP);
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UNGROUP);
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GLIST);
 	}
 };
 

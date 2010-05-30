@@ -33,6 +33,11 @@ class CommandOSUpdate : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_UPDATE);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_UPDATE);
+	}
 };
 
 class OSUpdate : public Module
@@ -45,12 +50,6 @@ class OSUpdate : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSUpdate());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_UPDATE);
 	}
 };
 

@@ -104,6 +104,12 @@ class CommandNSIdentify : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		if (this->name == "IDENTIFY")
+			notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
+	}
 };
 
 class NSIdentify : public Module
@@ -117,12 +123,6 @@ class NSIdentify : public Module
 
 		this->AddCommand(NickServ, new CommandNSIdentify("IDENTIFY"));
 		this->AddCommand(NickServ, new CommandNSIdentify("ID"));
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
 	}
 };
 

@@ -109,6 +109,11 @@ class CommandCSForbid : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_FORBID);
+	}
 };
 
 class CSForbid : public Module
@@ -120,12 +125,6 @@ class CSForbid : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(ChanServ, new CommandCSForbid());
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_FORBID);
 	}
 };
 

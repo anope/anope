@@ -149,6 +149,11 @@ class CommandHSSet : public Command
 	{
 		syntax_error(Config.s_HostServ, u, "SET", HOST_SET_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_SET);
+	}
 };
 
 class HSSet : public Module
@@ -161,12 +166,6 @@ class HSSet : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSSet());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_SET);
 	}
 };
 

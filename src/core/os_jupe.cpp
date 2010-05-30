@@ -57,6 +57,11 @@ class CommandOSJupe : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_JUPE);
+	}
 };
 
 class OSJupe : public Module
@@ -69,12 +74,6 @@ class OSJupe : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSJupe());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_JUPE);
 	}
 };
 

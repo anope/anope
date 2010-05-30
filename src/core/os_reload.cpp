@@ -43,6 +43,11 @@ class CommandOSReload : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_RELOAD);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RELOAD);
+	}
 };
 
 class OSReload : public Module
@@ -55,12 +60,6 @@ class OSReload : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSReload());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RELOAD);
 	}
 };
 

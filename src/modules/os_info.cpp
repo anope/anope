@@ -116,6 +116,11 @@ class CommandNSOInfo : public Command
 	{
 		me->NoticeLang(Config.s_NickServ, u, OINFO_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		me->NoticeLang(Config.s_NickServ, u, OINFO_HELP_CMD);
+	}
 };
 
 class CommandCSOInfo : public Command
@@ -179,6 +184,11 @@ class CommandCSOInfo : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, OCINFO_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		me->NoticeLang(Config.s_ChanServ, u, OCINFO_HELP_CMD);
 	}
 };
 
@@ -409,8 +419,8 @@ class OSInfo : public Module
 		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 
-		Implementation i[] = { I_OnNickServHelp, I_OnChanServHelp, I_OnNickInfo, I_OnChanInfo, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata };
-		ModuleManager::Attach(i, this, 6);
+		Implementation i[] = { I_OnNickInfo, I_OnChanInfo, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata };
+		ModuleManager::Attach(i, this, 4);
 	}
 
 	~OSInfo()
@@ -450,16 +460,6 @@ class OSInfo : public Module
 			if (ci->GetExtArray("os_info", c))
 				u->SendMessage(Config.s_ChanServ, " OperInfo: %s", c);
 		}
-	}
-
-	void OnNickServHelp(User *u)
-	{
-		this->NoticeLang(Config.s_NickServ, u, OINFO_HELP_CMD);
-	}
-
-	void OnChanServHelp(User *u)
-	{
-		this->NoticeLang(Config.s_ChanServ, u, OCINFO_HELP_CMD);
 	}
 
 	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickCore *nc)

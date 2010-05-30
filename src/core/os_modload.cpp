@@ -51,6 +51,11 @@ class CommandOSModLoad : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODLOAD);
+	}
 };
 
 class OSModLoad : public Module
@@ -64,12 +69,6 @@ class OSModLoad : public Module
 		this->SetPermanent(true);
 
 		this->AddCommand(OperServ, new CommandOSModLoad());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODLOAD);
 	}
 };
 

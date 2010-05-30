@@ -198,6 +198,11 @@ class CommandMSInfo : public Command
 
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_INFO);
+	}
 };
 
 class MSInfo : public Module
@@ -209,12 +214,6 @@ class MSInfo : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSInfo());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_INFO);
 	}
 };
 

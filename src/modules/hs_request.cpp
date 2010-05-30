@@ -205,6 +205,11 @@ class CommandHSRequest : public Command
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		me->NoticeLang(Config.s_HostServ, u, LNG_HELP);
+	}
 };
 
 class CommandHSActivate : public Command
@@ -256,6 +261,11 @@ class CommandHSActivate : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		me->NoticeLang(Config.s_HostServ, u, LNG_HELP_SETTER);
 	}
 };
 
@@ -645,8 +655,8 @@ class HSRequest : public Module
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 
-		Implementation i[] = { I_OnHostServHelp, I_OnPreCommand, I_OnDatabaseRead, I_OnDatabaseWrite };
-		ModuleManager::Attach(i, this, 4);
+		Implementation i[] = { I_OnPreCommand, I_OnDatabaseRead, I_OnDatabaseWrite };
+		ModuleManager::Attach(i, this, 3);
 	}
 
 	~HSRequest()
@@ -696,12 +706,6 @@ class HSRequest : public Module
 		}
 
 		return EVENT_CONTINUE;
-	}
-
-	void OnHostServHelp(User *u)
-	{
-		this->NoticeLang(Config.s_HostServ, u, LNG_HELP);
-		this->NoticeLang(Config.s_HostServ, u, LNG_HELP_SETTER);
 	}
 
 	EventReturn OnDatabaseRead(const std::vector<std::string> &params)

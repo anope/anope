@@ -164,6 +164,11 @@ class CommandNSConfirm : public Command
 	{
 		notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_CONFIRM);
+	}
 };
 
 class CommandNSRegister : public CommandNSConfirm
@@ -314,6 +319,11 @@ class CommandNSRegister : public CommandNSConfirm
 		else
 			syntax_error(Config.s_NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_REGISTER);
+	}
 };
 
 class CommandNSResend : public Command
@@ -357,6 +367,11 @@ class CommandNSResend : public Command
 		notice_help(Config.s_NickServ, u, NICK_HELP_RESEND);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RESEND);
+	}
 };
 
 class NSRegister : public Module
@@ -371,18 +386,6 @@ class NSRegister : public Module
 		this->AddCommand(NickServ, new CommandNSRegister());
 		this->AddCommand(NickServ, new CommandNSConfirm("CONFIRM", 1, 1));
 		this->AddCommand(NickServ, new CommandNSResend());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_REGISTER);
-		if (Config.NSEmailReg)
-		{
-			notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_CONFIRM);
-			notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_RESEND);
-		}
 	}
 };
 

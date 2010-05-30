@@ -41,6 +41,11 @@ class CommandOSGlobal : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_GLOBAL);
+	}
 };
 
 class OSGlobal : public Module
@@ -53,12 +58,6 @@ class OSGlobal : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSGlobal());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_GLOBAL);
 	}
 };
 

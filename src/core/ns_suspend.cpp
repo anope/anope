@@ -104,6 +104,11 @@ class CommandNSSuspend : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SUSPEND);
+	}
 };
 
 class CommandNSUnSuspend : public Command
@@ -172,6 +177,11 @@ class CommandNSUnSuspend : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
+	}
 };
 
 class NSSuspend : public Module
@@ -185,13 +195,6 @@ class NSSuspend : public Module
 
 		this->AddCommand(NickServ, new CommandNSSuspend());
 		this->AddCommand(NickServ, new CommandNSUnSuspend());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SUSPEND);
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
 	}
 };
 

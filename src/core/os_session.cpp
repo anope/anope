@@ -204,6 +204,11 @@ class CommandOSSession : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SESSION);
+	}
 };
 
 class CommandOSException : public Command
@@ -479,6 +484,11 @@ class CommandOSException : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
+	}
 };
 
 class OSSession : public Module
@@ -492,13 +502,6 @@ class OSSession : public Module
 
 		this->AddCommand(OperServ, new CommandOSSession());
 		this->AddCommand(OperServ, new CommandOSException());
-
-		ModuleManager::Attach(I_OnOperServHelp, this);
-	}
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SESSION);
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
 	}
 };
 

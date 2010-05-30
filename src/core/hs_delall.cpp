@@ -57,6 +57,11 @@ class CommandHSDelAll : public Command
 	{
 		syntax_error(Config.s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DELALL);
+	}
 };
 
 class HSDelAll : public Module
@@ -69,12 +74,6 @@ class HSDelAll : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(HostServ, new CommandHSDelAll());
-
-		ModuleManager::Attach(I_OnHostServHelp, this);
-	}
-	void OnHostServHelp(User *u)
-	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DELALL);
 	}
 };
 

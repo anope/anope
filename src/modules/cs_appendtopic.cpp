@@ -128,6 +128,11 @@ class CommandCSAppendTopic : public Command
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
+	}
 };
 
 class CSAppendTopic : public Module
@@ -222,12 +227,6 @@ class CSAppendTopic : public Module
 		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
 		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
-
-		ModuleManager::Attach(I_OnChanServHelp, this);
-	}
-	void OnChanServHelp(User *u)
-	{
-		this->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
 	}
 };
 

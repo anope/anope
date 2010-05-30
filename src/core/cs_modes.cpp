@@ -92,6 +92,11 @@ class CommandCSOp : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_OP);
+	}
 };
 
 
@@ -118,6 +123,11 @@ class CommandCSDeOp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEOP);
 	}
 };
 
@@ -146,6 +156,11 @@ class CommandCSVoice : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_VOICE);
+	}
 };
 
 
@@ -172,6 +187,11 @@ class CommandCSDeVoice : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
 	}
 };
 
@@ -204,6 +224,11 @@ class CommandCSHalfOp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
 	}
 };
 
@@ -238,6 +263,11 @@ class CommandCSDeHalfOp : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
+	}
 };
 
 
@@ -270,6 +300,11 @@ class CommandCSProtect : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
+	}
 };
 
 class CommandCSDeProtect : public Command
@@ -300,6 +335,11 @@ class CommandCSDeProtect : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
 	}
 };
 
@@ -332,6 +372,11 @@ class CommandCSOwner : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_OWNER);
+	}
 };
 
 class CommandCSDeOwner : public Command
@@ -363,6 +408,11 @@ class CommandCSDeOwner : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
+	}
 };
 
 
@@ -384,9 +434,9 @@ class CSModes : public Module
 			OnUplinkSync(NULL);
 
 		Implementation i[] = {
-			I_OnUplinkSync, I_OnServerDisconnect, I_OnChanServHelp
+			I_OnUplinkSync, I_OnServerDisconnect
 		};
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	void OnUplinkSync(Server *)
@@ -418,33 +468,6 @@ class CSModes : public Module
 		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEPROTECT"));
 		this->DelCommand(ChanServ, FindCommand(ChanServ, "HALFOP"));
 		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEHALFOP"));
-	}
-
-	void OnChanServHelp(User *u)
-	{
-		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-		{
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_OWNER);
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
-		}
-
-		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
-		{
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
-		}
-
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_OP);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEOP);
-
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-		{
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
-		}
-
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_VOICE);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
 	}
 };
 

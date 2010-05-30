@@ -391,6 +391,11 @@ class CommandSyncSQL : public Command
 		notice_help(Config.s_OperServ, u, OPER_HELP_SYNC);
 		return true;
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SQLSYNC);
+	}
 };
 
 class DBMySQLWrite : public DBMySQL
@@ -433,15 +438,10 @@ class DBMySQLWrite : public DBMySQL
 			/* MemoServ */
 			I_OnMemoSend, I_OnMemoDel,
 			/* OperServ */
-			I_OnOperServHelp, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
+			I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
 			I_OnAddXLine, I_OnDelXLine
 		};
-		ModuleManager::Attach(i, this, 40);
-	}
-
-	void OnOperServHelp(User *u)
-	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SQLSYNC);
+		ModuleManager::Attach(i, this, 39);
 	}
 
 	EventReturn OnSaveDatabase()

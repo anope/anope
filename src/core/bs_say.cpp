@@ -71,6 +71,11 @@ class CommandBSSay : public Command
 	{
 		syntax_error(Config.s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_SAY);
+	}
 };
 
 class BSSay : public Module
@@ -82,12 +87,6 @@ class BSSay : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(BotServ, new CommandBSSay());
-
-		ModuleManager::Attach(I_OnBotServHelp, this);
-	}
-	void OnBotServHelp(User *u)
-	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_SAY);
 	}
 };
 

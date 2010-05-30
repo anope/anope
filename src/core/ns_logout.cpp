@@ -77,6 +77,11 @@ class CommandNSLogout : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LOGOUT);
+	}
 };
 
 class NSLogout : public Module
@@ -89,12 +94,6 @@ class NSLogout : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSLogout());
-
-		ModuleManager::Attach(I_OnNickServHelp, this);
-	}
-	void OnNickServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LOGOUT);
 	}
 };
 

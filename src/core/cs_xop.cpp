@@ -476,6 +476,8 @@ class XOPBase : public Command
 	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
 
 	virtual void OnSyntaxError(User *u, const ci::string &subcommand) = 0;
+
+	virtual void OnServHelp(User *u) = 0;
 };
 
 class CommandCSQOP : public XOPBase
@@ -499,6 +501,11 @@ class CommandCSQOP : public XOPBase
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_QOP);
 	}
 };
 
@@ -524,6 +531,11 @@ class CommandCSAOP : public XOPBase
 	{
 		syntax_error(Config.s_ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_AOP);
+	}
 };
 
 class CommandCSHOP : public XOPBase
@@ -547,6 +559,11 @@ class CommandCSHOP : public XOPBase
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_HOP);
 	}
 };
 
@@ -572,6 +589,11 @@ class CommandCSSOP : public XOPBase
 	{
 		syntax_error(Config.s_ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SOP);
+	}
 };
 
 class CommandCSVOP : public XOPBase
@@ -596,6 +618,11 @@ class CommandCSVOP : public XOPBase
 	{
 		syntax_error(Config.s_ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_VOP);
+	}
 };
 
 class CSXOP : public Module
@@ -615,9 +642,9 @@ class CSXOP : public Module
 			OnUplinkSync(NULL);
 
 		Implementation i[] = {
-			I_OnUplinkSync, I_OnServerDisconnect, I_OnChanServHelp
+			I_OnUplinkSync, I_OnServerDisconnect
 		};
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	void OnUplinkSync(Server *)
@@ -632,18 +659,6 @@ class CSXOP : public Module
 	{
 		this->DelCommand(ChanServ, FindCommand(ChanServ, "QOP"));
 		this->DelCommand(ChanServ, FindCommand(ChanServ, "HOP"));
-	}
-
-	void OnChanServHelp(User *u)
-	{
-		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_QOP);
-		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SOP);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_AOP);
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-			notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_HOP);
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_VOP);
 	}
 };
 

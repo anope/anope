@@ -69,6 +69,11 @@ class CommandMSCancel : public Command
 	{
 		syntax_error(Config.s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
+	}
 };
 
 class MSCancel : public Module
@@ -80,12 +85,6 @@ class MSCancel : public Module
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(MemoServ, new CommandMSCancel());
-
-		ModuleManager::Attach(I_OnMemoServHelp, this);
-	}
-	void OnMemoServHelp(User *u)
-	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
 	}
 };
 

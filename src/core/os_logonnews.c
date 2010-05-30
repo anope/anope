@@ -15,8 +15,6 @@
 
 #include "module.h"
 
-Command *c;
-
 void myOperServHelp(User * u);
 int load_config(void);
 int reload_config(int argc, char **argv);
@@ -29,6 +27,7 @@ int reload_config(int argc, char **argv);
  **/
 int AnopeInit(int argc, char **argv)
 {
+    Command *c;
     EvtHook *hook;
     char buf[BUFSIZE];
 
@@ -62,7 +61,12 @@ int AnopeInit(int argc, char **argv)
  **/
 void AnopeFini(void)
 {
-	free(c->help_param1);
+    Command *c = findCommand(OPERSERV, "LOGONNEWS");
+    if (c && c->help_param1)
+    {
+        free(c->help_param1);
+        c->help_param1 = NULL;
+    }
 }
 
 
@@ -83,12 +87,15 @@ void myOperServHelp(User * u)
  **/
 int reload_config(int argc, char **argv) {
     char buf[BUFSIZE];
+    Command *c;
 
     if (argc >= 1) {
         if (!stricmp(argv[0], EVENT_START)) {
-			free(c->help_param1);
-            snprintf(buf, BUFSIZE, "%d", NewsCount),
-            c->help_param1 = sstrdup(buf);
+            if ((c = findCommand(OPERSERV, "LOGONNEWS"))) {
+                free(c->help_param1);
+                snprintf(buf, BUFSIZE, "%d", NewsCount),
+                c->help_param1 = sstrdup(buf);
+            }
         }
     }
 

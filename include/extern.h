@@ -46,9 +46,8 @@ E BotInfo *OperServ;
 
 E void get_botserv_stats(long *nrec, long *memuse);
 E void bs_init();
-E void botserv(User *u, char *buf);
-E void botmsgs(User *u, BotInfo *bi, char *buf);
-E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
+E void botserv(User *u, BotInfo *bi, const std::string &buf);
+E void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf);
 E BotInfo *findbot(const char *nick);
 E BotInfo *findbot(const std::string &nick);
 E BotInfo *findbot(const ci::string &nick);
@@ -115,7 +114,7 @@ E void get_chanserv_stats(long *nrec, long *memuse);
 
 E void reset_levels(ChannelInfo * ci);
 E void cs_init();
-E void chanserv(User * u, char *buf);
+E void chanserv(User *u, const std::string &buf);
 E void expire_chans();
 E void cs_remove_nick(const NickCore * nc);
 
@@ -159,7 +158,7 @@ E int read_config(int reload);
 
 /* hostserv.c */
 E void do_on_id(User *u);
-E void hostserv(User *u, char *buf);
+E void hostserv(User *u, const std::string &buf);
 E void HostServSyncVhosts(NickAlias *na);
 
 /**** encrypt.c ****/
@@ -254,7 +253,7 @@ E char *sstrdup(const char *s);
 /**** memoserv.c ****/
 
 E void ms_init();
-E void memoserv(User * u, char *buf);
+E void memoserv(User * u, const std::string &buf);
 E void rsend_notify(User *u, Memo *m, const char *chan);
 E void check_memos(User * u);
 E MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid);
@@ -267,7 +266,7 @@ E int m_nickcoll(const char *user);
 E int m_away(const char *source, const char *msg);
 E int m_kill(const std::string &nick, const char *msg);
 E int m_motd(const char *source);
-E int m_privmsg(const char *source, const std::string &receiver, const char *msg);
+E int m_privmsg(const std::string &source, const std::string &receiver, const std::string &message);
 E int m_stats(const char *source, int ac, const char **av);
 E int m_whois(const char *source, const char *who);
 E int m_time(const char *source, int ac, const char **av);
@@ -358,7 +357,7 @@ E void change_core_display(NickCore * nc, const char *newdisplay);
 E int do_setmodes(User * u);
 
 E void ns_init();
-E void nickserv(User * u, char *buf);
+E void nickserv(User * u, const std::string &buf);
 E int validate_user(User * u);
 E void expire_nicks();
 E void expire_requests();
@@ -433,9 +432,6 @@ E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
 E User *finduser(const std::string &nick);
 E User *finduser(const ci::string &nick);
-E User *find_byuid(const char *uid);
-E User *find_byuid(const ci::string &uid);
-E User *find_byuid(const std::string &uid);
 
 E Server *findserver_uid(Server * s, const char *name);
 E char *TS6SID;

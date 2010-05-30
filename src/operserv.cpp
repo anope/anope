@@ -39,23 +39,23 @@ void os_init()
 	XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
 }
 
-void operserv(User * u, char *buf)
+void operserv(User *u, const std::string &buf)
 {
-	const char *cmd, *s;
+	if (!u || buf.empty())
+		return;
 
 	Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  buf;
 
-	cmd = strtok(buf, " ");
-	if (!cmd)
-		return;
-	else if (!stricmp(cmd, "\1PING")) {
-		if (!(s = strtok(NULL, ""))) {
-			s = "";
-		}
-		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "PING %s", s);
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	{
+		std::string command = buf;
+		command.erase(command.begin());
+		command.erase(command.end());
+		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "%s", command.c_str());
 	}
-	else {
-		mod_run_cmd(OperServ, u, cmd);
+	else
+	{
+		mod_run_cmd(OperServ, u, buf.c_str());
 	}
 }
 

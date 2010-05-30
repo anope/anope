@@ -39,7 +39,7 @@ void get_botserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
 
-	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 	{
 		BotInfo *bi = it->second;
 
@@ -71,46 +71,21 @@ void bs_init()
 
 /* Main BotServ routine. */
 
-void botserv(User * u, char *buf)
+void botserv(User *u, BotInfo *bi, const std::string &buf)
 {
-	char *cmd, *s;
-
-	cmd = strtok(buf, " ");
-
-	if (!cmd) {
+	if (!u || !bi || buf.empty())
 		return;
-	} else if (stricmp(cmd, "\1PING") == 0) {
-		if (!(s = strtok(NULL, ""))) {
-			*s = 0;
-		}
-		ircdproto->SendCTCP(BotServ, u->nick.c_str(), "PING %s", s);
-	} else {
-		mod_run_cmd(BotServ, u, cmd);
-	}
-
-}
-
-/*************************************************************************/
-
-/* Handles all messages sent to bots. (Currently only answers to pings ;) */
-
-void botmsgs(User * u, BotInfo * bi, char *buf)
-{
-	char *cmd = strtok(buf, " ");
-	char *s;
-
-	if (!cmd || !u || !bi)
-		return;
-
-	if (!stricmp(cmd, "\1PING")) {
-		if (!(s = strtok(NULL, ""))) {
-			*s = 0;
-		}
-		ircdproto->SendCTCP(bi, u->nick.c_str(), "PING %s", s);
-	}
-	else if (cmd && !bi->Commands.empty())
+	
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
 	{
-		mod_run_cmd(bi, u, cmd);
+		std::string command = buf;
+		command.erase(command.begin());
+		command.erase(command.end());
+		ircdproto->SendCTCP(bi, u->nick.c_str(), "%s", command.c_str());
+	}
+	else
+	{
+		mod_run_cmd(bi, u, buf.c_str());
 	}
 }
 
@@ -121,31 +96,35 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
  *
  */
 
-void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
+void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 {
-	int c;
-	char *cmd;
-	UserData *ud;
-	bool was_action = false;
-	std::string bbuf;
-
-	if (!u || !buf || !ci || !ci->c)
+	if (!u || !ci || !ci->c || buf.empty())
 		return;
-
-	/* Answer to ping if needed, without breaking the buffer. */
-	if (!strnicmp(buf, "\1PING", 5)) {
-		ircdproto->SendCTCP(ci->bi, u->nick.c_str(), "PING %s", buf);
+	
+	/* Answer to ping if needed */
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	{
+		std::string ctcp = buf;
+		ctcp.erase(ctcp.begin());
+		ctcp.erase(ctcp.end());
+		ircdproto->SendCTCP(ci->bi, u->nick.c_str(), "%s", ctcp.c_str());
 	}
 
-	/* If it's a /me, cut the CTCP part at the beginning (not
-	 * at the end, because one character just doesn't matter,
-	 * but the ACTION may create strange behaviours with the
-	 * caps or badwords kickers */
-	if (!strnicmp(buf, "\1ACTION ", 8))
+	bool was_action = false;
+	std::string realbuf = buf;
+
+	/* If it's a /me, cut the CTCP part because the ACTION will cause
+	 * problems with the caps or badwords kicker
+	 */
+	if (realbuf.find("\1ACTION ", 0, 8) && realbuf[buf.length() - 1] == '\1')
 	{
-		buf += 8;
+		realbuf.erase(0, 8);
+		realbuf.erase(realbuf.end());
 		was_action = true;
 	}
+
+	if (realbuf.empty())
+		return;
 
 	/* Now we can make kicker stuff. We try to order the checks
 	 * from the fastest one to the slowest one, since there's
@@ -164,56 +143,61 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 	else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && ci->c->HasUserStatus(u, CMODE_VOICE))
 		Allow = true;
 
-	if (buf && !check_access(u, ci, CA_NOKICK) && Allow)
+	if (!check_access(u, ci, CA_NOKICK) && Allow)
 	{
 		/* Bolds kicker */
-		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && strchr(buf, 2)) {
+		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find_first_of(2) != std::string::npos)
+		{
 			check_ban(ci, u, TTB_BOLDS);
 			bot_kick(ci, u, BOT_REASON_BOLD);
 			return;
 		}
 
 		/* Color kicker */
-		if (ci->botflags.HasFlag(BS_KICK_COLORS) && strchr(buf, 3)) {
+		if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find_first_of(3) != std::string::npos)
+		{
 			check_ban(ci, u, TTB_COLORS);
 			bot_kick(ci, u, BOT_REASON_COLOR);
 			return;
 		}
 
 		/* Reverses kicker */
-		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && strchr(buf, 22)) {
+		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find_first_of(22) != std::string::npos)
+		{
 			check_ban(ci, u, TTB_REVERSES);
 			bot_kick(ci, u, BOT_REASON_REVERSE);
 			return;
 		}
 
 		/* Underlines kicker */
-		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && strchr(buf, 31)) {
+		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find_first_of(31) != std::string::npos)
+		{
 			check_ban(ci, u, TTB_UNDERLINES);
 			bot_kick(ci, u, BOT_REASON_UNDERLINE);
 			return;
 		}
 
 		/* Caps kicker */
-		if (ci->botflags.HasFlag(BS_KICK_CAPS)
-			&& ((c = strlen(buf)) >= ci->capsmin)) {
+		if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= ci->capsmin)
+		{
 			int i = 0;
 			int l = 0;
-			char *s = buf;
 
-			do {
-				if (isupper(*s))
-					i++;
-				else if (islower(*s))
-					l++;
-			} while (*s++);
-
+			for (unsigned j = 0; j < realbuf.length(); ++j)
+			{
+				if (isupper(realbuf[j]))
+					++i;
+				else if (islower(realbuf[j]))
+					++l;
+			}
+			
 			/* i counts uppercase chars, l counts lowercase chars. Only
 			 * alphabetic chars (so islower || isupper) qualify for the
 			 * percentage of caps to kick for; the rest is ignored. -GD
 			 */
 
-			if (i && l && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent) {
+			if (i && l && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
+			{
 				check_ban(ci, u, TTB_CAPS);
 				bot_kick(ci, u, BOT_REASON_CAPS);
 				return;
@@ -221,49 +205,42 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 
 		/* Bad words kicker */
-		if (ci->botflags.HasFlag(BS_KICK_BADWORDS)) {
-			int mustkick = 0;
-			char *nbuf;
-			BadWord *bw;
+		if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
+		{
+			bool mustkick = false;
 
 			/* Normalize the buffer */
-			nbuf = normalizeBuffer(buf);
+			const char *nbuf = normalizeBuffer(realbuf.c_str());
 
 			for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
 			{
-				bw = ci->GetBadWord(i);
+				BadWord *bw = ci->GetBadWord(i);
 
-				if (bw->type == BW_ANY
-					&& ((Config.BSCaseSensitive && strstr(nbuf, bw->word.c_str()))
-						|| (!Config.BSCaseSensitive && stristr(nbuf, bw->word.c_str())))) {
-					mustkick = 1;
-				} else if (bw->type == BW_SINGLE) {
-					int len = bw->word.length();
+				if (bw->type == BW_ANY && ((Config.BSCaseSensitive && strstr(nbuf, bw->word.c_str())) || (!Config.BSCaseSensitive && stristr(nbuf, bw->word.c_str()))))
+				{
+					mustkick = true;
+				}
+				else if (bw->type == BW_SINGLE)
+				{
+					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && nbuf == bw->word)
-						|| (!Config.BSCaseSensitive
-							&& (!stricmp(nbuf, bw->word.c_str())))) {
-						mustkick = 1;
-						/* two next if are quite odd isn't it? =) */
-					} else if ((strchr(nbuf, ' ') == nbuf + len)
-							   &&
-							   ((Config.BSCaseSensitive && nbuf == bw->word)
-								|| (!Config.BSCaseSensitive
-									&& (stristr(nbuf, bw->word.c_str()) ==
-										nbuf)))) {
-						mustkick = 1;
-					} else {
-						if ((strrchr(nbuf, ' ') ==
-							 nbuf + strlen(nbuf) - len - 1)
-							&&
-							((Config.BSCaseSensitive
-							  && (strstr(nbuf, bw->word.c_str()) ==
-								  nbuf + strlen(nbuf) - len))
-							 || (!Config.BSCaseSensitive
-								 && (stristr(nbuf, bw->word.c_str()) ==
-									 nbuf + strlen(nbuf) - len)))) {
-							mustkick = 1;
-						} else {
+					if ((Config.BSCaseSensitive && nbuf == bw->word) || (!Config.BSCaseSensitive && (!stricmp(nbuf, bw->word.c_str())))) 
+					{
+						mustkick = true;
+					}
+					else if ((strchr(nbuf, ' ') == nbuf + len) && ((Config.BSCaseSensitive && nbuf == bw->word)
+						|| (!Config.BSCaseSensitive && (stristr(nbuf, bw->word.c_str()) == nbuf))))
+					{
+						mustkick = true;
+					}
+					else
+					{
+						if ((strrchr(nbuf, ' ') == nbuf + strlen(nbuf) - len - 1) && ((Config.BSCaseSensitive && (strstr(nbuf, bw->word.c_str()) == nbuf + strlen(nbuf) - len)) || (!Config.BSCaseSensitive && (stristr(nbuf, bw->word.c_str()) == nbuf + strlen(nbuf) - len))))
+						{
+							mustkick = true;
+						}
+						else
+						{
 							char *wordbuf = new char[len + 3];
 
 							wordbuf[0] = ' ';
@@ -271,69 +248,67 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							wordbuf[len + 2] = '\0';
 							memcpy(wordbuf + 1, bw->word.c_str(), len);
 
-							if ((Config.BSCaseSensitive
-								 && (strstr(nbuf, wordbuf)))
-								|| (!Config.BSCaseSensitive
-									&& (stristr(nbuf, wordbuf)))) {
-								mustkick = 1;
+							if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf))) || (!Config.BSCaseSensitive && (stristr(nbuf, wordbuf))))
+							{
+								mustkick = true;
 							}
 
-							/* free previous (sc)allocated memory (#850) */
 							delete [] wordbuf;
 						}
 					}
-				} else if (bw->type == BW_START) {
-					int len = bw->word.length();
+				}
+				else if (bw->type == BW_START)
+				{
+					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive
-						 && (!strncmp(nbuf, bw->word.c_str(), len)))
-						|| (!Config.BSCaseSensitive
-							&& (!strnicmp(nbuf, bw->word.c_str(), len)))) {
-						mustkick = 1;
-					} else {
+					if ((Config.BSCaseSensitive && (!strncmp(nbuf, bw->word.c_str(), len))) || (!Config.BSCaseSensitive && (!strnicmp(nbuf, bw->word.c_str(), len))))
+					{
+						mustkick = true;
+					}
+					else
+					{
 						char *wordbuf = new char[len + 2];
 
 						memcpy(wordbuf + 1, bw->word.c_str(), len);
 						wordbuf[0] = ' ';
 						wordbuf[len + 1] = '\0';
 
-						if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf)))
-							|| (!Config.BSCaseSensitive
-								&& (stristr(nbuf, wordbuf))))
-							mustkick = 1;
+						if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf))) || (!Config.BSCaseSensitive && (stristr(nbuf, wordbuf))))
+						{
+							mustkick = true;
+						}
 
 						delete [] wordbuf;
 					}
-				} else if (bw->type == BW_END) {
-					int len = bw->word.length();
+				}
+				else if (bw->type == BW_END)
+				{
+					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive
-						 &&
-						 (!strncmp
-						  (nbuf + strlen(nbuf) - len, bw->word.c_str(), len)))
-						|| (!Config.BSCaseSensitive
-							&&
-							(!strnicmp
-							 (nbuf + strlen(nbuf) - len, bw->word.c_str(),
-							  len)))) {
-						mustkick = 1;
-					} else {
+					if ((Config.BSCaseSensitive && (!strncmp(nbuf + strlen(nbuf) - len, bw->word.c_str(), len)))
+						|| (!Config.BSCaseSensitive && (!strnicmp(nbuf + strlen(nbuf) - len, bw->word.c_str(), len))))
+					{
+						mustkick = true;
+					}
+					else
+					{
 						char *wordbuf = new char[len + 2];
 
 						memcpy(wordbuf, bw->word.c_str(), len);
 						wordbuf[len] = ' ';
 						wordbuf[len + 1] = '\0';
 
-						if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf)))
-							|| (!Config.BSCaseSensitive
-								&& (stristr(nbuf, wordbuf))))
-							mustkick = 1;
+						if ((Config.BSCaseSensitive && (strstr(nbuf, wordbuf))) || (!Config.BSCaseSensitive && (stristr(nbuf, wordbuf))))
+						{
+							mustkick = true;
+						}
 
 						delete [] wordbuf;
 					}
 				}
 
-				if (mustkick) {
+				if (mustkick)
+				{
 					check_ban(ci, u, TTB_BADWORDS);
 					if (Config.BSGentleBWReason)
 						bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
@@ -352,21 +327,23 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 
 		/* Flood kicker */
-		if (ci->botflags.HasFlag(BS_KICK_FLOOD)) {
+		if (ci->botflags.HasFlag(BS_KICK_FLOOD))
+		{
 			time_t now = time(NULL);
 
-			ud = get_user_data(ci->c, u);
-			if (!ud) {
+			UserData *ud = get_user_data(ci->c, u);
+			if (!ud)
 				return;
-			}
 
-			if (now - ud->last_start > ci->floodsecs) {
+			if (now - ud->last_start > ci->floodsecs)
+			{
 				ud->last_start = time(NULL);
 				ud->lines = 0;
 			}
 
 			ud->lines++;
-			if (ud->lines >= ci->floodlines) {
+			if (ud->lines >= ci->floodlines)
+			{
 				check_ban(ci, u, TTB_FLOOD);
 				bot_kick(ci, u, BOT_REASON_FLOOD);
 				return;
@@ -374,22 +351,27 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 
 		/* Repeat kicker */
-		if (ci->botflags.HasFlag(BS_KICK_REPEAT)) {
-			ud = get_user_data(ci->c, u);
-			if (!ud) {
+		if (ci->botflags.HasFlag(BS_KICK_REPEAT))
+		{
+			UserData *ud = get_user_data(ci->c, u);
+			if (!ud)
 				return;
-			}
-			if (ud->lastline && stricmp(ud->lastline, buf)) {
+			
+			if (ud->lastline && stricmp(ud->lastline, buf.c_str()))
+			{
 				delete [] ud->lastline;
-				ud->lastline = sstrdup(buf);
+				ud->lastline = sstrdup(buf.c_str());
 				ud->times = 0;
-			} else {
+			}
+			else
+			{
 				if (!ud->lastline)
-					ud->lastline = sstrdup(buf);
+					ud->lastline = sstrdup(buf.c_str());
 				ud->times++;
 			}
 
-			if (ud->times >= ci->repeattimes) {
+			if (ud->times >= ci->repeattimes)
+			{
 				check_ban(ci, u, TTB_REPEAT);
 				bot_kick(ci, u, BOT_REASON_REPEAT);
 				return;
@@ -397,31 +379,31 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 		}
 	}
 
-
 	/* return if the user is on the ignore list  */
-	if (get_ignore(u->nick.c_str()) != NULL) {
+	if (get_ignore(u->nick.c_str()) != NULL)
+	{
 		return;
 	}
 
 	/* Fantaisist commands */
+	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == *Config.BSFantasyCharacter && !was_action)
+	{
+		spacesepstream sep(buf);
+		std::string token;
 
-	if (buf && ci->botflags.HasFlag(BS_FANTASY) && *buf == *Config.BSFantasyCharacter && !was_action) {
-		cmd = strtok(buf, " ");
-
-		if (cmd && (cmd[0] == *Config.BSFantasyCharacter)) {
-			char *params = strtok(NULL, "");
-
+		if (sep.GetToken(token) && (token[0] == *Config.BSFantasyCharacter))
+		{
 			/* Strip off the fantasy character */
-			cmd++;
+			token.erase(token.begin());
 
 			if (check_access(u, ci, CA_FANTASIA))
 			{
-				Command *command = FindCommand(ChanServ, cmd);
+				Command *command = FindCommand(ChanServ, token.c_str());
 
 				/* Command exists and can not be called by fantasy */
 				if (command && !command->HasFlag(CFLAG_DISABLE_FANTASY))
 				{
-					bbuf = std::string(cmd);
+					std::string bbuf = std::string(token);
 
 					/* Some commands don't need the channel name added.. eg !help */
 					if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
@@ -430,20 +412,20 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						bbuf += ci->name;
 					}
 
-					if (params)
+					if (!sep.StreamEnd())
 					{
 						bbuf += " ";
-						bbuf += params;
+						bbuf += sep.GetRemaining();
 					}
 
-					chanserv(u, const_cast<char *>(bbuf.c_str())); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+					chanserv(u, bbuf);
 				}
 
-				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(cmd, u, ci, params));
+				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(token, u, ci, sep.GetRemaining()));
 			}
 			else
 			{
-				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(cmd, u, ci, params));
+				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(token, u, ci, sep.GetRemaining()));
 			}
 		}
 	}
@@ -463,9 +445,18 @@ BotInfo *findbot(const std::string &nick)
 
 BotInfo *findbot(const ci::string &nick)
 {
-	botinfo_map::const_iterator it = BotList.find(nick);
+	if (isdigit(nick[0]) && ircd->ts6)
+	{
+		botinfo_uid_map::const_iterator it = BotListByUID.find(nick.c_str());
 
-	if (it != BotList.end())
+		if (it != BotListByUID.end())
+			return it->second;
+		return NULL;
+	}
+
+	botinfo_map::const_iterator it = BotListByNick.find(nick);
+
+	if (it != BotListByNick.end())
 		return it->second;
 	return NULL;
 }

@@ -79,25 +79,25 @@ void hostserv_init()
  * @param buf Buffer holding the message
  * @return void
  */
-void hostserv(User * u, char *buf)
+void hostserv(User *u, const std::string &buf)
 {
-	const char *cmd, *s;
-
-	cmd = strtok(buf, " ");
-
-	if (!cmd) {
+	if (!u || buf.empty())
 		return;
-	} else if (stricmp(cmd, "\1PING") == 0) {
-		if (!(s = strtok(NULL, ""))) {
-			s = "";
-		}
-		ircdproto->SendCTCP(HostServ, u->nick.c_str(), "PING %s", s);
-	} else {
-		if (ircd->vhost) {
-			mod_run_cmd(HostServ, u, cmd);
-		} else {
-			notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ);
-		}
+	
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	{
+		std::string command = buf;
+		command.erase(command.begin());
+		command.erase(command.end());
+		ircdproto->SendCTCP(HostServ, u->nick.c_str(), "%s", command.c_str());
+	}
+	else if (!ircd->vhost)
+	{
+		notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ);
+	}
+	else
+	{
+		mod_run_cmd(HostServ, u, buf.c_str());
 	}
 }
 

@@ -168,27 +168,21 @@ void ns_init()
 
 /* Main NickServ routine. */
 
-void nickserv(User * u, char *buf)
+void nickserv(User *u, const std::string &buf)
 {
-	const char *cmd, *s;
-
-	cmd = strtok(buf, " ");
-
-	if (!cmd)
-	{
+	if (!u || buf.empty())
 		return;
-	}
-	else if (stricmp(cmd, "\1PING") == 0)
+	
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
 	{
-		if (!(s = strtok(NULL, "")))
-		{
-			s = "";
-		}
-		ircdproto->SendCTCP(NickServ, u->nick.c_str(), "PING %s", s);
+		std::string command = buf;
+		command.erase(command.begin());
+		command.erase(command.end());
+		ircdproto->SendCTCP(NickServ, u->nick.c_str(), "%s", command.c_str());
 	}
 	else
 	{
-		mod_run_cmd(NickServ, u, cmd);
+		mod_run_cmd(NickServ, u, buf.c_str());
 	}
 
 }

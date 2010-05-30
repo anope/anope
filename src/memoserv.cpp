@@ -51,20 +51,21 @@ void ms_init()
  * @param buf Buffer containing the privmsg
  * @return void
  */
-void memoserv(User * u, char *buf)
+void memoserv(User *u, const std::string &buf)
 {
-	const char *cmd, *s;
-
-	cmd = strtok(buf, " ");
-	if (!cmd) {
+	if (!u || buf.empty())
 		return;
-	} else if (stricmp(cmd, "\1PING") == 0) {
-		if (!(s = strtok(NULL, ""))) {
-			s = "";
-		}
-		ircdproto->SendCTCP(MemoServ, u->nick.c_str(), "PING %s", s);
-	} else {
-		mod_run_cmd(MemoServ, u, cmd);
+	
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	{
+		std::string command = buf;
+		command.erase(command.begin());
+		command.erase(command.end());
+		ircdproto->SendCTCP(MemoServ, u->nick.c_str(), "%s", command.c_str());
+	}
+	else
+	{
+		mod_run_cmd(MemoServ, u, buf.c_str());
 	}
 }
 

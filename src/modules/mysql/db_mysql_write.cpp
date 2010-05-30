@@ -265,7 +265,7 @@ static void SaveDatabases()
 	query << "TRUNCATE TABLE `anope_bs_core`";
 	ExecuteQuery(query);
 	
-	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 	{
 		me->OnBotCreate(it->second);
 	}
@@ -472,7 +472,7 @@ class DBMySQLWrite : public DBMySQL
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, CurChannel));
 		}
 		
-		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 		{
 			CurBot = it->second;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));

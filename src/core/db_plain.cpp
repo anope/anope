@@ -1006,7 +1006,7 @@ class DBPlain : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 		}
 
-		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 		{
 			BotInfo *bi = it->second;
 			

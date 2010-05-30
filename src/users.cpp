@@ -503,7 +503,6 @@ void User::UpdateHost()
 		return;
 
 	NickAlias *na = findnick(this->nick);
-
 	OnAccess = false;
 	if (na)
 		OnAccess = is_on_access(this, na->nc);
@@ -743,35 +742,18 @@ User *finduser(const std::string &nick)
 
 User *finduser(const ci::string &nick)
 {
-	Alog(LOG_DEBUG_3) << "finduser("<<  nick << ")";
-
 	if (isdigit(nick[0]) && ircd->ts6)
-		return find_byuid(nick);
+	{
+		user_uid_map::const_iterator it = UserListByUID.find(nick.c_str());
+
+		if (it != UserListByUID.end())
+			return it->second;
+		return NULL;
+	}
 
 	user_map::const_iterator it = UserListByNick.find(nick);
 
 	if (it != UserListByNick.end())
-		return it->second;
-	return NULL;
-}
-
-User *find_byuid(const char *uid)
-{
-	return find_byuid(std::string(uid));
-}
-
-User *find_byuid(const ci::string &uid)
-{
-	return find_byuid(std::string(uid.c_str()));
-}
-
-User *find_byuid(const std::string &uid)
-{
-	Alog(LOG_DEBUG_3) << "finduser_byuid(" << uid << ")";
-
-	user_uid_map::iterator it = UserListByUID.find(uid);
-
-	if (it != UserListByUID.end())
 		return it->second;
 	return NULL;
 }
@@ -874,11 +856,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 	else
 	{
 		/* An old user changing nicks. */
-		if (ircd->ts6)
-			user = find_byuid(source);
-
-		if (!user)
-			user = finduser(source);
+		user = finduser(source);
 
 		if (!user) {
 			Alog() << "user: NICK from nonexistent nick " << source;

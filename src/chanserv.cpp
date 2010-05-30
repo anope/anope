@@ -259,21 +259,21 @@ void cs_init()
 
 /* Main ChanServ routine. */
 
-void chanserv(User * u, char *buf)
+void chanserv(User *u, const std::string &buf)
 {
-	char *cmd, *s;
-
-	cmd = strtok(buf, " ");
-
-	if (!cmd) {
+	if (!u || buf.empty())
 		return;
-	} else if (stricmp(cmd, "\1PING") == 0) {
-		if (!(s = strtok(NULL, ""))) {
-			*s = 0;
-		}
-		ircdproto->SendCTCP(ChanServ, u->nick.c_str(), "PING %s", s);
-	} else {
-		mod_run_cmd(ChanServ, u, cmd);
+	
+	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	{
+		std::string command = buf;
+		command.erase(command.begin());
+		command.erase(command.end());
+		ircdproto->SendCTCP(ChanServ, u->nick.c_str(), "%s", command.c_str());
+	}
+	else
+	{
+		mod_run_cmd(ChanServ, u, buf.c_str());
 	}
 }
 

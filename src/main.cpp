@@ -188,7 +188,7 @@ void do_restart_services()
 	if (!quitmsg)
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
-	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 	{
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
 		ircdproto->SendQuit(it->second, "Restarting");
@@ -228,7 +228,7 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
-		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 		{
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
 			ircdproto->SendQuit(it->second, "Shutting down");

@@ -12,7 +12,8 @@
 #include "modules.h"
 #include "commands.h"
 
-botinfo_map BotList;
+botinfo_map BotListByNick;
+botinfo_uid_map BotListByUID;
 
 BotInfo *BotServ = NULL;
 BotInfo *ChanServ = NULL;
@@ -62,7 +63,9 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 		Global = this;
 	}
 
-	BotList[this->nick.c_str()] = this;
+	BotListByNick[this->nick.c_str()] = this;
+	if (!this->uid.empty())
+		BotListByUID[this->uid] = this;
 
 	// If we're synchronised with the uplink already, call introduce_user() for this bot.
 	if (Me && Me->GetUplink()->IsSynced())
@@ -85,17 +88,19 @@ BotInfo::~BotInfo()
 		}
 	}
 
-	BotList.erase(this->nick.c_str());
+	BotListByNick.erase(this->nick.c_str());
+	if (!this->uid.empty())
+		BotListByUID.erase(this->uid);
 }
 
 
 void BotInfo::ChangeNick(const char *newnick)
 {
-	BotList.erase(this->nick.c_str());
+	BotListByNick.erase(this->nick.c_str());
 
 	this->nick = newnick;
 
-	BotList[this->nick.c_str()] = this;
+	BotListByNick[this->nick.c_str()] = this;
 }
 
 void BotInfo::RejoinAll()

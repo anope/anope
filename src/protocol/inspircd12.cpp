@@ -393,8 +393,8 @@ int anope_event_mode(const char *source, int ac, const char **av)
 		   users modes, we have to kludge this
 		   as it slightly breaks RFC1459
 		 */
-		User *u = find_byuid(source);
-		User *u2 = find_byuid(av[0]);
+		User *u = finduser(source);
+		User *u2 = finduser(av[0]);
 
 		// This can happen with server-origin modes.
 		if (u == NULL)
@@ -550,7 +550,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		}
 		buf.erase(buf.begin());
 
-		User *u = find_byuid(buf);
+		User *u = finduser(buf);
 		if (!u)
 		{
 			Alog(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
@@ -642,7 +642,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
 	time_t topic_time = time(NULL);
-	User *u = find_byuid(source);
+	User *u = finduser(source);
 
 	if (!c)
 	{
@@ -704,7 +704,7 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
 int anope_event_kill(const char *source, int ac, const char **av)
 {
-	User *u = find_byuid(av[0]);
+	User *u = finduser(av[0]);
 	BotInfo *bi = findbot(av[0]);
 	m_kill(u ? u->nick.c_str() : (bi ? bi->nick : av[0]), av[1]);
 	return MOD_CONT;
@@ -904,13 +904,10 @@ int anope_event_server(const char *source, int ac, const char **av)
 
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
-	User *u = find_byuid(source);
-	BotInfo *bi = findbot(av[0]);
-
-	if (!u)
+	if (!finduser(source))
 		return MOD_CONT; // likely a message from a server, which can happen.
 
-	m_privmsg(u->nick.c_str(), bi ? bi->nick: av[0], av[1]);
+	m_privmsg(source, av[0], av[1]);
 	return MOD_CONT;
 }
 
@@ -934,7 +931,7 @@ int anope_event_metadata(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	else if (!strcmp(av[1], "accountname"))
 	{
-		if ((u = find_byuid(av[0])))
+		if ((u = finduser(av[0])))
 		{
 			/* Identify the user for this account - Adam */
 			u->AutoID(av[2]);

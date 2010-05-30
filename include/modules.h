@@ -419,13 +419,14 @@ class CoreExport Module
 	virtual void OnUserNickChange(User *u, const std::string &oldnick) { }
 
 	/** Called immediatly when a user tries to run a command
-	 * @param bi The bot the command is being run from
 	 * @param u The user
-	 * @param cmd The command
+	 * @param bi The bot the command is being run from
+	 * @param command The command
+	 * @param message The parameters used for the command
 	 * @param c The command class (if it exists)
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(BotInfo *bi, User *u, const ci::string &cmd, Command *c) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, const ci::string &command, const ci::string &message, Command *c) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
@@ -473,7 +474,7 @@ class CoreExport Module
 	 * @param ci The channel it's being used in
 	 * @param params The params
 	 */
-	virtual void OnBotFantasy(char *command, User *u, ChannelInfo *ci, char *params) { }
+	virtual void OnBotFantasy(const std::string &command, User *u, ChannelInfo *ci, const std::string &params) { }
 
 	/** Called on fantasy command without access
 	 * @param command The command
@@ -481,7 +482,7 @@ class CoreExport Module
 	 * @param ci The channel it's being used in
 	 * @param params The params
 	 */
-	virtual void OnBotNoFantasyAccess(const char *command, User *u, ChannelInfo *ci, const char *params) { }
+	virtual void OnBotNoFantasyAccess(const std::string &command, User *u, ChannelInfo *ci, const std::string &params) { }
 
 	/** Called after a bot joins a channel
 	 * @param ci The channael

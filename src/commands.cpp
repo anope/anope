@@ -29,23 +29,28 @@ Command *FindCommand(BotInfo *bi, const ci::string &name)
 	return NULL;
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd)
+void mod_run_cmd(BotInfo *bi, User *u, const ci::string &message)
 {
-	if (!bi || !u || cmd.empty())
+	if (!bi || !u || message.empty())
+		return;
+	
+	spacesepstream sep(message);
+	ci::string command;
+
+	if (!sep.GetToken(command))
 		return;
 
-	Command *c = FindCommand(bi, cmd);
-	int retVal = MOD_CONT;
-	ChannelInfo *ci;
+	Command *c = FindCommand(bi, command);
+	CommandReturn ret = MOD_CONT;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(bi, u, cmd, c));
+	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, sep.GetRemaining().c_str(), c));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
 	if (!c)
 	{
-		notice_lang(bi->nick, u, UNKNOWN_COMMAND_HELP, cmd.c_str(), bi->nick.c_str());
+		notice_lang(bi->nick, u, UNKNOWN_COMMAND_HELP, command.c_str(), bi->nick.c_str());
 		return;
 	}
 
@@ -55,35 +60,34 @@ void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 		if (!u->IsIdentified())
 		{
 			notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
-			Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << cmd;
+			Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << command;
 			return;
 		}
 	}
 
 	std::vector<ci::string> params;
-	std::string curparam;
-	char *s = NULL;
-	while ((s = strtok(NULL, " ")))
+	ci::string curparam, endparam;
+	while (sep.GetToken(curparam))
 	{
 		// - 1 because params[0] corresponds with a maxparam of 1.
 		if (params.size() >= (c->MaxParams - 1))
 		{
-			curparam += s;
-			curparam += " ";
+			endparam += curparam;
+			endparam += " ";
 		}
 		else
 		{
-			params.push_back(s);
+			params.push_back(curparam);
 		}
 	}
 
-	if (!curparam.empty())
+	if (!endparam.empty())
 	{
 		// Remove trailing space
-		curparam.erase(curparam.size() - 1, curparam.size());
+		endparam.erase(endparam.size() - 1, endparam.size());
 
 		// Add it
-		params.push_back(curparam.c_str());
+		params.push_back(endparam);
 	}
 
 	if (params.size() < c->MinParams)
@@ -100,20 +104,21 @@ void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 	{
 		if (ircdproto->IsChannelValid(params[0].c_str()))
 		{
-			if ((ci = cs_findchan(params[0])))
+			ChannelInfo *ci = cs_findchan(params[0]);
+			if (ci)
 			{
 				if ((ci->HasFlag(CI_FORBIDDEN)) && (!c->HasFlag(CFLAG_ALLOW_FORBIDDEN)))
 				{
 					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
 					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick
-						<< " and command " << cmd << " because of FORBIDDEN channel " << ci->name;
+						<< " and command " << command << " because of FORBIDDEN channel " << ci->name;
 					return;
 				}
 				else if ((ci->HasFlag(CI_SUSPENDED)) && (!c->HasFlag(CFLAG_ALLOW_SUSPENDED)))
 				{
 					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
 					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick
-						<<" and command " << cmd << " because of SUSPENDED channel " << ci->name;
+						<<" and command " << command << " because of SUSPENDED channel " << ci->name;
 					return;
 				}
 			}
@@ -137,15 +142,15 @@ void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 		if (!u->Account()->HasCommand(c->permission))
 		{
 			notice_lang(bi->nick, u, ACCESS_DENIED);
-			Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << cmd;
+			Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << command;
 			return;
 		}
 
 	}
 
-	retVal = c->Execute(u, params);
+	ret = c->Execute(u, params);
 
-	if (retVal == MOD_CONT)
+	if (ret == MOD_CONT)
 	{
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name.c_str(), params));
 	}

@@ -101,44 +101,51 @@ int m_motd(const char *source)
 
 /*************************************************************************/
 
-int m_privmsg(const char *source, const std::string &receiver, const char *msg)
+int m_privmsg(const std::string &source, const std::string &receiver, const std::string &message)
 {
 	char *target;
 	time_t starttime, stoptime; /* When processing started and finished */
 
-	BotInfo *bi;
-	ChannelInfo *ci;
-	User *u;
-
-	if (!source || !*source || receiver.empty() || !msg) {
+	if (source.empty() || receiver.empty() || message.empty())
+	{
 		return MOD_CONT;
 	}
 
-	u = finduser(source);
+	User *u = finduser(source);
 
-	if (!u) {
-		Alog() << msg << ": user record for " << source << " not found";
-		/* Two lookups naughty, however, this won't happen often. -- w00t */
-		if (findbot(receiver))
+	if (!u)
+	{
+		Alog() << message << ": user record for " << source << " not found";
+
+		BotInfo *bi = findbot(receiver);
+		if (bi)
 		{
-			ircdproto->SendMessage(findbot(receiver), source, "%s", getstring(USER_RECORD_NOT_FOUND));
+			ircdproto->SendMessage(bi, source.c_str(), "%s", getstring(USER_RECORD_NOT_FOUND));
 		}
+
 		return MOD_CONT;
 	}
 
-	if (receiver[0] == '#') {
-		if (Config.s_BotServ && (ci = cs_findchan(receiver))) {
+	if (receiver[0] == '#' && Config.s_BotServ)
+	{
+		ChannelInfo *ci = cs_findchan(receiver);
+		if (ci)
+		{
 			/* Some paranoia checks */
-			if (!ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi) {
-				botchanmsgs(u, ci, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+			if (!ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi)
+			{
+				botchanmsgs(u, ci, message);
 			}
 		}
-	} else {
+	}
+	else
+	{
 		/* Check if we should ignore.  Operators always get through. */
-		if (allow_ignore && !is_oper(u)) {
-			IgnoreData *ign = get_ignore(source);
-			if (ign) {
-				target = myStrGetToken(msg, ' ', 0);
+		if (allow_ignore && !is_oper(u))
+		{
+			if (get_ignore(source.c_str()))
+			{
+				target = myStrGetToken(message.c_str(), ' ', 0);
 				Alog() << "Ignored message from " << source << " to " << receiver << " using command " << target;
 				delete [] target;
 				return MOD_CONT;
@@ -156,16 +163,18 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 			if (servername != Config.ServerName)
 				return MOD_CONT;
 		}
-		else if (Config.UseStrictPrivMsg) {
+		else if (Config.UseStrictPrivMsg)
+		{
 			Alog(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
 			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(),
 						Config.ServerName, receiver.c_str());
 			return MOD_CONT;
 		}
 
-		starttime = time(NULL);
+		if (allow_ignore)
+			starttime = time(NULL);
 
-		bi = findbot(botname);
+		BotInfo *bi = findbot(botname);
 
 		if (bi)
 		{
@@ -179,37 +188,34 @@ int m_privmsg(const char *source, const std::string &receiver, const char *msg)
 						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
 				}
 				else
-					operserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+					operserv(u, message);
 			}
 			else if (ci_bi_nick == Config.s_NickServ)
-				nickserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-			else if (ci_bi_nick== Config.s_ChanServ)
+				nickserv(u, message);
+			else if (ci_bi_nick == Config.s_ChanServ)
 			{
 				if (!is_oper(u) && Config.CSOpersOnly)
 					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				else
-					chanserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+					chanserv(u, message);
 			}
 			else if (ci_bi_nick == Config.s_MemoServ)
-				memoserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				memoserv(u, message);
 			else if (Config.s_HostServ && ci_bi_nick == Config.s_HostServ)
-				hostserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
+				hostserv(u, message);
 			else if (Config.s_BotServ)
-			{
-				if (ci_bi_nick == Config.s_BotServ)
-					botserv(u, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-				else
-					botmsgs(u, bi, const_cast<char *>(msg)); // XXX Unsafe cast, this needs reviewing -- CyberBotX
-			}
+				botserv(u, bi, message);
 		}
 
 		/* Add to ignore list if the command took a significant amount of time. */
-		if (allow_ignore) {
+		if (allow_ignore)
+		{
 			stoptime = time(NULL);
-			if (stoptime > starttime && *source && !strchr(source, '.'))
-				add_ignore(source, stoptime - starttime);
+			if (stoptime > starttime && source.find('.') == std::string::npos)
+				add_ignore(source.c_str(), stoptime - starttime);
 		}
 	}
+
 	return MOD_CONT;
 }
 

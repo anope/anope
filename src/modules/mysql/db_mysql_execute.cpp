@@ -129,11 +129,7 @@ class SQLTimer : public Timer
 					continue;
 				}
 
-				// XXX this whole strtok thing needs to die
-				char *cmdbuf = sstrdup(qres[i]["command"].c_str());
-				char *cmd = strtok(cmdbuf, " ");
-				mod_run_cmd(bi, u, cmd);
-				delete [] cmdbuf;
+				mod_run_cmd(bi, u, qres[i]["command"].c_str());
 
 				if (logout)
 					u->Logout();

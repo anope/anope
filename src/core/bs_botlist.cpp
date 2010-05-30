@@ -25,13 +25,13 @@ class CommandBSBotList : public Command
 	{
 		unsigned count = 0;
 
-		if (BotList.empty())
+		if (BotListByNick.empty())
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 		{
 			BotInfo *bi = it->second;
 			
@@ -44,11 +44,11 @@ class CommandBSBotList : public Command
 			}
 		}
 
-		if (u->Account()->HasCommand("botserv/botlist") && count < BotList.size())
+		if (u->Account()->HasCommand("botserv/botlist") && count < BotListByNick.size())
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
-			for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+			for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 			{
 				BotInfo *bi = it->second;
 				

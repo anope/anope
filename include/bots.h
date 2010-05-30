@@ -11,8 +11,11 @@
 #include "commands.h"
 
 class BotInfo;
+
 typedef unordered_map_namespace::unordered_map<ci::string, BotInfo *, hash_compare_ci_string> botinfo_map;
-extern CoreExport botinfo_map BotList;
+typedef unordered_map_namespace::unordered_map<std::string, BotInfo *, hash_compare_std_string> botinfo_uid_map;
+extern CoreExport botinfo_map BotListByNick;
+extern CoreExport botinfo_uid_map BotListByUID;
 
 /** Flags settable on a bot
  */

@@ -35,7 +35,7 @@ void introduce_user(const std::string &user)
 	/* We make the bots go online */
 
 	/* XXX: it might be nice to have this inside BotInfo's constructor, or something? */
-	for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 	{
 		BotInfo *bi = it->second;
 		

@@ -378,7 +378,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			Status.push_back(cm);
 		}
 
-		User *u = find_byuid(buf);
+		User *u = finduser(buf);
 		if (!u)
 		{
 			Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
@@ -507,7 +507,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 		if (ac > 1 && *av[1])
 			c->topic = sstrdup(av[1]);
 
-		u = find_byuid(source);
+		u = finduser(source);
 		c->topic_setter = u ? u->nick : source;
 		c->topic_time = topic_time;
 
@@ -590,7 +590,7 @@ int anope_event_away(const char *source, int ac, const char **av)
 {
 	User *u = NULL;
 
-	u = find_byuid(source);
+	u = finduser(source);
 	m_away(u ? u->nick.c_str() : source, (ac ? av[0] : NULL));
 	return MOD_CONT;
 }
@@ -642,7 +642,7 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	u = find_byuid(source);
+	u = finduser(source);
 	bi = findbot(av[0]);
 	// XXX: this is really the same as charybdis
 	m_privmsg(source, av[0], av[1]);
@@ -657,7 +657,7 @@ int anope_event_part(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	u = find_byuid(source);
+	u = finduser(source);
 	do_part(u ? u->nick.c_str() : source, ac, av);
 
 	return MOD_CONT;
@@ -715,7 +715,7 @@ int anope_event_quit(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	u = find_byuid(source);
+	u = finduser(source);
 
 	do_quit(u ? u->nick.c_str() : source, ac, av);
 	return MOD_CONT;
@@ -732,8 +732,8 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (*av[0] == '#' || *av[0] == '&') {
 		do_cmode(source, ac, av);
 	} else {
-		u = find_byuid(source);
-		u2 = find_byuid(av[0]);
+		u = finduser(source);
+		u2 = finduser(av[0]);
 		av[0] = u2->nick.c_str();
 		do_umode(u->nick.c_str(), ac, av);
 	}

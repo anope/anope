@@ -211,7 +211,7 @@ class OSDEFCON : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommandRun(const std::string &service, User *u, const char *cmd, Command *c)
+	EventReturn OnPreCommandRun(User *u, BotInfo *bi, const ci::string &command, const ci::string &message, Command *c)
 	{
 		if (!c)
 		{
@@ -222,7 +222,7 @@ class OSDEFCON : public Module
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
 			{
-				notice_lang(service, u, OPER_DEFCON_DENIED);
+				notice_lang(bi->nick.c_str(), u, OPER_DEFCON_DENIED);
 			}
 
 			return EVENT_STOP;

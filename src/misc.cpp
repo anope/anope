@@ -830,7 +830,7 @@ int nickIsServices(const char *tempnick, int bot)
 		found++;
 	else if (Config.s_BotServ && bot)
 	{
-		for (botinfo_map::const_iterator it = BotList.begin(); it != BotList.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 		{
 			BotInfo *bi = it->second;
 			

@@ -1464,7 +1464,8 @@ int main(int argc, char *argv[])
                         goto waiting_for_input3;
                     }
                 } /* NO COLLISION (biptr) */
-                insert_bot(bi);
+                else
+                    insert_bot(bi);
             }
         } else
             nobot = 1;

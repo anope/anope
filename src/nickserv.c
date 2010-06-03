@@ -250,6 +250,9 @@ int validate_user(User * u)
 		if (na->last_realname)
 			delete [] na->last_realname;
 		na->last_realname = sstrdup(u->realname);
+
+		check_memos(u);
+
 		return 1;
 	}
 

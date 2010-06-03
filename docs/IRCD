@@ -196,10 +196,7 @@ How To Add IRCd Support
     42) Global TLD Prefix: Prefix used to send global messages, should probably
                            be "$"
 
-    43) Delayed AUTH: Does the ircd send if a user is identified for their nick
-                      AFTER the initial NICK/UID? Set this to 0 for no.
-
-    44) Max Modes: The max number of mode changes we can send in one line
+    43) Max Modes: The max number of mode changes we can send in one line
 
 4) Modes 
 

@@ -398,21 +398,23 @@ void User::Collide(NickAlias *na)
  */
 void User::CheckAuthenticationToken(const char *svid)
 {
-	char *c;
 	NickAlias *na;
 
 	if ((na = findnick(this->nick)))
 	{
+		char *c;
 		if (na->nc && na->nc->GetExtArray("authenticationtoken", c))
 		{
 			if (svid && c && !strcmp(svid, c))
 			{
 				/* Users authentication token matches so they should become identified */
-				check_memos(this);
-				this->nc = na->nc;
+				this->Login(na->nc);
+				return;
 			}
 		}
 	}
+
+	validate_user(this);
 }
 
 /** Auto identify the user to the given accountname.
@@ -488,13 +490,13 @@ const bool User::IsIdentified(bool CheckNick) const
 
 		if (na && na->nc == this->nc)
 		{
-			return this->nc;
+			return true;
 		}
 		
-		return NULL;
+		return false;
 	}
 
-	return this->nc;
+	return this->nc ? true : false;
 }
 
 /** Check if the user is recognized for their nick (on the nicks access list)
@@ -975,6 +977,13 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (old_na && (old_na->nc == user->Account() || user->IsRecognized()))
 				old_na->last_seen = time(NULL);
 
+			/* On nick change -r gets set on nick changes but we aren't informed about it, causing SetMode(UMODE_REGISTERED)
+			 * to fail (we think it is already set). Remove it silently like the IRCds
+			 */
+			UserMode *um = ModeManager::FindUserModeByName(UMODE_REGISTERED);
+			if (um)
+				user->RemoveModeInternal(um);
+
 			std::string oldnick = user->nick;
 			user->SetNewNick(nick);
 			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick.c_str()));
@@ -984,47 +993,34 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 			NickAlias *na = findnick(user->nick);
 			/* If the new nick isnt registerd or its registerd and not yours */
-			if (!na || (old_na && na->nc != old_na->nc))
+			if (!na || na->nc != user->Account())
 			{
 				ircdproto->SendUnregisteredNick(user);
+
+				validate_user(user);
 			}
-		}
-
-		if (ircd->sqline)
-		{
-			if (!is_oper(user) && check_sqline(user->nick.c_str(), 1))
-				return NULL;
-		}
-
-	}						   /* if (!*source) */
-
-	/* Do not attempt to validate the user if their server is syncing and this
-	 * ircd has delayed auth - Adam
-	 */
-	if (!(ircd->b_delay_auth && user->server->sync == SSYNC_IN_PROGRESS))
-	{
-		NickAlias *na = findnick(user->nick);
-
-		if (!na || na->nc != user->Account())
-		{
-			if (validate_user(user))
-				check_memos(user);
-		}
-		else
-		{
-			na->last_seen = time(NULL);
-			user->UpdateHost();
-			do_on_id(user);
-			ircdproto->SetAutoIdentificationToken(user);
-			Alog() << Config.s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
-		}
-
-		/* Bahamut sets -r on every nick changes */
-		if (ircd->check_nick_id)
-		{
-			if (user->IsIdentified())
+			else
 			{
+				na->last_seen = time(NULL);
+				user->UpdateHost();
+				do_on_id(user);
 				ircdproto->SetAutoIdentificationToken(user);
+				Alog() << Config.s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
+			}
+
+			/* Bahamut sets -r on every nick change */
+			if (ircd->check_nick_id)
+			{
+				if (na && na->nc == user->Account())
+				{
+					user->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+				}
+			}
+		
+			if (ircd->sqline)
+			{
+				if (!is_oper(user) && check_sqline(user->nick.c_str(), 1))
+					return NULL;
 			}
 		}
 	}

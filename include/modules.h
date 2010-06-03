@@ -515,9 +515,9 @@ class CoreExport Module
 
 	/** Called after a user changed the nick
 	 * @param u The user.
-	 * @param oldnick the old nick of the user
+	 * @param oldnick The old nick of the user
 	 */
-	virtual void OnUserNickChange(User *u, const char *oldnick) { }
+	virtual void OnUserNickChange(User *u, const std::string &oldnick) { }
 
 	/** Called immediatly when a user tries to run a command
 	 * @param service The service

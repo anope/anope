@@ -394,7 +394,6 @@ struct ircdvars_ {
 	int umode;					/* change user modes		*/
 	int nickvhost;				/* Users vhost sent during NICK */
 	int chgreal;				/* Change RealName		*/
-	int check_nick_id;			/* On nick change check if they could be identified */
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
 	int token;					/* Does Anope support the tokens for the ircd */
 	int sjb64;

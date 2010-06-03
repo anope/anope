@@ -60,7 +60,6 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 1,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 0,
 	 1,						 /* No Knock requires +i */
 	 0,						 /* We support inspircd TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
@@ -325,6 +324,8 @@ class InspIRCdProto : public IRCDProto
 
 		u->Account()->Shrink("authenticationtoken");
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
+
+		u->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
 	}
 
 } ircd_proto;
@@ -1182,6 +1183,13 @@ class ProtoInspIRCd : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
+
+		ModuleManager::Attach(I_OnUserNickChange, this);
+	}
+
+	void OnUserNickChange(User *u, const std::string &)
+	{
+		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
 	}
 
 };

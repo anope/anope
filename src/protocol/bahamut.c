@@ -43,7 +43,6 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 0,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 1,
 	 1,						 /* No Knock requires +i */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
@@ -828,8 +827,14 @@ class ProtoBahamut : public Module
 		moduleAddModes();
 
 		pmodule_ircd_proto(&ircd_proto);
+
+		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
 
+	void OnUserNickChange(User *u, const std::string &)
+	{
+		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+	}
 };
 
 MODULE_INIT(ProtoBahamut)

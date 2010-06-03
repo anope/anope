@@ -43,7 +43,6 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 1,						 /* VHOST ON NICK		*/
 	 1,						 /* Change RealName	  */
-	 1,						 /* On nick change check if they could be identified */
 	 1,						 /* No Knock requires +i */
 	 1,						 /* We support Unreal TOKENS */
 	 1,						 /* TIME STAMPS are BASE64 */
@@ -1384,8 +1383,14 @@ class ProtoUnreal : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
-	}
 
+		ModuleManager::Attach(I_OnUserNickChange, this);
+	}
+	
+	void OnUserNickChange(User *u, const std::string &)
+	{
+		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+	}
 };
 
 MODULE_INIT(ProtoUnreal)

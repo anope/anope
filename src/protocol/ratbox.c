@@ -41,7 +41,6 @@ IRCDVar myIrcd[] = {
 	 0,						 /* O:LINE			   */
 	 0,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 1,						 /* On nick change check if they could be identified */
 	 0,						 /* No Knock requires +i */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */
@@ -849,7 +848,6 @@ void moduleAddModes()
 	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
 	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
 	ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
 	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
 	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
 
@@ -904,7 +902,6 @@ class ProtoRatbox : public Module
 	{
 		delete [] TS6SID;
 	}
-
 };
 
 MODULE_INIT(ProtoRatbox)

@@ -34,7 +34,7 @@ int inet_aton(const char *name, struct in_addr *addr)
 #endif
 
 IRCDVar myIrcd[] = {
-	{"InspIRCd 1.2",			/* ircd name */
+	{"InspIRCd 2.0",			/* ircd name */
 	 "+I",					  /* Modes used by pseudoclients */
 	 5,						 /* Chan Max Symbols	 */
 	 "+ao",					 /* Channel Umode used by Botserv bots */
@@ -1385,7 +1385,7 @@ class ProtoInspIRCd : public Module
 		if (Config.Numeric)
 			TS6SID = sstrdup(Config.Numeric);
 
-		pmodule_ircd_version("InspIRCd 1.2");
+		pmodule_ircd_version("InspIRCd 2.0");
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_useTSMode(0);
 
@@ -1406,10 +1406,8 @@ class ProtoInspIRCd : public Module
 
 	void OnUserNickChange(User *u, const std::string &)
 	{
-		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
-		 * this will cancel out this -r, resulting in no mode changes.
-		 */
-		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		/* InspIRCd 2.0 removes r on nick change and doesn't tell services, even though it tells the user */
+		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
 	}
 };
 

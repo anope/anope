@@ -977,19 +977,9 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (old_na && (old_na->nc == user->Account() || user->IsRecognized()))
 				old_na->last_seen = time(NULL);
 
-			/* On nick change -r gets set on nick changes but we aren't informed about it, causing SetMode(UMODE_REGISTERED)
-			 * to fail (we think it is already set). Remove it silently like the IRCds
-			 */
-			if (ircd->check_nick_id)
-			{
-				UserMode *um = ModeManager::FindUserModeByName(UMODE_REGISTERED);
-				if (um)
-					user->RemoveModeInternal(um);
-			}
-
 			std::string oldnick = user->nick;
 			user->SetNewNick(nick);
-			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick.c_str()));
+			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick));
 
 			if (old_na)
 				old_na->OnCancel(user);

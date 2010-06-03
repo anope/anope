@@ -594,6 +594,23 @@ int anope_event_ping(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
+/** This is here because:
+ * 
+ * If we had servers three servers, A, B & C linked like so: A<->B<->C
+ * If Anope is (linked to) A and B splits from A and then reconnects
+ * B introduces itself, introduces C, sends EOS for C, introduces Bs clients
+ * introduces Cs clients, sends EOS for B. This causes all of Cs clients to be introduced
+ * with their server "not syncing". We now send a PING immediatly when receiving a new server
+ * and then finish sync once we get a pong back from that server
+ */
+int anope_event_pong(const char *source, int ac, const char **av)
+{
+	Server *s = findserver(servlist, source);
+	if (s && !is_sync(s))
+		finish_sync(s, 0);
+	return MOD_CONT;
+}
+
 /* netinfo
  *  argv[0] = max global count
  *  argv[1] = time of end sync
@@ -607,20 +624,6 @@ int anope_event_ping(const char *source, int ac, const char **av)
 int anope_event_netinfo(const char *source, int ac, const char **av)
 {
 	unreal_cmd_netinfo(ac, av);
-	return MOD_CONT;
-}
-
-int anope_event_eos(const char *source, int ac, const char **av)
-{
-	Server *s;
-	s = findserver(servlist, source);
-	/* If we found a server with the given source, that one just
-	 * finished bursting. If there was no source, then our uplink
-	 * server finished bursting. -GD
-	 */
-	if (!s && serv_uplink)
-		s = serv_uplink;
-	finish_sync(s, 1);
 	return MOD_CONT;
 }
 
@@ -984,6 +987,7 @@ int anope_event_server(const char *source, int ac, const char **av)
 	} else {
 		do_server(source, av[0], av[1], av[2], "");
 	}
+	ircdproto->SendPing(Config.ServerName, av[0]);
 
 	return MOD_CONT;
 }
@@ -1241,6 +1245,8 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("D",		anope_event_part); addCoreMessage(IRCD,m);
 	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
 	m = createMessage("8",		anope_event_ping); addCoreMessage(IRCD,m);
+	m = createMessage("PONG",       anope_event_pong); addCoreMessage(IRCD,m);
+	m = createMessage("9",          anope_event_pong); addCoreMessage(IRCD,m);
 	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
 	m = createMessage("!",		anope_event_privmsg); addCoreMessage(IRCD,m);
 	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
@@ -1273,8 +1279,6 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("AD",		anope_event_setident); addCoreMessage(IRCD,m);
 	m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
 	m = createMessage("AE",		anope_event_setname); addCoreMessage(IRCD,m);
-	m = createMessage("EOS", 	   anope_event_eos); addCoreMessage(IRCD,m);
-	m = createMessage("ES",	   anope_event_eos); addCoreMessage(IRCD,m);
 	m = createMessage("ERROR", 	   anope_event_error); addCoreMessage(IRCD,m);
 	m = createMessage("5",		anope_event_error); addCoreMessage(IRCD,m);
 	m = createMessage("UMODE2",	anope_event_umode2); addCoreMessage(IRCD,m);

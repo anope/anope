@@ -1036,6 +1036,7 @@ class CoreExport IRCDProto
 		 */
 		virtual void SendQuit(const char *nick, const char *) MARK_DEPRECATED;
 		virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
+		virtual void SendPing(const char *servname, const char *who);
 		virtual void SendPong(const char *servname, const char *who);
 		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
 		virtual void SendSQLineDel(const std::string &) = 0;

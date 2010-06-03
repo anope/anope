@@ -176,6 +176,14 @@ void IRCDProto::SendQuit(BotInfo *bi, const char *fmt, ...)
 	SendQuitInternal(bi, buf);
 }
 
+void IRCDProto::SendPing(const char *servname, const char *who)
+{
+	if (!servname)
+		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PING %s", who);
+	else
+		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PING %s %s", servname, who);
+}
+
 /**
  * Send a PONG reply to a received PING.
  * servname should be left NULL to send a one param reply.

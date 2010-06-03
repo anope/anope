@@ -43,7 +43,7 @@ IRCDVar myIrcd[] = {
 	 1,						 /* UMODE			   */
 	 1,						 /* VHOST ON NICK		*/
 	 1,						 /* Change RealName	  */
-	 0,						 /* On nick change check if they could be identified */
+	 1,						 /* On nick change check if they could be identified */
 	 1,						 /* No Knock requires +i */
 	 1,						 /* We support Unreal TOKENS */
 	 1,						 /* TIME STAMPS are BASE64 */

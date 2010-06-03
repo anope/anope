@@ -41,7 +41,7 @@ IRCDVar myIrcd[] = {
 	 0,						 /* O:LINE			   */
 	 0,						 /* VHOST ON NICK		*/
 	 0,						 /* Change RealName	  */
-	 0,						 /* On nick change check if they could be identified */
+	 1,						 /* On nick change check if they could be identified */
 	 0,						 /* No Knock requires +i */
 	 0,						 /* We support TOKENS */
 	 0,						 /* TIME STAMPS are BASE64 */

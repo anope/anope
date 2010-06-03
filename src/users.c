@@ -980,9 +980,12 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			/* On nick change -r gets set on nick changes but we aren't informed about it, causing SetMode(UMODE_REGISTERED)
 			 * to fail (we think it is already set). Remove it silently like the IRCds
 			 */
-			UserMode *um = ModeManager::FindUserModeByName(UMODE_REGISTERED);
-			if (um)
-				user->RemoveModeInternal(um);
+			if (ircd->check_nick_id)
+			{
+				UserMode *um = ModeManager::FindUserModeByName(UMODE_REGISTERED);
+				if (um)
+					user->RemoveModeInternal(um);
+			}
 
 			std::string oldnick = user->nick;
 			user->SetNewNick(nick);
@@ -1008,15 +1011,6 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 				Alog() << Config.s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
 			}
 
-			/* Bahamut sets -r on every nick change */
-			if (ircd->check_nick_id)
-			{
-				if (na && na->nc == user->Account())
-				{
-					user->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
-				}
-			}
-		
 			if (ircd->sqline)
 			{
 				if (!is_oper(user) && check_sqline(user->nick.c_str(), 1))

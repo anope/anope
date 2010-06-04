@@ -3511,26 +3511,40 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        выводит текущий список "доверенных" хостмасок.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Синтаксис: SET опция параметры
 	
 	Команда SET позволяет вам настроить различные опции ника.
 	Список опций:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    установка главного ника группы
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   изменение текущего пароля на ник
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   выбор языка, посредством которого
 	               сервисы будут с вами общаться
+NICK_HELP_CMD_SET_URL
 	    URL        установка URL-адреса на ник
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      установка email-адреса на ник
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        установка ICQ-номера на ник
+NICK_HELP_CMD_SET_GREET
 	    GREET      установка приветственного сообщения
+NICK_HELP_CMD_SET_KILL
 	    KILL       активирование/деактивирование режима защиты
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     активирование/деактивирование режима безопасности
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    скрытие вашего ника в списке ников по %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       скрытие различной информации о вашем нике
+NICK_HELP_CMD_SET_MSG
 	    MSG        выбор метода общения сервисов с вами
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     активирование/деактивирование автостатуса
+NICK_HELP_SET_TAIL
 	
 	Чтобы получить справочную информацию по отдельно взятой опции
 	воспользуйтесь командой %R%S HELP SET опция
@@ -3665,27 +3679,42 @@ NICK_HELP_SET_AUTOOP
 	Укажите ON, если хотите что бы сервисы автоматически давали вам
 	статус при входе на канал. Соответственно OFF - для отключения.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Синтаксис: SASET ник опция параметры.
 	
 	Позволяет Администраторам сервисов настраивать какие-либо опции для
 	указанного ника без идентификации к нему. Список опции:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    установка главного ника группы
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   изменение текущего пароля на ник
+NICK_HELP_CMD_SASET_URL
 	    URL        установка URL-адреса на ник
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      установка email-адреса на ник
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        установка ICQ-номера на ник
+NICK_HELP_CMD_SASET_GREET
 	    GREET      установка приветственного сообщения
+NICK_HELP_CMD_SASET_KILL
 	    KILL       активирование/деактивирование режима защиты
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     активирование/деактивирование режима безопасности
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    скрытие ника в списке ников по %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       скрытие различной информации о нике
+NICK_HELP_CMD_SASET_MSG
 	    MSG        выбор метода общения сервисов с ником
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   установка на ник т.н. режима 'не-истечения'
+NICK_HELP_CMD_SASET_AUTOOP
 	    AUTOOP     активирование/деактивирование режима автостатуса
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   выбор языка, посредством которого сервисы будут с
 	               указанным ником.
+NICK_HELP_SASET_TAIL
 	
 	Чтобы получить справочную информацию по отдельно взятой опции
 	воспользуйтесь командой %R%S HELP SASET опция

@@ -3644,27 +3644,41 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Affiche votre liste d'accès.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Syntaxe: SET option paramètres
 	
 	Configure diverses options du pseudo. option peut être:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Change l'affichage de votre groupe
 	                   dans les services
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Change le mot de passe de votre pseudo
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Change la langue dans laquelle les Services
 	                   vous envoient leurs messages
+NICK_HELP_CMD_SET_URL
 	    URL        Associe une adresse de site à votre pseudo
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associe une e-mail à votre pseudo
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Associe un numéro ICQ à votre pseudo
+NICK_HELP_CMD_SET_GREET
 	    GREET      Associe un message d'accueil à votre pseudo
+NICK_HELP_CMD_SET_KILL
 	    KILL       Active ou désactive la protection
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     Active ou désactive la sécurité du pseudo
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Empêche votre pseudo d'être affiché par
 	                   %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Cache certaines parties des informations du pseudo
+NICK_HELP_CMD_SET_MSG
 	    MSG        Change le mode de communication des Services
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Demande à Services de vous rendre automatiquement OP.    
+NICK_HELP_SET_TAIL
 	
 	Pour utiliser cette commande, vous devez d'abord vous
 	identifier avec votre mot de passe (%R%S HELP 
@@ -3783,26 +3797,40 @@ NICK_HELP_SET_AUTOOP
 	Positionnez sur ON pour	permettre à ChanServ de le faire quand
 	vous entrez dans un canal.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntaxe: SASET pseudo option parametres.
 	
 	Configure plusieurs options sur un pseudo.  option doit être l'une ci-dessous:
-	
+
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Affiche les pseudos du groupe du pseudo donné
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Change le mot de passe du pseudo donné
+NICK_HELP_CMD_SASET_URL
 	    URL        Associe une url au pseudo donné
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associe une email au pseudo donné
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Associe un compte ICQ au pseudo donné
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Associe un message d'accueil au pseudo donné
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Active ou désactive l'option kill du pseudo donné
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Active ou désactive la securité du pseudo donné
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Empêche le pseudo d'apparaître dans un
 	                   %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Cache certaines informations personnelles du pseudo
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Change le mode de communication des Services
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Empêche le pseudo d'expirer
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Défini la langue que Services utilisera dans les messages
 	               qu'il vous envoie.
+NICK_HELP_SASET_TAIL
 	
 	Taper %R%S HELP SASET option pour plus d'informations
 	sur une option spécifique. L'option devra être mise avec le pseudo

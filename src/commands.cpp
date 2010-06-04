@@ -29,22 +29,26 @@ Command *FindCommand(BotInfo *bi, const ci::string &name)
 	return NULL;
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, const ci::string &message)
+void mod_run_cmd(BotInfo *bi, User *u, const std::string &message)
 {
-	if (!bi || !u || message.empty())
-		return;
-	
-	spacesepstream sep(message);
-	ci::string command;
+	spacesepstream sep(ci::string(message.c_str()));
+	ci::string cmd;
 
-	if (!sep.GetToken(command))
+	if (sep.GetToken(cmd))
+	{
+		mod_run_cmd(bi, u, FindCommand(bi, cmd), cmd, sep.GetRemaining().c_str());
+	}
+}
+
+void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, const ci::string &message)
+{
+	if (!bi || !u)
 		return;
 
-	Command *c = FindCommand(bi, command);
 	CommandReturn ret = MOD_CONT;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, sep.GetRemaining().c_str(), c));
+	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, message, c));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -67,6 +71,7 @@ void mod_run_cmd(BotInfo *bi, User *u, const ci::string &message)
 
 	std::vector<ci::string> params;
 	ci::string curparam, endparam;
+	spacesepstream sep(message);
 	while (sep.GetToken(curparam))
 	{
 		// - 1 because params[0] corresponds with a maxparam of 1.

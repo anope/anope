@@ -412,7 +412,7 @@ void User::AutoID(const std::string &account)
 				delete [] na->last_realname;
 			na->last_realname = sstrdup(this->realname);
 			na->last_seen = time(NULL);
-			this->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+			this->SetMode(NickServ, UMODE_REGISTERED);
 			this->UpdateHost();
 			check_memos(this);
 

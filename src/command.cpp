@@ -20,16 +20,31 @@ Command::~Command()
 {
 }
 
-CommandReturn Command::Execute(User *u, const std::vector<ci::string> &) { return MOD_CONT; }
+CommandReturn Command::Execute(User *u, const std::vector<ci::string> &)
+{
+	return MOD_CONT;
+}
 
 void Command::OnServHelp(User *u) { }
 
 bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
 
-void Command::OnSyntaxError(User *u, const ci::string &subcommand) { }
+void Command::OnSyntaxError(User *u, const ci::string &subcommand)
+{
+}
 
 void Command::SetPermission(const std::string &reststr)
 {
 	this->permission = reststr;
+}
+
+bool Command::AddSubcommand(Command *c)
+{
+	return false;
+}
+
+bool Command::DelSubcommand(const ci::string &cname)
+{
+	return false;
 }
 

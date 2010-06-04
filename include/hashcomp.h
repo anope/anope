@@ -16,7 +16,8 @@
 #include <string>
 
 #ifndef _WIN32
-	#ifdef HASHMAP_DEPRECATED /* If gcc ver > 4.3 */
+//	#ifdef HASHMAP_DEPRECATED /* If gcc ver > 4.3 */
+	#if 1
 		/* GCC4.3+ has deprecated hash_map and uses tr1. But of course, uses a different include to MSVC. */
 		#include <tr1/unordered_map>
 		#define unordered_map_namespace std::tr1

@@ -1400,7 +1400,7 @@ class ProtoInspIRCd : public Module
 		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
 		 * this will cancel out this -r, resulting in no mode changes.
 		 */
-		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 };
 

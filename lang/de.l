@@ -3594,34 +3594,48 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	    Zeigt die aktuelle Zugriffsliste an.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Syntax: SET Option Parameter
 	
 	Stellt verschiedene Optionen zu deinem Nicknamen ein.
 	Option kann eines der folgenden Werte sein:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY      Ändert den "Ursprung" deiner Gruppe
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD     Setzt das Passwort deines Nicknamens neu
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE     Stellt die Sprache ein, in der dir die 
 	                 Services antworten sollen.
+NICK_HELP_CMD_SET_URL
 	    URL          Verbindet eine URL mit deinem Nicknamen
+NICK_HELP_CMD_SET_ICQ
 	    ICQ          Trägt deine ICQ-Nummer unter den Infos
 	                 zu deinem Nicknamen ein.
+NICK_HELP_CMD_SET_MSG
 	    MSG          Ändert die Methode, wie die Services mit
 	                 dir kommunizieren
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL        Verbindet eine öffentliche eMail-Adresse
 	                 mit deinem Nicknamen         
+NICK_HELP_CMD_SET_GREET
 	    GREET        Stellt eine Begrüssungsmeldung für deinen
 	                 Nicknamen ein.
+NICK_HELP_CMD_SET_KILL
 	    KILL         Stellt Kill-Schutz an oder aus.
+NICK_HELP_CMD_SET_SECURE
 	    SECURE       Aktiviert/Deaktiviert den Sicherheitsmodus
 	                 für deinen Nicknamen
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE      Verhindert das Erscheinen deines Nicknamens 
 	                 auf der Liste von %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE         Versteckt bestimmte Informationen deines
 	                 Nicknamens
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP       Sollten Dir die Services automatisch
 	                 Op-Status geben.    
+NICK_HELP_SET_TAIL
 	
 	Wenn du eines dieser Optionen nutzen willst, musst du dich
 	vorher identifizeren. 
@@ -3758,31 +3772,46 @@ NICK_HELP_SET_AUTOOP
 	erlaubt es ChanServ Dir automatisch Op-Status zu geben,
 	wenn Du die Channels betrittst.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntax: SASET nickname option parameters.
 	
 	Setzt verschiedene Einstellungen für den Nicknamen.  Gültig für option ist:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Setzt einen Nicknamen als Ursprung der Nickgruppe
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Setzt das Passwort eines Nicknamens
+NICK_HELP_CMD_SASET_URL
 	    URL        Fügt eine URL dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Fügt eine Emailadresse dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Fügt eine ICQ Nummer dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Fügt eine Begrüssungsnachricht dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Schützt den Nicknamen durch Identifikationszwang
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Schaltet die Identifikationssicherheitsfunktion 
 	               an oder aus
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Verhindert, dass der Nickname im Befehl
 	               %R%S LIST auftaucht
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Versteckt bestimmte, dem Nicknamen zugeordnete, 
 	               Informationen
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Bestimmt die Art wie die Services Nachrichten senden
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Verhindert, dass der Nickname nach einer bestimmten
 	               Zeit verfällt
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Stellt die Sprache ein, in der die Services
 	               dem Nicknamen antworten sollen.
+NICK_HELP_CMD_SASET_AUTOOP
 	    AUTOOP     Sollten die Services dem Nick automatisch seinen
 	               Op-Status geben.
+NICK_HELP_SASET_TAIL
 	
 	Mit %R%S HELP SASET option können mehr Informationen zu 
 	den Einstellungen angefordert werden. Die Einstellungen betreffen den

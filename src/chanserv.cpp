@@ -273,7 +273,7 @@ void chanserv(User *u, const std::string &buf)
 	}
 	else
 	{
-		mod_run_cmd(ChanServ, u, buf.c_str());
+		mod_run_cmd(ChanServ, u, buf);
 	}
 }
 

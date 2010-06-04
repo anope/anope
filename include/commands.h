@@ -23,7 +23,7 @@ class Command;
 typedef std::map<ci::string, Command *> CommandMap;
 
 /** The return value from commands.
- *  */
+ */
 enum CommandReturn
 {
 	MOD_CONT,
@@ -32,7 +32,8 @@ enum CommandReturn
 
 extern CoreExport Command *FindCommand(BotInfo *bi, const ci::string &cmd);
 extern CoreExport void mod_help_cmd(BotInfo *bi, User *u, const ci::string &cmd);
-extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, const ci::string &cmd);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, const std::string &message);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, const ci::string &message);
 
 enum CommandFlag
 {
@@ -101,6 +102,16 @@ class CoreExport Command : public Flags<CommandFlag>
 	 * @param reststr The permission required to successfully execute this command
 	 */
 	void SetPermission(const std::string &reststr);
+
+	/** Add a subcommand to this command
+	 * @param c The command
+	 */
+	virtual bool AddSubcommand(Command *c);
+
+	/** Delete a subcommand from this command
+	 * @param cname The subcommand name
+	 */
+	virtual bool DelSubcommand(const ci::string &cname);
 };
 
 #endif

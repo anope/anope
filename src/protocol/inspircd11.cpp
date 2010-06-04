@@ -321,7 +321,7 @@ class InspIRCdProto : public IRCDProto
 		u->Account()->Shrink("authenticationtoken");
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 
-		u->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		u->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
 } ircd_proto;

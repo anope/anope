@@ -594,9 +594,9 @@ int anope_event_ping(const char *source, int ac, const char **av)
  */
 int anope_event_pong(const char *source, int ac, const char **av)
 {
-	Server *s = findserver(servlist, source);
-	if (s && !is_sync(s))
-		finish_sync(s, 0);
+	Server *s = Server::Find(source);
+	if (s && !s->IsSynced())
+		s->Sync(false);
 	return MOD_CONT;
 }
 

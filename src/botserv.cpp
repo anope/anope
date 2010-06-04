@@ -85,7 +85,7 @@ void botserv(User *u, BotInfo *bi, const std::string &buf)
 	}
 	else
 	{
-		mod_run_cmd(bi, u, buf.c_str());
+		mod_run_cmd(bi, u, buf);
 	}
 }
 

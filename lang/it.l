@@ -3498,25 +3498,39 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Visualizza la lista di accesso attuale.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Sintassi: SET opzione parametri
 	
 	Imposta varie opzioni del nick. opzione può essere una delle
 	seguenti:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Imposta il nome del tuo gruppo
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associa un indirizzo e-mail al tuo nick
+NICK_HELP_CMD_SET_GREET
 	    GREET      Associa un messaggio di saluto al tuo nick
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Nasconde alcune informazioni sul tuo nick
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Associa un numero ICQ al tuo nick
+NICK_HELP_CMD_SET_KILL
 	    KILL       Attiva o disattiva la protezione
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Imposta la lingua utilizzata dai Services
+NICK_HELP_CMD_SET_MSG
 	    MSG        Cambia il metodo di comunicazione usato dai Services
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Imposta la password del tuo nick
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Nasconde il nick dalla lista (%R%S LIST)
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     Attiva o disattiva la sicurezza
+NICK_HELP_CMD_SET_URL
 	    URL        Associa un URL al tuo nick
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Should services op you automatically.    
+NICK_HELP_SET_TAIL
 	
 	Per usare questo comando, devi prima identificarti con
 	la tua password (digita %R%S HELP IDENTIFY per
@@ -3633,26 +3647,40 @@ NICK_HELP_SET_AUTOOP
 	Sets whether you will be opped automatically. Set to ON to 
 	allow ChanServ to op you automatically when entering channels.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Sintassi: SASET nickname opzione parametri.
 	
 	Imposta varie opzioni del nick. opzione può essere una delle
 	seguenti:
-	
+
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Imposta il nome del gruppo
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Imposta la password del nick
+NICK_HELP_CMD_SASET_URL
 	    URL        Associa un URL al nickname
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associa un indirizzo e-mail al nickname
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Associa un numero ICQ al nickname
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Associa un messaggio di saluto al nickname
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Attiva o disattiva la protezione
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Attiva o disattiva la sicurezza
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Nasconde il nick dalla lista (%R%S LIST)
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Nsconde alcune informazioni sul nick
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Cambia il metodo di comunicazione usato dai servizi
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Evita che il nickname scada
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Set the language Services will use when
 	               sending messages to nickname
+NICK_HELP_SASET_TAIL
 	
 	Digita %R%S HELP SASET opzione per maggiori informazioni
 	su un'opzione specifica. Le opzioni verranno impostate sul

@@ -4551,26 +4551,40 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Wy¶wietla aktualn± listê dostêpu.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Sk³adnia: SET opcja parametry
 	
 	Ustawia ró¿ne opcje nicka. Dostêpne opcje to:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Ustawia nick reprezentuj±cy grupê nicków
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Ustawia has³o do nicka
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Ustawia jêzyk w którym serwisy bêd±
 	               wysy³a³y komunikaty
+NICK_HELP_CMD_SET_URL
 	    URL        Przypisuje adres www do nicka
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Przypisuje adres e-mail do nicka
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Przypisuje numer ICQ do nicka
+NICK_HELP_CMD_SET_GREET
 	    GREET      Przypisuje komunikat powitalny do nicka
+NICK_HELP_CMD_SET_KILL
 	    KILL       W³±cza lub wy³±cza ochronê nicka
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     W³±cza lub wy³±cza bezpieczeñstwo nicka
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Zapobiega wy¶wietlaniu nicka po wydaniu
 	               polecenia: %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Ukrywa poszczególne informacje o nicku
+NICK_HELP_CMD_SET_MSG
 	    MSG        Zmienia sposób komunikacji serwisów
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     W³±cza lub wy³±cza automatyczne opowanie
+NICK_HELP_SET_TAIL
 	
 	Aby u¿yæ tej komendy musisz siê zidentyfikowaæ z u¿yciem
 	Twojego has³a. Aby uzyskaæ wiêcej informacji wpisz:
@@ -4691,28 +4705,43 @@ NICK_HELP_SET_AUTOOP
 	W³±cza lub wy³±cza automatyczne nadawanie uprawnieñ
 	przy wchodzeniu na kana³.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Sk³adnia: SASET nick opcja parametry.
 	
 	Ustawia ró¿ne opcje nicka wskazanemu u¿ytkownikowi.
 	Dostêpne opcje to:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Ustawia nick reprezentuj±cy grupê nicków
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Ustawia has³o do nicka
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Ustawia jêzyk w którym serwisy bêd±
 	               wysy³a³y komunikaty
+NICK_HELP_CMD_SASET_URL
 	    URL        Przypisuje adres www do nicka
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Przypisuje adres e-mail do nicka
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Przypisuje numer ICQ do nicka
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Przypisuje komunikat powitalny do nicka
+NICK_HELP_CMD_SASET_KILL
 	    KILL       W³±cza lub wy³±cza ochronê nicka
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     W³±cza lub wy³±cza bezpieczeñstwo nicka
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Zapobiega wy¶wietlaniu nicka po wydaniu
 	               polecenia: %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Ukrywa poszczególne informacje o nicku
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Zmienia sposób komunikacji serwisów
+NICK_HELP_CMD_SASET_AUTOOP
 	    AUTOOP     W³±cza lub wy³±cza automatyczne opowanie
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Zapobiega wyga¶niêciu nicka
+NICK_HELP_SASET_TAIL
 	
 	Aby uzyskaæ wiêcej informacji o danej opcji wpisz:
 	%R%S HELP SASET opcja

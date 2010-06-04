@@ -55,7 +55,7 @@ void operserv(User *u, const std::string &buf)
 	}
 	else
 	{
-		mod_run_cmd(OperServ, u, buf.c_str());
+		mod_run_cmd(OperServ, u, buf);
 	}
 }
 

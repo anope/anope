@@ -97,7 +97,7 @@ void hostserv(User *u, const std::string &buf)
 	}
 	else
 	{
-		mod_run_cmd(HostServ, u, buf.c_str());
+		mod_run_cmd(HostServ, u, buf);
 	}
 }
 

@@ -1008,6 +1008,9 @@ int validate_user(User * u)
         return 0;
     }
 
+    if (na->status & NS_IDENTIFIED)
+        return 1;
+
     on_access = is_on_access(u, na->nc);
     if (on_access)
         na->status |= NS_ON_ACCESS;

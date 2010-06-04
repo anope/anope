@@ -746,8 +746,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
             oldnick = sstrdup(user->nick);
             change_user_nick(user, nick);
-            send_event(EVENT_CHANGE_NICK, 2, nick, oldnick);
-            free(oldnick);
 
             if ((old_na ? old_na->nc : NULL) ==
                 (user->na ? user->na->nc : NULL))
@@ -758,6 +756,9 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             else {
                 anope_cmd_nc_change(user);
             }
+
+            send_event(EVENT_CHANGE_NICK, 2, nick, oldnick);
+            free(oldnick);
         }
 
         if (ircd->sqline) {

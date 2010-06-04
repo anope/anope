@@ -198,23 +198,26 @@ void do_on_id(User *u)
 	if (!na || !na->hostinfo.HasVhost())
 		return;
 	
-	ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
-	if (ircd->vhost)
+	if (!u->vhost || u->vhost != na->hostinfo.GetHost() || (!na->hostinfo.GetIdent().empty() && u->GetVIdent() != na->hostinfo.GetIdent()))
 	{
-		if (u->vhost)
-			delete [] u->vhost;
-		u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
-	}
-	if (ircd->vident && !na->hostinfo.GetIdent().empty())
-	{
-		u->SetVIdent(na->hostinfo.GetIdent());
-	}
-	u->UpdateHost();
+		ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
+		if (ircd->vhost)
+		{
+			if (u->vhost)
+				delete [] u->vhost;
+			u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
+		}
+		if (ircd->vident && !na->hostinfo.GetIdent().empty())
+		{
+			u->SetVIdent(na->hostinfo.GetIdent());
+		}
+		u->UpdateHost();
 
-	if (!na->hostinfo.GetIdent().empty())
-		notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
-	else
-		notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+		if (!na->hostinfo.GetIdent().empty())
+			notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+		else
+			notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+	}
 }
 
 

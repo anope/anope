@@ -810,7 +810,7 @@ int anope_event_setident(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	u->SetIdent(av[0]);
+	u->SetVIdent(av[0]);
 	return MOD_CONT;
 }
 int anope_event_chgident(const char *source, int ac, const char **av)
@@ -827,7 +827,7 @@ int anope_event_chgident(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	u->SetIdent(av[1]);
+	u->SetVIdent(av[1]);
 	return MOD_CONT;
 }
 

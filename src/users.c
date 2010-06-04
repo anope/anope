@@ -158,7 +158,7 @@ const std::string &User::GetCloakedHost() const
 
 const std::string &User::GetUID() const
 {
- return this->uid;
+	return this->uid;
 }
 
 
@@ -166,7 +166,7 @@ void User::SetVIdent(const std::string &sident)
 {
 	this->vident = sident;
 
-	Alog(LOG_DEBUG) << this->nick << " changed ident to " << sident;
+	Alog(LOG_DEBUG) << this->nick << " changed vident to " << sident;
 
 	this->UpdateHost();
 }

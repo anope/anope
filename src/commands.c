@@ -95,6 +95,8 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                 notice_lang(service, u, OPER_DEFCON_DENIED);
             }
         } else {
+            char *mod_current_module_name_save = mod_current_module_name;
+            Module *mod_current_module_save = mod_current_module;
             mod_current_module_name = c->mod_name;
             mod_current_module = findModule(c->mod_name);
             if ((c->has_priv == NULL) || c->has_priv(u)) {
@@ -106,8 +108,6 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                         mod_current_module = findModule(current->mod_name);
                         if (current->routine)
                             retVal = current->routine(u);
-                        mod_current_module_name = NULL;
-                        mod_current_module = NULL;
                         current = current->next;
                     }
                 }
@@ -116,8 +116,8 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                 alog("Access denied for %s with service %s and command %s",
                      u->nick, service, cmd);
             }
-            mod_current_module_name = NULL;
-            mod_current_module = NULL;
+            mod_current_module_name = mod_current_module_name_save;
+            mod_current_module = mod_current_module_save;
         }
     } else {
         if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u)) {

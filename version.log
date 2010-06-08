@@ -9,9 +9,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="2999"
+VERSION_BUILD="3000"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3000 - Never unset mod_current_module in functions that modules might call, instead save the old values and reset them
 #Revision 2999 - Moved EVENT_CHANGE_NICK call to after anope_cmd_nc_change() call. Added user identified check to validate_user() to prevent identified user being told to identify.
 #Revision 2993 - Fixed db-mergers handling of bot collisions
 #Revision 2991 - Fixed a crash on shutdown when running Anope on Mac

@@ -13,8 +13,6 @@ Anope Version 1.8 - SVN
 4/28  F Fixed a bug that could make some nick requests disappear         [  #00]
 5/18  F Fixed English and grammar in e-mail messages                     [  #00]
 5/23  F Fixed SQUITing juped servers on InspIRCd 1.2                     [#1165]
-6/4   F Check if user is identified before telling them to identify      [  #00]
-6/4   F Moved EVENT_CHANGE_NICK call to after the nick change processing [  #00]
 
 Anope Version 1.8.4
 -------------------

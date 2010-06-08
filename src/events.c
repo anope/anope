@@ -127,23 +127,23 @@ void event_message_process(char *eventbuf)
     /* Do something with the message. */
     evm = find_event(cmd);
     if (evm) {
+        char *mod_current_module_name_save = mod_current_module_name;
+        Module *mod_current_module_save = mod_current_module;
         if (evm->func) {
             mod_current_module_name = evm->mod_name;
             mod_current_module = findModule(evm->mod_name);
             retVal = evm->func(source, ac, av);
-            mod_current_module_name = NULL;
-            mod_current_module = NULL;
             if (retVal == MOD_CONT) {
                 current = evm->next;
                 while (current && current->func && retVal == MOD_CONT) {
                     mod_current_module_name = current->mod_name;
                     mod_current_module = findModule(current->mod_name);
                     retVal = current->func(source, ac, av);
-                    mod_current_module_name = NULL;
-                    mod_current_module = NULL;
                     current = current->next;
                 }
             }
+            mod_current_module_name = mod_current_module_name_save;
+            mod_current_module = mod_current_module_save;
         }
     }
     /* Free argument list we created */
@@ -162,22 +162,22 @@ void event_process_hook(const char *name, int argc, char **argv)
     evh = find_eventhook(name);
     if (evh) {
         if (evh->func) {
+            char *mod_current_module_name_save = mod_current_module_name;
+            Module *mod_current_module_save = mod_current_module;
             mod_current_module = findModule(evh->mod_name);
             mod_current_module_name = evh->mod_name;
             retVal = evh->func(argc, argv);
-            mod_current_module = NULL;
-            mod_current_module_name = NULL;
             if (retVal == MOD_CONT) {
                 current = evh->next;
                 while (current && current->func && retVal == MOD_CONT) {
                     mod_current_module = findModule(current->mod_name);
                     mod_current_module_name = current->mod_name;
                     retVal = current->func(argc, argv);
-                    mod_current_module = NULL;
-                    mod_current_module_name = NULL;
                     current = current->next;
                 }
             }
+            mod_current_module_name = mod_current_module_name_save;
+            mod_current_module = mod_current_module_save;
         }
     }
 }

@@ -780,7 +780,15 @@ int main(int argc, char *argv[])
 			fs << "MD LEVELS";
 			for (j = 0; j < 36; j++)
 			{
-				fs << " " << GetLevelName(j) << " " << ci->levels[j];
+				/* In 1.8 disabled meant founder only. In 1.9.2 disabled literally means its disabled so, we will set these to ACCESS_QOP */
+				if (ci->levels[j] == -10000)
+				{
+					fs << " " << GetLevelName(j) << " " << 10000;
+				}
+				else
+				{
+					fs << " " << GetLevelName(j) << " " << ci->levels[j];
+				}
 			}
 			fs << std::endl;
 			fs << "MD FLAGS" 

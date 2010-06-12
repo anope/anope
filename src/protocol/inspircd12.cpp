@@ -86,7 +86,7 @@ static int has_inviteexceptionmod = 0;
 static int has_hidechansmod = 0;
 
 /* Previously introduced user during burst */
-static User *prev_u_intro;
+static User *prev_u_intro = NULL;
 
 
 /* CHGHOST */
@@ -863,12 +863,16 @@ int anope_event_uid(const char *source, int ac, const char **av)
 			ts, htonl(*ad), av[4], av[0]);
 	if (user)
 	{
+		UserSetInternalModes(user, 1, &av[8]);
+		user->SetCloakedHost(av[4]);
 		if (user->server->sync == SSYNC_IN_PROGRESS)
 		{
 			prev_u_intro = user;
 		}
-		UserSetInternalModes(user, 1, &av[8]);
-		user->SetCloakedHost(av[4]);
+		else
+		{
+			validate_user(user);
+		}
 	}
 
 	return MOD_CONT;

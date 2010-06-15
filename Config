@@ -29,7 +29,7 @@ Load_Cache () {
     if [ -f config.cache -a -r config.cache -a ! "$IGNORE_CACHE" ] ; then
         echo "Using defaults from config.cache. To ignore, ./Config -nocache"
         echo ""
-        . config.cache
+        . ./config.cache
         CAN_QUICK="yes"
     else
         CAN_QUICK="no"

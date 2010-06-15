@@ -9,9 +9,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="3003"
+VERSION_BUILD="3005"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3005 - Fixed ./Config to correctly load the previously used settings from config.cache
+#Revision 3003 - Grab users cloaked hosts on Unreal after setting +x, fixes us never knowing cloaked hosts if the user is introduced with a vhost
 #Revision 3000 - Never unset mod_current_module in functions that modules might call, instead save the old values and reset them
 #Revision 2999 - Moved EVENT_CHANGE_NICK call to after anope_cmd_nc_change() call. Added user identified check to validate_user() to prevent identified user being told to identify.
 #Revision 2993 - Fixed db-mergers handling of bot collisions

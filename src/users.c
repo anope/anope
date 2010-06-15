@@ -636,13 +636,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         user->realname = sstrdup(realname);
         user->timestamp = ts;
         user->my_signon = time(NULL);
-        /* Initially set both the vhost and cloaked host to the users cloaked host, vhost will be changed
-         * later if they get a real vhost, chost however should *never* be changed to anything else.
-         * It is possible that on most IRCds (Unreal) a server splits and then comes back, reintroducing clients
-         * with a vhost (not a cloaked host) and never informing Anope about  the real cloaked host. For now I'm
-         * leaving this open (we should prboably request a USERHOST or so) as this won't occur that much, and any
-         * fixes to this problem are ugly. - Adam
-	 */
         user->chost = vhost ? sstrdup(vhost) : sstrdup(host);
         user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
         if (uid) {

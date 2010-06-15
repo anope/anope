@@ -489,8 +489,7 @@ void unreal_set_umode(User * user, int ac, char **av)
             }
             break;
         case 'x':
-            if (!add)
-            {
+            if (!add) {
                 if (user->vhost)
                     free(user->vhost);
                 user->vhost = NULL;
@@ -1403,7 +1402,13 @@ int anope_event_sethost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[0]);
+    if (u->mode & UMODE_x)
+        change_user_host(u, av[0]);
+    else {
+        if (u->chost)
+            free(u->chost);
+        u->chost = sstrdup(av[0]);
+    }
     return MOD_CONT;
 }
 

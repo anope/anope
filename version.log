@@ -9,7 +9,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="3000"
+VERSION_BUILD="3003"
 
 # $Log$ # Changes since the 1.8.4 Release
 #Revision 3000 - Never unset mod_current_module in functions that modules might call, instead save the old values and reset them

@@ -845,21 +845,12 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	/* If a user has a custom host and a server splits and reconnects
-	 * Unreal does not send the users cloaked host to Anope.. so we do not know it.
-	 * However, they will be +t if this is the case, so we will set their vhost
-	 * to the sethost value (which really is their vhost) and clear the chost.
-	 * The chost will be request later (if needed) - Adam
-	 */
-	if (u->HasMode(UMODE_VHOST))
+	/* When a user sets +x we recieve the new host and then the mode change */
+	if (u->HasMode(UMODE_CLOAK))
 	{
 		u->SetDisplayedHost(av[0]);
-		u->chost.clear();
 	}
-	/* If the new host doesn't match the real host or ip.. set it
-	 * else we will not set a cloaked host, and request it later if needed
-	 */
-	else if ((u->host && strcmp(av[0], u->host)) || (u->hostip && strcmp(av[0], u->hostip)))
+	else
 	{
 		u->SetCloakedHost(av[0]);
 	}
@@ -1035,31 +1026,6 @@ int anope_event_sdesc(const char *source, int ac, const char **av)
 
 	if (s) {
 		s->desc = const_cast<char *>(av[0]); // XXX Unsafe cast -- CyberBotX
-	}
-
-	return MOD_CONT;
-}
-
-int anope_event_userhost(const char *source, int ac, const char **av)
-{
-	/** Hack to get around Unreal:
-	 * This is the USERHOST reply, we only send a request if we do not know the users cloaked host
-	 * (they got introducted using a vhost) - Adam
-	 */
-	if (ac < 2 || !av[1] || !*av[1])
-		return MOD_CONT;
-
-	std::string reply = av[1];
-	std::string user = std::string(reply.begin(), std::find(reply.begin(), reply.end(), '='));
-	if (user[user.length() - 1] == '*')
-		user.erase(user.length() - 1);
-	std::string host = std::string(std::find(reply.begin(), reply.end(), '@'), reply.end());
-	host.erase(host.begin());
-
-	User *u = finduser(user);
-	if (u)
-	{
-		u->SetCloakedHost(host);
 	}
 
 	return MOD_CONT;
@@ -1286,7 +1252,6 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("~",		anope_event_sjoin); addCoreMessage(IRCD,m);
 	m = createMessage("SDESC",	  anope_event_sdesc); addCoreMessage(IRCD,m);
 	m = createMessage("AG",	   anope_event_sdesc); addCoreMessage(IRCD,m);
-	m = createMessage("302",	anope_event_userhost); addCoreMessage(IRCD,m);
 
 	/* The non token version of these is in messages.c */
 	m = createMessage("2",		 m_stats); addCoreMessage(IRCD,m);

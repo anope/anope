@@ -1320,13 +1320,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:
-				if (add && user->vhost)
-				{
-					user->SetCloakedHost(user->vhost);
-					delete [] user->vhost;
-					user->vhost = NULL;
-				}
-				else if (user->vhost)
+				if (!add && user->vhost)
 				{
 					delete [] user->vhost;
 					user->vhost = NULL;

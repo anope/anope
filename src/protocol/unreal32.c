@@ -701,9 +701,9 @@ int anope_event_mode(const char *source, int ac, const char **av)
 /* This is used to strip the TS from the end of the mode stirng */
 int anope_event_gmode(const char *source, int ac, const char **av)
 {
-        if (findserver(servlist, source))
-                --ac;
-        return anope_event_mode(source, ac, av);
+	if (findserver(servlist, source))
+		--ac;
+	return anope_event_mode(source, ac, av);
 }
 
 /* Unreal sends USER modes with this */

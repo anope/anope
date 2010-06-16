@@ -507,24 +507,24 @@ void defconParseModeString(const char *str)
 
 static char *defconReverseModes(const char *modes)
 {
-        char *newmodes = NULL;
-        unsigned i = 0;
-        if (!modes) {
-                return NULL;
-        }
-        if (!(newmodes = new char[strlen(modes) + 1])) {
-                return NULL;
-        }
-        for (i = 0; i < strlen(modes); i++) {
-                if (modes[i] == '+')
-                        newmodes[i] = '-';
-                else if (modes[i] == '-')
-                        newmodes[i] = '+';
-                else
-                        newmodes[i] = modes[i];
-        }
-        newmodes[i] = '\0';
-        return newmodes;
+	char *newmodes = NULL;
+	unsigned i = 0;
+	if (!modes) {
+		return NULL;
+	}
+	if (!(newmodes = new char[strlen(modes) + 1])) {
+		return NULL;
+	}
+	for (i = 0; i < strlen(modes); i++) {
+		if (modes[i] == '+')
+			newmodes[i] = '-';
+		else if (modes[i] == '-')
+			newmodes[i] = '+';
+		else
+			newmodes[i] = modes[i];
+	}
+	newmodes[i] = '\0';
+	return newmodes;
 }
 
 MODULE_INIT(OSDEFCON)

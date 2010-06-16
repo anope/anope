@@ -7,6 +7,7 @@ A Prevent negaitve mode changes, kicks, bans, and autokicks from affecting peopl
 A Added nickserv/auxpex permission
 A Added nickserv ungroup command
 A Renamed the SGLINE to be SNLINE
+A Added /chanserv saset command
 
 Anope Version 1.9.2
 --------------------

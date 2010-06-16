@@ -8,22 +8,23 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
+ * $Id$
  *
  */
 /*************************************************************************/
 
 #include "module.h"
 
-class CommandCSSet : public Command
+class CommandCSSASet : public Command
 {
 	std::map<ci::string, Command *> subcommands;
 
  public:
-	CommandCSSet(const ci::string &cname) : Command(cname, 2, 3)
+	CommandCSSASet(const ci::string &cname) : Command(cname, 2, 3)
 	{
 	}
 
-	~CommandCSSet()
+	~CommandCSSASet()
 	{
 		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
 		{
@@ -39,12 +40,6 @@ class CommandCSSet : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_DISABLED);
 			return MOD_CONT;
 		}
-		if (!check_access(u, cs_findchan(params[0]), CA_SET))
-		{
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-			return MOD_CONT;
-		}
-
 
 		Command *c = this->FindCommand(params[1]);
 
@@ -68,7 +63,7 @@ class CommandCSSet : public Command
 	{
 		if (subcommand.empty())
 		{
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_HEAD);
+			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_HEAD);
 			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
 				it->second->OnServHelp(u);
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_TAIL);
@@ -89,12 +84,12 @@ class CommandCSSet : public Command
 
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET);
+		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SASET);
 	}
 
 	bool AddSubcommand(Command *c)
@@ -120,17 +115,17 @@ class CommandCSSet : public Command
 	}
 };
 
-class CSSet : public Module
+class CSSASet : public Module
 {
  public:
-	CSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSASet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSSet("SET"));
+		this->AddCommand(ChanServ, new CommandCSSASet("SASET"));
 	}
 };
 
-MODULE_INIT(CSSet)
+MODULE_INIT(CSSASet)

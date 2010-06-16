@@ -1097,6 +1097,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	Kanaal %s is gede-registreerd.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET kanaal optie parameters
@@ -4204,6 +4232,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registreer een kanaal
 CHAN_HELP_CMD_SET
 	    SET        Stel kanaal opties en informatie in
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4305,7 +4335,15 @@ CHAN_HELP_DROP
 	Heft de registratie van het gegeven kanaal op. Kan alleen
 	gebruik wordt door de kanaalstichter.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Gebruik: SET kanaal optie parameters
 	
 	Stelt de kanaalstichter in staat om verschillende kanaal-
@@ -4313,42 +4351,65 @@ CHAN_HELP_SET
 	
 	Beschikbare opties:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Stelt de stichter van het kanaal in
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Stelt de opvolger van het kanaal in
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Stelt de kanaalbeschrijving in
+CHAN_HELP_CMD_SET_URL
 	    URL           Associeer een URL met het kanaal
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Associate een E-mail adres met het kanaal
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Stel een bericht in dat naar de gebruikers
 	                    wordt gestuurd zodra ze het kanaal binnekomen
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Stelt in hoe Services bans op het kanaal maken
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Zet kanaal modes vast aan of uit
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Onthoud het topic zoland het kanaal niet in
 	                    gebruik is
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Stuur een notice wanneer de OP/DEOP commando's
 	                    worden gebruikt.
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Reguleer het gebruik van kritieke commando's
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Verberg een kanaal van het LIST commando
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Limiteer toegang tot het kanaal
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Activeer %S veiligheidsopties
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Sterkere controle van de kanaalop status
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Sterkere controle van de stichter status
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Onderteken kicks die worden uitgevoerd met het
 	                    KICK commando
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic kan alleen veranderd worden met TOPIC
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Schakel het gebruikersprivilegesysteem om
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Type %R%S HELP option voor meer informatie over een
 	specifieke optie.
 
 CHAN_HELP_SET_FOUNDER
-	Gebruik: SET kanaal FOUNDER nick
+	Gebruik: %s kanaal FOUNDER nick
 	
 	Veranderd de stichter van een kanaal. De nieuwe nick moet
 	een geregistreerde nick zijn.
 
 CHAN_HELP_SET_SUCCESSOR
-	Gebruik: SET kanaal SUCCESSOR nick
+	Gebruik: %s kanaal SUCCESSOR nick
 	
 	Veranderd de opvolger van een kanaal. Als de nick van de
 	stichter verloopt of de registratie ervan wordt geannuleerd
@@ -4360,13 +4421,13 @@ CHAN_HELP_SET_SUCCESSOR
 	geregistreerde nick zijn.
 
 CHAN_HELP_SET_DESC
-	Gebruik: SET kanaal DESC beschrijving
+	Gebruik: %s kanaal DESC beschrijving
 	
 	Stelt de beschrijving van een kanaal in, die weergegeven
 	wordt door de LIST en INFO commando's.
 
 CHAN_HELP_SET_URL
-	Gebruik: SET kanaal URL [url]
+	Gebruik: %s kanaal URL [url]
 	
 	Associeer de gegeven URL met het kanaal. Deze URL zal worden
 	weergegeven wanneer iemand informatie over het kanaal op-
@@ -4374,7 +4435,7 @@ CHAN_HELP_SET_URL
 	wordt de URL voor het kanaal verwijderd.
 
 CHAN_HELP_SET_EMAIL
-	Gebruik: SET kanaal EMAIL [adres]
+	Gebruik: %s kanaal EMAIL [adres]
 	
 	Associeer het gegeven e-mail adres met het kanaal. Dit adres
 	zal worden weergegeven wanneer iemand informatie over het
@@ -4383,7 +4444,7 @@ CHAN_HELP_SET_EMAIL
 	verwijderd.
 
 CHAN_HELP_SET_ENTRYMSG
-	Gebruik: SET kanaal ENTRYMSG [bericht]
+	Gebruik: %s kanaal ENTRYMSG [bericht]
 	
 	Stelt het bericht in dat via /notice zal worden verstuurd
 	aan gebruikers die het kanaal binnenkomen. Als er geen
@@ -4391,7 +4452,7 @@ CHAN_HELP_SET_ENTRYMSG
 	als iemand het kanaal binnenkomt.
 
 CHAN_HELP_SET_BANTYPE
-	Gebruik: SET kanaal BANTYPE bantype
+	Gebruik: %s kanaal BANTYPE bantype
 	
 	Stelt het bantype in dat gebruikt zal worden door services
 	wanneer ze een ban moet zetten op je kanaal.
@@ -4404,7 +4465,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban in het formaat *!*gebruiker@*.domein
 
 CHAN_HELP_SET_KEEPTOPIC
-	Gebruik: SET kanaal KEEPTOPIC {ON | OFF}
+	Gebruik: %s kanaal KEEPTOPIC {ON | OFF}
 	
 	Zet de topicbehoud optie aan of uit voor een kanaal.
 	Wanneer topicbehoud aan staat zal het topic van het
@@ -4414,7 +4475,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	teruggezet.
 
 CHAN_HELP_SET_TOPICLOCK
-	Gebruik: SET kanaal TOPICLOCK {ON | OFF}
+	Gebruik: %s kanaal TOPICLOCK {ON | OFF}
 	
 	Zet de topicslot optie aan of uit voor een kanaal.
 	Wanneer topicslot aan staat zal %S het niet toestaan om
@@ -4422,7 +4483,7 @@ CHAN_HELP_SET_TOPICLOCK
 	alleen veranderd worden met het TOPIC commando.
 
 CHAN_HELP_SET_MLOCK
-	Gebruik: SET kanaal MLOCK modes
+	Gebruik: %s kanaal MLOCK modes
 	
 	Stelt de mode-slot paramenter in voor het kanaal. %S
 	staat je toe om verschillen kanaalmodes altijd aan of uit
@@ -4458,7 +4519,7 @@ CHAN_HELP_SET_MLOCK
 	        vrij ingesteld worden met /MODE.
 
 CHAN_HELP_SET_PEACE
-	Gebruik: SET kanaal PEACE {ON | OFF}
+	Gebruik: %s kanaal PEACE {ON | OFF}
 	
 	Zet de vrede optie aan of uit voor een kanaal. Wanneer
 	vrede aanstaat kan een gebruiker niemand kicken, bannen,
@@ -4467,21 +4528,21 @@ CHAN_HELP_SET_PEACE
 	van zichzelf via de %S commando's.
 
 CHAN_HELP_SET_PRIVATE
-	Gebruik: SET kanaal PRIVATE {ON | OFF}
+	Gebruik: %s kanaal PRIVATE {ON | OFF}
 	
 	Zet de prive optie aan of uit voor een kanaal. Wanneer
 	de prive optie aan staat zal %R%S LIST het kanaal
 	in geen enkele lijst weergeven.
 
 CHAN_HELP_SET_RESTRICTED
-	Gebruik: SET kanaal RESTRICTED {ON | OFF}
+	Gebruik: %s kanaal RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Gebruik: SET kanaal SECURE {ON | OFF}
+	Gebruik: %s kanaal SECURE {ON | OFF}
 	
 	Zet %S's veiligheidsfuncties aan of uit voor een kanaal.
 	Wanneer SECURE aan staat zullen alleen gebruikers die
@@ -4490,14 +4551,14 @@ CHAN_HELP_SET_SECURE
 	zoals geregeld door de toegangslijst.
 
 CHAN_HELP_SET_SECUREOPS
-	Gebruik: SET kanaal SECUREOPS {ON | OFF}
+	Gebruik: %s kanaal SECUREOPS {ON | OFF}
 	
 	Zet de veilige ops optie aan of uit voor een kanaal.
 	Wanneer veilige ops aan staat mogen gebruikers die niet
 	op de toegangslijst staan geen kanaalop status krijgen.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Gebruik: SET kanaal SECUREFOUNDER {ON | OFF}
+	Gebruik: %s kanaal SECUREFOUNDER {ON | OFF}
 	
 	Zet de veilige stichter optie aan of uit voor een kanaal.
 	Wanneer veilige stichter aan staat zal alleen de echte
@@ -4506,7 +4567,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	die alleen geidentificeerd zijn met %S.
 
 CHAN_HELP_SET_SIGNKICK
-	Gebruik: SET kanaal SIGNKICK {ON | LEVEL | OFF}
+	Gebruik: %s kanaal SIGNKICK {ON | LEVEL | OFF}
 	
 	Zet ondertekende kicks aan of uit voor een kanaal.
 	Wanneer SIGNKICK aan staat zullen kicks die uitgevoerd
@@ -4519,7 +4580,7 @@ CHAN_HELP_SET_SIGNKICK
 	Zie %R%S HELP LEVELS voor meer informatie.
 
 CHAN_HELP_SET_XOP
-	Gebruik: SET kanaal XOP {ON | OFF}
+	Gebruik: %s kanaal XOP {ON | OFF}
 	
 	Zet het xOP lijsten systeem aan of uit voor een kanaal.
 	Wanneer XOP aan staat moet je de AOP/SOP/VOP
@@ -4542,7 +4603,7 @@ CHAN_HELP_SET_XOP
 	systeem brengt echter geen problemen met zich mee.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4565,7 +4626,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Gebruik: SET kanaal OPNOTICE {ON | OFF}
+	Gebruik: %s kanaal OPNOTICE {ON | OFF}
 	
 	Zet de op-notificatie optie aan of uit voor een kanaal.
 	Wanneer op-notificatie aan staat  zal %S een notice naar
@@ -5126,13 +5187,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Zegt de registratie van het gegeven kanaal op. Alleen
 	Services Operators kunnen elk kanaal droppen, ook al zijn
 	ze niet voor het betreffende kanaal geindtificeerd.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Services Operatorstrators kunnen ook de NOEXPIRE optie
-	instellen, waarmee kanalen niet kunnen verlopen. Ook
-	kunnen ze elke optie voor elk kanaal zet zonder zich te
-	identificeren met het wachtwoord voor het kanaal.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Gebruik: SET kanaal NOEXPIRE {ON | OFF}

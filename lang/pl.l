@@ -1399,6 +1399,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	Kana³ %s zosta³ odrejestrowany.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET kana³ opcja parametry
@@ -5180,6 +5208,9 @@ CHAN_HELP_CMD_REGISTER
 CHAN_HELP_CMD_SET
 	    SET         Modyfikuje ustawienia kana³u
 
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
+
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 
@@ -5309,7 +5340,15 @@ CHAN_HELP_DROP
 	Usuwa podany kana³. Komenda mo¿e zostaæ u¿yta
 	jedynie przez w³a¶ciciela kana³u.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Sk³adnia: SET kana³ opcja parametry
 	
 	Pozwala w³a¶cicielowi kana³u na zmianê ro¿nych  
@@ -5317,42 +5356,65 @@ CHAN_HELP_SET
 	
 	Dostêpne opcje:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Ustawia nick w³a¶ciciela kana³u
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Ustawia nick spadkobiercy kana³u
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Ustawia opis kana³u
+CHAN_HELP_CMD_SET_URL
 	    URL           Przypisuje adres www do kana³u
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Przypisuje adres e-mail do kana³u
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Ustawia wiadomo¶æ, która bêdzie wysy³ana
 	                  do u¿ytkowników wchodz±cych na kana³
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Ustawia sposób banowania przez serwisy
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Blokuje zdejmowanie lub zak³adanie flag
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Zapamiêtuje temat kiedy kana³ jest pusty
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Wysy³a powiadomienie kiedy zostaj± u¿yte
 	                  komendy OP/DEOP
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Reguluje u¿ycie krytycznych komend
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Zapobiega wy¶wietlaniu kana³u po wydaniu
 	                  polecenia LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Ogranicza dostêp do kana³u
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        W³±cza lub wy³±cza bezpieczeñstwo kana³u
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     ¦ci¶le kontroluje status operatorów
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER ¦ci¶le kontroluje status w³a¶ciciela
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Podpisuje kicki kiedy u¿yto komendy KICK
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Ogranicza mo¿liwo¶æ zmiany tematu
+CHAN_HELP_CMD_SET_XOP
 	    XOP           W³±cza system uprawnieñ xOP
 	                  (u¿ycie komend SOP, AOP, HOP, VOP)
-		PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_PERSIST
+	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Aby uzyskaæ wiêcej informacji o danej opcji wpisz:
 	%R%S HELP SET opcja
 
 CHAN_HELP_SET_FOUNDER
-	Sk³adnia: SET kana³ FOUNDER nick
+	Sk³adnia: %s kana³ FOUNDER nick
 	
 	Zmienia w³a¶ciciela kana³u.
 	Nowy nick musi byæ zarejestrowany.
 
 CHAN_HELP_SET_SUCCESSOR
-	Sk³adnia: SET kana³ SUCCESSOR nick
+	Sk³adnia: %s kana³ SUCCESSOR nick
 	
 	Ustawia spadkobiercê kana³u. Je¶li nick w³a¶ciciela
 	wyga¶nie lub zostanie usuniêty kana³ zostaje przekazany
@@ -5361,33 +5423,33 @@ CHAN_HELP_SET_SUCCESSOR
 	liczby kana³ów (%d) to kana³ zostanie odrejestrowany.
 
 CHAN_HELP_SET_DESC
-	Sk³adnia: SET kana³ DESC opis
+	Sk³adnia: %s kana³ DESC opis
 	
 	Ustawia opis kana³u widoczny po wydaniu polecenia LIST oraz INFO.
 
 CHAN_HELP_SET_URL
-	Sk³adnia: SET kana³ URL [url]
+	Sk³adnia: %s kana³ URL [url]
 	
 	Przypisuje adres strony www do kana³u. Adres bêdzie
 	widoczny po u¿yciu polecenia INFO. Komenda wywo³ana
 	bez parametru usuwa wcze¶niej ustawiony adres.
 
 CHAN_HELP_SET_EMAIL
-	Sk³adnia: SET kana³ EMAIL [adres]
+	Sk³adnia: %s kana³ EMAIL [adres]
 	
 	Przypisuje adres e-mail do kana³u. Adres bêdzie
 	widoczny po u¿yciu polecenia INFO. Komenda wywo³ana
 	bez parametru usuwa wcze¶niej ustawiony adres.
 
 CHAN_HELP_SET_ENTRYMSG
-	Sk³adnia: SET kana³ ENTRYMSG [tre¶æ]
+	Sk³adnia: %s kana³ ENTRYMSG [tre¶æ]
 	
 	Ustawia tekst powiadomienia wysy³anego poprzez /notice
 	do u¿ytkowników wchodz±cych na kana³. Komenda wywo³ana
 	bez parametru usuwa wcze¶niej ustawion± wiadomo¶æ.
 
 CHAN_HELP_SET_BANTYPE
-	Sk³adnia: SET kana³ BANTYPE typ
+	Sk³adnia: %s kana³ BANTYPE typ
 	
 	Ustala typ banów zak³adanych przez serwisy.
 	
@@ -5400,7 +5462,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban w postaci *!*ident@*.domena
 
 CHAN_HELP_SET_KEEPTOPIC
-	Sk³adnia: SET kana³ KEEPTOPIC {ON | OFF}
+	Sk³adnia: %s kana³ KEEPTOPIC {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê zapamiêtywania tematu.
 	Kiedy ta opcja jest w³±czona %S ustawi ostatni
@@ -5408,7 +5470,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	pierwsza osoba.
 
 CHAN_HELP_SET_TOPICLOCK
-	Sk³adnia: SET kana³ TOPICLOCK {ON | OFF}
+	Sk³adnia: %s kana³ TOPICLOCK {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê blokowania tematu kana³u.
 	
@@ -5416,7 +5478,7 @@ CHAN_HELP_SET_TOPICLOCK
 	zmianê tematu tylko poprzez wydanie komendy TOPIC.
 
 CHAN_HELP_SET_MLOCK
-	Sk³adnia: SET kana³ MLOCK flagi
+	Sk³adnia: %s kana³ MLOCK flagi
 	
 	Ustawia blokadê flag kana³owych. %S pozwala na 
 	definiowanie, które flag kana³owe maj± byæ zawsze 
@@ -5452,7 +5514,7 @@ CHAN_HELP_SET_MLOCK
 	        Wy³±cza blokowanie flag - mog± byæ zmieniane dowolnie.
 
 CHAN_HELP_SET_PEACE
-	Sk³adnia: SET kana³ PEACE {ON | OFF}
+	Sk³adnia: %s kana³ PEACE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê PEACE dla kana³u.
 	W³±czenie tej opcji uniemo¿liwia wykopanie,
@@ -5461,7 +5523,7 @@ CHAN_HELP_SET_PEACE
 	korzystaj±c z poleceñ serwisu %S.
 
 CHAN_HELP_SET_PRIVATE
-	Sk³adnia: SET kana³ PRIVATE {ON | OFF}
+	Sk³adnia: %s kana³ PRIVATE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê PRIVATE dla kana³u.
 	Kiedy ta opcja jest w³±czona kana³ nie bêdzie
@@ -5469,7 +5531,7 @@ CHAN_HELP_SET_PRIVATE
 	%R%S LIST
 
 CHAN_HELP_SET_RESTRICTED
-	Sk³adnia: SET kana³ RESTRICTED {ON | OFF}
+	Sk³adnia: %s kana³ RESTRICTED {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê ograniczonego dostêpu do kana³u.
 	Po w³±czeniu tej opcji tylko osoby znajduj±ce siê na
@@ -5477,7 +5539,7 @@ CHAN_HELP_SET_RESTRICTED
 	u¿ytkownicy bêd± banowani, a nastêpnie usuwani z kana³u.
 
 CHAN_HELP_SET_SECURE
-	Sk³adnia: SET kana³ SECURE {ON | OFF}
+	Sk³adnia: %s kana³ SECURE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcje bezpieczeñstwa kana³u.
 	Po w³±czeniu tej opcji tylko zarejestrowani
@@ -5486,7 +5548,7 @@ CHAN_HELP_SET_SECURE
 	wynikaj±ce z wpisów na li¶cie dostêpu.
 
 CHAN_HELP_SET_SECUREOPS
-	Sk³adnia: SET kana³ SECUREOPS {ON | OFF}
+	Sk³adnia: %s kana³ SECUREOPS {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê SECUREOPS dla kana³u.
 	Kiedy ta opcja jest w³±czona u¿ytkownicy bez wpisu
@@ -5494,7 +5556,7 @@ CHAN_HELP_SET_SECUREOPS
 	mogli posiadaæ statusu operatora.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Sk³adnia: SET kana³ SECUREFOUNDER {ON | OFF}
+	Sk³adnia: %s kana³ SECUREFOUNDER {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê bezpiecznego w³a¶ciciela.
 	Ustawienie tej opcji powoduje ograniczenie uprawnieñ
@@ -5505,7 +5567,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	dla jednego u¿ytkownika.
 
 CHAN_HELP_SET_SIGNKICK
-	Sk³adnia: SET kana³ SIGNKICK {ON | LEVEL | OFF}
+	Sk³adnia: %s kana³ SIGNKICK {ON | LEVEL | OFF}
 	
 	W³±cza lub wy³±cza podpisywanie komend kick.
 	W³±czenie tej opcji powoduje dodawanie nicka osoby 
@@ -5517,7 +5579,7 @@ CHAN_HELP_SET_SIGNKICK
 	%R%S HELP LEVELS
 
 CHAN_HELP_SET_XOP
-	Sk³adnia: SET kana³ XOP {ON | OFF}
+	Sk³adnia: %s kana³ XOP {ON | OFF}
 	
 	W³±cza lub wy³±cza system list xOP dla kana³u.
 	Kiedy XOP zostanie w³±czony przyznawanie uprawnieñ
@@ -5540,7 +5602,7 @@ CHAN_HELP_SET_XOP
 	polecenia LEVELS.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -5563,7 +5625,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Sk³adnia: SET kana³ OPNOTICE {ON | OFF}
+	Sk³adnia: %s kana³ OPNOTICE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê OPNOTICE dla kana³u.
 	Kiedy ta opcja jest w³±czona, %S bêdzie
@@ -6137,12 +6199,6 @@ CHAN_SERVADMIN_HELP_DROP
 	
 	Usuwa wskazany kana³. Tylko administratorzy serwisów
 	mog± usun±æ kana³, którego nie s± w³a¶cicielami.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Administratorzy serwisów mog± ustawiæ kana³owi 
-	opcjê NOEXPIRE, która zapobiega wyga¶niêciu
-	kana³u je¶li nie jest on u¿ywany.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Sk³adnia: SET kana³ NOEXPIRE {ON | OFF}

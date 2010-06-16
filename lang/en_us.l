@@ -1077,6 +1077,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	Channel %s has been dropped.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET channel option parameters
@@ -4102,6 +4130,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Register a channel
 CHAN_HELP_CMD_SET
 	    SET        Set channel options and information
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4203,7 +4233,15 @@ CHAN_HELP_DROP
 	Unregisters the named channel.  Can only be used by
 	channel founder.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Syntax: SET channel option parameters
 	
 	Allows the channel founder to set various channel options
@@ -4211,39 +4249,62 @@ CHAN_HELP_SET
 	
 	Available options:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Set the founder of a channel
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Set the successor for a channel
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Set the channel description
+CHAN_HELP_CMD_SET_URL
 	    URL           Associate a URL with the channel
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Associate an E-mail address with the channel
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Set a message to be sent to users when they
 	                     enter the channel
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Set how Services make bans on the channel
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Lock channel modes on or off
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Retain topic when channel is not in use
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Send a notice when OP/DEOP commands are used
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Regulate the use of critical commands
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Hide channel from LIST command
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Restrict access to the channel
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Activate %S security features
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Stricter control of chanop status
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Stricter control of channel founder status
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Sign kicks that are done with KICK command
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic can only be changed with TOPIC
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Toggle the user privilege system
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Type %R%S HELP SET option for more information on a
 	particular option.
 
 CHAN_HELP_SET_FOUNDER
-	Syntax: SET channel FOUNDER nick
+	Syntax: %s channel FOUNDER nick
 	
 	Changes the founder of a channel.  The new nickname must
 	be a registered one.
 
 CHAN_HELP_SET_SUCCESSOR
-	Syntax: SET channel SUCCESSOR nick
+	Syntax: %s channel SUCCESSOR nick
 	
 	Changes the successor of a channel.  If the founder's
 	nickname expires or is dropped while the channel is still
@@ -4254,13 +4315,13 @@ CHAN_HELP_SET_SUCCESSOR
 	nickname must be a registered one.
 
 CHAN_HELP_SET_DESC
-	Syntax: SET channel DESC description
+	Syntax: %s channel DESC description
 	
 	Sets the description for the channel, which shows up with
 	the LIST and INFO commands.
 
 CHAN_HELP_SET_URL
-	Syntax: SET channel URL [url]
+	Syntax: %s channel URL [url]
 	
 	Associates the given URL with the channel.  This URL will
 	be displayed whenever someone requests information on the
@@ -4268,7 +4329,7 @@ CHAN_HELP_SET_URL
 	deletes any current URL for the channel.
 
 CHAN_HELP_SET_EMAIL
-	Syntax: SET channel EMAIL [address]
+	Syntax: %s channel EMAIL [address]
 	
 	Associates the given E-mail address with the channel.
 	This address will be displayed whenever someone requests
@@ -4277,14 +4338,14 @@ CHAN_HELP_SET_EMAIL
 	the channel.
 
 CHAN_HELP_SET_ENTRYMSG
-	Syntax: SET channel ENTRYMSG [message]
+	Syntax: %s channel ENTRYMSG [message]
 	
 	Sets the message which will be sent via /notice to users
 	when they enter the channel.  If no parameter is given,
 	causes no message to be sent upon entering the channel.
 
 CHAN_HELP_SET_BANTYPE
-	Syntax: SET channel BANTYPE bantype
+	Syntax: %s channel BANTYPE bantype
 	
 	Sets the ban type that will be used by services whenever
 	they need to ban someone from your channel.
@@ -4297,7 +4358,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban in the form *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Syntax: SET channel KEEPTOPIC {ON | OFF}
+	Syntax: %s channel KEEPTOPIC {ON | OFF}
 	
 	Enables or disables the topic retention option for a
 	channel.  When topic retention is set, the topic for the
@@ -4306,7 +4367,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	next time the channel is created.
 
 CHAN_HELP_SET_TOPICLOCK
-	Syntax: SET channel TOPICLOCK {ON | OFF}
+	Syntax: %s channel TOPICLOCK {ON | OFF}
 	
 	Enables or disables the topic lock option for a channel.
 	When topic lock is set, %S will not allow the
@@ -4314,7 +4375,7 @@ CHAN_HELP_SET_TOPICLOCK
 	command.
 
 CHAN_HELP_SET_MLOCK
-	Syntax: SET channel MLOCK modes
+	Syntax: %s channel MLOCK modes
 	
 	Sets the mode-lock parameter for the channel. %S
 	allows you to define certain channel modes to be always
@@ -4348,7 +4409,7 @@ CHAN_HELP_SET_MLOCK
 	        to be either on or off.
 
 CHAN_HELP_SET_PEACE
-	Syntax: SET channel PEACE {ON | OFF}
+	Syntax: %s channel PEACE {ON | OFF}
 	
 	Enables or disables the peace option for a channel.
 	When peace is set, a user won't be able to kick,
@@ -4356,21 +4417,21 @@ CHAN_HELP_SET_PEACE
 	a level superior or equal to his via %S commands.
 
 CHAN_HELP_SET_PRIVATE
-	Syntax: SET channel PRIVATE {ON | OFF}
+	Syntax: %s channel PRIVATE {ON | OFF}
 	
 	Enables or disables the private option for a channel.
 	When private is set, a %R%S LIST will not
 	include the channel in any lists.
 
 CHAN_HELP_SET_RESTRICTED
-	Syntax: SET channel RESTRICTED {ON | OFF}
+	Syntax: %s channel RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Syntax: SET channel SECURE {ON | OFF}
+	Syntax: %s channel SECURE {ON | OFF}
 	
 	Enables or disables %S's security features for a
 	channel.  When SECURE is set, only users who have
@@ -4379,14 +4440,14 @@ CHAN_HELP_SET_SECURE
 	as controlled by the access list.
 
 CHAN_HELP_SET_SECUREOPS
-	Syntax: SET channel SECUREOPS {ON | OFF}
+	Syntax: %s channel SECUREOPS {ON | OFF}
 	
 	Enables or disables the secure ops option for a channel.
 	When secure ops is set, users who are not on the userlist
 	will not be allowed chanop status.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Syntax: SET channel SECUREFOUNDER {ON | OFF}
+	Syntax: %s channel SECUREFOUNDER {ON | OFF}
 	
 	Enables or disables the secure founder option for a channel.
 	When secure founder is set, only the real founder will be
@@ -4394,7 +4455,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	successor, and not those who are IDENTIFY'd with %S.
 	
 CHAN_HELP_SET_SIGNKICK
-	Syntax: SET channel SIGNKICK {ON | LEVEL | OFF}
+	Syntax: %s channel SIGNKICK {ON | LEVEL | OFF}
 	
 	Enables or disables signed kicks for a
 	channel.  When SIGNKICK is set, kicks issued with
@@ -4406,7 +4467,7 @@ CHAN_HELP_SET_SIGNKICK
 	kicks signed. See %R%S HELP LEVELS for more information. 
 
 CHAN_HELP_SET_XOP
-	Syntax: SET channel XOP {ON | OFF}
+	Syntax: %s channel XOP {ON | OFF}
 	
 	Enables or disables the xOP lists system for a channel.
 	When XOP is set, you have to use the AOP/SOP/VOP
@@ -4428,7 +4489,7 @@ CHAN_HELP_SET_XOP
 	causes no problem though.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4451,7 +4512,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Syntax: SET channel OPNOTICE {ON | OFF}
+	Syntax: %s channel OPNOTICE {ON | OFF}
 	
 	Enables or disables the op-notice option for a channel.
 	When op-notice is set, %S will send a notice to the
@@ -5001,13 +5062,6 @@ CHAN_SERVADMIN_HELP_DROP
 	
 	Unregisters the named channel.  Only Services Operators
 	can drop a channel for which they have not identified.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Services Operators can also set the option NOEXPIRE, with
-	which channels can be prevented from expiring.
-	Additionally, Services Operators can set options for any
-	channel without identifying by password for the channel.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Syntax: SET channel NOEXPIRE {ON | OFF}

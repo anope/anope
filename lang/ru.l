@@ -1078,6 +1078,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	Канал %s удален из базы данных.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET #канал опция параметр
@@ -4183,6 +4211,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Регистрация канала
 CHAN_HELP_CMD_SET
 	    SET        Настройка различных опций канала
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4287,45 +4317,76 @@ CHAN_HELP_DROP
 	Удаляет указанный канал из базы данных сервисов. Использовать DROP
 	может лишь владелец канала.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Синтаксис: SET #канал опция параметр
 	
 	Позволяет владельцу канала менять различные настройки канала.
 	Доступные опции:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       смена владельца канала
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     установка наследника канала
+CHAN_HELP_CMD_SET_DESC
 	    DESC          изменение описания канала
+CHAN_HELP_CMD_SET_URL
 	    URL           установка URL-адреса канала
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         установка Email-адреса канала
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      установка автосообщения при входе на канал
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       установка типа бана сервисами на канале
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         блокировка определенных режимов канала
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     активирование автосохранения топика канала
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      активирование уведомлений об использовании
 	                  команд OP/DEOP
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         активирование режима "спокойствия" на канале
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       скрытие канала в списке каналов выводимых по LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    ограничение уровня доступа на канал до прописанных
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        дополнительные возможности %S'а по безопасности
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     контроль за получением статуса оператора канала
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER ограничение на получение статуса владельца канала
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      настройка режима "подписанных киков"
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     блокировка топика канала от изменений его кем-либо
+CHAN_HELP_CMD_SET_XOP
 	    XOP           настройка системы привилегий канала
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Для более подробной информации о какой-либо конкретной опции, см.
 	справку по %R%S HELP опция
 
 CHAN_HELP_SET_FOUNDER
-	Синтаксис: SET #канал FOUNDER ник
+	Синтаксис: %s #канал FOUNDER ник
 	
 	Позволяет передать права на владение каналом другому пользователю.
 	Ник нового владельца канала должен быть зарегистрированным.
 
 CHAN_HELP_SET_SUCCESSOR
-	Синтаксис: SET #канал SUCCESSOR ник
+	Синтаксис: %s #канал SUCCESSOR ник
 	
 	Позволяет назначить наследника канала. Если ник текущего владельца
 	канала будет удален ввиду истечения срока регистрации или по каким
@@ -4336,13 +4397,13 @@ CHAN_HELP_SET_SUCCESSOR
 	должен быть зарегистрированным ником.
 
 CHAN_HELP_SET_DESC
-	Синтаксис: SET #канал DESC описание
+	Синтаксис: %s #канал DESC описание
 	
 	Позволяет установить описание канала, которое будет показано при
 	использовании команд LIST и INFO.
 
 CHAN_HELP_SET_URL
-	Синтаксис: SET #канал URL [адрес]
+	Синтаксис: %s #канал URL [адрес]
 	
 	Позволяет установить URL-адрес канала. Данный URL будет показан
 	тогда, когда кто-либо запросит информацию о канале с помощью
@@ -4350,7 +4411,7 @@ CHAN_HELP_SET_URL
 	данную команду без параметра.
 
 CHAN_HELP_SET_EMAIL
-	Синтаксис: SET #канал EMAIL [адрес@почты]
+	Синтаксис: %s #канал EMAIL [адрес@почты]
 	
 	Позволяет установить адрес электронной почты канала. Этот адрес
 	будет показан тогда, когда кто-либо запросит информацию о канале
@@ -4358,7 +4419,7 @@ CHAN_HELP_SET_EMAIL
 	используйте данную команду без параметра.
 
 CHAN_HELP_SET_ENTRYMSG
-	Синтаксис: SET #канал ENTRYMSG [текст]
+	Синтаксис: %s #канал ENTRYMSG [текст]
 	
 	Позволяет  установить  "сообщение  при  входе",  которое  будет
 	отправлено нотисом (notice) каждому вошедшему на канал пользователю.
@@ -4366,7 +4427,7 @@ CHAN_HELP_SET_ENTRYMSG
 	сообщение будет удалено.
 
 CHAN_HELP_SET_BANTYPE
-	Синтаксис: SET #канал BANTYPE тип_бана
+	Синтаксис: %s #канал BANTYPE тип_бана
 	
 	Позволяет установить шаблон банмаски, по которой будет забанен
 	пользователь канала, относительно которого применяется сервисная
@@ -4381,7 +4442,7 @@ CHAN_HELP_SET_BANTYPE
 	3 - бан вида *!*идент@*.домен
 
 CHAN_HELP_SET_KEEPTOPIC
-	Синтаксис: SET #канал KEEPTOPIC {ON | OFF}
+	Синтаксис: %s #канал KEEPTOPIC {ON | OFF}
 	
 	Позволяет активировать/деактивировать опцию хранения топика на
 	канале. При включенном режиме хранения топика, текст топика канала
@@ -4391,14 +4452,14 @@ CHAN_HELP_SET_KEEPTOPIC
 	кто-либо зайдет).
 
 CHAN_HELP_SET_TOPICLOCK
-	Синтаксис: SET #канал TOPICLOCK {ON | OFF}
+	Синтаксис: %s #канал TOPICLOCK {ON | OFF}
 	
 	Включает или выключает опцию блокировки топика на канале. При
 	включенном режиме блокировки топика, %S разрешит менять
 	топик канала только через сервисную команду TOPIC.
 
 CHAN_HELP_SET_MLOCK
-	Синтаксис: SET #канал MLOCK режимы
+	Синтаксис: %s #канал MLOCK режимы
 	
 	MLOCK позволяет вам установить и заблокировать определенные режимы
 	канала. Вы  можете  заблокировать от снятия/установки любые режимы,
@@ -4434,7 +4495,7 @@ CHAN_HELP_SET_MLOCK
 	        свободно изменены любым оператором канала.
 
 CHAN_HELP_SET_PEACE
-	Синтаксис: SET #канал PEACE {ON | OFF}
+	Синтаксис: %s #канал PEACE {ON | OFF}
 	
 	Активирует/деактивирует опцию спокойствия на канале. Данный режим
 	позволяет запретить использование таких команд %S'а как BAN,
@@ -4444,20 +4505,20 @@ CHAN_HELP_SET_PEACE
 	сможет использовать их относительно себя.
 
 CHAN_HELP_SET_PRIVATE
-	Синтаксис: SET #канал PRIVATE {ON | OFF}
+	Синтаксис: %s #канал PRIVATE {ON | OFF}
 	
 	Активирует/деактивирует опцию приватности канала. Данный режим
 	позволяет скрыть ваш канал в списке каналов по %R%S LIST.
 
 CHAN_HELP_SET_RESTRICTED
-	Синтаксис: SET #канал RESTRICTED {ON | OFF}
+	Синтаксис: %s #канал RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Синтаксис: SET #канал SECURE {ON | OFF}
+	Синтаксис: %s #канал SECURE {ON | OFF}
 	
 	Активирует/деактивирует режим безопасности для канала.
 	Когда SECURE включено, только пользователи с зарегистрированными
@@ -4469,7 +4530,7 @@ CHAN_HELP_SET_SECURE
 	всего лишь через список масок на %s.
 
 CHAN_HELP_SET_SECUREOPS
-	Синтаксис: SET #канал SECUREOPS {ON | OFF}
+	Синтаксис: %s #канал SECUREOPS {ON | OFF}
 	
 	Активирует/деактивирует режим ограничения на получение статуса
 	оператора канала. Данный  режим  позволяет  запретить возможность
@@ -4478,7 +4539,7 @@ CHAN_HELP_SET_SECUREOPS
 	получаемому статусу.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Синтаксис: SET #канал SECUREFOUNDER {ON | OFF}
+	Синтаксис: %s #канал SECUREFOUNDER {ON | OFF}
 	
 	Активирует/деактивирует режим безопасности владельца на канале.
 	Активирование SECUREFOUNDER позволяет вам ограничить возможность
@@ -4487,7 +4548,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	(и не важно, кто там идентифицировался к каналу через %S ID).
 
 CHAN_HELP_SET_SIGNKICK
-	Синтаксис: SET #канал SIGNKICK {ON | LEVEL | OFF}
+	Синтаксис: %s #канал SIGNKICK {ON | LEVEL | OFF}
 	
 	Включает или выключает опцию "подписанных киков" на канале.
 	Активирование режима SIGNKICK заставит %S автоматически
@@ -4500,7 +4561,7 @@ CHAN_HELP_SET_SIGNKICK
 	более подробной информации).
 
 CHAN_HELP_SET_XOP
-	Синтаксис: SET #канал XOP {ON | OFF}
+	Синтаксис: %s #канал XOP {ON | OFF}
 	
 	Позволяет активировать/деактивировать систему привелегий xOP на
 	вашем канале. Особенности данной системы состоят в том, что все
@@ -4527,7 +4588,7 @@ CHAN_HELP_SET_XOP
 	каких-либо проблем.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4550,7 +4611,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Синтаксис: SET #канал OPNOTICE {ON | OFF}
+	Синтаксис: %s #канал OPNOTICE {ON | OFF}
 	
 	Включает или выключает опцию OP-уведомления на вашем канале.
 	Когда оп-уведомление включено, %S будет посылать нотис
@@ -5131,13 +5192,6 @@ CHAN_SERVADMIN_HELP_DROP
 	только те каналы, которыми вы владеете.
 	Как Администратор сервисов, вы можете удалить любой зарегистрированный
 	канал сети без какой-либо идентификации к нему.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Администраторам сервисов доступна возможность изменять настройки
-	любого  зарегистрированного  канала  сети. Также,  им  доступна
-	установка скрытой опции NOEXPIRE  (исключает  канал  из условий
-	истечения регистрации по времени).
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Синтаксис: SET #канал NOEXPIRE {ON | OFF}

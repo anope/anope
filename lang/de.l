@@ -1122,6 +1122,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	Channel %s wurde aus der Datenbank entfernt.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameter
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET Channel Option Parameter
@@ -4287,6 +4315,8 @@ CHAN_HELP_CMD_REGISTER
 CHAN_HELP_CMD_SET
 	    SET        Bestimmte Channel-Optionen und
 	               Informationen einstellen
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Verwaltet die QOP-Liste von einem Channel
 CHAN_HELP_CMD_AOP
@@ -4394,7 +4424,15 @@ CHAN_HELP_DROP
 	Entfernt die Registrierung des angegebenen Channels.
 	Kann nur vom Channel-Founder benutzt werden.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Syntax: SET Channel Option Parameter
 	
 	Erlaubt es dem Channel-Founder bestimmte Optionen
@@ -4402,44 +4440,65 @@ CHAN_HELP_SET
 	
 	Verfügbare Optionen:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Stellt den Gründer des Channels ein
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Stellt den Vertreter des Founders ein
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Ändert die Channel-Beschreibung
+CHAN_HELP_CMD_SET_URL
 	    URL           Verbindet eine URL mit dem Channel
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Verbindet eine eMail-Adresse mit dem
 	                  Channel
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Stellt eine Begrüssungsmeldung des
 	                  Channels ein
-	    TOPIC         Ändert das Topic im Channel
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Ändert den Ban-Typ, den die Services
 	                  in dem Channel anwenden
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Topic behalten, wenn Channel nicht
 	                  benutzt wird
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic kann nur durch TOPIC geändert werden
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Channel-Modes fest einstellen
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Den Channel vom /LIST-Befehl verstecken
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Eingeschränkter Zugriff auf den Channel
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Aktiviert %S's Sicherheits-funktionen
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Strengere Kontrolle des Op-Status im Channel
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Strengere Kontrolle des Founder-Status
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Kicks durch ChanServ in dem Channel
 	                  werden durch den Kicker signiert
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Sendet eine Notice wenn Op/Deop-Befehl
 	                  benutzt werden
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Schaltet das Listen System ein oder aus
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Tippe %R%S HELP Option für weitere Informationen
 	zu einem bestimmten Befehl.
 
 CHAN_HELP_SET_FOUNDER
-	Syntax: SET Channel FOUNDER Nickname
+	Syntax: %s Channel FOUNDER Nickname
 	
 	Ändert den Gründer (Founder) eines Channels. Der neue
 	Nickname muss registriert sein.
 
 CHAN_HELP_SET_SUCCESSOR
-	Syntax: SET Channel SUCCESSOR Nickname
+	Syntax: %s Channel SUCCESSOR Nickname
 	
 	Ändert den Vertreter des Gründers in dem Channel. Wenn
 	der Nickname des Gründers ausläuft oder gedropped wird,
@@ -4451,13 +4510,13 @@ CHAN_HELP_SET_SUCCESSOR
 	Der Nickname des Vertreters muss registriert sein.
 
 CHAN_HELP_SET_DESC
-	Syntax: SET Channel DESC Beschreibung
+	Syntax: %s Channel DESC Beschreibung
 	
 	Ändert die Beschreibung für einen Channel, die bei
 	dem LIST und INFO Befehl angezeigt wird.
 
 CHAN_HELP_SET_URL
-	Syntax: SET Channel URL [Url]
+	Syntax: %s Channel URL [Url]
 	
 	Verbindet die angegebene URL mit dem Channel. Diese
 	URL wird angezeigt, wenn jemand Informationen
@@ -4466,7 +4525,7 @@ CHAN_HELP_SET_URL
 	URL gelöscht.
 
 CHAN_HELP_SET_EMAIL
-	Syntax: SET Channel EMAIL [eMail-Adresse]
+	Syntax: %s Channel EMAIL [eMail-Adresse]
 	
 	Verbindet die angegebene eMail-Adresse mit dem
 	Channel. Diese eMail-Adresse wird angezeigt,
@@ -4475,7 +4534,7 @@ CHAN_HELP_SET_EMAIL
 	angegeben, wird die aktuelle eMail-Adresse gelöscht.
 
 CHAN_HELP_SET_ENTRYMSG
-	Syntax: SET Channel ENTRYMSG [Nachricht]
+	Syntax: %s Channel ENTRYMSG [Nachricht]
 	
 	Ändert die Nachricht, die User beim Joinen des
 	Channels per /notice bekommen. Wird kein Parameter
@@ -4483,7 +4542,7 @@ CHAN_HELP_SET_ENTRYMSG
 	angezeigt.
 	
 CHAN_HELP_SET_BANTYPE
-	Syntax: SET Channel BANTYPE Ban-Typ
+	Syntax: %s Channel BANTYPE Ban-Typ
 	
 	Stellt den Ban-Typ für den Channel ein, den die
 	Services anwenden, wenn sie einen Ban eintragen
@@ -4497,7 +4556,7 @@ CHAN_HELP_SET_BANTYPE
 	3: Ban in der Form *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Syntax: SET Channel KEEPTOPIC {ON | OFF}
+	Syntax: %s Channel KEEPTOPIC {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Topic Wiederherstellung für
 	den Channel. Wird diese Option eingeschaltet, wird das 
@@ -4507,7 +4566,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	kommt.
 
 CHAN_HELP_SET_TOPICLOCK
-	Syntax: SET Channel TOPICLOCK {ON | OFF}
+	Syntax: %s Channel TOPICLOCK {ON | OFF}
 	
 	Aktiviert oder deaktiviert die topic lock-Option
 	für den angegebenen Channel.
@@ -4516,7 +4575,7 @@ CHAN_HELP_SET_TOPICLOCK
 	ausser es wurde durch TOPIC eingestellt.
 
 CHAN_HELP_SET_MLOCK
-	Syntax: SET Channel MLOCK Modi
+	Syntax: %s Channel MLOCK Modi
 	
 	Stellt den Mode-Lock-Parameter für den angegebenen
 	Channel ein. %S ermöglicht es dir, einzustellen,
@@ -4551,7 +4610,7 @@ CHAN_HELP_SET_MLOCK
 	        kann jetzt wahlweise an oder ausgeschaltet werden.
 
 CHAN_HELP_SET_PEACE
-	Syntax: SET Channel PEACE {ON | OFF}
+	Syntax: %s Channel PEACE {ON | OFF}
 
 	Aktiviert oder deaktiviert die peace Option. Wenn
 	peace aktiviert ist, kann ein User einen anderen User
@@ -4559,21 +4618,21 @@ CHAN_HELP_SET_PEACE
 	%S  kicken, bannen oder dessen Channelstatus löschen.
 
 CHAN_HELP_SET_PRIVATE
-	Syntax: SET Channel PRIVATE {ON | OFF}
+	Syntax: %s Channel PRIVATE {ON | OFF}
 	
 	Schaltet den Privat-Modus für einen Channel an
 	oder aus. Wird er aktiviert, wird der Channel in der
 	Ausgabe von%R%S LIST nicht mehr auftauchen.
 
 CHAN_HELP_SET_RESTRICTED
-	Syntax: SET Channel RESTRICTED {ON | OFF}
+	Syntax: %s Channel RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Syntax: SET Channel SECURE {ON | OFF}
+	Syntax: %s Channel SECURE {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Sicherheitsfunktionen
 	von %S für den angegebenen Channel. 
@@ -4583,7 +4642,7 @@ CHAN_HELP_SET_SECURE
 	in der Zugriffsliste des Channels steht.
 
 CHAN_HELP_SET_SECUREOPS
-	Syntax: SET Channel SECUREOPS {ON | OFF}
+	Syntax: %s Channel SECUREOPS {ON | OFF}
 	
 	Ändert die Secure-Ops Option für einen Channel.
 	Wird diese Option eingeschaltet, können Nicknamen, 
@@ -4591,7 +4650,7 @@ CHAN_HELP_SET_SECUREOPS
 	keinen Op-Status erhalten.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Syntax: SET Channel SECUREFOUNDER {ON | OFF}
+	Syntax: %s Channel SECUREFOUNDER {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Secure Founder-Option
 	für einen Channel.
@@ -4602,7 +4661,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	hat.
 	
 CHAN_HELP_SET_SIGNKICK
-	Syntax: SET Channel SIGNKICK {ON | LEVEL | OFF}
+	Syntax: %s Channel SIGNKICK {ON | LEVEL | OFF}
 	
 	Aktiviert oder deaktiviert signierte Kicks für einen
 	Channel. Ist SIGNKICK aktiviert, wird der Grund
@@ -4615,7 +4674,7 @@ CHAN_HELP_SET_SIGNKICK
 	Siehe %R%S HELP LEVELS für weitere Informationen.
 
 CHAN_HELP_SET_XOP
-	Syntax: SET Channel XOP {ON | OFF}
+	Syntax: %s Channel XOP {ON | OFF}
 	
 	Aktiviert oder deaktiviert das xOP Listen System für einen Channel.
 	Wenn XOP aktiviert ist, musst du AOP/SOP/VOP
@@ -4636,7 +4695,7 @@ CHAN_HELP_SET_XOP
 	jedoch fehlerfrei.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4659,7 +4718,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Syntax: SET Channel OPNOTICE {ON | OFF}
+	Syntax: %s Channel OPNOTICE {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Op-Notice Option für
 	einen Channel.
@@ -5229,16 +5288,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Nur Services Operators können Channel DROPEN, 
 	(löschen) ohne sich vorher gegenüber dem Channel als 
 	Founder zu identifizieren.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Services Administratoren können zusätzlich die Option NOEXPIRE
-	an einem Channel setzen, dies verhindert den automatischen
-	Auslauf des Channels.
-	
-	Weiterhin können Services Administratoren Einstellungen 
-	eines Channels verändern, ohne sich vorher für ihn
-	identifizieren zu müssen.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Syntax: SET Channel NOEXPIRE {ON | OFF}

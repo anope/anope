@@ -1090,6 +1090,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	%s csatorna regisztrációjának törlése sikerült.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET válaszok
 CHAN_SET_SYNTAX
 	SET #szoba opció paraméterek
@@ -4167,6 +4195,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Szoba regisztrálása
 CHAN_HELP_CMD_SET
 	    SET        Beállíthatod a csatornád opcióit
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4269,7 +4299,15 @@ CHAN_HELP_DROP
 	Törli a megnevezett szoba regisztrációját.
 	Csak a szoba founder használhatja.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Syntax: SET #szoba opció paraméterek
 	
 	Lehetõséget ad a foundernek, hogy a beállításokat
@@ -4277,39 +4315,60 @@ CHAN_HELP_SET
 	
 	Elérhetõ opciók:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       A founder megváltoztatása
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     A successor megadása
-	    PASSWORD      A founder jelszó változtatása
+CHAN_HELP_CMD_SET_DESC
 	    DESC          A szobameghatározás állítás
+CHAN_HELP_CMD_SET_URL
 	    URL           Egy URL társítása a szobához
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Egy E-mail cím társítása a szobához
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      A szoba belépo üzenetének 
 	                  állítása
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       A banolás tipusának beállítása
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Szoba módok lezárása (+flag -flag)
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Topic megtartása ha a szoba nincs használatban
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Üzenetet küld az OP/VOICE parancsok használtáról
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Szabályozza a kritikus parancsok használatát
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       A szoba elrejtése a listából
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Aktiválja a %S biztonsági lehetõségeit
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     A csatornán az op státusz szigorú kezelése
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Csatornán a founder státusz szigorú kezelése
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Sign kickek, melyek a KICK paranccsal történnek
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Témaváltás letiltása 
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Xop (Sop, Aop, Hop, Vop) lista rendszer bekapcsolása
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Írd be: %R%S HELP SET opció bõvebb információért az
 	adott opcióról.
 
 CHAN_HELP_SET_FOUNDER
-	Syntax: SET #szoba FOUNDER nick
+	Syntax: %s #szoba FOUNDER nick
 	
 	Megváltoztatja a szoba founderjét.
 	Az új nicknév regisztrált kell hogy legyen!
 
 CHAN_HELP_SET_SUCCESSOR
-	Syntax: SET #szoba SUCCESSOR nick
+	Syntax: %s #szoba SUCCESSOR nick
 	
 	Megváltoztatja a successort a csatornán. Ha a founder neve
 	elévül vagy törlõdik, de a szoba még regisztrált, akkor
@@ -4320,20 +4379,20 @@ CHAN_HELP_SET_SUCCESSOR
 	A nicknek regisztrálnak kell lennie.
 
 CHAN_HELP_SET_DESC
-	Syntax: SET #szoba DESC leírás
+	Syntax: %s #szoba DESC leírás
 	
 	Beállítható a szoba általános meghatározása, ami látszódni
 	fog a  LIST és INFO parancs használata esetén.
 
 CHAN_HELP_SET_URL
-	Syntax: SET #szoba URL [url]
+	Syntax: %s #szoba URL [url]
 	
 	Egy URL társítása a szobához. Ha van honlapja a szobának,
 	akkor bárki megtudhatja, ha lekérte a szobáról az INFO-t.
 	Ha nincs megadva paraméter, akkor törli a meglévõ URL-t.
 
 CHAN_HELP_SET_EMAIL
-	Syntax: SET #szoba EMAIL [emailcím]
+	Syntax: %s #szoba EMAIL [emailcím]
 	
 	Egy E-mail cím társítása a szobához. Ha van E-mail címe
 	a szobának; akkor azt bárki megtudhatja, ha lekérte
@@ -4341,14 +4400,14 @@ CHAN_HELP_SET_EMAIL
 	törli a meglévõ e-mail címet.
 
 CHAN_HELP_SET_ENTRYMSG
-	Syntax: SET #szoba ENTRYMSG [üzenet]
+	Syntax: %s #szoba ENTRYMSG [üzenet]
 	
 	Beállít egy üzenetet, amit /notice formában fognak
 	a szobába belépõ userek megkapni. Ha nincs paraméter
 	megadva akkor a szoba belépõ üzenete törlõdik.
 
 CHAN_HELP_SET_BANTYPE
-	Syntax: SET #szoba BANTYPE bantípus
+	Syntax: %s #szoba BANTYPE bantípus
 	
 	A banolás típusának beállítása, amit a Services akkor fog
 	használni, ha valakit banolni kell a csatornáról.
@@ -4361,7 +4420,7 @@ CHAN_HELP_SET_BANTYPE
 	3: *!*user@*.domain formátumú tiltás
 
 CHAN_HELP_SET_KEEPTOPIC
-	Syntax: SET #szoba KEEPTOPIC {ON | OFF}
+	Syntax: %s #szoba KEEPTOPIC {ON | OFF}
 	
 	Engedélyezi vagy letiltja a topic megtartása opciót a
 	szoba részére.  Ha a topic megtartása be van állítva,
@@ -4369,7 +4428,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	szobát, és visszaállítja a következõ megnyitáskor.
 
 CHAN_HELP_SET_TOPICLOCK
-	Syntax: SET #szoba TOPICLOCK {ON | OFF}
+	Syntax: %s #szoba TOPICLOCK {ON | OFF}
 	
 	Engedélyezi vagy letiltja a topic lezárása opciót a 
 	csatornán. Ha a topic lezárása be van kapcsolva,a %S nem
@@ -4377,7 +4436,7 @@ CHAN_HELP_SET_TOPICLOCK
 	paranccsal.
 	
 CHAN_HELP_SET_MLOCK
-	Syntax: SET #szoba  MLOCK módok
+	Syntax: %s #szoba  MLOCK módok
 	
 	Beállíthatod a mode-lock opciót a csatornán. A  %S
 	lehetõséget nyújt arra, hogy meghatározd azokat a módokat
@@ -4411,7 +4470,7 @@ CHAN_HELP_SET_MLOCK
 	         Minden mód szabadon ki/bekapcsolható.
 	
 CHAN_HELP_SET_PEACE
-	Syntax: SET #szoba PEACE {ON | OFF}
+	Syntax: %s #szoba PEACE {ON | OFF}
 	
 	Engedélyezi vagy letiltja a peace opciót.
 	Amikor a peace be van állítva, akkor a userek nem,
@@ -4419,7 +4478,7 @@ CHAN_HELP_SET_PEACE
 	egyenlõ vagy magasabb szintje van a %S parancsokhoz.
 	
 CHAN_HELP_SET_PRIVATE
-	Syntax: SET #szoba PRIVATE {ON | OFF}
+	Syntax: %s #szoba PRIVATE {ON | OFF}
 	
 	Engedélyezi vagy letiltja a private opciót a csatornán.
 	Amikor a private be van kapcsolva, a %R%S LIST 
@@ -4427,14 +4486,14 @@ CHAN_HELP_SET_PRIVATE
 	a szoba.
 
 CHAN_HELP_SET_RESTRICTED
-	Syntax: SET #szoba RESTRICTED {ON | OFF}
+	Syntax: %s #szoba RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 	
 CHAN_HELP_SET_SECURE
-	Syntax: SET #szoba SECURE {ON | OFF}
+	Syntax: %s #szoba SECURE {ON | OFF}
 	
 	Engedélyezi vagy letitlja a %S biztonsági lehetõségeit
 	a szobában. Ha SECURE mûködik, csak azok a felhasználók
@@ -4443,7 +4502,7 @@ CHAN_HELP_SET_SECURE
 	a szobában jogokat, ha szerepelnek a hozzáférési listán.
 	
 CHAN_HELP_SET_SECUREOPS
-	Syntax: SET #szoba SECUREOPS {ON | OFF}
+	Syntax: %s #szoba SECUREOPS {ON | OFF}
 	
 	Bekapcsolja vagy letiltja a secure ops opciót.
 	Amikor a secure ops be van kapcsolva, akkor azok, akik 
@@ -4451,7 +4510,7 @@ CHAN_HELP_SET_SECUREOPS
 	operátori státuszt.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Syntax: SET #szoba SECUREFOUNDER {ON | OFF}
+	Syntax: %s #szoba SECUREFOUNDER {ON | OFF}
 	
 	Engedélyezi vagy letiltja a secure founder opciót a 
 	csatornán. Amikor a secure founder be van állítva, csak
@@ -4460,7 +4519,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	akik csak az IDENTIFY parancsot használták a %S-ben.
 	
 CHAN_HELP_SET_SIGNKICK
-	Syntax: SET #szoba SIGNKICK {ON | SZINT | OFF}
+	Syntax: %s #szoba SIGNKICK {ON | SZINT | OFF}
 	
 	Engedélyezi vagy letiltja a signed kick opciót a csatornán
 	Amikor a SIGNKICK be van állítva, a %S KICK parancsával
@@ -4472,7 +4531,7 @@ CHAN_HELP_SET_SIGNKICK
 	Lásd még: %R%S HELP LEVELS bõvebb információkért. 
 	
 CHAN_HELP_SET_XOP
-	Syntax: SET #szoba XOP {ON | OFF}
+	Syntax: %s #szoba XOP {ON | OFF}
 	
 	Engedélyezi vagy letiltja az xOP lista rendszert.
 	Ha az XOP be van kapcsolva, akkor AOP/SOP/VOP
@@ -4483,7 +4542,7 @@ CHAN_HELP_SET_XOP
 	áttérés nem okoz gondot.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4506,7 +4565,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 	
 CHAN_HELP_SET_OPNOTICE
-	Syntax: SET #szoba OPNOTICE {ON | OFF}
+	Syntax: %s #szoba OPNOTICE {ON | OFF}
 	
 	Be/kikapcsolja az opnotice opciót a csatornán.
 	Amikor az op-notice be van kapcsolva, a %S megjegyzést
@@ -5068,13 +5127,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Törli a regisztrációt a csatornáról.Csak Services Operators
 	droppolhat csatornát,úgy hogy nem használja a szoba
 	jelszavát.
-	
-CHAN_SERVADMIN_HELP_SET
-	
-	Szervíz admin beállíthatja a csatornát NEMELÉVÜLÕ -re,
-	ekkor a sorban megelõzi az elévülõket. A szervíz 
-	adminisztrátor beállíthatja anélkül, hogy szoba
-	jelszót használná.	
 	
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Syntax: SET #szoba NOEXPIRE {ON | OFF}

@@ -1105,6 +1105,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	%s kanalýnýn kaydý silinmiþtir (dropped).
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET kanaladý özellik parametre
@@ -4233,6 +4261,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Kanalý kaydeder
 CHAN_HELP_CMD_SET
 	    SET        Kanal özelliklerini ve bilgisini ayarlar
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4333,7 +4363,15 @@ CHAN_HELP_DROP
 	
 	Kanalýn kaydýný siler.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Kullanýmý: SET kanaladý özellik parametre
 	
 	Kanal founderýnýn çeþitli kanal özelliklerini ve diðer bilgileri
@@ -4341,40 +4379,63 @@ CHAN_HELP_SET
 	
 	Mevcut özellikler:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Kanal founderýný belirler
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Kanal successorýný belirler
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Kanal açýklamasýný belirler
+CHAN_HELP_CMD_SET_URL
 	    URL           Kanala bir URL adresini iliþkilendirir
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Kanala bir E-mail adresini iliþkilendirir
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Kanala giren kullanýcýlara gönderilecek mesajý
 	                   belirler
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Servislerin kanalda ne tip ban koyacaðýný belirler
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Kanalda kimse olmasa bile topiði hatýrlar
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic sadece SET TOPIC komutuyla deðiþtirilir
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Kanal modlarýný kitler yada açar
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       LIST komutuyla kanal listelenmez
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Kanala izinli giriþ gerektirir
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        %S güvenlik özelliklerini aktifleþtirir
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Kanal opu durumunun sýký kontrolünü saðlar
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Kanal founderý durumunun sýký kontrolünü saðlar
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      KICK komutuyla yapýlan atmalarý iþaretler
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      OP/DEOP komutlarý kullanýldýðýnda mesaj yollar
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         kritik komutlarin kullanilmasini engeller
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Ayricalik sistemleri arasinda geçisi saglar
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
-
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
+	
 	
 	Belirli bir özellik hakkýnda daha fazla bilgi için
 	%R%S HELP özellik yazýn.
 
 CHAN_HELP_SET_FOUNDER
-	Kullanýmý: SET kanaladý FOUNDER nick
+	Kullanýmý: %s kanaladý FOUNDER nick
 	
 	Kanal founderýný deðiþtirir.  Yeni nickin kayýtlý 
 	olmasý gereklidir.
 
 CHAN_HELP_SET_SUCCESSOR
-	Kullanýmý: SET kanaladý SUCCESSOR nick
+	Kullanýmý: %s kanaladý SUCCESSOR nick
 	
 	Kanal successorýný belirler, deðiþtirir. Eðer bir kanalýn
 	founderýnýn nicki zaman aþýmýna uðrayýp kaydý silinirse
@@ -4385,13 +4446,13 @@ CHAN_HELP_SET_SUCCESSOR
 	Komutta belirtilen nickin kayýtlý olmasý gereklidir.
 
 CHAN_HELP_SET_DESC
-	Kullanýmý: SET kanaladý DESC açýklama
+	Kullanýmý: %s kanaladý DESC açýklama
 	
 	LIST ve INFO komutlarý kullanýldýðýnda gözükecek kanal 
 	açýklamasýný belirler.
 
 CHAN_HELP_SET_URL
-	Kullanýmý: SET kanaladý URL [urladresi]
+	Kullanýmý: %s kanaladý URL [urladresi]
 	
 	Belirtilen URL adresini kanal ile iliþkilendirir. Bu URL 
 	adresi birisi kanal hakkýnda bilgi almak için INFO 
@@ -4400,7 +4461,7 @@ CHAN_HELP_SET_URL
 	silinir.
 
 CHAN_HELP_SET_EMAIL
-	Kullanýmý: SET kanaladý EMAIL [emailadresi]
+	Kullanýmý: %s kanaladý EMAIL [emailadresi]
 	
 	Belirtilen E-mail adresini kanal ile iliþkilendirir.Bu E-mail 
 	adresi birisi kanal hakkýnda bilgi almak için INFO komutunu 
@@ -4409,14 +4470,14 @@ CHAN_HELP_SET_EMAIL
 	silinir.
 
 CHAN_HELP_SET_ENTRYMSG
-	Kullanýmý: SET kanaladý ENTRYMSG [mesaj]
+	Kullanýmý: %s kanaladý ENTRYMSG [mesaj]
 	
 	Kanala giren kullanýcýlara notice þeklinde gönderilecek
 	mesajý belirler.  Eðer mesaj parametresi belirtilmezse
 	giren kullanýcýya bir mesaj gönderilmez.
 
 CHAN_HELP_SET_BANTYPE
-	Kullanýmý: SET kanaladý BANTYPE bantipi
+	Kullanýmý: %s kanaladý BANTYPE bantipi
 	
 	Servislerin birini kanaldan banlarken kullanacaðý ban 
 	tipini belirler.
@@ -4429,7 +4490,7 @@ CHAN_HELP_SET_BANTYPE
 	3: *!*user@*.domain formatýnda ban için
 
 CHAN_HELP_SET_KEEPTOPIC
-	Kullanýmý: SET kanaladý KEEPTOPIC {ON | OFF}
+	Kullanýmý: %s kanaladý KEEPTOPIC {ON | OFF}
 	
 	Bir kanal için topic hatýrlamayý aktifleþtirir yada kapatýr.
 	topic hatýrlama aktifse kanal kapansa bile kanal topic i
@@ -4437,14 +4498,14 @@ CHAN_HELP_SET_KEEPTOPIC
 	topic geçerli olur.
 
 CHAN_HELP_SET_TOPICLOCK
-	Kullanýmý: SET kanaladý TOPICLOCK {ON | OFF}
+	Kullanýmý: %s kanaladý TOPICLOCK {ON | OFF}
 	
 	Bir kanal için topic kilidini aktifleþtirir yada kapatýr.
 	topic kilidi aktifse, %S SET TOPIC komutunun
 	dýþýnda kanal topic inin deðiþtirilmesine izin vermez.
 
 CHAN_HELP_SET_MLOCK
-	Kullanýmý: SET kanaladý MLOCK modlar
+	Kullanýmý: %s kanaladý MLOCK modlar
 	
 	Bir kanal için mod-kilidini aktifleþtirir. %S belirlediðiniz
 	modlarýn her zaman açýk yada kapalý olacaðýný ayarlar.
@@ -4474,7 +4535,7 @@ CHAN_HELP_SET_MLOCK
 	        kapanacak þekilde serbest býrakýr.
 
 CHAN_HELP_SET_PEACE
-	Kullanimi: SET kanaladi PEACE {ON | OFF}
+	Kullanimi: %s kanaladi PEACE {ON | OFF}
 	
 	Bir kanalin peace özelligini açar veya kapatir.
 	peace özelligi ayarlandiginda, hic kimse seviyesi kendinden
@@ -4482,20 +4543,20 @@ CHAN_HELP_SET_PEACE
 	seviyesini degistiremez.
 
 CHAN_HELP_SET_PRIVATE
-	Kullanýmý: SET kanaladý PRIVATE {ON | OFF}
+	Kullanýmý: %s kanaladý PRIVATE {ON | OFF}
 	
 	Bir kanal için private özelliðini açar kapatýr. private özelliði
 	aktifse, %R%S LIST komutuyla kanal listelenemez.
 
 CHAN_HELP_SET_RESTRICTED
-	Kullanýmý: SET kanaladý RESTRICTED {ON | OFF}
+	Kullanýmý: %s kanaladý RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Kullanýmý: SET kanaladý SECURE {ON | OFF}
+	Kullanýmý: %s kanaladý SECURE {ON | OFF}
 	
 	Bir kanal için %S'ün güvenlik özelliklerini açar veya 
 	kapatýr. SECURE özelliði aktifse, sadece nicki kayýtlý
@@ -4504,14 +4565,14 @@ CHAN_HELP_SET_SECURE
 	alabilirler.(mesela op olabilirler)
 
 CHAN_HELP_SET_SECUREOPS
-	Kullanýmý: SET kanaladý SECUREOPS {ON | OFF}
+	Kullanýmý: %s kanaladý SECUREOPS {ON | OFF}
 	
 	Bir kanal için güvenli op özelliðini açar veya kapatýr.
 	güvenli op özelliði aktifse, access listesinde olmayan
 	kullanýcýlar kanalda op olamazlar.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Kullanýmý: SET kanaladý SECUREFOUNDER {ON | OFF}
+	Kullanýmý: %s kanaladý SECUREFOUNDER {ON | OFF}
 	
 	Bir kanal için güvenli founder özelliðini açar yada kapatýr.
 	güvenli founder özelliði aktifse, sadece gerçek founder 
@@ -4521,7 +4582,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	ama nicki founderýn nicki olmayanlar bu komutlarý kullanamazlar.
 
 CHAN_HELP_SET_SIGNKICK
-	Kullanýmý: SET kanaladý SIGNKICK {ON | LEVEL | OFF}
+	Kullanýmý: %s kanaladý SIGNKICK {ON | LEVEL | OFF}
 	
 	Bir kanal için iþaretli atmayý açar yada kapatýr.
 	SIGNKICK ayarlandýðý zaman, %S KICK
@@ -4534,7 +4595,7 @@ CHAN_HELP_SET_SIGNKICK
 	bilgi için %R%S HELP LEVELS yazýn.
 
 CHAN_HELP_SET_XOP
-	Kullanimi: SET kanaladi XOP {ON | OFF}
+	Kullanimi: %s kanaladi XOP {ON | OFF}
 	
 	Bir kanalin xOP sistemini açar veya kapatir. XOP
 	ayarlandigi zaman, AOP/SOP/VOP komutlariyla
@@ -4557,7 +4618,7 @@ CHAN_HELP_SET_XOP
 	bir problem çikarmaz.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4580,7 +4641,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Kullanýmý: SET kanaladý OPNOTICE {ON | OFF}
+	Kullanýmý: %s kanaladý OPNOTICE {ON | OFF}
 	
 	Bir kanal için op-notu özelliðini açar yada kapatýr.
 	op-notu özelliði aktifse, %S kanala bir kullanýcý 
@@ -5099,13 +5160,6 @@ CHAN_SERVADMIN_HELP_DROP
 	
 	Belirtilen kanalýn kaydýný siler. Sadece Servis adminleri
 	kanalý tanýtmadan kaydýný silebilirler.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Servis adminleri NOEXPIRE özelliðini ayarlayarak istedikleri
-	kanalýn zaman aþýmýna uðramasýný engelleyebilirler.
-	Ek olarak, Servis adminleri þifreyle kanalý tanýtmaya gerek 
-	olmadan bir kanalýn tüm özelliklerini ayarlayabilirler.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Kullanýmý: SET kanaladý NOEXPIRE {ON | OFF}

@@ -1099,6 +1099,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	Το κανάλι %s διαγράφτηκε από τις υπηρεσίες.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET channel option parameters
@@ -4244,6 +4272,8 @@ CHAN_HELP_CMD_REGISTER
 CHAN_HELP_CMD_SET
 	    SET        Ρυθμίζει τις επιλογές και τις πληροφορίες
 	               του καναλιού	
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4346,7 +4376,15 @@ CHAN_HELP_DROP
 	Κάνει το κανάλι ξεκατοχυρώσημο,το αφήνει ελεύθερο χωρίς founder. Για να
 	γίνει αυτό πρέπει ο founder.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Σύνταξη: SET κανάλι επιλογή παράμετροι
 	
 	Επιτρέπουν στον founder του καναλιού να επιλέξει και να ρυθμίσει το κανάλι
@@ -4354,40 +4392,63 @@ CHAN_HELP_SET
 	
 	Διαθέσιμες επιλογές:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Αλλάζει τον founder του καναλιού
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Αλλάζει τον successor του καναλιού
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Αλλάζει την περιγραφή του καναλιού
+CHAN_HELP_CMD_SET_URL
 	    URL           Συσχετίζει ένα URL με το κανάλι
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Συσχετίζει ένα E-mail με το κανάλι
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Αλλάζει το μήνυμα εισαγωγής που στέλνετε σε όλους τους
 	                     χρήστες που μπένουν στο κανάλι
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Αλλάζει τον τύπο του ban που θα κάνουν τα Services
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Κλείδωμα των Modes του καναλιού
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Να αλλάζει το topic όταν δεν χρησιμοποιείται το κανάλι
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Να στέλνει μέσα στο κανάλι μήνυμα ποιος χρησιμοποιεί OP/DEOP 
 	         εντολές
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Να ελλατώνει την χρήση "βίαιων" εντολών
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Να μην εμφανίζεται το κανάλι όταν γίνεται εντολή LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Απαγόρευση εισόδου στο κανάλι αν δεν έχεις access εκεί
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Ενεργοποίηση του %S ,μελλοντική ασφάλεια
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Μόνο όσοι έχουν access θα έχουν op
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Ασφάλεια του founder από το κανάλι
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Εμφαν. kicks τα οποία γίνονται με την εντολή KICK
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Το Topic μπορεί να αλλάξει με την εντολή TOPIC
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Αν είναι ON δουλεύει με AOP/SOP,αν είναι off με access
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Γράψε %R%S HELP επιλογή για περισσότερες πληροφορίες
 	για την κάθε εντολή.
 
 CHAN_HELP_SET_FOUNDER
-	Σύνταξη: SET κανάλι FOUNDER ψευδώνυμο
+	Σύνταξη: %s κανάλι FOUNDER ψευδώνυμο
 	
 	Αλλάζει τον founder του καναλιού.  Το νέο ψευδώνυμο πρέπει να είναι
 	κατοχυρωμένο.
 
 CHAN_HELP_SET_SUCCESSOR
-	Σύνταξη: SET κανάλι SUCCESSOR ψευδώνυμο
+	Σύνταξη: %s κανάλι SUCCESSOR ψευδώνυμο
 	
 	Αλλάζει τον successor του καναλιού.  Αν το ψευδώνυμο του founder
 	λήξει ή σβηστεί (drop) τότε το κανάλι θα είναι ακόμα κατοχυρωμένο.
@@ -4397,13 +4458,13 @@ CHAN_HELP_SET_SUCCESSOR
 	successor.  Το νέο ψευδώνυμο θα πρέπει να είναι κατοχυρωμένο.
 
 CHAN_HELP_SET_DESC
-	Σύνταξη: SET κανάλι DESC περιγραφή
+	Σύνταξη: %s κανάλι DESC περιγραφή
 	
 	Αλλάζετε την περιγραφή του καναλιού, η οποία φένεται με την εντολή
 	LIST και INFO.
 
 CHAN_HELP_SET_URL
-	Σύνταξη: SET κανάλι URL [url]
+	Σύνταξη: %s κανάλι URL [url]
 	
 	Συσχετίζει ένα URL με το κανάλι.  Αυτό το URL θα
 	εμφανίζεται όταν κάποιος θα κοιτάζεις τις πληροφορίες του καναλιού
@@ -4411,7 +4472,7 @@ CHAN_HELP_SET_URL
 	θα σβηστεί οποιοδήποτε URL είχε δωθεί παλαιότερα στο κανάλι.
 
 CHAN_HELP_SET_EMAIL
-	Σύνταξη: SET κανάλι EMAIL [διεύθυνση]
+	Σύνταξη: %s κανάλι EMAIL [διεύθυνση]
 	
 	Συσχετίζει μια διεύθυνση E-mail με το κανάλι.
 	Αυτή η διεύθυνση εμφανίζεται όταν κάποιος θέλει να δει
@@ -4420,14 +4481,14 @@ CHAN_HELP_SET_EMAIL
 	είχε δωθεί στο κανάλι.
 
 CHAN_HELP_SET_ENTRYMSG
-	Σύνταξη: SET κανάλι ENTRYMSG [μήνυμα]
+	Σύνταξη: %s κανάλι ENTRYMSG [μήνυμα]
 	
 	Αλλάζει το μήνυμα εισαγωγής το οποίο στέλνετε σε κάθε χρήστη μέσω /notice
 	(παρατήρηση) όταν αυτός μπένει στο κανάλι.  Αν δεν δωθεί καμία παράμετρος,
 	δεν θα στέλνετε κανένα μήνυμα στο χρήστη,ο οποίος θα εισέρχεται στο κανάλι.
 
 CHAN_HELP_SET_BANTYPE
-	Σύνταξη: SET κανάλι BANTYPE τύπος-ban
+	Σύνταξη: %s κανάλι BANTYPE τύπος-ban
 	
 	Αλλάζει τον τύπο του ban, ο οποίος θα χρησιμοποιείται από τις υπηρεσίες όταν
 	θα χρειάζεται να κάνει κάποιον ban από το κανάλι (πχ akick).
@@ -4440,7 +4501,7 @@ CHAN_HELP_SET_BANTYPE
 	3: το ban θα είναι της μορφής *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Σύνταξη: SET κανάλι KEEPTOPIC {ON | OFF}
+	Σύνταξη: %s κανάλι KEEPTOPIC {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή topic retention του καναλιού.
 	Όταν το topic retention είναι on, το topic του καναλιού
@@ -4448,14 +4509,14 @@ CHAN_HELP_SET_KEEPTOPIC
 	το κανάλι, και θα αποθηκεύεται για την επόμενη φορά.
 	
 CHAN_HELP_SET_TOPICLOCK
-	Σύνταξη: SET κανάλι KEEPTOPIC {ON | OFF}
+	Σύνταξη: %s κανάλι KEEPTOPIC {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή κλείδωμα topic του καναλιού.
 	Όταν το κλείδωμα topic είναι on, ο %S δεν θα επιτρέπει σε κανέναν να αλλάξει
 	το topic του καναλιού εκτός της εντολής TOPIC του.
 	
 CHAN_HELP_SET_MLOCK
-	Σύνταξη: SET κανάλι MLOCK modes
+	Σύνταξη: %s κανάλι MLOCK modes
 	    
 	Καθορίζει το κλείδωμα των modes για το κανάλι. Ο %S
 	σας επιτρέπει να καθορίσετε συγκεκριμένα modes για το κανάλι
@@ -4492,7 +4553,7 @@ CHAN_HELP_SET_MLOCK
 	    απενεργοποιηθούν.
 
 CHAN_HELP_SET_PEACE
-	Σύνταξη: SET κανάλι PEACE {ON | OFF}
+	Σύνταξη: %s κανάλι PEACE {ON | OFF}
 	
 	Ενεργοποιεί ή απεεργοποιεί την εντολή peace στο κανάλι.
 	Όταν η εντολή peace είναι on, ο χρήστης δεν μπορεί να κάνει kick,
@@ -4500,21 +4561,21 @@ CHAN_HELP_SET_PEACE
 	level από αυτόν ή ίσο με αυτόν μέσω εντολών %S.
 
 CHAN_HELP_SET_PRIVATE
-	Σύνταξη: SET κανάλι PRIVATE {ON | OFF}
+	Σύνταξη: %s κανάλι PRIVATE {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή private για ένα κανάλι.
 	Όταν ενεργοποιείται η private εντολή,  το κανάλι δε συμπεριλαμβάνεται
 	στη λίστα που προκύπτει από την εντολή %R%S LIST.
 
 CHAN_HELP_SET_RESTRICTED
-	Σύνταξη: SET κανάλι RESTRICTED {ON | OFF}
+	Σύνταξη: %s κανάλι RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 	
 CHAN_HELP_SET_SECURE
-	Σύνταξη: SET κανάλι SECURE {ON | OFF}
+	Σύνταξη: %s κανάλι SECURE {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί τις δυνατότητες ασφάλειας του %S για
 	ένα κανάλι.  Όταν ενεργοποιείται το SECURE, μόνο οι χρήστες που
@@ -4523,14 +4584,14 @@ CHAN_HELP_SET_SECURE
 	από τη λίστα πρόσβασης.
 
 CHAN_HELP_SET_SECUREOPS
-	Σύνταξη: SET κανάλι SECUREOPS {ON | OFF}
+	Σύνταξη: %s κανάλι SECUREOPS {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή προστατευμένης διαχείρησης
 	για ένα κανάλι.  Όταν ενεργοποιείται η προστατευμένη διαχείρηση, οι
 	χρήστες που δεν είναι στη λίστα πρόσβασης, δε μπορούν να πάρουν op.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Σύνταξη: SET κανάλι SECUREFOUNDER {ON | OFF}
+	Σύνταξη: %s κανάλι SECUREFOUNDER {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή ασφαλής founder για ένα κανάλι.
 	Όταν ενεργοποιείται η επιλογή ασφαλής founder, μόνο ο πραγματικός founder 
@@ -4539,7 +4600,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	αναγνώρισης με τον %S.
 	    
 CHAN_HELP_SET_SIGNKICK
-	Σύνταξη: SET κανάλι SIGNKICK {ON | LEVEL | OFF}
+	Σύνταξη: %s κανάλι SIGNKICK {ON | LEVEL | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή signed kicks του
 	καναλιού.  Όταν ενεργοποιείται η επιλογή SIGNKICK, τα kicks θα 
@@ -4551,7 +4612,7 @@ CHAN_HELP_SET_SIGNKICK
 	kicks signed. Δες %R%S HELP LEVELS για περισσότερες πληροφορίες. 
 
 CHAN_HELP_SET_XOP
-	Σύνταξη: SET κανάλι XOP {ON | OFF}
+	Σύνταξη: %s κανάλι XOP {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή xOP system για ένα κανάλι.
 	Όταν ενεργοποιείται η επιλογή XOP, χρησιμοποιείς τις 
@@ -4567,7 +4628,7 @@ CHAN_HELP_SET_XOP
 	δεν θα υπάρξει κανένα πρόβλημα.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4590,7 +4651,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Σύνταξη: SET κανάλι OPNOTICE {ON | OFF}
+	Σύνταξη: %s κανάλι OPNOTICE {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή ενημέρωσης op για ένα κανάλι.
 	Όταν ενεργοποιείται η ενημέρωση op, ο %S στέλνει ένα notice στους ops 
@@ -5133,13 +5194,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Ξε-κατοχυρώνει το ζητούμενο κανάλι.  Μόνο οι Services Operators
 	μπορουν να το κάνουν αυτό σε ένα κανάλι, χωρίς να κάνουν εντολή αναγνώρισης
 	για το κανάλι.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Οι Services Operators μπορούν να επιλέξουν την NOEXPIRE εντολή, σε
-	αυτά που δεν θέλουν ποτέ να λήξουν.
-	Επίσης, οι Services Operators μπορούν να αλλάξουν τις επιλογές για κάθε κανάλι
-	χωρίς να κάνουν εντολή αναγνώρισης σε κάθε κανάλι.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Σύνταξη: SET κανάλι NOEXPIRE {ON | OFF}

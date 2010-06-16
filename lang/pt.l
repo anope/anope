@@ -1099,6 +1099,34 @@ CHAN_DROP_DISABLED
 CHAN_DROPPED
 	O canal %s foi desregistrado.
 
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
+
 # SET responses
 CHAN_SET_SYNTAX
 	SET canal opções parâmetros
@@ -4123,6 +4151,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registra um canal
 CHAN_HELP_CMD_SET
 	    SET        Ajusta as opções e informações do canal
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4225,7 +4255,15 @@ CHAN_HELP_DROP
 	Cancela o registro do canal. So poderá ser usado pelo
 	fundador do canal.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Sintaxe: SET canal opção parâmetros
 	
 	Permite ao fundador do canal ajustar as várias opções do
@@ -4233,39 +4271,62 @@ CHAN_HELP_SET
 	
 	Opções disponíveis:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Ajusta o fundador do canal
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Ajusta o sucessor do canal
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Ajusta a descrição do canal
+CHAN_HELP_CMD_SET_URL
 	    URL           Associa uma URL a um canal
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Associa um E-mail a um canal
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Ajusta a mensagem que deve ser mandada
 	                    aos usuários quando eles entram no canal
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Ajusta como os Services devem fazer o ban
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Liga ou desliga a trava dos modos do canal
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Mantem o tópico quando o canal não está em uso
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     O tópico pode ser mudado apenas com o comando TOPIC
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Regula o uso de comandos críticos
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Esconde o canal do comando LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Acesso restrito ao canal
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Ativa os recursos de segurança do %S
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Controle rigoroso do status de OP
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Controle rigoroso do status de Fundador do Canal
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Assinatura dos kicks feitos pelo comando KICK
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Envia uma notice quando os comandos OP/DEOP são usados
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Altera o sistema de privilégio de usuário
-		PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_PERSIST
+	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Digite %R%S HELP SET opção para maiores informações
 	sobre uma opção em particular.
 
 CHAN_HELP_SET_FOUNDER
-	Sintaxe: SET canal FOUNDER nick
+	Sintaxe: %s canal FOUNDER nick
 	
 	Muda o fundador do canal. O novo nick deve estar
 	registrado.
 
 CHAN_HELP_SET_SUCCESSOR
-	Sintaxe: SET canal SUCCESSOR nick
+	Sintaxe: %s canal SUCCESSOR nick
 	
 	Altera o sucessor de um canal. Se o nick do founder expirar
 	ou for dropado enquanto o canal ainda estiver registrado,
@@ -4275,13 +4336,13 @@ CHAN_HELP_SET_SUCCESSOR
 	sido ajustado. O novo nick deverá estar registrado.
 
 CHAN_HELP_SET_DESC
-	Sintaxe: SET canal DESC descrição
+	Sintaxe: %s canal DESC descrição
 	
 	Ajusta a descrição para o canal, que são mostradas com
 	os comandos LIST e INFO.
 
 CHAN_HELP_SET_URL
-	Sintaxe: SET canal URL [url]
+	Sintaxe: %s canal URL [url]
 	
 	Associa uma URL ao canal. Esta URL será mostrada
 	sempre que alguem solicitar informação sobre o canal
@@ -4289,7 +4350,7 @@ CHAN_HELP_SET_URL
 	apaga qualquer URL atualmente designada para o canal.
 
 CHAN_HELP_SET_EMAIL
-	Sintaxe: SET canal EMAIL [endereço]
+	Sintaxe: %s canal EMAIL [endereço]
 	
 	Associa um endereço de e-mail fornecido ao canal.
 	Este endereço será mostrado sempre que alguem solicitar
@@ -4298,7 +4359,7 @@ CHAN_HELP_SET_EMAIL
 	do canal.
 
 CHAN_HELP_SET_ENTRYMSG
-	Sintaxe: SET canal ENTRYMSG [mensagem]
+	Sintaxe: %s canal ENTRYMSG [mensagem]
 	
 	Ajusta a mensagem na qual será enviada via /notice para
 	os usuários quando eles entrarem no canal. Se nenhum
@@ -4306,7 +4367,7 @@ CHAN_HELP_SET_ENTRYMSG
 	ao se entrar no canal.
 	
 CHAN_HELP_SET_BANTYPE
-	Sintaxe: SET canal BANTYPE tipo-de-ban
+	Sintaxe: %s canal BANTYPE tipo-de-ban
 	
 	Seleciona o tipo de ban que será usado sempre que os Services
 	precisarem banir alguém do seu canal.
@@ -4319,7 +4380,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban na forma *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Sintaxe: SET canal KEEPTOPIC {ON|OFF}
+	Sintaxe: %s canal KEEPTOPIC {ON|OFF}
 	
 	Ativa ou desativa a opção de retenção de tópico para
 	um canal. Quando a retenção de tópico está acionada,
@@ -4328,7 +4389,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	restaurado na próxima vez que o canal for reutilizado.
 
 CHAN_HELP_SET_TOPICLOCK
-	Sintaxe: SET canal TOPICLOCK {ON|OFF}
+	Sintaxe: %s canal TOPICLOCK {ON|OFF}
 	
 	Ativa ou desativa a opção de trava do tópico de um canal.
 	Quando a trava do tópico está ativada, o %S não
@@ -4336,7 +4397,7 @@ CHAN_HELP_SET_TOPICLOCK
 	TOPIC.
 
 CHAN_HELP_SET_MLOCK
-	Sintaxe: SET canal MLOCK modos
+	Sintaxe: %s canal MLOCK modos
 	
 	Ajusta o parâmetro da trava do modo para um canal. O
 	%S permite que você defina certos modos no canal
@@ -4374,7 +4435,7 @@ CHAN_HELP_SET_MLOCK
 	        ficam livres para ser ativos ou desativos.
 
 CHAN_HELP_SET_PEACE
-	Sintaxe: SET canal PEACE {ON | OFF}
+	Sintaxe: %s canal PEACE {ON | OFF}
 	
 	Ativa ou destiva a opção peace para um canal.
 	Quando peace está ativada, um usuário não poderá kickar,
@@ -4382,21 +4443,21 @@ CHAN_HELP_SET_PEACE
 	nível superior ou igual ao seu via comandos do %S.
 
 CHAN_HELP_SET_PRIVATE
-	Sintaxe: SET canal PRIVATE {ON|OFF}
+	Sintaxe: %s canal PRIVATE {ON|OFF}
 	
 	Ativa ou desativa a opção private para um canal. Quando
 	private está ativada, um %R%S LIST não irá incluir
 	o canal em qualquer listagem.
 
 CHAN_HELP_SET_RESTRICTED
-	Sintaxe: SET canal RESTRICTED {ON|OFF}
+	Sintaxe: %s canal RESTRICTED {ON|OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Sintaxe: SET canal SECURE {ON|OFF}
+	Sintaxe: %s canal SECURE {ON|OFF}
 	
 	Ativa ou desativa os recursos de segurança do %S
 	para um canal. Quando o SECURE estiver ativo, somente
@@ -4405,14 +4466,14 @@ CHAN_HELP_SET_SECURE
 	controlado pela lista de acesso.
 
 CHAN_HELP_SET_SECUREOPS
-	Sintaxe: SET canal SECUREOPS {ON|OFF}
+	Sintaxe: %s canal SECUREOPS {ON|OFF}
 	
 	Ativa ou desativa a opção de segurança de ops para um canal.
 	Quando secure ops estiver ativada, os usuários que não
 	estiverem na lista de acesso não poderão ter o status de OP.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Sintaxe: SET canal SECUREFOUNDER {ON | OFF}
+	Sintaxe: %s canal SECUREFOUNDER {ON | OFF}
 	
 	Ativa ou desativa a opção secure founder para um canal.
 	Quando o secure founder está ligado, apenas o verdadeiro founder
@@ -4420,7 +4481,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	successor, e não aqueles que estiverem identificados no %S.
 	
 CHAN_HELP_SET_SIGNKICK
-	Sintaxe: SET canal SIGNKICK {ON | LEVEL | OFF}
+	Sintaxe: %s canal SIGNKICK {ON | LEVEL | OFF}
 	
 	Habilita ou desabilita a assinatura nos kicks para um
 	canal. Quando o SIGNKICK está habilitado, kicks através
@@ -4432,7 +4493,7 @@ CHAN_HELP_SET_SIGNKICK
 	motivo. Veja %R%S HELP LEVELS para maiores informações. 
 
 CHAN_HELP_SET_XOP
-	Sintaxe: SET canal XOP {ON | OFF}
+	Sintaxe: %s canal XOP {ON | OFF}
 	
 	Ativa ou desativa o sistema de listas xOP para um canal.
 	Quando XOP está ativado, você deve usar os comandos
@@ -4454,7 +4515,7 @@ CHAN_HELP_SET_XOP
 	de acesso não causa problemas.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4477,7 +4538,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Sintaxe: SET canal OPNOTICE {ON | OFF}
+	Sintaxe: %s canal OPNOTICE {ON | OFF}
 	
 	Ativa e desativa a opção Op-notice para um canal. Quando
 	Op-notice estiver ativado, o %S enviará uma notice para
@@ -5027,13 +5088,6 @@ CHAN_SERVADMIN_HELP_DROP
 	
 	Cancela o registro de um canal. Somente Administradores dos
 	Services podem cancelar canais que pertencem a outros usuários.
-
-CHAN_SERVADMIN_HELP_SET
-	
-	Administradores dos Services também podem ajustar a opção 
-	NOEXPIRE, fazendo com que canais sejam impedidos de ter 
-	seu registro expirado. Services Operators ainda
-	podem ajustar opções para qualquer canal de outros usuários.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Sintaxe: SET canal NOEXPIRE {ON | OFF}

@@ -453,7 +453,7 @@ class ServerConfig
 		bool StrictPasswords;
 		/* How many times you're allowed to give a bad password before being killed */
 		unsigned BadPassLimit;
-		/* How long before bad passwords are forgotten */ 
+		/* How long before bad passwords are forgotten */
 		time_t BadPassTimeout;
 		/* Delay between automatic database updates */
 		time_t UpdateTimeout;
@@ -510,7 +510,7 @@ class ServerConfig
 		char *NSGuestNickPrefix;
 		/* Allow users to set kill immed on */
 		bool NSAllowKillImmed;
-		/* Don't allow nicks to use /ns group to regroup nicks */ 
+		/* Don't allow nicks to use /ns group to regroup nicks */
 		bool NSNoGroupChange;
 		/* Default flags for newly registered nicks */
 		Flags<NickCoreFlag> NSDefFlags;
@@ -579,9 +579,9 @@ class ServerConfig
 		unsigned MSMaxMemos;
 		/* Time you must wait between sending memos */
 		time_t MSSendDelay;
-		/* Notify all of the aliases of the core the memo was sent to */ 
+		/* Notify all of the aliases of the core the memo was sent to */
 		bool MSNotifyAll;
-		/* Who can use memos reciepts */ 
+		/* Who can use memos reciepts */
 		unsigned MSMemoReceipt;
 
 		/* Defai;t BotServ flags */
@@ -686,13 +686,13 @@ class ServerConfig
 		unsigned DefSessionLimit;
 		/* How long before exceptions expire */
 		time_t ExceptionExpiry;
-		/* How many times to kill before adding an KILL */ 
+		/* How many times to kill before adding an KILL */
 		int MaxSessionKill;
 		/* Max limit that can be used for exceptions */
 		unsigned MaxSessionLimit;
 		/* How long session akills should last */
 		time_t SessionAutoKillExpiry;
-		/* Reason to use for session kills */ 
+		/* Reason to use for session kills */
 		char *SessionLimitExceeded;
 		/* Optional second reason */
 		char *SessionLimitDetailsLoc;
@@ -776,7 +776,7 @@ class ConfigException : public CoreException
 		 * Actually no, it does nothing. Never mind.
 		 * @throws Nothing!
 		 */
-		virtual ~ConfigException() throw() { };
+		virtual ~ConfigException() throw() { }
 };
 
 #define CONF_NO_ERROR 0x000000

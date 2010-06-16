@@ -480,17 +480,16 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
  */
 StackerInfo *ModeManager::GetInfo(void *Item)
 {
-        for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(); it !=
-StackerObjects.end(); ++it)
-        {
-                const std::pair<void *, StackerInfo *> &PItem = *it;
-                if (PItem.first == Item)
-                        return PItem.second;
-        }
+	for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(); it != StackerObjects.end(); ++it)
+	{
+		const std::pair<void *, StackerInfo *> &PItem = *it;
+		if (PItem.first == Item)
+			return PItem.second;
+	}
 
-        StackerInfo *s = new StackerInfo;
-        StackerObjects.push_back(std::make_pair(Item, s));
-        return s;
+	StackerInfo *s = new StackerInfo;
+	StackerObjects.push_back(std::make_pair(Item, s));
+	return s;
 }
 
 /** Build a list of mode strings to send to the IRCd from the mode stacker
@@ -566,7 +565,7 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 	if (!buf.empty())
 		ret.push_back(buf + parambuf);
-	
+
 	return ret;
 }
 
@@ -628,7 +627,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 			um->Name = static_cast<UserModeName>(UMODE_END + ++GenericUserModes);
 			Alog() << "ModeManager: Added generic support for user mode " << um->ModeChar;
 		}
-		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um)).second;
+		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um));
 		ModeManager::Modes.push_back(um);
 
 		FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
@@ -652,7 +651,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 			cm->Name = static_cast<ChannelModeName>(CMODE_END + ++GenericChannelModes);
 			Alog() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
 		}
-		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm)).second;
+		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm));
 		ModeManager::Modes.push_back(cm);
 
 		/* Apply this mode to the new default mlock if its used */

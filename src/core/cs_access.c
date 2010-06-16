@@ -88,7 +88,7 @@ static int access_view(User *u, int index, ChannelInfo *ci, int *sent_header)
 
 	if (!access || !access->in_use)
 		return 0;
-	
+
 	if (!*sent_header)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
@@ -121,6 +121,7 @@ static int access_view_callback(User *u, int num, va_list args)
 {
 	ChannelInfo *ci = va_arg(args, ChannelInfo *);
 	int *sent_header = va_arg(args, int *);
+	if (num < 1 || num > ci->GetAccessCount())
 		return 0;
 	return access_view(u, num - 1, ci, sent_header);
 }

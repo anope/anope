@@ -3,4 +3,3 @@
 
 file(READ "${FILE}" RESULT)
 message("${RESULT}")
-

@@ -243,12 +243,12 @@ User::~User()
 
 	if (is_oper(this))
 		opcnt--;
-	
+
 	while (!this->chans.empty())
 	{
 		this->chans.front()->chan->DeleteUser(this);
 	}
-	
+
 	if (this->prev)
 		this->prev->next = this->next;
 	else
@@ -460,7 +460,7 @@ void User::Logout()
 {
 	if (!this->nc)
 		return;
-		
+
 	std::list<User *>::iterator it = std::find(this->nc->Users.begin(), this->nc->Users.end(), this);
 	if (it != this->nc->Users.end())
 	{
@@ -492,7 +492,7 @@ const bool User::IsIdentified(bool CheckNick) const
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -955,7 +955,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 		{
 			const char *logrealname = normalizeBuffer(user->realname);
 			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host
-				<< (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" 
+				<< (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") ("
 				<< logrealname << ") " << "changed nick to " << nick << " (" << user->server->name << ").";
 			if (logrealname)
 				delete [] logrealname;
@@ -1082,7 +1082,7 @@ void do_kill(const std::string &nick, const std::string &msg)
 		return;
 	}
 	Alog(LOG_DEBUG) << nick << " killed";
-	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true))) 
+	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = time(NULL);
 		if (na->last_quit)
@@ -1267,7 +1267,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 
 	Alog(LOG_DEBUG) << "Changing user modes for " << user->nick << " to " << merge_args(ac, av);
 
-	for (; *modes; *modes++)
+	for (; *modes; modes++)
 	{
 		UserMode *um;
 

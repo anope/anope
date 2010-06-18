@@ -9,7 +9,7 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 int my_nick(char *source, int ac, char **av);
 int my_save(int argc, char **argv);

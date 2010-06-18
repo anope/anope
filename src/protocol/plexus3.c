@@ -12,6 +12,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "plexus3.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
   {"hybrid-7.2.1+plexus-3.0.0+",/* ircd name */

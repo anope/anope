@@ -9,7 +9,7 @@
 #include "module.h"
 
 #define AUTHOR "Anope"									/* Set the Author for a modinfo reply */
-#define VERSION "$Id$"									/* Set the version for a modinfo reply */
+#define VERSION VERSION_STRING									/* Set the version for a modinfo reply */
 
 int hs_moo_show(User * u);									/* Function to use when a /hs moo command is recived */
 int test(int argc, char **argv);

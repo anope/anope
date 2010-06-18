@@ -310,7 +310,6 @@ int main(int argc, char *argv[])
     HostCore *firsthc = NULL;
 
     printf("\n"C_LBLUE"DB Merger for Anope IRC Services"C_NONE"\n");
-    printf("Version: $Id$"C_NONE"\n\n");
 
     if (argc >= 2) {
         if (!mystricmp(argv[1], "--PREFEROLDEST")) {

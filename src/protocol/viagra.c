@@ -8,13 +8,13 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id$
  *
  */
 
 #include "services.h"
 #include "pseudo.h"
 #include "viagra.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"ViagraIRCd 1.3.*",        /* ircd name */

@@ -13,6 +13,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "charybdis.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"Charybdis 1.0+",           /* ircd name */

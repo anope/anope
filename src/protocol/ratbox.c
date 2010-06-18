@@ -14,6 +14,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "ratbox.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"Ratbox 2.0+",             /* ircd name */

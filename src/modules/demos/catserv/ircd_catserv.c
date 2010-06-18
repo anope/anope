@@ -10,7 +10,7 @@
 #include "catserv_messages.h"
 
 #define AUTHOR "Anope"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 int my_privmsg(char *source, int ac, char **av);
 

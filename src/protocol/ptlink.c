@@ -14,6 +14,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "ptlink.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"PTlink 6.15.*+",          /* ircd name */

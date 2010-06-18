@@ -16,6 +16,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "solidircd.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"Solid-IRCd 3.4.*",        /* ircd name */

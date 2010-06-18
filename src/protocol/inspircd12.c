@@ -11,7 +11,6 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id$
  *
  */
 
@@ -21,6 +20,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "inspircd12.h"
+#include "version.h"
 
 #ifndef _WIN32
 #include <sys/socket.h>

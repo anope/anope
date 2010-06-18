@@ -15,6 +15,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "shadowircd.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"ShadowIRCd 4.0+",         /* ircd name */

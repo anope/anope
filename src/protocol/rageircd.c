@@ -14,6 +14,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "rageircd.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"RageIRCd 2.0.*",          /* ircd name */

@@ -17,6 +17,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "inspircd11.h"
+#include "version.h"
 
 #ifndef _WIN32
 #include <sys/socket.h>

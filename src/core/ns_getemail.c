@@ -13,7 +13,6 @@
  * with. It returns the nicks that match the email you provide. Wild     
  * Cards are not excepted. Must use user@email-host.                     
  * 
- * $Id$
  *
  */
 /*************************************************************************/

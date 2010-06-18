@@ -14,6 +14,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "hybrid.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"HybridIRCd 7.*",          /* ircd name */

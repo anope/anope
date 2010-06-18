@@ -14,6 +14,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "dreamforge.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"DreamForge 4.6.7",        /* ircd name */

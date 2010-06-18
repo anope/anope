@@ -3,15 +3,15 @@
 #
 # Please read COPYING and README for further details.
 #
-# $Id$
 
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="3006"
+VERSION_BUILD="3007"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3007 - Removed all references to the SVN keyword $Id$
 #Revision 3006 - Set all of the core modules versions to VERSION_STRING - SVN is now officially not used anymore
 #Revision 3005 - Fixed ./Config to correctly load the previously used settings from config.cache
 #Revision 3003 - Grab users cloaked hosts on Unreal after setting +x, fixes us never knowing cloaked hosts if the user is introduced with a vhost

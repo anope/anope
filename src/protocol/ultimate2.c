@@ -14,6 +14,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "ultimate2.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"UltimateIRCd 2.8.*",      /* ircd name */

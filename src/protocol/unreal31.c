@@ -16,6 +16,7 @@
 #include "services.h"
 #include "pseudo.h"
 #include "unreal31.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
     {"UnrealIRCd 3.1.x",        /* ircd name */

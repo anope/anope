@@ -1701,9 +1701,10 @@ int read_config(int reload)
 	/**
 	 * Check all DEFCON dependiencies...
 	 **/
-	if (Config.DefConLevel) {
+	if (Config.DefConLevel)
+	{
 		/* Build DefCon's */
-		DefCon.reserve(6);
+		DefCon.resize(6);
 		DefCon[5].reset();
 		for (unsigned int level = 1; level < 5; ++level) {
 			DefCon[level] = 0;

@@ -270,7 +270,7 @@ class ESHA256 : public Module
 	ESHA256(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(ENCRYPTION);
 
 		ModuleManager::Attach(I_OnEncrypt, this);

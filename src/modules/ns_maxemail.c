@@ -16,7 +16,7 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 void my_load_config();
 void my_add_languages();

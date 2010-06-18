@@ -19,7 +19,7 @@
 #include "module.h"
 
 #define AUTHOR "SGR"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 /* ------------------------------------------------------------
  * Name: cs_appendtopic

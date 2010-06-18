@@ -19,7 +19,7 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 /* Multi-language stuff */
 #define LANG_NUM_STRINGS   10

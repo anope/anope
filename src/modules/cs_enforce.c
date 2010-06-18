@@ -16,7 +16,7 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 #define LNG_NUM_STRINGS	6
 

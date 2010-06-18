@@ -19,7 +19,7 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 void mySendResponse(User *u, const char *channel, char *mask, const char *time);
 

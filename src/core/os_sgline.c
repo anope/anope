@@ -334,7 +334,7 @@ class OSSGLine : public Module
 	{
 
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		this->AddCommand(OPERSERV, new CommandOSSGLine());

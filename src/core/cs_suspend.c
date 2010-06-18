@@ -177,7 +177,7 @@ class CSSuspend : public Module
 	CSSuspend(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		this->AddCommand(CHANSERV, new CommandCSSuspend());

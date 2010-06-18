@@ -88,7 +88,7 @@ class CSKick : public Module
 	CSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 		this->AddCommand(CHANSERV, new CommandCSKick("KICK"));
 		this->AddCommand(CHANSERV, new CommandCSKick("K"));

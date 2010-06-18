@@ -94,7 +94,7 @@ class NSRelease : public Module
 	NSRelease(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		this->AddCommand(NICKSERV, new CommandNSRelease());

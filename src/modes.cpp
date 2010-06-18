@@ -487,6 +487,9 @@ StackerInfo *ModeManager::GetInfo(void *Item)
 			return PItem.second;
 	}
 
+	StackerInfo *s = new StackerInfo;
+	StackerObjects.push_back(std::make_pair(Item, s));
+	return s;
 }
 
 /** Build a list of mode strings to send to the IRCd from the mode stacker

@@ -1,6 +1,5 @@
 #!/bin/sh
 #
-# $Id$
 
 # Location of the .sql file with the schema
 DBSQL="tables.sql"

@@ -6,7 +6,6 @@
  * Please read COPYING and README for further details.
  *
  *
- * $Id$
  *
  */
 

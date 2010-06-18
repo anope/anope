@@ -229,7 +229,7 @@ class DBMySQL : public Module
 		Me = this;
 
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(DATABASE);
 
 		if (!LoadConfig())

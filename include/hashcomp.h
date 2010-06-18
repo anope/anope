@@ -7,7 +7,6 @@
  * These classes have been copied from InspIRCd and modified
  * for use in Anope.
  *
- * $Id$
  *
  */
 

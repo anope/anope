@@ -29,7 +29,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
 
     hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);

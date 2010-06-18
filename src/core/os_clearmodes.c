@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("CLEARMODES", do_clearmodes, is_services_oper,

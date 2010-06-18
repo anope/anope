@@ -29,7 +29,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("INVITE", do_invite, NULL, CHAN_HELP_INVITE, -1, -1,

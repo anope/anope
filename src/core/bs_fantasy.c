@@ -28,7 +28,7 @@ int AnopeInit(int argc, char **argv)
     EvtHook *hook;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
     moduleAddEventHook(hook);

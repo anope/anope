@@ -32,7 +32,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1,

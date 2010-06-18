@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("KICK", do_kickcmd, NULL, BOT_HELP_KICK, -1, -1, -1,
                       -1);

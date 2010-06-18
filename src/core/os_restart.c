@@ -34,7 +34,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("RESTART", do_restart, is_services_root,
                       OPER_HELP_RESTART, -1, -1, -1, -1);

@@ -32,7 +32,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("BADWORDS", do_badwords, NULL, BOT_HELP_BADWORDS, -1,

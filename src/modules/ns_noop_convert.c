@@ -19,7 +19,7 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 /* The name of the default database to save info to */
 #define DEFAULT_DB_NAME "autoop.db"

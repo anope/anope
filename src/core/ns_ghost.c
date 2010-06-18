@@ -29,7 +29,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("GHOST", do_ghost, NULL, NICK_HELP_GHOST, -1, -1, -1,

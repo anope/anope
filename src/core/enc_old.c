@@ -427,7 +427,7 @@ int old_decrypt(const char *src, char *dest, int size)
 int AnopeInit(int argc, char **argv) {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(ENCRYPTION);
 
     encmodule_encrypt(old_encrypt);

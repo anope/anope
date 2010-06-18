@@ -35,7 +35,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("RSEND", do_rsend, NULL, MEMO_HELP_RSEND, -1, -1, -1,
                       -1);

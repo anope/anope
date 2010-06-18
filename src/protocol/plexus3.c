@@ -1834,7 +1834,7 @@ AnopeInit (int argc, char **argv)
 {
 
   moduleAddAuthor ("Anope");
-  moduleAddVersion ("$Id$");
+  moduleAddVersion (VERSION_STRING);
   moduleSetType (PROTOCOL);
 
   pmodule_ircd_version ("hybrid-7.2.1+plexus-3.0.0+");

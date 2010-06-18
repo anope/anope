@@ -251,7 +251,7 @@ int sha1_check_password(const char *plaintext, const char *password)
 int AnopeInit(int argc, char **argv) {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(ENCRYPTION);
  
     encmodule_encrypt(sha1_encrypt);

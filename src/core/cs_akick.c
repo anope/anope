@@ -31,7 +31,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("AKICK", do_akick, NULL, CHAN_HELP_AKICK, -1, -1, -1,

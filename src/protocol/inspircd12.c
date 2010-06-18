@@ -2648,7 +2648,7 @@ int AnopeInit(int argc, char **argv)
     int noforksave = nofork;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(PROTOCOL);
 
     if (!UseTS6) {

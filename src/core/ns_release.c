@@ -30,7 +30,7 @@ int myHelpResonse(User * u);
 int AnopeInit(int argc, char **argv)
 {
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("RELEASE", do_release, NULL, -1, -1, -1, -1, -1);

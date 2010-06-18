@@ -1683,7 +1683,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("Solid-IRCd 3.4.*");

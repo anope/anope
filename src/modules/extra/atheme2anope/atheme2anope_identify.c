@@ -30,7 +30,7 @@ int decrypt_password_md5(NickAlias *na, char *pass, char *tmp_pass);
 int AnopeInit(int argc, char **argv)
 {
 	moduleAddAuthor("Anope");
-	moduleAddVersion("$Id$");
+	moduleAddVersion(VERSION_STRING);
 	moduleSetType(SUPPORTED);
 
 	Command *c;

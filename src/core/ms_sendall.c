@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("SENDALL", do_sendall, is_services_admin, -1, -1, -1,
                       MEMO_HELP_SENDALL, MEMO_HELP_SENDALL);

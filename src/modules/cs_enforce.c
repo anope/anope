@@ -16,7 +16,7 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 int my_cs_enforce(User * u);
 void my_cs_help(User * u);

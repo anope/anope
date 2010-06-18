@@ -44,7 +44,7 @@ void WriteAkill(char *line);
 int AnopeInit(int argc, char **argv)
 {
 	moduleAddAuthor("Anope");
-	moduleAddVersion("$Id$");
+	moduleAddVersion(VERSION_STRING);
 	moduleSetType(SUPPORTED);
 
 	athemedb = fopen(ATHEMEDATABASE, "r");

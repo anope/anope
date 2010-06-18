@@ -1860,7 +1860,7 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("Ratbox IRCD 2.0+");

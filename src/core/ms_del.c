@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("DEL", do_del, NULL, MEMO_HELP_DEL, -1, -1, -1, -1);
     moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);

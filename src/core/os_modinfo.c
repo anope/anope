@@ -31,7 +31,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1,
                       OPER_HELP_MODINFO);

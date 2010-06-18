@@ -19,7 +19,7 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 /* Default database name */
 #define DEFAULT_DB_NAME "os_info.db"

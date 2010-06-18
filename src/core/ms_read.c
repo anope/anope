@@ -33,7 +33,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("READ", do_read, NULL, MEMO_HELP_READ, -1, -1, -1,
                       -1);

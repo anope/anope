@@ -31,7 +31,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("MODUNLOAD", do_modunload, is_services_root, -1, -1,

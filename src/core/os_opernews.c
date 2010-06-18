@@ -32,7 +32,7 @@ int AnopeInit(int argc, char **argv)
     char buf[BUFSIZE];
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     /** 

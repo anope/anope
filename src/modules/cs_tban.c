@@ -19,7 +19,7 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 void myHelp(User * u);
 void myFullHelpSyntax(User * u);

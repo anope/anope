@@ -1966,7 +1966,7 @@ int AnopeInit(int argc, char **argv)
     EvtHook *hk;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("Charybdis 1.0/1.1+");

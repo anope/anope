@@ -14,7 +14,7 @@
 #include "module.h"
 
 #define AUTHOR "Viper"
-#define VERSION "$Id$"
+#define VERSION VERSION_STRING
 
 /* Default database name */
 #define DefIgnoreDB "os_ignore.db"

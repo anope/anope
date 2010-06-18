@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("LOGOUT", do_logout, NULL, -1, CHAN_HELP_LOGOUT, -1,

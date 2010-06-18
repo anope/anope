@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion(VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("IGNORE", do_ignoreuser, is_services_admin,
                       OPER_HELP_IGNORE, -1, -1, -1, -1);

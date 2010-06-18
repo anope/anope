@@ -33,7 +33,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
 
     c = createCommand("ACCESS", do_access, NULL, CHAN_HELP_ACCESS, -1, -1,

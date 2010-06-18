@@ -36,7 +36,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id$");
+        (VERSION_STRING);
     moduleSetType(CORE);
     c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL,
                       -1, -1, -1, -1);

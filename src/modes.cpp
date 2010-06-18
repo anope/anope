@@ -487,9 +487,6 @@ StackerInfo *ModeManager::GetInfo(void *Item)
 			return PItem.second;
 	}
 
-	tackerInfo *s = new StackerInfo;
-	StackerObjects.push_back(std::make_pair(Item, s));
-	return s;
 }
 
 /** Build a list of mode strings to send to the IRCd from the mode stacker
@@ -565,7 +562,7 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 	if (!buf.empty())
 		ret.push_back(buf + parambuf);
-	
+
 	return ret;
 }
 

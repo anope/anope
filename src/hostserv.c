@@ -111,12 +111,12 @@ void hostserv(User * u, char *buf)
  * @param creator Who created the vhost
  * @param time When the vhost was craated
  */
-void HostInfo::SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t time)
+void HostInfo::SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t created)
 {
 	Ident = ident;
 	Host = host;
 	Creator = creator;
-	Time = time;
+	Time = created;
 }
 
 /** Remove a users vhost
@@ -197,7 +197,7 @@ void do_on_id(User *u)
 	NickAlias *na = findnick(u->nick);
 	if (!na || !na->hostinfo.HasVhost())
 		return;
-	
+
 	if (!u->vhost || u->vhost != na->hostinfo.GetHost() || (!na->hostinfo.GetIdent().empty() && u->GetVIdent() != na->hostinfo.GetIdent()))
 	{
 		ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());

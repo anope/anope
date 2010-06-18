@@ -456,7 +456,7 @@ class CoreExport HostInfo
 	 * @param creator Who created the vhost
 	 * @param time When the vhost was craated
 	 */
-	void SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t time = time(NULL));
+	void SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t created = time(NULL));
 
 	/** Remove a users vhost
 	 **/

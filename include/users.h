@@ -8,6 +8,15 @@
  *
  */
 
+/* Hash maps used for users. Note UserListByUID will not be used on non-TS6 IRCds, and should never
+ * be assumed to have users
+ */
+typedef unordered_map_namespace::unordered_map<ci::string, User *, hash_compare_ci_string> user_map;
+typedef unordered_map_namespace::unordered_map<std::string, User *, hash_compare_std_string> user_uid_map;
+
+extern CoreExport user_map UserListByNick;
+extern CoreExport user_uid_map UserListByUID;
+
 struct ChannelContainer
 {
 	Channel *chan;
@@ -27,13 +36,11 @@ class CoreExport User : public Extensible
 	std::string ident;
 	std::string uid;
 	bool OnAccess;	/* If the user is on the access list of the nick theyre on */
-	std::bitset<128> modes; /* Bitset of mode names the user has set on them */
+	Flags<UserModeName> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, std::string> Params; /* Map of user modes and the params this user has */
 	NickCore *nc; /* NickCore account the user is currently loggged in as */
 
  public: // XXX: exposing a tiny bit too much
-	User *next, *prev;
-
 	std::string nick;	/* User's current nick */
 
 	char *host;		/* User's real hostname 	*/
@@ -181,9 +188,10 @@ class CoreExport User : public Extensible
 	virtual const bool IsIdentified(bool CheckNick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
+	 * @param CheckSecure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	virtual const bool IsRecognized() const;
+	virtual const bool IsRecognized(bool CheckSecure = false) const;
 
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */
@@ -247,9 +255,9 @@ class CoreExport User : public Extensible
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the mode
-	 * @param modes The modes
+	 * @param umodes The modes
 	 */
-	void SetModes(BotInfo *bi, const char *modes, ...);
+	void SetModes(BotInfo *bi, const char *umodes, ...);
 
 	/** Find the channel container for Channel c that the user is on
 	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel
@@ -258,5 +266,10 @@ class CoreExport User : public Extensible
 	 * @return The channel container, or NULL
 	 */
 	ChannelContainer *FindChannel(Channel *c);
+
+	/** Check if the user is protected from kicks and negative mode changes
+	 * @return true or false
+	 */
+	bool IsProtected() const;
 };
 

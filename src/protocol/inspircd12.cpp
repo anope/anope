@@ -14,7 +14,7 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "pseudo.h"
+#include "modules.h"
 #include "hashcomp.h"
 
 #ifndef _WIN32
@@ -40,7 +40,7 @@ IRCDVar myIrcd[] = {
 	 "+ao",					 /* Channel Umode used by Botserv bots */
 	 1,						 /* SVSNICK */
 	 1,						 /* Vhost  */
-	 0,						 /* Supports SGlines	 */
+	 0,						 /* Supports SNlines	 */
 	 1,						 /* Supports SQlines	 */
 	 1,						 /* Supports SZlines	 */
 	 4,						 /* Number of server args */
@@ -94,11 +94,11 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 {
 	if (has_chghostmod != 1)
 	{
-		ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST not loaded!");
+		ircdproto->SendGlobops(OperServ, "CHGHOST not loaded!");
 		return;
 	}
 
-	BotInfo *bi = findbot(Config.s_OperServ);
+	BotInfo *bi = OperServ;
 	send_cmd(bi->uid, "CHGHOST %s %s", nick, vhost);
 }
 
@@ -123,10 +123,10 @@ void inspircd_cmd_pass(const char *pass)
 
 class InspIRCdProto : public IRCDProto
 {
-	void SendAkillDel(Akill *ak)
+	void SendAkillDel(XLine *x)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi->uid, "GLINE %s@%s", ak->user, ak->host);
+		BotInfo *bi = OperServ;
+		send_cmd(bi->uid, "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
@@ -147,14 +147,14 @@ class InspIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(Akill *ak)
+	void SendAkill(XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = ak->expires - time(NULL);
-		if (timeleft > 172800 || !ak->expires)
+		time_t timeleft = x->Expires - time(NULL);
+		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		BotInfo *bi = findbot(Config.s_OperServ);
-		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", ak->user, ak->host, ak->by, static_cast<long>(time(NULL)), static_cast<long>(timeleft), ak->reason);
+		BotInfo *bi = OperServ;
+		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
@@ -209,7 +209,7 @@ class InspIRCdProto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %s %d %s :%s", server->name, currentpass, server->hops, server->suid, server->desc);
+		send_cmd(NULL, "SERVER %s %s %d %s :%s", server->GetName().c_str(), currentpass, server->GetHops(), server->GetSID().c_str(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */
@@ -219,19 +219,15 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const std::string &user)
+	void SendSQLineDel(XLine *x)
 	{
-		if (user.empty())
-			return;
-		send_cmd(TS6SID, "DELLINE Q %s", user.c_str());
+		send_cmd(TS6SID, "DELLINE Q %s", x->Mask.c_str());
 	}
 
 	/* SQLINE */
-	void SendSQLine(const std::string &mask, const std::string &reason)
+	void SendSQLine(XLine *x)
 	{
-		if (mask.empty() || reason.empty())
-			return;
-		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", mask.c_str(), Config.s_OperServ, static_cast<long>(time(NULL)), reason.c_str());
+		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config.s_OperServ, static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -252,11 +248,11 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
+		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, TS6SID);
 		inspircd_cmd_pass(uplink_server->password);
-		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, TS6SID);
-		SendServer(me_server);
+		SendServer(Me);
 		send_cmd(TS6SID, "BURST");
-		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, Config.ServerName, ircd->name, version_flags, Config.EncModuleList.begin()->c_str(), version_build);
+		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - (%s) -- %s", version_number, Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), version_build);
 	}
 
 	/* CHGIDENT */
@@ -264,11 +260,11 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (has_chgidentmod == 0)
 		{
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT not loaded!");
+			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
 		}
 		else
 		{
-			BotInfo *bi = findbot(Config.s_OperServ);
+			BotInfo *bi = OperServ;
 			send_cmd(bi->uid, "CHGIDENT %s %s", nick, vIdent);
 		}
 	}
@@ -276,33 +272,33 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
+		BotInfo *bi = OperServ;
 		send_cmd(bi->uid, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(Config.NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		BotInfo *bi = findbot(Config.s_OperServ);
+		BotInfo *bi = OperServ;
 		send_cmd(bi->uid, "SVSHOLD %s", nick);
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(SXLine *sx)
+	void SendSZLineDel(XLine *x)
 	{
-		send_cmd(TS6SID, "DELLINE Z %s", sx->mask);
+		send_cmd(TS6SID, "DELLINE Z %s", x->Mask.c_str());
 	}
 
 	/* SZLINE */
-	void SendSZLine(SXLine *sx)
+	void SendSZLine(XLine *x)
 	{
-		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", sx->mask, sx->by, static_cast<long>(time(NULL)), sx->reason);
+		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SVSMODE -r */
 	void SendUnregisteredNick(User *u)
 	{
-		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
@@ -362,7 +358,7 @@ class InspIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		u->SetMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		u->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
 } ircd_proto;
@@ -397,8 +393,8 @@ int anope_event_mode(const char *source, int ac, const char **av)
 		   users modes, we have to kludge this
 		   as it slightly breaks RFC1459
 		 */
-		User *u = find_byuid(source);
-		User *u2 = find_byuid(av[0]);
+		User *u = finduser(source);
+		User *u2 = finduser(av[0]);
 
 		// This can happen with server-origin modes.
 		if (u == NULL)
@@ -554,7 +550,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		}
 		buf.erase(buf.begin());
 
-		User *u = find_byuid(buf);
+		User *u = finduser(buf);
 		if (!u)
 		{
 			Alog(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
@@ -646,7 +642,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
 	time_t topic_time = time(NULL);
-	User *u = find_byuid(source);
+	User *u = finduser(source);
 
 	if (!c)
 	{
@@ -688,12 +684,10 @@ int anope_event_squit(const char *source, int ac, const char **av)
 int anope_event_rsquit(const char *source, int ac, const char **av)
 {
 	/* On InspIRCd we must send a SQUIT when we recieve RSQUIT for a server we have juped */
-	Server *s = findserver(servlist, av[0]);
-	if (!s)
-		s = findserver_uid(servlist, av[0]);
+	Server *s = Server::Find(av[0]);
 	if (s && s->HasFlag(SERVER_JUPED))
 	{
-		send_cmd(TS6SID, "SQUIT %s :%s", s->suid, ac > 1 ? av[1] : "");
+		send_cmd(TS6SID, "SQUIT %s :%s", s->GetSID().c_str(), ac > 1 ? av[1] : "");
 	}
 
 	do_squit(source, ac, av);
@@ -710,7 +704,7 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
 int anope_event_kill(const char *source, int ac, const char **av)
 {
-	User *u = find_byuid(av[0]);
+	User *u = finduser(av[0]);
 	BotInfo *bi = findbot(av[0]);
 	m_kill(u ? u->nick.c_str() : (bi ? bi->nick : av[0]), av[1]);
 	return MOD_CONT;
@@ -837,7 +831,7 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	User *user;
 	NickAlias *na;
 	struct in_addr addy;
-	Server *s = findserver_uid(servlist, source);
+	Server *s = Server::Find(source ? source : "");
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 	int ts = strtoul(av[1], NULL, 10);
 
@@ -846,11 +840,11 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	user = prev_u_intro;
 	prev_u_intro = NULL;
 	if (user) na = findnick(user->nick);
-	if (user && user->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != user->Account()))
+	if (user && !user->server->IsSynced() && (!na || na->nc != user->Account()))
 	{
 		validate_user(user);
 		if (user->HasMode(UMODE_REGISTERED))
-			user->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+			user->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 	user = NULL;
 
@@ -858,14 +852,14 @@ int anope_event_uid(const char *source, int ac, const char **av)
 	user = do_nick("", av[2],   /* nick */
 			av[5],   /* username */
 			av[3],   /* realhost */
-			s->name,  /* server */
+			s->GetName().c_str(),  /* server */
 			av[ac - 1],   /* realname */
 			ts, htonl(*ad), av[4], av[0]);
 	if (user)
 	{
 		UserSetInternalModes(user, 1, &av[8]);
 		user->SetCloakedHost(av[4]);
-		if (user->server->sync == SSYNC_IN_PROGRESS)
+		if (!user->server->IsSynced())
 		{
 			prev_u_intro = user;
 		}
@@ -903,24 +897,17 @@ int anope_event_chghost(const char *source, int ac, const char **av)
  */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-	if (!stricmp(av[2], "0"))
-	{
-		uplink = sstrdup(av[0]);
-	}
-	do_server(source, av[0], av[2], av[4], av[3]);
+	do_server(source, av[0], atoi(av[2]), av[4], av[3]);
 	return MOD_CONT;
 }
 
 
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
-	User *u = find_byuid(source);
-	BotInfo *bi = findbot(av[0]);
-
-	if (!u)
+	if (!finduser(source))
 		return MOD_CONT; // likely a message from a server, which can happen.
 
-	m_privmsg(u->nick.c_str(), bi ? bi->nick: av[0], av[1]);
+	m_privmsg(source, av[0], av[1]);
 	return MOD_CONT;
 }
 
@@ -944,7 +931,7 @@ int anope_event_metadata(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	else if (!strcmp(av[1], "accountname"))
 	{
-		if ((u = find_byuid(av[0])))
+		if ((u = finduser(av[0])))
 		{
 			/* Identify the user for this account - Adam */
 			u->AutoID(av[2]);
@@ -1026,14 +1013,14 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							continue;
 						/* InspIRCd sends q and a here if they have no prefixes */
 						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '@'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '@'));
 							continue;
 						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT	, 'a', '@'));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT	, "CMODE_PROTECT", 'a', '@'));
 							continue;
 						// XXX list modes needs a bit of a rewrite, we need to be able to support +g here
 						default:
-							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
 					}
 				}
 
@@ -1046,7 +1033,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode(new ChannelModeKey('k'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
 					}
 				}
 
@@ -1056,25 +1043,25 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'F':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NICKFLOOD, 'F', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NICKFLOOD, "CMODE_NICKFLOOD", 'F', true));
 							continue;
 						case 'J':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NOREJOIN, 'J', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NOREJOIN, "CMODE_NOREJOIN", 'J', true));
 							continue;
 						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, "CMODE_REDIRECT", 'L', true));
 							continue;
 						case 'f':
 							ModeManager::AddChannelMode(new ChannelModeFlood('f', true));
 							continue;
 						case 'j':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, 'j', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, "CMODE_JOINFLOOD", 'j', true));
 							continue;
 						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l', true));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
 					}
 				}
 
@@ -1084,79 +1071,79 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modebuf[t])
 					{
 						case 'A':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, 'A'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, "CMODE_ALLINVITE", 'A'));
 							continue;
 						case 'B':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCAPS, 'B'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCAPS, "CMODE_BLOCKCAPS", 'B'));
 							continue;
 						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, "CMODE_NOCTCP", 'C'));
 							continue;
 						case 'D':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_DELAYEDJOIN, 'D'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_DELAYEDJOIN, "CMODE_DELAYEDJOIN", 'D'));
 							continue;
 						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, "CMODE_FILTER", 'G'));
 							continue;
 						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, 'K'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, "CMODE_NOKNOCK", 'K'));
 							continue;
 						case 'M':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
 							continue;
 						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, 'N'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, "CMODE_NONICK", 'N'));
 							continue;
 						case 'O':
 							ModeManager::AddChannelMode(new ChannelModeOper('O'));
 							continue;
 						case 'P':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, 'P'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'P'));
 							continue;
 						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, 'Q'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, "CMODE_NOKICK", 'Q'));
 							continue;
 						case 'R':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
 							continue;
 						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, 'S'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, "CMODE_STRIPCOLOR", 'S'));
 							continue;
 						case 'T':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'T'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, "CMODE_NONOTICE", 'T'));
 							continue;
 						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
 							continue;
 						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
 							continue;
 						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
 							continue;
 						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
 							continue;
 						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
 							continue;
 						case 'r':
 							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
 							continue;
 						case 's':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
 							continue;
 						case 't':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
 							continue;
 						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, 'u'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, "CMODE_AUDITORIUM", 'u'));
 							continue;
 						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
 					}
 				}
 			}
@@ -1173,64 +1160,64 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						switch (modebuf[t])
 						{
 							case 'h':
-								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
+								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, "UMODE_HELPOP", 'h'));
 								continue;
 							case 's':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
+								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, "UMODE_STRIPCOLOR", 'S'));
 								continue;
 							case 'B':
-								ModeManager::AddUserMode(new UserMode(UMODE_BOT, 'B'));
+								ModeManager::AddUserMode(new UserMode(UMODE_BOT, "UMODE_BOT", 'B'));
 								continue;
 							case 'G':
-								ModeManager::AddUserMode(new UserMode(UMODE_FILTER, 'G'));
+								ModeManager::AddUserMode(new UserMode(UMODE_FILTER, "UMODE_FILTER", 'G'));
 								continue;
 							case 'H':
-								ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, 'H'));
+								ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, "UMODE_HIDEOPER", 'H'));
 								continue;
 							case 'I':
-								ModeManager::AddUserMode(new UserMode(UMODE_PRIV, 'I'));
+								ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'I'));
 								continue;
 							case 'Q':
-								ModeManager::AddUserMode(new UserMode(UMODE_HIDDEN, 'Q'));
+								ModeManager::AddUserMode(new UserMode(UMODE_HIDDEN, "UMODE_HIDDEN", 'Q'));
 								continue;
 							case 'R':
-								ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
+								ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
 								continue;
 							case 'S':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
+								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, "UMODE_STRIPCOLOR", 'S'));
 								continue;
 							case 'W':
-								ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, 'W'));
+								ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, "UMODE_WHOIS", 'W'));
 								continue;
 							case 'c':
-								ModeManager::AddUserMode(new UserMode(UMODE_COMMONCHANS, 'c'));
+								ModeManager::AddUserMode(new UserMode(UMODE_COMMONCHANS, "UMODE_COMMONCHANS", 'c'));
 								continue;
 							case 'g':
-								ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
+								ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
 								continue;
 							case 'i':
-								ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
+								ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
 								continue;
 							case 'k':
-								ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'k'));
+								ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, "UMODE_PROTECTED", 'k'));
 								continue;
 							case 'o':
-								ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
+								ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
 								continue;
 							case 'r':
-								ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
+								ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
 								continue;
 							case 'w':
-								ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
+								ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
 								continue;
 							case 'x':
-								ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
+								ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
 								continue;
 							case 'd':
-								ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
+								ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'd'));
 								continue;
 							default:
-								ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
+								ModeManager::AddUserMode(new UserMode(UMODE_END, "", modebuf[t]));
 						}
 					}
 				}
@@ -1245,19 +1232,19 @@ int anope_event_capab(const char *source, int ac, const char **av)
 					switch (modes[t])
 					{
 						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', chars[t]));
 							continue;
 						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', chars[t]));
 							continue;
 						case 'o':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', chars[t]));
 							continue;
 						case 'h':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', chars[t]));
 							continue;
 						case 'v':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', chars[t]));
+							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', chars[t]));
 							continue;
 					}
 				}
@@ -1288,13 +1275,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "SVSHOLD missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chghostmod) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGHOST missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
 		}
 		if (!has_chgidentmod) {
-			ircdproto->SendGlobops(findbot(Config.s_OperServ), "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
 		}
 		ircd->svshold = has_svsholdmod;
 	}
@@ -1308,7 +1295,8 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 {
 	NickAlias *na;
 	User *u = prev_u_intro;
-	Server *s = findserver_uid(servlist, source);
+	Server *s = Server::Find(source ? source : "");
+
 	if (!s)
 	{
 		throw new CoreException("Got ENDBURST without a source");
@@ -1318,56 +1306,55 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	 * If not, validate the user. ~ Viper*/
 	prev_u_intro = NULL;
 	if (u) na = findnick(u->nick);
-	if (u && u->server->sync == SSYNC_IN_PROGRESS && (!na || na->nc != u->Account()))
+	if (u && !u->server->IsSynced() && (!na || na->nc != u->Account()))
 	{
 		validate_user(u);
 		if (u->HasMode(UMODE_REGISTERED))
-			u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+			u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 
-	Alog() << "Processed ENDBURST for " << s->name;
+	Alog() << "Processed ENDBURST for " << s->GetName();
 
-	finish_sync(s, 1);
+	s->Sync(true);
 	return MOD_CONT;
 }
 
-void moduleAddIRCDMsgs() {
-	Message *m;
-
-	m = createMessage("ENDBURST",  anope_event_endburst); addCoreMessage(IRCD, m);
-	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
-	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
-	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);
-	m = createMessage("KICK",	  anope_event_kick); addCoreMessage(IRCD,m);
-	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
-	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
-	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
-	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);
-	m = createMessage("UID",	  anope_event_uid); addCoreMessage(IRCD,m);
-	m = createMessage("CAPAB",	 anope_event_capab); addCoreMessage(IRCD,m);
-	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
-	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
-	m = createMessage("TIME",	  anope_event_time); addCoreMessage(IRCD,m);
-	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
-	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);
-	m = createMessage("SQUIT",	 anope_event_squit); addCoreMessage(IRCD,m);
-	m = createMessage("RSQUIT",	anope_event_rsquit); addCoreMessage(IRCD,m);
-	m = createMessage("TOPIC",	 anope_event_topic); addCoreMessage(IRCD,m);
-	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
-	m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
-	m = createMessage("FHOST",	 anope_event_chghost); addCoreMessage(IRCD,m);
-	m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
-	m = createMessage("FNAME",	 anope_event_chgname); addCoreMessage(IRCD,m);
-	m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
-	m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
-	m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
-	m = createMessage("FJOIN",	 anope_event_fjoin); addCoreMessage(IRCD,m);
-	m = createMessage("FMODE",	 anope_event_fmode); addCoreMessage(IRCD,m);
-	m = createMessage("FTOPIC",	anope_event_ftopic); addCoreMessage(IRCD,m);
-	m = createMessage("OPERTYPE",  anope_event_opertype); addCoreMessage(IRCD,m);
-	m = createMessage("IDLE",	  anope_event_idle); addCoreMessage(IRCD,m);
-	m = createMessage("METADATA", anope_event_metadata); addCoreMessage(IRCD,m);
+void moduleAddIRCDMsgs()
+{
+	Anope::AddMessage("ENDBURST", anope_event_endburst);
+	Anope::AddMessage("436", anope_event_436);
+	Anope::AddMessage("AWAY", anope_event_away);
+	Anope::AddMessage("JOIN", anope_event_join);
+	Anope::AddMessage("KICK", anope_event_kick);
+	Anope::AddMessage("KILL", anope_event_kill);
+	Anope::AddMessage("MODE", anope_event_mode);
+	Anope::AddMessage("MOTD", anope_event_motd);
+	Anope::AddMessage("NICK", anope_event_nick);
+	Anope::AddMessage("UID", anope_event_uid);
+	Anope::AddMessage("CAPAB", anope_event_capab);
+	Anope::AddMessage("PART", anope_event_part);
+	Anope::AddMessage("PING", anope_event_ping);
+	Anope::AddMessage("TIME", anope_event_time);
+	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
+	Anope::AddMessage("QUIT", anope_event_quit);
+	Anope::AddMessage("SERVER", anope_event_server);
+	Anope::AddMessage("SQUIT", anope_event_squit);
+	Anope::AddMessage("RSQUIT", anope_event_rsquit);
+	Anope::AddMessage("TOPIC", anope_event_topic);
+	Anope::AddMessage("WHOIS", anope_event_whois);
+	Anope::AddMessage("SVSMODE", anope_event_mode);
+	Anope::AddMessage("FHOST", anope_event_chghost);
+	Anope::AddMessage("CHGIDENT", anope_event_chgident);
+	Anope::AddMessage("FNAME", anope_event_chgname);
+	Anope::AddMessage("SETHOST", anope_event_sethost);
+	Anope::AddMessage("SETIDENT", anope_event_setident);
+	Anope::AddMessage("SETNAME", anope_event_setname);
+	Anope::AddMessage("FJOIN", anope_event_fjoin);
+	Anope::AddMessage("FMODE", anope_event_fmode);
+	Anope::AddMessage("FTOPIC", anope_event_ftopic);
+	Anope::AddMessage("OPERTYPE", anope_event_opertype);
+	Anope::AddMessage("IDLE", anope_event_idle);
+	Anope::AddMessage("METADATA", anope_event_metadata);
 }
 
 bool ChannelModeFlood::IsValid(const std::string &value)
@@ -1413,7 +1400,7 @@ class ProtoInspIRCd : public Module
 		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
 		 * this will cancel out this -r, resulting in no mode changes.
 		 */
-		u->RemoveMode(findbot(Config.s_NickServ), UMODE_REGISTERED);
+		u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 };
 

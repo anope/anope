@@ -375,6 +375,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	%s grubuna dahil edildiniz.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY þifreniz
@@ -812,9 +820,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	Grupta %d nick var.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (expires in %s)
+	   %s (expires in %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -864,18 +872,15 @@ NICK_SENDPASS_UNAVAILABLE
 	SENDPASS komutu devre dýþý çünkü þifreleme(encryption) devrede.
 NICK_SENDPASS_SUBJECT
 	Nick þifresi (%s)
-NICK_SENDPASS_HEAD
-	Selam,
-NICK_SENDPASS_LINE_1
-	%s nickinizin þifresinin e-mail adresinize yollanmasýný istemiþsiniz.
-NICK_SENDPASS_LINE_2
-	Nickinizin Þifresi %s Güvenlik nedenlerinden dolayý, bu maili aldýktan sonra deðiþtirseniz iyi olur.
-NICK_SENDPASS_LINE_3
-	Eðer bu mailin neden size gönderildiðini bilmiyorsanýz, maili ciddiye almayýn.
-NICK_SENDPASS_LINE_4
-	LÜTFEN BU MAÝLE CEVAP VERMEYÝN!
-NICK_SENDPASS_LINE_5
-	%s yönetimi.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	%s nickinin þifresi gönderildi.
 
@@ -889,9 +894,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -942,17 +946,14 @@ NICK_ENTER_REG_CODE
 	A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration
 NICK_REG_MAIL_SUBJECT
 	Nickname Registration (%s)
-NICK_REG_MAIL_HEAD
+NICK_REG_MAIL
 	Hi,
-NICK_REG_MAIL_LINE_1
-	You have requested to register the following nickname %s.
-NICK_REG_MAIL_LINE_2
+	
+	You have requested to register the nickname %s on %s.
 	Please type " %R%s confirm %s " to complete registration.
-NICK_REG_MAIL_LINE_3
-	If you don't know why this mail is sent to you, please ignore it silently.
-NICK_REG_MAIL_LINE_4
-	PLEASE DON'T ANSWER TO THIS MAIL!
-NICK_REG_MAIL_LINE_5
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
 	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Passcode for %s is %s.
@@ -1053,6 +1054,8 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1101,6 +1104,34 @@ CHAN_DROP_DISABLED
 	Kanal kaydýnýn silinmesi(DROP) geçici olarak devre dýþýdýr.
 CHAN_DROPPED
 	%s kanalýnýn kaydý silinmiþtir (dropped).
+
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
 
 # SET responses
 CHAN_SET_SYNTAX
@@ -2028,12 +2059,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Standard responses
 MEMO_MAIL_SUBJECT
 	New memo
-MEMO_MAIL_TEXT1
+NICK_MAIL_TEXT
 	Hi %s
-MEMO_MAIL_TEXT2
+	
 	You've just received a new memo from %s. This is memo number %d.
-MEMO_MAIL_TEXT3
-	Memo Text:
+	
+	Memo text:
+	
+	%s
 
 ###########################################################################
 #
@@ -2566,22 +2599,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Varsayýlan AKILL zaman aþýmý: 1 dakika
 OPER_STATS_AKILL_EXPIRE_NONE
 	Varsayýlan AKILL zaman aþýmý: zaman aþýmý yok
-OPER_STATS_SGLINE_COUNT
-	Þu anki SGLINE sayýsý: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Varsayýlan SGLINE zaman aþýmý süresi: %d gün
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Varsayýlan SGLINE zaman aþýmý süresi: 1 gün
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Varsayýlan SGLINE zaman aþýmý süresi: %d saat
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Varsayýlan SGLINE zaman aþýmý süresi: 1 saat
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Varsayýlan SGLINE zaman aþýmý süresi: %d dakika
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Varsayýlan SGLINE zaman aþýmý süresi: 1 dakika
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Varsayýlan SGLINE zaman aþýmý süresi: Zaman aþýmý yok
+OPER_STATS_SNLINE_COUNT
+	Þu anki SNLINE sayýsý: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Varsayýlan SNLINE zaman aþýmý süresi: %d gün
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Varsayýlan SNLINE zaman aþýmý süresi: 1 gün
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Varsayýlan SNLINE zaman aþýmý süresi: %d saat
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Varsayýlan SNLINE zaman aþýmý süresi: 1 saat
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Varsayýlan SNLINE zaman aþýmý süresi: %d dakika
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Varsayýlan SNLINE zaman aþýmý süresi: 1 dakika
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Varsayýlan SNLINE zaman aþýmý süresi: Zaman aþýmý yok
 OPER_STATS_SQLINE_COUNT
 	Su anki SQLINE sayisi: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2709,49 +2742,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	AKILL listesi temizlendi.
 
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+zamanaþýmý] {mask | kayýt-sýrasý} [sebep]]
-OPER_SGLINE_UNSUPPORTED
-	SGLINE bu networkte mevcut deðil.
-OPER_SGLINE_EXISTS
-	%s zaten SGLINE listesinde.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+zamanaþýmý] {mask | kayýt-sýrasý} [sebep]]
+OPER_SNLINE_UNSUPPORTED
+	SNLINE bu networkte mevcut deðil.
+OPER_SNLINE_EXISTS
+	%s zaten SNLINE listesinde.
+OPER_SNLINE_ALREADY_COVERED
 	%s zaten %s tarafýndan deðiþtirildi.
-OPER_SGLINE_REACHED_LIMIT
-	Sadece %d kiþi SGLINE listesinde olabilir.
-OPER_SGLINE_ADDED
-	%s SGLINE listesinde eklendi.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Sadece %d kiþi SNLINE listesinde olabilir.
+OPER_SNLINE_ADDED
+	%s SNLINE listesinde eklendi.
+OPER_SNLINE_CHANGED
 	%s nickinin zaman aþýmý süresi deðiþtirildi.
-OPER_SGLINE_NOT_FOUND
-	%s SGLINE listesinde bulunamadý.
-OPER_SGLINE_NO_MATCH
-	SGLINE listesinde uyuþan kayýt bulunamadý.
-OPER_SGLINE_DELETED
-	%s SGLINE listesinden silindi.
-OPER_SGLINE_DELETED_ONE
-	SGLINE listesinden 1 kayýt silindi.
-OPER_SGLINE_DELETED_SEVERAL
-	SGLINE listesinden %d kayýt silindi.
-OPER_SGLINE_LIST_EMPTY
-	SGLINE listesi boþ.
-OPER_SGLINE_LIST_HEADER
-	Þu anki SGLINE listesi:
+OPER_SNLINE_NOT_FOUND
+	%s SNLINE listesinde bulunamadý.
+OPER_SNLINE_NO_MATCH
+	SNLINE listesinde uyuþan kayýt bulunamadý.
+OPER_SNLINE_DELETED
+	%s SNLINE listesinden silindi.
+OPER_SNLINE_DELETED_ONE
+	SNLINE listesinden 1 kayýt silindi.
+OPER_SNLINE_DELETED_SEVERAL
+	SNLINE listesinden %d kayýt silindi.
+OPER_SNLINE_LIST_EMPTY
+	SNLINE listesi boþ.
+OPER_SNLINE_LIST_HEADER
+	Þu anki SNLINE listesi:
 	  No   Mask                              Sebep
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Þu anki SGLINE listesi:
+OPER_SNLINE_VIEW_HEADER
+	Þu anki SNLINE listesi:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (by %s on %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	SGLINE listesi temizlendi.
+OPER_SNLINE_CLEAR
+	SNLINE listesi temizlendi.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -3404,6 +3437,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Nickinizi kaydeder
 NICK_HELP_CMD_GROUP
 	    GROUP      Bir gruba dahil eder
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Þifrenizle nickinizi tanýtýr
 NICK_HELP_CMD_ACCESS
@@ -3536,6 +3571,15 @@ NICK_HELP_GROUP
 	
 	Not: bir gruptaki tüm nickler bir þifreye sahip olurlar.
 
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Kullanýmý: IDENTIFY þifreniz
 	
@@ -3598,26 +3642,39 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Mevcut access listesini görüntüler.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Kullanýmý: SET özellik parametre
 	
 	Çeþitli nick özelliklerini ayarlar.  özellik þunlardan biri 
 	olabilir:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Grubunuzun servislerde nasýl görüneceðini ayarlar
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Nickinize þifre belirtir
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Servislerin size hitap edeceði 
 	                  dili belirler
+NICK_HELP_CMD_SET_URL
 	    URL        Nickinizle bir URL yi iliþkilendirir
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Nickinizle bir email adresini iliþkilendirir
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Nickinizle bir ICQ numarasýný iliþikilendirir
+NICK_HELP_CMD_SET_GREET
 	    GREET      Nickiniz için bir karþýlama mesajý belirler
+NICK_HELP_CMD_SET_KILL
 	    KILL       Korumayý açar kapatýr
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     Nick güvenliðini açar kapatýr
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Nickinizin %R%S LIST yazýldýðýnda görünmesini
 	                  engeller
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Nickinizle ilgili bazý bilgileri saklar
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Should services op you automatically.    
+NICK_HELP_SET_TAIL
 	
 	Bu komutu kullanabilmek için önce, þifrenizle 
 	kendinizi tanýtmanýz gerekir (Daha fazla bilgi için 
@@ -3734,26 +3791,40 @@ NICK_HELP_SET_AUTOOP
 	Sets whether you will be opped automatically. Set to ON to 
 	allow ChanServ to op you automatically when entering channels.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntax: SASET nickname option parameters.
 	
 	Sets various nickname options.  option can be one of:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
+NICK_HELP_CMD_SASET_URL
 	    URL        Associate a URL with the nickname
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Associate an ICQ number with the nickname
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Turn protection on or off
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Turn nickname security on or off
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Prevent the nickname from appearing in a
 	                   %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Hide certain pieces of nickname information
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Change the communication method of Services
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Prevent the nickname from expiring
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Set the language Services will use when
 	               sending messages to nickname
+NICK_HELP_SASET_TAIL
 	
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
@@ -4072,8 +4143,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Servis adminleri ALL parametresini herhangi bir nick için 
-	kullanabilirler.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Kullanýmý: LIST model [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4190,6 +4261,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Kanalý kaydeder
 CHAN_HELP_CMD_SET
 	    SET        Kanal özelliklerini ve bilgisini ayarlar
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4290,7 +4363,15 @@ CHAN_HELP_DROP
 	
 	Kanalýn kaydýný siler.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Kullanýmý: SET kanaladý özellik parametre
 	
 	Kanal founderýnýn çeþitli kanal özelliklerini ve diðer bilgileri
@@ -4298,40 +4379,63 @@ CHAN_HELP_SET
 	
 	Mevcut özellikler:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Kanal founderýný belirler
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Kanal successorýný belirler
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Kanal açýklamasýný belirler
+CHAN_HELP_CMD_SET_URL
 	    URL           Kanala bir URL adresini iliþkilendirir
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Kanala bir E-mail adresini iliþkilendirir
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Kanala giren kullanýcýlara gönderilecek mesajý
 	                   belirler
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Servislerin kanalda ne tip ban koyacaðýný belirler
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Kanalda kimse olmasa bile topiði hatýrlar
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic sadece SET TOPIC komutuyla deðiþtirilir
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Kanal modlarýný kitler yada açar
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       LIST komutuyla kanal listelenmez
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Kanala izinli giriþ gerektirir
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        %S güvenlik özelliklerini aktifleþtirir
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Kanal opu durumunun sýký kontrolünü saðlar
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Kanal founderý durumunun sýký kontrolünü saðlar
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      KICK komutuyla yapýlan atmalarý iþaretler
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      OP/DEOP komutlarý kullanýldýðýnda mesaj yollar
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         kritik komutlarin kullanilmasini engeller
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Ayricalik sistemleri arasinda geçisi saglar
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
-
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
+	
 	
 	Belirli bir özellik hakkýnda daha fazla bilgi için
 	%R%S HELP özellik yazýn.
 
 CHAN_HELP_SET_FOUNDER
-	Kullanýmý: SET kanaladý FOUNDER nick
+	Kullanýmý: %s kanaladý FOUNDER nick
 	
 	Kanal founderýný deðiþtirir.  Yeni nickin kayýtlý 
 	olmasý gereklidir.
 
 CHAN_HELP_SET_SUCCESSOR
-	Kullanýmý: SET kanaladý SUCCESSOR nick
+	Kullanýmý: %s kanaladý SUCCESSOR nick
 	
 	Kanal successorýný belirler, deðiþtirir. Eðer bir kanalýn
 	founderýnýn nicki zaman aþýmýna uðrayýp kaydý silinirse
@@ -4342,13 +4446,13 @@ CHAN_HELP_SET_SUCCESSOR
 	Komutta belirtilen nickin kayýtlý olmasý gereklidir.
 
 CHAN_HELP_SET_DESC
-	Kullanýmý: SET kanaladý DESC açýklama
+	Kullanýmý: %s kanaladý DESC açýklama
 	
 	LIST ve INFO komutlarý kullanýldýðýnda gözükecek kanal 
 	açýklamasýný belirler.
 
 CHAN_HELP_SET_URL
-	Kullanýmý: SET kanaladý URL [urladresi]
+	Kullanýmý: %s kanaladý URL [urladresi]
 	
 	Belirtilen URL adresini kanal ile iliþkilendirir. Bu URL 
 	adresi birisi kanal hakkýnda bilgi almak için INFO 
@@ -4357,7 +4461,7 @@ CHAN_HELP_SET_URL
 	silinir.
 
 CHAN_HELP_SET_EMAIL
-	Kullanýmý: SET kanaladý EMAIL [emailadresi]
+	Kullanýmý: %s kanaladý EMAIL [emailadresi]
 	
 	Belirtilen E-mail adresini kanal ile iliþkilendirir.Bu E-mail 
 	adresi birisi kanal hakkýnda bilgi almak için INFO komutunu 
@@ -4366,14 +4470,14 @@ CHAN_HELP_SET_EMAIL
 	silinir.
 
 CHAN_HELP_SET_ENTRYMSG
-	Kullanýmý: SET kanaladý ENTRYMSG [mesaj]
+	Kullanýmý: %s kanaladý ENTRYMSG [mesaj]
 	
 	Kanala giren kullanýcýlara notice þeklinde gönderilecek
 	mesajý belirler.  Eðer mesaj parametresi belirtilmezse
 	giren kullanýcýya bir mesaj gönderilmez.
 
 CHAN_HELP_SET_BANTYPE
-	Kullanýmý: SET kanaladý BANTYPE bantipi
+	Kullanýmý: %s kanaladý BANTYPE bantipi
 	
 	Servislerin birini kanaldan banlarken kullanacaðý ban 
 	tipini belirler.
@@ -4386,7 +4490,7 @@ CHAN_HELP_SET_BANTYPE
 	3: *!*user@*.domain formatýnda ban için
 
 CHAN_HELP_SET_KEEPTOPIC
-	Kullanýmý: SET kanaladý KEEPTOPIC {ON | OFF}
+	Kullanýmý: %s kanaladý KEEPTOPIC {ON | OFF}
 	
 	Bir kanal için topic hatýrlamayý aktifleþtirir yada kapatýr.
 	topic hatýrlama aktifse kanal kapansa bile kanal topic i
@@ -4394,14 +4498,14 @@ CHAN_HELP_SET_KEEPTOPIC
 	topic geçerli olur.
 
 CHAN_HELP_SET_TOPICLOCK
-	Kullanýmý: SET kanaladý TOPICLOCK {ON | OFF}
+	Kullanýmý: %s kanaladý TOPICLOCK {ON | OFF}
 	
 	Bir kanal için topic kilidini aktifleþtirir yada kapatýr.
 	topic kilidi aktifse, %S SET TOPIC komutunun
 	dýþýnda kanal topic inin deðiþtirilmesine izin vermez.
 
 CHAN_HELP_SET_MLOCK
-	Kullanýmý: SET kanaladý MLOCK modlar
+	Kullanýmý: %s kanaladý MLOCK modlar
 	
 	Bir kanal için mod-kilidini aktifleþtirir. %S belirlediðiniz
 	modlarýn her zaman açýk yada kapalý olacaðýný ayarlar.
@@ -4431,7 +4535,7 @@ CHAN_HELP_SET_MLOCK
 	        kapanacak þekilde serbest býrakýr.
 
 CHAN_HELP_SET_PEACE
-	Kullanimi: SET kanaladi PEACE {ON | OFF}
+	Kullanimi: %s kanaladi PEACE {ON | OFF}
 	
 	Bir kanalin peace özelligini açar veya kapatir.
 	peace özelligi ayarlandiginda, hic kimse seviyesi kendinden
@@ -4439,20 +4543,20 @@ CHAN_HELP_SET_PEACE
 	seviyesini degistiremez.
 
 CHAN_HELP_SET_PRIVATE
-	Kullanýmý: SET kanaladý PRIVATE {ON | OFF}
+	Kullanýmý: %s kanaladý PRIVATE {ON | OFF}
 	
 	Bir kanal için private özelliðini açar kapatýr. private özelliði
 	aktifse, %R%S LIST komutuyla kanal listelenemez.
 
 CHAN_HELP_SET_RESTRICTED
-	Kullanýmý: SET kanaladý RESTRICTED {ON | OFF}
+	Kullanýmý: %s kanaladý RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Kullanýmý: SET kanaladý SECURE {ON | OFF}
+	Kullanýmý: %s kanaladý SECURE {ON | OFF}
 	
 	Bir kanal için %S'ün güvenlik özelliklerini açar veya 
 	kapatýr. SECURE özelliði aktifse, sadece nicki kayýtlý
@@ -4461,14 +4565,14 @@ CHAN_HELP_SET_SECURE
 	alabilirler.(mesela op olabilirler)
 
 CHAN_HELP_SET_SECUREOPS
-	Kullanýmý: SET kanaladý SECUREOPS {ON | OFF}
+	Kullanýmý: %s kanaladý SECUREOPS {ON | OFF}
 	
 	Bir kanal için güvenli op özelliðini açar veya kapatýr.
 	güvenli op özelliði aktifse, access listesinde olmayan
 	kullanýcýlar kanalda op olamazlar.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Kullanýmý: SET kanaladý SECUREFOUNDER {ON | OFF}
+	Kullanýmý: %s kanaladý SECUREFOUNDER {ON | OFF}
 	
 	Bir kanal için güvenli founder özelliðini açar yada kapatýr.
 	güvenli founder özelliði aktifse, sadece gerçek founder 
@@ -4478,7 +4582,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	ama nicki founderýn nicki olmayanlar bu komutlarý kullanamazlar.
 
 CHAN_HELP_SET_SIGNKICK
-	Kullanýmý: SET kanaladý SIGNKICK {ON | LEVEL | OFF}
+	Kullanýmý: %s kanaladý SIGNKICK {ON | LEVEL | OFF}
 	
 	Bir kanal için iþaretli atmayý açar yada kapatýr.
 	SIGNKICK ayarlandýðý zaman, %S KICK
@@ -4491,7 +4595,7 @@ CHAN_HELP_SET_SIGNKICK
 	bilgi için %R%S HELP LEVELS yazýn.
 
 CHAN_HELP_SET_XOP
-	Kullanimi: SET kanaladi XOP {ON | OFF}
+	Kullanimi: %s kanaladi XOP {ON | OFF}
 	
 	Bir kanalin xOP sistemini açar veya kapatir. XOP
 	ayarlandigi zaman, AOP/SOP/VOP komutlariyla
@@ -4514,7 +4618,7 @@ CHAN_HELP_SET_XOP
 	bir problem çikarmaz.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4537,7 +4641,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Kullanýmý: SET kanaladý OPNOTICE {ON | OFF}
+	Kullanýmý: %s kanaladý OPNOTICE {ON | OFF}
 	
 	Bir kanal için op-notu özelliðini açar yada kapatýr.
 	op-notu özelliði aktifse, %S kanala bir kullanýcý 
@@ -5057,13 +5161,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Belirtilen kanalýn kaydýný siler. Sadece Servis adminleri
 	kanalý tanýtmadan kaydýný silebilirler.
 
-CHAN_SERVADMIN_HELP_SET
-	
-	Servis adminleri NOEXPIRE özelliðini ayarlayarak istedikleri
-	kanalýn zaman aþýmýna uðramasýný engelleyebilirler.
-	Ek olarak, Servis adminleri þifreyle kanalý tanýtmaya gerek 
-	olmadan bir kanalýn tüm özelliklerini ayarlayabilirler.
-
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Kullanýmý: SET kanaladý NOEXPIRE {ON | OFF}
 	
@@ -5398,8 +5495,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Ayni ip'deki tum kullanicilari kill'ler.
 OPER_HELP_CMD_AKILL
 	    AKILL       AKILL listesini düzenler
-OPER_HELP_CMD_SGLINE
-	    SGLINE      SGLINE listesini düzenler
+OPER_HELP_CMD_SNLINE
+	    SNLINE      SNLINE listesini düzenler
 OPER_HELP_CMD_SQLINE
 	    SQLINE      SQLINE listesini düzenler
 OPER_HELP_CMD_SZLINE
@@ -5601,50 +5698,50 @@ OPER_HELP_AKILL
 	
 	Servis operatörlerinin Kullanýmýyla sýnýrlýdýr.
 
-OPER_HELP_SGLINE
-	Kullanýmý: SGLINE ADD [+zamanaþýmý] mask:sebep
-	         SGLINE DEL {mask | kayýt-no | liste}
-	           SGLINE LIST [mask | liste]
-	           SGLINE VIEW [mask | liste]
-	           SGLINE CLEAR
+OPER_HELP_SNLINE
+	Kullanýmý: SNLINE ADD [+zamanaþýmý] mask:sebep
+	         SNLINE DEL {mask | kayýt-no | liste}
+	           SNLINE LIST [mask | liste]
+	           SNLINE VIEW [mask | liste]
+	           SNLINE CLEAR
 	
-	Servis operatörlerinin SGLINE listesi oluþturmalarýný saðlar.
-	Eðer SGLINE listesindeki bir kullanýcý gerçek ismi(realname)
+	Servis operatörlerinin SNLINE listesi oluþturmalarýný saðlar.
+	Eðer SNLINE listesindeki bir kullanýcý gerçek ismi(realname)
 	servera baðlanmaya çalýþan bir kullanýcýnýnkiyle uyuþuyorsa
 	o kullanýcýnýn servera baðlanmasý engellenir.
 	
-	SGLINE ADD komutu belirtilen realname(gerçek isim) mask ýný
-	SGLINE listesine bir sebeple(belirtilmesi zorunludur) 
+	SNLINE ADD komutu belirtilen realname(gerçek isim) mask ýný
+	SNLINE listesine bir sebeple(belirtilmesi zorunludur) 
 	birlikte ekler.
 	zamanaþýmý zaman belirleyici olarak tanýmlanýr ve þunlar birini
 	takip etmelidir: d (gün), h (saat), veya m (dakika). 1h30m
 	þeklindeki kombinasyonlar kullanýlamaz. Eðer zaman tanýmlayýcý öðe
 	konulmazsa varsayýlan olarak gün kabul edilir (yani +30 un manasý
-	30 gündür). Zaman aþýmýna uðramayacak bir SGLINE eklemek için +0
+	30 gündür). Zaman aþýmýna uðramayacak bir SNLINE eklemek için +0
 	kullanýn.  Eklenecek realname mask ý + ile baþlýyorsa, o zaman
 	zaman aþýmý süresi varsayýlanla ayný olsa bile belirtilmelidir.
-	Mevcut SGLINE varsayýlan zaman aþýmý süresi STATS AKILL komutuyla
+	Mevcut SNLINE varsayýlan zaman aþýmý süresi STATS AKILL komutuyla
 	bulunabilir.
 	Not: realname maský boþluk içerebileceðinden bunla sebep arasýnda iki
 	nokta üstüste(:) kullanýlmalýdýr.
 	
-	SGLINE DEL komutu belirtilen maský(eðer listede mevcutsa) SGLINE 
+	SNLINE DEL komutu belirtilen maský(eðer listede mevcutsa) SNLINE 
 	listesinden siler. eðer bir kayýt numaralarý listesi belirtilmiþse
 	o kayýtlar silinir. (Aþaðýdaki LIST için verilmiþ örneði inceleyin.)
 	
-	SGLINE LIST komutu SGLINE listesini görüntüler. Eðer bir yýldýzlý
+	SNLINE LIST komutu SNLINE listesini görüntüler. Eðer bir yýldýzlý
 	mask verilmiþse, sadece o maskla uyuþan kayýtlarý içeren bir liste
 	görüntülenir.  Eðer bir kayýt numaralarý listesi belirtilmiþse,
 	sadece o kayýtlar görüntülenir; örneðin:
 	
-	   SGLINE LIST 2-5,7-9
-	      2 den 5 e 7 den 9 a kadar olan SGLINE kayýtlarýný listeler.
+	   SNLINE LIST 2-5,7-9
+	      2 den 5 e 7 den 9 a kadar olan SNLINE kayýtlarýný listeler.
 	      
-	SGLINE VIEW komutu SGLINE LIST komutunun daha açýklayýcý bilgi 
-	veren þeklidir, ve SGLINE ý kimin eklediðini, eklendiði tarihi, ve
+	SNLINE VIEW komutu SNLINE LIST komutunun daha açýklayýcý bilgi 
+	veren þeklidir, ve SNLINE ý kimin eklediðini, eklendiði tarihi, ve
 	ne zaman sona ereceðini realname ve sebeple birlikte gösterir.
 	
-	SGLINE CLEAR komutu SGLINE listesindeki tüm kayýtlarý siler.
+	SNLINE CLEAR komutu SNLINE listesindeki tüm kayýtlarý siler.
 	
 	Servis operatörlerinin Kullanýmýyla sýnýrlýdýr.
 

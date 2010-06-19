@@ -374,6 +374,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Je zit nu in de group van %s.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY wachtwoord
@@ -809,9 +817,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	%d nicks in de groep.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (expires in %s)
+	   %s (expires in %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -861,18 +869,15 @@ NICK_SENDPASS_UNAVAILABLE
 	SENDPASS commando is onbeschikbaar omdat encryptie aanstaat.
 NICK_SENDPASS_SUBJECT
 	Nick wachtwoord (%s)
-NICK_SENDPASS_HEAD
-	Hoi,
-NICK_SENDPASS_LINE_1
-	Je hebt het wachtwoord van nick %s via e-mail aangevraagd.
-NICK_SENDPASS_LINE_2
-	Het wachtwoord is %s Wegens veiligheidsredenen kun je dit het beste zo snel mogelijk veranderen.
-NICK_SENDPASS_LINE_3
-	Als je niet weet waarom deze email gestuurd is, negeer deze dan.
-NICK_SENDPASS_LINE_4
-	ANTWOORD NIET OP DEZE E-MAIL!
-NICK_SENDPASS_LINE_5
-	%s beheerders.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	Wachtwoord %s is verstuurd.
 
@@ -885,9 +890,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 
@@ -933,18 +937,15 @@ NICK_ENTER_REG_CODE
 	Een verificatiecode is verstuurd naar %s. Type %R%s confirm <verificatiecode> om de registratie te voltooien.
 NICK_REG_MAIL_SUBJECT
 	Nickname Registratie (%s)
-NICK_REG_MAIL_HEAD
-	Hoi,
-NICK_REG_MAIL_LINE_1
-	Je hebt een aanvraag ingediend om de nickname %s te registreren.
-NICK_REG_MAIL_LINE_2
-	Type " %R%s confirm %s " om de registratie te voltooien.
-NICK_REG_MAIL_LINE_3
-	Als je niet weet waarom deze e-mail naar je gestuurd is, negeer deze dan.
-NICK_REG_MAIL_LINE_4
-	REAGEER NIET OP DEZE MAIL!
-NICK_REG_MAIL_LINE_5
-	%s administrators.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.	
 NICK_GETPASS_PASSCODE_IS
 	Verificatiecode voor %s is %s.
 NICK_FORCE_REG
@@ -1045,6 +1046,8 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1093,6 +1096,34 @@ CHAN_DROP_DISABLED
 	Sorry, kanaal de-registratie is tijdelijk uitgeschakeld.
 CHAN_DROPPED
 	Kanaal %s is gede-registreerd.
+
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
 
 # SET responses
 CHAN_SET_SYNTAX
@@ -2017,12 +2048,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Standard responses
 MEMO_MAIL_SUBJECT
 	Nieuwe memo
-MEMO_MAIL_TEXT1
-	Hoi %s
-MEMO_MAIL_TEXT2
-	Je hebt zojuist een memo ontvangen van %s. Het gaat om memo nummer %d.
-MEMO_MAIL_TEXT3
-	Inhoud van de memo:
+NICK_MAIL_TEXT
+	Hi %s
+	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
 
 ###########################################################################
 #
@@ -2543,22 +2576,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Standaard AKILL verloop tijd: 1 minuut
 OPER_STATS_AKILL_EXPIRE_NONE
 	Standaard AKILL verloop tijd: Verloopt niet
-OPER_STATS_SGLINE_COUNT
-	Huidig aantal SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Standaard SGLINE verloop tijd: %d dagen
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Standaard SGLINE verloop tijd: 1 dag
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Standaard SGLINE verloop tijd: %d uur
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Standaard SGLINE verloop tijd: 1 uur
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Standaard SGLINE verloop tijd: %d minuten
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Standaard SGLINE verloop tijd: 1 minuut
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Standaard SGLINE verloop tijd: Verloopt niet
+OPER_STATS_SNLINE_COUNT
+	Huidig aantal SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Standaard SNLINE verloop tijd: %d dagen
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Standaard SNLINE verloop tijd: 1 dag
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Standaard SNLINE verloop tijd: %d uur
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Standaard SNLINE verloop tijd: 1 uur
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Standaard SNLINE verloop tijd: %d minuten
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Standaard SNLINE verloop tijd: 1 minuut
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Standaard SNLINE verloop tijd: Verloopt niet
 OPER_STATS_SQLINE_COUNT
 	Huidig aantal SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2682,49 +2715,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	De AKILL lijst is leeggemaakt.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+verloop] {mask | toegangslijst}[:reden]]
-OPER_SGLINE_UNSUPPORTED
-	Sorry, SGLINE is niet beschikbaar op dit netwerk.
-OPER_SGLINE_EXISTS
-	%s bestaat al op de SGLINE lijst.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+verloop] {mask | toegangslijst}[:reden]]
+OPER_SNLINE_UNSUPPORTED
+	Sorry, SNLINE is niet beschikbaar op dit netwerk.
+OPER_SNLINE_EXISTS
+	%s bestaat al op de SNLINE lijst.
+OPER_SNLINE_ALREADY_COVERED
 	%s is al gedekt door %s.
-OPER_SGLINE_REACHED_LIMIT
-	Sorry, je kan maar %d SGLINEs hebben.
-OPER_SGLINE_ADDED
-	%s toegevoegd aan de SGLINE lijst.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Sorry, je kan maar %d SNLINEs hebben.
+OPER_SNLINE_ADDED
+	%s toegevoegd aan de SNLINE lijst.
+OPER_SNLINE_CHANGED
 	Verlooptijd van %s veranderd.
-OPER_SGLINE_NOT_FOUND
-	%s niet gevonden op de SGLINE lijst.
-OPER_SGLINE_NO_MATCH
-	Geen overeenkomsten op de SGLINE lijst.
-OPER_SGLINE_DELETED
-	%s verwijderd van de SGLINE lijst.
-OPER_SGLINE_DELETED_ONE
-	1 SGLINE verwijderd van de SGLINE lijst.
-OPER_SGLINE_DELETED_SEVERAL
-	%d SGLINEs verwijderd van de SGLINE lijst.
-OPER_SGLINE_LIST_EMPTY
-	SGLINE lijst is leeg.
-OPER_SGLINE_LIST_HEADER
-	Huidige SGLINE lijst:
+OPER_SNLINE_NOT_FOUND
+	%s niet gevonden op de SNLINE lijst.
+OPER_SNLINE_NO_MATCH
+	Geen overeenkomsten op de SNLINE lijst.
+OPER_SNLINE_DELETED
+	%s verwijderd van de SNLINE lijst.
+OPER_SNLINE_DELETED_ONE
+	1 SNLINE verwijderd van de SNLINE lijst.
+OPER_SNLINE_DELETED_SEVERAL
+	%d SNLINEs verwijderd van de SNLINE lijst.
+OPER_SNLINE_LIST_EMPTY
+	SNLINE lijst is leeg.
+OPER_SNLINE_LIST_HEADER
+	Huidige SNLINE lijst:
 	  Nr    Mask                              Reden
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Huidige SGLINE lijst:
+OPER_SNLINE_VIEW_HEADER
+	Huidige SNLINE lijst:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (door %s op %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	De SGLINE lijst is leeggemaakt.
+OPER_SNLINE_CLEAR
+	De SNLINE lijst is leeggemaakt.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -3363,6 +3396,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Registreer een nickname
 NICK_HELP_CMD_GROUP
 	    GROUP      Bij een groep aanmelden
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Jezelf identificeren met je wachtwoord
 NICK_HELP_CMD_ACCESS
@@ -3495,6 +3530,15 @@ NICK_HELP_GROUP
 	
 	Opmerking: alle nicks in een groep hebben hetzelfde wachtwoord.
 
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Gebruik: IDENTIFY wachtwoord
 	
@@ -3553,26 +3597,40 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Geeft de huidige toegangslijst weer.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Gebruik: SET optie parameters
 	
 	Stelt verscheidene nick opties in.  option kan zijn:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Stel de weergave van je groep in Services in
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Verander het wachtwoord voor je nick
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Selecteer de taal die Services zal gebruiken
 	                   voor het versturen van berichten naar jou
+NICK_HELP_CMD_SET_URL
 	    URL        Associeer een URL met je nick
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associeer een E-mail adres met je nick
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Associeer een ICQ nummer met je nick
+NICK_HELP_CMD_SET_GREET
 	    GREET      Associeer een begroeting met je nick
+NICK_HELP_CMD_SET_KILL
 	    KILL       Zet bescherming aan of uit
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     Zet nickname beveiliging aan of uit
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Zorgt ervoor dat je nick niet verschijnt in een
 	                   %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Verberg verschillende soorten nick informatie
+NICK_HELP_CMD_SET_MSG
 	    MSG        Verander de communicatiemanier van Services
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Should services op you automatically.    
+NICK_HELP_SET_TAIL
 	
 	Om dit commando te gebruiken moet je je eerst identificeren
 	met je wachtwoord (%R%S HELP IDENTIFY voor meer
@@ -3689,26 +3747,40 @@ NICK_HELP_SET_AUTOOP
 	Sets whether you will be opped automatically. Set to ON to 
 	allow ChanServ to op you automatically when entering channels.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntax: SASET nickname option parameters.
 	
 	Sets various nickname options.  option can be one of:
-	
+
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
+NICK_HELP_CMD_SASET_URL
 	    URL        Associate a URL with the nickname
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Associate an ICQ number with the nickname
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Turn protection on or off
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Turn nickname security on or off
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Prevent the nickname from appearing in a
 	                   %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Hide certain pieces of nickname information
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Change the communication method of Services
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Prevent the nickname from expiring
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Set the language Services will use when
 	               sending messages to nickname
+NICK_HELP_SASET_TAIL
 	
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
@@ -4030,7 +4102,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Services Operators mogen het ALL parameter met elke nick gebruiken.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Gebruik: trefbeeld [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4159,6 +4232,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registreer een kanaal
 CHAN_HELP_CMD_SET
 	    SET        Stel kanaal opties en informatie in
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4260,7 +4335,15 @@ CHAN_HELP_DROP
 	Heft de registratie van het gegeven kanaal op. Kan alleen
 	gebruik wordt door de kanaalstichter.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Gebruik: SET kanaal optie parameters
 	
 	Stelt de kanaalstichter in staat om verschillende kanaal-
@@ -4268,42 +4351,65 @@ CHAN_HELP_SET
 	
 	Beschikbare opties:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Stelt de stichter van het kanaal in
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Stelt de opvolger van het kanaal in
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Stelt de kanaalbeschrijving in
+CHAN_HELP_CMD_SET_URL
 	    URL           Associeer een URL met het kanaal
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Associate een E-mail adres met het kanaal
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Stel een bericht in dat naar de gebruikers
 	                    wordt gestuurd zodra ze het kanaal binnekomen
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Stelt in hoe Services bans op het kanaal maken
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Zet kanaal modes vast aan of uit
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Onthoud het topic zoland het kanaal niet in
 	                    gebruik is
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Stuur een notice wanneer de OP/DEOP commando's
 	                    worden gebruikt.
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Reguleer het gebruik van kritieke commando's
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Verberg een kanaal van het LIST commando
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Limiteer toegang tot het kanaal
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Activeer %S veiligheidsopties
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Sterkere controle van de kanaalop status
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Sterkere controle van de stichter status
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Onderteken kicks die worden uitgevoerd met het
 	                    KICK commando
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic kan alleen veranderd worden met TOPIC
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Schakel het gebruikersprivilegesysteem om
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Type %R%S HELP option voor meer informatie over een
 	specifieke optie.
 
 CHAN_HELP_SET_FOUNDER
-	Gebruik: SET kanaal FOUNDER nick
+	Gebruik: %s kanaal FOUNDER nick
 	
 	Veranderd de stichter van een kanaal. De nieuwe nick moet
 	een geregistreerde nick zijn.
 
 CHAN_HELP_SET_SUCCESSOR
-	Gebruik: SET kanaal SUCCESSOR nick
+	Gebruik: %s kanaal SUCCESSOR nick
 	
 	Veranderd de opvolger van een kanaal. Als de nick van de
 	stichter verloopt of de registratie ervan wordt geannuleerd
@@ -4315,13 +4421,13 @@ CHAN_HELP_SET_SUCCESSOR
 	geregistreerde nick zijn.
 
 CHAN_HELP_SET_DESC
-	Gebruik: SET kanaal DESC beschrijving
+	Gebruik: %s kanaal DESC beschrijving
 	
 	Stelt de beschrijving van een kanaal in, die weergegeven
 	wordt door de LIST en INFO commando's.
 
 CHAN_HELP_SET_URL
-	Gebruik: SET kanaal URL [url]
+	Gebruik: %s kanaal URL [url]
 	
 	Associeer de gegeven URL met het kanaal. Deze URL zal worden
 	weergegeven wanneer iemand informatie over het kanaal op-
@@ -4329,7 +4435,7 @@ CHAN_HELP_SET_URL
 	wordt de URL voor het kanaal verwijderd.
 
 CHAN_HELP_SET_EMAIL
-	Gebruik: SET kanaal EMAIL [adres]
+	Gebruik: %s kanaal EMAIL [adres]
 	
 	Associeer het gegeven e-mail adres met het kanaal. Dit adres
 	zal worden weergegeven wanneer iemand informatie over het
@@ -4338,7 +4444,7 @@ CHAN_HELP_SET_EMAIL
 	verwijderd.
 
 CHAN_HELP_SET_ENTRYMSG
-	Gebruik: SET kanaal ENTRYMSG [bericht]
+	Gebruik: %s kanaal ENTRYMSG [bericht]
 	
 	Stelt het bericht in dat via /notice zal worden verstuurd
 	aan gebruikers die het kanaal binnenkomen. Als er geen
@@ -4346,7 +4452,7 @@ CHAN_HELP_SET_ENTRYMSG
 	als iemand het kanaal binnenkomt.
 
 CHAN_HELP_SET_BANTYPE
-	Gebruik: SET kanaal BANTYPE bantype
+	Gebruik: %s kanaal BANTYPE bantype
 	
 	Stelt het bantype in dat gebruikt zal worden door services
 	wanneer ze een ban moet zetten op je kanaal.
@@ -4359,7 +4465,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban in het formaat *!*gebruiker@*.domein
 
 CHAN_HELP_SET_KEEPTOPIC
-	Gebruik: SET kanaal KEEPTOPIC {ON | OFF}
+	Gebruik: %s kanaal KEEPTOPIC {ON | OFF}
 	
 	Zet de topicbehoud optie aan of uit voor een kanaal.
 	Wanneer topicbehoud aan staat zal het topic van het
@@ -4369,7 +4475,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	teruggezet.
 
 CHAN_HELP_SET_TOPICLOCK
-	Gebruik: SET kanaal TOPICLOCK {ON | OFF}
+	Gebruik: %s kanaal TOPICLOCK {ON | OFF}
 	
 	Zet de topicslot optie aan of uit voor een kanaal.
 	Wanneer topicslot aan staat zal %S het niet toestaan om
@@ -4377,7 +4483,7 @@ CHAN_HELP_SET_TOPICLOCK
 	alleen veranderd worden met het TOPIC commando.
 
 CHAN_HELP_SET_MLOCK
-	Gebruik: SET kanaal MLOCK modes
+	Gebruik: %s kanaal MLOCK modes
 	
 	Stelt de mode-slot paramenter in voor het kanaal. %S
 	staat je toe om verschillen kanaalmodes altijd aan of uit
@@ -4413,7 +4519,7 @@ CHAN_HELP_SET_MLOCK
 	        vrij ingesteld worden met /MODE.
 
 CHAN_HELP_SET_PEACE
-	Gebruik: SET kanaal PEACE {ON | OFF}
+	Gebruik: %s kanaal PEACE {ON | OFF}
 	
 	Zet de vrede optie aan of uit voor een kanaal. Wanneer
 	vrede aanstaat kan een gebruiker niemand kicken, bannen,
@@ -4422,21 +4528,21 @@ CHAN_HELP_SET_PEACE
 	van zichzelf via de %S commando's.
 
 CHAN_HELP_SET_PRIVATE
-	Gebruik: SET kanaal PRIVATE {ON | OFF}
+	Gebruik: %s kanaal PRIVATE {ON | OFF}
 	
 	Zet de prive optie aan of uit voor een kanaal. Wanneer
 	de prive optie aan staat zal %R%S LIST het kanaal
 	in geen enkele lijst weergeven.
 
 CHAN_HELP_SET_RESTRICTED
-	Gebruik: SET kanaal RESTRICTED {ON | OFF}
+	Gebruik: %s kanaal RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Gebruik: SET kanaal SECURE {ON | OFF}
+	Gebruik: %s kanaal SECURE {ON | OFF}
 	
 	Zet %S's veiligheidsfuncties aan of uit voor een kanaal.
 	Wanneer SECURE aan staat zullen alleen gebruikers die
@@ -4445,14 +4551,14 @@ CHAN_HELP_SET_SECURE
 	zoals geregeld door de toegangslijst.
 
 CHAN_HELP_SET_SECUREOPS
-	Gebruik: SET kanaal SECUREOPS {ON | OFF}
+	Gebruik: %s kanaal SECUREOPS {ON | OFF}
 	
 	Zet de veilige ops optie aan of uit voor een kanaal.
 	Wanneer veilige ops aan staat mogen gebruikers die niet
 	op de toegangslijst staan geen kanaalop status krijgen.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Gebruik: SET kanaal SECUREFOUNDER {ON | OFF}
+	Gebruik: %s kanaal SECUREFOUNDER {ON | OFF}
 	
 	Zet de veilige stichter optie aan of uit voor een kanaal.
 	Wanneer veilige stichter aan staat zal alleen de echte
@@ -4461,7 +4567,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	die alleen geidentificeerd zijn met %S.
 
 CHAN_HELP_SET_SIGNKICK
-	Gebruik: SET kanaal SIGNKICK {ON | LEVEL | OFF}
+	Gebruik: %s kanaal SIGNKICK {ON | LEVEL | OFF}
 	
 	Zet ondertekende kicks aan of uit voor een kanaal.
 	Wanneer SIGNKICK aan staat zullen kicks die uitgevoerd
@@ -4474,7 +4580,7 @@ CHAN_HELP_SET_SIGNKICK
 	Zie %R%S HELP LEVELS voor meer informatie.
 
 CHAN_HELP_SET_XOP
-	Gebruik: SET kanaal XOP {ON | OFF}
+	Gebruik: %s kanaal XOP {ON | OFF}
 	
 	Zet het xOP lijsten systeem aan of uit voor een kanaal.
 	Wanneer XOP aan staat moet je de AOP/SOP/VOP
@@ -4497,7 +4603,7 @@ CHAN_HELP_SET_XOP
 	systeem brengt echter geen problemen met zich mee.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4520,7 +4626,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Gebruik: SET kanaal OPNOTICE {ON | OFF}
+	Gebruik: %s kanaal OPNOTICE {ON | OFF}
 	
 	Zet de op-notificatie optie aan of uit voor een kanaal.
 	Wanneer op-notificatie aan staat  zal %S een notice naar
@@ -5082,13 +5188,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Services Operators kunnen elk kanaal droppen, ook al zijn
 	ze niet voor het betreffende kanaal geindtificeerd.
 
-CHAN_SERVADMIN_HELP_SET
-	
-	Services Operatorstrators kunnen ook de NOEXPIRE optie
-	instellen, waarmee kanalen niet kunnen verlopen. Ook
-	kunnen ze elke optie voor elk kanaal zet zonder zich te
-	identificeren met het wachtwoord voor het kanaal.
-
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Gebruik: SET kanaal NOEXPIRE {ON | OFF}
 	
@@ -5423,8 +5522,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Kill alle gebruikers met een bepaalde hostmask
 OPER_HELP_CMD_AKILL
 	    AKILL       Beheer de AKILL lijst
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Beheer de SGLINE lijst
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Beheer de SNLINE lijst
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Beheer de SQLINE lijst
 OPER_HELP_CMD_SZLINE
@@ -5628,50 +5727,50 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR maakt de AKILL lijst leeg.
 	
-OPER_HELP_SGLINE
-	Gebruik: SGLINE ADD [+verlooptijd] mask reden
-	         SGLINE DEL {mask | entry-nr | lijst}
-	         SGLINE LIST [mask | lijst]
-	         SGLINE VIEW [mask | lijst]
-	         SGLINE CLEAR
+OPER_HELP_SNLINE
+	Gebruik: SNLINE ADD [+verlooptijd] mask reden
+	         SNLINE DEL {mask | entry-nr | lijst}
+	         SNLINE LIST [mask | lijst]
+	         SNLINE VIEW [mask | lijst]
+	         SNLINE CLEAR
 	
-	Stelt Services operators in staat de SGLINE lijst te beheren.
-	Als een gebruiker die overeenkomt met een SGLINE mask probeert
+	Stelt Services operators in staat de SNLINE lijst te beheren.
+	Als een gebruiker die overeenkomt met een SNLINE mask probeert
 	te verbinden zullen Services deze gebruiker niet toestaan zijn
 	of haar IRC sessie voort te zetten.
 	
-	SGLINE ADD voeg het gegeven user@host mask toe aan de SGLINE
+	SNLINE ADD voeg het gegeven user@host mask toe aan de SNLINE
 	lijst met de gegeven reden (die moet worden gegeven).
 	verlooptijd wordt gespecificeerd als een getal waarachter d 
 	(dagen), h (uur), of m (minuten) geplaatst wordt. Combinaties
 	(zoals 1h30m) zijn niet toegestaan. Als er geen d, h of m wordt 
 	meegegeven, is het standaard dagen (dus +30 zelfstandig betekent
-	30 dagen). Om een SGLINE die niet verloopt toe te voegen, gebruik je
+	30 dagen). Om een SNLINE die niet verloopt toe te voegen, gebruik je
 	+0. Als de usermask die toegevoegd moet worden met een + begint,
 	is een verlooptijd verplicht, zelfs als die overeenkomt met de
 	standaard verlooptijd. De huidige standaard verlooptijd voor een
-	SGLINE kan gevonden worden met het STATS AKILL commando.
+	SNLINE kan gevonden worden met het STATS AKILL commando.
 	
-	Het SGLINE DEL commando verwijdert het gegeven mask van de SGLINE
+	Het SNLINE DEL commando verwijdert het gegeven mask van de SNLINE
 	lijst als deze erop staat. Als er een lijst van entry-nummers
 	is opgegeven zullen die verwijderd worden. (Zie het voorbeeld voor
 	LIST hier onder.)
 	
-	Her SGLINE LIST commando geeft de SGLINE lijst weer.
-	Als een mask met een * is gegeven zullen alleen de SGLINEs die
+	Her SNLINE LIST commando geeft de SNLINE lijst weer.
+	Als een mask met een * is gegeven zullen alleen de SNLINEs die
 	overeenkomen met het mask worden weergegeven. Als een lijst van
 	entry-nummers is gegeven worden alleen die weergegeven.
 	Bijvoorbeeld:
 
-	   SGLINE LIST 2-5,7-9
-	      Geeft SGLINEs 2 t/m 5 en 7 t/m 9 weer.
+	   SNLINE LIST 2-5,7-9
+	      Geeft SNLINEs 2 t/m 5 en 7 t/m 9 weer.
 	      
-	SGLINE VIEW is een versie van SGLINE LIST die meer informatie
-	geeft: de naam van degene die de SGLINE toe heeft gevoegd, de datum
+	SNLINE VIEW is een versie van SNLINE LIST die meer informatie
+	geeft: de naam van degene die de SNLINE toe heeft gevoegd, de datum
 	waarop dit gebeurde, waneer deze verloopt, en de user@host mask
 	en de reden.
 	
-	SGLINE CLEAR maakt de SGLINE lijst leeg.
+	SNLINE CLEAR maakt de SNLINE lijst leeg.
 
 OPER_HELP_SQLINE
 	Gebruik: SQLINE ADD [+verlooptijd] mask reden

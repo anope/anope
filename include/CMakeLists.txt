@@ -8,7 +8,7 @@ if(MSVC OR NOT SH)
   # Generate version.h from the above executable and the version.log file from the main source directory, with dependencies to the given headers and all source files in the main Anope build
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
     COMMAND version_sh ${Anope_SOURCE_DIR}/version.log ${CMAKE_CURRENT_SOURCE_DIR}/version.sh ${CMAKE_CURRENT_BINARY_DIR}/version.h
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/version.sh DEPENDS version_sh ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${CMAKE_CURRENT_SOURCE_DIR}/pseudo.h ${CMAKE_CURRENT_SOURCE_DIR}/messages.h ${SRC_SRCS}
+    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/version.sh DEPENDS version_sh ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${SRC_SRCS}
   )
   # Add version_sh to list of files for CPack to ignore
   get_target_property(version_sh_BINARY version_sh LOCATION)
@@ -19,7 +19,7 @@ else(MSVC OR NOT SH)
   # Generate version.h from version.sh and the version.log file from the main source directory, with dependencies to the given headers and all source files in the main Anope build
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
     COMMAND ${SH} ${CMAKE_CURRENT_SOURCE_DIR}/version.sh ${Anope_SOURCE_DIR}/version.log ${CMAKE_CURRENT_BINARY_DIR}/version.h
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/version.sh DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${CMAKE_CURRENT_SOURCE_DIR}/pseudo.h ${CMAKE_CURRENT_SOURCE_DIR}/messages.h ${SRC_SRCS}
+    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/version.sh DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${SRC_SRCS}
   )
 endif(MSVC OR NOT SH)
 

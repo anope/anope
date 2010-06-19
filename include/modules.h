@@ -19,13 +19,13 @@
 #include "timers.h"
 #include "hashcomp.h"
 #include "version.h"
+#include "commands.h"
 
 /* Cross OS compatibility macros */
 #ifdef _WIN32
 	typedef HMODULE ano_module_t;
 
 	#define dlopen(file, unused)		LoadLibrary(file)
-	E const char *dlerror();
 	#define dlsym(file, symbol)	(HMODULE)GetProcAddress(file, symbol)
 	#define dlclose(file)		FreeLibrary(file) ? 0 : 1
 	#define ano_modclearerr()		SetLastError(0)
@@ -104,68 +104,6 @@ do { \
 	} \
 } while(0);
 
-
-
-/** Priority types which can be returned from Module::Prioritize()
- */
-enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
-
-
-
-/*************************************************************************/
-#define CMD_HASH(x)	  (((x)[0]&31)<<5 | ((x)[1]&31))	/* Will gen a hash from a string :) */
-#define MAX_CMD_HASH 1024
-
-/** The return value from commands.
- */
-enum CommandReturn
-{
-	MOD_CONT,
-	MOD_STOP
-};
-
-#define HOSTSERV HS_cmdTable /* using HOSTSERV etc. looks nicer than HS_cmdTable for modules */
-#define BOTSERV BS_cmdTable
-#define MEMOSERV MS_cmdTable
-#define NICKSERV NS_cmdTable
-#define CHANSERV CS_cmdTable
-#define OPERSERV OS_cmdTable
-#define IRCD IRCD_cmdTable
-#define MODULE_HASH Module_table
-#define EVENT EVENT_cmdTable
-#define EVENTHOOKS HOOK_cmdTable
-
-/**********************************************************************
- * Module Returns
- **********************************************************************/
-#define MOD_ERR_OK		  0
-#define MOD_ERR_MEMORY	  1
-#define MOD_ERR_PARAMS	  2
-#define MOD_ERR_EXISTS	  3
-#define MOD_ERR_NOEXIST	 4
-#define MOD_ERR_NOUSER	  5
-#define MOD_ERR_NOLOAD	  6
-#define MOD_ERR_NOUNLOAD	7
-#define MOD_ERR_SYNTAX	  8
-#define MOD_ERR_NODELETE	9
-#define MOD_ERR_UNKNOWN	 10
-#define MOD_ERR_FILE_IO	 11
-#define MOD_ERR_NOSERVICE   12
-#define MOD_ERR_NO_MOD_NAME 13
-
-/*************************************************************************/
-/* Macros to export the Module API functions/variables */
-#ifndef _WIN32
-#define MDE
-#else
-#ifndef MODULE_COMPILE
-#define MDE __declspec(dllexport)
-#else
-#define MDE __declspec(dllimport)
-#endif
-#endif
-/*************************************************************************/
-
 #if !defined(_WIN32)
 	#include <dlfcn.h>
 	/* Define these for systems without them */
@@ -185,95 +123,42 @@ enum CommandReturn
 	const char *ano_moderr();
 #endif
 
-typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION,DATABASE } MODType;
-typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
+extern CoreExport Module *FindModule(const std::string &name);
+int protocol_module_init();
+extern CoreExport Message *createMessage(const char *name, int (*func)(const char *source, int ac, const char **av));
+std::vector<Message *> FindMessage(const std::string &name);
+extern CoreExport bool moduleMinVersion(int major,int minor,int patch,int build);
+
+enum ModuleReturn
+{
+	MOD_ERR_OK,
+	MOD_ERR_MEMORY,
+	MOD_ERR_PARAMS,
+	MOD_ERR_EXISTS,
+	MOD_ERR_NOEXIST,
+	MOD_ERR_NOUSER,
+	MOD_ERR_NOLOAD,
+	MOD_ERR_NOUNLOAD,
+	MOD_ERR_SYNTAX,
+	MOD_ERR_NODELETE,
+	MOD_ERR_UNKNOWN,
+	MOD_ERR_FILE_IO,
+	MOD_ERR_NOSERVICE,
+	MOD_ERR_NO_MOD_NAME
+};
+
+/** Priority types which can be returned from Module::Prioritize()
+ */
+enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
+enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE };
+
+struct Message;
+extern CoreExport std::multimap<std::string, Message *> MessageMap;
+class Module;
+extern CoreExport std::deque<Module *> Modules;
 
 /*************************************************************************/
 /* Structure for information about a *Serv command. */
-
-struct CommandHash;
-typedef struct ModuleLang_ ModuleLang;
-typedef struct ModuleHash_ ModuleHash;
-typedef struct Message_ Message;
-typedef struct MessageHash_ MessageHash;
-
-/*************************************************************************/
-
-
-
-
-extern MDE CommandHash *HOSTSERV[MAX_CMD_HASH];
-extern MDE CommandHash  *BOTSERV[MAX_CMD_HASH];
-extern MDE CommandHash *MEMOSERV[MAX_CMD_HASH];
-extern MDE CommandHash *NICKSERV[MAX_CMD_HASH];
-extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
-extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
-extern MDE MessageHash *IRCD[MAX_CMD_HASH];
-extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
-
-struct ModuleLang_ {
-	int argc;
-	char **argv;
-};
-
-enum CommandFlag
-{
-	CFLAG_ALLOW_UNREGISTERED,
-	CFLAG_ALLOW_FORBIDDEN,
-	CFLAG_ALLOW_SUSPENDED,
-	CFLAG_ALLOW_UNREGISTEREDCHANNEL,
-	CFLAG_STRIP_CHANNEL,
-	CFLAG_DISABLE_FANTASY
-};
-
-/** Every services command is a class, inheriting from Command.
- */
-class CoreExport Command : public Flags<CommandFlag>
-{
- public:
-	size_t MaxParams;
-	size_t MinParams;
-	std::string name;
-	std::string permission;
-
-	/** Create a new command.
-	 * @param min_params The minimum number of parameters the parser will require to execute this command
-	 * @param max_params The maximum number of parameters the parser will create, after max_params, all will be combined into the last argument.
-	 * NOTE: If max_params is not set (default), there is no limit to the max number of params.
-	 */
-	Command(const std::string &sname, size_t min_params, size_t max_params = 0, const std::string &spermission = "");
-
-	virtual ~Command();
-
-	/** Execute this command.
-	 * @param u The user executing the command.
-	 */
-	virtual CommandReturn Execute(User *u, const std::vector<ci::string> &);
-
-	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
-	 * @param u The user requesting help
-	 * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of "FOO BAR LOL")
-	 * @return true if help was provided to the user, false otherwise.
-	 */
-	virtual bool OnHelp(User *u, const ci::string &subcommand);
-
-	/** Requested when the user provides bad syntax to this command (not enough params, etc).
-	 * @param u The user executing the command.
-	 * @param subcommand The subcommand the user tried to use
-	 */
-	virtual void OnSyntaxError(User *u, const ci::string &subcommand);
-
-	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
-	 * @param reststr The permission required to successfully execute this command
-	 */
-	void SetPermission(const std::string &reststr);
-
-	/* Module related stuff */
-	int core;		   /* Can this command be deleted? */
-	char *mod_name;	/* Name of the module who owns us, NULL for core's  */
-	char *service;	/* Service we provide this command for */
-	Command *next;
-};
 
 class Version
 {
@@ -332,15 +217,31 @@ class CoreExport Module
 	 */
 	std::list<CallBack *> CallBacks;
 
+	/** Handle for this module, obtained from dlopen()
+	 */
 	ano_module_t handle;
+
+	/** Time this module was created
+	 */
 	time_t created;
+
+	/** Version of this module
+	 */
 	std::string version;
+
+	/** Author of the module
+	 */
 	std::string author;
 
+	/** What type this module is
+	 */
 	MODType type;
 
-	MessageHash *msgList[MAX_CMD_HASH];
-	ModuleLang lang[NUM_LANGS];
+	struct ModuleLang
+	{
+		int argc;
+		char **argv;
+	} lang[NUM_LANGS];
 
 	/** Creates and initialises a new module.
 	 * @param loadernick The nickname of the user loading the module.
@@ -384,7 +285,7 @@ class CoreExport Module
 	 * compiled against
 	 * @return The version
 	 */
-	virtual Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
+	Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
 
 	/**
 	 * Allow a module to add a set of language strings to anope
@@ -419,50 +320,19 @@ class CoreExport Module
 
 	/**
 	 * Add a module provided command to the given service.
-	 * e.g. AddCommand(NICKSERV,c,MOD_HEAD);
-	 * @param cmdTable the services to add the command to
-	 * @param c the command to add
+	 * @param bi The service to add the command to
+	 * @param c The command to add
 	 * @return MOD_ERR_OK on successfully adding the command
 	 */
-	int AddCommand(CommandHash *cmdTable[], Command * c);
+	int AddCommand(BotInfo *bi, Command *c);
 
 	/**
 	 * Delete a command from the service given.
-	 * @param cmdTable the cmdTable for the services to remove the command from
-	 * @param name the name of the command to delete from the service
+	 * @param bi The service to remove the command from
+	 * @param c Thec command to delete
 	 * @return returns MOD_ERR_OK on success
 	 */
-	int DelCommand(CommandHash * cmdTable[], const char *name);
-
-	/** Called on NickServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnNickServHelp(User *u) { }
-
-	/** Called on ChanServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnChanServHelp(User *u) { }
-
-	/** Called on Botserv HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnBotServHelp(User *u) { }
-
-	/** Called on HostServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnHostServHelp(User *u) { }
-
-	/** Called on OperServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnOperServHelp(User *u) { }
-
-	/** Called on MemoServ HELP
-	 * @param u The user requesting help
-	 */
-	virtual void OnMemoServHelp(User *u) { }
+	int DelCommand(BotInfo *bi, Command *c);
 
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
@@ -519,13 +389,14 @@ class CoreExport Module
 	virtual void OnUserNickChange(User *u, const std::string &oldnick) { }
 
 	/** Called immediatly when a user tries to run a command
-	 * @param service The service
 	 * @param u The user
-	 * @param cmd The command
+	 * @param bi The bot the command is being run from
+	 * @param command The command
+	 * @param message The parameters used for the command
 	 * @param c The command class (if it exists)
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(const std::string &service, User *u, const char *cmd, Command *c) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, const ci::string &command, const ci::string &message, Command *c) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
@@ -534,7 +405,7 @@ class CoreExport Module
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(User *u, BotInfo *service, const ci::string &command, const std::vector<ci::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
 	 * @param u The user executing the command
@@ -542,7 +413,7 @@ class CoreExport Module
 	 * @param command The command the user executed
 	 * @param params The parameters the user sent
 	 */
-	virtual void OnPostCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params) { }
+	virtual void OnPostCommand(User *u, BotInfo *service, const ci::string &command, const std::vector<ci::string> &params) { }
 
 	/** Called after the core has finished loading the databases, but before
 	 * we connect to the server
@@ -573,7 +444,7 @@ class CoreExport Module
 	 * @param ci The channel it's being used in
 	 * @param params The params
 	 */
-	virtual void OnBotFantasy(char *command, User *u, ChannelInfo *ci, char *params) { }
+	virtual void OnBotFantasy(const std::string &command, User *u, ChannelInfo *ci, const std::string &params) { }
 
 	/** Called on fantasy command without access
 	 * @param command The command
@@ -581,7 +452,7 @@ class CoreExport Module
 	 * @param ci The channel it's being used in
 	 * @param params The params
 	 */
-	virtual void OnBotNoFantasyAccess(const char *command, User *u, ChannelInfo *ci, const char *params) { }
+	virtual void OnBotNoFantasyAccess(const std::string &command, User *u, ChannelInfo *ci, const std::string &params) { }
 
 	/** Called after a bot joins a channel
 	 * @param ci The channael
@@ -661,17 +532,20 @@ class CoreExport Module
 	 */
 	virtual void OnChanExpire(const char *chname) { }
 
-	/** Called before anope connects to its uplink
+	/** Called before Anope connects to its uplink
+	 * @param u The uplink we're going to connect to
+	 * @param Number What number the uplink is
+	 * @return Other than EVENT_CONTINUE to stop attempting to connect
 	 */
-	virtual void OnPreServerConnect() { }
+	virtual EventReturn OnPreServerConnect(Uplink *u, int Number) { return EVENT_CONTINUE; }
 
 	/** Called when Anope connects to its uplink
 	 */
 	virtual void OnServerConnect() { }
 
-	/** Called when we are done synching with the uplink, just before we send the EOB
+	/** Called when we are almost done synching with the uplink, just before we send the EOB
 	 */
-	virtual void OnFinishSync(Server *serv) { }
+	virtual void OnPreUplinkSync(Server *serv) { }
 
 	/** Called when Anope disconnects from its uplink, before it tries to reconnect
 	 */
@@ -714,6 +588,14 @@ class CoreExport Module
 	 */
 	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
 
+	/** Called when nickrequest metadata is read from the database
+	 * @param nr The nickrequest
+	 * @parm key The metadata key
+	 * @param params The params from the database
+	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
+	 */
+	virtual EventReturn OnDatabaseReadMetadata(NickRequest *nr, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+
 	/** Called when botinfo metadata is read from the database
 	 * @param bi The botinfo
 	 * @param key The metadata key
@@ -741,6 +623,12 @@ class CoreExport Module
 	 * @param na The nick alias
 	 */
 	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickAlias *na) { }
+
+	/** Called when we are wrting metadata for a nickrequest
+	 * @param WriteMetata A callback function used to insert the metadata
+	 * @param nr The nick request
+	 */
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickRequest *nr) { }
 
 	/** Called when we are writing metadata for a botinfo
 	 * @param WriteMetata A callback function used to insert the metadata
@@ -782,9 +670,9 @@ class CoreExport Module
 	virtual EventReturn OnPreNickExpire(NickAlias *na) { return EVENT_CONTINUE; }
 
 	/** Called when a nick drops
-	 * @param nick The nick
+	 * @param na The nick
 	 */
-	virtual void OnNickExpire(const char *nick) { }
+	virtual void OnNickExpire(NickAlias *na) { }
 
 	/** Called when defcon level changes
 	 * @param level The level
@@ -796,13 +684,13 @@ class CoreExport Module
 	 * @param ak The akill
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddAkill(User *u, Akill *ak) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddAkill(User *u, XLine *ak) { return EVENT_CONTINUE; }
 
 	/** Called before an akill is deleted
 	 * @param u The user removing the akill
 	 * @param ak The akill, can be NULL for all akills!
 	 */
-	virtual void OnDelAkill(User *u, Akill *ak) { }
+	virtual void OnDelAkill(User *u, XLine *ak) { }
 
 	/** Called after an exception has been added
 	 * @param u The user who added it
@@ -817,20 +705,20 @@ class CoreExport Module
 	 */
 	virtual void OnExceptionDel(User *u, Exception *ex) { }
 
-	/** Called before a SXLine is added
-	 * @param u The user adding the SXLine
-	 * @param sx The SXLine
-	 * @param Type The type of SXLine this is
+	/** Called before a XLine is added
+	 * @param u The user adding the XLine
+	 * @param sx The XLine
+	 * @param Type The type of XLine this is
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddSXLine(User *u, SXLine *sx, SXLineType Type) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddXLine(User *u, XLine *x, XLineType Type) { return EVENT_CONTINUE; }
 
-	/** Called before a SXLine is deleted
-	 * @param u The user deleting the SXLine
-	 * @param sx The SXLine, can be NULL for all SXLines
-	 * @param Type The type of SXLine this is
+	/** Called before a XLine is deleted
+	 * @param u The user deleting the XLine
+	 * @param sx The XLine, can be NULL for all XLines
+	 * @param Type The type of XLine this is
 	 */
-	virtual void OnDelSXLine(User *u, SXLine *sx, SXLineType Type) { }
+	virtual void OnDelXLine(User *u, XLine *x, XLineType Type) { }
 
 	/** Called when a server quits
 	 * @param server The server
@@ -873,18 +761,18 @@ class CoreExport Module
 	/** Called when access is changed
 	 * @param ci The channel
 	 * @param u The user who changed the access
-	 * @param na The nick whos access was changed
+	 * @param nc The nick whos access was changed
 	 * @param level The level of the new access
 	 */
-	virtual void OnAccessChange(ChannelInfo *ci, User *u, NickAlias *na, int level) { }
+	virtual void OnAccessChange(ChannelInfo *ci, User *u, NickCore *nc, int level) { }
 
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param u The user who added the access
-	 * @para na The nick who was added to access
+	 * @para nc The nick who was added to access
 	 * @param level The level they were added at
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, User *u, NickAlias *na, int level) { }
+	virtual void OnAccessAdd(ChannelInfo *ci, User *u, NickCore *nc, int level) { }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel
@@ -941,16 +829,25 @@ class CoreExport Module
 	virtual void OnChannelDelete(Channel *c) { }
 
 	/** Called after adding an akick to a channel
+	 * @param u The user adding the akick
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickAdd(ChannelInfo *ci, AutoKick *ak) { }
+	virtual void OnAkickAdd(User *u, ChannelInfo *ci, AutoKick *ak) { }
 
 	/** Called before removing an akick from a channel
+	 * @param u The user removing the akick
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickDel(ChannelInfo *ci, AutoKick *ak) { }
+	virtual void OnAkickDel(User *u, ChannelInfo *ci, AutoKick *ak) { }
+
+	/** Called when a user requests info for a channel
+	 * @param u The user requesting info
+	 * @param ci The channel the user is requesting info for
+	 * @param ShowHidden true if we should show the user everything
+	 */
+	virtual void OnChanInfo(User *u, ChannelInfo *ci, bool ShowHidden) { }
 
 	/** Called when a nick is dropped
 	 * @param nick The nick
@@ -1030,13 +927,20 @@ class CoreExport Module
 	 */
 	virtual void OnNickAddAccess(NickCore *nc, const std::string &entry) { }
 
-	/** called from NickCore::EraseAccess()
+	/** Called from NickCore::EraseAccess()
 	 * @param nc pointer to the NickCore
 	 * @param entry The access mask
 	 */
 	virtual void OnNickEraseAccess(NickCore *nc, const std::string &entry) { }
 
-	/** called when a vhost is deleted
+	/** Called when a user requests info for a nick
+	 * @param u The user requesting info
+	 * @param na The nick the user is requesting info from
+	 * @param ShowHidden true if we should show the user everything
+	 */
+	virtual void OnNickInfo(User *u, NickAlias *na, bool ShowHidden) { }
+
+	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
 	 */
 	virtual void OnDeleteVhost(NickAlias *na) { }
@@ -1144,8 +1048,9 @@ class CoreExport Module
 	virtual void OnServerSync(Server *s) { }
 
 	/** Called when we sync with our uplink
+	 * @param s Our uplink
 	 */
-	virtual void OnUplinkSync() { }
+	virtual void OnUplinkSync(Server *s) { }
 
 };
 
@@ -1156,33 +1061,35 @@ enum Implementation
 {
 	I_BEGIN,
 		/* NickServ */
-		I_OnNickServHelp, I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
+		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
+		I_OnNickInfo,
 
 		/* ChanServ */
-		I_OnChanServHelp, I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
+		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
+		I_OnChanInfo,
 
 		/* BotServ */
-		I_OnBotServHelp, I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
+		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
 		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
 
 		/* HostServ */
-		I_OnHostServHelp, I_OnSetVhost, I_OnDeleteVhost,
+		I_OnSetVhost, I_OnDeleteVhost,
 
 		/* MemoServ */
-		I_OnMemoServHelp, I_OnMemoSend, I_OnMemoDel,
+		I_OnMemoSend, I_OnMemoDel,
 
 		/* Users */
 		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
 		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
 
 		/* OperServ */
-		I_OnOperServHelp, I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
-		I_OnAddSXLine, I_OnDelSXLine,
+		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
+		I_OnAddXLine, I_OnDelXLine,
 
 		/* Database */
 		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase,
@@ -1193,7 +1100,7 @@ enum Implementation
 		I_OnModuleLoad, I_OnModuleUnload,
 
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnFinishSync, I_OnServerDisconnect, I_OnPreCommandRun,
+		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
 		I_OnPreCommand, I_OnPostCommand, I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
@@ -1289,7 +1196,13 @@ class CoreExport ModuleManager
 	 */
 	static void ClearCallBacks(Module *m);
 
-private:
+	/** Unloading all modules, NEVER call this when Anope isn't shutting down.
+	 * Ever.
+	 * @param unload_proto true to unload the protocol module
+	 */
+	static void UnloadAll(bool unload_proto);
+
+ private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
 	 */
@@ -1318,57 +1231,10 @@ class CallBack : public Timer
 	}
 };
 
-struct ModuleHash_ {
-		char *name;
-		Module *m;
-		ModuleHash *next;
-};
-
-struct CommandHash {
-		char *name;	/* Name of the command */
-		Command *c;	/* Actual command */
-		CommandHash *next; /* Next command */
-};
-
-struct Message_ {
-	char *name;
+struct Message
+{
+	std::string name;
 	int (*func)(const char *source, int ac, const char **av);
-	int core;
-	Message *next;
 };
-
-struct MessageHash_ {
-		char *name;
-		Message *m;
-		MessageHash *next;
-};
-
-/*************************************************************************/
-/* Module Managment Functions */
-MDE Module *findModule(const char *name);	/* Find a module */
-
-int protocol_module_init();	/* Load the IRCD Protocol Module up*/
-
-/*************************************************************************/
-/*************************************************************************/
-/* Command Managment Functions */
-MDE Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
-
-/*************************************************************************/
-
-/* Message Managment Functions */
-MDE Message *createMessage(const char *name,int (*func)(const char *source, int ac, const char **av));
-Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
-MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
-MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
-int delMessage(MessageHash *msgTable[], Message *m);		/* Del a Message from a msg table */
-int destroyMessage(Message *m);					/* destroy a Message*/
-
-/*************************************************************************/
-
-MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
-
-/************************************************************************/
 
 #endif
-/* EOF */

@@ -1,5 +1,4 @@
-# Find all the *.c and *.cpp files within the current source directory, and sort the list
-file(GLOB MODULES_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
+# Find all the *.cpp files within the current source directory, and sort the list
 file(GLOB MODULES_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(MODULES_SRCS ${MODULES_SRCS_C} ${MODULES_SRCS_CPP})
 sort_list(MODULES_SRCS)
@@ -58,6 +57,7 @@ endforeach(SRC)
 file(GLOB MODULES_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*")
 remove_item_from_list(MODULES_FILES "CMakeFiles")
 remove_item_from_list(MODULES_FILES "mysql")
+remove_item_from_list(MODULES_FILES "ssl")
 
 # Iterate through this directory searching for subdirectories, and creating modules for those subdirectories
 foreach(FILE ${MODULES_FILES})

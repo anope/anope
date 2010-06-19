@@ -1,31 +1,24 @@
 #include "services.h"
 #include "modules.h"
 
-#define HASH(nick)       ((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
-
 NickRequest::NickRequest(const std::string &nickname)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickRequest constructor");
 
-	next = prev = NULL;
 	email = NULL;
 	requested = lastmail = 0;
 
 	this->nick = sstrdup(nickname.c_str());
-	insert_requestnick(this); // till this is destroyed / redone in STL
+
+	NickRequestList[this->nick] = this;
 }
 
 NickRequest::~NickRequest()
 {
 	FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(this));
 
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		nrlists[HASH(this->nick)] = this->next;
+	NickRequestList.erase(this->nick);
 	
 	if (this->nick)
 		delete [] this->nick;
@@ -44,14 +37,14 @@ NickAlias::NickAlias(const std::string &nickname, NickCore *nickcore)
 	else if (!nickcore)
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
-	next = prev = NULL;
 	nick = last_quit = last_realname = last_usermask = NULL;
 	time_registered = last_seen = 0;
 	
 	this->nick = sstrdup(nickname.c_str());
 	this->nc = nickcore;
-	slist_add(&nc->aliases, this);
-	alpha_insert_alias(this);
+	nc->aliases.push_back(this);
+
+	NickAliasList[this->nick] = this;
 
 	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
 	{
@@ -95,8 +88,12 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		slist_remove(&this->nc->aliases, this);
-		if (this->nc->aliases.count == 0)
+		std::list<NickAlias *>::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
+		if (it != this->nc->aliases.end())
+		{
+			nc->aliases.erase(it);
+		}
+		if (this->nc->aliases.empty())
 		{
 			delete this->nc;
 			this->nc = NULL;
@@ -110,12 +107,7 @@ NickAlias::~NickAlias()
 	}
 
 	/* Remove us from the aliases list */
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		nalists[HASH(this->nick)] = this->next;
+	NickAliasList.erase(this->nick);
 
 	delete [] this->nick;
 	if (this->last_usermask)

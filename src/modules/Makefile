@@ -8,8 +8,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'\
 	   'MAKEBIN=${MAKEBIN}' 'MYSQLDIR=${MYSQLDIR}'
 
-OBJECTS= $(SRCS:.c=.so)
-OBJECTS+= $(SRCS:.cpp=.so)
+OBJECTS= $(SRCS:.cpp=.so)
 CDEFS= -rdynamic -Wall
 MYSQL_ARGS = -I$(MYSQLDIR)/include/ -L$(MYSQLDIR)/lib/ -Wl,-rpath -Wl,$(MYSQLDIR)/lib/ -lmysqlpp
 
@@ -25,16 +24,11 @@ install:
 
 distclean: spotless
 
-.SUFFIXES: .c .cpp .so
-
-.c.so:
-	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
-	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) \
-	-I../${INCLUDEDIR} -o $@ $<
+.SUFFIXES: .cpp .so
 
 .cpp.so:
 	$(MAKEBIN) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} \
-	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) \
+	$(if $(shell grep RequiredLibraries $< | grep mysqlpp), $(MYSQL_ARGS)) $(if $(shell grep RequiredLibraries $< | grep ssl), -lssl) $(if $(shell grep RequiredLibraries $< | grep crypt), -lcrypt) \
 	-I../${INCLUDEDIR} -o $@ $<
 
 subs:

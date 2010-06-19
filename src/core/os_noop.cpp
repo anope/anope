@@ -1,0 +1,91 @@
+/* OperServ core functions
+ *
+ * (C) 2003-2010 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ *
+ */
+/*************************************************************************/
+
+#include "module.h"
+
+class CommandOSNOOP : public Command
+{
+ public:
+	CommandOSNOOP() : Command("NOOP", 2, 2, "operserv/noop")
+	{
+	}
+
+	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	{
+		ci::string cmd = params[0];
+		const char *server = params[1].c_str();
+
+		if (cmd == "SET")
+		{
+			std::string reason;
+
+			/* Remove the O:lines */
+			ircdproto->SendSVSNOOP(server, 1);
+
+			reason = "NOOP command used by " + u->nick;
+			if (Config.WallOSNoOp)
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server);
+			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
+
+			/* Kill all the IRCops of the server */
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			{
+				User *u2 = it->second;
+				++it;
+
+				if (u2 && is_oper(u2) && Anope::Match(u2->server->GetName(), server, true))
+					kill_user(Config.s_OperServ, u2->nick.c_str(), reason.c_str());
+			}
+		}
+		else if (cmd == "REVOKE")
+		{
+			ircdproto->SendSVSNOOP(server, 0);
+			notice_lang(Config.s_OperServ, u, OPER_NOOP_REVOKE, server);
+		}
+		else
+			this->OnSyntaxError(u, "");
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const ci::string &subcommand)
+	{
+		notice_help(Config.s_OperServ, u, OPER_HELP_NOOP);
+		return true;
+	}
+
+	void OnSyntaxError(User *u, const ci::string &subcommand)
+	{
+		syntax_error(Config.s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_NOOP);
+	}
+};
+
+class OSNOOP : public Module
+{
+ public:
+	OSNOOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetVersion(VERSION_STRING);
+		this->SetType(CORE);
+
+		this->AddCommand(OperServ, new CommandOSNOOP());
+	}
+};
+
+MODULE_INIT(OSNOOP)

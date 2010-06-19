@@ -379,6 +379,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Você é agora um membro do grupo %s.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY senha
@@ -811,9 +819,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	%d nicks no grupo.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (expira em %s)
+	   %s (expira em %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -863,18 +871,15 @@ NICK_SENDPASS_UNAVAILABLE
 	Comando SENDPASS não disponível: modo de encriptação ativado.
 NICK_SENDPASS_SUBJECT
 	Senha do nick (%s)
-NICK_SENDPASS_HEAD
-	Olá,
-NICK_SENDPASS_LINE_1
-	Você pediu para que a senha do nick %s fosse enviada por e-mail.
-NICK_SENDPASS_LINE_2
-	A senha é %s. Por motivos de segurança, recomendamos que você mude sua senha após ler este e-mail.
-NICK_SENDPASS_LINE_3
-	Se você não souba porque este e-mail lhe foi enviado, por favor ignore-o.
-NICK_SENDPASS_LINE_4
-	NÃO RESPONDA A ESTE E-MAIL!
-NICK_SENDPASS_LINE_5
-	Administradores %s.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	Senha para %s foi enviada.
 
@@ -888,9 +893,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -935,18 +939,15 @@ NICK_ENTER_REG_CODE
 	O passcode foi enviado para %s, por favor digite %R%s confirm <passcode> para completar o registro.
 NICK_REG_MAIL_SUBJECT
 	Registro de nick (%s)
-NICK_REG_MAIL_HEAD
-	Olá,
-NICK_REG_MAIL_LINE_1
-	Você solicitou o registro do seguinte nick: %s.
-NICK_REG_MAIL_LINE_2
-	Por favor digite %R%s confirm %s para completar o registro.
-NICK_REG_MAIL_LINE_3
-	Se você não sabe porque este e-mail lhe foi enviado, por favor ignore-o com sigilo.
-NICK_REG_MAIL_LINE_4
-	POR FAVOR NÃO RESPONDA A ESTE E-MAIL!
-NICK_REG_MAIL_LINE_5
-	Administradores %s.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Passcode para %s é %s.
 NICK_FORCE_REG
@@ -1047,6 +1048,8 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1095,6 +1098,34 @@ CHAN_DROP_DISABLED
 	Desculpe, o comando DROP está temporariamente desativado.
 CHAN_DROPPED
 	O canal %s foi desregistrado.
+
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
 
 # SET responses
 CHAN_SET_SYNTAX
@@ -2010,12 +2041,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Memo2Mail responses
 MEMO_MAIL_SUBJECT
 	Novo memo
-MEMO_MAIL_TEXT1
-	Olá %s
-MEMO_MAIL_TEXT2
-	Você recebeu um novo memo de %s. Este é seu memo número %d.
-MEMO_MAIL_TEXT3
-	Mensagem do memo:
+NICK_MAIL_TEXT
+	Hi %s
+	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
 
 # RSEND responses
 MEMO_RSEND_PLEASE_WAIT
@@ -2516,22 +2549,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Tempo atual de expiração de akill: 1 minuto
 OPER_STATS_AKILL_EXPIRE_NONE
 	Tempo atual de expiração de akill: Não expira
-OPER_STATS_SGLINE_COUNT
-	Número atual de SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Tempo atual de expiração de SGLINE: %d dias
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Tempo atual de expiração de SGLINE: 1 dia
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Tempo atual de expiração de SGLINE: %d horas
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Tempo atual de expiração de SGLINE: 1 hora
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Tempo atual de expiração de SGLINE: %d minutos
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Tempo atual de expiração de SGLINE: 1 minuto
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Tempo atual de expiração de SGLINE: Não expira
+OPER_STATS_SNLINE_COUNT
+	Número atual de SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Tempo atual de expiração de SNLINE: %d dias
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Tempo atual de expiração de SNLINE: 1 dia
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Tempo atual de expiração de SNLINE: %d horas
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Tempo atual de expiração de SNLINE: 1 hora
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Tempo atual de expiração de SNLINE: %d minutos
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Tempo atual de expiração de SNLINE: 1 minuto
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Tempo atual de expiração de SNLINE: Não expira
 OPER_STATS_SQLINE_COUNT
 	Número atual de SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2657,46 +2690,46 @@ OPER_AKILL_CLEAR
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+tempo] {#canal} [motivo]
 
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+tempo] {máscara | lista}[:motivo]]
-OPER_SGLINE_UNSUPPORTED
-	Desculpe, SGLINE não está disponível nesta Rede.
-OPER_SGLINE_EXISTS
-	%s já existe na lista de SGLINE.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+tempo] {máscara | lista}[:motivo]]
+OPER_SNLINE_UNSUPPORTED
+	Desculpe, SNLINE não está disponível nesta Rede.
+OPER_SNLINE_EXISTS
+	%s já existe na lista de SNLINE.
+OPER_SNLINE_ALREADY_COVERED
 	%s já está coberto por %s.
-OPER_SGLINE_REACHED_LIMIT
-	Desculpe, você pode ter apenas %d SGLINEs.
-OPER_SGLINE_ADDED
-	%s adicionado à lista de SGLINE.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Desculpe, você pode ter apenas %d SNLINEs.
+OPER_SNLINE_ADDED
+	%s adicionado à lista de SNLINE.
+OPER_SNLINE_CHANGED
 	Tempo de expiração para %s aterado.
-OPER_SGLINE_NOT_FOUND
-	%s não encontrado na lista de SGLINE.
-OPER_SGLINE_NO_MATCH
-	Nenhum resultado equivalente na lista de SGLINE.
-OPER_SGLINE_DELETED
-	%s removido da lista de SGLINE.
-OPER_SGLINE_DELETED_ONE
-	Removida 1 entrada da lista de SGLINE.
-OPER_SGLINE_DELETED_SEVERAL
-	Removidas %d entradas da lista de SGLINE.
-OPER_SGLINE_LIST_EMPTY
-	A lista de SGLINE está vazia.
-OPER_SGLINE_LIST_HEADER
-	Lista de SGLINE atual:
+OPER_SNLINE_NOT_FOUND
+	%s não encontrado na lista de SNLINE.
+OPER_SNLINE_NO_MATCH
+	Nenhum resultado equivalente na lista de SNLINE.
+OPER_SNLINE_DELETED
+	%s removido da lista de SNLINE.
+OPER_SNLINE_DELETED_ONE
+	Removida 1 entrada da lista de SNLINE.
+OPER_SNLINE_DELETED_SEVERAL
+	Removidas %d entradas da lista de SNLINE.
+OPER_SNLINE_LIST_EMPTY
+	A lista de SNLINE está vazia.
+OPER_SNLINE_LIST_HEADER
+	Lista de SNLINE atual:
 	  Núm   Máscara                           Motivo
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Lista de SGLINE atual:
+OPER_SNLINE_VIEW_HEADER
+	Lista de SNLINE atual:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (por %s em %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	A lista de SGLINE foi apagada.
+OPER_SNLINE_CLEAR
+	A lista de SNLINE foi apagada.
 
 # SZLINE responses
 OPER_SQLINE_SYNTAX
@@ -3310,6 +3343,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Registra um nick
 NICK_HELP_CMD_GROUP
 	    GROUP      Se junta a um grupo
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Identifica seu nick com sua senha
 NICK_HELP_CMD_ACCESS
@@ -3440,6 +3475,15 @@ NICK_HELP_GROUP
 	
 	Atenção: todos os nicks do grupo terão a mesma senha.
 
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+	
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Sintaxe: IDENTIFY senha
 	
@@ -3500,25 +3544,39 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Mostra a lista de acesso atual.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Sintaxe: SET opção parâmetros
 	
 	Ajusta várias opções de nick. A opção pode ser:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Mostra o seu grupo nos Services
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Ajusta a senha do seu nick
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Ajusta a linguagem dos Services quando
 	                   mensagens são enviadas à você
+NICK_HELP_CMD_SET_URL
 	    URL        Associa um endereço URL com seu nick
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associa um endereço de e-mail ao seu nick
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Associa um número de ICQ ao seu nick
+NICK_HELP_CMD_SET_GREET
 	    GREET      Associa uma mensgem de entrada ao seu nick
+NICK_HELP_CMD_SET_KILL
 	    KILL       Ativa/Desativa a proteção de kill para o seu nick
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     Ativa/Desativa os recursos de segurança para o seu nick
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Previne seu nick de aparecer em um %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Esconde certas informações sobre seu nick
+NICK_HELP_CMD_SET_MSG
 	    MSG        Altera o método de comunicação dos Services
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Should services op you automatically.    
+NICK_HELP_SET_TAIL
 	
 	Para usar este comando, você deve primeiro se identificar
 	com sua senha (%R%S HELP IDENTIFY para maiores
@@ -3641,26 +3699,40 @@ NICK_HELP_SET_AUTOOP
 	Sets whether you will be opped automatically. Set to ON to 
 	allow ChanServ to op you automatically when entering channels.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntax: SASET nickname option parameters.
 	
 	Sets various nickname options.  option can be one of:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
+NICK_HELP_CMD_SASET_URL
 	    URL        Associate a URL with the nickname
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Associate an ICQ number with the nickname
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Turn protection on or off
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Turn nickname security on or off
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Prevent the nickname from appearing in a
 	                   %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Hide certain pieces of nickname information
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Change the communication method of Services
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Prevent the nickname from expiring
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Set the language Services will use when
 	               sending messages to nickname
+NICK_HELP_SASET_TAIL
 	
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
@@ -3975,7 +4047,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Administradores de Services podem usar o parâmetro ALL com qualquer nick.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Sintaxe: LIST padrão [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4078,6 +4151,8 @@ CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registra um canal
 CHAN_HELP_CMD_SET
 	    SET        Ajusta as opções e informações do canal
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4180,7 +4255,15 @@ CHAN_HELP_DROP
 	Cancela o registro do canal. So poderá ser usado pelo
 	fundador do canal.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Sintaxe: SET canal opção parâmetros
 	
 	Permite ao fundador do canal ajustar as várias opções do
@@ -4188,39 +4271,62 @@ CHAN_HELP_SET
 	
 	Opções disponíveis:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Ajusta o fundador do canal
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Ajusta o sucessor do canal
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Ajusta a descrição do canal
+CHAN_HELP_CMD_SET_URL
 	    URL           Associa uma URL a um canal
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Associa um E-mail a um canal
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Ajusta a mensagem que deve ser mandada
 	                    aos usuários quando eles entram no canal
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Ajusta como os Services devem fazer o ban
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Liga ou desliga a trava dos modos do canal
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Mantem o tópico quando o canal não está em uso
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     O tópico pode ser mudado apenas com o comando TOPIC
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Regula o uso de comandos críticos
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Esconde o canal do comando LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Acesso restrito ao canal
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Ativa os recursos de segurança do %S
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Controle rigoroso do status de OP
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Controle rigoroso do status de Fundador do Canal
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Assinatura dos kicks feitos pelo comando KICK
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Envia uma notice quando os comandos OP/DEOP são usados
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Altera o sistema de privilégio de usuário
-		PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_PERSIST
+	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Digite %R%S HELP SET opção para maiores informações
 	sobre uma opção em particular.
 
 CHAN_HELP_SET_FOUNDER
-	Sintaxe: SET canal FOUNDER nick
+	Sintaxe: %s canal FOUNDER nick
 	
 	Muda o fundador do canal. O novo nick deve estar
 	registrado.
 
 CHAN_HELP_SET_SUCCESSOR
-	Sintaxe: SET canal SUCCESSOR nick
+	Sintaxe: %s canal SUCCESSOR nick
 	
 	Altera o sucessor de um canal. Se o nick do founder expirar
 	ou for dropado enquanto o canal ainda estiver registrado,
@@ -4230,13 +4336,13 @@ CHAN_HELP_SET_SUCCESSOR
 	sido ajustado. O novo nick deverá estar registrado.
 
 CHAN_HELP_SET_DESC
-	Sintaxe: SET canal DESC descrição
+	Sintaxe: %s canal DESC descrição
 	
 	Ajusta a descrição para o canal, que são mostradas com
 	os comandos LIST e INFO.
 
 CHAN_HELP_SET_URL
-	Sintaxe: SET canal URL [url]
+	Sintaxe: %s canal URL [url]
 	
 	Associa uma URL ao canal. Esta URL será mostrada
 	sempre que alguem solicitar informação sobre o canal
@@ -4244,7 +4350,7 @@ CHAN_HELP_SET_URL
 	apaga qualquer URL atualmente designada para o canal.
 
 CHAN_HELP_SET_EMAIL
-	Sintaxe: SET canal EMAIL [endereço]
+	Sintaxe: %s canal EMAIL [endereço]
 	
 	Associa um endereço de e-mail fornecido ao canal.
 	Este endereço será mostrado sempre que alguem solicitar
@@ -4253,7 +4359,7 @@ CHAN_HELP_SET_EMAIL
 	do canal.
 
 CHAN_HELP_SET_ENTRYMSG
-	Sintaxe: SET canal ENTRYMSG [mensagem]
+	Sintaxe: %s canal ENTRYMSG [mensagem]
 	
 	Ajusta a mensagem na qual será enviada via /notice para
 	os usuários quando eles entrarem no canal. Se nenhum
@@ -4261,7 +4367,7 @@ CHAN_HELP_SET_ENTRYMSG
 	ao se entrar no canal.
 	
 CHAN_HELP_SET_BANTYPE
-	Sintaxe: SET canal BANTYPE tipo-de-ban
+	Sintaxe: %s canal BANTYPE tipo-de-ban
 	
 	Seleciona o tipo de ban que será usado sempre que os Services
 	precisarem banir alguém do seu canal.
@@ -4274,7 +4380,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban na forma *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Sintaxe: SET canal KEEPTOPIC {ON|OFF}
+	Sintaxe: %s canal KEEPTOPIC {ON|OFF}
 	
 	Ativa ou desativa a opção de retenção de tópico para
 	um canal. Quando a retenção de tópico está acionada,
@@ -4283,7 +4389,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	restaurado na próxima vez que o canal for reutilizado.
 
 CHAN_HELP_SET_TOPICLOCK
-	Sintaxe: SET canal TOPICLOCK {ON|OFF}
+	Sintaxe: %s canal TOPICLOCK {ON|OFF}
 	
 	Ativa ou desativa a opção de trava do tópico de um canal.
 	Quando a trava do tópico está ativada, o %S não
@@ -4291,7 +4397,7 @@ CHAN_HELP_SET_TOPICLOCK
 	TOPIC.
 
 CHAN_HELP_SET_MLOCK
-	Sintaxe: SET canal MLOCK modos
+	Sintaxe: %s canal MLOCK modos
 	
 	Ajusta o parâmetro da trava do modo para um canal. O
 	%S permite que você defina certos modos no canal
@@ -4329,7 +4435,7 @@ CHAN_HELP_SET_MLOCK
 	        ficam livres para ser ativos ou desativos.
 
 CHAN_HELP_SET_PEACE
-	Sintaxe: SET canal PEACE {ON | OFF}
+	Sintaxe: %s canal PEACE {ON | OFF}
 	
 	Ativa ou destiva a opção peace para um canal.
 	Quando peace está ativada, um usuário não poderá kickar,
@@ -4337,21 +4443,21 @@ CHAN_HELP_SET_PEACE
 	nível superior ou igual ao seu via comandos do %S.
 
 CHAN_HELP_SET_PRIVATE
-	Sintaxe: SET canal PRIVATE {ON|OFF}
+	Sintaxe: %s canal PRIVATE {ON|OFF}
 	
 	Ativa ou desativa a opção private para um canal. Quando
 	private está ativada, um %R%S LIST não irá incluir
 	o canal em qualquer listagem.
 
 CHAN_HELP_SET_RESTRICTED
-	Sintaxe: SET canal RESTRICTED {ON|OFF}
+	Sintaxe: %s canal RESTRICTED {ON|OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Sintaxe: SET canal SECURE {ON|OFF}
+	Sintaxe: %s canal SECURE {ON|OFF}
 	
 	Ativa ou desativa os recursos de segurança do %S
 	para um canal. Quando o SECURE estiver ativo, somente
@@ -4360,14 +4466,14 @@ CHAN_HELP_SET_SECURE
 	controlado pela lista de acesso.
 
 CHAN_HELP_SET_SECUREOPS
-	Sintaxe: SET canal SECUREOPS {ON|OFF}
+	Sintaxe: %s canal SECUREOPS {ON|OFF}
 	
 	Ativa ou desativa a opção de segurança de ops para um canal.
 	Quando secure ops estiver ativada, os usuários que não
 	estiverem na lista de acesso não poderão ter o status de OP.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Sintaxe: SET canal SECUREFOUNDER {ON | OFF}
+	Sintaxe: %s canal SECUREFOUNDER {ON | OFF}
 	
 	Ativa ou desativa a opção secure founder para um canal.
 	Quando o secure founder está ligado, apenas o verdadeiro founder
@@ -4375,7 +4481,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	successor, e não aqueles que estiverem identificados no %S.
 	
 CHAN_HELP_SET_SIGNKICK
-	Sintaxe: SET canal SIGNKICK {ON | LEVEL | OFF}
+	Sintaxe: %s canal SIGNKICK {ON | LEVEL | OFF}
 	
 	Habilita ou desabilita a assinatura nos kicks para um
 	canal. Quando o SIGNKICK está habilitado, kicks através
@@ -4387,7 +4493,7 @@ CHAN_HELP_SET_SIGNKICK
 	motivo. Veja %R%S HELP LEVELS para maiores informações. 
 
 CHAN_HELP_SET_XOP
-	Sintaxe: SET canal XOP {ON | OFF}
+	Sintaxe: %s canal XOP {ON | OFF}
 	
 	Ativa ou desativa o sistema de listas xOP para um canal.
 	Quando XOP está ativado, você deve usar os comandos
@@ -4409,7 +4515,7 @@ CHAN_HELP_SET_XOP
 	de acesso não causa problemas.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4432,7 +4538,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Sintaxe: SET canal OPNOTICE {ON | OFF}
+	Sintaxe: %s canal OPNOTICE {ON | OFF}
 	
 	Ativa e desativa a opção Op-notice para um canal. Quando
 	Op-notice estiver ativado, o %S enviará uma notice para
@@ -4983,13 +5089,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Cancela o registro de um canal. Somente Administradores dos
 	Services podem cancelar canais que pertencem a outros usuários.
 
-CHAN_SERVADMIN_HELP_SET
-	
-	Administradores dos Services também podem ajustar a opção 
-	NOEXPIRE, fazendo com que canais sejam impedidos de ter 
-	seu registro expirado. Services Operators ainda
-	podem ajustar opções para qualquer canal de outros usuários.
-
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Sintaxe: SET canal NOEXPIRE {ON | OFF}
 	
@@ -5303,8 +5402,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Derruba todos os usuários de um mesmo host
 OPER_HELP_CMD_AKILL
 	    AKILL       Manipula a lista de AKILL
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Manipula a lista de SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Manipula a lista de SNLINE
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Manipula a lista de SQLINE
 OPER_HELP_CMD_SZLINE
@@ -5501,50 +5600,50 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR apaga todas as entradas da lista de AKILL.
 	
-OPER_HELP_SGLINE
-	Sintaxe: SGLINE ADD [+tempo] máscara:motivo
-	         SGLINE DEL {máscara | entrada | lista-entradas}
-	         SGLINE LIST [máscara | lista-entradas]
-	         SGLINE VIEW [máscara | lista-entradas]
-	         SGLINE CLEAR
+OPER_HELP_SNLINE
+	Sintaxe: SNLINE ADD [+tempo] máscara:motivo
+	         SNLINE DEL {máscara | entrada | lista-entradas}
+	         SNLINE LIST [máscara | lista-entradas]
+	         SNLINE VIEW [máscara | lista-entradas]
+	         SNLINE CLEAR
 	
 	Permite que Operadores dos Services manipulem a lista de
-	SGLINE. Se um usuário que tenta conectar possui um realname
-	previsto na lista de SGLINE, os Services não permitirão que
+	SNLINE. Se um usuário que tenta conectar possui um realname
+	previsto na lista de SNLINE, os Services não permitirão que
 	ele continue sua sessão de IRC.
 	
-	SGLINE ADD adiciona uma máscara realname na lista de SGLINE
+	SNLINE ADD adiciona uma máscara realname na lista de SNLINE
 	para um dado motivo (deve ser fornecido).
 	Opcionalmente, um tempo pode ser fornecido. O tempo precede a
 	máscara e é especificado como um número inteiro seguido por uma das
 	seguintes unidades: d (dias), h (horas) ou m (minutos).
 	Combinações (como 1h30m) não são permitidas. Se uma unidade
 	específica não é incluída, o padrão é em dias (assim, +30
-	significa 30 dias). Para adicionar um SGLINE que não expira,
+	significa 30 dias). Para adicionar um SNLINE que não expira,
 	use +0. Se a máscara de realname a ser adicionada começar com
-	um +, o tempo do SGLINE deve ser fornecido, mesmo se esse tempo
-	for igual ao padrão. O tempo atual de expiração de SGLINE pode ser
+	um +, o tempo do SNLINE deve ser fornecido, mesmo se esse tempo
+	for igual ao padrão. O tempo atual de expiração de SNLINE pode ser
 	encontrado com o comando STATS AKILL.
 	Nota: devido ao fato da máscara de realname poder conter espaços,
 	o separador entre ela e o motivo é um sinal de dois-pontos.
 	
-	SGLINE DEL remove uma dada máscara da lista de SGLINE, se ela
+	SNLINE DEL remove uma dada máscara da lista de SNLINE, se ela
 	estiver presente. Se uma lista de números de entrada for fornecida,
 	essas entradas serão apagadas. (Veja o exemplo para LIST abaixo.)
 	
-	SGLINE LIST mostra a lista de SGLINE atual.
+	SNLINE LIST mostra a lista de SNLINE atual.
 	Se uma máscara for fornecida, apenas as entradas que combinarem
 	com a máscara serão exibidas. Se uma lista de números de entrada
 	for fornecida, apenas essas entradas serão exibidas; por exemplo:
 	
-	   SGLINE LIST 2-5,7-9
-	      Lista as entradas de SGLINE numeradas de 2 a 5 e de 7 a 9.
+	   SNLINE LIST 2-5,7-9
+	      Lista as entradas de SNLINE numeradas de 2 a 5 e de 7 a 9.
 	
-	SGLINE VIEW é uma versão mais detalhada do SGLINE LIST,
-	e mostrará quem adicionou o SGLINE, a data em que foi adicionado,
+	SNLINE VIEW é uma versão mais detalhada do SNLINE LIST,
+	e mostrará quem adicionou o SNLINE, a data em que foi adicionado,
 	e quando irá expirar, como também a máscara realname e o motivo.
 	
-	SGLINE CLEAR apaga todas as entradas da lista de SGLINE.
+	SNLINE CLEAR apaga todas as entradas da lista de SNLINE.
 
 OPER_HELP_SQLINE
 	Sintaxe: SQLINE ADD [+tempo] máscara motivo

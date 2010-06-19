@@ -27,7 +27,7 @@ static std::vector<std::string> MakeVector(std::string buf)
 
 static void LoadDatabase()
 {
-	mysqlpp::Query query(Me->Con);
+	mysqlpp::Query query(me->Con);
 	mysqlpp::StoreQueryResult qres;
 
 	query << "SELECT * FROM `anope_ns_core`";
@@ -166,7 +166,13 @@ static void LoadDatabase()
 	{
 		for (size_t i = 0; i < qres.num_rows(); ++i)
 		{
-			BotInfo *bi = new BotInfo(SQLAssign(qres[i]["nick"]), SQLAssign(qres[i]["user"]), SQLAssign(qres[i]["host"]), SQLAssign(qres[i]["rname"]));
+			BotInfo *bi = findbot(SQLAssign(qres[i]["nick"]));
+			if (!bi)
+				bi = new BotInfo(SQLAssign(qres[i]["nick"]));
+			bi->user = SQLAssign(qres[i]["user"]);
+			bi->host = SQLAssign(qres[i]["host"]);
+			bi->real = SQLAssign(qres[i]["rname"]);
+
 			if (qres[i]["flags"].size())
 			{
 				spacesepstream sep(SQLAssign(qres[i]["flags"]));
@@ -266,52 +272,37 @@ static void LoadDatabase()
 			ci->bantype = atoi(qres[i]["bantype"].c_str());
 			if (qres[i]["mlock_on"].size())
 			{
+				std::vector<std::string> modes;
 				std::string buf;
+
 				spacesepstream sep(SQLAssign(qres[i]["mlock_on"]));
 				while (sep.GetToken(buf))
-				{
-					for (int j = 0; ChannelModes[j].Mode != -1; ++j)
-					{
-						if (buf == ChannelModes[j].Name)
-						{
-							ci->SetMLock(ChannelModes[j].Mode, true);
-							break;
-						}
-					}
-				}
+					modes.push_back(buf);
+
+				ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<std::string> >(modes));
 			}
 			if (qres[i]["mlock_off"].size())
 			{
+				std::vector<std::string> modes;
 				std::string buf;
+
 				spacesepstream sep(SQLAssign(qres[i]["mlock_off"]));
 				while (sep.GetToken(buf))
-				{
-					for (int j = 0; ChannelModes[j].Mode != -1; ++j)
-					{
-						if (buf == ChannelModes[j].Name)
-						{
-							ci->SetMLock(ChannelModes[j].Mode, false);
-							break;
-						}
-					}
-				}
+					modes.push_back(buf);
+
+				ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<std::string> >(modes));
 			}
 			if (qres[i]["mlock_params"].size())
 			{
-				std::string buf;
+				std::vector<std::pair<std::string, std::string> > mlp;
+				std::string buf, buf2;
+
 				spacesepstream sep(SQLAssign(qres[i]["mlock_params"]));
-				while (sep.GetToken(buf))
-				{
-					for (int j = 0; ChannelModes[j].Mode != -1; ++j)
-					{
-						if (buf == ChannelModes[j].Name)
-						{
-							sep.GetToken(buf);
-							ci->SetMLock(ChannelModes[j].Mode, true, buf);
-							break;
-						}
-					}
-				}
+
+				while (sep.GetToken(buf) && sep.GetToken(buf2))
+					mlp.push_back(std::make_pair(buf, buf2));
+
+				ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<std::string, std::string> > >(mlp));
 			}
 			if (qres[i]["entry_message"].size())
 				ci->entry_message = sstrdup(qres[i]["entry_message"].c_str());
@@ -629,42 +620,51 @@ static void LoadDatabase()
 	query << "SELECT * FROM `anope_os_akills`";
 	qres = StoreQuery(query);
 
-	if (qres)
+	if (qres && SGLine)
 	{
 		for (size_t i = 0; i < qres.size(); ++i)
 		{
-			Akill *ak = new Akill;
-			ak->user = sstrdup(qres[i]["user"].c_str());
-			ak->host = sstrdup(qres[i]["host"].c_str());
-			ak->by = sstrdup(qres[i]["xby"].c_str());
-			ak->reason = sstrdup(qres[i]["reason"].c_str());
-			ak->seton = atol(qres[i]["seton"].c_str());
-			ak->expires = atol(qres[i]["expire"].c_str());
-			slist_add(&akills, ak);
+			ci::string user = qres[i]["user"].c_str();
+			ci::string host = qres[i]["host"].c_str();
+			ci::string by = qres[i]["xby"].c_str();
+			std::string reason = SQLAssign(qres[i]["reason"]);
+			time_t seton = atol(qres[i]["seton"].c_str());
+			time_t expires = atol(qres[i]["expire"].c_str());
+
+			XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
+			if (x)
+			{
+				x->By = by;
+				x->Created = seton;
+			}
 		}
 	}
 
-	query << "SELECT * FROM `anope_os_sxlines`";
+	query << "SELECT * FROM `anope_os_xlines`";
 	qres = StoreQuery(query);
 
 	if (qres)
 	{
 		for (size_t i = 0; i < qres.size(); ++i)
 		{
-			SXLine *sx = new SXLine;
-			sx->mask = sstrdup(qres[i]["mask"].c_str());
-			sx->by = sstrdup(qres[i]["xby"].c_str());
-			sx->reason = sstrdup(qres[i]["reason"].c_str());
-			sx->seton = atol(qres[i]["seton"].c_str());
-			sx->expires = atol(qres[i]["expires"].c_str());
-			if (qres[i]["type"] == "SGLINE")
-				slist_add(&sglines, sx);
-			else if (qres[i]["type"] == "SQLINE")
-				slist_add(&sqlines, sx);
-			else if (qres[i]["type"] == "SZLINE")
-				slist_add(&szlines, sx);
-			else
-				delete sx;
+			ci::string mask = qres[i]["mask"].c_str();
+			ci::string by = qres[i]["xby"].c_str();
+			std::string reason = SQLAssign(qres[i]["reason"]);
+			time_t seton = atol(qres[i]["seton"].c_str());
+			time_t expires = atol(qres[i]["expires"].c_str());
+
+			XLine *x = NULL;
+			if (qres[i]["type"] == "SNLINE" && SNLine)
+				x = SNLine->Add(NULL, NULL, mask, expires, reason);
+			else if (qres[i]["type"] == "SQLINE" && SQLine)
+				x = SQLine->Add(NULL, NULL, mask, expires, reason);
+			else if (qres[i]["type"] == "SZLINE" && SZLine)
+				x = SZLine->Add(NULL, NULL,mask, expires, reason);
+			if (x)
+			{
+				x->By = by;
+				x->Created = seton;
+			}
 		}
 	}
 }

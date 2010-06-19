@@ -17,13 +17,10 @@
 #define E extern CoreExport
 #define EI extern DllExport
 
-#include "slist.h"
 #include "hashcomp.h"
 
 E void ModuleRunTimeDirCleanUp();
 
-
-E char *uplink;
 
 /* IRC Variables */
 
@@ -35,19 +32,25 @@ E IRCDProto *ircdproto;
 
 E void kill_user(const std::string &source, const std::string &user, const std::string &reason);
 E bool bad_password(User *u);
-E void sqline(const std::string &mask, const std::string &reason);
 E void common_unban(ChannelInfo *ci, const std::string &nick);
+
+E BotInfo *BotServ;
+E BotInfo *ChanServ;
+E BotInfo *Global;
+E BotInfo *HostServ;
+E BotInfo *MemoServ;
+E BotInfo *NickServ;
+E BotInfo *OperServ;
 
 /**** botserv.c ****/
 
-E BotInfo *botlists[256];
-E int nbots;
 E void get_botserv_stats(long *nrec, long *memuse);
 E void bs_init();
-E void botserv(User *u, char *buf);
-E void botmsgs(User *u, BotInfo *bi, char *buf);
-E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
+E void botserv(User *u, BotInfo *bi, const std::string &buf);
+E void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf);
+E BotInfo *findbot(const char *nick);
 E BotInfo *findbot(const std::string &nick);
+E BotInfo *findbot(const ci::string &nick);
 
 /** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
  * @param uid The UID to search for
@@ -55,7 +58,6 @@ E BotInfo *findbot(const std::string &nick);
  */
 E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
-E void insert_bot(BotInfo * bi);
 
 E void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, const char *reason);
 E void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, const char *reason);
@@ -63,12 +65,11 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *
 
 /**** channels.c ****/
 
-E Channel *chanlist[1024];
-
 E void get_channel_stats(long *nrec, long *memuse);
+
 E Channel *findchan(const char *chan);
-E Channel *firstchan();
-E Channel *nextchan();
+E Channel *findchan(const std::string &chan);
+E Channel *findchan(const ci::string &chan);
 
 E void ChanSetInternalModes(Channel *c, int ac, const char **av);
 
@@ -77,6 +78,7 @@ E User *nc_on_chan(Channel * c, NickCore * nc);
 E char *chan_get_modes(Channel * chan, int complete, int plus);
 
 E int get_access_level(ChannelInfo * ci, NickAlias * na);
+E int get_access_level(ChannelInfo *ci, NickCore *nc);
 E const char *get_xop_level(int level);
 
 E void do_cmode(const char *source, int ac, const char **av);
@@ -106,34 +108,28 @@ E long get_memuse(EList *list);
 
 /**** chanserv.c ****/
 
-E ChannelInfo *chanlists[256];
 E LevelInfo levelinfo[];
 
 E void get_chanserv_stats(long *nrec, long *memuse);
 
-E void alpha_insert_chan(ChannelInfo * ci);
 E void reset_levels(ChannelInfo * ci);
 E void cs_init();
-E void chanserv(User * u, char *buf);
+E void chanserv(User *u, const std::string &buf);
 E void expire_chans();
 E void cs_remove_nick(const NickCore * nc);
 
 E void check_modes(Channel * c);
 E int check_valid_admin(User * user, Channel * chan, int servermode);
 E int check_valid_op(User * user, Channel * chan, int servermode);
-E int check_should_op(User * user, char *chan);
-E int check_should_voice(User * user, char *chan);
-E int check_should_halfop(User * user, char *chan);
-E int check_should_owner(User * user, char *chan);
-E int check_should_protect(User * user, char *chan);
 E void record_topic(const char *chan);
 E void restore_topic(const char *chan);
 E int check_topiclock(Channel * c, time_t topic_time);
 
+E ChannelInfo *cs_findchan(const char *chan);
 E ChannelInfo *cs_findchan(const std::string &chan);
+E ChannelInfo *cs_findchan(const ci::string &chan);
 E int check_access(User * user, ChannelInfo * ci, int what);
 E bool IsFounder(User *user, ChannelInfo *ci);
-E bool IsRealFounder(User *user, ChannelInfo *ci);
 E int get_access(User *user, ChannelInfo *ci);
 E void update_cs_lastseen(User * user, ChannelInfo * ci);
 E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
@@ -162,7 +158,7 @@ E int read_config(int reload);
 
 /* hostserv.c */
 E void do_on_id(User *u);
-E void hostserv(User *u, char *buf);
+E void hostserv(User *u, const std::string &buf);
 E void HostServSyncVhosts(NickAlias *na);
 
 /**** encrypt.c ****/
@@ -213,22 +209,12 @@ E void log_perror(const char *fmt, ...)		FORMAT(printf,1,2);
 E void fatal(const char *fmt, ...)		FORMAT(printf,1,2);
 E void fatal_perror(const char *fmt, ...)	FORMAT(printf,1,2);
 
-/**** mail.c ****/
-
-E MailInfo *MailBegin(User *u, NickCore *nc, char *subject, char *service);
-E MailInfo *MailRegBegin(User *u, NickRequest *nr, char *subject, char *service);
-E MailInfo *MailMemoBegin(NickCore * nc);
-E void MailEnd(MailInfo *mail);
-E void MailReset(User *u, NickCore *nc);
-E int MailValidate(const char *email);
-
 /**** main.c ****/
 
 E const char version_number[];
 E const char version_number_dotted[];
 E const char version_build[];
 E char *version_protocol;
-E const char version_flags[];
 
 E std::string services_dir;
 E std::string log_filename;
@@ -267,7 +253,8 @@ E char *sstrdup(const char *s);
 /**** memoserv.c ****/
 
 E void ms_init();
-E void memoserv(User * u, char *buf);
+E void memoserv(User * u, const std::string &buf);
+E void rsend_notify(User *u, Memo *m, const char *chan);
 E void check_memos(User * u);
 E MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid);
 E void memo_send(User * u, const char *name, const char *text, int z);
@@ -279,7 +266,7 @@ E int m_nickcoll(const char *user);
 E int m_away(const char *source, const char *msg);
 E int m_kill(const std::string &nick, const char *msg);
 E int m_motd(const char *source);
-E int m_privmsg(const char *source, const std::string &receiver, const char *msg);
+E int m_privmsg(const std::string &source, const std::string &receiver, const std::string &message);
 E int m_stats(const char *source, int ac, const char **av);
 E int m_whois(const char *source, const char *who);
 E int m_time(const char *source, int ac, const char **av);
@@ -288,6 +275,7 @@ E int m_version(const char *source, int ac, const char **av);
 
 /**** misc.c ****/
 
+E bool IsFile(const std::string &filename);
 E int toupper(char);
 E int tolower(char);
 E char *strscpy(char *d, const char *s, size_t len);
@@ -306,10 +294,6 @@ E time_t dotime(const char *s);
 E const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds);
 E const char *expire_left(NickCore *nc, char *buf, int len, time_t expires);
 E int doValidHost(const char *host, int type);
-
-typedef int (*range_callback_t) (User * u, int num, va_list args);
-E int process_numlist(const char *numstr, int *count_ret,
-					  range_callback_t callback, User * u, ...);
 
 E int isValidHost(const char *host, int type);
 E int isvalidchar(const char c);
@@ -354,25 +338,18 @@ E int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host);
 /**** modes.cpp ****/
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
-E std::bitset<128> DefMLockOn;
-E std::bitset<128> DefMLockOff;
+E Flags<ChannelModeName> DefMLockOn;
+E Flags<ChannelModeName> DefMLockOff;
 E std::map<ChannelModeName, std::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
 E std::list<ChannelModeStatus *> BotModes;
 E void SetDefaultMLock();
 
-/**** modules.c ****/
-E void modules_unload_all(bool unload_proto);	/* Read warnings near function source */
-
 /**** nickserv.c ****/
 
-E NickAlias *nalists[1024];
-E NickCore *nclists[1024];
-E NickRequest *nrlists[1024];
 E NickRequest *findrequestnick(const char *nick);
-E void insert_requestnick(NickRequest * nr);
-E void alpha_insert_alias(NickAlias * na);
-E void insert_core(NickCore * nc);
+E NickRequest *findrequestnick(const std::string &nick);
+E NickRequest *findrequestnick(const ci::string &nick);
 E void get_aliases_stats(long *nrec, long *memuse);
 E void get_core_stats(long *nrec, long *memuse);
 E void change_core_display(NickCore * nc);
@@ -380,58 +357,17 @@ E void change_core_display(NickCore * nc, const char *newdisplay);
 E int do_setmodes(User * u);
 
 E void ns_init();
-E void nickserv(User * u, char *buf);
+E void nickserv(User * u, const std::string &buf);
 E int validate_user(User * u);
 E void expire_nicks();
 E void expire_requests();
 E NickAlias *findnick(const char *nick);
 E NickAlias *findnick(const std::string &nick);
-E NickCore  *findcore(const char *nick);
+E NickAlias *findnick(const ci::string &nick);
+E NickCore *findcore(const char *nick);
+E NickCore *findcore(const std::string &nick);
+E NickCore *findcore(const ci::string &nick);
 E bool is_on_access(User *u, NickCore *nc);
-
-/**** operserv.c  ****/
-
-E SList akills, sglines, sqlines, szlines;
-
-E int DefConModesSet;
-E Flags<ChannelModeName> DefConModesOn;
-E Flags<ChannelModeName> DefConModesOff;
-E std::map<ChannelModeName, std::string> DefConModesOnParams;
-E bool SetDefConParam(ChannelModeName, std::string &);
-E bool GetDefConParam(ChannelModeName, std::string *);
-E void UnsetDefConParam(ChannelModeName);
-
-E void operserv(User *u, char *buf);
-E void os_init();
-
-E int add_akill(User *u, const char *mask, const char *by, const time_t expires, const char *reason);
-E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
-E void expire_akills();
-E void oper_global(char *nick, const char *fmt, ...);
-
-E int add_sgline(User *u, const char *mask, const char *by, time_t expires, const char *reason);
-E int check_sgline(const char *nick, const char *realname);
-E void expire_sglines();
-
-E int add_sqline(User *u, const char *mask, const char *by, time_t expires, const char *reason);
-E int check_sqline(const char *nick, int nick_change);
-E void expire_sqlines();
-E int check_chan_sqline(const char *chan);
-
-E int add_szline(User * u, const char *mask, const char *by,
-				 time_t expires, const char *reason);
-E void expire_szlines();
-E int check_szline(const char *nick, char *ip);
-
-E Server *server_global(Server * s, char *msg);
-
-E std::vector<NewsItem *> News;
-
-E bool CheckDefCon(DefconLevel Level);
-E bool CheckDefCon(int level, DefconLevel Level);
-E void AddDefCon(int level, DefconLevel Level);
-E void DelDefCon(int level, DefconLevel Level);
-E std::vector<std::bitset<32> > DefCon;
 
 /**** process.c ****/
 
@@ -459,44 +395,10 @@ E void notice_lang(const std::string &source, User *dest, int message, ...); // 
 E void notice_help(const char *source, User *dest, int message, ...); // MARK_DEPRECATED;
 
 
-/**** servers.c ****/
-
-E Server *servlist;
-E Server *me_server;
-E Server *serv_uplink;
-E Flags<CapabType> Capab;
-E CapabInfo Capab_Info[];
-
-E Server *first_server(ServerFlag flag);
-E Server *next_server(ServerFlag flag);
-
-E void CapabParse(int ac, const char **av);
-E int is_ulined(const char *server);
-E int is_sync(Server *server);
-
-E Server *new_server(Server * uplink, const char *name, const char *desc, ServerFlag flag, const std::string &suid);
-
-E Server *findserver(Server *s, const char *name);
-
-E void do_server(const char *source, const char *servername, const char *hops, const char *descript, const std::string &numeric);
-E void do_squit(const char *source, int ac, const char **av);
-E int anope_check_sync(const char *name);
-
-E void finish_sync(Server *serv, int sync_links);
-
-E void ts6_uid_init();
-E void ts6_uid_increment(unsigned int slot);
-E const char *ts6_uid_retrieve();
-
-E const char *ts6_sid_retrieve();
-
 /**** sessions.c ****/
 
 E Exception *exceptions;
 E int16 nexceptions;
-
-E Session *sessionlist[1024];
-E int32 nsessions;
 
 E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
@@ -506,26 +408,13 @@ E void del_session(const char *host);
 
 E void expire_exceptions();
 
-E Session *findsession(const char *host);
+E Session *findsession(const std::string &host);
 
 E Exception *find_host_exception(const char *host);
 E Exception *find_hostip_exception(const char *host, const char *hostip);
 E int exception_add(User * u, const char *mask, const int limit,
 						 const char *reason, const char *who,
 						 const time_t expires);
-
-/**** slist.c ****/
-E int slist_add(SList *slist, void *item);
-E void slist_clear(SList *slist, int free);
-E int slist_delete(SList *slist, int index);
-E int slist_delete_range(SList *slist, const char *range, slist_delcheckcb_t cb, ...);
-E int slist_enum(SList *slist, const char *range, slist_enumcb_t cb, ...);
-E int slist_full(SList *slist);
-E int slist_indexof(SList *slist, void *item);
-E void slist_init(SList *slist);
-E void slist_pack(SList *slist);
-E int slist_remove(SList *slist, void *item);
-E int slist_setcapacity(SList *slist, int16 capacity);
 
 /**** sockets.cpp ****/
 E SocketEngine socketEngine;
@@ -534,23 +423,18 @@ E int32 TotalWritten;
 
 /**** users.c ****/
 
-E User *userlist[1024];
-
 E int32 opcnt;
 E uint32 maxusercnt, usercnt;
 E time_t maxusertime;
 
 E void get_user_stats(long *nusers, long *memuse);
-E User *finduser(const std::string &nick);
-E User *firstuser();
-E User *nextuser();
 
-E User *find_byuid(const std::string &uid);
-E User *first_uid();
-E User *next_uid();
+E User *finduser(const char *nick);
+E User *finduser(const std::string &nick);
+E User *finduser(const ci::string &nick);
+
 E Server *findserver_uid(Server * s, const char *name);
 E char *TS6SID;
-E char *TS6UPLINK;
 
 E User *do_nick(const char *source, const char *nick, const char *username, const char *host,
 			  const char *server, const char *realname, time_t ts, uint32 ip, const char *vhost, const char *uid);
@@ -560,7 +444,6 @@ E void do_quit(const char *source, int ac, const char **av);
 E void do_kill(const std::string &source, const std::string &reason);
 
 E int is_oper(User * user);
-E int is_protected(User * user);
 
 E int is_excepted(ChannelInfo * ci, User * user);
 E int is_excepted_mask(ChannelInfo * ci, const char *mask);

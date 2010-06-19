@@ -8,6 +8,9 @@
  *
  */
 
+typedef unordered_map_namespace::unordered_map<ci::string, ChannelInfo *, hash_compare_ci_string> registered_channel_map;
+extern CoreExport registered_channel_map RegisteredChannelList;
+
 /** Flags used for the ChannelInfo class
  */
 enum ChannelInfoFlag
@@ -64,9 +67,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name for mlock */
 	std::vector<ChanAccess *> access;			/* List of authorized users */
 	std::vector<AutoKick *> akick;				/* List of users to kickban */
-	std::vector<BadWord *> badwords;				/* List of badwords */
-	std::bitset<128> mlock_on;				/* Modes mlocked on */
-	std::bitset<128> mlock_off;				/* Modes mlocked off */
+	std::vector<BadWord *> badwords;			/* List of badwords */
+	Flags<ChannelModeName> mlock_on;			/* Modes mlocked on */
+	Flags<ChannelModeName> mlock_off;			/* Modes mlocked off */
 
  public:
  	/** Default constructor
@@ -78,7 +81,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	~ChannelInfo();
 
-	ChannelInfo *next, *prev;
 	std::string name;		/* Channel name */
 	NickCore *founder;
 	NickCore *successor;		/* Who gets the channel if the founder
@@ -159,12 +161,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	void EraseAccess(unsigned index);
 
-	/** Cleans the channel access list
-	 *
-	 * Cleans up the access list so it no longer contains entries no longer in use.
-	 */
-	void CleanAccess();
-
 	/** Clear the entire channel access list
 	 *
 	 * Clears the entire access list by deleting every item and then clearing the vector.
@@ -201,17 +197,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	const unsigned GetAkickCount() const;
 
 	/** Erase an entry from the channel akick list
-	 * @param akick The akick
+	 * @param index The index of the akick
 	 */
-	void EraseAkick(AutoKick *akick);
+	void EraseAkick(unsigned index);
 
 	/** Clear the whole akick list
 	 */
 	void ClearAkick();
-
-	/** Clean all of the nonused entries from the akick list
-	 */
-	void CleanAkick();
 
 	/** Add a badword to the badword list
 	 * @param word The badword
@@ -232,17 +224,18 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	const unsigned GetBadWordCount() const;
 
 	/** Remove a badword
-	 * @param badword The badword
+	 * @param index The index of the badword
 	 */
-	void EraseBadWord(BadWord *badword);
+	void EraseBadWord(unsigned index);
 
 	/** Clear all badwords from the channel
 	 */
 	void ClearBadWords();
 
-	/** Clean all of the nonused entries from the badwords list
+	/** Loads MLocked modes from extensible. This is used from database loading because Anope doesn't know what modes exist
+	 * until after it connects to the IRCd.
 	 */
-	void CleanBadWords();
+	void LoadMLock();
 
 	/** Check if a mode is mlocked
 	 * @param Name The mode

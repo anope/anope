@@ -23,7 +23,6 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
-	next = prev = NULL;
 	founder = successor = NULL;
 	desc = url = email = last_topic = forbidby = forbidreason = NULL;
 	last_topic_time = 0;
@@ -61,7 +60,8 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 		this->ttb[i] = 0;
 
 	reset_levels(this);
-	alpha_insert_chan(this);
+
+	RegisteredChannelList[this->name.c_str()] = this;
 }
 
 /** Default destructor, cleans up the channel complete and removes it from the internal list
@@ -84,12 +84,8 @@ ChannelInfo::~ChannelInfo()
 		this->c->ci = NULL;
 	}
 
-	if (this->next)
-		this->next->prev = this->prev;
-	if (this->prev)
-		this->prev->next = this->next;
-	else
-		chanlists[static_cast<unsigned char>(tolower(this->name[1]))] = this->next;
+	RegisteredChannelList.erase(this->name.c_str());
+
 	if (this->desc)
 		delete [] this->desc;
 	if (this->url)
@@ -142,7 +138,6 @@ ChannelInfo::~ChannelInfo()
 void ChannelInfo::AddAccess(NickCore *nc, int16 level, const std::string &creator, int32 last_seen)
 {
 	ChanAccess *new_access = new ChanAccess();
-	new_access->in_use = 1;
 	new_access->nc = nc;
 	new_access->level = level;
 	new_access->last_seen = last_seen;
@@ -185,7 +180,7 @@ ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
 		return NULL;
 
 	for (unsigned i = 0; i < access.size(); i++)
-		if (access[i]->in_use && access[i]->nc == nc && (level ? access[i]->level == level : true))
+		if (access[i]->nc == nc && (level ? access[i]->level == level : true))
 			return access[i];
 
 	return NULL;
@@ -214,25 +209,16 @@ void ChannelInfo::EraseAccess(unsigned index)
 	access.erase(access.begin() + index);
 }
 
-/** Cleans the channel access list
- *
- * Cleans up the access list so it no longer contains entries no longer in use.
- */
-void ChannelInfo::CleanAccess()
-{
-	for (unsigned j = access.size(); j > 0; --j)
-		if (!access[j - 1]->in_use)
-			EraseAccess(j - 1);
-}
-
 /** Clear the entire channel access list
  *
  * Clears the entire access list by deleting every item and then clearing the vector.
  */
 void ChannelInfo::ClearAccess()
 {
-	while (access.begin() != access.end())
+	while (!access.empty())
+	{
 		EraseAccess(0);
+	}
 }
 
 /** Add an akick entry to the channel by NickCore
@@ -249,7 +235,6 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 		return NULL;
 
 	AutoKick *autokick = new AutoKick();
-	autokick->InUse = true;
 	autokick->SetFlag(AK_ISNICK);
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -258,8 +243,6 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, NickCore *akicknc, cons
 	autokick->last_used = lu;
 
 	akick.push_back(autokick);
-
-	FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(this, autokick));
 
 	return autokick;
 }
@@ -276,15 +259,12 @@ AutoKick *ChannelInfo::AddAkick(const std::string &user, const std::string &mask
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->mask = mask;
-	autokick->InUse = true;
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;
 	autokick->last_used = lu;
 
 	akick.push_back(autokick);
-
-	FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(this, autokick));
 
 	return autokick;
 }
@@ -310,38 +290,25 @@ const unsigned ChannelInfo::GetAkickCount() const
 }
 
 /** Erase an entry from the channel akick list
- * @param akick The akick
+ * @param index The index of the akick
  */
-void ChannelInfo::EraseAkick(AutoKick *autokick)
+void ChannelInfo::EraseAkick(unsigned index)
 {
-	std::vector<AutoKick *>::iterator it = std::find(akick.begin(), akick.end(), autokick);
-
-	if (it != akick.end())
-	{
-		FOREACH_MOD(I_OnAkickDel, OnAkickDel(this, *it));
-
-		delete *it;
-		akick.erase(it);
-	}
+	if (akick.empty() || index > akick.size())
+		return;
+	
+	delete akick[index];
+	akick.erase(akick.begin() + index);
 }
 
 /** Clear the whole akick list
  */
 void ChannelInfo::ClearAkick()
 {
-	for (unsigned i = akick.size(); i > 0; --i)
+	while (!akick.empty())
 	{
-		EraseAkick(akick[i - 1]);
+		EraseAkick(0);
 	}
-}
-
-/** Clean all of the nonused entries from the akick list
- */
-void ChannelInfo::CleanAkick()
-{
-	for (unsigned i = akick.size(); i > 0; --i)
-		if (!akick[i - 1]->InUse)
-			EraseAkick(akick[i - 1]);
 }
 
 /** Add a badword to the badword list
@@ -352,7 +319,6 @@ void ChannelInfo::CleanAkick()
 BadWord *ChannelInfo::AddBadWord(const std::string &word, BadWordType type)
 {
 	BadWord *bw = new BadWord;
-	bw->InUse = true;
 	bw->word = word;
 	bw->type = type;
 
@@ -384,37 +350,98 @@ const unsigned ChannelInfo::GetBadWordCount() const
 }
 
 /** Remove a badword
- * @param badword The badword
+ * @param index The index of the badword
  */
-void ChannelInfo::EraseBadWord(BadWord *badword)
+void ChannelInfo::EraseBadWord(unsigned index)
 {
-	std::vector<BadWord *>::iterator it = std::find(badwords.begin(), badwords.end(), badword);
-
-	if (it != badwords.end())
-	{
-		FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, *it));
-		delete *it;
-		badwords.erase(it);
-	}
+	if (badwords.empty() || index >= badwords.size())
+		return;
+	
+	delete badwords[index];
+	badwords.erase(badwords.begin() + index);
 }
 
 /** Clear all badwords from the channel
  */
 void ChannelInfo::ClearBadWords()
 {
-	for (unsigned i = badwords.size(); i > 0; --i)
+	while (!badwords.empty())
 	{
-		EraseBadWord(badwords[i - 1]);
+		EraseBadWord(0);
 	}
 }
 
-/** Clean all of the nonused entries from the badwords list
+/** Loads MLocked modes from extensible. This is used from database loading because Anope doesn't know what modes exist
+ * until after it connects to the IRCd.
  */
-void ChannelInfo::CleanBadWords()
+void ChannelInfo::LoadMLock()
 {
-	for (unsigned i = badwords.size(); i > 0; --i)
-		if (!badwords[i - 1]->InUse)
-			EraseBadWord(badwords[i - 1]);
+	std::vector<std::string> modenames;
+	
+	if (this->GetExtRegular("db_mlock_modes_on", modenames))
+	{
+		for (std::vector<std::string>::iterator it = modenames.begin(); it != modenames.end(); ++it)
+		{
+			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(); mit != ModeManager::Modes.end(); ++mit)
+			{
+				if ((*mit)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+
+					if (cm->NameAsString == *it)
+					{
+						this->SetMLock(cm->Name, true);
+					}
+				}
+			}
+		}
+
+		this->Shrink("db_mlock_modes_on");
+	}
+
+	if (this->GetExtRegular("db_mlock_modes_off", modenames))
+	{
+		for (std::vector<std::string>::iterator it = modenames.begin(); it != modenames.end(); ++it)
+		{
+			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(); mit != ModeManager::Modes.end(); ++mit)
+			{
+				if ((*mit)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+
+					if (cm->NameAsString == *it)
+					{
+						this->SetMLock(cm->Name, false);
+					}
+				}
+			}
+		}
+
+		this->Shrink("db_mlock_modes_off");
+	}
+
+	std::vector<std::pair<std::string, std::string> > params;
+
+	if (this->GetExtRegular("db_mlp", params))
+	{
+		for (std::vector<std::pair<std::string, std::string> >::iterator it = params.begin(); it != params.end(); ++it)
+		{
+			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(); mit != ModeManager::Modes.end(); ++mit)
+			{
+				if ((*mit)->Class == MC_CHANNEL)
+				{
+					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+
+					if (cm->NameAsString == it->first)
+					{
+						this->SetMLock(cm->Name, true, it->second);
+					}
+				}
+			}
+		}
+
+		this->Shrink("db_mlp");
+	}
 }
 
 /** Check if a mode is mlocked
@@ -425,9 +452,9 @@ void ChannelInfo::CleanBadWords()
 const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
 {
 	if (status)
-		return mlock_on[Name];
+		return mlock_on.HasFlag(Name);
 	else
-		return mlock_off[Name];
+		return mlock_off.HasFlag(Name);
 }
 
 /** Set a mlock
@@ -438,8 +465,6 @@ const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
  */
 bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string param)
 {
-	size_t value = Name;
-
 	if (!status && !param.empty())
 		throw CoreException("Was told to mlock a mode negatively with a param?");
 
@@ -449,8 +474,8 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
 		return false;
 
 	/* First, remove this everywhere */
-	mlock_on[value] = false;
-	mlock_off[value] = false;
+	mlock_on.UnsetFlag(Name);
+	mlock_off.UnsetFlag(Name);
 
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 	if (it != Params.end())
@@ -459,9 +484,9 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
 	}
 
 	if (status)
-		mlock_on[value] = true;
+		mlock_on.SetFlag(Name);
 	else
-		mlock_off[value] = true;
+		mlock_off.SetFlag(Name);
 	
 	if (status && !param.empty())
 	{
@@ -477,15 +502,13 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const std::string 
  */
 bool ChannelInfo::RemoveMLock(ChannelModeName Name)
 {
-	size_t value = Name;
-
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(Name));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
-	mlock_on[value] = false;
-	mlock_off[value] = false;
+	mlock_on.UnsetFlag(Name);
+	mlock_off.UnsetFlag(Name);
 	
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 	if (it != Params.end())
@@ -500,8 +523,8 @@ bool ChannelInfo::RemoveMLock(ChannelModeName Name)
  */
 void ChannelInfo::ClearMLock()
 {
-	mlock_on.reset();
-	mlock_off.reset();
+	mlock_on.ClearFlags();
+	mlock_off.ClearFlags();
 }
 
 /** Get the number of mlocked modes for this channel
@@ -511,9 +534,9 @@ void ChannelInfo::ClearMLock()
 const size_t ChannelInfo::GetMLockCount(bool status) const
 {
 	if (status)
-		return mlock_on.count();
+		return mlock_on.FlagCount();
 	else
-		return mlock_off.count();
+		return mlock_off.FlagCount();
 }
 
 /** Get a param from the channel
@@ -564,7 +587,7 @@ void ChannelInfo::ClearParams()
  */
 bool ChannelInfo::CheckKick(User *user)
 {
-	AutoKick *akick;
+	AutoKick *autokick;
 	bool set_modes = false, do_kick = false;
 	NickCore *nc;
 	char mask[BUFSIZE];
@@ -573,13 +596,19 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!user || !this->c)
 		return false;
 
-	if (user->isSuperAdmin == 1)
+	if (user->isSuperAdmin)
 		return false;
 
 	/* We don't enforce services restrictions on clients on ulined services
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
-	if (is_ulined(user->server->name))
+	if (user->server->IsULined())
 		return false;
+	
+	if (!do_kick && user->IsProtected())
+		return false;
+	
+	if (ircd->chansqline && SQLineManager::Check(this->c))
+		do_kick = true;
 
 	if (!is_oper(user) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
 	{
@@ -589,34 +618,34 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 	}
 
+	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
+		return false;
+
 	if (user->Account() || user->IsRecognized())
 		nc = user->Account();
 	else
 		nc = NULL;
 
-	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
-		return false;
-
-	for (unsigned j = 0; j < this->GetAkickCount(); ++j)
+	if (!do_kick)
 	{
-		akick = this->GetAkick(j);
-
-		if (!akick->InUse || do_kick)
-			continue;
-
-		if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc)
-			|| (!akick->HasFlag(AK_ISNICK)
-			&& match_usermask(akick->mask.c_str(), user)))
+		for (unsigned j = 0; j < this->GetAkickCount(); ++j)
 		{
-			Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (akick->HasFlag(AK_ISNICK) ? 
-akick->nc->display : akick->mask);
-			akick->last_used = time(NULL);
-			if (akick->HasFlag(AK_ISNICK))
-				get_idealban(this, user, mask, sizeof(mask));
-			else
-				strlcpy(mask, akick->mask.c_str(), sizeof(mask));
-			reason = !akick->reason.empty() ? akick->reason.c_str() : Config.CSAutokickReason;
-			do_kick = true;
+			autokick = this->GetAkick(j);
+
+			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc)
+				|| (!autokick->HasFlag(AK_ISNICK)
+				&& match_usermask(autokick->mask.c_str(), user)))
+			{
+				Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
+				autokick->last_used = time(NULL);
+				if (autokick->HasFlag(AK_ISNICK))
+					get_idealban(this, user, mask, sizeof(mask));
+				else
+					strlcpy(mask, autokick->mask.c_str(), sizeof(mask));
+				reason = !autokick->reason.empty() ? autokick->reason.c_str() : Config.CSAutokickReason;
+				do_kick = true;
+				break;
+			}
 		}
 	}
 
@@ -631,7 +660,7 @@ akick->nc->display : akick->mask);
 	if (!do_kick)
 		return false;
 
-	Alog(LOG_DEBUG) << "channel: Autokicking "<< user->GetMask() <<  " from " << this->name;
+	Alog(LOG_DEBUG) << "Autokicking "<< user->GetMask() <<  " from " << this->name;
 
 	/* If the channel isn't syncing and doesn't have any users, join ChanServ
 	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
@@ -648,7 +677,7 @@ akick->nc->display : akick->mask);
 		}
 
 		/* Join ChanServ */
-		ircdproto->SendJoin(findbot(Config.s_ChanServ), this->name.c_str(), this->c->creation_time);
+		ircdproto->SendJoin(ChanServ, this->name.c_str(), this->c->creation_time);
 
 		/* Set a timer for this channel to part ChanServ later */
 		new ChanServTimer(this->c);

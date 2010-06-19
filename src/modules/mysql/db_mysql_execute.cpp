@@ -1,24 +1,18 @@
 /* RequiredLibraries: mysqlpp */
 
 #include "db_mysql.h"
-#define HASH(nick)      (((nick)[0]&31)<<5 | ((nick)[1]&31))
 
 class FakeNickCore : public NickCore
 {
  public:
  	FakeNickCore() : NickCore("-SQLUser")
 	{
-		if (this->next)
-			this->next->prev = this->prev;
-		if (this->prev)
-			this->prev->next = this->next;
-		else
-			nclists[HASH(this->display)] = this->next;
+		NickCoreList.erase(this->display);
 	}
 
 	~FakeNickCore()
 	{
-		insert_core(this);
+		NickCoreList[this->display] = this;
 		Users.clear();
 	}
 
@@ -37,27 +31,17 @@ class FakeUser : public User
 		this->realname = sstrdup("Fake SQL User");
 		this->hostip = sstrdup("255.255.255.255");
 		this->vhost = NULL;
-		this->server = serv_uplink; // XXX Need a good way to set this to ourself
+		this->server = Me;
 
-		if (this->prev)
-			this->prev->next = this->next;
-		else
-			userlist[HASH(this->nick.c_str())] = this->next;
-		if (this->next)
-			this->next->prev = this->prev;
+		UserListByNick.erase("-SQLUser");
 		--usercnt;
 	}
 
 	~FakeUser()
 	{
-		this->server = serv_uplink; // XXX Need a good way to set this to ourself
-
-		User **list = &userlist[HASH(this->nick.c_str())];
-		this->next = *list;
-		if (*list)
-			(*list)->prev = this;
-		*list = this;
+		UserListByNick["-SQLUser"] = this;
 		++usercnt;
+
 		nc = NULL;
 	}
 
@@ -68,21 +52,22 @@ class FakeUser : public User
 
 	NickCore *Account() const { return nc; }
 	const bool IsIdentified(bool) const { return nc ? true : false; }
+	const bool IsRecognized(bool) const { return true; }
 } SQLUser;
 
 class SQLTimer : public Timer
 {
  public:
-	SQLTimer() : Timer(Me->Delay, time(NULL), true)
+	SQLTimer() : Timer(me->Delay, time(NULL), true)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		query << "TRUNCATE TABLE `anope_commands`";
 		ExecuteQuery(query);
 	}
 
 	void Tick(time_t)
 	{
-		mysqlpp::Query query(Me->Con);
+		mysqlpp::Query query(me->Con);
 		mysqlpp::StoreQueryResult qres;
 
 		query << "SELECT * FROM `anope_commands`";
@@ -144,11 +129,7 @@ class SQLTimer : public Timer
 					continue;
 				}
 
-				// XXX this whole strtok thing needs to die
-				char *cmdbuf = sstrdup(qres[i]["command"].c_str());
-				char *cmd = strtok(cmdbuf, " ");
-				mod_run_cmd(bi->nick, u, bi->cmdTable, cmd);
-				delete [] cmdbuf;
+				mod_run_cmd(bi, u, qres[i]["command"].c_str());
 
 				if (logout)
 					u->Logout();
@@ -171,7 +152,7 @@ class DBMySQLExecute : public DBMySQL
 	
 	~DBMySQLExecute()
 	{
-		TimerManager::DelTimer(_SQLTimer);
+		delete _SQLTimer;
 	}
 };
 

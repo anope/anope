@@ -21,7 +21,7 @@ if test "${with_instdir+set}" != set; then
   exit 0
 fi
 
-AC_CONFIG_SRCDIR([src/actions.c])
+AC_CONFIG_SRCDIR([src/actions.cpp])
 AC_CONFIG_HEADER(include/sysconf.h)
 AC_PROG_CC
 if test "$ac_cv_c_compiler_gnu" = "yes"; then
@@ -94,6 +94,8 @@ int main()
 
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
+
+ANOPELIBS="$ANOPELIBS -pthread"
 
 AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
 dnl module checking based on Unreal's module checking code

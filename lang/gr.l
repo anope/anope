@@ -371,6 +371,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Είσαι τώρα μέσα στην ομάδα του %s.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY ^_κωδικό^_
@@ -805,9 +813,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	%d ψευδώνυμα μέσα στην ομάδα.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (expires in %s)
+	   %s (expires in %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -857,18 +865,15 @@ NICK_SENDPASS_UNAVAILABLE
 	Η SENDPASS εντολή δεν είναι διαθέσιμη γιατί χρησιμοποιείται η κωδικοποίηση.
 NICK_SENDPASS_SUBJECT
 	Ο κωδικός του ψευδώνυμου (%s)
-NICK_SENDPASS_HEAD
-	Γειά,
-NICK_SENDPASS_LINE_1
-	Είσαι στην λίστα για να λάβεις τον κωδικό του ψευδώνυμού σου %s μέσω e-mail.
-NICK_SENDPASS_LINE_2
-	Ο κωδικό σου είναι %s Για περισσότερη ασφάλεια, θα πρέπει να αλλάξεις όσο σύντομα γίνεται τον κωδικό σου αφού λάβεις τον κωδικό σου σε e-mail.
-NICK_SENDPASS_LINE_3
-	Αν δεν γνωρίζεις γιατί αυτό το e-mail στάλθηκε σε σένα, παρακαλώ αγνόησέ το χωρίς ερωτήσεις κλπ.
-NICK_SENDPASS_LINE_4
-	ΠΑΡΑΚΑΛΩ ΜΗΝ ΑΠΑΝΤΗΣΕΙΣ ΣΕ ΑΥΤΟ ΤΟ E-MAIL!
-NICK_SENDPASS_LINE_5
-	%s επικεφαλείς υπηρεσιών.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	Ο κωδικός του %s έχει σταλθεί.
 
@@ -882,10 +887,9 @@ NICK_RESETPASS_MESSAGE
 
 	You have requested to have the pasword for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
-
-	PLEASE DON'T ANSWER TO THIS MAIL!
-
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
 	Password reset email for %s has been sent.
@@ -935,17 +939,14 @@ NICK_ENTER_REG_CODE
 	A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration
 NICK_REG_MAIL_SUBJECT
 	Nickname Registration (%s)
-NICK_REG_MAIL_HEAD
+NICK_REG_MAIL
 	Hi,
-NICK_REG_MAIL_LINE_1
-	You have requested to register the following nickname %s.
-NICK_REG_MAIL_LINE_2
+	
+	You have requested to register the nickname %s on %s.
 	Please type " %R%s confirm %s " to complete registration.
-NICK_REG_MAIL_LINE_3
-	If you don't know why this mail is sent to you, please ignore it silently.
-NICK_REG_MAIL_LINE_4
-	PLEASE DON'T ANSWER TO THIS MAIL!
-NICK_REG_MAIL_LINE_5
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
 	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Passcode for %s is %s.
@@ -1047,6 +1048,8 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
 
 # Automatic responses
 CHAN_IS_REGISTERED
@@ -1095,6 +1098,34 @@ CHAN_DROP_DISABLED
 	Συγνώμη, η υπηρεσία διαγραφής καναλιών είναι απενεργοποιημένη.
 CHAN_DROPPED
 	Το κανάλι %s διαγράφτηκε από τις υπηρεσίες.
+
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
 
 # SET responses
 CHAN_SET_SYNTAX
@@ -2034,12 +2065,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Standard responses
 MEMO_MAIL_SUBJECT
 	New memo
-MEMO_MAIL_TEXT1
+NICK_MAIL_TEXT
 	Hi %s
-MEMO_MAIL_TEXT2
+	
 	You've just received a new memo from %s. This is memo number %d.
-MEMO_MAIL_TEXT3
-	Memo Text:
+	
+	Memo text:
+	
+	%s
 
 ###########################################################################
 #
@@ -2573,22 +2606,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Εξαρχής χρόνος λήξης AKILL: 1 λεπτό
 OPER_STATS_AKILL_EXPIRE_NONE
 	Εξαρχής χρόνος λήξης AKILL: Δεν λήγει ποτέ
-OPER_STATS_SGLINE_COUNT
-	Ως τώρα υπάρχουν SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Εξαρχής χρόνος λήξης SGLINE: %d μέρες
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Εξαρχής χρόνος λήξης SGLINE: 1 μέρα
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Εξαρχής χρόνος λήξης SGLINE: %d ώρες
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Εξαρχής χρόνος λήξης SGLINE: 1 ώρα
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Εξαρχής χρόνος λήξης SGLINE: %d λεπτά
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Εξαρχής χρόνος λήξης SGLINE: 1 λεπτό
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Εξαρχής χρόνος λήξης SGLINE: Δεν λήγει ποτέ
+OPER_STATS_SNLINE_COUNT
+	Ως τώρα υπάρχουν SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Εξαρχής χρόνος λήξης SNLINE: %d μέρες
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Εξαρχής χρόνος λήξης SNLINE: 1 μέρα
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Εξαρχής χρόνος λήξης SNLINE: %d ώρες
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Εξαρχής χρόνος λήξης SNLINE: 1 ώρα
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Εξαρχής χρόνος λήξης SNLINE: %d λεπτά
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Εξαρχής χρόνος λήξης SNLINE: 1 λεπτό
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Εξαρχής χρόνος λήξης SNLINE: Δεν λήγει ποτέ
 OPER_STATS_SQLINE_COUNT
 	Ως τώρα υπάρχουν SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2716,49 +2749,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	Η λίστα AKILL καθαρίστηκε.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]
-OPER_SGLINE_UNSUPPORTED
-	Συγνώμη, η εντολή SGLINE δεν είναι διαθέσιμη σε αυτό το δίκτυο.
-OPER_SGLINE_EXISTS
-	%s υπάρχει ήδη στην λίστα SGLINE.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]
+OPER_SNLINE_UNSUPPORTED
+	Συγνώμη, η εντολή SNLINE δεν είναι διαθέσιμη σε αυτό το δίκτυο.
+OPER_SNLINE_EXISTS
+	%s υπάρχει ήδη στην λίστα SNLINE.
+OPER_SNLINE_ALREADY_COVERED
 	%s έχει ήδη καλυφθεί από τον %s.
-OPER_SGLINE_REACHED_LIMIT
-	Συγνώμη, μπορείς να έχεις μόνο %d SGLINEs.
-OPER_SGLINE_ADDED
-	%s προσθέθηκε στην λίστα SGLINE.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Συγνώμη, μπορείς να έχεις μόνο %d SNLINEs.
+OPER_SNLINE_ADDED
+	%s προσθέθηκε στην λίστα SNLINE.
+OPER_SNLINE_CHANGED
 	Το χρονικό όριο του/της %s άλλαξε.
-OPER_SGLINE_NOT_FOUND
-	%s δεν βρέθηκε στην λίστα SGLINE.
-OPER_SGLINE_NO_MATCH
-	Δεν βρέθηκαν θέσεις στην λίστα SGLINE.
-OPER_SGLINE_DELETED
-	%s διαγράφηκε από την λίστα SGLINE.
-OPER_SGLINE_DELETED_ONE
-	Διαγράφηκε 1 θέση από την λίστα SGLINE.
-OPER_SGLINE_DELETED_SEVERAL
-	Διαγράφηκαν %d θέσεις από την λίστα SGLINE.
-OPER_SGLINE_LIST_EMPTY
-	Η λίστα SGLINE είναι άδεια.
-OPER_SGLINE_LIST_HEADER
-	Η έως τώρα λίστα SGLINE είναι οι εξης:
+OPER_SNLINE_NOT_FOUND
+	%s δεν βρέθηκε στην λίστα SNLINE.
+OPER_SNLINE_NO_MATCH
+	Δεν βρέθηκαν θέσεις στην λίστα SNLINE.
+OPER_SNLINE_DELETED
+	%s διαγράφηκε από την λίστα SNLINE.
+OPER_SNLINE_DELETED_ONE
+	Διαγράφηκε 1 θέση από την λίστα SNLINE.
+OPER_SNLINE_DELETED_SEVERAL
+	Διαγράφηκαν %d θέσεις από την λίστα SNLINE.
+OPER_SNLINE_LIST_EMPTY
+	Η λίστα SNLINE είναι άδεια.
+OPER_SNLINE_LIST_HEADER
+	Η έως τώρα λίστα SNLINE είναι οι εξης:
 	  Νου   Μάσκα                              Λόγος
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Current SGLINE list:
+OPER_SNLINE_VIEW_HEADER
+	Current SNLINE list:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (by %s on %s; %s)
 	      %s
-OPER_SGLINE_CLEAR
-	Η λίστα SGLINE καθαρίστηκε.
+OPER_SNLINE_CLEAR
+	Η λίστα SNLINE καθαρίστηκε.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -3402,6 +3435,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER   Κατοχυρώνει ένα ψευδώνυμο
 NICK_HELP_CMD_GROUP
 	    GROUP      Μπένετε σε ομάδα ψευδώνυμου
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY   Σας αναγνωρίζει με τη χρήση κωδικού
 NICK_HELP_CMD_ACCESS
@@ -3538,7 +3573,16 @@ NICK_HELP_GROUP
 	    
 	Σημείωση: όλα τα ψευδώνυμα που ανήκουν στην ίδια ομάδα έχουν τον ίδιο 
 	κωδικό.
-	
+
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Σύνταξη: IDENTIFY κωδικό
 	
@@ -3601,26 +3645,40 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Εμφανίζει την τρέχουσα λίστα πρόσβασης.
 	    
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Σύνταξη: SET option parameters
 	
 	Αλλάζει διάφορες επιλογές του ψευδωνύμου.  Η επιλογή μπορεί να είναι:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Αλλάζει την λίστα των ομάδων
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Αλλάζει τον κωδικό του ψευδωνύμου σας
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Αλλάζει τη γλώσσα που χρησιμοποιούν οι
 	                   υπηρεσίες όταν τις χρησιμοποιείτε
+NICK_HELP_CMD_SET_URL
 	    URL        Συσχετίζει ένα URL με το ψευδώνυμό σας
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Συσχετίζει μία διεύθυνση e-mail με το ψευδώνυμό σας
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Συσχετίζει ένα νούμερο ICQ με το ψευδώνυμό σας
+NICK_HELP_CMD_SET_GREET
 	    GREET      Συσχετίζει ένα μήνυμα χαιρετισμού με το ψευδώνυμό σας
+NICK_HELP_CMD_SET_KILL
 	    KILL       Ενεργοποιεί/απενεργοποιεί την προστασία με αποσύνδεση
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     Ενεργοποιεί/απενεργοποιεί τη λειτουργία ασφάλειας
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Εμποδίζει το ψευδώνυμό σας να εμφανίζεται
 	                   με την εντολή  %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Αποκρύπτει συγκεκριμένα τμήματα πληροφοριών του ψευδωνύμου
+NICK_HELP_CMD_SET_MSG
 	    MSG        Αλλάζει την μέθοδο επικοινωνίας με τις υπηρεσίες
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Should services op you automatically.    
+NICK_HELP_SET_TAIL
 	
 	Για να χρησιμοποιήσετε αυτή την εντολή, πρέπει πρώτα να
 	αναγνωριστείτε με τον κωδικό σας (για περισσότερες πληροφορίες,
@@ -3744,26 +3802,40 @@ NICK_HELP_SET_AUTOOP
 	Sets whether you will be opped automatically. Set to ON to 
 	allow ChanServ to op you automatically when entering channels.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntax: SASET nickname option parameters.
 	
 	Sets various nickname options.  option can be one of:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
+NICK_HELP_CMD_SASET_URL
 	    URL        Associate a URL with the nickname
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Associate an ICQ number with the nickname
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Turn protection on or off
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Turn nickname security on or off
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Prevent the nickname from appearing in a
 	                   %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Hide certain pieces of nickname information
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Change the communication method of Services
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Prevent the nickname from expiring
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Set the language Services will use when
 	               sending messages to nickname
+NICK_HELP_SASET_TAIL
 	
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
@@ -4082,11 +4154,11 @@ NICK_SERVADMIN_HELP_DROP
 	Μπορεί να σβήσεις κάποιο ψευδώνυμο που μπορεί να είναι στην ομάδα σου χωρίς 
 	να έχεις ξεχωριστά δικαιώματα. Το σβήσιμο του ψευδώνυμου έχουν το δικαίωμα να το 
 	κάνουν οι (επικεφαλείς) Services Operators.
-	
+
 NICK_SERVADMIN_HELP_INFO
 	
-	Οι Services Operators μπορούν να χρησιμοποιούν την ALL παράμετρο για 
-	κάθε ψευδώνυμο.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Σύνταξη: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4200,6 +4272,8 @@ CHAN_HELP_CMD_REGISTER
 CHAN_HELP_CMD_SET
 	    SET        Ρυθμίζει τις επιλογές και τις πληροφορίες
 	               του καναλιού	
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
 CHAN_HELP_CMD_AOP
@@ -4302,7 +4376,15 @@ CHAN_HELP_DROP
 	Κάνει το κανάλι ξεκατοχυρώσημο,το αφήνει ελεύθερο χωρίς founder. Για να
 	γίνει αυτό πρέπει ο founder.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Σύνταξη: SET κανάλι επιλογή παράμετροι
 	
 	Επιτρέπουν στον founder του καναλιού να επιλέξει και να ρυθμίσει το κανάλι
@@ -4310,40 +4392,63 @@ CHAN_HELP_SET
 	
 	Διαθέσιμες επιλογές:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Αλλάζει τον founder του καναλιού
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Αλλάζει τον successor του καναλιού
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Αλλάζει την περιγραφή του καναλιού
+CHAN_HELP_CMD_SET_URL
 	    URL           Συσχετίζει ένα URL με το κανάλι
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Συσχετίζει ένα E-mail με το κανάλι
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Αλλάζει το μήνυμα εισαγωγής που στέλνετε σε όλους τους
 	                     χρήστες που μπένουν στο κανάλι
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Αλλάζει τον τύπο του ban που θα κάνουν τα Services
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Κλείδωμα των Modes του καναλιού
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Να αλλάζει το topic όταν δεν χρησιμοποιείται το κανάλι
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Να στέλνει μέσα στο κανάλι μήνυμα ποιος χρησιμοποιεί OP/DEOP 
 	         εντολές
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Να ελλατώνει την χρήση "βίαιων" εντολών
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Να μην εμφανίζεται το κανάλι όταν γίνεται εντολή LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Απαγόρευση εισόδου στο κανάλι αν δεν έχεις access εκεί
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Ενεργοποίηση του %S ,μελλοντική ασφάλεια
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Μόνο όσοι έχουν access θα έχουν op
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Ασφάλεια του founder από το κανάλι
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Εμφαν. kicks τα οποία γίνονται με την εντολή KICK
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Το Topic μπορεί να αλλάξει με την εντολή TOPIC
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Αν είναι ON δουλεύει με AOP/SOP,αν είναι off με access
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Γράψε %R%S HELP επιλογή για περισσότερες πληροφορίες
 	για την κάθε εντολή.
 
 CHAN_HELP_SET_FOUNDER
-	Σύνταξη: SET κανάλι FOUNDER ψευδώνυμο
+	Σύνταξη: %s κανάλι FOUNDER ψευδώνυμο
 	
 	Αλλάζει τον founder του καναλιού.  Το νέο ψευδώνυμο πρέπει να είναι
 	κατοχυρωμένο.
 
 CHAN_HELP_SET_SUCCESSOR
-	Σύνταξη: SET κανάλι SUCCESSOR ψευδώνυμο
+	Σύνταξη: %s κανάλι SUCCESSOR ψευδώνυμο
 	
 	Αλλάζει τον successor του καναλιού.  Αν το ψευδώνυμο του founder
 	λήξει ή σβηστεί (drop) τότε το κανάλι θα είναι ακόμα κατοχυρωμένο.
@@ -4353,13 +4458,13 @@ CHAN_HELP_SET_SUCCESSOR
 	successor.  Το νέο ψευδώνυμο θα πρέπει να είναι κατοχυρωμένο.
 
 CHAN_HELP_SET_DESC
-	Σύνταξη: SET κανάλι DESC περιγραφή
+	Σύνταξη: %s κανάλι DESC περιγραφή
 	
 	Αλλάζετε την περιγραφή του καναλιού, η οποία φένεται με την εντολή
 	LIST και INFO.
 
 CHAN_HELP_SET_URL
-	Σύνταξη: SET κανάλι URL [url]
+	Σύνταξη: %s κανάλι URL [url]
 	
 	Συσχετίζει ένα URL με το κανάλι.  Αυτό το URL θα
 	εμφανίζεται όταν κάποιος θα κοιτάζεις τις πληροφορίες του καναλιού
@@ -4367,7 +4472,7 @@ CHAN_HELP_SET_URL
 	θα σβηστεί οποιοδήποτε URL είχε δωθεί παλαιότερα στο κανάλι.
 
 CHAN_HELP_SET_EMAIL
-	Σύνταξη: SET κανάλι EMAIL [διεύθυνση]
+	Σύνταξη: %s κανάλι EMAIL [διεύθυνση]
 	
 	Συσχετίζει μια διεύθυνση E-mail με το κανάλι.
 	Αυτή η διεύθυνση εμφανίζεται όταν κάποιος θέλει να δει
@@ -4376,14 +4481,14 @@ CHAN_HELP_SET_EMAIL
 	είχε δωθεί στο κανάλι.
 
 CHAN_HELP_SET_ENTRYMSG
-	Σύνταξη: SET κανάλι ENTRYMSG [μήνυμα]
+	Σύνταξη: %s κανάλι ENTRYMSG [μήνυμα]
 	
 	Αλλάζει το μήνυμα εισαγωγής το οποίο στέλνετε σε κάθε χρήστη μέσω /notice
 	(παρατήρηση) όταν αυτός μπένει στο κανάλι.  Αν δεν δωθεί καμία παράμετρος,
 	δεν θα στέλνετε κανένα μήνυμα στο χρήστη,ο οποίος θα εισέρχεται στο κανάλι.
 
 CHAN_HELP_SET_BANTYPE
-	Σύνταξη: SET κανάλι BANTYPE τύπος-ban
+	Σύνταξη: %s κανάλι BANTYPE τύπος-ban
 	
 	Αλλάζει τον τύπο του ban, ο οποίος θα χρησιμοποιείται από τις υπηρεσίες όταν
 	θα χρειάζεται να κάνει κάποιον ban από το κανάλι (πχ akick).
@@ -4396,7 +4501,7 @@ CHAN_HELP_SET_BANTYPE
 	3: το ban θα είναι της μορφής *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Σύνταξη: SET κανάλι KEEPTOPIC {ON | OFF}
+	Σύνταξη: %s κανάλι KEEPTOPIC {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή topic retention του καναλιού.
 	Όταν το topic retention είναι on, το topic του καναλιού
@@ -4404,14 +4509,14 @@ CHAN_HELP_SET_KEEPTOPIC
 	το κανάλι, και θα αποθηκεύεται για την επόμενη φορά.
 	
 CHAN_HELP_SET_TOPICLOCK
-	Σύνταξη: SET κανάλι KEEPTOPIC {ON | OFF}
+	Σύνταξη: %s κανάλι KEEPTOPIC {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή κλείδωμα topic του καναλιού.
 	Όταν το κλείδωμα topic είναι on, ο %S δεν θα επιτρέπει σε κανέναν να αλλάξει
 	το topic του καναλιού εκτός της εντολής TOPIC του.
 	
 CHAN_HELP_SET_MLOCK
-	Σύνταξη: SET κανάλι MLOCK modes
+	Σύνταξη: %s κανάλι MLOCK modes
 	    
 	Καθορίζει το κλείδωμα των modes για το κανάλι. Ο %S
 	σας επιτρέπει να καθορίσετε συγκεκριμένα modes για το κανάλι
@@ -4448,7 +4553,7 @@ CHAN_HELP_SET_MLOCK
 	    απενεργοποιηθούν.
 
 CHAN_HELP_SET_PEACE
-	Σύνταξη: SET κανάλι PEACE {ON | OFF}
+	Σύνταξη: %s κανάλι PEACE {ON | OFF}
 	
 	Ενεργοποιεί ή απεεργοποιεί την εντολή peace στο κανάλι.
 	Όταν η εντολή peace είναι on, ο χρήστης δεν μπορεί να κάνει kick,
@@ -4456,21 +4561,21 @@ CHAN_HELP_SET_PEACE
 	level από αυτόν ή ίσο με αυτόν μέσω εντολών %S.
 
 CHAN_HELP_SET_PRIVATE
-	Σύνταξη: SET κανάλι PRIVATE {ON | OFF}
+	Σύνταξη: %s κανάλι PRIVATE {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή private για ένα κανάλι.
 	Όταν ενεργοποιείται η private εντολή,  το κανάλι δε συμπεριλαμβάνεται
 	στη λίστα που προκύπτει από την εντολή %R%S LIST.
 
 CHAN_HELP_SET_RESTRICTED
-	Σύνταξη: SET κανάλι RESTRICTED {ON | OFF}
+	Σύνταξη: %s κανάλι RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 	
 CHAN_HELP_SET_SECURE
-	Σύνταξη: SET κανάλι SECURE {ON | OFF}
+	Σύνταξη: %s κανάλι SECURE {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί τις δυνατότητες ασφάλειας του %S για
 	ένα κανάλι.  Όταν ενεργοποιείται το SECURE, μόνο οι χρήστες που
@@ -4479,14 +4584,14 @@ CHAN_HELP_SET_SECURE
 	από τη λίστα πρόσβασης.
 
 CHAN_HELP_SET_SECUREOPS
-	Σύνταξη: SET κανάλι SECUREOPS {ON | OFF}
+	Σύνταξη: %s κανάλι SECUREOPS {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή προστατευμένης διαχείρησης
 	για ένα κανάλι.  Όταν ενεργοποιείται η προστατευμένη διαχείρηση, οι
 	χρήστες που δεν είναι στη λίστα πρόσβασης, δε μπορούν να πάρουν op.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Σύνταξη: SET κανάλι SECUREFOUNDER {ON | OFF}
+	Σύνταξη: %s κανάλι SECUREFOUNDER {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή ασφαλής founder για ένα κανάλι.
 	Όταν ενεργοποιείται η επιλογή ασφαλής founder, μόνο ο πραγματικός founder 
@@ -4495,7 +4600,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	αναγνώρισης με τον %S.
 	    
 CHAN_HELP_SET_SIGNKICK
-	Σύνταξη: SET κανάλι SIGNKICK {ON | LEVEL | OFF}
+	Σύνταξη: %s κανάλι SIGNKICK {ON | LEVEL | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή signed kicks του
 	καναλιού.  Όταν ενεργοποιείται η επιλογή SIGNKICK, τα kicks θα 
@@ -4507,7 +4612,7 @@ CHAN_HELP_SET_SIGNKICK
 	kicks signed. Δες %R%S HELP LEVELS για περισσότερες πληροφορίες. 
 
 CHAN_HELP_SET_XOP
-	Σύνταξη: SET κανάλι XOP {ON | OFF}
+	Σύνταξη: %s κανάλι XOP {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή xOP system για ένα κανάλι.
 	Όταν ενεργοποιείται η επιλογή XOP, χρησιμοποιείς τις 
@@ -4523,7 +4628,7 @@ CHAN_HELP_SET_XOP
 	δεν θα υπάρξει κανένα πρόβλημα.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4546,7 +4651,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Σύνταξη: SET κανάλι OPNOTICE {ON | OFF}
+	Σύνταξη: %s κανάλι OPNOTICE {ON | OFF}
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή ενημέρωσης op για ένα κανάλι.
 	Όταν ενεργοποιείται η ενημέρωση op, ο %S στέλνει ένα notice στους ops 
@@ -5090,13 +5195,6 @@ CHAN_SERVADMIN_HELP_DROP
 	μπορουν να το κάνουν αυτό σε ένα κανάλι, χωρίς να κάνουν εντολή αναγνώρισης
 	για το κανάλι.
 
-CHAN_SERVADMIN_HELP_SET
-	
-	Οι Services Operators μπορούν να επιλέξουν την NOEXPIRE εντολή, σε
-	αυτά που δεν θέλουν ποτέ να λήξουν.
-	Επίσης, οι Services Operators μπορούν να αλλάξουν τις επιλογές για κάθε κανάλι
-	χωρίς να κάνουν εντολή αναγνώρισης σε κάθε κανάλι.
-
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Σύνταξη: SET κανάλι NOEXPIRE {ON | OFF}
 	
@@ -5440,8 +5538,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Σκοτώνει όλους τους χρήστες που έχουν το ίδιο host
 OPER_HELP_CMD_AKILL
 	    AKILL       Προσθέτει ip κλπ στην λίστα AKILL
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Προσθέτει ip στην λίστα SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Προσθέτει ip στην λίστα SNLINE
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Προσθέτει ip στην λίστα SQLINE
 OPER_HELP_CMD_SZLINE
@@ -5642,50 +5740,50 @@ OPER_HELP_AKILL
 
 	Μόνο για τους Services operators.	
 	    
-OPER_HELP_SGLINE
-	Σύνταξη: SGLINE ADD [+expiry] μάσκα:λόγος
-	    SGLINE DEL {μάσκα | θέσεις-νούμερα | λίστα}
-	        SGLINE LIST [μάσκα | λίστα]
-	        SGLINE VIEW [μάσκα | λίστα]
-	        SGLINE CLEAR
+OPER_HELP_SNLINE
+	Σύνταξη: SNLINE ADD [+expiry] μάσκα:λόγος
+	    SNLINE DEL {μάσκα | θέσεις-νούμερα | λίστα}
+	        SNLINE LIST [μάσκα | λίστα]
+	        SNLINE VIEW [μάσκα | λίστα]
+	        SNLINE CLEAR
 	
-	Οι Services operators μπορούν να αλλάξουν την λίστα SGLINE.  Αν
-	ο χρήστης με το πραγματικό όνομα ταιριάζει με την SGLINE μάσκα,τα 
+	Οι Services operators μπορούν να αλλάξουν την λίστα SNLINE.  Αν
+	ο χρήστης με το πραγματικό όνομα ταιριάζει με την SNLINE μάσκα,τα 
 	Services δεν θα τον αφήσουν να συνδεθεί.
 	    
-	Η εντολή SGLINE ADD προσθέτει μια πραγματική μάσκα στην λίστα SGLINE
+	Η εντολή SNLINE ADD προσθέτει μια πραγματική μάσκα στην λίστα SNLINE
 	με κάποιον λόγο τον οποίο πρέπει να τον δώσετε.
 	Το expiry είναι συγκεκριμένο και επιλέγεται από τα επόμενα, d 
 	(μέρες), h (ώρες), ή m (λεπτά).  Συνδιασμοί (όπως 
 	1h30m) δεν επιτρέπονται .  Αν δεν δώσετε το χρόνο 
 	από default θα είναι σε μέρες (θα είναι +30 που σημαίνει 30 
-	μέρες).  Για να προσθέσετε ένα SGLINE που να μην λήγει, χρησιμοποιείστε +0.
+	μέρες).  Για να προσθέσετε ένα SNLINE που να μην λήγει, χρησιμοποιείστε +0.
 	usermask ξεκινάει με +, ο χρόνος λήξης θα πρέπει να δίνετε
 	ακόμα και αν είναι ίδιος με τον default.  Ο
-	συγκεκριμένος χρόνος λήξης της εντολής SGLINE μπορεί να βρεθεί με την εντολή
+	συγκεκριμένος χρόνος λήξης της εντολής SNLINE μπορεί να βρεθεί με την εντολή
 	STATS AKILL.
 	Σημείωση: επειδή το πραγματικό όνομα-μάσκα μπορεί να περιέχει κενά,
 	διαχωριστικά μεταξύ τους να είστε προσεκτικοί στο λόγο.
 	
-	Η εντολή SGLINE DEL αφαιρεί μία μάσκα από την λίστα
-	SGLINE list αν υπάρχει.  Αν η λίστα με τις θέσεις-νούμερα δίνετε, 
+	Η εντολή SNLINE DEL αφαιρεί μία μάσκα από την λίστα
+	SNLINE list αν υπάρχει.  Αν η λίστα με τις θέσεις-νούμερα δίνετε, 
 	αυτές διαγράφονται.  (Δές το παράδειγμα LIST.) 
 	    
-	Η εντολή SGLINE LIST εμφανίζει την λίστα με τα SGLINE.  
+	Η εντολή SNLINE LIST εμφανίζει την λίστα με τα SNLINE.  
 	Αν δίνεται μια συγκεκριμένη μάσκα, θα εμφανιστούν οι θέσεις που αντιστοιχούν σε
 	αυτή τη μάσκα
 	Αν δίνετε η λίστα με τις θέσεις-νούμερα μπορείτε να τις δείτε και αλλιώς,
 	παράδειγμα:
 
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      Εμφανίζει τις θέσεις με τα νούμερα 2 εως 5 και 7 
-	      εως 9 της λίστας SGLINE.
+	      εως 9 της λίστας SNLINE.
 	      
-	Η εντολή SGLINE VIEW είναι πιο βελτιωμένη από την SGLINE LIST, και 
-	εμφανίζει ποιος έβαλε το κάθε SGLINE, την ημερομηνία που μπήκε, και πότε 
+	Η εντολή SNLINE VIEW είναι πιο βελτιωμένη από την SNLINE LIST, και 
+	εμφανίζει ποιος έβαλε το κάθε SNLINE, την ημερομηνία που μπήκε, και πότε 
 	λήγει, και φυσικά τη realname μάσκα και τον λόγο.
 	
-	Η εντολή SGLINE CLEAR καθαρίζει όλες τις θέσεις από την λίστα SGLINE.
+	Η εντολή SNLINE CLEAR καθαρίζει όλες τις θέσεις από την λίστα SNLINE.
 	
 	Μόνο για τους Services operators.
 

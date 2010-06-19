@@ -24,31 +24,12 @@ Module::Module(const std::string &mname, const std::string &creator)
 		this->lang[i].argc = 0;
 	}
 
-	int index = 0;
-	ModuleHash *current = NULL;
-	ModuleHash *newHash = NULL;
-	ModuleHash *lastHash = NULL;
-
-	index = CMD_HASH(this->name);
-
-	for (current = MODULE_HASH[index]; current; current = current->next) {
-		if (this->name ==current->name)
-			throw CoreException("Module already exists!");
-		lastHash = current;
-	}
-
-	if (!(newHash = new ModuleHash)) {
-		fatal("Out of memory");
-	}
+	if (FindModule(this->name))
+		throw CoreException("Module already exists!");
+	
 	this->created = time(NULL);
-	newHash->next = NULL;
-	newHash->name = sstrdup(this->name.c_str());
-	newHash->m = this;
 
-	if (lastHash == NULL)
-		MODULE_HASH[index] = newHash;
-	else
-		lastHash->next = newHash;
+	Modules.push_back(this);
 }
 
 Module::~Module()
@@ -60,85 +41,91 @@ Module::~Module()
 
 	remove(this->filename.c_str());
 
-	int idx;
-	CommandHash *current = NULL;
-
-	Command *c;
-
 	/* Clear any active callbacks this module has */
 	ModuleManager::ClearCallBacks(this);
 
 	/**
 	 * ok, im going to walk every hash looking for commands we own, now, not exactly elegant or efficiant :)
 	 **/
-	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-		for (current = HS_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(HOSTSERV, c->name.c_str());
-				}
-			}
-		}
+	if (HostServ)
+	{
+		for (std::map<ci::string, Command *>::iterator it = HostServ->Commands.begin(); it != HostServ->Commands.end();)
+		{
+			Command *c = it->second;
+			++it;
 
-		for (current = BS_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(BOTSERV, c->name.c_str());
-				}
-			}
-		}
-
-		for (current = MS_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(MEMOSERV, c->name.c_str());
-				}
-			}
-		}
-
-		for (current = NS_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(NICKSERV, c->name.c_str());
-				}
-			}
-		}
-
-		for (current = CS_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (strcmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(CHANSERV, c->name.c_str());
-				}
-			}
-		}
-
-		for (current = OS_cmdTable[idx]; current; current = current->next) {
-			for (c = current->c; c; c = c->next) {
-				if ((c->mod_name) && (stricmp(c->mod_name, this->name.c_str()) == 0)) {
-					this->DelCommand(OPERSERV, c->name.c_str());
-				}
-			}
+			if (c->module == this)
+				this->DelCommand(HostServ, c);
 		}
 	}
 
-	int index = 0;
-	ModuleHash *lastHash = NULL;
-	ModuleHash *mhash = NULL;
+	if (BotServ)
+	{
+		for (std::map<ci::string, Command *>::iterator it = BotServ->Commands.begin(); it != BotServ->Commands.end();)
+		{
+			Command *c = it->second;
+			++it;
 
-	index = CMD_HASH(this->name);
+			if (c->module == this)
+				this->DelCommand(BotServ, c);
+		}
+	}
 
-	for (mhash = MODULE_HASH[index]; mhash; mhash = mhash->next) {
-		if (this->name == mhash->name) {
-			if (!lastHash) {
-				MODULE_HASH[index] = mhash->next;
-			} else {
-				lastHash->next = mhash->next;
-			}
-			delete [] mhash->name;
-			delete mhash;
+	if (MemoServ)
+	{
+		for (std::map<ci::string, Command *>::iterator it = MemoServ->Commands.begin(); it != MemoServ->Commands.end();)
+		{
+			Command *c = it->second;
+			++it;
+
+			if (c->module == this)
+				this->DelCommand(MemoServ, c);
+		}
+	}
+
+	if (NickServ)
+	{
+		for (std::map<ci::string, Command *>::iterator it = NickServ->Commands.begin(); it != NickServ->Commands.end();)
+		{
+			Command *c = it->second;
+			++it;
+
+			if (c->module == this)
+				this->DelCommand(NickServ, c);
+		}
+	}
+		
+	if (ChanServ)
+	{
+		for (std::map<ci::string, Command *>::iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end();)
+		{
+			Command *c = it->second;
+			++it;
+
+			if (c->module == this)
+				this->DelCommand(ChanServ, c);
+		}
+	}
+
+	if (OperServ)
+	{
+		for (std::map<ci::string, Command *>::iterator it = OperServ->Commands.begin(); it != OperServ->Commands.end();)
+		{
+			Command *c = it->second;
+			++it;
+
+			if (c->module == this)
+				this->DelCommand(OperServ, c);
+		}
+	}
+
+	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
+	{
+		if (*it == this)
+		{
+			Modules.erase(it);
 			break;
 		}
-		lastHash = mhash;
 	}
 }
 

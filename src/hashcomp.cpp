@@ -164,3 +164,46 @@ bool sepstream::StreamEnd()
 {
 	return n == tokens.end();
 }
+
+/** Return a hash value for a string
+ * @param s The string
+ * @return The hash value
+ */
+size_t hash_compare_std_string::operator()(const std::string &s) const
+{
+	register size_t t = 0;
+
+	for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+		t = 5 * t + static_cast<const unsigned char>(*it);
+	
+	return t;
+}
+
+/** Return a hash value for a string using case insensitivity
+ * @param s The string
+ * @return The hash value
+ */
+size_t hash_compare_ci_string::operator()(const ci::string &s) const
+{
+	register size_t t = 0;
+
+	for (ci::string::const_iterator it = s.begin(); it != s.end(); ++it)
+		t = 5 * t + ascii_case_insensitive_map[static_cast<const unsigned char>(*it)];
+	
+	return t;
+}
+
+/** Return a hash value for a string using RFC1459 case sensitivity rules
+ * @param s The string
+ * @return The hash value
+ */
+size_t hash_compare_irc_string::operator()(const irc::string &s) const
+{
+	register size_t t = 0;
+
+	for (irc::string::const_iterator it = s.begin(); it != s.end(); ++it)
+		t = 5 * t + rfc_case_insensitive_map[static_cast<const unsigned char>(*it)];
+	
+	return t;
+}
+

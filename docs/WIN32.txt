@@ -25,27 +25,19 @@ Anope for Windows
 
         (NOTE: When installing, tell CMake to add itself to the PATH.)
 
-        If you have Visual C++ 6, 7 (.NET 2002/2003), 8 (2005), or 9 (2008) skip ahead to step 2, else you
+        If you have Visual C++ 10 (2010) skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once
         downloaded, install these packages.
 
-        * Microsoft Visual C++ 2008 Express Edition:
+        * Microsoft Visual C++ 2010 Express Edition:
             http://www.microsoft.com/express/vc/
 
         or
-
-        * Microsoft Visual C++ 2005 Express Edition:
-            http://www.microsoft.com/downloads/details.aspx?FamilyId=7B0B0339-613A-46E6-AB4D-080D4D4A8C4E&displaylang=en
 
         then download and install:
 
         * Microsoft Windows 2008 SDK:
             http://www.microsoft.com/downloads/details.aspx?FamilyId=E6E1C3DF-A74F-4207-8586-711EBE331CDC&displaylang=en
-
-        or (if you prefer a smaller download)
-
-        * Microsoft Windows 2003 Platform SDK: (Requires WGA validation)
-            http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
 
         (NOTE: Although they say for Windows Server 2003 or 2008, they do infact work on all supported
         versions of Windows. When installing the 2003 SDK, you should select the Custom option, and only select
@@ -53,10 +45,6 @@ Anope for Windows
         Custom option, and only select to have the Developer Tools installed, but also expand that and deselect
         the Visual C++ Compilers as well as the Mobile Tools. Doing this will decrease the install time as well
         as the space used by the SDK.)
-
-        If you chose to download the 2003 SDK, it will not work out-of-the-box on either Visual C++ 2005 Express or
-        Visual C++ 2008 Express. The 2008 SDK will work out-of-the-box with Visual C++ 2008 Express but not with
-        Visual C++ 2005 Express.
 
     2) Unpack the Anope tarball with your favorite uncompression program
        (WinZip or WinRAR, etc).

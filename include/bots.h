@@ -8,6 +8,15 @@
  *
  */
 
+#include "commands.h"
+
+class BotInfo;
+
+typedef unordered_map_namespace::unordered_map<ci::string, BotInfo *, hash_compare_ci_string> botinfo_map;
+typedef unordered_map_namespace::unordered_map<std::string, BotInfo *, hash_compare_std_string> botinfo_uid_map;
+extern CoreExport botinfo_map BotListByNick;
+extern CoreExport botinfo_uid_map BotListByUID;
+
 /** Flags settable on a bot
  */
 enum BotFlag
@@ -16,29 +25,13 @@ enum BotFlag
 
 	/* This bot can only be assigned by IRCops */
 	BI_PRIVATE,
-	/* The following flags are used to determin what bot really is what.
-	 * Since you *could* have ChanServ really named BotServ or something stupid,
-	 * this keeps track of them and allows them to be renamed in the config
-	 * at any time, even if they already exist in the database
-	 */
-	BI_CHANSERV,
-	BI_BOTSERV,
-	BI_HOSTSERV,
-	BI_OPERSERV,
-	BI_MEMOSERV,
-	BI_NICKSERV,
-	BI_GLOBAL,
 
 	BI_END
 };
 
-struct CommandHash;
-
 class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 {
  public:
-	BotInfo *next, *prev;
-
 	std::string uid;		/* required for UID supporting servers, as opposed to the shitty struct Uid. */
 	std::string nick;		/* Nickname of the bot */
 	std::string user;		/* Its user name */
@@ -48,7 +41,7 @@ class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 	int16 chancount;		/* Number of channels that use the bot. */
 	/* Dynamic data */
 	time_t lastmsg;			/* Last time we said something */
-	CommandHash **cmdTable;
+	CommandMap Commands;
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.

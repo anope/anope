@@ -20,6 +20,8 @@
 #define CloseSocket close
 #endif
 
+#define NET_BUFSIZE 65536
+
 class SocketException : public CoreException
 {
  public:

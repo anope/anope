@@ -8,6 +8,9 @@
  *
  */
 
+typedef unordered_map_namespace::unordered_map<ci::string, Channel *, hash_compare_ci_string> channel_map;
+extern CoreExport channel_map ChannelList;
+
 struct UserData
 {
 	UserData()
@@ -59,7 +62,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	std::map<ChannelModeName, std::string> Params;
 
 	/* Modes set on the channel */
-	std::bitset<128> modes;
+	Flags<ChannelModeName> modes;
 
  public:
 	/** Default constructor
@@ -72,7 +75,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	~Channel();
 
-	Channel *next, *prev;
 	std::string name;	       /* Channel name */
 	ChannelInfo *ci;			/* Corresponding ChannelInfo */
 	time_t creation_time;	   /* When channel was created */
@@ -134,7 +136,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	/** See if the channel has any modes at all
 	 * @return true or false
 	 */
-	inline const bool HasModes() const { return modes.count(); }
+	inline const bool HasModes() const { return modes.FlagCount(); }
 
 	/** See if a channel has a mode
 	 * @param Name The mode name

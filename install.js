@@ -107,22 +107,22 @@ var installerQuestions = [
 	},
 	{
 		'question' : [
-			'Are you using Visual Studio 2008?  If you are, you need to answer yes',
+			'Are you using Visual Studio 2010?  If you are, you need to answer yes',
 			'to this question, otherwise CMake will not function properly.'
 		],
-		'short' : 'Using Visual Studio 2008?',
+		'short' : 'Using Visual Studio 2010?',
 		'options' : [
 			'yes',
 			'no'
 		],
 		'default_answer' : 'no',
 		'store_answer' : function(answer) {
-			installerResponses['Visual Studio 2008'] = answer;
+			installerResponses['Visual Studio 2010'] = answer;
 			return true;
 		},
 		'cmake_argument' : function() {
-			if (installerResponses['Visual Studio 2008'] == 'yes')
-				return '-G"Visual Studio 9 2008"';
+			if (installerResponses['Visual Studio 2010'] == 'yes')
+				return '-G"Visual Studio 10"';
 			else
 				return '';
 		}
@@ -176,9 +176,9 @@ for (x in installerQuestions)
 		installerResponses['Debug'] = 'msvc';
 		continue;
 	}
-	if (thisQuestion.short == 'Using Visual Studio 2008?' && installerResponses['Debug'] != 'msvc')
+	if (thisQuestion.short == 'Using Visual Studio 2010?' && installerResponses['Debug'] != 'msvc')
 	{
-		installerResponses['Visual Studio 2008'] = 'no';
+		installerResponses['Visual Studio 2010'] = 'no';
 		continue;
 	}
 	while (!validResponse)

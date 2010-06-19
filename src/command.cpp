@@ -10,32 +10,41 @@
 #include "services.h"
 #include "modules.h"
 
-Command::Command(const std::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
+Command::Command(const ci::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
-	this->core = 0;
-	this->mod_name = NULL;
+	this->module = NULL;
 	this->service = NULL;
-	this->next = NULL;
 }
 
 Command::~Command()
 {
-	if (this->mod_name) {
-		delete [] this->mod_name;
-	}
-	if (this->service) {
-		delete [] this->service;
-	}
 }
 
-CommandReturn Command::Execute(User *u, const std::vector<ci::string> &) { return MOD_CONT; }
+CommandReturn Command::Execute(User *u, const std::vector<ci::string> &)
+{
+	return MOD_CONT;
+}
+
+void Command::OnServHelp(User *u) { }
 
 bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
 
-void Command::OnSyntaxError(User *u, const ci::string &subcommand) { }
+void Command::OnSyntaxError(User *u, const ci::string &subcommand)
+{
+}
 
 void Command::SetPermission(const std::string &reststr)
 {
 	this->permission = reststr;
+}
+
+bool Command::AddSubcommand(Command *c)
+{
+	return false;
+}
+
+bool Command::DelSubcommand(const ci::string &cname)
+{
+	return false;
 }
 

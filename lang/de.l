@@ -391,6 +391,14 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Du bist jetzt in der Gruppe %s vertreten.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY Passwort
@@ -825,9 +833,9 @@ NICK_GLIST_HEADER_X
 NICK_GLIST_FOOTER
 	%d Nicknamen in der Gruppe.
 NICK_GLIST_REPLY
-	   %c%s
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (wird in %s auslaufen)
+	   %s (wird in %s auslaufen)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -877,18 +885,15 @@ NICK_SENDPASS_UNAVAILABLE
 	SENDPASS Befehl nicht verfügbar, da die Verschlüsselung aktiviert ist.
 NICK_SENDPASS_SUBJECT
 	Nick-Passwort (%s)
-NICK_SENDPASS_HEAD
+NICK_SENDPASS
 	Hi,
-NICK_SENDPASS_LINE_1
-	Du wolltest dir dein Passwort von dem Nicknamen %s via eMail schicken lassen.
-NICK_SENDPASS_LINE_2
-	Das Passwort ist %s Aus Sicherheitsgründen solltest du das Passwort nach Erhalt dieser eMail ändern.
-NICK_SENDPASS_LINE_3
-	Wenn du nicht weisst, warum du diese Mail erhalten hast, ignoriere sie bitte.
-NICK_SENDPASS_LINE_4
-	BITTE NICHT AUF DIESE NACHRICHT ANTWORTEN!
-NICK_SENDPASS_LINE_5
-	%s Administratoren.
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_SENDPASS_OK
 	Das Passwort von %s wurde per eMail verschickt.
 
@@ -902,9 +907,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -949,18 +953,15 @@ NICK_ENTER_REG_CODE
 	Ein Password wurde zu %s gesendet, bitte tippe %R%s confirm <passcode> um die Registrierung abzuschließen.
 NICK_REG_MAIL_SUBJECT
 	Nickname Registrierung (%s)
-NICK_REG_MAIL_HEAD
+NICK_REG_MAIL
 	Hi,
-NICK_REG_MAIL_LINE_1
-	Du hast die Registrierung des Nicknamen %s angefordert.
-NICK_REG_MAIL_LINE_2
-	Bitte tippe " %R%s confirm %s " zum Abschluß der Registrierung ein.
-NICK_REG_MAIL_LINE_3
-	Wenn du nicht weisst, warum du diese Mail erhalten hast, ignoriere sie bitte.
-NICK_REG_MAIL_LINE_4
-	BITTE NICHT AUF DIESE NACHRICHT ANTWORTEN!
-NICK_REG_MAIL_LINE_5
-	Die %s Administratoren.
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 NICK_GETPASS_PASSCODE_IS
 	Passcode für %s ist %s.
 NICK_FORCE_REG
@@ -1053,6 +1054,8 @@ CHAN_LEVEL_OWNER
 	Allowed to use OWNER command
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
 CHAN_ACCESS_VIEW_XOP_FORMAT
 	  %3d   %s   %s
 	    by %s, last seen %s
@@ -1118,6 +1121,34 @@ CHAN_DROP_DISABLED
 	Das Entfernen von Channel-Registrierungen ist derzeit deaktiviert.
 CHAN_DROPPED
 	Channel %s wurde aus der Datenbank entfernt.
+
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameter
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
 
 # SET responses
 CHAN_SET_SYNTAX
@@ -2029,13 +2060,15 @@ MEMO_INFO_X_NOTIFY_SIGNON
 # Memo2Mail
 MEMO_MAIL_SUBJECT
 	Neue Memo
-MEMO_MAIL_TEXT1
+NICK_MAIL_TEXT
 	Hi %s
-MEMO_MAIL_TEXT2
-	Du hast gerade eine neue Memo von %s erhalten. Dies ist Memo Nummer %d.
-MEMO_MAIL_TEXT3
-	Memo Text:
 	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
+
 # Standard responses
 MEMO_RSEND_PLEASE_WAIT
 	Bitte warte %d Sekunden bevor der RSEND Befehl wieder funktioniert.
@@ -2541,22 +2574,22 @@ OPER_STATS_AKILL_EXPIRE_MIN
 	Standard Auslaufzeit von AKILLs: 1 Minute
 OPER_STATS_AKILL_EXPIRE_NONE
 	Standard Auslaufzeit von AKILLs: Kein Auslauf, permanent
-OPER_STATS_SGLINE_COUNT
-	Aktuelle Anzahl von SGLINEs: %d
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Standard Auslaufzeit von SGLINEs: %d Tage
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Standard Auslaufzeit von SGLINEs: 1 Tag
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Standard Auslaufzeit von SGLINEs: %d Stunden
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Standard Auslaufzeit von SGLINEs: 1 Stunde
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Standard Auslaufzeit von SGLINEs: %d Minuten
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Standard Auslaufzeit von SGLINEs: 1 Minute
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Standard Auslaufzeit von SGLINEs: Kein Auslauf, permanent
+OPER_STATS_SNLINE_COUNT
+	Aktuelle Anzahl von SNLINEs: %d
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Standard Auslaufzeit von SNLINEs: %d Tage
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Standard Auslaufzeit von SNLINEs: 1 Tag
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Standard Auslaufzeit von SNLINEs: %d Stunden
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Standard Auslaufzeit von SNLINEs: 1 Stunde
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Standard Auslaufzeit von SNLINEs: %d Minuten
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Standard Auslaufzeit von SNLINEs: 1 Minute
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Standard Auslaufzeit von SNLINEs: Kein Auslauf, permanent
 OPER_STATS_SQLINE_COUNT
 	Aktuelle Anzahl von SQLINEs: %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
@@ -2682,49 +2715,49 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	Die AKILL-Liste wurde geleert.
 	
-# SGLINE responses
+# SNLINE responses
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+Zeit] {Channel} [Grund]
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmask | entry-liste}[:Grund]]
-OPER_SGLINE_UNSUPPORTED
-	SGLINE ist in diesem Netz nicht verfügbar.
-OPER_SGLINE_EXISTS
-	%s existiert bereits auf der SGLINE-Liste.
-OPER_SGLINE_ALREADY_COVERED
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmask | entry-liste}[:Grund]]
+OPER_SNLINE_UNSUPPORTED
+	SNLINE ist in diesem Netz nicht verfügbar.
+OPER_SNLINE_EXISTS
+	%s existiert bereits auf der SNLINE-Liste.
+OPER_SNLINE_ALREADY_COVERED
 	%s wird bereits durch %s getroffen.
-OPER_SGLINE_REACHED_LIMIT
-	Du kannst nur %d SGLINE's haben.
-OPER_SGLINE_ADDED
-	%s wurde zur SGLINE-Liste hinzugefügt.
-OPER_SGLINE_CHANGED
+OPER_SNLINE_REACHED_LIMIT
+	Du kannst nur %d SNLINE's haben.
+OPER_SNLINE_ADDED
+	%s wurde zur SNLINE-Liste hinzugefügt.
+OPER_SNLINE_CHANGED
 	Auslaufzeit von %s geändert.
-OPER_SGLINE_NOT_FOUND
-	%s wurde nicht auf der SGLINE-Liste gefunden.
-OPER_SGLINE_NO_MATCH
-	Keine entsprechenden Einträge auf der SGLINE-Liste.
-OPER_SGLINE_DELETED
-	%s wurde von der SGLINE-Liste entfernt.
-OPER_SGLINE_DELETED_ONE
-	Es wurde 1 Eintrag aus der SGLINE-Liste entfernt.
-OPER_SGLINE_DELETED_SEVERAL
-	Es wurden %d Einträge aus der SGLINE-Liste entfernt.
-OPER_SGLINE_LIST_EMPTY
-	Die SGLINE-Liste ist leer.
-OPER_SGLINE_LIST_HEADER
-	Aktuelle SGLINE-Liste:
+OPER_SNLINE_NOT_FOUND
+	%s wurde nicht auf der SNLINE-Liste gefunden.
+OPER_SNLINE_NO_MATCH
+	Keine entsprechenden Einträge auf der SNLINE-Liste.
+OPER_SNLINE_DELETED
+	%s wurde von der SNLINE-Liste entfernt.
+OPER_SNLINE_DELETED_ONE
+	Es wurde 1 Eintrag aus der SNLINE-Liste entfernt.
+OPER_SNLINE_DELETED_SEVERAL
+	Es wurden %d Einträge aus der SNLINE-Liste entfernt.
+OPER_SNLINE_LIST_EMPTY
+	Die SNLINE-Liste ist leer.
+OPER_SNLINE_LIST_HEADER
+	Aktuelle SNLINE-Liste:
 	  Nummer   Maske                             Grund
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
-OPER_SGLINE_VIEW_HEADER
-	Aktuelle SGLINE-Liste:
+OPER_SNLINE_VIEW_HEADER
+	Aktuelle SNLINE-Liste:
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (von %s am %s, %s)
 	      %s
-OPER_SGLINE_CLEAR
-	Die SGLINE-Liste wurde geleert.
+OPER_SNLINE_CLEAR
+	Die SNLINE-Liste wurde geleert.
 
 # SZLINE responses
 OPER_SQLINE_SYNTAX
@@ -3365,6 +3398,8 @@ NICK_HELP_CMD_REGISTER
 	    REGISTER    Registriert einen Nicknamen
 NICK_HELP_CMD_GROUP
 	    GROUP       Verwaltung von Nickname-Gruppierungen
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP     Remove a nick from a group
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY    Identifizierung des Nicknames
 NICK_HELP_CMD_ACCESS
@@ -3512,6 +3547,15 @@ NICK_HELP_GROUP
 	Achtung: Alle Mitglieder einer Gruppe haben dasselbe
 	Passwort.
 
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Syntax: IDENTIFY Passwort
 	
@@ -3578,34 +3622,48 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	    Zeigt die aktuelle Zugriffsliste an.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Syntax: SET Option Parameter
 	
 	Stellt verschiedene Optionen zu deinem Nicknamen ein.
 	Option kann eines der folgenden Werte sein:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY      Ändert den "Ursprung" deiner Gruppe
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD     Setzt das Passwort deines Nicknamens neu
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE     Stellt die Sprache ein, in der dir die 
 	                 Services antworten sollen.
+NICK_HELP_CMD_SET_URL
 	    URL          Verbindet eine URL mit deinem Nicknamen
+NICK_HELP_CMD_SET_ICQ
 	    ICQ          Trägt deine ICQ-Nummer unter den Infos
 	                 zu deinem Nicknamen ein.
+NICK_HELP_CMD_SET_MSG
 	    MSG          Ändert die Methode, wie die Services mit
 	                 dir kommunizieren
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL        Verbindet eine öffentliche eMail-Adresse
 	                 mit deinem Nicknamen         
+NICK_HELP_CMD_SET_GREET
 	    GREET        Stellt eine Begrüssungsmeldung für deinen
 	                 Nicknamen ein.
+NICK_HELP_CMD_SET_KILL
 	    KILL         Stellt Kill-Schutz an oder aus.
+NICK_HELP_CMD_SET_SECURE
 	    SECURE       Aktiviert/Deaktiviert den Sicherheitsmodus
 	                 für deinen Nicknamen
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE      Verhindert das Erscheinen deines Nicknamens 
 	                 auf der Liste von %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE         Versteckt bestimmte Informationen deines
 	                 Nicknamens
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP       Sollten Dir die Services automatisch
 	                 Op-Status geben.    
+NICK_HELP_SET_TAIL
 	
 	Wenn du eines dieser Optionen nutzen willst, musst du dich
 	vorher identifizeren. 
@@ -3742,31 +3800,46 @@ NICK_HELP_SET_AUTOOP
 	erlaubt es ChanServ Dir automatisch Op-Status zu geben,
 	wenn Du die Channels betrittst.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Syntax: SASET nickname option parameters.
 	
 	Setzt verschiedene Einstellungen für den Nicknamen.  Gültig für option ist:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Setzt einen Nicknamen als Ursprung der Nickgruppe
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Setzt das Passwort eines Nicknamens
+NICK_HELP_CMD_SASET_URL
 	    URL        Fügt eine URL dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Fügt eine Emailadresse dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Fügt eine ICQ Nummer dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Fügt eine Begrüssungsnachricht dem Nicknamen hinzu
+NICK_HELP_CMD_SASET_KILL
 	    KILL       Schützt den Nicknamen durch Identifikationszwang
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     Schaltet die Identifikationssicherheitsfunktion 
 	               an oder aus
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Verhindert, dass der Nickname im Befehl
 	               %R%S LIST auftaucht
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Versteckt bestimmte, dem Nicknamen zugeordnete, 
 	               Informationen
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Bestimmt die Art wie die Services Nachrichten senden
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Verhindert, dass der Nickname nach einer bestimmten
 	               Zeit verfällt
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Stellt die Sprache ein, in der die Services
 	               dem Nicknamen antworten sollen.
+NICK_HELP_CMD_SASET_AUTOOP
 	    AUTOOP     Sollten die Services dem Nick automatisch seinen
 	               Op-Status geben.
+NICK_HELP_SASET_TAIL
 	
 	Mit %R%S HELP SASET option können mehr Informationen zu 
 	den Einstellungen angefordert werden. Die Einstellungen betreffen den
@@ -4123,8 +4196,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Services Administratoren können den ALL Parameter für
-	jeden beliebigen Nickname benutzen.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST Muster [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4242,6 +4315,8 @@ CHAN_HELP_CMD_REGISTER
 CHAN_HELP_CMD_SET
 	    SET        Bestimmte Channel-Optionen und
 	               Informationen einstellen
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 CHAN_HELP_CMD_QOP
 	    QOP        Verwaltet die QOP-Liste von einem Channel
 CHAN_HELP_CMD_AOP
@@ -4349,7 +4424,15 @@ CHAN_HELP_DROP
 	Entfernt die Registrierung des angegebenen Channels.
 	Kann nur vom Channel-Founder benutzt werden.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Syntax: SET Channel Option Parameter
 	
 	Erlaubt es dem Channel-Founder bestimmte Optionen
@@ -4357,44 +4440,65 @@ CHAN_HELP_SET
 	
 	Verfügbare Optionen:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Stellt den Gründer des Channels ein
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Stellt den Vertreter des Founders ein
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Ändert die Channel-Beschreibung
+CHAN_HELP_CMD_SET_URL
 	    URL           Verbindet eine URL mit dem Channel
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Verbindet eine eMail-Adresse mit dem
 	                  Channel
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Stellt eine Begrüssungsmeldung des
 	                  Channels ein
-	    TOPIC         Ändert das Topic im Channel
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Ändert den Ban-Typ, den die Services
 	                  in dem Channel anwenden
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Topic behalten, wenn Channel nicht
 	                  benutzt wird
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Topic kann nur durch TOPIC geändert werden
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Channel-Modes fest einstellen
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Den Channel vom /LIST-Befehl verstecken
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Eingeschränkter Zugriff auf den Channel
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        Aktiviert %S's Sicherheits-funktionen
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     Strengere Kontrolle des Op-Status im Channel
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER Strengere Kontrolle des Founder-Status
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Kicks durch ChanServ in dem Channel
 	                  werden durch den Kicker signiert
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Sendet eine Notice wenn Op/Deop-Befehl
 	                  benutzt werden
+CHAN_HELP_CMD_SET_XOP
 	    XOP           Schaltet das Listen System ein oder aus
+CHAN_HELP_CMD_SET_PERSIST
 	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Tippe %R%S HELP Option für weitere Informationen
 	zu einem bestimmten Befehl.
 
 CHAN_HELP_SET_FOUNDER
-	Syntax: SET Channel FOUNDER Nickname
+	Syntax: %s Channel FOUNDER Nickname
 	
 	Ändert den Gründer (Founder) eines Channels. Der neue
 	Nickname muss registriert sein.
 
 CHAN_HELP_SET_SUCCESSOR
-	Syntax: SET Channel SUCCESSOR Nickname
+	Syntax: %s Channel SUCCESSOR Nickname
 	
 	Ändert den Vertreter des Gründers in dem Channel. Wenn
 	der Nickname des Gründers ausläuft oder gedropped wird,
@@ -4406,13 +4510,13 @@ CHAN_HELP_SET_SUCCESSOR
 	Der Nickname des Vertreters muss registriert sein.
 
 CHAN_HELP_SET_DESC
-	Syntax: SET Channel DESC Beschreibung
+	Syntax: %s Channel DESC Beschreibung
 	
 	Ändert die Beschreibung für einen Channel, die bei
 	dem LIST und INFO Befehl angezeigt wird.
 
 CHAN_HELP_SET_URL
-	Syntax: SET Channel URL [Url]
+	Syntax: %s Channel URL [Url]
 	
 	Verbindet die angegebene URL mit dem Channel. Diese
 	URL wird angezeigt, wenn jemand Informationen
@@ -4421,7 +4525,7 @@ CHAN_HELP_SET_URL
 	URL gelöscht.
 
 CHAN_HELP_SET_EMAIL
-	Syntax: SET Channel EMAIL [eMail-Adresse]
+	Syntax: %s Channel EMAIL [eMail-Adresse]
 	
 	Verbindet die angegebene eMail-Adresse mit dem
 	Channel. Diese eMail-Adresse wird angezeigt,
@@ -4430,7 +4534,7 @@ CHAN_HELP_SET_EMAIL
 	angegeben, wird die aktuelle eMail-Adresse gelöscht.
 
 CHAN_HELP_SET_ENTRYMSG
-	Syntax: SET Channel ENTRYMSG [Nachricht]
+	Syntax: %s Channel ENTRYMSG [Nachricht]
 	
 	Ändert die Nachricht, die User beim Joinen des
 	Channels per /notice bekommen. Wird kein Parameter
@@ -4438,7 +4542,7 @@ CHAN_HELP_SET_ENTRYMSG
 	angezeigt.
 	
 CHAN_HELP_SET_BANTYPE
-	Syntax: SET Channel BANTYPE Ban-Typ
+	Syntax: %s Channel BANTYPE Ban-Typ
 	
 	Stellt den Ban-Typ für den Channel ein, den die
 	Services anwenden, wenn sie einen Ban eintragen
@@ -4452,7 +4556,7 @@ CHAN_HELP_SET_BANTYPE
 	3: Ban in der Form *!*user@*.domain
 
 CHAN_HELP_SET_KEEPTOPIC
-	Syntax: SET Channel KEEPTOPIC {ON | OFF}
+	Syntax: %s Channel KEEPTOPIC {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Topic Wiederherstellung für
 	den Channel. Wird diese Option eingeschaltet, wird das 
@@ -4462,7 +4566,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	kommt.
 
 CHAN_HELP_SET_TOPICLOCK
-	Syntax: SET Channel TOPICLOCK {ON | OFF}
+	Syntax: %s Channel TOPICLOCK {ON | OFF}
 	
 	Aktiviert oder deaktiviert die topic lock-Option
 	für den angegebenen Channel.
@@ -4471,7 +4575,7 @@ CHAN_HELP_SET_TOPICLOCK
 	ausser es wurde durch TOPIC eingestellt.
 
 CHAN_HELP_SET_MLOCK
-	Syntax: SET Channel MLOCK Modi
+	Syntax: %s Channel MLOCK Modi
 	
 	Stellt den Mode-Lock-Parameter für den angegebenen
 	Channel ein. %S ermöglicht es dir, einzustellen,
@@ -4506,7 +4610,7 @@ CHAN_HELP_SET_MLOCK
 	        kann jetzt wahlweise an oder ausgeschaltet werden.
 
 CHAN_HELP_SET_PEACE
-	Syntax: SET Channel PEACE {ON | OFF}
+	Syntax: %s Channel PEACE {ON | OFF}
 
 	Aktiviert oder deaktiviert die peace Option. Wenn
 	peace aktiviert ist, kann ein User einen anderen User
@@ -4514,21 +4618,21 @@ CHAN_HELP_SET_PEACE
 	%S  kicken, bannen oder dessen Channelstatus löschen.
 
 CHAN_HELP_SET_PRIVATE
-	Syntax: SET Channel PRIVATE {ON | OFF}
+	Syntax: %s Channel PRIVATE {ON | OFF}
 	
 	Schaltet den Privat-Modus für einen Channel an
 	oder aus. Wird er aktiviert, wird der Channel in der
 	Ausgabe von%R%S LIST nicht mehr auftauchen.
 
 CHAN_HELP_SET_RESTRICTED
-	Syntax: SET Channel RESTRICTED {ON | OFF}
+	Syntax: %s Channel RESTRICTED {ON | OFF}
 	
 	Enables or disables the restricted access option for a
 	channel.  When restricted access is set, users not on the access list will
 	instead be kicked and banned from the channel.
 
 CHAN_HELP_SET_SECURE
-	Syntax: SET Channel SECURE {ON | OFF}
+	Syntax: %s Channel SECURE {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Sicherheitsfunktionen
 	von %S für den angegebenen Channel. 
@@ -4538,7 +4642,7 @@ CHAN_HELP_SET_SECURE
 	in der Zugriffsliste des Channels steht.
 
 CHAN_HELP_SET_SECUREOPS
-	Syntax: SET Channel SECUREOPS {ON | OFF}
+	Syntax: %s Channel SECUREOPS {ON | OFF}
 	
 	Ändert die Secure-Ops Option für einen Channel.
 	Wird diese Option eingeschaltet, können Nicknamen, 
@@ -4546,7 +4650,7 @@ CHAN_HELP_SET_SECUREOPS
 	keinen Op-Status erhalten.
 	
 CHAN_HELP_SET_SECUREFOUNDER
-	Syntax: SET Channel SECUREFOUNDER {ON | OFF}
+	Syntax: %s Channel SECUREFOUNDER {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Secure Founder-Option
 	für einen Channel.
@@ -4557,7 +4661,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	hat.
 	
 CHAN_HELP_SET_SIGNKICK
-	Syntax: SET Channel SIGNKICK {ON | LEVEL | OFF}
+	Syntax: %s Channel SIGNKICK {ON | LEVEL | OFF}
 	
 	Aktiviert oder deaktiviert signierte Kicks für einen
 	Channel. Ist SIGNKICK aktiviert, wird der Grund
@@ -4570,7 +4674,7 @@ CHAN_HELP_SET_SIGNKICK
 	Siehe %R%S HELP LEVELS für weitere Informationen.
 
 CHAN_HELP_SET_XOP
-	Syntax: SET Channel XOP {ON | OFF}
+	Syntax: %s Channel XOP {ON | OFF}
 	
 	Aktiviert oder deaktiviert das xOP Listen System für einen Channel.
 	Wenn XOP aktiviert ist, musst du AOP/SOP/VOP
@@ -4591,7 +4695,7 @@ CHAN_HELP_SET_XOP
 	jedoch fehlerfrei.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -4614,7 +4718,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Syntax: SET Channel OPNOTICE {ON | OFF}
+	Syntax: %s Channel OPNOTICE {ON | OFF}
 	
 	Aktiviert oder deaktiviert die Op-Notice Option für
 	einen Channel.
@@ -5185,16 +5289,6 @@ CHAN_SERVADMIN_HELP_DROP
 	(löschen) ohne sich vorher gegenüber dem Channel als 
 	Founder zu identifizieren.
 
-CHAN_SERVADMIN_HELP_SET
-	
-	Services Administratoren können zusätzlich die Option NOEXPIRE
-	an einem Channel setzen, dies verhindert den automatischen
-	Auslauf des Channels.
-	
-	Weiterhin können Services Administratoren Einstellungen 
-	eines Channels verändern, ohne sich vorher für ihn
-	identifizieren zu müssen.
-
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Syntax: SET Channel NOEXPIRE {ON | OFF}
 	
@@ -5539,8 +5633,8 @@ OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES   Alle User mit einem bestimmten Host killen
 OPER_HELP_CMD_AKILL
 	    AKILL        Die AutoKill-Liste bearbeiten
-OPER_HELP_CMD_SGLINE
-	    SGLINE       Die SGLINE-Liste bearbeiten
+OPER_HELP_CMD_SNLINE
+	    SNLINE       Die SNLINE-Liste bearbeiten
 OPER_HELP_CMD_SQLINE
 	    SQLINE       Die SQLINE-Liste bearbeiten
 OPER_HELP_CMD_SZLINE
@@ -5749,21 +5843,21 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR entfernt alle Einträge aus der AKILL-Liste.
 	
-OPER_HELP_SGLINE
-	Syntax: SGLINE ADD [+Zeit] Maske:Grund
-	    SGLINE DEL {Maske | entry-num | Liste}
-	        SGLINE LIST [Maske | Liste]
-	        SGLINE VIEW [Maske | Liste]
-	        SGLINE CLEAR
+OPER_HELP_SNLINE
+	Syntax: SNLINE ADD [+Zeit] Maske:Grund
+	    SNLINE DEL {Maske | entry-num | Liste}
+	        SNLINE LIST [Maske | Liste]
+	        SNLINE VIEW [Maske | Liste]
+	        SNLINE CLEAR
 	
-	Erlaubt Services Operatoren die SGLINE-Liste zu
+	Erlaubt Services Operatoren die SNLINE-Liste zu
 	bearbeiten. Versucht ein User dessen Realname auf 
-	einen Eintrag in der SGLINE-Liste trifft zu verbinden,
+	einen Eintrag in der SNLINE-Liste trifft zu verbinden,
 	werden die Services ihn die verbindung auf das IRC Netz
 	nicht ausführen lassen.
 	
-	SGLINE ADD fügt die angegebene Realnamen-Maske mit 
-	dem Grund (muss angegeben werden) zur SGLINE-Liste 
+	SNLINE ADD fügt die angegebene Realnamen-Maske mit 
+	dem Grund (muss angegeben werden) zur SNLINE-Liste 
 	hinzu. Mit Hilfe von Zeit lässt sich eine bestimmte
 	Auslaufzeit dieses Eintrags definieren.
 	Zeit wird durch eine Ganzzahl angegeben, gefolgt von
@@ -5771,39 +5865,39 @@ OPER_HELP_SGLINE
 	d  (Tage), h (Stunden), oder m (Minuten). Kombinationen
 	(wie zum Beispiel 1h30m) sind nicht zulässig.  Wird kein
 	Buchstabe angegeben, wird von Tagen ausgegangen (also +30 
-	bedeutet dann z.B. 30 Tage). Um einen SGLINE-Eintrag zu
+	bedeutet dann z.B. 30 Tage). Um einen SNLINE-Eintrag zu
 	erstellen, der nicht ausläuft, benutze +0. Beginnt
 	die Realnamen-Maske mit einem +, an, muss eine 
 	Auslaufzeit (expiry) definiert werden, auch wenn es die 
 	Standard-Zeit ist. Die Standard-Auslaufzeit für eine
-	SGLINE kann man unter STATS AKILL finden.
+	SNLINE kann man unter STATS AKILL finden.
 	
 	Beachte: Da die Realnamen-Maske Leerzeichen enthalten kann,
 	ist das Trennzeichen zwischen der Maske und dem Grund
 	ein Doppelpunkt.
 
-	Das SGLINE DEL Befehl entfernt die angegebene Maske
-	von der SGLINE-Liste, sofern ein solcher Eintag existiert.
+	Das SNLINE DEL Befehl entfernt die angegebene Maske
+	von der SNLINE-Liste, sofern ein solcher Eintag existiert.
 	Wird eine Liste von Nummern angegeben, werden diese
 	Einträge entfernt. (Siehe das Beispiel für LIST weiter
 	unten.)
 	
-	Mit Hilfe von SGLINE LIST wird die SGLINE-Liste 
+	Mit Hilfe von SNLINE LIST wird die SNLINE-Liste 
 	angezeigt. Werden Platzhalter (Wildcards) in der Maske
 	angegeben, werden nur die entsprechenden Einträge
 	angezeigt. Die Ausgabe lässt sich ebenfalls durch einen
 	Zahlenbereich begrenzen, wie das Beispiel zeigt:
 	
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      Zeigt nur die Einträge 2 bis 5 und 7 bis 9.
 	
-	SGLINE VIEW ist eine ausführlichere Version des 
-	SGLINE LIST Befehls und zeigt zusätzlich, wer einen 
+	SNLINE VIEW ist eine ausführlichere Version des 
+	SNLINE LIST Befehls und zeigt zusätzlich, wer einen 
 	Eintrag wann erstellt hat, wann er ausläuft und 
 	natürlich die user@host Maske mit dem Grund.
 	
-	SGLINE CLEAR entfernt alle Einträge aus der 
-	SGLINE-Liste.
+	SNLINE CLEAR entfernt alle Einträge aus der 
+	SNLINE-Liste.
 
 OPER_HELP_SQLINE
 	Syntax: SQLINE ADD [+Zeit] Maske Grund
@@ -5822,7 +5916,7 @@ OPER_HELP_SQLINE
 	die dieses Feature unterstützen).
 	
 	SQLINE ADD fügt den angegeben Nicknamen mit dem Grund (muss
-	angegeben werden) zur SGLINE-Liste hinzu. ^_Zeit^_ wird
+	angegeben werden) zur SNLINE-Liste hinzu. ^_Zeit^_ wird
 	durch eine Ganzzahl angegeben, gefolgt von einem Buchstaben: 
 	d (Tage), h (Stunden), oder m (Minuten).
 	Kombinationen sind nicht erlaubt. Wird kein Buchstabe angegeben,

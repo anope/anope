@@ -454,6 +454,16 @@ NICK_GROUP_TOO_MANY
 NICK_GROUP_JOINED
 	Nale¿ysz teraz do grupy %s.
 
+# UNGROUP responses
+NICK_UNGROUP_ONE_NICK
+	Your nick is not grouped to anything, you can't ungroup it.
+
+NICK_UNGROUP_NOT_IN_GROUP
+	The nick %s is not in your group.
+
+NICK_UNGROUP_SUCCESSFUL
+	Nick %s has been ungrouped from %s.
+
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY has³o
@@ -1019,10 +1029,10 @@ NICK_GLIST_FOOTER
 	%d nicków w grupie.
 
 NICK_GLIST_REPLY
-	   %c%s
+	   %s (wygasa za %s)
 
-NICK_GLIST_REPLY_ADMIN
-	   %c%s (wygasa za %s)
+NICK_GLIST_REPLY_NOEXPIRE
+	   %s (does not expire)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -1086,24 +1096,15 @@ NICK_SENDPASS_UNAVAILABLE
 NICK_SENDPASS_SUBJECT
 	Has³o do nicka %s
 
-NICK_SENDPASS_HEAD
-	Witaj!
-
-NICK_SENDPASS_LINE_1
-	Za¿±da³e¶(a¶) wys³ania has³a do nicka %s na e-mail.
-
-NICK_SENDPASS_LINE_2
-	Twoje has³o to: %s
-	Dla w³asnego bezpieczeñstwa nale¿y to has³o natychmiast zmieniæ na inne.
-
-NICK_SENDPASS_LINE_3
-	Je¶li nie wiesz dlaczego ta wiadomo¶æ dotar³a do Ciebie zignoruj j±. Je¶li ta sytuacja bêdzie siê powtarzaæ skontaktuj siê z administratorem sieci.
-
-NICK_SENDPASS_LINE_4
-	PROSZÊ NIE ODPOWIADAÆ NA T¡ WIADOMO¦Æ!
-
-NICK_SENDPASS_LINE_5
-	Administratorzy sieci %s.
+NICK_SENDPASS
+	Hi,
+	
+	You have requested to receive the password of nickname %s by e-mail.
+	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 
 NICK_SENDPASS_OK
 	Has³o do nicka %s zosta³o wys³ane.
@@ -1118,9 +1119,8 @@ NICK_RESETPASS_MESSAGE
 	
 	You have requested to have the password for %s reset.
 	To reset your password, type %R%s CONFIRM %s
-	If you don't know why this mail is sent to you, please ignore it silently.
 	
-	PLEASE DON'T ANSWER TO THIS MAIL!
+	If you don't know why this mail was sent to you, please ignore it silently.
 	
 	%s administrators.
 NICK_RESETPASS_COMPLETE
@@ -1179,22 +1179,15 @@ NICK_ENTER_REG_CODE
 NICK_REG_MAIL_SUBJECT
 	Rejestracja nicka %s
 
-NICK_REG_MAIL_HEAD
-	Witaj!
-
-NICK_REG_MAIL_LINE_1
-	Chcesz zarejestrowaæ nastêpuj±cy nick: %s.
-
-NICK_REG_MAIL_LINE_2
-	Proszê napisaæ %R%s CONFIRM %s aby dokoñczyæ rejestracjê.
-
-NICK_REG_MAIL_LINE_3
-	Je¶li nie wiesz dlaczego ta wiadomo¶æ dotar³a do Ciebie zignoruj j±. Je¶li sytuacja bêdzie siê powtarzaæ skontaktuj siê z administratorem sieci.
-NICK_REG_MAIL_LINE_4
-	PROSZÊ NIE ODPOWIADAÆ NA T¡ WIADOMO¦Æ!
-
-NICK_REG_MAIL_LINE_5
-	Administratorzy sieci %s.
+NICK_REG_MAIL
+	Hi,
+	
+	You have requested to register the nickname %s on %s.
+	Please type " %R%s confirm %s " to complete registration.
+	
+	If you don't know why this mail was sent to you, please ignore it silently.
+	
+	%s administrators.
 
 NICK_GETPASS_PASSCODE_IS
 	Kod rejestracyjny dla %s to %s.
@@ -1339,6 +1332,9 @@ CHAN_LEVEL_OWNER
 CHAN_LEVEL_OWNERME
 	Allowed to (de)owner him/herself
 
+CHAN_LEVEL_FOUNDER
+	Allowed to issue commands restricted to channel founders
+
 # Automatic responses
 CHAN_IS_REGISTERED
 	Ten kana³ zosta³ zarejestrowany z %s.
@@ -1402,6 +1398,34 @@ CHAN_DROP_DISABLED
 
 CHAN_DROPPED
 	Kana³ %s zosta³ odrejestrowany.
+
+# SASET responses
+CHAN_SASET_SYNTAX
+	SASET channel option parameters
+CHAN_SASET_KEEPTOPIC_SYNTAX
+	SASET channel KEEPTOPIC {ON | OFF}
+CHAN_SASET_OPNOTICE_SYNTAX
+	SASET channel OPNOTICE {ON | OFF}
+CHAN_SASET_PEACE_SYNTAX
+	SASET channel PEACE {ON | OFF}
+CHAN_SASET_PERSIST_SYNTAX
+	SASET channel PERSIST {ON | OFF}
+CHAN_SASET_PRIVATE_SYNTAX
+	SASET channel PRIVATE {ON | OFF}
+CHAN_SASET_RESTRICTED_SYNTAX
+	SASET channel RESTRICTED {ON | OFF}
+CHAN_SASET_SECURE_SYNTAX
+	SASET channel SECURE {ON | OFF}
+CHAN_SASET_SECUREFOUNDER_SYNTAX
+	SASET channel SECUREFOUNDER {ON | OFF}
+CHAN_SASET_SECUREOPS_SYNTAX
+	SASET channel SECUREOPS {ON | OFF}
+CHAN_SASET_SIGNKICK_SYNTAX
+	SASET channel SIGNKICK {ON | OFF}
+CHAN_SASET_TOPICLOCK_SYNTAX
+	SASET channel TOPICLOCK {ON | OFF}
+CHAN_SASET_XOP_SYNTAX
+	SASET channel XOP {ON | OFF}
 
 # SET responses
 CHAN_SET_SYNTAX
@@ -2630,14 +2654,14 @@ MEMO_INFO_X_NOTIFY_SIGNON
 MEMO_MAIL_SUBJECT
 	Nowa wiadomo¶æ
 
-MEMO_MAIL_TEXT1
-	Witaj %s!
-
-MEMO_MAIL_TEXT2
-	W³a¶nie nadesz³a now± wiadomo¶æ od %s, ma numer %d.
-
-MEMO_MAIL_TEXT3
-	Tre¶æ wiadomo¶ci:
+NICK_MAIL_TEXT
+	Hi %s
+	
+	You've just received a new memo from %s. This is memo number %d.
+	
+	Memo text:
+	
+	%s
 
 # RSEND responses
 MEMO_RSEND_PLEASE_WAIT
@@ -3313,29 +3337,29 @@ OPER_STATS_AKILL_EXPIRE_MIN
 OPER_STATS_AKILL_EXPIRE_NONE
 	Domy¶lny czas wygasania AKILL: nie wygasa
 
-OPER_STATS_SGLINE_COUNT
-	Aktualna ilo¶æ wpisów SGLINE: %d
+OPER_STATS_SNLINE_COUNT
+	Aktualna ilo¶æ wpisów SNLINE: %d
 
-OPER_STATS_SGLINE_EXPIRE_DAYS
-	Domy¶lny czas wygasania SGLINE: %d dni
+OPER_STATS_SNLINE_EXPIRE_DAYS
+	Domy¶lny czas wygasania SNLINE: %d dni
 
-OPER_STATS_SGLINE_EXPIRE_DAY
-	Domy¶lny czas wygasania SGLINE: 1 dzieñ
+OPER_STATS_SNLINE_EXPIRE_DAY
+	Domy¶lny czas wygasania SNLINE: 1 dzieñ
 
-OPER_STATS_SGLINE_EXPIRE_HOURS
-	Domy¶lny czas wygasania SGLINE: %d godzin(y)
+OPER_STATS_SNLINE_EXPIRE_HOURS
+	Domy¶lny czas wygasania SNLINE: %d godzin(y)
 
-OPER_STATS_SGLINE_EXPIRE_HOUR
-	Domy¶lny czas wygasania SGLINE: 1 godzina
+OPER_STATS_SNLINE_EXPIRE_HOUR
+	Domy¶lny czas wygasania SNLINE: 1 godzina
 
-OPER_STATS_SGLINE_EXPIRE_MINS
-	Domy¶lny czas wygasania SGLINE: %d minut(y)
+OPER_STATS_SNLINE_EXPIRE_MINS
+	Domy¶lny czas wygasania SNLINE: %d minut(y)
 
-OPER_STATS_SGLINE_EXPIRE_MIN
-	Domy¶lny czas wygasania SGLINE: 1 minuta
+OPER_STATS_SNLINE_EXPIRE_MIN
+	Domy¶lny czas wygasania SNLINE: 1 minuta
 
-OPER_STATS_SGLINE_EXPIRE_NONE
-	Domy¶lny czas wygasania SGLINE: nie wygasa
+OPER_STATS_SNLINE_EXPIRE_NONE
+	Domy¶lny czas wygasania SNLINE: nie wygasa
 
 OPER_STATS_SQLINE_COUNT
 	Aktualna ilo¶æ wpisów SQLINE: %d
@@ -3504,63 +3528,63 @@ OPER_AKILL_CLEAR
 OPER_CHANKILL_SYNTAX
 	CHANKILL [+czas-trwania] {#kana³} [powód]
 
-# SGLINE responses
-OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+czas-trwania] {maska | pozycja} [powód]]
+# SNLINE responses
+OPER_SNLINE_SYNTAX
+	SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+czas-trwania] {maska | pozycja} [powód]]
 
-OPER_SGLINE_UNSUPPORTED
-	Komenda SGLINE nie jest dostêpna w tej sieci.
+OPER_SNLINE_UNSUPPORTED
+	Komenda SNLINE nie jest dostêpna w tej sieci.
 
-OPER_SGLINE_EXISTS
-	%s ju¿ istnieje na li¶cie SGLINE.
+OPER_SNLINE_EXISTS
+	%s ju¿ istnieje na li¶cie SNLINE.
 
-OPER_SGLINE_ALREADY_COVERED
+OPER_SNLINE_ALREADY_COVERED
 	%s ju¿ jest obejmowane przez %s.
 
-OPER_SGLINE_REACHED_LIMIT
-	Mo¿esz mieæ tylko %d wpisów na li¶cie SGLINE.
+OPER_SNLINE_REACHED_LIMIT
+	Mo¿esz mieæ tylko %d wpisów na li¶cie SNLINE.
 
-OPER_SGLINE_ADDED
-	%s dodano do listy SGLINE.
+OPER_SNLINE_ADDED
+	%s dodano do listy SNLINE.
 
-OPER_SGLINE_CHANGED
+OPER_SNLINE_CHANGED
 	Zmieniono czas wygasania %s.
 
-OPER_SGLINE_NOT_FOUND
-	%s nie znaleziono na li¶cie SGLINE.
+OPER_SNLINE_NOT_FOUND
+	%s nie znaleziono na li¶cie SNLINE.
 
-OPER_SGLINE_NO_MATCH
-	Nie znaleziono pasuj±cych wpisów na li¶cie SGLINE.
+OPER_SNLINE_NO_MATCH
+	Nie znaleziono pasuj±cych wpisów na li¶cie SNLINE.
 
-OPER_SGLINE_DELETED
-	%s usuniêto z listy SGLINE.
+OPER_SNLINE_DELETED
+	%s usuniêto z listy SNLINE.
 
-OPER_SGLINE_DELETED_ONE
-	Usuniêto 1 wpis z listy SGLINE.
+OPER_SNLINE_DELETED_ONE
+	Usuniêto 1 wpis z listy SNLINE.
 
-OPER_SGLINE_DELETED_SEVERAL
-	Usuniêto %d wpisy(ów) z listy SGLINE.
+OPER_SNLINE_DELETED_SEVERAL
+	Usuniêto %d wpisy(ów) z listy SNLINE.
 
-OPER_SGLINE_LIST_EMPTY
-	Lista SGLINE jest pusta.
+OPER_SNLINE_LIST_EMPTY
+	Lista SNLINE jest pusta.
 
-OPER_SGLINE_LIST_HEADER
-	Aktualna lista SGLINE:
+OPER_SNLINE_LIST_HEADER
+	Aktualna lista SNLINE:
 	  Nr    Maska                             Powód
 
-OPER_SGLINE_LIST_FORMAT
+OPER_SNLINE_LIST_FORMAT
 	  %3d   %-32s  %s
 
-OPER_SGLINE_VIEW_HEADER
-	Aktualna lista SGLINE:
+OPER_SNLINE_VIEW_HEADER
+	Aktualna lista SNLINE:
 
 # number, mask, set-by, set-time, expires, reason
-OPER_SGLINE_VIEW_FORMAT
+OPER_SNLINE_VIEW_FORMAT
 	%3d  %s (przez %s na %s; %s)
 	      %s
 
-OPER_SGLINE_CLEAR
-	Lista SGLINE zosta³a wyczyszczona.
+OPER_SNLINE_CLEAR
+	Lista SNLINE zosta³a wyczyszczona.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
@@ -4330,6 +4354,9 @@ NICK_HELP_CMD_REGISTER
 NICK_HELP_CMD_GROUP
 	    GROUP       Do³±cza nick do wskazanej grupy
 
+NICK_HELP_CMD_UNGROUP
+	    UNGROUP    Remove a nick from a group
+
 NICK_HELP_CMD_IDENTIFY
 	    IDENTIFY    Identyfikuje w³a¶ciciela nicka
 
@@ -4486,6 +4513,15 @@ NICK_HELP_GROUP
 	
 	Uwaga: wszystkie nicki w grupie maj± to samo has³o.
 
+NICK_HELP_UNGROUP
+	Syntax: UNGROUP [nick]
+
+	This command ungroups your nick, or if given, the specificed nick,
+	from the group it is in. The ungrouped nick keeps its registration
+	time, password, email, greet, language, url, and icq. Everything
+	else is reset. You may not ungroup yourself if there is only one
+	nick in your group.
+
 NICK_HELP_IDENTIFY
 	Sk³adnia: IDENTIFY has³o
 	
@@ -4543,26 +4579,40 @@ NICK_HELP_ACCESS
 	    ACCESS LIST
 	        Wy¶wietla aktualn± listê dostêpu.
 
-NICK_HELP_SET
+NICK_HELP_SET_HEAD
 	Sk³adnia: SET opcja parametry
 	
 	Ustawia ró¿ne opcje nicka. Dostêpne opcje to:
 	
+NICK_HELP_CMD_SET_DISPLAY
 	    DISPLAY    Ustawia nick reprezentuj±cy grupê nicków
+NICK_HELP_CMD_SET_PASSWORD
 	    PASSWORD   Ustawia has³o do nicka
+NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Ustawia jêzyk w którym serwisy bêd±
 	               wysy³a³y komunikaty
+NICK_HELP_CMD_SET_URL
 	    URL        Przypisuje adres www do nicka
+NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Przypisuje adres e-mail do nicka
+NICK_HELP_CMD_SET_ICQ
 	    ICQ        Przypisuje numer ICQ do nicka
+NICK_HELP_CMD_SET_GREET
 	    GREET      Przypisuje komunikat powitalny do nicka
+NICK_HELP_CMD_SET_KILL
 	    KILL       W³±cza lub wy³±cza ochronê nicka
+NICK_HELP_CMD_SET_SECURE
 	    SECURE     W³±cza lub wy³±cza bezpieczeñstwo nicka
+NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Zapobiega wy¶wietlaniu nicka po wydaniu
 	               polecenia: %R%S LIST
+NICK_HELP_CMD_SET_HIDE
 	    HIDE       Ukrywa poszczególne informacje o nicku
+NICK_HELP_CMD_SET_MSG
 	    MSG        Zmienia sposób komunikacji serwisów
+NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     W³±cza lub wy³±cza automatyczne opowanie
+NICK_HELP_SET_TAIL
 	
 	Aby u¿yæ tej komendy musisz siê zidentyfikowaæ z u¿yciem
 	Twojego has³a. Aby uzyskaæ wiêcej informacji wpisz:
@@ -4683,28 +4733,43 @@ NICK_HELP_SET_AUTOOP
 	W³±cza lub wy³±cza automatyczne nadawanie uprawnieñ
 	przy wchodzeniu na kana³.
 
-NICK_HELP_SASET
+NICK_HELP_SASET_HEAD
 	Sk³adnia: SASET nick opcja parametry.
 	
 	Ustawia ró¿ne opcje nicka wskazanemu u¿ytkownikowi.
 	Dostêpne opcje to:
 	
+NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Ustawia nick reprezentuj±cy grupê nicków
+NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Ustawia has³o do nicka
+NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Ustawia jêzyk w którym serwisy bêd±
 	               wysy³a³y komunikaty
+NICK_HELP_CMD_SASET_URL
 	    URL        Przypisuje adres www do nicka
+NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Przypisuje adres e-mail do nicka
+NICK_HELP_CMD_SASET_ICQ
 	    ICQ        Przypisuje numer ICQ do nicka
+NICK_HELP_CMD_SASET_GREET
 	    GREET      Przypisuje komunikat powitalny do nicka
+NICK_HELP_CMD_SASET_KILL
 	    KILL       W³±cza lub wy³±cza ochronê nicka
+NICK_HELP_CMD_SASET_SECURE
 	    SECURE     W³±cza lub wy³±cza bezpieczeñstwo nicka
+NICK_HELP_CMD_SASET_PRIVATE
 	    PRIVATE    Zapobiega wy¶wietlaniu nicka po wydaniu
 	               polecenia: %R%S LIST
+NICK_HELP_CMD_SASET_HIDE
 	    HIDE       Ukrywa poszczególne informacje o nicku
+NICK_HELP_CMD_SASET_MSG
 	    MSG        Zmienia sposób komunikacji serwisów
+NICK_HELP_CMD_SASET_AUTOOP
 	    AUTOOP     W³±cza lub wy³±cza automatyczne opowanie
+NICK_HELP_CMD_SASET_NOEXPIRE
 	    NOEXPIRE   Zapobiega wyga¶niêciu nicka
+NICK_HELP_SASET_TAIL
 	
 	Aby uzyskaæ wiêcej informacji o danej opcji wpisz:
 	%R%S HELP SASET opcja
@@ -5029,8 +5094,8 @@ NICK_SERVADMIN_HELP_DROP
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Administratorzy serwisów mog± u¿ywaæ parametru
-	ALL dla ka¿dego nicka.
+	Services Operators with the nickserv/auspex privilege may
+	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Sk³adnia: LIST wzorzec [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -5142,6 +5207,9 @@ CHAN_HELP_CMD_REGISTER
 
 CHAN_HELP_CMD_SET
 	    SET         Modyfikuje ustawienia kana³u
+
+CHAN_HELP_CMD_SASET
+	    SASET      Forcefully set channel options and information
 
 CHAN_HELP_CMD_QOP
 	    QOP        Modify the list of QOP users
@@ -5272,7 +5340,15 @@ CHAN_HELP_DROP
 	Usuwa podany kana³. Komenda mo¿e zostaæ u¿yta
 	jedynie przez w³a¶ciciela kana³u.
 
-CHAN_HELP_SET
+CHAN_HELP_SASET_HEAD
+	Syntax: SASET channel option parameters
+	
+	Allows Services Operators to forcefully change settings
+	on channels.
+	
+	Available options:
+
+CHAN_HELP_SET_HEAD
 	Sk³adnia: SET kana³ opcja parametry
 	
 	Pozwala w³a¶cicielowi kana³u na zmianê ro¿nych  
@@ -5280,42 +5356,65 @@ CHAN_HELP_SET
 	
 	Dostêpne opcje:
 	
+CHAN_HELP_CMD_SET_FOUNDER
 	    FOUNDER       Ustawia nick w³a¶ciciela kana³u
+CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Ustawia nick spadkobiercy kana³u
+CHAN_HELP_CMD_SET_DESC
 	    DESC          Ustawia opis kana³u
+CHAN_HELP_CMD_SET_URL
 	    URL           Przypisuje adres www do kana³u
+CHAN_HELP_CMD_SET_EMAIL
 	    EMAIL         Przypisuje adres e-mail do kana³u
+CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Ustawia wiadomo¶æ, która bêdzie wysy³ana
 	                  do u¿ytkowników wchodz±cych na kana³
+CHAN_HELP_CMD_SET_BANTYPE
 	    BANTYPE       Ustawia sposób banowania przez serwisy
+CHAN_HELP_CMD_SET_MLOCK
 	    MLOCK         Blokuje zdejmowanie lub zak³adanie flag
+CHAN_HELP_CMD_SET_KEEPTOPIC
 	    KEEPTOPIC     Zapamiêtuje temat kiedy kana³ jest pusty
+CHAN_HELP_CMD_SET_OPNOTICE
 	    OPNOTICE      Wysy³a powiadomienie kiedy zostaj± u¿yte
 	                  komendy OP/DEOP
+CHAN_HELP_CMD_SET_PEACE
 	    PEACE         Reguluje u¿ycie krytycznych komend
+CHAN_HELP_CMD_SET_PRIVATE
 	    PRIVATE       Zapobiega wy¶wietlaniu kana³u po wydaniu
 	                  polecenia LIST
+CHAN_HELP_CMD_SET_RESTRICTED
 	    RESTRICTED    Ogranicza dostêp do kana³u
+CHAN_HELP_CMD_SET_SECURE
 	    SECURE        W³±cza lub wy³±cza bezpieczeñstwo kana³u
+CHAN_HELP_CMD_SET_SECUREOPS
 	    SECUREOPS     ¦ci¶le kontroluje status operatorów
+CHAN_HELP_CMD_SET_SECUREFOUNDER
 	    SECUREFOUNDER ¦ci¶le kontroluje status w³a¶ciciela
+CHAN_HELP_CMD_SET_SIGNKICK
 	    SIGNKICK      Podpisuje kicki kiedy u¿yto komendy KICK
+CHAN_HELP_CMD_SET_TOPICLOCK
 	    TOPICLOCK     Ogranicza mo¿liwo¶æ zmiany tematu
+CHAN_HELP_CMD_SET_XOP
 	    XOP           W³±cza system uprawnieñ xOP
 	                  (u¿ycie komend SOP, AOP, HOP, VOP)
-		PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_PERSIST
+	    PERSIST       Set the channel as permanent
+CHAN_HELP_CMD_SET_NOEXPIRE
+	    NOEXPIRE      Prevent the channel from expiring
+CHAN_HELP_SET_TAIL
 	
 	Aby uzyskaæ wiêcej informacji o danej opcji wpisz:
 	%R%S HELP SET opcja
 
 CHAN_HELP_SET_FOUNDER
-	Sk³adnia: SET kana³ FOUNDER nick
+	Sk³adnia: %s kana³ FOUNDER nick
 	
 	Zmienia w³a¶ciciela kana³u.
 	Nowy nick musi byæ zarejestrowany.
 
 CHAN_HELP_SET_SUCCESSOR
-	Sk³adnia: SET kana³ SUCCESSOR nick
+	Sk³adnia: %s kana³ SUCCESSOR nick
 	
 	Ustawia spadkobiercê kana³u. Je¶li nick w³a¶ciciela
 	wyga¶nie lub zostanie usuniêty kana³ zostaje przekazany
@@ -5324,33 +5423,33 @@ CHAN_HELP_SET_SUCCESSOR
 	liczby kana³ów (%d) to kana³ zostanie odrejestrowany.
 
 CHAN_HELP_SET_DESC
-	Sk³adnia: SET kana³ DESC opis
+	Sk³adnia: %s kana³ DESC opis
 	
 	Ustawia opis kana³u widoczny po wydaniu polecenia LIST oraz INFO.
 
 CHAN_HELP_SET_URL
-	Sk³adnia: SET kana³ URL [url]
+	Sk³adnia: %s kana³ URL [url]
 	
 	Przypisuje adres strony www do kana³u. Adres bêdzie
 	widoczny po u¿yciu polecenia INFO. Komenda wywo³ana
 	bez parametru usuwa wcze¶niej ustawiony adres.
 
 CHAN_HELP_SET_EMAIL
-	Sk³adnia: SET kana³ EMAIL [adres]
+	Sk³adnia: %s kana³ EMAIL [adres]
 	
 	Przypisuje adres e-mail do kana³u. Adres bêdzie
 	widoczny po u¿yciu polecenia INFO. Komenda wywo³ana
 	bez parametru usuwa wcze¶niej ustawiony adres.
 
 CHAN_HELP_SET_ENTRYMSG
-	Sk³adnia: SET kana³ ENTRYMSG [tre¶æ]
+	Sk³adnia: %s kana³ ENTRYMSG [tre¶æ]
 	
 	Ustawia tekst powiadomienia wysy³anego poprzez /notice
 	do u¿ytkowników wchodz±cych na kana³. Komenda wywo³ana
 	bez parametru usuwa wcze¶niej ustawion± wiadomo¶æ.
 
 CHAN_HELP_SET_BANTYPE
-	Sk³adnia: SET kana³ BANTYPE typ
+	Sk³adnia: %s kana³ BANTYPE typ
 	
 	Ustala typ banów zak³adanych przez serwisy.
 	
@@ -5363,7 +5462,7 @@ CHAN_HELP_SET_BANTYPE
 	3: ban w postaci *!*ident@*.domena
 
 CHAN_HELP_SET_KEEPTOPIC
-	Sk³adnia: SET kana³ KEEPTOPIC {ON | OFF}
+	Sk³adnia: %s kana³ KEEPTOPIC {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê zapamiêtywania tematu.
 	Kiedy ta opcja jest w³±czona %S ustawi ostatni
@@ -5371,7 +5470,7 @@ CHAN_HELP_SET_KEEPTOPIC
 	pierwsza osoba.
 
 CHAN_HELP_SET_TOPICLOCK
-	Sk³adnia: SET kana³ TOPICLOCK {ON | OFF}
+	Sk³adnia: %s kana³ TOPICLOCK {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê blokowania tematu kana³u.
 	
@@ -5379,7 +5478,7 @@ CHAN_HELP_SET_TOPICLOCK
 	zmianê tematu tylko poprzez wydanie komendy TOPIC.
 
 CHAN_HELP_SET_MLOCK
-	Sk³adnia: SET kana³ MLOCK flagi
+	Sk³adnia: %s kana³ MLOCK flagi
 	
 	Ustawia blokadê flag kana³owych. %S pozwala na 
 	definiowanie, które flag kana³owe maj± byæ zawsze 
@@ -5415,7 +5514,7 @@ CHAN_HELP_SET_MLOCK
 	        Wy³±cza blokowanie flag - mog± byæ zmieniane dowolnie.
 
 CHAN_HELP_SET_PEACE
-	Sk³adnia: SET kana³ PEACE {ON | OFF}
+	Sk³adnia: %s kana³ PEACE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê PEACE dla kana³u.
 	W³±czenie tej opcji uniemo¿liwia wykopanie,
@@ -5424,7 +5523,7 @@ CHAN_HELP_SET_PEACE
 	korzystaj±c z poleceñ serwisu %S.
 
 CHAN_HELP_SET_PRIVATE
-	Sk³adnia: SET kana³ PRIVATE {ON | OFF}
+	Sk³adnia: %s kana³ PRIVATE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê PRIVATE dla kana³u.
 	Kiedy ta opcja jest w³±czona kana³ nie bêdzie
@@ -5432,7 +5531,7 @@ CHAN_HELP_SET_PRIVATE
 	%R%S LIST
 
 CHAN_HELP_SET_RESTRICTED
-	Sk³adnia: SET kana³ RESTRICTED {ON | OFF}
+	Sk³adnia: %s kana³ RESTRICTED {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê ograniczonego dostêpu do kana³u.
 	Po w³±czeniu tej opcji tylko osoby znajduj±ce siê na
@@ -5440,7 +5539,7 @@ CHAN_HELP_SET_RESTRICTED
 	u¿ytkownicy bêd± banowani, a nastêpnie usuwani z kana³u.
 
 CHAN_HELP_SET_SECURE
-	Sk³adnia: SET kana³ SECURE {ON | OFF}
+	Sk³adnia: %s kana³ SECURE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcje bezpieczeñstwa kana³u.
 	Po w³±czeniu tej opcji tylko zarejestrowani
@@ -5449,7 +5548,7 @@ CHAN_HELP_SET_SECURE
 	wynikaj±ce z wpisów na li¶cie dostêpu.
 
 CHAN_HELP_SET_SECUREOPS
-	Sk³adnia: SET kana³ SECUREOPS {ON | OFF}
+	Sk³adnia: %s kana³ SECUREOPS {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê SECUREOPS dla kana³u.
 	Kiedy ta opcja jest w³±czona u¿ytkownicy bez wpisu
@@ -5457,7 +5556,7 @@ CHAN_HELP_SET_SECUREOPS
 	mogli posiadaæ statusu operatora.
 
 CHAN_HELP_SET_SECUREFOUNDER
-	Sk³adnia: SET kana³ SECUREFOUNDER {ON | OFF}
+	Sk³adnia: %s kana³ SECUREFOUNDER {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê bezpiecznego w³a¶ciciela.
 	Ustawienie tej opcji powoduje ograniczenie uprawnieñ
@@ -5468,7 +5567,7 @@ CHAN_HELP_SET_SECUREFOUNDER
 	dla jednego u¿ytkownika.
 
 CHAN_HELP_SET_SIGNKICK
-	Sk³adnia: SET kana³ SIGNKICK {ON | LEVEL | OFF}
+	Sk³adnia: %s kana³ SIGNKICK {ON | LEVEL | OFF}
 	
 	W³±cza lub wy³±cza podpisywanie komend kick.
 	W³±czenie tej opcji powoduje dodawanie nicka osoby 
@@ -5480,7 +5579,7 @@ CHAN_HELP_SET_SIGNKICK
 	%R%S HELP LEVELS
 
 CHAN_HELP_SET_XOP
-	Sk³adnia: SET kana³ XOP {ON | OFF}
+	Sk³adnia: %s kana³ XOP {ON | OFF}
 	
 	W³±cza lub wy³±cza system list xOP dla kana³u.
 	Kiedy XOP zostanie w³±czony przyznawanie uprawnieñ
@@ -5503,7 +5602,7 @@ CHAN_HELP_SET_XOP
 	polecenia LEVELS.
 
 CHAN_HELP_SET_PERSIST
-	Syntax: SET channel PERSIST {ON | OFF}
+	Syntax: %s channel PERSIST {ON | OFF}
 
 	Enables or disables the persistant channel setting.
 	When persistant is set, the service bot will remain
@@ -5526,7 +5625,7 @@ CHAN_HELP_SET_PERSIST
 	set persist on or off.
 
 CHAN_HELP_SET_OPNOTICE
-	Sk³adnia: SET kana³ OPNOTICE {ON | OFF}
+	Sk³adnia: %s kana³ OPNOTICE {ON | OFF}
 	
 	W³±cza lub wy³±cza opcjê OPNOTICE dla kana³u.
 	Kiedy ta opcja jest w³±czona, %S bêdzie
@@ -6101,12 +6200,6 @@ CHAN_SERVADMIN_HELP_DROP
 	Usuwa wskazany kana³. Tylko administratorzy serwisów
 	mog± usun±æ kana³, którego nie s± w³a¶cicielami.
 
-CHAN_SERVADMIN_HELP_SET
-	
-	Administratorzy serwisów mog± ustawiæ kana³owi 
-	opcjê NOEXPIRE, która zapobiega wyga¶niêciu
-	kana³u je¶li nie jest on u¿ywany.
-
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Sk³adnia: SET kana³ NOEXPIRE {ON | OFF}
 	
@@ -6444,8 +6537,8 @@ OPER_HELP_CMD_KILLCLONES
 OPER_HELP_CMD_AKILL
 	    AKILL       Zarz±dza list± AKILL
 
-OPER_HELP_CMD_SGLINE
-	    SGLINE      Zarz±dza list± SGLINE
+OPER_HELP_CMD_SNLINE
+	    SNLINE      Zarz±dza list± SNLINE
 
 OPER_HELP_CMD_SQLINE
 	    SQLINE      Zarz±dza list± SQLINE
@@ -6647,19 +6740,19 @@ OPER_HELP_AKILL
 	AKILL CLEAR usuwa wszystkie wpisy z listy AKILL.
 	
 
-OPER_HELP_SGLINE
-	Sk³adnia: SGLINE ADD [+czas-trwania] maska powód
-	          SGLINE DEL {maska | numer-wpisu | lista}
-	          SGLINE LIST [maska | lista]
-	          SGLINE VIEW [maska | lista]
-	          SGLINE CLEAR
+OPER_HELP_SNLINE
+	Sk³adnia: SNLINE ADD [+czas-trwania] maska powód
+	          SNLINE DEL {maska | numer-wpisu | lista}
+	          SNLINE LIST [maska | lista]
+	          SNLINE VIEW [maska | lista]
+	          SNLINE CLEAR
 	
-	Pozwala operatorom serwisów na zarz±dzanie list± SGLINE.
+	Pozwala operatorom serwisów na zarz±dzanie list± SNLINE.
 	Je¶li u¿ytkownik z realname pasuj±cym do maski na li¶cie
 	pod³±czy siê do sieci serwisy natychmiast go roz³±cz±.
 	
-	SGLINE ADD dodaje wskazan± maskê realname oraz 
-	powód (który musi zostaæ podany) na listê SGLINE.
+	SNLINE ADD dodaje wskazan± maskê realname oraz 
+	powód (który musi zostaæ podany) na listê SNLINE.
 	Podaj±c czas mo¿na stosowaæ jednostki: s dla sekund,
 	m dla minut, h dla godzin oraz d dla dni.
 	Kombinacja tych jednostek nie jest mo¿liwa. Domy¶ln±
@@ -6671,22 +6764,22 @@ OPER_HELP_SGLINE
 	Uwaga: realname mo¿e zawieraæ spacje, dlatego
 	separatorem pomiêdzy mask± i powodem jest dwukropek.
 	
-	SGLINE DEL usuwa wskazane wpisy z listy SGLINE.
+	SNLINE DEL usuwa wskazane wpisy z listy SNLINE.
 	Jako argument przyjmuje maskê, numer wpisu lub
 	listê (przyk³ad poni¿ej dla polecenia LIST).
 	
-	SGLINE LIST wy¶wietla zawarto¶æ listy SGLINE. Je¶li
+	SNLINE LIST wy¶wietla zawarto¶æ listy SNLINE. Je¶li
 	zostanie podana maska tylko pasuj±ce wpisy zostan±
 	pokazane. Mo¿na tak¿e u¿yæ listy, przyk³ad:
 
-	   SGLINE LIST 2-5,7-9
+	   SNLINE LIST 2-5,7-9
 	      Listuje wpisy od 2 do 5 oraz od 7 do 9.
 	
-	SGLINE VIEW zwraca wiêcej szczegó³ów ni¿ SGLINE LIST.
-	Wy¶wietla informacje o dodaj±cym SGLINE, datê dodania,
+	SNLINE VIEW zwraca wiêcej szczegó³ów ni¿ SNLINE LIST.
+	Wy¶wietla informacje o dodaj±cym SNLINE, datê dodania,
 	datê wyga¶niêcia, maskê oraz powód.
 	
-	SGLINE CLEAR usuwa wszystkie wpisy z listy.
+	SNLINE CLEAR usuwa wszystkie wpisy z listy.
 
 OPER_HELP_SQLINE
 	Sk³adnia: SQLINE ADD [+czas-trwania] maska powód

@@ -322,7 +322,7 @@ CREATE TABLE anope_os_core (
   maxusercnt int(11) NOT NULL default '0',
   maxusertime int(10) unsigned NOT NULL default '0',
   akills_count int(11) NOT NULL default '0',
-  sglines_count int(11) NOT NULL default '0',
+  snlines_count int(11) NOT NULL default '0',
   sqlines_count int(11) NOT NULL default '0',
   szlines_count int(11) NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -346,11 +346,11 @@ CREATE TABLE anope_os_exceptions (
 -- --------------------------------------------------------
 
 --
--- Table structure for table 'anope_os_sxlines'
+-- Table structure for table 'anope_os_xlines'
 --
 
-DROP TABLE IF EXISTS anope_os_sxlines;
-CREATE TABLE anope_os_sxlines (
+DROP TABLE IF EXISTS anope_os_xlines;
+CREATE TABLE anope_os_xlines (
   type varchar(20) NOT NULL,
   mask varchar(255) NOT NULL,
   xby text NOT NULL,

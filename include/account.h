@@ -1,3 +1,14 @@
+class NickAlias;
+class NickCore;
+class NickRequest;
+
+typedef unordered_map_namespace::unordered_map<ci::string, NickAlias *, hash_compare_ci_string> nickalias_map;
+typedef unordered_map_namespace::unordered_map<ci::string, NickCore *, hash_compare_ci_string> nickcore_map;
+typedef unordered_map_namespace::unordered_map<ci::string, NickRequest *, hash_compare_ci_string> nickrequest_map;
+
+extern CoreExport nickalias_map NickAliasList;
+extern CoreExport nickcore_map NickCoreList;
+extern CoreExport nickrequest_map NickRequestList;
 
 /* NickServ nickname structures. */
 
@@ -69,16 +80,13 @@ enum NickCoreFlag
 	NI_END
 };
 
-/** XXX: this really needs to die with fire and be merged with metadata into NickCore or something.
- */
-class CoreExport NickRequest
+class CoreExport NickRequest : public Extensible
 {
  public:
 	NickRequest(const std::string &nickname);
 
 	~NickRequest();
 
-	NickRequest *next, *prev;
 	char *nick;
 	std::string passcode;
 	std::string password;
@@ -102,7 +110,6 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 	 */
 	~NickAlias();
 
-	NickAlias *next, *prev;
 	char *nick;				/* Nickname */
 	char *last_quit;			/* Last quit message */
 	char *last_realname;			/* Last realname */
@@ -137,8 +144,6 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 	 */
 	~NickCore();
 
-	NickCore *next, *prev;
-
 	std::list<User *> Users;
 
 	char *display;				/* How the nick is displayed */
@@ -156,7 +161,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 
 	/* Unsaved data */
 	time_t lastmail;			/* Last time this nick record got a mail */
-	SList aliases;				/* List of aliases */
+	std::list<NickAlias *> aliases;		/* List of aliases */
 
 	/** Check whether this opertype has access to run the given command string.
 	  * @param cmdstr The string to check, e.g. botserv/set/private.

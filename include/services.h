@@ -17,7 +17,8 @@
 /*************************************************************************/
 
 #include "sysconf.h"
-#include "config.h"
+
+#define BUFSIZE 1024
 
 /* Some SUN fixs */
 #ifdef __sun
@@ -33,9 +34,9 @@
 # define u_int32_t uint32_t
 # define u_int64_t uint64_t
 
-#  ifndef INADDR_NONE
-#   define INADDR_NONE (-1)
-#  endif
+# ifndef INADDR_NONE
+#  define INADDR_NONE (-1)
+# endif
 #endif
 
 
@@ -51,7 +52,7 @@
 
 #include <sys/stat.h>   /* for umask() on some systems */
 #include <sys/types.h>
-
+#include <assert.h>
 #include <fcntl.h>
 
 #ifndef _WIN32
@@ -90,8 +91,16 @@
 # define inet_ntop inet_ntop_
 # define MARK_DEPRECATED
 
+extern CoreExport const char *dlerror();
 extern CoreExport int inet_pton(int af, const char *src, void *dst);
 extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+#endif
+
+/* Telling compilers about printf()-like functions: */
+#ifdef __GNUC__
+# define FORMAT(type,fmt,start) __attribute__((format(type,fmt,start)))
+#else
+# define FORMAT(type,fmt,start)
 #endif
 
 #ifdef HAVE_GETTIMEOFDAY
@@ -139,10 +148,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 #define tolower tolower_
 #define toupper toupper_
 
-/* We also have our own encrypt(). */
-#define encrypt encrypt_
-
-
 #ifdef __WINS__
 #ifndef BKCHECK
 #define BKCHECK
@@ -158,12 +163,12 @@ extern int strncasecmp(const char *, const char *, size_t);
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
- * It defines the class factory and external init_module function.
+ * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
 #ifdef _WIN32
 	#define MODULE_INIT(x) \
-		extern "C" DllExport Module *init_module(const std::string &, const std::string &); \
-		extern "C" Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" DllExport Module *AnopeInit(const std::string &, const std::string &); \
+		extern "C" Module *AnopeInit(const std::string &modname, const std::string &creator) \
 		{ \
 			return new x(modname, creator); \
 		} \
@@ -177,27 +182,26 @@ extern int strncasecmp(const char *, const char *, size_t);
 			} \
 			return TRUE; \
 		} \
-		extern "C" DllExport void destroy_module(x *); \
-		extern "C" void destroy_module(x *m) \
+		extern "C" DllExport void AnopeFini(x *); \
+		extern "C" void AnopeFini(x *m) \
 		{ \
 			delete m; \
 		}
 
 #else
 	#define MODULE_INIT(x) \
-		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
+		extern "C" DllExport Module *AnopeInit(const std::string &modname, const std::string &creator) \
 		{ \
 			return new x(modname, creator); \
 		} \
-		extern "C" DllExport void destroy_module(x *m) \
+		extern "C" DllExport void AnopeFini(x *m) \
 		{ \
 			delete m; \
 		}
 #endif
 
 /* Miscellaneous definitions. */
-#include "defs.h"
-#include "slist.h"
+#include "hashcomp.h"
 
 /* Pull in the various bits of STL */
 #include <iostream>
@@ -348,15 +352,16 @@ template<typename T> class Flags
 class User;
 class ChannelInfo;
 class Channel;
+class Server;
 struct EList;
+struct Session;
 
 typedef struct bandata_ BanData;
 typedef struct mailinfo_ MailInfo;
-typedef struct akill_ Akill;
 typedef struct exception_ Exception;
-typedef struct session_ Session;
 
 #include "extensible.h"
+#include "threadengine.h"
 #include "bots.h"
 #include "opertype.h"
 #include "modes.h"
@@ -374,7 +379,7 @@ struct ircdvars_ {
 	const char *botchanumode;			/* Modes set when botserv joins a channel */
 	int svsnick;				/* Supports SVSNICK		*/
 	int vhost;				/* Supports vhost		*/
-	int sgline;				/* Supports SGline		*/
+	int snline;				/* Supports SNline		*/
 	int sqline;				/* Supports SQline		*/
 	int szline;				/* Supports SZline		*/
 	int numservargs;			/* Number of Server Args	*/
@@ -523,7 +528,6 @@ enum AccessLevel
 /* Access levels for users. */
 struct ChanAccess
 {
-	uint16 in_use;	/* 1 if this entry is in use, else 0 */
 	int16 level;
 	NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
 	time_t last_seen;
@@ -544,7 +548,6 @@ enum AutoKickFlag
 class AutoKick : public Flags<AutoKickFlag>
 {
  public:
- 	bool InUse;
 	/* Only one of these can be in use */
 	std::string mask;
 	NickCore *nc;
@@ -572,7 +575,6 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct BadWord
 {
-	bool InUse;
 	std::string word;
 	BadWordType type;
 };
@@ -617,8 +619,9 @@ struct BadWord
 #define CA_AUTOOWNER			36
 #define CA_OWNER			37
 #define CA_OWNERME			38
+#define CA_FOUNDER			39
 
-#define CA_SIZE		39
+#define CA_SIZE		40
 
 /* BotServ SET flags */
 enum BotServFlag
@@ -677,48 +680,7 @@ typedef struct {
 
 /*************************************************************************/
 
-/* Server data */
-
-typedef enum {
-	SSYNC_IN_PROGRESS   = 0,	/* Sync is currently in progress */
-	SSYNC_DONE		  = 1		/* We're in sync				 */
-} SyncState;
-
-/** Flags set on servers
- */
-enum ServerFlag
-{
-	SERVER_START,
-
-	/* This server is me */
-	SERVER_ISME,
-	/* This server was juped */
-	SERVER_JUPED,
-	/* This server is the current uplink */
-	SERVER_ISUPLINK,
-
-	SERVER_END
-};
-
-class Server : public Flags<ServerFlag>
-{
- public:
-	Server *next, *prev;
-
-	char *name;	 /* Server name						*/
-	uint16 hops;	/* Hops between services and server   */
-	char *desc;	 /* Server description				 */
-	char *suid;	 /* Server Univeral ID				 */
-	SyncState sync; /* Server sync state (see above)	  */
-
-	Server *links;	/* Linked list head for linked servers 	  */
-	Server *uplink;	/* Server which pretends to be the uplink */
-};
-
-/*************************************************************************/
-
 #include "users.h"
-
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
  */
@@ -816,39 +778,6 @@ struct mailinfo_ {
 
 /*************************************************************************/
 
-struct akill_ {
-	char *user;			/* User part of the AKILL */
-	char *host;			/* Host part of the AKILL */
-
-	char *by;			/* Who set the akill */
-	char *reason;		/* Why they got akilled */
-
-	time_t seton;		/* When it was set */
-	time_t expires;		/* When it expires */
-};
-
-/*************************************************************************/
-
-/* Structure for OperServ SGLINE and SZLINE commands */
-
-enum SXLineType
-{
-	SX_SGLINE,
-	SX_SQLINE,
-	SX_SZLINE
-};
-
-struct SXLine {
-	char *mask;
-	char *by;
-	char *reason;
-	time_t seton;
-	time_t expires;
-};
-
-
-/************************************************************************/
-
 struct exception_ {
 	char *mask;				 /* Hosts to which this exception applies */
 	int limit;				  /* Session limit for exception */
@@ -864,8 +793,11 @@ struct exception_ {
 
 /*************************************************************************/
 
-struct session_ {
-	Session *prev, *next;
+typedef unordered_map_namespace::unordered_map<std::string, Session *, hash_compare_std_string> session_map;
+extern CoreExport session_map SessionList;
+
+struct Session
+{
 	char *host;
 	int count;				  /* Number of clients with this host */
 	int hits;				   /* Number of subsequent kills for a host */
@@ -920,55 +852,6 @@ enum DefconLevel
 
 /*************************************************************************/
 
-/* Types of capab
- */
-enum CapabType
-{
-	CAPAB_BEGIN,
-
-	CAPAB_NOQUIT,
-	CAPAB_TSMODE,
-	CAPAB_UNCONNECT,
-	CAPAB_NICKIP,
-	CAPAB_NSJOIN,
-	CAPAB_ZIP,
-	CAPAB_BURST,
-	CAPAB_TS3,
-	CAPAB_TS5,
-	CAPAB_DKEY,
-	CAPAB_DOZIP,
-	CAPAB_DODKEY,
-	CAPAB_QS,
-	CAPAB_SCS,
-	CAPAB_PT4,
-	CAPAB_UID,
-	CAPAB_KNOCK,
-	CAPAB_CLIENT,
-	CAPAB_IPV6,
-	CAPAB_SSJ5,
-	CAPAB_SN2,
-	CAPAB_VHOST,
-	CAPAB_TOKEN,
-	CAPAB_SSJ3,
-	CAPAB_NICK2,
-	CAPAB_VL,
-	CAPAB_TLKEXT,
-	CAPAB_CHANMODE,
-	CAPAB_SJB64,
-	CAPAB_NICKCHARS,
-
-	CAPAB_END
-};
-
-/* CAPAB stuffs */
-struct CapabInfo
-{
-	std::string Token;
-	CapabType Flag;
-};
-
-/*************************************************************************/
-
 /**
  * RFC: defination of a valid nick
  * nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
@@ -986,8 +869,12 @@ struct CapabInfo
 class IRCDProto;
 struct Uplink;
 class ServerConfig;
+
 #include "extern.h"
-#include "configreader.h"
+#include "operserv.h"
+#include "mail.h"
+#include "servers.h"
+#include "config.h"
 
 class CoreExport IRCDProto
 {
@@ -1012,8 +899,8 @@ class CoreExport IRCDProto
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendTopic(BotInfo *, Channel *, const char *, const char *) = 0;
 		virtual void SendVhostDel(User *) { }
-		virtual void SendAkill(Akill *) = 0;
-		virtual void SendAkillDel(Akill *) = 0;
+		virtual void SendAkill(XLine *) = 0;
+		virtual void SendAkillDel(XLine *) = 0;
 		virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
@@ -1038,11 +925,11 @@ class CoreExport IRCDProto
 		virtual void SendPing(const char *servname, const char *who);
 		virtual void SendPong(const char *servname, const char *who);
 		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
-		virtual void SendSQLineDel(const std::string &) = 0;
+		virtual void SendSQLineDel(XLine *x) = 0;
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
 		virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
 		virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
-		virtual void SendSQLine(const std::string &, const std::string &) = 0;
+		virtual void SendSQLine(XLine *x) = 0;
 		virtual void SendSquit(const char *servname, const char *message);
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
@@ -1051,10 +938,10 @@ class CoreExport IRCDProto
 		virtual void SendConnect() = 0;
 		virtual void SendSVSHold(const char *) { }
 		virtual void SendSVSHoldDel(const char *) { }
-		virtual void SendSGLineDel(SXLine *) { }
-		virtual void SendSZLineDel(SXLine *) { }
-		virtual void SendSZLine(SXLine *) { }
-		virtual void SendSGLine(SXLine *) { }
+		virtual void SendSGLineDel(XLine *) { }
+		virtual void SendSZLineDel(XLine *) { }
+		virtual void SendSZLine(XLine *) { }
+		virtual void SendSGLine(XLine *) { }
 		virtual void SendBanDel(Channel *, const std::string &) { }
 		virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
 		virtual void SendUnregisteredNick(User *) { }
@@ -1137,17 +1024,32 @@ class CoreExport Alog
 	}
 };
 
+class Message; // XXX
 
 class CoreExport Anope
 {
  public:
 	/** Check whether two strings match.
-	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param str The string to check against the pattern (e.g. foobar)
+	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
 	static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
 	inline static bool Match(const ci::string &str, const ci::string &mask) { return Match(str.c_str(), mask.c_str(), false); }
+
+	/** Add a message to Anope
+	 * @param name The message name as sent by the IRCd
+	 * @param func A callback function that will be called when this message is received
+	 * @return The new message object
+	 */
+	static Message *AddMessage(const std::string &name, int (*func)(const char *source, int ac, const char **av));
+
+	/** Deletes a message from Anope
+	 * XXX Im not sure what will happen if this function is called indirectly from message function pointed to by this message.. must check
+	 * @param m The message
+	 * @return true if the message was found and deleted, else false
+	 */
+	static bool DelMessage(Message *m);
 };
 
 /*************************************************************************/
@@ -1224,6 +1126,48 @@ class ChanServTimer : public Timer
 	 * @param The current time
 	 */
 	void Tick(time_t);
+};
+
+/** A class to process numbered lists (passed to most DEL/LIST/VIEW commands).
+ * The function HandleNumber is called for every number in the list. Note that
+ * if descending is true it gets called in descending order. This is so deleting
+ * the index passed to the function from an array will not cause the other indexes
+ * passed to the function to be incorrect. This keeps us from having to have an
+ * 'in use' flag on everything.
+ */
+class NumberList
+{
+ private:
+	std::set<unsigned> numbers;
+
+	bool desc;
+ public:
+	/** Processes a numbered list
+	 * @param list The list
+	 * @param descending True to make HandleNumber get called with numbers in descending order
+	 */
+	NumberList(const std::string &list, bool descending);
+
+	/** Destructor, does nothing
+	 */
+	virtual ~NumberList();
+
+	/** Should be called after the constructors are done running. This calls the callbacks.
+	 */
+	void Process();
+
+	/** Called with a number from the list
+	 * @param Number The number
+	 */
+	virtual void HandleNumber(unsigned Number);
+
+	/** Called when there is an error with the numbered list
+	 * Return false to immediatly stop processing the list and return
+	 * This is all done before we start calling HandleNumber, so no numbers will have been processed yet
+	 * @param list The list
+	 * @return false to stop processing
+	 */
+	virtual bool InvalidRange(const std::string &list);
 };
 
 #endif	/* SERVICES_H */

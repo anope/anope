@@ -39,48 +39,6 @@ NickCoreFlagInfo NickCoreFlags[] = {
 	{"", static_cast<NickCoreFlag>(-1)}
 };
 
-struct ChannelModeInfo
-{
-	std::string Name;
-	ChannelModeName Mode;
-};
-
-ChannelModeInfo ChannelModes[] = {
-	{"CMODE_BLOCKCOLOR", CMODE_BLOCKCOLOR},
-	{"CMODE_FLOOD", CMODE_FLOOD},
-	{"CMODE_INVITE", CMODE_INVITE},
-	{"CMODE_KEY", CMODE_KEY},
-	{"CMODE_LIMIT", CMODE_LIMIT},
-	{"CMODE_MODERATED", CMODE_MODERATED},
-	{"CMODE_NOEXTERNAL", CMODE_NOEXTERNAL},
-	{"CMODE_PRIVATE", CMODE_PRIVATE},
-	{"CMODE_REGISTERED", CMODE_REGISTERED},
-	{"CMODE_SECRET", CMODE_SECRET},
-	{"CMODE_TOPIC", CMODE_TOPIC},
-	{"CMODE_AUDITORIUM", CMODE_AUDITORIUM},
-	{"CMODE_SSL", CMODE_SSL},
-	{"CMODE_ADMINONLY", CMODE_ADMINONLY},
-	{"CMODE_NOCTCP", CMODE_NOCTCP},
-	{"CMODE_FILTER", CMODE_FILTER},
-	{"CMODE_NOKNOCK", CMODE_NOKNOCK},
-	{"CMODE_REDIRECT", CMODE_REDIRECT},
-	{"CMODE_REGMODERATED", CMODE_REGMODERATED},
-	{"CMODE_NONICK", CMODE_NONICK},
-	{"CMODE_OPERONLY", CMODE_OPERONLY},
-	{"CMODE_NONICK", CMODE_NONICK},
-	{"CMODE_REGISTEREDONLY", CMODE_REGISTEREDONLY},
-	{"CMODE_STRIPCOLOR", CMODE_STRIPCOLOR},
-	{"CMODE_NONOTICE", CMODE_NONOTICE},
-	{"CMODE_NOINVITE", CMODE_NOINVITE},
-	{"CMODE_ALLINVITE", CMODE_ALLINVITE},
-	{"CMODE_BLOCKCAPS", CMODE_BLOCKCAPS},
-	{"CMODE_PERM", CMODE_PERM},
-	{"CMODE_NICKFLOOD", CMODE_NICKFLOOD},
-	{"CMODE_JOINFLOOD", CMODE_JOINFLOOD},
-	{"CMODE_NOREJOIN", CMODE_NOREJOIN},
-	{"", static_cast<ChannelModeName>(-1)}
-};
-
 struct BotFlagInfo
 {
 	std::string Name;
@@ -140,13 +98,6 @@ struct BotServFlagInfo
 
 BotServFlagInfo BotServFlags[] = {
 	{"PRIVATE", BI_PRIVATE},
-	{"CHANSERV", BI_CHANSERV},
-	{"BOTSERV", BI_BOTSERV},
-	{"HOSTSERV", BI_HOSTSERV},
-	{"OPERSERV", BI_OPERSERV},
-	{"MEMOSERV", BI_MEMOSERV},
-	{"NICKSERV", BI_NICKSERV},
-	{"GLOBAL", BI_GLOBAL},
 	{"", static_cast<BotFlag>(-1)}
 };
 
@@ -169,7 +120,7 @@ MemoFlagInfo MemoFlags[] = {
 inline std::string SQLAssign(const mysqlpp::String& s) { return s.c_str(); }
 
 class DBMySQL;
-static DBMySQL *Me;
+static DBMySQL *me;
 
 bool ExecuteQuery(mysqlpp::Query& query)
 {
@@ -226,7 +177,7 @@ class DBMySQL : public Module
 
 	DBMySQL(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		Me = this;
+		me = this;
 
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);

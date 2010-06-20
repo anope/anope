@@ -497,6 +497,37 @@ int main(int argc, char *argv[])
 		}
 		if (input == "y")
 			broken = 1;
+		input = "";
+		while (input != "y" && input != "n")
+		{
+			std::cout << std::endl << "Are you converting a 1.8.x database? (y/n) " << std::endl << "? ";
+			std::cin >> input;
+		}
+		/* 1.8 doesn't have nickserv etc in bot.db, create them */
+		if (input == "y")
+		{
+			time_t now = time(NULL);
+			fs << "BI NickServ NickServ services.anope.org " << now << " 0 :NickServ" << std::endl;
+			fs << "MD FLAGS NICKSERV" << std::endl;
+
+			fs << "BI ChanServ ChanServ services.anope.org " << now << " 0 :ChanServ" << std::endl;
+			fs << "MD FLAGS CHANSERV" << std::endl;
+
+			fs << "BI BotServ BotServ services.anope.org " << now << " 0 :BotServ" << std::endl;
+			fs << "MD FLAGS BOTSERV" << std::endl;
+
+			fs << "BI HostServ HostServ services.anope.org " << now << " 0 :HostServ" << std::endl;
+			fs << "MD FLAGS HOSTSERV" << std::endl;
+
+			fs << "BI OperServ OperServ services.anope.org " << now << " 0 :OperServ" << std::endl;
+			fs << "MD FLAGS OPERSERV" << std::endl;
+
+			fs << "BI MemoServ MemoServ services.anope.org " << now << " 0 :MemoServ" << std::endl;
+			fs << "MD FLAGS MEMOSERV" << std::endl;
+
+			fs << "BI Global Global services.anope.org " << now << " 0: Global" << std::endl;
+			fs << "MD FLAGS GLOBAL" << std::endl;
+		}
 
 		while ((c = getc_db(f)) == 1) {
 			READ(read_string(&nick, f));

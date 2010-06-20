@@ -461,8 +461,6 @@ class ServerConfig
 	/* The hostname if services clients */
 	char *ServiceHost;
 
-	/* Help channel, ops here get usermode +h **/
-	char *HelpChannel;
 	/* Log channel */
 	char *LogChannel;
 	/* Name of the network were on */

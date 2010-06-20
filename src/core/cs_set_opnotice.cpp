@@ -18,7 +18,7 @@
 class CommandCSSetOpNotice : public Command
 {
  public:
-	CommandCSSetOpNotice(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetOpNotice(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
@@ -91,7 +91,7 @@ class CSSetOpNotice : public Module
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
 			c->AddSubcommand(new CommandCSSetOpNotice("OPNOTICE"));
-		
+
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
 			c->AddSubcommand(new CommandCSSASetOpNotice("OPNOTICE"));

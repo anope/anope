@@ -18,7 +18,7 @@
 class CommandCSSetFounder : public Command
 {
  public:
-	CommandCSSetFounder(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetFounder(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
@@ -121,7 +121,7 @@ class CSSetFounder : public Module
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
 			c->AddSubcommand(new CommandCSSetFounder("FOUNDER"));
-		
+
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
 			c->AddSubcommand(new CommandCSSASetFounder("FOUNDER"));

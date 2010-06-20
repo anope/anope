@@ -20,7 +20,7 @@
 class CommandCSSetXOP : public Command
 {
  public:
-	CommandCSSetXOP(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetXOP(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
@@ -54,7 +54,7 @@ class CommandCSSetXOP : public Command
 						access->level = ACCESS_SOP;
 					else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP) || CHECKLEV(CA_OPDEOPME))
 						access->level = ACCESS_AOP;
-					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP) 
+					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP)
 || CHECKLEV(CA_HALFOPME)))
 							access->level = ACCESS_HOP;
 					else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE) || CHECKLEV(CA_VOICEME))

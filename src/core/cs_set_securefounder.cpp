@@ -18,7 +18,7 @@
 class CommandCSSetSecureFounder : public Command
 {
  public:
-	CommandCSSetSecureFounder(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSecureFounder(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

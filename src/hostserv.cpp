@@ -7,16 +7,13 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
 #include "modules.h"
 #include "language.h"
 
-E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
-				 char *creator, time_t time);
+E int do_hs_sync(NickCore *nc, char *vIdent, char *hostmask, char *creator, time_t time);
 
 E void moduleAddHostServCmds();
 
@@ -38,7 +35,7 @@ void get_hostserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
 
-	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
+	for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 	{
 		NickAlias *na = it->second;
 
@@ -66,9 +63,8 @@ void get_hostserv_stats(long *nrec, long *memuse)
  */
 void hostserv_init()
 {
-	if (Config.s_HostServ) {
+	if (Config.s_HostServ)
 		moduleAddHostServCmds();
-	}
 }
 
 /*************************************************************************/
@@ -83,7 +79,7 @@ void hostserv(User *u, const std::string &buf)
 {
 	if (!u || buf.empty())
 		return;
-	
+
 	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
 	{
 		std::string command = buf;
@@ -92,13 +88,9 @@ void hostserv(User *u, const std::string &buf)
 		ircdproto->SendCTCP(HostServ, u->nick.c_str(), "%s", command.c_str());
 	}
 	else if (!ircd->vhost)
-	{
 		notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ);
-	}
 	else
-	{
 		mod_run_cmd(HostServ, u, buf);
-	}
 }
 
 /** Set a vhost for the user
@@ -166,7 +158,7 @@ const time_t HostInfo::GetTime() const
 }
 
 /*************************************************************************/
-/*	Start of Generic Functions					 */
+/* Start of Generic Functions */
 /*************************************************************************/
 
 /** Sync all vhosts in a group to the same thing
@@ -177,7 +169,7 @@ void HostServSyncVhosts(NickAlias *na)
 	if (!na || !na->hostinfo.HasVhost())
 		return;
 
-	for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(); it != na->nc->aliases.end(); ++it)
+	for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
 	{
 		NickAlias *nick = *it;
 		nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
@@ -204,9 +196,7 @@ void do_on_id(User *u)
 			u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
 		}
 		if (ircd->vident && !na->hostinfo.GetIdent().empty())
-		{
 			u->SetVIdent(na->hostinfo.GetIdent());
-		}
 		u->UpdateHost();
 
 		if (!na->hostinfo.GetIdent().empty())
@@ -215,5 +205,3 @@ void do_on_id(User *u)
 			notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
 	}
 }
-
-

@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -69,28 +67,16 @@ Channel::~Channel()
 		delete [] this->topic;
 
 	if (this->bans && this->bans->count)
-	{
 		while (this->bans->entries)
 			entry_delete(this->bans, this->bans->entries);
-	}
 
-	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-	{
-		if (this->excepts && this->excepts->count)
-		{
-			while (this->excepts->entries)
-				entry_delete(this->excepts, this->excepts->entries);
-		}
-	}
+	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && this->excepts && this->excepts->count)
+		while (this->excepts->entries)
+			entry_delete(this->excepts, this->excepts->entries);
 
-	if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
-	{
-		if (this->invites && this->invites->count)
-		{
-			while (this->invites->entries)
-				entry_delete(this->invites, this->invites->entries);
-		}
-	}
+	if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE) && this->invites && this->invites->count)
+		while (this->invites->entries)
+			entry_delete(this->invites, this->invites->entries);
 
 	ChannelList.erase(this->name.c_str());
 }
@@ -120,9 +106,9 @@ void Channel::JoinUser(User *user)
 	uc->Status = Status;
 	this->users.push_back(uc);
 
-	if (get_ignore(user->nick.c_str()) == NULL)
+	if (!get_ignore(user->nick.c_str()))
 	{
-		if (this->ci && (check_access(user, this->ci, CA_MEMO)) && (this->ci->memos.memos.size() > 0))
+		if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
 		{
 			if (this->ci->memos.memos.size() == 1)
 				notice_lang(Config.s_MemoServ, user, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
@@ -143,26 +129,17 @@ void Channel::JoinUser(User *user)
 	 * But don't join the bot if the channel is persistant - Adam
 	 * But join persistant channels when syncing with our uplink- DP
 	 **/
-	if (Config.s_BotServ && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)))
+	if (Config.s_BotServ && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() == Config.BSMinUsers)
+		bot_join(this->ci);
+	/* Only display the greet if the main uplink we're connected
+	 * to has synced, or we'll get greet-floods when the net
+	 * recovers from a netsplit. -GD
+	 */
+	if (Config.s_BotServ && this->ci && this->ci->bi && this->users.size() >= Config.BSMinUsers && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && user->Account()->greet &&
+		check_access(user, this->ci, CA_GREET) && user->server->IsSynced())
 	{
-		if (this->users.size() == Config.BSMinUsers)
-			bot_join(this->ci);
-	}
-	if (Config.s_BotServ && this->ci && this->ci->bi)
-	{
-		if (this->users.size() >= Config.BSMinUsers && (this->ci->botflags.HasFlag(BS_GREET))
-		&& user->Account() && user->Account()->greet && check_access(user, this->ci, CA_GREET))
-		{
-			/* Only display the greet if the main uplink we're connected
-			 * to has synced, or we'll get greet-floods when the net
-			 * recovers from a netsplit. -GD
-			 */
-			if (user->server->IsSynced())
-			{
-				ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->Account()->display, user->Account()->greet);
-				this->ci->bi->lastmsg = time(NULL);
-			}
-		}
+		ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->Account()->display, user->Account()->greet);
+		this->ci->bi->lastmsg = time(NULL);
 	}
 }
 
@@ -174,9 +151,9 @@ void Channel::DeleteUser(User *user)
 	if (this->ci)
 		update_cs_lastseen(user, this->ci);
 
-	CUserList::iterator cit;
-	for (cit = this->users.begin(); (*cit)->user != user && cit != this->users.end(); ++cit);
-	if (cit == this->users.end())
+	CUserList::iterator cit, cit_end = this->users.end();
+	for (cit = this->users.begin(); (*cit)->user != user && cit != cit_end; ++cit);
+	if (cit == cit_end)
 	{
 		Alog(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
 		return;
@@ -186,9 +163,9 @@ void Channel::DeleteUser(User *user)
 	delete *cit;
 	this->users.erase(cit);
 
-	UChannelList::iterator uit;
-	for (uit = user->chans.begin(); (*uit)->chan != this && uit != user->chans.end(); ++uit);
-	if (uit == user->chans.end())
+	UChannelList::iterator uit, uit_end = user->chans.end();
+	for (uit = user->chans.begin(); (*uit)->chan != this && uit != uit_end; ++uit);
+	if (uit == uit_end)
 	{
 		Alog(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
 		return;
@@ -200,20 +177,20 @@ void Channel::DeleteUser(User *user)
 	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
 	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
 		return;
-	
+
 	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
 	 * We also don't part the bot here either, if necessary we will part it after the sync
 	 */
 	if (this->HasFlag(CH_SYNCING))
 		return;
-	
+
 	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
 	if (this->ci && this->ci->HasFlag(CI_INHABIT))
 		return;
 
 	if (Config.s_BotServ && this->ci && this->ci->bi && this->users.size() <= Config.BSMinUsers - 1)
 		ircdproto->SendPart(this->ci->bi, this, NULL);
-	
+
 	if (this->users.empty())
 		delete this;
 }
@@ -224,7 +201,7 @@ void Channel::DeleteUser(User *user)
  */
 UserContainer *Channel::FindUser(User *u)
 {
-	for (CUserList::iterator it = this->users.begin(); it != this->users.end(); ++it)
+	for (CUserList::iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		if ((*it)->user == u)
 			return *it;
 	return NULL;
@@ -312,9 +289,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		/* Set the status on the user */
 		ChannelContainer *cc = u->FindChannel(this);
 		if (cc)
-		{
 			cc->Status->SetFlag(cm->Name);
-		}
 
 		/* Enforce secureops, etc */
 		chan_set_correct_modes(u, this, 0);
@@ -347,9 +322,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 		/* They could be resetting the mode to change its params */
 		std::map<ChannelModeName, std::string>::iterator it = Params.find(cm->Name);
 		if (it != Params.end())
-		{
 			Params.erase(it);
-		}
 
 		Params.insert(std::make_pair(cm->Name, param));
 	}
@@ -368,15 +341,11 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 
 	/* Non registered channels can not be +r */
 	if (!ci && HasMode(CMODE_REGISTERED))
-	{
 		RemoveMode(NULL, CMODE_REGISTERED);
-	}
 
 	/* Non registered channel has no mlock */
 	if (!ci)
-	{
 		return;
-	}
 
 	/* If this channel has this mode locked negative */
 	if (ci->HasMLock(cm->Name, false))
@@ -403,10 +372,8 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 
 		/* We have the wrong param set */
 		if (cparam.empty() || ciparam.empty() || cparam != ciparam)
-		{
 			/* Reset the mode with the correct param */
 			SetMode(NULL, cm, ciparam);
-		}
 	}
 }
 
@@ -437,9 +404,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		if (bi)
 		{
 			if (std::find(BotModes.begin(), BotModes.end(), cm) != BotModes.end())
-			{
 				this->SetMode(bi, cm, bi->nick);
-			}
 			/* We don't track bots */
 			return;
 		}
@@ -456,9 +421,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		/* Remove the status on the user */
 		ChannelContainer *cc = u->FindChannel(this);
 		if (cc)
-		{
 			cc->Status->UnsetFlag(cm->Name);
-		}
 
 		return;
 	}
@@ -482,9 +445,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 	{
 		std::map<ChannelModeName, std::string>::iterator it = Params.find(cm->Name);
 		if (it != Params.end())
-		{
 			Params.erase(it);
-		}
 	}
 
 	if (cm->Name == CMODE_PERM)
@@ -547,13 +508,8 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const std::string &param, bo
 	else if (cm->Type == MODE_PARAM && HasMode(cm->Name))
 	{
 		std::string cparam;
-		if (GetParam(cm->Name, cparam))
-		{
-			if (cparam == param)
-			{
-				return;
-			}
-		}
+		if (GetParam(cm->Name, cparam) && cparam == param)
+			return;
 	}
 	else if (cm->Type == MODE_STATUS)
 	{
@@ -684,9 +640,7 @@ const bool Channel::HasParam(ChannelModeName Name)
 	std::map<ChannelModeName, std::string>::iterator it = Params.find(Name);
 
 	if (it != Params.end())
-	{
 		return true;
-	}
 
 	return false;
 }
@@ -707,9 +661,7 @@ void Channel::ClearModes(BotInfo *bi)
 		if (cm && this->HasMode(cm->Name))
 		{
 			if (cm->Type == MODE_REGULAR)
-			{
 				this->RemoveMode(NULL, cm);
-			}
 			else if (cm->Type == MODE_PARAM)
 			{
 				std::string param;
@@ -733,14 +685,12 @@ void Channel::ClearBans(BotInfo *bi)
 	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 
 	if (cml && this->bans && this->bans->count)
-	{
 		for (entry = this->bans->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
 			this->RemoveMode(bi, CMODE_BAN, entry->mask);
 		}
-	}
 }
 
 /** Clear all the excepts from the channel
@@ -754,14 +704,12 @@ void Channel::ClearExcepts(BotInfo *bi)
 	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 
 	if (cml && this->excepts && this->excepts->count)
-	{
 		for (entry = this->excepts->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
 			this->RemoveMode(bi, CMODE_EXCEPT, entry->mask);
 		}
-	}
 }
 
 /** Clear all the invites from the channel
@@ -775,14 +723,12 @@ void Channel::ClearInvites(BotInfo *bi)
 	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 
 	if (cml && this->invites && this->invites->count)
-	{
 		for (entry = this->invites->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
 			this->RemoveMode(bi, CMODE_INVITEOVERRIDE, entry->mask);
 		}
-	}
 }
 
 /** Set a string of modes on the channel
@@ -802,7 +748,7 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0; i < modebuf.size(); ++i)
+	for (unsigned i = 0, end = modebuf.size(); i < end; ++i)
 	{
 		ChannelMode *cm;
 
@@ -829,7 +775,7 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 			else
 				this->SetMode(bi, cm, "", EnforceMLock);
 		}
-		else if (add == 0)
+		else if (!add)
 		{
 			if (cm->Type != MODE_REGULAR && sep.GetToken(sbuf))
 				this->RemoveMode(bi, cm, sbuf, EnforceMLock);
@@ -852,7 +798,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		return;
 
 	int k = 0, j = 0, add = -1;
-	for (unsigned int i = 0; i < strlen(av[0]); ++i)
+	for (unsigned int i = 0, end = strlen(av[0]); i < end; ++i)
 	{
 		ChannelMode *cm;
 
@@ -899,15 +845,11 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 				c->RemoveModeInternal(cm, av[j]);
 		}
 		else
-		{
 			Alog() << "warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j;
-		}
 	}
 
 	if (j + k + 1 < ac)
-	{
 		Alog() << "warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j << " k: " << k;
-	}
 }
 
 /** Kick a user from a channel internally
@@ -935,7 +877,7 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 	}
 
 	Alog(LOG_DEBUG) << "Channel::KickInternal kicking " << user->nick << " from " << this->name;
-	
+
 	if (user->FindChannel(this))
 	{
 		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, user, source, reason));
@@ -962,7 +904,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	/* May not kick ulines */
 	if (u->server->IsULined())
 		return false;
-	
+
 	/* Do not kick protected clients */
 	if (u->IsProtected())
 		return false;
@@ -989,7 +931,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
 
 	if (chan->HasModes())
 	{
-		for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+		for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 		{
 			if ((*it)->Class != MC_CHANNEL)
 				continue;
@@ -1069,7 +1011,7 @@ void get_channel_stats(long *nrec, long *memuse)
 	{
 		Channel *chan = cit->second;
 
-		count++;
+		++count;
 		mem += sizeof(*chan);
 		if (chan->topic)
 			mem += strlen(chan->topic) + 1;
@@ -1084,14 +1026,15 @@ void get_channel_stats(long *nrec, long *memuse)
 			mem += get_memuse(chan->excepts);
 		if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
 			mem += get_memuse(chan->invites);
-		for (CUserList::iterator it = chan->users.begin(); it != chan->users.end(); ++it)
+		for (CUserList::iterator it = chan->users.begin(), it_end = chan->users.end(); it != it_end; ++it)
 		{
 			mem += sizeof(*it);
 			mem += sizeof((*it)->ud);
 			if ((*it)->ud.lastline)
 				mem += strlen((*it)->ud.lastline) + 1;
 		}
-		for (bd = chan->bd; bd; bd = bd->next) {
+		for (bd = chan->bd; bd; bd = bd->next)
+		{
 			if (bd->mask)
 				mem += strlen(bd->mask) + 1;
 			mem += sizeof(*bd);
@@ -1106,12 +1049,12 @@ void get_channel_stats(long *nrec, long *memuse)
 /* Is the given nick on the given channel?
    This function supports links. */
 
-User *nc_on_chan(Channel * c, NickCore * nc)
+User *nc_on_chan(Channel *c, NickCore *nc)
 {
 	if (!c || !nc)
 		return NULL;
 
-	for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+	for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 	{
 		UserContainer *uc = *it;
 
@@ -1148,7 +1091,7 @@ void do_join(const char *source, int ac, const char **av)
 	{
 		if (buf[0] == '0')
 		{
-			for (UChannelList::iterator it = user->chans.begin(); it != user->chans.end();)
+			for (UChannelList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
 			{
 				ChannelContainer *cc = *it++;
 
@@ -1165,9 +1108,7 @@ void do_join(const char *source, int ac, const char **av)
 
 		/* Channel doesn't exist, create it */
 		if (!chan)
-		{
 			chan = new Channel(av[0], ctime);
-		}
 
 		/* Join came with a TS */
 		if (ac == 2)
@@ -1231,9 +1172,7 @@ void do_kick(const std::string &source, int ac, const char **av)
 	std::string buf;
 	commasepstream sep(av[1]);
 	while (sep.GetToken(buf))
-	{
 		c->KickInternal(source, buf, av[2]);
-	}
 }
 
 /*************************************************************************/
@@ -1246,7 +1185,7 @@ void do_kick(const std::string &source, int ac, const char **av)
 void do_part(const char *source, int ac, const char **av)
 {
 	User *user = finduser(source);
-	if (!user) 
+	if (!user)
 	{
 		Alog(LOG_DEBUG) << "PART from nonexistent user " << source << ": " << merge_args(ac, av);
 		return;
@@ -1257,11 +1196,9 @@ void do_part(const char *source, int ac, const char **av)
 	while (sep.GetToken(buf))
 	{
 		Channel *c = findchan(buf);
-		
+
 		if (!c)
-		{
 			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
-		}
 
 		Alog(LOG_DEBUG) << source << " leaves " << buf;
 
@@ -1289,34 +1226,31 @@ void do_cmode(const char *source, int ac, const char **av)
 {
 	Channel *c;
 	ChannelInfo *ci;
-	unsigned int i;
+	unsigned i, end;
 	const char *t;
 
 	if (Capab.HasFlag(CAPAB_TSMODE) || UseTSMODE)
 	{
-		for (i = 0; i < strlen(av[1]); i++)
+		for (i = 0, end = strlen(av[1]); i < end; ++i)
 			if (!isdigit(av[1][i]))
 				break;
-		if (av[1][i] == '\0')
+		if (!av[1][i])
 		{
 			t = av[0];
 			av[0] = av[1];
 			av[1] = t;
-			ac--;
-			av++;
+			--ac;
+			++av;
 		}
 		else
 			Alog() << "TSMODE enabled but MODE has no valid TS";
 	}
 
 	/* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
-	if (ircd->ts6)
+	if (ircd->ts6 && isdigit(av[0][0]))
 	{
-		if (isdigit(av[0][0]))
-		{
-			ac--;
-			av++;
-		}
+			--ac;
+			++av;
 	}
 
 	c = findchan(av[0]);
@@ -1338,11 +1272,11 @@ void do_cmode(const char *source, int ac, const char **av)
 			c->server_modecount = 0;
 			c->server_modetime = time(NULL);
 		}
-		c->server_modecount++;
+		++c->server_modecount;
 	}
 
-	ac--;
-	av++;
+	--ac;
+	++av;
 	ChanSetInternalModes(c, ac, av);
 }
 
@@ -1358,16 +1292,17 @@ void do_topic(const char *source, int ac, const char **av)
 	time_t topic_time;
 	char *topicsetter;
 
-	if (ircd->sjb64) {
+	if (ircd->sjb64)
+	{
 		ts = base64dects(av[2]);
 		Alog(LOG_DEBUG) << "encoded TOPIC TS " << av[2] << " converted to " << ts;
-	} else {
-		ts = strtoul(av[2], NULL, 10);
 	}
+	else
+		ts = strtoul(av[2], NULL, 10);
 
 	topic_time = ts;
 
-	if (!c) 
+	if (!c)
 	{
 		Alog(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return;
@@ -1387,25 +1322,25 @@ void do_topic(const char *source, int ac, const char **av)
 	 * channel exactly, there's no need to update anything and we can as
 	 * well just return silently without updating anything. -GD
 	 */
-	if ((ac > 3) && *av[3] && ci && ci->last_topic
-		&& (strcmp(av[3], ci->last_topic) == 0)
-		&& (strcmp(topicsetter, ci->last_topic_setter.c_str()) == 0)) {
+	if (ac > 3 && *av[3] && ci && ci->last_topic && !strcmp(av[3], ci->last_topic) && !strcmp(topicsetter, ci->last_topic_setter.c_str()))
+	{
 		delete [] topicsetter;
 		return;
 	}
 
-	if (check_topiclock(c, topic_time)) {
+	if (check_topiclock(c, topic_time))
+	{
 		delete [] topicsetter;
 		return;
 	}
 
-	if (c->topic) {
+	if (c->topic)
+	{
 		delete [] c->topic;
 		c->topic = NULL;
 	}
-	if (ac > 3 && *av[3]) {
+	if (ac > 3 && *av[3])
 		c->topic = sstrdup(av[3]);
-	}
 
 	c->topic_setter = topicsetter;
 	c->topic_time = topic_time;
@@ -1429,7 +1364,7 @@ void do_topic(const char *source, int ac, const char **av)
  * @param give_modes Set to 1 to give modes, 0 to not give modes
  * @return void
  **/
-void chan_set_correct_modes(User * user, Channel * c, int give_modes)
+void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 {
 	ChannelInfo *ci;
 	ChannelMode *owner, *admin, *op, *halfop, *voice;
@@ -1443,7 +1378,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 	if (!c || !(ci = c->ci))
 		return;
 
-	if ((ci->HasFlag(CI_FORBIDDEN)) || (*(c->name.c_str()) == '+'))
+	if (ci->HasFlag(CI_FORBIDDEN) || *(c->name.c_str()) == '+')
 		return;
 
 	Alog(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
@@ -1488,7 +1423,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
  */
 void MassChannelModes(BotInfo *bi, const std::string &modes)
 {
-	for (channel_map::const_iterator it = ChannelList.begin(); it != ChannelList.end(); ++it)
+	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 	{
 		Channel *c = it->second;
 
@@ -1502,11 +1437,11 @@ void MassChannelModes(BotInfo *bi, const std::string &modes)
 
 void restore_unsynced_topics()
 {
-	for (channel_map::const_iterator it = ChannelList.begin(); it != ChannelList.end(); ++it)
+	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 	{
 		Channel *c = it->second;
 
-		if (!(c->topic_sync))
+		if (!c->topic_sync)
 			restore_topic(c->name.c_str());
 	}
 }
@@ -1535,28 +1470,34 @@ Entry *entry_create(char *mask)
 	entry->mask = sstrdup(mask);
 
 	host = strchr(mask, '@');
-	if (host) {
+	if (host)
+	{
 		*host++ = '\0';
 		/* If the user is purely a wildcard, ignore it */
 		if (str_is_pure_wildcard(mask))
 			user = NULL;
-		else {
-
+		else
+		{
 			/* There might be a nick too  */
 			user = strchr(mask, '!');
-			if (user) {
+			if (user)
+			{
 				*user++ = '\0';
 				/* If the nick is purely a wildcard, ignore it */
 				if (str_is_pure_wildcard(mask))
 					nick = NULL;
 				else
 					nick = mask;
-			} else {
+			}
+			else
+			{
 				nick = NULL;
 				user = mask;
 			}
 		}
-	} else {
+	}
+	else
+	{
 		/* It is possibly an extended ban/invite mask, but we do
 		 * not support these at this point.. ~ Viper */
 		/* If there's no user in the mask, assume a pure wildcard */
@@ -1564,7 +1505,8 @@ Entry *entry_create(char *mask)
 		host = mask;
 	}
 
-	if (nick) {
+	if (nick)
+	{
 		entry->nick = sstrdup(nick);
 		/* Check if we have a wildcard user */
 		if (str_is_wildcard(nick))
@@ -1573,7 +1515,8 @@ Entry *entry_create(char *mask)
 			entry->SetFlag(ENTRYTYPE_NICK);
 	}
 
-	if (user) {
+	if (user)
+	{
 		entry->user = sstrdup(user);
 		/* Check if we have a wildcard user */
 		if (str_is_wildcard(user))
@@ -1583,13 +1526,17 @@ Entry *entry_create(char *mask)
 	}
 
 	/* Only check the host if it's not a pure wildcard */
-	if (*host && !str_is_pure_wildcard(host)) {
-		if (ircd->cidrchanbei && str_is_cidr(host, &ip, &cidr, &cidrhost)) {
+	if (*host && !str_is_pure_wildcard(host))
+	{
+		if (ircd->cidrchanbei && str_is_cidr(host, &ip, &cidr, &cidrhost))
+		{
 			entry->cidr_ip = ip;
 			entry->cidr_mask = cidr;
 			entry->SetFlag(ENTRYTYPE_CIDR4);
 			host = cidrhost;
-		} else if (ircd->cidrchanbei && strchr(host, '/')) {
+		}
+		else if (ircd->cidrchanbei && strchr(host, '/'))
+		{
 			/* Most IRCd's don't enforce sane bans therefore it is not
 			 * so unlikely we will encounter this.
 			 * Currently we only support strict CIDR without taking into
@@ -1600,7 +1547,9 @@ Entry *entry_create(char *mask)
 			 * but do not use if during matching.. ~ Viper */
 			entry->ClearFlags();
 			entry->SetFlag(ENTRYTYPE_NONE);
-		} else {
+		}
+		else
+		{
 			entry->host = sstrdup(host);
 			if (str_is_wildcard(host))
 				entry->SetFlag(ENTRYTYPE_HOST_WILD);
@@ -1613,14 +1562,13 @@ Entry *entry_create(char *mask)
 	return entry;
 }
 
-
 /**
  * Create an entry and add it at the beginning of given list.
  * @param list The List the mask should be added to
  * @param mask The mask to parse and add to the list
  * @return Pointer to newly added entry. NULL if it fails.
  */
-Entry *entry_add(EList * list, const char *mask)
+Entry *entry_add(EList *list, const char *mask)
 {
 	Entry *e;
 	char *hostmask;
@@ -1637,18 +1585,17 @@ Entry *entry_add(EList * list, const char *mask)
 	if (list->entries)
 		list->entries->prev = e;
 	list->entries = e;
-	list->count++;
+	++list->count;
 
 	return e;
 }
-
 
 /**
  * Delete the given entry from a given list.
  * @param list Linked list from which entry needs to be removed.
  * @param e The entry to be deleted, must be member of list.
  */
-void entry_delete(EList * list, Entry * e)
+void entry_delete(EList *list, Entry *e)
 {
 	if (!list || !e)
 		return;
@@ -1670,9 +1617,8 @@ void entry_delete(EList * list, Entry * e)
 	delete [] e->mask;
 	delete e;
 
-	list->count--;
+	--list->count;
 }
-
 
 /**
  * Create and initialize a new entrylist
@@ -1688,7 +1634,6 @@ EList *list_create()
 
 	return list;
 }
-
 
 /**
  * Match the given Entry to the given user/host and optional IP addy
@@ -1731,7 +1676,7 @@ int entry_match(Entry *e, const ci::string &nick, const ci::string &user, const 
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match_mask(Entry * e, const char *mask, uint32 ip)
+int entry_match_mask(Entry *e, const char *mask, uint32 ip)
 {
 	char *hostmask, *nick, *user, *host;
 	int res;
@@ -1739,17 +1684,23 @@ int entry_match_mask(Entry * e, const char *mask, uint32 ip)
 	hostmask = sstrdup(mask);
 
 	host = strchr(hostmask, '@');
-	if (host) {
+	if (host)
+	{
 		*host++ = '\0';
 		user = strchr(hostmask, '!');
-		if (user) {
+		if (user)
+		{
 			*user++ = '\0';
 			nick = hostmask;
-		} else {
+		}
+		else
+		{
 			nick = NULL;
 			user = hostmask;
 		}
-	} else {
+	}
+	else
+	{
 		nick = NULL;
 		user = NULL;
 		host = hostmask;
@@ -1772,18 +1723,16 @@ int entry_match_mask(Entry * e, const char *mask, uint32 ip)
  * @param ip The ip to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match(EList * list, const char *nick, const char *user, const char *host,
-				   uint32 ip)
+Entry *elist_match(EList *list, const char *nick, const char *user, const char *host, uint32 ip)
 {
 	Entry *e;
 
 	if (!list || !list->entries)
 		return NULL;
 
-	for (e = list->entries; e; e = e->next) {
+	for (e = list->entries; e; e = e->next)
 		if (entry_match(e, nick ? nick : "", user ? user : "", host ? host : "", ip))
 			return e;
-	}
 
 	/* We matched none */
 	return NULL;
@@ -1796,7 +1745,7 @@ Entry *elist_match(EList * list, const char *nick, const char *user, const char 
  * @param ip The ip to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match_mask(EList * list, const char *mask, uint32 ip)
+Entry *elist_match_mask(EList *list, const char *mask, uint32 ip)
 {
 	char *hostmask, *nick, *user, *host;
 	Entry *res;
@@ -1807,17 +1756,23 @@ Entry *elist_match_mask(EList * list, const char *mask, uint32 ip)
 	hostmask = sstrdup(mask);
 
 	host = strchr(hostmask, '@');
-	if (host) {
+	if (host)
+	{
 		*host++ = '\0';
 		user = strchr(hostmask, '!');
-		if (user) {
+		if (user)
+		{
 			*user++ = '\0';
 			nick = hostmask;
-		} else {
+		}
+		else
+		{
 			nick = NULL;
 			user = hostmask;
 		}
-	} else {
+	}
+	else
+	{
 		nick = NULL;
 		user = NULL;
 		host = hostmask;
@@ -1837,7 +1792,7 @@ Entry *elist_match_mask(EList * list, const char *mask, uint32 ip)
  * @param user The user to match against the entries
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match_user(EList * list, User * u)
+Entry *elist_match_user(EList *list, User *u)
 {
 	Entry *res;
 	char *host;
@@ -1846,16 +1801,16 @@ Entry *elist_match_user(EList * list, User * u)
 	if (!list || !list->entries || !u)
 		return NULL;
 
-	if (u->hostip == NULL) {
+	if (u->hostip == NULL)
+	{
 		host = host_resolve(u->host);
 		/* we store the just resolved hostname so we don't
 		 * need to do this again */
-		if (host) {
+		if (host)
 			u->hostip = sstrdup(host);
-		}
-	} else {
-		host = sstrdup(u->hostip);
 	}
+	else
+		host = sstrdup(u->hostip);
 
 	/* Convert the host to an IP.. */
 	if (host)
@@ -1880,17 +1835,16 @@ Entry *elist_match_user(EList * list, User * u)
  * @param mask The *!*@* mask to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_find_mask(EList * list, const char *mask)
+Entry *elist_find_mask(EList *list, const char *mask)
 {
 	Entry *e;
 
 	if (!list || !list->entries || !mask)
 		return NULL;
 
-	for (e = list->entries; e; e = e->next) {
+	for (e = list->entries; e; e = e->next)
 		if (!stricmp(e->mask, mask))
 			return e;
-	}
 
 	return NULL;
 }
@@ -1900,7 +1854,7 @@ Entry *elist_find_mask(EList * list, const char *mask)
  * @param list The list we should estimate the mem use of.
  * @return Returns the memory useage of the given list.
  */
-long get_memuse(EList * list)
+long get_memuse(EList *list)
 {
 	Entry *e;
 	long mem = 0;
@@ -1910,8 +1864,10 @@ long get_memuse(EList * list)
 
 	mem += sizeof(EList *);
 	mem += sizeof(Entry *) * list->count;
-	if (list->entries) {
-		for (e = list->entries; e; e = e->next) {
+	if (list->entries)
+	{
+		for (e = list->entries; e; e = e->next)
+		{
 			if (e->nick)
 				mem += strlen(e->nick) + 1;
 			if (e->user)

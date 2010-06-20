@@ -53,7 +53,7 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password) 
+	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
 	{
 		if (hashm != "plain")
 			return EVENT_CONTINUE;
@@ -61,10 +61,10 @@ class ENone : public Module
 		this->OnEncrypt(plaintext, buf);
 		if(!password.compare(buf))
 		{
-			/* if we are NOT the first module in the list, 
+			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front().compare(this->name))
+			if (Config.EncModuleList.front() == this->name)
 			{
 				enc_encrypt(plaintext, password);
 			}

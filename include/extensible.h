@@ -1,12 +1,11 @@
 /*
- *
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
+
+#ifndef EXTENSIBLE_H
+#define EXTENSIBLE_H
 
 /** Dummy base class we use to cast everything to/from
  */
@@ -62,19 +61,17 @@ class CoreExport Extensible
 	std::map<std::string, ExtensibleItemBase *> Extension_Items;
 
  public:
- 	/** Default constructor, does nothing
+	/** Default constructor, does nothing
 	 */
- 	Extensible() { }
+	Extensible() { }
 
 	/** Default destructor, deletes all of the extensible items in this object
 	 * then clears the map
 	 */
 	virtual ~Extensible()
 	{
-		for (std::map<std::string, ExtensibleItemBase *>::iterator it = Extension_Items.begin(); it != Extension_Items.end(); ++it)
-		{
+		for (std::map<std::string, ExtensibleItemBase *>::iterator it = Extension_Items.begin(), it_end = Extension_Items.end(); it != it_end; ++it)
 			delete it->second;
-		}
 		Extension_Items.clear();
 	}
 
@@ -161,7 +158,7 @@ class CoreExport Extensible
 	}
 
 	/** Get an extension item that is a pointer.
-	 * 
+	 *
 	 * @param key The key parameter is an arbitary string which identifies the extension data
 	 * * @param p If you provide a non-existent key, this value will be NULL. Otherwise a pointer to the item you requested will be placed in this templated parameter.
 	 * @return Returns true if the item was found and false if it was nor, regardless of wether 'p' is NULL. This allows you to store NULL values in Extensible.
@@ -211,7 +208,7 @@ class CoreExport Extensible
 	 */
 	bool GetExt(const std::string &key)
 	{
-		return (this->Extension_Items.find(key) != this->Extension_Items.end());
+		return this->Extension_Items.find(key) != this->Extension_Items.end();
 	}
 
 	/** Get a list of all extension items names.
@@ -221,11 +218,9 @@ class CoreExport Extensible
 	 */
 	void GetExtList(std::deque<std::string> &list)
 	{
-		for (std::map<std::string, ExtensibleItemBase *>::iterator i = Extension_Items.begin(); i != Extension_Items.end(); ++i)
-		{
-			list.push_back(i->first);
-		}
+		for (std::map<std::string, ExtensibleItemBase *>::iterator it = Extension_Items.begin(), it_end = Extension_Items.end(); it != it_end; ++it)
+			list.push_back(it->first);
 	}
-
 };
 
+#endif // EXTENSIBLE_H

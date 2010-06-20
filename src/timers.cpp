@@ -5,9 +5,7 @@
  *
  * Please read COPYING and README for furhter details.
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- *
+ * Based on the original code of Services by Andy Church.
  */
 
 #include "services.h"
@@ -91,11 +89,9 @@ void TimerManager::AddTimer(Timer *T)
 void TimerManager::DelTimer(Timer *T)
 {
 	std::vector<Timer *>::iterator i = std::find(Timers.begin(), Timers.end(), T);
-		
+
 	if (i != Timers.end())
-	{
 		Timers.erase(i);
-	}
 }
 
 /** Tick all pending timers
@@ -108,7 +104,7 @@ void TimerManager::TickTimers(time_t ctime)
 		Timer *t = Timers.front();
 
 		t->Tick(ctime);
-		
+
 		if (t->GetRepeat())
 		{
 			t->SetTimer(ctime + t->GetSecs());

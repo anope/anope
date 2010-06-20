@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -23,7 +21,6 @@ extern void moduleAddIRCDMsgs();
 
 void introduce_user(const std::string &user)
 {
-
 	/* Watch out for infinite loops... */
 #define LTSIZE 20
 	static int lasttimes[LTSIZE];
@@ -35,10 +32,10 @@ void introduce_user(const std::string &user)
 	/* We make the bots go online */
 
 	/* XXX: it might be nice to have this inside BotInfo's constructor, or something? */
-	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
 		BotInfo *bi = it->second;
-		
+
 		ci::string ci_bi_nick(bi->nick.c_str());
 		if (user.empty() || ci_bi_nick == user)
 		{
@@ -61,15 +58,19 @@ static int set_group()
 	struct group *gr;
 
 	setgrent();
-	while ((gr = getgrent()) != NULL) {
-		if (strcmp(gr->gr_name, RUNGROUP) == 0)
+	while ((gr = getgrent()) != NULL)
+	{
+		if (!strcmp(gr->gr_name, RUNGROUP))
 			break;
 	}
 	endgrent();
-	if (gr) {
+	if (gr)
+	{
 		setgid(gr->gr_gid);
 		return 0;
-	} else {
+	}
+	else
+	{
 		Alog() << "Unknown group `" << RUNGROUP << "'";
 		return -1;
 	}
@@ -130,8 +131,8 @@ bool GetCommandLineArgument(const std::string &name, char shortname)
 bool GetCommandLineArgument(const std::string &name, char shortname, std::string &param)
 {
 	param.clear();
-	
-	for (std::vector<std::pair<std::string, std::string> >::iterator it = CommandLineArguments.begin(); it != CommandLineArguments.end(); ++it)
+
+	for (std::vector<std::pair<std::string, std::string> >::iterator it = CommandLineArguments.begin(), it_end = CommandLineArguments.end(); it != it_end; ++it)
 	{
 		if (it->first == name || it->first[0] == shortname)
 		{
@@ -161,7 +162,8 @@ static void write_pidfile()
 	FILE *pidfile;
 
 	pidfile = fopen(Config.PIDFilename, "w");
-	if (pidfile) {
+	if (pidfile)
+	{
 #ifdef _WIN32
 		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
 #else
@@ -169,9 +171,9 @@ static void write_pidfile()
 #endif
 		fclose(pidfile);
 		atexit(remove_pidfile);
-	} else {
-		log_perror("Warning: cannot write to PID file %s", Config.PIDFilename);
 	}
+	else
+		log_perror("Warning: cannot write to PID file %s", Config.PIDFilename);
 }
 
 /*************************************************************************/
@@ -224,9 +226,7 @@ int init_primary(int ac, char **av)
 	}
 
 	if (GetCommandLineArgument("nofork", 'n'))
-	{
 		nofork = 1;
-	}
 
 	if (GetCommandLineArgument("support", 's'))
 	{
@@ -235,24 +235,16 @@ int init_primary(int ac, char **av)
 	}
 
 	if (GetCommandLineArgument("readonly", 'r'))
-	{
 		readonly = 1;
-	}
 
 	if (GetCommandLineArgument("nothird"))
-	{
 		nothird = 1;
-	}
 
 	if (GetCommandLineArgument("noexpire", 'e'))
-	{
 		noexpire = 1;
-	}
 
 	if (GetCommandLineArgument("protocoldebug"))
-	{
 		protocoldebug = 1;
-	}
 
 	std::string Arg;
 	if (GetCommandLineArgument("debug", 'd', Arg))
@@ -279,7 +271,7 @@ int init_primary(int ac, char **av)
 			Alog(LOG_TERMINAL) << "The --config option requires a file name";
 			return -1;
 		}
-		services_conf = Arg;
+		services_conf = Arg.c_str();
 	}
 
 	if (GetCommandLineArgument("dir", 0, Arg))
@@ -303,26 +295,25 @@ int init_primary(int ac, char **av)
 	}
 
 	/* Chdir to Services data directory. */
-	if (chdir(services_dir.c_str()) < 0) {
+	if (chdir(services_dir.c_str()) < 0)
+	{
 		fprintf(stderr, "chdir(%s): %s\n", services_dir.c_str(), strerror(errno));
 		return -1;
 	}
 
 	/* Open logfile, and complain if we didn't. */
-	if (open_log() < 0) {
+	if (open_log() < 0)
+	{
 		openlog_errno = errno;
-		if (started_from_term) {
-			fprintf(stderr, "Warning: unable to open log file %s: %s\n",
-					log_filename.c_str(), strerror(errno));
-		} else {
+		if (started_from_term)
+			fprintf(stderr, "Warning: unable to open log file %s: %s\n", log_filename.c_str(), strerror(errno));
+		else
 			openlog_failed = 1;
-		}
 	}
 
 	/* Read configuration file; exit if there are problems. */
-	if (!read_config(0)) {
+	if (!read_config(0))
 		return -1;
-	}
 
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init())
@@ -377,26 +368,31 @@ int init_secondary(int ac, char **av)
 	if (!nofork)
 	{
 		int i;
-		if ((i = fork()) < 0) {
+		if ((i = fork()) < 0)
+		{
 			perror("fork()");
 			return -1;
-		} else if (i != 0) {
+		}
+		else if (i != 0)
+		{
 			Alog(LOG_TERMINAL) << "PID " << i;
 			exit(0);
 		}
-		if (started_from_term) {
+		if (started_from_term)
+		{
 			close(0);
 			close(1);
 			close(2);
 		}
-		if (setpgid(0, 0) < 0) {
+		if (setpgid(0, 0) < 0)
+		{
 			perror("setpgid()");
 			return -1;
 		}
 	}
 #else
-	if (!SupportedWindowsVersion()) {
-
+	if (!SupportedWindowsVersion())
+	{
 		char *winver = GetWindowsVersion();
 
 		Alog() << winver << " is not a supported version of Windows";
@@ -404,9 +400,9 @@ int init_secondary(int ac, char **av)
 		delete [] winver;
 
 		return -1;
-
 	}
-	if (!nofork) {
+	if (!nofork)
+	{
 		Alog(LOG_TERMINAL) << "PID " << GetCurrentProcessId();
 		Alog() << "Launching Anope into the background";
 		FreeConsole();
@@ -417,12 +413,8 @@ int init_secondary(int ac, char **av)
 	write_pidfile();
 
 	/* Announce ourselves to the logfile. */
-	Alog() << "Anope " << version_number << " (ircd protocol: " << version_protocol << ") starting up" 
-		<< (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") 
-		<< (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
+	Alog() << "Anope " << version_number << " (ircd protocol: " << version_protocol << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 	start_time = time(NULL);
-
-
 
 	/* If in read-only mode, close the logfile again. */
 	if (readonly)
@@ -440,7 +432,6 @@ int init_secondary(int ac, char **av)
 	/* Initialize multi-language support */
 	lang_init();
 	Alog(LOG_DEBUG) << "Loaded languages";
-
 
 	/* Initialize subservices */
 	ns_init();

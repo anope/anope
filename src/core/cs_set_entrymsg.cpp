@@ -18,7 +18,7 @@
 class CommandCSSetEntryMsg : public Command
 {
  public:
-	CommandCSSetEntryMsg(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetEntryMsg(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 2, cpermission)
 	{
 	}
 

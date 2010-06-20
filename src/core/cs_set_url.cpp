@@ -18,7 +18,7 @@
 class CommandCSSetURL : public Command
 {
  public:
-	CommandCSSetURL(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetURL(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 2, cpermission)
 	{
 	}
 

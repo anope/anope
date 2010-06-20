@@ -1,3 +1,6 @@
+#ifndef ACCOUNT_H
+#define ACCOUNT_H
+
 class NickAlias;
 class NickCore;
 class NickRequest;
@@ -92,7 +95,7 @@ class CoreExport NickRequest : public Extensible
 	std::string password;
 	char *email;
 	time_t requested;
-	time_t lastmail;			/* Unsaved */
+	time_t lastmail; /* Unsaved */
 };
 
 class NickCore;
@@ -111,12 +114,12 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 	~NickAlias();
 
 	char *nick;				/* Nickname */
-	char *last_quit;			/* Last quit message */
-	char *last_realname;			/* Last realname */
-	char *last_usermask;			/* Last usermask */
-	time_t time_registered;			/* When the nick was registered */
-	time_t last_seen;			/* When it was seen online for the last time */
-	NickCore *nc;				/* I'm an alias of this */
+	char *last_quit;		/* Last quit message */
+	char *last_realname;	/* Last realname */
+	char *last_usermask;	/* Last usermask */
+	time_t time_registered;	/* When the nick was registered */
+	time_t last_seen;		/* When it was seen online for the last time */
+	NickCore *nc;			/* I'm an alias of this */
 	HostInfo hostinfo;
 
 	/** Release a nick
@@ -146,28 +149,28 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 
 	std::list<User *> Users;
 
-	char *display;				/* How the nick is displayed */
-	std::string pass;			/* Password of the nicks */
-	char *email;				/* E-mail associated to the nick */
-	char *greet;				/* Greet associated to the nick */
-	uint32 icq;				/* ICQ # associated to the nick */
-	char *url;				/* URL associated to the nick */
-	uint16 language;			/* Language selected by nickname owner (LANG_*) */
-	std::vector<std::string> access; 	/* Access list, vector of strings */
+	char *display;		/* How the nick is displayed */
+	std::string pass;	/* Password of the nicks */
+	char *email;		/* E-mail associated to the nick */
+	char *greet;		/* Greet associated to the nick */
+	uint32 icq;			/* ICQ # associated to the nick */
+	char *url;			/* URL associated to the nick */
+	uint16 language;	/* Language selected by nickname owner (LANG_*) */
+	std::vector<std::string> access; /* Access list, vector of strings */
 	MemoInfo memos;
-	uint16 channelcount;			/* Number of channels currently registered */
+	uint16 channelcount; /* Number of channels currently registered */
 
 	OperType *ot;
 
 	/* Unsaved data */
-	time_t lastmail;			/* Last time this nick record got a mail */
-	std::list<NickAlias *> aliases;		/* List of aliases */
+	time_t lastmail;				/* Last time this nick record got a mail */
+	std::list<NickAlias *> aliases;	/* List of aliases */
 
 	/** Check whether this opertype has access to run the given command string.
 	  * @param cmdstr The string to check, e.g. botserv/set/private.
 	  * @return True if this opertype may run the specified command, false otherwise.
 	  */
-	virtual bool HasCommand(const std::string &cmdstr) const;
+	virtual bool HasCommand(const ci::string &cmdstr) const;
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
@@ -178,7 +181,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 	  * @param privstr The priv to check for, e.g. users/auspex.
 	  * @return True if this opertype has the specified priv, false otherwise.
 	  */
-	virtual bool HasPriv(const std::string &privstr) const;
+	virtual bool HasPriv(const ci::string &privstr) const;
 
 	/** Add an entry to the nick's access list
 	 *
@@ -221,3 +224,4 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
 	void ClearAccess();
 };
 
+#endif // ACCOUNT_H

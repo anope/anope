@@ -7,17 +7,15 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
 
 /* smalloc, scalloc, srealloc, sstrdup:
- *	Versions of the memory allocation functions which will cause the
- *	program to terminate with an "Out of memory" error if the memory
- *	cannot be allocated.  (Hence, the return value from these functions
- *	is never NULL.)
+ *  Versions of the memory allocation functions which will cause the
+ *  program to terminate with an "Out of memory" error if the memory
+ *  cannot be allocated.  (Hence, the return value from these functions
+ *  is never NULL.)
  */
 
 /*************************************************************************/
@@ -31,9 +29,8 @@ void *smalloc(long size)
 {
 	void *buf;
 
-	if (!size) {
+	if (!size)
 		size = 1;
-	}
 	buf = malloc(size);
 	if (!buf)
 		abort();
@@ -52,9 +49,8 @@ void *scalloc(long elsize, long els)
 {
 	void *buf;
 
-	if (!elsize || !els) {
+	if (!elsize || !els)
 		elsize = els = 1;
-	}
 	buf = calloc(elsize, els);
 	if (!buf)
 		abort();
@@ -73,9 +69,8 @@ void *srealloc(void *oldptr, long newsize)
 {
 	void *buf;
 
-	if (!newsize) {
+	if (!newsize)
 		newsize = 1;
-	}
 	buf = realloc(oldptr, newsize);
 	if (!buf)
 		abort();
@@ -93,12 +88,15 @@ void *srealloc(void *oldptr, long newsize)
 char *sstrdup(const char *src)
 {
 	char *ret = NULL;
-	if (src) {
+	if (src)
+	{
 		ret = new char[strlen(src) + 1];
 		if (!ret)
 			abort();
 		strcpy(ret, src);
-	} else {
+	}
+	else
+	{
 		Alog() << "sstrdup() called with NULL-arg";
 		abort();
 	}

@@ -18,7 +18,7 @@
 class CommandCSSetPeace : public Command
 {
  public:
-	CommandCSSetPeace(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPeace(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

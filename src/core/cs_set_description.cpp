@@ -18,7 +18,7 @@
 class CommandCSSetDescription : public Command
 {
  public:
-	CommandCSSetDescription(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetDescription(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
@@ -86,7 +86,7 @@ class CSSetDescription : public Module
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
 			c->AddSubcommand(new CommandCSSetDescription("DESC"));
-		
+
 		c = FindCommand(ChanServ, "SASEt");
 		if (c)
 			c->AddSubcommand(new CommandCSSASetDescription("DESC"));

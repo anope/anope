@@ -18,7 +18,7 @@
 class CommandCSSetSecureOps : public Command
 {
  public:
-	CommandCSSetSecureOps(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSecureOps(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
@@ -91,7 +91,7 @@ class CSSetSecureOps : public Module
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
 			c->AddSubcommand(new CommandCSSetSecureOps("SECUREOPS"));
-		
+
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
 			c->AddSubcommand(new CommandCSSASetSecureOps("SECUREOPS"));

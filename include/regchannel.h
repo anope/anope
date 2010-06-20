@@ -4,9 +4,10 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- *
  */
+
+#ifndef REGCHANNEL_H
+#define REGCHANNEL_H
 
 typedef unordered_map_namespace::unordered_map<ci::string, ChannelInfo *, hash_compare_ci_string> registered_channel_map;
 extern CoreExport registered_channel_map RegisteredChannelList;
@@ -64,12 +65,12 @@ enum ChannelInfoFlag
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 {
  private:
-	std::map<ChannelModeName, std::string> Params;		/* Map of parameters by mode name for mlock */
-	std::vector<ChanAccess *> access;			/* List of authorized users */
-	std::vector<AutoKick *> akick;				/* List of users to kickban */
-	std::vector<BadWord *> badwords;			/* List of badwords */
-	Flags<ChannelModeName> mlock_on;			/* Modes mlocked on */
-	Flags<ChannelModeName> mlock_off;			/* Modes mlocked off */
+	std::map<ChannelModeName, std::string> Params;	/* Map of parameters by mode name for mlock */
+	std::vector<ChanAccess *> access;				/* List of authorized users */
+	std::vector<AutoKick *> akick;					/* List of users to kickban */
+	std::vector<BadWord *> badwords;				/* List of badwords */
+	Flags<ChannelModeName> mlock_on;				/* Modes mlocked on */
+	Flags<ChannelModeName> mlock_off;				/* Modes mlocked off */
 
  public:
  	/** Default constructor
@@ -81,32 +82,30 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	~ChannelInfo();
 
-	std::string name;		/* Channel name */
+	std::string name; /* Channel name */
 	NickCore *founder;
-	NickCore *successor;		/* Who gets the channel if the founder
-					 			 * nick is dropped or expires */
+	NickCore *successor; /* Who gets the channel if the founder nick is dropped or expires */
 	char *desc;
 	char *url;
 	char *email;
 
 	time_t time_registered;
 	time_t last_used;
-	char *last_topic;			/* Last topic on the channel */
-	std::string last_topic_setter;			/* Who set the last topic */
-	time_t last_topic_time;		/* When the last topic was set */
+	char *last_topic;				/* Last topic on the channel */
+	std::string last_topic_setter;	/* Who set the last topic */
+	time_t last_topic_time;			/* When the last topic was set */
 
 	char *forbidby;
 	char *forbidreason;
 
 	int16 bantype;
-	int16 *levels;				/* Access levels for commands */
+	int16 *levels; /* Access levels for commands */
 
-	char *entry_message;		/* Notice sent on entering channel */
+	char *entry_message; /* Notice sent on entering channel */
 
 	MemoInfo memos;
 
-	Channel *c;			/* Pointer to channel record (if   *
-					 			 *	channel is currently in use) */
+	Channel *c; /* Pointer to channel record (if channel is currently in use) */
 
 	/* For BotServ */
 
@@ -290,3 +289,5 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
 	 */
 	bool CheckKick(User *user);
 };
+
+#endif // REGCHANNEL_H

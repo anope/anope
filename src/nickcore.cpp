@@ -21,7 +21,7 @@ NickCore::NickCore(const std::string &coredisplay)
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
 		if (Config.NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
 			SetFlag(static_cast<NickCoreFlag>(t));
-	
+
 	NickCoreList[this->display] = this;
 }
 
@@ -34,7 +34,7 @@ NickCore::~NickCore()
 	/* Clean up this nick core from any users online using it
 	 * (ones that /nick but remain unidentified)
 	 */
-	for (std::list<User *>::iterator it = this->Users.begin(); it != this->Users.end(); ++it)
+	for (std::list<User *>::iterator it = this->Users.begin(), it_end = this->Users.end(); it != it_end; ++it)
 	{
 		User *user = *it;
 		ircdproto->SendAccountLogout(user, user->Account());
@@ -64,11 +64,11 @@ NickCore::~NickCore()
 	if (this->greet)
 		delete [] this->greet;
 	if (this->url)
-	       delete [] this->url;
+		delete [] this->url;
 
 	if (!this->memos.memos.empty())
 	{
-		for (unsigned i = 0; i < this->memos.memos.size(); ++i)
+		for (unsigned i = 0, end = this->memos.memos.size(); i < end; ++i)
 		{
 			if (this->memos.memos[i]->text)
 				delete [] this->memos.memos[i]->text;
@@ -78,7 +78,7 @@ NickCore::~NickCore()
 	}
 }
 
-bool NickCore::HasCommand(const std::string &cmdstr) const
+bool NickCore::HasCommand(const ci::string &cmdstr) const
 {
 	if (!this->ot)
 	{
@@ -97,13 +97,11 @@ bool NickCore::IsServicesOper() const
 	return false;
 }
 
-bool NickCore::HasPriv(const std::string &privstr) const
+bool NickCore::HasPriv(const ci::string &privstr) const
 {
 	if (!this->ot)
-	{
 		// No opertype.
 		return false;
-	}
 
 	return this->ot->HasPriv(privstr);
 }
@@ -123,7 +121,7 @@ std::string NickCore::GetAccess(unsigned entry)
 
 bool NickCore::FindAccess(const std::string &entry)
 {
-	for (unsigned i = 0; i < access.size(); ++i)
+	for (unsigned i = 0, end = access.size(); i < end; ++i)
 		if (access[i] == entry)
 			return true;
 
@@ -132,7 +130,7 @@ bool NickCore::FindAccess(const std::string &entry)
 
 void NickCore::EraseAccess(const std::string &entry)
 {
-	for (unsigned i = 0; i < access.size(); ++i)
+	for (unsigned i = 0, end = access.size(); i < end; ++i)
 		if (access[i] == entry)
 		{
 			FOREACH_MOD(I_OnNickEraseAccess, OnNickEraseAccess(this, entry));

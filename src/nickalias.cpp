@@ -19,7 +19,7 @@ NickRequest::~NickRequest()
 	FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(this));
 
 	NickRequestList.erase(this->nick);
-	
+
 	if (this->nick)
 		delete [] this->nick;
 	if (this->email)
@@ -39,22 +39,22 @@ NickAlias::NickAlias(const std::string &nickname, NickCore *nickcore)
 
 	nick = last_quit = last_realname = last_usermask = NULL;
 	time_registered = last_seen = 0;
-	
+
 	this->nick = sstrdup(nickname.c_str());
 	this->nc = nickcore;
 	nc->aliases.push_back(this);
 
 	NickAliasList[this->nick] = this;
 
-	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); it++)
+	for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 	{
 		if (nc->ot)
 			break;
 		if (stricmp(it->first.c_str(), this->nick))
 			continue;
 
-		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); tit++)
-		{	
+		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(), tit_end = Config.MyOperTypes.end(); tit != tit_end; ++tit)
+		{
 			OperType *ot = *tit;
 
 			if (ot->GetName() == it->second)
@@ -90,9 +90,7 @@ NickAlias::~NickAlias()
 		/* Next: see if our core is still useful. */
 		std::list<NickAlias *>::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
 		if (it != this->nc->aliases.end())
-		{
 			nc->aliases.erase(it);
-		}
 		if (this->nc->aliases.empty())
 		{
 			delete this->nc;
@@ -127,14 +125,10 @@ void NickAlias::Release()
 	if (this->HasFlag(NS_HELD))
 	{
 		if (ircd->svshold)
-		{
 			ircdproto->SendSVSHoldDel(this->nick);
-		}
 		else
-		{
 			ircdproto->SendQuit(this->nick, NULL);
-		}
-	
+
 		this->UnsetFlag(NS_HELD);
 	}
 }
@@ -151,9 +145,7 @@ void NickAlias::OnCancel(User *)
 		this->UnsetFlag(NS_COLLIDED);
 
 		if (ircd->svshold)
-		{
 			ircdproto->SendSVSHold(this->nick);
-		}
 		else
 		{
 			std::string uid = (ircd->ts6 ? ts6_uid_retrieve() : "");
@@ -163,4 +155,3 @@ void NickAlias::OnCancel(User *)
 		}
 	}
 }
-

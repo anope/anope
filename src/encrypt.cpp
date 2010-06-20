@@ -6,9 +6,7 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- *
+ * Based on the original code of Services by Andy Church.
  */
 
 #include "services.h"
@@ -16,7 +14,7 @@
 
 /******************************************************************************/
 
-/** 
+/**
  * Encrypt string `src' of length `len', placing the result in buffer
  * `dest' of size `size'.  Returns 0 on success, -1 on error.
  **/
@@ -39,7 +37,7 @@ int enc_encrypt_in_place(std::string &buf)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnEncryptInPlace, OnEncryptInPlace(buf));
 	if (MOD_RESULT == EVENT_ALLOW)
-	        return 0;
+		return 0;
 	return -1;
 }
 
@@ -54,15 +52,15 @@ int enc_decrypt(const std::string &src, std::string &dest)
 	size_t pos = src.find(":");
 	if (pos == std::string::npos)
 	{
-		Alog() << "Error: enc_decrypt() called with invalid password string (" << src << ")"; 
+		Alog() << "Error: enc_decrypt() called with invalid password string (" << src << ")";
 		return -1;
 	}
-	std::string hashm(src.begin(), src.begin()+pos);
+	std::string hashm(src.begin(), src.begin() + pos);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(hashm, src, dest));
 	if (MOD_RESULT == EVENT_ALLOW)
-	        return 1;
+		return 1;
 	return -1;
 }
 
@@ -82,13 +80,11 @@ int enc_check_password(std::string &plaintext, std::string &password)
 		Alog() << "Error: enc_check_password() called with invalid password string (" << password << ")";
 		return 0;
 	}
-	hashm.assign(password.begin(), password.begin()+pos);
+	hashm.assign(password.begin(), password.begin() + pos);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(hashm, plaintext, password));
 	if (MOD_RESULT == EVENT_ALLOW)
-	        return 1;
+		return 1;
 	return 0;
 }
-
-/* EOF */

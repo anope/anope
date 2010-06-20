@@ -4,17 +4,17 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
+
+#ifndef MODES_H
+#define MODES_H
 
 /** All of the valid user mode names
  */
 enum UserModeName
 {
 	UMODE_BEGIN,
-	
+
 	UMODE_SERV_ADMIN, UMODE_BOT, UMODE_CO_ADMIN, UMODE_FILTER, UMODE_HIDEOPER, UMODE_NETADMIN,
 	UMODE_REGPRIV, UMODE_PROTECTED, UMODE_NO_CTCP, UMODE_WEBTV, UMODE_WHOIS, UMODE_ADMIN, UMODE_DEAF,
 	UMODE_GLOBOPS, UMODE_HELPOP, UMODE_INVIS, UMODE_OPER, UMODE_PRIV, UMODE_GOD, UMODE_REGISTERED,
@@ -77,7 +77,7 @@ enum ModeClass
 class CoreExport Mode
 {
  public:
-  	/* Class of mode this is */
+	/* Class of mode this is */
 	ModeClass Class;
 	/* The mode name, as a string */
 	std::string NameAsString;
@@ -327,7 +327,7 @@ class CoreExport ChannelModeOper : public ChannelMode
 	/* Opers only */
 	bool CanSet(User *u);
 };
-			       
+
 /** This class is used for channel mode +r (registered channel)
  * No one may mlock r
  */
@@ -349,7 +349,7 @@ enum StackerType
 class StackerInfo
 {
  public:
- 	/* Modes to be added */
+	/* Modes to be added */
 	std::list<std::pair<void *, std::string> > AddModes;
 	/* Modes to be deleted */
 	std::list<std::pair<void *, std::string> > DelModes;
@@ -422,57 +422,57 @@ class CoreExport ModeManager
 	/* List of all modes Anope knows about */
 	static std::list<Mode *> Modes;
 
-        /* User modes */
-        static std::map<char, UserMode *> UserModesByChar;
-        static std::map<UserModeName, UserMode *> UserModesByName;
-        /* Channel modes */
-        static std::map<char, ChannelMode *> ChannelModesByChar;
-        static std::map<ChannelModeName, ChannelMode *> ChannelModesByName;
-        /* Although there are two different maps for UserModes and ChannelModes
-         * the pointers in each are the same. This is used to increase efficiency.
+	/* User modes */
+	static std::map<char, UserMode *> UserModesByChar;
+	static std::map<UserModeName, UserMode *> UserModesByName;
+	/* Channel modes */
+	static std::map<char, ChannelMode *> ChannelModesByChar;
+	static std::map<ChannelModeName, ChannelMode *> ChannelModesByName;
+	/* Although there are two different maps for UserModes and ChannelModes
+	 * the pointers in each are the same. This is used to increase efficiency.
 	 */
 
-        /** Add a user mode to Anope
-         * @param um A UserMode or UserMode derived class
-         * @return true on success, false on error
-         */
-        static bool AddUserMode(UserMode *um);
+	/** Add a user mode to Anope
+	 * @param um A UserMode or UserMode derived class
+	 * @return true on success, false on error
+	 */
+	static bool AddUserMode(UserMode *um);
 
-        /** Add a channel mode to Anope
-         * @param cm A ChannelMode or ChannelMode derived class
-         * @return true on success, false on error
-         */
-        static bool AddChannelMode(ChannelMode *cm);
+	/** Add a channel mode to Anope
+	 * @param cm A ChannelMode or ChannelMode derived class
+	 * @return true on success, false on error
+	 */
+	static bool AddChannelMode(ChannelMode *cm);
 
-        /** Find a channel mode
-         * @param Mode The mode
-         * @return The mode class
-         */
-        static ChannelMode *FindChannelModeByChar(char Mode);
+	/** Find a channel mode
+	 * @param Mode The mode
+	 * @return The mode class
+	 */
+	static ChannelMode *FindChannelModeByChar(char Mode);
 
-        /** Find a user mode
-         * @param Mode The mode
-         * @return The mode class
-         */
-        static UserMode *FindUserModeByChar(char Mode);
+	/** Find a user mode
+	 * @param Mode The mode
+	 * @return The mode class
+	 */
+	static UserMode *FindUserModeByChar(char Mode);
 
-        /** Find a channel mode
-         * @param Mode The modename
-         * @return The mode class
-         */
-        static ChannelMode *FindChannelModeByName(ChannelModeName Name);
+	/** Find a channel mode
+	 * @param Mode The modename
+	 * @return The mode class
+	 */
+	static ChannelMode *FindChannelModeByName(ChannelModeName Name);
 
-        /** Find a user mode
-         * @param Mode The modename
-         * @return The mode class
-         */
-        static UserMode *FindUserModeByName(UserModeName Name);
+	/** Find a user mode
+	 * @param Mode The modename
+	 * @return The mode class
+	 */
+	static UserMode *FindUserModeByName(UserModeName Name);
 
-        /** Gets the channel mode char for a symbol (eg + returns v)
-         * @param Value The symbol
-         * @return The char
-         */
-        static char GetStatusChar(char Value);
+	/** Gets the channel mode char for a symbol (eg + returns v)
+	 * @param Value The symbol
+	 * @return The char
+	 */
+	static char GetStatusChar(char Value);
 
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from
@@ -481,7 +481,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-        static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const std::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from
@@ -490,7 +490,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-        static void StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const std::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from
@@ -499,7 +499,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-        static void StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const std::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -533,3 +533,4 @@ class CoreExport ModeManager
 	static void ProcessModes();
 };
 
+#endif // MODES_H

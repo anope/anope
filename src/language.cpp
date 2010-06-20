@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -27,29 +25,29 @@ int langlist[NUM_LANGS];
 
 /* Order in which languages should be displayed: (alphabetical) */
 static int langorder[NUM_LANGS] = {
-	LANG_EN_US,				 /* English (US) */
-	LANG_FR,					/* French */
-	LANG_DE,					/* German */
-	LANG_IT,					/* Italian */
-	LANG_JA_JIS,				/* Japanese (JIS encoding) */
-	LANG_JA_EUC,				/* Japanese (EUC encoding) */
-	LANG_JA_SJIS,			   /* Japanese (SJIS encoding) */
-	LANG_PT,					/* Portugese */
-	LANG_ES,					/* Spanish */
-	LANG_TR,					/* Turkish */
-	LANG_CAT,				   /* Catalan */
-	LANG_GR,					/* Greek */
-	LANG_NL,					/* Dutch */
-	LANG_RU,					/* Russian */
-	LANG_HUN,				   /* Hungarian */
-	LANG_PL,					/* Polish */
+	LANG_EN_US,		/* English (US) */
+	LANG_FR,		/* French */
+	LANG_DE,		/* German */
+	LANG_IT,		/* Italian */
+	LANG_JA_JIS,	/* Japanese (JIS encoding) */
+	LANG_JA_EUC,	/* Japanese (EUC encoding) */
+	LANG_JA_SJIS,	/* Japanese (SJIS encoding) */
+	LANG_PT,		/* Portugese */
+	LANG_ES,		/* Spanish */
+	LANG_TR,		/* Turkish */
+	LANG_CAT,		/* Catalan */
+	LANG_GR,		/* Greek */
+	LANG_NL,		/* Dutch */
+	LANG_RU,		/* Russian */
+	LANG_HUN,		/* Hungarian */
+	LANG_PL,		/* Polish */
 };
 
 /*************************************************************************/
 
 /* Load a language file. */
 
-static int read_int32(int32 * ptr, FILE * f)
+static int read_int32(int32 *ptr, FILE *f)
 {
 	int a = fgetc(f);
 	int b = fgetc(f);
@@ -70,28 +68,33 @@ static void load_lang(int index, const char *filename)
 	Alog(LOG_DEBUG) << "Loading language " << index << " from file `languages/" << filename << "'";
 	snprintf(buf, sizeof(buf), "languages/%s", filename);
 #ifndef _WIN32
-	if (!(f = fopen(buf, "r"))) {
+	const char *mode = "r";
 #else
-	if (!(f = fopen(buf, "rb"))) {
+	const char *mode = "rb";
 #endif
+	if (!(f = fopen(buf, mode)))
+	{
 		log_perror("Failed to load language %d (%s)", index, filename);
 		return;
-	} else if (read_int32(&num, f) < 0) {
+	}
+	else if (read_int32(&num, f) < 0)
+	{
 		Alog() << "Failed to read number of strings for language " << index << "(" << filename << ")";
 		return;
-	} else if (num != NUM_STRINGS) {
-		Alog() << "Warning: Bad number of strings (" << num << " , wanted " << NUM_STRINGS << ") "
-			<< "for language " << index << " (" << filename << ")";
 	}
+	else if (num != NUM_STRINGS)
+		Alog() << "Warning: Bad number of strings (" << num << " , wanted " << NUM_STRINGS << ") for language " << index << " (" << filename << ")";
 	langtexts[index] = new char *[NUM_STRINGS];
 	if (num > NUM_STRINGS)
 		num = NUM_STRINGS;
-	for (i = 0; i < num; i++) {
+	for (i = 0; i < num; ++i)
+	{
 		int32 pos, len;
 		fseek(f, i * 8 + 4, SEEK_SET);
-		if (read_int32(&pos, f) < 0 || read_int32(&len, f) < 0) {
+		if (read_int32(&pos, f) < 0 || read_int32(&len, f) < 0)
+		{
 			Alog() << "Failed to read entry " << i << " in language " << index << " (" << filename << ") TOC";
-			while (--i >= 0) 
+			while (--i >= 0)
 			{
 				if (langtexts[index][i])
 					delete [] langtexts[index][i];
@@ -100,32 +103,41 @@ static void load_lang(int index, const char *filename)
 			langtexts[index] = NULL;
 			return;
 		}
-		if (len == 0) {
+		if (!len)
 			langtexts[index][i] = NULL;
-		} else if (len >= 65536) {
+		else if (len >= 65536)
+		{
 			Alog() << "Entry " << i << " in language " << index << " (" << filename << ") is too long (over 64k) -- corrupt TOC?";
-			while (--i >= 0) {
+			while (--i >= 0)
+			{
 				if (langtexts[index][i])
 					delete [] langtexts[index][i];
 			}
 			delete [] langtexts[index];
 			langtexts[index] = NULL;
 			return;
-		} else if (len < 0) {
+		}
+		else if (len < 0)
+		{
 			Alog() << "Entry " << i << " in language " << index << " (" << filename << ") has negative length -- corrupt TOC?";
-			while (--i >= 0) {
+			while (--i >= 0)
+			{
 				if (langtexts[index][i])
 					delete [] langtexts[index][i];
 			}
 			delete [] langtexts[index];
 			langtexts[index] = NULL;
 			return;
-		} else {
+		}
+		else
+		{
 			langtexts[index][i] = new char[len + 1];
 			fseek(f, pos, SEEK_SET);
-			if (fread(langtexts[index][i], 1, len, f) != len) {
+			if (fread(langtexts[index][i], 1, len, f) != len)
+			{
 				Alog() << "Failed to read string " << i << " in language " << index << "(" << filename << ")";
-				while (--i >= 0) {
+				while (--i >= 0)
+				{
 					if (langtexts[index][i])
 						delete [] langtexts[index][i];
 				}
@@ -148,16 +160,18 @@ void lang_sanitize()
 	int len = 0;
 	char tmp[2000];
 	char *newstr = NULL;
-	for (i = 0; i < NUM_LANGS; i++) {
-		for (j = 0; j < NUM_STRINGS; j++) {
-			if (strstr(langtexts[i][j], "%R")) {
+	for (i = 0; i < NUM_LANGS; ++i)
+	{
+		for (j = 0; j < NUM_STRINGS; ++j)
+		{
+			if (strstr(langtexts[i][j], "%R"))
+			{
 				len = strlen(langtexts[i][j]);
 				strscpy(tmp, langtexts[i][j], sizeof(tmp));
-				if (Config.UseStrictPrivMsg) {
+				if (Config.UseStrictPrivMsg)
 					strnrepl(tmp, sizeof(tmp), "%R", "/");
-				} else {
+				else
 					strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
-				}
 				newstr = sstrdup(tmp);
 				delete [] langtexts[i][j];
 				langtexts[i][j] = newstr;
@@ -187,18 +201,18 @@ void lang_init()
 	load_lang(LANG_HUN, "hun");
 	load_lang(LANG_PL, "pl");
 
-	for (i = 0; i < NUM_LANGS; i++) {
-		if (langtexts[langorder[i]] != NULL) {
+	for (i = 0; i < NUM_LANGS; ++i)
+	{
+		if (langtexts[langorder[i]] != NULL)
+		{
 			langnames[langorder[i]] = langtexts[langorder[i]][LANG_NAME];
 			langlist[n++] = langorder[i];
-			for (j = 0; j < NUM_STRINGS; j++) {
-				if (!langtexts[langorder[i]][j]) {
-					langtexts[langorder[i]][j] =
-						langtexts[DEF_LANGUAGE][j];
-				}
-				if (!langtexts[langorder[i]][j]) {
+			for (j = 0; j < NUM_STRINGS; ++j)
+			{
+				if (!langtexts[langorder[i]][j])
+					langtexts[langorder[i]][j] = langtexts[DEF_LANGUAGE][j];
+				if (!langtexts[langorder[i]][j])
 					langtexts[langorder[i]][j] = langtexts[LANG_EN_US][j];
-				}
 			}
 		}
 	}
@@ -212,7 +226,8 @@ void lang_init()
 
 	if (!langtexts[DEF_LANGUAGE])
 		fatal("Unable to load default language");
-	for (i = 0; i < NUM_LANGS; i++) {
+	for (i = 0; i < NUM_LANGS; ++i)
+	{
 		if (!langtexts[i])
 			langtexts[i] = langtexts[DEF_LANGUAGE];
 	}
@@ -230,44 +245,47 @@ void lang_init()
  * greater than BUFSIZE.
  */
 
-int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
+int strftime_lang(char *buf, int size, User *u, int format, struct tm *tm)
 {
 	int language = u && u->Account() ? u->Account()->language : Config.NSDefLanguage;
 	char tmpbuf[BUFSIZE], buf2[BUFSIZE];
 	char *s;
 	int i, ret;
 
-	if (!tm) {
+	if (!tm)
 		return 0;
-	}
 
 	strscpy(tmpbuf, langtexts[language][format], sizeof(tmpbuf));
-	if ((s = langtexts[language][STRFTIME_DAYS_SHORT]) != NULL) {
-		for (i = 0; i < tm->tm_wday; i++)
+	if ((s = langtexts[language][STRFTIME_DAYS_SHORT]))
+	{
+		for (i = 0; i < tm->tm_wday; ++i)
 			s += strcspn(s, "\n") + 1;
 		i = strcspn(s, "\n");
 		strncpy(buf2, s, i);
 		buf2[i] = 0;
 		strnrepl(tmpbuf, sizeof(tmpbuf), "%a", buf2);
 	}
-	if ((s = langtexts[language][STRFTIME_DAYS_LONG]) != NULL) {
-		for (i = 0; i < tm->tm_wday; i++)
+	if ((s = langtexts[language][STRFTIME_DAYS_LONG]))
+	{
+		for (i = 0; i < tm->tm_wday; ++i)
 			s += strcspn(s, "\n") + 1;
 		i = strcspn(s, "\n");
 		strncpy(buf2, s, i);
 		buf2[i] = 0;
 		strnrepl(tmpbuf, sizeof(tmpbuf), "%A", buf2);
 	}
-	if ((s = langtexts[language][STRFTIME_MONTHS_SHORT]) != NULL) {
-		for (i = 0; i < tm->tm_mon; i++)
+	if ((s = langtexts[language][STRFTIME_MONTHS_SHORT]))
+	{
+		for (i = 0; i < tm->tm_mon; ++i)
 			s += strcspn(s, "\n") + 1;
 		i = strcspn(s, "\n");
 		strncpy(buf2, s, i);
 		buf2[i] = 0;
 		strnrepl(tmpbuf, sizeof(tmpbuf), "%b", buf2);
 	}
-	if ((s = langtexts[language][STRFTIME_MONTHS_LONG]) != NULL) {
-		for (i = 0; i < tm->tm_mon; i++)
+	if ((s = langtexts[language][STRFTIME_MONTHS_LONG]))
+	{
+		for (i = 0; i < tm->tm_mon; ++i)
 			s += strcspn(s, "\n") + 1;
 		i = strcspn(s, "\n");
 		strncpy(buf2, s, i);
@@ -285,13 +303,12 @@ int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
 
 /* Send a syntax-error message to the user. */
 
-void syntax_error(char *service, User * u, const char *command, int msgnum)
+void syntax_error(char *service, User *u, const char *command, int msgnum)
 {
 	const char *str;
 
-	if (!u) {
+	if (!u)
 		return;
-	}
 
 	str = getstring(u, msgnum);
 	notice_lang(service, u, SYNTAX_ERROR, str);
@@ -316,9 +333,7 @@ const char *getstring(NickCore *nc, int index)
 	int langidx = Config.NSDefLanguage;
 
 	if (nc)
-	{
 		langidx = nc->language;
-	}
 
 	return langtexts[langidx][index];
 }

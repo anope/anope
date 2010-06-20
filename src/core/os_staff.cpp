@@ -25,10 +25,10 @@ class CommandOSStaff : public Command
 	{
 		notice_lang(Config.s_OperServ, u, OPER_STAFF_LIST_HEADER);
 
-		for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+		for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 		{
 			int found = 0;
-			std::string nick = it->first, type = it->second;
+			ci::string nick = it->first, type = it->second;
 
 			NickAlias *na = findnick(nick);
 			if (na)

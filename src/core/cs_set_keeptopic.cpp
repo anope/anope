@@ -18,7 +18,7 @@
 class CommandCSSetKeepTopic : public Command
 {
  public:
-	CommandCSSetKeepTopic(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetKeepTopic(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

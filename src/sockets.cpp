@@ -25,7 +25,7 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 {
 	if (!IPv6 && (TargetHost.find(':') != std::string::npos || BindHost.find(':') != std::string::npos))
 		IPv6 = true;
-	
+
 	Sock = socket(IPv6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
 
 	addrinfo hints;
@@ -41,7 +41,7 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 		sockaddr_in6 bindaddr6;
 
 		int Bound = -1;
-		if (getaddrinfo(BindHost.c_str(), NULL, &hints, &bindar) == 0)
+		if (!getaddrinfo(BindHost.c_str(), NULL, &hints, &bindar))
 		{
 			if (IPv6)
 				memcpy(&bindaddr6, bindar->ai_addr, bindar->ai_addrlen);
@@ -59,28 +59,20 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 				bindaddr6.sin6_family = AF_INET6;
 
 				if (inet_pton(AF_INET6, BindHost.c_str(), &bindaddr6.sin6_addr) < 1)
-				{
 					throw SocketException("Invalid bind host");
-				}
 
 				if (bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr6), sizeof(bindaddr6)) == -1)
-				{
 					throw SocketException("Unable to bind to address");
-				}
 			}
 			else
 			{
 				bindaddr.sin_family = AF_INET;
 
 				if (inet_pton(bindaddr.sin_family, BindHost.c_str(), &bindaddr.sin_addr) < 1)
-				{
 					throw SocketException("Invalid bind host");
-				}
 
 				if (bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr), sizeof(bindaddr)) == -1)
-				{
 					throw SocketException("Unable to bind to address");
-				}
 			}
 		}
 	}
@@ -88,7 +80,7 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 	addrinfo *conar;
 	sockaddr_in conaddr;
 	sockaddr_in6 conaddr6;
-	if (getaddrinfo(TargetHost.c_str(), NULL, &hints, &conar) == 0)
+	if (!getaddrinfo(TargetHost.c_str(), NULL, &hints, &conar))
 	{
 		if (IPv6)
 			memcpy(&conaddr6, conar->ai_addr, conar->ai_addrlen);
@@ -102,16 +94,12 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 		if (IPv6)
 		{
 			if (inet_pton(AF_INET6, TargetHost.c_str(), &conaddr6.sin6_addr) < 1)
-			{
 				throw SocketException("Invalid server address");
-			}
 		}
 		else
 		{
 			if (inet_pton(AF_INET, TargetHost.c_str(), &conaddr.sin_addr) < 1)
-			{
 				throw SocketException("Invalid server address");
-			}
 		}
 	}
 
@@ -121,9 +109,7 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 		conaddr6.sin6_port = htons(Port);
 
 		if (connect(Sock, reinterpret_cast<sockaddr *>(&conaddr6), sizeof(conaddr6)) < 0)
-		{
 			throw SocketException("Error connecting to server");
-		}
 	}
 	else
 	{
@@ -131,9 +117,7 @@ Socket::Socket(const std::string &nTargetHost, int nPort, const std::string &nBi
 		conaddr.sin_port = htons(Port);
 
 		if (connect(Sock, reinterpret_cast<sockaddr *>(&conaddr), sizeof(conaddr)) < 0)
-		{
 			throw SocketException("Error connecting to server");
-		}
 	}
 
 	socketEngine.AddSocket(this);
@@ -193,9 +177,7 @@ bool Socket::ProcessRead()
 
 	RecvLen = RecvInternal(buffer, sizeof(buffer) - 1);
 	if (RecvLen <= 0)
-	{
 		return false;
-	}
 	TotalRead += RecvLen;
 
 	std::string sbuffer = extrabuf;
@@ -208,7 +190,7 @@ bool Socket::ProcessRead()
 		TrimBuf(extrabuf);
 		sbuffer = sbuffer.substr(0, lastnewline);
 	}
-	
+
 	sepstream stream(sbuffer, '\n');
 	std::string buf;
 
@@ -217,12 +199,8 @@ bool Socket::ProcessRead()
 		TrimBuf(buf);
 
 		if (!buf.empty())
-		{
 			if (!Read(buf))
-			{
 				return false;
-			}
-		}
 	}
 
 	return true;
@@ -235,9 +213,7 @@ bool Socket::ProcessWrite()
 {
 	int Written = SendInternal(WriteBuffer);
 	if (Written == -1)
-	{
 		return false;
-	}
 	TotalWritten += Written;
 
 	WriteBuffer.clear();
@@ -310,9 +286,7 @@ SocketEngine::SocketEngine()
 #ifdef _WIN32
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 0), &wsa))
-	{
 		Alog() << "Failed to initialize WinSock library";
-	}
 #endif
 }
 
@@ -377,9 +351,7 @@ void SocketEngine::Process()
 	int sresult = select(MaxFD + 1, &rfdset, &wfdset, &efdset, &tval);
 
 	if (sresult == -1)
-	{
 		Alog() << "SocketEngine::Process error, " << GetError();
-	}
 	else if (sresult)
 	{
 		for (std::set<Socket *>::iterator it = Sockets.begin(); it != Sockets.end(); ++it)
@@ -456,4 +428,3 @@ const std::string SocketEngine::GetError() const
 			return "Socket engine caught unknown error";
 	}
 }
-

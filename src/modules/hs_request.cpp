@@ -781,7 +781,7 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 {
 	int z = 2;
 	char host[BUFSIZE];
-	std::list<std::pair<std::string, std::string> >::iterator it;
+	std::list<std::pair<ci::string, ci::string> >::iterator it;
 
 	if (vIdent)
 		snprintf(host, sizeof(host), "%s@%s", vIdent, vHost);
@@ -792,7 +792,7 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 	{
 		for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 		{
-			std::string nick = it->first;
+			ci::string nick = it->first;
 			my_memo_lang(u, nick.c_str(), z, LNG_REQUEST_MEMO, host);
 		}
 	}

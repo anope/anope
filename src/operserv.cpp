@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -54,9 +52,7 @@ void operserv(User *u, const std::string &buf)
 		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "%s", command.c_str());
 	}
 	else
-	{
 		mod_run_cmd(OperServ, u, buf);
-	}
 }
 
 bool SetDefConParam(ChannelModeName Name, std::string &buf)
@@ -84,9 +80,7 @@ void UnsetDefConParam(ChannelModeName Name)
 	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
 
 	if (it != DefConModesOnParams.end())
-	{
 		DefConModesOnParams.erase(it);
-	}
 }
 
 /** Check if a certain defcon option is currently in affect
@@ -136,17 +130,15 @@ void server_global(Server *s, const std::string &message)
 
 	if (s->GetLinks())
 	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
-		{
+		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(), it_end = s->GetLinks()->end(); it != it_end; ++it)
 			server_global(*it, message);
-		}
 	}
 }
 
 void oper_global(char *nick, const char *fmt, ...)
 {
 	va_list args;
-	char msg[2048];			 /* largest valid message is 512, this should cover any global */
+	char msg[2048]; /* largest valid message is 512, this should cover any global */
 
 	va_start(args, fmt);
 	vsnprintf(msg, sizeof(msg), fmt, args);
@@ -191,17 +183,11 @@ ci::string XLine::GetUser() const
 	size_t user_t = Mask.find('!'), host_t = Mask.find('@');
 
 	if (user_t == ci::string::npos)
-	{
 		return Mask.substr(0, host_t);
-	}
 	else if (host_t != ci::string::npos)
-	{
 		return Mask.substr((user_t != ci::string::npos ? user_t + 1 : 0), host_t);
-	}
 	else
-	{
 		return "";
-	}
 }
 
 ci::string XLine::GetHost() const
@@ -209,13 +195,9 @@ ci::string XLine::GetHost() const
 	size_t host_t = Mask.find('@');
 
 	if (host_t == ci::string::npos)
-	{
 		return Mask;
-	}
 	else
-	{
 		return Mask.substr(host_t + 1);
-	}
 }
 
 /** Constructor
@@ -251,9 +233,7 @@ void XLineManager::UnregisterXLineManager(XLineManager *xlm)
 	std::list<XLineManager *>::iterator it = std::find(XLineManagers.begin(), XLineManagers.end(), xlm);
 
 	if (it != XLineManagers.end())
-	{
 		XLineManagers.erase(it);
-	}
 }
 
 /* Check a user against all known XLineManagers
@@ -264,7 +244,7 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 {
 	std::pair<XLineManager *, XLine *> ret(NULL, NULL);
 
-	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(); it != XLineManagers.end(); ++it)
+	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(), it_end = XLineManagers.end(); it != it_end; ++it)
 	{
 		XLineManager *xlm = *it;
 
@@ -332,7 +312,7 @@ XLine *XLineManager::GetEntry(unsigned index) const
 {
 	if (index >= XLines.size())
 		return NULL;
-	
+
 	return XLines[index];
 }
 
@@ -340,10 +320,8 @@ XLine *XLineManager::GetEntry(unsigned index) const
  */
 void XLineManager::Clear()
 {
-	for (std::deque<XLine *>::iterator it = XLines.begin(); it != XLines.end(); ++it)
-	{
+	for (std::deque<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
 		delete *it;
-	}
 	XLines.clear();
 }
 
@@ -380,14 +358,14 @@ std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expi
 {
 	std::pair<int, XLine *> ret(0, NULL);
 
-	for (unsigned i = 0; i < GetCount(); ++i)
+	for (unsigned i = 0, end = GetCount(); i < end; ++i)
 	{
 		XLine *x = GetEntry(i);
 		ret.second = x;
 
 		if (x->Mask == mask)
 		{
-			if (x->Expires == 0 || x->Expires >= expires)
+			if (!x->Expires || x->Expires >= expires)
 			{
 				ret.first = 1;
 				break;
@@ -400,12 +378,12 @@ std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expi
 				break;
 			}
 		}
-		else if (Anope::Match(mask, x->Mask) && (x->Expires == 0 || x->Expires >= expires))
+		else if (Anope::Match(mask, x->Mask) && (!x->Expires || x->Expires >= expires))
 		{
 			ret.first = 3;
 			break;
 		}
-		else if (Anope::Match(x->Mask, mask) && (expires == 0 || x->Expires <= expires))
+		else if (Anope::Match(x->Mask, mask) && (!expires || x->Expires <= expires))
 		{
 			this->DelXLine(x);
 			--i;
@@ -421,14 +399,12 @@ std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expi
  */
 XLine *XLineManager::HasEntry(const ci::string &mask) const
 {
-	for (unsigned i = 0; i < XLines.size(); ++i)
+	for (unsigned i = 0, end = XLines.size(); i < end; ++i)
 	{
 		XLine *x = XLines[i];
 
 		if (x->Mask == mask)
-		{
 			return x;
-		}
 	}
 
 	return NULL;
@@ -442,7 +418,7 @@ XLine *XLineManager::Check(User *u)
 {
 	const time_t now = time(NULL);
 
-	for (std::deque<XLine *>::iterator it = XLines.begin(); it != XLines.end(); ++it)
+	for (std::deque<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
 	{
 		XLine *x = *it;
 
@@ -461,7 +437,7 @@ XLine *XLineManager::Check(User *u)
 		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent().c_str(), x->GetUser()))
 			continue;
 
-		if (x->GetHost().empty() || ((u->hostip && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost.c_str(), x->GetHost())) || (u->vhost && Anope::Match(u->vhost, x->GetHost()))))
+		if (x->GetHost().empty() || (u->hostip && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost.c_str(), x->GetHost())) || (u->vhost && Anope::Match(u->vhost, x->GetHost())))
 		{
 			OnMatch(u, x);
 			return x;
@@ -528,7 +504,7 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 	std::string realreason = reason;
 	if (u && Config.AddAkiller)
 		realreason = "[" + u->nick + "]" + reason;
-	
+
 	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, realreason);
 
 	EventReturn MOD_RESULT;
@@ -538,12 +514,12 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 		delete x;
 		return NULL;
 	}
-	
+
 	this->AddXLine(x);
 
 	if (Config.AkillOnAdd)
 		ircdproto->SendAkill(x);
-	
+
 	return x;
 }
 
@@ -584,7 +560,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 			else if (canAdd.first == 3)
 				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
-		
+
 		return canAdd.second;
 	}
 
@@ -604,15 +580,13 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 	{
 		std::string rreason = "G-Lined: " + reason;
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
 		{
 			User *user = it->second;
 			++it;
 
 			if (!is_oper(user) && Anope::Match(user->realname, x->Mask))
-			{
 				kill_user(Config.ServerName, user->nick, rreason.c_str());
-			}
 		}
 	}
 
@@ -688,13 +662,13 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 
 		if (mask[0] == '#')
 		{
-			for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
+			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 			{
 				Channel *c = cit->second;
 
 				if (!Anope::Match(c->name.c_str(), mask))
 					continue;
-				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 				{
 					UserContainer *uc = *it;
 					++it;
@@ -707,15 +681,13 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 		}
 		else
 		{
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
 			{
 				User *user = it->second;
 				++it;
 
 				if (!is_oper(user) && Anope::Match(user->nick.c_str(), x->Mask))
-				{
 					kill_user(Config.ServerName, user->nick, rreason.c_str());
-				}
 			}
 		}
 	}
@@ -749,14 +721,12 @@ bool SQLineManager::Check(Channel *c)
 {
 	if (ircd->chansqline && SQLine)
 	{
-		for (std::deque<XLine *>::const_iterator it = SGLine->GetList().begin(); it != SGLine->GetList().end(); ++it)
+		for (std::deque<XLine *>::const_iterator it = SGLine->GetList().begin(), it_end = SGLine->GetList().end(); it != it_end; ++it)
 		{
 			XLine *x = *it;
 
 			if (Anope::Match(c->name.c_str(), x->Mask))
-			{
 				return true;
-			}
 		}
 	}
 
@@ -825,4 +795,3 @@ void SZLineManager::OnExpire(XLine *x)
 	if (Config.WallSZLineExpire)
 		ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
 }
-

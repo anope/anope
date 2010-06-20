@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #ifdef WIN32
@@ -24,7 +22,6 @@ const char *dlerror()
 	return errbuf;
 }
 
- 
 /** This is inet_pton, but it works on Windows
  * @param af The protocol type, AF_INET or AF_INET6
  * @param src The address
@@ -37,7 +34,7 @@ int inet_pton(int af, const char *src, void *dst)
 	sockaddr_storage sa;
 	sockaddr_in *sin = reinterpret_cast<sockaddr_in *>(&sa);
 	sockaddr_in6 *sin6 = reinterpret_cast<sockaddr_in6 *>(&sa);
- 
+
 	switch (af)
 	{
 		case AF_INET:
@@ -49,8 +46,8 @@ int inet_pton(int af, const char *src, void *dst)
 		default:
 			return -1;
 	}
- 
-	if (WSAStringToAddress((LPSTR) src, af, NULL, reinterpret_cast<LPSOCKADDR>(&sa), &address_length) == 0) 
+
+	if (!WSAStringToAddress((LPSTR) src, af, NULL, reinterpret_cast<LPSOCKADDR>(&sa), &address_length))
 	{
 		switch (af)
 		{
@@ -63,10 +60,10 @@ int inet_pton(int af, const char *src, void *dst)
 		}
 		return 1;
 	}
- 
+
 	return 0;
 }
- 
+
 /** This is inet_ntop, but it works on Windows
  * @param af The protocol type, AF_INET or AF_INET6
  * @param src Network address structure
@@ -81,9 +78,9 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 	sockaddr_storage sa;
 	sockaddr_in *sin = reinterpret_cast<sockaddr_in *>(&sa);
 	sockaddr_in6 *sin6 = reinterpret_cast<sockaddr_in6 *>(&sa);
-	
+
 	memset(&sa, 0, sizeof(sa));
- 
+
 	switch (af)
 	{
 		case AF_INET:
@@ -99,10 +96,10 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 		default:
 			return NULL;
 	}
- 
-	if (WSAAddressToString(reinterpret_cast<LPSOCKADDR>(&sa), address_length, NULL, dst, &string_length) == 0)
+
+	if (!WSAAddressToString(reinterpret_cast<LPSOCKADDR>(&sa), address_length, NULL, dst, &string_length))
 		return dst;
- 
+
 	return NULL;
 }
 

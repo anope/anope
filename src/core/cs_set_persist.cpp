@@ -18,7 +18,7 @@
 class CommandCSSetPersist : public Command
 {
  public:
-	CommandCSSetPersist(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPersist(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
@@ -79,7 +79,7 @@ class CommandCSSetPersist : public Command
 				if (!cm && !Config.s_BotServ && ci->bi)
 				{
 					/* Unassign bot */
-					ChanServ->UnAssign(NULL, ci);   
+					ChanServ->UnAssign(NULL, ci);
 				}
 
 				if (ci->c && ci->c->users.empty())
@@ -142,7 +142,7 @@ class CSSetPersist : public Module
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
 			c->AddSubcommand(new CommandCSSetPersist("PERSIST"));
-		
+
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
 			c->AddSubcommand(new CommandCSSASetPersist("PERSIST"));

@@ -85,7 +85,7 @@ class CommandNSConfirm : public Command
 				validate_user(user);
 			}
 		}
-		
+
 		FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
 
 		return MOD_CONT;
@@ -196,7 +196,7 @@ class CommandNSRegister : public CommandNSConfirm
 				'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
 				'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 			};
-		std::list<std::pair<std::string, std::string> >::iterator it;
+		std::list<std::pair<ci::string, ci::string> >::iterator it;
 
 		if (readonly)
 		{
@@ -237,7 +237,7 @@ class CommandNSRegister : public CommandNSConfirm
 		{
 			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 			{
-				std::string nick = it->first;
+				ci::string nick = it->first;
 
 				if (stristr(u->nick.c_str(), nick.c_str()) && !is_oper(u))
 				{

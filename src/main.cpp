@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program (see the file COPYING); if not, write to the
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *
  */
 
 #include "services.h"
@@ -36,27 +34,26 @@
 # include <sys/resource.h>
 #endif
 
-
 /******** Global variables! ********/
 
 /* Command-line options: (note that configuration variables are in config.c) */
-std::string services_dir;	  /* -dir dirname */
+std::string services_dir;	/* -dir dirname */
 std::string services_bin;	/* Binary as specified by the user */
 std::string orig_cwd;		/* Original current working directory */
-std::string log_filename = "services.log";	  /* -log filename */
-int debug = 0;				  /* -debug */
-int readonly = 0;			   /* -readonly */
-bool LogChan = false;				/* -logchan */
-int nofork = 0;				 /* -nofork */
-int forceload = 0;			  /* -forceload */
-int nothird = 0;				/* -nothrid */
-int noexpire = 0;			   /* -noexpire */
-int protocoldebug = 0;		  /* -protocoldebug */
+std::string log_filename = "services.log"; /* -log filename */
+int debug = 0;				/* -debug */
+int readonly = 0;			/* -readonly */
+bool LogChan = false;		/* -logchan */
+int nofork = 0;				/* -nofork */
+int forceload = 0;			/* -forceload */
+int nothird = 0;			/* -nothrid */
+int noexpire = 0;			/* -noexpire */
+int protocoldebug = 0;		/* -protocoldebug */
 
 std::string binary_dir; /* Used to store base path for Anope */
 #ifdef _WIN32
-#include <process.h>
-#define execve _execve
+# include <process.h>
+# define execve _execve
 #endif
 
 /* Set to 1 if we are to quit */
@@ -80,8 +77,7 @@ char **my_av, **my_envp;
 /* Moved here from version.h */
 const char version_number[] = VERSION_STRING;
 const char version_number_dotted[] = VERSION_STRING_DOTTED;
-const char version_build[] =
-	"build #" BUILD ", compiled " __DATE__ " " __TIME__;
+const char version_build[] = "build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */
 
 /******** Local variables! ********/
@@ -144,10 +140,8 @@ class UplinkSocket : public Socket
 extern void expire_all()
 {
 	if (noexpire || readonly)
-	{
 		// Definitely *do not* want.
 		return;
-	}
 
 	FOREACH_MOD(I_OnPreDatabaseExpire, OnPreDatabaseExpire());
 
@@ -166,7 +160,7 @@ void save_databases()
 {
 	if (readonly)
 		return;
-	
+
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	Alog(LOG_DEBUG) << "Saving FFF databases";
@@ -177,7 +171,8 @@ void save_databases()
 /* Restarts services */
 void do_restart_services()
 {
-	if (!readonly) {
+	if (!readonly)
+	{
 		expire_all();
 		save_databases();
 	}
@@ -188,11 +183,9 @@ void do_restart_services()
 	if (!quitmsg)
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
-	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
-	{
+	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
 		ircdproto->SendQuit(it->second, "Restarting");
-	}
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
 	/* Process to send the last bits of information before disconnecting */
 	socketEngine.Process();
@@ -203,7 +196,8 @@ void do_restart_services()
 	ModuleManager::UnloadAll(true);
 	chdir(binary_dir.c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
-	if (!readonly) {
+	if (!readonly)
+	{
 		open_log();
 		log_perror("Restart failed");
 		close_log();
@@ -228,18 +222,14 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
-		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
-		{
+		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
 			ircdproto->SendQuit(it->second, "Shutting down");
-		}
 
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
 
 		while (!UserListByNick.empty())
-		{
 			delete UserListByNick.begin()->second;
-		}
 	}
 	/* Process to send the last bits of information before disconnecting */
 	socketEngine.Process();
@@ -284,7 +274,8 @@ void sighandler(int signum)
 			FOREACH_MOD(I_OnReload, OnReload(true));
 			return;
 
-		} else
+		}
+		else
 #endif
 		if (signum == SIGTERM)
 		{
@@ -316,7 +307,6 @@ void sighandler(int signum)
 		}
 	}
 
-
 	/* Should we send the signum here as well? -GD */
 	FOREACH_MOD(I_OnSignal, OnSignal(quitmsg));
 
@@ -328,13 +318,9 @@ void sighandler(int signum)
 	else
 	{
 		if (isatty(2))
-		{
 			fprintf(stderr, "%s\n", quitmsg);
-		}
 		else
-		{
 			Alog() << quitmsg;
-		}
 
 		exit(1);
 	}
@@ -390,7 +376,7 @@ static bool Connect()
 {
 	/* Connect to the remote server */
 	int servernum = 1;
-	for (std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(); curr_uplink != Config.Uplinks.end(); ++curr_uplink, ++servernum)
+	for (std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end(); curr_uplink != end_uplink; ++curr_uplink, ++servernum)
 	{
 		uplink_server = *curr_uplink;
 
@@ -407,7 +393,7 @@ static bool Connect()
 		{
 			new UplinkSocket(uplink_server->host, uplink_server->port, Config.LocalHost ? Config.LocalHost : "", uplink_server->ipv6);
 		}
-		catch (SocketException& ex)
+		catch (const SocketException &ex)
 		{
 			Alog() << "Unable to connect to server" << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "), " << ex.GetReason();
 			continue;
@@ -443,12 +429,11 @@ int main(int ac, char **av, char **envp)
 
 #ifndef _WIN32
 	/* If we're root, issue a warning now */
-	if ((getuid() == 0) && (getgid() == 0)) {
-		fprintf(stderr,
-				"WARNING: You are currently running Anope as the root superuser. Anope does not\n");
-		fprintf(stderr,
-				"	require root privileges to run, and it is discouraged that you run Anope\n");
-		fprintf(stderr, "	as the root superuser.\n");
+	if (!getuid() && !getgid())
+	{
+		fprintf(stderr, "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
+		fprintf(stderr, "    require root privileges to run, and it is discouraged that you run Anope\n");
+		fprintf(stderr, "    as the root superuser.\n");
 	}
 #endif
 
@@ -467,9 +452,9 @@ int main(int ac, char **av, char **envp)
 	ModuleRunTimeDirCleanUp();
 
 	/* General initialization first */
-	if ((i = init_primary(ac, av)) != 0)
+	if ((i = init_primary(ac, av)))
 		return i;
-	
+
 	Alog(LOG_TERMINAL) << "Anope " << version_number << ", " << version_build;
 #ifdef _WIN32
 	Alog(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;
@@ -478,7 +463,7 @@ int main(int ac, char **av, char **envp)
 #endif
 
 	/* Initialization stuff. */
-	if ((i = init_secondary(ac, av)) != 0)
+	if ((i = init_secondary(ac, av)))
 		return i;
 
 	/* If the first connect fails give up, don't sit endlessly trying to reconnect */
@@ -495,16 +480,12 @@ int main(int ac, char **av, char **envp)
 	{
 		rlimit rl;
 		if (getrlimit(RLIMIT_CORE, &rl) == -1)
-		{
 			Alog() << "Failed to getrlimit()!";
-		}
 		else
 		{
 			rl.rlim_cur = rl.rlim_max;
 			if (setrlimit(RLIMIT_CORE, &rl) == -1)
-			{
 				Alog() << "setrlimit() failed, cannot increase coredump size";
-			}
 		}
 	}
 #endif
@@ -553,10 +534,8 @@ int main(int ac, char **av, char **envp)
 		}
 
 		if (quitting)
-		{
 			/* Disconnect and exit */
 			services_shutdown();
-		}
 		else
 		{
 			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
@@ -584,4 +563,3 @@ int main(int ac, char **av, char **envp)
 
 	return 0;
 }
-

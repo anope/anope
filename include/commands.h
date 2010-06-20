@@ -7,12 +7,10 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
-#ifndef COMMAND_H_
-#define COMMAND_H_
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include "services.h"
 
@@ -57,7 +55,7 @@ class CoreExport Command : public Flags<CommandFlag>
 	/* Command name */
 	ci::string name;
 	/* Permission needed to use this comand */
-	std::string permission;
+	ci::string permission;
 
 	/* Module which owns us */
 	Module *module;
@@ -70,7 +68,7 @@ class CoreExport Command : public Flags<CommandFlag>
 	 * @param max_params The maximum number of parameters the parser will create, after max_params, all will be combined into the last argument.
 	 * NOTE: If max_params is not set (default), there is no limit to the max number of params.
 	 */
-	Command(const ci::string &sname, size_t min_params, size_t max_params = 0, const std::string &spermission = "");
+	Command(const ci::string &sname, size_t min_params, size_t max_params = 0, const ci::string &spermission = "");
 
 	virtual ~Command();
 
@@ -86,8 +84,7 @@ class CoreExport Command : public Flags<CommandFlag>
 
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
 	 * @param u The user requesting help
-	 * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of 
-"FOO BAR LOL")
+	 * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of "FOO BAR LOL")
 	 * @return true if help was provided to the user, false otherwise.
 	 */
 	virtual bool OnHelp(User *u, const ci::string &subcommand);
@@ -101,7 +98,7 @@ class CoreExport Command : public Flags<CommandFlag>
 	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
 	 * @param reststr The permission required to successfully execute this command
 	 */
-	void SetPermission(const std::string &reststr);
+	void SetPermission(const ci::string &reststr);
 
 	/** Add a subcommand to this command
 	 * @param c The command
@@ -114,5 +111,4 @@ class CoreExport Command : public Flags<CommandFlag>
 	virtual bool DelSubcommand(const ci::string &cname);
 };
 
-#endif
-
+#endif // COMMANDS_H

@@ -18,7 +18,7 @@
 class CommandCSSetTopicLock : public Command
 {
  public:
-	CommandCSSetTopicLock(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetTopicLock(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

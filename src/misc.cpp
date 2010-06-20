@@ -8,8 +8,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -19,7 +17,8 @@
 /* Cheaper than isspace() or isblank() */
 #define issp(c) ((c) == 32)
 
-struct arc4_stream {
+struct arc4_stream
+{
 	uint8 i;
 	uint8 j;
 	uint8 s[256];
@@ -35,43 +34,39 @@ bool IsFile(const std::string &filename)
 {
 	struct stat fileinfo;
 	if (!stat(filename.c_str(), &fileinfo))
-	{
 		return true;
-	}
 
 	return false;
 }
 
 /**
  * toupper:  Like the ANSI functions, but make sure we return an
- *				   int instead of a (signed) char.
+ *           int instead of a (signed) char.
  * @param c Char
  * @return int
  */
 int toupper(char c)
 {
-	if (islower(c)) {
+	if (islower(c))
 		return static_cast<int>(c) - ('a' - 'A');
-	} else {
+	else
 		return static_cast<int>(c);
-	}
 }
 
 /*************************************************************************/
 
 /**
  * tolower:  Like the ANSI functions, but make sure we return an
- *				   int instead of a (signed) char.
+ *           int instead of a (signed) char.
  * @param c Char
  * @return int
  */
 int tolower(char c)
 {
-	if (isupper(c)) {
+	if (isupper(c))
 		return static_cast<int>(c) + ('a' - 'A');
-	} else {
+	else
 		return static_cast<int>(c);
-	}
 }
 
 /*************************************************************************/
@@ -85,7 +80,8 @@ void binary_to_hex(unsigned char *bin, char *hex, int length)
 	static const char trans[] = "0123456789ABCDEF";
 	int i;
 
-	for (i = 0; i < length; i++) {
+	for (i = 0; i < length; ++i)
+	{
 		hex[i << 1] = trans[bin[i] >> 4];
 		hex[(i << 1) + 1] = trans[bin[i] & 0xf];
 	}
@@ -108,9 +104,8 @@ char *strscpy(char *d, const char *s, size_t len)
 {
 	char *d_orig = d;
 
-	if (!len) {
+	if (!len)
 		return d;
-	}
 	while (--len && (*d++ = *s++));
 	*d = '\0';
 	return d_orig;
@@ -130,13 +125,17 @@ const char *stristr(const char *s1, const char *s2)
 {
 	register const char *s = s1, *d = s2;
 
-	while (*s1) {
-		if (tolower(*s1) == tolower(*d)) {
-			s1++;
-			d++;
-			if (*d == 0)
+	while (*s1)
+	{
+		if (tolower(*s1) == tolower(*d))
+		{
+			++s1;
+			++d;
+			if (!*d)
 				return s;
-		} else {
+		}
+		else
+		{
 			s = ++s1;
 			d = s2;
 		}
@@ -148,9 +147,9 @@ const char *stristr(const char *s1, const char *s2)
 
 /**
  * strnrepl:  Replace occurrences of `old' with `new' in string `s'.  Stop
- *			replacing if a replacement would cause the string to exceed
- *			`size' bytes (including the null terminator).  Return the
- *			string.
+ *            replacing if a replacement would cause the string to exceed
+ *            `size' bytes (including the null terminator).  Return the
+ *            string.
  * @param s String
  * @param size size of s
  * @param old character to replace
@@ -166,15 +165,17 @@ char *strnrepl(char *s, int32 size, const char *old, const char *newstr)
 	int32 newlen = strlen(newstr);
 	int32 diff = newlen - oldlen;
 
-	while (left >= oldlen) {
-		if (strncmp(ptr, old, oldlen) != 0) {
-			left--;
-			ptr++;
+	while (left >= oldlen)
+	{
+		if (strncmp(ptr, old, oldlen))
+		{
+			--left;
+			++ptr;
 			continue;
 		}
 		if (diff > avail)
 			break;
-		if (diff != 0)
+		if (diff)
 			memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
 		strncpy(ptr, newstr, newlen);
 		ptr += newlen;
@@ -187,8 +188,8 @@ char *strnrepl(char *s, int32 size, const char *old, const char *newstr)
 
 /**
  * merge_args:  Take an argument count and argument vector and merge them
- *			  into a single string in which each argument is separated by
- *			  a space.
+ *              into a single string in which each argument is separated by
+ *              a space.
  * @param int Number of Args
  * @param argv Array
  * @return string of the merged array
@@ -200,9 +201,8 @@ const char *merge_args(int argc, const char **argv)
 	char *t;
 
 	t = s;
-	for (i = 0; i < argc; i++)
-		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
-					  (i < argc - 1) ? " " : "");
+	for (i = 0; i < argc; ++i)
+		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++, i < argc - 1 ? " " : "");
 	return s;
 }
 
@@ -216,9 +216,8 @@ const char *merge_args(int argc, char **argv)
 	char *t;
 
 	t = s;
-	for (i = 0; i < argc; i++)
-		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
-					  (i < argc - 1) ? " " : "");
+	for (i = 0; i < argc; ++i)
+		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++, i < argc - 1 ? " " : "");
 	return s;
 }
 
@@ -240,10 +239,8 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 		if (t == std::string::npos)
 		{
 			unsigned num = strtol(token.c_str(), &error, 10);
-			if (*error == '\0')
-			{
+			if (!*error)
 				numbers.insert(num);
-			}
 			else
 			{
 				if (!this->InvalidRange(list))
@@ -258,12 +255,10 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 			char *error2;
 			unsigned num1 = strtol(token.substr(0, t).c_str(), &error, 10);
 			unsigned num2 = strtol(token.substr(t + 1).c_str(), &error2, 10);
-			if (*error == '\0' && *error2 == '\0')
+			if (!*error && !*error2)
 			{
 				for (unsigned i = num1; i <= num2; ++i)
-				{
 					numbers.insert(i);
-				}
 			}
 			else
 			{
@@ -285,19 +280,15 @@ void NumberList::Process()
 {
 	if (this->desc)
 	{
-		for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(); it != numbers.rend(); ++it)
-		{
+		for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(), it_end = numbers.rend(); it != it_end; ++it)
 			this->HandleNumber(*it);
-		}
 	}
 	else
 	{
-		for (std::set<unsigned>::iterator it = numbers.begin(); it != numbers.end(); ++it)
-		{
+		for (std::set<unsigned>::iterator it = numbers.begin(), it_end = numbers.end(); it != it_end; ++it)
 			this->HandleNumber(*it);
-		}
 	}
-	
+
 	delete this;
 }
 
@@ -312,12 +303,12 @@ bool NumberList::InvalidRange(const std::string &)
 
 /**
  * dotime:  Return the number of seconds corresponding to the given time
- *		  string.  If the given string does not represent a valid time,
- *		  return -1.
+ *          string.  If the given string does not represent a valid time,
+ *          return -1.
  *
- *		  A time string is either a plain integer (representing a number
- *		  of seconds), or an integer followed by one of these characters:
- *		  "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
+ *          A time string is either a plain integer (representing a number
+ *          of seconds), or an integer followed by one of these characters:
+ *          "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
  * @param s String to convert
  * @return time_t
  */
@@ -325,31 +316,32 @@ time_t dotime(const char *s)
 {
 	int amount;
 
-	if (!s || !*s) {
+	if (!s || !*s)
 		return -1;
-	}
 
 	amount = strtol(s, const_cast<char **>(&s), 10);
-	if (*s) {
-		switch (*s) {
-		case 's':
-			return amount;
-		case 'm':
-			return amount * 60;
-		case 'h':
-			return amount * 3600;
-		case 'd':
-			return amount * 86400;
-		case 'w':
-			return amount * 86400 * 7;
-		case 'y':
-			return amount * 86400 * 365;
-		default:
-			return -1;
+	if (*s)
+	{
+		switch (*s)
+		{
+			case 's':
+				return amount;
+			case 'm':
+				return amount * 60;
+			case 'h':
+				return amount * 3600;
+			case 'd':
+				return amount * 86400;
+			case 'w':
+				return amount * 86400 * 7;
+			case 'y':
+				return amount * 86400 * 365;
+			default:
+				return -1;
 		}
-	} else {
-		return amount;
 	}
+	else
+		return amount;
 }
 
 /*************************************************************************/
@@ -378,42 +370,27 @@ const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds)
 	seconds -= (hours * 3600);
 	minutes = seconds / 60;
 
-	if (!days && !hours && !minutes) {
-		snprintf(buf, bufsize,
-				 getstring(nc,
-						   (seconds <=
-							1 ? DURATION_SECOND : DURATION_SECONDS)),
-				 seconds);
-	} else {
+	if (!days && !hours && !minutes)
+		snprintf(buf, bufsize, getstring(nc, seconds <= 1 ? DURATION_SECOND : DURATION_SECONDS), seconds);
+	else
+	{
 		end = buf;
-		if (days) {
-			snprintf(buf2, sizeof(buf2),
-					 getstring(nc,
-							   (days == 1 ? DURATION_DAY : DURATION_DAYS)),
-					 days);
+		if (days)
+		{
+			snprintf(buf2, sizeof(buf2), getstring(nc, days == 1 ? DURATION_DAY : DURATION_DAYS), days);
 			end += snprintf(end, bufsize - (end - buf), "%s", buf2);
 			need_comma = 1;
 		}
-		if (hours) {
-			snprintf(buf2, sizeof(buf2),
-					 getstring(nc,
-							   (hours ==
-								1 ? DURATION_HOUR : DURATION_HOURS)),
-					 hours);
-			end +=
-				snprintf(end, bufsize - (end - buf), "%s%s",
-						 (need_comma ? comma : ""), buf2);
+		if (hours)
+		{
+			snprintf(buf2, sizeof(buf2), getstring(nc, hours == 1 ? DURATION_HOUR : DURATION_HOURS), hours);
+			end += snprintf(end, bufsize - (end - buf), "%s%s", need_comma ? comma : "", buf2);
 			need_comma = 1;
 		}
-		if (minutes) {
-			snprintf(buf2, sizeof(buf2),
-					 getstring(nc,
-							   (minutes ==
-								1 ? DURATION_MINUTE : DURATION_MINUTES)),
-					 minutes);
-			end +=
-				snprintf(end, bufsize - (end - buf), "%s%s",
-						 (need_comma ? comma : ""), buf2);
+		if (minutes)
+		{
+			snprintf(buf2, sizeof(buf2), getstring(nc, minutes == 1 ? DURATION_MINUTE : DURATION_MINUTES), minutes);
+			end += snprintf(end, bufsize - (end - buf), "%s%s", need_comma ? comma : "", buf2);
 			need_comma = 1;
 		}
 	}
@@ -435,42 +412,32 @@ const char *expire_left(NickCore *nc, char *buf, int len, time_t expires)
 {
 	time_t now = time(NULL);
 
-	if (!expires) {
+	if (!expires)
 		strlcpy(buf, getstring(nc, NO_EXPIRE), len);
-	} else if (expires <= now) {
+	else if (expires <= now)
 		strlcpy(buf, getstring(nc, EXPIRES_SOON), len);
-	} else {
+	else
+	{
 		time_t diff = expires - now + 59;
 
-		if (diff >= 86400) {
+		if (diff >= 86400)
+		{
 			int days = diff / 86400;
-			snprintf(buf, len,
-					 getstring(nc, (days == 1) ? EXPIRES_1D : EXPIRES_D),
-					 days);
-		} else {
-			if (diff <= 3600) {
+			snprintf(buf, len, getstring(nc, days == 1 ? EXPIRES_1D : EXPIRES_D), days);
+		}
+		else
+		{
+			if (diff <= 3600)
+			{
 				int minutes = diff / 60;
-				snprintf(buf, len,
-						 getstring(nc,
-								   (minutes ==
-									1) ? EXPIRES_1M : EXPIRES_M), minutes);
-			} else {
+				snprintf(buf, len, getstring(nc, minutes == 1 ? EXPIRES_1M : EXPIRES_M), minutes);
+			}
+			else
+			{
 				int hours = diff / 3600, minutes;
-				diff -= (hours * 3600);
+				diff -= hours * 3600;
 				minutes = diff / 60;
-				snprintf(buf, len,
-						 getstring(nc,
-								   ((hours == 1
-									 && minutes ==
-									 1) ? EXPIRES_1H1M : ((hours == 1
-														   && minutes !=
-														   1) ? EXPIRES_1HM
-														  : ((hours != 1
-															  && minutes ==
-															  1) ?
-															 EXPIRES_H1M :
-															 EXPIRES_HM)))),
-						 hours, minutes);
+				snprintf(buf, len, getstring(nc, hours == 1 && minutes == 1 ? EXPIRES_1H1M : (hours == 1 && minutes != 1 ? EXPIRES_1HM : (hours != 1 && minutes == 1 ? EXPIRES_H1M : EXPIRES_HM))), hours, minutes);
 			}
 		}
 	}
@@ -496,73 +463,67 @@ int doValidHost(const char *host, int type)
 	int len = 0;
 	int sec_len = 0;
 	int dots = 1;
-	if (type != 1 && type != 2) {
+	if (type != 1 && type != 2)
 		return 0;
-	}
-	if (!host) {
+	if (!host)
 		return 0;
-	}
 
 	len = strlen(host);
 
-	if (len > Config.HostLen) {
+	if (len > Config.HostLen)
 		return 0;
-	}
 
-	switch (type) {
-	case 1:
-		for (idx = 0; idx < len; idx++) {
-			if (isdigit(host[idx])) {
-				if (sec_len < 3) {
-					sec_len++;
-				} else {
-					return 0;
+	switch (type)
+	{
+		case 1:
+			for (idx = 0; idx < len; ++idx)
+			{
+				if (isdigit(host[idx]))
+				{
+					if (sec_len < 3)
+						++sec_len;
+					else
+						return 0;
 				}
-			} else {
-				if (idx == 0) {
-					return 0;
-				}			   /* cant start with a non-digit */
-				if (host[idx] != '.') {
-					return 0;
-				}			   /* only . is a valid non-digit */
-				if (sec_len > 3) {
-					return 0;
-				}			   /* sections cant be more than 3 digits */
-				sec_len = 0;
-				dots++;
-			}
-		}
-		if (dots != 4) {
-			return 0;
-		}
-		break;
-	case 2:
-		dots = 0;
-		for (idx = 0; idx < len; idx++) {
-			if (!isalnum(host[idx])) {
-				if (idx == 0) {
-					return 0;
-				}
-				if ((host[idx] != '.') && (host[idx] != '-')) {
-					return 0;
-				}
-				if (host[idx] == '.') {
-					dots++;
+				else
+				{
+					if (!idx)
+						return 0; /* cant start with a non-digit */
+					if (host[idx] != '.')
+						return 0; /* only . is a valid non-digit */
+					if (sec_len > 3)
+						return 0; /* sections cant be more than 3 digits */
+					sec_len = 0;
+					++dots;
 				}
 			}
-		}
-		if (host[len - 1] == '.') {
-			return 0;
-		}
-		/**
-	 * Ultimate3 dosnt like a non-dotted hosts at all, nor does unreal,
-	 * so just dont allow them.
-	 **/
-		if (dots == 0) {
-			return 0;
-		}
+			if (dots != 4)
+				return 0;
+			break;
+		case 2:
+			dots = 0;
+			for (idx = 0; idx < len; ++idx)
+			{
+				if (!isalnum(host[idx]))
+				{
+					if (!idx)
+						return 0;
+					if (host[idx] != '.' && host[idx] != '-')
+						return 0;
+					if (host[idx] == '.')
+						++dots;
+				}
+			}
+			if (host[len - 1] == '.')
+				return 0;
+			/**
+			 * Ultimate3 dosnt like a non-dotted hosts at all, nor does unreal,
+			 * so just dont allow them.
+			 */
+			if (!dots)
+				return 0;
 
-		break;
+			break;
 	}
 	return 1;
 }
@@ -578,13 +539,13 @@ int doValidHost(const char *host, int type)
 int isValidHost(const char *host, int type)
 {
 	int status = 0;
-	if (type == 3) {
-		if (!(status = doValidHost(host, 1))) {
+	if (type == 3)
+	{
+		if (!(status = doValidHost(host, 1)))
 			status = doValidHost(host, 2);
-		}
-	} else {
-		status = doValidHost(host, type);
 	}
+	else
+		status = doValidHost(host, type);
 	return status;
 }
 
@@ -597,14 +558,11 @@ int isValidHost(const char *host, int type)
  */
 int isvalidchar(const char c)
 {
-	if (((c >= 'A') && (c <= 'Z')) ||
-		((c >= 'a') && (c <= 'z')) ||
-		((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
 		return 1;
 	else
 		return 0;
 }
-
 
 /*************************************************************************/
 
@@ -619,19 +577,18 @@ char *myStrGetToken(const char *str, const char dilim, int token_number)
 {
 	int len, idx, counter = 0, start_pos = 0;
 	char *substring = NULL;
-	if (!str) {
+	if (!str)
 		return NULL;
-	}
 	len = strlen(str);
-	for (idx = 0; idx <= len; idx++) {
-		if ((str[idx] == dilim) || (idx == len)) {
-			if (counter == token_number) {
+	for (idx = 0; idx <= len; ++idx)
+	{
+		if (str[idx] == dilim || idx == len)
+		{
+			if (counter == token_number)
 				substring = myStrSubString(str, start_pos, idx);
-				counter++;
-			} else {
+			else
 				start_pos = idx + 1;
-				counter++;
-			}
+			++counter;
 		}
 	}
 	return substring;
@@ -646,27 +603,27 @@ char *myStrGetToken(const char *str, const char dilim, int token_number)
  * @param token_number the token number
  * @return token
  */
-char *myStrGetOnlyToken(const char *str, const char dilim,
-						int token_number)
+char *myStrGetOnlyToken(const char *str, const char dilim, int token_number)
 {
 	int len, idx, counter = 0, start_pos = 0;
 	char *substring = NULL;
-	if (!str) {
+	if (!str)
 		return NULL;
-	}
 	len = strlen(str);
-	for (idx = 0; idx <= len; idx++) {
-		if (str[idx] == dilim) {
-			if (counter == token_number) {
+	for (idx = 0; idx <= len; ++idx)
+	{
+		if (str[idx] == dilim)
+		{
+			if (counter == token_number)
+			{
 				if (str[idx] == '\r')
 					substring = myStrSubString(str, start_pos, idx - 1);
 				else
 					substring = myStrSubString(str, start_pos, idx);
-				counter++;
-			} else {
-				start_pos = idx + 1;
-				counter++;
 			}
+			else
+				start_pos = idx + 1;
+			++counter;
 		}
 	}
 	return substring;
@@ -681,25 +638,23 @@ char *myStrGetOnlyToken(const char *str, const char dilim,
  * @param token_number the token number
  * @return token
  */
-char *myStrGetTokenRemainder(const char *str, const char dilim,
-							 int token_number)
+char *myStrGetTokenRemainder(const char *str, const char dilim, int token_number)
 {
 	int len, idx, counter = 0, start_pos = 0;
 	char *substring = NULL;
-	if (!str) {
+	if (!str)
 		return NULL;
-	}
 	len = strlen(str);
 
-	for (idx = 0; idx <= len; idx++) {
-		if ((str[idx] == dilim) || (idx == len)) {
-			if (counter == token_number) {
+	for (idx = 0; idx <= len; ++idx)
+	{
+		if (str[idx] == dilim || idx == len)
+		{
+			if (counter == token_number)
 				substring = myStrSubString(str, start_pos, len);
-				counter++;
-			} else {
+			else
 				start_pos = idx + 1;
-				counter++;
-			}
+			++counter;
 		}
 	}
 	return substring;
@@ -718,15 +673,14 @@ char *myStrSubString(const char *src, int start, int end)
 {
 	char *substring = NULL;
 	int len, idx;
-	if (!src) {
+	if (!src)
 		return NULL;
-	}
 	len = strlen(src);
-	if (((start >= 0) && (end <= len)) && (end > start)) {
+	if (start >= 0 && end <= len && end > start)
+	{
 		substring = new char[(end - start) + 1];
-		for (idx = 0; idx <= end - start; idx++) {
+		for (idx = 0; idx <= end - start; ++idx)
 			substring[idx] = src[start + idx];
-		}
 		substring[end - start] = '\0';
 	}
 	return substring;
@@ -744,28 +698,28 @@ void doCleanBuffer(char *str)
 	char *in, *out;
 	char ch;
 
-	if (!str) {
+	if (!str)
 		return;
-	}
 
 	in = str;
 	out = str;
 
 	while (issp(ch = *in++));
-	if (ch != '\0')
-		for (;;) {
+	if (ch)
+		for (;;)
+		{
 			*out++ = ch;
 			ch = *in++;
-			if (ch == '\0')
+			if (!ch)
 				break;
 			if (!issp(ch))
 				continue;
 			while (issp(ch = *in++));
-			if (ch == '\0')
+			if (!ch)
 				break;
 			*out++ = ' ';
 		}
-	*out = ch;				  /* == '\0' */
+	*out = ch; /* == '\0' */
 }
 
 /*************************************************************************/
@@ -780,7 +734,8 @@ void EnforceQlinedNick(const std::string &nick, const char *killer)
 {
 	User *u2;
 
-	if ((u2 = finduser(nick))) {
+	if ((u2 = finduser(nick)))
+	{
 		Alog() << "Killed Q-lined nick: " << u2->GetMask();
 		kill_user(killer, u2->nick.c_str(), "This nick is reserved for Services. Please use a non Q-Lined nick.");
 	}
@@ -799,45 +754,46 @@ int nickIsServices(const char *tempnick, int bot)
 	int found = 0;
 	char *s, *nick;
 
-	if (!tempnick) {
+	if (!tempnick)
 		return found;
-	}
 
 	nick = sstrdup(tempnick);
 
 	s = strchr(nick, '@');
-	if (s) {
+	if (s)
+	{
 		*s++ = 0;
-		if (stricmp(s, Config.ServerName) != 0) {
+		if (stricmp(s, Config.ServerName))
+		{
 			delete [] nick;
 			return found;
 		}
 	}
 
-	if (Config.s_NickServ && (stricmp(nick, Config.s_NickServ) == 0))
-		found++;
-	else if (Config.s_ChanServ && (stricmp(nick, Config.s_ChanServ) == 0))
-		found++;
-	else if (Config.s_HostServ && (stricmp(nick, Config.s_HostServ) == 0))
-		found++;
-	else if (Config.s_MemoServ && (stricmp(nick, Config.s_MemoServ) == 0))
-		found++;
-	else if (Config.s_BotServ && (stricmp(nick, Config.s_BotServ) == 0))
-		found++;
-	else if (Config.s_OperServ && (stricmp(nick, Config.s_OperServ) == 0))
-		found++;
-	else if (Config.s_GlobalNoticer && (stricmp(nick, Config.s_GlobalNoticer) == 0))
-		found++;
+	if (Config.s_NickServ && !stricmp(nick, Config.s_NickServ))
+		++found;
+	else if (Config.s_ChanServ && !stricmp(nick, Config.s_ChanServ))
+		++found;
+	else if (Config.s_HostServ && !stricmp(nick, Config.s_HostServ))
+		++found;
+	else if (Config.s_MemoServ && !stricmp(nick, Config.s_MemoServ))
+		++found;
+	else if (Config.s_BotServ && !stricmp(nick, Config.s_BotServ))
+		++found;
+	else if (Config.s_OperServ && !stricmp(nick, Config.s_OperServ))
+		++found;
+	else if (Config.s_GlobalNoticer && !stricmp(nick, Config.s_GlobalNoticer))
+		++found;
 	else if (Config.s_BotServ && bot)
 	{
-		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
-			
+
 			ci::string ci_bi_nick(bi->nick.c_str());
 			if (ci_bi_nick == nick)
 			{
-				found++;
+				++found;
 				break;
 			}
 		}
@@ -858,7 +814,7 @@ int nickIsServices(const char *tempnick, int bot)
 static void arc4_init()
 {
 	int n;
-	for (n = 0; n < 256; n++)
+	for (n = 0; n < 256; ++n)
 		rs.s[n] = n;
 	rs.i = 0;
 	rs.j = 0;
@@ -877,11 +833,12 @@ static void arc4_addrandom(void *dat, int datlen)
 	int n;
 	uint8 si;
 
-	rs.i--;
-	for (n = 0; n < 256; n++) {
-		rs.i = (rs.i + 1);
+	--rs.i;
+	for (n = 0; n < 256; ++n)
+	{
+		rs.i = rs.i + 1;
 		si = rs.s[rs.i];
-		rs.j = (rs.j + si + (static_cast<unsigned char *>(dat))[n % datlen]);
+		rs.j = rs.j + si + (static_cast<unsigned char *>(dat))[n % datlen];
 		rs.s[rs.i] = rs.s[rs.j];
 		rs.s[rs.j] = si;
 	}
@@ -900,11 +857,11 @@ void rand_init()
 #endif
 	struct {
 #ifndef _WIN32
-		struct timeval nowt;	/* time */
-		char rnd[32];		   /* /dev/urandom */
+		struct timeval nowt; /* time */
+		char rnd[32]; /* /dev/urandom */
 #else
-		MEMORYSTATUS mstat;	 /* memory status */
-		struct _timeb nowt;	 /* time */
+		MEMORYSTATUS mstat; /* memory status */
+		struct _timeb nowt; /* time */
 #endif
 	} rdat;
 
@@ -916,7 +873,8 @@ void rand_init()
 	gettimeofday(&rdat.nowt, NULL);
 	/* unix/bsd: /dev/urandom */
 	fd = open("/dev/urandom", O_RDONLY);
-	if (fd) {
+	if (fd)
+	{
 		n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
 		close(fd);
 	}
@@ -954,13 +912,13 @@ unsigned char getrandom8()
 {
 	unsigned char si, sj;
 
-	rs.i = (rs.i + 1);
+	rs.i = rs.i + 1;
 	si = rs.s[rs.i];
-	rs.j = (rs.j + si);
+	rs.j = rs.j + si;
 	sj = rs.s[rs.j];
 	rs.s[rs.i] = sj;
 	rs.s[rs.j] = si;
-	return (rs.s[(si + sj) & 0xff]);
+	return rs.s[(si + sj) & 0xff];
 }
 
 /*************************************************************************/
@@ -1006,14 +964,15 @@ uint32 getrandom32()
 int myNumToken(const char *str, const char dilim)
 {
 	int len, idx, counter = 0, start_pos = 0;
-	if (!str) {
+	if (!str)
 		return 0;
-	}
 	len = strlen(str);
-	for (idx = 0; idx <= len; idx++) {
-		if ((str[idx] == dilim) || (idx == len)) {
+	for (idx = 0; idx <= len; ++idx)
+	{
+		if (str[idx] == dilim || idx == len)
+		{
 			start_pos = idx + 1;
-			counter++;
+			++counter;
 		}
 	}
 	return counter;
@@ -1038,16 +997,15 @@ char *host_resolve(char *host)
 
 	hentp = gethostbyname(host);
 
-	if (hentp) {
+	if (hentp)
+	{
 		memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
 		addr.s_addr = ip;
 		ntoa(addr, ipbuf, sizeof(ipbuf));
 		ipreturn = sstrdup(ipbuf);
 		Alog(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
-		return ipreturn;
-	} else {
-		return ipreturn;
 	}
+	return ipreturn;
 }
 
 /*************************************************************************/
@@ -1088,7 +1046,7 @@ std::vector<std::string> BuildStringVector(const std::string &src)
 
 	while (tokens.GetToken(token))
 		Ret.push_back(token);
-	
+
 	return Ret;
 }
 
@@ -1106,7 +1064,8 @@ char *str_signed(unsigned char *str)
 	char *nstr;
 
 	nstr = reinterpret_cast<char *>(str);
-	while (*str) {
+	while (*str)
+	{
 		*nstr = static_cast<char>(*str);
 		str++;
 		nstr++;
@@ -1122,9 +1081,8 @@ char *str_signed(unsigned char *str)
 
 char *stripModePrefix(const char *str)
 {
-	if (str && ((*str == '+') || (*str == '-'))) {
+	if (str && (*str == '+' || *str == '-'))
 		return sstrdup(str + 1);
-	}
 	return NULL;
 }
 
@@ -1133,8 +1091,7 @@ char *stripModePrefix(const char *str)
 void ntoa(struct in_addr addr, char *ipaddr, int len)
 {
 	unsigned char *bytes = reinterpret_cast<unsigned char *>(&addr.s_addr);
-	snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2],
-			 bytes[3]);
+	snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2], bytes[3]);
 }
 
 /*
@@ -1149,12 +1106,12 @@ void ntoa(struct in_addr addr, char *ipaddr, int len)
 * modification, are permitted provided that the following conditions
 * are met:
 * 1. Redistributions of source code must retain the above copyright
-*	notice, this list of conditions and the following disclaimer.
+*    notice, this list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright
-*	notice, this list of conditions and the following disclaimer in the
-*	documentation and/or other materials provided with the distribution.
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
 * 3. The name of the author may not be used to endorse or promote products
-*	derived from this software without specific prior written permission.
+*    derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED `AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -1175,26 +1132,28 @@ size_t strlcat(char *dst, const char *src, size_t siz)
 	const char *s = src;
 	size_t n = siz, dlen;
 
-	while (n-- != 0 && *d != '\0')
-		d++;
+	while (n-- && *d)
+		++d;
 
 	dlen = d - dst;
 	n = siz - dlen;
 
-	if (n == 0)
-		return (dlen + strlen(s));
+	if (!n)
+		return dlen + strlen(s);
 
-	while (*s != '\0') {
-		if (n != 1) {
+	while (*s)
+	{
+		if (n != 1)
+		{
 			*d++ = *s;
-			n--;
+			--n;
 		}
 
-		s++;
+		++s;
 	}
 
 	*d = '\0';
-	return dlen + (s - src);	/* count does not include NUL */
+	return dlen + (s - src); /* count does not include NUL */
 }
 #endif
 
@@ -1206,27 +1165,27 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 	size_t n = siz;
 
 	/* Copy as many bytes as will fit */
-	if (n != 0 && --n != 0) {
-		do {
-			if ((*d++ = *s++) == 0)
+	if (n && --n)
+	{
+		do
+		{
+			if (!(*d++ = *s++))
 				break;
 		}
-		while (--n != 0);
+		while (--n);
 	}
 
 	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
-		if (siz != 0)
-			*d = '\0';		  /* NUL-terminate dst */
+	if (!n)
+	{
+		if (siz)
+			*d = '\0'; /* NUL-terminate dst */
 		while (*s++);
 	}
 
-	return s - src - 1;		 /* count does not include NUL */
+	return s - src - 1; /* count does not include NUL */
 }
 #endif
-
-
-
 
 #ifdef _WIN32
 char *GetWindowsVersion()
@@ -1242,126 +1201,119 @@ char *GetWindowsVersion()
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
+	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi)))
+	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
+		if (!GetVersionEx((OSVERSIONINFO *)&osvi))
 			return sstrdup("");
-		}
 	}
 	GetSystemInfo(&si);
 
 	/* Determine CPU type 32 or 64 */
-	if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64 ) {
-	   cputype = sstrdup(" 64-bit");
-	} else if (si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_INTEL ) {
-	   cputype = sstrdup(" 32-bit");
-	}	else if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_IA64 ) {
-	   cputype = sstrdup(" Itanium 64-bit");
-	} else {
-  		cputype = sstrdup(" ");
-	}
+	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+		cputype = sstrdup(" 64-bit");
+	else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+		cputype = sstrdup(" 32-bit");
+	else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
+		cputype = sstrdup(" Itanium 64-bit");
+	else
+		cputype = sstrdup(" ");
 
-	switch (osvi.dwPlatformId) {
+	switch (osvi.dwPlatformId)
+	{
 		/* test for the Windows NT product family. */
-	case VER_PLATFORM_WIN32_NT:
-	/* Windows Vista or Windows Server 2008 */
-		if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
-			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-				extra = sstrdup("Enterprise Edition");
-			} else if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-				extra = sstrdup("Datacenter Edition");
-			} else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
-				extra = sstrdup("Home Premium/Basic");
-			} else {
-				extra = sstrdup(" ");
+		case VER_PLATFORM_WIN32_NT:
+			/* Windows Vista or Windows Server 2008 */
+			if (osvi.dwMajorVersion == 6 && !osvi.dwMinorVersion)
+			{
+				if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+					extra = sstrdup("Enterprise Edition");
+				else if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+					extra = sstrdup("Datacenter Edition");
+				else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
+					extra = sstrdup("Home Premium/Basic");
+				else
+					extra = sstrdup(" ");
+				if (osvi.wProductType & VER_NT_WORKSTATION)
+					snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s%s", cputype, extra);
+				else
+					snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s", cputype, extra);
+				delete [] extra;
 			}
-		if (osvi.wProductType & VER_NT_WORKSTATION) {
-				snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s%s",
-						 cputype, extra);
-		} else {
-				snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s",
-						 cputype, extra);
-		}
-			delete [] extra;
-		}
-	/* Windows 2003 or Windows XP Pro 64 */
-		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
-			if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-				extra = sstrdup("Datacenter Edition");
-			} else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-				extra = sstrdup("Enterprise Edition");
+			/* Windows 2003 or Windows XP Pro 64 */
+			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
+			{
+				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+					extra = sstrdup("Datacenter Edition");
+				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+					extra = sstrdup("Enterprise Edition");
 #ifdef VER_SUITE_COMPUTE_SERVER
-			} else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER) {
-				extra = sstrdup("Compute Cluster Edition");
+				else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
+					extra = sstrdup("Compute Cluster Edition");
 #endif
-			} else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
-				extra = sstrdup("Web Edition");
-			} else {
-				extra = sstrdup("Standard Edition");
+				else if (osvi.wSuiteMask == VER_SUITE_BLADE)
+					extra = sstrdup("Web Edition");
+				else
+					extra = sstrdup("Standard Edition");
+				if (osvi.wProductType & VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+					snprintf(buf, sizeof(buf), "Windows XP Professional x64 Edition %s", extra);
+				else
+					snprintf(buf, sizeof(buf), "Microsoft Windows Server 2003 Family %s%s", cputype, extra);
+				delete [] extra;
 			}
-		if ( osvi.wProductType & VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
-				snprintf(buf, sizeof(buf), "Windows XP Professional x64 Edition %s",
-						 extra);
-		} else {
-				snprintf(buf, sizeof(buf),
-						 "Microsoft Windows Server 2003 Family %s%s", cputype, extra);
-		}
-			delete [] extra;
-		}
-		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
-			if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT) {
-				extra = sstrdup("Embedded");
-			} else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
-				extra = sstrdup("Home Edition");
-			} else {
-				extra = sstrdup(" ");
+			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
+			{
+				if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT)
+					extra = sstrdup("Embedded");
+				else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
+					extra = sstrdup("Home Edition");
+				else
+					extra = sstrdup(" ");
+				snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
+				delete [] extra;
 			}
-			snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
-			delete [] extra;
-		}
-		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
-			if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-				extra = sstrdup("Datacenter Server");
-			} else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-				extra = sstrdup("Advanced Server");
-			} else {
-				extra = sstrdup("Server");
+			if (osvi.dwMajorVersion == 5 && !osvi.dwMinorVersion)
+			{
+				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+					extra = sstrdup("Datacenter Server");
+				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+					extra = sstrdup("Advanced Server");
+				else
+					extra = sstrdup("Server");
+				snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
+				delete [] extra;
 			}
-			snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
-			delete [] extra;
-		}
-		if (osvi.dwMajorVersion <= 4) {
-			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-				extra = sstrdup("Server 4.0, Enterprise Edition");
-			} else {
-				extra = sstrdup("Server 4.0");
+			if (osvi.dwMajorVersion <= 4)
+			{
+				if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+					extra = sstrdup("Server 4.0, Enterprise Edition");
+				else
+					extra = sstrdup("Server 4.0");
+				snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
+				delete [] extra;
 			}
-			snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
-			delete [] extra;
-		}
-	case VER_PLATFORM_WIN32_WINDOWS:
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
-			if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
-				extra = sstrdup("OSR2");
-			} else {
-				extra = sstrdup(" ");
+			break;
+		case VER_PLATFORM_WIN32_WINDOWS:
+			if (osvi.dwMajorVersion == 4 && !osvi.dwMinorVersion)
+			{
+				if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B')
+					extra = sstrdup("OSR2");
+				else
+					extra = sstrdup(" ");
+				snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
+				delete [] extra;
 			}
-			snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
-			delete [] extra;
-		}
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
-			if (osvi.szCSDVersion[1] == 'A') {
-				extra = sstrdup("SE");
-			} else {
-				extra = sstrdup(" ");
+			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
+			{
+				if (osvi.szCSDVersion[1] == 'A')
+					extra = sstrdup("SE");
+				else
+					extra = sstrdup(" ");
+				snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
+				delete [] extra;
 			}
-			snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
-			delete [] extra;
-		}
-		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
-			snprintf(buf, sizeof(buf),
-					 "Microsoft Windows Millennium Edition");
-		}
+			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
+				snprintf(buf, sizeof(buf), "Microsoft Windows Millennium Edition");
 	}
 	delete [] cputype;
 	return sstrdup(buf);
@@ -1375,31 +1327,30 @@ int SupportedWindowsVersion()
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
+	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi)))
+	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
+		if (!GetVersionEx((OSVERSIONINFO *)&osvi))
 			return 0;
-		}
 	}
 
-	switch (osvi.dwPlatformId) {
+	switch (osvi.dwPlatformId)
+	{
 		/* test for the Windows NT product family. */
-	case VER_PLATFORM_WIN32_NT:
-		/* win nt4 */
-		if (osvi.dwMajorVersion <= 4) {
-			return 0;
-		}
-		/* the rest */
-		return 1;
+		case VER_PLATFORM_WIN32_NT:
+			/* win nt4 */
+			if (osvi.dwMajorVersion <= 4)
+				return 0;
+			/* the rest */
+			return 1;
 		/* win95 win98 winME */
-	case VER_PLATFORM_WIN32_WINDOWS:
-		return 0;
+		case VER_PLATFORM_WIN32_WINDOWS:
+			return 0;
 	}
 	return 0;
 }
 
 #endif
-
 
 /*************************************************************************/
 /* This 2 functions were originally found in Bahamut */
@@ -1411,10 +1362,10 @@ int SupportedWindowsVersion()
  */
 uint32 cidr_to_netmask(uint16 cidr)
 {
-	if (cidr == 0)
+	if (!cidr)
 		return 0;
 
-	return (0xFFFFFFFF - (1 << (32 - cidr)) + 1);
+	return 0xFFFFFFFF - (1 << (32 - cidr)) + 1;
 }
 
 /**
@@ -1426,10 +1377,10 @@ uint16 netmask_to_cidr(uint32 mask)
 {
 	int tmp = 0;
 
-	while (!(mask & (1 << tmp)) && (tmp < 32))
-		tmp++;
+	while (!(mask & (1 << tmp)) && tmp < 32)
+		++tmp;
 
-	return (32 - tmp);
+	return 32 - tmp;
 }
 
 /*************************************************************************/
@@ -1441,10 +1392,11 @@ uint16 netmask_to_cidr(uint32 mask)
  */
 int str_is_wildcard(const char *str)
 {
-	while (*str) {
-		if ((*str == '*') || (*str == '?'))
+	while (*str)
+	{
+		if (*str == '*' || *str == '?')
 			return 1;
-		str++;
+		++str;
 	}
 
 	return 0;
@@ -1457,10 +1409,11 @@ int str_is_wildcard(const char *str)
  */
 int str_is_pure_wildcard(const char *str)
 {
-	while (*str) {
+	while (*str)
+	{
 		if (*str != '*')
 			return 0;
-		str++;
+		++str;
 	}
 
 	return 1;
@@ -1480,14 +1433,14 @@ uint32 str_is_ip(char *str)
 	char *s = str;
 	uint32 ip;
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; ++i)
+	{
 		octets[i] = strtol(s, &s, 10);
 		/* Bail out if the octet is invalid or wrongly terminated */
-		if ((octets[i] < 0) || (octets[i] > 255)
-			|| ((i < 3) && (*s != '.')))
+		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && *s != '.'))
 			return 0;
 		if (i < 3)
-			s++;
+			++s;
 	}
 
 	/* Fill the IP - the dirty way */
@@ -1510,7 +1463,7 @@ uint32 str_is_ip(char *str)
  * @param host Displayed host
  * @return 1 for IP/CIDR, 0 for anything else
  */
-int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host)
+int str_is_cidr(char *str, uint32 *ip, uint32 *mask, char **host)
 {
 	int i;
 	int octets[4] = { -1, -1, -1, -1 };
@@ -1518,14 +1471,14 @@ int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host)
 	char buf[512];
 	uint16 cidr;
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; ++i)
+	{
 		octets[i] = strtol(s, &s, 10);
 		/* Bail out if the octet is invalid or wrongly terminated */
-		if ((octets[i] < 0) || (octets[i] > 255)
-			|| ((i < 3) && (*s != '.')))
+		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && *s != '.'))
 			return 0;
 		if (i < 3)
-			s++;
+			++s;
 	}
 
 	/* Fill the IP - the dirty way */
@@ -1534,17 +1487,18 @@ int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host)
 	*ip += octets[1] * 65536;
 	*ip += octets[0] * 16777216;
 
-	if (*s == '/') {
-		s++;
+	if (*s == '/')
+	{
+		++s;
 		/* There's a CIDR mask here! */
 		cidr = strtol(s, &s, 10);
 		/* Bail out if the CIDR is invalid or the string isn't done yet */
-		if ((cidr > 32) || (*s))
+		if (cidr > 32 || *s)
 			return 0;
-	} else {
+	}
+	else
 		/* No CIDR mask here - use 32 so the whole ip will be matched */
 		cidr = 32;
-	}
 
 	*mask = cidr_to_netmask(cidr);
 	/* Apply the mask to avoid 255.255.255.255/8 bans */
@@ -1557,15 +1511,11 @@ int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host)
 	octets[3] = (*ip & 0x000000FF);
 
 	if (cidr == 32)
-		snprintf(buf, 512, "%d.%d.%d.%d", octets[0], octets[1], octets[2],
-				 octets[3]);
+		snprintf(buf, 512, "%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3]);
 	else
-		snprintf(buf, 512, "%d.%d.%d.%d/%d", octets[0], octets[1],
-				 octets[2], octets[3], cidr);
+		snprintf(buf, 512, "%d.%d.%d.%d/%d", octets[0], octets[1], octets[2], octets[3], cidr);
 
 	*host = sstrdup(buf);
 
 	return 1;
 }
-
-/* EOF */

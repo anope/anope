@@ -18,7 +18,7 @@
 class CommandCSSetBanType : public Command
 {
  public:
-	CommandCSSetBanType(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetBanType(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

@@ -3,10 +3,10 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
+
+#ifndef OPERTYPE_H
+#define OPERTYPE_H
 
 #include "hashcomp.h"
 
@@ -14,23 +14,23 @@ class CoreExport OperType
 {
  private:
 	/** The name of this opertype, e.g. "sra".
-	  */
+	 */
 	ci::string name;
 
 	/** Privs that this opertype may use, e.g. 'users/auspex'.
-	  * This *must* be std::list, see commands comment for details.
-	  */
-	std::list<std::string> privs;
+	 * This *must* be std::list, see commands comment for details.
+	 */
+	std::list<ci::string> privs;
 
 	/** Commands this user may execute, e.g:
-	  * botserv/set/ *, botserv/set/private, botserv/ *
-	  * et cetera.
-	  *
-	  * This *must* be std::list, not std::map, because
-	  * we support full globbing here. This shouldn't be a problem
-	  * as we don't invoke it often.
-	  */
-	std::list<std::string> commands;
+	 * botserv/set/ *, botserv/set/private, botserv/ *
+	 * et cetera.
+	 *
+	 * This *must* be std::list, not std::map, because
+	 * we support full globbing here. This shouldn't be a problem
+	 * as we don't invoke it often.
+	 */
+	std::list<ci::string> commands;
 
 	/** Set of opertypes we inherit from
 	 */
@@ -42,26 +42,26 @@ class CoreExport OperType
 	OperType(const ci::string &nname);
 
 	/** Check whether this opertype has access to run the given command string.
-	  * @param cmdstr The string to check, e.g. botserv/set/private.
-	  * @return True if this opertype may run the specified command, false otherwise.
-	  */
-	bool HasCommand(const std::string &cmdstr) const;
+	 * @param cmdstr The string to check, e.g. botserv/set/private.
+	 * @return True if this opertype may run the specified command, false otherwise.
+	 */
+	bool HasCommand(const ci::string &cmdstr) const;
 
 	/** Check whether this opertype has access to the given special permission.
-	  * @param privstr The priv to check for, e.g. users/auspex.
-	  * @return True if this opertype has the specified priv, false otherwise.
-	  */
-	bool HasPriv(const std::string &privstr) const;
+	 * @param privstr The priv to check for, e.g. users/auspex.
+	 * @return True if this opertype has the specified priv, false otherwise.
+	 */
+	bool HasPriv(const ci::string &privstr) const;
 
 	/** Add the specified command to this opertype.
-	  * @param cmdstr The command mask to grant this opertype access to, e.g: nickserv/ *, chanserv/set/ *, botserv/set/private.
-	  */
-	void AddCommand(const std::string &cmdstr);
+	 * @param cmdstr The command mask to grant this opertype access to, e.g: nickserv/ *, chanserv/set/ *, botserv/set/private.
+	 */
+	void AddCommand(const ci::string &cmdstr);
 
 	/** Add the specified priv mask to this opertype.
-	  * @param privstr The specified mask of privs to grant this opertype access to,  e.g. users/auspex, users/ *, etc.
-	  */
-	void AddPriv(const std::string &privstr);
+	 * @param privstr The specified mask of privs to grant this opertype access to,  e.g. users/auspex, users/ *, etc.
+	 */
+	void AddPriv(const ci::string &privstr);
 
 	/** Returns the name of this opertype.
 	 */
@@ -72,3 +72,5 @@ class CoreExport OperType
 	 */
 	void Inherits(OperType *ot);
 };
+
+#endif // OPERTYPE_H

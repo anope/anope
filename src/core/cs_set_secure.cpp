@@ -18,7 +18,7 @@
 class CommandCSSetSecure : public Command
 {
  public:
-	CommandCSSetSecure(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSecure(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

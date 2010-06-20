@@ -4,8 +4,6 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
  */
 
 #include "services.h"
@@ -51,15 +49,15 @@ void SetDefaultMLock()
 	spacesepstream sep(Config.MLock);
 	sep.GetToken(modes);
 
-	for (unsigned i = 0; i < modes.size(); ++i)
+	for (unsigned i = 0, end_mode = modes.size(); i < end_mode; ++i)
 	{
-		 if (modes[i] == '+')
-			  ptr = &DefMLockOn;
-		 else if (modes[i] == '-')
-			  ptr = &DefMLockOff;
-		 else
-		 {
-		 	if (!ptr)
+		if (modes[i] == '+')
+			ptr = &DefMLockOn;
+		else if (modes[i] == '-')
+			ptr = &DefMLockOff;
+		else
+		{
+			if (!ptr)
 				continue;
 
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
@@ -71,9 +69,7 @@ void SetDefaultMLock()
 				if (ptr == &DefMLockOn && cm->Type == MODE_PARAM)
 				{
 					if (sep.GetToken(param))
-					{
 						DefMLockParams.insert(std::make_pair(cm->Name, param));
-					}
 					else
 					{
 						Alog() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
@@ -86,14 +82,12 @@ void SetDefaultMLock()
 
 	/* Set Bot Modes */
 	BotModes.clear();
-	for (unsigned i = 0; i < Config.BotModes.size(); ++i)
+	for (unsigned i = 0, end_mode = Config.BotModes.size(); i < end_mode; ++i)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByChar(Config.BotModes[i]);
 
 		if (cm && cm->Type == MODE_STATUS && std::find(BotModes.begin(), BotModes.end(), cm) == BotModes.end())
-		{
 			BotModes.push_back(dynamic_cast<ChannelModeStatus *>(cm));
-		}
 	}
 }
 
@@ -274,8 +268,7 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 
 	/* Check whether it matches a botserv bot after adding internally
 	 * and parsing it through cidr support. ~ Viper */
-	if (Config.s_BotServ && Config.BSSmartJoin && chan->ci && chan->ci->bi
-		&& chan->users.size() >= Config.BSMinUsers)
+	if (Config.s_BotServ && Config.BSSmartJoin && chan->ci && chan->ci->bi && chan->users.size() >= Config.BSMinUsers)
 	{
 		BotInfo *bi = chan->ci->bi;
 
@@ -300,7 +293,7 @@ void ChannelModeBan::DelMask(Channel *chan, const char *mask)
 	Entry *ban;
 
 	/* Sanity check as it seems some IRCD will just send -b without a mask */
-	if (!mask || !chan->bans || (chan->bans->count == 0))
+	if (!mask || !chan->bans || !chan->bans->count)
 		return;
 
 	ban = elist_find_mask(chan->bans, mask);
@@ -351,7 +344,7 @@ void ChannelModeExcept::DelMask(Channel *chan, const char *mask)
 	Entry *exception;
 
 	/* Sanity check as it seems some IRCD will just send -e without a mask */
-	if (!mask || !chan->excepts || (chan->excepts->count == 0))
+	if (!mask || !chan->excepts || !chan->excepts->count)
 		return;
 
 	exception = elist_find_mask(chan->excepts, mask);
@@ -399,7 +392,7 @@ void ChannelModeInvite::DelMask(Channel *chan, const char *mask)
 	Entry *invite;
 
 	/* Sanity check as it seems some IRCD will just send -I without a mask */
-	if (!mask || !chan->invites || (chan->invites->count == 0))
+	if (!mask || !chan->invites || !chan->invites->count)
 		return;
 
 	invite = elist_find_mask(chan->invites, mask);
@@ -416,24 +409,20 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
 	std::list<std::pair<void *, std::string> > *list, *otherlist;
-	std::list<std::pair<void *, std::string > >::iterator it;
+	std::list<std::pair<void *, std::string > >::iterator it, it_end;
 	bool IsParam = false;
 
 	if (Type == ST_CHANNEL)
 	{
 		cm = static_cast<ChannelMode *>(Mode);
 		if (cm->Type == MODE_PARAM)
-		{
 			IsParam = true;
-		}
 	}
 	else if (Type == ST_USER)
 	{
 		um = static_cast<UserMode *>(Mode);
 		if (um->Type == MODE_PARAM)
-		{
 			IsParam = true;
-		}
 	}
 	if (Set)
 	{
@@ -447,7 +436,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 	}
 
 	/* Loop through the list and find if this mode is already on here */
-	for (it = list->begin(); it != list->end(); ++it)
+	for (it = list->begin(), it_end = list->end(); it != it_end; ++it)
 	{
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
@@ -460,7 +449,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 		}
 	}
 	/* If the mode is on the other list, remove it from there (eg, we dont want +o-o Adam Adam) */
-	for (it = otherlist->begin(); it != otherlist->end(); ++it)
+	for (it = otherlist->begin(), it_end = otherlist->end(); it != it_end; ++it)
 	{
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
@@ -486,7 +475,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
  */
 StackerInfo *ModeManager::GetInfo(void *Item)
 {
-	for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(); it != StackerObjects.end(); ++it)
+	for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(), it_end = StackerObjects.end(); it != it_end; ++it)
 	{
 		const std::pair<void *, StackerInfo *> &PItem = *it;
 		if (PItem.first == Item)
@@ -505,14 +494,14 @@ StackerInfo *ModeManager::GetInfo(void *Item)
 std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 {
 	std::list<std::string> ret;
-	std::list<std::pair<void *, std::string> >::iterator it;
+	std::list<std::pair<void *, std::string> >::iterator it, it_end;
 	std::string buf, parambuf;
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
 	unsigned NModes = 0;
 
 	buf = "+";
-	for (it = info->AddModes.begin(); it != info->AddModes.end(); ++it)
+	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
 	{
 		if (++NModes > ircd->maxmodes)
 		{
@@ -541,7 +530,7 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
 		buf.erase(buf.length() - 1);
 
 	buf += "-";
-	for (it = info->DelModes.begin(); it != info->DelModes.end(); ++it)
+	for (it = info->DelModes.begin(), it_end = info->DelModes.end(); it != it_end; ++it)
 	{
 		if (++NModes > ircd->maxmodes)
 		{
@@ -679,9 +668,7 @@ ChannelMode *ModeManager::FindChannelModeByChar(char Mode)
 	std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.find(Mode);
 
 	if (it != ModeManager::ChannelModesByChar.end())
-	{
 		return it->second;
-	}
 
 	return NULL;
 }
@@ -695,9 +682,7 @@ UserMode *ModeManager::FindUserModeByChar(char Mode)
 	std::map<char, UserMode *>::iterator it = ModeManager::UserModesByChar.find(Mode);
 
 	if (it != ModeManager::UserModesByChar.end())
-	{
 		return it->second;
-	}
 
 	return NULL;
 }
@@ -711,9 +696,7 @@ ChannelMode *ModeManager::FindChannelModeByName(ChannelModeName Name)
 	std::map<ChannelModeName, ChannelMode *>::iterator it = ModeManager::ChannelModesByName.find(Name);
 
 	if (it != ModeManager::ChannelModesByName.end())
-	{
 		return it->second;
-	}
 
 	return NULL;
 }
@@ -727,9 +710,7 @@ UserMode *ModeManager::FindUserModeByName(UserModeName Name)
 	std::map<UserModeName, UserMode *>::iterator it = ModeManager::UserModesByName.find(Name);
 
 	if (it != ModeManager::UserModesByName.end())
-	{
 		return it->second;
-	}
 
 	return NULL;
 }
@@ -740,11 +721,11 @@ UserMode *ModeManager::FindUserModeByName(UserModeName Name)
  */
 char ModeManager::GetStatusChar(char Value)
 {
-	std::map<char, ChannelMode *>::iterator it;
+	std::map<char, ChannelMode *>::iterator it, it_end;
 	ChannelMode *cm;
 	ChannelModeStatus *cms;
 
-	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+	for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 	{
 		cm = it->second;
 		if (cm->Type == MODE_STATUS)
@@ -752,9 +733,7 @@ char ModeManager::GetStatusChar(char Value)
 			cms = dynamic_cast<ChannelModeStatus *>(cm);
 
 			if (Value == cms->Symbol)
-			{
 				return it->first;
-			}
 		}
 	}
 
@@ -839,7 +818,7 @@ void ModeManager::ProcessModes()
 {
 	if (!StackerObjects.empty())
 	{
-		for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(); it != StackerObjects.end(); ++it)
+		for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(), it_end = StackerObjects.end(); it != it_end; ++it)
 		{
 			StackerInfo *s = it->second;
 			User *u = NULL;
@@ -853,7 +832,7 @@ void ModeManager::ProcessModes()
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 
-			for (std::list<std::string>::iterator lit = ModeStrings.begin(); lit != ModeStrings.end(); ++lit)
+			for (std::list<std::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
 			{
 				if (c)
 					ircdproto->SendMode(s->bi, c, lit->c_str());
@@ -865,4 +844,3 @@ void ModeManager::ProcessModes()
 		StackerObjects.clear();
 	}
 }
-

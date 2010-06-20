@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 #include "modules.h"
 #include "language.h"
 #include "version.h"
@@ -23,23 +22,22 @@ char *ModuleGetErrStr(int status)
 {
 	const char *module_err_str[] = {
 		"Module, Okay - No Error",						/* MOD_ERR_OK */
-		"Module Error, Allocating memory",					/* MOD_ERR_MEMORY */
-		"Module Error, Not enough parameters",					/* MOD_ERR_PARAMS */
-		"Module Error, Already loaded",						/* MOD_ERR_EXISTS */
-		"Module Error, File does not exist",					/* MOD_ERR_NOEXIST */
+		"Module Error, Allocating memory",				/* MOD_ERR_MEMORY */
+		"Module Error, Not enough parameters",			/* MOD_ERR_PARAMS */
+		"Module Error, Already loaded",					/* MOD_ERR_EXISTS */
+		"Module Error, File does not exist",			/* MOD_ERR_NOEXIST */
 		"Module Error, No User",						/* MOD_ERR_NOUSER */
-		"Module Error, Error during load time or module returned MOD_STOP",	/* MOD_ERR_NOLOAD */
-		"Module Error, Unable to unload",					/* MOD_ERR_NOUNLOAD */
-		"Module Error, Incorrect syntax",					/* MOD_ERR_SYNTAX */
-		"Module Error, Unable to delete",					/* MOD_ERR_NODELETE */
-		"Module Error, Unknown Error occuried",					/* MOD_ERR_UNKOWN */
-		"Module Error, File I/O Error",						/* MOD_ERR_FILE_IO */
-		"Module Error, No Service found for request",				/* MOD_ERR_NOSERVICE */
-		"Module Error, No module name for request"				/* MOD_ERR_NO_MOD_NAME */
+		"Module Error, Error during load time or module returned MOD_STOP", /* MOD_ERR_NOLOAD */
+		"Module Error, Unable to unload",				/* MOD_ERR_NOUNLOAD */
+		"Module Error, Incorrect syntax",				/* MOD_ERR_SYNTAX */
+		"Module Error, Unable to delete",				/* MOD_ERR_NODELETE */
+		"Module Error, Unknown Error occuried",			/* MOD_ERR_UNKOWN */
+		"Module Error, File I/O Error",					/* MOD_ERR_FILE_IO */
+		"Module Error, No Service found for request",	/* MOD_ERR_NOSERVICE */
+		"Module Error, No module name for request"		/* MOD_ERR_NO_MOD_NAME */
 	};
 	return const_cast<char *>(module_err_str[status]);
 }
-
 
 /************************************************/
 
@@ -79,15 +77,13 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 
 	Alog(LOG_DEBUG) << this->name << "Adding " << ac << " texts for language " << langNumber;
 
-	if (this->lang[langNumber].argc > 0) {
+	if (this->lang[langNumber].argc > 0)
 		this->DeleteLanguage(langNumber);
-	}
 
 	this->lang[langNumber].argc = ac;
 	this->lang[langNumber].argv = new char *[ac];
-	for (i = 0; i < ac; i++) {
+	for (i = 0; i < ac; ++i)
 		this->lang[langNumber].argv[i] = sstrdup(av[i]);
-	}
 }
 
 /**
@@ -97,17 +93,25 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
  */
 Module *FindModule(const std::string &name)
 {
-	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
+	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 	{
 		Module *m = *it;
 
 		if (m->name == name)
-		{
 			return m;
-		}
 	}
 
 	return NULL;
+}
+
+Module *FindModule(const char *name)
+{
+	return FindModule(std::string(name));
+}
+
+Module *FindModule(const ci::string &name)
+{
+	return FindModule(std::string(name.c_str()));
 }
 
 /** Add a message to Anope
@@ -138,9 +142,7 @@ bool Anope::DelMessage(Message *m)
 	std::multimap<std::string, Message *>::iterator it = MessageMap.find(m->name);
 
 	if (it == MessageMap.end())
-	{
 		return false;
-	}
 
 	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(m->name);
 
@@ -165,7 +167,7 @@ int Module::AddCommand(BotInfo *bi, Command *c)
 {
 	if (!bi || !c)
 		return MOD_ERR_PARAMS;
-	
+
 	c->module = this;
 	c->service = bi;
 
@@ -177,7 +179,7 @@ int Module::AddCommand(BotInfo *bi, Command *c)
 		delete c;
 		return MOD_ERR_EXISTS;
 	}
-	
+
 	return MOD_ERR_OK;
 }
 
@@ -191,7 +193,7 @@ int Module::DelCommand(BotInfo *bi, Command *c)
 {
 	if (!bi || !c)
 		return MOD_ERR_PARAMS;
-	
+
 	if (!bi->Commands.erase(c->name))
 		return MOD_ERR_NOEXIST;
 
@@ -211,7 +213,7 @@ std::vector<Message *> FindMessage(const std::string &name)
 
 	if (it == MessageMap.end())
 		return messages;
-	
+
 	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(name);
 
 	for (; it != upper; ++it)
@@ -235,29 +237,28 @@ std::vector<Message *> FindMessage(const std::string &name)
 bool moduleMinVersion(int major, int minor, int patch, int build)
 {
 	bool ret = false;
-	if (VERSION_MAJOR > major) {		/* Def. new */
+	if (VERSION_MAJOR > major) /* Def. new */
 		ret = true;
-	} else if (VERSION_MAJOR == major) {		/* Might be newer */
-		if (minor == -1) {
-			return true;
-		}					   /* They dont care about minor */
-		if (VERSION_MINOR > minor) {	/* Def. newer */
+	else if (VERSION_MAJOR == major) /* Might be newer */
+	{
+		if (minor == -1)
+			return true; /* They dont care about minor */
+		if (VERSION_MINOR > minor) /* Def. newer */
 			ret = true;
-		} else if (VERSION_MINOR == minor) {	/* Might be newer */
-			if (patch == -1) {
-				return true;
-			}				   /* They dont care about patch */
-			if (VERSION_PATCH > patch) {
+		else if (VERSION_MINOR == minor) /* Might be newer */
+		{
+			if (patch == -1)
+				return true; /* They dont care about patch */
+			if (VERSION_PATCH > patch)
 				ret = true;
-			} else if (VERSION_PATCH == patch) {
+			else if (VERSION_PATCH == patch)
+			{
 #if 0
 // XXX
-				if (build == -1) {
-					return true;
-				}			   /* They dont care about build */
-				if (VERSION_BUILD >= build) {
+				if (build == -1)
+					return true; /* They dont care about build */
+				if (VERSION_BUILD >= build)
 					ret = true;
-				}
 #endif
 			}
 		}
@@ -265,7 +266,7 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	return ret;
 }
 
-void Module::NoticeLang(const char *source, User * u, int number, ...)
+void Module::NoticeLang(const char *source, User *u, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -274,18 +275,16 @@ void Module::NoticeLang(const char *source, User * u, int number, ...)
 	char *s, *t, *buf;
 
 	/* Find the users lang, and use it if we can */
-	if (u && u->Account()) {
+	if (u && u->Account())
 		mlang = u->Account()->language;
-	}
 
 	/* If the users lang isnt supported, drop back to English */
-	if (this->lang[mlang].argc == 0)
-	{
+	if (!this->lang[mlang].argc)
 		mlang = LANG_EN_US;
-	}
 
 	/* If the requested lang string exists for the language */
-	if (this->lang[mlang].argc > number) {
+	if (this->lang[mlang].argc > number)
+	{
 		fmt = this->lang[mlang].argv[number];
 
 		buf = sstrdup(fmt);
@@ -293,7 +292,8 @@ void Module::NoticeLang(const char *source, User * u, int number, ...)
 		vsnprintf(buffer, 4095, buf, va);
 		va_end(va);
 		s = buffer;
-		while (*s) {
+		while (*s)
+		{
 			t = s;
 			s += strcspn(s, "\n");
 			if (*s)
@@ -302,12 +302,12 @@ void Module::NoticeLang(const char *source, User * u, int number, ...)
 			u->SendMessage(source, "%s", outbuf);
 		}
 		delete [] buf;
-	} else {
-		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 	}
+	else
+		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 }
 
-const char *Module::GetLangString(User * u, int number)
+const char *Module::GetLangString(User *u, int number)
 {
 	int mlang = Config.NSDefLanguage;
 
@@ -316,17 +316,18 @@ const char *Module::GetLangString(User * u, int number)
 		mlang = u->Account()->language;
 
 	/* If the users lang isnt supported, drop back to English */
-	if (this->lang[mlang].argc == 0)
+	if (!this->lang[mlang].argc)
 		mlang = LANG_EN_US;
 
 	/* If the requested lang string exists for the language */
-	if (this->lang[mlang].argc > number) {
+	if (this->lang[mlang].argc > number)
 		return this->lang[mlang].argv[number];
 	/* Return an empty string otherwise, because we might be used without
 	 * the return value being checked. If we would return NULL, bad things
 	 * would happen!
 	 */
-	} else {
+	else
+	{
 		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 		return "";
 	}
@@ -336,7 +337,7 @@ void Module::DeleteLanguage(int langNumber)
 {
 	if (this->lang[langNumber].argc)
 	{
-		for (int idx = 0; idx > this->lang[langNumber].argc; idx++)
+		for (int idx = 0; idx > this->lang[langNumber].argc; ++idx)
 			delete [] this->lang[langNumber].argv[idx];
 		delete [] this->lang[langNumber].argv;
 		this->lang[langNumber].argc = 0;
@@ -362,52 +363,49 @@ void ModuleRunTimeDirCleanUp()
 
 	Alog(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
-
 #ifndef _WIN32
-	if ((dirp = opendir(dirbuf)) == NULL) 
+	if (!(dirp = opendir(dirbuf)))
 	{
 		Alog(LOG_DEBUG) << "cannot open directory (" << dirbuf << ")";
 		return;
 	}
-	while ((dp = readdir(dirp)) != NULL) {
-		if (dp->d_ino == 0) {
+	while ((dp = readdir(dirp)))
+	{
+		if (!dp->d_ino)
 			continue;
-		}
-		if (!stricmp(dp->d_name, ".") || !stricmp(dp->d_name, "..")) {
+		if (!stricmp(dp->d_name, ".") || !stricmp(dp->d_name, ".."))
 			continue;
-		}
 		snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
 		unlink(filebuf);
 	}
 	closedir(dirp);
 #else
 	/* Get the current working directory: */
-	if (_getcwd(buffer, _MAX_PATH) == NULL) 
-	{
+	if (!_getcwd(buffer, _MAX_PATH))
 		Alog(LOG_DEBUG) << "Unable to set Current working directory";
-	}
 	snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirbuf);
 
 	hList = FindFirstFile(szDir, &FileData);
-	if (hList != INVALID_HANDLE_VALUE) {
+	if (hList != INVALID_HANDLE_VALUE)
+	{
 		fFinished = FALSE;
-		while (!fFinished) {
-			if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+		while (!fFinished)
+		{
+			if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
 				snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, FileData.cFileName);
 				DeleteFile(filebuf);
 			}
-			if (!FindNextFile(hList, &FileData)) {
-				if (GetLastError() == ERROR_NO_MORE_FILES) {
+			if (!FindNextFile(hList, &FileData))
+			{
+				if (GetLastError() == ERROR_NO_MORE_FILES)
 					fFinished = TRUE;
-				}
 			}
 		}
-	} else {
-		Alog(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
 	}
+	else
+		Alog(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
 	FindClose(hList);
 #endif
 	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }
-
-/* EOF */

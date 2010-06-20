@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -32,7 +30,8 @@ void anope_SendNumeric(const char *source, int numeric, const char *dest, const 
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
-	if (fmt) {
+	if (fmt)
+	{
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
@@ -43,7 +42,7 @@ void anope_SendNumeric(const char *source, int numeric, const char *dest, const 
 /**
  * Set routines for modules to set the prefered function for dealing with things.
  **/
-void pmodule_ircd_var(IRCDVar * ircdvar)
+void pmodule_ircd_var(IRCDVar *ircdvar)
 {
 	ircd = ircdvar;
 }

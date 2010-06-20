@@ -1,3 +1,6 @@
+#ifndef SERVERS_H
+#define SERVERS_H
+
 /* Anope */
 extern CoreExport Server *Me;
 
@@ -112,7 +115,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Get the name for this server
 	 * @return The name
 	 */
-	const std::string& GetName() const;
+	const std::string &GetName() const;
 
 	/** Get the number of hops this server is from services
 	 * @return Number of hops
@@ -122,27 +125,27 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Set the server description
 	 * @param desc The new description
 	 */
-	void SetDescription(const std::string& desc);
+	void SetDescription(const std::string &desc);
 
 	/** Get the server description
 	 * @return The server description
 	 */
-	const std::string& GetDescription() const;
+	const std::string &GetDescription() const;
 
 	/** Get the server numeric/SID
 	 * @return The numeric/SID
 	 */
-	const std::string& GetSID() const;
+	const std::string &GetSID() const;
 
 	/** Get the list of links this server has, or NULL if it has none
 	 * @return A list of servers
 	 */
-	const std::list<Server*>* GetLinks() const;
+	const std::list<Server *> *GetLinks() const;
 
 	/** Get the uplink server for this server, if this is our uplink will be Me
 	 * @return The servers uplink
 	 */
-	Server* GetUplink() const;
+	Server *GetUplink() const;
 
 	/** Adds a link to this server
 	 * @param s The linking server
@@ -174,6 +177,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param s The server list to search for this server on, defaults to our Uplink
 	 * @return The server
 	 */
-	static Server* Find(const std::string &name, Server *s = NULL);
+	static Server *Find(const std::string &name, Server *s = NULL);
 };
 
+#endif // SERVERS_H

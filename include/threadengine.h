@@ -1,3 +1,6 @@
+#ifndef THREADENGINE_H
+#define THREADENGINE_H
+
 #ifdef _WIN32
 typedef HANDLE ThreadHandle;
 typedef CRITICAL_SECTION MutexHandle;
@@ -35,10 +38,10 @@ class Thread : public Extensible
 {
  private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
-	bool Exit; 
- 
+	bool Exit;
+
  public:
- 	/* Handle for this thread */
+	/* Handle for this thread */
 	ThreadHandle Handle;
 
 	/** Threads constructor
@@ -76,7 +79,7 @@ class Mutex
  public:
 	/** Constructor
 	 */
- 	Mutex();
+	Mutex();
 
 	/** Destructor
 	 */
@@ -115,3 +118,4 @@ class Condition : public Mutex
 	void Wait();
 };
 
+#endif // THREADENGINE_H

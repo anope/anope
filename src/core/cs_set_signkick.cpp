@@ -18,7 +18,7 @@
 class CommandCSSetSignKick : public Command
 {
  public:
-	CommandCSSetSignKick(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSignKick(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

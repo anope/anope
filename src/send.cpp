@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -54,7 +52,6 @@ void send_cmd(const char *source, const char *fmt, ...)
 
 	va_end(args);
 }
-
 
 /*
  * Copypasta version that accepts std::string source.
@@ -104,18 +101,17 @@ void send_cmd(const std::string &source, const char *fmt, ...)
 void notice_server(char *source, Server * s, const char *fmt, ...)
 {
 	va_list args;
-	char buf[BUFSIZE];
-	*buf = '\0';
+	char buf[BUFSIZE] = "";
 
-	if (fmt) {
+	if (fmt)
+	{
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-		if (Config.NSDefFlags.HasFlag(NI_MSG)) {
+		if (Config.NSDefFlags.HasFlag(NI_MSG))
 			ircdproto->SendGlobalPrivmsg(findbot(source), s, buf);
-		} else {
+		else
 			ircdproto->SendGlobalNotice(findbot(source), s, buf);
-		}
 		va_end(args);
 	}
 }
@@ -132,17 +128,17 @@ void notice_server(char *source, Server * s, const char *fmt, ...)
 void notice_list(char *source, char *dest, char **text)
 {
 	User *u = finduser(dest);
-	while (*text) {
+	while (*text)
+	{
 		/* Have to kludge around an ircII bug here: if a notice includes
 		 * no text, it is ignored, so we replace blank lines by lines
 		 * with a single space.
 		 */
-		if (**text) {
+		if (**text)
 			u->SendMessage(source, "%s", *text);
-		} else {
+		else
 			u->SendMessage(source, " ");
-		}
-		text++;
+		++text;
 	}
 }
 
@@ -159,13 +155,12 @@ void notice_list(char *source, char *dest, char **text)
 void notice_lang(const std::string &source, User * dest, int message, ...)
 {
 	va_list args;
-	char buf[4096];			 /* because messages can be really big */
+	char buf[4096]; /* because messages can be really big */
 	char *s, *t;
 	const char *fmt;
 
-	if (!dest || !message) {
+	if (!dest || !message)
 		return;
-	}
 	va_start(args, message);
 	fmt = getstring(dest, message);
 
@@ -174,7 +169,8 @@ void notice_lang(const std::string &source, User * dest, int message, ...)
 	memset(buf, 0, 4096);
 	vsnprintf(buf, sizeof(buf), fmt, args);
 	s = buf;
-	while (*s) {
+	while (*s)
+	{
 		t = s;
 		s += strcspn(s, "\n");
 		if (*s)
@@ -204,9 +200,8 @@ void notice_help(const char *source, User * dest, int message, ...)
 	char *s, *t;
 	const char *fmt;
 
-	if (!dest || !message) {
+	if (!dest || !message)
 		return;
-	}
 	va_start(args, message);
 	fmt = getstring(dest, message);
 	if (!fmt)
@@ -218,7 +213,8 @@ void notice_help(const char *source, User * dest, int message, ...)
 	strnrepl(buf2, sizeof(buf2), "%S", "\1\1");
 	vsnprintf(buf, sizeof(buf), buf2, args);
 	s = buf;
-	while (*s) {
+	while (*s)
+	{
 		t = s;
 		s += strcspn(s, "\n");
 		if (*s)

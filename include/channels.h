@@ -4,9 +4,10 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- *
  */
+
+#ifndef CHANNELS_H
+#define CHANNELS_H
 
 typedef unordered_map_namespace::unordered_map<ci::string, Channel *, hash_compare_ci_string> channel_map;
 extern CoreExport channel_map ChannelList;
@@ -75,12 +76,12 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	~Channel();
 
-	std::string name;	       /* Channel name */
-	ChannelInfo *ci;			/* Corresponding ChannelInfo */
-	time_t creation_time;	   /* When channel was created */
+	std::string name;		/* Channel name */
+	ChannelInfo *ci;		/* Corresponding ChannelInfo */
+	time_t creation_time;	/* When channel was created */
 	char *topic;
 	std::string topic_setter;
-	time_t topic_time;		      /* When topic was set */
+	time_t topic_time;		/* When topic was set */
 
 	EList *bans;
 	EList *excepts;
@@ -90,13 +91,13 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	CUserList users;
 
 	BanData *bd;
-				     
-	time_t server_modetime;	 /* Time of last server MODE */
-	time_t chanserv_modetime;       /* Time of last check_modes() */
-	int16 server_modecount;	 /* Number of server MODEs this second */
-	int16 chanserv_modecount;       /* Number of check_mode()'s this sec */
-	int16 bouncy_modes;		     /* Did we fail to set modes here? */
-	int16 topic_sync;		  /* Is the topic in sync? */
+
+	time_t server_modetime;		/* Time of last server MODE */
+	time_t chanserv_modetime;	/* Time of last check_modes() */
+	int16 server_modecount;		/* Number of server MODEs this second */
+	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
+	int16 bouncy_modes;			/* Did we fail to set modes here? */
+	int16 topic_sync;			/* Is the topic in sync? */
 
 	/** Restore the channel topic, set mlock (key), set stickied bans, etc
 	 */
@@ -263,3 +264,4 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
 };
 
+#endif // CHANNELS_H

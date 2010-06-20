@@ -6,8 +6,6 @@
  *
  * These classes have been copied from InspIRCd and modified
  * for use in Anope.
- *
- *
  */
 
 #include "services.h"
@@ -175,7 +173,7 @@ size_t hash_compare_std_string::operator()(const std::string &s) const
 
 	for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
 		t = 5 * t + static_cast<const unsigned char>(*it);
-	
+
 	return t;
 }
 
@@ -189,7 +187,7 @@ size_t hash_compare_ci_string::operator()(const ci::string &s) const
 
 	for (ci::string::const_iterator it = s.begin(); it != s.end(); ++it)
 		t = 5 * t + ascii_case_insensitive_map[static_cast<const unsigned char>(*it)];
-	
+
 	return t;
 }
 
@@ -203,7 +201,6 @@ size_t hash_compare_irc_string::operator()(const irc::string &s) const
 
 	for (irc::string::const_iterator it = s.begin(); it != s.end(); ++it)
 		t = 5 * t + rfc_case_insensitive_map[static_cast<const unsigned char>(*it)];
-	
+
 	return t;
 }
-

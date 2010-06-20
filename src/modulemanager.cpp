@@ -4,9 +4,8 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- *
  */
+
 #include "modules.h"
 #include "language.h"
 #include "version.h"
@@ -16,7 +15,17 @@ std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
 void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
 {
-	for (std::list<std::string>::iterator it = ModuleList.begin(); it != ModuleList.end(); ++it)
+	for (std::list<std::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
+	{
+		Module *m = FindModule(*it);
+		if (!m)
+			ModuleManager::LoadModule(*it, NULL);
+	}
+}
+
+void ModuleManager::LoadModuleList(std::list<ci::string> &ModuleList)
+{
+	for (std::list<ci::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
 	{
 		Module *m = FindModule(*it);
 		if (!m)
@@ -47,7 +56,7 @@ static int moduleCopyFile(const char *name, const char *output)
 	strlcat(input, name, sizeof(input));
 	strlcat(input, MODULE_EXT, sizeof(input));
 
-	if ((source = fopen(input, "rb")) == NULL)
+	if (!(source = fopen(input, "rb")))
 		return MOD_ERR_NOEXIST;
 
 #ifndef _WIN32
@@ -61,19 +70,16 @@ static int moduleCopyFile(const char *name, const char *output)
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
 #ifndef _WIN32
-	if ((target = fdopen(srcfp, "w")) == NULL) {
+	if (!(target = fdopen(srcfp, "w")))
 #else
-	if ((target = fopen(output, "wb")) == NULL) {
+	if (!(target = fopen(output, "wb")))
 #endif
 		return MOD_ERR_FILE_IO;
-	}
-	while ((ch = fgetc(source)) != EOF) {
+	while ((ch = fgetc(source)) != EOF)
 		fputc(ch, target);
-	}
 	fclose(source);
-	if (fclose(target) != 0) {
+	if (fclose(target))
 		return MOD_ERR_FILE_IO;
-	}
 	return MOD_ERR_OK;
 }
 
@@ -81,12 +87,10 @@ static bool IsOneOfModuleTypeLoaded(MODType mt)
 {
 	int pmods = 0;
 
-	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
+	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 	{
 		if ((*it)->type == mt)
-		{
 			++pmods;
-		}
 	}
 
 	/*
@@ -104,10 +108,10 @@ static bool IsOneOfModuleTypeLoaded(MODType mt)
  * This function will take a pointer from either dlsym or GetProcAddress and cast it in
  * a way that won't cause C++ warnings/errors to come up.
  */
-template <class TYPE>
-TYPE function_cast(ano_module_t symbol)
+template <class TYPE> TYPE function_cast(ano_module_t symbol)
 {
-	union {
+	union
+	{
 		ano_module_t symbol;
 		TYPE function;
 	} cast;
@@ -115,7 +119,7 @@ TYPE function_cast(ano_module_t symbol)
 	return cast.function;
 }
 
-int ModuleManager::LoadModule(const std::string &modname, User * u)
+int ModuleManager::LoadModule(const std::string &modname, User *u)
 {
 	const char *err;
 	Module *(*func)(const std::string &, const std::string &);
@@ -154,7 +158,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	ano_modclearerr();
 
 	ano_module_t handle = dlopen(pbuf.c_str(), RTLD_LAZY);
-	if (handle == NULL && (err = dlerror()) != NULL)
+	if (!handle && (err = dlerror()))
 	{
 		Alog() << err;
 		return MOD_ERR_NOLOAD;
@@ -162,7 +166,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	ano_modclearerr();
 	func = function_cast<Module *(*)(const std::string &, const std::string &)>(dlsym(handle, "AnopeInit"));
-	if (func == NULL && (err = dlerror()) != NULL)
+	if (!func && (err = dlerror()))
 	{
 		Alog() << "No init function found, not an Anope module";
 		dlclose(handle);
@@ -170,9 +174,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	}
 
 	if (!func)
-	{
 		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
-	}
 
 	/* Create module. */
 	std::string nick;
@@ -187,7 +189,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	{
 		m = func(modname, nick);
 	}
-	catch (ModuleException &ex)
+	catch (const ModuleException &ex)
 	{
 		Alog() << "Error while loading " << modname << ": " << ex.GetReason();
 		return MOD_STOP;
@@ -210,18 +212,11 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		return MOD_STOP;
 	}
 	else if (v.GetBuild() < VERSION_BUILD)
-	{
 		Alog() << "Module " << modname << " is compiled against an older revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
-	}
 	else if (v.GetBuild() > VERSION_BUILD)
-	{
 		Alog() << "Module " << modname << " is compiled against a newer revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
-	}
 	else if (v.GetBuild() == VERSION_BUILD)
-	{
 		Alog(LOG_DEBUG) << "Module " << modname << " compiled against current version of Anope " << v.GetBuild();
-	}
-
 
 	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))
 	{
@@ -244,6 +239,16 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
 
 	return MOD_ERR_OK;
+}
+
+int ModuleManager::LoadModule(const char *modname, User *u)
+{
+	return LoadModule(std::string(modname), u);
+}
+
+int ModuleManager::LoadModule(const ci::string &modname, User *u)
+{
+	return LoadModule(std::string(modname.c_str()), u);
 }
 
 int ModuleManager::UnloadModule(Module *m, User *u)
@@ -281,33 +286,29 @@ void ModuleManager::DeleteModule(Module *m)
 	ano_module_t handle;
 
 	if (!m || !m->handle) /* check m is least possibly valid */
-	{
 		return;
-	}
 
 	DetachAll(m);
 	handle = m->handle;
 
 	ano_modclearerr();
 	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
-	if (destroy_func == NULL && (err = dlerror()) != NULL)
+	if (!destroy_func && (err = dlerror()))
 	{
 		Alog() << "No destroy function found, chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
 	}
 	else
-	{
 		destroy_func(m); /* Let the module delete it self, just in case */
-	}
 
 	if (handle)
 	{
-		if ((dlclose(handle)) != 0)
+		if (dlclose(handle))
 			Alog() << dlerror();
 	}
 }
 
-bool ModuleManager::Attach(Implementation i, Module* mod)
+bool ModuleManager::Attach(Implementation i, Module *mod)
 {
 	if (std::find(EventHandlers[i].begin(), EventHandlers[i].end(), mod) != EventHandlers[i].end())
 		return false;
@@ -316,7 +317,7 @@ bool ModuleManager::Attach(Implementation i, Module* mod)
 	return true;
 }
 
-bool ModuleManager::Detach(Implementation i, Module* mod)
+bool ModuleManager::Detach(Implementation i, Module *mod)
 {
 	std::vector<Module *>::iterator x = std::find(EventHandlers[i].begin(), EventHandlers[i].end(), mod);
 
@@ -327,19 +328,19 @@ bool ModuleManager::Detach(Implementation i, Module* mod)
 	return true;
 }
 
-void ModuleManager::Attach(Implementation* i, Module* mod, size_t sz)
+void ModuleManager::Attach(Implementation *i, Module *mod, size_t sz)
 {
 	for (size_t n = 0; n < sz; ++n)
 		Attach(i[n], mod);
 }
 
-void ModuleManager::DetachAll(Module* mod)
+void ModuleManager::DetachAll(Module *mod)
 {
 	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
 		Detach(static_cast<Implementation>(n), mod);
 }
 
-bool ModuleManager::SetPriority(Module* mod, Priority s)
+bool ModuleManager::SetPriority(Module *mod, Priority s)
 {
 	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
 		SetPriority(mod, static_cast<Implementation>(n), s);
@@ -347,7 +348,7 @@ bool ModuleManager::SetPriority(Module* mod, Priority s)
 	return true;
 }
 
-bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Module** modules, size_t sz)
+bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Module **modules, size_t sz)
 {
 	/** To change the priority of a module, we first find its position in the vector,
 	 * then we find the position of the other modules in the vector that this module
@@ -363,7 +364,7 @@ bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Modul
 	/* Locate our module. This is O(n) but it only occurs on module load so we're
 	 * not too bothered about it
 	 */
-	for (size_t x = 0; x != EventHandlers[i].size(); ++x)
+	for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
 	{
 		if (EventHandlers[i][x] == mod)
 		{
@@ -384,59 +385,58 @@ bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Modul
 		/* Dummy value */
 		case PRIORITY_DONTCARE:
 			swap = false;
-		break;
+			break;
 		/* Module wants to be first, sod everything else */
 		case PRIORITY_FIRST:
 			swap_pos = 0;
-		break;
+			break;
 		/* Module is submissive and wants to be last... awww. */
 		case PRIORITY_LAST:
 			if (EventHandlers[i].empty())
 				swap_pos = 0;
 			else
 				swap_pos = EventHandlers[i].size() - 1;
-		break;
+			break;
 		/* Place this module after a set of other modules */
 		case PRIORITY_AFTER:
-		{
-			/* Find the latest possible position */
-			swap_pos = 0;
-			swap = false;
-			for (size_t x = 0; x != EventHandlers[i].size(); ++x)
 			{
-				for (size_t n = 0; n < sz; ++n)
+				/* Find the latest possible position */
+				swap_pos = 0;
+				swap = false;
+				for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
 				{
-					if ((modules[n]) && (EventHandlers[i][x] == modules[n]) && (x >= swap_pos) && (source <= swap_pos))
+					for (size_t n = 0; n < sz; ++n)
 					{
-						swap_pos = x;
-						swap = true;
+						if (modules[n] && EventHandlers[i][x] == modules[n] && x >= swap_pos && source <= swap_pos)
+						{
+							swap_pos = x;
+							swap = true;
+						}
 					}
 				}
 			}
-		}
-		break;
+			break;
 		/* Place this module before a set of other modules */
 		case PRIORITY_BEFORE:
-		{
-			swap_pos = EventHandlers[i].size() - 1;
-			swap = false;
-			for (size_t x = 0; x != EventHandlers[i].size(); ++x)
 			{
-				for (size_t n = 0; n < sz; ++n)
+				swap_pos = EventHandlers[i].size() - 1;
+				swap = false;
+				for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
 				{
-					if ((modules[n]) && (EventHandlers[i][x] == modules[n]) && (x <= swap_pos) && (source >= swap_pos))
+					for (size_t n = 0; n < sz; ++n)
 					{
-						swap = true;
-						swap_pos = x;
+						if (modules[n] && EventHandlers[i][x] == modules[n] && x <= swap_pos && source >= swap_pos)
+						{
+							swap = true;
+							swap_pos = x;
+						}
 					}
 				}
 			}
-		}
-		break;
 	}
 
 	/* Do we need to swap? */
-	if (swap && (swap_pos != source))
+	if (swap && swap_pos != source)
 	{
 		/* Suggestion from Phoenix, "shuffle" the modules to better retain call order */
 		int incrmnt = 1;
@@ -446,10 +446,10 @@ bool ModuleManager::SetPriority(Module* mod, Implementation i, Priority s, Modul
 
 		for (unsigned int j = source; j != swap_pos; j += incrmnt)
 		{
-			if (( j + incrmnt > EventHandlers[i].size() - 1) || (j + incrmnt < 0))
+			if (j + incrmnt > EventHandlers[i].size() - 1 || j + incrmnt < 0)
 				continue;
 
-			std::swap(EventHandlers[i][j], EventHandlers[i][j+incrmnt]);
+			std::swap(EventHandlers[i][j], EventHandlers[i][j + incrmnt]);
 		}
 	}
 
@@ -471,7 +471,7 @@ void ModuleManager::ClearCallBacks(Module *m)
  */
 void ModuleManager::UnloadAll(bool unload_proto)
 {
-	for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end();)
+	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; )
 	{
 		Module *m = *it++;
 
@@ -482,4 +482,3 @@ void ModuleManager::UnloadAll(bool unload_proto)
 			break;
 	}
 }
-

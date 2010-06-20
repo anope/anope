@@ -3,14 +3,12 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
+
 #include "services.h"
 #include "modules.h"
 
-Command::Command(const ci::string &sname, size_t min_params, size_t max_params, const std::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
+Command::Command(const ci::string &sname, size_t min_params, size_t max_params, const ci::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
 	this->module = NULL;
 	this->service = NULL;
@@ -33,7 +31,7 @@ void Command::OnSyntaxError(User *u, const ci::string &subcommand)
 {
 }
 
-void Command::SetPermission(const std::string &reststr)
+void Command::SetPermission(const ci::string &reststr)
 {
 	this->permission = reststr;
 }
@@ -47,4 +45,3 @@ bool Command::DelSubcommand(const ci::string &cname)
 {
 	return false;
 }
-

@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -91,7 +89,7 @@ void common_unban(ChannelInfo *ci, const std::string &nick)
 	if (!ci->c->bans || !ci->c->bans->count)
 		return;
 
-	if (u->hostip == NULL)
+	if (!u->hostip)
 	{
 		host = host_resolve(u->host);
 		/* we store the just resolved hostname so we don't
@@ -108,14 +106,12 @@ void common_unban(ChannelInfo *ci, const std::string &nick)
 	if (ircd->svsmode_unban)
 		ircdproto->SendBanDel(ci->c, nick);
 	else
-	{
 		for (ban = ci->c->bans->entries; ban; ban = next)
 		{
 			next = ban->next;
 			if (entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->host, ip) || entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
 				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
-	}
 	/* host_resolve() sstrdup us this info so we gotta free it */
 	if (host)
 		delete [] host;

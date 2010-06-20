@@ -7,5 +7,4 @@
 #include "modules.h"
 #include "version.h"
 
-#endif
-
+#endif // MODULE_H

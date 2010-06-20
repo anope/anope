@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -20,7 +18,7 @@ Command *FindCommand(BotInfo *bi, const ci::string &name)
 {
 	if (!bi || bi->Commands.empty() || name.empty())
 		return NULL;
-	
+
 	std::map<ci::string, Command *>::iterator it = bi->Commands.find(name);
 
 	if (it != bi->Commands.end())
@@ -35,9 +33,7 @@ void mod_run_cmd(BotInfo *bi, User *u, const std::string &message)
 	ci::string cmd;
 
 	if (sep.GetToken(cmd))
-	{
 		mod_run_cmd(bi, u, FindCommand(bi, cmd), cmd, sep.GetRemaining().c_str());
-	}
 }
 
 void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, const ci::string &message)
@@ -58,15 +54,12 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, co
 		return;
 	}
 
-	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED))
+	// Command requires registered users only
+	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
-		// Command requires registered users only
-		if (!u->IsIdentified())
-		{
-			notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
-			Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << command;
-			return;
-		}
+		notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
+		Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << command;
+		return;
 	}
 
 	std::vector<ci::string> params;
@@ -81,9 +74,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, co
 			endparam += " ";
 		}
 		else
-		{
 			params.push_back(curparam);
-		}
 	}
 
 	if (!endparam.empty())
@@ -112,18 +103,16 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, co
 			ChannelInfo *ci = cs_findchan(params[0]);
 			if (ci)
 			{
-				if ((ci->HasFlag(CI_FORBIDDEN)) && (!c->HasFlag(CFLAG_ALLOW_FORBIDDEN)))
+				if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
 				{
 					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
-					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick
-						<< " and command " << command << " because of FORBIDDEN channel " << ci->name;
+					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << command << " because of FORBIDDEN channel " << ci->name;
 					return;
 				}
-				else if ((ci->HasFlag(CI_SUSPENDED)) && (!c->HasFlag(CFLAG_ALLOW_SUSPENDED)))
+				else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 				{
 					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
-					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick
-						<<" and command " << command << " because of SUSPENDED channel " << ci->name;
+					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick <<" and command " << command << " because of SUSPENDED channel " << ci->name;
 					return;
 				}
 			}
@@ -142,23 +131,17 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, co
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
-	if (!c->permission.empty())
+	if (!c->permission.empty() && !u->Account()->HasCommand(c->permission))
 	{
-		if (!u->Account()->HasCommand(c->permission))
-		{
-			notice_lang(bi->nick, u, ACCESS_DENIED);
-			Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << command;
-			return;
-		}
-
+		notice_lang(bi->nick, u, ACCESS_DENIED);
+		Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << command;
+		return;
 	}
 
 	ret = c->Execute(u, params);
 
 	if (ret == MOD_CONT)
-	{
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name.c_str(), params));
-	}
 }
 
 /**
@@ -173,7 +156,7 @@ void mod_help_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 {
 	if (!bi || !u || cmd.empty())
 		return;
-	
+
 	spacesepstream tokens(cmd);
 	ci::string token;
 	tokens.GetToken(token);
@@ -196,11 +179,10 @@ void mod_help_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 			notice_lang(bi->nick, u, COMMAND_IDENTIFY_REQUIRED);
 		/* User doesn't have the proper permission to use this command */
-		else if (!c->permission.empty() && (!u->Account() || (!u->Account()->HasCommand(c->permission))))
+		else if (!c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission)))
 			notice_lang(bi->nick, u, COMMAND_CANNOT_USE);
 		/* User can use this command */
 		else
 			notice_lang(bi->nick, u, COMMAND_CAN_USE);
 	}
 }
-

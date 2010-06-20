@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -64,7 +62,7 @@ void get_session_stats(long *nrec, long *memuse)
 {
 	long mem = sizeof(Session) * SessionList.size();
 
-	for (session_map::const_iterator it = SessionList.begin(); it != SessionList.end(); ++it)
+	for (session_map::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 	{
 		Session *session = it->second;
 
@@ -81,7 +79,8 @@ void get_exception_stats(long *nrec, long *memuse)
 	int i;
 
 	mem = sizeof(Exception) * nexceptions;
-	for (i = 0; i < nexceptions; i++) {
+	for (i = 0; i < nexceptions; ++i)
+	{
 		mem += strlen(exceptions[i].mask) + 1;
 		mem += strlen(exceptions[i].reason) + 1;
 	}
@@ -115,12 +114,14 @@ int add_session(const char *nick, const char *host, char *hostip)
 
 	session = findsession(host);
 
-	if (session) {
+	if (session)
+	{
 		exception = find_hostip_exception(host, hostip);
 
 		sessionlimit = exception ? exception->limit : Config.DefSessionLimit;
 
-		if (sessionlimit != 0 && session->count >= sessionlimit) {
+		if (sessionlimit != 0 && session->count >= sessionlimit)
+		{
 			if (Config.SessionLimitExceeded)
 				ircdproto->SendMessage(OperServ, nick, Config.SessionLimitExceeded, host);
 			if (Config.SessionLimitDetailsLoc)
@@ -133,11 +134,12 @@ int add_session(const char *nick, const char *host, char *hostip)
 			 * read users.c), so we must increment this here no matter what because it will either be
 			 * decremented in do_kill or in do_quit - Adam
 			 */
-			session->count++;
+			++session->count;
 			kill_user(Config.s_OperServ, nick, "Session limit exceeded");
 
-			session->hits++;
-			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill) {
+			++session->hits;
+			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
+			{
 				char akillmask[BUFSIZE];
 				snprintf(akillmask, sizeof(akillmask), "*@%s", host);
 				XLine *x = new XLine(ci::string("*@") + host, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
@@ -146,8 +148,10 @@ int add_session(const char *nick, const char *host, char *hostip)
 				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
 			}
 			return 0;
-		} else {
-			session->count++;
+		}
+		else
+		{
+			++session->count;
 			return 1;
 		}
 	}
@@ -164,12 +168,14 @@ int add_session(const char *nick, const char *host, char *hostip)
 
 void del_session(const char *host)
 {
-	if (!Config.LimitSessions) {
+	if (!Config.LimitSessions)
+	{
 		Alog(LOG_DEBUG) << "del_session called when LimitSessions is disabled";
 		return;
 	}
 
-	if (!host || !*host) {
+	if (!host || !*host)
+	{
 		Alog(LOG_DEBUG) << "del_session called with NULL values";
 		return;
 	}
@@ -178,8 +184,9 @@ void del_session(const char *host)
 
 	Session *session = findsession(host);
 
-	if (!session) {
-		if (debug) 
+	if (!session)
+	{
+		if (debug)
 		{
 			ircdproto->SendGlobops(OperServ, "WARNING: Tried to delete non-existant session: \2%s", host);
 			Alog(LOG_DEBUG) << "session: Tried to delete non-existant session: " << host;
@@ -187,8 +194,9 @@ void del_session(const char *host)
 		return;
 	}
 
-	if (session->count > 1) {
-		session->count--;
+	if (session->count > 1)
+	{
+		--session->count;
 		return;
 	}
 
@@ -202,7 +210,6 @@ void del_session(const char *host)
 	Alog(LOG_DEBUG_2) << "del_session() done";
 }
 
-
 /*************************************************************************/
 /********************** Internal Exception Functions *********************/
 /*************************************************************************/
@@ -212,21 +219,19 @@ void expire_exceptions()
 	int i;
 	time_t now = time(NULL);
 
-	for (i = 0; i < nexceptions; i++) {
-		if (exceptions[i].expires == 0 || exceptions[i].expires > now)
+	for (i = 0; i < nexceptions; ++i)
+	{
+		if (!exceptions[i].expires || exceptions[i].expires > now)
 			continue;
 		if (Config.WallExceptionExpire)
-			ircdproto->SendGlobops(OperServ,
-							 "Session limit exception for %s has expired.",
-							 exceptions[i].mask);
+			ircdproto->SendGlobops(OperServ, "Session limit exception for %s has expired.", exceptions[i].mask);
 		delete [] exceptions[i].mask;
 		delete [] exceptions[i].reason;
 		delete [] exceptions[i].who;
-		nexceptions--;
-		memmove(exceptions + i, exceptions + i + 1,
-				sizeof(Exception) * (nexceptions - i));
+		--nexceptions;
+		memmove(exceptions + i, exceptions + i + 1, sizeof(Exception) * (nexceptions - i));
 		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
-		i--;
+		--i;
 	}
 }
 
@@ -235,11 +240,9 @@ Exception *find_host_exception(const char *host)
 {
 	int i;
 
-	for (i = 0; i < nexceptions; i++) {
-		if ((Anope::Match(host, exceptions[i].mask, false))) {
+	for (i = 0; i < nexceptions; ++i)
+		if ((Anope::Match(host, exceptions[i].mask, false)))
 			return &exceptions[i];
-		}
-	}
 
 	return NULL;
 }
@@ -250,41 +253,37 @@ Exception *find_hostip_exception(const char *host, const char *hostip)
 {
 	int i;
 
-	for (i = 0; i < nexceptions; i++) {
-		if ((Anope::Match(host, exceptions[i].mask, false))
-			|| ((ircd->nickip && hostip)
-				&& (Anope::Match(hostip, exceptions[i].mask, false)))) {
+	for (i = 0; i < nexceptions; ++i)
+		if (Anope::Match(host, exceptions[i].mask, false) || ((ircd->nickip && hostip) && Anope::Match(hostip, exceptions[i].mask, false)))
 			return &exceptions[i];
-		}
-	}
 
 	return NULL;
 }
-
 
 /*************************************************************************/
 /************************ Exception Manipulation *************************/
 /*************************************************************************/
 
-int exception_add(User * u, const char *mask, const int limit,
-				  const char *reason, const char *who,
-				  const time_t expires)
+int exception_add(User *u, const char *mask, const int limit, const char *reason, const char *who, const time_t expires)
 {
 	int i;
 
 	/* Check if an exception already exists for this mask */
-	for (i = 0; i < nexceptions; i++) {
-		if (!stricmp(mask, exceptions[i].mask)) {
-			if (exceptions[i].limit != limit) {
+	for (i = 0; i < nexceptions; ++i)
+	{
+		if (!stricmp(mask, exceptions[i].mask))
+		{
+			if (exceptions[i].limit != limit)
+			{
 				exceptions[i].limit = limit;
 				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_CHANGED,
-								mask, exceptions[i].limit);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_CHANGED, mask, exceptions[i].limit);
 				return -2;
-			} else {
+			}
+			else
+			{
 				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_EXISTS,
-								mask);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_EXISTS, mask);
 				return -1;
 			}
 		}

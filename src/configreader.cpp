@@ -33,12 +33,12 @@ ConfigReader::ConfigReader(const std::string &filename) : data(new ConfigDataHas
 std::string ConfigReader::ReadValue(const std::string &tag, const std::string &name, const std::string &default_value, int index, bool allow_linefeeds)
 {
 	/* Don't need to strlcpy() tag and name anymore, ReadConf() takes const char* */
-	std::string result;
+	ci::string result;
 
-	if (!Config.ConfValue(*this->data, tag, name, default_value, index, result, allow_linefeeds))
+	if (!Config.ConfValue(*this->data, ci::string(tag.c_str()), ci::string(name.c_str()), ci::string(default_value.c_str()), index, result, allow_linefeeds))
 		this->error = CONF_VALUE_NOT_FOUND;
 
-	return result;
+	return result.c_str();
 }
 
 std::string ConfigReader::ReadValue(const std::string &tag, const std::string &name, int index, bool allow_linefeeds)
@@ -48,7 +48,7 @@ std::string ConfigReader::ReadValue(const std::string &tag, const std::string &n
 
 bool ConfigReader::ReadFlag(const std::string &tag, const std::string &name, const std::string &default_value, int index)
 {
-	return Config.ConfValueBool(*this->data, tag, name, default_value, index);
+	return Config.ConfValueBool(*this->data, ci::string(tag.c_str()), ci::string(name.c_str()), ci::string(default_value.c_str()), index);
 }
 
 bool ConfigReader::ReadFlag(const std::string &tag, const std::string &name, int index)
@@ -60,7 +60,7 @@ int ConfigReader::ReadInteger(const std::string &tag, const std::string &name, c
 {
 	int result;
 
-	if (!Config.ConfValueInteger(*this->data, tag, name, default_value, index, result))
+	if (!Config.ConfValueInteger(*this->data, ci::string(tag.c_str()), ci::string(name.c_str()), ci::string(default_value.c_str()), index, result))
 	{
 		this->error = CONF_VALUE_NOT_FOUND;
 		return 0;
@@ -99,7 +99,7 @@ int ConfigReader::Enumerate(const std::string &tag)
 
 int ConfigReader::EnumerateValues(const std::string &tag, int index)
 {
-	return Config.ConfVarEnum(*this->data, tag, index);
+	return Config.ConfVarEnum(*this->data, ci::string(tag.c_str()), index);
 }
 
 bool ConfigReader::Verify()

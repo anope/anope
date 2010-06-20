@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 /*************************************************************************/
@@ -20,113 +18,112 @@
 registered_channel_map RegisteredChannelList;
 
 static int def_levels[][2] = {
-	{ CA_AUTOOP,					 5 },
-	{ CA_AUTOVOICE,				  3 },
-	{ CA_AUTODEOP,				  -1 },
-	{ CA_NOJOIN,					-2 },
-	{ CA_INVITE,					 5 },
-	{ CA_AKICK,					 10 },
-	{ CA_SET,	 		ACCESS_QOP },
-	{ CA_CLEAR,   		ACCESS_FOUNDER },
-	{ CA_UNBAN,					  5 },
-	{ CA_OPDEOP,					 5 },
-	{ CA_ACCESS_LIST,				1 },
-	{ CA_ACCESS_CHANGE,			 10 },
-	{ CA_MEMO,					  10 },
-	{ CA_ASSIGN,  		ACCESS_FOUNDER },
-	{ CA_BADWORDS,				  10 },
-	{ CA_NOKICK,					 1 },
-	{ CA_FANTASIA,					 3 },
-	{ CA_SAY,						 5 },
-	{ CA_GREET,					  5 },
-	{ CA_VOICEME,					 3 },
-	{ CA_VOICE,						 5 },
-	{ CA_GETKEY,					 5 },
-	{ CA_AUTOHALFOP,				 4 },
-	{ CA_AUTOPROTECT,			   10 },
-	{ CA_OPDEOPME,				   5 },
-	{ CA_HALFOPME,				   4 },
-	{ CA_HALFOP,					 5 },
-	{ CA_PROTECTME,				 10 },
-	{ CA_PROTECT,  		ACCESS_QOP },
-	{ CA_KICKME,			   		 5 },
-	{ CA_KICK,					   5 },
-	{ CA_SIGNKICK, 		ACCESS_FOUNDER },
-	{ CA_BANME,					  5 },
-	{ CA_BAN,						5 },
-	{ CA_TOPIC,		 ACCESS_FOUNDER },
-	{ CA_INFO,		  ACCESS_QOP },
+	{ CA_AUTOOP,		5 },
+	{ CA_AUTOVOICE,		3 },
+	{ CA_AUTODEOP,		-1 },
+	{ CA_NOJOIN,		-2 },
+	{ CA_INVITE,		5 },
+	{ CA_AKICK,			10 },
+	{ CA_SET,			ACCESS_QOP },
+	{ CA_CLEAR,			ACCESS_FOUNDER },
+	{ CA_UNBAN,			5 },
+	{ CA_OPDEOP,		5 },
+	{ CA_ACCESS_LIST,	1 },
+	{ CA_ACCESS_CHANGE,	10 },
+	{ CA_MEMO,			10 },
+	{ CA_ASSIGN,		ACCESS_FOUNDER },
+	{ CA_BADWORDS,		10 },
+	{ CA_NOKICK,		1 },
+	{ CA_FANTASIA,		3 },
+	{ CA_SAY,			5 },
+	{ CA_GREET,			5 },
+	{ CA_VOICEME,		3 },
+	{ CA_VOICE,			5 },
+	{ CA_GETKEY,		5 },
+	{ CA_AUTOHALFOP,	4 },
+	{ CA_AUTOPROTECT,	10 },
+	{ CA_OPDEOPME,		5 },
+	{ CA_HALFOPME,		4 },
+	{ CA_HALFOP,		5 },
+	{ CA_PROTECTME,		10 },
+	{ CA_PROTECT,		ACCESS_QOP },
+	{ CA_KICKME,		5 },
+	{ CA_KICK,			5 },
+	{ CA_SIGNKICK,		ACCESS_FOUNDER },
+	{ CA_BANME,			5 },
+	{ CA_BAN,			5 },
+	{ CA_TOPIC,			ACCESS_FOUNDER },
+	{ CA_INFO,			ACCESS_QOP },
 	{ CA_AUTOOWNER,		ACCESS_QOP },
-	{ CA_OWNER,		ACCESS_FOUNDER },
+	{ CA_OWNER,			ACCESS_FOUNDER },
 	{ CA_OWNERME,		ACCESS_QOP },
 	{ CA_FOUNDER,		ACCESS_QOP },
 	{ -1 }
 };
 
-
 LevelInfo levelinfo[] = {
-	{ CA_AUTODEOP,	  "AUTODEOP",	 CHAN_LEVEL_AUTODEOP },
-	{ CA_AUTOHALFOP,	"AUTOHALFOP",   CHAN_LEVEL_AUTOHALFOP },
-	{ CA_AUTOOP,		"AUTOOP",	   CHAN_LEVEL_AUTOOP },
-	{ CA_AUTOPROTECT,   "AUTOPROTECT",  CHAN_LEVEL_AUTOPROTECT },
-	{ CA_AUTOVOICE,	 "AUTOVOICE",	CHAN_LEVEL_AUTOVOICE },
-	{ CA_NOJOIN,		"NOJOIN",	   CHAN_LEVEL_NOJOIN },
-	{ CA_SIGNKICK,	  "SIGNKICK",	 CHAN_LEVEL_SIGNKICK },
-	{ CA_ACCESS_LIST,   "ACC-LIST",	 CHAN_LEVEL_ACCESS_LIST },
-	{ CA_ACCESS_CHANGE, "ACC-CHANGE",   CHAN_LEVEL_ACCESS_CHANGE },
-	{ CA_AKICK,		 "AKICK",		CHAN_LEVEL_AKICK },
-	{ CA_SET,		   "SET",		  CHAN_LEVEL_SET },
-	{ CA_BAN,		   "BAN",		  CHAN_LEVEL_BAN },
-	{ CA_BANME,		 "BANME",		CHAN_LEVEL_BANME },
-	{ CA_CLEAR,		 "CLEAR",		CHAN_LEVEL_CLEAR },
-	{ CA_GETKEY,		"GETKEY",	   CHAN_LEVEL_GETKEY },
-	{ CA_HALFOP,		"HALFOP",	   CHAN_LEVEL_HALFOP },
-	{ CA_HALFOPME,	  "HALFOPME",	 CHAN_LEVEL_HALFOPME },
-	{ CA_INFO,		  "INFO",		 CHAN_LEVEL_INFO },
-	{ CA_KICK,		  "KICK",		 CHAN_LEVEL_KICK },
-	{ CA_KICKME,		"KICKME",	   CHAN_LEVEL_KICKME },
-	{ CA_INVITE,		"INVITE",	   CHAN_LEVEL_INVITE },
-	{ CA_OPDEOP,		"OPDEOP",	   CHAN_LEVEL_OPDEOP },
-	{ CA_OPDEOPME,	  "OPDEOPME",	 CHAN_LEVEL_OPDEOPME },
-	{ CA_PROTECT,	   "PROTECT",	  CHAN_LEVEL_PROTECT },
-	{ CA_PROTECTME,	 "PROTECTME",	CHAN_LEVEL_PROTECTME },
-	{ CA_TOPIC,		 "TOPIC",		CHAN_LEVEL_TOPIC },
-	{ CA_UNBAN,		 "UNBAN",		CHAN_LEVEL_UNBAN },
-	{ CA_VOICE,		 "VOICE",		CHAN_LEVEL_VOICE },
-	{ CA_VOICEME,	   "VOICEME",	  CHAN_LEVEL_VOICEME },
-	{ CA_MEMO,		  "MEMO",		 CHAN_LEVEL_MEMO },
-	{ CA_ASSIGN,		"ASSIGN",	   CHAN_LEVEL_ASSIGN },
-	{ CA_BADWORDS,	  "BADWORDS",	 CHAN_LEVEL_BADWORDS },
-	{ CA_FANTASIA,	  "FANTASIA",	 CHAN_LEVEL_FANTASIA },
-	{ CA_GREET,		"GREET",		CHAN_LEVEL_GREET },
-	{ CA_NOKICK,		"NOKICK",	   CHAN_LEVEL_NOKICK },
-	{ CA_SAY,		"SAY",		CHAN_LEVEL_SAY },
+	{ CA_AUTODEOP,		"AUTODEOP",		CHAN_LEVEL_AUTODEOP },
+	{ CA_AUTOHALFOP,	"AUTOHALFOP",	CHAN_LEVEL_AUTOHALFOP },
+	{ CA_AUTOOP,		"AUTOOP",		CHAN_LEVEL_AUTOOP },
+	{ CA_AUTOPROTECT,	"AUTOPROTECT",	CHAN_LEVEL_AUTOPROTECT },
+	{ CA_AUTOVOICE,		"AUTOVOICE",	CHAN_LEVEL_AUTOVOICE },
+	{ CA_NOJOIN,		"NOJOIN",		CHAN_LEVEL_NOJOIN },
+	{ CA_SIGNKICK,		"SIGNKICK",		CHAN_LEVEL_SIGNKICK },
+	{ CA_ACCESS_LIST,	"ACC-LIST",		CHAN_LEVEL_ACCESS_LIST },
+	{ CA_ACCESS_CHANGE,	"ACC-CHANGE",	CHAN_LEVEL_ACCESS_CHANGE },
+	{ CA_AKICK,			"AKICK",		CHAN_LEVEL_AKICK },
+	{ CA_SET,			"SET",			CHAN_LEVEL_SET },
+	{ CA_BAN,			"BAN",			CHAN_LEVEL_BAN },
+	{ CA_BANME,			"BANME",		CHAN_LEVEL_BANME },
+	{ CA_CLEAR,			"CLEAR",		CHAN_LEVEL_CLEAR },
+	{ CA_GETKEY,		"GETKEY",		CHAN_LEVEL_GETKEY },
+	{ CA_HALFOP,		"HALFOP",		CHAN_LEVEL_HALFOP },
+	{ CA_HALFOPME,		"HALFOPME",		CHAN_LEVEL_HALFOPME },
+	{ CA_INFO,			"INFO",			CHAN_LEVEL_INFO },
+	{ CA_KICK,			"KICK",			CHAN_LEVEL_KICK },
+	{ CA_KICKME,		"KICKME",		CHAN_LEVEL_KICKME },
+	{ CA_INVITE,		"INVITE",		CHAN_LEVEL_INVITE },
+	{ CA_OPDEOP,		"OPDEOP",		CHAN_LEVEL_OPDEOP },
+	{ CA_OPDEOPME,		"OPDEOPME",		CHAN_LEVEL_OPDEOPME },
+	{ CA_PROTECT,		"PROTECT",		CHAN_LEVEL_PROTECT },
+	{ CA_PROTECTME,		"PROTECTME",	CHAN_LEVEL_PROTECTME },
+	{ CA_TOPIC,			"TOPIC",		CHAN_LEVEL_TOPIC },
+	{ CA_UNBAN,			"UNBAN",		CHAN_LEVEL_UNBAN },
+	{ CA_VOICE,			"VOICE",		CHAN_LEVEL_VOICE },
+	{ CA_VOICEME,		"VOICEME",		CHAN_LEVEL_VOICEME },
+	{ CA_MEMO,			"MEMO",			CHAN_LEVEL_MEMO },
+	{ CA_ASSIGN,		"ASSIGN",		CHAN_LEVEL_ASSIGN },
+	{ CA_BADWORDS,		"BADWORDS",		CHAN_LEVEL_BADWORDS },
+	{ CA_FANTASIA,		"FANTASIA",		CHAN_LEVEL_FANTASIA },
+	{ CA_GREET,			"GREET",		CHAN_LEVEL_GREET },
+	{ CA_NOKICK,		"NOKICK",		CHAN_LEVEL_NOKICK },
+	{ CA_SAY,			"SAY",			CHAN_LEVEL_SAY },
 	{ CA_AUTOOWNER,		"AUTOOWNER",	CHAN_LEVEL_AUTOOWNER },
-	{ CA_OWNER,		"OWNER",	CHAN_LEVEL_OWNER },
-	{ CA_OWNERME,		"OWNERME",	CHAN_LEVEL_OWNERME },
-	{ CA_FOUNDER,		"FOUNDER",	CHAN_LEVEL_FOUNDER },
-		{ -1 }
+	{ CA_OWNER,			"OWNER",		CHAN_LEVEL_OWNER },
+	{ CA_OWNERME,		"OWNERME",		CHAN_LEVEL_OWNERME },
+	{ CA_FOUNDER,		"FOUNDER",		CHAN_LEVEL_FOUNDER },
+	{ -1 }
 };
 int levelinfo_maxwidth = 0;
 
 /*************************************************************************/
 
-void moduleAddChanServCmds() {
+void moduleAddChanServCmds()
+{
 	ModuleManager::LoadModuleList(Config.ChanServCoreModules);
 }
 
-/* *INDENT-ON* */
 /*************************************************************************/
 
 /* Returns modes for mlock in a nice way. */
 
-char *get_mlock_modes(ChannelInfo * ci, int complete)
+char *get_mlock_modes(ChannelInfo *ci, int complete)
 {
 	static char res[BUFSIZE];
 	char *end, *value;
 	ChannelMode *cm;
 	ChannelModeParam *cmp;
-	std::map<char, ChannelMode *>::iterator it;
+	std::map<char, ChannelMode *>::iterator it, it_end;
 	std::string param;
 
 	memset(&res, '\0', sizeof(res));
@@ -138,7 +135,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 		{
 			*end++ = '+';
 
-			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+			for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 			{
 				cm = it->second;
 
@@ -151,7 +148,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 		{
 			*end++ = '-';
 
-			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+			for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 			{
 				cm = it->second;
 
@@ -162,7 +159,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
 
 		if (ci->GetMLockCount(true) && complete)
 		{
-			for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+			for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 			{
 				cm = it->second;
 
@@ -197,11 +194,11 @@ void get_chanserv_stats(long *nrec, long *memuse)
 	long count = 0, mem = 0;
 	std::string param;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
-		count++;
+		++count;
 		mem += sizeof(*ci);
 		if (ci->desc)
 			mem += strlen(ci->desc) + 1;
@@ -231,12 +228,11 @@ void get_chanserv_stats(long *nrec, long *memuse)
 			mem += strlen(ci->forbidreason) + 1;
 		if (ci->levels)
 			mem += sizeof(*ci->levels) * CA_SIZE;
-		mem += ci->memos.memos.size() * sizeof(Memo);
-		for (unsigned j = 0; j < ci->memos.memos.size(); j++)
-		{
+		unsigned memos = ci->memos.memos.size();
+		mem += memos * sizeof(Memo);
+		for (unsigned j = 0; j < memos; ++j)
 			if (ci->memos.memos[j]->text)
 				mem += strlen(ci->memos.memos[j]->text) + 1;
-		}
 		if (ci->ttb)
 			mem += sizeof(*ci->ttb) * TTB_SIZE;
 		mem += ci->GetBadWordCount() * sizeof(BadWord);
@@ -263,7 +259,7 @@ void chanserv(User *u, const std::string &buf)
 {
 	if (!u || buf.empty())
 		return;
-	
+
 	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
 	{
 		std::string command = buf;
@@ -272,9 +268,7 @@ void chanserv(User *u, const std::string &buf)
 		ircdproto->SendCTCP(ChanServ, u->nick.c_str(), "%s", command.c_str());
 	}
 	else
-	{
 		mod_run_cmd(ChanServ, u, buf);
-	}
 }
 
 /*************************************************************************/
@@ -288,7 +282,7 @@ void check_modes(Channel *c)
 	time_t t = time(NULL);
 	ChannelInfo *ci;
 	ChannelMode *cm;
-	std::map<char, ChannelMode *>::iterator it;
+	std::map<char, ChannelMode *>::iterator it, it_end;
 	std::string param, ciparam;
 
 	if (!c)
@@ -320,13 +314,11 @@ void check_modes(Channel *c)
 	if (!(ci = c->ci))
 	{
 		if (c->HasMode(CMODE_REGISTERED))
-		{
 			c->RemoveMode(NULL, CMODE_REGISTERED);
-		}
 		return;
 	}
 
-	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+	for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 	{
 		cm = it->second;
 
@@ -352,13 +344,11 @@ void check_modes(Channel *c)
 
 			/* If the channel doesnt have the mode, or it does and it isn't set correctly */
 			if (!c->HasMode(cm->Name) || (!param.empty() && !ciparam.empty() && param != ciparam))
-			{
 				c->SetMode(NULL, cm, ciparam);
-			}
 		}
 	}
 
-	for (it = ModeManager::ChannelModesByChar.begin(); it != ModeManager::ChannelModesByChar.end(); ++it)
+	for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 	{
 		cm = it->second;
 
@@ -384,7 +374,7 @@ void check_modes(Channel *c)
 
 /*************************************************************************/
 
-int check_valid_admin(User * user, Channel * chan, int servermode)
+int check_valid_admin(User *user, Channel *chan, int servermode)
 {
 	ChannelMode *cm;
 
@@ -420,7 +410,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
  * aren't, deop them.  If serverop is 1, the +o was done by a server.
  * Return 1 if the user is allowed to be opped, 0 otherwise. */
 
-int check_valid_op(User * user, Channel * chan, int servermode)
+int check_valid_op(User *user, Channel *chan, int servermode)
 {
 	ChannelMode *owner, *protect, *halfop;
 	if (!chan || !chan->ci)
@@ -507,7 +497,8 @@ void restore_topic(const char *chan)
 		return;
 	/* We can be sure that the topic will be in sync when we return -GD */
 	c->topic_sync = 1;
-	if (!(ci->HasFlag(CI_KEEPTOPIC))) {
+	if (!(ci->HasFlag(CI_KEEPTOPIC)))
+	{
 		/* We need to reset the topic here, since it's currently empty and
 		 * should be updated with a TOPIC from the IRCd soon. -GD
 		 */
@@ -518,26 +509,25 @@ void restore_topic(const char *chan)
 	}
 	if (c->topic)
 		delete [] c->topic;
-	if (ci->last_topic) {
+	if (ci->last_topic)
+	{
 		c->topic = sstrdup(ci->last_topic);
 		c->topic_setter = ci->last_topic_setter;
 		c->topic_time = ci->last_topic_time;
-	} else {
+	}
+	else
+	{
 		c->topic = NULL;
 		c->topic_setter = whosends(ci)->nick;
 	}
-	if (ircd->join2set) {
-		if (whosends(ci) == ChanServ) {
-			ircdproto->SendJoin(ChanServ, chan, c->creation_time);
-			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
-		}
+	if (ircd->join2set && whosends(ci) == ChanServ)
+	{
+		ircdproto->SendJoin(ChanServ, chan, c->creation_time);
+		c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 	}
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
-	if (ircd->join2set) {
-		if (whosends(ci) == ChanServ) {
-			ircdproto->SendPart(ChanServ, c, NULL);
-		}
-	}
+	if (ircd->join2set && whosends(ci) == ChanServ)
+		ircdproto->SendPart(ChanServ, c, NULL);
 }
 
 /*************************************************************************/
@@ -545,40 +535,45 @@ void restore_topic(const char *chan)
 /* See if the topic is locked on the given channel, and return 1 (and fix
  * the topic) if so. */
 
-int check_topiclock(Channel * c, time_t topic_time)
+int check_topiclock(Channel *c, time_t topic_time)
 {
 	ChannelInfo *ci;
 
-	if (!c) 
+	if (!c)
 	{
 		Alog(LOG_DEBUG) << "check_topiclock called with NULL values";
 		return 0;
 	}
 
-	if (!(ci = c->ci) || !(ci->HasFlag(CI_TOPICLOCK)))
+	if (!(ci = c->ci) || !ci->HasFlag(CI_TOPICLOCK))
 		return 0;
 
 	if (c->topic)
 		delete [] c->topic;
-	if (ci->last_topic) {
+	if (ci->last_topic)
+	{
 		c->topic = sstrdup(ci->last_topic);
 		c->topic_setter = ci->last_topic_setter;
-	} else {
+	}
+	else
+	{
 		c->topic = NULL;
 		/* Bot assigned & Symbiosis ON?, the bot will set the topic - doc */
 		/* Altough whosends() also checks for Config.BSMinUsers -GD */
 		c->topic_setter = whosends(ci)->nick;
 	}
 
-	if (ircd->topictsforward) {
+	if (ircd->topictsforward)
+	{
 		/* Because older timestamps are rejected */
 		/* Some how the topic_time from do_topic is 0 set it to current + 1 */
-		if (!topic_time) {
+		if (!topic_time)
 			c->topic_time = time(NULL) + 1;
-		} else {
+		else
 			c->topic_time = topic_time + 1;
-		}
-	} else {
+	}
+	else
+	{
 		/* If no last topic, we can't use last topic time! - doc */
 		if (ci->last_topic)
 			c->topic_time = ci->last_topic_time;
@@ -586,20 +581,16 @@ int check_topiclock(Channel * c, time_t topic_time)
 			c->topic_time = time(NULL) + 1;
 	}
 
-	if (ircd->join2set) {
-		if (whosends(ci) == ChanServ) {
-			ircdproto->SendJoin(ChanServ, c->name.c_str(), c->creation_time);
-			c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
-		}
+	if (ircd->join2set && whosends(ci) == ChanServ)
+	{
+		ircdproto->SendJoin(ChanServ, c->name.c_str(), c->creation_time);
+		c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 	}
 
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 
-	if (ircd->join2set) {
-		if (whosends(ci) == ChanServ) {
-			ircdproto->SendPart(ChanServ, c, NULL);
-		}
-	}
+	if (ircd->join2set && whosends(ci) == ChanServ)
+		ircdproto->SendPart(ChanServ, c, NULL);
 	return 1;
 }
 
@@ -611,10 +602,10 @@ void expire_chans()
 {
 	if (!Config.CSExpire)
 		return;
-	
+
 	time_t now = time(NULL);
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end();)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
 	{
 		ChannelInfo *ci = it->second;
 		++it;
@@ -638,39 +629,44 @@ void expire_chans()
 /*************************************************************************/
 
 // XXX this is slightly inefficient
-void cs_remove_nick(const NickCore * nc)
+void cs_remove_nick(const NickCore *nc)
 {
 	int j;
 	ChanAccess *ca;
 	AutoKick *akick;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
-		if (ci->founder == nc) {
-			if (ci->successor) {
+		if (ci->founder == nc)
+		{
+			if (ci->successor)
+			{
 				NickCore *nc2 = ci->successor;
-				if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg) {
-					Alog() << Config.s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel", 
+				if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg)
+				{
+					Alog() << Config.s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel",
 					delete ci;
 					continue;
-				} else {
+				}
+				else
+				{
 					Alog() << Config.s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
 					ci->founder = nc2;
 					ci->successor = NULL;
 					nc2->channelcount++;
 				}
-			} else {
+			}
+			else
+			{
 				Alog() << Config.s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
 
-				if ((ModeManager::FindChannelModeByName(CMODE_REGISTERED)))
+				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 				{
 					/* Maybe move this to delchan() ? */
 					if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
-					{
 						ci->c->RemoveMode(NULL, CMODE_REGISTERED);
-					}
 				}
 
 				delete ci;
@@ -727,14 +723,12 @@ ChannelInfo *cs_findchan(const ci::string &chan)
  * the user does _not_ have access to the channel (i.e. matches the NOJOIN
  * criterion). */
 
-int check_access(User * user, ChannelInfo * ci, int what)
+int check_access(User *user, ChannelInfo *ci, int what)
 {
-	int level;
-	int limit;
+	int level, limit;
 
-	if (!user || !ci) {
+	if (!user || !ci)
 		return 0;
-	}
 
 	level = get_access(user, ci);
 	limit = ci->levels[what];
@@ -745,16 +739,16 @@ int check_access(User * user, ChannelInfo * ci, int what)
 
 	/* Superadmin always wins. Always. */
 	if (user->isSuperAdmin)
-		return (what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1);
+		return what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1;
 	/* If the access of the level we are checking is disabled, they *always* get denied */
 	if (limit == ACCESS_INVALID)
 		return 0;
 	/* If the level of the user is >= the level for "founder" of this channel and "founder" isn't disabled, they can do anything */
 	if (ci->levels[CA_FOUNDER] != ACCESS_INVALID && level >= ci->levels[CA_FOUNDER])
-		return (what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1);
+		return what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1;
 
 	/* Hacks to make flags work */
-	if (what == CA_AUTODEOP && (ci->HasFlag(CI_SECUREOPS)) && level == 0)
+	if (what == CA_AUTODEOP && (ci->HasFlag(CI_SECUREOPS)) && !level)
 		return 1;
 
 	if (what == CA_AUTODEOP || what == CA_NOJOIN)
@@ -769,7 +763,7 @@ int check_access(User * user, ChannelInfo * ci, int what)
 
 /* Reset channel access level values to their default state. */
 
-void reset_levels(ChannelInfo * ci)
+void reset_levels(ChannelInfo *ci)
 {
 	int i;
 
@@ -782,7 +776,7 @@ void reset_levels(ChannelInfo * ci)
 	if (ci->levels)
 		delete [] ci->levels;
 	ci->levels = new int16[CA_SIZE];
-	for (i = 0; def_levels[i][0] >= 0; i++)
+	for (i = 0; def_levels[i][0] >= 0; ++i)
 		ci->levels[def_levels[i][0]] = def_levels[i][1];
 }
 
@@ -806,7 +800,6 @@ bool IsFounder(User *user, ChannelInfo *ci)
 
 	return false;
 }
-
 
 /** Return the access level for the user on the channel.
  * If the channel doesn't exist, the user isn't on the access list, or the
@@ -849,15 +842,14 @@ int get_access(User *user, ChannelInfo *ci)
 
 /*************************************************************************/
 
-void update_cs_lastseen(User * user, ChannelInfo * ci)
+void update_cs_lastseen(User *user, ChannelInfo *ci)
 {
 	ChanAccess *access;
 
 	if (!ci || !user || !user->Account())
 		return;
 
-	if (IsFounder(user, ci) || user->IsIdentified()
-		|| (user->IsRecognized() && !ci->HasFlag(CI_SECURE)))
+	if (IsFounder(user, ci) || user->IsIdentified() || (user->IsRecognized() && !ci->HasFlag(CI_SECURE)))
 		if ((access = ci->GetAccess(user->Account())))
 			access->last_seen = time(NULL);
 }
@@ -867,7 +859,7 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 /* Returns the best ban possible for an user depending of the bantype
    value. */
 
-int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen)
+int get_idealban(ChannelInfo *ci, User *u, char *ret, int retlen)
 {
 	char *mask;
 
@@ -876,38 +868,35 @@ int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen)
 
 	std::string vident = u->GetIdent();
 
-	switch (ci->bantype) {
-	case 0:
-		snprintf(ret, retlen, "*!%s@%s", vident.c_str(),
-				 u->GetDisplayedHost().c_str());
-		return 1;
-	case 1:
-		if (vident[0] == '~')
-			snprintf(ret, retlen, "*!*%s@%s",
-				vident.c_str(), u->GetDisplayedHost().c_str());
-		else
-			snprintf(ret, retlen, "*!%s@%s",
-				vident.c_str(), u->GetDisplayedHost().c_str());
+	switch (ci->bantype)
+	{
+		case 0:
+			snprintf(ret, retlen, "*!%s@%s", vident.c_str(), u->GetDisplayedHost().c_str());
+			return 1;
+		case 1:
+			if (vident[0] == '~')
+				snprintf(ret, retlen, "*!*%s@%s", vident.c_str(), u->GetDisplayedHost().c_str());
+			else
+				snprintf(ret, retlen, "*!%s@%s", vident.c_str(), u->GetDisplayedHost().c_str());
 
-		return 1;
-	case 2:
-		snprintf(ret, retlen, "*!*@%s", u->GetDisplayedHost().c_str());
-		return 1;
-	case 3:
-		mask = create_mask(u);
-		snprintf(ret, retlen, "*!%s", mask);
-		delete [] mask;
-		return 1;
+			return 1;
+		case 2:
+			snprintf(ret, retlen, "*!*@%s", u->GetDisplayedHost().c_str());
+			return 1;
+		case 3:
+			mask = create_mask(u);
+			snprintf(ret, retlen, "*!%s", mask);
+			delete [] mask;
+			return 1;
 
-	default:
-		return 0;
+		default:
+			return 0;
 	}
 }
 
-
 /*************************************************************************/
 
-int get_access_level(ChannelInfo * ci, NickAlias * na)
+int get_access_level(ChannelInfo *ci, NickAlias *na)
 {
 	ChanAccess *access;
 
@@ -929,10 +918,10 @@ int get_access_level(ChannelInfo *ci, NickCore *nc)
 {
 	if (!ci || !nc)
 		return 0;
-	
+
 	if (nc == ci->founder)
 		return ACCESS_FOUNDER;
-	
+
 	ChanAccess *access = ci->GetAccess(nc);
 
 	if (!access)
@@ -974,7 +963,7 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 	if (!ci)
 		return NULL;
 
-	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+	for (unsigned i = 0, akicks = ci->GetAkickCount(); i < akicks; ++i)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
@@ -994,22 +983,24 @@ AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 
 /* Ban the stuck mask in a safe manner. */
 
-void stick_mask(ChannelInfo * ci, AutoKick * akick)
+void stick_mask(ChannelInfo *ci, AutoKick *akick)
 {
 	Entry *ban;
 
-	if (!ci) {
+	if (!ci)
 		return;
-	}
 
-	if (ci->c->bans && ci->c->bans->entries != 0) {
-		for (ban = ci->c->bans->entries; ban; ban = ban->next) {
+	if (ci->c->bans && ci->c->bans->entries)
+	{
+		for (ban = ci->c->bans->entries; ban; ban = ban->next)
+		{
 			/* If akick is already covered by a wider ban.
 			   Example: c->bans[i] = *!*@*.org and akick->u.mask = *!*@*.epona.org */
 			if (entry_match_mask(ban, akick->mask.c_str(), 0))
 				return;
 
-			if (ircd->reversekickcheck) {
+			if (ircd->reversekickcheck)
+			{
 				/* If akick is wider than a ban already in place.
 				   Example: c->bans[i] = *!*@irc.epona.org and akick->u.mask = *!*@*.epona.org */
 				if (Anope::Match(ban->mask, akick->mask.c_str(), false))
@@ -1024,12 +1015,12 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 
 /* Ban the stuck mask in a safe manner. */
 
-void stick_all(ChannelInfo * ci)
+void stick_all(ChannelInfo *ci)
 {
 	if (!ci)
 		return;
 
-	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+	for (unsigned i = 0, akicks = ci->GetAkickCount(); i < akicks; ++i)
 	{
 		AutoKick *akick = ci->GetAkick(i);
 
@@ -1050,17 +1041,16 @@ void ChanServTimer::Tick(time_t)
 {
 	if (!c->ci)
 		return;
-	
+
 	c->ci->UnsetFlag(CI_INHABIT);
 
 	/* If the channel has users again, don't part it and halt */
 	if (!c->users.empty())
 		return;
-	
+
 	ircdproto->SendPart(ChanServ, c, NULL);
-	
+
 	/* Now delete the channel as it is empty */
 	if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))
 		delete c;
 }
-

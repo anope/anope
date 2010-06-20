@@ -8,9 +8,7 @@ static DWORD WINAPI entry_point(void *parameter)
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
 	if (!thread->GetExitState())
-	{
 		thread->Join();
-	}
 	delete thread;
 	return 0;
 }
@@ -106,4 +104,3 @@ void Condition::Wait()
 	WaitForSingleObject(cond, INFINITE);
 	EnterCriticalSection(&mutex);
 }
-

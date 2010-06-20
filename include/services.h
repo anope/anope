@@ -22,9 +22,9 @@
 
 /* Some SUN fixs */
 #ifdef __sun
- /* Solaris specific code, types that do not exist in Solaris'
-  * sys/types.h
-  **/
+/* Solaris specific code, types that do not exist in Solaris'
+ * sys/types.h
+ */
 # undef u_int8_t
 # undef u_int16_t
 # undef u_int32_t
@@ -39,7 +39,6 @@
 # endif
 #endif
 
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,7 +49,7 @@
 #include <errno.h>
 #include <limits.h>
 
-#include <sys/stat.h>   /* for umask() on some systems */
+#include <sys/stat.h> /* for umask() on some systems */
 #include <sys/types.h>
 #include <assert.h>
 #include <fcntl.h>
@@ -98,9 +97,9 @@ extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size
 
 /* Telling compilers about printf()-like functions: */
 #ifdef __GNUC__
-# define FORMAT(type,fmt,start) __attribute__((format(type,fmt,start)))
+# define FORMAT(type, fmt, start) __attribute__((format(type, fmt, start)))
 #else
-# define FORMAT(type,fmt,start)
+# define FORMAT(type, fmt, start)
 #endif
 
 #ifdef HAVE_GETTIMEOFDAY
@@ -117,12 +116,12 @@ extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size
 
 #ifndef va_copy
 # ifdef __va_copy
-#  define VA_COPY(DEST,SRC) __va_copy((DEST),(SRC))
+#  define VA_COPY(DEST,SRC) __va_copy((DEST), (SRC))
 # else
 #  define VA_COPY(DEST, SRC) memcpy ((&DEST), (&SRC), sizeof(va_list))
 # endif
 #else
-# define VA_COPY(DEST, SRC) va_copy(DEST, SRC)
+# define VA_COPY(DEST, SRC) va_copy((DEST), (SRC))
 #endif
 
 #ifdef _AIX
@@ -149,12 +148,11 @@ extern int strncasecmp(const char *, const char *, size_t);
 #define toupper toupper_
 
 #ifdef __WINS__
-#ifndef BKCHECK
-#define BKCHECK
-  extern "C" void __pfnBkCheck() {}
+# ifndef BKCHECK
+#  define BKCHECK
+extern "C" void __pfnBkCheck() {}
+#  endif
 #endif
-#endif
-
 
 #if INTTYPE_WORKAROUND
 # undef int16
@@ -166,38 +164,37 @@ extern int strncasecmp(const char *, const char *, size_t);
  * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
 #ifdef _WIN32
-	#define MODULE_INIT(x) \
-		extern "C" DllExport Module *AnopeInit(const std::string &, const std::string &); \
-		extern "C" Module *AnopeInit(const std::string &modname, const std::string &creator) \
+# define MODULE_INIT(x) \
+	extern "C" DllExport Module *AnopeInit(const std::string &, const std::string &); \
+	extern "C" Module *AnopeInit(const std::string &modname, const std::string &creator) \
+	{ \
+		return new x(modname, creator); \
+	} \
+	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
+	{ \
+		switch (nReason) \
 		{ \
-			return new x(modname, creator); \
+			case DLL_PROCESS_ATTACH: \
+			case DLL_PROCESS_DETACH: \
+				break; \
 		} \
-		BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
-		{ \
-			switch ( nReason ) \
-			{ \
-				case DLL_PROCESS_ATTACH: \
-				case DLL_PROCESS_DETACH: \
-					break; \
-			} \
-			return TRUE; \
-		} \
-		extern "C" DllExport void AnopeFini(x *); \
-		extern "C" void AnopeFini(x *m) \
-		{ \
-			delete m; \
-		}
-
+		return TRUE; \
+	} \
+	extern "C" DllExport void AnopeFini(x *); \
+	extern "C" void AnopeFini(x *m) \
+	{ \
+		delete m; \
+	}
 #else
-	#define MODULE_INIT(x) \
-		extern "C" DllExport Module *AnopeInit(const std::string &modname, const std::string &creator) \
-		{ \
-			return new x(modname, creator); \
-		} \
-		extern "C" DllExport void AnopeFini(x *m) \
-		{ \
-			delete m; \
-		}
+# define MODULE_INIT(x) \
+	extern "C" DllExport Module *AnopeInit(const std::string &modname, const std::string &creator) \
+	{ \
+		return new x(modname, creator); \
+	} \
+	extern "C" DllExport void AnopeFini(x *m) \
+	{ \
+		delete m; \
+	}
 #endif
 
 /* Miscellaneous definitions. */
@@ -235,11 +232,19 @@ class CoreException : public std::exception
 	CoreException() : err("Core threw an exception"), source("The core") {}
 	/** This constructor can be used to specify an error message before throwing.
 	 */
+	CoreException(const char *message) : err(message), source("The core") {}
 	CoreException(const std::string &message) : err(message), source("The core") {}
+	CoreException(const ci::string &message) : err(message.c_str()), source("The core") {}
 	/** This constructor can be used to specify an error message before throwing,
 	 * and to specify the source of the exception.
 	 */
+	CoreException(const char *message, const char *src) : err(message), source(src) {}
+	CoreException(const std::string &message, const char *src) : err(message), source(src) {}
+	CoreException(const ci::string &message, const char *src) : err(message.c_str()), source(src) {}
 	CoreException(const std::string &message, const std::string &src) : err(message), source(src) {}
+	CoreException(const ci::string &message, const std::string &src) : err(message.c_str()), source(src) {}
+	CoreException(const std::string &message, const ci::string &src) : err(message), source(src.c_str()) {}
+	CoreException(const ci::string &message, const ci::string &src) : err(message.c_str()), source(src.c_str()) {}
 	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
@@ -248,12 +253,12 @@ class CoreException : public std::exception
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
-	virtual const char* GetReason() const
+	virtual const char *GetReason() const
 	{
 		return err.c_str();
 	}
 
-	virtual const char* GetSource() const
+	virtual const char *GetSource() const
 	{
 		return source.c_str();
 	}
@@ -268,7 +273,9 @@ class ModuleException : public CoreException
 
 	/** This constructor can be used to specify an error message before throwing.
 	 */
+	ModuleException(const char *message) : CoreException(message, "A Module") {}
 	ModuleException(const std::string &message) : CoreException(message, "A Module") {}
+	ModuleException(const ci::string &message) : CoreException(message, "A Module") {}
 	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
@@ -356,10 +363,6 @@ class Server;
 struct EList;
 struct Session;
 
-typedef struct bandata_ BanData;
-typedef struct mailinfo_ MailInfo;
-typedef struct exception_ Exception;
-
 #include "extensible.h"
 #include "threadengine.h"
 #include "bots.h"
@@ -370,46 +373,45 @@ typedef struct exception_ Exception;
 
 /* Protocol tweaks */
 
-typedef struct ircdvars_ IRCDVar;
-
-struct ircdvars_ {
+struct IRCDVar
+{
 	const char *name;				/* Name of the IRCd command */
-	const char *pseudoclient_mode;			/* Mode used by BotServ Bots	*/
-	int max_symbols;			/* Chan Max Symbols		*/
-	const char *botchanumode;			/* Modes set when botserv joins a channel */
-	int svsnick;				/* Supports SVSNICK		*/
-	int vhost;				/* Supports vhost		*/
-	int snline;				/* Supports SNline		*/
-	int sqline;				/* Supports SQline		*/
-	int szline;				/* Supports SZline		*/
-	int numservargs;			/* Number of Server Args	*/
-	int join2set;				/* Join 2 Set Modes		*/
-	int join2msg;				/* Join 2 Message		*/
-	int topictsforward;			/* TS on Topics Forward		*/
-	int topictsbackward;			/* TS on Topics Backward	*/
-	int chansqline;				/* Supports Channel Sqlines	*/
-	int quitonkill;				/* IRCD sends QUIT when kill	*/
-	int svsmode_unban;			/* svsmode can be used to unban	*/
-	int reversekickcheck;			/* Can reverse ban check	*/
-	int vident;				/* Supports vidents		*/
-	int svshold;				/* Supports svshold		*/
-	int tsonmode;				/* Timestamp on mode changes	*/
-	int nickip;					/* Sends IP on NICK		*/
-	int omode;					/* On the fly o:lines		*/
-	int umode;					/* change user modes		*/
-	int nickvhost;				/* Users vhost sent during NICK */
-	int chgreal;				/* Change RealName		*/
-	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
-	int token;					/* Does Anope support the tokens for the ircd */
+	const char *pseudoclient_mode;	/* Mode used by BotServ Bots */
+	int max_symbols;				/* Chan Max Symbols */
+	const char *botchanumode;		/* Modes set when botserv joins a channel */
+	int svsnick;					/* Supports SVSNICK */
+	int vhost;						/* Supports vhost */
+	int snline;						/* Supports SNline */
+	int sqline;						/* Supports SQline */
+	int szline;						/* Supports SZline */
+	int numservargs;				/* Number of Server Args */
+	int join2set;					/* Join 2 Set Modes */
+	int join2msg;					/* Join 2 Message */
+	int topictsforward;				/* TS on Topics Forward */
+	int topictsbackward;			/* TS on Topics Backward */
+	int chansqline;					/* Supports Channel Sqlines */
+	int quitonkill;					/* IRCD sends QUIT when kill */
+	int svsmode_unban;				/* svsmode can be used to unban */
+	int reversekickcheck;			/* Can reverse ban check */
+	int vident;						/* Supports vidents */
+	int svshold;					/* Supports svshold */
+	int tsonmode;					/* Timestamp on mode changes */
+	int nickip;						/* Sends IP on NICK */
+	int omode;						/* On the fly o:lines */
+	int umode;						/* change user modes */
+	int nickvhost;					/* Users vhost sent during NICK */
+	int chgreal;					/* Change RealName */
+	int knock_needs_i;				/* Check if we needed +i when setting NOKNOCK */
+	int token;						/* Does Anope support the tokens for the ircd */
 	int sjb64;
-	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
+	int svsmode_ucmode;				/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
-	int ts6;					/* ircd is TS6 */
-	int p10;					/* ircd is P10  */
-	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
-							 * 0 for no support, 1 for strict cidr support, anything else
-							 * for ircd specific support (nefarious only cares about first /mask) */
-	const char *globaltldprefix;		/* TLD prefix used for Global */
+	int ts6;						/* ircd is TS6 */
+	int p10;						/* ircd is P10  */
+	int cidrchanbei;				/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
+									 * 0 for no support, 1 for strict cidr support, anything else
+									 * for ircd specific support (nefarious only cares about first /mask) */
+	const char *globaltldprefix;	/* TLD prefix used for Global */
 	unsigned maxmodes;				/* Max modes to send per line */
 };
 
@@ -438,11 +440,11 @@ class Memo : public Flags<MemoFlag>
 	char *text;
 };
 
-typedef struct {
+struct MemoInfo
+{
 	int16 memomax;
 	std::vector<Memo *> memos;
-} MemoInfo;
-
+};
 
 /*************************************************************************/
 
@@ -529,7 +531,7 @@ enum AccessLevel
 struct ChanAccess
 {
 	int16 level;
-	NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
+	NickCore *nc; /* Guaranteed to be non-NULL if in use, NULL if not */
 	time_t last_seen;
 	std::string creator;
 };
@@ -580,48 +582,50 @@ struct BadWord
 };
 
 /* Indices for cmd_access[]: */
-#define CA_INVITE			0
-#define CA_AKICK			1
-#define CA_SET				2	/* but not FOUNDER or PASSWORD */
-#define CA_UNBAN			3
-#define CA_AUTOOP			4
-#define CA_AUTODEOP			5	/* Maximum, not minimum */
-#define CA_AUTOVOICE			6
-#define CA_OPDEOP			7	/* ChanServ commands OP and DEOP */
-#define CA_ACCESS_LIST			8
-#define CA_CLEAR			9
-#define CA_NOJOIN			10	/* Maximum */
-#define CA_ACCESS_CHANGE 		11
-#define CA_MEMO				12
-#define CA_ASSIGN	   		13  /* BotServ ASSIGN command */
-#define CA_BADWORDS	 		14  /* BotServ BADWORDS command */
-#define CA_NOKICK	   		15  /* Not kicked by the bot */
-#define CA_FANTASIA   			16
-#define CA_SAY				17
-#define CA_GREET					18
-#define CA_VOICEME			19
-#define CA_VOICE			20
-#define CA_GETKEY		   		21
-#define CA_AUTOHALFOP			22
-#define CA_AUTOPROTECT			23
-#define CA_OPDEOPME		 		24
-#define CA_HALFOPME		 		25
-#define CA_HALFOP		   		26
-#define CA_PROTECTME				27
-#define CA_PROTECT		  		28
-#define CA_KICKME		   		29
-#define CA_KICK			 		30
-#define CA_SIGNKICK			31
-#define CA_BANME					32
-#define CA_BAN			  		33
-#define CA_TOPIC					34
-#define CA_INFO			 		35
-#define CA_AUTOOWNER			36
-#define CA_OWNER			37
-#define CA_OWNERME			38
-#define CA_FOUNDER			39
-
-#define CA_SIZE		40
+enum ChannelAccess
+{
+	CA_INVITE,
+	CA_AKICK,
+	CA_SET,			/* but not FOUNDER or PASSWORD */
+	CA_UNBAN,
+	CA_AUTOOP,
+	CA_AUTODEOP,	/* Maximum, not minimum */
+	CA_AUTOVOICE,
+	CA_OPDEOP,		/* ChanServ commands OP and DEOP */
+	CA_ACCESS_LIST,
+	CA_CLEAR,
+	CA_NOJOIN,		/* Maximum */
+	CA_ACCESS_CHANGE,
+	CA_MEMO,
+	CA_ASSIGN,		/* BotServ ASSIGN command */
+	CA_BADWORDS,	/* BotServ BADWORDS command */
+	CA_NOKICK,		/* Not kicked by the bot */
+	CA_FANTASIA,
+	CA_SAY,
+	CA_GREET,
+	CA_VOICEME,
+	CA_VOICE,
+	CA_GETKEY,
+	CA_AUTOHALFOP,
+	CA_AUTOPROTECT,
+	CA_OPDEOPME,
+	CA_HALFOPME,
+	CA_HALFOP,
+	CA_PROTECTME,
+	CA_PROTECT,
+	CA_KICKME,
+	CA_KICK,
+	CA_SIGNKICK,
+	CA_BANME,
+	CA_BAN,
+	CA_TOPIC,
+	CA_INFO,
+	CA_AUTOOWNER,
+	CA_OWNER,
+	CA_OWNERME,
+	CA_FOUNDER,
+	CA_SIZE
+};
 
 /* BotServ SET flags */
 enum BotServFlag
@@ -671,11 +675,12 @@ enum BotServFlag
 
 /*************************************************************************/
 
-typedef struct {
+struct LevelInfo
+{
 	int what;
 	const char *name;
 	int desc;
-} LevelInfo;
+};
 
 
 /*************************************************************************/
@@ -685,13 +690,12 @@ typedef struct {
  * user is kicked.
  */
 
-struct bandata_ {
+struct BanData
+{
 	BanData *next, *prev;
 
-	char *mask;				/* Since a nick is unsure and a User structure
-						   	   is unsafe */
-	time_t last_use;		/* Since time is the only way to check
-						   	   whether it's still useful */
+	char *mask;			/* Since a nick is unsure and a User structure is unsafe */
+	time_t last_use;	/* Since time is the only way to check whether it's still useful */
 	int16 ttb[TTB_SIZE];
 };
 
@@ -715,8 +719,8 @@ class Entry : public Flags<EntryType>
 {
  public:
 	Entry *next, *prev;
-	uint32 cidr_ip;			 /* IP mask for CIDR matching */
-	uint32 cidr_mask;		   /* Netmask for CIDR matching */
+	uint32 cidr_ip;		/* IP mask for CIDR matching */
+	uint32 cidr_mask;	/* Netmask for CIDR matching */
 	char *nick, *user, *host, *mask;
 };
 
@@ -730,11 +734,12 @@ struct EList
 
 /* Ignorance list data. */
 
-typedef struct ignore_data {
-	struct ignore_data *prev, *next;
+struct IgnoreData
+{
+	IgnoreData *prev, *next;
 	char *mask;
-	time_t time;	/* When do we stop ignoring them? */
-} IgnoreData;
+	time_t time; /* When do we stop ignoring them? */
+};
 
 /*************************************************************************/
 
@@ -769,7 +774,8 @@ struct NewsItem
 
 /* Mail data */
 
-struct mailinfo_ {
+struct MailInfo
+{
 	FILE *pipe;
 	User *sender;
 	NickCore *recipient;
@@ -778,17 +784,18 @@ struct mailinfo_ {
 
 /*************************************************************************/
 
-struct exception_ {
-	char *mask;				 /* Hosts to which this exception applies */
-	int limit;				  /* Session limit for exception */
+struct Exception
+{
+	char *mask;		/* Hosts to which this exception applies */
+	int limit;		/* Session limit for exception */
 	char *who;		/* Nick of person who added the exception */
-	char *reason;			   /* Reason for exception's addition */
-	time_t time;				/* When this exception was added */
-	time_t expires;			 /* Time when it expires. 0 == no expiry */
-	int num;					/* Position in exception list; used to track
-								 * positions when deleting entries. It is
-								 * symbolic and used internally. It is
-								 * calculated at load time and never saved. */
+	char *reason;	/* Reason for exception's addition */
+	time_t time;	/* When this exception was added */
+	time_t expires;	/* Time when it expires. 0 == no expiry */
+	int num;		/* Position in exception list; used to track
+					 * positions when deleting entries. It is
+					 * symbolic and used internally. It is
+					 * calculated at load time and never saved. */
 };
 
 /*************************************************************************/
@@ -799,8 +806,8 @@ extern CoreExport session_map SessionList;
 struct Session
 {
 	char *host;
-	int count;				  /* Number of clients with this host */
-	int hits;				   /* Number of subsequent kills for a host */
+	int count;	/* Number of clients with this host */
+	int hits;	/* Number of subsequent kills for a host */
 };
 
 /*************************************************************************/
@@ -827,39 +834,40 @@ enum DefconLevel
  * the order the languages are displayed in for NickServ HELP SET LANGUAGE,
  * do it in language.c.
  */
-#define LANG_EN_US			  0	/* United States English */
-#define LANG_JA_JIS			 1	/* Japanese (JIS encoding) */
-#define LANG_JA_EUC			 2	/* Japanese (EUC encoding) */
-#define LANG_JA_SJIS			3	/* Japanese (SJIS encoding) */
-#define LANG_ES				 4	/* Spanish */
-#define LANG_PT				 5	/* Portugese */
-#define LANG_FR				 6	/* French */
-#define LANG_TR				 7	/* Turkish */
-#define LANG_IT				 8	/* Italian */
-#define LANG_DE				 9   	/* German */
-#define LANG_CAT			   10   	/* Catalan */
-#define LANG_GR				11   	/* Greek */
-#define LANG_NL				12   	/* Dutch */
-#define LANG_RU				13   	/* Russian */
-#define LANG_HUN			   14   	/* Hungarian */
-#define LANG_PL				15   	/* Polish */
+enum Languages
+{
+	LANG_EN_US,		/* United States English */
+	LANG_JA_JIS,	/* Japanese (JIS encoding) */
+	LANG_JA_EUC,	/* Japanese (EUC encoding) */
+	LANG_JA_SJIS,	/* Japanese (SJIS encoding) */
+	LANG_ES,		/* Spanish */
+	LANG_PT,		/* Portugese */
+	LANG_FR,		/* French */
+	LANG_TR,		/* Turkish */
+	LANG_IT,		/* Italian */
+	LANG_DE,		/* German */
+	LANG_CAT,		/* Catalan */
+	LANG_GR,		/* Greek */
+	LANG_NL,		/* Dutch */
+	LANG_RU,		/* Russian */
+	LANG_HUN,		/* Hungarian */
+	LANG_PL,		/* Polish */
+	NUM_LANGS		/* Number of languages */
+};
+static const int USED_LANGS = 13; /* Number of languages provided */
 
-#define NUM_LANGS			  16	/* Number of languages */
-#define USED_LANGS			 13	/* Number of languages provided */
-
-
-#define DEF_LANGUAGE	LANG_EN_US
+static const int DEF_LANGUAGE = LANG_EN_US;
 
 /*************************************************************************/
 
 /**
  * RFC: defination of a valid nick
- * nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
- * letter	 =  %x41-5A / %x61-7A	   ; A-Z / a-z
- * digit	  =  %x30-39				 ; 0-9
- * special	=  %x5B-60 / %x7B-7D	   ; "[", "]", "\", "`", "_", "^", "{", "|", "}"
+ * nickname =  ( letter / special ) *8( letter / digit / special / "-" )
+ * letter   =  %x41-5A / %x61-7A ; A-Z / a-z
+ * digit    =  %x30-39 ; 0-9
+ * special  =  %x5B-60 / %x7B-7D ; "[", "]", "\", "`", "_", "^", "{", "|", "}"
  **/
-#define isvalidnick(c) ( isalnum(c) || ((c) >='\x5B' && (c) <='\x60') || ((c) >='\x7B' && (c) <='\x7D') || (c)=='-' )
+#define isvalidnick(c) (isalnum(c) || ((c) >= '\x5B' && (c) <= '\x60') || ((c) >= '\x7B' && (c) <= '\x7D') || (c) == '-')
 
 /*************************************************************************/
 
@@ -879,98 +887,97 @@ class ServerConfig;
 class CoreExport IRCDProto
 {
  private:
-		virtual void SendSVSKillInternal(BotInfo *, User *, const char *) = 0;
-		virtual void SendModeInternal(BotInfo *, Channel *, const char *) = 0;
-		virtual void SendModeInternal(BotInfo *, User *, const char *) = 0;
-		virtual void SendKickInternal(BotInfo *, Channel *, User *, const char *) = 0;
-		virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const char *) = 0;
-		virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf);
-		virtual void SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg);
-		virtual void SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf);
-		virtual void SendQuitInternal(BotInfo *bi, const char *buf);
-		virtual void SendPartInternal(BotInfo *bi, Channel *chan, const char *buf);
-		virtual void SendGlobopsInternal(BotInfo *source, const char *buf);
-		virtual void SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf);
-		virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf);
-	public:
+	virtual void SendSVSKillInternal(BotInfo *, User *, const char *) = 0;
+	virtual void SendModeInternal(BotInfo *, Channel *, const char *) = 0;
+	virtual void SendModeInternal(BotInfo *, User *, const char *) = 0;
+	virtual void SendKickInternal(BotInfo *, Channel *, User *, const char *) = 0;
+	virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const char *) = 0;
+	virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf);
+	virtual void SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg);
+	virtual void SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf);
+	virtual void SendQuitInternal(BotInfo *bi, const char *buf);
+	virtual void SendPartInternal(BotInfo *bi, Channel *chan, const char *buf);
+	virtual void SendGlobopsInternal(BotInfo *source, const char *buf);
+	virtual void SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf);
+	virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf);
+ public:
+	virtual ~IRCDProto() { }
 
-		virtual ~IRCDProto() { }
+	virtual void SendSVSNOOP(const char *, int) { }
+	virtual void SendTopic(BotInfo *, Channel *, const char *, const char *) = 0;
+	virtual void SendVhostDel(User *) { }
+	virtual void SendAkill(XLine *) = 0;
+	virtual void SendAkillDel(XLine *) = 0;
+	virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
+	virtual void SendSVSMode(User *, int, const char **) = 0;
+	virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
+	virtual void SendMode(BotInfo *bi, User *u, const char *fmt, ...);
+	virtual void SendClientIntroduction(const std::string &, const std::string &, const std::string &, const std::string &, const char *, const std::string &uid) = 0;
+	virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
+	virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);
+	virtual void SendMessage(BotInfo *bi, const char *dest, const char *fmt, ...);
+	virtual void SendNotice(BotInfo *bi, const char *dest, const char *fmt, ...);
+	virtual void SendAction(BotInfo *bi, const char *dest, const char *fmt, ...);
+	virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...);
+	virtual void SendGlobalNotice(BotInfo *bi, Server *dest, const char *msg);
+	virtual void SendGlobalPrivmsg(BotInfo *bi, Server *desc, const char *msg);
 
-		virtual void SendSVSNOOP(const char *, int) { }
-		virtual void SendTopic(BotInfo *, Channel *, const char *, const char *) = 0;
-		virtual void SendVhostDel(User *) { }
-		virtual void SendAkill(XLine *) = 0;
-		virtual void SendAkillDel(XLine *) = 0;
-		virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
-		virtual void SendSVSMode(User *, int, const char **) = 0;
-		virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
-		virtual void SendMode(BotInfo *bi, User *u, const char *fmt, ...);
-		virtual void SendClientIntroduction(const std::string &, const std::string &, const std::string &, const std::string &, const char *, const std::string &uid) = 0;
-		virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
-		virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);
-		virtual void SendMessage(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendNotice(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendAction(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendGlobalNotice(BotInfo *bi, Server *dest, const char *msg);
-		virtual void SendGlobalPrivmsg(BotInfo *bi, Server *desc, const char *msg);
+	/** XXX: This is a hack for NickServ enforcers. It is deprecated.
+	 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
+	 * Thanks.
+	 * -- w00t
+	 */
+	virtual void SendQuit(const char *nick, const char *) MARK_DEPRECATED;
+	virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
+	virtual void SendPing(const char *servname, const char *who);
+	virtual void SendPong(const char *servname, const char *who);
+	virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
+	virtual void SendSQLineDel(XLine *x) = 0;
+	virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
+	virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
+	virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
+	virtual void SendSQLine(XLine *x) = 0;
+	virtual void SendSquit(const char *servname, const char *message);
+	virtual void SendSVSO(const char *, const char *, const char *) { }
+	virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
+	virtual void SendForceNickChange(User *u, const char *newnick, time_t when);
+	virtual void SendVhost(User *, const std::string &, const std::string &) { }
+	virtual void SendConnect() = 0;
+	virtual void SendSVSHold(const char *) { }
+	virtual void SendSVSHoldDel(const char *) { }
+	virtual void SendSGLineDel(XLine *) { }
+	virtual void SendSZLineDel(XLine *) { }
+	virtual void SendSZLine(XLine *) { }
+	virtual void SendSGLine(XLine *) { }
+	virtual void SendBanDel(Channel *, const std::string &) { }
+	virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
+	virtual void SendUnregisteredNick(User *) { }
+	virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...);
+	virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
+	virtual void SendSVSPart(const char *, const char *, const char *) { }
+	virtual void SendSWhois(const char *, const char *, const char *) { }
+	virtual void SendEOB() { }
+	virtual void SendServer(Server *) = 0;
+	virtual int IsNickValid(const char *) { return 1; }
+	virtual int IsChannelValid(const char *);
+	virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...);
 
-		/** XXX: This is a hack for NickServ enforcers. It is deprecated.
-		 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
-		 * Thanks.
-		 * -- w00t
-		 */
-		virtual void SendQuit(const char *nick, const char *) MARK_DEPRECATED;
-		virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
-		virtual void SendPing(const char *servname, const char *who);
-		virtual void SendPong(const char *servname, const char *who);
-		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
-		virtual void SendSQLineDel(XLine *x) = 0;
-		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
-		virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
-		virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
-		virtual void SendSQLine(XLine *x) = 0;
-		virtual void SendSquit(const char *servname, const char *message);
-		virtual void SendSVSO(const char *, const char *, const char *) { }
-		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
-		virtual void SendForceNickChange(User *u, const char *newnick, time_t when);
-		virtual void SendVhost(User *, const std::string &, const std::string &) { }
-		virtual void SendConnect() = 0;
-		virtual void SendSVSHold(const char *) { }
-		virtual void SendSVSHoldDel(const char *) { }
-		virtual void SendSGLineDel(XLine *) { }
-		virtual void SendSZLineDel(XLine *) { }
-		virtual void SendSZLine(XLine *) { }
-		virtual void SendSGLine(XLine *) { }
-		virtual void SendBanDel(Channel *, const std::string &) { }
-		virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
-		virtual void SendUnregisteredNick(User *) { }
-		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...);
-		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
-		virtual void SendSVSPart(const char *, const char *, const char *) { }
-		virtual void SendSWhois(const char *, const char *, const char *) { }
-		virtual void SendEOB() { }
-		virtual void SendServer(Server *) = 0;
-		virtual int IsNickValid(const char *) { return 1; }
-		virtual int IsChannelValid(const char *);
-		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...);
+	/** Sends a message logging a user into an account, where ircds support such a feature.
+	 * @param u The user logging in
+	 * @param account The account the user is logging into
+	 */
+	virtual void SendAccountLogin(User *u, NickCore *account) { }
 
-		/** Sends a message logging a user into an account, where ircds support such a feature.
-		 * @param u The user logging in
-		 * @param account The account the user is logging into
-		 */
-		virtual void SendAccountLogin(User *u, NickCore *account) { }
+	/** Sends a message logging a user out of an account, where ircds support such a feature.
+	 * @param u The user logging out
+	 * @param account The account the user is logging out of
+	 */
+	virtual void SendAccountLogout(User *u, NickCore *account) { }
 
-		/** Sends a message logging a user out of an account, where ircds support such a feature.
-		 * @param u The user logging out
-		 * @param account The account the user is logging out of
-		 */
-		virtual void SendAccountLogout(User *u, NickCore *account) { }
-
-		/** Set a users auto identification token
-		 * @param u The user
-		 */
-		virtual void SetAutoIdentificationToken(User *u) { }
+	/** Set a users auto identification token
+	 * @param u The user
+	 */
+	virtual void SetAutoIdentificationToken(User *u) { }
 };
 
 class IRCDTS6Proto : public IRCDProto
@@ -979,7 +986,8 @@ class IRCDTS6Proto : public IRCDProto
 
 /*************************************************************************/
 
-struct Uplink {
+struct Uplink
+{
 	char *host;
 	unsigned port;
 	char *password;
@@ -1017,14 +1025,14 @@ class CoreExport Alog
  public:
 	Alog(LogLevel val = LOG_NORMAL);
 	~Alog();
-	template<typename T> Alog& operator<<(T val)
+	template<typename T> Alog &operator<<(T val)
 	{
 		buf << val;
 		return *this;
 	}
 };
 
-class Message; // XXX
+struct Message; // XXX
 
 class CoreExport Anope
 {
@@ -1170,4 +1178,4 @@ class NumberList
 	virtual bool InvalidRange(const std::string &list);
 };
 
-#endif	/* SERVICES_H */
+#endif /* SERVICES_H */

@@ -18,7 +18,7 @@
 class CommandCSSetMLock : public Command
 {
  public:
-	CommandCSSetMLock(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 1, 0, cpermission)
+	CommandCSSetMLock(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 0, cpermission)
 	{
 	}
 

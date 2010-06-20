@@ -18,7 +18,7 @@
 class CommandCSSetEMail : public Command
 {
  public:
-	CommandCSSetEMail(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetEMail(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 2, cpermission)
 	{
 	}
 

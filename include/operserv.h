@@ -4,10 +4,10 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
- *
- * $Id$
- *
  */
+
+#ifndef OPERSERV_H
+#define OPERSERV_H
 
 extern CoreExport std::vector<NewsItem *> News;
 extern CoreExport std::vector<std::bitset<32> > DefCon;
@@ -52,7 +52,7 @@ struct XLine
 	std::string Reason;
 
 	XLine(const ci::string &mask, const std::string &reason = "");
-	
+
 	XLine(const ci::string &mask, const ci::string &by, const time_t expires, const std::string &reason);
 
 	ci::string GetNick() const;
@@ -63,14 +63,14 @@ struct XLine
 class CoreExport XLineManager
 {
  private:
- 	/* List of XLine managers we check users against in XLineManager::CheckAll */
+	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
-	
+
  protected:
 	/* List of XLines in this XLineManager */
 	std::deque<XLine *> XLines;
  public:
- 	/** Constructor
+	/** Constructor
 	 */
 	XLineManager();
 
@@ -106,7 +106,7 @@ class CoreExport XLineManager
 	 * @return The list
 	 */
 	const std::deque<XLine *>& GetList() const;
-	
+
 	/** Add an entry to this XLineManager
 	 * @param x The entry
 	 */
@@ -142,7 +142,7 @@ class CoreExport XLineManager
 	 * @param x The xline
 	 */
 	virtual void Del(XLine *x);
-	
+
 	/** Checks if a mask can/should be added to the XLineManager
 	 * @param mask The mask
 	 * @param expires When the mask would expire
@@ -229,3 +229,4 @@ class SZLineManager : public XLineManager
 	void OnExpire(XLine *x);
 };
 
+#endif // OPERSERV_H

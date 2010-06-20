@@ -6,7 +6,7 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 	unsigned char *string = const_cast<unsigned char *>(str); // XXX: unsafe cast
 	unsigned char *wild = const_cast<unsigned char *>(mask); // XXX: unsafe cast
 
-	while ((*string) && (*wild != '*'))
+	while (*string && *wild != '*')
 	{
 		if (case_sensitive)
 		{
@@ -28,12 +28,10 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 		if (*wild == '*')
 		{
 			if (!*++wild)
-			{
 				return 1;
-			}
 
 			mp = wild;
-			cp = string+1;
+			cp = string + 1;
 		}
 		else
 		{
@@ -41,8 +39,8 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 			{
 				if (*wild == *string || *wild == '?')
 				{
-					wild++;
-					string++;
+					++wild;
+					++string;
 				}
 				else
 				{
@@ -54,8 +52,8 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 			{
 				if (tolower(*wild) == tolower(*string) || *wild == '?')
 				{
-					wild++;
-					string++;
+					++wild;
+					++string;
 				}
 				else
 				{
@@ -68,9 +66,7 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 	}
 
 	while (*wild == '*')
-	{
-		wild++;
-	}
+		++wild;
 
 	return !*wild;
 }

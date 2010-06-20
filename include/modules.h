@@ -7,7 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
  */
 
 #ifndef MODULES_H
@@ -25,21 +24,21 @@
 #ifdef _WIN32
 	typedef HMODULE ano_module_t;
 
-	#define dlopen(file, unused)		LoadLibrary(file)
-	#define dlsym(file, symbol)	(HMODULE)GetProcAddress(file, symbol)
-	#define dlclose(file)		FreeLibrary(file) ? 0 : 1
-	#define ano_modclearerr()		SetLastError(0)
-	#define MODULE_EXT			".so"
+# define dlopen(file, unused) LoadLibrary(file)
+# define dlsym(file, symbol) (HMODULE)GetProcAddress(file, symbol)
+# define dlclose(file) FreeLibrary(file) ? 0 : 1
+# define ano_modclearerr() SetLastError(0)
+# define MODULE_EXT ".so"
 #else
-	typedef void *	ano_module_t;
+	typedef void * ano_module_t;
 
-	/* We call dlerror() here because it clears the module error after being
-	 * called. This previously read 'errno = 0', but that didn't work on
-	 * all POSIX-compliant architectures. This way the error is guaranteed
-	 * to be cleared, POSIX-wise. -GD
-	 */
-	#define ano_modclearerr()		dlerror()
-	#define MODULE_EXT			".so"
+/* We call dlerror() here because it clears the module error after being
+ * called. This previously read 'errno = 0', but that didn't work on
+ * all POSIX-compliant architectures. This way the error is guaranteed
+ * to be cleared, POSIX-wise. -GD
+ */
+# define ano_modclearerr() dlerror()
+# define MODULE_EXT ".so"
 #endif
 
 /** Possible return types from events.
@@ -51,13 +50,14 @@ enum EventReturn
 	EVENT_ALLOW
 };
 
-
 /**
  * This #define allows us to call a method in all
  * loaded modules in a readable simple way, e.g.:
  * 'FOREACH_MOD(I_OnConnect,OnConnect(user));'
  */
-#define FOREACH_MOD(y,x) do { \
+#define FOREACH_MOD(y,x) \
+do \
+{ \
 	std::vector<Module*>::iterator safei; \
 	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
 	{ \
@@ -67,7 +67,7 @@ enum EventReturn
 		{ \
 			(*_i)->x ; \
 		} \
-		catch (CoreException& modexcept) \
+		catch (const CoreException &modexcept) \
 		{ \
 			Alog() << "Exception caught: " << modexcept.GetReason(); \
 		} \
@@ -81,7 +81,8 @@ enum EventReturn
  * and any modules after are ignored.
  */
 #define FOREACH_RESULT(y,x) \
-do { \
+do \
+{ \
 	std::vector<Module*>::iterator safei; \
 	MOD_RESULT = EVENT_CONTINUE; \
 	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
@@ -96,7 +97,7 @@ do { \
 				break; \
 			} \
 		} \
-		catch (CoreException& modexcept) \
+		catch (const CoreException &modexcept) \
 		{ \
 			Alog() << "Exception caught: " << modexcept.GetReason(); \
 		} \
@@ -104,26 +105,28 @@ do { \
 	} \
 } while(0);
 
-#if !defined(_WIN32)
-	#include <dlfcn.h>
+#ifndef _WIN32
+# include <dlfcn.h>
 	/* Define these for systems without them */
-	#ifndef RTLD_NOW
-		#define RTLD_NOW 0
-	#endif
-	#ifndef RTLD_LAZY
-		#define RTLD_LAZY RTLD_NOW
-	#endif
-	#ifndef RTLD_GLOBAL
-		#define RTLD_GLOBAL 0
-	#endif
-	#ifndef RTLD_LOCAL
-		#define RTLD_LOCAL 0
-	#endif
+# ifndef RTLD_NOW
+#  define RTLD_NOW 0
+# endif
+# ifndef RTLD_LAZY
+#  define RTLD_LAZY RTLD_NOW
+# endif
+# ifndef RTLD_GLOBAL
+#  define RTLD_GLOBAL 0
+# endif
+# ifndef RTLD_LOCAL
+#  define RTLD_LOCAL 0
+# endif
 #else
 	const char *ano_moderr();
 #endif
 
+extern CoreExport Module *FindModule(const char *name);
 extern CoreExport Module *FindModule(const std::string &name);
+extern CoreExport Module *FindModule(const ci::string &name);
 int protocol_module_init();
 extern CoreExport Message *createMessage(const char *name, int (*func)(const char *source, int ac, const char **av));
 std::vector<Message *> FindMessage(const std::string &name);
@@ -162,12 +165,12 @@ extern CoreExport std::deque<Module *> Modules;
 
 class Version
 {
-  private:
-	  unsigned Major;
-	  unsigned Minor;
-	  unsigned Build;
+ private:
+	unsigned Major;
+	unsigned Minor;
+	unsigned Build;
 
-  public:
+ public:
 	/** Constructor
 	 * @param vMajor The major version numbber
 	 * @param vMinor The minor version numbber
@@ -466,7 +469,7 @@ class CoreExport Module
 	 * @param mask The mask being banned
 	 */
 	virtual void OnBotBan(User *u, ChannelInfo *ci, const char *mask) { }
-	
+
 	/** Called before a badword is added to the badword list
 	 * @param ci The channel
 	 * @param bw The badword
@@ -1051,9 +1054,7 @@ class CoreExport Module
 	 * @param s Our uplink
 	 */
 	virtual void OnUplinkSync(Server *s) { }
-
 };
-
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
  */
@@ -1125,12 +1126,31 @@ class CoreExport ModuleManager
 	 **/
 	static void LoadModuleList(std::list<std::string> &ModList);
 
+	/** Load up a list of modules.
+	 * @param module_list The list of modules to load
+	 **/
+	static void LoadModuleList(std::list<ci::string> &ModList);
+
 	/** Loads a given module.
 	 * @param m the module to load
 	 * @param u the user who loaded it, NULL for auto-load
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
-	static int LoadModule(const std::string &modname, User * u);
+	static int LoadModule(const char *modname, User *u);
+
+	/** Loads a given module.
+	 * @param m the module to load
+	 * @param u the user who loaded it, NULL for auto-load
+	 * @return MOD_ERR_OK on success, anything else on fail
+	 */
+	static int LoadModule(const std::string &modname, User *u);
+
+	/** Loads a given module.
+	 * @param m the module to load
+	 * @param u the user who loaded it, NULL for auto-load
+	 * @return MOD_ERR_OK on success, anything else on fail
+	 */
+	static int LoadModule(const ci::string &modname, User *u);
 
 	/** Unload the given module.
 	 * @param m the module to unload
@@ -1154,7 +1174,7 @@ class CoreExport ModuleManager
 	 * @param sz The number of modules being passed for PRIO_BEFORE and PRIO_AFTER. Defaults to 1, as most of the time you will only want to prioritize your module
 	 * to be before or after one other module.
 	 */
-	static bool SetPriority(Module* mod, Implementation i, Priority s, Module** modules = NULL, size_t sz = 1);
+	static bool SetPriority(Module *mod, Implementation i, Priority s, Module **modules = NULL, size_t sz = 1);
 
 	/** Change the priority of all events in a module.
 	 * @param mod The module to set the priority of
@@ -1162,7 +1182,7 @@ class CoreExport ModuleManager
 	 * Note that with this method, it is not possible to effectively use PRIO_BEFORE or PRIO_AFTER, you should use the more fine tuned
 	 * SetPriority method for this, where you may specify other modules to be prioritized against.
 	 */
-	static bool SetPriority(Module* mod, Priority s);
+	static bool SetPriority(Module *mod, Priority s);
 
 	/** Attach an event to a module.
 	 * You may later detatch the event with ModuleManager::Detach(). If your module is unloaded, all events are automatically detatched.
@@ -1170,7 +1190,7 @@ class CoreExport ModuleManager
 	 * @param mod Module to attach event to
 	 * @return True if the event was attached
 	 */
-	static bool Attach(Implementation i, Module* mod);
+	static bool Attach(Implementation i, Module *mod);
 
 	/** Detatch an event from a module.
 	 * This is not required when your module unloads, as the core will automatically detatch your module from all events it is attached to.
@@ -1178,18 +1198,18 @@ class CoreExport ModuleManager
 	 * @param mod Module to detach event from
 	 * @param Detach true if the event was detached
 	 */
-	static bool Detach(Implementation i, Module* mod);
+	static bool Detach(Implementation i, Module *mod);
 
 	/** Detach all events from a module (used on unload)
 	 * @param mod Module to detach from
 	 */
-	static void DetachAll(Module* mod);
+	static void DetachAll(Module *mod);
 
 	/** Attach an array of events to a module
 	 * @param i Event types (array) to attach
 	 * @param mod Module to attach events to
 	 */
-	static void Attach(Implementation* i, Module* mod, size_t sz);
+	static void Attach(Implementation *i, Module *mod, size_t sz);
 
 	/** Delete all callbacks attached to a module
 	 * @param m The module
@@ -1225,9 +1245,7 @@ class CallBack : public Timer
 	{
 		std::list<CallBack *>::iterator it = std::find(m->CallBacks.begin(), m->CallBacks.end(), this);
 		if (it != m->CallBacks.end())
-		{
 			m->CallBacks.erase(it);
-		}
 	}
 };
 
@@ -1237,4 +1255,4 @@ struct Message
 	int (*func)(const char *source, int ac, const char **av);
 };
 
-#endif
+#endif // MODULES_H

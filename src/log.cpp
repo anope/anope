@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -24,8 +22,8 @@ static int get_logname(char *name, int count, struct tm *tm)
 	char timestamp[32];
 	time_t t;
 
-
-	if (!tm) {
+	if (!tm)
+	{
 		time(&t);
 		tm = localtime(&t);
 	}
@@ -69,7 +67,8 @@ static void checkday()
 	time(&t);
 	tm = *localtime(&t);
 
-	if (curday != tm.tm_yday) {
+	if (curday != tm.tm_yday)
+	{
 		close_log();
 		remove_log();
 		open_log();
@@ -121,21 +120,19 @@ char *log_gettimestamp()
 	time(&t);
 	tm = *localtime(&t);
 #if HAVE_GETTIMEOFDAY
-	if (debug) {
+	if (debug)
+	{
 		char *s;
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S", &tm);
 		s = tbuf + strlen(tbuf);
-		s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d",
-					  static_cast<int>(tv.tv_usec));
+		s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d", static_cast<int>(tv.tv_usec));
 		strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
-	} else {
+	}
+	else
 #endif
 		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S %Y]", &tm);
-#if HAVE_GETTIMEOFDAY
-	}
-#endif
 	return tbuf;
 }
 
@@ -154,9 +151,8 @@ void log_perror(const char *fmt, ...)
 
 	checkday();
 
-	if (!fmt) {
+	if (!fmt)
 		return;
-	}
 
 	va_start(args, fmt);
 	vsnprintf(str, sizeof(str), fmt, args);
@@ -164,12 +160,10 @@ void log_perror(const char *fmt, ...)
 
 	buf = log_gettimestamp();
 
-	if (logfile) {
+	if (logfile)
 		fprintf(logfile, "%s %s : %s\n", buf, str, strerror(errno_save));
-	}
-	if (nofork) {
+	if (nofork)
 		fprintf(stderr, "%s %s : %s\n", buf, str, strerror(errno_save));
-	}
 	errno = errno_save;
 }
 
@@ -187,9 +181,8 @@ void fatal(const char *fmt, ...)
 
 	checkday();
 
-	if (!fmt) {
+	if (!fmt)
 		return;
-	}
 
 	va_start(args, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, args);
@@ -223,9 +216,8 @@ void fatal_perror(const char *fmt, ...)
 
 	checkday();
 
-	if (!fmt) {
+	if (!fmt)
 		return;
-	}
 
 	va_start(args, fmt);
 	vsnprintf(buf2, sizeof(buf2), fmt, args);
@@ -234,14 +226,11 @@ void fatal_perror(const char *fmt, ...)
 	buf = log_gettimestamp();
 
 	if (logfile)
-		fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
-				strerror(errno_save));
+		fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2, strerror(errno_save));
 	if (nofork)
-		fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
-				strerror(errno_save));
+		fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2, strerror(errno_save));
 	if (UplinkSock)
-		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2,
-						 strerror(errno_save));
+		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
 
 	/* one of the many places this needs to be called from */
 	ModuleRunTimeDirCleanUp();
@@ -267,15 +256,13 @@ Alog::~Alog()
 
 	tbuf = log_gettimestamp();
 
-	if (logfile) {
+	if (logfile)
 		fprintf(logfile, "%s %s\n", tbuf, buf.str().c_str());
-	}
 	if (nofork)
 		std::cout << tbuf << " " << buf.str() << std::endl;
 	else if (Level == LOG_TERMINAL) // XXX dont use this yet unless you know we're at terminal and not daemonized
 		std::cout << buf.str() << std::endl;
-	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel)) {
+	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel))
 		ircdproto->SendPrivmsg(Global, Config.LogChannel, "%s", buf.str().c_str());
-	}
 	errno = errno_save;
 }

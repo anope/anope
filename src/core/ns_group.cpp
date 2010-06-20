@@ -27,7 +27,7 @@ class CommandNSGroup : public Command
 		NickAlias *na, *target;
 		const char *nick = params[0].c_str();
 		std::string pass = params[1].c_str();
-		std::list<std::pair<std::string, std::string> >::iterator it;
+		std::list<std::pair<ci::string, ci::string> >::iterator it;
 
 		if (Config.NSEmailReg && findrequestnick(u->nick))
 		{
@@ -51,7 +51,7 @@ class CommandNSGroup : public Command
 		{
 			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
 			{
-				if (!is_oper(u) && u->nick.find(it->first) != std::string::npos)
+				if (!is_oper(u) && u->nick.find(it->first.c_str()) != std::string::npos)
 				{
 					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
@@ -183,7 +183,7 @@ class CommandNSUngroup : public Command
 			{
 				oldcore->aliases.erase(it);
 			}
-			
+
 			if (!stricmp(oldcore->display, na->nick))
 			{
 				change_core_display(oldcore);
@@ -255,7 +255,7 @@ class CommandNSGList : public Command
 			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
 			{
 				NickAlias *na2 = *it;
-				
+
 				if (!(wont_expire = na2->HasFlag(NS_NO_EXPIRE)))
 				{
 					expt = na2->last_seen + Config.NSExpire;

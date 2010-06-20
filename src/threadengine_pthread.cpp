@@ -11,9 +11,7 @@ static void *entry_point(void *parameter)
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
 	if (!thread->GetExitState())
-	{
 		thread->Join();
-	}
 	delete thread;
 	pthread_exit(0);
 }
@@ -23,9 +21,7 @@ static void *entry_point(void *parameter)
 ThreadEngine::ThreadEngine()
 {
 	if (pthread_attr_init(&threadengine_attr))
-	{
 		throw CoreException("ThreadEngine: Error calling pthread_attr_init");
-	}
 }
 
 /** Threadengines destructor
@@ -110,4 +106,3 @@ void Condition::Wait()
 {
 	pthread_cond_wait(&cond, &mutex);
 }
-

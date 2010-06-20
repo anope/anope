@@ -7,9 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
 
 #include "services.h"
@@ -70,7 +67,7 @@ Server::Server(Server *uplink, const std::string &name, unsigned int hops, const
 	/* Add this server to our uplinks leaf list */
 	if (UplinkServer)
 		UplinkServer->AddLink(this);
-	
+
 	if (Me && UplinkServer && Me == UplinkServer)
 	{
 		/* Bring in our pseudo-clients */
@@ -78,10 +75,8 @@ Server::Server(Server *uplink, const std::string &name, unsigned int hops, const
 
 		/* And some IRCds needs Global joined in the logchan */
 		if (LogChan && ircd->join2msg)
-		{
 			/* XXX might desync */
 			ircdproto->SendJoin(Global, Config.LogChannel, time(NULL));
-		}
 	}
 }
 
@@ -95,7 +90,7 @@ Server::~Server()
 	{
 		time_t t = time(NULL);
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
 		{
 			User *u = it->second;
 			++it;
@@ -112,9 +107,7 @@ Server::~Server()
 				}
 
 				if (Config.LimitSessions && !u->server->IsULined())
-				{
 					del_session(u->host);
-				}
 
 				delete u;
 			}
@@ -125,10 +118,8 @@ Server::~Server()
 
 	if (Links)
 	{
-		for (std::list<Server *>::iterator it = Links->begin(); it != Links->end(); ++it)
-		{
+		for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
 			delete *it;
-		}
 	}
 
 	delete Links;
@@ -146,7 +137,7 @@ void Server::Delete(const std::string &reason)
 /** Get the name for this server
  * @return The name
  */
-const std::string& Server::GetName() const
+const std::string &Server::GetName() const
 {
 	return Name;
 }
@@ -162,7 +153,7 @@ unsigned int Server::GetHops() const
 /** Set the server description
  * @param desc The new description
  */
-void Server::SetDescription(const std::string& desc)
+void Server::SetDescription(const std::string &desc)
 {
 	Description = desc;
 }
@@ -170,7 +161,7 @@ void Server::SetDescription(const std::string& desc)
 /** Get the server description
  * @return The server description
  */
-const std::string& Server::GetDescription() const
+const std::string &Server::GetDescription() const
 {
 	return Description;
 }
@@ -178,7 +169,7 @@ const std::string& Server::GetDescription() const
 /** Get the server numeric/SID
  * @return The numeric/SID
  */
-const std::string& Server::GetSID() const
+const std::string &Server::GetSID() const
 {
 	return SID;
 }
@@ -186,7 +177,7 @@ const std::string& Server::GetSID() const
 /** Get the list of links this server has, or NULL if it has none
  * @return A list of servers
  */
-const std::list<Server*>* Server::GetLinks() const
+const std::list<Server*> *Server::GetLinks() const
 {
 	return Links;
 }
@@ -194,7 +185,7 @@ const std::list<Server*>* Server::GetLinks() const
 /** Get the uplink server for this server, if this is our uplink will be Me
  * @return The servers uplink
  */
-Server* Server::GetUplink() const
+Server *Server::GetUplink() const
 {
 	return UplinkServer;
 }
@@ -208,15 +199,11 @@ void Server::AddLink(Server *s)
 	 * connect to the server which introduces itself and has us as the uplink, which calls this
 	 */
 	if (!UplinkServer)
-	{
 		UplinkServer = s;
-	}
 	else
 	{
 		if (!Links)
-		{
 			Links = new std::list<Server *>();
-		}
 
 		Links->push_back(s);
 	}
@@ -231,8 +218,8 @@ void Server::DelLink(Server *s)
 {
 	if (!Links)
 		throw CoreException("Server::DelLink called on " + GetName() + " for " + s->GetName() + " but we have no links?");
-	
-	for (std::list<Server *>::iterator it = Links->begin(); it != Links->end(); ++it)
+
+	for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
 	{
 		if (*it == s)
 		{
@@ -257,15 +244,13 @@ void Server::Sync(bool SyncLinks)
 {
 	if (IsSynced())
 		return;
-	
+
 	UnsetFlag(SERVER_SYNCING);
 
 	if (SyncLinks && Links)
 	{
-		for (std::list<Server *>::iterator it = Links->begin(); it != Links->end(); ++it)
-		{
+		for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
 			(*it)->Sync(true);
-		}
 	}
 
 	if (this == Me->GetUplink())
@@ -310,16 +295,16 @@ bool Server::IsULined() const
  * @param s The server list to search for this server on, defaults to our Uplink
  * @return The server
  */
-Server* Server::Find(const std::string &name, Server *s)
+Server *Server::Find(const std::string &name, Server *s)
 {
 	if (!s)
 		s = Me->GetUplink();
 	if (s->GetName() == name || s->GetSID() == name)
 		return s;
-	
+
 	if (s->GetLinks())
 	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
+		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(), it_end = s->GetLinks()->end(); it != it_end; ++it)
 		{
 			Server *serv = *it;
 
@@ -353,7 +338,7 @@ void do_server(const std::string &source, const std::string &servername, unsigne
 		Alog(LOG_DEBUG) << "Server introduced (" << servername << ")" << " from " << source;
 
 	Server *s = NULL;
-	
+
 	if (!source.empty())
 	{
 		s = Server::Find(source);
@@ -442,7 +427,7 @@ void CapabParse(int ac, const char **av)
 	}
 
 	/* Apply MLock now that we know what modes exist (capab is parsed after modes are added to Anope) */
-	for (registered_channel_map::iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
@@ -455,7 +440,7 @@ void CapabParse(int ac, const char **av)
 /* TS6 UID generator common code.
  *
  * Derived from atheme-services, uid.c (hg 2954:116d46894b4c).
- *		 -nenolod
+ *    -nenolod
  */
 static bool ts6_uid_initted = false;
 static char ts6_new_uid[10];
@@ -477,7 +462,7 @@ static void ts6_uid_increment(unsigned int slot)
 	else
 	{
 		if (ts6_new_uid[slot] == 'Z')
-			for (slot = 3; slot < 9; slot++)
+			for (slot = 3; slot < 9; ++slot)
 				ts6_new_uid[slot] = 'A';
 		else
 			++ts6_new_uid[slot];
@@ -489,7 +474,7 @@ static void ts6_uid_increment(unsigned int slot)
  */
 const char *ts6_uid_retrieve()
 {
-	if (ircd->ts6 == 0)
+	if (!ircd->ts6)
 	{
 		Alog(LOG_DEBUG) << "ts6_uid_retrieve(): TS6 not supported on this ircd";
 		return "";
@@ -508,7 +493,7 @@ const char *ts6_uid_retrieve()
 /*******************************************************************/
 
 /*
- * TS6 generator code, provided by DukePyrolator
+ * TS6 SID generator code, provided by DukePyrolator
  */
 
 static bool ts6_sid_initted = false;
@@ -581,5 +566,3 @@ const char *ts6_sid_retrieve()
 	/* not reached */
 	return "";
 }
-
-/* EOF */

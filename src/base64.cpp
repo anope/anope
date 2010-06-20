@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 /*
@@ -35,8 +33,7 @@ long base64dec(const char *b64)
 		return 0;
 }
 
-static const char Base64[] =
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char Base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
 
 /* (From RFC1521 and draft-ietf-dnssec-secext-03.txt)
@@ -109,7 +106,7 @@ int b64_encode(const char *src, size_t srclength, char *target, size_t targsize)
 	unsigned char output[4];
 	size_t i;
 
-	while (2 < srclength)
+	while (srclength > 2)
 	{
 		input[0] = *src++;
 		input[1] = *src++;
@@ -173,14 +170,14 @@ int b64_decode(const char *src, char *target, size_t targsize)
 
 	while ((ch = *src++) != '\0')
 	{
-		if (isspace(ch))		/* Skip whitespace anywhere. */
+		if (isspace(ch)) /* Skip whitespace anywhere. */
 			continue;
 
 		if (ch == Pad64)
 			break;
 
 		pos = const_cast<char *>(strchr(Base64, ch));
-		if (!pos)		   /* A non-base64 character. */
+		if (!pos) /* A non-base64 character. */
 			return -1;
 
 		switch (state)
@@ -236,16 +233,16 @@ int b64_decode(const char *src, char *target, size_t targsize)
 	 * on a byte boundary, and/or with erroneous trailing characters.
 	 */
 
-	if (ch == Pad64)		  /* We got a pad char. */
+	if (ch == Pad64) /* We got a pad char. */
 	{
-		ch = *src++;			/* Skip it, get next. */
+		ch = *src++; /* Skip it, get next. */
 		switch (state)
 		{
-			case 0:				/* Invalid = in first position */
-			case 1:				/* Invalid = in second position */
+			case 0: /* Invalid = in first position */
+			case 1: /* Invalid = in second position */
 				return -1;
 
-			case 2:				/* Valid, means one byte of info */
+			case 2: /* Valid, means one byte of info */
 				/* Skip any number of spaces. */
 				for (; ch != '\0'; ch = *src++)
 					if (!isspace(ch))
@@ -253,11 +250,11 @@ int b64_decode(const char *src, char *target, size_t targsize)
 				/* Make sure there is another trailing = sign. */
 				if (ch != Pad64)
 					return -1;
-				ch = *src++;		/* Skip the = */
+				ch = *src++; /* Skip the = */
 				/* Fall through to "single trailing =" case. */
 				/* FALLTHROUGH */
 
-			case 3:				/* Valid, means two bytes of info */
+			case 3: /* Valid, means two bytes of info */
 				/*
 				 * We know this char is an =.  Is there anything but
 				 * whitespace after it?
@@ -289,12 +286,12 @@ int b64_decode(const char *src, char *target, size_t targsize)
 	return tarindex;
 }
 
-const char* encode_ip(unsigned char *ip)
+const char *encode_ip(unsigned char *ip)
 {
 	static char buf[25];
 	unsigned char *cp;
-	struct in_addr ia;		  /* For IPv4 */
-	char *s_ip;				 /* Signed ip string */
+	struct in_addr ia;	/* For IPv4 */
+	char *s_ip;			/* Signed ip string */
 
 	if (!ip)
 		return "*";
@@ -319,11 +316,11 @@ int decode_ip(const char *buf)
 
 	b64_decode(buf, targ, 25);
 	ia = *reinterpret_cast<struct in_addr *>(targ);
-	if (len == 24)			/* IPv6 */
+	if (len == 24) /* IPv6 */
 		return 0;
-	else if (len == 8)		/* IPv4 */
+	else if (len == 8) /* IPv4 */
 		return ia.s_addr;
-	else						/* Error?? */
+	else /* Error?? */
 		return 0;
 }
 

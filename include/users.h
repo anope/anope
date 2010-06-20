@@ -3,10 +3,10 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
+
+#ifndef USERS_H
+#define USERS_H
 
 /* Hash maps used for users. Note UserListByUID will not be used on non-TS6 IRCds, and should never
  * be assumed to have users
@@ -35,7 +35,7 @@ class CoreExport User : public Extensible
 	std::string vident;
 	std::string ident;
 	std::string uid;
-	bool OnAccess;	/* If the user is on the access list of the nick theyre on */
+	bool OnAccess; /* If the user is on the access list of the nick theyre on */
 	Flags<UserModeName> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, std::string> Params; /* Map of user modes and the params this user has */
 	NickCore *nc; /* NickCore account the user is currently loggged in as */
@@ -43,14 +43,14 @@ class CoreExport User : public Extensible
  public: // XXX: exposing a tiny bit too much
 	std::string nick;	/* User's current nick */
 
-	char *host;		/* User's real hostname 	*/
-	char *hostip;		/* User's IP number			 */
-	char *vhost;		/* User's virtual hostname 	*/
+	char *host;			/* User's real hostname */
+	char *hostip;		/* User's IP number */
+	char *vhost;		/* User's virtual hostname */
 	std::string chost;	/* User's cloaked hostname */
-	char *realname;		/* Realname 			*/
-	Server *server;		/* Server user is connected to  */
-	time_t timestamp;	/* Timestamp of the nick 	*/
-	time_t my_signon;	/* When did _we_ see the user?  */
+	char *realname;		/* Realname */
+	Server *server;		/* Server user is connected to */
+	time_t timestamp;	/* Timestamp of the nick */
+	time_t my_signon;	/* When did _we_ see the user? */
 
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 
@@ -58,12 +58,11 @@ class CoreExport User : public Extensible
 	UChannelList chans;
 
 	unsigned short invalid_pw_count;	/* # of invalid password attempts */
-	time_t invalid_pw_time;	/* Time of last invalid password */
+	time_t invalid_pw_time;				/* Time of last invalid password */
 
 	time_t lastmemosend;	/* Last time MS SEND command used */
-	time_t lastnickreg;	/* Last time NS REGISTER cmd used */
-	time_t lastmail;	/* Last time this user sent a mail */
-
+	time_t lastnickreg;		/* Last time NS REGISTER cmd used */
+	time_t lastmail;		/* Last time this user sent a mail */
 
 	/****************************************************************/
 
@@ -197,10 +196,10 @@ class CoreExport User : public Extensible
 	 */
 	void UpdateHost();
 
-       /** Check if the user has a mode
-        * @param Name Mode name
-        * @return true or false
-        */
+	/** Check if the user has a mode
+	 * @param Name Mode name
+	 * @return true or false
+	 */
 	const bool HasMode(UserModeName Name) const;
 
 	/** Set a mode internally on the user, the IRCd is not informed
@@ -273,3 +272,4 @@ class CoreExport User : public Extensible
 	bool IsProtected() const;
 };
 
+#endif // USERS_H

@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -17,28 +15,28 @@
 
 /*************************************************************************/
 
-std::string services_conf = "services.conf"; // Services configuration file name
+ci::string services_conf = "services.conf"; // Services configuration file name
 ServerConfig Config;
 
-static std::string Modules;
-static std::string EncModules;
-static std::string DBModules;
-static std::string HostCoreModules;
-static std::string MemoCoreModules;
-static std::string BotCoreModules;
-static std::string OperCoreModules;
-static std::string NickCoreModules;
-static std::string ChanCoreModules;
-static std::string DefCon1;
-static std::string DefCon2;
-static std::string DefCon3;
-static std::string DefCon4;
+static ci::string Modules;
+static ci::string EncModules;
+static ci::string DBModules;
+static ci::string HostCoreModules;
+static ci::string MemoCoreModules;
+static ci::string BotCoreModules;
+static ci::string OperCoreModules;
+static ci::string NickCoreModules;
+static ci::string ChanCoreModules;
+static ci::string DefCon1;
+static ci::string DefCon2;
+static ci::string DefCon3;
+static ci::string DefCon4;
 static char *UlineServers;
-static std::string OSNotifications;
-static std::string BSDefaults;
-static std::string CSDefaults;
+static ci::string OSNotifications;
+static ci::string BSDefaults;
+static ci::string CSDefaults;
 static char *temp_nsuserhost;
-static std::string NSDefaults;
+static ci::string NSDefaults;
 
 /*************************************************************************/
 
@@ -72,18 +70,18 @@ bool DoneConfItem(ServerConfig *, const char *)
 	return true;
 }
 
-void ServerConfig::ValidateNoSpaces(const char *p, const std::string &tag, const std::string &val)
+void ServerConfig::ValidateNoSpaces(const char *p, const ci::string &tag, const ci::string &val)
 {
 	for (const char *ptr = p; *ptr; ++ptr)
 		if (*ptr == ' ')
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> cannot contain spaces");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> cannot contain spaces");
 }
 
 /* NOTE: Before anyone asks why we're not using inet_pton for this, it is because inet_pton and friends do not return so much detail,
  * even in strerror(errno). They just return 'yes' or 'no' to an address without such detail as to whats WRONG with the address.
  * Because ircd users arent as technical as they used to be (;)) we are going to give more of a useful error message.
  */
-void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::string &val, bool wild)
+void ServerConfig::ValidateIP(const char *p, const ci::string &tag, const ci::string &val, bool wild)
 {
 	int num_dots = 0, num_seps = 0;
 	bool not_numbers = false, not_hex = false;
@@ -91,26 +89,23 @@ void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::
 	if (*p)
 	{
 		if (*p == '.')
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not an IP address");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is not an IP address");
 
 		for (const char *ptr = p; *ptr; ++ptr)
 		{
 			if (wild && (*ptr == '*' || *ptr == '?' || *ptr == '/'))
 				continue;
 
-			if (*ptr != ':' && *ptr != '.')
+			if (*ptr != ':' && *ptr != '.' && (*ptr < '0' || *ptr > '9'))
 			{
-				if (*ptr < '0' || *ptr > '9')
-				{
-					not_numbers = true;
-					if (toupper(*ptr) < 'A' || toupper(*ptr) > 'F')
-						not_hex = true;
-				}
+				not_numbers = true;
+				if (toupper(*ptr) < 'A' || toupper(*ptr) > 'F')
+					not_hex = true;
 			}
 			switch (*ptr)
 			{
 				case ' ':
-					throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not an IP address");
+					throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is not an IP address");
 				case '.':
 					++num_dots;
 					break;
@@ -119,26 +114,26 @@ void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::
 			}
 		}
 		if (num_dots > 3)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is an IPv4 address with too many fields!");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is an IPv4 address with too many fields!");
 
 		if (num_seps > 8)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is an IPv6 address with too many fields!");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is an IPv6 address with too many fields!");
 
 		if (!num_seps && num_dots < 3 && !wild)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> looks to be a malformed IPv4 address");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> looks to be a malformed IPv4 address");
 
 		if (!num_seps && num_dots == 3 && not_numbers)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> contains non-numeric characters in an IPv4 address");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> contains non-numeric characters in an IPv4 address");
 
 		if (num_seps && not_hex)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> contains non-hexdecimal characters in an IPv6 address");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> contains non-hexdecimal characters in an IPv6 address");
 
 		if (num_seps && num_dots != 3 && num_dots && !wild)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is a malformed IPv6 4in6 address");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is a malformed IPv6 4in6 address");
 	}
 }
 
-void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const std::string &val)
+void ServerConfig::ValidateHostname(const char *p, const ci::string &tag, const ci::string &val)
 {
 	if (!strcasecmp(p, "localhost"))
 		return;
@@ -147,13 +142,13 @@ void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const
 	if (*p)
 	{
 		if (*p == '.')
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 		for (const char *ptr = p; *ptr; ++ptr)
 		{
 			switch (*ptr)
 			{
 				case ' ':
-					throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
+					throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 				case '.':
 					++num_dots;
 					break;
@@ -163,7 +158,7 @@ void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const
 			}
 		}
 		if (!num_dots && !num_seps)
-			throw ConfigException(std::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
+			throw ConfigException(ci::string("The value of <") + tag + ":" + val + "> is not a valid hostname");
 	}
 }
 
@@ -185,7 +180,7 @@ bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueI
 {
 	if (Config.NSEmailReg)
 	{
-		if (std::string(value) == "preregexpire")
+		if (ci::string(value) == "preregexpire")
 		{
 			if (!data.GetInteger())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
@@ -240,12 +235,12 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 {
 	if (Config.s_BotServ)
 	{
-		if (std::string(value) == "description")
+		if (ci::string(value) == "description")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
-		else if (std::string(value) == "minusers" || std::string(value) == "badwordsmax" || std::string(value) == "keepdata")
+		else if (ci::string(value) == "minusers" || ci::string(value) == "badwordsmax" || ci::string(value) == "keepdata")
 		{
 			if (!data.GetInteger())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
@@ -258,7 +253,7 @@ bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueI
 {
 	if (Config.s_HostServ)
 	{
-		if (std::string(value) == "description")
+		if (ci::string(value) == "description")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
@@ -271,7 +266,7 @@ bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, V
 {
 	if (Config.LimitSessions)
 	{
-		if (std::string(value) == "maxsessionlimit" || std::string(value) == "exceptionexpiry")
+		if (ci::string(value) == "maxsessionlimit" || ci::string(value) == "exceptionexpiry")
 		{
 			if (!data.GetInteger())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
@@ -282,7 +277,7 @@ bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, V
 
 bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (std::string(value) == "defaultlevel")
+	if (ci::string(value) == "defaultlevel")
 	{
 		int level = data.GetInteger();
 		if (!level)
@@ -292,17 +287,17 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 	}
 	else if (Config.DefConLevel)
 	{
-		if ((std::string(value).substr(0, 5) == "level" && isdigit(value[5])) || std::string(value) == "chanmodes" || std::string(value) == "akillreason")
+		if ((ci::string(value).substr(0, 5) == "level" && isdigit(value[5])) || ci::string(value) == "chanmodes" || ci::string(value) == "akillreason")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
-		else if (std::string(value) == "message" && Config.GlobalOnDefconMore)
+		else if (ci::string(value) == "message" && Config.GlobalOnDefconMore)
 		{
 			if (data.GetValue().empty())
 				throw ConfigException("The value for <defcon:message> cannot be empty when globalondefconmore is enabled!");
 		}
-		else if (std::string(value) == "sessionlimit" || std::string(value) == "akillexpire")
+		else if (ci::string(value) == "sessionlimit" || ci::string(value) == "akillexpire")
 		{
 			if (!data.GetInteger())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> must be non-zero when DefCon is enabled!");
@@ -332,7 +327,7 @@ bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem 
 {
 	if (Config.UseMail)
 	{
-		if (std::string(value) == "sendmailpath" || std::string(value) == "sendfrom")
+		if (ci::string(value) == "sendmailpath" || ci::string(value) == "sendfrom")
 		{
 			if (data.GetValue().empty())
 				throw ConfigException(std::string("The value for <") + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
@@ -415,7 +410,7 @@ bool DoneUplinks(ServerConfig *, const char *, bool bail)
 
 static bool InitOperTypes(ServerConfig *, const char *, bool)
 {
-	for (std::list<OperType *>::iterator it = Config.MyOperTypes.begin(); it != Config.MyOperTypes.end(); ++it)
+	for (std::list<OperType *>::iterator it = Config.MyOperTypes.begin(), it_end = Config.MyOperTypes.end(); it != it_end; ++it)
 		delete *it;
 
 	Config.MyOperTypes.clear();
@@ -435,7 +430,7 @@ static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueLis
 
 	OperType *ot = new OperType(name);
 
-	std::string tok;
+	ci::string tok;
 	spacesepstream cmdstr(commands);
 	while (cmdstr.GetToken(tok))
 		ot->AddCommand(tok);
@@ -443,14 +438,14 @@ static bool DoOperType(ServerConfig *conf, const char *, const char **, ValueLis
 	spacesepstream privstr(privs);
 	while (privstr.GetToken(tok))
 		ot->AddPriv(tok);
-	
+
 	commasepstream inheritstr(inherits);
 	while (inheritstr.GetToken(tok))
 	{
 		/* Strip leading ' ' after , */
 		if (tok.size() > 1 && tok[0] == ' ')
 			tok.erase(tok.begin());
-		for (std::list<OperType *>::iterator it = Config.MyOperTypes.begin(); it != Config.MyOperTypes.end(); ++it)
+		for (std::list<OperType *>::iterator it = Config.MyOperTypes.begin(), it_end = Config.MyOperTypes.end(); it != it_end; ++it)
 		{
 			if ((*it)->GetName() == tok)
 			{
@@ -474,7 +469,7 @@ static bool DoneOperTypes(ServerConfig *, const char *, bool)
 
 static bool InitOpers(ServerConfig *, const char *, bool)
 {
-	for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		it->second->ot = NULL;
 
 	Config.Opers.clear();
@@ -502,9 +497,9 @@ static bool DoOper(ServerConfig *conf, const char *, const char **, ValueList &v
 static bool DoneOpers(ServerConfig *, const char *, bool)
 {
 	// XXX: this is duplicated in config.c
-	for (std::list<std::pair<std::string, std::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+	for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 	{
-		std::string nick = it->first, type = it->second;
+		ci::string nick = it->first, type = it->second;
 
 		NickAlias *na = findnick(nick);
 		if (!na)
@@ -515,7 +510,7 @@ static bool DoneOpers(ServerConfig *, const char *, bool)
 			// Nick with no core (wtf?)
 			abort();
 
-		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(); tit != Config.MyOperTypes.end(); ++tit)
+		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(), tit_end = Config.MyOperTypes.end(); tit != tit_end; ++tit)
 		{
 			OperType *ot = *tit;
 			if (ot->GetName() == type)
@@ -585,6 +580,10 @@ int ServerConfig::Read(bool bail)
 		 * std::string blarg;
 		 * {"tag", "value", "", new ValueContainerString(&blarg), DT_STRING, <validation>},
 		 *
+		 * If you want to create a directive using a case-insensitive string:
+		 * std::string blarg;
+		 * {"tag", "value", "", new ValueContainerCIString(&blarg), DT_CISTRING, <validation>},
+		 *
 		 * If you want to create a directive using a boolean:
 		 * bool blarg;
 		 * {"tag", "value", "no", new ValueContainerBool(&blarg), DT_BOOLEAN, <validation>},
@@ -608,7 +607,7 @@ int ServerConfig::Read(bool bail)
 		 * For the second-to-last argument, you can or (|) in the following values:
 		 * DT_NORELOAD - The variable can't be changed on a reload of the configuration
 		 * DT_ALLOW_WILD - Allows wildcards/CIDR in DT_IPADDRESS
-		 * DT_ALLOW_NEWLINE - Allows new line characters in DT_CHARPTR and DT_STRING
+		 * DT_ALLOW_NEWLINE - Allows new line characters in DT_CHARPTR, DT_STRING, and DT_CISTRING
 		 *
 		 * We may need to add some other validation functions to handle certain things, we can handle that later.
 		 * Any questions about these, w00t, feel free to ask. */
@@ -628,9 +627,9 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&Config.NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&Config.UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&Config.HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
-		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "encryption", "", new ValueContainerCIString(&EncModules), DT_CISTRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "passlen", "32", new ValueContainerUInt(&Config.PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
-		{"options", "database", "", new ValueContainerString(&DBModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "database", "", new ValueContainerCIString(&DBModules), DT_CISTRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&Config.UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&Config.UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&Config.UserKey3), DT_LUINTEGER, NoValidation},
@@ -660,16 +659,16 @@ int ServerConfig::Read(bool bail)
 		{"options", "newscount", "3", new ValueContainerUInt(&Config.NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerChar(&UlineServers), DT_CHARPTR, NoValidation},
 		{"options", "enablelogchannel", "no", new ValueContainerBool(&LogChan), DT_BOOLEAN, NoValidation},
-		{"options", "mlock", "+nrt", new ValueContainerString(&Config.MLock), DT_STRING, NoValidation},
-		{"options", "botmodes", "", new ValueContainerString(&Config.BotModes), DT_STRING, NoValidation},
+		{"options", "mlock", "+nrt", new ValueContainerCIString(&Config.MLock), DT_CISTRING, NoValidation},
+		{"options", "botmodes", "", new ValueContainerCIString(&Config.BotModes), DT_CISTRING, NoValidation},
 		{"options", "maxretries", "10", new ValueContainerUInt(&Config.MaxRetries), DT_UINTEGER, NoValidation},
 		{"options", "retrywait", "60", new ValueContainerInt(&Config.RetryWait), DT_INTEGER, ValidateNotZero},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&Config.s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&Config.desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&Config.NSEmailReg), DT_BOOLEAN, NoValidation},
-		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
+		{"nickserv", "modules", "", new ValueContainerCIString(&NickCoreModules), DT_CISTRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&Config.NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
-		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
+		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerCIString(&NSDefaults), DT_CISTRING, NoValidation},
 		{"nickserv", "defaultlanguage", "0", new ValueContainerUInt(&Config.NSDefLanguage), DT_UINTEGER, ValidateLanguage},
 		{"nickserv", "regdelay", "0", new ValueContainerTime(&Config.NSRegDelay), DT_TIME, NoValidation},
 		{"nickserv", "resenddelay", "0", new ValueContainerTime(&Config.NSResendDelay), DT_TIME, NoValidation},
@@ -696,8 +695,8 @@ int ServerConfig::Read(bool bail)
 		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&Config.DontQuoteAddresses), DT_BOOLEAN, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&Config.s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&Config.desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, NoValidation},
-		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
+		{"chanserv", "modules", "", new ValueContainerCIString(&ChanCoreModules), DT_CISTRING, NoValidation},
+		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerCIString(&CSDefaults), DT_CISTRING, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&Config.CSMaxReg), DT_UINTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&Config.CSExpire), DT_TIME, NoValidation},
 		{"chanserv", "defbantype", "2", new ValueContainerInt(&Config.CSDefBantype), DT_INTEGER, ValidateBantype},
@@ -710,15 +709,15 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&Config.CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&Config.s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&Config.desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"memoserv", "modules", "", new ValueContainerString(&MemoCoreModules), DT_STRING, NoValidation},
+		{"memoserv", "modules", "", new ValueContainerCIString(&MemoCoreModules), DT_CISTRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&Config.MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&Config.MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&Config.MSNotifyAll), DT_BOOLEAN, NoValidation},
 		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&Config.MSMemoReceipt), DT_UINTEGER, NoValidation},
 		{"botserv", "nick", "", new ValueContainerChar(&Config.s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&Config.desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
-		{"botserv", "modules", "", new ValueContainerString(&BotCoreModules), DT_STRING, NoValidation},
-		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
+		{"botserv", "modules", "", new ValueContainerCIString(&BotCoreModules), DT_CISTRING, NoValidation},
+		{"botserv", "defaults", "", new ValueContainerCIString(&BSDefaults), DT_CISTRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerUInt(&Config.BSMinUsers), DT_UINTEGER, ValidateBotServ},
 		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&Config.BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
 		{"botserv", "keepdata", "0", new ValueContainerTime(&Config.BSKeepData), DT_TIME, ValidateBotServ},
@@ -728,12 +727,12 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&Config.BSFantasyCharacter), DT_CHARPTR, NoValidation},
 		{"hostserv", "nick", "", new ValueContainerChar(&Config.s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&Config.desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
-		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
+		{"hostserv", "modules", "", new ValueContainerCIString(&HostCoreModules), DT_CISTRING, NoValidation},
 		{"operserv", "nick", "OperServ", new ValueContainerChar(&Config.s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&Config.desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&Config.s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&Config.desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
+		{"operserv", "modules", "", new ValueContainerCIString(&OperCoreModules), DT_CISTRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&Config.SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&Config.LogMaxUsers), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&Config.AutokillExpiry), DT_TIME, ValidateNotZero},
@@ -744,7 +743,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&Config.AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsnline", "no", new ValueContainerBool(&Config.KillonSNline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&Config.KillonSQline), DT_BOOLEAN, NoValidation},
-		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
+		{"operserv", "notifications", "", new ValueContainerCIString(&OSNotifications), DT_CISTRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&Config.LimitSessions), DT_BOOLEAN, NoValidation},
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&Config.DefSessionLimit), DT_UINTEGER, NoValidation},
 		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&Config.MaxSessionLimit), DT_UINTEGER, ValidateLimitSessions},
@@ -756,10 +755,10 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "addakiller", "no", new ValueContainerBool(&Config.AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&Config.OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
-		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
-		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},
-		{"defcon", "level2", "", new ValueContainerString(&DefCon2), DT_STRING, ValidateDefCon},
-		{"defcon", "level1", "", new ValueContainerString(&DefCon1), DT_STRING, ValidateDefCon},
+		{"defcon", "level4", "", new ValueContainerCIString(&DefCon4), DT_CISTRING, ValidateDefCon},
+		{"defcon", "level3", "", new ValueContainerCIString(&DefCon3), DT_CISTRING, ValidateDefCon},
+		{"defcon", "level2", "", new ValueContainerCIString(&DefCon2), DT_CISTRING, ValidateDefCon},
+		{"defcon", "level1", "", new ValueContainerCIString(&DefCon1), DT_CISTRING, ValidateDefCon},
 		{"defcon", "sessionlimit", "0", new ValueContainerInt(&Config.DefConSessionLimit), DT_INTEGER, ValidateDefCon},
 		{"defcon", "akillexpire", "0", new ValueContainerTime(&Config.DefConAKILL), DT_TIME, ValidateDefCon},
 		{"defcon", "chanmodes", "", new ValueContainerChar(&Config.DefConChanModes), DT_CHARPTR, ValidateDefCon},
@@ -878,6 +877,12 @@ int ServerConfig::Read(bool bail)
 						vcs->Set(vi.GetValue());
 					}
 					break;
+				case DT_CISTRING:
+					{
+						ValueContainerCIString *vcs = dynamic_cast<ValueContainerCIString *>(Values[Index].val);
+						vcs->Set(vi.GetCIValue());
+					}
+					break;
 				case DT_INTEGER:
 					{
 						int val = vi.GetInteger();
@@ -985,8 +990,17 @@ int ServerConfig::Read(bool bail)
 							break;
 						case DT_STRING:
 							{
-								std::string item;
-								if (ConfValue(config_data, std::string(MultiValues[Index].tag), std::string(MultiValues[Index].items[valuenum]), std::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
+								ci::string item;
+								if (ConfValue(config_data, ci::string(MultiValues[Index].tag), ci::string(MultiValues[Index].items[valuenum]), ci::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
+									vl.push_back(ValueItem(item));
+								else
+									vl.push_back(ValueItem(""));
+							}
+							break;
+						case DT_CISTRING:
+							{
+								ci::string item;
+								if (ConfValue(config_data, ci::string(MultiValues[Index].tag), ci::string(MultiValues[Index].items[valuenum]), ci::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
 									vl.push_back(ValueItem(item));
 								else
 									vl.push_back(ValueItem(""));
@@ -1005,8 +1019,8 @@ int ServerConfig::Read(bool bail)
 							break;
 						case DT_TIME:
 							{
-								std::string item;
-								if (ConfValue(config_data, std::string(MultiValues[Index].tag), std::string(MultiValues[Index].items[valuenum]), std::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
+								ci::string item;
+								if (ConfValue(config_data, ci::string(MultiValues[Index].tag), ci::string(MultiValues[Index].items[valuenum]), ci::string(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines))
 								{
 #ifdef _WIN32
 									long time = static_cast<long>(dotime(item.c_str()));
@@ -1031,7 +1045,7 @@ int ServerConfig::Read(bool bail)
 			MultiValues[Index].finish_function(this, MultiValues[Index].tag, bail);
 		}
 	}
-	catch (ConfigException &ce)
+	catch (const ConfigException &ce)
 	{
 		ReportConfigError(ce.GetReason(), bail);
 		if (!CheckedAllValues)
@@ -1054,7 +1068,8 @@ int ServerConfig::Read(bool bail)
 
 bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::ostringstream &errorstream)
 {
-	std::string line, wordbuffer, section, itemname;
+	std::string line;
+	ci::string section, wordbuffer, itemname;
 	std::ifstream conf(filename);
 	int linenumber = 0;
 	bool in_word = false, in_quote = false, in_ml_comment = false;
@@ -1173,7 +1188,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 					wordbuffer.clear();
 					itemname.clear();
 				}
-				target.insert(std::pair<std::string, KeyValList>(section, sectiondata));
+				target.insert(std::pair<ci::string, KeyValList>(section, sectiondata));
 				section.clear();
 				sectiondata.clear();
 			}
@@ -1244,6 +1259,11 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const std::string &filename,
 	return LoadConf(target, filename.c_str(), errorstream);
 }
 
+bool ServerConfig::LoadConf(ConfigDataHash &target, const ci::string &filename, std::ostringstream &errorstream)
+{
+	return LoadConf(target, filename.c_str(), errorstream);
+}
+
 bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char *var, int index, char *result, int length, bool allow_linefeeds)
 {
 	return ConfValue(target, tag, var, "", index, result, length, allow_linefeeds);
@@ -1251,18 +1271,18 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char
 
 bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, char *result, int length, bool allow_linefeeds)
 {
-	std::string value;
-	bool r = ConfValue(target, std::string(tag), std::string(var), std::string(default_value), index, value, allow_linefeeds);
+	ci::string value;
+	bool r = ConfValue(target, ci::string(tag), ci::string(var), ci::string(default_value), index, value, allow_linefeeds);
 	strlcpy(result, value.c_str(), length);
 	return r;
 }
 
-bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, std::string &result, bool allow_linefeeds)
+bool ServerConfig::ConfValue(ConfigDataHash &target, const ci::string &tag, const ci::string &var, int index, ci::string &result, bool allow_linefeeds)
 {
 	return ConfValue(target, tag, var, "", index, result, allow_linefeeds);
 }
 
-bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index, std::string &result, bool allow_linefeeds)
+bool ServerConfig::ConfValue(ConfigDataHash &target, const ci::string &tag, const ci::string &var, const ci::string &default_value, int index, ci::string &result, bool allow_linefeeds)
 {
 	ConfigDataHash::size_type pos = index;
 	if (pos < target.count(tag))
@@ -1280,7 +1300,7 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, con
 				if (!allow_linefeeds && j->second.find('\n') != std::string::npos)
 				{
 					Alog(LOG_DEBUG) << "Value of <" << tag << ":" << var << "> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.";
-					std::string::iterator n = j->second.begin(), nend = j->second.end();
+					ci::string::iterator n = j->second.begin(), nend = j->second.end();
 					for (; n != nend; ++n)
 						if (*n == '\n')
 							*n = ' ';
@@ -1311,25 +1331,25 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, con
 
 bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const char *tag, const char *var, int index, int &result)
 {
-	return ConfValueInteger(target, std::string(tag), std::string(var), "", index, result);
+	return ConfValueInteger(target, ci::string(tag), ci::string(var), "", index, result);
 }
 
 bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, int &result)
 {
-	return ConfValueInteger(target, std::string(tag), std::string(var), std::string(default_value), index, result);
+	return ConfValueInteger(target, ci::string(tag), ci::string(var), ci::string(default_value), index, result);
 }
 
-bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, int &result)
+bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const ci::string &tag, const ci::string &var, int index, int &result)
 {
 	return ConfValueInteger(target, tag, var, "", index, result);
 }
 
-bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index, int &result)
+bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const ci::string &tag, const ci::string &var, const ci::string &default_value, int index, int &result)
 {
-	std::string value;
+	ci::string value;
 	std::istringstream stream;
 	bool r = ConfValue(target, tag, var, default_value, index, value);
-	stream.str(value);
+	stream.str(value.c_str());
 	if (!(stream >> result))
 		return false;
 	else
@@ -1372,22 +1392,22 @@ bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &t
 
 bool ServerConfig::ConfValueBool(ConfigDataHash &target, const char *tag, const char *var, int index)
 {
-	return ConfValueBool(target, std::string(tag), std::string(var), "", index);
+	return ConfValueBool(target, ci::string(tag), ci::string(var), "", index);
 }
 
 bool ServerConfig::ConfValueBool(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index)
 {
-	return ConfValueBool(target, std::string(tag), std::string(var), std::string(default_value), index);
+	return ConfValueBool(target, ci::string(tag), ci::string(var), ci::string(default_value), index);
 }
 
-bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag, const std::string &var, int index)
+bool ServerConfig::ConfValueBool(ConfigDataHash &target, const ci::string &tag, const ci::string &var, int index)
 {
 	return ConfValueBool(target, tag, var, "", index);
 }
 
-bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index)
+bool ServerConfig::ConfValueBool(ConfigDataHash &target, const ci::string &tag, const ci::string &var, const ci::string &default_value, int index)
 {
-	std::string result;
+	ci::string result;
 	if (!ConfValue(target, tag, var, default_value, index, result))
 		return false;
 
@@ -1401,15 +1421,20 @@ int ServerConfig::ConfValueEnum(ConfigDataHash &target, const char *tag)
 
 int ServerConfig::ConfValueEnum(ConfigDataHash &target, const std::string &tag)
 {
+	return target.count(tag.c_str());
+}
+
+int ServerConfig::ConfValueEnum(ConfigDataHash &target, const ci::string &tag)
+{
 	return target.count(tag);
 }
 
 int ServerConfig::ConfVarEnum(ConfigDataHash &target, const char *tag, int index)
 {
-	return ConfVarEnum(target, std::string(tag), index);
+	return ConfVarEnum(target, ci::string(tag), index);
 }
 
-int ServerConfig::ConfVarEnum(ConfigDataHash &target, const std::string &tag, int index)
+int ServerConfig::ConfVarEnum(ConfigDataHash &target, const ci::string &tag, int index)
 {
 	ConfigDataHash::size_type pos = index;
 
@@ -1451,6 +1476,8 @@ ValueItem::ValueItem(const char *value) : v(value) { }
 
 ValueItem::ValueItem(const std::string &value) : v(value) { }
 
+ValueItem::ValueItem(const ci::string &value) : v(value.c_str()) { }
+
 void ValueItem::Set(const char *value)
 {
 	v = value;
@@ -1459,6 +1486,11 @@ void ValueItem::Set(const char *value)
 void ValueItem::Set(const std::string &value)
 {
 	v = value;
+}
+
+void ValueItem::Set(const ci::string &value)
+{
+	v = value.c_str();
 }
 
 void ValueItem::Set(int value)
@@ -1470,7 +1502,8 @@ void ValueItem::Set(int value)
 
 int ValueItem::GetInteger()
 {
-	if (v.empty()) return 0;
+	if (v.empty())
+		return 0;
 	return atoi(v.c_str());
 }
 
@@ -1502,8 +1535,8 @@ void error(int linenum, const char *message, ...)
 	else
 		Alog() << services_conf << ": " << buf;
 
-
-	if (!nofork && isatty(2)) {
+	if (!nofork && isatty(2))
+	{
 		if (linenum)
 			fprintf(stderr, "%s:%d: %s\n", services_conf.c_str(), linenum, buf);
 		else
@@ -1513,18 +1546,24 @@ void error(int linenum, const char *message, ...)
 
 /*************************************************************************/
 
-#define CHECK(v) do {			\
-	if (!v) {				\
-	error(0, #v " missing");	\
-	retval = 0;			\
-	}					\
+#define CHECK(v) \
+do \
+{ \
+	if (!v) \
+	{\
+		error(0, #v " missing"); \
+		retval = 0; \
+	} \
 } while (0)
 
-#define CHEK2(v,n) do {			\
-	if (!v) {				\
-	error(0, #n " missing");	\
-	retval = 0;			\
-	}					\
+#define CHEK2(v, n) \
+do \
+{ \
+	if (!v) \
+	{ \
+		error(0, #n " missing"); \
+		retval = 0; \
+	} \
 } while (0)
 
 /* Read the entire configuration file.  If an error occurs while reading
@@ -1533,7 +1572,6 @@ void error(int linenum, const char *message, ...)
  *
  * If reload is 1, will reload the configuration file.
  *		--lara
- *
  */
 
 int read_config(int reload)
@@ -1545,11 +1583,15 @@ int read_config(int reload)
 	retval = Config.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
 
-	if (temp_nsuserhost) {
-		if (!(s = strchr(temp_nsuserhost, '@'))) {
+	if (temp_nsuserhost)
+	{
+		if (!(s = strchr(temp_nsuserhost, '@')))
+		{
 			Config.NSEnforcerUser = temp_nsuserhost;
 			Config.NSEnforcerHost = Config.ServiceHost;
-		} else {
+		}
+		else
+		{
 			*s++ = 0;
 			Config.NSEnforcerUser = temp_nsuserhost;
 			Config.NSEnforcerHost = s;
@@ -1562,34 +1604,50 @@ int read_config(int reload)
 		Config.NSDefFlags.SetFlag(NI_MEMO_SIGNON);
 		Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
 	}
-	else if (NSDefaults != "none") {
+	else if (NSDefaults != "none")
+	{
 		spacesepstream options(NSDefaults);
-		std::string option;
+		ci::string option;
 		while (options.GetToken(option))
 		{
-			if (option == "kill") Config.NSDefFlags.SetFlag(NI_KILLPROTECT);
-			else if (option == "killquick") Config.NSDefFlags.SetFlag(NI_KILL_QUICK);
-			else if (option == "secure") Config.NSDefFlags.SetFlag(NI_SECURE);
-			else if (option == "private") Config.NSDefFlags.SetFlag(NI_PRIVATE);
-			else if (option == "msg") {
-				if (!Config.UsePrivmsg) Alog() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
-				else Config.NSDefFlags.SetFlag(NI_MSG);
+			if (option == "kill")
+				Config.NSDefFlags.SetFlag(NI_KILLPROTECT);
+			else if (option == "killquick")
+				Config.NSDefFlags.SetFlag(NI_KILL_QUICK);
+			else if (option == "secure")
+				Config.NSDefFlags.SetFlag(NI_SECURE);
+			else if (option == "private")
+				Config.NSDefFlags.SetFlag(NI_PRIVATE);
+			else if (option == "msg")
+			{
+				if (!Config.UsePrivmsg)
+					Alog() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
+				else
+					Config.NSDefFlags.SetFlag(NI_MSG);
 			}
-			else if (option == "hideemail") Config.NSDefFlags.SetFlag(NI_HIDE_EMAIL);
-			else if (option == "hideusermask") Config.NSDefFlags.SetFlag(NI_HIDE_MASK);
-			else if (option == "hidequit") Config.NSDefFlags.SetFlag(NI_HIDE_QUIT);
-			else if (option == "memosignon") Config.NSDefFlags.SetFlag(NI_MEMO_SIGNON);
-			else if (option == "memoreceive") Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
-			else if (option == "autoop") Config.NSDefFlags.SetFlag(NI_AUTOOP);
+			else if (option == "hideemail")
+				Config.NSDefFlags.SetFlag(NI_HIDE_EMAIL);
+			else if (option == "hideusermask")
+				Config.NSDefFlags.SetFlag(NI_HIDE_MASK);
+			else if (option == "hidequit")
+				Config.NSDefFlags.SetFlag(NI_HIDE_QUIT);
+			else if (option == "memosignon")
+				Config.NSDefFlags.SetFlag(NI_MEMO_SIGNON);
+			else if (option == "memoreceive")
+				Config.NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
+			else if (option == "autoop")
+				Config.NSDefFlags.SetFlag(NI_AUTOOP);
 		}
 	}
 
-	if (reload) {
+	if (reload)
+	{
 		if ((Config.NSDefLanguage = langlist[Config.NSDefLanguage]) < 0)
 			Config.NSDefLanguage = DEF_LANGUAGE;
 	}
 
-	if (Config.CSDefBantype < 0 || Config.CSDefBantype > 3) {
+	if (Config.CSDefBantype < 0 || Config.CSDefBantype > 3)
+	{
 		error(0, "Value of CSDefBantype must be between 0 and 3 included");
 		retval = 0;
 	}
@@ -1601,78 +1659,126 @@ int read_config(int reload)
 		Config.CSDefFlags.SetFlag(CI_SECUREFOUNDER);
 		Config.CSDefFlags.SetFlag(CI_SIGNKICK);
 	}
-	else if (CSDefaults != "none") {
+	else if (CSDefaults != "none")
+	{
 		spacesepstream options(CSDefaults);
-		std::string option;
-		while (options.GetToken(option)) {
-			if (option == "keeptopic") Config.CSDefFlags.SetFlag(CI_KEEPTOPIC);
-			else if (option == "topiclock") Config.CSDefFlags.SetFlag(CI_TOPICLOCK);
-			else if (option == "private") Config.CSDefFlags.SetFlag(CI_PRIVATE);
-			else if (option == "restricted") Config.CSDefFlags.SetFlag(CI_RESTRICTED);
-			else if (option == "secure") Config.CSDefFlags.SetFlag(CI_SECURE);
-			else if (option == "secureops") Config.CSDefFlags.SetFlag(CI_SECUREOPS);
-			else if (option == "securefounder") Config.CSDefFlags.SetFlag(CI_SECUREFOUNDER);
-			else if (option == "signkick") Config.CSDefFlags.SetFlag(CI_SIGNKICK);
-			else if (option == "signkicklevel") Config.CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
-			else if (option == "opnotice") Config.CSDefFlags.SetFlag(CI_OPNOTICE);
-			else if (option == "xop") Config.CSDefFlags.SetFlag(CI_XOP);
-			else if (option == "peace") Config.CSDefFlags.SetFlag(CI_PEACE);
-			else if (option == "persist") Config.CSDefFlags.SetFlag(CI_PERSIST);
+		ci::string option;
+		while (options.GetToken(option))
+		{
+			if (option == "keeptopic")
+				Config.CSDefFlags.SetFlag(CI_KEEPTOPIC);
+			else if (option == "topiclock")
+				Config.CSDefFlags.SetFlag(CI_TOPICLOCK);
+			else if (option == "private")
+				Config.CSDefFlags.SetFlag(CI_PRIVATE);
+			else if (option == "restricted")
+				Config.CSDefFlags.SetFlag(CI_RESTRICTED);
+			else if (option == "secure")
+				Config.CSDefFlags.SetFlag(CI_SECURE);
+			else if (option == "secureops")
+				Config.CSDefFlags.SetFlag(CI_SECUREOPS);
+			else if (option == "securefounder")
+				Config.CSDefFlags.SetFlag(CI_SECUREFOUNDER);
+			else if (option == "signkick")
+				Config.CSDefFlags.SetFlag(CI_SIGNKICK);
+			else if (option == "signkicklevel")
+				Config.CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
+			else if (option == "opnotice")
+				Config.CSDefFlags.SetFlag(CI_OPNOTICE);
+			else if (option == "xop")
+				Config.CSDefFlags.SetFlag(CI_XOP);
+			else if (option == "peace")
+				Config.CSDefFlags.SetFlag(CI_PEACE);
+			else if (option == "persist")
+				Config.CSDefFlags.SetFlag(CI_PERSIST);
 		}
 	}
 
-	if (!BSDefaults.empty()) {
+	if (!BSDefaults.empty())
+	{
 		spacesepstream options(BSDefaults);
-		std::string option;
-		while (options.GetToken(option)) {
-			if (option == "dontkickops") Config.BSDefFlags.SetFlag(BS_DONTKICKOPS);
-			else if (option == "dontkickvoices") Config.BSDefFlags.SetFlag(BS_DONTKICKVOICES);
-			else if (option == "greet") Config.BSDefFlags.SetFlag(BS_GREET);
-			else if (option == "fantasy") Config.BSDefFlags.SetFlag(BS_FANTASY);
-			else if (option == "symbiosis") Config.BSDefFlags.SetFlag(BS_SYMBIOSIS);
+		ci::string option;
+		while (options.GetToken(option))
+		{
+			if (option == "dontkickops")
+				Config.BSDefFlags.SetFlag(BS_DONTKICKOPS);
+			else if (option == "dontkickvoices")
+				Config.BSDefFlags.SetFlag(BS_DONTKICKVOICES);
+			else if (option == "greet")
+				Config.BSDefFlags.SetFlag(BS_GREET);
+			else if (option == "fantasy")
+				Config.BSDefFlags.SetFlag(BS_FANTASY);
+			else if (option == "symbiosis")
+				Config.BSDefFlags.SetFlag(BS_SYMBIOSIS);
 		}
 	}
 
 	Config.WallOper = Config.WallBadOS = Config.WallOSGlobal = Config.WallOSMode = Config.WallOSClearmodes = Config.WallOSKick = Config.WallOSAkill = Config.WallOSSNLine = Config.WallOSSQLine =
-	Config.WallOSSZLine = Config.WallOSNoOp = Config.WallOSJupe = Config.WallAkillExpire = Config.WallSNLineExpire = Config.WallSQLineExpire = Config.WallSZLineExpire = Config.WallExceptionExpire = Config.WallGetpass = Config.WallSetpass = Config.WallForbid =
-	Config.WallDrop = false;
-	if (!OSNotifications.empty()) {
+		Config.WallOSSZLine = Config.WallOSNoOp = Config.WallOSJupe = Config.WallAkillExpire = Config.WallSNLineExpire = Config.WallSQLineExpire = Config.WallSZLineExpire = Config.WallExceptionExpire =
+		Config.WallGetpass = Config.WallSetpass = Config.WallForbid = Config.WallDrop = false;
+	if (!OSNotifications.empty())
+	{
 		spacesepstream notifications(OSNotifications);
-		std::string notice;
-		while (notifications.GetToken(notice)) {
-			if (notice == "oper") Config.WallOper = true;
-			else if (notice == "bados") Config.WallBadOS = true;
-			else if (notice == "osglobal") Config.WallOSGlobal = true;
-			else if (notice == "osmode") Config.WallOSMode = true;
-			else if (notice == "osclearmodes") Config.WallOSClearmodes = true;
-			else if (notice == "oskick") Config.WallOSKick = true;
-			else if (notice == "osakill") Config.WallOSAkill = true;
-			else if (notice == "ossnline") Config.WallOSSNLine = true;
-			else if (notice == "ossqline") Config.WallOSSQLine = true;
-			else if (notice == "osszline") Config.WallOSSZLine = true;
-			else if (notice == "osnoop") Config.WallOSNoOp = true;
-			else if (notice == "osjupe") Config.WallOSJupe = true;
-			else if (notice == "akillexpire") Config.WallAkillExpire = true;
-			else if (notice == "snlineexpire") Config.WallSNLineExpire = true;
-			else if (notice == "sqlineexpire") Config.WallSQLineExpire = true;
-			else if (notice == "szlineexpire") Config.WallSZLineExpire = true;
-			else if (notice == "exceptionexpire") Config.WallExceptionExpire = true;
-			else if (notice == "getpass") Config.WallGetpass = true;
-			else if (notice == "setpass") Config.WallSetpass = true;
-			else if (notice == "forbid") Config.WallForbid = true;
-			else if (notice == "drop") Config.WallDrop = true;
+		ci::string notice;
+		while (notifications.GetToken(notice))
+		{
+			if (notice == "oper")
+				Config.WallOper = true;
+			else if (notice == "bados")
+				Config.WallBadOS = true;
+			else if (notice == "osglobal")
+				Config.WallOSGlobal = true;
+			else if (notice == "osmode")
+				Config.WallOSMode = true;
+			else if (notice == "osclearmodes")
+				Config.WallOSClearmodes = true;
+			else if (notice == "oskick")
+				Config.WallOSKick = true;
+			else if (notice == "osakill")
+				Config.WallOSAkill = true;
+			else if (notice == "ossnline")
+				Config.WallOSSNLine = true;
+			else if (notice == "ossqline")
+				Config.WallOSSQLine = true;
+			else if (notice == "osszline")
+				Config.WallOSSZLine = true;
+			else if (notice == "osnoop")
+				Config.WallOSNoOp = true;
+			else if (notice == "osjupe")
+				Config.WallOSJupe = true;
+			else if (notice == "akillexpire")
+				Config.WallAkillExpire = true;
+			else if (notice == "snlineexpire")
+				Config.WallSNLineExpire = true;
+			else if (notice == "sqlineexpire")
+				Config.WallSQLineExpire = true;
+			else if (notice == "szlineexpire")
+				Config.WallSZLineExpire = true;
+			else if (notice == "exceptionexpire")
+				Config.WallExceptionExpire = true;
+			else if (notice == "getpass")
+				Config.WallGetpass = true;
+			else if (notice == "setpass")
+				Config.WallSetpass = true;
+			else if (notice == "forbid")
+				Config.WallForbid = true;
+			else if (notice == "drop")
+				Config.WallDrop = true;
 		}
 	}
 
 	/* Ulines */
 
-	if (UlineServers) {
+	if (UlineServers)
+	{
 		Config.NumUlines = 0;
 
 		s = strtok(UlineServers, " ");
-		do {
-			if (s) {
-				Config.NumUlines++;
+		do
+		{
+			if (s)
+			{
+				++Config.NumUlines;
 				Config.Ulines = static_cast<char **>(realloc(Config.Ulines, sizeof(char *) * Config.NumUlines));
 				Config.Ulines[Config.NumUlines - 1] = sstrdup(s);
 			}
@@ -1690,25 +1796,22 @@ int read_config(int reload)
 	Config.ChanServCoreModules = BuildStringList(!ChanCoreModules.empty() ? ChanCoreModules : "");
 	Config.NickServCoreModules = BuildStringList(!NickCoreModules.empty() ? NickCoreModules : "");
 
-	if (Config.LimitSessions) {
+	if (Config.LimitSessions)
+	{
 		if (Config.MaxSessionKill && !Config.SessionAutoKillExpiry)
-			Config.SessionAutoKillExpiry = 1800;	/* 30 minutes */
+			Config.SessionAutoKillExpiry = 1800; /* 30 minutes */
 	}
 
-	if (Config.s_BotServ) {
+	if (Config.s_BotServ)
+	{
 		if (!Config.BSFantasyCharacter || !*Config.BSFantasyCharacter)
 			Config.BSFantasyCharacter = sstrdup("!");
-		if (*Config.BSFantasyCharacter && (strlen(Config.BSFantasyCharacter) > 1)) {
-			printf
-				("*** Config.BSFantasyCharacter is more than 1 character long. Only the first\n"
-				 "*** character ('%c') will be used. The others will be ignored.\n",
-				 *Config.BSFantasyCharacter);
-		}
+		if (*Config.BSFantasyCharacter && strlen(Config.BSFantasyCharacter) > 1)
+			printf("*** Config.BSFantasyCharacter is more than 1 character long. Only the first\n*** character ('%c') will be used. The others will be ignored.\n", *Config.BSFantasyCharacter);
 	}
 
 	/* Check the user keys */
-	if ((Config.UserKey1 == Config.UserKey2) || (Config.UserKey1 == Config.UserKey3)
-		|| (Config.UserKey3 == Config.UserKey2))
+	if (Config.UserKey1 == Config.UserKey2 || Config.UserKey1 == Config.UserKey3 || Config.UserKey3 == Config.UserKey2)
 		Alog() << "Every UserKey must be different. It's for YOUR safety! Remember that!";
 
 	/**
@@ -1719,10 +1822,12 @@ int read_config(int reload)
 		/* Build DefCon's */
 		DefCon.resize(6);
 		DefCon[5].reset();
-		for (unsigned int level = 1; level < 5; ++level) {
+		for (unsigned int level = 1; level < 5; ++level)
+		{
 			DefCon[level] = 0;
-			std::string *levelDefinition = NULL;
-			switch (level) {
+			ci::string *levelDefinition = NULL;
+			switch (level)
+			{
 				case 1:
 					levelDefinition = &DefCon1;
 					break;
@@ -1736,37 +1841,44 @@ int read_config(int reload)
 					levelDefinition = &DefCon4;
 			}
 			spacesepstream operations(*levelDefinition);
-			std::string operation;
-			while (operations.GetToken(operation)) {
-				if (operation == "nonewchannels") AddDefCon(level, DEFCON_NO_NEW_CHANNELS);
-				else if (operation == "nonewnicks") AddDefCon(level, DEFCON_NO_NEW_NICKS);
-				else if (operation == "nomlockchanges") AddDefCon(level, DEFCON_NO_MLOCK_CHANGE); 
-				else if (operation == "forcechanmodes") AddDefCon(level, DEFCON_FORCE_CHAN_MODES);
-				else if (operation == "reducedsessions") AddDefCon(level, DEFCON_REDUCE_SESSION);
-				else if (operation == "nonewclients") AddDefCon(level, DEFCON_NO_NEW_CLIENTS);
-				else if (operation == "operonly") AddDefCon(level, DEFCON_OPER_ONLY);
-				else if (operation == "silentoperonly") AddDefCon(level, DEFCON_SILENT_OPER_ONLY);
-				else if (operation == "akillnewclients") AddDefCon(level, DEFCON_AKILL_NEW_CLIENTS);
-				else if (operation == "nonewmemos") AddDefCon(level, DEFCON_NO_NEW_MEMOS);
+			ci::string operation;
+			while (operations.GetToken(operation))
+			{
+				if (operation == "nonewchannels")
+					AddDefCon(level, DEFCON_NO_NEW_CHANNELS);
+				else if (operation == "nonewnicks")
+					AddDefCon(level, DEFCON_NO_NEW_NICKS);
+				else if (operation == "nomlockchanges")
+					AddDefCon(level, DEFCON_NO_MLOCK_CHANGE);
+				else if (operation == "forcechanmodes")
+					AddDefCon(level, DEFCON_FORCE_CHAN_MODES);
+				else if (operation == "reducedsessions")
+					AddDefCon(level, DEFCON_REDUCE_SESSION);
+				else if (operation == "nonewclients")
+					AddDefCon(level, DEFCON_NO_NEW_CLIENTS);
+				else if (operation == "operonly")
+					AddDefCon(level, DEFCON_OPER_ONLY);
+				else if (operation == "silentoperonly")
+					AddDefCon(level, DEFCON_SILENT_OPER_ONLY);
+				else if (operation == "akillnewclients")
+					AddDefCon(level, DEFCON_AKILL_NEW_CLIENTS);
+				else if (operation == "nonewmemos")
+					AddDefCon(level, DEFCON_NO_NEW_MEMOS);
 			}
 		}
 
 		/* Check any defcon needed settings */
-		for (defconCount = 1; defconCount <= 5; defconCount++)
+		for (defconCount = 1; defconCount <= 5; ++defconCount)
 		{
 			if (CheckDefCon(defconCount, DEFCON_REDUCE_SESSION))
-			{
 				CHECK(Config.DefConSessionLimit);
-			}
 			if (CheckDefCon(defconCount, DEFCON_AKILL_NEW_CLIENTS))
 			{
 				CHECK(Config.DefConAKILL);
 				CHECK(Config.DefConAkillReason);
 			}
 			if (CheckDefCon(defconCount, DEFCON_FORCE_CHAN_MODES))
-			{
 				CHECK(Config.DefConChanModes);
-			}
 		}
 	}
 
@@ -1776,13 +1888,13 @@ int read_config(int reload)
 	if (!Config.LogChannel && LogChan)
 		LogChan = false;
 
-	if (!retval) {
-		printf
-			("\n*** Support resources: Read through the services.conf self-contained \n*** documentation. Read the documentation files found in the 'docs' \n*** folder. Visit our portal located at http://www.anope.org/. Join \n*** our support channel on /server irc.anope.org channel #anope.\n\n");
+	if (!retval)
+	{
+		printf("\n*** Support resources: Read through the services.conf self-contained \n*** documentation. Read the documentation files found in the 'docs' \n"
+			"*** folder. Visit our portal located at http://www.anope.org/. Join \n*** our support channel on /server irc.anope.org channel #anope.\n\n");
 	}
 
 	return retval;
 }
-
 
 /*************************************************************************/

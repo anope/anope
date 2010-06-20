@@ -3,10 +3,10 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
+
+#ifndef BOTS_H
+#define BOTS_H
 
 #include "commands.h"
 
@@ -32,15 +32,15 @@ enum BotFlag
 class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 {
  public:
-	std::string uid;		/* required for UID supporting servers, as opposed to the shitty struct Uid. */
-	std::string nick;		/* Nickname of the bot */
-	std::string user;		/* Its user name */
-	std::string host;		/* Its hostname */
-	std::string real;		/* Its real name */
-	time_t created; 		/* Birth date ;) */
-	int16 chancount;		/* Number of channels that use the bot. */
+	std::string uid;	/* required for UID supporting servers, as opposed to the shitty struct Uid. */
+	std::string nick;	/* Nickname of the bot */
+	std::string user;	/* Its user name */
+	std::string host;	/* Its hostname */
+	std::string real;	/* Its real name */
+	time_t created; 	/* Birth date ;) */
+	int16 chancount;	/* Number of channels that use the bot. */
 	/* Dynamic data */
-	time_t lastmsg;			/* Last time we said something */
+	time_t lastmsg;		/* Last time we said something */
 	CommandMap Commands;
 
 	/** Create a new bot.
@@ -77,3 +77,5 @@ class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
 	 */
 	void UnAssign(User *u, ChannelInfo *ci);
 };
+
+#endif // BOTS_H

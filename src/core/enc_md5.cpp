@@ -382,10 +382,10 @@ class EMD5 : public Module
 		this->OnEncrypt(plaintext, buf);
 		if (!password.compare(buf))
 		{
-			/* if we are NOT the first module in the list, 
+			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front().compare(this->name))
+			if (Config.EncModuleList.front() == this->name)
 			{
 				enc_encrypt(plaintext, password);
 			}

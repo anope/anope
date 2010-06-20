@@ -34,4 +34,3 @@ bool Thread::GetExitState() const
 void Thread::Run()
 {
 }
-

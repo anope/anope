@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -31,7 +29,7 @@ int m_away(const char *source, const char *msg)
 
 	u = finduser(source);
 
-	if (u && msg == 0)		  /* un-away */
+	if (u && !msg) /* un-away */
 		check_memos(u);
 	return MOD_CONT;
 }
@@ -62,9 +60,8 @@ int m_time(const char *source, int ac, const char **av)
 	struct tm *tm;
 	char buf[64];
 
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 
 	time(&t);
 	tm = localtime(&t);
@@ -80,22 +77,23 @@ int m_motd(const char *source)
 	FILE *f;
 	char buf[BUFSIZE];
 
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 
 	f = fopen(Config.MOTDFilename, "r");
-	if (f) {
+	if (f)
+	{
 		ircdproto->SendNumeric(Config.ServerName, 375, source, ":- %s Message of the Day", Config.ServerName);
-		while (fgets(buf, sizeof(buf), f)) {
+		while (fgets(buf, sizeof(buf), f))
+		{
 			buf[strlen(buf) - 1] = 0;
 			ircdproto->SendNumeric(Config.ServerName, 372, source, ":- %s", buf);
 		}
 		fclose(f);
 		ircdproto->SendNumeric(Config.ServerName, 376, source, ":End of /MOTD command.");
-	} else {
-		ircdproto->SendNumeric(Config.ServerName, 422, source, ":- MOTD file not found!  Please contact your IRC administrator.");
 	}
+	else
+		ircdproto->SendNumeric(Config.ServerName, 422, source, ":- MOTD file not found!  Please contact your IRC administrator.");
 	return MOD_CONT;
 }
 
@@ -107,9 +105,7 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 	time_t starttime, stoptime; /* When processing started and finished */
 
 	if (source.empty() || receiver.empty() || message.empty())
-	{
 		return MOD_CONT;
-	}
 
 	User *u = finduser(source);
 
@@ -119,9 +115,7 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 
 		BotInfo *bi = findbot(receiver);
 		if (bi)
-		{
 			ircdproto->SendMessage(bi, source.c_str(), "%s", getstring(USER_RECORD_NOT_FOUND));
-		}
 
 		return MOD_CONT;
 	}
@@ -133,9 +127,7 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 		{
 			/* Some paranoia checks */
 			if (!ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi)
-			{
 				botchanmsgs(u, ci, message);
-			}
 		}
 	}
 	else
@@ -166,8 +158,7 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 		else if (Config.UseStrictPrivMsg)
 		{
 			Alog(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
-			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(),
-						Config.ServerName, receiver.c_str());
+			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config.ServerName, receiver.c_str());
 			return MOD_CONT;
 		}
 
@@ -228,53 +219,54 @@ int m_stats(const char *source, int ac, const char **av)
 	if (ac < 1)
 		return MOD_CONT;
 
-	switch (*av[0]) {
-	case 'l':
-		u = finduser(source);
+	switch (*av[0])
+	{
+		case 'l':
+			u = finduser(source);
 
-		if (u && is_oper(u)) {
-
-			ircdproto->SendNumeric(Config.ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-			ircdproto->SendNumeric(Config.ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host, UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, time(NULL) - start_time);
-		}
-
-		ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
-		break;
-	case 'o':
-	case 'O':
-/* Check whether the user is an operator */
-		u = finduser(source);
-		if (u && !is_oper(u) && Config.HideStatsO) {
-			ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
-		} else {
-			std::list<std::pair<std::string, std::string> >::iterator it;
-
-			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+			if (u && is_oper(u))
 			{
-				std::string nick = it->first, type = it->second;
-
-				NickCore *nc = findcore(nick);
-				if (nc)
-					ircdproto->SendNumeric(Config.ServerName, 243, source, "O * * %s %s 0", nick.c_str(), type.c_str());
+				ircdproto->SendNumeric(Config.ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
+				ircdproto->SendNumeric(Config.ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host, UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, time(NULL) - start_time);
 			}
 
 			ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
-		}
+			break;
+		case 'o':
+		case 'O':
+			/* Check whether the user is an operator */
+			u = finduser(source);
+			if (u && !is_oper(u) && Config.HideStatsO)
+				ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			else
+			{
+				std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
 
-		break;
+				for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
+				{
+					ci::string nick = it->first, type = it->second;
 
-	case 'u':{
+					NickCore *nc = findcore(nick);
+					if (nc)
+						ircdproto->SendNumeric(Config.ServerName, 243, source, "O * * %s %s 0", nick.c_str(), type.c_str());
+				}
+
+				ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			}
+
+			break;
+
+		case 'u':
+		{
 			int uptime = time(NULL) - start_time;
-			ircdproto->SendNumeric(Config.ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s",
-				(uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+			ircdproto->SendNumeric(Config.ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 			ircdproto->SendNumeric(Config.ServerName, 250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
 			ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
 			break;
-		}					   /* case 'u' */
+		} /* case 'u' */
 
-	default:
-		ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
-		break;
+		default:
+			ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
 	}
 	return MOD_CONT;
 }
@@ -287,7 +279,6 @@ int m_version(const char *source, int ac, const char **av)
 		ircdproto->SendNumeric(Config.ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", version_number, Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), version_build);
 	return MOD_CONT;
 }
-
 
 /*************************************************************************/
 
@@ -316,9 +307,7 @@ int m_whois(const char *source, const char *who)
 			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
 		}
 		else
-		{
 			ircdproto->SendNumeric(Config.ServerName, 401, source, "%s :No such service.", who);
-		}
 	}
 	return MOD_CONT;
 }
@@ -330,4 +319,3 @@ void moduleAddMsgs()
 	Anope::AddMessage("TIME", m_time);
 	Anope::AddMessage("VERSION", m_version);
 }
-

@@ -3,9 +3,6 @@
  * Copyright (C) 2008-2010 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- *
- *
  */
 
 #include "services.h"
@@ -35,33 +32,19 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 
 	ci::string ci_nick(nnick.c_str());
 	if (Config.s_ChanServ && ci_nick == Config.s_ChanServ)
-	{
 		ChanServ = this;
-	}
 	else if (Config.s_BotServ && ci_nick == Config.s_BotServ)
-	{
 		BotServ = this;
-	}
 	else if (Config.s_HostServ && ci_nick == Config.s_HostServ)
-	{
 		HostServ = this;
-	}
 	else if (Config.s_OperServ && ci_nick == Config.s_OperServ)
-	{
 		OperServ = this;
-	}
 	else if (Config.s_MemoServ && ci_nick == Config.s_MemoServ)
-	{
 		MemoServ = this;
-	}
 	else if (Config.s_NickServ && ci_nick == Config.s_NickServ)
-	{
 		NickServ = this;
-	}
 	else if (Config.s_GlobalNoticer && ci_nick == Config.s_GlobalNoticer)
-	{
 		Global = this;
-	}
 
 	BotListByNick[this->nick.c_str()] = this;
 	if (!this->uid.empty())
@@ -78,14 +61,12 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 
 BotInfo::~BotInfo()
 {
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
 		if (ci->bi == this)
-		{
 			ci->bi = NULL;
-		}
 	}
 
 	BotListByNick.erase(this->nick.c_str());
@@ -105,7 +86,7 @@ void BotInfo::ChangeNick(const char *newnick)
 
 void BotInfo::RejoinAll()
 {
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 

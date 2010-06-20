@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -40,42 +38,52 @@ void add_ignore(const char *nick, time_t delta)
 		return;
 	now = time(NULL);
 	/* If it s an existing user, we ignore the hostmask. */
-	if ((u = finduser(nick))) {
+	if ((u = finduser(nick)))
+	{
 		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
 		mask = sstrdup(tmp);
+	}
 	/* Determine whether we get a nick or a mask. */
-	} else if ((host = const_cast<char *>(strchr(nick, '@')))) {
+	else if ((host = const_cast<char *>(strchr(nick, '@'))))
+	{
 		/* Check whether we have a nick too.. */
-			if ((user = const_cast<char *>(strchr(nick, '!')))) {
+		if ((user = const_cast<char *>(strchr(nick, '!'))))
+		{
 			/* this should never happen */
 			if (user > host)
 				return;
 			mask = sstrdup(nick);
-		} else {
+		}
+		else
+		{
 			/* We have user@host. Add nick wildcard. */
-				snprintf(tmp, sizeof(tmp), "*!%s", nick);
+			snprintf(tmp, sizeof(tmp), "*!%s", nick);
 			mask = sstrdup(tmp);
 		}
+	}
 	/* We only got a nick.. */
-	} else {
+	else {
 		snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 		mask = sstrdup(tmp);
 	}
 	/* Check if we already got an identical entry. */
 	for (ign = ignore; ign; ign = ign->next)
-		if (stricmp(ign->mask, mask) == 0)
+		if (!stricmp(ign->mask, mask))
 			break;
 	/* Found one.. */
-	if (ign) {
-		if (delta == 0)
+	if (ign)
+	{
+		if (!delta)
 			ign->time = 0;
 		else if (ign->time < now + delta)
 			ign->time = now + delta;
+	}
 	/* Create new entry.. */
-	} else {
+	else
+	{
 		ign = new IgnoreData;
 		ign->mask = mask;
-		ign->time = (delta == 0 ? 0 : now + delta);
+		ign->time = !delta ? 0 : now + delta;
 		ign->prev = NULL;
 		ign->next = ignore;
 		if (ignore)
@@ -109,34 +117,40 @@ IgnoreData *get_ignore(const char *nick)
 	now = time(NULL);
 	u = finduser(nick);
 	/* If we find a real user, match his mask against the ignorelist. */
-	if (u) {
+	if (u)
+	{
 		/* Opers are not ignored, even if a matching entry may be present. */
 		if (is_oper(u))
 			return NULL;
 		for (ign = ignore; ign; ign = ign->next)
 			if (match_usermask(ign->mask, u))
 				break;
-		} else {
+	}
+	else
+	{
 		/* We didn't get a user.. generate a valid mask. */
-			if ((host = const_cast<char *>(strchr(nick, '@')))) {
-				if ((user = const_cast<char *>(strchr(nick, '!')))) {
+		if ((host = const_cast<char *>(strchr(nick, '@'))))
+		{
+			if ((user = const_cast<char *>(strchr(nick, '!'))))
+			{
 				/* this should never happen */
 				if (user > host)
 					return NULL;
 				snprintf(tmp, sizeof(tmp), "%s", nick);
-			} else {
+			}
+			else
 				/* We have user@host. Add nick wildcard. */
 				snprintf(tmp, sizeof(tmp), "*!%s", nick);
-			}
+		}
 		/* We only got a nick.. */
-		} else
+		else
 			snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 		for (ign = ignore; ign; ign = ign->next)
 			if (Anope::Match(tmp, ign->mask, false))
 				break;
 	}
 	/* Check whether the entry has timed out */
-	if (ign && ign->time != 0 && ign->time <= now) 
+	if (ign && ign->time != 0 && ign->time <= now)
 	{
 		Alog(LOG_DEBUG) << "Expiring ignore entry " << ign->mask;
 		if (ign->prev)
@@ -154,7 +168,6 @@ IgnoreData *get_ignore(const char *nick)
 	return ign;
 }
 
-
 /*************************************************************************/
 
 /**
@@ -171,25 +184,28 @@ int delete_ignore(const char *nick)
 	if (!nick)
 		return 0;
 	/* If it s an existing user, we ignore the hostmask. */
-	if ((u = finduser(nick))) {
+	if ((u = finduser(nick)))
 		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
 	/* Determine whether we get a nick or a mask. */
-	} else if ((host = const_cast<char *>(strchr(nick, '@')))) {
+	else if ((host = const_cast<char *>(strchr(nick, '@'))))
+	{
 		/* Check whether we have a nick too.. */
-		if ((user = const_cast<char *>(strchr(nick, '!')))) {
+		if ((user = const_cast<char *>(strchr(nick, '!'))))
+		{
 			/* this should never happen */
 			if (user > host)
 				return 0;
 			snprintf(tmp, sizeof(tmp), "%s", nick);
-		} else {
-			/* We have user@host. Add nick wildcard. */
-				snprintf(tmp, sizeof(tmp), "*!%s", nick);
 		}
+		else
+			/* We have user@host. Add nick wildcard. */
+			snprintf(tmp, sizeof(tmp), "*!%s", nick);
+	}
 	/* We only got a nick.. */
-	} else
+	else
 		snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 	for (ign = ignore; ign; ign = ign->next)
-		if (stricmp(ign->mask, tmp) == 0)
+		if (!stricmp(ign->mask, tmp))
 			break;
 	/* No matching ignore found. */
 	if (!ign)
@@ -208,8 +224,6 @@ int delete_ignore(const char *nick)
 	return 1;
 }
 
-
-
 /*************************************************************************/
 
 /**
@@ -222,25 +236,25 @@ int clear_ignores()
 	int i = 0;
 	if (!ignore)
 		return 0;
-	for (ign = ignore; ign; ign = next) {
+	for (ign = ignore; ign; ign = next)
+	{
 		next = ign->next;
 		Alog(LOG_DEBUG) << "Deleting ignore entry " << ign->mask;
 		delete [] ign->mask;
 		delete ign;
-		i++;
+		++i;
 	}
 	ignore = NULL;
 	return i;
 }
 
-
 /*************************************************************************/
 /* split_buf:  Split a buffer into arguments and store the arguments in an
- *			 argument vector pointed to by argv (which will be malloc'd
- *			 as necessary); return the argument count.  If colon_special
- *			 is non-zero, then treat a parameter with a leading ':' as
- *			 the last parameter of the line, per the IRC RFC.  Destroys
- *			 the buffer by side effect.
+ *             argument vector pointed to by argv (which will be malloc'd
+ *             as necessary); return the argument count.  If colon_special
+ *             is non-zero, then treat a parameter with a leading ':' as
+ *             the last parameter of the line, per the IRC RFC.  Destroys
+ *             the buffer by side effect.
  */
 int split_buf(char *buf, const char ***argv, int colon_special)
 {
@@ -250,23 +264,29 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 
 	*argv = static_cast<const char **>(scalloc(sizeof(const char *) * argvsize, 1));
 	argc = 0;
-	while (*buf) {
-		if (argc == argvsize) {
+	while (*buf)
+	{
+		if (argc == argvsize)
+		{
 			argvsize += 8;
 			*argv = static_cast<const char **>(srealloc(*argv, sizeof(const char *) * argvsize));
 		}
-		if (*buf == ':') {
+		if (*buf == ':')
+		{
 			(*argv)[argc++] = buf + 1;
 			buf = const_cast<char *>(""); // XXX: unsafe cast.
-		} else {
+		}
+		else
+		{
 			s = strpbrk(buf, " ");
-			if (s) {
+			if (s)
+			{
 				*s++ = 0;
 				while (*s == ' ')
-					s++;
-			} else {
-				s = buf + strlen(buf);
+					++s;
 			}
+			else
+				s = buf + strlen(buf);
 			(*argv)[argc++] = buf;
 			buf = s;
 		}
@@ -277,22 +297,17 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 /*************************************************************************/
 
 /* process:  Main processing routine.  Takes the string in inbuf (global
- *		   variable) and does something appropriate with it. */
+ *           variable) and does something appropriate with it. */
 
 void process(const std::string &buffer)
 {
 	int retVal = 0;
-	char source[64];
-	char cmd[64];
-	char buf[512];			  /* Longest legal IRC command line */
+	char source[64] = "";
+	char cmd[64] = "";
+	char buf[512] = ""; /* Longest legal IRC command line */
 	char *s;
-	int ac;					 /* Parameters for the command */
+	int ac; /* Parameters for the command */
 	const char **av;
-
-	/* zero out the buffers before we do much else */
-	*buf = '\0';
-	*source = '\0';
-	*cmd = '\0';
 
 	/* If debugging, log the buffer */
 	Alog(LOG_DEBUG) << "Received: " << buffer;
@@ -304,7 +319,8 @@ void process(const std::string &buffer)
 	doCleanBuffer(buf);
 
 	/* Split the buffer into pieces. */
-	if (*buf == ':') {
+	if (*buf == ':')
+	{
 		s = strpbrk(buf, " ");
 		if (!s)
 			return;
@@ -312,16 +328,18 @@ void process(const std::string &buffer)
 		while (isspace(*++s));
 		strscpy(source, buf + 1, sizeof(source));
 		memmove(buf, s, strlen(s) + 1);
-	} else {
-		*source = 0;
 	}
+	else
+		*source = 0;
 	if (!*buf)
 		return;
 	s = strpbrk(buf, " ");
-	if (s) {
+	if (s)
+	{
 		*s = 0;
 		while (isspace(*++s));
-	} else
+	}
+	else
 		s = buf + strlen(buf);
 	strscpy(cmd, buf, sizeof(cmd));
 	ac = split_buf(s, &av, 1);
@@ -335,7 +353,7 @@ void process(const std::string &buffer)
 		if (ac)
 		{
 			int i;
-			for (i = 0; i < ac; i++)
+			for (i = 0; i < ac; ++i)
 				Alog() << "av[" << i << "] = " << av[i];
 		}
 		else
@@ -349,7 +367,7 @@ void process(const std::string &buffer)
 	{
 		retVal = MOD_CONT;
 
-		for (std::vector<Message *>::iterator it = messages.begin(); retVal == MOD_CONT && it != messages.end(); ++it)
+		for (std::vector<Message *>::iterator it = messages.begin(), it_end = messages.end(); retVal == MOD_CONT && it != it_end; ++it)
 		{
 			Message *m = *it;
 

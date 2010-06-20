@@ -156,7 +156,7 @@ class ESHA256 : public Module
 		return buf2;
 	}
 
-	/* splits the appended IV from the password string so it can be used for the next encryption */ 
+	/* splits the appended IV from the password string so it can be used for the next encryption */
 	/* password format:  <hashmethod>:<password_b64>:<iv_b64> */
 	void GetIVFromPass(std::string &password)
 	{
@@ -302,7 +302,7 @@ class ESHA256 : public Module
 		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest.assign(buf.str());
 		return EVENT_ALLOW;
-		
+
 	}
 
 	EventReturn OnEncryptInPlace(std::string &buf)
@@ -310,14 +310,14 @@ class ESHA256 : public Module
 		return this->OnEncrypt(buf, buf);
 	}
 
-	EventReturn OnDecrypt(const std::string &hashm, std::string &src, std::string &dest) 
+	EventReturn OnDecrypt(const std::string &hashm, std::string &src, std::string &dest)
 	{
 		if (hashm != "sha256")
 			return EVENT_CONTINUE;
 		return EVENT_STOP;
 	}
 
-	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password) 
+	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
 	{
 		if (hashm != "sha256")
 			return EVENT_CONTINUE;
@@ -329,10 +329,10 @@ class ESHA256 : public Module
 
 		if(!password.compare(buf))
 		{
-			/* if we are NOT the first module in the list, 
+			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front().compare(this->name))
+			if (Config.EncModuleList.front() == this->name)
 			{
 				enc_encrypt(plaintext, password );
 			}

@@ -1,23 +1,20 @@
 /*
- *
  * (C) 2004-2010 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- *
+ * Based on the original code of Services by Andy Church.
  */
 
 #ifndef SOCKETS_H
 #define SOCKETS_H
 
 #ifdef _WIN32
-#define CloseSocket closesocket
+# define CloseSocket closesocket
 #else
-#define CloseSocket close
+# define CloseSocket close
 #endif
 
 #define NET_BUFSIZE 65536
@@ -25,7 +22,7 @@
 class SocketException : public CoreException
 {
  public:
- 	/** Default constructor for socket exceptions
+	/** Default constructor for socket exceptions
 	 * @param message Error message
 	 */
 	SocketException(const std::string &message) : CoreException(message) { }
@@ -72,7 +69,7 @@ class CoreExport Socket
 	size_t RecvLen;
 
  public:
- 	/** Default constructor
+	/** Default constructor
 	 * @param nTargetHost Hostname to connect to
 	 * @param nPort Port to connect to
 	 * @param nBindHos Host to bind to when connecting
@@ -134,9 +131,9 @@ class CoreExport Socket
 class CoreExport SocketEngine
 {
  private:
- 	/* List of sockets that need to be deleted */
+	/* List of sockets that need to be deleted */
 	std::set<Socket *> OldSockets;
- 	/* FDs to read */
+	/* FDs to read */
 	fd_set ReadFDs;
 	/* FDs that want writing */
 	fd_set WriteFDs;
@@ -184,4 +181,4 @@ class CoreExport SocketEngine
 	const std::string GetError() const;
 };
 
-#endif
+#endif // SOCKETS_H

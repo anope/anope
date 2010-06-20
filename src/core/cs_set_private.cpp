@@ -18,7 +18,7 @@
 class CommandCSSetPrivate : public Command
 {
  public:
-	CommandCSSetPrivate(const ci::string &cname, const std::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPrivate(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 

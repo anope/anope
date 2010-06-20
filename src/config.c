@@ -608,7 +608,6 @@ int ServerConfig::Read(bool bail)
 		{"serverinfo", "hostname", "", new ValueContainerChar(&Config.ServiceHost), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "pid", "services.pid", new ValueContainerChar(&Config.PIDFilename), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "motd", "services.motd", new ValueContainerChar(&Config.MOTDFilename), DT_CHARPTR, ValidateNotEmpty},
-		{"networkinfo", "helpchannel", "", new ValueContainerChar(&Config.HelpChannel), DT_CHARPTR, NoValidation},
 		{"networkinfo", "logchannel", "", new ValueContainerChar(&Config.LogChannel), DT_CHARPTR, NoValidation},
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&Config.LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&Config.NetworkName), DT_CHARPTR, ValidateNotEmpty},

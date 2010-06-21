@@ -14,7 +14,7 @@
 #include "version.h"
 
 std::multimap<std::string, Message *> MessageMap;
-std::deque<Module *> Modules;
+std::list<Module *> Modules;
 
 char *mod_current_buffer = NULL;
 
@@ -93,7 +93,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
  */
 Module *FindModule(const std::string &name)
 {
-	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 	{
 		Module *m = *it;
 

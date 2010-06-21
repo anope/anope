@@ -69,7 +69,7 @@ class CoreExport XLineManager
 
  protected:
 	/* List of XLines in this XLineManager */
-	std::deque<XLine *> XLines;
+	std::vector<XLine *> XLines;
  public:
 	/** Constructor
 	 */
@@ -103,10 +103,10 @@ class CoreExport XLineManager
 	 */
 	const size_t GetCount() const;
 
-	/** Get the XLine list
-	 * @return The list
+	/** Get the XLine vector
+	 * @return The vector
 	 */
-	const std::deque<XLine *>& GetList() const;
+	const std::vector<XLine *>& GetList() const;
 
 	/** Add an entry to this XLineManager
 	 * @param x The entry
@@ -125,7 +125,7 @@ class CoreExport XLineManager
 	 */
 	XLine *GetEntry(unsigned index) const;
 
-	/** Clear the XLine list
+	/** Clear the XLine vector
 	 */
 	void Clear();
 

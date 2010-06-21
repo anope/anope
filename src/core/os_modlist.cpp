@@ -118,7 +118,7 @@ class CommandOSModList : public Command
 
 		notice_lang(Config.s_OperServ, u, OPER_MODULE_LIST_HEADER);
 
-		for (std::deque<Module *>::iterator it = Modules.begin(); it != Modules.end(); ++it)
+		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 		{
 			Module *m = *it;
 

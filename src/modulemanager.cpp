@@ -87,7 +87,7 @@ static bool IsOneOfModuleTypeLoaded(MODType mt)
 {
 	int pmods = 0;
 
-	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 	{
 		if ((*it)->type == mt)
 			++pmods;
@@ -471,14 +471,12 @@ void ModuleManager::ClearCallBacks(Module *m)
  */
 void ModuleManager::UnloadAll(bool unload_proto)
 {
-	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; )
+	for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; )
 	{
 		Module *m = *it++;
 
 		if (unload_proto || m->type != PROTOCOL)
 			DeleteModule(m);
-
-		if (Modules.empty())
-			break;
 	}
 }
+

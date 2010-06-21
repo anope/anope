@@ -158,7 +158,7 @@ enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE 
 struct Message;
 extern CoreExport std::multimap<std::string, Message *> MessageMap;
 class Module;
-extern CoreExport std::deque<Module *> Modules;
+extern CoreExport std::list<Module *> Modules;
 
 /*************************************************************************/
 /* Structure for information about a *Serv command. */

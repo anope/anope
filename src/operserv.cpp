@@ -272,10 +272,10 @@ const size_t XLineManager::GetCount() const
 	return XLines.size();
 }
 
-/** Get the XLine list
-  * @return The list
+/** Get the XLine vector
+  * @return The vecotr
   */
-const std::deque<XLine *>& XLineManager::GetList() const
+const std::vector<XLine *>& XLineManager::GetList() const
 {
 	return XLines;
 }
@@ -294,7 +294,7 @@ void XLineManager::AddXLine(XLine *x)
  */
 bool XLineManager::DelXLine(XLine *x)
 {
-	std::deque<XLine *>::iterator it = std::find(XLines.begin(), XLines.end(), x);
+	std::vector<XLine *>::iterator it = std::find(XLines.begin(), XLines.end(), x);
 
 	if (it != XLines.end())
 	{
@@ -319,11 +319,11 @@ XLine *XLineManager::GetEntry(unsigned index) const
 	return XLines[index];
 }
 
-/** Clear the XLine list
+/** Clear the XLine vector
  */
 void XLineManager::Clear()
 {
-	for (std::deque<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
+	for (std::vector<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
 		delete *it;
 	XLines.clear();
 }
@@ -424,7 +424,7 @@ XLine *XLineManager::Check(User *u)
 {
 	const time_t now = time(NULL);
 
-	for (std::deque<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
+	for (std::vector<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
 	{
 		XLine *x = *it;
 
@@ -727,7 +727,7 @@ bool SQLineManager::Check(Channel *c)
 {
 	if (ircd->chansqline && SQLine)
 	{
-		for (std::deque<XLine *>::const_iterator it = SGLine->GetList().begin(), it_end = SGLine->GetList().end(); it != it_end; ++it)
+		for (std::vector<XLine *>::const_iterator it = SGLine->GetList().begin(), it_end = SGLine->GetList().end(); it != it_end; ++it)
 		{
 			XLine *x = *it;
 

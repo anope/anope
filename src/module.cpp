@@ -116,13 +116,10 @@ Module::~Module()
 		}
 	}
 
-	for (std::deque<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	std::list<Module *>::iterator it = std::find(Modules.begin(), Modules.end(), this);
+	if (it != Modules.end())
 	{
-		if (*it == this)
-		{
-			Modules.erase(it);
-			break;
-		}
+		Modules.erase(it);
 	}
 }
 

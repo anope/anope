@@ -36,8 +36,6 @@ Module::~Module()
 	for (i = 0; i < NUM_LANGS; ++i)
 		this->DeleteLanguage(i);
 
-	remove(this->filename.c_str());
-
 	/* Clear any active callbacks this module has */
 	ModuleManager::ClearCallBacks(this);
 

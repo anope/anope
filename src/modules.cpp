@@ -346,16 +346,6 @@ void Module::DeleteLanguage(int langNumber)
 
 void ModuleRunTimeDirCleanUp()
 {
-#ifndef _WIN32
-	DIR *dirp;
-	struct dirent *dp;
-#else
-	BOOL fFinished;
-	HANDLE hList;
-	TCHAR szDir[MAX_PATH + 1];
-	WIN32_FIND_DATA FileData;
-	char buffer[_MAX_PATH];
-#endif
 	char dirbuf[BUFSIZE];
 	char filebuf[BUFSIZE];
 
@@ -364,9 +354,12 @@ void ModuleRunTimeDirCleanUp()
 	Alog(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
 #ifndef _WIN32
+	DIR *dirp;
+	struct dirent *dp;
+
 	if (!(dirp = opendir(dirbuf)))
 	{
-		Alog(LOG_DEBUG) << "cannot open directory (" << dirbuf << ")";
+		Alog(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
 		return;
 	}
 	while ((dp = readdir(dirp)))
@@ -376,14 +369,16 @@ void ModuleRunTimeDirCleanUp()
 		if (!stricmp(dp->d_name, ".") || !stricmp(dp->d_name, ".."))
 			continue;
 		snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
-		unlink(filebuf);
+		DeleteFile(filebuf);
 	}
 	closedir(dirp);
 #else
-	/* Get the current working directory: */
-	if (!_getcwd(buffer, _MAX_PATH))
-		Alog(LOG_DEBUG) << "Unable to set Current working directory";
-	snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirbuf);
+	BOOL fFinished;
+	HANDLE hList;
+	TCHAR szDir[MAX_PATH + 1];
+	WIN32_FIND_DATA FileData;
+
+	snprintf(szDir, sizeof(szDir), "%s/*", dirbuf);
 
 	hList = FindFirstFile(szDir, &FileData);
 	if (hList != INVALID_HANDLE_VALUE)
@@ -394,7 +389,8 @@ void ModuleRunTimeDirCleanUp()
 			if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, FileData.cFileName);
-				DeleteFile(filebuf);
+				if (!DeleteFile(filebuf))
+					Alog(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << dlerror();
 			}
 			if (!FindNextFile(hList, &FileData))
 			{
@@ -405,7 +401,9 @@ void ModuleRunTimeDirCleanUp()
 	}
 	else
 		Alog(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
+
 	FindClose(hList);
+
 #endif
 	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }

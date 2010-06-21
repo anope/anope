@@ -17,9 +17,7 @@ void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
 {
 	for (std::list<std::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
 	{
-		Module *m = FindModule(*it);
-		if (!m)
-			ModuleManager::LoadModule(*it, NULL);
+		ModuleManager::LoadModule(*it, NULL);
 	}
 }
 
@@ -27,9 +25,7 @@ void ModuleManager::LoadModuleList(std::list<ci::string> &ModuleList)
 {
 	for (std::list<ci::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
 	{
-		Module *m = FindModule(*it);
-		if (!m)
-			ModuleManager::LoadModule(*it, NULL);
+		ModuleManager::LoadModule(*it, NULL);
 	}
 }
 
@@ -61,11 +57,13 @@ static int moduleCopyFile(const char *name, const char *output)
 
 #ifndef _WIN32
 	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)
-		return MOD_ERR_FILE_IO;
 #else
 	if (!mktemp(const_cast<char *>(output)))
-		return MOD_ERR_FILE_IO;
 #endif
+	{
+		fclose(source);
+		return MOD_ERR_FILE_IO;
+	}
 
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
@@ -74,7 +72,10 @@ static int moduleCopyFile(const char *name, const char *output)
 #else
 	if (!(target = fopen(output, "wb")))
 #endif
+	{
+		fclose(source);
 		return MOD_ERR_FILE_IO;
+	}
 	while ((ch = fgetc(source)) != EOF)
 		fputc(ch, target);
 	fclose(source);
@@ -281,15 +282,15 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 
 void ModuleManager::DeleteModule(Module *m)
 {
+	if (!m || !m->handle)
+		return;
+		
 	const char *err;
 	void (*destroy_func)(Module *m);
-	ano_module_t handle;
-
-	if (!m || !m->handle) /* check m is least possibly valid */
-		return;
 
 	DetachAll(m);
-	handle = m->handle;
+	ano_module_t handle = m->handle;
+	std::string filename = m->filename;
 
 	ano_modclearerr();
 	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
@@ -306,6 +307,9 @@ void ModuleManager::DeleteModule(Module *m)
 		if (dlclose(handle))
 			Alog() << dlerror();
 	}
+	
+	if (!filename.empty())
+		DeleteFile(filename.c_str());
 }
 
 bool ModuleManager::Attach(Implementation i, Module *mod)

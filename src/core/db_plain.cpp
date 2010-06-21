@@ -44,6 +44,7 @@ static void ReadDatabase(Module *m = NULL)
 	EventReturn MOD_RESULT;
 	MDType Type = MD_NONE;
 
+	db.clear();
 	db.open(DatabaseFile.c_str(), std::ios_base::in);
 
 	if (!db.is_open())
@@ -584,7 +585,7 @@ class DBPlain : public Module
 			{
 				ircdproto->SendGlobops(findbot(Config.s_OperServ), "Unable to backup database!");
 				Alog() << "Unable to back up database!";
-	
+
 				if (!Config.NoBackupOkay)
 					quitting = 1;
 
@@ -928,6 +929,7 @@ class DBPlain : public Module
 	{
 		BackupDatabase();
 
+		db.clear();
 		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 		if (!db.is_open())

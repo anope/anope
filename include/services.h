@@ -1143,7 +1143,7 @@ class ChanServTimer : public Timer
  * passed to the function to be incorrect. This keeps us from having to have an
  * 'in use' flag on everything.
  */
-class NumberList
+class CoreExport NumberList
 {
  private:
 	std::set<unsigned> numbers;

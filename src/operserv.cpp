@@ -242,7 +242,10 @@ void XLineManager::UnregisterXLineManager(XLineManager *xlm)
  */
 std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 {
-	std::pair<XLineManager *, XLine *> ret(NULL, NULL);
+	std::pair<XLineManager *, XLine *> ret;
+	
+	ret.first = NULL;
+	ret.second = NULL;
 
 	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(), it_end = XLineManagers.end(); it != it_end; ++it)
 	{
@@ -356,7 +359,10 @@ void XLineManager::Del(XLine *x)
  */
 std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expires)
 {
-	std::pair<int, XLine *> ret(0, NULL);
+	std::pair<int, XLine *> ret;
+	
+	ret.first = 0;
+	ret.second = NULL;
 
 	for (unsigned i = 0, end = GetCount(); i < end; ++i)
 	{

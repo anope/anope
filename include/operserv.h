@@ -43,8 +43,9 @@ enum XLineType
 	X_SZLINE
 };
 
-struct XLine
+class CoreExport XLine
 {
+ public:
 	ci::string Mask;
 	ci::string By;
 	time_t Created;

@@ -19,9 +19,7 @@ void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
 {
 	for (std::list<std::string>::iterator it = ModuleList.begin(); it != ModuleList.end(); ++it)
 	{
-		Module *m = findModule(it->c_str());
-		if (!m)
-			ModuleManager::LoadModule(*it, NULL);
+		ModuleManager::LoadModule(*it, NULL);
 	}
 }
 
@@ -53,11 +51,13 @@ static int moduleCopyFile(const char *name, const char *output)
 
 #ifndef _WIN32
 	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)
-		return MOD_ERR_FILE_IO;
 #else
 	if (!mktemp(const_cast<char *>(output)))
-		return MOD_ERR_FILE_IO;
 #endif
+	{
+		fclose(source);
+		return MOD_ERR_FILE_IO;
+	}
 
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
@@ -66,6 +66,7 @@ static int moduleCopyFile(const char *name, const char *output)
 #else
 	if ((target = fopen(output, "wb")) == NULL) {
 #endif
+		fclose(source);
 		return MOD_ERR_FILE_IO;
 	}
 	while ((ch = fgetc(source)) != EOF) {
@@ -291,6 +292,7 @@ void ModuleManager::DeleteModule(Module *m)
 
 	DetachAll(m);
 	handle = m->handle;
+	std::string filename = m->filename;
 
 	ano_modclearerr();
 	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "destroy_module"));
@@ -309,6 +311,9 @@ void ModuleManager::DeleteModule(Module *m)
 		if ((dlclose(handle)) != 0)
 			Alog() << dlerror();
 	}
+	
+	if (!filename.empty())
+		DeleteFile(filename.c_str());
 }
 
 bool ModuleManager::Attach(Implementation i, Module* mod)

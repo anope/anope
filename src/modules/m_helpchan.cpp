@@ -31,7 +31,7 @@ class HelpChannel : public Module
 			User *u = finduser(param);
 
 			if (u)
-				u->SetMode(OperServ, UMODE_HELPOP);
+				u->SetMode(findbot(Config.s_OperServ), UMODE_HELPOP);
 		}
 
 		return EVENT_CONTINUE;

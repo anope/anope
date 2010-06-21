@@ -72,6 +72,8 @@ static void ReadDatabase(Module *m = NULL)
 				buf.erase(buf.begin());
 				if (!buf.empty() && !sep.StreamEnd())
 					params.push_back(buf + " " + sep.GetRemaining());
+				else if (!sep.StreamEnd())
+					params.push_back(sep.GetRemaining());
 				else if (!buf.empty())
 					params.push_back(buf);
 				break;

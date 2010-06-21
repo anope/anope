@@ -839,7 +839,7 @@ int main(int argc, char *argv[])
 					<< ((ci->flags & CI_SIGNKICK_LEVEL) ? " SIGNKICKLEVEL" : "")
 					<< ((ci->flags & CI_XOP           ) ? " XOP"           : "")
 					<< ((ci->flags & CI_SUSPENDED     ) ? " SUSPENDED"      : "") << std::endl;
-			if (ci->desc)
+			if (ci->desc && *ci->desc)
 				fs << "MD DESC :" << ci->desc << std::endl;
 			if (ci->url)
 				fs << "MD URL :" << ci->url << std::endl;
@@ -962,8 +962,8 @@ int main(int argc, char *argv[])
 					fs << "MD BI BADWORD "
 						<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
 						<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
-						<< (( ci->badwords[j].type == 3 ) ? "START "  : "" )
-						<< (( ci->badwords[j].type == 4 ) ? "END "    : "" )
+						<< (( ci->badwords[j].type == 2 ) ? "START "  : "" )
+						<< (( ci->badwords[j].type == 3 ) ? "END "    : "" )
 						<< ":" << ci->badwords[j].word << std::endl;
 				}
 			}

@@ -43,6 +43,7 @@ static void ReadDatabase(Module *m = NULL)
 	EventReturn MOD_RESULT;
 	MDType Type = MD_NONE;
 
+	db.clear();
 	db.open(DatabaseFile.c_str(), std::ios_base::in);
 
 	if (!db.is_open())
@@ -573,7 +574,7 @@ class DBPlain : public Module
 			{
 				ircdproto->SendGlobops(OperServ, "Unable to backup database!");
 				Alog() << "Unable to back up database!";
-	
+
 				if (!Config.NoBackupOkay)
 					quitting = 1;
 
@@ -904,6 +905,7 @@ class DBPlain : public Module
 	{
 		BackupDatabase();
 
+		db.clear();
 		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 		if (!db.is_open())
@@ -917,7 +919,7 @@ class DBPlain : public Module
 		for (nickrequest_map::const_iterator it = NickRequestList.begin(); it != NickRequestList.end(); ++it)
 		{
 			NickRequest *nr = it->second;
-			
+
 			db << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
@@ -986,7 +988,7 @@ class DBPlain : public Module
 		for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
 		{
 			NickAlias *na = it->second;
-			
+
 			db << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
 			if (na->last_usermask)
 				db << "MD LAST_USERMASK " << na->last_usermask << endl;
@@ -1009,7 +1011,7 @@ class DBPlain : public Module
 		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
 		{
 			BotInfo *bi = it->second;
-			
+
 			db << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->real << endl;
 			if (bi->FlagCount())
 			{

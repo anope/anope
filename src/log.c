@@ -34,7 +34,7 @@ static int get_logname(char *name, int count, struct tm *tm)
 
 	/* fix bug 577 */
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
-	snprintf(name, count, "logs/%s.%s", log_filename.c_str(), timestamp);
+	snprintf(name, count, "logs/%s.%s", timestamp, log_filename.c_str());
 	curday = tm->tm_yday;
 
 	return 1;

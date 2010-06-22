@@ -1,5 +1,4 @@
 /*
- *
  * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
  *
@@ -7,9 +6,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -86,9 +84,7 @@ static void ReadDatabase(Module *m = NULL)
 		if (m)
 			MOD_RESULT = m->OnDatabaseRead(params);
 		else
-		{
 			FOREACH_RESULT(I_OnDatabaseRead, OnDatabaseRead(params));
-		}
 		if (MOD_RESULT == EVENT_STOP)
 			continue;
 
@@ -132,9 +128,7 @@ static void ReadDatabase(Module *m = NULL)
 						if (m)
 							m->OnDatabaseReadMetadata(nc, key, params);
 						else
-						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, key, params));
-						}
 					}
 					catch (DatabaseException& ex)
 					{
@@ -148,9 +142,7 @@ static void ReadDatabase(Module *m = NULL)
 						if (m)
 							m->OnDatabaseReadMetadata(na, key, params);
 						else
-						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, key, params));
-						}
 					}
 					catch (DatabaseException& ex)
 					{
@@ -164,9 +156,7 @@ static void ReadDatabase(Module *m = NULL)
 						if (m)
 							m->OnDatabaseReadMetadata(nr, key, params);
 						else
-						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nr, key, params));
-						}
 					}
 					catch (DatabaseException& ex)
 					{
@@ -180,9 +170,7 @@ static void ReadDatabase(Module *m = NULL)
 						if (m)
 							m->OnDatabaseReadMetadata(bi, key, params);
 						else
-						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, key, params));
-						}
 					}
 					catch (DatabaseException& ex)
 					{
@@ -196,9 +184,7 @@ static void ReadDatabase(Module *m = NULL)
 						if (m)
 							m->OnDatabaseReadMetadata(ci, key, params);
 						else
-						{
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, key, params));
-						}
 					}
 					catch (DatabaseException& ex)
 					{
@@ -374,10 +360,8 @@ static void LoadNickCore(const std::vector<std::string> &params)
 	nc->ClearFlags();
 
 	if (params.size() <= 2)
-	{
 		/* This is a forbidden nick */
 		return;
-	}
 
 	nc->pass.assign(params[1]);
 
@@ -500,7 +484,7 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 	}
 	else if (params[0] == "EXCEPTION")
 	{
-		nexceptions++;
+		++nexceptions;
 		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
 		exceptions[nexceptions - 1].mask = sstrdup(params[1].c_str());
 		exceptions[nexceptions - 1].limit = atol(params[2].c_str());
@@ -551,9 +535,7 @@ class DBPlain : public Module
 	{
 		/* Do not backup a database that doesn't exist */
 		if (!IsFile(DatabaseFile))
-		{
 			return;
-		}
 
 		time_t now = time(NULL);
 		tm *tm = localtime(&now);
@@ -651,7 +633,7 @@ class DBPlain : public Module
 			nc->AddAccess(params[0]);
 		else if (key == "FLAGS")
 		{
-			for (unsigned j = 0; j < params.size(); ++j)
+			for (unsigned j = 0, end = params.size(); j < end; ++j)
 				for (int i = 0; NickCoreFlags[i].Flag != -1; ++i)
 					if (NickCoreFlags[i].Name == params[j])
 						nc->SetFlag(NickCoreFlags[i].Flag);
@@ -662,7 +644,7 @@ class DBPlain : public Module
 			m->number = atoi(params[0].c_str());
 			m->time = strtol(params[1].c_str(), NULL, 10);
 			m->sender = params[2];
-			for (unsigned j = 3; (params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"); ++j)
+			for (unsigned j = 3; params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"; ++j)
 			{
 				if (params[j] == "UNREAD")
 					m->SetFlag(MF_UNREAD);
@@ -688,7 +670,7 @@ class DBPlain : public Module
 			na->last_quit = sstrdup(params[0].c_str());
 		else if (key == "FLAGS")
 		{
-			for (unsigned j = 0; j < params.size(); ++j)
+			for (unsigned j = 0, end = params.size(); j < end; ++j)
 			{
 				if (params[j] == "FORBIDDEN")
 					na->SetFlag(NS_FORBIDDEN);
@@ -697,9 +679,7 @@ class DBPlain : public Module
 			}
 		}
 		else if (key == "VHOST")
-		{
 			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], strtol(params[1].c_str(), NULL, 10));
-		}
 
 		return EVENT_CONTINUE;
 	}
@@ -708,7 +688,7 @@ class DBPlain : public Module
 	{
 		if (key == "FLAGS")
 		{
-			for (unsigned j = 0; j < params.size(); ++j)
+			for (unsigned j = 0, end = params.size(); j < end; ++j)
 			{
 				if (params[j] == "PRIVATE")
 					bi->SetFlag(BI_PRIVATE);
@@ -734,14 +714,14 @@ class DBPlain : public Module
 			ci->successor = findcore(params[0]);
 		else if (key == "LEVELS")
 		{
-			for (unsigned j = 0; j < params.size(); ++j, ++j)
+			for (unsigned j = 0, end = params.size(); j < end; j += 2)
 				for (int i = 0; ChannelLevels[i].Level != -1; ++i)
 					if (ChannelLevels[i].Name == params[j])
 						ci->levels[ChannelLevels[i].Level] = atoi(params[j + 1].c_str());
 		}
 		else if (key == "FLAGS")
 		{
-			for (unsigned j = 0; j < params.size(); ++j)
+			for (unsigned j = 0, end = params.size(); j < end; ++j)
 				for (int i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
 					if (ChannelInfoFlags[i].Name == params[j])
 						ci->SetFlag(ChannelInfoFlags[i].Flag);
@@ -814,10 +794,8 @@ class DBPlain : public Module
 		{
 			std::vector<std::pair<std::string, std::string> > mlp;
 
-			for (unsigned j = 0; j < params.size(); ++j, ++j)
-			{
+			for (unsigned j = 0, end = params.size(); j < end; j += 2)
 				mlp.push_back(std::make_pair(params[j], params[j + 1]));
-			}
 
 			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
 			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<std::string, std::string> > >(mlp));
@@ -828,7 +806,7 @@ class DBPlain : public Module
 			m->number = atoi(params[0].c_str());
 			m->time = strtol(params[1].c_str(), NULL, 10);
 			m->sender = params[2];
-			for (unsigned j = 3; (params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"); ++j)
+			for (unsigned j = 3; params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"; ++j)
 			{
 				if (params[j] == "UNREAD")
 					m->SetFlag(MF_UNREAD);
@@ -848,14 +826,14 @@ class DBPlain : public Module
 				ci->bi = findbot(params[1]);
 			else if (params[0] == "FLAGS")
 			{
-				for (unsigned j = 1; j < params.size(); ++j)
+				for (unsigned j = 1, end = params.size(); j < end; ++j)
 					for (int i = 0; BotFlags[i].Flag != -1; ++i)
 						if (BotFlags[i].Name == params[j])
 							ci->botflags.SetFlag(BotFlags[i].Flag);
 			}
 			else if (params[0] == "TTB")
 			{
-				for (unsigned j = 1; j < params.size(); ++j, ++j)
+				for (unsigned j = 1, end = params.size(); j < end; j += 2)
 				{
 					if (params[j] == "BOLDS")
 						ci->ttb[0] = atoi(params[j + 1].c_str());
@@ -918,7 +896,7 @@ class DBPlain : public Module
 
 		db << "VER 1" << endl;
 
-		for (nickrequest_map::const_iterator it = NickRequestList.begin(); it != NickRequestList.end(); ++it)
+		for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
 		{
 			NickRequest *nr = it->second;
 
@@ -927,7 +905,7 @@ class DBPlain : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
 		}
 
-		for (nickcore_map::const_iterator nit = NickCoreList.begin(); nit != NickCoreList.end(); ++nit)
+		for (nickcore_map::const_iterator nit = NickCoreList.begin(), nit_end = NickCoreList.end(); nit != nit_end; ++nit)
 		{
 			NickCore *nc = nit->second;
 
@@ -939,9 +917,7 @@ class DBPlain : public Module
 				continue;
 			}
 			else
-			{
 				db << "NC " << nc->display << " " << nc->pass << " ";
-			}
 			for (int j = 0; LangInfos[j].LanguageId != -1; ++j)
 				if (nc->language ==  LangInfos[j].LanguageId)
 					db << LangInfos[j].Name;
@@ -957,7 +933,7 @@ class DBPlain : public Module
 				db << "MD URL :" << nc->url << endl;
 			if (!nc->access.empty())
 			{
-				for (std::vector<std::string>::iterator it = nc->access.begin(); it != nc->access.end(); ++it)
+				for (std::vector<std::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 					db << "MD ACCESS " << *it << endl;
 			}
 			if (nc->FlagCount())
@@ -971,7 +947,7 @@ class DBPlain : public Module
 			if (!nc->memos.memos.empty())
 			{
 				MemoInfo *mi = &nc->memos;
-				for (unsigned k = 0; k < mi->memos.size(); ++k)
+				for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
 				{
 					db << "MD MI " << mi->memos[k]->number << " " << mi->memos[k]->time << " " << mi->memos[k]->sender;
 					if (mi->memos[k]->HasFlag(MF_UNREAD))
@@ -984,10 +960,9 @@ class DBPlain : public Module
 				}
 			}
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
-
 		}
 
-		for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
+		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
 			NickAlias *na = it->second;
 
@@ -999,18 +974,14 @@ class DBPlain : public Module
 			if (na->last_quit)
 				db << "MD LAST_QUIT :" << na->last_quit << endl;
 			if (na->HasFlag(NS_FORBIDDEN) || na->HasFlag(NS_NO_EXPIRE))
-			{
 				db << "MD FLAGS" << (na->HasFlag(NS_FORBIDDEN) ? " FORBIDDEN" : "") << (na->HasFlag(NS_NO_EXPIRE) ? " NOEXPIRE " : "") << endl;
-			}
 			if (na->hostinfo.HasVhost())
-			{
 				db << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
-			}
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 		}
 
-		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
 
@@ -1024,7 +995,7 @@ class DBPlain : public Module
 			}
 		}
 
-		for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(); cit != RegisteredChannelList.end(); ++cit)
+		for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
 		{
 			ChannelInfo *ci = cit->second;
 
@@ -1056,17 +1027,11 @@ class DBPlain : public Module
 				if (ci->HasFlag(CI_FORBIDDEN))
 					db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 			}
-			for (unsigned k = 0; k < ci->GetAccessCount(); ++k)
-				db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " "
-				<< ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
-			for (unsigned k = 0; k < ci->GetAkickCount(); ++k)
+			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
+				db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
-				db << "MD AKICK "
-				<< (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ")
-				<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ")
-				<< (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask)
-				<< " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime
-				<< " " << ci->last_used << " :";
+				db << "MD AKICK " << (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ") << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
 				if (!ci->GetAkick(k)->reason.empty())
 					db << ci->GetAkick(k)->reason;
 				db << endl;
@@ -1074,16 +1039,14 @@ class DBPlain : public Module
 			if (ci->GetMLockCount(true))
 			{
 				db << "MD MLOCK_ON";
-				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 				{
 					if ((*it)->Class == MC_CHANNEL)
 					{
 						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
 
 						if (ci->HasMLock(cm->Name, true))
-						{
 							db << " " << cm->NameAsString;
-						}
 					}
 				}
 				db << endl;
@@ -1091,38 +1054,34 @@ class DBPlain : public Module
 			if (ci->GetMLockCount(false))
 			{
 				db << "MD MLOCK_OFF";
-				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 				{
 					if ((*it)->Class == MC_CHANNEL)
 					{
 						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
 
 						if (ci->HasMLock(cm->Name, false))
-						{
 							db << " " << cm->NameAsString;
-						}
 					}
 				}
 				db << endl;
 			}
 			std::string Param;
-			for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(); it != ModeManager::Modes.end(); ++it)
+			for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 			{
 				if ((*it)->Class == MC_CHANNEL)
 				{
 					ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
 
 					if (ci->GetParam(cm->Name, Param))
-					{
 						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
-					}
 				}
 			}
 			if (!ci->memos.memos.empty())
 			{
 				MemoInfo *memos = &ci->memos;
 
-				for (unsigned k = 0; k < memos->memos.size(); ++k)
+				for (unsigned k = 0, end = memos->memos.size(); k < end; ++k)
 				{
 					db << "MD MI " << memos->memos[k]->number << " " << memos->memos[k]->time << " " << memos->memos[k]->sender;
 					if (memos->memos[k]->HasFlag(MF_UNREAD))
@@ -1157,13 +1116,8 @@ class DBPlain : public Module
 				db << "MD BI FLOODSECS " << ci->floodsecs << endl;
 			if (ci->repeattimes)
 				db << "MD BI REPEATTIMES " << ci->repeattimes << endl;
-			for (unsigned k = 0; k < ci->GetBadWordCount(); ++k)
-				db << "MD BI BADWORD "
-					<< (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "")
-					<< (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "")
-					<< (ci->GetBadWord(k)->type == BW_START ? "START " : "")
-					<< (ci->GetBadWord(k)->type == BW_END ? "END " : "")
-					<< ":" << ci->GetBadWord(k)->word << endl;
+			for (unsigned k = 0, end = ci->GetBadWordCount(); k < end; ++k)
+				db << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") << (ci->GetBadWord(k)->type == BW_END ? "END " : "") << ":" << ci->GetBadWord(k)->word << endl;
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 		}
@@ -1171,45 +1125,35 @@ class DBPlain : public Module
 		db << "OS STATS " << maxusercnt << " " << maxusertime << endl;
 
 		if (SGLine)
-		{
-			for (unsigned i = 0; i < SGLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SGLine->GetEntry(i);
 				db << "OS AKILL " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
-		}
 
 		if (SNLine)
-		{
-			for (unsigned i = 0; i < SNLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SNLine->GetEntry(i);
 				db << "OS SNLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
-		}
 
 		if (SQLine)
-		{
-			for (unsigned i = 0; i < SQLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SQLine->GetEntry(i);
 				db << "OS SQLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
-		}
 
 		if (SZLine)
-		{
-			for (unsigned i = 0; i < SZLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SZLine->GetEntry(i);
 				db << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
-		}
 
-		for (int i = 0; i < nexceptions; i++)
-		{
+		for (int i = 0; i < nexceptions; ++i)
 			db << "OS EXCEPTION " << exceptions[i].mask << " " << exceptions[i].limit << " " << exceptions[i].who << " " << exceptions[i].time << " " << exceptions[i].expires << " " << exceptions[i].reason << endl;
-		}
 
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
 
@@ -1223,19 +1167,16 @@ class DBPlain : public Module
 		if (!u)
 			return;
 
-		Implementation events[] = { I_OnDatabaseRead, I_OnDatabaseReadMetadata };
+		Implementation events[] = {I_OnDatabaseRead, I_OnDatabaseReadMetadata};
 		for (int i = 0; i < 2; ++i)
 		{
 			std::vector<Module *>::iterator it = std::find(ModuleManager::EventHandlers[events[i]].begin(), ModuleManager::EventHandlers[events[i]].end(), m);
 			/* This module wants to read from the database */
 			if (it != ModuleManager::EventHandlers[events[i]].end())
-			{
 				/* Loop over the database and call the events it would on a normal startup */
 				ReadDatabase(m);
-			}
 		}
 	}
 };
 
 MODULE_INIT(DBPlain)
-

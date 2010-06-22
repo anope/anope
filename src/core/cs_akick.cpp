@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -19,8 +18,7 @@
  * missing parts.
  */
 
-static void split_usermask(const char *mask, const char **nick, const char **user,
-					const char **host)
+static void split_usermask(const char *mask, const char **nick, const char **user, const char **host)
 {
 	char *mask2 = sstrdup(mask);
 
@@ -28,7 +26,8 @@ static void split_usermask(const char *mask, const char **nick, const char **use
 	*user = strtok(NULL, "@");
 	*host = strtok(NULL, "");
 	/* Handle special case: mask == user@host */
-	if (*nick && !*user && strchr(*nick, '@')) {
+	if (*nick && !*user && strchr(*nick, '@'))
+	{
 		*nick = NULL;
 		*user = strtok(mask2, "@");
 		*host = strtok(NULL, "");
@@ -78,9 +77,7 @@ class AkickListCallback : public NumberList
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1,
-			((akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str()),
-			(!akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON)));
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
 	}
 };
 
@@ -120,10 +117,7 @@ class AkickViewCallback : public AkickListCallback
 		else
 			snprintf(timebuf, sizeof(timebuf), "%s", getstring(u, UNKNOWN));
 
-		notice_lang(Config.s_ChanServ, u, (akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT), index + 1,
-			((akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str()),
-			!akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf,
-			(!akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON)));
+		notice_lang(Config.s_ChanServ, u, (akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT), index + 1, (akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf, !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
 
 		if (akick->last_used)
 		{
@@ -197,53 +191,47 @@ class CommandCSAKick : public Command
 		}
 
 		/* Check excepts BEFORE we get this far */
-		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
+		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask.c_str()))
 		{
-			 if (is_excepted_mask(ci, mask.c_str()))
-			 {
-				notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
-				return;
-			 }
+			notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
+			return;
 		}
 
 		/* Check whether target nick has equal/higher access
 		* or whether the mask matches a user with higher/equal access - Viper */
-		if ((ci->HasFlag(CI_PEACE)) && nc)
+		if (ci->HasFlag(CI_PEACE) && nc)
 		{
-			 if ((nc == ci->founder) || (get_access_level(ci, nc) >= get_access(u, ci)))
-			 {
+			if (nc == ci->founder || get_access_level(ci, nc) >= get_access(u, ci))
+			{
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				return;
-			 }
+			}
 		}
-		else if ((ci->HasFlag(CI_PEACE)))
+		else if (ci->HasFlag(CI_PEACE))
 		{
-			 /* Match against all currently online users with equal or
-			  * higher access. - Viper */
-			 for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			 {
-			 	User *u2 = it->second;
-				
-				if (check_access(u2, ci, CA_FOUNDER) || (get_access(u2, ci) >= get_access(u, ci)))
+			/* Match against all currently online users with equal or
+			 * higher access. - Viper */
+			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			{
+				User *u2 = it->second;
+
+				if ((check_access(u2, ci, CA_FOUNDER) || get_access(u2, ci) >= get_access(u, ci)) && match_usermask(mask.c_str(), u2))
 				{
-					if (match_usermask(mask.c_str(), u2))
-					{
-						notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-						return;
-					}
+					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+					return;
 				}
-			 }
+			}
 
 			/* Match against the lastusermask of all nickalias's with equal
 			 * or higher access. - Viper */
-			for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
+			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 			{
 				NickAlias *na2 = it->second;
-				
+
 				if (na2->HasFlag(NS_FORBIDDEN))
 					continue;
 
-				if (na2->nc && ((na2->nc == ci->founder) || (get_access_level(ci, na2->nc) >= get_access(u, ci))))
+				if (na2->nc && (na2->nc == ci->founder || get_access_level(ci, na2->nc) >= get_access(u, ci)))
 				{
 					char buf[BUFSIZE];
 
@@ -257,12 +245,12 @@ class CommandCSAKick : public Command
 			 }
 		}
 
-		for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
+		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
 		{
 			akick = ci->GetAkick(j);
-			if ((akick->HasFlag(AK_ISNICK)) ? akick->nc == nc : akick->mask == mask)
+			if (akick->HasFlag(AK_ISNICK) ? akick->nc == nc : akick->mask == mask)
 			{
-				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, (akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str(), ci->name.c_str());
+				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str(), ci->name.c_str());
 				return;
 			}
 		}
@@ -291,39 +279,39 @@ class CommandCSAKick : public Command
 		NickAlias *na;
 		NickCore *nc;
 		ci::string mask = params[2];
-		unsigned i;
+		unsigned i, end;
 		AutoKick *akick;
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			return;
 		}
 
 		na = findnick(mask);
-		nc = (na ? na->nc : NULL);
+		nc = na ? na->nc : NULL;
 
-		for (i = 0; i < ci->GetAkickCount(); ++i)
+		for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
 		{
 			akick = ci->GetAkick(i);
 
-		        if (akick->HasFlag(AK_ISNICK))
-		                continue;
+			if (akick->HasFlag(AK_ISNICK))
+				continue;
 			if (akick->mask == mask)
-		                break;
+				break;
 		}
 
-		if (i == ci->GetAkickCount())
+		if (i == end)
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+			return;
 		}
 
 		akick->SetFlag(AK_STUCK);
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name.c_str());
 
 		if (ci->c)
-		        stick_mask(ci, akick);
+			stick_mask(ci, akick);
 	}
 
 	void DoUnStick(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
@@ -331,32 +319,32 @@ class CommandCSAKick : public Command
 		NickAlias *na;
 		NickCore *nc;
 		AutoKick *akick;
-		unsigned i;
+		unsigned i, end;
 		ci::string mask = params[2];
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			return;
 		}
 
 		na = findnick(mask);
-		nc = (na ? na->nc : NULL);
+		nc = na ? na->nc : NULL;
 
-		for (i = 0; i < ci->GetAkickCount(); ++i)
+		for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
 		{
 			akick = ci->GetAkick(i);
 
-		        if (akick->HasFlag(AK_ISNICK))
-		                continue;
+			if (akick->HasFlag(AK_ISNICK))
+				continue;
 			if (akick->mask == mask)
-		                break;
+				break;
 		}
 
-		if (i == ci->GetAkickCount())
+		if (i == end)
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+			return;
 		}
 
 		akick->UnsetFlag(AK_STUCK);
@@ -367,12 +355,12 @@ class CommandCSAKick : public Command
 	{
 		ci::string mask = params[2];
 		AutoKick *akick;
-		unsigned i;
+		unsigned i, end;
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			return;
 		}
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
@@ -380,16 +368,14 @@ class CommandCSAKick : public Command
 			(new AkickDelCallback(u, ci, mask.c_str()))->Process();
 		else
 		{
-		        NickAlias *na = findnick(mask);
-		        NickCore *nc = (na ? na->nc : NULL);
+			NickAlias *na = findnick(mask);
+			NickCore *nc = (na ? na->nc : NULL);
 
-			for (i = 0; i < ci->GetAkickCount(); ++i)
+			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
 				akick = ci->GetAkick(i);
 
-				if (((akick->HasFlag(AK_ISNICK)) && akick->nc == nc)
-					|| (!(akick->HasFlag(AK_ISNICK))
-					&& akick->mask == mask))
+				if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) || (!akick->HasFlag(AK_ISNICK) && akick->mask == mask))
 					break;
 			}
 
@@ -411,8 +397,8 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			return;
 		}
 
 		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
@@ -421,18 +407,18 @@ class CommandCSAKick : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+			for (unsigned i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
 				AutoKick *akick = ci->GetAkick(i);
 
-		                if (!mask.empty())
+				if (!mask.empty())
 				{
-					if (!(akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
-					        continue;
-					if ((akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->nc->display, mask.c_str(), false))
-			        		continue;
-	                	}
-				
+					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
+						continue;
+					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask.c_str(), false))
+						continue;
+				}
+
 				if (!SentHeader)
 				{
 					SentHeader = true;
@@ -440,10 +426,10 @@ class CommandCSAKick : public Command
 				}
 
 				AkickListCallback::DoList(u, ci, i, akick);
- 		       }
-		       
-		       if (!SentHeader)
-		       		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
+			}
+
+			if (!SentHeader)
+				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
 		}
 	}
 
@@ -453,8 +439,8 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			return;
 		}
 
 		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
@@ -463,17 +449,17 @@ class CommandCSAKick : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+			for (unsigned i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
 				AutoKick *akick = ci->GetAkick(i);
 
-		                if (!mask.empty())
+				if (!mask.empty())
 				{
-					if (!(akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
-					        continue;
-					if ((akick->HasFlag(AK_ISNICK)) && !Anope::Match(akick->nc->display, mask.c_str(), false))
-					        continue;
-		                }
+					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
+						continue;
+					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask.c_str(), false))
+						continue;
+				}
 
 				if (!SentHeader)
 				{
@@ -482,7 +468,7 @@ class CommandCSAKick : public Command
 				}
 
 				AkickViewCallback::DoList(u, ci, i, akick);
-		        }
+			}
 
 			if (!SentHeader)
 				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
@@ -496,18 +482,16 @@ class CommandCSAKick : public Command
 
 		if (!c)
 		{
-		        notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, ci->name.c_str());
-		        return;
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, ci->name.c_str());
+			return;
 		}
 
-		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
 			UserContainer *uc = *it++;
 
 			if (ci->CheckKick(uc->user))
-			{
-				count++;
-		        }
+				++count;
 		}
 
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
@@ -576,9 +560,6 @@ class CommandCSAKick : public Command
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_AKICK);
 	}
 };
-
-
-
 
 class CSAKick : public Module
 {

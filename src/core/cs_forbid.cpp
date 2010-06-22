@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -48,7 +47,7 @@ class CommandCSForbid : public Command
 			return MOD_CONT;
 		}
 
-		if ((ci = cs_findchan(chan)) != NULL)
+		if ((ci = cs_findchan(chan)))
 			delete ci;
 
 		ci = new ChannelInfo(chan);
@@ -71,7 +70,7 @@ class CommandCSForbid : public Command
 			c->ClearExcepts();
 			c->ClearInvites();
 
-			for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 			{
 				UserContainer *uc = *it++;
 

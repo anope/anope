@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -27,7 +25,7 @@ class CommandCSSetMLock : public Command
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		int add = -1;		      /* 1 if adding, 0 if deleting, -1 if neither */
+		int add = -1; /* 1 if adding, 0 if deleting, -1 if neither */
 		unsigned char mode;
 		ChannelMode *cm;
 		unsigned paramcount = 2;
@@ -41,24 +39,23 @@ class CommandCSSetMLock : public Command
 		const char *modes = params[1].c_str();
 		while (modes && (mode = *modes++))
 		{
-			switch (mode) {
-			case '+':
-				add = 1;
-				continue;
-			case '-':
-				add = 0;
-				continue;
-			default:
-				if (add < 0)
+			switch (mode)
+			{
+				case '+':
+					add = 1;
 					continue;
+				case '-':
+					add = 0;
+					continue;
+				default:
+					if (add < 0)
+						continue;
 			}
 
 			if ((cm = ModeManager::FindChannelModeByChar(mode)))
 			{
 				if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(u))
-				{
 					notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR, mode);
-				}
 				else if (add)
 				{
 					ci->RemoveMLock(cm->Name);
@@ -78,46 +75,33 @@ class CommandCSSetMLock : public Command
 						ci->SetMLock(cmp->Name, true, param);
 					}
 					else
-					{
 						ci->SetMLock(cm->Name, true);
-					}
 				}
 				else
-				{
 					ci->SetMLock(cm->Name, false);
-				}
 			}
 			else
 				notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_UNKNOWN_CHAR, mode);
-		}			    /* while (*modes) */
+		} /* while (*modes) */
 
-		if (ModeManager::FindChannelModeByName(CMODE_REDIRECT))
-		{
-			/* We can't mlock +L if +l is not mlocked as well. */
-			if (ci->HasMLock(CMODE_REDIRECT, true) && !ci->HasMLock(CMODE_LIMIT, true))
-			{
-				ci->RemoveMLock(CMODE_REDIRECT);
-				notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_L_REQUIRED);
-			}
+		/* We can't mlock +L if +l is not mlocked as well. */
+		if (ModeManager::FindChannelModeByName(CMODE_REDIRECT) && ci->HasMLock(CMODE_REDIRECT, true) && !ci->HasMLock(CMODE_LIMIT, true))
+			ci->RemoveMLock(CMODE_REDIRECT);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_L_REQUIRED);
 		}
 
 		/* Some ircd we can't set NOKNOCK without INVITE */
 		/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
-		if (ModeManager::FindChannelModeByName(CMODE_NOKNOCK) && ircd->knock_needs_i)
-		{
-			if (ci->HasMLock(CMODE_NOKNOCK, true) && !ci->HasMLock(CMODE_INVITE, true))
-			{
-				ci->RemoveMLock(CMODE_NOKNOCK);
-				notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_K_REQUIRED);
-			}
+		if (ModeManager::FindChannelModeByName(CMODE_NOKNOCK) && ircd->knock_needs_i && ci->HasMLock(CMODE_NOKNOCK, true) && !ci->HasMLock(CMODE_INVITE, true))
+			ci->RemoveMLock(CMODE_NOKNOCK);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_K_REQUIRED);
 		}
 
 		/* Since we always enforce mode r there is no way to have no
 		 * mode lock at all.
 		 */
-		if (get_mlock_modes(ci, 0)) {
+		if (get_mlock_modes(ci, 0))
 			notice_lang(Config.s_ChanServ, u, CHAN_MLOCK_CHANGED, ci->name.c_str(), get_mlock_modes(ci, 0));
-		}
 
 		/* Implement the new lock. */
 		if (ci->c)
@@ -170,7 +154,7 @@ class CSSetMLock : public Module
 	CSSetMLock(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		Command *c = FindCommand(ChanServ, "SET");

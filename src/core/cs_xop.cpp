@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -128,7 +127,7 @@ class XOPListCallback : public NumberList
 			return;
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
-		
+
 		if (level != access->level)
 			return;
 
@@ -165,7 +164,7 @@ class XOPDelCallback : public NumberList
 			 notice_lang(Config.s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
 		else
 		{
-			 Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of users " << Nicks << " on " << ci->name;
+			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of users " << Nicks << " on " << ci->name;
 
 			if (Deleted == 1)
 				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name.c_str());
@@ -256,9 +255,7 @@ class XOPBase : public Command
 		}
 
 		if (!change)
-		{
 			ci->AddAccess(nc, level, u->nick);
-		}
 		else
 		{
 			access->level = level;
@@ -266,9 +263,7 @@ class XOPBase : public Command
 			access->creator = u->nick;
 		}
 
-		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") " 
-			<< (change ? "changed" : "set") << " access level " << level << " to " << na->nick 
-			<< " (group " << nc->display << ") on channel " << ci->name;
+		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") " << (change ? "changed" : "set") << " access level " << level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
 
 		if (!change)
 		{
@@ -328,8 +323,8 @@ class XOPBase : public Command
 			}
 			NickCore *nc = na->nc;
 
-			unsigned i;
-			for (i = 0; i < ci->GetAccessCount(); ++i)
+			unsigned i, end;
+			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				access = ci->GetAccess(nc, level);
 
@@ -337,16 +332,14 @@ class XOPBase : public Command
 					break;
 			}
 
-			if (i == ci->GetAccessCount())
+			if (i == end)
 			{
 				notice_lang(Config.s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name.c_str());
 				return MOD_CONT;
 			}
 
 			if (ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-			{
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-			}
 			else
 			{
 				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of user " << access->nc->display << " on " << ci->name;
@@ -384,7 +377,7 @@ class XOPBase : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
+			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
@@ -641,9 +634,7 @@ class CSXOP : public Module
 		if (Me && Me->IsSynced())
 			OnUplinkSync(NULL);
 
-		Implementation i[] = {
-			I_OnUplinkSync, I_OnServerDisconnect
-		};
+		Implementation i[] = {I_OnUplinkSync, I_OnServerDisconnect};
 		ModuleManager::Attach(i, this, 2);
 	}
 

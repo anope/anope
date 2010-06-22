@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -51,8 +50,7 @@ public:
 				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
-			for (s = tmp; *s; s++)
-			{
+			for (s = tmp; *s; ++s)
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
@@ -60,7 +58,6 @@ public:
 					notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
-			}
 			from = atoi(tmp);
 			delete [] tmp;
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
@@ -70,8 +67,7 @@ public:
 				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
-			for (s = tmp; *s; s++)
-			{
+			for (s = tmp; *s; ++s)
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
@@ -79,7 +75,6 @@ public:
 					notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
-			}
 			to = atoi(tmp);
 			delete [] tmp;
 			pattern = sstrdup("*");
@@ -90,18 +85,16 @@ public:
 
 		if (is_servadmin && params.size() > 1)
 		{
-			std::string keyword;
+			ci::string keyword;
 			spacesepstream keywords(params[1].c_str());
 			while (keywords.GetToken(keyword))
 			{
-				ci::string keyword_ci = keyword.c_str();
-				if (keyword_ci == "FORBIDDEN")
+				if (keyword == "FORBIDDEN")
 					forbidden = true;
-				if (keyword_ci == "SUSPENDED")
+				if (keyword == "SUSPENDED")
 					suspended = true;
-				if (keyword_ci == "NOEXPIRE")
+				if (keyword == "NOEXPIRE")
 					channoexpire = true;
-
 			}
 		}
 
@@ -111,12 +104,11 @@ public:
 
 		notice_lang(Config.s_ChanServ, u, CHAN_LIST_HEADER, pattern);
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
 
-			if (!is_servadmin && ((ci->HasFlag(CI_PRIVATE))
-				|| (ci->HasFlag(CI_FORBIDDEN)) || (ci->HasFlag(CI_SUSPENDED))))
+			if (!is_servadmin && (ci->HasFlag(CI_PRIVATE) || ci->HasFlag(CI_FORBIDDEN) || ci->HasFlag(CI_SUSPENDED)))
 				continue;
 			if (forbidden && !ci->HasFlag(CI_FORBIDDEN))
 				continue;
@@ -125,43 +117,28 @@ public:
 			else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
 				continue;
 
-			if ((stricmp(pattern, ci->name.c_str()) == 0)
-				  || (stricmp(spattern, ci->name.c_str()) == 0)
-				  || Anope::Match(ci->name, pattern, false)
-				  || Anope::Match(ci->name, spattern, false))
+			if (!stricmp(pattern, ci->name.c_str()) || !stricmp(spattern, ci->name.c_str()) || Anope::Match(ci->name, pattern, false) || Anope::Match(ci->name, spattern, false))
 			{
-				if ((((count + 1 >= from) && (count + 1 <= to))
-					  || ((from == 0) && (to == 0)))
-					  && (++nchans <= Config.CSListMax))
+				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config.CSListMax)
 				{
 					char noexpire_char = ' ';
 					if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
 						noexpire_char = '!';
 
 					if (ci->HasFlag(CI_FORBIDDEN))
-					{
-						snprintf(buf, sizeof(buf),
-							   "%-20s  [Forbidden]", ci->name.c_str());
-					}
+						snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", ci->name.c_str());
 					else if (ci->HasFlag(CI_SUSPENDED))
-					{
-						snprintf(buf, sizeof(buf),
-							   "%-20s  [Suspended]", ci->name.c_str());
-					}
+						snprintf(buf, sizeof(buf), "%-20s  [Suspended]", ci->name.c_str());
 					else
-					{
-						snprintf(buf, sizeof(buf), "%-20s  %s",
-							   ci->name.c_str(), ci->desc ? ci->desc : "");
-					}
+						snprintf(buf, sizeof(buf), "%-20s  %s", ci->name.c_str(), ci->desc ? ci->desc : "");
 
 					u->SendMessage(Config.s_ChanServ, "  %c%s", noexpire_char, buf);
 				}
-				count++;
+				++count;
 			}
 		}
 
-		notice_lang(Config.s_ChanServ, u, CHAN_LIST_END,
-				nchans > Config.CSListMax ? Config.CSListMax : nchans, nchans);
+		notice_lang(Config.s_ChanServ, u, CHAN_LIST_END, nchans > Config.CSListMax ? Config.CSListMax : nchans, nchans);
 		delete [] spattern;
 		if (tofree)
 			delete [] pattern;

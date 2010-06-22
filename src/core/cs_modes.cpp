@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -36,7 +35,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 	if (!nick)
 		nick = u->nick.c_str();
 
-	is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick.c_str()) == 0);
+	is_same = nick == u->nick ? 1 : !stricmp(nick, u->nick.c_str());
 
 	if (c)
 		ci = c->ci;
@@ -61,8 +60,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 			c->RemoveMode(NULL, cm, u2->nick);
 
 		if (notice && ci->HasFlag(notice))
-			ircdproto->SendMessage(whosends(ci), c->name.c_str(), "%s command used for %s by %s",
-				   name.c_str(), u2->nick.c_str(), u->nick.c_str());
+			ircdproto->SendMessage(whosends(ci), c->name.c_str(), "%s command used for %s by %s", name.c_str(), u2->nick.c_str(), u->nick.c_str());
 	}
 
 	return MOD_CONT;
@@ -79,7 +77,7 @@ class CommandCSOp : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -99,7 +97,6 @@ class CommandCSOp : public Command
 	}
 };
 
-
 class CommandCSDeOp : public Command
 {
  public:
@@ -111,7 +108,7 @@ class CommandCSDeOp : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -131,7 +128,6 @@ class CommandCSDeOp : public Command
 	}
 };
 
-
 class CommandCSVoice : public Command
 {
  public:
@@ -143,7 +139,7 @@ class CommandCSVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -163,7 +159,6 @@ class CommandCSVoice : public Command
 	}
 };
 
-
 class CommandCSDeVoice : public Command
 {
  public:
@@ -175,7 +170,7 @@ class CommandCSDeVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -195,7 +190,6 @@ class CommandCSDeVoice : public Command
 	}
 };
 
-
 class CommandCSHalfOp : public Command
 {
  public:
@@ -206,13 +200,13 @@ class CommandCSHalfOp : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
-		
+
 		if (!cm)
 		{
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -232,7 +226,6 @@ class CommandCSHalfOp : public Command
 	}
 };
 
-
 class CommandCSDeHalfOp : public Command
 {
  public:
@@ -245,12 +238,9 @@ class CommandCSDeHalfOp : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 		if (!cm)
-		{
 			return MOD_CONT;
 
-		}
-
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -270,7 +260,6 @@ class CommandCSDeHalfOp : public Command
 	}
 };
 
-
 class CommandCSProtect : public Command
 {
  public:
@@ -283,11 +272,9 @@ class CommandCSProtect : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
-		{
 			return MOD_CONT;
-		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -319,11 +306,9 @@ class CommandCSDeProtect : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
-		{
 			return MOD_CONT;
-		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -355,11 +340,9 @@ class CommandCSOwner : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
-		{
 			return MOD_CONT;
-		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -391,11 +374,9 @@ class CommandCSDeOwner : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
-		{
 			return MOD_CONT;
-		}
 
-		return do_util(u, cm, (params.size() > 0 ? params[0].c_str() : NULL), (params.size() > 1 ? params[1].c_str() : NULL), false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
+		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
@@ -415,7 +396,6 @@ class CommandCSDeOwner : public Command
 	}
 };
 
-
 class CSModes : public Module
 {
  public:
@@ -433,9 +413,7 @@ class CSModes : public Module
 		if (Me && Me->IsSynced())
 			OnUplinkSync(NULL);
 
-		Implementation i[] = {
-			I_OnUplinkSync, I_OnServerDisconnect
-		};
+		Implementation i[] = {I_OnUplinkSync, I_OnServerDisconnect};
 		ModuleManager::Attach(i, this, 2);
 	}
 
@@ -470,6 +448,5 @@ class CSModes : public Module
 		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEHALFOP"));
 	}
 };
-
 
 MODULE_INIT(CSModes)

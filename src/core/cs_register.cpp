@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -92,9 +91,7 @@ class CommandCSRegister : public Command
 					ci->SetFlag(CI_PERSIST);
 				/* Persist may be in def cflags, set it here */
 				else if (ci->HasFlag(CI_PERSIST) && (cm = ModeManager::FindChannelModeByName(CMODE_PERM)))
-				{
 					c->SetMode(NULL, CMODE_PERM);
-				}
 			}
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));

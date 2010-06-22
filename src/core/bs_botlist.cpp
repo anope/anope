@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -31,15 +30,15 @@ class CommandBSBotList : public Command
 			return MOD_CONT;
 		}
 
-		for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
-			
+
 			if (!bi->HasFlag(BI_PRIVATE))
 			{
 				if (!count)
 					notice_lang(Config.s_BotServ, u, BOT_BOTLIST_HEADER);
-				count++;
+				++count;
 				u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str());
 			}
 		}
@@ -48,14 +47,14 @@ class CommandBSBotList : public Command
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
-			for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+			for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			{
 				BotInfo *bi = it->second;
-				
+
 				if (bi->HasFlag(BI_PRIVATE))
 				{
 					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str());
-					count++;
+					++count;
 				}
 			}
 		}

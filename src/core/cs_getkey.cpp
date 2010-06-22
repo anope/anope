@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -61,7 +60,6 @@ class CommandCSGetKey : public Command
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
 	}
 };
-
 
 class CSGetKey : public Module
 {

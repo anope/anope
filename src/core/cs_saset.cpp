@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -26,10 +24,8 @@ class CommandCSSASet : public Command
 
 	~CommandCSSASet()
 	{
-		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
-		{
+		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 			delete it->second;
-		}
 		this->subcommands.clear();
 	}
 
@@ -46,7 +42,7 @@ class CommandCSSASet : public Command
 		if (c)
 		{
 			ci::string cmdparams = cs_findchan(params[0])->name.c_str();
-			for (std::vector<ci::string>::const_iterator it = params.begin() + 2; it != params.end(); ++it)
+			for (std::vector<ci::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
 			mod_run_cmd(ChanServ, u, c, params[1], cmdparams);
 		}
@@ -64,7 +60,7 @@ class CommandCSSASet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_HEAD);
-			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
+			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_TAIL);
 			return true;
@@ -74,9 +70,7 @@ class CommandCSSASet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-			{
 				return c->OnHelp(u, subcommand);
-			}
 		}
 
 		return false;
@@ -107,9 +101,7 @@ class CommandCSSASet : public Command
 		std::map<ci::string, Command *>::const_iterator it = this->subcommands.find(subcommand);
 
 		if (it != this->subcommands.end())
-		{
 			return it->second;
-		}
 
 		return NULL;
 	}
@@ -121,7 +113,7 @@ class CSSASet : public Module
 	CSSASet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		this->AddCommand(ChanServ, new CommandCSSASet("SASET"));

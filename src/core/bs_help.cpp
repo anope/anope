@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -33,7 +32,7 @@ class CommandBSHelp : public Command
 	{
 		// Abuse syntax error to display general list help.
 		notice_help(Config.s_BotServ, u, BOT_HELP);
-		for (CommandMap::const_iterator it = BotServ->Commands.begin(); it != BotServ->Commands.end(); ++it)
+		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
 			it->second->OnServHelp(u);
 		notice_help(Config.s_BotServ, u, BOT_HELP_FOOTER, Config.BSMinUsers);
 	}
@@ -50,7 +49,5 @@ class BSHelp : public Module
 		this->AddCommand(BotServ, new CommandBSHelp());
 	}
 };
-
-
 
 MODULE_INIT(BSHelp)

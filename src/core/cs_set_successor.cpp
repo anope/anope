@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -60,9 +58,7 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Alog() << Config.s_ChanServ << ": Changing successor of " << ci->name << " from "
-			<< (ci->successor ? ci->successor->display : "none")
-			<< " to " << (nc ? nc->display : "none") << " by " << u->GetMask();
+		Alog() << Config.s_ChanServ << ": Changing successor of " << ci->name << " from " << (ci->successor ? ci->successor->display : "none") << " to " << (nc ? nc->display : "none") << " by " << u->GetMask();
 
 		ci->successor = nc;
 
@@ -118,7 +114,7 @@ class CSSetSuccessor : public Module
 	CSSetSuccessor(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		Command *c = FindCommand(ChanServ, "SET");

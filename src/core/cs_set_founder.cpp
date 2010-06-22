@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -55,16 +53,15 @@ class CommandCSSetFounder : public Command
 			return MOD_CONT;
 		}
 
-		Alog() << Config.s_ChanServ << ": Changing founder of " << ci->name << " from " << ci->founder->display
-			<< " to " << nc->display << " by " << u->GetMask();
+		Alog() << Config.s_ChanServ << ": Changing founder of " << ci->name << " from " << ci->founder->display << " to " << nc->display << " by " << u->GetMask();
 
 		/* Founder and successor must not be the same group */
 		if (nc == ci->successor)
 			ci->successor = NULL;
 
-		nc0->channelcount--;
+		--nc0->channelcount;
 		ci->founder = nc;
-		nc->channelcount++;
+		++nc->channelcount;
 
 		notice_lang(Config.s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name.c_str(), na->nick);
 
@@ -115,7 +112,7 @@ class CSSetFounder : public Module
 	CSSetFounder(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		Command *c = FindCommand(ChanServ, "SET");

@@ -7,15 +7,14 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
 
 class CommandCSInfo : public Command
-{       
+{
 	void CheckOptStr(std::string &buf, ChannelInfoFlag opt, const std::string &str, ChannelInfo *ci, NickCore *nc)
 	{
 		if (ci->HasFlag(opt))
@@ -52,10 +51,7 @@ class CommandCSInfo : public Command
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
 			if (is_oper(u) && ci->forbidby)
-				notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN_OPER, chan,
-							ci->forbidby,
-							(ci->forbidreason ? ci->
-							 forbidreason : getstring(u, NO_REASON)));
+				notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN_OPER, chan, ci->forbidby, ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON));
 			else
 				notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 
@@ -119,9 +115,7 @@ class CommandCSInfo : public Command
 
 			// XXX: we could just as easily (and tidily) merge this in with the flags display above.
 			if (ci->HasFlag(CI_NO_EXPIRE))
-			{
 				notice_lang(Config.s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
-			}
 			else
 			{
 				if (has_auspex)
@@ -134,9 +128,7 @@ class CommandCSInfo : public Command
 			}
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
-		{
 			notice_lang(Config.s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby, (ci->forbidreason ? ci->forbidreason : getstring(u, NO_REASON)));
-		}
 
 		FOREACH_MOD(I_OnChanInfo, OnChanInfo(u, ci, show_all));
 

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -32,18 +31,14 @@ class CommandCSHelp : public Command
 			int i;
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
 			if (!levelinfo_maxwidth)
-			{
-				for (i = 0; levelinfo[i].what >= 0; i++)
+				for (i = 0; levelinfo[i].what >= 0; ++i)
 				{
 					int len = strlen(levelinfo[i].name);
 					if (len > levelinfo_maxwidth)
 						levelinfo_maxwidth = len;
 				}
-			}
-			for (i = 0; levelinfo[i].what >= 0; i++)
-			{
+			for (i = 0; levelinfo[i].what >= 0; ++i)
 				notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name, getstring(u, levelinfo[i].desc));
-			}
 		}
 		else
 			mod_help_cmd(ChanServ, u, cmd.c_str());
@@ -62,7 +57,6 @@ class CommandCSHelp : public Command
 			notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP);
 	}
 };
-
 
 class CSHelp : public Module
 {

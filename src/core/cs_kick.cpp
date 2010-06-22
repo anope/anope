@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -28,9 +27,7 @@ class CommandCSKick : public Command
 		const char *reason = NULL;
 
 		if (params.size() > 2)
-		{
 			reason = params[2].c_str();
-		}
 
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
@@ -38,29 +35,28 @@ class CommandCSKick : public Command
 
 		int is_same;
 
-		if (!reason) {
+		if (!reason)
 			reason = "Requested";
-		}
 
-		is_same = (target == u->nick.c_str()) ? 1 : (stricmp(target, u->nick.c_str()) == 0);
+		is_same = target == u->nick.c_str() ? 1 : !stricmp(target, u->nick.c_str());
 
 		if (c)
 			ci = c->ci;
 
-		if (!c) {
+		if (!c)
 			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-		} else if (is_same ? !(u2 = u) : !(u2 = finduser(target))) {
+		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
-		} else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME)) {
+		else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		} else if (!is_same && (ci->HasFlag(CI_PEACE))
-					 && (get_access(u2, ci) >= get_access(u, ci))) {
+		else if (!is_same && (ci->HasFlag(CI_PEACE)) && get_access(u2, ci) >= get_access(u, ci))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		} else if (u2->IsProtected())
+		else if (u2->IsProtected())
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		else if (!c->FindUser(u2)) {
+		else if (!c->FindUser(u2))
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
-		} else {
+		else
+		{
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
 				ci->c->Kick(whosends(ci), u2, "%s (%s)", reason, u->nick.c_str());
 			else

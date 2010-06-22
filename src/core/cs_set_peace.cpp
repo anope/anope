@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -38,9 +36,7 @@ class CommandCSSetPeace : public Command
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name.c_str());
 		}
 		else
-		{
 			this->OnSyntaxError(u, "PEACE");
-		}
 
 		return MOD_CONT;
 	}
@@ -87,7 +83,7 @@ class CSSetPeace : public Module
 	CSSetPeace(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		Command *c = FindCommand(ChanServ, "SET");

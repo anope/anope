@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -44,19 +42,15 @@ class CommandCSSetPersist : public Command
 				}
 
 				/* No botserv bot, no channel mode */
+				/* Give them ChanServ
+				 * Yes, this works fine with no Config.s_BotServ
+				 */
 				if (!ci->bi && !cm)
-				{
-					/* Give them ChanServ
-					 * Yes, this works fine with no Config.s_BotServ
-					 */
-				      ChanServ->Assign(NULL, ci);
-				}
+					ChanServ->Assign(NULL, ci);
 
 				/* Set the perm mode */
 				if (cm && ci->c && !ci->c->HasMode(CMODE_PERM))
-				{
 					ci->c->SetMode(NULL, cm);
-				}
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name.c_str());
@@ -77,10 +71,8 @@ class CommandCSSetPersist : public Command
 				 * which was assigned when persist was set on
 				 */
 				if (!cm && !Config.s_BotServ && ci->bi)
-				{
 					/* Unassign bot */
 					ChanServ->UnAssign(NULL, ci);
-				}
 
 				if (ci->c && ci->c->users.empty())
 					delete ci->c;
@@ -136,7 +128,7 @@ class CSSetPersist : public Module
 	CSSetPersist(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		Command *c = FindCommand(ChanServ, "SET");

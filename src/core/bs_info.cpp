@@ -24,7 +24,7 @@ class CommandBSInfo : public Command
 		*buf = 0;
 		end = buf;
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
 
@@ -90,142 +90,114 @@ class CommandBSInfo : public Command
 			else
 				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_BOT_NONE);
 
-			if (ci->botflags.HasFlag(BS_KICK_BADWORDS)) {
+			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
+			{
 				if (ci->ttb[TTB_BADWORDS])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_BADWORDS]);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_BADWORDS]);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS,
-								getstring(u, BOT_INFO_ACTIVE));
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_BOLDS)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS, getstring(u, BOT_INFO_ACTIVE));
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BADWORDS, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_BOLDS))
+			{
 				if (ci->ttb[TTB_BOLDS])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_BOLDS]);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_BOLDS]);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS,
-								getstring(u, BOT_INFO_ACTIVE));
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_CAPS)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS, getstring(u, BOT_INFO_ACTIVE));
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_BOLDS, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_CAPS))
+			{
 				if (ci->ttb[TTB_CAPS])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_CAPS], ci->capsmin,
-								ci->capspercent);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_CAPS], ci->capsmin, ci->capspercent);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_ON,
-								getstring(u, BOT_INFO_ACTIVE), ci->capsmin,
-								ci->capspercent);
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_OFF,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_COLORS)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_ON, getstring(u, BOT_INFO_ACTIVE), ci->capsmin, ci->capspercent);
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_CAPS_OFF, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_COLORS))
+			{
 				if (ci->ttb[TTB_COLORS])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_COLORS]);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_COLORS]);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS,
-								getstring(u, BOT_INFO_ACTIVE));
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_FLOOD)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS, getstring(u, BOT_INFO_ACTIVE));
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_COLORS, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_FLOOD))
+			{
 				if (ci->ttb[TTB_FLOOD])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_FLOOD], ci->floodlines,
-								ci->floodsecs);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_FLOOD], ci->floodlines, ci->floodsecs);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_ON,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->floodlines, ci->floodsecs);
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_OFF,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_REPEAT)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_ON, getstring(u, BOT_INFO_ACTIVE), ci->floodlines, ci->floodsecs);
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_FLOOD_OFF, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_REPEAT))
+			{
 				if (ci->ttb[TTB_REPEAT])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_REPEAT], ci->repeattimes);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_REPEAT], ci->repeattimes);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_ON,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->repeattimes);
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_OFF,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_REVERSES)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_ON, getstring(u, BOT_INFO_ACTIVE), ci->repeattimes);
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REPEAT_OFF, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_REVERSES))
+			{
 				if (ci->ttb[TTB_REVERSES])
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_REVERSES]);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_REVERSES]);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES,
-								getstring(u, BOT_INFO_ACTIVE));
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES,
-							getstring(u, BOT_INFO_INACTIVE));
-			if (ci->botflags.HasFlag(BS_KICK_UNDERLINES)) {
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES, getstring(u, BOT_INFO_ACTIVE));
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_REVERSES, getstring(u, BOT_INFO_INACTIVE));
+			if (ci->botflags.HasFlag(BS_KICK_UNDERLINES))
+			{
 				if (ci->ttb[TTB_UNDERLINES])
-					notice_lang(Config.s_BotServ, u,
-								BOT_INFO_CHAN_KICK_UNDERLINES_BAN,
-								getstring(u, BOT_INFO_ACTIVE),
-								ci->ttb[TTB_UNDERLINES]);
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_UNDERLINES]);
 				else
-					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES,
-								getstring(u, BOT_INFO_ACTIVE));
-			} else
-				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES,
-							getstring(u, BOT_INFO_INACTIVE));
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES, getstring(u, BOT_INFO_ACTIVE));
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES, getstring(u, BOT_INFO_INACTIVE));
 
 			end = buf;
 			*end = 0;
-			if (ci->botflags.HasFlag(BS_DONTKICKOPS)) {
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s",
-								getstring(u, BOT_INFO_OPT_DONTKICKOPS));
+			if (ci->botflags.HasFlag(BS_DONTKICKOPS))
+			{
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s", getstring(u, BOT_INFO_OPT_DONTKICKOPS));
 				need_comma = 1;
 			}
-			if (ci->botflags.HasFlag(BS_DONTKICKVOICES)) {
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
-								need_comma ? commastr : "",
-								getstring(u, BOT_INFO_OPT_DONTKICKVOICES));
+			if (ci->botflags.HasFlag(BS_DONTKICKVOICES))
+			{
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? commastr : "", getstring(u, BOT_INFO_OPT_DONTKICKVOICES));
 				need_comma = 1;
 			}
-			if (ci->botflags.HasFlag(BS_FANTASY)) {
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
-								need_comma ? commastr : "",
-								getstring(u, BOT_INFO_OPT_FANTASY));
+			if (ci->botflags.HasFlag(BS_FANTASY))
+			{
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? commastr : "", getstring(u, BOT_INFO_OPT_FANTASY));
 				need_comma = 1;
 			}
-			if (ci->botflags.HasFlag(BS_GREET)) {
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
-								need_comma ? commastr : "",
-								getstring(u, BOT_INFO_OPT_GREET));
+			if (ci->botflags.HasFlag(BS_GREET))
+			{
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? commastr : "", getstring(u, BOT_INFO_OPT_GREET));
 				need_comma = 1;
 			}
-			if (ci->botflags.HasFlag(BS_NOBOT)) {
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
-								need_comma ? commastr : "",
-								getstring(u, BOT_INFO_OPT_NOBOT));
+			if (ci->botflags.HasFlag(BS_NOBOT))
+			{
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? commastr : "", getstring(u, BOT_INFO_OPT_NOBOT));
 				need_comma = 1;
 			}
-			if (ci->botflags.HasFlag(BS_SYMBIOSIS)) {
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
-								need_comma ? commastr : "",
-								getstring(u, BOT_INFO_OPT_SYMBIOSIS));
+			if (ci->botflags.HasFlag(BS_SYMBIOSIS))
+			{
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? commastr : "", getstring(u, BOT_INFO_OPT_SYMBIOSIS));
 				need_comma = 1;
 			}
-			notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_OPTIONS,
-						*buf ? buf : getstring(u, BOT_INFO_OPT_NONE));
-
-		} else
+			notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_OPTIONS, *buf ? buf : getstring(u, BOT_INFO_OPT_NONE));
+		}
+		else
 			notice_lang(Config.s_BotServ, u, BOT_INFO_NOT_FOUND, query);
 		return MOD_CONT;
 	}

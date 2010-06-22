@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -153,7 +152,7 @@ class AccessDelCallback : public NumberList
 			Nicks += ", " + std::string(access->nc->display);
 		else
 			Nicks = access->nc->display;
-		
+
 		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access->nc));
 
 		ci->EraseAccess(Number - 1);
@@ -231,8 +230,7 @@ class CommandCSAccess : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
 
-		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level " << level << " to " << na->nick << " (group " << nc->display << ") on channel " << 
-ci->name;
+		Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level " << level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
 		notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display, ci->name.c_str(), level);
 
 		return MOD_CONT;
@@ -257,9 +255,9 @@ ci->name;
 
 			NickCore *nc = na->nc;
 
-			unsigned i;
+			unsigned i, end;
 			ChanAccess *access = NULL;
-			for (i = 0; i < ci->GetAccessCount(); ++i)
+			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				access = ci->GetAccess(i);
 
@@ -267,14 +265,10 @@ ci->name;
 					break;
 			}
 
-			if (i == ci->GetAccessCount())
-			{
+			if (i == end)
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
-			}
 			else if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-			{
 				notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-			}
 			else
 			{
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display, ci->name.c_str());
@@ -300,7 +294,7 @@ ci->name;
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < ci->GetAccessCount(); i++)
+			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
@@ -337,7 +331,7 @@ ci->name;
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
+			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
@@ -365,9 +359,7 @@ ci->name;
 	CommandReturn DoClear(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
 	{
 		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
-		{
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		}
 		else
 		{
 			ci->ClearAccess();
@@ -410,40 +402,22 @@ ci->name;
 			else
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_XOP, Config.s_ChanServ);
 		}
-		else if ((
-				 (is_list && !check_access(u, ci, CA_ACCESS_LIST) && !u->Account()->HasCommand("chanserv/access/list"))
-				 ||
-				 (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->Account()->HasPriv("chanserv/access/modify"))
-				))
+		else if ((is_list && !check_access(u, ci, CA_ACCESS_LIST) && !u->Account()->HasCommand("chanserv/access/list")) || (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->Account()->HasPriv("chanserv/access/modify")))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (readonly && (cmd == "ADD" || cmd == "DEL" || cmd == "CLEAR"))
-		{
 			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_DISABLED);
-		}
 		else if (cmd == "ADD")
-		{
 			this->DoAdd(u, ci, params);
-		}
 		else if (cmd == "DEL")
-		{
 			this->DoDel(u, ci, params);
-		}
 		else if (cmd == "LIST")
-		{
 			this->DoList(u, ci, params);
-		}
 		else if (cmd == "VIEW")
-		{
 			this->DoView(u, ci, params);
-		}
 		else if (cmd == "CLEAR")
-		{
 			this->DoClear(u, ci, params);
-		}
 		else
-		{
 			this->OnSyntaxError(u, "");
-		}
 
 		return MOD_CONT;
 	}
@@ -461,7 +435,6 @@ ci->name;
 	}
 };
 
-
 class CommandCSLevels : public Command
 {
 	CommandReturn DoSet(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
@@ -478,17 +451,12 @@ class CommandCSLevels : public Command
 			*error = '\0';
 		}
 
-		if (*error != '\0')
-		{
+		if (*error)
 			this->OnSyntaxError(u, "SET");
-		}
 		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
-		{
 			notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
-		}
 		else
-		{
-			for (int i = 0; levelinfo[i].what >= 0; i++)
+			for (int i = 0; levelinfo[i].what >= 0; ++i)
 			{
 				if (levelinfo[i].name == what)
 				{
@@ -502,8 +470,6 @@ class CommandCSLevels : public Command
 					return MOD_CONT;
 				}
 			}
-		}
-
 
 		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what.c_str(), Config.s_ChanServ);
 
@@ -516,20 +482,18 @@ class CommandCSLevels : public Command
 
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
 		if (what != "FOUNDER")
-		{
-			for (int i = 0; levelinfo[i].what >= 0; i++)
+			for (int i = 0; levelinfo[i].what >= 0; ++i)
 			{
 				if (levelinfo[i].name == what)
 				{
 					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
 					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
-	
+
 					Alog() << Config.s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name << " on channel " << ci->name;
 					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_DISABLED, levelinfo[i].name, ci->name.c_str());
 					return MOD_CONT;
 				}
 			}
-		}
 
 		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what.c_str(), Config.s_ChanServ);
 
@@ -541,31 +505,30 @@ class CommandCSLevels : public Command
 		notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, ci->name.c_str());
 
 		if (!levelinfo_maxwidth)
-		{
-			for (int i = 0; levelinfo[i].what >= 0; i++) {
+			for (int i = 0; levelinfo[i].what >= 0; ++i)
+			{
 				int len = strlen(levelinfo[i].name);
 				if (len > levelinfo_maxwidth)
 					levelinfo_maxwidth = len;
 			}
-		}
 
-		for (int i = 0; levelinfo[i].what >= 0; i++) {
+		for (int i = 0; levelinfo[i].what >= 0; ++i)
+		{
 			int j = ci->levels[levelinfo[i].what];
 
-			if (j == ACCESS_INVALID) {
+			if (j == ACCESS_INVALID)
+			{
 				j = levelinfo[i].what;
 
-				if (j == CA_AUTOOP || j == CA_AUTODEOP || j == CA_AUTOVOICE
-					|| j == CA_NOJOIN) {
+				if (j == CA_AUTOOP || j == CA_AUTODEOP || j == CA_AUTOVOICE || j == CA_NOJOIN)
 					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name);
-				} else {
+				else
 					notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name);
-				}
-			} else if (j == ACCESS_FOUNDER) {
-				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name);
-			} else {
-				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_NORMAL, levelinfo_maxwidth, levelinfo[i].name, j);
 			}
+			else if (j == ACCESS_FOUNDER)
+				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name);
+			else
+				notice_lang(Config.s_ChanServ, u, CHAN_LEVELS_LIST_NORMAL, levelinfo_maxwidth, levelinfo[i].name, j);
 		}
 
 		return MOD_CONT;
@@ -604,25 +567,15 @@ class CommandCSLevels : public Command
 		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (cmd == "SET")
-		{
 			this->DoSet(u, ci, params);
-		}
 		else if (cmd == "DIS" || cmd == "DISABLE")
-		{
 			this->DoDisable(u, ci, params);
-		}
 		else if (cmd == "LIST")
-		{
 			this->DoList(u, ci, params);
-		}
 		else if (cmd == "RESET")
-		{
 			this->DoReset(u, ci, params);
-		}
 		else
-		{
 			this->OnSyntaxError(u, "");
-		}
 
 		return MOD_CONT;
 	}
@@ -645,7 +598,6 @@ class CommandCSLevels : public Command
 	}
 };
 
-
 class CSAccess : public Module
 {
  public:
@@ -659,6 +611,5 @@ class CSAccess : public Module
 		this->AddCommand(ChanServ, new CommandCSLevels());
 	}
 };
-
 
 MODULE_INIT(CSAccess)

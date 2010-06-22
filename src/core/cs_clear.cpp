@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -19,7 +18,6 @@ class CommandCSClear : public Command
  public:
 	CommandCSClear() : Command("CLEAR", 2, 2)
 	{
-
 	}
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
@@ -51,14 +49,12 @@ class CommandCSClear : public Command
 			c->ClearExcepts();
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
-
 		}
 		else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what == "invites")
 		{
 			c->ClearInvites();
 
 			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
-
 		}
 		else if (what == "modes")
 		{
@@ -95,7 +91,7 @@ class CommandCSClear : public Command
 			}
 			else
 			{
-				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 				{
 					UserContainer *uc = *it;
 
@@ -112,7 +108,7 @@ class CommandCSClear : public Command
 		}
 		else if ((halfop && what == "hops") || (voice && what == "voices"))
 		{
-			ChannelMode *cm = (what == "hops" ? halfop : voice);
+			ChannelMode *cm = what == "hops" ? halfop : voice;
 
 			if (ircd->svsmode_ucmode)
 			{
@@ -123,7 +119,7 @@ class CommandCSClear : public Command
 			}
 			else
 			{
-				for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 				{
 					UserContainer *uc = *it;
 
@@ -136,7 +132,7 @@ class CommandCSClear : public Command
 		{
 			std::string buf = "CLEAR USERS command from " + u->nick;
 
-			for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 			{
 				UserContainer *uc = *it++;
 

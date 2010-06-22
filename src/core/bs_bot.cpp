@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -57,14 +56,12 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = nick; *ch && (ch - nick) < Config.NickLen; ch++)
-		{
+		for (ch = nick; *ch && ch - nick < Config.NickLen; ++ch)
 			if (!isvalidnick(*ch))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 				return MOD_CONT;
 			}
-		}
 
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
@@ -80,15 +77,12 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = user; *ch && (ch - user) < Config.UserLen; ch++)
-		{
+		for (ch = user; *ch && ch - user < Config.UserLen; ++ch)
 			if (!isalnum(*ch))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, Config.UserLen);
 				return MOD_CONT;
 			}
-		}
-
 
 		/* We check whether the nick is registered, and inform the user
 		* if so. You need to drop the nick manually before you can use
@@ -185,14 +179,12 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = nick; *ch && (ch - nick) < Config.NickLen; ch++)
-		{
+		for (ch = nick; *ch && ch - nick < Config.NickLen; ++ch)
 			if (!isvalidnick(*ch))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 				return MOD_CONT;
 			}
-		}
 
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
@@ -208,16 +200,12 @@ class CommandBSBot : public Command
 		}
 
 		if (user)
-		{
-			for (ch = user; *ch && (ch - user) < Config.UserLen; ch++)
-			{
+			for (ch = user; *ch && ch - user < Config.UserLen; ++ch)
 				if (!isalnum(*ch))
 				{
 					notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, Config.UserLen);
 					return MOD_CONT;
 				}
-			}
-		}
 
 		ci::string ci_bi_nick(bi->nick.c_str());
 		if (ci_bi_nick != nick && findbot(nick))
@@ -271,10 +259,9 @@ class CommandBSBot : public Command
 
 		if (user)
 		{
-			if (ircd->ts6) {
+			if (ircd->ts6)
 				// This isn't the nicest way to do this, unfortunately.
 				bi->uid = ts6_uid_retrieve();
-			}
 			ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid);
 			XLine x(bi->nick.c_str(), "Reserved for services");
 			ircdproto->SendSQLine(&x);

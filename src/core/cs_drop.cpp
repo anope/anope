@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -36,13 +35,13 @@ class CommandCSDrop : public Command
 
 		ci = cs_findchan(chan);
 
-		if ((ci->HasFlag(CI_FORBIDDEN)) && !u->Account()->HasCommand("chanserv/drop"))
+		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
 		}
 
-		if ((ci->HasFlag(CI_SUSPENDED)) && !u->Account()->HasCommand("chanserv/drop"))
+		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
 			return MOD_CONT;
@@ -56,13 +55,8 @@ class CommandCSDrop : public Command
 
 		int level = get_access(u, ci);
 
-		if (ci->c)
-		{
-			if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-			{
-				ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
-			}
-		}
+		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
+			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 
 		if (ircd->chansqline && (ci->HasFlag(CI_FORBIDDEN)))
 		{
@@ -70,18 +64,15 @@ class CommandCSDrop : public Command
 			ircdproto->SendSQLineDel(&x);
 		}
 
-		Alog() << Config.s_ChanServ << ": Channel " << ci->name << " dropped by " << u->GetMask() << " (founder: "
-			<< (ci->founder ? ci->founder->display : "(none)") << ")";
+		Alog() << Config.s_ChanServ << ": Channel " << ci->name << " dropped by " << u->GetMask() << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << ")";
 
 		delete ci;
 
 		/* We must make sure that the Services admin has not normally the right to
 		 * drop the channel before issuing the wallops.
 		 */
-		if (Config.WallDrop) {
-			if ((level < ACCESS_FOUNDER) || (!IsFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER)))
-				ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan);
-		}
+		if (Config.WallDrop && (level < ACCESS_FOUNDER || (!IsFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER))))
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan);
 
 		notice_lang(Config.s_ChanServ, u, CHAN_DROPPED, chan);
 
@@ -104,7 +95,7 @@ class CommandCSDrop : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "DROP", CHAN_DROP_SYNTAX);
 	}
-	
+
 	void OnServHelp(User *u)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_DROP);

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -86,16 +85,14 @@ class CommandBSBadwords : public Command
 	CommandReturn DoList(User *u, ChannelInfo *ci, const ci::string &word)
 	{
 		if (!ci->GetBadWordCount())
-		{
 			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
-		}
 		else if (!word.empty() && strspn(word.c_str(), "1234567890,-") == word.length())
 			(new BadwordsListCallback(u, ci, word.c_str()))->Process();
 		else
 		{
 			bool SentHeader = false;
-			
-			for (unsigned i = 0; i < ci->GetBadWordCount(); i++)
+
+			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
 				BadWord *bw = ci->GetBadWord(i);
 
@@ -145,12 +142,11 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
+		for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 		{
 			BadWord *bw = ci->GetBadWord(i);
 
-			if (!bw->word.empty() && ((Config.BSCaseSensitive && !stricmp(bw->word.c_str(), realword.c_str()))
-				|| (!Config.BSCaseSensitive && bw->word == realword.c_str())))
+			if (!bw->word.empty() && ((Config.BSCaseSensitive && !stricmp(bw->word.c_str(), realword.c_str())) || (!Config.BSCaseSensitive && bw->word == realword.c_str())))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
 				return MOD_CONT;
@@ -171,10 +167,10 @@ class CommandBSBadwords : public Command
 			(new BadwordsDelCallback(u, ci, word.c_str()))->Process();
 		else
 		{
-			unsigned i;
+			unsigned i, end;
 			BadWord *badword;
 
-			for (i = 0; i < ci->GetBadWordCount(); ++i)
+			for (i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
 				badword = ci->GetBadWord(i);
 
@@ -182,12 +178,12 @@ class CommandBSBadwords : public Command
 					break;
 			}
 
-			if (i == ci->GetBadWordCount())
+			if (i == end)
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
-			
+
 			ci->EraseBadWord(i);
 
 			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());

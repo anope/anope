@@ -7,15 +7,12 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
 /*************************************************************************/
 
 #include "module.h"
 
-#define CHECKLEV(lev) ((ci->levels[(lev)] != ACCESS_INVALID) && (access->level >= ci->levels[(lev)]))
+#define CHECKLEV(lev) (ci->levels[(lev)] != ACCESS_INVALID && access->level >= ci->levels[(lev)])
 
 class CommandCSSetXOP : public Command
 {
@@ -54,9 +51,8 @@ class CommandCSSetXOP : public Command
 						access->level = ACCESS_SOP;
 					else if (CHECKLEV(CA_AUTOOP) || CHECKLEV(CA_OPDEOP) || CHECKLEV(CA_OPDEOPME))
 						access->level = ACCESS_AOP;
-					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP)
-|| CHECKLEV(CA_HALFOPME)))
-							access->level = ACCESS_HOP;
+					else if (ModeManager::FindChannelModeByName(CMODE_HALFOP) && (CHECKLEV(CA_AUTOHALFOP) || CHECKLEV(CA_HALFOP) || CHECKLEV(CA_HALFOPME)))
+						access->level = ACCESS_HOP;
 					else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE) || CHECKLEV(CA_VOICEME))
 						access->level = ACCESS_VOP;
 					else
@@ -125,7 +121,7 @@ class CSSetXOP : public Module
 	CSSetXOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
+		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		Command *c = FindCommand(ChanServ, "SET");

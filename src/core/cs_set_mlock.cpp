@@ -86,6 +86,7 @@ class CommandCSSetMLock : public Command
 
 		/* We can't mlock +L if +l is not mlocked as well. */
 		if (ModeManager::FindChannelModeByName(CMODE_REDIRECT) && ci->HasMLock(CMODE_REDIRECT, true) && !ci->HasMLock(CMODE_LIMIT, true))
+		{
 			ci->RemoveMLock(CMODE_REDIRECT);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_L_REQUIRED);
 		}
@@ -93,6 +94,7 @@ class CommandCSSetMLock : public Command
 		/* Some ircd we can't set NOKNOCK without INVITE */
 		/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
 		if (ModeManager::FindChannelModeByName(CMODE_NOKNOCK) && ircd->knock_needs_i && ci->HasMLock(CMODE_NOKNOCK, true) && !ci->HasMLock(CMODE_INVITE, true))
+		{
 			ci->RemoveMLock(CMODE_NOKNOCK);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_K_REQUIRED);
 		}

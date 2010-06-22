@@ -280,12 +280,9 @@ int main(int argc, char *argv[])
 				na = (NickAlias *)calloc(1, sizeof(NickAlias));
 
 				READ(read_string(&na->nick, f));
-				char *mask;
-				char *real;
-				char *quit;
-				READ(read_string(&mask, f));
-				READ(read_string(&real, f));
-				READ(read_string(&quit, f));
+				READ(read_string(&na->last_usermask, f));
+				READ(read_string(&na->last_realname, f));
+				READ(read_string(&na->last_quit, f));
 
 				READ(read_int32(&tmp32, f));
 				na->time_registered = tmp32;
@@ -296,9 +293,6 @@ int main(int argc, char *argv[])
 				na->nc = findcore(s, 0);
 				na->nc->aliascount++;
 				free(s);
-				free(mask);
-				free(real);
-				free(quit);
 
 				*nalast = na;
 				nalast = &na->next;

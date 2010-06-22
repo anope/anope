@@ -1058,6 +1058,13 @@ class CoreExport Anope
 	 * @return true if the message was found and deleted, else false
 	 */
 	static bool DelMessage(Message *m);
+
+	/** Returns a list of pointers to message handlers
+	 * @param The message name as sent by the IRCd
+	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)
+	 */
+	static std::vector<Message *> FindMessage(const std::string &name);
+
 };
 
 /*************************************************************************/

@@ -361,7 +361,7 @@ void process(const std::string &buffer)
 	}
 
 	/* Do something with the message. */
-	std::vector<Message *> messages = FindMessage(cmd);
+	std::vector<Message *> messages = Anope::FindMessage(cmd);
 
 	if (!messages.empty())
 	{

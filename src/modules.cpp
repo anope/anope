@@ -158,6 +158,27 @@ bool Anope::DelMessage(Message *m)
 
 	return false;
 }
+/** Find  message in the message table
+ * @param name The name of the message were looking for
+ * @return NULL if we cant find it, or a pointer to the Message if we can
+ **/
+std::vector<Message *> Anope::FindMessage(const std::string &name)
+{
+	std::vector<Message *> messages;
+
+	std::multimap<std::string, Message *>::iterator it = MessageMap.find(name);
+
+	if (it == MessageMap.end())
+		return messages;
+
+	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(name);
+
+	for (; it != upper; ++it)
+		messages.push_back(it->second);
+
+	return messages;
+}
+
 
 /*******************************************************************************
  * Command Functions
@@ -200,27 +221,6 @@ int Module::DelCommand(BotInfo *bi, Command *c)
 	return MOD_ERR_OK;
 }
 
-/**
- * Find a message in the message table
- * @param name The name of the message were looking for
- * @return NULL if we cant find it, or a pointer to the Message if we can
- **/
-std::vector<Message *> FindMessage(const std::string &name)
-{
-	std::vector<Message *> messages;
-
-	std::multimap<std::string, Message *>::iterator it = MessageMap.find(name);
-
-	if (it == MessageMap.end())
-		return messages;
-
-	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(name);
-
-	for (; it != upper; ++it)
-		messages.push_back(it->second);
-
-	return messages;
-}
 
 /*******************************************************************************
  * Module Callback Functions

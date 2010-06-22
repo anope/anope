@@ -129,7 +129,6 @@ extern CoreExport Module *FindModule(const std::string &name);
 extern CoreExport Module *FindModule(const ci::string &name);
 int protocol_module_init();
 extern CoreExport Message *createMessage(const char *name, int (*func)(const char *source, int ac, const char **av));
-std::vector<Message *> FindMessage(const std::string &name);
 extern CoreExport bool moduleMinVersion(int major,int minor,int patch,int build);
 
 enum ModuleReturn

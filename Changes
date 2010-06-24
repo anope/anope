@@ -1,35 +1,37 @@
 Anope Version 1.8 - SVN
 -----------------------
-5/5   A Added an internal event called when a nick is requested          [  #00]
-5/9   A Added an Atheme to Anope database converter                      [  #00]
-5/12  A Added logging for stateful commands                              [  #00]
-5/22  A Added an internal event called when a nick is ghosted            [  #00]
-5/22  A Added an internal event called when a nick is recovered          [  #00]
-5/23  A Added old nick parameter to EVENT_CHANGE_NICK                    [  #00]
-4/15  F Fixed os_info to backup its database on Windows                  [  #00]
-4/15  F Fixed a potential crash in cs_clear ops                          [#1154]
-4/16  F Fixed missing TS6SID on FJOIN in inspircd12                      [  #00]
-4/19  F Fixed ns_info to show nick expire times to opers not only admins [  #00]
-4/28  F Fixed a bug that could make some nick requests disappear         [  #00]
-5/18  F Fixed English and grammar in e-mail messages                     [  #00]
-5/23  F Fixed SQUITing juped servers on InspIRCd 1.2                     [#1165]
-6/15  F Fixed ./Config to correctly load config.cache                    [  #00]
+05/05  A Added an internal event called when a nick is requested         [  #00]
+05/09  A Added an Atheme to Anope database converter                     [  #00]
+05/12  A Added logging for stateful commands                             [  #00]
+05/22  A Added an internal event called when a nick is ghosted           [  #00]
+05/22  A Added an internal event called when a nick is recovered         [  #00]
+05/23  A Added old nick parameter to EVENT_CHANGE_NICK                   [  #00]
+04/15  F Fixed os_info to backup its database on Windows                 [  #00]
+04/15  F Fixed a potential crash in cs_clear ops                         [#1154]
+04/16  F Fixed missing TS6SID on FJOIN in inspircd12                     [  #00]
+04/19  F Fixed ns_info to show nick expire times to opers not only admins[  #00]
+04/28  F Fixed a bug that could make some nick requests disappear        [  #00]
+05/18  F Fixed English and grammar in e-mail messages                    [  #00]
+05/23  F Fixed SQUITing juped servers on InspIRCd 1.2                    [#1165]
+06/15  F Fixed ./Config to correctly load config.cache                   [  #00]
+06/24  F Fixed pseudo-client kills not being detected on some TS6 IRCDs. [  #00]
+
 
 Anope Version 1.8.4
 -------------------
-3/10  A Added support for tracking permanent channels                    [  #00]
-3/24  A Added logging of deleting and clearing XOP access lists          [  #00]
-2/9   F Fixed marking halfops as deopped, stops unsetting modes by them  [#1136]
-2/18  F Fixed listing unconfirmed nicks with suspended nicks to SA+      [  #00]
-3/2   F Fixed a bug that could cause access entries to disappear         [  #00]
-3/13  F Fixed maximum hostname checking in HS SET and HS REQUEST         [#1138]
-3/13  F Fixed deleting force dropped nicks from the hs_waiting list      [#1139]
-3/13  F Fixed backing up 3rd party module databases more than once a day [#1140]
-3/16  F Fixed os_info to display syntax errors if no command is entered  [  #00]
-3/29  F Fixed defcon to only apply its mode parameters when it's on      [#1146]
-3/29  F Fixed numbering of memos when saved in SQL                       [#1149]
-3/30  F Fixed module demos to work correctly on TS6 IRCDs                [  #00]
-4/3   F Fixed saving databases in readonly mode when using anoperc       [  #00]
+03/10  A Added support for tracking permanent channels                   [  #00]
+03/24  A Added logging of deleting and clearing XOP access lists         [  #00]
+02/09  F Fixed marking halfops as deopped, stops unsetting modes by them [#1136]
+02/18  F Fixed listing unconfirmed nicks with suspended nicks to SA+     [  #00]
+03/02  F Fixed a bug that could cause access entries to disappear        [  #00]
+03/13  F Fixed maximum hostname checking in HS SET and HS REQUEST        [#1138]
+03/13  F Fixed deleting force dropped nicks from the hs_waiting list     [#1139]
+03/13  F Fixed backing up 3rd party module DBs more than once a day      [#1140]
+03/16  F Fixed os_info to display syntax errors if no command is entered [  #00]
+03/29  F Fixed defcon to only apply its mode parameters when it's on     [#1146]
+03/29  F Fixed numbering of memos when saved in SQL                      [#1149]
+03/30  F Fixed module demos to work correctly on TS6 IRCDs               [  #00]
+04/03  F Fixed saving databases in readonly mode when using anoperc      [  #00]
 
 Anope Version 1.8.3
 -------------------
@@ -55,7 +57,7 @@ Provided by Anope Dev. <team@anope.org> - 2009
 11/25 F Fixed a bug in CLEAR OPS causing incorrect mode removal.         [#1114]
 12/01 F Fixed tracking of users host when they disable their vhost       [#1106]
 12/20 F Fixed nickcores access list being loaded from SQL with RDB       [  #00]
-1/15  F Fixed BotServ from kicking and banning ULined clients            [#1135]
+01/15  F Fixed BotServ from kicking and banning ULined clients           [#1135]
 
 Provided by Han` <Han@mefalcon.org> - 2009
 07/28 F Updated german language file.                                    [  #00]
@@ -65,7 +67,7 @@ Provided by Yusuf Kurekci <ysfm.20@gmail.com> - 2009
 08/11 F Updated Turkish language file.                                   [  #00]
 
 Provided by Christopher N. <saka@epiknet.org> - 2009
-9/20 F Updated French language file.                                     [  #00]
+09/20 F Updated French language file.                                    [  #00]
 
 Anope Version 1.8.2
 -------------------

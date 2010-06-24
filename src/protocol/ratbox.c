@@ -1048,10 +1048,18 @@ int anope_event_away(char *source, int ac, char **av)
 
 int anope_event_kill(char *source, int ac, char **av)
 {
+    User *u = NULL;
+    Uid *ud = NULL;
+
     if (ac != 2)
         return MOD_CONT;
 
-    m_kill(av[0], av[1]);
+    if (UseTS6) {
+        u = find_byuid(source);
+        ud = find_nickuid(av[0]);
+    }
+
+    m_kill(u ? u->nick : (ud ? ud->nick : av[0]), av[1]);
     return MOD_CONT;
 }
 

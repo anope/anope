@@ -171,7 +171,7 @@ size_t hash_compare_std_string::operator()(const std::string &s) const
 {
 	register size_t t = 0;
 
-	for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+	for (std::string::const_iterator it = s.begin(), it_end = s.end(); it != it_end; ++it)
 		t = 5 * t + static_cast<const unsigned char>(*it);
 
 	return t;
@@ -185,7 +185,7 @@ size_t hash_compare_ci_string::operator()(const ci::string &s) const
 {
 	register size_t t = 0;
 
-	for (ci::string::const_iterator it = s.begin(); it != s.end(); ++it)
+	for (ci::string::const_iterator it = s.begin(), it_end = s.end(); it != it_end; ++it)
 		t = 5 * t + ascii_case_insensitive_map[static_cast<const unsigned char>(*it)];
 
 	return t;
@@ -199,7 +199,7 @@ size_t hash_compare_irc_string::operator()(const irc::string &s) const
 {
 	register size_t t = 0;
 
-	for (irc::string::const_iterator it = s.begin(); it != s.end(); ++it)
+	for (irc::string::const_iterator it = s.begin(), it_end = s.end(); it != it_end; ++it)
 		t = 5 * t + rfc_case_insensitive_map[static_cast<const unsigned char>(*it)];
 
 	return t;

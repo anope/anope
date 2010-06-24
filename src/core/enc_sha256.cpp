@@ -52,63 +52,54 @@
  * SUCH DAMAGE.
  */
 
-
 #include "module.h"
 
-#define SHA256_DIGEST_SIZE (256 / 8)
-#define SHA256_BLOCK_SIZE  (512 / 8)
-
-#ifndef HAS_STDINT
-typedef unsigned int uint32_t;
-#endif
+static const unsigned SHA256_DIGEST_SIZE = 256 / 8;
+static const unsigned SHA256_BLOCK_SIZE = 512 / 8;
 
 /** An sha256 context
  */
 class SHA256Context
 {
  public:
-	unsigned int tot_len;
-	unsigned int len;
+	unsigned tot_len;
+	unsigned len;
 	unsigned char block[2 * SHA256_BLOCK_SIZE];
-	uint32_t h[8];
+	uint32 h[8];
 };
 
-#define SHFR(x, n)    (x >> n)
-#define ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
-#define ROTL(x, n)   ((x << n) | (x >> ((sizeof(x) << 3) - n)))
-#define CH(x, y, z)  ((x & y) ^ (~x & z))
-#define MAJ(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
+inline static uint32 SHFR(uint32 x, uint32 n) { return x >> n; }
+inline static uint32 ROTR(uint32 x, uint32 n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
+inline static uint32 ROTL(uint32 x, uint32 n) { return (x << n) | (x >> ((sizeof(x) << 3) - n)); }
+inline static uint32 CH(uint32 x, uint32 y, uint32 z) { return (x & y) ^ (~x & z); }
+inline static uint32 MAJ(uint32 x, uint32 y, uint32 z) { return (x & y) ^ (x & z) ^ (y & z); }
 
-#define SHA256_F1(x) (ROTR(x,  2) ^ ROTR(x, 13) ^ ROTR(x, 22))
-#define SHA256_F2(x) (ROTR(x,  6) ^ ROTR(x, 11) ^ ROTR(x, 25))
-#define SHA256_F3(x) (ROTR(x,  7) ^ ROTR(x, 18) ^ SHFR(x,  3))
-#define SHA256_F4(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10))
+inline static uint32 SHA256_F1(uint32 x) { return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22); }
+inline static uint32 SHA256_F2(uint32 x) { return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25); }
+inline static uint32 SHA256_F3(uint32 x) { return ROTR(x, 7) ^ ROTR(x, 18) ^ SHFR(x, 3); }
+inline static uint32 SHA256_F4(uint32 x) { return ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10); }
 
-#define UNPACK32(x, str)		       \
-{					      \
-	*((str) + 3) = (uint8) ((x)      );      \
-	*((str) + 2) = (uint8) ((x) >>  8);      \
-	*((str) + 1) = (uint8) ((x) >> 16);      \
-	*((str) + 0) = (uint8) ((x) >> 24);      \
+inline static void UNPACK32(unsigned x, unsigned char *str)
+{
+	str[3] = static_cast<uint8>(x);
+	str[2] = static_cast<uint8>(x >> 8);
+	str[1] = static_cast<uint8>(x >> 16);
+	str[0] = static_cast<uint8>(x >> 24);
 }
 
-#define PACK32(str, x)			 \
-{					      \
-	*(x) = ((uint32_t) *((str) + 3)      )     \
-	| ((uint32_t) *((str) + 2) <<  8)     \
-	| ((uint32_t) *((str) + 1) << 16)     \
-	| ((uint32_t) *((str) + 0) << 24);    \
+inline static void PACK32(unsigned char *str, uint32 &x)
+{
+	x = static_cast<uint32>(str[3]) | static_cast<uint32>(str[2]) << 8 | static_cast<uint32>(str[1]) << 16 | static_cast<uint32>(str[0]) << 24;
 }
 
 /* Macros used for loops unrolling */
 
-#define SHA256_SCR(i)			  \
-{					      \
-	w[i] =  SHA256_F4(w[i - 2]) + w[i - 7]     \
-	+ SHA256_F3(w[i - 15]) + w[i - 16];  \
+inline static void SHA256_SCR(uint32 w[64], int i)
+{
+	w[i] = SHA256_F4(w[i - 2]) + w[i - 7] + SHA256_F3(w[i - 15]) + w[i - 16];
 }
 
-uint32_t sha256_k[64] =
+uint32 sha256_k[64] =
 {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -130,17 +121,14 @@ uint32_t sha256_k[64] =
 
 class ESHA256 : public Module
 {
-	unsigned int iv[8];
+	unsigned iv[8];
 	bool use_iv;
 
 	/* initializes the IV with a new random value */
 	void NewRandomIV()
 	{
-		srand(time(NULL));
-		for (int i = 0; i < 8; i++)
-		{
+		for (int i = 0; i < 8; ++i)
 			iv[i] = getrandom32();
-		}
 	}
 
 	/* returns the IV as base64-encrypted string */
@@ -148,11 +136,9 @@ class ESHA256 : public Module
 	{
 		unsigned char buf[33];
 		char buf2[512];
-		for (int i = 0; i < 8; i++)
-		{
+		for (int i = 0; i < 8; ++i)
 			UNPACK32(iv[i], &buf[i << 2]);
-		}
-		b64_encode(reinterpret_cast<char*>(buf), 32, buf2, 512);
+		b64_encode(reinterpret_cast<char *>(buf), 32, buf2, 512);
 		return buf2;
 	}
 
@@ -160,45 +146,41 @@ class ESHA256 : public Module
 	/* password format:  <hashmethod>:<password_b64>:<iv_b64> */
 	void GetIVFromPass(std::string &password)
 	{
-		size_t pos;
-		pos = password.find(":");
-		std::string buf(password, password.find(":", pos+1)+1, password.size());
+		size_t pos = password.find(":");
+		std::string buf(password, password.find(":", pos + 1) + 1, password.size());
 		unsigned char buf2[33];
-		b64_decode(buf.c_str(), reinterpret_cast<char*>(buf2), 33);
-		for (int i = 0 ; i < 8; i++)
-		{
-			PACK32(&buf2[i<<2], &iv[i]);
-		}
+		b64_decode(buf.c_str(), reinterpret_cast<char *>(buf2), 33);
+		for (int i = 0 ; i < 8; ++i)
+			PACK32(&buf2[i<<2], iv[i]);
 	}
 
 	void SHA256Init(SHA256Context *ctx)
 	{
-		for (int i = 0; i < 8; i++)
+		for (int i = 0; i < 8; ++i)
 			ctx->h[i] = iv[i];
 		ctx->len = 0;
 		ctx->tot_len = 0;
 	}
 
-	void SHA256Transform(SHA256Context *ctx, unsigned char *message, unsigned int block_nb)
+	void SHA256Transform(SHA256Context *ctx, unsigned char *message, unsigned block_nb)
 	{
-		uint32_t w[64];
-		uint32_t wv[8];
+		uint32 w[64], wv[8];
 		unsigned char *sub_block;
-		for (unsigned int i = 1; i <= block_nb; i++)
+		for (unsigned i = 1; i <= block_nb; ++i)
 		{
 			int j;
 			sub_block = message + ((i - 1) << 6);
 
-			for (j = 0; j < 16; j++)
-				PACK32(&sub_block[j << 2], &w[j]);
-			for (j = 16; j < 64; j++)
-				SHA256_SCR(j);
-			for (j = 0; j < 8; j++)
+			for (j = 0; j < 16; ++j)
+				PACK32(&sub_block[j << 2], w[j]);
+			for (j = 16; j < 64; ++j)
+				SHA256_SCR(w, j);
+			for (j = 0; j < 8; ++j)
 				wv[j] = ctx->h[j];
-			for (j = 0; j < 64; j++)
+			for (j = 0; j < 64; ++j)
 			{
-				uint32_t t1 = wv[7] + SHA256_F2(wv[4]) + CH(wv[4], wv[5], wv[6]) + sha256_k[j] + w[j];
-				uint32_t t2 = SHA256_F1(wv[0]) + MAJ(wv[0], wv[1], wv[2]);
+				uint32 t1 = wv[7] + SHA256_F2(wv[4]) + CH(wv[4], wv[5], wv[6]) + sha256_k[j] + w[j];
+				uint32 t2 = SHA256_F1(wv[0]) + MAJ(wv[0], wv[1], wv[2]);
 				wv[7] = wv[6];
 				wv[6] = wv[5];
 				wv[5] = wv[4];
@@ -208,32 +190,30 @@ class ESHA256 : public Module
 				wv[1] = wv[0];
 				wv[0] = t1 + t2;
 			}
-			for (j = 0; j < 8; j++)
+			for (j = 0; j < 8; ++j)
 				ctx->h[j] += wv[j];
 		}
 	}
 
-	void SHA256Update(SHA256Context *ctx, unsigned char *message, unsigned int len)
+	void SHA256Update(SHA256Context *ctx, const unsigned char *message, unsigned len)
 	{
 		/*
 		 * XXX here be dragons!
 		 * After many hours of pouring over this, I think I've found the problem.
 		 * When Special created our module from the reference one, he used:
 		 *
-		 *     unsigned int rem_len = SHA256_BLOCK_SIZE - ctx->len;
+		 *     unsigned rem_len = SHA256_BLOCK_SIZE - ctx->len;
 		 *
 		 * instead of the reference's version of:
 		 *
-		 *     unsigned int tmp_len = SHA256_BLOCK_SIZE - ctx->len;
-		 *     unsigned int rem_len = len < tmp_len ? len : tmp_len;
+		 *     unsigned tmp_len = SHA256_BLOCK_SIZE - ctx->len;
+		 *     unsigned rem_len = len < tmp_len ? len : tmp_len;
 		 *
 		 * I've changed back to the reference version of this code, and it seems to work with no errors.
 		 * So I'm inclined to believe this was the problem..
 		 *             -- w00t (January 06, 2008)
 		 */
-		unsigned int tmp_len = SHA256_BLOCK_SIZE - ctx->len;
-		unsigned int rem_len = len < tmp_len ? len : tmp_len;
-
+		unsigned tmp_len = SHA256_BLOCK_SIZE - ctx->len, rem_len = len < tmp_len ? len : tmp_len;
 
 		memcpy(&ctx->block[ctx->len], message, rem_len);
 		if (ctx->len + len < SHA256_BLOCK_SIZE)
@@ -241,27 +221,28 @@ class ESHA256 : public Module
 			ctx->len += len;
 			return;
 		}
-		unsigned int new_len = len - rem_len;
-		unsigned int block_nb = new_len / SHA256_BLOCK_SIZE;
-		unsigned char *shifted_message = message + rem_len;
+		unsigned new_len = len - rem_len, block_nb = new_len / SHA256_BLOCK_SIZE;
+		unsigned char *shifted_message = new unsigned char[len - rem_len];
+		memcpy(shifted_message, message + rem_len, len - rem_len);
 		SHA256Transform(ctx, ctx->block, 1);
 		SHA256Transform(ctx, shifted_message, block_nb);
 		rem_len = new_len % SHA256_BLOCK_SIZE;
-		memcpy(ctx->block, &shifted_message[block_nb << 6],rem_len);
+		memcpy(ctx->block, &shifted_message[block_nb << 6], rem_len);
+		delete [] shifted_message;
 		ctx->len = rem_len;
 		ctx->tot_len += (block_nb + 1) << 6;
 	}
 
 	void SHA256Final(SHA256Context *ctx, unsigned char *digest)
 	{
-		unsigned int block_nb = (1 + ((SHA256_BLOCK_SIZE - 9) < (ctx->len % SHA256_BLOCK_SIZE)));
-		unsigned int len_b = (ctx->tot_len + ctx->len) << 3;
-		unsigned int pm_len = block_nb << 6;
+		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (ctx->len % SHA256_BLOCK_SIZE));
+		unsigned len_b = (ctx->tot_len + ctx->len) << 3;
+		unsigned pm_len = block_nb << 6;
 		memset(ctx->block + ctx->len, 0, pm_len - ctx->len);
 		ctx->block[ctx->len] = 0x80;
 		UNPACK32(len_b, ctx->block + pm_len - 4);
 		SHA256Transform(ctx, ctx->block, block_nb);
-		for (int i = 0 ; i < 8; i++)
+		for (int i = 0 ; i < 8; ++i)
 			UNPACK32(ctx->h[i], &digest[i << 2]);
 	}
 
@@ -294,15 +275,14 @@ class ESHA256 : public Module
 			use_iv = false;
 
 		SHA256Init(&ctx);
-		SHA256Update(&ctx, (unsigned char *)src.c_str(), src.size());
-		SHA256Final(&ctx, (unsigned char*)digest);
+		SHA256Update(&ctx, reinterpret_cast<const unsigned char *>(src.c_str()), src.size());
+		SHA256Final(&ctx, reinterpret_cast<unsigned char *>(digest));
 
 		b64_encode(digest, SHA256_DIGEST_SIZE, cpass, 1000);
 		buf << "sha256:" << cpass << ":" << GetIVString();
 		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
-		dest.assign(buf.str());
+		dest = buf.str();
 		return EVENT_ALLOW;
-
 	}
 
 	EventReturn OnEncryptInPlace(std::string &buf)
@@ -327,15 +307,13 @@ class ESHA256 : public Module
 		use_iv = true;
 		this->OnEncrypt(plaintext, buf);
 
-		if(!password.compare(buf))
+		if (password == buf)
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front() == this->name)
-			{
+			if (Config.EncModuleList.front() != this->name)
 				enc_encrypt(plaintext, password );
-			}
 			return EVENT_ALLOW;
 		}
 		return EVENT_STOP;

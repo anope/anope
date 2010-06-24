@@ -29,9 +29,9 @@ class ENone : public Module
 		std::string buf = "plain:";
 		char cpass[1000];
 		b64_encode(src.c_str(), src.size(), cpass, 1000);
-		buf.append(cpass);
+		buf += cpass;
 		Alog(LOG_DEBUG_2) << "(enc_none) hashed password from [" << src << "] to [" << buf << "]";
-		dest.assign(buf);
+		dest = buf;
 		return EVENT_ALLOW;
 	}
 
@@ -44,12 +44,11 @@ class ENone : public Module
 	{
 		if (hashm != "plain")
 			return EVENT_CONTINUE;
-		char cpass[1000];
-		memset(&cpass, 0, sizeof(cpass));
+		char cpass[1000] = "";
 		size_t pos = src.find(":");
-		std::string buf(src.begin()+pos+1, src.end());
+		std::string buf(src.begin() + pos + 1, src.end());
 		b64_decode(buf.c_str(), cpass, 1000);
-		dest.assign(cpass);
+		dest = cpass;
 		return EVENT_ALLOW;
 	}
 
@@ -59,20 +58,17 @@ class ENone : public Module
 			return EVENT_CONTINUE;
 		std::string buf;
 		this->OnEncrypt(plaintext, buf);
-		if(!password.compare(buf))
+		if (password == buf)
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front() == this->name)
-			{
+			if (Config.EncModuleList.front() != this->name)
 				enc_encrypt(plaintext, password);
-			}
 			return EVENT_ALLOW;
 		}
 		return EVENT_STOP;
 	}
-
 };
 
 MODULE_INIT(ENone)

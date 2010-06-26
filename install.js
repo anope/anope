@@ -13,7 +13,7 @@
 //
 
 var anopeVersion = "Unknown";
-var vMaj, vMin, vPat, vBuild, vExtra;
+var vMaj, vMin, vPat, vExtra;
 
 var installerResponses = new Array();
 
@@ -258,13 +258,13 @@ else
 // Functions
 
 function FindAnopeVersion() {
-	if (!fso.FileExists(ScriptPath + 'version.log'))
+	if (!fso.FileExists(ScriptPath + 'src\\version'))
 	{
 		anopeVersion = 'Unknown';
 		return;
 	}
 
-	var versionLog = fso.OpenTextFile(ScriptPath + 'version.log');
+	var versionLog = fso.OpenTextFile(ScriptPath + 'src\\version');
 	while (!versionLog.atEndOfStream)
 	{
 		var versionLine = versionLog.readline();
@@ -292,14 +292,9 @@ function FindAnopeVersion() {
 			vExtra = versionLine.replace('VERSION_EXTRA=', '');
 			continue;
 		}
-		if (versionLine.match(/VERSION_BUILD=/g))
-		{
-			vBuild = versionLine.replace('VERSION_BUILD=', '');
-			continue;
-		}
 	}
 	versionLog.close();
-	anopeVersion = vMaj + '.' + vMin + '.' + vPat + '.' + vBuild + vExtra;
+	anopeVersion = vMaj + '.' + vMin + '.' + vPat + vExtra;
 	return;
 }
 

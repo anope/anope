@@ -206,9 +206,6 @@ E void fatal_perror(const char *fmt, ...) FORMAT(printf,1,2);
 
 /**** main.c ****/
 
-E const char version_number[];
-E const char version_number_dotted[];
-E const char version_build[];
 E char *version_protocol;
 
 E std::string services_dir;

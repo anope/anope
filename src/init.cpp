@@ -198,13 +198,13 @@ int init_primary(int ac, char **av)
 
 	if (GetCommandLineArgument("version", 'v'))
 	{
-		Alog(LOG_TERMINAL) << "Anope-" << version_number << " -- " << version_build;
+		Alog(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
 		return -1;
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
-		Alog(LOG_TERMINAL) << "Anope-" << version_number << " -- " << version_build;
+		Alog(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
 		Alog(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
 		Alog(LOG_TERMINAL) << "Usage ./" << SERVICES_BIN << " [options] ...";
 		Alog(LOG_TERMINAL) << "-c, --config=filename.conf";
@@ -413,7 +413,7 @@ int init_secondary(int ac, char **av)
 	write_pidfile();
 
 	/* Announce ourselves to the logfile. */
-	Alog() << "Anope " << version_number << " (ircd protocol: " << version_protocol << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
+	Alog() << "Anope " << Anope::Version() << " (ircd protocol: " << version_protocol << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 	start_time = time(NULL);
 
 	/* If in read-only mode, close the logfile again. */

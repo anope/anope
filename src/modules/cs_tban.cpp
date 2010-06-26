@@ -19,7 +19,6 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION VERSION_STRING
 
 void mySendResponse(User *u, const char *channel, char *mask, const char *time);
 
@@ -100,7 +99,6 @@ class CSTBan : public Module
 		this->AddCommand(ChanServ, new CommandCSTBan());
 
 		this->SetAuthor(AUTHOR);
-		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		const char* langtable_en_us[] = {

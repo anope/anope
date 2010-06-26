@@ -366,8 +366,8 @@ else(INSTDIR)
 endif(INSTDIR)
 
 # Version number processing
-# Find all lines in version.log that start with VERSION_
-read_from_file(${Anope_SOURCE_DIR}/version.log "^VERSION_" VERSIONS)
+# Find all lines in src/version.sh that start with VERSION_
+read_from_file(${Anope_SOURCE_DIR}/src/version.sh "^VERSION_" VERSIONS)
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   # Get the length of the string
@@ -381,6 +381,25 @@ foreach(VERSION_STR ${VERSIONS})
   # Set the version type to the value extract from above
   set(VERSION_${VERSION_TYPE} ${VERSION})
 endforeach(VERSION_STR ${VERSIONS})
+
+# Default build version to 0
+set(VERSION_BUILD 0)
+
+# Only change the build number if version.h exists
+if(EXISTS "${Anope_SOURCE_DIR}/include/version.h")
+  # Attempt to read the build number from include/version.h
+  read_from_file(${Anope_SOURCE_DIR}/include/version.h "^#define VERSION_BUILD" VERSIONS)
+  foreach(VERSION_STR ${VERSIONS})
+    # Get the length of the string
+    string(LENGTH ${VERSION_STR} VERSION_LEN)
+    # Subtract 22 from the string's length
+    math(EXPR VERSION_NUM_LEN "${VERSION_LEN} - 22")
+    # Extract the value from the string
+    string(SUBSTRING ${VERSION_STR} 22 ${VERSION_NUM_LEN} VERSION)
+    # Set VERSION_BUILD correctly
+    set(VERSION_BUILD ${VERSION})
+  endforeach(VERSION_STR ${VERSIONS})
+endif(EXISTS "${Anope_SOURCE_DIR}/include/version.h")
 
 # Set the version variables based on what was found above
 set(VERSION_COMMA "${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH},${VERSION_BUILD}")

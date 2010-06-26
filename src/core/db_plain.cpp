@@ -516,7 +516,6 @@ class DBPlain : public Module
 	DBPlain(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
 		this->SetType(DATABASE);
 
 		Implementation i[] = { I_OnReload, I_OnDatabaseRead, I_OnLoadDatabase, I_OnDatabaseReadMetadata, I_OnSaveDatabase, I_OnModuleLoad };

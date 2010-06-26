@@ -18,7 +18,6 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION VERSION_STRING
 
 /* Configuration variables */
 int HSRequestMemoUser = 0;
@@ -394,7 +393,6 @@ class HSRequest : public Module
 		this->AddCommand(HostServ, new CommandHSWaiting());
 
 		this->SetAuthor(AUTHOR);
-		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		my_load_config();

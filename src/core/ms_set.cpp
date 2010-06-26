@@ -264,7 +264,6 @@ class MSSet : public Module
 	MSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		this->AddCommand(MemoServ, new CommandMSSet());

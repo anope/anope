@@ -276,7 +276,7 @@ int m_stats(const char *source, int ac, const char **av)
 int m_version(const char *source, int ac, const char **av)
 {
 	if (source)
-		ircdproto->SendNumeric(Config.ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", version_number, Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), version_build);
+		ircdproto->SendNumeric(Config.ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
 	return MOD_CONT;
 }
 

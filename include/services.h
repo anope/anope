@@ -16,6 +16,7 @@
 
 /*************************************************************************/
 
+#include "version.h"
 #include "sysconf.h"
 
 #define BUFSIZE 1024
@@ -202,6 +203,7 @@ extern "C" void __pfnBkCheck() {}
 
 /* Pull in the various bits of STL */
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <exception>
@@ -352,6 +354,19 @@ template<typename T> class Flags
 		Flag_Values.reset();
 	}
 };
+
+/*************************************************************************/
+
+template<typename T>
+inline const std::string stringify(const T &x)
+{
+	std::stringstream stream;
+
+	if (!(stream << x))
+		throw CoreException("Stringify fail");
+	
+	return stream.str();
+}
 
 /*************************************************************************/
 
@@ -1036,7 +1051,19 @@ struct Message; // XXX
 
 class CoreExport Anope
 {
+ private:
+	static const char * const compiled;
  public:
+	static inline const std::string Version()
+	{
+		return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA " (" + stringify(VERSION_BUILD) + ")";
+	}
+
+	static inline const std::string Build()
+	{
+		return "build #" + stringify(BUILD) + ", compiled " + compiled;
+	}
+
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)
 	 * @param mask The pattern to check (e.g. foo*bar)
@@ -1064,7 +1091,6 @@ class CoreExport Anope
 	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)
 	 */
 	static std::vector<Message *> FindMessage(const std::string &name);
-
 };
 
 /*************************************************************************/

@@ -16,7 +16,6 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION VERSION_STRING
 
 void my_load_config();
 void my_add_languages();
@@ -38,7 +37,6 @@ class NSMaxEmail : public Module
 		me = this;
 
 		this->SetAuthor(AUTHOR);
-		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		ModuleManager::Attach(I_OnReload, this);

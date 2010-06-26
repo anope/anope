@@ -248,7 +248,7 @@ class InspIRCdProto : public IRCDProto
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd(NULL, "BURST");
-		send_cmd(Config.ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", version_number, Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), version_build);
+		send_cmd(Config.ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
 	}
 
 	/* CHGIDENT */
@@ -1160,7 +1160,6 @@ class ProtoInspIRCd : public Module
 	ProtoInspIRCd(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("InspIRCd 1.1");

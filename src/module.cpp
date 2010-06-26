@@ -26,6 +26,8 @@ Module::Module(const std::string &mname, const std::string &creator)
 
 	this->created = time(NULL);
 
+	this->SetVersion(Anope::Version());
+
 	Modules.push_back(this);
 }
 

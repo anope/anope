@@ -25,7 +25,6 @@
 
 #include "services.h"
 #include "timers.h"
-#include "version.h"
 #include "modules.h"
 
 // getrlimit.
@@ -33,6 +32,8 @@
 # include <sys/time.h>
 # include <sys/resource.h>
 #endif
+
+const char * const Anope::compiled = __TIME__ " " __DATE__;
 
 /******** Global variables! ********/
 
@@ -73,12 +74,6 @@ time_t start_time;
 
 /* Parameters and environment */
 char **my_av, **my_envp;
-
-/* Moved here from version.h */
-const char version_number[] = VERSION_STRING;
-const char version_number_dotted[] = VERSION_STRING_DOTTED;
-const char version_build[] = "build #" BUILD ", compiled " __DATE__ " " __TIME__;
-/* the space is needed cause if you build with nothing it will complain */
 
 /******** Local variables! ********/
 
@@ -455,7 +450,7 @@ int main(int ac, char **av, char **envp)
 	if ((i = init_primary(ac, av)))
 		return i;
 
-	Alog(LOG_TERMINAL) << "Anope " << version_number << ", " << version_build;
+	Alog(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
 #ifdef _WIN32
 	Alog(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;
 #else

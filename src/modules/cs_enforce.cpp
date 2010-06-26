@@ -16,7 +16,6 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION VERSION_STRING
 
 #define LNG_NUM_STRINGS	6
 
@@ -231,7 +230,6 @@ class CSEnforce : public Module
 		me = this;
 
 		this->SetAuthor(AUTHOR);
-		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		this->AddCommand(ChanServ, new CommandCSEnforce());

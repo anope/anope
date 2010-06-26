@@ -205,8 +205,13 @@ if [ ! "$NO_INTRO" ] ; then
 			clear
 			;;
 	esac
-	. $SOURCE_DIR/version.log
-	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER
+	. src/version.sh
+	if [ -d .git ] ; then
+		VERSION=`git describe --tags`
+		echo "#define VERSION_BUILD	`echo "$VERSION" | cut -d'-' -f2`" > include/version.h
+		echo "#define VERSION_EXTRA	\"-`echo "$VERSION" | cut -d'-' -f3`$VERSION_EXTRA\"" >> include/version.h
+	fi
+	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER
 	echo ""
 else
 	echo ""

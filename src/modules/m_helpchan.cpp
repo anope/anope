@@ -15,7 +15,6 @@ class HelpChannel : public Module
 	HelpChannel(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
 		this->SetType(SUPPORTED);
 
 		Implementation i[] = { I_OnChannelModeSet, I_OnReload };

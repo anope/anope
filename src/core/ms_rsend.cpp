@@ -81,7 +81,6 @@ class MSRSend : public Module
 			throw ModuleException("Don't like memo reciepts, or something.");
 
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
 
 		this->AddCommand(MemoServ, new CommandMSRSend());

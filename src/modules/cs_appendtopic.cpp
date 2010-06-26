@@ -19,7 +19,6 @@
 #include "module.h"
 
 #define AUTHOR "SGR"
-#define VERSION VERSION_STRING
 
 /* ------------------------------------------------------------
  * Name: cs_appendtopic
@@ -143,7 +142,6 @@ class CSAppendTopic : public Module
 		me = this;
 
 		this->SetAuthor(AUTHOR);
-		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		this->AddCommand(ChanServ, new CommandCSAppendTopic());

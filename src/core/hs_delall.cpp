@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -34,7 +33,7 @@ class CommandHSDelAll : public Command
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			NickCore *nc = na->nc;
-			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
+			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				na = *it;
 				na->hostinfo.RemoveVhost();

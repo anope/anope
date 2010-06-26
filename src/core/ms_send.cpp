@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -55,6 +54,7 @@ class MSSend : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSSend());
 	}
 };

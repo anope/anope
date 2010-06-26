@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -44,15 +43,13 @@ class CommandMSCancel : public Command
 			int i;
 
 			for (i = mi->memos.size() - 1; i >= 0; --i)
-			{
 				if ((mi->memos[i]->HasFlag(MF_UNREAD)) && !stricmp(mi->memos[i]->sender.c_str(), u->Account()->display) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(name)->nc, mi, mi->memos[i]->number))
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(name)->nc, mi, mi->memos[i]->number));
 					delmemo(mi, mi->memos[i]->number);
 					notice_lang(Config.s_MemoServ, u, MEMO_CANCELLED, name);
 					return MOD_CONT;
 				}
-			}
 
 			notice_lang(Config.s_MemoServ, u, MEMO_CANCEL_NONE);
 		}

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -68,7 +67,6 @@ class CommandHSSetAll : public Command
 			else
 			{
 				for (s = vIdent; *s; ++s)
-				{
 					if (!isvalidchar(*s))
 					{
 						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
@@ -77,7 +75,6 @@ class CommandHSSetAll : public Command
 						delete [] hostmask;
 						return MOD_CONT;
 					}
-				}
 			}
 			if (!ircd->vident)
 			{
@@ -117,9 +114,7 @@ class CommandHSSetAll : public Command
 
 		tmp_time = time(NULL);
 
-		Alog() << "vHost for all nicks in group \002" << nick << "\002 set to \002"
-			<< (vIdent && ircd->vident ? vIdent : "") << (vIdent && ircd->vident ? "@" : "")
-			<< hostmask << " \002 by oper \002" << u->nick << "\002";
+		Alog() << "vHost for all nicks in group \002" << nick << "\002 set to \002" << (vIdent && ircd->vident ? vIdent : "") << (vIdent && ircd->vident ? "@" : "") << hostmask << " \002 by oper \002" << u->nick << "\002";
 
 		na->hostinfo.SetVhost(vIdent ? vIdent : "", hostmask, u->nick);
 		HostServSyncVhosts(na);

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -32,7 +31,7 @@ class CommandHSOff : public Command
 			ircdproto->SendVhostDel(u);
 			notice_lang(Config.s_HostServ, u, HOST_OFF);
 		}
-		
+
 		return MOD_CONT;
 	}
 

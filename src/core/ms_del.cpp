@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -30,13 +29,9 @@ class MemoDelCallback : public NumberList
 			return;
 
 		if (ci)
-		{
 			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, Number - 1));
-		}
 		else
-		{
 			FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, Number - 1));
-		}
 
 		delmemo(mi, Number - 1);
 	}
@@ -54,7 +49,7 @@ class CommandMSDel : public Command
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
 		ci::string numstr = params.size() ? params[0] : "", chan;
-		unsigned i;
+		unsigned i, end;
 		int last;
 
 		if (!numstr.empty() && numstr[0] == '#')
@@ -80,9 +75,7 @@ class CommandMSDel : public Command
 			mi = &ci->memos;
 		}
 		else
-		{
 			mi = &u->Account()->memos;
-		}
 		if (numstr.empty() || (!isdigit(numstr[0]) && numstr != "ALL" && numstr != "LAST"))
 			this->OnSyntaxError(u, numstr);
 		else if (mi->memos.empty())
@@ -99,31 +92,23 @@ class CommandMSDel : public Command
 			else if (numstr == "LAST")
 			{
 				/* Delete last memo. */
-				for (i = 0; i < mi->memos.size(); ++i)
+				for (i = 0, end = mi->memos.size(); i < end; ++i)
 					last = mi->memos[i]->number;
 				if (ci)
-				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, last));
-				}
 				else
-				{
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, last))
-				}
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, last));
 				delmemo(mi, last);
 				notice_lang(Config.s_MemoServ, u, MEMO_DELETED_ONE, last);
 			}
 			else
 			{
 				if (ci)
-				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, 0));
-				}
 				else
-				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, 0));
-				}
 				/* Delete all memos. */
-				for (i = 0; i < mi->memos.size(); ++i)
+				for (i = 0, end = mi->memos.size(); i < end; ++i)
 				{
 					delete [] mi->memos[i]->text;
 					delete mi->memos[i];
@@ -136,7 +121,7 @@ class CommandMSDel : public Command
 			}
 
 			/* Reset the order */
-			for (i = 0; i < mi->memos.size(); ++i)
+			for (i = 0, end = mi->memos.size(); i < end; ++i)
 				mi->memos[i]->number = i + 1;
 		}
 		return MOD_CONT;
@@ -167,6 +152,8 @@ class MSDel : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
+		this->AddCommand(MemoServ, new CommandMSDel());
 	}
 };
 

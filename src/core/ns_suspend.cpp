@@ -84,7 +84,7 @@ class CommandNSSuspend : public Command
 			Alog() << Config.s_NickServ << ": " << u->nick << " set SUSPEND for nick " << nick;
 			notice_lang(Config.s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
 
-			FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na))
+			FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
 		}
 		else
 		{

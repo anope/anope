@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -32,10 +31,10 @@ class CommandMSStaff : public Command
 			return MOD_CONT;
 		}
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			NickCore *nc = it->second;
-			
+
 			if (nc->IsServicesOper())
 				memo_send(u, nc->display, text, z);
 		}
@@ -68,6 +67,7 @@ class MSStaff : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSStaff());
 	}
 };

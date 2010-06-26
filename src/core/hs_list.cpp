@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -41,7 +40,7 @@ class CommandHSList : public Command
 				notice_lang(Config.s_HostServ, u, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
-			for (unsigned i = 1; i < key.size(); ++i)
+			for (unsigned i = 1, end = key.size(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
@@ -53,7 +52,7 @@ class CommandHSList : public Command
 			}
 		}
 
-		for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
+		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
 			NickAlias *na = it->second;
 

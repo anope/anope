@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -41,7 +40,7 @@ class CommandMSCheck : public Command
 			return MOD_CONT;
 		}
 
-		if ((na->HasFlag(NS_FORBIDDEN)))
+		if (na->HasFlag(NS_FORBIDDEN))
 		{
 			notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
 			return MOD_CONT;
@@ -100,6 +99,7 @@ class MSCheck : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSCheck());
 	}
 };

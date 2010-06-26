@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -34,10 +33,10 @@ class CommandMSSendAll : public Command
 
 		NickAlias *na = findnick(u->nick);
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			NickCore *nc = it->second;
-			
+
 			if ((na && na->nc == nc) || stricmp(u->nick.c_str(), nc->display))
 				memo_send(u, nc->display, text, z);
 		}
@@ -71,6 +70,7 @@ class MSSendAll : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSSendAll());
 	}
 };

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -84,12 +83,10 @@ class CommandMSInfo : public Command
 			}
 			else
 			{
-				int count = 0, i;
-				for (i = 0; i < mi->memos.size(); ++i)
-				{
+				int count = 0, i, end;
+				for (i = 0, end = mi->memos.size(); i < end; ++i)
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
-				}
 				if (count == mi->memos.size())
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ALL_UNREAD, name, count);
 				else if (!count)
@@ -143,12 +140,10 @@ class CommandMSInfo : public Command
 			}
 			else
 			{
-				int count = 0, i;
-				for (i = 0; i < mi->memos.size(); ++i)
-				{
+				int count = 0, i, end;
+				for (i = 0, end = mi->memos.size(); i < end; ++i)
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
-				}
 				if (count == mi->memos.size())
 					notice_lang(Config.s_MemoServ, u, MEMO_INFO_MEMOS_ALL_UNREAD, count);
 				else if (!count)
@@ -213,6 +208,7 @@ class MSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSInfo());
 	}
 };

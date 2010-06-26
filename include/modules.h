@@ -55,8 +55,8 @@ enum EventReturn
  * loaded modules in a readable simple way, e.g.:
  * 'FOREACH_MOD(I_OnConnect,OnConnect(user));'
  */
-#define FOREACH_MOD(y,x) \
-do \
+#define FOREACH_MOD(y, x) \
+if (true) \
 { \
 	std::vector<Module*>::iterator safei; \
 	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
@@ -73,15 +73,17 @@ do \
 		} \
 		_i = safei; \
 	} \
-} while (0);
+} \
+else \
+	static_cast<void>(0)
 
 /**
  * This define is similar to the one above but returns a result in MOD_RESULT.
  * The first module to return a nonzero result is the value to be accepted,
  * and any modules after are ignored.
  */
-#define FOREACH_RESULT(y,x) \
-do \
+#define FOREACH_RESULT(y, x) \
+if (true) \
 { \
 	std::vector<Module*>::iterator safei; \
 	MOD_RESULT = EVENT_CONTINUE; \
@@ -103,7 +105,9 @@ do \
 		} \
 		_i = safei; \
 	} \
-} while(0);
+} \
+else \
+	static_cast<void>(0)
 
 #ifndef _WIN32
 # include <dlfcn.h>

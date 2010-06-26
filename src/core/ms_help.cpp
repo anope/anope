@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -31,7 +30,7 @@ class CommandMSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_HEADER);
-		for (CommandMap::const_iterator it = NickServ->Commands.begin(); it != NickServ->Commands.end(); ++it)
+		for (CommandMap::const_iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; ++it)
 			it->second->OnServHelp(u);
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_FOOTER, Config.s_ChanServ);
 	}
@@ -45,6 +44,7 @@ class MSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSHelp());
 	}
 };

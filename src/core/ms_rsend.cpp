@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -29,13 +28,10 @@ class CommandMSRSend : public Command
 		int z = 3;
 
 		/* prevent user from rsend to themselves */
-		if ((na = findnick(nick)))
+		if ((na = findnick(nick)) && na->nc == u->Account())
 		{
-			if (na->nc == u->Account())
-			{
-				notice_lang(Config.s_MemoServ, u, MEMO_NO_RSEND_SELF);
-				return MOD_CONT;
-			}
+			notice_lang(Config.s_MemoServ, u, MEMO_NO_RSEND_SELF);
+			return MOD_CONT;
 		}
 
 		if (Config.MSMemoReceipt == 1)
@@ -81,13 +77,14 @@ class MSRSend : public Module
  public:
 	MSRSend(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!Config.MSMemoReceipt)
+			throw ModuleException("Don't like memo reciepts, or something.");
+
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
-		this->AddCommand(MemoServ, new CommandMSRSend());
 
-		if (!Config.MSMemoReceipt)
-			throw ModuleException("Don't like memo reciepts, or something.");
+		this->AddCommand(MemoServ, new CommandMSRSend());
 	}
 };
 

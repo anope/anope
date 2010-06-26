@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -83,9 +82,7 @@ class CommandMSRead : public Command
 			mi = &ci->memos;
 		}
 		else
-		{
 			mi = &u->Account()->memos;
-		}
 		num = !numstr.empty() ? atoi(numstr.c_str()) : -1;
 		if (numstr.empty() || (numstr != "LAST" && numstr != "NEW" && num <= 0))
 			this->OnSyntaxError(u, numstr);
@@ -97,19 +94,17 @@ class CommandMSRead : public Command
 				notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else {
-			int i;
+			int i, end;
 
 			if (numstr == "NEW")
 			{
 				int readcount = 0;
-				for (i = 0; i < mi->memos.size(); ++i)
-				{
+				for (i = 0, end = mi->memos.size(); i < end; ++i)
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 					{
 						MemoListCallback::DoRead(u, mi, ci, i);
 						++readcount;
 					}
-				}
 				if (!readcount)
 				{
 					if (!chan.empty())
@@ -120,13 +115,11 @@ class CommandMSRead : public Command
 			}
 			else if (numstr == "LAST")
 			{
-				for (i = 0; i < mi->memos.size() - 1; ++i);
+				for (i = 0, end = mi->memos.size() - 1; i < end; ++i);
 				MemoListCallback::DoRead(u, mi, ci, i);
 			}
 			else /* number[s] */
-			{
 				(new MemoListCallback(u, mi, numstr.c_str()))->Process();
-			}
 		}
 		return MOD_CONT;
 	}
@@ -156,6 +149,7 @@ class MSRead : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSRead());
 	}
 };

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -67,7 +66,7 @@ class CommandMSList : public Command
 		ci::string param = params.size() ? params[0] : "", chan;
 		ChannelInfo *ci;
 		MemoInfo *mi;
-		int i;
+		int i, end;
 
 		if (!param.empty() && param[0] == '#')
 		{
@@ -87,9 +86,7 @@ class CommandMSList : public Command
 			mi = &ci->memos;
 		}
 		else
-		{
 			mi = &u->Account()->memos;
-		}
 		if (!param.empty() && !isdigit(param[0]) && param != "NEW")
 			this->OnSyntaxError(u, param);
 		else if (!mi->memos.size())
@@ -107,12 +104,10 @@ class CommandMSList : public Command
 			{
 				if (!param.empty())
 				{
-					for (i = 0; i < mi->memos.size(); ++i)
-					{
+					for (i = 0, end = mi->memos.size(); i < end; ++i)
 						if (mi->memos[i]->HasFlag(MF_UNREAD))
 							break;
-					}
-					if (i == mi->memos.size())
+					if (i == end)
 					{
 						if (!chan.empty())
 							notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
@@ -124,7 +119,7 @@ class CommandMSList : public Command
 
 				bool SentHeader = false;
 
-				for (i = 0; i < mi->memos.size(); ++i)
+				for (i = 0, end = mi->memos.size(); i < end; ++i)
 				{
 					if (!param.empty() && !(mi->memos[i]->HasFlag(MF_UNREAD)))
 						continue;
@@ -171,6 +166,7 @@ class MSList : public Module
 		this->SetAuthor("Anope");
 		this->SetVersion(VERSION_STRING);
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSList());
 	}
 };

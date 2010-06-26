@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -55,7 +54,6 @@ class CommandHSSet : public Command
 			else
 			{
 				for (s = vIdent; *s; ++s)
-				{
 					if (!isvalidchar(*s))
 					{
 						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
@@ -64,7 +62,6 @@ class CommandHSSet : public Command
 						delete [] hostmask;
 						return MOD_CONT;
 					}
-				}
 			}
 			if (!ircd->vident)
 			{
@@ -101,7 +98,6 @@ class CommandHSSet : public Command
 			return MOD_CONT;
 		}
 
-
 		tmp_time = time(NULL);
 
 		if ((na = findnick(nick)))
@@ -117,9 +113,7 @@ class CommandHSSet : public Command
 				delete [] hostmask;
 				return MOD_CONT;
 			}
-			Alog() << "vHost for user \002" << nick << "\002 set to \002"
-				<< (vIdent && ircd->vident ? vIdent : "") << (vIdent && ircd->vident ? "@" : "")
-				<< hostmask << " \002 by oper \002" << u->nick << "\002";
+			Alog() << "vHost for user \002" << nick << "\002 set to \002" << (vIdent && ircd->vident ? vIdent : "") << (vIdent && ircd->vident ? "@" : "") << hostmask << " \002 by oper \002" << u->nick << "\002";
 
 			na->hostinfo.SetVhost(vIdent ? vIdent : "", hostmask, u->nick);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -31,7 +30,7 @@ class CommandHSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP, Config.s_HostServ);
-		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
+		for (CommandMap::const_iterator it = HostServ->Commands.begin(), it_end = HostServ->Commands.end(); it != it_end; ++it)
 			it->second->OnServHelp(u);
 	}
 };

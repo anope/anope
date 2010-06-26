@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -46,7 +45,7 @@ class CommandHSOn : public Command
 		}
 		else
 			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
-		
+
 		return MOD_CONT;
 	}
 

@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
 
 			if (nc->accesscount)
 			{
-				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
+				for (j = 0, access = nc->access; j < nc->accesscount && *access; j++, access++)
 					fs << "MD ACCESS " << *access << std::endl;
 			}
 

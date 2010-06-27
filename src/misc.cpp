@@ -732,9 +732,12 @@ void doCleanBuffer(char *str)
  */
 void EnforceQlinedNick(const std::string &nick, const char *killer)
 {
-	User *u2;
+	if (findbot(nick))
+		return;
+	
+	User *u2 = finduser(nick);
 
-	if ((u2 = finduser(nick)))
+	if (u2)
 	{
 		Alog() << "Killed Q-lined nick: " << u2->GetMask();
 		kill_user(killer, u2->nick.c_str(), "This nick is reserved for Services. Please use a non Q-Lined nick.");

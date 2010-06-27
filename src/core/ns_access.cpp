@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -20,7 +19,7 @@ class CommandNSAccess : public Command
 	CommandReturn DoServAdminList(User *u, const std::vector<ci::string> &params, NickCore *nc)
 	{
 		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
-		unsigned i;
+		unsigned i, end;
 
 		if (nc->access.empty())
 		{
@@ -35,7 +34,7 @@ class CommandNSAccess : public Command
 		}
 
 		notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
-		for (i = 0; i < nc->access.size(); ++i)
+		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			std::string access = nc->GetAccess(i);
 			if (mask && !Anope::Match(access, mask, true))
@@ -94,7 +93,7 @@ class CommandNSAccess : public Command
 
 	CommandReturn DoList(User *u, NickCore *nc, const char *mask)
 	{
-		unsigned i;
+		unsigned i, end;
 
 		if (nc->access.empty())
 		{
@@ -103,7 +102,7 @@ class CommandNSAccess : public Command
 		}
 
 		notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST);
-		for (i = 0; i < nc->access.size(); ++i)
+		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			std::string access = nc->GetAccess(i);
 			if (mask && !Anope::Match(access, mask, true))

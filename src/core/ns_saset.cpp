@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -24,10 +23,8 @@ class CommandNSSASet : public Command
 
 	~CommandNSSASet()
 	{
-		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
-		{
+		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 			delete it->second;
-		}
 		this->subcommands.clear();
 	}
 
@@ -61,11 +58,9 @@ class CommandNSSASet : public Command
 				mod_run_cmd(NickServ, u, c, params[1], cmdparams);
 			}
 			else
-			{
 				notice_lang(Config.s_NickServ, u, NICK_SASET_UNKNOWN_OPTION, cmd.c_str());
-			}
 		}
-		
+
 		return MOD_CONT;
 	}
 
@@ -74,7 +69,7 @@ class CommandNSSASet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_HEAD);
-			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
+			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
 			notice_help(Config.s_NickServ, u, NICK_HELP_SASET_TAIL);
 			return true;
@@ -84,9 +79,7 @@ class CommandNSSASet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-			{
 				return c->OnHelp(u, subcommand);
-			}
 		}
 
 		return false;
@@ -117,9 +110,7 @@ class CommandNSSASet : public Command
 		std::map<ci::string, Command *>::const_iterator it = this->subcommands.find(subcommand);
 
 		if (it != this->subcommands.end())
-		{
 			return it->second;
-		}
 
 		return NULL;
 	}

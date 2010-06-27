@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -39,9 +38,7 @@ class CommandNSLogout : public Command
 			na = findnick(u2->nick);
 
 			if (nick && !param.empty() && param == "REVALIDATE")
-			{
 				validate_user(u2);
-			}
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
 			Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out nickname " << u2->nick;

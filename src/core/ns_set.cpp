@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -24,10 +23,8 @@ class CommandNSSet : public Command
 
 	~CommandNSSet()
 	{
-		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
-		{
+		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 			delete it->second;
-		}
 		this->subcommands.clear();
 	}
 
@@ -50,16 +47,14 @@ class CommandNSSet : public Command
 		if (c)
 		{
 			ci::string cmdparams;
-			for (std::vector<ci::string>::const_iterator it = params.begin() + 1; it != params.end(); ++it)
+			for (std::vector<ci::string>::const_iterator it = params.begin() + 1, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
 			if (!cmdparams.empty())
 				cmdparams.erase(cmdparams.begin());
 			mod_run_cmd(NickServ, u, c, params[0], cmdparams);
 		}
 		else
-		{
 			notice_lang(Config.s_NickServ, u, NICK_SET_UNKNOWN_OPTION, params[0].c_str());
-		}
 
 		return MOD_CONT;
 	}
@@ -69,7 +64,7 @@ class CommandNSSet : public Command
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_NickServ, u, NICK_HELP_SET_HEAD);
-			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(); it != this->subcommands.end(); ++it)
+			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
 			notice_help(Config.s_NickServ, u, NICK_HELP_SET_TAIL);
 			return true;
@@ -79,9 +74,7 @@ class CommandNSSet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-			{
 				return c->OnHelp(u, subcommand);
-			}
 		}
 
 		return false;
@@ -112,9 +105,7 @@ class CommandNSSet : public Command
 		std::map<ci::string, Command *>::const_iterator it = this->subcommands.find(subcommand);
 
 		if (it != this->subcommands.end())
-		{
 			return it->second;
-		}
 
 		return NULL;
 	}

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -81,14 +80,14 @@ class NSGetPass : public Module
  public:
 	NSGetPass(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		std::string tmp_pass = "plain:tmp";
+		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
+			throw ModuleException("Incompatible with the encryption module being used");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSGetPass());
-
-		std::string tmp_pass = "plain:tmp";
-		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
-			throw ModuleException("Incompatible with the encryption module being used");
 	}
 };
 

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -28,7 +27,8 @@ class CommandNSForbid : public Command
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
 		/* Assumes that permission checking has already been done. */
-		if (Config.ForceForbidReason && !reason) {
+		if (Config.ForceForbidReason && !reason)
+		{
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -58,9 +57,7 @@ class CommandNSIdentify : public Command
 		else
 		{
 			if (u->IsIdentified())
-			{
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out of account " << u->Account()->display;
-			}
 
 			if (na->last_realname)
 				delete [] na->last_realname;

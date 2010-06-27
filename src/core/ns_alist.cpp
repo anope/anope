@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -94,7 +93,7 @@ class CommandNSAList : public Command
 
 			notice_lang(Config.s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick);
 
-			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 			{
 				ChannelInfo *ci = it->second;
 
@@ -107,7 +106,7 @@ class CommandNSAList : public Command
 
 					++match_count;
 
-					if ((ci->HasFlag(CI_XOP)) || level == ACCESS_FOUNDER)
+					if (ci->HasFlag(CI_XOP) || level == ACCESS_FOUNDER)
 					{
 						const char *xop;
 

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -95,13 +94,8 @@ class CommandNSInfo : public Command
 
 			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
 
-			if (na->nc->IsServicesOper())
-			{
-				if (show_hidden || (!(na->nc->HasFlag(NI_HIDE_STATUS))))
-				{
-					notice_lang(Config.s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
-				}
-			}
+			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
+				notice_lang(Config.s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
 
 			if (nick_online)
 			{
@@ -143,7 +137,7 @@ class CommandNSInfo : public Command
 				{
 					if (ircd->vident && !na->hostinfo.GetIdent().empty())
 						notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST2, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
-					else	
+					else
 						notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST, na->hostinfo.GetHost().c_str());
 				}
 				if (na->nc->greet)

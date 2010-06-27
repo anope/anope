@@ -8,13 +8,11 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- *
  * A simple call to check for all emails that a user may have registered
  * with. It returns the nicks that match the email you provide. Wild
  * Cards are not excepted. Must use user@email-host.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -33,17 +31,14 @@ class CommandNSGetEMail : public Command
 
 		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			NickCore *nc = it->second;
 
-			if (nc->email)
+			if (nc->email && nc->email == email)
 			{
-				if (nc->email == email)
-				{
-					++j;
-					notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
-				}
+				++j;
+				notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
 			}
 		}
 

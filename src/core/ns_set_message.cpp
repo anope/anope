@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -56,7 +54,7 @@ class CommandNSSetMessage : public Command
 	{
 		syntax_error(Config.s_NickServ, u, "SET MSG", NICK_SET_MSG_SYNTAX);
 	}
-	
+
 	void OnServHelp(User *u)
 	{
 		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_MSG);
@@ -122,7 +120,6 @@ class NSSetMessage : public Module
 	NSSetMessage(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		Command *c = FindCommand(NickServ, "SET");

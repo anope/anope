@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -60,7 +59,7 @@ class CommandNSSuspend : public Command
 			na->nc->UnsetFlag(NI_KILL_QUICK);
 			na->nc->UnsetFlag(NI_KILL_IMMED);
 
-			for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(); it != na->nc->aliases.end(); ++it)
+			for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
 			{
 				NickAlias *na2 = *it;
 

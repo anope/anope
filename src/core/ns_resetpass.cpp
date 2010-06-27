@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -67,11 +66,11 @@ class NSResetPass : public Module
  public:
 	NSResetPass(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		this->SetAuthor("Anope");
-		this->SetType(CORE);
-
 		if (!Config.UseMail)
 			throw ModuleException("Not using mail.");
+
+		this->SetAuthor("Anope");
+		this->SetType(CORE);
 
 		this->AddCommand(NickServ, new CommandNSResetPass());
 
@@ -83,7 +82,7 @@ class NSResetPass : public Module
 		if (service == Config.s_NickServ && command == "CONFIRM" && !params.empty())
 		{
 			NickAlias *na = findnick(u->nick);
-			
+
 			time_t t;
 			std::string c;
 			if (na && na->nc->GetExtRegular("ns_resetpass_code", c) && na->nc->GetExtRegular("ns_resetpass_time", t))
@@ -131,7 +130,7 @@ class NSResetPass : public Module
 				return EVENT_STOP;
 			}
 		}
-		
+
 		return EVENT_CONTINUE;
 	}
 };

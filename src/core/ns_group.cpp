@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -27,7 +26,7 @@ class CommandNSGroup : public Command
 		NickAlias *na, *target;
 		const char *nick = params[0].c_str();
 		std::string pass = params[1].c_str();
-		std::list<std::pair<ci::string, ci::string> >::iterator it;
+		std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
 
 		if (Config.NSEmailReg && findrequestnick(u->nick))
 		{
@@ -48,16 +47,12 @@ class CommandNSGroup : public Command
 		}
 
 		if (Config.RestrictOperNicks)
-		{
-			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
-			{
+			for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 				if (!is_oper(u) && u->nick.find(it->first.c_str()) != std::string::npos)
 				{
 					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
-			}
-		}
 
 		na = findnick(u->nick);
 		if (!(target = findnick(nick)))
@@ -121,9 +116,7 @@ class CommandNSGroup : public Command
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 				ircdproto->SetAutoIdentificationToken(u);
 
-				Alog() << Config.s_NickServ << ": " << u->GetMask() << " makes " << u->nick
-						<< " join group of " << target->nick << " (" << target->nc->display
-						<< ") (e-mail: " <<  (target->nc->email ? target->nc->email : "none") << ")";
+				Alog() << Config.s_NickServ << ": " << u->GetMask() << " makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (e-mail: " <<  (target->nc->email ? target->nc->email : "none") << ")";
 				notice_lang(Config.s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
 				u->lastnickreg = time(NULL);
@@ -180,14 +173,10 @@ class CommandNSUngroup : public Command
 
 			std::list<NickAlias *>::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
 			if (it != oldcore->aliases.end())
-			{
 				oldcore->aliases.erase(it);
-			}
 
 			if (!stricmp(oldcore->display, na->nick))
-			{
 				change_core_display(oldcore);
-			}
 
 			na->nc = new NickCore(na->nick);
 			na->nc->aliases.push_back(na);
@@ -206,10 +195,8 @@ class CommandNSUngroup : public Command
 
 			User *user = finduser(na->nick);
 			if (user)
-			{
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
 				user->RemoveMode(NickServ, UMODE_REGISTERED);
-			}
 		}
 
 		return MOD_CONT;
@@ -252,7 +239,7 @@ class CommandNSGList : public Command
 			int wont_expire;
 
 			notice_lang(Config.s_NickServ, u, nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display);
-			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
+			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				NickAlias *na2 = *it;
 

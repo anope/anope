@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -68,7 +66,6 @@ class NSSASetNoexpire : public Module
 	NSSASetNoexpire(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		Command *c = FindCommand(NickServ, "SASET");
@@ -80,7 +77,7 @@ class NSSASetNoexpire : public Module
 	{
 		Command *c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("NOEXPRE");
+			c->DelSubcommand("NOEXPIRE");
 	}
 };
 

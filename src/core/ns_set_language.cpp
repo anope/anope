@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -116,7 +114,6 @@ class NSSetLanguage : public Module
 	NSSetLanguage(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		Command *c = FindCommand(NickServ, "SET");

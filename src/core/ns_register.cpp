@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -81,9 +80,7 @@ class CommandNSConfirm : public Command
 			/* Delrequest must be called before validate_user */
 			delete nr;
 			if (user)
-			{
 				validate_user(user);
-			}
 		}
 
 		FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
@@ -189,14 +186,14 @@ class CommandNSRegister : public CommandNSConfirm
 		const char *email = params.size() > 1 ? params[1].c_str() : NULL;
 		char passcode[11];
 		int idx, min = 1, max = 62;
-		int chars[] =
-			{ ' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-				'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-				'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-				'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
-				'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-			};
-		std::list<std::pair<ci::string, ci::string> >::iterator it;
+		int chars[] = {
+			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+			'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+			'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+			'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+		};
+		std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
 
 		if (readonly)
 		{
@@ -234,8 +231,7 @@ class CommandNSRegister : public CommandNSConfirm
 		}
 
 		if (Config.RestrictOperNicks)
-		{
-			for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+			for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 			{
 				ci::string nick = it->first;
 
@@ -244,7 +240,6 @@ class CommandNSRegister : public CommandNSConfirm
 					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
-			}
 		}
 
 		if (Config.NSForceEmail && !email)

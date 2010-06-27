@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -65,14 +64,12 @@ class CommandNSList : public Command
 				return MOD_CONT;
 			}
 			for (s = tmp; *s; ++s)
-			{
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
 					notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
-			}
 			from = atoi(tmp);
 			delete [] tmp;
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
@@ -82,14 +79,12 @@ class CommandNSList : public Command
 				return MOD_CONT;
 			}
 			for (s = tmp; *s; ++s)
-			{
 				if (!isdigit(*s))
 				{
 					delete [] tmp;
 					notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
-			}
 			to = atoi(tmp);
 			delete [] tmp;
 			pattern = sstrdup("*");
@@ -100,18 +95,17 @@ class CommandNSList : public Command
 
 		if (is_servadmin && params.size() > 1)
 		{
-			std::string keyword;
+			ci::string keyword;
 			spacesepstream keywords(params[1].c_str());
 			while (keywords.GetToken(keyword))
 			{
-				ci::string keyword_ci = keyword.c_str();
-				if (keyword_ci == "FORBIDDEN")
+				if (keyword == "FORBIDDEN")
 					forbidden = true;
-				if (keyword_ci == "NOEXPIRE")
+				if (keyword == "NOEXPIRE")
 					nsnoexpire = true;
-				if (keyword_ci == "SUSPENDED")
+				if (keyword == "SUSPENDED")
 					suspended = true;
-				if (keyword_ci == "UNCONFIRMED")
+				if (keyword == "UNCONFIRMED")
 					unconfirmed = true;
 			}
 		}
@@ -121,14 +115,14 @@ class CommandNSList : public Command
 		notice_lang(Config.s_NickServ, u, NICK_LIST_HEADER, pattern);
 		if (!unconfirmed)
 		{
-			for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end(); ++it)
+			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 			{
 				NickAlias *na = it->second;
-				
+
 				/* Don't show private and forbidden nicks to non-services admins. */
-				if ((na->HasFlag(NS_FORBIDDEN)) && !is_servadmin)
+				if (na->HasFlag(NS_FORBIDDEN) && !is_servadmin)
 					continue;
-				if ((na->nc->HasFlag(NI_PRIVATE)) && !is_servadmin && na->nc != mync)
+				if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
 					continue;
 				if (forbidden && !na->HasFlag(NS_FORBIDDEN))
 					continue;
@@ -140,7 +134,7 @@ class CommandNSList : public Command
 				/* We no longer compare the pattern against the output buffer.
 				 * Instead we build a nice nick!user@host buffer to compare.
 				 * The output is then generated separately. -TheShadow */
-				snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !(na->HasFlag(NS_FORBIDDEN)) ? na->last_usermask : "*@*");
+				snprintf(buf, sizeof(buf), "%s!%s", na->nick, na->last_usermask && !na->HasFlag(NS_FORBIDDEN) ? na->last_usermask : "*@*");
 				if (!stricmp(pattern, na->nick) || Anope::Match(buf, pattern, false))
 				{
 					if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config.NSListMax)
@@ -168,18 +162,15 @@ class CommandNSList : public Command
 		{
 			noexpire_char = ' ';
 
-			for (nickrequest_map::const_iterator it = NickRequestList.begin(); it != NickRequestList.end(); ++it)
+			for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
 			{
 				NickRequest *nr = it->second;
 
 				snprintf(buf, sizeof(buf), "%s!*@*", nr->nick);
-				if (!stricmp(pattern, nr->nick) || Anope::Match(buf, pattern, false))
+				if ((!stricmp(pattern, nr->nick) || Anope::Match(buf, pattern, false)) && ++nnicks <= Config.NSListMax)
 				{
-					if (++nnicks <= Config.NSListMax)
-					{
-						snprintf(buf, sizeof(buf), "%-20s  [UNCONFIRMED]", nr->nick);
-						u->SendMessage(Config.s_NickServ, "   %c%s", noexpire_char, buf);
-					}
+					snprintf(buf, sizeof(buf), "%-20s  [UNCONFIRMED]", nr->nick);
+					u->SendMessage(Config.s_NickServ, "   %c%s", noexpire_char, buf);
 				}
 			}
 		}

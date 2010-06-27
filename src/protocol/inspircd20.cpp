@@ -770,16 +770,15 @@ int anope_event_setident(const char *source, int ac, const char **av)
 
 int anope_event_chgident(const char *source, int ac, const char **av)
 {
-	User *u;
+	User *u = finduser(source);
 
-	u = finduser(av[0]);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
+		Alog(LOG_DEBUG) << "FIDENT for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
-	u->SetIdent(av[1]);
+	u->SetIdent(av[0]);
 	return MOD_CONT;
 }
 
@@ -1312,7 +1311,7 @@ void moduleAddIRCDMsgs()
 	Anope::AddMessage("WHOIS", anope_event_whois);
 	Anope::AddMessage("SVSMODE", anope_event_mode);
 	Anope::AddMessage("FHOST", anope_event_chghost);
-	Anope::AddMessage("CHGIDENT", anope_event_chgident);
+	Anope::AddMessage("FIDENT", anope_event_chgident);
 	Anope::AddMessage("FNAME", anope_event_chgname);
 	Anope::AddMessage("SETHOST", anope_event_sethost);
 	Anope::AddMessage("SETIDENT", anope_event_setident);

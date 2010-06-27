@@ -709,7 +709,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s is %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -757,8 +757,6 @@ NICK_INFO_OPT_NONE
 	None
 NICK_INFO_NO_EXPIRE
 	This nickname will not expire.
-NICK_INFO_FOR_MORE
-	For more verbose information, type %R%s INFO %s ALL.
 NICK_INFO_SUSPENDED
 	This nickname is currently suspended, reason: %s
 NICK_INFO_SUSPENDED_NO_REASON
@@ -1585,7 +1583,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO channel [ALL]
+	INFO channel
 CHAN_INFO_HEADER
 	Information for channel %s:
 CHAN_INFO_FOUNDER
@@ -3872,14 +3870,11 @@ NICK_HELP_GHOST
 	the nickname.
 
 NICK_HELP_INFO
-	Syntax: INFO nickname [ALL]
+	Syntax: INFO nickname
 	
 	Displays information about the given nickname, such as
 	the nick's owner, last seen address and time, and nick
-	options. If you are identified for the nick you're 
-	getting information for and ALL is specified, you will
-	be shown all the information; regardless of whether 
-	it's hidden or not.
+	options.
 
 NICK_HELP_LIST
 	Syntax: LIST pattern
@@ -4018,11 +4013,6 @@ NICK_SERVADMIN_HELP_DROP
 	You may drop any nick within your group without any 
 	special privileges. Dropping any nick is limited to 
 	Services Operators.
-
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
 
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
@@ -4868,16 +4858,13 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Syntax: INFO channel [ALL]
+	Syntax: INFO channel
 	
 	Lists information about the named registered channel,
 	including its founder, time of registration, last time
 	used, description, and mode lock, if any. If ALL is 
 	specified, the entry message and successor will also 
 	be displayed.
-	
-	By default, the ALL option is limited to those with
-	founder access on the channel.
 
 CHAN_HELP_LIST
 	Syntax: LIST pattern
@@ -5068,11 +5055,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	
 	Sets whether the given channel will expire.  Setting this
 	to ON prevents the channel from expiring.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]

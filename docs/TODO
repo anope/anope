@@ -29,7 +29,7 @@ Legend:
    [?] Last successful login time/ip? perhaps both of these should be a new nick setting
 [ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
-[ ] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
+[x] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
 
 Future
 ------

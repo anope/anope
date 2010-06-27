@@ -729,7 +729,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	   %s                isim: %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -777,8 +777,6 @@ NICK_INFO_OPT_NONE
 	YOK
 NICK_INFO_NO_EXPIRE
 	Bu nick zaman aþýmýna uðramayacak.
-NICK_INFO_FOR_MORE
-	Geniþ bilgi için, %R%s INFO %s ALL yazýn.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1611,7 +1609,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO kanaladý [ALL]
+	INFO kanaladý
 CHAN_INFO_HEADER
 	%s kanalý için bilgi:
 CHAN_INFO_FOUNDER
@@ -3996,7 +3994,7 @@ NICK_HELP_GHOST
 	grubundaki baþka bir nickin tanýtýlmýþ olmasý gerekir.
 
 NICK_HELP_INFO
-	Kullanýmý: INFO nick [ALL]
+	Kullanýmý: INFO nick
 	
 	Belirtilen nick hakkýnda o nickin sahibi, son görüldüðü adres ve 
 	zaman, ve nickin özellikleri gibi bilgiler verir. Eðer nick 
@@ -4971,7 +4969,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Kullanýmý: INFO kanaladý [ALL]
+	Kullanýmý: INFO kanaladý
 	
 	Belirtilen kayýtlý kanalla ilgili bilgiler sunar. Bu 
 	bilgilerin içeriðinde kanalýn founderý, kayýt zamaný,

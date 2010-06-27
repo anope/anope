@@ -28,7 +28,7 @@ class CommandCSInfo : public Command
 	}
 
  public:
-	CommandCSInfo() : Command("INFO", 1, 2)
+	CommandCSInfo() : Command("INFO", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
@@ -38,15 +38,13 @@ class CommandCSInfo : public Command
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
 		const char *chan = params[0].c_str();
-		ci::string param = params.size() > 1 ? params[1] : "";
-		ChannelInfo *ci;
 		char buf[BUFSIZE];
 		struct tm *tm;
 		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex");
 		bool show_all = false;
 		time_t expt;
 
-		ci = cs_findchan(chan);
+		ChannelInfo *ci = cs_findchan(chan);
 
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
@@ -59,7 +57,7 @@ class CommandCSInfo : public Command
 		}
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (!param.empty() && param == "ALL" && (check_access(u, ci, CA_INFO) || has_auspex))
+		if (has_auspex && check_access(u, ci, CA_INFO))
 			show_all = true;
 
 		notice_lang(Config.s_ChanServ, u, CHAN_INFO_HEADER, chan);
@@ -118,13 +116,10 @@ class CommandCSInfo : public Command
 				notice_lang(Config.s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
 			else
 			{
-				if (has_auspex)
-				{
-					expt = ci->last_used + Config.CSExpire;
-					tm = localtime(&expt);
-					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-					notice_lang(Config.s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
-				}
+				expt = ci->last_used + Config.CSExpire;
+				tm = localtime(&expt);
+				strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
+				notice_lang(Config.s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
 			}
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
@@ -132,16 +127,12 @@ class CommandCSInfo : public Command
 
 		FOREACH_MOD(I_OnChanInfo, OnChanInfo(u, ci, show_all));
 
-		if (!show_all && (check_access(u, ci, CA_INFO) || has_auspex))
-			notice_lang(Config.s_ChanServ, u, NICK_INFO_FOR_MORE, Config.s_ChanServ, ci->name.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_lang(Config.s_ChanServ, u, CHAN_HELP_INFO);
-		if (u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex"))
-			notice_lang(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_INFO);
 
 		return true;
 	}

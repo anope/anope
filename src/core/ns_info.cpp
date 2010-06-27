@@ -29,38 +29,26 @@ class CommandNSInfo : public Command
 		}
 	}
  public:
-	CommandNSInfo() : Command("INFO", 1, 2)
+	CommandNSInfo() : Command("INFO", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-		/* Show hidden info to nick owners and sadmins when the "ALL" parameter is
-		 * supplied. If a nick is online, the "Last seen address" changes to "Is
-		 * online from".
-		 * Syntax: INFO <nick> {ALL}
-		 * -TheShadow (13 Mar 1999)
-		 */
 		const char *nick = params[0].c_str();
-		ci::string param = params.size() > 1 ? params[1] : "";
 
-		NickAlias *na;
-		NickRequest *nr = NULL;
-		/* Being an oper is enough from now on -GD */
+		NickAlias *na = findnick(nick);
+		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex");
 
-		if (!(na = findnick(nick)))
+		if (!na)
 		{
-			if ((nr = findrequestnick(nick)))
+			NickRequest *nr = findrequestnick(nick);
+			if (nr)
 			{
 				notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
-				if (!param.empty() && param == "ALL" && u->Account() && u->Account()->IsServicesOper())
+				if (has_auspex)
 					notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, nr->email);
-				else
-				{
-					if (u->Account() && u->Account()->IsServicesOper())
-						notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, nr->nick);
-				}
 			}
 			else if (nickIsServices(nick, 1))
 				notice_lang(Config.s_NickServ, u, NICK_X_IS_SERVICES, nick);
@@ -80,16 +68,13 @@ class CommandNSInfo : public Command
 			char buf[BUFSIZE];
 			bool nick_online = false, show_hidden = false;
 			time_t expt;
-			bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex");
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
 			User *u2 = finduser(na->nick);
 			if (u2 && u2->Account() == na->nc)
 				nick_online = true;
 
-			/* Only show hidden fields to owner and sadmins and only when the ALL
-			 * parameter is used. -TheShadow */
-			if (!param.empty() && param == "ALL" && u->Account() && (na->nc == u->Account() || has_auspex))
+			if (has_auspex || (u->Account() && na->nc == u->Account()))
 				show_hidden = true;
 
 			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
@@ -173,9 +158,6 @@ class CommandNSInfo : public Command
 			}
 
 			FOREACH_MOD(I_OnNickInfo, OnNickInfo(u, na, show_hidden));
-
-			if (!show_hidden && u->Account() && (na->nc == u->Account() || has_auspex))
-				notice_lang(Config.s_NickServ, u, NICK_INFO_FOR_MORE, Config.s_NickServ, na->nick);
 		}
 		return MOD_CONT;
 	}
@@ -183,8 +165,6 @@ class CommandNSInfo : public Command
 	bool OnHelp(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_INFO);
-		if (u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex"))
-			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_INFO);
 
 		return true;
 	}

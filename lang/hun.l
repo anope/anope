@@ -719,7 +719,7 @@ NICK_STATUS_REPLY
 
 # INFO Válaszok
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s az %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -767,8 +767,6 @@ NICK_INFO_OPT_NONE
 	Nincs
 NICK_INFO_NO_EXPIRE
 	Ez a nicknév nem fog elévülni.
-NICK_INFO_FOR_MORE
-	Bõvebb információkért, írd be: %R%s INFO %s ALL.
 
 # LIST válaszok
 NICK_INFO_SUSPENDED
@@ -1611,7 +1609,7 @@ CHAN_STATUS_INFO
 
 # INFO válaszok
 CHAN_INFO_SYNTAX
-	INFO #szoba [ALL]
+	INFO #szoba
 CHAN_INFO_HEADER
 	%s információi:
 CHAN_INFO_FOUNDER
@@ -3918,7 +3916,7 @@ NICK_HELP_GHOST
 	A beragadt nicked killelheted, ha ismered a jelszót .
 	
 NICK_HELP_INFO
-	Syntax: INFO nicknév [ALL]
+	Syntax: INFO nicknév
 	
 	Megmutatja a nicknévvel kapcsolatos információkat, mint a
 	nick tulajdonosa, utoljára látott címe, regisztrálás ideje,
@@ -4930,7 +4928,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 	
 CHAN_HELP_INFO
-	Syntax: INFO #szoba [ALL]
+	Syntax: INFO #szoba
 	
 	Listázza az összes információt a megnevezett regisztrált
 	csatornáról, pl a foundert, a regisztrálás idõpontját,

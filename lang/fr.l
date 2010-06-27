@@ -733,7 +733,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO pseudo [ALL]
+	INFO pseudo
 NICK_INFO_REALNAME
 	%s est %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -781,8 +781,6 @@ NICK_INFO_OPT_NONE
 	Aucune
 NICK_INFO_NO_EXPIRE
 	Ce pseudo n'expirera pas.
-NICK_INFO_FOR_MORE
-	Pour plus d'informations, tapez %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1623,7 +1621,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO canal [ALL]
+	INFO canal
 CHAN_INFO_HEADER
 	Informations pour le canal %s:
 CHAN_INFO_FOUNDER
@@ -4033,7 +4031,7 @@ NICK_HELP_GHOST
 	correct pour le pseudo.
 
 NICK_HELP_INFO
-	Syntaxe: INFO pseudo [ALL]
+	Syntaxe: INFO pseudo
 	
 	Affiche des informations sur le pseudo donné, telles que
 	le propriétaire du pseudo, l'adresse avec laquelle il était
@@ -5080,7 +5078,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Syntaxe: INFO canal [ALL]
+	Syntaxe: INFO canal
 	
 	Liste les informations concernant le canal enregistré cité,
 	dont son propriétaire, la date d'enregistrement,

@@ -726,7 +726,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s es %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -774,8 +774,6 @@ NICK_INFO_OPT_NONE
 	Ninguno
 NICK_INFO_NO_EXPIRE
 	Este nickname no expirara.
-NICK_INFO_FOR_MORE
-	Para mayor informacion, tipea %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1613,7 +1611,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO canal [ALL]
+	INFO canal
 CHAN_INFO_HEADER
 	Informacion para el canal %s:
 CHAN_INFO_FOUNDER
@@ -3978,7 +3976,7 @@ NICK_HELP_GHOST
 	para ese nickname.
 
 NICK_HELP_INFO
-	Sintaxis: INFO nickname [ALL]
+	Sintaxis: INFO nickname
 	
 	Muestra informacion relativa al nick que especifiques,
 	tal como el propietario del nick, la ultima direccion usada
@@ -5023,7 +5021,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Sintaxis: INFO canal [ALL]
+	Sintaxis: INFO canal
 	
 	Lista informacion acerca del canal registrado dado,
 	incluyendo su fundador, tiempo de registracion, ultima

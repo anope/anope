@@ -726,7 +726,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s is %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -774,8 +774,6 @@ NICK_INFO_OPT_NONE
 	Geen
 NICK_INFO_NO_EXPIRE
 	Deze nick zal niet verlopen.
-NICK_INFO_FOR_MORE
-	Voor meer informatie, type %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1604,7 +1602,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO kanaal [ALL]
+	INFO kanaal
 CHAN_INFO_HEADER
 	Informatie voor kanaal %s:
 CHAN_INFO_FOUNDER
@@ -3953,7 +3951,7 @@ NICK_HELP_GHOST
 	die nick, of het correcte wachtwoord opgegeven zijn.
 
 NICK_HELP_INFO
-	Gebruik: INFO nick [ALL]
+	Gebruik: INFO nick
 	
 	Geeft informatie weer over de gegeven nick, zoals de laatste
 	eigenaar van de nick, het laatst beekende adres, wanneer deze
@@ -4986,7 +4984,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Gebruik: INFO kanaal [ALL]
+	Gebruik: INFO kanaal
 	
 	Geeft informatie weer over het gegeven geregistreerde
 	kanaal, zoals de stichter, registratietijd, tijd van

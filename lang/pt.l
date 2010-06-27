@@ -728,7 +728,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s é %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -776,8 +776,6 @@ NICK_INFO_OPT_NONE
 	Nenhuma
 NICK_INFO_NO_EXPIRE
 	Este nick não irá expirar.
-NICK_INFO_FOR_MORE
-	Para informações mais detalhadas, digite %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1605,7 +1603,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO canal [ALL]
+	INFO canal
 CHAN_INFO_HEADER
 	Informações do canal %s:
 CHAN_INFO_FOUNDER
@@ -2630,7 +2628,7 @@ OPER_OLINE_IRCOP
 
 # CLEARMODES responses
 OPER_CLEARMODES_SYNTAX
-	CLEARMODES canal [ALL]
+	CLEARMODES canal[ALL]
 OPER_CLEARMODES_DONE
 	Modos binários e bans removidos do canal %s.
 OPER_CLEARMODES_ALL_DONE
@@ -3902,7 +3900,7 @@ NICK_HELP_GHOST
 	nick, ou você deve fornecer a senha correta para o nick.
 
 NICK_HELP_INFO
-	Sintaxe: INFO nick [ALL]
+	Sintaxe: INFO nick
 	
 	Mostra a informação sobre o nick dado, como o dono do nick,
 	último endereço utilizado e horário, e opções. Se você está
@@ -4886,7 +4884,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Sintaxe: INFO canal [ALL]
+	Sintaxe: INFO canal
 	
 	Lista as informações referentes ao canal registrado dado,
 	incluindo seu fundador, data do registro, última vez que

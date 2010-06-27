@@ -903,7 +903,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 
 NICK_INFO_REALNAME
 	%s to %s
@@ -974,9 +974,6 @@ NICK_INFO_OPT_NONE
 
 NICK_INFO_NO_EXPIRE
 	Ten nick nie wyga¶nie.
-
-NICK_INFO_FOR_MORE
-	Aby uzyskaæ wiêcej informacji napisz %R%s INFO %s ALL.
 
 NICK_INFO_SUSPENDED
 	Ten nick jest obecnie zawieszony, powód: %s
@@ -2063,7 +2060,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO kana³ [ALL]
+	INFO kana³
 
 CHAN_INFO_HEADER
 	Informacje o kanale %s:
@@ -4946,7 +4943,7 @@ NICK_HELP_GHOST
 	3. podasz prawid³owe has³o do nicka.
 
 NICK_HELP_INFO
-	Sk³adnia: INFO nick [ALL]
+	Sk³adnia: INFO nick
 	
 	Wy¶wietla informacje na temat wybranego nicka:
 	w³a¶ciciel, kiedy ostatnio widziano, z jakiego 
@@ -5988,7 +5985,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Sk³adnia: INFO kana³ [ALL]
+	Sk³adnia: INFO kana³
 	
 	Wy¶wietla informacje o zarejestrowanym kanale:
 	w³a¶ciciel, data za³o¿enia, opis, blokada flag,

@@ -722,7 +722,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s είναι %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -770,8 +770,6 @@ NICK_INFO_OPT_NONE
 	Κανένα
 NICK_INFO_NO_EXPIRE
 	Αυτό το ψευδώνυμο δεν θα λήξει ποτέ.
-NICK_INFO_FOR_MORE
-	Για περισσότερες πληροφορίες, γράψε %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1617,7 +1615,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO channel [ALL]
+	INFO channel
 CHAN_INFO_HEADER
 	Πληροφορίες για το κανάλι %s:
 CHAN_INFO_FOUNDER
@@ -4008,7 +4006,7 @@ NICK_HELP_GHOST
 	δώσει τον σωστό κωδικό για το ψευδώνυμο.
 	
 NICK_HELP_INFO
-	Σύνταξη: INFO ψευδώνυμο [ALL]
+	Σύνταξη: INFO ψευδώνυμο
 	
 	Εμφανίζει πληροφορίες για το ψευδώνυμο που θα δώσετε, όπως
 	τον κάτοχο του ψευδωνύμου, την τελευταία διεύθυνση και ώρα
@@ -5001,7 +4999,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Σύνταξη: INFO κανάλι [ALL]
+	Σύνταξη: INFO κανάλι
 	
 	Εμφανίζει πληροφορίες σχετικά με το όνομα του κατοχυρωμένου καναλιού,
 	περιλαμβανομένου τον founder, την ώρα της κατοχύρωσης, πότε χρησιμοποιήθηκε 

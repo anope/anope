@@ -724,7 +724,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO nick
 NICK_INFO_REALNAME
 	%s es %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -772,8 +772,6 @@ NICK_INFO_OPT_NONE
 	Cap
 NICK_INFO_NO_EXPIRE
 	Aquest nickname no caducara.
-NICK_INFO_FOR_MORE
-	Per més informació, escriu %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -1615,7 +1613,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO canal [ALL]
+	INFO canal
 CHAN_INFO_HEADER
 	Informació pel canal %s:
 CHAN_INFO_FOUNDER
@@ -4006,14 +4004,11 @@ NICK_HELP_GHOST
 	per aquest nickname.
 
 NICK_HELP_INFO
-	Sintaxis: INFO nickname [ALL]
+	Sintaxis: INFO nickname
 	
 	Mostra informació relativa al nick que s'especifiqui,
 	tal com el propietari del nick, l'ultima adreça utilitzada
-	i temps, i opcions del nick. Si estas identificat amb el
-	nick per el qual demanes informació i utilitzes el parametre
-	ALL, podras veure tota la informació; independentment de
-	si esta oculta o no.
+	i temps, i opcions del nick.
 
 NICK_HELP_LIST
 	Sintaxis: LIST patró
@@ -5051,16 +5046,13 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Sintàxi: INFO canal [ALL]
+	Sintàxi: INFO canal
 	
 	llista informació sobre el canal registrat donat,
 	incloent el seu fundador, temps de registració, últim
 	cop utilitzat, descripció i fixació de Modes, si existeixen.
 	Si ALL és especificat, el misatge d'entrada i
 	sucsesor també seran mostrats.
-	
-	Per defecte, l'opció ALL està limitada a aquells
-	amb accés de fundador en el canal.
 
 CHAN_HELP_LIST
 	Sintàxi: LIST patró

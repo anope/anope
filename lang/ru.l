@@ -711,7 +711,7 @@ NICK_STATUS_REPLY
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO ник [ALL]
+	INFO ник
 NICK_INFO_REALNAME
 	%s это %s
 NICK_INFO_SERVICES_OPERTYPE
@@ -759,8 +759,6 @@ NICK_INFO_OPT_NONE
 	отсутствуют
 NICK_INFO_NO_EXPIRE
 	Дополнительно: регистрация этого ника никогда не истечет.
-NICK_INFO_FOR_MORE
-	Для более подробной информации см. %R%s INFO %s ALL.
 NICK_INFO_SUSPENDED
 	Дополнительно: этот ник находится в режиме саспенда по причине: %s
 NICK_INFO_SUSPENDED_NO_REASON
@@ -1584,7 +1582,7 @@ CHAN_STATUS_INFO
 
 # INFO responses
 CHAN_INFO_SYNTAX
-	INFO #канал [ALL]
+	INFO #канал
 CHAN_INFO_HEADER
 	Информация о канале %s:
 CHAN_INFO_FOUNDER
@@ -3950,7 +3948,7 @@ NICK_HELP_GHOST
 	идентификации к нику всего лишь через список хостмасок.
 
 NICK_HELP_INFO
-	Синтаксис: INFO ник [ALL]
+	Синтаксис: INFO ник
 	
 	Запрашивает у сервисов информацию об указанном нике. В частности
 	будут показаны: реальное имя владельца (realname), его последняя
@@ -4984,7 +4982,7 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
 
 CHAN_HELP_INFO
-	Синтаксис: INFO #канал [ALL]
+	Синтаксис: INFO #канал
 	
 	Позволяет получить подробную информацию о зарегистрированом канале,
 	в частности такую как: ник владельца, время регистрации канала, дату

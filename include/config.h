@@ -576,7 +576,7 @@ class ServerConfig
 	/* Don't allow nicks to use /ns group to regroup nicks */
 	bool NSNoGroupChange;
 	/* Default flags for newly registered nicks */
-	Flags<NickCoreFlag> NSDefFlags;
+	Flags<NickCoreFlag, NI_END> NSDefFlags;
 	/* Default language used by services */
 	unsigned NSDefLanguage;
 	/* Users must be connected this long before they can register
@@ -616,7 +616,7 @@ class ServerConfig
 	bool NSAddAccessOnReg;
 
 	/* Default flags for newly registered channels */
-	Flags<ChannelInfoFlag> CSDefFlags;
+	Flags<ChannelInfoFlag, CI_END> CSDefFlags;
 	/* Max number of channels a user can own */
 	unsigned CSMaxReg;
 	/* Time before a channel expires */

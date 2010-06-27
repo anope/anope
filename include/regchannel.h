@@ -62,15 +62,15 @@ enum ChannelInfoFlag
 	CI_END
 };
 
-class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag>
+class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>
 {
  private:
 	std::map<ChannelModeName, std::string> Params;	/* Map of parameters by mode name for mlock */
 	std::vector<ChanAccess *> access;				/* List of authorized users */
 	std::vector<AutoKick *> akick;					/* List of users to kickban */
 	std::vector<BadWord *> badwords;				/* List of badwords */
-	Flags<ChannelModeName> mlock_on;				/* Modes mlocked on */
-	Flags<ChannelModeName> mlock_off;				/* Modes mlocked off */
+	Flags<ChannelModeName, CMODE_END> mlock_on;				/* Modes mlocked on */
+	Flags<ChannelModeName, CMODE_END> mlock_off;				/* Modes mlocked off */
 
  public:
  	/** Default constructor

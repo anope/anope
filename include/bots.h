@@ -29,7 +29,7 @@ enum BotFlag
 	BI_END
 };
 
-class CoreExport BotInfo : public Extensible, public Flags<BotFlag>
+class CoreExport BotInfo : public Extensible, public Flags<BotFlag, BI_END>
 {
  public:
 	std::string uid;	/* required for UID supporting servers, as opposed to the shitty struct Uid. */

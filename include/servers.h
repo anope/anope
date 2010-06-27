@@ -59,7 +59,7 @@ struct CapabInfo
 	CapabType Flag;
 };
 
-extern CoreExport Flags<CapabType> Capab;
+extern CoreExport Flags<CapabType, CAPAB_END> Capab;
 extern CoreExport CapabInfo Capab_Info[];
 
 /** Flags set on servers

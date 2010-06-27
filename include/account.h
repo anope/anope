@@ -100,7 +100,7 @@ class CoreExport NickRequest : public Extensible
 
 class NickCore;
 
-class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
+class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>
 {
  public:
  	/** Default constructor
@@ -135,7 +135,7 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag>
 	void OnCancel(User *u);
 };
 
-class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag>
+class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>
 {
  public:
  	/** Default constructor

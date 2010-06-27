@@ -308,10 +308,10 @@ class DatabaseException : public CoreException
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
  */
-template<typename T> class Flags
+template<typename T, size_t Size = 32> class Flags
 {
  protected:
-	std::bitset<128> Flag_Values;
+	std::bitset<Size> Flag_Values;
 
  public:
 	/** Add a flag to this item

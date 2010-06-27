@@ -47,7 +47,7 @@ CapabInfo Capab_Info[] = {
 	{"", CAPAB_END}
 };
 
-Flags<CapabType> Capab;
+Flags<CapabType, CAPAB_END> Capab;
 
 /** Constructor
  * @param uplink The uplink this server is from, is only NULL when creating Me

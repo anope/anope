@@ -28,9 +28,9 @@ std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
 /* Number of generic modes we support */
 unsigned GenericChannelModes = 0, GenericUserModes = 0;
 /* Default mlocked modes on */
-Flags<ChannelModeName> DefMLockOn;
+Flags<ChannelModeName, CMODE_END> DefMLockOn;
 /* Default mlocked modes off */
-Flags<ChannelModeName> DefMLockOff;
+Flags<ChannelModeName, CMODE_END> DefMLockOff;
 /* Map for default mlocked mode parameters */
 std::map<ChannelModeName, std::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
@@ -43,7 +43,7 @@ void SetDefaultMLock()
 	DefMLockOn.ClearFlags();
 	DefMLockOff.ClearFlags();
 	DefMLockParams.clear();
-	Flags<ChannelModeName> *ptr = NULL;
+	Flags<ChannelModeName, CMODE_END> *ptr = NULL;
 
 	std::string modes, param;
 	spacesepstream sep(Config.MLock);

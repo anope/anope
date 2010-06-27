@@ -39,7 +39,7 @@ struct UserContainer
 {
 	User *user;
 	UserData ud;
-	Flags<ChannelModeName> *Status;
+	Flags<ChannelModeName, CMODE_END> *Status;
 
 	UserContainer(User *u) : user(u) { }
 	virtual ~UserContainer() { }
@@ -55,7 +55,7 @@ enum ChannelFlags
 	CH_SYNCING
 };
 
-class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
+class CoreExport Channel : public Extensible, public Flags<ChannelFlags, CMODE_END>
 {
  private:
 	/** A map of channel modes with their parameters set on this channel
@@ -63,7 +63,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	std::map<ChannelModeName, std::string> Params;
 
 	/* Modes set on the channel */
-	Flags<ChannelModeName> modes;
+	Flags<ChannelModeName, CMODE_END> modes;
 
  public:
 	/** Default constructor

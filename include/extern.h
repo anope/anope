@@ -326,8 +326,8 @@ E int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host);
 /**** modes.cpp ****/
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
-E Flags<ChannelModeName> DefMLockOn;
-E Flags<ChannelModeName> DefMLockOff;
+E Flags<ChannelModeName, CMODE_END> DefMLockOn;
+E Flags<ChannelModeName, CMODE_END> DefMLockOff;
 E std::map<ChannelModeName, std::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
 E std::list<ChannelModeStatus *> BotModes;

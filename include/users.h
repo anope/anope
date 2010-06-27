@@ -20,7 +20,7 @@ extern CoreExport user_uid_map UserListByUID;
 struct ChannelContainer
 {
 	Channel *chan;
-	Flags<ChannelModeName> *Status;
+	Flags<ChannelModeName, CMODE_END> *Status;
 
 	ChannelContainer(Channel *c) : chan(c) { }
 	virtual ~ChannelContainer() { }
@@ -36,7 +36,7 @@ class CoreExport User : public Extensible
 	std::string ident;
 	std::string uid;
 	bool OnAccess; /* If the user is on the access list of the nick theyre on */
-	Flags<UserModeName> modes; /* Bitset of mode names the user has set on them */
+	Flags<UserModeName, UMODE_END> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, std::string> Params; /* Map of user modes and the params this user has */
 	NickCore *nc; /* NickCore account the user is currently loggged in as */
 

@@ -90,10 +90,12 @@ class CommandNSDrop : public Command
 					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
 				else
 					notice_lang(Config.s_NickServ, u, NICK_DROPPED);
-				if (my_nick)
-					delete [] my_nick;
 			}
 		}
+
+		if (my_nick)
+			delete [] my_nick;
+
 		return MOD_CONT;
 	}
 

@@ -201,6 +201,8 @@ User::~User()
 {
 	Alog(LOG_DEBUG_2) << "User::~User() called";
 
+	this->Logout();
+
 	if (Config.LogUsers)
 	{
 		const char *srealname = normalizeBuffer(this->realname);

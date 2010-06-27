@@ -29,19 +29,12 @@ enum BotFlag
 	BI_END
 };
 
-class CoreExport BotInfo : public Extensible, public Flags<BotFlag, BI_END>
+class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 {
  public:
-	std::string uid;	/* required for UID supporting servers, as opposed to the shitty struct Uid. */
-	std::string nick;	/* Nickname of the bot */
-	std::string user;	/* Its user name */
-	std::string host;	/* Its hostname */
-	std::string real;	/* Its real name */
 	time_t created; 	/* Birth date ;) */
-	int16 chancount;	/* Number of channels that use the bot. */
-	/* Dynamic data */
 	time_t lastmsg;		/* Last time we said something */
-	CommandMap Commands;
+	CommandMap Commands;	/* Commands on this bot */
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
@@ -76,6 +69,10 @@ class CoreExport BotInfo : public Extensible, public Flags<BotFlag, BI_END>
 	 * @param ci The channel registration to remove the bot from.
 	 */
 	void UnAssign(User *u, ChannelInfo *ci);
+
+	void Join(Channel *c);
+	void Join(const std::string &chname);
+	void Part(Channel *c, const std::string &reason = "");
 };
 
 #endif // BOTS_H

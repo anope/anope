@@ -268,11 +268,11 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 
 	/* Check whether it matches a botserv bot after adding internally
 	 * and parsing it through cidr support. ~ Viper */
-	if (Config.s_BotServ && Config.BSSmartJoin && chan->ci && chan->ci->bi && chan->users.size() >= Config.BSMinUsers)
+	if (Config.s_BotServ && Config.BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
 	{
 		BotInfo *bi = chan->ci->bi;
 
-		if (entry_match(ban, bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), 0))
+		if (entry_match(ban, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host, 0))
 		{
 			ircdproto->SendMode(bi, chan, "-b %s", mask);
 			entry_delete(chan->bans, ban);

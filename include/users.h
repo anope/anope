@@ -76,7 +76,7 @@ class CoreExport User : public Extensible
 
 	/** Destroy a user.
 	 */
-	~User();
+	virtual ~User();
 
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.

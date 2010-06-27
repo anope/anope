@@ -290,7 +290,7 @@ int m_whois(const char *source, const char *who)
 		BotInfo *bi = findbot(who);
 		if (bi)
 		{
-			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->user.c_str(), bi->host.c_str(), bi->real.c_str());
+			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host, bi->realname);
 			ircdproto->SendNumeric(Config.ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
 			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config.ServerName, Config.ServerDesc);
 			ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);

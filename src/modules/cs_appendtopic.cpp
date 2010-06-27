@@ -98,17 +98,17 @@ class CommandCSAppendTopic : public Command
 				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
 			if (ircd->join2set)
 			{
-				if (whosends(ci) == findbot(Config.s_ChanServ))
+				if (whosends(ci) == ChanServ)
 				{
-					ircdproto->SendJoin(findbot(Config.s_ChanServ), c->name.c_str(), c->creation_time);
-					ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ);
+					ChanServ->Join(c);
+					ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ); // XXX
 				}
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic);
 			if (ircd->join2set)
 			{
-				if (whosends(ci) == findbot(Config.s_ChanServ))
-					ircdproto->SendPart(findbot(Config.s_ChanServ), c, NULL);
+				if (whosends(ci) == ChanServ)
+					ChanServ->Part(c);
 			}
 		}
 		return MOD_CONT;

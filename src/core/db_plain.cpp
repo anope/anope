@@ -409,11 +409,12 @@ static void LoadBotInfo(const std::vector<std::string> &params)
 	BotInfo *bi = findbot(params[0]);
 	if (!bi)
 		bi = new BotInfo(params[0]);
-	bi->user = params[1];
-	bi->host = params[2];
+	bi->SetIdent(params[1]);
+	bi->host = sstrdup(params[2].c_str());
 	bi->created = atol(params[3].c_str());
-	bi->chancount = atol(params[4].c_str());
-	bi->real = params[5];
+	//bi no longer has a chancount, use bi->chans.size()
+	//bi->chancount = atol(params[4].c_str());
+	bi->realname = sstrdup(params[5].c_str());
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
 }
@@ -984,7 +985,7 @@ class DBPlain : public Module
 		{
 			BotInfo *bi = it->second;
 
-			db << "BI " << bi->nick << " " << bi->user << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->real << endl;
+			db << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chans.size() << " :" << bi->realname << endl;
 			if (bi->FlagCount())
 			{
 				db << "MD FLAGS";

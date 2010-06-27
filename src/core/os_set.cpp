@@ -113,7 +113,10 @@ class CommandOSSet : public Command
 			if (ircd->join2msg)
 			{
 				c = findchan(Config.LogChannel);
-				ircdproto->SendJoin(Global, Config.LogChannel, c ? c->creation_time : time(NULL));
+				if (c)
+					Global->Join(c);
+				else
+					Global->Join(Config.LogChannel);
 			}
 			LogChan = true;
 			Alog() << "Now sending log messages to " << Config.LogChannel;
@@ -122,8 +125,9 @@ class CommandOSSet : public Command
 		else if (Config.LogChannel && setting == "OFF")
 		{
 			Alog() << "No longer sending log messages to a channel";
-			if (ircd->join2msg)
-				ircdproto->SendPart(Global, findchan(Config.LogChannel), NULL);
+			c = findchan(Config.LogChannel);
+			if (ircd->join2msg && c)
+				Global->Part(c);
 			LogChan = false;
 			notice_lang(Config.s_OperServ, u, OPER_SET_LOGCHAN_OFF);
 		}

@@ -36,9 +36,9 @@ class CommandCSSetPersist : public Command
 				/* Channel doesn't exist, create it internally */
 				if (!ci->c)
 				{
-					new Channel(ci->name);
+					Channel *c = new Channel(ci->name);
 					if (ci->bi)
-						bot_join(ci);
+						ci->bi->Join(c);
 				}
 
 				/* No botserv bot, no channel mode */
@@ -64,8 +64,8 @@ class CommandCSSetPersist : public Command
 				/* Unset perm mode */
 				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))
 					ci->c->RemoveMode(NULL, cm);
-				if (Config.s_BotServ && ci->bi && ci->c->users.size() == Config.BSMinUsers - 1)
-					ircdproto->SendPart(ci->bi, ci->c, NULL);
+				if (Config.s_BotServ && ci->bi && ci->c->FindUser(ci->bi))
+					ci->bi->Part(ci->c);
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on

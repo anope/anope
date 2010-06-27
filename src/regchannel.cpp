@@ -72,13 +72,10 @@ ChannelInfo::~ChannelInfo()
 
 	Alog(LOG_DEBUG) << "Deleting channel " << this->name;
 
-	if (this->bi)
-		--this->bi->chancount;
-
 	if (this->c)
 	{
 		if (this->bi && this->c->users.size() >= Config.BSMinUsers)
-			ircdproto->SendPart(this->bi, this->c, NULL);
+			this->bi->Part(this->c);
 		this->c->ci = NULL;
 	}
 
@@ -637,9 +634,11 @@ bool ChannelInfo::CheckKick(User *user)
 	Alog(LOG_DEBUG) << "Autokicking "<< user->GetMask() <<  " from " << this->name;
 
 	/* If the channel isn't syncing and doesn't have any users, join ChanServ
-	 * NOTE: we use usercount == 1 here as there is one user, but they are about to be destroyed
+	 * Note that the user AND POSSIBLY the botserv bot exist here
+	 * ChanServ always enforces channels like this to keep people from deleting bots etc
+	 * that are holding channels.
 	 */
-	if (this->c->users.size() == 1 && !this->HasFlag(CI_INHABIT) && !this->c->HasFlag(CH_SYNCING))
+	if (this->c->users.size() == (this->bi ? 2 : 1) && !this->HasFlag(CI_INHABIT) && !this->c->HasFlag(CH_SYNCING))
 	{
 		/* If channel was forbidden, etc, set it +si to prevent rejoin */
 		if (set_modes)
@@ -651,7 +650,7 @@ bool ChannelInfo::CheckKick(User *user)
 		}
 
 		/* Join ChanServ */
-		ircdproto->SendJoin(ChanServ, this->name.c_str(), this->c->creation_time);
+		ChanServ->Join(this->c);
 
 		/* Set a timer for this channel to part ChanServ later */
 		new ChanServTimer(this->c);

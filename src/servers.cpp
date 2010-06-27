@@ -75,8 +75,7 @@ Server::Server(Server *uplink, const std::string &name, unsigned int hops, const
 
 		/* And some IRCds needs Global joined in the logchan */
 		if (LogChan && ircd->join2msg)
-			/* XXX might desync */
-			ircdproto->SendJoin(Global, Config.LogChannel, time(NULL));
+			Global->Join(Config.LogChannel);
 	}
 }
 

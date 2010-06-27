@@ -10,34 +10,34 @@ void IRCDProto::SendMessageInternal(BotInfo *bi, const char *dest, const char *b
 
 void IRCDProto::SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s :%s", dest, msg);
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s :%s", dest, msg);
 }
 
 void IRCDProto::SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PRIVMSG %s :%s", dest, buf);
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s :%s", dest, buf);
 }
 
 void IRCDProto::SendQuitInternal(BotInfo *bi, const char *buf)
 {
 	if (buf)
-		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "QUIT :%s", buf);
+		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "QUIT :%s", buf);
 	else
-		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "QUIT");
+		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "QUIT");
 }
 
 void IRCDProto::SendPartInternal(BotInfo *bi, Channel *chan, const char *buf)
 {
 	if (buf)
-		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s :%s", chan->name.c_str(), buf);
+		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PART %s :%s", chan->name.c_str(), buf);
 	else
-		send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s", chan->name.c_str());
+		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PART %s", chan->name.c_str());
 }
 
 void IRCDProto::SendGlobopsInternal(BotInfo *source, const char *buf)
 {
 	if (source)
-		send_cmd(ircd->ts6 ? source->uid : source->nick, "GLOBOPS :%s", buf);
+		send_cmd(ircd->ts6 ? source->GetUID() : source->nick, "GLOBOPS :%s", buf);
 	else
 		send_cmd(Config.ServerName, "GLOBOPS :%s", buf);
 }
@@ -45,7 +45,7 @@ void IRCDProto::SendGlobopsInternal(BotInfo *source, const char *buf)
 void IRCDProto::SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf)
 {
 	char *s = normalizeBuffer(buf);
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s :\1%s\1", dest, s);
 	delete [] s;
 }
 
@@ -153,12 +153,12 @@ void IRCDProto::SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...)
 
 void IRCDProto::SendGlobalNotice(BotInfo *bi, Server *dest, const char *msg)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg);
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg);
 }
 
 void IRCDProto::SendGlobalPrivmsg(BotInfo *bi, Server *dest, const char *msg)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg);
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg);
 }
 
 void IRCDProto::SendQuit(const char *nick, const char *)
@@ -200,7 +200,7 @@ void IRCDProto::SendPong(const char *servname, const char *who)
 
 void IRCDProto::SendInvite(BotInfo *bi, const char *chan, const char *nick)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "INVITE %s %s", nick, chan);
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "INVITE %s %s", nick, chan);
 }
 
 void IRCDProto::SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...)
@@ -234,7 +234,7 @@ void IRCDProto::SendSquit(const char *servname, const char *message)
 
 void IRCDProto::SendChangeBotNick(BotInfo *bi, const char *newnick)
 {
-	send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NICK %s %ld", newnick, static_cast<long>(time(NULL)));
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NICK %s %ld", newnick, static_cast<long>(time(NULL)));
 }
 void IRCDProto::SendForceNickChange(User *u, const char *newnick, time_t when)
 {

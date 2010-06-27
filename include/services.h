@@ -370,8 +370,8 @@ inline const std::string stringify(const T &x)
 
 /*************************************************************************/
 
-/* forward declarations, mostly used by older code */
 class User;
+class BotInfo;
 class ChannelInfo;
 class Channel;
 class Server;
@@ -380,7 +380,6 @@ struct Session;
 
 #include "extensible.h"
 #include "threadengine.h"
-#include "bots.h"
 #include "opertype.h"
 #include "modes.h"
 
@@ -701,6 +700,8 @@ struct LevelInfo
 /*************************************************************************/
 
 #include "users.h"
+#include "bots.h"
+
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
  */

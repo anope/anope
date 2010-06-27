@@ -45,9 +45,9 @@ void get_botserv_stats(long *nrec, long *memuse)
 		count++;
 		mem += sizeof(*bi);
 		mem += bi->nick.size() + 1;
-		mem += bi->user.size() + 1;
-		mem += bi->host.size() + 1;
-		mem += bi->real.size() + 1;
+		mem += bi->GetIdent().size() + 1;
+		mem += strlen(bi->host) + 1;
+		mem += strlen(bi->realname) + 1;
 	}
 
 	*nrec = count;
@@ -524,46 +524,6 @@ static UserData *get_user_data(Channel *c, User *u)
 	}
 
 	return NULL;
-}
-
-/*************************************************************************/
-
-/* Makes the bot join a channel and op himself. */
-
-void bot_join(ChannelInfo * ci)
-{
-	if (!ci || !ci->c || !ci->bi)
-		return;
-
-	if (Config.BSSmartJoin)
-	{
-		/* We check for bans */
-		if (ci->c->bans && ci->c->bans->count)
-		{
-			Entry *ban, *next;
-
-			for (ban = ci->c->bans->entries; ban; ban = next)
-			{
-				next = ban->next;
-
-				if (entry_match(ban, ci->bi->nick.c_str(), ci->bi->user.c_str(), ci->bi->host.c_str(), 0))
-					ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
-			}
-		}
-
-		std::string Limit;
-		int limit = 0;
-		if (ci->c->GetParam(CMODE_LIMIT, Limit))
-			limit = atoi(Limit.c_str());
-
-		/* Should we be invited? */
-		if (ci->c->HasMode(CMODE_INVITE) || (limit && ci->c->users.size() >= limit))
-			ircdproto->SendNoticeChanops(ci->bi, ci->c, "%s invited %s into the channel.", ci->bi->nick.c_str(), ci->bi->nick.c_str());
-	}
-	ircdproto->SendJoin(ci->bi, ci->c->name.c_str(), ci->c->creation_time);
-	for (std::list<ChannelModeStatus *>::iterator it = BotModes.begin(), it_end = BotModes.end(); it != it_end; ++it)
-		ci->c->SetMode(ci->bi, *it, ci->bi->nick, false);
-	FOREACH_MOD(I_OnBotJoin, OnBotJoin(ci, ci->bi));
 }
 
 /*************************************************************************/

@@ -130,12 +130,12 @@ void Channel::JoinUser(User *user)
 	 * But join persistant channels when syncing with our uplink- DP
 	 **/
 	if (Config.s_BotServ && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() == Config.BSMinUsers)
-		bot_join(this->ci);
+		this->ci->bi->Join(this);
 	/* Only display the greet if the main uplink we're connected
 	 * to has synced, or we'll get greet-floods when the net
 	 * recovers from a netsplit. -GD
 	 */
-	if (Config.s_BotServ && this->ci && this->ci->bi && this->users.size() >= Config.BSMinUsers && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && user->Account()->greet &&
+	if (Config.s_BotServ && this->ci && this->ci->bi && this->FindUser(this->ci->bi) && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && user->Account()->greet &&
 		check_access(user, this->ci, CA_GREET) && user->server->IsSynced())
 	{
 		ircdproto->SendPrivmsg(this->ci->bi, this->name.c_str(), "[%s] %s", user->Account()->display, user->Account()->greet);
@@ -150,6 +150,8 @@ void Channel::DeleteUser(User *user)
 {
 	if (this->ci)
 		update_cs_lastseen(user, this->ci);
+	
+	Alog(LOG_DEBUG) << user->nick << " leaves " << this->name;
 
 	CUserList::iterator cit, cit_end = this->users.end();
 	for (cit = this->users.begin(); (*cit)->user != user && cit != cit_end; ++cit);
@@ -188,10 +190,9 @@ void Channel::DeleteUser(User *user)
 	if (this->ci && this->ci->HasFlag(CI_INHABIT))
 		return;
 
-	if (Config.s_BotServ && this->ci && this->ci->bi && this->users.size() <= Config.BSMinUsers - 1)
-		ircdproto->SendPart(this->ci->bi, this, NULL);
-
-	if (this->users.empty())
+	if (Config.s_BotServ && this->ci && this->ci->bi && this->FindUser(this->ci->bi))
+		this->ci->bi->Part(this->ci->c);
+	else if (this->users.empty())
 		delete this;
 }
 
@@ -273,11 +274,11 @@ void Channel::SetModeInternal(ChannelMode *cm, const std::string &param, bool En
 			return;
 		}
 
-		/* We don't track bots */
-		if (findbot(param))
-			return;
+		BotInfo *bi = NULL;
+		if (Config.s_BotServ)
+			bi = findbot(param);
+		User *u = bi ? bi : finduser(param);
 
-		User *u = finduser(param);
 		if (!u)
 		{
 			Alog(LOG_DEBUG) << "MODE " << this->name << " +" << cm->ModeChar << " for nonexistant user " << param;
@@ -399,17 +400,18 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 			return;
 		}
 
+		BotInfo *bi = NULL;
+		if (Config.s_BotServ)
+			bi = findbot(param);
+		User *u = bi ? bi : finduser(param);
+
 		/* Reset modes on bots if we're supposed to */
-		BotInfo *bi = findbot(param);
 		if (bi)
 		{
 			if (std::find(BotModes.begin(), BotModes.end(), cm) != BotModes.end())
 				this->SetMode(bi, cm, bi->nick);
-			/* We don't track bots */
-			return;
 		}
 
-		User *u = finduser(param);
 		if (!u)
 		{
 			Alog() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->ModeChar << " for nonexistant user " << param;
@@ -455,8 +457,8 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const std::string &param, bool
 		if (ci)
 		{
 			ci->UnsetFlag(CI_PERSIST);
-			if (Config.s_BotServ && ci->bi && users.size() == Config.BSMinUsers - 1)
-				ircdproto->SendPart(ci->bi, this, NULL);
+			if (Config.s_BotServ && ci->bi && this->FindUser(ci->bi))
+				this->ci->bi->Part(this);
 		}
 	}
 
@@ -859,17 +861,10 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
  */
 void Channel::KickInternal(const std::string &source, const std::string &nick, const std::string &reason)
 {
-	/* If it is the bot that is being kicked, we make it rejoin the
-	 * channel and stop immediately.
-	 *        --lara
-	 */
-	if (Config.s_BotServ && this->ci && findbot(nick))
-	{
-		bot_join(this->ci);
-		return;
-	}
-
-	User *user = finduser(nick);
+	BotInfo *bi = NULL;
+	if (Config.s_BotServ && this->ci)
+		bi = findbot(nick);
+	User *user = bi ? bi : finduser(nick);
 	if (!user)
 	{
 		Alog(LOG_DEBUG) << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
@@ -878,6 +873,8 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 
 	Alog(LOG_DEBUG) << "Channel::KickInternal kicking " << user->nick << " from " << this->name;
 
+	std::string chname = this->name;
+
 	if (user->FindChannel(this))
 	{
 		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, user, source, reason));
@@ -885,6 +882,10 @@ void Channel::KickInternal(const std::string &source, const std::string &nick, c
 	}
 	else
 		Alog(LOG_DEBUG) << "Channel::KickInternal got kick for user " << user->nick << " who isn't on channel " << this->name << " ?";
+	
+	/* Bots get rejoined */
+	if (bi)
+		bi->Join(chname);
 }
 
 /** Kick a user from the channel
@@ -1125,8 +1126,8 @@ void do_join(const char *source, int ac, const char **av)
 					/* Cycle the bot to fix ts */
 					if (chan->ci->bi)
 					{
-						ircdproto->SendPart(chan->ci->bi, chan, "TS reop");
-						bot_join(chan->ci);
+						chan->ci->bi->Part(chan, "TS reop");
+						chan->ci->bi->Join(chan);
 					}
 					/* Be sure to set mlock again, else we could be -r etc.. */
 					check_modes(chan);
@@ -1398,7 +1399,7 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	/* If this channel has secureops or the user matches autodeop or the channel is syncing and this is the first user and they are not ulined, check to remove modes */
-	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || (c->HasFlag(CH_SYNCING) && c->users.size() == 1)) && !user->server->IsULined())
+	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || (c->HasFlag(CH_SYNCING) && c->users.size() == (ci->bi ? 2 : 1))) && !user->server->IsULined())
 	{
 		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !check_access(user, ci, CA_FOUNDER))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);

@@ -228,8 +228,6 @@ User::~User()
 	if (na)
 		na->OnCancel(this);
 
-	Alog(LOG_DEBUG_2) << "User::~User(): free user data";
-
 	delete [] this->host;
 
 	if (this->vhost)

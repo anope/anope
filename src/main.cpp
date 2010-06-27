@@ -179,8 +179,14 @@ void do_restart_services()
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
 	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	{
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
 		ircdproto->SendQuit(it->second, "Restarting");
+		/* Erase bots from the user list so they don't get nuked later on */
+		UserListByNick.erase(it->second->nick.c_str());
+		if (!it->second->GetUID().empty())
+			UserListByUID.erase(it->second->GetUID().c_str());
+	}
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
 	/* Process to send the last bits of information before disconnecting */
 	socketEngine.Process();
@@ -218,8 +224,14 @@ static void services_shutdown()
 	{
 		/* Send a quit for all of our bots */
 		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		{
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
 			ircdproto->SendQuit(it->second, "Shutting down");
+			/* Erase bots from the user list so they don't get nuked later on */
+			UserListByNick.erase(it->second->nick.c_str());
+			if (!it->second->GetUID().empty())
+				UserListByUID.erase(it->second->GetUID());
+		}
 
 		ircdproto->SendSquit(Config.ServerName, quitmsg);
 

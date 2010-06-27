@@ -131,7 +131,7 @@ class RatboxProto : public IRCDTS6Proto
 	void SendGlobopsInternal(BotInfo *source, const char *buf)
 	{
 		if (source)
-			send_cmd(source->uid, "OPERWALL :%s", buf);
+			send_cmd(source->GetUID(), "OPERWALL :%s", buf);
 		else
 			send_cmd(TS6SID, "OPERWALL :%s", buf);
 	}
@@ -144,19 +144,19 @@ class RatboxProto : public IRCDTS6Proto
 	void SendSGLineDel(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNXLINE * %s", x->Mask.c_str());
+		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
 	void SendSGLine(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
+		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	void SendAkillDel(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
+		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
 	void SendSQLineDel(XLine *x)
@@ -166,18 +166,18 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, user->uid.c_str());
+		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, user->GetUID().c_str());
 	}
 
 	void SendAkill(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->uid : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		send_cmd(source ? source->uid : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf);
+		send_cmd(source ? source->GetUID() : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -210,9 +210,9 @@ class RatboxProto : public IRCDTS6Proto
 	void SendPartInternal(BotInfo *bi, const char *chan, const char *buf)
 	{
 		if (buf)
-			send_cmd(bi->uid, "PART %s :%s", chan, buf);
+			send_cmd(bi->GetUID(), "PART %s :%s", chan, buf);
 		else
-			send_cmd(bi->uid, "PART %s", chan);
+			send_cmd(bi->GetUID(), "PART %s", chan);
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -225,7 +225,7 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		if (bi)
 		{
-			send_cmd(bi->uid, "MODE %s %s", dest->name.c_str(), buf);
+			send_cmd(bi->GetUID(), "MODE %s %s", dest->name.c_str(), buf);
 		}
 		else send_cmd(TS6SID, "MODE %s %s", dest->name.c_str(), buf);
 	}
@@ -233,13 +233,13 @@ class RatboxProto : public IRCDTS6Proto
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(bi ? bi->uid : TS6SID, "SVSMODE %s %s", u->nick.c_str(), buf);
+		send_cmd(bi ? bi->GetUID() : TS6SID, "SVSMODE %s %s", u->nick.c_str(), buf);
 	}
 
 	void SendKickInternal(BotInfo *bi, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
-		else send_cmd(bi->uid, "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
+		if (buf) send_cmd(bi->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
+		else send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
@@ -250,15 +250,15 @@ class RatboxProto : public IRCDTS6Proto
 	/* QUIT */
 	void SendQuitInternal(BotInfo *bi, const char *buf)
 	{
-		if (buf) send_cmd(bi->uid, "QUIT :%s", buf);
-		else send_cmd(bi->uid, "QUIT");
+		if (buf) send_cmd(bi->GetUID(), "QUIT :%s", buf);
+		else send_cmd(bi->GetUID(), "QUIT");
 	}
 
 	/* INVITE */
 	void SendInvite(BotInfo *source, const char *chan, const char *nick)
 	{
 		User *u = finduser(nick);
-		send_cmd(source->uid, "INVITE %s %s", u ? u->GetUID().c_str(): nick, chan);
+		send_cmd(source->GetUID(), "INVITE %s %s", u ? u->GetUID().c_str(): nick, chan);
 	}
 
 	void SendAccountLogin(User *u, NickCore *account)
@@ -280,7 +280,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendTopic(BotInfo *bi, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(bi->uid, "TOPIC %s :%s", c->name.c_str(), topic);
+		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), topic);
 	}
 
 	void SetAutoIdentificationToken(User *u)
@@ -334,8 +334,8 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			/* Rejoin the bot to fix the TS */
 			if (c->ci->bi)
 			{
-				ircdproto->SendPart(c->ci->bi, c, "TS reop");
-				bot_join(c->ci);
+				c->ci->bi->Part(c, "TS reop");
+				c->ci->bi->Join(c);
 			}
 			/* Reset mlock */
 			check_modes(c);
@@ -669,7 +669,7 @@ int anope_event_whois(const char *source, int ac, const char **av)
 
 	if (source && ac >= 1) {
 		bi = findbot(av[0]);
-		m_whois(source, bi->uid.c_str());
+		m_whois(source, bi->GetUID().c_str());
 	}
 	return MOD_CONT;
 }

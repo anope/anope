@@ -522,12 +522,12 @@ void restore_topic(const char *chan)
 	}
 	if (ircd->join2set && whosends(ci) == ChanServ)
 	{
-		ircdproto->SendJoin(ChanServ, chan, c->creation_time);
+		ChanServ->Join(chan);
 		c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 	}
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 	if (ircd->join2set && whosends(ci) == ChanServ)
-		ircdproto->SendPart(ChanServ, c, NULL);
+		ChanServ->Part(c);
 }
 
 /*************************************************************************/
@@ -583,14 +583,14 @@ int check_topiclock(Channel *c, time_t topic_time)
 
 	if (ircd->join2set && whosends(ci) == ChanServ)
 	{
-		ircdproto->SendJoin(ChanServ, c->name.c_str(), c->creation_time);
+		ChanServ->Join(c);
 		c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
 	}
 
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter.c_str(), c->topic ? c->topic : "");
 
 	if (ircd->join2set && whosends(ci) == ChanServ)
-		ircdproto->SendPart(ChanServ, c, NULL);
+		ChanServ->Part(c);
 	return 1;
 }
 
@@ -1048,7 +1048,7 @@ void ChanServTimer::Tick(time_t)
 	if (!c->users.empty())
 		return;
 
-	ircdproto->SendPart(ChanServ, c, NULL);
+	ChanServ->Part(c);
 
 	/* Now delete the channel as it is empty */
 	if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))

@@ -1051,8 +1051,8 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			/* Rejoin the bot to fix the TS */
 			if (c->ci->bi)
 			{
-				ircdproto->SendPart(c->ci->bi, c, "TS reop");
-				bot_join(c->ci);
+				c->ci->bi->Part(c, "TS reop");
+				c->ci->bi->Join(c);
 			}
 			/* Reset mlock */
 			check_modes(c);

@@ -56,12 +56,12 @@ class CommandCSTopic : public Command
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
 			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
-				ircdproto->SendJoin(ChanServ, c->name.c_str(), c->creation_time);
-				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ);
+				ChanServ->Join(c);
+				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ); // XXX
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic ? topic : "");
 			if (ircd->join2set && whosends(ci) == ChanServ)
-				ircdproto->SendPart(ChanServ, c, NULL);
+				ChanServ->Part(c);
 		}
 		return MOD_CONT;
 	}

@@ -53,7 +53,6 @@ E BotInfo *findbot(const ci::string &nick);
  * @param uid The UID to search for
  * @return The pseudoclient structure, or NULL if one could not be found
  */
-E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
 
 E void bot_raw_ban(User * requester, ChannelInfo *ci, char *nick, const char *reason);
@@ -100,7 +99,7 @@ E Entry *elist_match_user(EList *list, User *u);
 E Entry *elist_find_mask(EList *list, const char *mask);
 E long get_memuse(EList *list);
 
-#define whosends(ci) ((!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->users.size() < Config.BSMinUsers) ? findbot(Config.s_ChanServ) : (ci)->bi)
+#define whosends(ci) (!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->FindUser((ci)->bi) ? findbot(Config.s_ChanServ) : (ci)->bi)
 
 /**** chanserv.c ****/
 

@@ -93,7 +93,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 	}
 
 	BotInfo *bi = OperServ;
-	send_cmd(bi->uid, "CHGHOST %s %s", nick, vhost);
+	send_cmd(bi->GetUID(), "CHGHOST %s %s", nick, vhost);
 }
 
 int anope_event_idle(const char *source, int ac, const char **av)
@@ -102,7 +102,7 @@ int anope_event_idle(const char *source, int ac, const char **av)
 	if (!bi)
 		return MOD_CONT;
 
-	send_cmd(bi->uid, "IDLE %s %ld %ld", source, static_cast<long>(start_time), static_cast<long>(time(NULL) - bi->lastmsg));
+	send_cmd(bi->GetUID(), "IDLE %s %ld %ld", source, static_cast<long>(start_time), static_cast<long>(time(NULL) - bi->lastmsg));
 	return MOD_CONT;
 }
 
@@ -120,12 +120,12 @@ class InspIRCdProto : public IRCDProto
 	void SendAkillDel(XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi->uid, "GLINE %s", x->Mask.c_str());
+		send_cmd(bi->GetUID(), "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
 	{
-		send_cmd(whosets->uid, "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time), whosetit, topic);
+		send_cmd(whosets->GetUID(), "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time), whosetit, topic);
 	}
 
 	void SendVhostDel(User *u)
@@ -148,12 +148,12 @@ class InspIRCdProto : public IRCDProto
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
 		BotInfo *bi = OperServ;
-		send_cmd(bi->uid, "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
+		send_cmd(bi->GetUID(), "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
 	{
-		send_cmd(source ? source->uid : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf);
+		send_cmd(source ? source->GetUID() : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
@@ -173,13 +173,13 @@ class InspIRCdProto : public IRCDProto
 
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		send_cmd(source ? source->uid : TS6SID, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf);
+		send_cmd(source ? source->GetUID() : TS6SID, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(bi ? bi->uid : TS6SID, "MODE %s %s", u->GetUID().c_str(), buf);
+		send_cmd(bi ? bi->GetUID() : TS6SID, "MODE %s %s", u->GetUID().c_str(), buf);
 	}
 
 	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
@@ -190,9 +190,9 @@ class InspIRCdProto : public IRCDProto
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
 		if (buf)
-			send_cmd(source->uid, "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
+			send_cmd(source->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
 		else
-			send_cmd(source->uid, "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), user->nick.c_str());
+			send_cmd(source->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), user->nick.c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
@@ -209,7 +209,7 @@ class InspIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(TS6SID, "FJOIN %s %ld + :,%s", channel, static_cast<long>(chantime), user->uid.c_str());
+		send_cmd(TS6SID, "FJOIN %s %ld + :,%s", channel, static_cast<long>(chantime), user->GetUID().c_str());
 	}
 
 	/* UNSQLINE */
@@ -262,7 +262,7 @@ class InspIRCdProto : public IRCDProto
 		else
 		{
 			BotInfo *bi = OperServ;
-			send_cmd(bi->uid, "CHGIDENT %s %s", nick, vIdent);
+			send_cmd(bi->GetUID(), "CHGIDENT %s %s", nick, vIdent);
 		}
 	}
 
@@ -270,14 +270,14 @@ class InspIRCdProto : public IRCDProto
 	void SendSVSHold(const char *nick)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi->uid, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(Config.NSReleaseTimeout), "Being held for registered user");
+		send_cmd(bi->GetUID(), "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(Config.NSReleaseTimeout), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi->uid, "SVSHOLD %s", nick);
+		send_cmd(bi->GetUID(), "SVSHOLD %s", nick);
 	}
 
 	/* UNSZLINE */
@@ -302,14 +302,14 @@ class InspIRCdProto : public IRCDProto
 	{
 		User *u = finduser(nick);
 		BotInfo *bi = findbot(source);
-		send_cmd(bi->uid, "SVSJOIN %s %s", u->GetUID().c_str(), chan);
+		send_cmd(bi->GetUID(), "SVSJOIN %s %s", u->GetUID().c_str(), chan);
 	}
 
 	void SendSVSPart(const char *source, const char *nick, const char *chan)
 	{
 		User *u = finduser(nick);
 		BotInfo *bi = findbot(source);
-		send_cmd(bi->uid, "SVSPART %s %s", u->GetUID().c_str(), chan);
+		send_cmd(bi->GetUID(), "SVSPART %s %s", u->GetUID().c_str(), chan);
 	}
 
 	void SendSWhois(const char *source, const char *who, const char *mask)
@@ -326,7 +326,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendGlobopsInternal(BotInfo *source, const char *buf)
 	{
-		send_cmd(source ? source->uid : TS6SID, "SNONOTICE g :%s", buf);
+		send_cmd(source ? source->GetUID() : TS6SID, "SNONOTICE g :%s", buf);
 	}
 
 	void SendAccountLogin(User *u, NickCore *account)
@@ -499,8 +499,8 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 			/* Rejoin the bot to fix the TS */
 			if (c->ci->bi)
 			{
-				ircdproto->SendPart(c->ci->bi, c, "TS reop");
-				bot_join(c->ci);
+				c->ci->bi->Part(c, "TS reop");
+				c->ci->bi->Join(c);
 			}
 			/* Reset mlock */
 			check_modes(c);

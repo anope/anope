@@ -65,13 +65,13 @@ class CommandBSInfo : public Command
 			struct tm *tm;
 
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_HEADER, bi->nick.c_str());
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_MASK, bi->user.c_str(), bi->host.c_str());
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_REALNAME, bi->real.c_str());
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_MASK, bi->GetIdent().c_str(), bi->host);
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_REALNAME, bi->realname);
 			tm = localtime(&bi->created);
 			strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_CREATED, buf);
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_OPTIONS, getstring(u, (bi->HasFlag(BI_PRIVATE) ? BOT_INFO_OPT_PRIVATE : BOT_INFO_OPT_NONE)));
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_USAGE, bi->chancount);
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_USAGE, bi->chans.size());
 
 			if (u->Account()->HasPriv("botserv/administration"))
 				this->send_bot_channels(u, bi);

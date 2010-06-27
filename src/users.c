@@ -452,6 +452,7 @@ void User::AutoID(const std::string &account)
  */
 void User::Login(NickCore *core)
 {
+	this->Logout();
 	nc = core;
 	core->Users.push_back(this);
 }

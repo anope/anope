@@ -273,10 +273,10 @@ class CoreExport ChannelModeExcept : public ChannelModeList
 
 /** Channel mode +I
  */
-class CoreExport ChannelModeInvite : public ChannelModeList
+class CoreExport ChannelModeInvex : public ChannelModeList
 {
  public:
-	ChannelModeInvite(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, "CMODE_INVITEOVERRIDE", modeChar) { }
+	ChannelModeInvex(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, "CMODE_INVITEOVERRIDE", modeChar) { }
 
 	void AddMask(Channel *chan, const char *mask);
 

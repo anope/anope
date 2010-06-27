@@ -360,7 +360,7 @@ void ChannelModeExcept::DelMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The invex
  */
-void ChannelModeInvite::AddMask(Channel *chan, const char *mask)
+void ChannelModeInvex::AddMask(Channel *chan, const char *mask)
 {
 	Entry *invite;
 
@@ -387,7 +387,7 @@ void ChannelModeInvite::AddMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The index
  */
-void ChannelModeInvite::DelMask(Channel *chan, const char *mask)
+void ChannelModeInvex::DelMask(Channel *chan, const char *mask)
 {
 	Entry *invite;
 

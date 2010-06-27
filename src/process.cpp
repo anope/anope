@@ -304,7 +304,7 @@ void process(const std::string &buffer)
 	int retVal = 0;
 	char source[64] = "";
 	char cmd[64] = "";
-	char buf[512] = ""; /* Longest legal IRC command line */
+	char buf[1024] = ""; // XXX InspIRCd 2.0 can send messages longer than 512 characters to servers... how disappointing.
 	char *s;
 	int ac; /* Parameters for the command */
 	const char **av;

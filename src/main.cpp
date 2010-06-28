@@ -548,19 +548,19 @@ int main(int ac, char **av, char **envp)
 		{
 			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
+			/* Clear all of our users, but not our bots */
+			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
+			{
+				User *u = it->second;
+				++it;
+
+				if (!findbot(u->nick))
+					delete u;
+			}
+
 			unsigned j = 0;
 			for (; j < (Config.MaxRetries ? Config.MaxRetries : j + 1); ++j)
 			{
-				/* Clear all of our users, but not our bots */
-				for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
-				{
-					User *u = it->second;
-					++it;
-
-					if (!findbot(u->nick))
-						delete u;
-				}
-
 				Alog() << "Disconnected from the server, retrying in " << Config.RetryWait << " seconds";
 
 				sleep(Config.RetryWait);

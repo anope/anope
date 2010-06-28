@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -125,7 +124,7 @@ class CommandOSDEFCON : public Command
 	{
 		syntax_error(Config.s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
 	}
-	
+
 	void OnServHelp(User *u)
 	{
 		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_DEFCON);
@@ -137,13 +136,11 @@ class OSDEFCON : public Module
  public:
 	OSDEFCON(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!Config.DefConLevel)
+			throw ModuleException("Invalid configuration settings");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
-
-		if (!Config.DefConLevel)
-		{
-			throw ModuleException("Invalid configuration settings");
-		}
 
 		Implementation i[] = { I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, 8);
@@ -197,9 +194,7 @@ class OSDEFCON : public Module
 			std::string param;
 
 			if (GetDefConParam(Name, param))
-			{
 				c->SetMode(OperServ, Name, param);
-			}
 			else
 				c->SetMode(OperServ, Name);
 
@@ -220,9 +215,7 @@ class OSDEFCON : public Module
 		if ((CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)) && !is_oper(u))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-			{
 				notice_lang(bi->nick.c_str(), u, OPER_DEFCON_DENIED);
-			}
 
 			return EVENT_STOP;
 		}
@@ -236,13 +229,10 @@ class OSDEFCON : public Module
 		{
 			if (command == "SET")
 			{
-				if (!params.empty() && params[0] == "MLOCK")
+				if (!params.empty() && params[0] == "MLOCK" && CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
 				{
-					if (CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
-					{
-						notice_lang(Config.s_ChanServ, u, OPER_DEFCON_DENIED);
-						return EVENT_STOP;
-					}
+					notice_lang(Config.s_ChanServ, u, OPER_DEFCON_DENIED);
+					return EVENT_STOP;
 				}
 			}
 			else if (command == "REGISTER" || command == "GROUP")
@@ -295,7 +285,7 @@ class OSDEFCON : public Module
 					ircdproto->SendMessage(OperServ, u->nick.c_str(), "%s", Config.SessionLimitDetailsLoc);
 
 				kill_user(Config.s_OperServ, u->nick, "Session limit exceeded");
-				session->hits++;
+				++session->hits;
 				if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
 				{
 					SGLine->Add(NULL, NULL, ci::string("*@") + u->host, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
@@ -312,21 +302,17 @@ class OSDEFCON : public Module
 			std::string modes = Config.DefConChanModes;
 
 			if (modes.find(cm->ModeChar) != std::string::npos)
-			{
 				/* New mode has been added to Anope, check to see if defcon
 				 * requires it
 				 */
 				defconParseModeString(Config.DefConChanModes);
-			}
 		}
 	}
 
 	void OnChannelCreate(Channel *c)
 	{
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES))
-		{
 			c->SetModes(OperServ, false, Config.DefConChanModes);
-		}
 	}
 };
 
@@ -398,7 +384,7 @@ void runDefCon()
  */
 void defconParseModeString(const char *str)
 {
-	int add = -1;		      /* 1 if adding, 0 if deleting, -1 if neither */
+	int add = -1; /* 1 if adding, 0 if deleting, -1 if neither */
 	unsigned char mode;
 	ChannelMode *cm;
 	ChannelModeParam *cmp;
@@ -414,7 +400,7 @@ void defconParseModeString(const char *str)
 	ss.GetToken(modes);
 
 	/* Loop while there are modes to set */
-	for (unsigned i = 0; i < modes.size(); ++i)
+	for (unsigned i = 0, end = modes.size(); i < end; ++i)
 	{
 		mode = modes[i];
 
@@ -466,34 +452,26 @@ void defconParseModeString(const char *str)
 					DefConModesOn.UnsetFlag(cm->Name);
 
 					if (cm->Type == MODE_PARAM)
-					{
 						UnsetDefConParam(cm->Name);
-					}
 				}
 			}
 		}
 	}
 
-	if ((cm = ModeManager::FindChannelModeByName(CMODE_REDIRECT)))
+	/* We can't mlock +L if +l is not mlocked as well. */
+	if ((cm = ModeManager::FindChannelModeByName(CMODE_REDIRECT)) && DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_LIMIT))
 	{
-		/* We can't mlock +L if +l is not mlocked as well. */
-		if (DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_LIMIT))
-		{
-			DefConModesOn.UnsetFlag(CMODE_REDIRECT);
+		DefConModesOn.UnsetFlag(CMODE_REDIRECT);
 
-			Alog() << "DefConChanModes must lock mode +l as well to lock mode +L";
-		}
+		Alog() << "DefConChanModes must lock mode +l as well to lock mode +L";
 	}
 
 	/* Some ircd we can't set NOKNOCK without INVITE */
 	/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
-	if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)))
+	if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)) && DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_INVITE))
 	{
-		if (DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_INVITE))
-		{
-			DefConModesOn.UnsetFlag(CMODE_NOKNOCK);
-			Alog() << "DefConChanModes must lock mode +i as well to lock mode +K";
-		}
+		DefConModesOn.UnsetFlag(CMODE_NOKNOCK);
+		Alog() << "DefConChanModes must lock mode +i as well to lock mode +K";
 	}
 }
 
@@ -501,13 +479,12 @@ static char *defconReverseModes(const char *modes)
 {
 	char *newmodes = NULL;
 	unsigned i = 0;
-	if (!modes) {
+	if (!modes)
 		return NULL;
-	}
-	if (!(newmodes = new char[strlen(modes) + 1])) {
+	if (!(newmodes = new char[strlen(modes) + 1]))
 		return NULL;
-	}
-	for (i = 0; i < strlen(modes); i++) {
+	for (i = 0; i < strlen(modes); ++i)
+	{
 		if (modes[i] == '+')
 			newmodes[i] = '-';
 		else if (modes[i] == '-')

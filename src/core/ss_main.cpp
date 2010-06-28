@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "module.h"
@@ -53,10 +51,8 @@ class SSMain : public Module
 	{
 		if (statserv)
 		{
-			for (std::map<ci::string, Command *>::iterator it = statserv->Commands.begin(); it != statserv->Commands.end(); ++it)
-			{
+			for (std::map<ci::string, Command *>::iterator it = statserv->Commands.begin(), it_end = statserv->Commands.end(); it != it_end; ++it)
 				this->DelCommand(statserv, it->second);
-			}
 
 			ircdproto->SendQuit(statserv, "Quit due to module unload.");
 			delete statserv;

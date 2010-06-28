@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -38,18 +37,14 @@ class CommandOSChanList : public Command
 		{
 			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
 
-			for (UChannelList::iterator uit = u2->chans.begin(); uit != u2->chans.end(); ++uit)
+			for (UChannelList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
 				ChannelContainer *cc = *uit;
 
 				if (!Modes.empty())
-				{
-					for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
-					{
+					for (std::list<ChannelModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
 						if (!cc->chan->HasMode(*it))
 							continue;
-					}
-				}
 
 				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), chan_get_modes(cc->chan, 1, 1), cc->chan->topic ? cc->chan->topic : "");
 			}
@@ -58,20 +53,16 @@ class CommandOSChanList : public Command
 		{
 			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER);
 
-			for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
+			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 			{
 				Channel *c = cit->second;
-				
+
 				if (pattern && !Anope::Match(c->name, pattern, false))
 					continue;
 				if (!Modes.empty())
-				{
-					for (std::list<ChannelModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
-					{
+					for (std::list<ChannelModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
 						if (!c->HasMode(*it))
 							continue;
-					}
-				}
 
 				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
 			}

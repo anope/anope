@@ -44,7 +44,7 @@ static std::string GetLevelName(int level)
 			return "NOJOIN";
 		case 11:
 			return "CHANGE";
-		case 12:	
+		case 12:
 			return "MEMO";
 		case 13:
 			return "ASSIGN";
@@ -60,7 +60,7 @@ static std::string GetLevelName(int level)
 			return "GREET";
 		case 19:
 			return "VOICEME";
-		case 20:	
+		case 20:
 			return "VOICE";
 		case 21:
 			return "GETKEY";
@@ -76,9 +76,9 @@ static std::string GetLevelName(int level)
 			return "HALFOP";
 		case 27:
 			return "PROTECTME";
-		case 28:	
+		case 28:
 			return "PROTECT";
-		case 29:	
+		case 29:
 			return "KICKME";
 		case 30:
 			return "KICK";
@@ -100,57 +100,57 @@ static std::string GetLevelName(int level)
 void process_mlock_modes(std::ofstream &fs, size_t m, const std::string &ircd)
 {
 	/* this is the same in all protocol modules */
-		if (m &        0x1) fs << " CMODE_INVITE";        // CMODE_i
-		if (m &        0x2) fs << " CMODE_MODERATED";     // CMODE_m
-		if (m &        0x4) fs << " CMODE_NOEXTERNAL";    // CMODE_n
-		if (m &        0x8) fs << " CMODE_PRIVATE";       // CMODE_p
-		if (m &       0x10) fs << " CMODE_SECRET";        // CMODE_s
-		if (m &       0x20) fs << " CMODE_TOPIC";         // CMODE_t
-		if (m &       0x40) fs << " CMODE_KEY";           // CMODE_k
-		if (m &       0x80) fs << " CMODE_LIMIT";         // CMODE_l
-		if (m &      0x200) fs << " CMODE_REGISTERED";    // CMODE_r
+	if (m & 0x1) fs << " CMODE_INVITE";			// CMODE_i
+	if (m & 0x2) fs << " CMODE_MODERATED";		// CMODE_m
+	if (m & 0x4) fs << " CMODE_NOEXTERNAL";		// CMODE_n
+	if (m & 0x8) fs << " CMODE_PRIVATE";		// CMODE_p
+	if (m & 0x10) fs << " CMODE_SECRET";		// CMODE_s
+	if (m & 0x20) fs << " CMODE_TOPIC";			// CMODE_t
+	if (m & 0x40) fs << " CMODE_KEY";			// CMODE_k
+	if (m & 0x80) fs << " CMODE_LIMIT";			// CMODE_l
+	if (m & 0x200) fs << " CMODE_REGISTERED";	// CMODE_r
 
 	if (ircd == "unreal" || ircd == "inspircd")
 	{
-		if (m &      0x100) fs << " CMODE_REGISTEREDONLY"; // CMODE_R
-		if (m &      0x400) fs << " CMODE_BLOCKCOLOR";     // CMODE_c
-		if (m &     0x2000) fs << " CMODE_NOKNOCK";        // CMODE_K
-		if (m &     0x4000) fs << " CMODE_REDIRECT";       // CMODE_L
-		if (m &     0x8000) fs << " CMODE_OPERONLY";       // CMODE_O
-		if (m &    0x10000) fs << " CMODE_NOKICK";         // CMODE_Q
-		if (m &    0x20000) fs << " CMODE_STRIPCOLOR";     // CMODE_S
-		if (m &    0x80000) fs << " CMODE_FLOOD";          // CMODE_f
-		if (m &   0x100000) fs << " CMODE_FILTER";         // CMODE_G
-		if (m &   0x200000) fs << " CMODE_NOCTCP";         // CMODE_C
-		if (m &   0x400000) fs << " CMODE_AUDITORIUM";     // CMODE_u
-		if (m &   0x800000) fs << " CMODE_SSL";            // CMODE_z
-		if (m &  0x1000000) fs << " CMODE_NONICK";         // CMODE_N
-		if (m &  0x4000000) fs << " CMODE_REGMODERATED";   // CMODE_M
+		if (m & 0x100) fs << " CMODE_REGISTEREDONLY";	// CMODE_R
+		if (m & 0x400) fs << " CMODE_BLOCKCOLOR";		// CMODE_c
+		if (m & 0x2000) fs << " CMODE_NOKNOCK";			// CMODE_K
+		if (m & 0x4000) fs << " CMODE_REDIRECT";		// CMODE_L
+		if (m & 0x8000) fs << " CMODE_OPERONLY";		// CMODE_O
+		if (m & 0x10000) fs << " CMODE_NOKICK";			// CMODE_Q
+		if (m & 0x20000) fs << " CMODE_STRIPCOLOR";		// CMODE_S
+		if (m & 0x80000) fs << " CMODE_FLOOD";			// CMODE_f
+		if (m & 0x100000) fs << " CMODE_FILTER";		// CMODE_G
+		if (m & 0x200000) fs << " CMODE_NOCTCP";		// CMODE_C
+		if (m & 0x400000) fs << " CMODE_AUDITORIUM";	// CMODE_u
+		if (m & 0x800000) fs << " CMODE_SSL";			// CMODE_z
+		if (m & 0x1000000) fs << " CMODE_NONICK";		// CMODE_N
+		if (m & 0x4000000) fs << " CMODE_REGMODERATED";	// CMODE_M
 	}
 
 	if (ircd == "unreal")
 	{
-		if (m &      0x800) fs << " CMODE_ADMINONLY";       // CMODE_A
-		if (m &    0x40000) fs << " CMODE_NOINVITE";        // CMODE_f
-		if (m &  0x2000000) fs << " CMODE_NONOTICE";        // CMODE_T
-		if (m &  0x8000000) fs << " CMODE_JOINFLOOD";       // CMODE_j
-	} // if (unreal)
+		if (m & 0x800) fs << " CMODE_ADMINONLY";		// CMODE_A
+		if (m & 0x40000) fs << " CMODE_NOINVITE";		// CMODE_f
+		if (m & 0x2000000) fs << " CMODE_NONOTICE";		// CMODE_T
+		if (m & 0x8000000) fs << " CMODE_JOINFLOOD";	// CMODE_j
+	}
 	if (ircd == "inspircd" )
 	{
-		if (m &      0x800) fs << " CMODE_ALLINVITE";        // CMODE_A
-		if (m &     0x1000) fs << " CMODE_NONOTICE";         // CMODE_T
+		if (m & 0x800) fs << " CMODE_ALLINVITE";		// CMODE_A
+		if (m & 0x1000) fs << " CMODE_NONOTICE";		// CMODE_T
 		/* for some reason, there is no CMODE_P in 1.8.x and no CMODE_V in the 1.9.1 protocol module
-		   we are ignoring this flag until we find a solution for this problem, 
-		   so the +V/+P mlock mode is lost on convert 
-		   anope 1.8: if (m &    0x40000) fs << " NOINVITE";         // CMODE_V
-		   anope 1.9: if (m &    0x40000) fs << " PERM";             // CMODE_P
+		   we are ignoring this flag until we find a solution for this problem,
+		   so the +V/+P mlock mode is lost on convert
+		   anope 1.8: if (m &    0x40000) fs << " NOINVITE";	// CMODE_V
+		   anope 1.9: if (m &    0x40000) fs << " PERM";		// CMODE_P
 		*/
-		if (m &  0x2000000) fs << " CMODE_JOINFLOOD";        // CMODE_j
-		if (m &  0x8000000) fs << " CMODE_BLOCKCAPS";        // CMODE_B
-		if (m & 0x10000000) fs << " CMODE_NICKFLOOD";        // CMODE_F
-		//if (m & 0x20000000) fs << "";                  // CMODE_g (mode +g <badword>) ... can't be mlocked in older version
-		//if (m & 0x40000000) fs << "";                  // CMODE_J (mode +J [seconds] ... can't be mlocked in older versions
-	} // if (inspircd)
+		if (m & 0x2000000) fs << " CMODE_JOINFLOOD";	// CMODE_j
+		if (m & 0x8000000) fs << " CMODE_BLOCKCAPS";	// CMODE_B
+		if (m & 0x10000000) fs << " CMODE_NICKFLOOD";	// CMODE_F
+		//if (m & 0x20000000) fs << ""; // CMODE_g (mode +g <badword>) ... can't be mlocked in older version
+		//if (m & 0x40000000) fs << ""; // CMODE_J (mode +J [seconds] ... can't be mlocked in older versions
+	}
 }
 
 int main(int argc, char *argv[])
@@ -168,11 +168,8 @@ int main(int argc, char *argv[])
 		std::cout << "Which hash method did you use? (md5, sha1, oldmd5, plain)" << std::endl << "? ";
 		std::cin >> hashm;
 	}
-	
-	while (ircd != "bahamut" && ircd != "charybdis" && ircd != "dreamforge" && ircd != "hybrid"
-				&& ircd != "inspircd" && ircd != "plexus2" && ircd != "plexus3" && ircd != "ptlink"
-				&& ircd != "rageircd" && ircd != "ratbox" && ircd != "shadowircd" && ircd != "solidircd"
-				&& ircd != "ultimate2" && ircd != "ultimate3" && ircd != "unreal" && ircd != "viagra")
+
+	while (ircd != "bahamut" && ircd != "charybdis" && ircd != "dreamforge" && ircd != "hybrid" && ircd != "inspircd" && ircd != "plexus2" && ircd != "plexus3" && ircd != "ptlink" && ircd != "rageircd" && ircd != "ratbox" && ircd != "shadowircd" && ircd != "solidircd" && ircd != "ultimate2" && ircd != "ultimate3" && ircd != "unreal" && ircd != "viagra")
 	{
 		if (!ircd.empty())
 			std::cout << "Select a valid option!" << std::endl;
@@ -184,6 +181,7 @@ int main(int argc, char *argv[])
 
 	std::cout << "You selected " << hashm << std::endl;
 
+	fs.clear();
 	fs.open("anope.db");
 	if (!fs.is_open())
 	{
@@ -198,7 +196,6 @@ int main(int argc, char *argv[])
 	/* Ia: First database */
 	if ((f = open_db_read("NickServ", "nick.db", 14)))
 	{
-
 		NickAlias *na, **nalast, *naprev;
 		NickCore *nc, **nclast, *ncprev;
 		int16 tmp16;
@@ -208,17 +205,20 @@ int main(int argc, char *argv[])
 		printf("Trying to merge nicks...\n");
 
 		/* Nick cores */
-		for (i = 0; i < 1024; i++) {
+		for (i = 0; i < 1024; ++i)
+		{
 			nclast = &nclists[i];
 			ncprev = NULL;
 
-			while ((c = getc_db(f)) == 1) {
-				if (c != 1) {
+			while ((c = getc_db(f)) == 1)
+			{
+				if (c != 1)
+				{
 					printf("Invalid format in nickserv db.\n");
 					exit(0);
 				}
 
-				nc = (NickCore *)calloc(1, sizeof(NickCore));
+				nc = new NickCore;
 				nc->aliascount = 0;
 				nc->unused = 0;
 
@@ -236,20 +236,21 @@ int main(int argc, char *argv[])
 				READ(read_uint32(&nc->flags, f));
 				READ(read_uint16(&nc->language, f));
 				READ(read_uint16(&nc->accesscount, f));
-				if (nc->accesscount) {
-					char **access;
-					access = (char **)calloc(sizeof(char *) * nc->accesscount, 1);
+				if (nc->accesscount)
+				{
+					char **access = new char *[nc->accesscount + 1];
 					nc->access = access;
-					for (j = 0; j < nc->accesscount; j++, access++)
+					for (j = 0; j < nc->accesscount; ++j, ++access)
 						READ(read_string(access, f));
 				}
 				READ(read_int16(&nc->memos.memocount, f));
 				READ(read_int16(&nc->memos.memomax, f));
-				if (nc->memos.memocount) {
-					Memo *memos;
-					memos = (Memo *)calloc(sizeof(Memo) * nc->memos.memocount, 1);
+				if (nc->memos.memocount)
+				{
+					Memo *memos = new Memo[nc->memos.memocount];
 					nc->memos.memos = memos;
-					for (j = 0; j < nc->memos.memocount; j++, memos++) {
+					for (j = 0; j < nc->memos.memocount; ++j, ++memos)
+					{
 						READ(read_uint32(&memos->number, f));
 						READ(read_uint16(&memos->flags, f));
 						READ(read_int32(&tmp32, f));
@@ -265,19 +266,22 @@ int main(int argc, char *argv[])
 		} /* for() loop */
 
 		/* Nick aliases */
-		for (i = 0; i < 1024; i++) {
+		for (i = 0; i < 1024; ++i)
+		{
 			char *s = NULL;
 
 			nalast = &nalists[i];
 			naprev = NULL;
 
-			while ((c = getc_db(f)) == 1) {
-				if (c != 1) {
+			while ((c = getc_db(f)) == 1)
+			{
+				if (c != 1)
+				{
 					printf("Invalid format in nick db.\n");
 					exit(0);
 				}
 
-				na = (NickAlias *)calloc(1, sizeof(NickAlias));
+				na = new NickAlias;
 
 				READ(read_string(&na->nick, f));
 				READ(read_string(&na->last_usermask, f));
@@ -291,8 +295,9 @@ int main(int argc, char *argv[])
 				READ(read_uint16(&na->status, f));
 				READ(read_string(&s, f));
 				na->nc = findcore(s, 0);
-				na->nc->aliascount++;
-				free(s);
+				++na->nc->aliascount;
+				//free(s);
+				delete [] s;
 
 				*nalast = na;
 				nalast = &na->next;
@@ -306,11 +311,14 @@ int main(int argc, char *argv[])
 
 	/* CLEAN THE CORES */
 	int i;
-	for (i = 0; i < 1024; i++) {
+	for (i = 0; i < 1024; ++i)
+	{
 		NickCore *ncnext;
-		for (NickCore *nc = nclists[i]; nc; nc = ncnext) {
+		for (NickCore *nc = nclists[i]; nc; nc = ncnext)
+		{
 			ncnext = nc->next;
-			if (nc->aliascount < 1) {
+			if (nc->aliascount < 1)
+			{
 				printf("Deleting core %s (%s).\n", nc->display, nc->email);
 				delcore(nc);
 			}
@@ -325,7 +333,7 @@ int main(int argc, char *argv[])
 
 		while ((c = getc_db(f)) == 1)
 		{
-			hc = (HostCore *)calloc(1, sizeof(HostCore));
+			hc = new HostCore;
 			READ(read_string(&hc->nick, f));
 			READ(read_string(&hc->vIdent, f));
 			READ(read_string(&hc->vHost, f));
@@ -340,7 +348,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Nick cores */
-	for (i = 0; i < 1024; i++)
+	for (i = 0; i < 1024; ++i)
 	{
 		NickAlias *na;
 		NickCore *nc;
@@ -371,10 +379,10 @@ int main(int argc, char *argv[])
 				len = 20;
 			else if (hashm == "oldmd5")
 				len = 16;
-			else 
+			else
 				len = 32;
-			
-			b64_encode(nc->pass, len, (char *)cpass, 5000);
+
+			b64_encode(nc->pass, len, cpass, 5000);
 
 			fs << "NC " << nc->display << " " << hashm << ":" << cpass;
 			fs << " " << GetLanguageID(nc->language) << " " << nc->memos.memomax << " " << nc->channelcount << std::endl;
@@ -390,34 +398,32 @@ int main(int argc, char *argv[])
 				fs << "MD URL :" << nc->url << std::endl;
 
 			if (nc->accesscount)
-			{
-				for (j = 0, access = nc->access; j < nc->accesscount && *access; j++, access++)
+				for (j = 0, access = nc->access; j < nc->accesscount && *access; ++j, ++access)
 					fs << "MD ACCESS " << *access << std::endl;
-			}
 
 			fs << "MD FLAGS "
-					<< ((nc->flags & NI_KILLPROTECT  ) ? "KILLPROTECT "  : "")
-					<< ((nc->flags & NI_SECURE       ) ? "SECURE "       : "")
-					<< ((nc->flags & NI_MSG          ) ? "MSG "          : "")
-					<< ((nc->flags & NI_MEMO_HARDMAX ) ? "MEMO_HARDMAX " : "")
-					<< ((nc->flags & NI_MEMO_SIGNON  ) ? "MEMO_SIGNON "  : "")
-					<< ((nc->flags & NI_MEMO_RECEIVE ) ? "MEMO_RECEIVE " : "")
-					<< ((nc->flags & NI_PRIVATE      ) ? "PRIVATE "      : "")
-					<< ((nc->flags & NI_HIDE_EMAIL   ) ? "HIDE_EMAIL "   : "")
-					<< ((nc->flags & NI_HIDE_MASK    ) ? "HIDE_MASK "    : "")
-					<< ((nc->flags & NI_HIDE_QUIT    ) ? "HIDE_QUIT "    : "")
-					<< ((nc->flags & NI_KILL_QUICK   ) ? "KILL_QUICK "   : "")
-					<< ((nc->flags & NI_KILL_IMMED   ) ? "KILL_IMMED "   : "")
-					<< ((nc->flags & NI_MEMO_MAIL    ) ? "MEMO_MAIL "    : "")
-					<< ((nc->flags & NI_HIDE_STATUS  ) ? "HIDE_STATUS "  : "")
-					<< ((nc->flags & NI_SUSPENDED    ) ? "SUSPENDED "    : "")
-					// in 1.8, the AUTOOP flag was set to disable AUTOOP. Now we enable it. --DP
-					<< (!(nc->flags & NI_AUTOOP      ) ? "AUTOOP "       : "")
-					<< ((nc->flags & NI_FORBIDDEN    ) ? "FORBIDDEN "    : "") << std::endl;
+				<< (nc->flags & NI_KILLPROTECT ? "KILLPROTECT " : "")
+				<< (nc->flags & NI_SECURE ? "SECURE " : "")
+				<< (nc->flags & NI_MSG ? "MSG " : "")
+				<< (nc->flags & NI_MEMO_HARDMAX ? "MEMO_HARDMAX " : "")
+				<< (nc->flags & NI_MEMO_SIGNON ? "MEMO_SIGNON " : "")
+				<< (nc->flags & NI_MEMO_RECEIVE ? "MEMO_RECEIVE " : "")
+				<< (nc->flags & NI_PRIVATE ? "PRIVATE " : "")
+				<< (nc->flags & NI_HIDE_EMAIL ? "HIDE_EMAIL " : "")
+				<< (nc->flags & NI_HIDE_MASK ? "HIDE_MASK " : "")
+				<< (nc->flags & NI_HIDE_QUIT ? "HIDE_QUIT " : "")
+				<< (nc->flags & NI_KILL_QUICK ? "KILL_QUICK " : "")
+				<< (nc->flags & NI_KILL_IMMED ? "KILL_IMMED " : "")
+				<< (nc->flags & NI_MEMO_MAIL ? "MEMO_MAIL " : "")
+				<< (nc->flags & NI_HIDE_STATUS ? "HIDE_STATUS " : "")
+				<< (nc->flags & NI_SUSPENDED ? "SUSPENDED " : "")
+				// in 1.8, the AUTOOP flag was set to disable AUTOOP. Now we enable it. --DP
+				<< (!(nc->flags & NI_AUTOOP) ? "AUTOOP " : "")
+				<< (nc->flags & NI_FORBIDDEN ? "FORBIDDEN " : "") << std::endl;
 			if (nc->memos.memocount)
 			{
 				memos = nc->memos.memos;
-				for (j = 0; j < nc->memos.memocount; j++, memos++)
+				for (j = 0; j < nc->memos.memocount; ++j, ++memos)
 				{
 					if (!memos->text)
 						break;
@@ -433,7 +439,7 @@ int main(int argc, char *argv[])
 			}
 
 			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
-			for (int tmp = 0; tmp < 1024; tmp++)
+			for (int tmp = 0; tmp < 1024; ++tmp)
 			{
 				for (na = nalists[tmp]; na; na = na->next)
 				{
@@ -455,27 +461,21 @@ int main(int argc, char *argv[])
 						fs << "MD LAST_REALNAME :" << na->last_realname << std::endl;
 					if (na->last_quit)
 						fs << "MD LAST_QUIT :" << na->last_quit << std::endl;
-					if ((na->status & NS_FORBIDDEN) || (na->status & NS_NO_EXPIRE)) 
-					{
-						fs << "MD FLAGS"
-							<< ((na->status & NS_FORBIDDEN) ? " FORBIDDEN" : "")
-							<< ((na->status & NS_NO_EXPIRE) ? " NOEXPIRE"   : "") << std::endl;
-					}
+					if ((na->status & NS_FORBIDDEN) || (na->status & NS_NO_EXPIRE))
+						fs << "MD FLAGS" << (na->status & NS_FORBIDDEN ? " FORBIDDEN" : "") << (na->status & NS_NO_EXPIRE ? " NOEXPIRE" : "") << std::endl;
 
 					HostCore *hc = findHostCore(na->nick);
 					if (hc)
-					{
 						fs << "MD VHOST " << hc->creator << " " << hc->time << " " << hc->vHost << " :" << (hc->vIdent ? hc->vIdent : "") << std::endl;
-					}
 				}
 			}
 		}
 	}
 
-
 	/* Section II: Bots */
 	/* IIa: First database */
-	if ((f = open_db_read("Botserv", "bot.db", 10))) {
+	if ((f = open_db_read("Botserv", "bot.db", 10)))
+	{
 		std::string input;
 		int c, broken = 0;
 		int32 created;
@@ -523,7 +523,8 @@ int main(int argc, char *argv[])
 			fs << "MD FLAGS GLOBAL" << std::endl;
 		}
 
-		while ((c = getc_db(f)) == 1) {
+		while ((c = getc_db(f)) == 1)
+		{
 			READ(read_string(&nick, f));
 			READ(read_string(&user, f));
 			READ(read_string(&host, f));
@@ -532,39 +533,39 @@ int main(int argc, char *argv[])
 			READ(read_int32(&created, f));
 			READ(read_int16(&chancount, f));
 
-			if (created == 0)
+			if (!created)
 				created = time(NULL); // Unfortunatley, we forgot to store the created bot time in 1.9.1+
 
 			/* fix for the 1.9.0 broken bot.db */
 			if (broken)
 			{
 				flags = 0;
-				if (!stricmp(nick, "ChanServ"))
+				if (!mystricmp(nick, "ChanServ"))
 					flags |= BI_CHANSERV;
-				if (!stricmp(nick, "BotServ"))
+				if (!mystricmp(nick, "BotServ"))
 					flags |= BI_BOTSERV;
-				if (!stricmp(nick, "HostServ"))
+				if (!mystricmp(nick, "HostServ"))
 					flags |= BI_HOSTSERV;
-				if (!stricmp(nick, "OperServ"))
+				if (!mystricmp(nick, "OperServ"))
 					flags |= BI_OPERSERV;
-				if (!stricmp(nick, "MemoServ"))
+				if (!mystricmp(nick, "MemoServ"))
 					flags |= BI_MEMOSERV;
-				if (!stricmp(nick, "NickServ"))
+				if (!mystricmp(nick, "NickServ"))
 					flags |= BI_NICKSERV;
-				if (!stricmp(nick, "Global"))
+				if (!mystricmp(nick, "Global"))
 					flags |= BI_GLOBAL;
 			} /* end of 1.9.0 broken database fix */
 			std::cout << "Writing Bot " << nick << "!" << user << "@" << host << std::endl;
 			fs << "BI " << nick << " " << user << " " << host << " " << created << " " << chancount << " :" << real << std::endl;
 			fs << "MD FLAGS"
-					<< (( flags & BI_PRIVATE  ) ? " PRIVATE"  : "" )
-					<< (( flags & BI_CHANSERV ) ? " CHANSERV" : "" )
-					<< (( flags & BI_BOTSERV  ) ? " BOTSERV"  : "" )
-					<< (( flags & BI_HOSTSERV ) ? " HOSTSERV" : "" )
-					<< (( flags & BI_OPERSERV ) ? " OPERSERV" : "" )
-					<< (( flags & BI_MEMOSERV ) ? " MEMOSERV" : "" )
-					<< (( flags & BI_NICKSERV ) ? " NICKSERV" : "" )
-					<< (( flags & BI_GLOBAL   ) ? " GLOBAL"   : "" ) << std::endl;
+				<< (flags & BI_PRIVATE ? " PRIVATE" : "")
+				<< (flags & BI_CHANSERV ? " CHANSERV" : "")
+				<< (flags & BI_BOTSERV ? " BOTSERV" : "")
+				<< (flags & BI_HOSTSERV ? " HOSTSERV" : "")
+				<< (flags & BI_OPERSERV ? " OPERSERV" : "")
+				<< (flags & BI_MEMOSERV ? " MEMOSERV" : "")
+				<< (flags & BI_NICKSERV ? " NICKSERV" : "")
+				<< (flags & BI_GLOBAL ? " GLOBAL" : "") << std::endl;
 		}
 		close_db(f);
 	}
@@ -578,7 +579,7 @@ int main(int argc, char *argv[])
 
 		printf("Trying to merge channels...\n");
 
-		for (i = 0; i < 256; i++)
+		for (i = 0; i < 256; ++i)
 		{
 			int16 tmp16;
 			int32 tmp32;
@@ -599,7 +600,7 @@ int main(int argc, char *argv[])
 					exit(0);
 				}
 
-				ci = (ChannelInfo *)calloc(sizeof(ChannelInfo), 1);
+				ci = new ChannelInfo;
 				*last = ci;
 				last = &ci->next;
 				ci->prev = prev;
@@ -631,8 +632,8 @@ int main(int argc, char *argv[])
 				ci->bantype = tmp16;
 				READ(read_int16(&tmp16, f));
 				n_levels = tmp16;
-				ci->levels = (int16 *)calloc(36 * sizeof(*ci->levels), 1);
-				for (j = 0; j < n_levels; j++)
+				ci->levels = new int16[36];
+				for (j = 0; j < n_levels; ++j)
 				{
 					if (j < 36)
 						READ(read_int16(&ci->levels[j], f));
@@ -642,8 +643,8 @@ int main(int argc, char *argv[])
 				READ(read_uint16(&ci->accesscount, f));
 				if (ci->accesscount)
 				{
-					ci->access = (ChanAccess *)calloc(ci->accesscount, sizeof(ChanAccess));
-					for (j = 0; j < ci->accesscount; j++)
+					ci->access = new ChanAccess[ci->accesscount];
+					for (j = 0; j < ci->accesscount; ++j)
 					{
 						READ(read_uint16(&ci->access[j].in_use, f));
 						if (ci->access[j].in_use)
@@ -653,7 +654,7 @@ int main(int argc, char *argv[])
 							if (s)
 							{
 								ci->access[j].nc = findcore(s, 0);
-								free(s);
+								delete [] s;
 							}
 							if (ci->access[j].nc == NULL)
 								ci->access[j].in_use = 0;
@@ -663,14 +664,12 @@ int main(int argc, char *argv[])
 					}
 				}
 				else
-				{
 					ci->access = NULL;
-				}
 				READ(read_uint16(&ci->akickcount, f));
 				if (ci->akickcount)
 				{
-					ci->akick = (AutoKick *)calloc(ci->akickcount, sizeof(AutoKick));
-					for (j = 0; j < ci->akickcount; j++)
+					ci->akick = new AutoKick[ci->akickcount];
+					for (j = 0; j < ci->akickcount; ++j)
 					{
 						SAFE(read_uint16(&ci->akick[j].flags, f));
 						if (ci->akick[j].flags & 0x0001)
@@ -681,26 +680,20 @@ int main(int argc, char *argv[])
 								ci->akick[j].u.nc = findcore(s, 0);
 								if (!ci->akick[j].u.nc)
 									ci->akick[j].flags &= ~0x0001;
-								free(s);
+								delete [] s;
 							}
 							else
-							{
 								ci->akick[j].u.mask = s;
-							}
 							SAFE(read_string(&s, f));
 							if (ci->akick[j].flags & 0x0001)
 								ci->akick[j].reason = s;
 							else if (s)
-								free(s);
+								delete [] s;
 							SAFE(read_string(&s, f));
 							if (ci->akick[j].flags & 0x0001)
-							{
 								ci->akick[j].creator = s;
-							}
 							else if (s)
-							{
-								free(s);
-							}
+								delete [] s;
 							SAFE(read_int32(&tmp32, f));
 							if (ci->akick[j].flags & 0x0001)
 								ci->akick[j].addtime = tmp32;
@@ -708,9 +701,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				else
-				{
 					ci->akick = NULL;
-				}
 				READ(read_uint32(&ci->mlock_on, f));
 				READ(read_uint32(&ci->mlock_off, f));
 				READ(read_uint32(&ci->mlock_limit, f));
@@ -721,10 +712,9 @@ int main(int argc, char *argv[])
 				READ(read_int16(&ci->memos.memomax, f));
 				if (ci->memos.memocount)
 				{
-					Memo *memos;
-					memos = (Memo *)calloc(sizeof(Memo) * ci->memos.memocount, 1);
+					Memo *memos = new Memo[ci->memos.memocount];
 					ci->memos.memos = memos;
-					for (j = 0; j < ci->memos.memocount; j++, memos++)
+					for (j = 0; j < ci->memos.memocount; ++j, ++memos)
 					{
 						READ(read_uint32(&memos->number, f));
 						READ(read_uint16(&memos->flags, f));
@@ -742,15 +732,15 @@ int main(int argc, char *argv[])
 				ci->botflags = tmp32;
 				READ(read_int16(&tmp16, f));
 				n_ttb = tmp16;
-				ci->ttb = (int16 *)calloc(2 * 8, 1);
-				for (j = 0; j < n_ttb; j++)
+				ci->ttb = new int16[16];
+				for (j = 0; j < n_ttb; ++j)
 				{
 					if (j < 8)
 						READ(read_int16(&ci->ttb[j], f));
 					else
 						READ(read_int16(&tmp16, f));
 				}
-				for (j = n_ttb; j < 8; j++)
+				for (j = n_ttb; j < 8; ++j)
 					ci->ttb[j] = 0;
 				READ(read_int16(&tmp16, f));
 				ci->capsmin = tmp16;
@@ -766,8 +756,8 @@ int main(int argc, char *argv[])
 				READ(read_uint16(&ci->bwcount, f));
 				if (ci->bwcount)
 				{
-					ci->badwords = (BadWord *)calloc(ci->bwcount, sizeof(BadWord));
-					for (j = 0; j < ci->bwcount; j++)
+					ci->badwords = new BadWord[ci->bwcount];
+					for (j = 0; j < ci->bwcount; ++j)
 					{
 						SAFE(read_uint16(&ci->badwords[j].in_use, f));
 						if (ci->badwords[j].in_use)
@@ -778,9 +768,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				else
-				{
 					ci->badwords = NULL;
-				}
 			}
 			*last = NULL;
 		}
@@ -790,7 +778,7 @@ int main(int argc, char *argv[])
 
 	ChannelInfo *ci;
 
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 256; ++i)
 	{
 		for (ci = chanlists[i]; ci; ci = ci->next)
 		{
@@ -803,36 +791,32 @@ int main(int argc, char *argv[])
 			if (ci->successor)
 				fs << "MD SUCCESSOR " << ci->successor << std::endl;
 			fs << "MD LEVELS";
-			for (j = 0; j < 36; j++)
+			for (j = 0; j < 36; ++j)
 			{
 				/* In 1.8 disabled meant founder only. In 1.9.2 disabled literally means its disabled so, we will set these to ACCESS_QOP */
 				if (ci->levels[j] == -10000)
-				{
 					fs << " " << GetLevelName(j) << " " << 10000;
-				}
 				else
-				{
 					fs << " " << GetLevelName(j) << " " << ci->levels[j];
-				}
 			}
 			fs << std::endl;
-			fs << "MD FLAGS" 
-					<< ((ci->flags & CI_KEEPTOPIC     ) ? " KEEPTOPIC"     : "")
-					<< ((ci->flags & CI_SECUREOPS     ) ? " SECUREOPS"     : "")
-					<< ((ci->flags & CI_PRIVATE       ) ? " PRIVATE"       : "")
-					<< ((ci->flags & CI_TOPICLOCK     ) ? " TOPICLOCK"     : "")
-					<< ((ci->flags & CI_RESTRICTED    ) ? " RESTRICTED"    : "")
-					<< ((ci->flags & CI_PEACE         ) ? " PEACE"         : "")
-					<< ((ci->flags & CI_SECURE        ) ? " SECURE"        : "")
-					<< ((ci->flags & CI_FORBIDDEN     ) ? " FORBIDDEN"     : "")
-					<< ((ci->flags & CI_NO_EXPIRE     ) ? " NO_EXPIRE"     : "")
-					<< ((ci->flags & CI_MEMO_HARDMAX  ) ? " MEMO_HARDMAX"  : "")
-					<< ((ci->flags & CI_OPNOTICE      ) ? " OPNOTICE"      : "")
-					<< ((ci->flags & CI_SECUREFOUNDER ) ? " SECUREFOUNDER" : "")
-					<< ((ci->flags & CI_SIGNKICK      ) ? " SIGNKICK"      : "")
-					<< ((ci->flags & CI_SIGNKICK_LEVEL) ? " SIGNKICKLEVEL" : "")
-					<< ((ci->flags & CI_XOP           ) ? " XOP"           : "")
-					<< ((ci->flags & CI_SUSPENDED     ) ? " SUSPENDED"      : "") << std::endl;
+			fs << "MD FLAGS"
+				<< (ci->flags & CI_KEEPTOPIC ? " KEEPTOPIC" : "")
+				<< (ci->flags & CI_SECUREOPS ? " SECUREOPS" : "")
+				<< (ci->flags & CI_PRIVATE ? " PRIVATE" : "")
+				<< (ci->flags & CI_TOPICLOCK ? " TOPICLOCK" : "")
+				<< (ci->flags & CI_RESTRICTED ? " RESTRICTED" : "")
+				<< (ci->flags & CI_PEACE ? " PEACE" : "")
+				<< (ci->flags & CI_SECURE ? " SECURE" : "")
+				<< (ci->flags & CI_FORBIDDEN ? " FORBIDDEN" : "")
+				<< (ci->flags & CI_NO_EXPIRE ? " NO_EXPIRE" : "")
+				<< (ci->flags & CI_MEMO_HARDMAX ? " MEMO_HARDMAX" : "")
+				<< (ci->flags & CI_OPNOTICE ? " OPNOTICE" : "")
+				<< (ci->flags & CI_SECUREFOUNDER ? " SECUREFOUNDER" : "")
+				<< (ci->flags & CI_SIGNKICK ? " SIGNKICK" : "")
+				<< (ci->flags & CI_SIGNKICK_LEVEL ? " SIGNKICKLEVEL" : "")
+				<< (ci->flags & CI_XOP ? " XOP" : "")
+				<< (ci->flags & CI_SUSPENDED ? " SUSPENDED" : "") << std::endl;
 			if (ci->desc && *ci->desc)
 				fs << "MD DESC :" << ci->desc << std::endl;
 			if (ci->url)
@@ -844,28 +828,24 @@ int main(int argc, char *argv[])
 			if (ci->flags & CI_FORBIDDEN)
 				fs << "MD FORBID " << ci->forbidby << " :" << (ci->forbidreason ? ci->forbidreason : "no reason given") << std::endl;
 
-			for (j = 0; j < ci->accesscount; j++)
-			{  // MD ACCESS <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2
+			for (j = 0; j < ci->accesscount; ++j)
+				// MD ACCESS <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2
 				if (ci->access[j].in_use)
-					fs << "MD ACCESS "
-						<< ci->access[j].nc->display << " " << ci->access[j].level << " " 
-						<< ci->access[j].last_seen << " Unknown" << std::endl;
-			}
+					fs << "MD ACCESS " << ci->access[j].nc->display << " " << ci->access[j].level << " " << ci->access[j].last_seen << " Unknown" << std::endl;
 
-			for (j = 0; j < ci->akickcount; j++)
-			{  // MD AKICK <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
+			for (j = 0; j < ci->akickcount; ++j)
+				// MD AKICK <STUCK/UNSTUCK> <NICK/MASK> <akick> <creator> <addtime> :<reason>
 				if (ci->akick[j].flags & 0x0001)
 				{
 					fs << "MD AKICK "
-						<< ((ci->akick[j].flags & AK_STUCK) ? "STUCK " : "UNSTUCK " )
-						<< ((ci->akick[j].flags & AK_ISNICK) ? "NICK " : "MASK ")
-						<< ((ci->akick[j].flags & AK_ISNICK) ? ci->akick[j].u.nc->display : ci->akick[j].u.mask )
+						<< (ci->akick[j].flags & AK_STUCK ? "STUCK " : "UNSTUCK ")
+						<< (ci->akick[j].flags & AK_ISNICK ? "NICK " : "MASK ")
+						<< (ci->akick[j].flags & AK_ISNICK ? ci->akick[j].u.nc->display : ci->akick[j].u.mask)
 						<< " " << ci->akick[j].creator << " " << ci->akick[j].addtime << " 0 :"; // 0 is for last used, added in 1.9.2
-						if (ci->akick[j].reason)
-							fs << ci->akick[j].reason;
-						fs << std::endl;
+					if (ci->akick[j].reason)
+						fs << ci->akick[j].reason;
+					fs << std::endl;
 				}
-			}
 
 			if (ci->mlock_on)
 			{
@@ -894,9 +874,8 @@ int main(int argc, char *argv[])
 			}
 			if (ci->memos.memocount)
 			{
-				Memo *memos;
-				memos = ci->memos.memos;
-				for (j = 0; j < ci->memos.memocount; j++, memos++)
+				Memo *memos = ci->memos.memos;
+				for (j = 0; j < ci->memos.memocount; ++j, ++memos)
 				{
 					fs << "MD MI " << memos->number << " " << memos->time << " " << memos->sender;
 					if (memos->flags & MF_UNREAD)
@@ -915,20 +894,20 @@ int main(int argc, char *argv[])
 				fs << "MD BI NAME " << ci->bi << std::endl;
 			if (ci->botflags)
 				fs << "MD BI FLAGS"
-					<< (( ci->botflags & BS_DONTKICKOPS     ) ? " DONTKICKOPS"    : "" )
-					<< (( ci->botflags & BS_DONTKICKVOICES  ) ? " DONTKICKVOICES"  : "")
-					<< (( ci->botflags & BS_FANTASY         ) ? " FANTASY"         : "")
-					<< (( ci->botflags & BS_SYMBIOSIS       ) ? " SYMBIOSIS"       : "")
-					<< (( ci->botflags & BS_GREET           ) ? " GREET"           : "")
-					<< (( ci->botflags & BS_NOBOT           ) ? " NOBOT"           : "")
-					<< (( ci->botflags & BS_KICK_BOLDS      ) ? " KICK_BOLDS"      : "")
-					<< (( ci->botflags & BS_KICK_COLORS     ) ? " KICK_COLORS"     : "")
-					<< (( ci->botflags & BS_KICK_REVERSES   ) ? " KICK_REVERSES"   : "")
-					<< (( ci->botflags & BS_KICK_UNDERLINES ) ? " KICK_UNDERLINES" : "")
-					<< (( ci->botflags & BS_KICK_BADWORDS   ) ? " KICK_BADWORDS"   : "")
-					<< (( ci->botflags & BS_KICK_CAPS       ) ? " KICK_CAPS"       : "")
-					<< (( ci->botflags & BS_KICK_FLOOD      ) ? " KICK_FLOOD"      : "")
-					<< (( ci->botflags & BS_KICK_REPEAT     ) ? " KICK_REPEAT"     : "") << std::endl;
+					<< (ci->botflags & BS_DONTKICKOPS ? " DONTKICKOPS" : "" )
+					<< (ci->botflags & BS_DONTKICKVOICES ? " DONTKICKVOICES" : "")
+					<< (ci->botflags & BS_FANTASY ? " FANTASY" : "")
+					<< (ci->botflags & BS_SYMBIOSIS ? " SYMBIOSIS" : "")
+					<< (ci->botflags & BS_GREET ? " GREET" : "")
+					<< (ci->botflags & BS_NOBOT ? " NOBOT" : "")
+					<< (ci->botflags & BS_KICK_BOLDS ? " KICK_BOLDS" : "")
+					<< (ci->botflags & BS_KICK_COLORS ? " KICK_COLORS" : "")
+					<< (ci->botflags & BS_KICK_REVERSES ? " KICK_REVERSES" : "")
+					<< (ci->botflags & BS_KICK_UNDERLINES ? " KICK_UNDERLINES" : "")
+					<< (ci->botflags & BS_KICK_BADWORDS ? " KICK_BADWORDS" : "")
+					<< (ci->botflags & BS_KICK_CAPS ? " KICK_CAPS" : "")
+					<< (ci->botflags & BS_KICK_FLOOD ? " KICK_FLOOD" : "")
+					<< (ci->botflags & BS_KICK_REPEAT ? " KICK_REPEAT" : "") << std::endl;
 			fs << "MD BI TTB";
 			fs << " BOLDS " << ci->ttb[0];
 			fs << " COLORS " << ci->ttb[1];
@@ -949,18 +928,16 @@ int main(int argc, char *argv[])
 				fs << "MD BI FLOODSECS " << ci->floodsecs << std::endl;
 			if (ci->repeattimes)
 				fs << "MD BI REPEATTIMES " << ci->repeattimes << std::endl;
-			for (j = 0; j < ci->bwcount; j++)
-			{
+			for (j = 0; j < ci->bwcount; ++j)
 				if (ci->badwords[j].in_use)
 				{
 					fs << "MD BI BADWORD "
-						<< (( ci->badwords[j].type == 0 ) ? "ANY "    : "" )
-						<< (( ci->badwords[j].type == 1 ) ? "SINGLE " : "" )
-						<< (( ci->badwords[j].type == 2 ) ? "START "  : "" )
-						<< (( ci->badwords[j].type == 3 ) ? "END "    : "" )
+						<< (!ci->badwords[j].type ? "ANY " : "")
+						<< (ci->badwords[j].type == 1 ? "SINGLE " : "")
+						<< (ci->badwords[j].type == 2 ? "START " : "")
+						<< (ci->badwords[j].type == 3 ? "END " : "")
 						<< ":" << ci->badwords[j].word << std::endl;
 				}
-			}
 
 		} /* for (chanlists[i]) */
 	} /* for (i) */
@@ -983,7 +960,7 @@ int main(int argc, char *argv[])
 
 		/* AKILLS */
 		read_int16(&capacity, f);
-		for (i = 0; i < capacity; i++) 
+		for (i = 0; i < capacity; ++i)
 		{
 			SAFE(read_string(&user, f));
 			SAFE(read_string(&host, f));
@@ -992,11 +969,14 @@ int main(int argc, char *argv[])
 			SAFE(read_int32(&seton, f));
 			SAFE(read_int32(&expires, f));
 			fs << "OS AKILL " << user << " " << host << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
-			free(user); free(host); free(by); free(reason);
+			delete [] user;
+			delete [] host;
+			delete [] by;
+			delete [] reason;
 		}
 		/* SNLINES */
 		read_int16(&capacity, f);
-		for (i = 0; i < capacity; i++) 
+		for (i = 0; i < capacity; ++i)
 		{
 			SAFE(read_string(&mask, f));
 			SAFE(read_string(&by, f));
@@ -1004,11 +984,13 @@ int main(int argc, char *argv[])
 			SAFE(read_int32(&seton, f));
 			SAFE(read_int32(&expires, f));
 			fs << "OS SNLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
-			free(mask); free(by); free(reason);
+			delete [] mask;
+			delete [] by;
+			delete [] reason;
 		}
 		/* SQLINES */
 		read_int16(&capacity, f);
-		for (i = 0; i < capacity; i++) 
+		for (i = 0; i < capacity; ++i)
 		{
 			SAFE(read_string(&mask, f));
 			SAFE(read_string(&by, f));
@@ -1016,11 +998,13 @@ int main(int argc, char *argv[])
 			SAFE(read_int32(&seton, f));
 			SAFE(read_int32(&expires, f));
 			fs << "OS SQLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
-			free(mask); free(by); free(reason);
+			delete [] mask;
+			delete [] by;
+			delete [] reason;
 		}
 		/* SZLINES */
 		read_int16(&capacity, f);
-		for (i = 0; i < capacity; i++) 
+		for (i = 0; i < capacity; ++i)
 		{
 			SAFE(read_string(&mask, f));
 			SAFE(read_string(&by, f));
@@ -1028,11 +1012,12 @@ int main(int argc, char *argv[])
 			SAFE(read_int32(&seton, f));
 			SAFE(read_int32(&expires, f));
 			fs << "OS SZLINE " << mask << " " << by << " " << seton << " " << expires << " :" << reason << std::endl;
-			free(mask); free(by); free(reason);
+			delete [] mask;
+			delete [] by;
+			delete [] reason;
 		}
 		close_db(f);
 	} // operserv database
-
 
 	/* CONVERTING DONE \o/ HURRAY! */
 	fs.flush();

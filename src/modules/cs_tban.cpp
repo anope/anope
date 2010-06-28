@@ -12,7 +12,6 @@
  * Send bug reports to the Anope Coder instead of the module
  * author, because any changes since the inclusion into anope
  * are not supported by the original author.
- *
  */
 /*************************************************************************/
 
@@ -29,11 +28,14 @@ void mAddLanguages();
 
 static Module *me = NULL;
 
-#define LANG_NUM_STRINGS	4
-#define TBAN_HELP		   0
-#define TBAN_SYNTAX		 1
-#define TBAN_HELP_DETAIL	2
-#define TBAN_RESPONSE	   3
+enum
+{
+	TBAN_HELP,
+	TBAN_SYNTAX,
+	TBAN_HELP_DETAIL,
+	TBAN_RESPONSE,
+	LANG_NUM_STRINGS
+};
 
 class CommandCSTBan : public Command
 {
@@ -57,14 +59,12 @@ class CommandCSTBan : public Command
 		else if (!(u2 = finduser(nick)))
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
 		else
-		{
 			if (canBanUser(c, u, u2))
 			{
 				get_idealban(c->ci, u2, mask, sizeof(mask));
 				addBan(c, dotime(time), mask);
 				mySendResponse(u, chan, mask, time);
 			}
-		}
 
 		return MOD_CONT;
 	}
@@ -179,9 +179,7 @@ class TempBan : public CallBack
 			Channel *c;
 
 			if ((c = findchan(chan)) && c->ci)
-			{
 				c->RemoveMode(NULL, CMODE_BAN, mask);
-			}
 		}
 };
 

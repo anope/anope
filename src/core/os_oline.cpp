@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -71,13 +70,13 @@ class OSOLine : public Module
  public:
 	OSOLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!ircd->omode)
+			throw ModuleException("Your IRCd does not support OMODE.");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSOLine());
-
-		if (!ircd->omode)
-			throw ModuleException("Your IRCd does not support OMODE.");
 	}
 };
 

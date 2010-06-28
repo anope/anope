@@ -34,8 +34,7 @@ static void LoadDatabase()
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickCore *nc = new NickCore(SQLAssign(qres[i]["display"]));
 			nc->pass = SQLAssign(qres[i]["pass"]);
@@ -51,28 +50,20 @@ static void LoadDatabase()
 			spacesepstream sep(SQLAssign(qres[i]["flags"]));
 			std::string buf;
 			while (sep.GetToken(buf))
-			{
 				for (int j = 0; NickCoreFlags[j].Flag != -1; ++j)
-				{
 					if (NickCoreFlags[j].Name == buf)
-					{
 						nc->SetFlag(NickCoreFlags[j].Flag);
-					}
-				}
-			}
 
 			nc->language = atoi(qres[i]["language"].c_str());
 			nc->channelcount = atoi(qres[i]["channelcount"].c_str());
 			nc->memos.memomax = atoi(qres[i]["memomax"].c_str());
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_access`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickCore *nc = findcore(qres[i]["display"].c_str());
 			if (!nc)
@@ -83,14 +74,12 @@ static void LoadDatabase()
 
 			nc->AddAccess(SQLAssign(qres[i]["access"]));
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_core_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickCore *nc = findcore(qres[i]["display"].c_str());
 			if (!nc)
@@ -102,14 +91,12 @@ static void LoadDatabase()
 			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, SQLAssign(qres[i]["name"]), Params));
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_alias`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickCore *nc = findcore(qres[i]["display"].c_str());
 			if (!nc)
@@ -128,24 +115,16 @@ static void LoadDatabase()
 			spacesepstream sep(SQLAssign(qres[i]["flags"]));
 			std::string buf;
 			while (sep.GetToken(buf))
-			{
 				for (int j = 0; NickAliasFlags[j].Flag != -1; ++j)
-				{
 					if (NickAliasFlags[j].Name == buf)
-					{
 						na->SetFlag(NickAliasFlags[j].Flag);
-					}
-				}
-			}
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_alias_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickAlias *na = findnick(SQLAssign(qres[i]["nick"]));
 			if (!na)
@@ -157,14 +136,12 @@ static void LoadDatabase()
 			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, SQLAssign(qres[i]["name"]), Params));
 		}
-	}
 
 	query << "SELECT * FROM `anope_bs_core`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			BotInfo *bi = findbot(SQLAssign(qres[i]["nick"]));
 			if (!bi)
@@ -178,28 +155,22 @@ static void LoadDatabase()
 				spacesepstream sep(SQLAssign(qres[i]["flags"]));
 				std::string buf;
 				while (sep.GetToken(buf))
-				{
 					for (unsigned j = 0; BotServFlags[j].Flag != -1; ++j)
-					{
 						if (buf == BotServFlags[j].Name)
 						{
 							bi->SetFlag(BotServFlags[j].Flag);
 							break;
 						}
-					}
-				}
 			}
 			bi->created = atol(qres[i]["created"]);
 			bi->chancount = atol(qres[i]["chancount"]);
 		}
-	}
 
 	query << "SELECT * FROM `anope_bs_info_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			BotInfo *bi = findbot(SQLAssign(qres[i]["botname"]));
 			if (!bi)
@@ -212,14 +183,12 @@ static void LoadDatabase()
 			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, SQLAssign(qres[i]["name"]), Params));
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_info`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickCore *nc;
 			if (qres[i]["founder"].size())
@@ -254,16 +223,12 @@ static void LoadDatabase()
 				std::string buf;
 				spacesepstream sep(SQLAssign(qres[i]["flags"]));
 				while (sep.GetToken(buf))
-				{
 					for (int j = 0; ChannelFlags[j].Flag != -1; ++j)
-					{
 						if (buf == ChannelFlags[j].Name)
 						{
 							ci->SetFlag(ChannelFlags[j].Flag);
 							break;
 						}
-					}
-				}
 			}
 			if (qres[i]["forbidby"].size())
 				ci->forbidby = sstrdup(qres[i]["forbidby"].c_str());
@@ -316,16 +281,12 @@ static void LoadDatabase()
 					std::string buf;
 					spacesepstream sep(SQLAssign(qres[i]["botflags"]));
 					while (sep.GetToken(buf))
-					{
 						for (int j = 0; BotFlags[j].Flag != -1; ++j)
-						{
 							if (buf == BotFlags[j].Name)
 							{
 								ci->botflags.SetFlag(BotFlags[j].Flag);
 								break;
 							}
-						}
-					}
 				}
 			}
 			if (qres[i]["capsmin"].size())
@@ -339,14 +300,12 @@ static void LoadDatabase()
 			if (qres[i]["repeattimes"].size())
 				ci->repeattimes = atoi(qres[i]["repeattimes"].c_str());
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_ttb";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
@@ -357,14 +316,12 @@ static void LoadDatabase()
 
 			ci->ttb[atoi(qres[i]["ttb_id"].c_str())] = atoi(qres[i]["value"].c_str());
 		}
-	}
 
 	query << "SELECT * FROM `anope_bs_badwords`";
 	qres = StoreQuery(query);
-	
+
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
@@ -372,7 +329,7 @@ static void LoadDatabase()
 				Alog() << "MySQL: Channel badwords entry for nonexistant channel " << qres[i]["channel"];
 				continue;
 			}
-			
+
 			BadWordType BWTYPE = BW_ANY;
 			if (qres[i]["type"] == "SINGLE")
 				BWTYPE = BW_SINGLE;
@@ -382,14 +339,12 @@ static void LoadDatabase()
 				BWTYPE = BW_END;
 			ci->AddBadWord(SQLAssign(qres[i]["word"]), BWTYPE);
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_access`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
@@ -406,14 +361,12 @@ static void LoadDatabase()
 
 			ci->AddAccess(nc, atoi(qres[i]["level"]), SQLAssign(qres[i]["creator"]), atol(qres[i]["last_seen"]));
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_akick`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
@@ -426,12 +379,10 @@ static void LoadDatabase()
 			std::string flag, mask;
 			bool stuck = false;
 			while (sep.GetToken(flag))
-			{
 				if (flag == "ISNICK")
 					nc = findcore(qres[i]["mask"]);
 				else if (flag == "STUCK")
 					stuck = true;
-			}
 			AutoKick *ak;
 			if (nc)
 				ak = ci->AddAkick(SQLAssign(qres[i]["creator"]), nc, SQLAssign(qres[i]["reason"]), atol(qres[i]["created"].c_str()), atol(qres[i]["last_used"].c_str()));
@@ -442,14 +393,12 @@ static void LoadDatabase()
 			if (nc)
 				ak->SetFlag(AK_ISNICK);
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_levels`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
@@ -459,14 +408,12 @@ static void LoadDatabase()
 			}
 			ci->levels[atoi(qres[i]["position"])] = atoi(qres[i]["level"]);
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_info_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (!ci)
@@ -474,19 +421,17 @@ static void LoadDatabase()
 				Alog() << "MySQL: Channel metadata for nonexistant channel " << qres[i]["channel"];
 				continue;
 			}
-			
+
 			EventReturn MOD_RESULT;
 			std::vector<std::string> Params = MakeVector(SQLAssign(qres[i]["value"]));
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, SQLAssign(qres[i]["name"]), Params));
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_request`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickRequest *nr = new NickRequest(qres[i]["nick"].c_str());
 			nr->passcode = SQLAssign(qres[i]["passcode"]);
@@ -494,27 +439,23 @@ static void LoadDatabase()
 			nr->email = sstrdup(qres[i]["email"].c_str());
 			nr->requested = atol(qres[i]["requested"].c_str());
 		}
-	}
 
 	EventReturn MOD_RESULT;
 	query << "SELECT * FROM `anope_extra`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			std::vector<std::string> params = MakeVector(SQLAssign(qres[i]["data"]));
 			FOREACH_RESULT(I_OnDatabaseRead, OnDatabaseRead(params));
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_core_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickCore *nc = findcore(qres[i]["nick"].c_str());
 			if (nc)
@@ -523,14 +464,12 @@ static void LoadDatabase()
 				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, SQLAssign(qres[i]["name"]), params));
 			}
 		}
-	}
 
 	query << "SELECT * FROM `anope_ns_alias_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			NickAlias *na = findnick(SQLAssign(qres[i]["nick"]));
 			if (na)
@@ -539,14 +478,12 @@ static void LoadDatabase()
 				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, SQLAssign(qres[i]["name"]), params));
 			}
 		}
-	}
 
 	query << "SELECT * FROM `anope_cs_info_metadata`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ChannelInfo *ci = cs_findchan(SQLAssign(qres[i]["channel"]));
 			if (ci)
@@ -555,14 +492,12 @@ static void LoadDatabase()
 				FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, SQLAssign(qres[i]["name"]), params));
 			}
 		}
-	}
 
 	query << "SELECT * FROM `anope_ms_info`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.num_rows(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			MemoInfo *mi = NULL;
 			if (qres[i]["serv"] == "NICK")
@@ -592,37 +527,27 @@ static void LoadDatabase()
 					}
 				}
 				else
-				{
 					m->number = 1;
-				}
 				m->time = atol(qres[i]["time"].c_str());
 				m->text = sstrdup(qres[i]["text"].c_str());
-				
+
 				if (qres[i]["flags"].size())
 				{
 					spacesepstream sep(SQLAssign(qres[i]["flags"]));
 					std::string buf;
 					while (sep.GetToken(buf))
-					{
 						for (unsigned j = 0; MemoFlags[j].Flag != -1; ++j)
-						{
 							if (MemoFlags[j].Name == buf)
-							{
 								m->SetFlag(MemoFlags[j].Flag);
-							}
-						}
-					}
 				}
 			}
 		}
-	}
 
 	query << "SELECT * FROM `anope_os_akills`";
 	qres = StoreQuery(query);
 
 	if (qres && SGLine)
-	{
-		for (size_t i = 0; i < qres.size(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ci::string user = qres[i]["user"].c_str();
 			ci::string host = qres[i]["host"].c_str();
@@ -638,14 +563,12 @@ static void LoadDatabase()
 				x->Created = seton;
 			}
 		}
-	}
 
 	query << "SELECT * FROM `anope_os_xlines`";
 	qres = StoreQuery(query);
 
 	if (qres)
-	{
-		for (size_t i = 0; i < qres.size(); ++i)
+		for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 		{
 			ci::string mask = qres[i]["mask"].c_str();
 			ci::string by = qres[i]["xby"].c_str();
@@ -666,7 +589,6 @@ static void LoadDatabase()
 				x->Created = seton;
 			}
 		}
-	}
 }
 
 class DBMySQLRead : public DBMySQL

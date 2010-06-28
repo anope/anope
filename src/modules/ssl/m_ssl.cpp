@@ -2,6 +2,7 @@
 
 #include "module.h"
 
+#define OPENSSL_NO_SHA512
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -31,7 +32,7 @@ class SSLSocket : public Socket
 	SSLSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : Socket(nTargetHost, nPort, nBindHost, nIPv6)
 	{
 		sslsock = SSL_new(ctx);
-		
+
 		if (!sslsock)
 			throw CoreException("Unable to initialize SSL socket");
 
@@ -62,20 +63,13 @@ class SSLModule : public Module
  public:
 	SSLModule(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
-		this->SetType(SUPPORTED);
-		this->SetPermanent(true);
-
 		SSL_load_error_strings();
 		SSLeay_add_ssl_algorithms();
 
 		ctx = SSL_CTX_new(SSLv23_client_method());
 
 		if (!ctx)
-		{
 			throw ModuleException("Error initializing SSL CTX");
-		}
 
 		if (IsFile(CERTFILE))
 		{
@@ -86,9 +80,7 @@ class SSLModule : public Module
 			}
 		}
 		else
-		{
 			Alog() << "m_ssl: No certificate file found";
-		}
 
 		if (IsFile(KEYFILE))
 		{
@@ -106,10 +98,12 @@ class SSLModule : public Module
 				throw ModuleException("Error loading private key - file not found");
 			}
 			else
-			{
 				Alog() << "m_ssl: No private key found";
-			}
 		}
+
+		this->SetAuthor("Anope");
+		this->SetType(SUPPORTED);
+		this->SetPermanent(true);
 
 		SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
 		SSL_CTX_set_options(ctx, SSL_OP_TLS_ROLLBACK_BUG | SSL_OP_ALL);

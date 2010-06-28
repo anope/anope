@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -23,7 +22,6 @@ class CommandOSShutdown : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-
 		quitmsg = new char[32 + u->nick.length()];
 		if (!quitmsg)
 			quitmsg = "SHUTDOWN command received, but out of memory!";

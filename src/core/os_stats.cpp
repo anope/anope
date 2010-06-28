@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -25,16 +24,12 @@ static int stats_count_servers(Server *s)
 {
 	if (!s)
 		return 0;
-	
+
 	int count = 1;
 
 	if (s->GetLinks())
-	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(); it != s->GetLinks()->end(); ++it)
-		{
+		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(), it_end = s->GetLinks()->end(); it != it_end; ++it)
 			count += stats_count_servers(*it);
-		}
-	}
 
 	return count;
 }
@@ -147,7 +142,8 @@ class CommandOSStats : public Command
 			notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1DHMS, days, hours, mins, secs);
 		else
 		{
-			if (hours > 1) {
+			if (hours > 1)
+			{
 				if (mins != 1)
 				{
 					if (secs != 1)
@@ -207,12 +203,8 @@ class CommandOSStats : public Command
 		std::string buf;
 
 		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
-		{
 			if (Capab.HasFlag(Capab_Info[j].Flag))
-			{
 				buf += " " + Capab_Info[j].Token;
-			}
-		}
 
 		if (!buf.empty())
 			buf.erase(buf.begin());
@@ -314,14 +306,15 @@ class OSStats : public Module
 
 void get_operserv_stats(long *nrec, long *memuse)
 {
-	unsigned i;
+	unsigned i, end;
 	long mem = 0, count = 0, mem2 = 0, count2 = 0;
 	XLine *x;
 
-	count += SGLine->GetCount();
-	mem += SGLine->GetCount() * sizeof(XLine);
+	end = SGLine->GetCount();
+	count += end;
+	mem += end * sizeof(XLine);
 
-	for (i = 0; i < SGLine->GetCount(); ++i)
+	for (i = 0; i < end; ++i)
 	{
 		x = SGLine->GetEntry(i);
 
@@ -335,10 +328,11 @@ void get_operserv_stats(long *nrec, long *memuse)
 
 	if (ircd->snline)
 	{
-		count += SNLine->GetCount();
-		mem += SNLine->GetCount() * sizeof(XLine);
+		end = SNLine->GetCount();
+		count += end;
+		mem += end * sizeof(XLine);
 
-		for (i = 0; i < SNLine->GetCount(); ++i)
+		for (i = 0; i < end; ++i)
 		{
 			x = SNLine->GetEntry(i);
 
@@ -352,10 +346,11 @@ void get_operserv_stats(long *nrec, long *memuse)
 	}
 	if (ircd->sqline)
 	{
-		count += SQLine->GetCount();
-		mem += SGLine->GetCount() * sizeof(XLine);
+		end = SQLine->GetCount();
+		count += end;
+		mem += end * sizeof(XLine);
 
-		for (i = 0; i < SQLine->GetCount(); ++i)
+		for (i = 0; i < end; ++i)
 		{
 			x = SNLine->GetEntry(i);
 
@@ -369,10 +364,11 @@ void get_operserv_stats(long *nrec, long *memuse)
 	}
 	if (ircd->szline)
 	{
-		count += SZLine->GetCount();
-		mem += SZLine->GetCount() * sizeof(XLine);
-		
-		for (i = 0; i < SZLine->GetCount(); ++i)
+		end = SZLine->GetCount();
+		count += end;
+		mem += end * sizeof(XLine);
+
+		for (i = 0; i < end; ++i)
 		{
 			x = SZLine->GetEntry(i);
 

@@ -25,29 +25,31 @@ int HSRequestMemoOper = 0;
 int HSRequestMemoSetters = 0;
 
 /* Language defines */
-#define LNG_NUM_STRINGS 21
-
-#define LNG_REQUEST_SYNTAX		0
-#define LNG_REQUESTED			1
-#define LNG_REQUEST_WAIT		2
-#define LNG_REQUEST_MEMO		3
-#define LNG_ACTIVATE_SYNTAX		4
-#define LNG_ACTIVATED			5
-#define LNG_ACTIVATE_MEMO		6
-#define LNG_REJECT_SYNTAX		7
-#define LNG_REJECTED			8
-#define LNG_REJECT_MEMO			9
-#define LNG_REJECT_MEMO_REASON	10
-#define LNG_NO_REQUEST			11
-#define LNG_HELP				12
-#define LNG_HELP_SETTER			13
-#define LNG_HELP_REQUEST		14
-#define LNG_HELP_ACTIVATE		15
-#define LNG_HELP_ACTIVATE_MEMO	16
-#define LNG_HELP_REJECT			17
-#define LNG_HELP_REJECT_MEMO	18
-#define LNG_WAITING_SYNTAX		19
-#define LNG_HELP_WAITING		20
+enum
+{
+	LNG_REQUEST_SYNTAX,
+	LNG_REQUESTED,
+	LNG_REQUEST_WAIT,
+	LNG_REQUEST_MEMO,
+	LNG_ACTIVATE_SYNTAX,
+	LNG_ACTIVATED,
+	LNG_ACTIVATE_MEMO,
+	LNG_REJECT_SYNTAX,
+	LNG_REJECTED,
+	LNG_REJECT_MEMO,
+	LNG_REJECT_MEMO_REASON,
+	LNG_NO_REQUEST,
+	LNG_HELP,
+	LNG_HELP_SETTER,
+	LNG_HELP_REQUEST,
+	LNG_HELP_ACTIVATE,
+	LNG_HELP_ACTIVATE_MEMO,
+	LNG_HELP_REJECT,
+	LNG_HELP_REJECT_MEMO,
+	LNG_WAITING_SYNTAX,
+	LNG_HELP_WAITING,
+	LNG_NUM_STRINGS
+};
 
 void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, time_t tmp_time);
 int my_isvalidchar(const char c);
@@ -107,9 +109,7 @@ class CommandHSRequest : public Command
 				return MOD_CONT;
 			}
 			else
-			{
 				for (s = vIdent; *s; ++s)
-				{
 					if (!my_isvalidchar(*s))
 					{
 						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
@@ -118,8 +118,6 @@ class CommandHSRequest : public Command
 						delete [] hostmask;
 						return MOD_CONT;
 					}
-				}
-			}
 			if (!ircd->vident)
 			{
 				notice_lang(Config.s_HostServ, u, HOST_NO_VIDENT);
@@ -157,20 +155,17 @@ class CommandHSRequest : public Command
 
 		if ((na = findnick(nick)))
 		{
-			if (HSRequestMemoOper || HSRequestMemoSetters)
+			if ((HSRequestMemoOper || HSRequestMemoSetters) && Config.MSSendDelay > 0 && u && u->lastmemosend + Config.MSSendDelay > now)
 			{
-				if (Config.MSSendDelay > 0 && u && u->lastmemosend + Config.MSSendDelay > now)
+				me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_WAIT, Config.MSSendDelay);
+				u->lastmemosend = now;
+				if (vIdent)
 				{
-					me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_WAIT, Config.MSSendDelay);
-					u->lastmemosend = now;
-					if (vIdent)
-					{
-						delete [] vIdent;
-						delete [] rawhostmask;
-					}
-					delete [] hostmask;
-					return MOD_CONT;
+					delete [] vIdent;
+					delete [] rawhostmask;
 				}
+				delete [] hostmask;
+				return MOD_CONT;
 			}
 			my_add_host_request(const_cast<char *>(nick), vIdent, hostmask, const_cast<char *>(u->nick.c_str()), now);
 
@@ -328,7 +323,7 @@ class HSListBase : public Command
 		unsigned display_counter = 0;
 		tm *tm;
 
-		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
+		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
 		{
 			HostRequest *hr = it->second;
 			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
@@ -721,7 +716,7 @@ class HSRequest : public Module
 
 	void OnDatabaseWrite(void (*Write)(const std::string &))
 	{
-		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
+		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
 		{
 			HostRequest *hr = it->second;
 			std::stringstream buf;
@@ -779,7 +774,7 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 {
 	int z = 2;
 	char host[BUFSIZE];
-	std::list<std::pair<ci::string, ci::string> >::iterator it;
+	std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
 
 	if (vIdent)
 		snprintf(host, sizeof(host), "%s@%s", vIdent, vHost);
@@ -787,13 +782,11 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 		snprintf(host, sizeof(host), "%s", vHost);
 
 	if (HSRequestMemoOper == 1)
-	{
-		for (it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+		for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 		{
 			ci::string nick = it->first;
 			my_memo_lang(u, nick.c_str(), z, LNG_REQUEST_MEMO, host);
 		}
-	}
 	if (HSRequestMemoSetters == 1)
 	{
 		/* Needs to be rethought because of removal of HostSetters in favor of opertype priv -- CyberBotX

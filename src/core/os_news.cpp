@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -18,19 +17,21 @@
 
 /* List of messages for each news type.  This simplifies message sending. */
 
-#define MSG_SYNTAX	0
-#define MSG_LIST_HEADER	1
-#define MSG_LIST_ENTRY	2
-#define MSG_LIST_NONE	3
-#define MSG_ADD_SYNTAX	4
-#define MSG_ADD_FULL	5
-#define MSG_ADDED	6
-#define MSG_DEL_SYNTAX	7
-#define MSG_DEL_NOT_FOUND 8
-#define MSG_DELETED	9
-#define MSG_DEL_NONE	10
-#define MSG_DELETED_ALL	11
-#define MSG_MAX		11
+enum
+{
+	MSG_SYNTAX,
+	MSG_LIST_HEADER,
+	MSG_LIST_ENTRY,
+	MSG_LIST_NONE,
+	MSG_ADD_SYNTAX,
+	MSG_ADD_FULL,
+	MSG_ADDED,
+	MSG_DEL_SYNTAX,
+	MSG_DEL_NOT_FOUND,
+	MSG_DELETED,
+	MSG_DEL_NONE,
+	MSG_DELETED_ALL
+};
 
 struct newsmsgs msgarray[] = {
 	{NEWS_LOGON, "LOGON",
@@ -96,7 +97,7 @@ static void DisplayNews(User *u, NewsType Type)
 
 	unsigned displayed = 0;
 	bool NewsExists = false;
-	for (unsigned i = 0; i < News.size(); ++i)
+	for (unsigned i = 0, end = News.size(); i < end; ++i)
 	{
 		if (News[i]->type == Type)
 		{
@@ -129,18 +130,16 @@ static void DisplayNews(User *u, NewsType Type)
 	}
 }
 
-static int add_newsitem(User * u, const char *text, NewsType type)
+static int add_newsitem(User *u, const char *text, NewsType type)
 {
 	int num = 0;
 
 	for (unsigned i = News.size(); i > 0; --i)
-	{
 		if (News[i - 1]->type == type)
 		{
 			num = News[i - 1]->num;
 			break;
 		}
-	}
 
 	NewsItem *news = new NewsItem;
 	news->type = type;
@@ -159,27 +158,25 @@ static int del_newsitem(unsigned num, NewsType type)
 	int count = 0;
 
 	for (unsigned i = News.size(); i > 0; --i)
-	{
 		if (News[i - 1]->type == type && (num == 0 || News[i - 1]->num == num))
 		{
 			delete News[i - 1];
 			News.erase(News.begin() + i - 1);
 			++count;
 		}
-	}
 
 	return count;
 }
 
 static int *findmsgs(NewsType type, const char **type_name)
 {
-	for (unsigned i = 0; i < lenof(msgarray); i++) {
-		if (msgarray[i].type == type) {
+	for (unsigned i = 0; i < lenof(msgarray); ++i)
+		if (msgarray[i].type == type)
+		{
 			if (type_name)
 				*type_name = msgarray[i].name;
 			return msgarray[i].msgs;
 		}
-	}
 	return NULL;
 }
 
@@ -192,8 +189,7 @@ class NewsBase : public Command
 		char timebuf[64];
 		struct tm *tm;
 
-		for (unsigned i = 0; i < News.size(); ++i)
-		{
+		for (unsigned i = 0, end = News.size(); i < end; ++i)
 			if (News[i]->type == type)
 			{
 				if (!count)
@@ -203,7 +199,6 @@ class NewsBase : public Command
 				notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
-		}
 		if (!count)
 			notice_lang(Config.s_OperServ, u, msgs[MSG_LIST_NONE]);
 		else
@@ -256,11 +251,9 @@ class NewsBase : public Command
 				if (num > 0 && del_newsitem(num, type))
 				{
 					notice_lang(Config.s_OperServ, u, msgs[MSG_DELETED], num);
-					for (unsigned i = 0; i < News.size(); ++i)
-					{
+					for (unsigned i = 0, end = News.size(); i < end; ++i)
 						if (News[i]->type == type && News[i]->num > num)
 							--News[i]->num;
-					}
 				}
 				else
 					notice_lang(Config.s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
@@ -422,7 +415,7 @@ class OSNews : public Module
 
 	~OSNews()
 	{
-		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
+		for (std::vector<NewsItem *>::iterator it = News.begin(), it_end = News.end(); it != it_end; ++it)
 			delete *it;
 		News.clear();
 	}
@@ -430,9 +423,7 @@ class OSNews : public Module
 	void OnUserModeSet(User *u, UserModeName Name)
 	{
 		if (Name == UMODE_OPER)
-		{
 			DisplayNews(u, NEWS_OPER);
-		}
 	}
 
 	void OnUserConnect(User *u)

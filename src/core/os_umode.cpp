@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -74,13 +73,13 @@ class OSUMode : public Module
  public:
 	OSUMode(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!ircd->umode)
+			throw ModuleException("Your IRCd does not support setting umodes");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSUMode());
-
-		if (!ircd->umode)
-			throw ModuleException("Your IRCd does not support setting umodes");
 	}
 };
 

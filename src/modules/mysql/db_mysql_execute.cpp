@@ -75,7 +75,7 @@ class SQLTimer : public Timer
 
 		if (qres && qres.num_rows())
 		{
-			for (size_t i = 0; i < qres.num_rows(); ++i)
+			for (size_t i = 0, end = qres.num_rows(); i < end; ++i)
 			{
 				User *u;
 				NickAlias *na = NULL;
@@ -149,7 +149,7 @@ class DBMySQLExecute : public DBMySQL
 	{
 		_SQLTimer = new SQLTimer();
 	}
-	
+
 	~DBMySQLExecute()
 	{
 		delete _SQLTimer;

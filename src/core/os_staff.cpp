@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -25,7 +24,7 @@ class CommandOSStaff : public Command
 	{
 		notice_lang(Config.s_OperServ, u, OPER_STAFF_LIST_HEADER);
 
-		for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(); it != Config.Opers.end(); ++it)
+		for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 		{
 			int found = 0;
 			ci::string nick = it->first, type = it->second;
@@ -34,7 +33,7 @@ class CommandOSStaff : public Command
 			if (na)
 			{
 				/* We have to loop all users as some may be logged into an account but not a nick */
-				for (user_map::iterator uit = UserListByNick.begin(); uit != UserListByNick.end(); ++uit)
+				for (user_map::iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
 				{
 					User *u2 = uit->second;
 
@@ -48,9 +47,7 @@ class CommandOSStaff : public Command
 					}
 				}
 				if (!found)
-				{
 					notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick);
-				}
 			}
 		}
 

@@ -7,10 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- * $Id$
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -178,7 +176,8 @@ class CommandOSSNLine : public Command
 		sep.GetToken(mask);
 		std::string reason = sep.GetRemaining();
 
-		if (!mask.empty() && !reason.empty()) {
+		if (!mask.empty() && !reason.empty())
+		{
 			/* Clean up the last character of the mask if it is a space
 			 * See bug #761
 			 */
@@ -292,11 +291,11 @@ class CommandOSSNLine : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SNLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SNLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -333,11 +332,11 @@ class CommandOSSNLine : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SNLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SNLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -410,15 +409,13 @@ class OSSNLine : public Module
  public:
 	OSSNLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!ircd->snline)
+			throw ModuleException("Your IRCd does not support SNLine");
 
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSSNLine());
-
-		if (!ircd->snline)
-			throw ModuleException("Your IRCd does not support SNLine");
 	}
 };
 

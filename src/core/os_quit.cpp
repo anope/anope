@@ -23,7 +23,6 @@ class CommandOSQuit : public Command
 
 	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
 	{
-
 		quitmsg = new char[28 + u->nick.length()];
 		if (!quitmsg)
 			quitmsg = "QUIT command received, but out of memory!";

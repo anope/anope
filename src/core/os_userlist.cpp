@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -29,26 +28,20 @@ class CommandOSUserList : public Command
 		std::list<UserModeName> Modes;
 
 		if (!opt.empty() && opt == "INVISIBLE")
-		{
 			Modes.push_back(UMODE_INVIS);
-		}
 
 		if (pattern && (c = findchan(pattern)))
 		{
 			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
 
-			for (CUserList::iterator cuit = c->users.begin(); cuit != c->users.end(); ++cuit)
+			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
 				UserContainer *uc = *cuit;
 
 				if (!Modes.empty())
-				{
-					for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
-					{
+					for (std::list<UserModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
 						if (!uc->user->HasMode(*it))
 							continue;
-					}
-				}
 
 				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
 			}
@@ -57,7 +50,7 @@ class CommandOSUserList : public Command
 		{
 			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER);
 
-			for (user_map::const_iterator uit = UserListByNick.begin(); uit != UserListByNick.end(); ++uit)
+			for (user_map::const_iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
 			{
 				User *u2 = uit->second;
 
@@ -68,13 +61,9 @@ class CommandOSUserList : public Command
 					if (!Anope::Match(mask, pattern, false))
 						continue;
 					if (!Modes.empty())
-					{
-						for (std::list<UserModeName>::iterator it = Modes.begin(); it != Modes.end(); ++it)
-						{
+						for (std::list<UserModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
 							if (!u2->HasMode(*it))
 								continue;
-						}
-					}
 				}
 				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 			}

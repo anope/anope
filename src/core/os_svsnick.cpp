@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -42,14 +41,12 @@ class CommandOSSVSNick : public Command
 			notice_lang(Config.s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 			return MOD_CONT;
 		}
-		for (unsigned i = 0; i < newnick.size(); ++i)
-		{
+		for (unsigned i = 0, end = newnick.size(); i < end; ++i)
 			if (!isvalidnick(newnick[i]))
 			{
 				notice_lang(Config.s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 				return MOD_CONT;
 			}
-		}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
@@ -89,13 +86,13 @@ class OSSVSNick : public Module
  public:
 	OSSVSNick(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!ircd->svsnick)
+			throw ModuleException("Your IRCd does not support SVSNICK");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSSVSNick());
-
-		if (!ircd->svsnick)
-			throw ModuleException("Your IRCd does not support SVSNICK");
 	}
 };
 

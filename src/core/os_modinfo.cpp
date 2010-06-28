@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -35,7 +34,7 @@ class CommandOSModInfo : public Command
 			tm = *localtime(&m->created);
 			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 			notice_lang(Config.s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", timebuf);
-			
+
 			showModuleCmdLoaded(HostServ, m->name.c_str(), u);
 			showModuleCmdLoaded(OperServ, m->name.c_str(), u);
 			showModuleCmdLoaded(NickServ, m->name.c_str(), u);
@@ -73,6 +72,7 @@ class OSModInfo : public Module
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(OperServ, new CommandOSModInfo());
 	}
 };
@@ -81,10 +81,10 @@ static int showModuleCmdLoaded(BotInfo *bi, const ci::string &mod_name, User *u)
 {
 	if (!bi)
 		return 0;
-	
+
 	int display = 0;
 
-	for (std::map<ci::string, Command *>::iterator it = bi->Commands.begin(); it != bi->Commands.end(); ++it)
+	for (std::map<ci::string, Command *>::iterator it = bi->Commands.begin(), it_end = bi->Commands.end(); it != it_end; ++it)
 	{
 		Command *c = it->second;
 

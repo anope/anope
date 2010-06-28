@@ -12,8 +12,8 @@
  * Send bug reports to the Anope Coder instead of the module
  * author, because any changes since the inclusion into anope
  * are not supported by the original author.
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -41,11 +41,13 @@
 /* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING		  */
 /* ---------------------------------------------------------------------- */
 
-#define LNG_NUM_STRINGS		3
-
-#define LNG_CHAN_HELP				0
-#define LNG_CHAN_HELP_APPENDTOPIC	1
-#define LNG_APPENDTOPIC_SYNTAX		2
+enum
+{
+	LNG_CHAN_HELP,
+	LNG_CHAN_HELP_APPENDTOPIC,
+	LNG_APPENDTOPIC_SYNTAX,
+	LNG_NUM_STRINGS
+};
 
 static Module *me;
 
@@ -96,20 +98,14 @@ class CommandCSAppendTopic : public Command
 
 			if (!check_access(u, ci, CA_TOPIC))
 				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
-			if (ircd->join2set)
+			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
-				if (whosends(ci) == ChanServ)
-				{
-					ChanServ->Join(c);
-					ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ); // XXX
-				}
+				ChanServ->Join(c);
+				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ); // XXX
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic);
-			if (ircd->join2set)
-			{
-				if (whosends(ci) == ChanServ)
-					ChanServ->Part(c);
-			}
+			if (ircd->join2set && whosends(ci) == ChanServ)
+				ChanServ->Part(c);
 		}
 		return MOD_CONT;
 	}

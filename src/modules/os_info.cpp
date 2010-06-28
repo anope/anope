@@ -12,7 +12,6 @@
  * Send bug reports to the Anope Coder instead of the module
  * author, because any changes since the inclusion into anope
  * are not supported by the original author.
- *
  */
 /*************************************************************************/
 
@@ -21,18 +20,20 @@
 #define AUTHOR "Rob"
 
 /* Multi-language stuff */
-#define LANG_NUM_STRINGS   10
-
-#define OINFO_SYNTAX		0
-#define OINFO_ADD_SUCCESS   1
-#define OINFO_DEL_SUCCESS   2
-#define OCINFO_SYNTAX	   3
-#define OCINFO_ADD_SUCCESS  4
-#define OCINFO_DEL_SUCCESS  5
-#define OINFO_HELP		  6
-#define OCINFO_HELP		 7
-#define OINFO_HELP_CMD	  8
-#define OCINFO_HELP_CMD	 9
+enum
+{
+	OINFO_SYNTAX,
+	OINFO_ADD_SUCCESS,
+	OINFO_DEL_SUCCESS,
+	OCINFO_SYNTAX,
+	OCINFO_ADD_SUCCESS,
+	OCINFO_DEL_SUCCESS,
+	OINFO_HELP,
+	OCINFO_HELP,
+	OINFO_HELP_CMD,
+	OCINFO_HELP_CMD,
+	LANG_NUM_STRINGS
+};
 
 /*************************************************************************/
 
@@ -425,14 +426,14 @@ class OSInfo : public Module
 	{
 		OnSaveDatabase();
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			NickCore *nc = it->second;
 
 			nc->Shrink("os_info");
 		}
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end(); ++it)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
 
@@ -503,7 +504,7 @@ class OSInfo : public Module
 		{
 			ci->Shrink("os_info");
 			ci->Extend("os_info", new ExtensibleItemPointerArray<char>(sstrdup(params[0].c_str())));
-			
+
 			return EVENT_STOP;
 		}
 

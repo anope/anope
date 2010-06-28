@@ -17,14 +17,16 @@
 
 #define AUTHOR "Anope"
 
-#define LNG_NUM_STRINGS	6
-
-#define LNG_CHAN_HELP						   0
-#define LNG_ENFORCE_SYNTAX					  1
-#define LNG_CHAN_HELP_ENFORCE				   2
-#define LNG_CHAN_HELP_ENFORCE_R_ENABLED		 3
-#define LNG_CHAN_HELP_ENFORCE_R_DISABLED		4
-#define LNG_CHAN_RESPONSE					   5
+enum
+{
+	LNG_CHAN_HELP,
+	LNG_ENFORCE_SYNTAX,
+	LNG_CHAN_HELP_ENFORCE,
+	LNG_CHAN_HELP_ENFORCE_R_ENABLED,
+	LNG_CHAN_HELP_ENFORCE_R_DISABLED,
+	LNG_CHAN_RESPONSE,
+	LNG_NUM_STRINGS
+};
 
 static Module *me;
 
@@ -71,7 +73,7 @@ class CommandCSEnforce : public Command
 			hadsecureops = true;
 		}
 
-		for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			UserContainer *uc = *it;
 
@@ -79,10 +81,7 @@ class CommandCSEnforce : public Command
 		}
 
 		if (hadsecureops)
-		{
 			ci->UnsetFlag(CI_SECUREOPS);
-		}
-
 	}
 
 	void DoRestricted(Channel *c)
@@ -101,7 +100,7 @@ class CommandCSEnforce : public Command
 		if (ci->levels[CA_NOJOIN] < 0)
 			ci->levels[CA_NOJOIN] = 0;
 
-		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
 			UserContainer *uc = *it++;
 
@@ -128,18 +127,16 @@ class CommandCSEnforce : public Command
 
 		Alog(LOG_DEBUG) << "[cs_enforce] Enforcing mode +R on " << c->name;
 
-		for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
 			UserContainer *uc = *it++;
-			
+
 			if (!uc->user->IsIdentified())
 			{
 				get_idealban(ci, uc->user, mask, sizeof(mask));
 				reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				if (!c->HasMode(CMODE_REGISTERED))
-				{
 					c->SetMode(NULL, CMODE_BAN, mask);
-				}
 				c->Kick(NULL, uc->user, "%s", reason);
 			}
 		}

@@ -23,9 +23,12 @@ bool check_email_limit_reached(const char *email, User * u);
 
 int NSEmailMax = 0;
 
-#define LNG_NUM_STRINGS		2
-#define LNG_NSEMAILMAX_REACHED		0
-#define LNG_NSEMAILMAX_REACHED_ONE	1
+enum
+{
+	LNG_NSEMAILMAX_REACHED,
+	LNG_NSEMAILMAX_REACHED_ONE,
+	LNG_NUM_STRINGS
+};
 
 static Module *me;
 
@@ -122,7 +125,6 @@ class NSMaxEmail : public Module
 	}
 };
 
-
 int count_email_in_use(const char *email, User * u)
 {
 	int count = 0;
@@ -130,7 +132,7 @@ int count_email_in_use(const char *email, User * u)
 	if (!email)
 		return 0;
 
-	for (nickcore_map::const_iterator it = NickCoreList.begin(); it != NickCoreList.end(); ++it)
+	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 	{
 		NickCore *nc = it->second;
 

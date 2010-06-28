@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -141,12 +140,13 @@ class OSIgnore : public Module
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(OperServ, new CommandOSIgnore());
 
 		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 2);
 	}
-	
+
 	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
 	{
 		std::string buf;
@@ -177,7 +177,7 @@ class OSIgnore : public Module
 		{
 			next = ign->next;
 
-			if (ign->time != 0 && ign->time <= now)
+			if (ign->time && ign->time <= now)
 			{
 				Alog(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << ign->mask;
 				if (ign->prev)

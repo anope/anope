@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -27,7 +26,7 @@ class SQLineDelCallback : public NumberList
 	{
 		if (!Deleted)
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_NO_MATCH);
-		else if (Deleted == 0)
+		else if (Deleted == 1)
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_ONE);
 		else
 			notice_lang(Config.s_OperServ, u, OPER_SQLINE_DELETED_SEVERAL, Deleted);
@@ -119,8 +118,7 @@ class SQLineViewCallback : public SQLineListCallback
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
-		notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, 
-expirebuf, x->Reason.c_str());
+		notice_lang(Config.s_OperServ, u, OPER_SQLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf, x->Reason.c_str());
 	}
 };
 
@@ -169,7 +167,7 @@ class CommandOSSQLine : public Command
 		if (mask && *reason)
 		{
 			XLine *x = SQLine->Add(OperServ, u, mask, expires, reason);
-			
+
 			if (!x)
 				return MOD_CONT;
 
@@ -274,11 +272,11 @@ class CommandOSSQLine : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SQLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SQLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -315,11 +313,11 @@ class CommandOSSQLine : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SQLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SQLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -392,13 +390,13 @@ class OSSQLine : public Module
  public:
 	OSSQLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!ircd->sqline)
+			throw ModuleException("Your IRCd does not support QLines.");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSSQLine());
-
-		if (!ircd->sqline)
-			throw ModuleException("Your IRCd does not support QLines.");
 	}
 };
 

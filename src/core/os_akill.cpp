@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -22,7 +21,7 @@ class AkillDelCallback : public NumberList
 	AkillDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
-	
+
 	~AkillDelCallback()
 	{
 		if (!Deleted)
@@ -83,7 +82,7 @@ class AkillListCallback : public NumberList
 
 		DoList(u, x, Number);
 	}
-	
+
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
 		notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
@@ -274,11 +273,11 @@ class CommandOSAKill : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SGLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SGLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -315,11 +314,11 @@ class CommandOSAKill : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SGLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SGLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -394,6 +393,7 @@ class OSAKill : public Module
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(OperServ, new CommandOSAKill());
 	}
 };

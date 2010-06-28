@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -42,10 +41,12 @@ class CommandOSClearModes : public Command
 		else
 		{
 			ci::string s = params.size() > 1 ? params[1] : "";
-			if (!s.empty()) {
+			if (!s.empty())
+			{
 				if (s == "ALL")
 					all = 1;
-				else {
+				else
+				{
 					this->OnSyntaxError(u, "");
 					return MOD_CONT;
 				}
@@ -60,7 +61,7 @@ class CommandOSClearModes : public Command
 					ircdproto->SendSVSModeChan(c, "-o", NULL);
 				else
 				{
-					for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 					{
 						UserContainer *uc = *it;
 
@@ -74,11 +75,11 @@ class CommandOSClearModes : public Command
 					ircdproto->SendSVSModeChan(c, "-v", NULL);
 				else
 				{
-					for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 					{
 						UserContainer *uc = *it;
 
-						if (uc->Status->HasFlag(CMODE_VOICE))	
+						if (uc->Status->HasFlag(CMODE_VOICE))
 							c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
 					}
 				}
@@ -90,7 +91,7 @@ class CommandOSClearModes : public Command
 						ircdproto->SendSVSModeChan(c, "-h", NULL);
 					else
 					{
-						for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+						for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 						{
 							UserContainer *uc = *it;
 
@@ -110,7 +111,7 @@ class CommandOSClearModes : public Command
 						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
 					else
 					{
-						for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+						for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 						{
 							UserContainer *uc = *it;
 
@@ -130,7 +131,7 @@ class CommandOSClearModes : public Command
 						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
 					else
 					{
-						for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+						for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 						{
 							UserContainer *uc = *it;
 

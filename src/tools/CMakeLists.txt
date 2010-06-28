@@ -13,6 +13,10 @@ foreach(SRC ${TOOLS_SRCS})
   string(REGEX REPLACE "\\.(c|cpp)$" "" EXE ${SRC})
   # Calculate the header file dependencies for the given source file
   calculate_depends(${SRC})
+  # For anoptsmtp, we also want hashcomp.cpp included, so we force it into the sources
+  if(SRC STREQUAL anopesmtp.cpp)
+    set(SRC ${SRC} ${Anope_SOURCE_DIR}/src/hashcomp.cpp)
+  endif(SRC STREQUAL anopesmtp.cpp)
   # Generate the executable and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_executable(${EXE} ${SRC})
   set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")

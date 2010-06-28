@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -39,7 +38,7 @@ class CommandOSNOOP : public Command
 			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
 
 			/* Kill all the IRCops of the server */
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
 			{
 				User *u2 = it->second;
 				++it;

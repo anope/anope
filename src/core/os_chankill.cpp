@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -67,7 +66,7 @@ class CommandOSChanKill : public Command
 
 			if ((c = findchan(channel)))
 			{
-				for (CUserList::iterator it = c->users.begin(); it != c->users.end();)
+				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 				{
 					UserContainer *uc = *it++;
 

@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -144,7 +143,7 @@ class CommandOSSession : public Command
 			notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_HEADER, mincount);
 			notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_COLHEAD);
 
-			for (session_map::const_iterator it = SessionList.begin(); it != SessionList.end(); ++it)
+			for (session_map::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 			{
 				Session *session = it->second;
 
@@ -300,7 +299,6 @@ class CommandOSException : public Command
 			int deleted = 0;
 
 			for (i = 0; i < nexceptions; ++i)
-			{
 				if (!stricmp(mask, exceptions[i].mask))
 				{
 					ExceptionDelCallback::DoDel(u, i);
@@ -308,7 +306,6 @@ class CommandOSException : public Command
 					deleted = 1;
 					break;
 				}
-			}
 			if (!deleted && i == nexceptions)
 				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask);
 		}
@@ -391,7 +388,6 @@ class CommandOSException : public Command
 			bool SentHeader = false;
 
 			for (i = 0; i < nexceptions; ++i)
-			{
 				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
 				{
 					if (!SentHeader)
@@ -403,7 +399,6 @@ class CommandOSException : public Command
 
 					ExceptionListCallback::DoList(u, i);
 				}
-			}
 
 			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
@@ -425,7 +420,6 @@ class CommandOSException : public Command
 			bool SentHeader = false;
 
 			for (i = 0; i < nexceptions; ++i)
-			{
 				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
 				{
 					if (!SentHeader)
@@ -436,7 +430,6 @@ class CommandOSException : public Command
 
 					ExceptionViewCallback::DoList(u, i);
 				}
-			}
 
 			if (!SentHeader)
 				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NO_MATCH);

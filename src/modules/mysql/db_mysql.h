@@ -1,3 +1,6 @@
+#ifndef DB_MYSQL_H
+#define DB_MYSQL_H
+
 #include "module.h"
 
 struct NickAliasFlagInfo
@@ -117,15 +120,15 @@ MemoFlagInfo MemoFlags[] = {
 #define MYSQLPP_MYSQL_HEADERS_BURIED
 #include <mysql++/mysql++.h>
 
-inline std::string SQLAssign(const mysqlpp::String& s) { return s.c_str(); }
+inline std::string SQLAssign(const mysqlpp::String &s) { return s.c_str(); }
 
 class DBMySQL;
 static DBMySQL *me;
 
-bool ExecuteQuery(mysqlpp::Query& query)
+bool ExecuteQuery(mysqlpp::Query &query)
 {
 	Alog(LOG_DEBUG) << "MySQL: " << query.str();
-	
+
 	if (!query.execute())
 	{
 		Alog() << "MySQL: error executing query: " << query.error();
@@ -135,15 +138,13 @@ bool ExecuteQuery(mysqlpp::Query& query)
 	return true;
 }
 
-mysqlpp::StoreQueryResult StoreQuery(mysqlpp::Query& query)
+mysqlpp::StoreQueryResult StoreQuery(mysqlpp::Query &query)
 {
 	Alog(LOG_DEBUG) << "MySQL: " << query.str();
 
 	mysqlpp::StoreQueryResult result = query.store();
 	if (!result)
-	{
 		Alog() << "MySQL: error executing query: " << query.error();
-	}
 	return result;
 }
 
@@ -195,7 +196,7 @@ class DBMySQL : public Module
 			delete Con;
 			throw ModuleException(Error.c_str());
 		}
-		
+
 		mysqlpp::Query query(Con);
 		query << "SET NAMES 'utf8'";
 		ExecuteQuery(query);
@@ -208,3 +209,4 @@ class DBMySQL : public Module
 	}
 };
 
+#endif // DB_MYSQL_H

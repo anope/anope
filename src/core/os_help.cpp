@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -30,7 +29,7 @@ class CommandOSHelp : public Command
 	void OnSyntaxError(User *u, const ci::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP);
-		for (CommandMap::const_iterator it = NickServ->Commands.begin(); it != NickServ->Commands.end(); ++it)
+		for (CommandMap::const_iterator it = OperServ->Commands.begin(), it_end = OperServ->Commands.end(); it != it_end; ++it)
 			it->second->OnServHelp(u);
 		notice_help(Config.s_OperServ, u, OPER_HELP_LOGGED);
 	}
@@ -43,6 +42,7 @@ class OSHelp : public Module
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(OperServ, new CommandOSHelp());
 	}
 };

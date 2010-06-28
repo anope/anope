@@ -7,9 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
+
 /*************************************************************************/
 
 #include "module.h"
@@ -119,11 +118,9 @@ class SZLineViewCallback : public SZLineListCallback
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf,
-expirebuf, x->Reason.c_str());
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf, x->Reason.c_str());
 	}
 };
-
 
 class CommandOSSZLine : public Command
 {
@@ -274,11 +271,11 @@ class CommandOSSZLine : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SZLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SZLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -313,11 +310,11 @@ class CommandOSSZLine : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0; i < SZLine->GetCount(); ++i)
+			for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SZLine->GetEntry(i);
 
-				if (mask.empty() || (mask == x->Mask || Anope::Match(x->Mask, mask)))
+				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -390,13 +387,13 @@ class OSSZLine : public Module
  public:
 	OSSZLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
+		if (!ircd->szline)
+			throw ModuleException("Your IRCd does not support ZLINEs");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(OperServ, new CommandOSSZLine());
-
-		if (!ircd->szline)
-			throw ModuleException("Your IRCd does not support ZLINEs");
 	}
 };
 

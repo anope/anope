@@ -48,10 +48,10 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 */
 	virtual ~BotInfo();
 
-	/** Change the nickname set on a bot.
+	/** Change the nickname for the bot.
 	 * @param newnick The nick to change to
 	 */
-	void ChangeNick(const char *newnick);
+	void SetNewNick(const std::string &newnick);
 
 	/** Rejoins all channels that this bot is assigned to.
 	 * Used on /kill, rename, etc.

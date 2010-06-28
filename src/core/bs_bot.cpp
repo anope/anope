@@ -245,7 +245,7 @@ class CommandBSBot : public Command
 		}
 
 		if (bi->nick != nick)
-			bi->ChangeNick(nick);
+			bi->SetNewNick(nick);
 
 		if (user && bi->GetIdent() != user)
 			bi->SetIdent(user);

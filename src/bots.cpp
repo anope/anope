@@ -74,7 +74,7 @@ BotInfo::~BotInfo()
 }
 
 
-void BotInfo::ChangeNick(const char *newnick)
+void BotInfo::SetNewNick(const std::string &newnick)
 {
 	UserListByNick.erase(this->nick.c_str());
 	BotListByNick.erase(this->nick.c_str());

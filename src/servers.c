@@ -219,9 +219,6 @@ static void delete_server(Server * serv, const char *quitreason)
 						delete [] na->last_quit;
 					na->last_quit = (quitreason ? sstrdup(quitreason) : NULL);
 				}
-					if (Config.LimitSessions && !is_ulined(u->server->name)) {
-					del_session(u->host);
-				}
 				delete u;
 			}
 			u = unext;

@@ -251,6 +251,11 @@ User::~User()
 		this->chans.front()->chan->DeleteUser(this);
 	}
 
+	if (Config.LimitSessions && !is_ulined(this->server->name))
+	{
+		del_session(this->host);
+	}
+
 	if (this->prev)
 		this->prev->next = this->next;
 	else
@@ -1059,9 +1064,6 @@ void do_quit(const char *source, int ac, const char **av)
 			delete [] na->last_quit;
 		na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
 	}
-	if (Config.LimitSessions && !is_ulined(user->server->name)) {
-		del_session(user->host);
-	}
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
 	delete user;
 }
@@ -1091,9 +1093,6 @@ void do_kill(const std::string &nick, const std::string &msg)
 		if (na->last_quit)
 			delete [] na->last_quit;
 		na->last_quit = !msg.empty() ? sstrdup(msg.c_str()) : NULL;
-	}
-	if (Config.LimitSessions && !is_ulined(user->server->name)) {
-		del_session(user->host);
 	}
 	delete user;
 }

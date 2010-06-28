@@ -557,6 +557,15 @@ int main(int ac, char **av, char **envp)
 		{
 			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
+			/* Clear all of our users */
+			User *u = firstuser();
+			while (u)
+			{
+				User *unext = nextuser();
+				delete u;
+				u = unext;
+			}
+
 			unsigned j = 0;
 			for (; j < (Config.MaxRetries ? Config.MaxRetries : j + 1); ++j)
 			{

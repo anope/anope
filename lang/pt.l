@@ -4043,11 +4043,6 @@ NICK_SERVADMIN_HELP_DROP
 	SEU GRUPO sem nenhum privilégio especial, mas desregistrar
 	QUALQUER nick é restrito aos Administradores dos Services.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Sintaxe: LIST padrão [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5093,11 +5088,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Determina se o canal poderá ter seu registro expirado.
 	Ajustando para ON, evita que o canal seja desregistrado
 	por passar do tempo de expiração.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Sintaxe: LIST padrão [FORBIDDEN] [SUSPENDED] [NOEXPIRE]

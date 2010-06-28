@@ -4139,11 +4139,6 @@ NICK_SERVADMIN_HELP_DROP
 	gerek olmadan silebilirsiniz. Bu iþlemler Servis adminleri 
 	tarafýndan yapýlabilir.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Kullanýmý: LIST model [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5167,11 +5162,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	uðramasýný engelleyecektir.
 	
 	Servis adminlerinin Kullanýmýyla sýnýrlýdýr.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Kullanýmý: LIST model [FORBIDDEN] [NOEXPIRE]

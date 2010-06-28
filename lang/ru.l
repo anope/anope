@@ -4091,11 +4091,6 @@ NICK_SERVADMIN_HELP_DROP
 	любой ник из вашей группы, не имея каких-либо особых привилегий.
 	Удалить абсолютно любой ник могут только Администраторы сервисов.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Синтаксис: LIST маска [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5198,11 +5193,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Активирование этой опции автоматически  исключит канал из условий
 	истечения его регистрации по времени. Соответственно деактивирование
 	режима вернет все на круги своя.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Синтаксис: LIST маска [FORBIDDEN] [SUSPENDED] [NOEXPIRE]

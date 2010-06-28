@@ -4192,11 +4192,6 @@ NICK_SERVADMIN_HELP_DROP
 	von der Datenbank entfernt. Du kannst jeden Nickname 
 	in deiner Gruppe ohne bestimmte Privilegien entfernen.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST Muster [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5293,11 +5288,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Ändert das NOEXPIRE-Flag an einem Channel. Wird es
 	auf ON gestellt, wird der Channel bei Nichtnutzung
 	nicht auslaufen.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Syntax: LIST Muster [FORBIDDEN] [NOEXPIRE]

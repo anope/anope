@@ -5089,11 +5089,6 @@ NICK_SERVADMIN_HELP_DROP
 	w jego grupie bez specjalnych uprawnieñ. Usuwanie
 	dowolnego nicka jest ograniczone do administratorów.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Sk³adnia: LIST wzorzec [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -6202,11 +6197,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	
 	W³±cza lub wy³±cza automatyczne usuniêcie kana³u,
 	je¶li nie bêdzie on u¿ywany.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Sk³adnia: LIST wzorzec [FORBIDDEN] [SUSPENDED] [NOEXPIRE]

@@ -4186,11 +4186,6 @@ NICK_SERVADMIN_HELP_DROP
 	d'effacer n'importe quel pseudo est cependant réservée aux 
 	Services Operators.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Syntaxe: LIST modèle [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5281,11 +5276,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	
 	Définit si le canal donné expirera. Mettre ceci sur ON
 	empêche le canal d'expirer.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Syntaxe: LIST modèle

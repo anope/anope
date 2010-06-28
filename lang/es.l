@@ -4124,11 +4124,6 @@ NICK_SERVADMIN_HELP_DROP
 	privilegios especiales. Botar cualquier nick esta
 	limitado a administradores de Servicios.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Sintaxis: LIST patron [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5227,11 +5222,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	a ON previene el canal a expirar.
 	
 	Limitado a administradores de Servicios.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Sintaxis: LIST patron [FORBIDDEN] [SUSPENDED] [NOEXPIRE]

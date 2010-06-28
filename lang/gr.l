@@ -4153,11 +4153,6 @@ NICK_SERVADMIN_HELP_DROP
 	να έχεις ξεχωριστά δικαιώματα. Το σβήσιμο του ψευδώνυμου έχουν το δικαίωμα να το 
 	κάνουν οι (επικεφαλείς) Services Operators.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Σύνταξη: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
@@ -5201,11 +5196,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	περιθώριο που σου δίνεται.
 	
 	Μόνο οι Services Operators μπορούν να το κάνουν.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Σύνταξη: LIST pattern [FORBIDDEN] [NOEXPIRE]

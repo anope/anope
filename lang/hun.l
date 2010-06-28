@@ -4064,11 +4064,6 @@ NICK_SERVADMIN_HELP_DROP
 	
 	Használat korlátozva Szervíz adminoknak.
 
-NICK_SERVADMIN_HELP_INFO
-	
-	Services Operators with the nickserv/auspex privilege may
-	use the ALL parameter with any nick.
-
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]
 	
@@ -5133,11 +5128,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	ON paranmétert megelõzi az elévülõ csatornákat.
 	
 	Korlátozva Szervíz adminnak.
-
-CHAN_SERVADMIN_HELP_INFO
-	
-	Services Operators with the chanserv/auspex permission can
-	use the ALL parameter with any channel.
 
 CHAN_SERVADMIN_HELP_LIST
 	Syntax: LIST pattern[FORBIDDEN] [SUSPENDED] [NOEXPIRE]

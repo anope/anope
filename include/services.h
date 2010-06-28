@@ -16,7 +16,6 @@
 
 /*************************************************************************/
 
-#include "version.h"
 #include "sysconf.h"
 
 #define BUFSIZE 1024
@@ -364,7 +363,7 @@ inline const std::string stringify(const T &x)
 
 	if (!(stream << x))
 		throw CoreException("Stringify fail");
-	
+
 	return stream.str();
 }
 
@@ -1055,15 +1054,9 @@ class CoreExport Anope
  private:
 	static const char * const compiled;
  public:
-	static inline const std::string Version()
-	{
-		return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA " (" + stringify(VERSION_BUILD) + ")";
-	}
+	static std::string Version();
 
-	static inline const std::string Build()
-	{
-		return "build #" + stringify(BUILD) + ", compiled " + compiled;
-	}
+	static std::string Build();
 
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)

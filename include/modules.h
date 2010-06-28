@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include "timers.h"
 #include "hashcomp.h"
-#include "version.h"
 #include "commands.h"
 
 /* Cross OS compatibility macros */
@@ -291,7 +290,7 @@ class CoreExport Module
 	 * compiled against
 	 * @return The version
 	 */
-	Version GetVersion() { return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD); }
+	Version GetVersion();
 
 	/**
 	 * Allow a module to add a set of language strings to anope

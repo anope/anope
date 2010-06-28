@@ -9,6 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>

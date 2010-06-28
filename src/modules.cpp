@@ -407,3 +407,8 @@ void ModuleRunTimeDirCleanUp()
 #endif
 	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }
+
+Version Module::GetVersion()
+{
+	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+}

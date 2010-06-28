@@ -6,7 +6,7 @@ set_target_properties(version PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLA
 # Modify version.h from the above executable, with dependencies to the given headers, version.cpp, and all source files in the main Anope build
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
   COMMAND version ${Anope_SOURCE_DIR}/src/version.sh ${CMAKE_CURRENT_SOURCE_DIR}/version.h
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/services.h ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp ${SRC_SRCS}
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp ${SRC_SRCS}
 )
 # Add version to list of files for CPack to ignore
 get_target_property(version_BINARY version LOCATION)

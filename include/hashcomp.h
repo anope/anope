@@ -28,9 +28,15 @@
 #  define unordered_map hash_map
 # endif
 #else
+# if _MSV_VER >= 1600
 /* MSVC 2010+ has tr1. Though MSVC and GCC use different includes! */
-# include <unordered_map>
-# define unordered_map_namespace std::tr1
+#  include <unordered_map>
+#  define unordered_map_namespace std::tr1
+# else
+#  include <hash_map>
+#  define unordered_map_namespace stdext
+#  define unordered_map hash_map
+# endif
 #endif
 
 /*******************************************************
@@ -488,6 +494,18 @@ class spacesepstream : public sepstream
 class CoreExport hash_compare_std_string
 {
  public:
+#if defined(_WIN32) && _MSV_VER < 1600
+	enum { bucket_size = 4, min_buckets = 8 };
+
+	/** Compare two std::string's values for hashing in hash_map
+	 * @param s1 The first string
+	 * @param s2 The second string
+	 * @return similar to strcmp, zero for equal, less than zero for str1
+	 * being less and greater than zero for str1 being greater than str2.
+	 */
+	bool operator()(const std::string &s1, const std::string &s2) const;
+#endif
+
 	/** Return a hash value for a string
 	 * @param s The string
 	 * @return The hash value
@@ -500,6 +518,17 @@ class CoreExport hash_compare_std_string
 class CoreExport hash_compare_ci_string
 {
  public:
+#if defined(_WIN32) && _MSV_VER < 1600
+	enum { bucket_size = 4, min_buckets = 8 };
+
+	/** Compare two ci::string's values for hashing in hash_map
+	 * @param s1 The first string
+	 * @param s2 The second string
+	 * @return similar to strcmp, zero for equal, less than zero for str1
+	 * being less and greater than zero for str1 being greater than str2.
+	 */
+	bool operator()(const ci::string &s1, const ci::string &s2) const;
+#endif
 	/** Return a hash value for a string using case insensitivity
 	 * @param s The string
 	 * @return The hash value
@@ -512,6 +541,17 @@ class CoreExport hash_compare_ci_string
 class CoreExport hash_compare_irc_string
 {
  public:
+#if defined(_WIN32) && _MSV_VER < 1600
+	enum { bucket_size = 4, min_buckets = 8 };
+
+	/** Compare two irc::string's values for hashing in hash_map
+	 * @param s1 The first string
+	 * @param s2 The second string
+	 * @return similar to strcmp, zero for equal, less than zero for str1
+	 * being less and greater than zero for str1 being greater than str2.
+	 */
+	bool operator()(const irc::string &s1, const irc::string &s2) const;
+#endif
 	/** Return a hash value for a string using RFC1459 case sensitivity rules
 	 * @param s The stirng
 	 * @return The hash value

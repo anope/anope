@@ -27,6 +27,8 @@
 #include <vector>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <cerrno>
 

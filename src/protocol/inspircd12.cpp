@@ -490,15 +490,21 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		c->creation_time = ts;
 
 		/* Remove status from all of our users */
-		for (CUserList::iterator it = c->users.begin(); it != c->users.end(); ++it)
+		for (std::list<Mode *>::const_iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 		{
-			UserContainer *uc = *it;
+			Mode *m = *it;
 
-			c->RemoveMode(NULL, CMODE_OWNER, uc->user->nick);
-			c->RemoveMode(NULL, CMODE_PROTECT, uc->user->nick);
-			c->RemoveMode(NULL, CMODE_OP, uc->user->nick);
-			c->RemoveMode(NULL, CMODE_HALFOP, uc->user->nick);
-			c->RemoveMode(NULL, CMODE_VOICE, uc->user->nick);
+			if (m->Type != MODE_STATUS)
+				continue;
+
+			ChannelMode *cm = dynamic_cast<ChannelMode *>(m);
+
+			for (CUserList::const_iterator uit = c->users.begin(), uit_end = c->users.end(); uit != uit_end; ++uit)
+			{
+				UserContainer *uc = *uit;
+
+				c->RemoveMode(NULL, cm, uc->user->nick);
+			}
 		}
 		if (c->ci)
 		{

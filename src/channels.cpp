@@ -1201,8 +1201,6 @@ void do_part(const char *source, int ac, const char **av)
 		if (!c)
 			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
 
-		Alog(LOG_DEBUG) << source << " leaves " << buf;
-
 		if (user->FindChannel(c))
 		{
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c));

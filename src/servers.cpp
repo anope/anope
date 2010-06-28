@@ -115,6 +115,11 @@ Server::~Server()
 		Alog(LOG_DEBUG) << "Finished removing all users for " << GetName();
 	}
 
+	if (UplinkServer)
+	{
+		UplinkServer->DelLink(this);
+	}
+
 	if (Links)
 	{
 		for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)

@@ -258,13 +258,13 @@ else
 // Functions
 
 function FindAnopeVersion() {
-	if (!fso.FileExists(ScriptPath + 'src\\version'))
+	if (!fso.FileExists(ScriptPath + 'src\\version.sh'))
 	{
 		anopeVersion = 'Unknown';
 		return;
 	}
 
-	var versionLog = fso.OpenTextFile(ScriptPath + 'src\\version');
+	var versionLog = fso.OpenTextFile(ScriptPath + 'src\\version.sh');
 	while (!versionLog.atEndOfStream)
 	{
 		var versionLine = versionLog.readline();

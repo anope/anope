@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
 
 	fstream fd;
 
+	fd.clear();
 	fd.open(argv[1], ios::in);
 	if (!fd.is_open())
 	{
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
 
 	fd.close();
 
+	fd.clear();
 	fd.open(argv[2], ios::in);
 
 	string version_build = "#define VERSION_BUILD	1";
@@ -84,6 +86,7 @@ int main(int argc, char *argv[])
 		fd.close();
 	}
 
+	fd.clear();
 	fd.open(argv[2], ios::out);
 
 	if (!fd.is_open())

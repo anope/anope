@@ -221,6 +221,9 @@ User::~User()
 
 	while (!this->chans.empty())
 		this->chans.front()->chan->DeleteUser(this);
+	
+	if (Config.LimitSessions && !this->server->IsULined())
+		del_session(this->host);
 
 	UserListByNick.erase(this->nick.c_str());
 	if (!this->uid.empty())
@@ -939,8 +942,6 @@ void do_quit(const char *source, int ac, const char **av)
 			delete [] na->last_quit;
 		na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
 	}
-	if (Config.LimitSessions && !user->server->IsULined())
-		del_session(user->host);
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
 	delete user;
 }
@@ -971,8 +972,6 @@ void do_kill(const std::string &nick, const std::string &msg)
 			delete [] na->last_quit;
 		na->last_quit = !msg.empty() ? sstrdup(msg.c_str()) : NULL;
 	}
-	if (Config.LimitSessions && !user->server->IsULined())
-		del_session(user->host);
 	delete user;
 }
 

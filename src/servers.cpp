@@ -105,9 +105,6 @@ Server::~Server()
 					na->last_quit = (!QReason.empty() ? sstrdup(QReason.c_str()) : NULL);
 				}
 
-				if (Config.LimitSessions && !u->server->IsULined())
-					del_session(u->host);
-
 				delete u;
 			}
 		}

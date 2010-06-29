@@ -8,7 +8,6 @@
 
 #include "modules.h"
 #include "language.h"
-#include "version.h"
 
 Module::Module(const std::string &mname, const std::string &creator)
 {

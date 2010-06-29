@@ -17,41 +17,41 @@
 #include "modules.h"
 
 IRCDVar myIrcd[] = {
-	{"Bahamut 1.8.x", /* ircd name */
-	 "+",					   /* Modes used by pseudoclients */
-	 2,						 /* Chan Max Symbols	 */
-	 "+o",					  /* Channel Umode used by Botserv bots */
-	 1,						 /* SVSNICK */
-	 0,						 /* Vhost  */
-	 1,						 /* Supports SNlines	 */
-	 1,						 /* Supports SQlines	 */
-	 1,						 /* Supports SZlines	 */
-	 3,						 /* Number of server args */
-	 0,						 /* Join 2 Set		   */
-	 0,						 /* Join 2 Message	   */
-	 0,						 /* TS Topic Forward	 */
-	 0,						 /* TS Topci Backward	*/
-	 1,						 /* Chan SQlines		 */
-	 1,						 /* Quit on Kill		 */
-	 1,						 /* SVSMODE unban		*/
-	 0,						 /* Reverse			  */
-	 0,						 /* vidents			  */
-	 1,						 /* svshold			  */
-	 1,						 /* time stamp on mode   */
-	 1,						 /* NICKIP			   */
-	 0,						 /* O:LINE			   */
-	 1,						 /* UMODE			   */
-	 0,						 /* VHOST ON NICK		*/
-	 0,						 /* Change RealName	  */
-	 1,						 /* No Knock requires +i */
-	 0,						 /* We support TOKENS */
-	 0,						 /* TIME STAMPS are BASE64 */
-	 0,						 /* Can remove User Channel Modes with SVSMODE */
-	 0,						 /* Sglines are not enforced until user reconnects */
-	 0,						 /* ts6 */
-	 0,						 /* p10 */
-	 0,						 /* CIDR channelbans */
-	 "$",					   /* TLD Prefix for Global */
+	{"Bahamut 1.8.x",	/* ircd name */
+	 "+",				/* Modes used by pseudoclients */
+	 2,					/* Chan Max Symbols */
+	 "+o",				/* Channel Umode used by Botserv bots */
+	 1,					/* SVSNICK */
+	 0,					/* Vhost */
+	 1,					/* Supports SNlines */
+	 1,					/* Supports SQlines */
+	 1,					/* Supports SZlines */
+	 3,					/* Number of server args */
+	 0,					/* Join 2 Set */
+	 0,					/* Join 2 Message */
+	 0,					/* TS Topic Forward */
+	 0,					/* TS Topci Backward */
+	 1,					/* Chan SQlines */
+	 1,					/* Quit on Kill */
+	 1,					/* SVSMODE unban */
+	 0,					/* Reverse */
+	 0,					/* vidents */
+	 1,					/* svshold */
+	 1,					/* time stamp on mode */
+	 1,					/* NICKIP */
+	 0,					/* O:LINE */
+	 1,					/* UMODE */
+	 0,					/* VHOST ON NICK */
+	 0,					/* Change RealName */
+	 1,					/* No Knock requires +i */
+	 0,					/* We support TOKENS */
+	 0,					/* TIME STAMPS are BASE64 */
+	 0,					/* Can remove User Channel Modes with SVSMODE */
+	 0,					/* Sglines are not enforced until user reconnects */
+	 0,					/* ts6 */
+	 0,					/* p10 */
+	 0,					/* CIDR channelbans */
+	 "$",				/* TLD Prefix for Global */
 	 6,					/* Max number of modes we can send per line */
 	 }
 	,
@@ -85,24 +85,22 @@ void bahamut_cmd_pass(const char *pass)
 /* CAPAB */
 void bahamut_cmd_capab()
 {
-	send_cmd(NULL,
-			 "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
+	send_cmd(NULL, "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
 }
 
 /* this avoids "undefined symbol" messages of those whom try to load mods that
    call on this function */
 void bahamut_cmd_chghost(const char *nick, const char *vhost)
 {
-		Alog(LOG_DEBUG) << "This IRCD does not support vhosting";
+	Alog(LOG_DEBUG) << "This IRCD does not support vhosting";
 }
-
-
 
 class BahamutIRCdProto : public IRCDProto
 {
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		if (Capab.HasFlag(CAPAB_TSMODE))
 			send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf);
 		else
@@ -111,7 +109,8 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf);
 	}
 
@@ -136,8 +135,10 @@ class BahamutIRCdProto : public IRCDProto
 	/* SVSMODE channel modes */
 	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode, nick);
-		else send_cmd(Config.ServerName, "SVSMODE %s %s", c->name.c_str(), mode);
+		if (nick)
+			send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode, nick);
+		else
+			send_cmd(Config.ServerName, "SVSMODE %s %s", c->name.c_str(), mode);
 	}
 
 	/* SQLINE */
@@ -210,7 +211,8 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - time(NULL);
-		if (timeleft > 172800) timeleft = 172800;
+		if (timeleft > 172800)
+			timeleft = 172800;
 		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
@@ -241,14 +243,17 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(NULL, "NOTICE @%s :%s", dest->name.c_str(), buf);
 	}
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
-		else send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
+		if (buf)
+			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		else
+			send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
 	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
@@ -299,9 +304,7 @@ class BahamutIRCdProto : public IRCDProto
 		u->SetMode(bi, UMODE_REGISTERED);
 		ircdproto->SendMode(bi, u, "+d %s", svidbuf);
 	}
-
 } ircd_proto;
-
 
 /* EVENT: SJOIN */
 int anope_event_sjoin(const char *source, int ac, const char **av)
@@ -353,11 +356,11 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 	else
 		keep_their_modes = false;
-	
+
 	/* Mark the channel as syncing */
 	if (was_created)
 		c->SetFlag(CH_SYNCING);
-	
+
 	/* If we need to keep their modes, and this SJOIN string contains modes */
 	if (keep_their_modes && ac >= 4)
 	{
@@ -372,9 +375,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 	{
 		User *u = finduser(source);
 		if (!u)
-		{
 			Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
-		}
 		else
 		{
 			EventReturn MOD_RESULT;
@@ -436,10 +437,8 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			/* Update their status internally on the channel
 			 * This will enforce secureops etc on the user
 			 */
-			for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
-			{
+			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
 				c->SetModeInternal(*it, buf);
-			}
 
 			/* Now set whatever modes this user is allowed to have on the channel */
 			chan_set_correct_modes(u, c, 1);
@@ -494,11 +493,11 @@ int anope_event_nick(const char *source, int ac, const char **av)
 {
 	User *user;
 
-	if (ac != 2) {
-		user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
-					   strtoul(av[2], NULL, 10), strtoul(av[8], NULL, 0),
-					   NULL, NULL);
-		if (user) {
+	if (ac != 2)
+	{
+		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], strtoul(av[2], NULL, 10), strtoul(av[8], NULL, 0), NULL, NULL);
+		if (user)
+		{
 			/* Check to see if the user should be identified because their
 			 * services id matches the one in their nickcore
 			 */
@@ -506,10 +505,9 @@ int anope_event_nick(const char *source, int ac, const char **av)
 
 			UserSetInternalModes(user, 1, &av[3]);
 		}
-	} else {
-		do_nick(source, av[0], NULL, NULL, NULL, NULL,
-				strtoul(av[1], NULL, 10), 0, NULL, NULL);
 	}
+	else
+		do_nick(source, av[0], NULL, NULL, NULL, NULL, strtoul(av[1], NULL, 10), 0, NULL, NULL);
 	return MOD_CONT;
 }
 
@@ -600,9 +598,8 @@ int anope_event_part(const char *source, int ac, const char **av)
 
 int anope_event_whois(const char *source, int ac, const char **av)
 {
-	if (source && ac >= 1) {
+	if (source && ac >= 1)
 		m_whois(source, av[0]);
-	}
 	return MOD_CONT;
 }
 
@@ -636,11 +633,10 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (ac < 2)
 		return MOD_CONT;
 
-	if (*av[0] == '#' || *av[0] == '&') {
+	if (*av[0] == '#' || *av[0] == '&')
 		do_cmode(source, ac, av);
-	} else {
+	else
 		do_umode(source, ac, av);
-	}
 	return MOD_CONT;
 }
 
@@ -675,9 +671,8 @@ int anope_event_join(const char *source, int ac, const char **av)
 /* EVENT: MOTD */
 int anope_event_motd(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 
 	m_motd(source);
 	return MOD_CONT;
@@ -685,9 +680,8 @@ int anope_event_motd(const char *source, int ac, const char **av)
 
 int anope_event_away(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 	m_away(source, (ac ? av[0] : NULL));
 	return MOD_CONT;
 }
@@ -711,9 +705,12 @@ int anope_event_burst(const char *source, int ac, const char **av)
 {
 	Server *s = Server::Find(source ? source : "");
 
-	if (!ac) {
+	if (!ac)
+	{
 		/* for future use  - start burst */
-	} else {
+	}
+	else
+	{
 		/* If we found a server with the given source, that one just
 		 * finished bursting. If there was no source, then our uplink
 		 * server finished bursting. -GD

@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 #include "services.h"
@@ -17,42 +15,42 @@
 static char *TS6UPLINK = NULL; // XXX is this needed?
 
 IRCDVar myIrcd[] = {
-	{"Ratbox 2.0+",			 /* ircd name */
-	 "+oi",					 /* Modes used by pseudoclients */
-	 2,						 /* Chan Max Symbols	 */
-	 "+o",					  /* Channel Umode used by Botserv bots */
-	 0,						 /* SVSNICK */
-	 0,						 /* Vhost  */
-	 1,						 /* Supports SNlines	 */
-	 1,						 /* Supports SQlines	 */
-	 0,						 /* Supports SZlines	 */
-	 3,						 /* Number of server args */
-	 1,						 /* Join 2 Set		   */
-	 1,						 /* Join 2 Message	   */
-	 0,						 /* TS Topic Forward	 */
-	 0,						 /* TS Topci Backward	*/
-	 1,						 /* Chan SQlines		 */
-	 0,						 /* Quit on Kill		 */
-	 0,						 /* SVSMODE unban		*/
-	 0,						 /* Reverse			  */
-	 0,						 /* vidents			  */
-	 0,						 /* svshold			  */
-	 0,						 /* time stamp on mode   */
-	 0,						 /* NICKIP			   */
-	 0,						 /* UMODE				*/
-	 0,						 /* O:LINE			   */
-	 0,						 /* VHOST ON NICK		*/
-	 0,						 /* Change RealName	  */
-	 0,						 /* No Knock requires +i */
-	 0,						 /* We support TOKENS */
-	 0,						 /* TIME STAMPS are BASE64 */
-	 0,						 /* Can remove User Channel Modes with SVSMODE */
-	 0,						 /* Sglines are not enforced until user reconnects */
-	 1,						 /* ts6 */
-	 0,						 /* p10 */
-	 0,						 /* CIDR channelbans */
-	 "$$",					  /* TLD Prefix for Global */
-	 4,					/* Max number of modes we can send per line */
+	{"Ratbox 2.0+",	/* ircd name */
+	 "+oi",			/* Modes used by pseudoclients */
+	 2,				/* Chan Max Symbols */
+	 "+o",			/* Channel Umode used by Botserv bots */
+	 0,				/* SVSNICK */
+	 0,				/* Vhost */
+	 1,				/* Supports SNlines */
+	 1,				/* Supports SQlines */
+	 0,				/* Supports SZlines */
+	 3,				/* Number of server args */
+	 1,				/* Join 2 Set */
+	 1,				/* Join 2 Message */
+	 0,				/* TS Topic Forward */
+	 0,				/* TS Topci Backward */
+	 1,				/* Chan SQlines */
+	 0,				/* Quit on Kill */
+	 0,				/* SVSMODE unban */
+	 0,				/* Reverse */
+	 0,				/* vidents */
+	 0,				/* svshold */
+	 0,				/* time stamp on mode */
+	 0,				/* NICKIP */
+	 0,				/* UMODE */
+	 0,				/* O:LINE */
+	 0,				/* VHOST ON NICK */
+	 0,				/* Change RealName */
+	 0,				/* No Knock requires +i */
+	 0,				/* We support TOKENS */
+	 0,				/* TIME STAMPS are BASE64 */
+	 0,				/* Can remove User Channel Modes with SVSMODE */
+	 0,				/* Sglines are not enforced until user reconnects */
+	 1,				/* ts6 */
+	 0,				/* p10 */
+	 0,				/* CIDR channelbans */
+	 "$$",			/* TLD Prefix for Global */
+	 4,				/* Max number of modes we can send per line */
 	 }
 	,
 	{NULL}
@@ -73,7 +71,6 @@ void ratbox_cmd_svinfo()
 
 void ratbox_cmd_svsinfo()
 {
-
 }
 
 void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
@@ -82,14 +79,14 @@ void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...
 	char buf[BUFSIZE];
 	*buf = '\0';
 
-	if (fmt) {
+	if (fmt)
+	{
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	if (!*buf) {
+	if (!*buf)
 		return;
-	}
 
 	send_cmd(NULL, "MODE %s %s", dest, buf);
 }
@@ -116,8 +113,7 @@ void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...
 */
 void ratbox_cmd_capab()
 {
-	send_cmd(NULL,
-			 "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP");
+	send_cmd(NULL, "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP");
 }
 
 /* PASS */
@@ -224,22 +220,23 @@ class RatboxProto : public IRCDTS6Proto
 	void SendModeInternal(BotInfo *bi, Channel *dest, const char *buf)
 	{
 		if (bi)
-		{
 			send_cmd(bi->GetUID(), "MODE %s %s", dest->name.c_str(), buf);
-		}
 		else send_cmd(TS6SID, "MODE %s %s", dest->name.c_str(), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(bi ? bi->GetUID() : TS6SID, "SVSMODE %s %s", u->nick.c_str(), buf);
 	}
 
 	void SendKickInternal(BotInfo *bi, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(bi->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
-		else send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
+		if (buf)
+			send_cmd(bi->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf);
+		else
+			send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
@@ -250,8 +247,10 @@ class RatboxProto : public IRCDTS6Proto
 	/* QUIT */
 	void SendQuitInternal(BotInfo *bi, const char *buf)
 	{
-		if (buf) send_cmd(bi->GetUID(), "QUIT :%s", buf);
-		else send_cmd(bi->GetUID(), "QUIT");
+		if (buf)
+			send_cmd(bi->GetUID(), "QUIT :%s", buf);
+		else
+			send_cmd(bi->GetUID(), "QUIT");
 	}
 
 	/* INVITE */
@@ -274,7 +273,8 @@ class RatboxProto : public IRCDTS6Proto
 	int IsNickValid(const char *nick)
 	{
 		/* TS6 Save extension -Certus */
-		if (isdigit(*nick)) return 0;
+		if (isdigit(*nick))
+			return 0;
 		return 1;
 	}
 
@@ -295,11 +295,7 @@ class RatboxProto : public IRCDTS6Proto
 		u->Account()->Shrink("authenticationtoken");
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
 	}
-
 } ircd_proto;
-
-
-
 
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
@@ -350,11 +346,11 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 	else
 		keep_their_modes = false;
-	
+
 	/* Mark the channel as syncing */
 	if (was_created)
 		c->SetFlag(CH_SYNCING);
-	
+
 	/* If we need to keep their modes, and this SJOIN string contains modes */
 	if (keep_their_modes && ac >= 4)
 	{
@@ -400,10 +396,8 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 		/* Update their status internally on the channel
 		 * This will enforce secureops etc on the user
 		 */
-		for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
-		{
+		for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
 			c->SetModeInternal(*it, buf);
-		}
 
 		/* Now set whatever modes this user is allowed to have on the channel */
 		chan_set_correct_modes(u, c, 1);
@@ -467,8 +461,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
 	{
 		Server *s = Server::Find(source ? source : "");
 		/* Source is always the server */
-		user = do_nick("", av[0], av[4], av[5], s->GetName().c_str(), av[8],
-					   strtoul(av[2], NULL, 10), 0, "*", av[7]);
+		user = do_nick("", av[0], av[4], av[5], s->GetName().c_str(), av[8], strtoul(av[2], NULL, 10), 0, "*", av[7]);
 		if (user)
 		{
 			/* No usermode +d on ratbox so we use
@@ -478,13 +471,9 @@ int anope_event_nick(const char *source, int ac, const char **av)
 
 			UserSetInternalModes(user, 1, &av[3]);
 		}
-	} else {
-		if (ac == 2)
-		{
-			do_nick(source, av[0], NULL, NULL, NULL, NULL,
-					strtoul(av[1], NULL, 10), 0, NULL, NULL);
-		}
 	}
+	else if (ac == 2)
+		do_nick(source, av[0], NULL, NULL, NULL, NULL, strtoul(av[1], NULL, 10), 0, NULL, NULL);
 	return MOD_CONT;
 }
 
@@ -492,13 +481,15 @@ int anope_event_topic(const char *source, int ac, const char **av)
 {
 	User *u;
 
-	if (ac == 4) {
+	if (ac == 4)
 		do_topic(source, ac, av);
-	} else {
+	else
+	{
 		Channel *c = findchan(av[0]);
 		time_t topic_time = time(NULL);
 
-		if (!c) {
+		if (!c)
+		{
 			Alog(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 			return MOD_CONT;
 		}
@@ -506,7 +497,8 @@ int anope_event_topic(const char *source, int ac, const char **av)
 		if (check_topiclock(c, topic_time))
 			return MOD_CONT;
 
-		if (c->topic) {
+		if (c->topic)
+		{
 			delete [] c->topic;
 			c->topic = NULL;
 		}
@@ -519,10 +511,12 @@ int anope_event_topic(const char *source, int ac, const char **av)
 
 		record_topic(av[0]);
 
-		if (ac > 1 && *av[1]) {
+		if (ac > 1 && *av[1])
+		{
 			FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[1]));
 		}
-		else {
+		else
+		{
 			FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, ""));
 		}
 	}
@@ -535,16 +529,15 @@ int anope_event_tburst(const char *source, int ac, const char **av)
 	Channel *c;
 	time_t topic_time;
 
-	if (ac != 4) {
+	if (ac != 4)
 		return MOD_CONT;
-	}
 
 	setter = myStrGetToken(av[2], '!', 0);
 
 	c = findchan(av[0]);
 	topic_time = strtol(av[1], NULL, 10);
 
-	if (!c) 
+	if (!c)
 	{
 		Alog(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		if (setter)
@@ -552,13 +545,15 @@ int anope_event_tburst(const char *source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	if (check_topiclock(c, topic_time)) {
+	if (check_topiclock(c, topic_time))
+	{
 		if (setter)
 			delete [] setter;
 		return MOD_CONT;
 	}
 
-	if (c->topic) {
+	if (c->topic)
+	{
 		delete [] c->topic;
 		c->topic = NULL;
 	}
@@ -582,7 +577,6 @@ int anope_event_436(const char *source, int ac, const char **av)
 	m_nickcoll(av[0]);
 	return MOD_CONT;
 }
-
 
 int anope_event_ping(const char *source, int ac, const char **av)
 {
@@ -620,20 +614,20 @@ int anope_event_kick(const char *source, int ac, const char **av)
 
 int anope_event_join(const char *source, int ac, const char **av)
 {
-	if (ac != 1) {
+	if (ac != 1)
+	{
 		anope_event_sjoin(source, ac, av);
 		return MOD_CONT;
-	} else {
-		do_join(source, ac, av);
 	}
+	else
+		do_join(source, ac, av);
 	return MOD_CONT;
 }
 
 int anope_event_motd(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 
 	m_motd(source);
 	return MOD_CONT;
@@ -644,9 +638,8 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
 	User *u;
 	BotInfo *bi;
 
-	if (ac != 2) {
+	if (ac != 2)
 		return MOD_CONT;
-	}
 
 	u = finduser(source);
 	bi = findbot(av[0]);
@@ -659,9 +652,8 @@ int anope_event_part(const char *source, int ac, const char **av)
 {
 	User *u;
 
-	if (ac < 1 || ac > 2) {
+	if (ac < 1 || ac > 2)
 		return MOD_CONT;
-	}
 
 	u = finduser(source);
 	do_part(u ? u->nick.c_str() : source, ac, av);
@@ -673,7 +665,8 @@ int anope_event_whois(const char *source, int ac, const char **av)
 {
 	BotInfo *bi;
 
-	if (source && ac >= 1) {
+	if (source && ac >= 1)
+	{
 		bi = findbot(av[0]);
 		m_whois(source, bi->GetUID().c_str());
 	}
@@ -683,15 +676,15 @@ int anope_event_whois(const char *source, int ac, const char **av)
 /* EVENT: SERVER */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-	if (!stricmp(av[1], "1")) {
-		if (TS6UPLINK) {
+	if (!stricmp(av[1], "1"))
+	{
+		if (TS6UPLINK)
 			do_server(source, av[0], atoi(av[1]), av[2], TS6UPLINK);
-		} else {
+		else
 			do_server(source, av[0], atoi(av[1]), av[2], "");
-		}
-	} else {
-		do_server(source, av[0], atoi(av[1]), av[2], "");
 	}
+	else
+		do_server(source, av[0], atoi(av[1]), av[2], "");
 	return MOD_CONT;
 }
 
@@ -717,9 +710,8 @@ int anope_event_quit(const char *source, int ac, const char **av)
 {
 	User *u;
 
-	if (ac != 1) {
+	if (ac != 1)
 		return MOD_CONT;
-	}
 
 	u = finduser(source);
 
@@ -731,13 +723,13 @@ int anope_event_mode(const char *source, int ac, const char **av)
 {
 	User *u, *u2;
 
-	if (ac < 2) {
+	if (ac < 2)
 		return MOD_CONT;
-	}
 
-	if (*av[0] == '#' || *av[0] == '&') {
+	if (*av[0] == '#' || *av[0] == '&')
 		do_cmode(source, ac, av);
-	} else {
+	else
+	{
 		u = finduser(source);
 		u2 = finduser(av[0]);
 		av[0] = u2->nick.c_str();
@@ -748,9 +740,8 @@ int anope_event_mode(const char *source, int ac, const char **av)
 
 int anope_event_tmode(const char *source, int ac, const char **av)
 {
-	if (*av[1] == '#' || *av[1] == '&') {
+	if (*av[1] == '#' || *av[1] == '&')
 		do_cmode(source, ac, av);
-	}
 	return MOD_CONT;
 }
 
@@ -779,20 +770,25 @@ int anope_event_bmask(const char *source, int ac, const char **av)
 	/*			 0		  1	  2   3			*/
 	c = findchan(av[1]);
 
-	if (c) {
+	if (c)
+	{
 		bans = sstrdup(av[3]);
 		count = myNumToken(bans, ' ');
-		for (i = 0; i <= count - 1; i++) {
+		for (i = 0; i <= count - 1; ++i)
+		{
 			b = myStrGetToken(bans, ' ', i);
-			if (!stricmp(av[2], "b")) {
+			if (!stricmp(av[2], "b"))
+			{
 				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('b'));
 				cms->AddMask(c, b);
 			}
-			if (!stricmp(av[2], "e")) {
+			if (!stricmp(av[2], "e"))
+			{
 				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('e'));
 				cms->AddMask(c, b);
 			}
-			if (!stricmp(av[2], "I")) {
+			if (!stricmp(av[2], "I"))
+			{
 				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('I'));
 				cms->AddMask(c, b);
 			}

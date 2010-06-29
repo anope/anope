@@ -141,7 +141,9 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const ci::string &command, co
 	ret = c->Execute(u, params);
 
 	if (ret == MOD_CONT)
+	{
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name.c_str(), params));
+	}
 }
 
 /**

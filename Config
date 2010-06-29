@@ -205,7 +205,7 @@ if [ ! "$NO_INTRO" ] ; then
 			clear
 			;;
 	esac
-	. src/version.sh
+	. $SOURCE_DIR/src/version.sh
 	if [ -d .git ] ; then
 		VERSION=`git describe --tags`
 		echo "#define VERSION_BUILD	`echo "$VERSION" | cut -d'-' -f2`" > include/version.h

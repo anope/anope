@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 /*************************************************************************/
@@ -17,41 +15,41 @@
 #include "modules.h"
 
 IRCDVar myIrcd[] = {
-	{"UnrealIRCd 3.2.x",		/* ircd name */
-	 "+Soi",					/* Modes used by pseudoclients */
-	 5,						 /* Chan Max Symbols	 */
-	 "+ao",					 /* Channel Umode used by Botserv bots */
-	 1,						 /* SVSNICK */
-	 1,						 /* Vhost  */
-	 1,						 /* Supports SNlines	 */
-	 1,						 /* Supports SQlines	 */
-	 1,						 /* Supports SZlines	 */
-	 3,						 /* Number of server args */
-	 0,						 /* Join 2 Set		   */
-	 0,						 /* Join 2 Message	   */
-	 1,						 /* TS Topic Forward	 */
-	 0,						 /* TS Topci Backward	*/
-	 0,						 /* Chan SQlines		 */
-	 0,						 /* Quit on Kill		 */
-	 1,						 /* SVSMODE unban		*/
-	 1,						 /* Reverse			  */
-	 1,						 /* vidents			  */
-	 1,						 /* svshold			  */
-	 1,						 /* time stamp on mode   */
-	 1,						 /* NICKIP			   */
-	 1,						 /* O:LINE			   */
-	 1,						 /* UMODE			   */
-	 1,						 /* VHOST ON NICK		*/
-	 1,						 /* Change RealName	  */
-	 1,						 /* No Knock requires +i */
-	 1,						 /* We support Unreal TOKENS */
-	 1,						 /* TIME STAMPS are BASE64 */
-	 1,						 /* Can remove User Channel Modes with SVSMODE */
-	 0,						 /* Sglines are not enforced until user reconnects */
-	 0,						 /* ts6 */
-	 0,						 /* p10 */
-	 0,						 /* CIDR channelbans */
-	 "$",					   /* TLD Prefix for Global */
+	{"UnrealIRCd 3.2.x",	/* ircd name */
+	 "+Soi",				/* Modes used by pseudoclients */
+	 5,						/* Chan Max Symbols */
+	 "+ao",					/* Channel Umode used by Botserv bots */
+	 1,						/* SVSNICK */
+	 1,						/* Vhost */
+	 1,						/* Supports SNlines */
+	 1,						/* Supports SQlines */
+	 1,						/* Supports SZlines */
+	 3,						/* Number of server args */
+	 0,						/* Join 2 Set */
+	 0,						/* Join 2 Message */
+	 1,						/* TS Topic Forward */
+	 0,						/* TS Topci Backward */
+	 0,						/* Chan SQlines */
+	 0,						/* Quit on Kill */
+	 1,						/* SVSMODE unban */
+	 1,						/* Reverse */
+	 1,						/* vidents */
+	 1,						/* svshold */
+	 1,						/* time stamp on mode */
+	 1,						/* NICKIP */
+	 1,						/* O:LINE */
+	 1,						/* UMODE */
+	 1,						/* VHOST ON NICK */
+	 1,						/* Change RealName */
+	 1,						/* No Knock requires +i */
+	 1,						/* We support Unreal TOKENS */
+	 1,						/* TIME STAMPS are BASE64 */
+	 1,						/* Can remove User Channel Modes with SVSMODE */
+	 0,						/* Sglines are not enforced until user reconnects */
+	 0,						/* ts6 */
+	 0,						/* p10 */
+	 0,						/* CIDR channelbans */
+	 "$",					/* TLD Prefix for Global */
 	 12,					/* Max number of modes we can send per line */
 	 }
 	,
@@ -72,31 +70,28 @@ void unreal_cmd_netinfo(int ac, const char **av)
 {
 	send_cmd(NULL, "AO %ld %ld %d %s 0 0 0 :%s", static_cast<long>(maxusercnt), static_cast<long>(time(NULL)), atoi(av[2]), av[3], av[7]);
 }
+
 /* PROTOCTL */
 /*
    NICKv2 = Nick Version 2
-   VHP	= Sends hidden host
+   VHP    = Sends hidden host
    UMODE2 = sends UMODE2 on user modes
    NICKIP = Sends IP on NICK
    TOKEN  = Use tokens to talk
-   SJ3	= Supports SJOIN
+   SJ3    = Supports SJOIN
    NOQUIT = No Quit
    TKLEXT = Extended TKL we don't use it but best to have it
    SJB64  = Base64 encoded time stamps
-   VL	 = Version Info
-   NS	 = Config.Numeric Server
+   VL     = Version Info
+   NS     = Config.Numeric Server
 
 */
 void unreal_cmd_capab()
 {
 	if (Config.Numeric)
-	{
 		send_cmd(NULL, "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
-	}
 	else
-	{
 		send_cmd(NULL, "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
-	}
 }
 
 /* PASS */
@@ -108,22 +103,18 @@ void unreal_cmd_pass(const char *pass)
 /* CHGHOST */
 void unreal_cmd_chghost(const char *nick, const char *vhost)
 {
-	if (!nick || !vhost) {
+	if (!nick || !vhost)
 		return;
-	}
 	send_cmd(Config.ServerName, "AL %s %s", nick, vhost);
 }
 
 /* CHGIDENT */
 void unreal_cmd_chgident(const char *nick, const char *vIdent)
 {
-	if (!nick || !vIdent) {
+	if (!nick || !vIdent)
 		return;
-	}
 	send_cmd(Config.ServerName, "AZ %s %s", nick, vIdent);
 }
-
-
 
 class UnrealIRCdProto : public IRCDProto
 {
@@ -157,7 +148,8 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - time(NULL);
-		if (timeleft > 172800) timeleft = 172800;
+		if (timeleft > 172800)
+			timeleft = 172800;
 		send_cmd(NULL, "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL) + timeleft), static_cast<long>(x->Expires), x->Reason.c_str());
 	}
 
@@ -175,21 +167,25 @@ class UnrealIRCdProto : public IRCDProto
 	 */
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		if (ac >= 1) {
-			if (!u || !av[0]) return;
+		if (ac >= 1)
+		{
+			if (!u || !av[0])
+				return;
 			this->SendModeInternal(NULL, u, merge_args(ac, av));
 		}
 	}
 
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(source->nick, "G %s %s", dest->name.c_str(), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(bi ? bi->nick : Config.ServerName, "v %s %s", u->nick.c_str(), buf);
 	}
 
@@ -201,13 +197,16 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "H %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
-		else send_cmd(source->nick, "H %s %s", chan->name.c_str(), user->nick.c_str());
+		if (buf)
+			send_cmd(source->nick, "H %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		else
+			send_cmd(source->nick, "H %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(source->nick, "B @%s :%s", dest->name.c_str(), buf);
 	}
 
@@ -234,7 +233,6 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(NULL, "d %s", x->Mask.c_str());
 	}
 
-
 	/* SQLINE */
 	/*
 	** - Unreal will translate this to TKL for us
@@ -253,14 +251,16 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSVSO(const char *source, const char *nick, const char *flag)
 	{
-		if (!source || !nick || !flag) return;
+		if (!source || !nick || !flag)
+			return;
 		send_cmd(source, "BB %s %s", nick, flag);
 	}
 
 	/* NICK <newnick>  */
 	void SendChangeBotNick(BotInfo *oldnick, const char *newnick)
 	{
-		if (!oldnick || !newnick) return;
+		if (!oldnick || !newnick)
+			return;
 		send_cmd(oldnick->nick, "& %s %ld", newnick, static_cast<long>(time(NULL)));
 	}
 
@@ -268,7 +268,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhost(User *u, const std::string &vIdent, const std::string &vhost)
 	{
-		if (!vIdent.empty()) 
+		if (!vIdent.empty())
 			unreal_cmd_chgident(u->nick.c_str(), vIdent.c_str());
 		if (!vhost.empty())
 			unreal_cmd_chghost(u->nick.c_str(), vhost.c_str());
@@ -285,8 +285,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(NULL, "BD + Q H %s %s %ld %ld :%s", nick, Config.ServerName, static_cast<long>(time(NULL) + Config.NSReleaseTimeout),
-			static_cast<long>(time(NULL)), "Being held for registered user");
+		send_cmd(NULL, "BD + Q H %s %s %ld %ld :%s", nick, Config.ServerName, static_cast<long>(time(NULL) + Config.NSReleaseTimeout), static_cast<long>(time(NULL)), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
@@ -334,13 +333,14 @@ class UnrealIRCdProto : public IRCDProto
 		SendSVSModeChan(c, "-b", nick.empty() ? NULL : nick.c_str());
 	}
 
-
 	/* SVSMODE channel modes */
 
 	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(Config.ServerName, "n %s %s %s", c->name.c_str(), mode, nick);
-		else send_cmd(Config.ServerName, "n %s %s", c->name.c_str(), mode);
+		if (nick)
+			send_cmd(Config.ServerName, "n %s %s %s", c->name.c_str(), mode, nick);
+		else
+			send_cmd(Config.ServerName, "n %s %s", c->name.c_str(), mode);
 	}
 
 	/* svsjoin
@@ -354,8 +354,10 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 	{
-		if (param) send_cmd(source, "BX %s %s :%s", nick, chan, param);
-		else send_cmd(source, "BX %s :%s", nick, chan);
+		if (param)
+			send_cmd(source, "BX %s %s :%s", nick, chan, param);
+		else
+			send_cmd(source, "BX %s :%s", nick, chan);
 	}
 
 	/* svspart
@@ -391,7 +393,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	int IsChannelValid(const char *chan)
 	{
-		if (strchr(chan, ':') || *chan != '#') return 0;
+		if (strchr(chan, ':') || *chan != '#')
+			return 0;
 		return 1;
 	}
 
@@ -419,10 +422,7 @@ class UnrealIRCdProto : public IRCDProto
 		u->RemoveMode(bi, UMODE_REGISTERED);
 		ircdproto->SendMode(bi, u, "+d 1");
 	}
-
 } ircd_proto;
-
-
 
 /* Event: PROTOCTL */
 int anope_event_capab(const char *source, int ac, const char **av)
@@ -438,7 +438,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			std::string modebuf;
 
 			sep.GetToken(modebuf);
-			for (size_t t = 0; t < modebuf.size(); ++t)
+			for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 			{
 				switch (modebuf[t])
 				{
@@ -457,7 +457,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 
 			sep.GetToken(modebuf);
-			for (size_t t = 0; t < modebuf.size(); ++t)
+			for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 			{
 				switch (modebuf[t])
 				{
@@ -476,7 +476,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 
 			sep.GetToken(modebuf);
-			for (size_t t = 0; t < modebuf.size(); ++t)
+			for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 			{
 				switch (modebuf[t])
 				{
@@ -492,7 +492,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			}
 
 			sep.GetToken(modebuf);
-			for (size_t t = 0; t < modebuf.size(); ++t)
+			for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 			{
 				switch (modebuf[t])
 				{
@@ -584,7 +584,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 }
 
 /** This is here because:
- * 
+ *
  * If we had servers three servers, A, B & C linked like so: A<->B<->C
  * If Anope is (linked to) A and B splits from A and then reconnects
  * B introduces itself, introduces C, sends EOS for C, introduces Bs clients
@@ -632,9 +632,8 @@ int anope_event_436(const char *source, int ac, const char **av)
 */
 int anope_event_away(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 	m_away(source, (ac ? av[0] : NULL));
 	return MOD_CONT;
 }
@@ -680,11 +679,10 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (ac < 2)
 		return MOD_CONT;
 
-	if (*av[0] == '#' || *av[0] == '&') {
+	if (*av[0] == '#' || *av[0] == '&')
 		do_cmode(source, ac, av);
-	} else {
+	else
 		do_umode(source, ac, av);
-	}
 	return MOD_CONT;
 }
 
@@ -731,7 +729,6 @@ int anope_event_kick(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-
 int anope_event_join(const char *source, int ac, const char **av)
 {
 	if (ac != 1)
@@ -742,9 +739,8 @@ int anope_event_join(const char *source, int ac, const char **av)
 
 int anope_event_motd(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 
 	m_motd(source);
 	return MOD_CONT;
@@ -758,7 +754,7 @@ int anope_event_setname(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(source);
-	if (!u) 
+	if (!u)
 	{
 		Alog(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
 		return MOD_CONT;
@@ -794,7 +790,7 @@ int anope_event_setident(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(source);
-	if (!u) 
+	if (!u)
 	{
 		Alog(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
 		return MOD_CONT;
@@ -829,7 +825,7 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	u = finduser(source);
-	if (!u) 
+	if (!u)
 	{
 		Alog(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
 		return MOD_CONT;
@@ -837,13 +833,9 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 
 	/* When a user sets +x we recieve the new host and then the mode change */
 	if (u->HasMode(UMODE_CLOAK))
-	{
 		u->SetDisplayedHost(av[0]);
-	}
 	else
-	{
 		u->SetCloakedHost(av[0]);
-	}
 
 	return MOD_CONT;
 }
@@ -883,35 +875,21 @@ int anope_event_nick(const char *source, int ac, const char **av)
 {
 	User *user;
 
-	if (ac != 2) {
-		if (ac == 7) {
+	if (ac != 2)
+	{
+		if (ac == 7)
+		{
 			/*
 			   <codemastr> that was a bug that is now fixed in 3.2.1
 			   <codemastr> in  some instances it would use the non-nickv2 format
 			   <codemastr> it's sent when a nick collision occurs
 			   - so we have to leave it around for now -TSL
 			 */
-			do_nick(source, av[0], av[3], av[4], av[5], av[6],
-					strtoul(av[2], NULL, 10), 0, "*", NULL);
-
-		} else if (ac == 11) {
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[10],
-						   strtoul(av[2], NULL, 10), ntohl(decode_ip(av[9])), av[8], NULL);
-			if (user)
-			{
-				/* Check to see if the user should be identified because their
-				 * services id matches the one in their nickcore
-				 */
-				user->CheckAuthenticationToken(av[6]);
-
-				UserSetInternalModes(user, 1, &av[7]);
-			}
-
-		} else {
-			/* NON NICKIP */
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[9],
-						   strtoul(av[2], NULL, 10), 0, av[8],
-						   NULL);
+			do_nick(source, av[0], av[3], av[4], av[5], av[6], strtoul(av[2], NULL, 10), 0, "*", NULL);
+		}
+		else if (ac == 11)
+		{
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], strtoul(av[2], NULL, 10), ntohl(decode_ip(av[9])), av[8], NULL);
 			if (user)
 			{
 				/* Check to see if the user should be identified because their
@@ -922,13 +900,25 @@ int anope_event_nick(const char *source, int ac, const char **av)
 				UserSetInternalModes(user, 1, &av[7]);
 			}
 		}
-	} else {
-		do_nick(source, av[0], NULL, NULL, NULL, NULL,
-				strtoul(av[1], NULL, 10), 0, NULL, NULL);
+		else
+		{
+			/* NON NICKIP */
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], strtoul(av[2], NULL, 10), 0, av[8], NULL);
+			if (user)
+			{
+				/* Check to see if the user should be identified because their
+				 * services id matches the one in their nickcore
+				 */
+				user->CheckAuthenticationToken(av[6]);
+
+				UserSetInternalModes(user, 1, &av[7]);
+			}
+		}
 	}
+	else
+		do_nick(source, av[0], NULL, NULL, NULL, NULL, strtoul(av[1], NULL, 10), 0, NULL, NULL);
 	return MOD_CONT;
 }
-
 
 int anope_event_chghost(const char *source, int ac, const char **av)
 {
@@ -955,7 +945,8 @@ int anope_event_server(const char *source, int ac, const char **av)
 	char *vl;
 	char *upnumeric;
 
-	if (!stricmp(av[1], "1")) {
+	if (!stricmp(av[1], "1"))
+	{
 		vl = myStrGetToken(av[2], ' ', 0);
 		upnumeric = myStrGetToken(vl, '-', 2);
 		desc = myStrGetTokenRemainder(av[2], ' ', 1);
@@ -963,9 +954,9 @@ int anope_event_server(const char *source, int ac, const char **av)
 		delete [] vl;
 		delete [] desc;
 		delete [] upnumeric;
-	} else {
-		do_server(source, av[0], atoi(av[1]), av[2], "");
 	}
+	else
+		do_server(source, av[0], atoi(av[1]), av[2], "");
 	ircdproto->SendPing(Config.ServerName, av[0]);
 
 	return MOD_CONT;
@@ -989,19 +980,17 @@ int anope_event_part(const char *source, int ac, const char **av)
 
 int anope_event_whois(const char *source, int ac, const char **av)
 {
-	if (source && ac >= 1) {
+	if (source && ac >= 1)
 		m_whois(source, av[0]);
-	}
 	return MOD_CONT;
 }
-
 
 int anope_event_error(const char *source, int ac, const char **av)
 {
 	if (av[0])
 	{
 		Alog(LOG_DEBUG) << av[0];
-		if(strstr(av[0],"No matching link configuration")!=0) 
+		if (strstr(av[0], "No matching link configuration"))
 			Alog() << "Error: Your IRCD's link block may not be setup correctly, please check unrealircd.conf";
 	}
 	return MOD_CONT;
@@ -1066,7 +1055,7 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 	else
 		keep_their_modes = false;
-	
+
 	/* Mark the channel as syncing */
 	if (was_created)
 		c->SetFlag(CH_SYNCING);
@@ -1144,11 +1133,9 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 			/* Update their status internally on the channel
 			 * This will enforce secureops etc on the user
 			 */
-			for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
-			{
+			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
 				c->SetModeInternal(*it, buf);
-			}
-			
+
 			/* Now set whatever modes this user is allowed to have on the channel */
 			chan_set_correct_modes(u, c, 1);
 
@@ -1184,43 +1171,43 @@ void moduleAddIRCDMsgs()
 {
 	Anope::AddMessage("436", anope_event_436);
 	Anope::AddMessage("AWAY", anope_event_away);
-	Anope::AddMessage("6",	anope_event_away);
+	Anope::AddMessage("6", anope_event_away);
 	Anope::AddMessage("JOIN", anope_event_join);
 	Anope::AddMessage("C", anope_event_join);
 	Anope::AddMessage("KICK", anope_event_kick);
-	Anope::AddMessage("H",	anope_event_kick);
+	Anope::AddMessage("H", anope_event_kick);
 	Anope::AddMessage("KILL", anope_event_kill);
-	Anope::AddMessage(".",	anope_event_kill);
+	Anope::AddMessage(".", anope_event_kill);
 	Anope::AddMessage("MODE", anope_event_mode);
-	Anope::AddMessage("G",	anope_event_gmode);
+	Anope::AddMessage("G", anope_event_gmode);
 	Anope::AddMessage("MOTD", anope_event_motd);
-	Anope::AddMessage("F",	anope_event_motd);
+	Anope::AddMessage("F", anope_event_motd);
 	Anope::AddMessage("NICK", anope_event_nick);
-	Anope::AddMessage("&",	anope_event_nick);
+	Anope::AddMessage("&", anope_event_nick);
 	Anope::AddMessage("PART", anope_event_part);
-	Anope::AddMessage("D",	anope_event_part);
+	Anope::AddMessage("D", anope_event_part);
 	Anope::AddMessage("PING", anope_event_ping);
-	Anope::AddMessage("8",	anope_event_ping);
+	Anope::AddMessage("8", anope_event_ping);
 	Anope::AddMessage("PONG", anope_event_pong);
 	Anope::AddMessage("9", anope_event_pong);
 	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
-	Anope::AddMessage("!",	anope_event_privmsg);
+	Anope::AddMessage("!", anope_event_privmsg);
 	Anope::AddMessage("QUIT", anope_event_quit);
-	Anope::AddMessage(",",	anope_event_quit);
+	Anope::AddMessage(",", anope_event_quit);
 	Anope::AddMessage("SERVER", anope_event_server);
-	Anope::AddMessage("'",	anope_event_server);
+	Anope::AddMessage("'", anope_event_server);
 	Anope::AddMessage("SQUIT", anope_event_squit);
-	Anope::AddMessage("-",	anope_event_squit);
+	Anope::AddMessage("-", anope_event_squit);
 	Anope::AddMessage("TOPIC", anope_event_topic);
-	Anope::AddMessage(")",	anope_event_topic);
+	Anope::AddMessage(")", anope_event_topic);
 	Anope::AddMessage("SVSMODE", anope_event_mode);
-	Anope::AddMessage("n",	anope_event_mode);
+	Anope::AddMessage("n", anope_event_mode);
 	Anope::AddMessage("SVS2MODE", anope_event_mode);
 	Anope::AddMessage("v", anope_event_mode);
 	Anope::AddMessage("WHOIS", anope_event_whois);
-	Anope::AddMessage("#",	anope_event_whois);
+	Anope::AddMessage("#", anope_event_whois);
 	Anope::AddMessage("PROTOCTL", anope_event_capab);
-	Anope::AddMessage("_",	anope_event_capab);
+	Anope::AddMessage("_", anope_event_capab);
 	Anope::AddMessage("CHGHOST", anope_event_chghost);
 	Anope::AddMessage("AL", anope_event_chghost);
 	Anope::AddMessage("CHGIDENT", anope_event_chgident);
@@ -1238,7 +1225,7 @@ void moduleAddIRCDMsgs()
 	Anope::AddMessage("ERROR", anope_event_error);
 	Anope::AddMessage("5", anope_event_error);
 	Anope::AddMessage("UMODE2", anope_event_umode2);
-	Anope::AddMessage("|",	anope_event_umode2);
+	Anope::AddMessage("|", anope_event_umode2);
 	Anope::AddMessage("SJOIN", anope_event_sjoin);
 	Anope::AddMessage("~", anope_event_sjoin);
 	Anope::AddMessage("SDESC", anope_event_sdesc);
@@ -1258,23 +1245,31 @@ bool ChannelModeFlood::IsValid(const std::string &value2)
 	/* NEW +F */
 	char xbuf[256], *p, *p2, *x = xbuf + 1;
 	int v;
-	if (!value) return 0;
-	if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-	else {
+	if (!value)
+		return 0;
+	if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end)
+		return 1;
+	else
+	{
 		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 		strlcpy(xbuf, value, sizeof(xbuf));
 		p2 = strchr(xbuf + 1, ']');
 		if (!p2) return 0;
 		*p2 = '\0';
-		if (*(p2 + 1) != ':') return 0;
-		for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
+		if (*(p2 + 1) != ':')
+			return 0;
+		for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ","))
+		{
 			/* <number><1 letter>[optional: '#'+1 letter] */
 			p = x;
-			while (isdigit(*p)) ++p;
-			if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't')) continue; /* continue instead of break for forward compatability. */
+			while (isdigit(*p))
+				++p;
+			if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't'))
+				continue; /* continue instead of break for forward compatability. */
 			*p = '\0';
 			v = atoi(x);
-			if (v < 1 || v > 999) return 0;
+			if (v < 1 || v > 999)
+				return 0;
 			++p;
 		}
 		return 1;
@@ -1341,7 +1336,7 @@ class ProtoUnreal : public Module
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
-	
+
 	void OnUserNickChange(User *u, const std::string &)
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));

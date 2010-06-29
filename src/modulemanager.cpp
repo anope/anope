@@ -16,17 +16,13 @@ std::vector<Module *> ModuleManager::EventHandlers[I_END];
 void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
 {
 	for (std::list<std::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
-	{
 		ModuleManager::LoadModule(*it, NULL);
-	}
 }
 
 void ModuleManager::LoadModuleList(std::list<ci::string> &ModuleList)
 {
 	for (std::list<ci::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
-	{
 		ModuleManager::LoadModule(*it, NULL);
-	}
 }
 
 /**
@@ -284,7 +280,7 @@ void ModuleManager::DeleteModule(Module *m)
 {
 	if (!m || !m->handle)
 		return;
-		
+
 	const char *err;
 	void (*destroy_func)(Module *m);
 
@@ -307,7 +303,7 @@ void ModuleManager::DeleteModule(Module *m)
 		if (dlclose(handle))
 			Alog() << dlerror();
 	}
-	
+
 	if (!filename.empty())
 		DeleteFile(filename.c_str());
 }

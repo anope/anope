@@ -175,4 +175,3 @@ void BotInfo::Part(Channel *c, const std::string &reason)
 	ircdproto->SendPart(this, c, !reason.empty() ? reason.c_str() : "");
 	c->DeleteUser(this);
 }
-

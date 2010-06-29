@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 /*************************************************************************/
@@ -18,13 +16,13 @@
 #include "hashcomp.h"
 
 #ifndef _WIN32
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
 #endif
 
 #ifdef _WIN32
-#include <winsock.h>
+# include <winsock.h>
 int inet_aton(const char *name, struct in_addr *addr)
 {
 	uint32 a = inet_addr(name);
@@ -34,63 +32,58 @@ int inet_aton(const char *name, struct in_addr *addr)
 #endif
 
 IRCDVar myIrcd[] = {
-	{"InspIRCd 1.1",			/* ircd name */
-	 "+I",					  /* Modes used by pseudoclients */
-	 5,						 /* Chan Max Symbols	 */
-	 "+ao",					 /* Channel Umode used by Botserv bots */
-	 1,						 /* SVSNICK */
-	 1,						 /* Vhost  */
-	 1,						 /* Supports SNlines	 */
-	 1,						 /* Supports SQlines	 */
-	 1,						 /* Supports SZlines	 */
-	 4,						 /* Number of server args */
-	 0,						 /* Join 2 Set		   */
-	 1,						 /* Join 2 Message	   */
-	 1,						 /* TS Topic Forward	 */
-	 0,						 /* TS Topci Backward	*/
-	 0,						 /* Chan SQlines		 */
-	 0,						 /* Quit on Kill		 */
-	 0,						 /* SVSMODE unban		*/
-	 1,						 /* Reverse			  */
-	 1,						 /* vidents			  */
-	 1,						 /* svshold			  */
-	 0,						 /* time stamp on mode   */
-	 0,						 /* NICKIP			   */
-	 1,						 /* O:LINE			   */
-	 1,						 /* UMODE			   */
-	 1,						 /* VHOST ON NICK		*/
-	 0,						 /* Change RealName	  */
-	 1,						 /* No Knock requires +i */
-	 0,						 /* We support inspircd TOKENS */
-	 0,						 /* TIME STAMPS are BASE64 */
-	 0,						 /* Can remove User Channel Modes with SVSMODE */
-	 0,						 /* Sglines are not enforced until user reconnects */
-	 0,						 /* ts6 */
-	 0,						 /* p10 */
-	 1,						 /* CIDR channelbans */
-	 "$",					   /* TLD Prefix for Global */
-	 20,					/* Max number of modes we can send per line */
+	{"InspIRCd 1.1",	/* ircd name */
+	 "+I",				/* Modes used by pseudoclients */
+	 5,					/* Chan Max Symbols */
+	 "+ao",				/* Channel Umode used by Botserv bots */
+	 1,					/* SVSNICK */
+	 1,					/* Vhost */
+	 1,					/* Supports SNlines */
+	 1,					/* Supports SQlines */
+	 1,					/* Supports SZlines */
+	 4,					/* Number of server args */
+	 0,					/* Join 2 Set */
+	 1,					/* Join 2 Message */
+	 1,					/* TS Topic Forward */
+	 0,					/* TS Topci Backward */
+	 0,					/* Chan SQlines */
+	 0,					/* Quit on Kill */
+	 0,					/* SVSMODE unban */
+	 1,					/* Reverse */
+	 1,					/* vidents */
+	 1,					/* svshold */
+	 0,					/* time stamp on mode */
+	 0,					/* NICKIP */
+	 1,					/* O:LINE */
+	 1,					/* UMODE */
+	 1,					/* VHOST ON NICK */
+	 0,					/* Change RealName */
+	 1,					/* No Knock requires +i */
+	 0,					/* We support inspircd TOKENS */
+	 0,					/* TIME STAMPS are BASE64 */
+	 0,					/* Can remove User Channel Modes with SVSMODE */
+	 0,					/* Sglines are not enforced until user reconnects */
+	 0,					/* ts6 */
+	 0,					/* p10 */
+	 1,					/* CIDR channelbans */
+	 "$",				/* TLD Prefix for Global */
+	 20,				/* Max number of modes we can send per line */
 	 }
 	,
 	{NULL}
 };
 
-
-static int has_servicesmod = 0;
-static int has_globopsmod = 0;
-static int has_svsholdmod = 0;
-static int has_chghostmod = 0;
-static int has_chgidentmod = 0;
-static int has_messagefloodmod = 0;
-static int has_banexceptionmod = 0;
-static int has_inviteexceptionmod = 0;
-static int has_hidechansmod = 0;
-
+static bool has_servicesmod = false;
+static bool has_globopsmod = false;
+static bool has_svsholdmod = false;
+static bool has_chghostmod = false;
+static bool has_chgidentmod = false;
+static bool has_hidechansmod = false;
 
 /* CHGHOST */
 void inspircd_cmd_chghost(const char *nick, const char *vhost)
 {
-	if (has_chghostmod == 1)
+	if (has_chghostmod)
 	{
 		if (!nick || !vhost)
 			return;
@@ -102,9 +95,8 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 
 int anope_event_idle(const char *source, int ac, const char **av)
 {
-	if (ac == 1) {
+	if (ac == 1)
 		send_cmd(av[0], "IDLE %s %ld 0", source, static_cast<long>(time(NULL)));
-	}
 	return MOD_CONT;
 }
 
@@ -115,7 +107,6 @@ void inspircd_cmd_pass(const char *pass)
 {
 	strlcpy(currentpass, pass, sizeof(currentpass));
 }
-
 
 class InspIRCdProto : public IRCDProto
 {
@@ -137,9 +128,7 @@ class InspIRCdProto : public IRCDProto
 			inspircd_cmd_chghost(u->nick.c_str(), u->host);
 
 		if (has_chgidentmod && u->GetIdent() != u->GetVIdent())
-		{
 			inspircd_cmd_chgident(u->nick.c_str(), u->GetIdent().c_str());
-		}
 	}
 
 	void SendAkill(XLine *x)
@@ -173,13 +162,15 @@ class InspIRCdProto : public IRCDProto
 
 	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(bi ? bi->nick : Config.ServerName, "MODE %s %s", u->nick.c_str(), buf);
 	}
 
@@ -191,13 +182,16 @@ class InspIRCdProto : public IRCDProto
 
 	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
-		else send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), user->nick.c_str());
+		if (buf)
+			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		else
+			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), user->nick.c_str());
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
 	{
-		if (!buf) return;
+		if (!buf)
+			return;
 		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest->name.c_str(), buf);
 	}
 
@@ -228,7 +222,8 @@ class InspIRCdProto : public IRCDProto
 	/* SQUIT */
 	void SendSquit(const char *servname, const char *message)
 	{
-		if (!servname || !message) return;
+		if (!servname || !message)
+			return;
 		send_cmd(Config.ServerName, "SQUIT %s :%s", servname, message);
 	}
 
@@ -254,14 +249,14 @@ class InspIRCdProto : public IRCDProto
 	/* CHGIDENT */
 	void inspircd_cmd_chgident(const char *nick, const char *vIdent)
 	{
-		if (has_chgidentmod == 1) {
-			if (!nick || !vIdent || !*vIdent) {
+		if (has_chgidentmod)
+		{
+			if (!nick || !vIdent || !*vIdent)
 				return;
-			}
 			send_cmd(Config.s_OperServ, "CHGIDENT %s %s", nick, vIdent);
-		} else {
-			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
 		}
+		else
+			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
 	}
 
 	/* SVSHOLD - set */
@@ -323,13 +318,7 @@ class InspIRCdProto : public IRCDProto
 
 		u->SetMode(NickServ, UMODE_REGISTERED);
 	}
-
 } ircd_proto;
-
-
-
-
-
 
 int anope_event_ftopic(const char *source, int ac, const char **av)
 {
@@ -337,9 +326,9 @@ int anope_event_ftopic(const char *source, int ac, const char **av)
 	const char *temp;
 	if (ac < 4)
 		return MOD_CONT;
-	temp = av[1];			   /* temp now holds ts */
-	av[1] = av[2];			  /* av[1] now holds set by */
-	av[2] = temp;			   /* av[2] now holds ts */
+	temp = av[1]; /* temp now holds ts */
+	av[1] = av[2]; /* av[1] now holds set by */
+	av[2] = temp; /* av[2] now holds ts */
 	do_topic(source, ac, av);
 	return MOD_CONT;
 }
@@ -349,18 +338,18 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (ac < 2)
 		return MOD_CONT;
 
-	if (*av[0] == '#' || *av[0] == '&') {
+	if (*av[0] == '#' || *av[0] == '&')
 		do_cmode(source, ac, av);
-	} else {
+	else
+	{
 		/* InspIRCd lets opers change another
 		   users modes, we have to kludge this
 		   as it slightly breaks RFC1459
 		 */
-		if (!strcasecmp(source, av[0])) {
+		if (!strcasecmp(source, av[0]))
 			do_umode(source, ac, av);
-		} else {
+		else
 			do_umode(av[0], ac, av);
-		}
 	}
 	return MOD_CONT;
 }
@@ -371,12 +360,14 @@ int anope_event_opertype(const char *source, int ac, const char **av)
 	   dont do this directly */
 	User *u;
 	u = finduser(source);
-	if (u && !is_oper(u)) {
+	if (u && !is_oper(u))
+	{
 		const char *newav[2];
 		newav[0] = source;
 		newav[1] = "+o";
 		return anope_event_mode(source, 2, newav);
-	} else
+	}
+	else
 		return MOD_CONT;
 }
 
@@ -391,28 +382,30 @@ int anope_event_fmode(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	/* Checking the TS for validity to avoid desyncs */
-	if ((c = findchan(av[0]))) {
-		if (c->creation_time > strtol(av[1], NULL, 10)) {
+	if ((c = findchan(av[0])))
+	{
+		if (c->creation_time > strtol(av[1], NULL, 10))
 			/* Our TS is bigger, we should lower it */
 			c->creation_time = strtol(av[1], NULL, 10);
-		} else if (c->creation_time < strtol(av[1], NULL, 10)) {
+		else if (c->creation_time < strtol(av[1], NULL, 10))
 			/* The TS we got is bigger, we should ignore this message. */
 			return MOD_CONT;
-		}
-	} else {
+	}
+	else
 		/* Got FMODE for a non-existing channel */
 		return MOD_CONT;
-	}
 
 	/* TS's are equal now, so we can proceed with parsing */
 	n = o = 0;
-	while (n < ac) {
-		if (n != 1) {
+	while (n < ac)
+	{
+		if (n != 1)
+		{
 			newav[o] = av[n];
-			o++;
+			++o;
 			Alog(LOG_DEBUG) << "Param: " << newav[o - 1];
 		}
-		n++;
+		++n;
 	}
 
 	return anope_event_mode(source, ac - 1, newav);
@@ -467,7 +460,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 	else
 		keep_their_modes = false;
-	
+
 	/* Mark the channel as syncing */
 	if (was_created)
 		c->SetFlag(CH_SYNCING);
@@ -512,10 +505,8 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		/* Update their status internally on the channel
 		 * This will enforce secureops etc on the user
 		 */
-		for (std::list<ChannelMode *>::iterator it = Status.begin(); it != Status.end(); ++it)
-		{
+		for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
 			c->SetModeInternal(*it, buf);
-		}
 
 		/* Now set whatever modes this user is allowed to have on the channel */
 		chan_set_correct_modes(u, c, 1);
@@ -567,9 +558,8 @@ int anope_event_436(const char *source, int ac, const char **av)
 
 int anope_event_away(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 	m_away(source, (ac ? av[0] : NULL));
 	return MOD_CONT;
 }
@@ -590,7 +580,8 @@ int anope_event_topic(const char *source, int ac, const char **av)
 	if (check_topiclock(c, topic_time))
 		return MOD_CONT;
 
-	if (c->topic) {
+	if (c->topic)
+	{
 		delete [] c->topic;
 		c->topic = NULL;
 	}
@@ -602,10 +593,12 @@ int anope_event_topic(const char *source, int ac, const char **av)
 
 	record_topic(av[0]);
 
-	if (ac > 1 && *av[1]) {
+	if (ac > 1 && *av[1])
+	{
 		FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[1]));
 	}
-	else {
+	else
+	{
 		FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, ""));
 	}
 
@@ -626,7 +619,7 @@ int anope_event_rsquit(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	/* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
-	if (ac > 1 && strcmp(Config.ServerName, av[0]) == 0)
+	if (ac > 1 && !strcmp(Config.ServerName, av[0]))
 		do_squit(source, ac - 1, av + 1);
 	else
 		do_squit(source, ac, av);
@@ -641,7 +634,6 @@ int anope_event_quit(const char *source, int ac, const char **av)
 	do_quit(source, ac, av);
 	return MOD_CONT;
 }
-
 
 int anope_event_kill(const char *source, int ac, const char **av)
 {
@@ -660,7 +652,6 @@ int anope_event_kick(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-
 int anope_event_join(const char *source, int ac, const char **av)
 {
 	if (ac != 2)
@@ -671,9 +662,8 @@ int anope_event_join(const char *source, int ac, const char **av)
 
 int anope_event_motd(const char *source, int ac, const char **av)
 {
-	if (!source) {
+	if (!source)
 		return MOD_CONT;
-	}
 
 	m_motd(source);
 	return MOD_CONT;
@@ -776,8 +766,10 @@ int anope_event_nick(const char *source, int ac, const char **av)
 	struct in_addr addy;
 	uint32 *ad = reinterpret_cast<uint32 *>(&addy);
 
-	if (ac != 1) {
-		if (ac == 8) {
+	if (ac != 1)
+	{
+		if (ac == 8)
+		{
 			int ts = strtoul(av[0], NULL, 10);
 
 			inet_aton(av[6], &addy);
@@ -787,7 +779,8 @@ int anope_event_nick(const char *source, int ac, const char **av)
 						   source,  /* server */
 						   av[7],   /* realname */
 						   ts, htonl(*ad), av[3], NULL);
-			if (user) {
+			if (user)
+			{
 				/* InspIRCd1.1 has no user mode +d so we
 				 * use nick timestamp to check for auth - Adam
 				 */
@@ -797,9 +790,9 @@ int anope_event_nick(const char *source, int ac, const char **av)
 				user->SetCloakedHost(av[3]);
 			}
 		}
-	} else {
-		do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, NULL, NULL);
 	}
+	else
+		do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, NULL, NULL);
 	return MOD_CONT;
 }
 
@@ -829,7 +822,6 @@ int anope_event_server(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
 	if (ac != 2)
@@ -848,55 +840,40 @@ int anope_event_part(const char *source, int ac, const char **av)
 
 int anope_event_whois(const char *source, int ac, const char **av)
 {
-	if (source && ac >= 1) {
+	if (source && ac >= 1)
 		m_whois(source, av[0]);
-	}
 	return MOD_CONT;
 }
 
 int anope_event_capab(const char *source, int ac, const char **av)
 {
-	if (strcasecmp(av[0], "START") == 0) {
+	if (!strcasecmp(av[0], "START"))
+	{
 		/* reset CAPAB */
-		has_servicesmod = 0;
-		has_globopsmod = 0;
-		has_svsholdmod = 0;
-		has_chghostmod = 0;
-		has_chgidentmod = 0;
-		has_messagefloodmod = 0;
-		has_banexceptionmod = 0;
-		has_inviteexceptionmod = 0;
-		has_hidechansmod = 0;
-
-	} else if (strcasecmp(av[0], "MODULES") == 0) {
-		if (strstr(av[1], "m_globops.so")) {
-			has_globopsmod = 1;
-		}
-		if (strstr(av[1], "m_services.so")) {
-			has_servicesmod = 1;
-		}
-		if (strstr(av[1], "m_svshold.so")) {
-			has_svsholdmod = 1;
-		}
-		if (strstr(av[1], "m_chghost.so")) {
-			has_chghostmod = 1;
-		}
-		if (strstr(av[1], "m_chgident.so")) {
-			has_chgidentmod = 1;
-		}
-		if (strstr(av[1], "m_messageflood.so")) {
-			has_messagefloodmod = 1;
-		}
-		if (strstr(av[1], "m_banexception.so")) {
-			has_banexceptionmod = 1;
-		}
-		if (strstr(av[1], "m_inviteexception.so")) {
-			has_inviteexceptionmod = 1;
-		}
-		if (strstr(av[1], "m_hidechans.so")) {
-			has_hidechansmod = 1;
-		}
-	} else if (strcasecmp(av[0], "CAPABILITIES") == 0) {
+		has_servicesmod = false;
+		has_globopsmod = false;
+		has_svsholdmod = false;
+		has_chghostmod = false;
+		has_chgidentmod = false;
+		has_hidechansmod = false;
+	}
+	else if (!strcasecmp(av[0], "MODULES"))
+	{
+		if (strstr(av[1], "m_globops.so"))
+			has_globopsmod = true;
+		if (strstr(av[1], "m_services.so"))
+			has_servicesmod = true;
+		if (strstr(av[1], "m_svshold.so"))
+			has_svsholdmod = true;
+		if (strstr(av[1], "m_chghost.so"))
+			has_chghostmod = true;
+		if (strstr(av[1], "m_chgident.so"))
+			has_chgidentmod = true;
+		if (strstr(av[1], "m_hidechans.so"))
+			has_hidechansmod = true;
+	}
+	else if (!strcasecmp(av[0], "CAPABILITIES"))
+	{
 		spacesepstream ssep(av[1]);
 		std::string capab;
 		while (ssep.GetToken(capab))
@@ -908,7 +885,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				std::string modebuf;
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0; t < modebuf.size(); ++t)
+				for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 				{
 					switch (modebuf[t])
 					{
@@ -927,7 +904,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				}
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0; t < modebuf.size(); ++t)
+				for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 				{
 					switch (modebuf[t])
 					{
@@ -941,7 +918,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				}
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0; t < modebuf.size(); ++t)
+				for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 				{
 					switch (modebuf[t])
 					{
@@ -960,7 +937,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				}
 
 				sep.GetToken(modebuf);
-				for (size_t t = 0; t < modebuf.size(); ++t)
+				for (size_t t = 0, end = modebuf.size(); t < end; ++t)
 				{
 					switch (modebuf[t])
 					{
@@ -1034,7 +1011,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				std::string modes(capab.begin() + 8, capab.begin() + capab.find(")"));
 				std::string chars(capab.begin() + capab.find(")") + 1, capab.end());
 
-				for (size_t t = 0; t < modes.size(); ++t)
+				for (size_t t = 0, end = modes.size(); t < end; ++t)
 				{
 					switch (modes[t])
 					{
@@ -1062,37 +1039,39 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				ircd->maxmodes = atoi(maxmodes.c_str());
 			}
 		}
-	} else if (strcasecmp(av[0], "END") == 0) {
-		if (!has_globopsmod) {
+	}
+	else if (!strcasecmp(av[0], "END"))
+	{
+		if (!has_globopsmod)
+		{
 			send_cmd(NULL, "ERROR :m_globops is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_globops module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}
-		if (!has_servicesmod) {
+		if (!has_servicesmod)
+		{
 			send_cmd(NULL, "ERROR :m_services is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_services module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}
-		if (!has_hidechansmod) {
+		if (!has_hidechansmod)
+		{
 			send_cmd(NULL, "ERROR :m_hidechans.so is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}
-		if (!has_svsholdmod) {
+		if (!has_svsholdmod)
 			ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
-		}
-		if (!has_chghostmod) {
+		if (!has_chghostmod)
 			ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
-		}
-		if (!has_chgidentmod) {
+		if (!has_chgidentmod)
 			ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
-		}
 		ircd->svshold = has_svsholdmod;
 	}
-	
+
 	CapabParse(ac, av);
 	return MOD_CONT;
 }
@@ -1102,7 +1081,6 @@ int anope_event_endburst(const char *source, int ac, const char **av)
 	Me->GetUplink()->Sync(true);
 	return MOD_CONT;
 }
-
 
 void moduleAddIRCDMsgs()
 {

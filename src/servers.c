@@ -199,9 +199,9 @@ static void delete_server(Server * serv, const char *quitreason)
 		return;
 	}
 
-	Alog(LOG_DEBUG) << "delete_server() called, deleting " << serv->name << "(" << serv->suid << ") uplinked to " 
+	Alog(LOG_DEBUG) << "delete_server() called, deleting " << serv->name << "(" << (serv->suid ? serv->suid : "") << ") uplinked to " 
 			<< (serv->uplink ? serv->uplink->name : "NOTHING") << "(" 
-			<< (serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK") << ")";
+			<< (serv->uplink && serv->uplink->suid ? serv->uplink->suid : "") << ")";
 
 	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
 	{

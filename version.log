@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3009"
+VERSION_BUILD="3010"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3010 - Encrypt very long passwords properly on /ns and /cs register
 #Revision 3009 - Fixed charybdis and ratbox protocol modules not (properly) translating TS6 UIDs into nicks on kills.
 #Revision 3007 - Removed all references to the SVN keyword $Id$
 #Revision 3006 - Set all of the core modules versions to VERSION_STRING - SVN is now officially not used anymore

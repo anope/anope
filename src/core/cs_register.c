@@ -75,7 +75,6 @@ int do_register(User * u)
     ChannelInfo *ci;
     struct u_chaninfolist *uc;
     int is_servadmin = is_services_admin(u);
-    char founderpass[PASSMAX];
     char tmp_pass[PASSMAX];
 
     if (readonly) {
@@ -129,8 +128,7 @@ int do_register(User * u)
         alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
 
-    } else if (strscpy(founderpass, pass, PASSMAX),
-               enc_encrypt_in_place(founderpass, PASSMAX) < 0) {
+    } else if (enc_encrypt(pass, strlen(pass), ci->founderpass, PASSMAX - 1) < 0) {
         alog("%s: Couldn't encrypt password for %s (REGISTER)",
              s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
@@ -145,8 +143,6 @@ int do_register(User * u)
         ci->last_used = ci->time_registered;
         ci->founder = nc;
 
-        memset(pass, 0, strlen(pass));
-        memcpy(ci->founderpass, founderpass, PASSMAX);
         ci->desc = sstrdup(desc);
         if (c->topic) {
             ci->last_topic = sstrdup(c->topic);

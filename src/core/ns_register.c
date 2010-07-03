@@ -197,11 +197,9 @@ int do_register(User * u)
         } passcode[idx] = '\0';
         nr = makerequest(u->nick);
         nr->passcode = sstrdup(passcode);
-        strscpy(nr->password, pass, PASSMAX);
-        memset(pass, 0, strlen(pass));
-        /* We are paranoid about keeping a plain text pass in memory, yet we would write
-         * it to a database.. - Viper */
-        enc_encrypt_in_place(nr->password, PASSMAX);
+        if (enc_encrypt(pass, strlen(pass), nr->password, PASSMAX - 1) < 0) {
+            alog("Failed to encrypt password for %s", nr->nick);
+        }
         if (email) {
             nr->email = sstrdup(email);
         }

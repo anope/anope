@@ -15,7 +15,7 @@ Anope Version 1.8 - SVN
 05/23  F Fixed SQUITing juped servers on InspIRCd 1.2                    [#1165]
 06/15  F Fixed ./Config to correctly load config.cache                   [  #00]
 06/24  F Fixed pseudo-client kills not being detected on some TS6 IRCDs. [  #00]
-
+07/01  F Fixed encrypting very long passwords when registering           [#1172]
 
 Anope Version 1.8.4
 -------------------

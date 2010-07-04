@@ -71,6 +71,22 @@ var installerQuestions = [
 
 var buildPackages = [
                                         {
+                                                        'name' : 'Microsoft Visual Studio 2010 (64bit)',
+                                                        'libpaths' : [
+                                                                     'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\lib',
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
+								     ],
+                                                        'incpaths': [
+                                                                     'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\include',
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\include'
+                                                         ],
+                                                         'nmake' : [
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
+                                                         ],
+							 'additional_switches' : [ '/w' ],
+							 'installedDrive' : 'C'
+                                        },
+                                        {
                                                         'name' : 'Microsoft Visual Studio 2010',
                                                         'libpaths' : [
                                                                      'Program Files\\Microsoft Visual Studio 10.0\\VC\\lib',
@@ -87,7 +103,7 @@ var buildPackages = [
                                                         'installedDrive' : 'C'
                                         },
                                         {
-                                                        'name' : 'Microsoft Visual Studio 2008 (New PSDK)',
+                                                        'name' : 'Microsoft Visual Studio 2008',
                                                         'libpaths' : [                                                                               
                                                                      'Program Files\\Microsoft Visual Studio 9.0\\VC\\Lib',
                                                                      'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
@@ -103,7 +119,7 @@ var buildPackages = [
                                                         'installedDrive' : 'C'
                                         },
                                         {
-                                                        'name' : 'Microsoft Visual Studio 2008 (64bit) (New PSDK)',
+                                                        'name' : 'Microsoft Visual Studio 2008 (64bit)',
                                                         'libpaths' : [
                                                                      'Program Files (x86)\\Microsoft Visual Studio 9.0\\VC\\Lib',
                                                                      'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
@@ -120,7 +136,7 @@ var buildPackages = [
                                         },
  
                                         {
-                                                        'name' : 'Microsoft Visual Studio 2005 (New PSDK)',
+                                                        'name' : 'Microsoft Visual Studio 2005',
                                                         'libpaths' : [
                                                                                 'Program Files\\Microsoft Visual Studio 8\\VC\\Lib',
                                                                                 'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'

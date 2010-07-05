@@ -326,7 +326,6 @@ class EOld : public Module
 		this->SetType(ENCRYPTION);
 
 		ModuleManager::Attach(I_OnEncrypt, this);
-		ModuleManager::Attach(I_OnEncryptInPlace, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
@@ -351,11 +350,6 @@ class EOld : public Module
 		Alog(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
-	}
-
-	EventReturn OnEncryptInPlace(std::string &buf)
-	{
-		return this->OnEncrypt(buf, buf);
 	}
 
 	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest )

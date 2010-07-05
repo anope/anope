@@ -439,7 +439,6 @@ class CoreExport Module
 	 *  see src/encrypt.c for detailed informations
 	 */
 	virtual EventReturn OnEncrypt(const std::string &src, std::string &dest) { return EVENT_CONTINUE; }
-	virtual EventReturn OnEncryptInPlace(std::string &buf) { return EVENT_CONTINUE; }
 	virtual EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest) { return EVENT_CONTINUE; }
 	virtual EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password) { return EVENT_CONTINUE; }
 
@@ -1106,7 +1105,7 @@ enum Implementation
 		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
 		I_OnPreCommand, I_OnPostCommand, I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
-		I_OnEncrypt, I_OnEncryptInPlace, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
+		I_OnEncrypt, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync,
 	I_END

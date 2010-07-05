@@ -28,20 +28,6 @@ int enc_encrypt(const std::string &src, std::string &dest)
 }
 
 /**
- * Encrypt null-terminated string stored in buffer `buf' of size `size',
- * placing the result in the same buffer.  Returns 0 on success, -1 on
- * error.
- **/
-int enc_encrypt_in_place(std::string &buf)
-{
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnEncryptInPlace, OnEncryptInPlace(buf));
-	if (MOD_RESULT == EVENT_ALLOW)
-		return 0;
-	return -1;
-}
-
-/**
  * Decrypt encrypted string `src' into buffer `dest' of length `len'.
  * Returns 1 (not 0) on success, -1 if the encryption algorithm does not
  * allow decryption, and -1 if another failure occurred (e.g. destination

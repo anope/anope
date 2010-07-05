@@ -254,7 +254,6 @@ class ESHA256 : public Module
 		this->SetType(ENCRYPTION);
 
 		ModuleManager::Attach(I_OnEncrypt, this);
-		ModuleManager::Attach(I_OnEncryptInPlace, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
 
@@ -282,11 +281,6 @@ class ESHA256 : public Module
 		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest = buf.str();
 		return EVENT_ALLOW;
-	}
-
-	EventReturn OnEncryptInPlace(std::string &buf)
-	{
-		return this->OnEncrypt(buf, buf);
 	}
 
 	EventReturn OnDecrypt(const std::string &hashm, std::string &src, std::string &dest)

@@ -270,8 +270,7 @@ class CommandNSRegister : public CommandNSConfirm
 			passcode[idx] = '\0';
 			nr = new NickRequest(u->nick);
 			nr->passcode = passcode;
-			nr->password = pass;
-			enc_encrypt_in_place(nr->password);
+			enc_encrypt(pass, nr->password);
 			if (email)
 				nr->email = sstrdup(email);
 			nr->requested = time(NULL);

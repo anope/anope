@@ -158,7 +158,6 @@ E void HostServSyncVhosts(NickAlias *na);
 
 /**** encrypt.c ****/
 E int enc_encrypt(const std::string &src, std::string &dest);
-E int enc_encrypt_in_place(std::string &buf);
 E int enc_decrypt(const std::string &src, std::string &dest);
 E int enc_check_password(std::string &plaintext, std::string &password);
 

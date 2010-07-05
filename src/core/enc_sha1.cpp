@@ -174,7 +174,6 @@ class ESHA1 : public Module
 		this->SetType(ENCRYPTION);
 
 		ModuleManager::Attach(I_OnEncrypt, this);
-		ModuleManager::Attach(I_OnEncryptInPlace, this);
 		ModuleManager::Attach(I_OnEncryptCheckLen, this);
 		ModuleManager::Attach(I_OnDecrypt, this);
 		ModuleManager::Attach(I_OnCheckPassword, this);
@@ -199,11 +198,6 @@ class ESHA1 : public Module
 		dest = buf;
 		delete [] digest;
 		return EVENT_ALLOW;
-	}
-
-	EventReturn OnEncryptInPlace(std::string &buf)
-	{
-		return this->OnEncrypt(buf, buf);
 	}
 
 	EventReturn OnDecrypt(const std::string &hashm, std::string &src, std::string &dest)

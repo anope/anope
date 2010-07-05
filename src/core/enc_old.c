@@ -388,13 +388,6 @@ int old_encrypt(const char *src, int len, char *dest, int size)
 
 }
 
-
-/* Shortcut for encrypting a null-terminated string in place. */
-int old_encrypt_in_place(char *buf, int size)
-{
-    return old_encrypt(buf, strlen(buf), buf, size);
-}
-
 int old_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 16)
@@ -430,7 +423,6 @@ int AnopeInit(int argc, char **argv) {
     moduleSetType(ENCRYPTION);
 
     encmodule_encrypt(old_encrypt);
-    encmodule_encrypt_in_place(old_encrypt_in_place);
     encmodule_encrypt_check_len(old_encrypt_check_len);
     encmodule_decrypt(old_decrypt);
     encmodule_check_password(old_check_password);
@@ -440,7 +432,6 @@ int AnopeInit(int argc, char **argv) {
 
 void AnopeFini(void) {
     encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
     encmodule_encrypt_check_len(NULL);
     encmodule_decrypt(NULL);
     encmodule_check_password(NULL);

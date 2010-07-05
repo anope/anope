@@ -204,20 +204,6 @@ int sha1_encrypt(const char *src, int len, char *dest, int size)
 }
 
 
-int sha1_encrypt_in_place(char *buf, int size)
-{
-    char tmp[41];
-
-    memset(tmp,0,41);
-    if(sha1_encrypt(buf, strlen(buf), tmp, size)==0) {
-        memcpy(buf, tmp, size);
-    } else {
-        return -1;
-    }
-    return 0;
-}
-
-
 int sha1_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 20)
@@ -255,7 +241,6 @@ int AnopeInit(int argc, char **argv) {
     moduleSetType(ENCRYPTION);
  
     encmodule_encrypt(sha1_encrypt);
-    encmodule_encrypt_in_place(sha1_encrypt_in_place);
     encmodule_encrypt_check_len(sha1_encrypt_check_len);
     encmodule_decrypt(sha1_decrypt);
     encmodule_check_password(sha1_check_password);
@@ -265,7 +250,6 @@ int AnopeInit(int argc, char **argv) {
 
 void AnopeFini(void) {
     encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
     encmodule_encrypt_check_len(NULL);
     encmodule_decrypt(NULL);
     encmodule_check_password(NULL);

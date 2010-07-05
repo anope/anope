@@ -362,12 +362,6 @@ int md5_encrypt(const char *src, int len, char *dest, int size)
 }
 
 
-int md5_encrypt_in_place(char *buf, int size)
-{
-    return md5_encrypt(buf, strlen(buf), buf, size);
-}
-
-
 int md5_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 16)
@@ -404,7 +398,6 @@ int AnopeInit(int argc, char **argv) {
     moduleSetType(ENCRYPTION);
  
     encmodule_encrypt(md5_encrypt);
-    encmodule_encrypt_in_place(md5_encrypt_in_place);
     encmodule_encrypt_check_len(md5_encrypt_check_len);
     encmodule_decrypt(md5_decrypt);
     encmodule_check_password(md5_check_password);
@@ -414,7 +407,6 @@ int AnopeInit(int argc, char **argv) {
 
 void AnopeFini(void) {
     encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
     encmodule_encrypt_check_len(NULL);
     encmodule_decrypt(NULL);
     encmodule_check_password(NULL);

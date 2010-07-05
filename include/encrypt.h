@@ -13,7 +13,6 @@
 
 typedef struct encryption_ {
     int (*encrypt)(const char *src, int len, char *dest, int size);
-    int (*encrypt_in_place)(char *buf, int size);
     int (*encrypt_check_len)(int passlen, int bufsize);
     int (*decrypt)(const char *src, char *dest, int size);
     int (*check_password)(const char *plaintext, const char *password);

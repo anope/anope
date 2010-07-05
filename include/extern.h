@@ -576,12 +576,10 @@ E long unsigned int UserKey3;
 /**** encrypt.c ****/
 E char *EncModule;
 E int enc_encrypt(const char *src, int len, char *dest, int size);
-E int enc_encrypt_in_place(char *buf, int size);
 E int enc_encrypt_check_len(int passlen, int bufsize);
 E int enc_decrypt(const char *src, char *dest, int size);
 E int enc_check_password(const char *plaintext, const char *password);
 E void encmodule_encrypt(int (*func)(const char *src, int len, char *dest, int size));
-E void encmodule_encrypt_in_place(int (*func)(char *buf, int size));
 E void encmodule_encrypt_check_len(int (*func)(int passlen, int bufsize));
 E void encmodule_decrypt(int (*func)(const char *src, char *dest, int size));
 E void encmodule_check_password(int (*func)(const char *plaintext, const char *password));

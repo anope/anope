@@ -23,11 +23,6 @@ void encmodule_encrypt(int (*func)
     encryption.encrypt = func;
 }
 
-void encmodule_encrypt_in_place(int (*func) (char *buf, int size))
-{
-    encryption.encrypt_in_place = func;
-}
-
 void encmodule_encrypt_check_len(int (*func) (int passlen, int bufsize))
 {
     encryption.encrypt_check_len = func;
@@ -56,19 +51,6 @@ int enc_encrypt(const char *src, int len, char *dest, int size)
 {
     if (encryption.encrypt) {
         return encryption.encrypt(src, len, dest, size);
-    }
-    return -1;
-}
-
-/**
- * Encrypt null-terminated string stored in buffer `buf' of size `size',
- * placing the result in the same buffer.  Returns 0 on success, -1 on
- * error.
- **/
-int enc_encrypt_in_place(char *buf, int size)
-{
-    if (encryption.encrypt_in_place) {
-        return encryption.encrypt_in_place(buf, size);
     }
     return -1;
 }

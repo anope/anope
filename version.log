@@ -8,7 +8,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3012"
+VERSION_BUILD="3013"
 
 # $Log$ # Changes since the 1.8.4 Release
 #Revision 3012 - Removed enc_encrypt_in_place, it is unnecessary and it can easially be used improperly

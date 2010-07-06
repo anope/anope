@@ -312,7 +312,7 @@ MDE int moduleAddCommand(CommandHash *cmdTable[], Command *c, int pos);
 MDE int addCommand(CommandHash *cmdTable[], Command *c,int pos);
 MDE int delCommand(CommandHash *cmdTable[], Command *c,char *mod_name);		/* Del a command from a cmd table */
 MDE int moduleDelCommand(CommandHash *cmdTable[],char *name);		/* Del a command from a cmd table */
-Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
+MDE Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
 
 /*************************************************************************/
 

@@ -1446,11 +1446,13 @@ int anope_event_squit(char *source, int ac, char **av)
 
 int anope_event_rsquit(char *source, int ac, char **av)
 {
+    Server *s;
+
     if (ac < 1 || ac > 3)
         return MOD_CONT;
 
     /* On InspIRCd we must send a SQUIT when we receive RSQUIT for a server we have juped */
-    Server *s = findserver(servlist, av[0]);
+    s = findserver(servlist, av[0]);
     if (!s)
         s = findserver_uid(servlist, av[0]);
     if (s && s->flags & SERVER_JUPED)

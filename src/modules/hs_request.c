@@ -65,7 +65,7 @@ struct HostRequest
 	time_t time;
 };
 
-std::map<std::string, HostRequest *> Requests;
+std::map<ci::string, HostRequest *> Requests;
 
 static Module *me;
 
@@ -221,10 +221,11 @@ class CommandHSActivate : public Command
 
 		if ((na = findnick(nick)))
 		{
-			std::map<std::string, HostRequest *>::iterator it = Requests.find(na->nick);
+			std::map<ci::string, HostRequest *>::iterator it = Requests.find(na->nick);
 			if (it != Requests.end())
 			{
-				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick,  it->second->time);
+				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick, it->second->time);
+				delete it->second;
 				Requests.erase(it);
 
 				if (HSRequestMemoUser)
@@ -271,9 +272,12 @@ class CommandHSReject : public Command
 		const char *nick = params[0].c_str();
 		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
 
-		std::map<std::string, HostRequest *>::iterator it = Requests.find(nick);
+		std::map<ci::string, HostRequest *>::iterator it = Requests.find(nick);
 		if (it != Requests.end())
 		{
+			delete it->second;
+			Requests.erase(it);
+
 			if (HSRequestMemoUser)
 			{
 				if (reason)
@@ -319,7 +323,7 @@ class HSListBase : public Command
 		unsigned display_counter = 0;
 		tm *tm;
 
-		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
+		for (std::map<ci::string, HostRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
 		{
 			HostRequest *hr = it->second;
 			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
@@ -684,7 +688,7 @@ class HSRequest : public Module
 
 				if (na)
 				{
-					std::map<std::string, HostRequest *>::iterator it = Requests.find(na->nick);
+					std::map<ci::string, HostRequest *>::iterator it = Requests.find(na->nick);
 
 					if (it != Requests.end())
 					{
@@ -719,7 +723,7 @@ class HSRequest : public Module
 
 	void OnDatabaseWrite(void (*Write)(const std::string &))
 	{
-		for (std::map<std::string, HostRequest *>::iterator it = Requests.begin(); it != Requests.end(); ++it)
+		for (std::map<ci::string, HostRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
 		{
 			HostRequest *hr = it->second;
 			std::stringstream buf;
@@ -806,9 +810,12 @@ void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, t
 	hr->ident = vIdent ? vIdent : "";
 	hr->host = vhost;
 	hr->time = tmp_time;
-	std::map<std::string, HostRequest *>::iterator it = Requests.find(nick);
+	std::map<ci::string, HostRequest *>::iterator it = Requests.find(nick);
 	if (it != Requests.end())
+	{
+		delete it->second;
 		Requests.erase(it);
+	}
 	Requests.insert(std::make_pair(nick, hr));
 }
 

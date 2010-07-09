@@ -293,7 +293,10 @@ class CommandOSException : public Command
 		}
 
 		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
-			(new ExceptionDelCallback(u, mask))->Process();
+		{
+			ExceptionDelCallback list(u, mask);
+			list.Process();
+		}
 		else
 		{
 			int deleted = 0;
@@ -382,7 +385,10 @@ class CommandOSException : public Command
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
-			(new ExceptionListCallback(u, mask))->Process();
+		{
+			ExceptionListCallback list(u, mask);
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -414,7 +420,10 @@ class CommandOSException : public Command
 		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
 
 		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
-			(new ExceptionViewCallback(u, mask))->Process();
+		{
+			ExceptionViewCallback list(u, mask);
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

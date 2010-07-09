@@ -312,7 +312,10 @@ class XOPBase : public Command
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
-			(new XOPDelCallback(u, ci, messages, nick))->Process();
+		{
+			XOPDelCallback list(u, ci, messages, nick);
+			list.Process();
+		}
 		else
 		{
 			NickAlias *na = findnick(nick);
@@ -372,7 +375,10 @@ class XOPBase : public Command
 		}
 
 		if (nick && strspn(nick, "1234567890,-") == strlen(nick))
-			(new XOPListCallback(u, ci, nick, level, messages))->Process();
+		{
+			XOPListCallback list(u, ci, nick, level, messages);
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

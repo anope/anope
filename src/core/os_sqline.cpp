@@ -233,7 +233,10 @@ class CommandOSSQLine : public Command
 		}
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SQLineDelCallback(u, mask.c_str()))->Process();
+		{
+			SQLineDelCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			XLine *x = SQLine->HasEntry(mask);
@@ -267,7 +270,10 @@ class CommandOSSQLine : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SQLineListCallback(u, mask.c_str()))->Process();
+		{
+			SQLineListCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -308,7 +314,10 @@ class CommandOSSQLine : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SQLineViewCallback(u, mask.c_str()))->Process();
+		{
+			SQLineViewCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

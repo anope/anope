@@ -365,7 +365,10 @@ class CommandCSAKick : public Command
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new AkickDelCallback(u, ci, mask.c_str()))->Process();
+		{
+			AkickDelCallback list(u, ci, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			NickAlias *na = findnick(mask);
@@ -402,7 +405,10 @@ class CommandCSAKick : public Command
 		}
 
 		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new AkickListCallback(u, ci, mask.c_str()))->Process();
+		{
+			AkickListCallback list(u, ci, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -444,7 +450,10 @@ class CommandCSAKick : public Command
 		}
 
 		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new AkickViewCallback(u, ci, mask.c_str()))->Process();
+		{
+			AkickViewCallback list(u, ci, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

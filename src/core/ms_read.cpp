@@ -119,7 +119,10 @@ class CommandMSRead : public Command
 				MemoListCallback::DoRead(u, mi, ci, i);
 			}
 			else /* number[s] */
-				(new MemoListCallback(u, mi, numstr.c_str()))->Process();
+			{
+				MemoListCallback list(u, mi, numstr.c_str());
+				list.Process();
+			}
 		}
 		return MOD_CONT;
 	}

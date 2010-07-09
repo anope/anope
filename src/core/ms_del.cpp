@@ -88,7 +88,10 @@ class CommandMSDel : public Command
 		else
 		{
 			if (isdigit(numstr[0]))
-				(new MemoDelCallback(u, ci, mi, numstr.c_str()))->Process();
+			{
+				MemoDelCallback list(u, ci, mi, numstr.c_str());
+				list.Process();
+			}
 			else if (numstr == "LAST")
 			{
 				/* Delete last memo. */

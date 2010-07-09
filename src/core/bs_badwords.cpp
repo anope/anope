@@ -87,7 +87,10 @@ class CommandBSBadwords : public Command
 		if (!ci->GetBadWordCount())
 			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
 		else if (!word.empty() && strspn(word.c_str(), "1234567890,-") == word.length())
-			(new BadwordsListCallback(u, ci, word.c_str()))->Process();
+		{
+			BadwordsListCallback list(u, ci, word.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -164,7 +167,10 @@ class CommandBSBadwords : public Command
 	{
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && strspn(word.c_str(), "1234567890,-") == word.length())
-			(new BadwordsDelCallback(u, ci, word.c_str()))->Process();
+		{
+			BadwordsDelCallback list(u, ci, word.c_str());
+			list.Process();
+		}
 		else
 		{
 			unsigned i, end;

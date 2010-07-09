@@ -252,7 +252,10 @@ class CommandOSSNLine : public Command
 		}
 
 		if (isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SNLineDelCallback(u, mask.c_str()))->Process();
+		{
+			SNLineDelCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			XLine *x = SNLine->HasEntry(mask);
@@ -286,7 +289,10 @@ class CommandOSSNLine : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SNLineListCallback(u, mask.c_str()))->Process();
+		{
+			SNLineListCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -327,7 +333,10 @@ class CommandOSSNLine : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SNLineViewCallback(u, mask.c_str()))->Process();
+		{
+			SNLineViewCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

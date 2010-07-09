@@ -234,7 +234,10 @@ class CommandOSAKill : public Command
 		}
 
 		if (isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new AkillDelCallback(u, mask.c_str()))->Process();
+		{
+			AkillDelCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			XLine *x = SGLine->HasEntry(mask);
@@ -268,7 +271,10 @@ class CommandOSAKill : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new AkillListCallback(u, mask.c_str()))->Process();
+		{
+			AkillListCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -309,7 +315,10 @@ class CommandOSAKill : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new AkillViewCallback(u, mask.c_str()))->Process();
+		{
+			AkillViewCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

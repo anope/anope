@@ -99,7 +99,10 @@ class CommandMSList : public Command
 		else
 		{
 			if (!param.empty() && isdigit(param[0]))
-				(new MemoListCallback(u, ci, mi, param.c_str()))->Process();
+			{
+				MemoListCallback list(u, ci, mi, param.c_str());
+				list.Process();
+			}
 			else
 			{
 				if (!param.empty())

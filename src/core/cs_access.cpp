@@ -243,7 +243,10 @@ class CommandCSAccess : public Command
 		if (!ci->GetAccessCount())
 			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (isdigit(*nick.c_str()) && strspn(nick.c_str(), "1234567890,-") == nick.length())
-			(new AccessDelCallback(u, ci, nick.c_str()))->Process();
+		{
+			AccessDelCallback list(u, ci, nick.c_str());
+			list.Process();
+		}
 		else
 		{
 			NickAlias *na = findnick(nick);
@@ -289,7 +292,10 @@ class CommandCSAccess : public Command
 		if (!ci->GetAccessCount())
 			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (!nick.empty() && strspn(nick.c_str(), "1234567890,-") == nick.length())
-			(new AccessListCallback(u, ci, nick.c_str()))->Process();
+		{
+			AccessListCallback list(u, ci, nick.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -326,7 +332,10 @@ class CommandCSAccess : public Command
 		if (!ci->GetAccessCount())
 			notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (!nick.empty() && strspn(nick.c_str(), "1234567890,-") == nick.length())
-			(new AccessViewCallback(u, ci, nick.c_str()))->Process();
+		{
+			AccessViewCallback list(u, ci, nick.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

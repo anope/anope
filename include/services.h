@@ -1172,6 +1172,8 @@ class ChanServTimer : public Timer
 class CoreExport NumberList
 {
  private:
+ 	bool is_valid;
+
 	std::set<unsigned> numbers;
 
 	bool desc;

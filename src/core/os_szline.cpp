@@ -232,7 +232,10 @@ class CommandOSSZLine : public Command
 		}
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SZLineDelCallback(u, mask.c_str()))->Process();
+		{
+			SZLineDelCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			XLine *x = SZLine->HasEntry(mask);
@@ -266,7 +269,10 @@ class CommandOSSZLine : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SZLineListCallback(u, mask.c_str()))->Process();
+		{
+			SZLineListCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;
@@ -305,7 +311,10 @@ class CommandOSSZLine : public Command
 		const ci::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
-			(new SZLineViewCallback(u, mask.c_str()))->Process();
+		{
+			SZLineViewCallback list(u, mask.c_str());
+			list.Process();
+		}
 		else
 		{
 			bool SentHeader = false;

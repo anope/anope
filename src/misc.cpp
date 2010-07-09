@@ -223,7 +223,7 @@ const char *merge_args(int argc, char **argv)
 
 /*************************************************************************/
 
-NumberList::NumberList(const std::string &list, bool descending) : desc(descending)
+NumberList::NumberList(const std::string &list, bool descending) : desc(descending), is_valid(true)
 {
 	char *error;
 	commasepstream sep(list);
@@ -245,7 +245,7 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 			{
 				if (!this->InvalidRange(list))
 				{
-					delete this;
+					is_valid = false;
 					return;
 				}
 			}
@@ -264,7 +264,7 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 			{
 				if (!this->InvalidRange(list))
 				{
-					delete this;
+					is_valid = false;
 					return;
 				}
 			}
@@ -278,6 +278,9 @@ NumberList::~NumberList()
 
 void NumberList::Process()
 {
+	if (!is_valid)
+		return;
+
 	if (this->desc)
 	{
 		for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(), it_end = numbers.rend(); it != it_end; ++it)

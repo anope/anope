@@ -14,22 +14,22 @@
 
 static SSL_CTX *ctx;
 
-class SSLSocket : public Socket
+class SSLSocket : public ClientSocket
 {
  private:
 	SSL *sslsock;
 
-	int RecvInternal(char *buf, size_t sz) const
+	const int RecvInternal(char *buf, size_t sz) const
 	{
 		return SSL_read(sslsock, buf, sz);
 	}
 
-	int SendInternal(const std::string &buf) const
+	const int SendInternal(const std::string &buf) const
 	{
 		return SSL_write(sslsock, buf.c_str(), buf.size());
 	}
  public:
-	SSLSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : Socket(nTargetHost, nPort, nBindHost, nIPv6)
+	SSLSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
 	{
 		sslsock = SSL_new(ctx);
 
@@ -37,7 +37,7 @@ class SSLSocket : public Socket
 			throw CoreException("Unable to initialize SSL socket");
 
 		SSL_set_connect_state(sslsock);
-		SSL_set_fd(sslsock, Sock);
+		SSL_set_fd(sslsock, sock);
 		SSL_connect(sslsock);
 
 		UplinkSock = this;

@@ -400,7 +400,7 @@ E int exception_add(User *u, const char *mask, const int limit, const char *reas
 
 /**** sockets.cpp ****/
 
-E SocketEngine socketEngine;
+E SocketEngineBase *SocketEngine;
 E int32 TotalRead;
 E int32 TotalWritten;
 

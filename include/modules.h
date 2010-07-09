@@ -155,7 +155,7 @@ enum ModuleReturn
 /** Priority types which can be returned from Module::Prioritize()
  */
 enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
-enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE };
+enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE, SOCKETENGINE };
 
 struct Message;
 extern CoreExport std::multimap<std::string, Message *> MessageMap;

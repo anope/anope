@@ -802,6 +802,9 @@ class ServerConfig
 	/* Reason to akill clients for defcon */
 	char *DefConAkillReason;
 
+	/* The socket engine in use */
+	ci::string SocketEngine;
+
 	/* User keys to use for generating random hashes for pass codes etc */
 	long unsigned int UserKey1;
 	long unsigned int UserKey2;

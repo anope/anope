@@ -300,10 +300,6 @@ class DatabaseException : public CoreException
 
 /*************************************************************************/
 
-#include "sockets.h"
-
-/*************************************************************************/
-
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
  */
@@ -353,6 +349,9 @@ template<typename T, size_t Size = 32> class Flags
 		Flag_Values.reset();
 	}
 };
+
+#include "sockets.h"
+#include "socketengine.h"
 
 /*************************************************************************/
 

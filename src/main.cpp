@@ -109,16 +109,18 @@ class UpdateTimer : public Timer
 
 Socket *UplinkSock = NULL;
 
-class UplinkSocket : public Socket
+class UplinkSocket : public ClientSocket
 {
  public:
-	UplinkSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : Socket(nTargetHost, nPort, nBindHost, nIPv6)
+	UplinkSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
 	{
 		UplinkSock = this;
 	}
 
 	~UplinkSocket()
 	{
+		/* Process the last bits of data before disconnecting */
+		SocketEngine->Process();
 		UplinkSock = NULL;
 	}
 
@@ -189,8 +191,6 @@ void do_restart_services()
 			UserListByUID.erase(it->second->GetUID().c_str());
 	}
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
-	/* Process to send the last bits of information before disconnecting */
-	socketEngine.Process();
 	delete UplinkSock;
 	close_log();
 	/* First don't unload protocol module, then do so */
@@ -239,8 +239,6 @@ static void services_shutdown()
 		while (!UserListByNick.empty())
 			delete UserListByNick.begin()->second;
 	}
-	/* Process to send the last bits of information before disconnecting */
-	socketEngine.Process();
 	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	/* First don't unload protocol module, then do so */
@@ -538,7 +536,7 @@ int main(int ac, char **av, char **envp)
 			ModeManager::ProcessModes();
 
 			/* Process the socket engine */
-			socketEngine.Process();
+			SocketEngine->Process();
 		}
 
 		if (quitting)

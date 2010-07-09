@@ -352,6 +352,9 @@ int init_primary(int ac, char **av)
 	/* Add Database Modules */
 	ModuleManager::LoadModuleList(Config.DBModuleList);
 
+	/* Load the socket engine */
+	ModuleManager::LoadModule(Config.SocketEngine, NULL);
+
 	return 0;
 }
 

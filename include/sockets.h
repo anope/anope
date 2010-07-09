@@ -1,5 +1,6 @@
-/*
- * (C) 2004-2010 Anope Team
+/*                                               
+ *
+ * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for furhter details.
@@ -11,13 +12,13 @@
 #ifndef SOCKETS_H
 #define SOCKETS_H
 
+#define NET_BUFSIZE 65535
+
 #ifdef _WIN32
 # define CloseSocket closesocket
 #else
 # define CloseSocket close
 #endif
-
-#define NET_BUFSIZE 65536
 
 class SocketException : public CoreException
 {
@@ -33,89 +34,68 @@ class SocketException : public CoreException
 	virtual ~SocketException() throw() { }
 };
 
-class CoreExport Socket
+enum SocketType
+{
+	SOCKTYPE_CLIENT,
+	SOCKTYPE_LISTEN
+};
+
+enum SocketFlag
+{
+	SF_DEAD
+};
+
+class CoreExport Socket : public Flags<SocketFlag, 1>
 {
  private:
-	/** Read from the socket
-	 * @param buf Buffer to read to
+	/** Really recieve something from the buffer
+	 * @param buf The buf to read to
 	 * @param sz How much to read
 	 * @return Number of bytes recieved
 	 */
-	virtual int RecvInternal(char *buf, size_t sz) const;
+	virtual const int RecvInternal(char *buf, size_t sz) const;
 
-	/** Write to the socket
+	/** Really write something to the socket
 	 * @param buf What to write
-	 * @return Number of bytes sent, -1 on error
+	 * @return Number of bytes written
 	 */
-	virtual int SendInternal(const std::string &buf) const;
+	virtual const int SendInternal(const std::string &buf) const;
 
  protected:
-	/* Socket FD */
-	int Sock;
-	/* Host this socket is connected to */
-	std::string TargetHost;
-	/* Port we're connected to */
-	int Port;
-	/* IP this socket is bound to */
-	std::string BindHost;
-	/* Is this an IPv6 socket? */
+ 	/* Socket FD */
+	int sock;
+	/* IPv6? */
 	bool IPv6;
-
-	/* Messages to be written to the socket */
+	/* Things to be written to the socket */
 	std::string WriteBuffer;
-	/* Part of a message not totally yet recieved */
+	/* Part of a message sent from the server, but not totally recieved */
 	std::string extrabuf;
-	/* How much data was recieved from the socket */
+	/* How much data was received from this socket */
 	size_t RecvLen;
 
  public:
-	/** Default constructor
-	 * @param nTargetHost Hostname to connect to
-	 * @param nPort Port to connect to
-	 * @param nBindHos Host to bind to when connecting
-	 * @param nIPv6 true to use IPv6
-	 */
-	Socket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false);
+	/* Type this socket is */
+	SocketType Type;
 
+	/** Default constructor
+	 * @param nsock The socket to use, 0 if we need to create our own
+	 * @param nIPv6 true if using ipv6
+	 */
+ 	Socket(int nsock, bool nIPv6);
+	
 	/** Default destructor
 	 */
 	virtual ~Socket();
 
 	/** Get the socket FD for this socket
-	 * @return The fd
+	 * @return the fd
 	 */
-	virtual int GetSock() const;
+	int GetSock() const;
 
 	/** Check if this socket is IPv6
 	 * @return true or false
 	 */
 	bool IsIPv6() const;
-
-	/** Called when there is something to be read from thie socket
-	 * @return true on success, false to kill this socket
-	 */
-	virtual bool ProcessRead();
-
-	/** Called when this socket becomes writeable
-	 * @return true on success, false to drop this socket
-	 */
-	virtual bool ProcessWrite();
-
-	/** Called when there is an error on this socket
-	 */
-	virtual void ProcessError();
-
-	/** Called with a message recieved from the socket
-	 * @param buf The message
-	 * @return true on success, false to kill this socket
-	 */
-	virtual bool Read(const std::string &buf);
-
-	/** Write to the socket
-	 * @param message The message to write
-	 */
-	void Write(const char *message, ...);
-	void Write(std::string &message);
 
 	/** Get the length of the read buffer
 	 * @return The length of the read buffer
@@ -126,59 +106,105 @@ class CoreExport Socket
 	 * @return The length of the write buffer
 	 */
 	size_t WriteBufferLen() const;
+
+	/** Called when there is something to be recieved for this socket
+	 * @return true on success, false to drop this socket
+	 */
+	virtual bool ProcessRead();
+
+	/** Called when there is something to be written to this socket
+	 * @return true on success, false to drop this socket
+	 */
+	virtual bool ProcessWrite();
+
+	/** Called when there is an error for this socket
+	 * @return true on success, false to drop this socket
+	 */
+	virtual void ProcessError();
+
+	/** Called with a line recieved from the socket
+	 * @param buf The line
+	 * @return true to continue reading, false to drop the socket
+	 */
+	virtual bool Read(const std::string &buf);
+
+	/** Write to the socket
+	 * @param message The message
+	 */
+	void Write(const char *message, ...);
+	void Write(const std::string &message);
 };
 
-class CoreExport SocketEngine
+class CoreExport ClientSocket : public Socket
 {
- private:
-	/* List of sockets that need to be deleted */
-	std::set<Socket *> OldSockets;
-	/* FDs to read */
-	fd_set ReadFDs;
-	/* FDs that want writing */
-	fd_set WriteFDs;
-	/* Max FD */
-	int MaxFD;
+ protected:
+	/* Target host we're connected to */
+	std::string TargetHost;
+	/* Target port we're connected to */
+	int Port;
+	/* The host to bind to */
+	std::string BindHost;
 
-	/** Unmark a socket as writeable
-	 * @param s The socket
-	 */
-	void ClearWriteable(Socket *s);
  public:
-	/* Set of sockets */
-	std::set<Socket *> Sockets;
 
+       /** Constructor
+	* @param nTargetHost The target host to connect to
+	* @param nPort The target port to connect to
+	* @param nBindHost The host to bind to for connecting
+	* @param nIPv6 true to use IPv6
+	*/
+       ClientSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost, bool nIPv6);
+
+       /** Default destructor
+	*/
+       virtual ~ClientSocket();
+
+      /** Called with a line recieved from the socket
+	* @param buf The line
+	* @return true to continue reading, false to drop the socket
+	*/
+	virtual bool Read(const std::string &buf);
+};
+
+class CoreExport ListenSocket : public Socket
+{
+ protected:
+	/* Bind IP */
+	std::string BindIP;
+	/* Port to bind to */
+	int Port;
+
+ public:
 	/** Constructor
+	 * @param bind The IP to bind to
+	 * @param port The port to listen on
 	 */
-	SocketEngine();
+	ListenSocket(const std::string &bind, int port);
 
 	/** Destructor
 	 */
-	virtual ~SocketEngine();
+	virtual ~ListenSocket();
 
-	/** Add a socket to the socket engine
-	 * @param s The socket
+	/** Process what has come in from the connection
+	 * @return false to destory this socket
 	 */
-	void AddSocket(Socket *s);
+	bool ProcessRead();
 
-	/** Delete a socket from the socket engine
-	 * @param s The socket
+	/** Called when a connection is accepted
+	 * @param s The socket for the new connection
+	 * @return true if the listen socket should remain alive
 	 */
-	void DelSocket(Socket *s);
+	virtual bool OnAccept(Socket *s);
 
-	/** Mark a socket as wanting to be written to
-	 * @param s The socket
+	/** Get the bind IP for this socket
+	 * @return the bind ip
 	 */
-	void MarkWriteable(Socket *s);
+	const std::string &GetBindIP() const;
 
-	/** Called to iterate through each socket and check for activity
-	 */
-	void Process();
-
-	/** Get the last socket error
-	 * @return The error
-	 */
-	const std::string GetError() const;
+	/** Get the port this socket is bound to
+	 * @return The port
+	*/
+	const int GetPort() const;
 };
 
-#endif // SOCKETS_H
+#endif // SOCKET_H

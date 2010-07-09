@@ -21,6 +21,7 @@ ServerConfig Config;
 static ci::string Modules;
 static ci::string EncModules;
 static ci::string DBModules;
+static ci::string SocketEngineModule;
 static ci::string HostCoreModules;
 static ci::string MemoCoreModules;
 static ci::string BotCoreModules;
@@ -629,6 +630,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "encryption", "", new ValueContainerCIString(&EncModules), DT_CISTRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "passlen", "32", new ValueContainerUInt(&Config.PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "database", "", new ValueContainerCIString(&DBModules), DT_CISTRING | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "socketengine", "", new ValueContainerCIString(&Config.SocketEngine), DT_CISTRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&Config.UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&Config.UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&Config.UserKey3), DT_LUINTEGER, NoValidation},

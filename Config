@@ -47,32 +47,24 @@ Run_Build_System () {
 	if [ "$INSTDIR" != "" ] ; then
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			WITH_INST="-DINSTDIR:STRING=$INSTDIR"
-		else
-			WITH_INST="--with-instdir=$INSTDIR"
 		fi
 	fi
 
 	if [ "$RUNGROUP" != "" ] ; then
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			WITH_RUN="-DRUNGROUP:STRING=$RUNGROUP"
-		else
-			WITH_RUN="--with-rungroup=$RUNGROUP"
 		fi
 	fi
 
 	if [ "$UMASK" != "" ] ; then
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			WITH_PERM="-DDEFUMASK:STRING=$UMASK"
-		else
-			WITH_PERM="--with-permissions=$UMASK"
 		fi
 	fi
 
 	if [ "$DEBUG" = "yes" ] ; then
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
-		else
-			BUILD_TYPE="--with-debugsym"
 		fi
 	else
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
@@ -83,17 +75,10 @@ Run_Build_System () {
 	if [ "$USE_RUN_CC_PL" = "yes" ] ; then
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
-		else
-			pwdsave=`pwd`
-			cd "`dirname $SOURCE_DIR/run-cc.pl`"
-			RUN_CC_PL="--with-makebin=`pwd`/run-cc.pl"
-			cd "$pwdsave"
 		fi
 	else
 		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
 			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
-		else
-			RUN_CC_PL="--with-makebin="
 		fi
 	fi
 
@@ -124,10 +109,6 @@ Run_Build_System () {
 		else
 			echo "Now run make to build Anope."
 		fi
-	else
-		echo "./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_CONFIG_ARGS $RUN_CC_PL"
-
-		./configure $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_CONFIG_ARGS $RUN_CC_PL
 	fi
 }
 
@@ -158,10 +139,10 @@ EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
 
-which cmake > /dev/null
-if [ $? -ne 0 ] ; then
-	BUILD_SYSTEM="configure"
-fi
+#which cmake > /dev/null
+#if [ $? -ne 0 ] ; then
+#	BUILD_SYSTEM="configure"
+#fi
 
 ###########################################################################
 # Check out the options
@@ -235,34 +216,34 @@ export ok INPUT
 ####
 
 ok=0
-echo "Note: press Return for the default, or enter a new value."
-echo "Are you using configure or cmake?"
-while [ $ok -eq 0 ] ; do
-	echo2 "[$BUILD_SYSTEM] "
-	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-	if [ ! "$INPUT" ] ; then
-		INPUT=$BUILD_SYSTEM
-	fi
-	case $INPUT in
-		cmake)
-			ok=1
-			;;
-		configure)
-			ok=1
-			;;
-		*)
-			echo "That is not a valid choice!"
-			ok=0
-			;;
-	esac
-done
-BUILD_SYSTEM=$INPUT
-echo ""
+#echo "Note: press Return for the default, or enter a new value."
+#echo "Are you using configure or cmake?"
+#while [ $ok -eq 0 ] ; do
+#	echo2 "[$BUILD_SYSTEM] "
+#	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+#	if [ ! "$INPUT" ] ; then
+#		INPUT=$BUILD_SYSTEM
+#	fi
+#	case $INPUT in
+#		cmake)
+#			ok=1
+#			;;
+#		configure)
+#			ok=1
+#			;;
+#		*)
+#			echo "That is not a valid choice!"
+#			ok=0
+#			;;
+#	esac
+#done
+#BUILD_SYSTEM=$INPUT
+#echo ""
 
-if [ "$SOURCE_DIR" != "." -a "$BUILD_SYSTEM" = "configure" ] ; then
-	echo "You can not use configure unless you are in the same folder as Config!"
-	exit 0
-fi
+#if [ "$SOURCE_DIR" != "." -a "$BUILD_SYSTEM" = "configure" ] ; then
+#	echo "You can not use configure unless you are in the same folder as Config!"
+#	exit 0
+#fi
 
 ok=0
 echo "In what directory do you want the binaries to be installed?"

@@ -1148,12 +1148,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 CHAN_DESC_CHANGED
 	Beschreibung von %s wurde geändert zu %s.
 
-# SET URL responses
-CHAN_URL_CHANGED
-	URL von %s wurde geändert zu %s.
-CHAN_URL_UNSET
-	URL von %s wurde entfernt.
-
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
 	eMail-Adresse von %s wurde geändert in %s.

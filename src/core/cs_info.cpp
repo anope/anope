@@ -82,10 +82,6 @@ class CommandCSInfo : public Command
 
 		if (ci->entry_message && show_all)
 			notice_lang(Config.s_ChanServ, u, CHAN_INFO_ENTRYMSG, ci->entry_message);
-		if (ci->url)
-			notice_lang(Config.s_ChanServ, u, CHAN_INFO_URL, ci->url);
-		if (ci->email)
-			notice_lang(Config.s_ChanServ, u, CHAN_INFO_EMAIL, ci->email);
 
 		if (show_all)
 		{

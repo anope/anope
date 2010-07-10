@@ -109,12 +109,8 @@ class CommandNSInfo : public Command
 			if (na->last_quit && (show_hidden || !(na->nc->HasFlag(NI_HIDE_QUIT))))
 				notice_lang(Config.s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit);
 
-			if (na->nc->url)
-				notice_lang(Config.s_NickServ, u, NICK_INFO_URL, na->nc->url);
 			if (na->nc->email && (show_hidden || !(na->nc->HasFlag(NI_HIDE_EMAIL))))
 				notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, na->nc->email);
-			if (na->nc->icq)
-				notice_lang(Config.s_NickServ, u, NICK_INFO_ICQ, na->nc->icq);
 
 			if (show_hidden)
 			{

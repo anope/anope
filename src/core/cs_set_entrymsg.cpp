@@ -43,7 +43,7 @@ class CommandCSSetEntryMsg : public Command
 
 	bool OnHelp(User *u, const ci::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG, "SEt");
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG, "SET");
 		return true;
 	}
 

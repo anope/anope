@@ -153,8 +153,6 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	std::string pass;	/* Password of the nicks */
 	char *email;		/* E-mail associated to the nick */
 	char *greet;		/* Greet associated to the nick */
-	uint32 icq;			/* ICQ # associated to the nick */
-	char *url;			/* URL associated to the nick */
 	uint16 language;	/* Language selected by nickname owner (LANG_*) */
 	std::vector<std::string> access; /* Access list, vector of strings */
 	MemoInfo memos;

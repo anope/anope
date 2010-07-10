@@ -460,12 +460,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Taal veranderd in Nederlands.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL veranderd in %s.
-NICK_SET_URL_UNSET
-	URL verwijderd.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	E-mail adres veranderd in %s.
@@ -473,14 +467,6 @@ NICK_SET_EMAIL_UNSET
 	E-mail adres verwijderd.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Je kan je e-mail adres niet verwijderen op dit netwerk.
-	
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	ICQ nummer veranderd in %s.
-NICK_SET_ICQ_UNSET
-	ICQ nummer verwijderd.
-NICK_SET_ICQ_INVALID
-	%s is geen geldig nummer.
 	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -585,12 +571,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Password for %s changed to %s.
 
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
-NICK_SASET_URL_UNSET
-	URL %s unset.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	E-mail address for %s changed to %s.
@@ -598,14 +578,6 @@ NICK_SASET_EMAIL_UNSET
 	E-mail address for %s unset.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	You cannot unset the e-mail on this network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
-NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
-NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -751,8 +723,6 @@ NICK_INFO_VHOST
 	               vhost: %s
 NICK_INFO_VHOST2
 	            	vhost: %s@%s
-NICK_INFO_ICQ
-	               ICQ #: %d
 NICK_INFO_GREET
 	       Groet-bericht: %s
 NICK_INFO_OPTIONS
@@ -1130,6 +1100,10 @@ CHAN_SET_DISABLED
 	Sorry, kanaal opties instellen is tijdelijk uitgeschakeld.
 CHAN_SET_UNKNOWN_OPTION
 	Onbekende SET optie %s.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1148,12 +1122,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	Beschrijving van %s veranderd in %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	URL voor %s veranderd in %s.
-CHAN_URL_UNSET
-	URL voor %s verwijderd.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3607,12 +3575,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Selecteer de taal die Services zal gebruiken
 	                   voor het versturen van berichten naar jou
-NICK_HELP_CMD_SET_URL
-	    URL        Associeer een URL met je nick
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associeer een E-mail adres met je nick
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Associeer een ICQ nummer met je nick
 NICK_HELP_CMD_SET_GREET
 	    GREET      Associeer een begroeting met je nick
 NICK_HELP_CMD_SET_KILL
@@ -3657,26 +3621,12 @@ NICK_HELP_SET_LANGUAGE
 	op een commando dat je hebt verzonden). nummer moet gekozen
 	worden uit de volgende lijst van ondersteunde talen:
 
-NICK_HELP_SET_URL
-	Gebruik: SET URL url
-	
-	Associeert de gegeven URL met je nick. Deze URL zal worden
-	weergegeven wanneer iemand informatie over jouw nick
-	opvraagt met het INFO commando.
-
 NICK_HELP_SET_EMAIL
 	Gebruik: SET EMAIL adres
 	
 	Associeert het gegeven e-mail adres met jouw nick. Dit adres
 	zal worden weergegeven wanneer iemand informatie over je nick
 	opvraagt met het INFO commando.
-	
-NICK_HELP_SET_ICQ
-	Gebruik: SET ICQ nummer
-	
-	Associeert het gegeven ICQ nummer met je nick. Dit nummer
-	zal worden weergegeven wanneer iemand informatie opvraagt
-	over je nick met het INFO commando.
 	
 NICK_HELP_SET_GREET
 	Gebruik: SET GREET bericht
@@ -3754,12 +3704,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
-NICK_HELP_CMD_SASET_URL
-	    URL        Associate a URL with the nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associate an ICQ number with the nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3795,24 +3741,10 @@ NICK_HELP_SASET_PASSWORD
 	
 	Changes the password used to identify as the nick's	owner.
 
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4350,10 +4282,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Stelt de opvolger van het kanaal in
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Stelt de kanaalbeschrijving in
-CHAN_HELP_CMD_SET_URL
-	    URL           Associeer een URL met het kanaal
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Associate een E-mail adres met het kanaal
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Stel een bericht in dat naar de gebruikers
 	                    wordt gestuurd zodra ze het kanaal binnekomen
@@ -4418,23 +4346,6 @@ CHAN_HELP_SET_DESC
 	
 	Stelt de beschrijving van een kanaal in, die weergegeven
 	wordt door de LIST en INFO commando's.
-
-CHAN_HELP_SET_URL
-	Gebruik: %s kanaal URL [url]
-	
-	Associeer de gegeven URL met het kanaal. Deze URL zal worden
-	weergegeven wanneer iemand informatie over het kanaal op-
-	vraagt met het INFO commando. Als er geen paramenter wordt
-	wordt de URL voor het kanaal verwijderd.
-
-CHAN_HELP_SET_EMAIL
-	Gebruik: %s kanaal EMAIL [adres]
-	
-	Associeer het gegeven e-mail adres met het kanaal. Dit adres
-	zal worden weergegeven wanneer iemand informatie over het
-	kanaal opvraagt met het INFO commando. Als er geen para-
-	menter wordt gegeven wordt het e-mail adres voor het kanaal
-	verwijderd.
 
 CHAN_HELP_SET_ENTRYMSG
 	Gebruik: %s kanaal ENTRYMSG [bericht]

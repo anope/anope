@@ -465,12 +465,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Linguagem alterada para Português.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL alterada para %s.
-NICK_SET_URL_UNSET
-	URL removida.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	E-mail alterado para %s.
@@ -478,14 +472,6 @@ NICK_SET_EMAIL_UNSET
 	E-mail removido.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Você não pode remover o e-mail nesta Rede.
-	
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	Número de ICQ alterado para %s.
-NICK_SET_ICQ_UNSET
-	Número de ICQ removido.
-NICK_SET_ICQ_INVALID
-	%s não é um número válido.
 	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -587,12 +573,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Password for %s changed to %s.
 
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
-NICK_SASET_URL_UNSET
-	URL %s unset.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	E-mail address for %s changed to %s.
@@ -600,14 +580,6 @@ NICK_SASET_EMAIL_UNSET
 	E-mail address for %s unset.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	You cannot unset the e-mail on this network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
-NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
-NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -753,8 +725,6 @@ NICK_INFO_VHOST
 	                   vHost: %s
 NICK_INFO_VHOST2
 	                   vHost: %s@%s
-NICK_INFO_ICQ
-	                     ICQ: %d
 NICK_INFO_GREET
 	     Mensagem de entrada: %s
 NICK_INFO_OPTIONS
@@ -1132,6 +1102,10 @@ CHAN_SET_DISABLED
 	Desculpe, o comando SET está temporariamente desativado.
 CHAN_SET_UNKNOWN_OPTION
 	Comando SET %s desconhecido.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1150,12 +1124,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	Descrição do canal %s alterada para %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	URL do canal %s alterada para %s.
-CHAN_URL_UNSET
-	URL do canal %s removida.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3554,12 +3522,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Ajusta a linguagem dos Services quando
 	                   mensagens são enviadas à você
-NICK_HELP_CMD_SET_URL
-	    URL        Associa um endereço URL com seu nick
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associa um endereço de e-mail ao seu nick
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Associa um número de ICQ ao seu nick
 NICK_HELP_CMD_SET_GREET
 	    GREET      Associa uma mensgem de entrada ao seu nick
 NICK_HELP_CMD_SET_KILL
@@ -3605,13 +3569,6 @@ NICK_HELP_SET_LANGUAGE
 	O número deve ser escolhido da seguinte lista de línguas:
 	
 
-NICK_HELP_SET_URL
-	Sintaxe: SET URL url
-	
-	Associa uma dada URL ao seu nick. Esta URL será mostrada
-	sempre que alguem solicitar informação sobre seu nick
-	através do comando INFO.
-
 NICK_HELP_SET_EMAIL
 	Sintaxe: SET EMAIL endereço
 	
@@ -3622,13 +3579,6 @@ NICK_HELP_SET_EMAIL
 	caso seja perdida. Caso não tenha nenhum endereço para seu
 	nick ou o mesmo seje inválido, não será possível recuperar
 	a senha perdida.
-	
-NICK_HELP_SET_ICQ
-	Sintaxe: SET ICQ número
-	
-	Associa um número de ICQ ao seu nick. Este número
-	será sempre mostrado quando alguém solicitar 
-	informação sobre seu nick através do comando INFO.
 	
 NICK_HELP_SET_GREET
 	Sintaxe: SET GREET mensagem
@@ -3706,12 +3656,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
-NICK_HELP_CMD_SASET_URL
-	    URL        Associate a URL with the nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associate an ICQ number with the nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3747,24 +3693,10 @@ NICK_HELP_SASET_PASSWORD
 	
 	Changes the password used to identify as the nick's	owner.
 
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4270,10 +4202,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Ajusta o sucessor do canal
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Ajusta a descrição do canal
-CHAN_HELP_CMD_SET_URL
-	    URL           Associa uma URL a um canal
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Associa um E-mail a um canal
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Ajusta a mensagem que deve ser mandada
 	                    aos usuários quando eles entram no canal
@@ -4333,23 +4261,6 @@ CHAN_HELP_SET_DESC
 	
 	Ajusta a descrição para o canal, que são mostradas com
 	os comandos LIST e INFO.
-
-CHAN_HELP_SET_URL
-	Sintaxe: %s canal URL [url]
-	
-	Associa uma URL ao canal. Esta URL será mostrada
-	sempre que alguem solicitar informação sobre o canal
-	com o comando INFO. Se nenhum parâmetro for fornecido,
-	apaga qualquer URL atualmente designada para o canal.
-
-CHAN_HELP_SET_EMAIL
-	Sintaxe: %s canal EMAIL [endereço]
-	
-	Associa um endereço de e-mail fornecido ao canal.
-	Este endereço será mostrado sempre que alguem solicitar
-	informação sobre o canal com o comando INFO. Se nenhum
-	parâmetro for fornecido, apaga qualquer endereço de e-mail
-	do canal.
 
 CHAN_HELP_SET_ENTRYMSG
 	Sintaxe: %s canal ENTRYMSG [mensagem]

@@ -445,12 +445,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Language changed to English.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL changed to %s.
-NICK_SET_URL_UNSET
-	URL unset.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	E-mail address changed to %s.
@@ -458,14 +452,6 @@ NICK_SET_EMAIL_UNSET
 	E-mail address unset.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	You cannot unset the e-mail on this network.
-	
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	ICQ number set to %s.
-NICK_SET_ICQ_UNSET
-	ICQ number unset.
-NICK_SET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -568,12 +554,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Password for %s changed to %s.
 
-# SASET URL responses
-NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
-NICK_SASET_URL_UNSET
-	URL %s unset.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	E-mail address for %s changed to %s.
@@ -581,14 +561,6 @@ NICK_SASET_EMAIL_UNSET
 	E-mail address for %s unset.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	You cannot unset the e-mail on this network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
-NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
-NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -734,8 +706,6 @@ NICK_INFO_VHOST
 	            vhost: %s
 NICK_INFO_VHOST2
 	            vhost: %s@%s
-NICK_INFO_ICQ
-	            ICQ #: %d
 NICK_INFO_GREET
 	    Greet message: %s
 NICK_INFO_OPTIONS
@@ -1110,6 +1080,10 @@ CHAN_SET_DISABLED
 	Sorry, channel option setting is temporarily disabled.
 CHAN_SET_UNKNOWN_OPTION
 	Unknown SET option %s.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1128,12 +1102,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	Description of %s changed to %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	URL for %s changed to %s.
-CHAN_URL_UNSET
-	URL for %s unset.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3521,12 +3489,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Set the language Services will use when
 	                   sending messages to you
-NICK_HELP_CMD_SET_URL
-	    URL        Associate a URL with your nickname
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associate an E-mail address with your nickname
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Associate an ICQ number with your nickname
 NICK_HELP_CMD_SET_GREET
 	    GREET      Associate a greet message with your nickname
 NICK_HELP_CMD_SET_KILL
@@ -3572,26 +3536,12 @@ NICK_HELP_SET_LANGUAGE
 	supported languages:
 	
 
-NICK_HELP_SET_URL
-	Syntax: SET URL url
-	
-	Associates the given URL with your nickname.  This URL
-	will be displayed whenever someone requests information
-	on your nick with the INFO command.
-
 NICK_HELP_SET_EMAIL
 	Syntax: SET EMAIL address
 	
 	Associates the given E-mail address with your nickname.
 	This address will be displayed whenever someone requests
 	information on the nickname with the INFO command.
-	
-NICK_HELP_SET_ICQ
-	Syntax: SET ICQ number
-	
-	Associates the given ICQ number with your nickname.  This 
-	number will be displayed whenever someone requests 
-	information on your nick with the INFO command.
 	
 NICK_HELP_SET_GREET
 	Syntax: SET GREET message
@@ -3670,12 +3620,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
-NICK_HELP_CMD_SASET_URL
-	    URL        Associate a URL with the nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associate an ICQ number with the nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3713,24 +3659,10 @@ NICK_HELP_SASET_PASSWORD
 	
 	Changes the password used to identify as the nick's	owner.
 
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4245,10 +4177,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Set the successor for a channel
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Set the channel description
-CHAN_HELP_CMD_SET_URL
-	    URL           Associate a URL with the channel
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Associate an E-mail address with the channel
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Set a message to be sent to users when they
 	                     enter the channel
@@ -4309,23 +4237,6 @@ CHAN_HELP_SET_DESC
 	
 	Sets the description for the channel, which shows up with
 	the LIST and INFO commands.
-
-CHAN_HELP_SET_URL
-	Syntax: %s channel URL [url]
-	
-	Associates the given URL with the channel.  This URL will
-	be displayed whenever someone requests information on the
-	channel with the INFO command.  If no parameter is given,
-	deletes any current URL for the channel.
-
-CHAN_HELP_SET_EMAIL
-	Syntax: %s channel EMAIL [address]
-	
-	Associates the given E-mail address with the channel.
-	This address will be displayed whenever someone requests
-	information on the channel with the INFO command.  If no
-	parameter is given, deletes any current E-mail address for
-	the channel.
 
 CHAN_HELP_SET_ENTRYMSG
 	Syntax: %s channel ENTRYMSG [message]

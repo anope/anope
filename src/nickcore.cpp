@@ -9,9 +9,8 @@ NickCore::NickCore(const std::string &coredisplay)
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	display = email = greet = url = NULL;
+	display = email = greet = NULL;
 	ot = NULL;
-	icq = 0;
 	language = channelcount = 0;
 	lastmail = 0;
 
@@ -63,9 +62,6 @@ NickCore::~NickCore()
 		delete [] this->email;
 	if (this->greet)
 		delete [] this->greet;
-	if (this->url)
-		delete [] this->url;
-
 	if (!this->memos.memos.empty())
 	{
 		for (unsigned i = 0, end = this->memos.memos.size(); i < end; ++i)

@@ -202,10 +202,6 @@ void get_chanserv_stats(long *nrec, long *memuse)
 		mem += sizeof(*ci);
 		if (ci->desc)
 			mem += strlen(ci->desc) + 1;
-		if (ci->url)
-			mem += strlen(ci->url) + 1;
-		if (ci->email)
-			mem += strlen(ci->email) + 1;
 		mem += ci->GetAccessCount() * sizeof(ChanAccess);
 		mem += ci->GetAkickCount() * sizeof(AutoKick);
 

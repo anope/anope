@@ -449,12 +449,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Язык сервисов изменен на Русский.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL-адрес для вашего ника изменен на: %s.
-NICK_SET_URL_UNSET
-	URL-адрес для вашего ника удален.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	Email-адрес для вашего ника изменен на: %s.
@@ -462,14 +456,6 @@ NICK_SET_EMAIL_UNSET
 	Email-адрес для вашего ника удален.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Возможность удаления email-адреса в вашей IRC-сети недоступна.
-
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	ICQ-номер для вашего ника изменен на: %s
-NICK_SET_ICQ_UNSET
-	ICQ-номер для вашего ника удален.
-NICK_SET_ICQ_INVALID
-	Значение вида %s не является правильным ICQ-номером.
 
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -571,12 +557,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Пароль для %s изменен на %s.
 
-# SASET URL responses
-NICK_SASET_URL_CHANGED
-	URL-адрес для %s изменен на %s.
-NICK_SASET_URL_UNSET
-	URL-адрес для %s удален.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	Email-адрес для %s изменен на %s.
@@ -584,14 +564,6 @@ NICK_SASET_EMAIL_UNSET
 	Email-адрес для %s удален.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	Возможность удаления email-адреса в вашей IRC-сети недоступна.
-
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ-номер для %s установлен на %s.
-NICK_SASET_ICQ_UNSET
-	ICQ-номер для %s удален.
-NICK_SASET_ICQ_INVALID
-	Значение %s не является правильным ICQ-номером.
 
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -736,8 +708,6 @@ NICK_INFO_VHOST
 	Виртуальный хост........: %s
 NICK_INFO_VHOST2
 	Виртуальный хост........: %s@%s
-NICK_INFO_ICQ
-	ICQ-номер...............: %d
 NICK_INFO_GREET
 	Текст приветствия.......: %s
 NICK_INFO_OPTIONS
@@ -1111,6 +1081,10 @@ CHAN_SET_DISABLED
 	Извините, возможность установки опций каналов временно недоступна.
 CHAN_SET_UNKNOWN_OPTION
 	Неизвестная SET-опция %s.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1129,12 +1103,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	Описание канала %s изменено на %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	URL-адрес канала %s изменен на %s.
-CHAN_URL_UNSET
-	URL-адрес канала %s удален.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3550,12 +3518,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   выбор языка, посредством которого
 	               сервисы будут с вами общаться
-NICK_HELP_CMD_SET_URL
-	    URL        установка URL-адреса на ник
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      установка email-адреса на ник
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        установка ICQ-номера на ник
 NICK_HELP_CMD_SET_GREET
 	    GREET      установка приветственного сообщения
 NICK_HELP_CMD_SET_KILL
@@ -3600,24 +3564,11 @@ NICK_HELP_SET_LANGUAGE
 	сейчас и читаете.
 	В качестве номера, вы должны указать конкретный номер языка из
 	списка поддерживаемых языков:
-	
 
-NICK_HELP_SET_URL
-	Синтаксис: SET URL url-адрес
-	
-	Ассоциирует URL-адрес с вашим ником. Данный URL будет показан в
-	информации о вашем нике, предоставляемой по команде INFO.
-	
 NICK_HELP_SET_EMAIL
 	Синтаксис: SET EMAIL адрес@email
 	
 	Ассоциирует email-адрес с вашим ником. Данный email будет показан
-	в информации о вашем нике, предоставляемой по команде INFO.
-	
-NICK_HELP_SET_ICQ
-	Синтаксис: SET ICQ ICQ-номер
-	
-	Ассоциирует ICQ-номер с вашим ником. Данный ICQ-номер будет показан
 	в информации о вашем нике, предоставляемой по команде INFO.
 	
 NICK_HELP_SET_GREET
@@ -3715,12 +3666,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    установка главного ника группы
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   изменение текущего пароля на ник
-NICK_HELP_CMD_SASET_URL
-	    URL        установка URL-адреса на ник
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      установка email-адреса на ник
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        установка ICQ-номера на ник
 NICK_HELP_CMD_SASET_GREET
 	    GREET      установка приветственного сообщения
 NICK_HELP_CMD_SASET_KILL
@@ -3760,24 +3707,12 @@ NICK_HELP_SASET_PASSWORD
 	Позволяет изменить пароль ника, используемый для идентификации
 	в качестве владельца ника.
 
-NICK_HELP_SASET_URL
-	Синтаксис: SASET ник URL url-адрес
-	
-	Ассоциирует URL-адрес с указанным ником. Данный URL будет показан
-	в информации об указанном нике, предоставляемой по команде INFO.
-
 NICK_HELP_SASET_EMAIL
 	Синтаксис: SASET ник EMAIL адрес@email
 	
 	Ассоциирует email-адрес с указанным ником. Данный email будет показан
 	в информации об указанном нике, предоставляемой по команде INFO.
 	
-NICK_HELP_SASET_ICQ
-	Синтаксис: SASET ник ICQ ICQ-номер
-	
-	Ассоциирует ICQ-номер с указанным ником. Данный номер будет показан
-	в информации об указанном нике, предоставляемой по команде INFO.
-
 NICK_HELP_SASET_GREET
 	Синтаксис: SASET ник GREET текст
 	
@@ -4330,10 +4265,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     установка наследника канала
 CHAN_HELP_CMD_SET_DESC
 	    DESC          изменение описания канала
-CHAN_HELP_CMD_SET_URL
-	    URL           установка URL-адреса канала
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         установка Email-адреса канала
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      установка автосообщения при входе на канал
 CHAN_HELP_CMD_SET_BANTYPE
@@ -4394,22 +4325,6 @@ CHAN_HELP_SET_DESC
 	
 	Позволяет установить описание канала, которое будет показано при
 	использовании команд LIST и INFO.
-
-CHAN_HELP_SET_URL
-	Синтаксис: %s #канал URL [адрес]
-	
-	Позволяет установить URL-адрес канала. Данный URL будет показан
-	тогда, когда кто-либо запросит информацию о канале с помощью
-	команды INFO. Чтобы удалить установленный URL-адрес, используйте
-	данную команду без параметра.
-
-CHAN_HELP_SET_EMAIL
-	Синтаксис: %s #канал EMAIL [адрес@почты]
-	
-	Позволяет установить адрес электронной почты канала. Этот адрес
-	будет показан тогда, когда кто-либо запросит информацию о канале
-	с помощью команды INFO. Чтобы удалить установленный email-адрес,
-	используйте данную команду без параметра.
 
 CHAN_HELP_SET_ENTRYMSG
 	Синтаксис: %s #канал ENTRYMSG [текст]

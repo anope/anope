@@ -86,8 +86,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	NickCore *founder;
 	NickCore *successor; /* Who gets the channel if the founder nick is dropped or expires */
 	char *desc;
-	char *url;
-	char *email;
 
 	time_t time_registered;
 	time_t last_used;

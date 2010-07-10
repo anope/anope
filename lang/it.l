@@ -448,12 +448,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Lingua cambiata a Italiano.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL cambiato a %s.
-NICK_SET_URL_UNSET
-	Impostazione dell'URL annullata.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	Indirizzo e-mail cambiato a %s.
@@ -461,14 +455,6 @@ NICK_SET_EMAIL_UNSET
 	Impostazione dell'indirizzo e-mail annullata.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Non puoi annullare l'impostazione dell'e-mail.
-
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	Numero ICQ impostato a %s.
-NICK_SET_ICQ_UNSET
-	Impostazione del numero ICQ annullata.
-NICK_SET_ICQ_INVALID
-	%s non è un numero valido.
 
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -570,12 +556,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Password per %s cambiata in %s.
 
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL per %s cambiato in %s.
-NICK_SASET_URL_UNSET
-	URL %s rimosso.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	Indirizzo e-mail per %s cambiato in %s.
@@ -583,14 +563,6 @@ NICK_SASET_EMAIL_UNSET
 	Indirizzo e-mail per %s rimosso.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	Non puoi rimuovere l'indirizzo e-mail su questo network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	Numero ICQ per %s impostato a %s.
-NICK_SASET_ICQ_UNSET
-	Numero ICQ per %s rimosso.
-NICK_SASET_ICQ_INVALID
-	%s non è un numero valido.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -736,8 +708,6 @@ NICK_INFO_VHOST
 	                      vhost: %s
 NICK_INFO_VHOST2
 	            	      vhost: %s@%s
-NICK_INFO_ICQ
-	                 Numero ICQ: %d
 NICK_INFO_GREET
 	Messaggio di saluto (greet): %s
 NICK_INFO_OPTIONS
@@ -1115,6 +1085,10 @@ CHAN_SET_DISABLED
 	Spiacente, l'impostazione delle opzioni dei canali è temporaneamente disabilitata.
 CHAN_SET_UNKNOWN_OPTION
 	Opzione SET %s sconosciuta.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1133,12 +1107,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	La descrizione di %s è stata impostata a %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	L'URL di %s è stato impostato a %s.
-CHAN_URL_UNSET
-	L'URL di %s è stato annullato.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3538,8 +3506,6 @@ NICK_HELP_CMD_SET_GREET
 	    GREET      Associa un messaggio di saluto al tuo nick
 NICK_HELP_CMD_SET_HIDE
 	    HIDE       Nasconde alcune informazioni sul tuo nick
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Associa un numero ICQ al tuo nick
 NICK_HELP_CMD_SET_KILL
 	    KILL       Attiva o disattiva la protezione
 NICK_HELP_CMD_SET_LANGUAGE
@@ -3552,8 +3518,6 @@ NICK_HELP_CMD_SET_PRIVATE
 	    PRIVATE    Nasconde il nick dalla lista (%R%S LIST)
 NICK_HELP_CMD_SET_SECURE
 	    SECURE     Attiva o disattiva la sicurezza
-NICK_HELP_CMD_SET_URL
-	    URL        Associa un URL al tuo nick
 NICK_HELP_CMD_SET_AUTOOP
 	    AUTOOP     Should services op you automatically.    
 NICK_HELP_SET_TAIL
@@ -3587,24 +3551,10 @@ NICK_HELP_SET_LANGUAGE
 	elenca le lingue supportate:
 	
 
-NICK_HELP_SET_URL
-	Sintassi: SET URL url
-	
-	Associa l'URL indicato al proprio nick. Questo URL
-	sarà mostrato quando qualcuno richiede informazioni
-	sul proprio nick con il comando INFO.
-
 NICK_HELP_SET_EMAIL
 	Sintassi: SET EMAIL indirizzo
 	
 	Associa l'indirizzo e-mail specificato al proprio nick.
-	Questo indirizzo sarà mostrato quando qualcuno richiede
-	informazioni sul proprio nick con il comando INFO.
-
-NICK_HELP_SET_ICQ
-	Sintassi: SET ICQ numero
-	
-	Associa il numero ICQ specificato al proprio nick.
 	Questo indirizzo sarà mostrato quando qualcuno richiede
 	informazioni sul proprio nick con il comando INFO.
 
@@ -3683,12 +3633,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Imposta il nome del gruppo
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Imposta la password del nick
-NICK_HELP_CMD_SASET_URL
-	    URL        Associa un URL al nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associa un indirizzo e-mail al nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associa un numero ICQ al nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associa un messaggio di saluto al nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3724,24 +3670,10 @@ NICK_HELP_SASET_PASSWORD
 	Cambia la password utilizzata per identificarsi come
 	proprietario del nick.
 
-NICK_HELP_SASET_URL
-	Sintassi: SASET nickname URL url
-	
-	Associa l'URL indicato al nick. Questo URL
-	sarà mostrato quando qualcuno richiede informazioni
-	sul nick con il comando INFO.
-
 NICK_HELP_SASET_EMAIL
 	Sintassi: SASET nickname EMAIL indirizzo
 	
 	Associa l'indirizzo e-mail specificato al nickname.
-	
-NICK_HELP_SASET_ICQ
-	Sintassi: SASET nickname ICQ numero
-	
-	Associa il numero ICQ specificato al nick.
-	Questo indirizzo sarà mostrato quando qualcuno richiede
-	informazioni sul nick con il comando INFO.
 	
 NICK_HELP_SASET_GREET
 	Sintassi: SASET nickname GREET messaggio
@@ -4266,10 +4198,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Imposta il successore del fondatore del canale
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Imposta la descrizione del canale
-CHAN_HELP_CMD_SET_URL
-	    URL           Associa un URL al canale
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Associa un indirizzo e-mail al canale
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Imposta un messaggio che sarà inviato agli utenti
 	                     che entrano nel canale
@@ -4335,23 +4263,6 @@ CHAN_HELP_SET_DESC
 	
 	Imposta la descrizione del canale, che viene mostrata
 	con i comandi LIST e INFO.
-
-CHAN_HELP_SET_URL
-	Sintassi: %s canale URL [url]
-	
-	Associa l'URL specificato al canale. Questo URL sarà
-	mostrato quando qualcuno richiede informazioni relative
-	al canale con il comando INFO. Se non viene specificato
-	nessun URL, l'URL attuale del canale viene eliminato.
-
-CHAN_HELP_SET_EMAIL
-	Sintassi: %s canale EMAIL [indirizzo]
-	
-	Associa l'indirizzo e-mail specificato al canale. Questo
-	indirizzo sarà mostrato quando qualcuno richiede
-	informazioni relative al canale con il comando INFO. Se
-	non viene specificato nessun indirizzo, l'indirizzo attuale
-	del canale viene eliminato.
 
 CHAN_HELP_SET_ENTRYMSG
 	Sintassi: %s canale ENTRYMSG [messaggio]

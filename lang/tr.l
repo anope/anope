@@ -463,12 +463,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Dil Türkçe olarak deðiþtirildi.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL adresi %s olarak deðiþtirildi.
-NICK_SET_URL_UNSET
-	URL adresi silindi.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	E-mail adresi %s olarak deðiþtirildi.
@@ -477,14 +471,6 @@ NICK_SET_EMAIL_UNSET
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	E-mail adresini bu networkte silemezsiniz.
 
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	ICQ numarasý %s olarak deðiþtirildi.
-NICK_SET_ICQ_UNSET
-	ICQ numarasý silindi.
-NICK_SET_ICQ_INVALID
-	%s geçerli bir numara deðil.
-	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
 	Karþýlama mesajý %s olarak deðiþtirildi.
@@ -588,12 +574,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Password for %s changed to %s.
 
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
-NICK_SASET_URL_UNSET
-	URL %s unset.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	E-mail address for %s changed to %s.
@@ -601,14 +581,6 @@ NICK_SASET_EMAIL_UNSET
 	E-mail address for %s unset.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	You cannot unset the e-mail on this network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
-NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
-NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -754,8 +726,6 @@ NICK_INFO_VHOST
 	                 vhost: %s
 NICK_INFO_VHOST2
 	            	vhost: %s@%s
-NICK_INFO_ICQ
-	                 ICQ #: %d
 NICK_INFO_GREET
 	      Karþýlama mesajý: %s
 NICK_INFO_OPTIONS
@@ -1138,6 +1108,10 @@ CHAN_SET_DISABLED
 	Chanserv'ün SET komutu geçici olarak devre dýþýdýr.
 CHAN_SET_UNKNOWN_OPTION
 	Varolmayan SET özelliði: %s.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1156,12 +1130,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	%s kanalýnýn açýklamasý %s olarak deðiþtirildi.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	%s kanalýnýn URL adresi %s olarak deðiþtirildi.
-CHAN_URL_UNSET
-	%s kanalýnýn URL adresi kaldýrýldý.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3653,12 +3621,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Servislerin size hitap edeceði 
 	                  dili belirler
-NICK_HELP_CMD_SET_URL
-	    URL        Nickinizle bir URL yi iliþkilendirir
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Nickinizle bir email adresini iliþkilendirir
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Nickinizle bir ICQ numarasýný iliþikilendirir
 NICK_HELP_CMD_SET_GREET
 	    GREET      Nickiniz için bir karþýlama mesajý belirler
 NICK_HELP_CMD_SET_KILL
@@ -3702,25 +3666,11 @@ NICK_HELP_SET_LANGUAGE
 	numara aþaðýdaki listede desteklenen dillerden biri olarak 
 	belirlenir:
 
-NICK_HELP_SET_URL
-	Kullanýmý: SET URL url
-	
-	Nickiniz için bir URL adresi belirtir. Bu URL adresi birisi
-	sizin hakkýnýzda bilgi almak için INFO komutunu 
-	kullandýðýnda görünür.
-
 NICK_HELP_SET_EMAIL
 	Kullanýmý: SET EMAIL email adresiniz
 	
 	Nickiniz için bir email adresi belirtir. Bu email adresi
 	birisi sizin hakkýnýzda bilgi almak için INFO komutunu 
-	kullandýðýnda görünür.
-
-NICK_HELP_SET_ICQ
-	Kullanýmý: SET ICQ icqnumaranýz
-	
-	Nickiniz için bir ICQ numarasý belirtir. Bu ICQ numarasý
-	birisi sizin hakkýnýzda bilgi almak için INFO komutunu
 	kullandýðýnda görünür.
 
 NICK_HELP_SET_GREET
@@ -3798,12 +3748,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
-NICK_HELP_CMD_SASET_URL
-	    URL        Associate a URL with the nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associate an ICQ number with the nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3839,24 +3785,10 @@ NICK_HELP_SASET_PASSWORD
 	
 	Changes the password used to identify as the nick's	owner.
 
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4378,10 +4310,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Kanal successorýný belirler
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Kanal açýklamasýný belirler
-CHAN_HELP_CMD_SET_URL
-	    URL           Kanala bir URL adresini iliþkilendirir
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Kanala bir E-mail adresini iliþkilendirir
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Kanala giren kullanýcýlara gönderilecek mesajý
 	                   belirler
@@ -4443,24 +4371,6 @@ CHAN_HELP_SET_DESC
 	
 	LIST ve INFO komutlarý kullanýldýðýnda gözükecek kanal 
 	açýklamasýný belirler.
-
-CHAN_HELP_SET_URL
-	Kullanýmý: %s kanaladý URL [urladresi]
-	
-	Belirtilen URL adresini kanal ile iliþkilendirir. Bu URL 
-	adresi birisi kanal hakkýnda bilgi almak için INFO 
-	komutunu kullandýðýnda gözükür. Eðer urladresi parametresi
-	belirtilmezse kanal için önceden belirtilen URL adresi
-	silinir.
-
-CHAN_HELP_SET_EMAIL
-	Kullanýmý: %s kanaladý EMAIL [emailadresi]
-	
-	Belirtilen E-mail adresini kanal ile iliþkilendirir.Bu E-mail 
-	adresi birisi kanal hakkýnda bilgi almak için INFO komutunu 
-	kullandýðýnda gözükür. Eðer emailadresi parametresi
-	belirtilmezse kanal için önceden belirtilen E-mail adresi
-	silinir.
 
 CHAN_HELP_SET_ENTRYMSG
 	Kullanýmý: %s kanaladý ENTRYMSG [mesaj]

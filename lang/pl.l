@@ -557,13 +557,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Jêzyk zosta³ zmieniony na Polski.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	Adres www zosta³ zmieniony na %s.
-
-NICK_SET_URL_UNSET
-	Adres www zosta³ usuniêty.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	Adres e-mail zosta³ zmieniony na %s.
@@ -573,17 +566,6 @@ NICK_SET_EMAIL_UNSET
 
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Nie mo¿esz usuwaæ adresu e-mail w tej sieci.
-	
-
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	Numer ICQ zosta³ zmieniony na %s.
-
-NICK_SET_ICQ_UNSET
-	Numer ICQ zosta³ usuniêty.
-
-NICK_SET_ICQ_INVALID
-	%s nie jest prawid³owym numerem.
 	
 
 # SET GREET responses
@@ -718,13 +700,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Has³o dla %s zosta³o zmienione na %s.
 
-# SASET URL responses
-NICK_SASET_URL_CHANGED
-	Adres www osoby %s zosta³ zmieniony na %s.
-
-NICK_SASET_URL_UNSET
-	Adres www osoby %s zosta³ usuniêty.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	Adres e-mail osoby %s zosta³ zmieniony na %s.
@@ -734,17 +709,6 @@ NICK_SASET_EMAIL_UNSET
 
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	Nie mo¿esz usuwaæ adresu e-mail w tej sieci.
-	
-
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	Numer ICQ osoby %s zosta³ zmieniony na %s.
-
-NICK_SASET_ICQ_UNSET
-	Numer ICQ osoby %s zosta³ usuniêty.
-
-NICK_SASET_ICQ_INVALID
-	%s nie jest prawid³owym numerem.
 	
 
 # SASET GREET responses
@@ -940,9 +904,6 @@ NICK_INFO_VHOST
 
 NICK_INFO_VHOST2
 	         vhost: %s@%s
-
-NICK_INFO_ICQ
-	     Numer ICQ: %d
 
 NICK_INFO_GREET
 	     Powitanie: %s
@@ -1434,6 +1395,12 @@ CHAN_SET_DISABLED
 CHAN_SET_UNKNOWN_OPTION
 	Nieznana opcja komendy SET: %s.
 
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+
+CHAN_SETTING_UNSET
+	%s for %s unset.
+
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
 	%s posiada za du¿o zarejestrowanych kana³ów.
@@ -1454,13 +1421,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	Opis kana³u %s zosta³ zmieniony na %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	Adres www dla kana³u %s zosta³ zmieniony na %s.
-
-CHAN_URL_UNSET
-	Adres www dla kana³u %s zosta³ usuniêty.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -4588,12 +4548,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Ustawia jêzyk w którym serwisy bêd±
 	               wysy³a³y komunikaty
-NICK_HELP_CMD_SET_URL
-	    URL        Przypisuje adres www do nicka
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Przypisuje adres e-mail do nicka
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Przypisuje numer ICQ do nicka
 NICK_HELP_CMD_SET_GREET
 	    GREET      Przypisuje komunikat powitalny do nicka
 NICK_HELP_CMD_SET_KILL
@@ -4638,27 +4594,12 @@ NICK_HELP_SET_LANGUAGE
 	wys³an± przez Ciebie komendê). Numer mo¿e byæ 
 	wybrany z poni¿szej listy obs³ugiwanych jêzyków:
 
-NICK_HELP_SET_URL
-	Sk³adnia: SET URL adres
-	
-	Przypisuje podany adres strony www nickowi.
-	Ten adres bêdzie siê pokazywa³ w opisie Twojego
-	nicka dostêpnym po u¿yciu polecenia INFO.
-
 NICK_HELP_SET_EMAIL
 	Sk³adnia: SET EMAIL adres
 	
 	Przypisuje adres e-mail Twojemu nickowi. Adres
 	bêdzie wy¶wietlany przy opisie Twojego nicka
 	dostêpnym przy u¿yciu komendy INFO.
-
-NICK_HELP_SET_ICQ
-	Sk³adnia: SET ICQ numer
-	
-	Przypisuje numer ICQ Twojemu nickowi, który
-	bêdzie wy¶wietlany przy opisie Twojego nicka
-	dostêpnym przy u¿yciu komendy INFO.
-	
 
 NICK_HELP_SET_GREET
 	Sk³adnia: SET GREET wiadomo¶æ
@@ -4743,12 +4684,8 @@ NICK_HELP_CMD_SASET_PASSWORD
 NICK_HELP_CMD_SASET_LANGUAGE
 	    LANGUAGE   Ustawia jêzyk w którym serwisy bêd±
 	               wysy³a³y komunikaty
-NICK_HELP_CMD_SASET_URL
-	    URL        Przypisuje adres www do nicka
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Przypisuje adres e-mail do nicka
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Przypisuje numer ICQ do nicka
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Przypisuje komunikat powitalny do nicka
 NICK_HELP_CMD_SASET_KILL
@@ -4783,24 +4720,11 @@ NICK_HELP_SASET_PASSWORD
 	
 	Zmienia has³o wskazanemu u¿ytkownikowi.
 
-NICK_HELP_SASET_URL
-	Sk³adnia: SASET nick URL url
-	
-	Przypisuje podany adres www wskazanemu u¿ytkownikowi.
-	Ten adres bêdzie siê pokazywa³ w opisie jego nicka
-	dostêpnym po u¿yciu polecenia INFO.
-
 NICK_HELP_SASET_EMAIL
 	Sk³adnia: SASET nick EMAIL adres
 	
 	Przypisuje wskazanemu u¿ytkownikowi adres e-mail.
 
-NICK_HELP_SASET_ICQ
-	Sk³adnia: SASET nick ICQ numer
-	
-	Przypisuje numer ICQ wskazanemu nickowi, który
-	bêdzie wy¶wietlany przy opisie nicka dostêpnym
-	przy u¿yciu komendy INFO.
 NICK_HELP_SASET_GREET
 	Sk³adnia: SASET nick GREET wiadomo¶æ
 	
@@ -5354,10 +5278,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Ustawia nick spadkobiercy kana³u
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Ustawia opis kana³u
-CHAN_HELP_CMD_SET_URL
-	    URL           Przypisuje adres www do kana³u
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Przypisuje adres e-mail do kana³u
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Ustawia wiadomo¶æ, która bêdzie wysy³ana
 	                  do u¿ytkowników wchodz±cych na kana³
@@ -5418,20 +5338,6 @@ CHAN_HELP_SET_DESC
 	Sk³adnia: %s kana³ DESC opis
 	
 	Ustawia opis kana³u widoczny po wydaniu polecenia LIST oraz INFO.
-
-CHAN_HELP_SET_URL
-	Sk³adnia: %s kana³ URL [url]
-	
-	Przypisuje adres strony www do kana³u. Adres bêdzie
-	widoczny po u¿yciu polecenia INFO. Komenda wywo³ana
-	bez parametru usuwa wcze¶niej ustawiony adres.
-
-CHAN_HELP_SET_EMAIL
-	Sk³adnia: %s kana³ EMAIL [adres]
-	
-	Przypisuje adres e-mail do kana³u. Adres bêdzie
-	widoczny po u¿yciu polecenia INFO. Komenda wywo³ana
-	bez parametru usuwa wcze¶niej ustawiony adres.
 
 CHAN_HELP_SET_ENTRYMSG
 	Sk³adnia: %s kana³ ENTRYMSG [tre¶æ]

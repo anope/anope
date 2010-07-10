@@ -625,10 +625,6 @@ class DBPlain : public Module
 			nc->email = sstrdup(params[0].c_str());
 		else if (key == "GREET")
 			nc->greet = sstrdup(params[0].c_str());
-		else if (key == "ICQ")
-			nc->icq = atoi(params[0].c_str());
-		else if (key == "URL")
-			nc->url = sstrdup(params[0].c_str());
 		else if (key == "ACCESS")
 			nc->AddAccess(params[0]);
 		else if (key == "FLAGS")
@@ -728,10 +724,6 @@ class DBPlain : public Module
 		}
 		else if (key == "DESC")
 			ci->desc = sstrdup(params[0].c_str());
-		else if (key == "URL")
-			ci->url = sstrdup(params[0].c_str());
-		else if (key == "EMAIL")
-			ci->email = sstrdup(params[0].c_str());
 		else if (key == "TOPIC")
 		{
 			ci->last_topic_setter = params[0];
@@ -927,10 +919,6 @@ class DBPlain : public Module
 				db << "MD EMAIL " << nc->email << endl;
 			if (nc->greet)
 				db << "MD GREET :" << nc->greet << endl;
-			if (nc->icq)
-				db << "MD ICQ :" << nc->icq << endl;
-			if (nc->url)
-				db << "MD URL :" << nc->url << endl;
 			if (!nc->access.empty())
 			{
 				for (std::vector<std::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
@@ -1007,10 +995,6 @@ class DBPlain : public Module
 				db << "MD SUCCESSOR " << ci->successor->display << endl;
 			if (ci->desc)
 				db << "MD DESC :" << ci->desc << endl;
-			if (ci->url)
-				db << "MD URL :" << ci->url << endl;
-			if (ci->email)
-				db << "MD EMAIL :" << ci->email << endl;
 			if (ci->last_topic)
 				db << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
 			db << "MD LEVELS";

@@ -459,12 +459,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Llenguatge canviat a Català.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL canviada a %s.
-NICK_SET_URL_UNSET
-	URL no establerta.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	Adreça E-mail canviada a %s.
@@ -472,138 +466,6 @@ NICK_SET_EMAIL_UNSET
 	Adreça E-mail no establerta.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	No pots establir la teva adreça e-mail en aquesta xarxa.
-	
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	Numero ICQ establert a %s.
-NICK_SET_ICQ_UNSET
-	Numero ICQ no establert.
-NICK_SET_ICQ_INVALID
-	%s no es un numero vàlid.
-	
-# SET GREET responses
-NICK_SET_GREET_CHANGED
-	Missatge de benvinguda canviat a %s.
-NICK_SET_GREET_UNSET
-	Missatge de benvinguda no establert.
-
-# SET PROTECT responses
-NICK_SET_KILL_SYNTAX
-	SET KILL {ON | QUICK | OFF}
-NICK_SET_KILL_IMMED_SYNTAX
-	SET KILL {ON | QUICK | IMMED | OFF}
-NICK_SET_KILL_ON
-	Protecció activada.
-NICK_SET_KILL_QUICK
-	La protecció esta activada, amb demora reduida.
-NICK_SET_KILL_IMMED
-	La protecció esta activada, sense demora.
-NICK_SET_KILL_IMMED_DISABLED
-	L'opció IMMED no esta disponible en aquesta xarxa.
-NICK_SET_KILL_OFF
-	La protecció esta desactivada.
-
-# SET SECURE responses
-NICK_SET_SECURE_SYNTAX
-	SET SECURE {ON | OFF}
-NICK_SET_SECURE_ON
-	L'opció de seguretat esta activada.
-NICK_SET_SECURE_OFF
-	L'opció de seguretat esta desactivada.
-
-# SET PRIVATE responses
-NICK_SET_PRIVATE_SYNTAX
-	SET PRIVATE {ON | OFF}
-NICK_SET_PRIVATE_ON
-	L'opció de privacitat esta activada.
-NICK_SET_PRIVATE_OFF
-	L'opció de privacitat esta desactivada.
-
-# SET HIDE responses
-NICK_SET_HIDE_SYNTAX
-	SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
-NICK_SET_HIDE_EMAIL_ON
-	La teva adreça e-mail no sera mostrada a %s INFO displays.
-NICK_SET_HIDE_EMAIL_OFF
-	La teva adreça e-mail sera mostrada a %s INFO displays.
-NICK_SET_HIDE_MASK_ON
-	La teva ultima mascara usuari@host no sera mostrada a %s INFO displays.
-NICK_SET_HIDE_MASK_OFF
-	La teva ultima mascara usuari@host sera mostrada a %s INFO displays.
-NICK_SET_HIDE_QUIT_ON
-	El teu últim missatge quit no sera mostrat a %s INFO displays.
-NICK_SET_HIDE_QUIT_OFF
-	El teu últim missatge quit sera mostrat a %s INFO displays.
-	
-# SET MSG responses
-NICK_SET_HIDE_STATUS_ON
-	Your services access status will now be hidden from %s INFO displays.
-NICK_SET_HIDE_STATUS_OFF
-	Your services access status will now be shown in %s INFO displays.
-	
-# SET MSG responses
-NICK_SET_MSG_SYNTAX
-	SET PRIVATE {ON | OFF}
-NICK_SET_MSG_ON
-	Els serveis et respondran ara amb missatge.
-NICK_SET_MSG_OFF
-	Els serveis et respondran ara amb noticies.
-
-# SET AUTOOP responses
-NICK_SET_AUTOOP_SYNTAX
-	SET AUTOOP {ON | OFF}
-NICK_SET_AUTOOP_ON
-	Services will now autoop you in channels.
-NICK_SET_AUTOOP_OFF
-	Services will no longer autoop you in channels.
-
-# SASET NOEXPIRE responses
-NICK_SASET_SYNTAX
-	SASET nickname option parameters
-NICK_SASET_DISABLED
-	Sorry, nickname option setting is temporarily disabled.
-NICK_SASET_UNKNOWN_OPTION
-	Unknown SASET option %s.
-NICK_SASET_BAD_NICK
-	Nickname %s not registered.
-NICK_SASET_OPTION_DISABLED
-	Option %s cannot be set on this network.
-
-# SASET DISPLAY responses
-NICK_SASET_DISPLAY_INVALID
-	The new display for %s MUST be a nickname of the nickname group!
-NICK_SASET_DISPLAY_CHANGED
-	The new display is now %s.
-
-# SASET PASSWORD responses
-NICK_SASET_PASSWORD_FAILED
-	Sorry, couldn't change password for %s.
-NICK_SASET_PASSWORD_CHANGED
-	Password for %s changed.
-NICK_SASET_PASSWORD_CHANGED_TO
-	Password for %s changed to %s.
-
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
-NICK_SASET_URL_UNSET
-	URL %s unset.
-
-# SASET EMAIL responses
-NICK_SASET_EMAIL_CHANGED
-	E-mail address for %s changed to %s.
-NICK_SASET_EMAIL_UNSET
-	E-mail address for %s unset.
-NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
-	You cannot unset the e-mail on this network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
-NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
-NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -749,8 +611,6 @@ NICK_INFO_VHOST
 	            	vhost: %s
 NICK_INFO_VHOST2
 	            	vhost: %s@%s
-NICK_INFO_ICQ
-	                 ICQ #: %d
 NICK_INFO_GREET
 	 Missatge de benvinguda: %s
 NICK_INFO_OPTIONS
@@ -1134,6 +994,10 @@ CHAN_SET_DISABLED
 	Ho sento, l'establiment d'Opciós de canal esta temporalment deshAbilitat.
 CHAN_SET_UNKNOWN_OPTION
 	Opció SET %s desconoceguda.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1152,12 +1016,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	La descripció de %s canviada a%s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	URL per a %s canviada a %s.
-CHAN_URL_UNSET
-	URL per a %s no establerta.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3656,12 +3514,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Estableix el llenguatge amb el que els serveis
 	                   t'enviaran missatges
-NICK_HELP_CMD_SET_URL
-	    URL        Associa una URL amb el teu nickname
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Associa un E-mail amb el teu nickname
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Associa un numero ICQ amb el teu nickname
 NICK_HELP_CMD_SET_GREET
 	    GREET      Associa un salutació amb el teu nickname
 NICK_HELP_CMD_SET_KILL
@@ -3709,26 +3563,12 @@ NICK_HELP_SET_LANGUAGE
 	soportats:
 	
 
-NICK_HELP_SET_URL
-	Sintaxis: SET URL url
-	
-	Associa l'URL donada amb el teu nickname. Aquesta URL
-	sera mostrada quant algu demani informació
-	sobre el teu nick amb la comanda INFO.
-
 NICK_HELP_SET_EMAIL
 	Sintaxis: SET EMAIL direccion
 	
 	Associa el E-mail donat amb el teu nickname. L'e-mail
 	sera mostrat quant algu demani informació
 	sobre el teu nick amb la comanda INFO.
-	
-NICK_HELP_SET_ICQ
-	Sintaxis: SET ICQ numero
-	
-	Associa el numero ICQ donat amb el teu nickname. Aquest
-	numero sera mostrat quant algu soliciti
-	informació sobre el teu nick amb la comanda INFO.
 	
 NICK_HELP_SET_GREET
 	Sintaxis: SET GREET missatge
@@ -3806,12 +3646,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
-NICK_HELP_CMD_SASET_URL
-	    URL        Associate a URL with the nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associate an ICQ number with the nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3847,24 +3683,10 @@ NICK_HELP_SASET_PASSWORD
 	
 	Changes the password used to identify as the nick's	owner.
 
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4399,10 +4221,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Estableix el successor d'un canal
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Estableix la descripció del canal
-CHAN_HELP_CMD_SET_URL
-	    URL           Associa una URL amb el canal
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Associa un E-mail amb el canal
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Estableix un missatge a enviar als
 	                  usuaris quant entrin al canal
@@ -4468,23 +4286,6 @@ CHAN_HELP_SET_DESC
 	
 	Estableix la descripció pel canal, la que es mostrada
 	amb les comandes LIST i INFO.
-
-CHAN_HELP_SET_URL
-	Sintaxis: %s canal URL [url]
-	
-	Associa l'URL especificada amb el canal. Aquesta URL sera mostrada
-	quant algu sol.liciti informació sobre el canal amb
-	la comanda INFO. Si no s'especifica cap parametre, 
-	esborra la URL actual pel canal.
-
-CHAN_HELP_SET_EMAIL
-	Sintaxis: %s canal EMAIL [direcció]
-	
-	Associa l'adreça e-mail especificada amb el canal.
-	Aquesta adreça sera mostrada quant algu sol.liciti
-	informació sobre el canal amb la comanda INFO.
-	Si cap parametre es establert, borra l'adreça e-mail
-	actual pel canal.
 
 CHAN_HELP_SET_ENTRYMSG
 	Sintaxis: %s canal ENTRYMSG [missatge]

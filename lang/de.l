@@ -477,12 +477,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Sprache wurde geändert zu Deutsch.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL zu %s geändert.
-NICK_SET_URL_UNSET
-	URL entfernt.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	eMail-Adresse zu %s geändert.
@@ -490,14 +484,6 @@ NICK_SET_EMAIL_UNSET
 	eMail-Adresse wurde entfernt.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Du kannst in diesem Netzwerk deine eMail-Adresse nicht entfernen.
-	
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	ICQ-Nummer auf %s gesetzt.
-NICK_SET_ICQ_UNSET
-	ICQ-Nummer wurde entfernt.
-NICK_SET_ICQ_INVALID
-	%s ist keine gültige ICQ-Nummer.
 	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -599,12 +585,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Passwort für %s wurde auf %s gesetzt.
 
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL für %s wurde auf %s gesetzt.
-NICK_SASET_URL_UNSET
-	URL %s wurde entfernt.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	E-mail Adresse für %s wurde auf %s geändert.
@@ -612,14 +592,6 @@ NICK_SASET_EMAIL_UNSET
 	E-mail Adresse  %s wurde entfernt.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	Auf diesem Netzwerk ist es nicht möglich die E-Mail Adresse zu entfernen.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ Nummer für %s wurde auf %s gesetzt.
-NICK_SASET_ICQ_UNSET
-	ICQ Nummer %s wurde entfernt.
-NICK_SASET_ICQ_INVALID
-	%s ist keine gültige ICQ Nummer.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -766,8 +738,6 @@ NICK_INFO_VHOST
 	                   vHost: %s
 NICK_INFO_VHOST2
 	            	vHost: %s@%s
-NICK_INFO_ICQ
-	                   ICQ #: %d
 NICK_INFO_GREET
 	          Grussnachricht: %s
 NICK_INFO_OPTIONS
@@ -1155,6 +1125,10 @@ CHAN_SET_DISABLED
 	Channel-Optionen sind derzeit deaktiviert.
 CHAN_SET_UNKNOWN_OPTION
 	Unbekannte SET-Option %s.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -3633,11 +3607,6 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE     Stellt die Sprache ein, in der dir die 
 	                 Services antworten sollen.
-NICK_HELP_CMD_SET_URL
-	    URL          Verbindet eine URL mit deinem Nicknamen
-NICK_HELP_CMD_SET_ICQ
-	    ICQ          Trägt deine ICQ-Nummer unter den Infos
-	                 zu deinem Nicknamen ein.
 NICK_HELP_CMD_SET_MSG
 	    MSG          Ändert die Methode, wie die Services mit
 	                 dir kommunizieren
@@ -3697,13 +3666,6 @@ NICK_HELP_SET_LANGUAGE
 	Nummer muss von der folgenden Liste der unter-
 	stützten Sprachen ausgewählt werden: 
 
-NICK_HELP_SET_URL
-	Syntax: SET URL Url
-	
-	Verbindet die angegebene URL mit deinem Nicknamen.
-	Diese URL wird angezeigt, wenn jemand Informationen
-	über deinen Nicknamen mit dem INFO Befehl anfordert.
-
 NICK_HELP_SET_EMAIL
 	Syntax: SET EMAIL Adresse
 	
@@ -3711,13 +3673,6 @@ NICK_HELP_SET_EMAIL
 	Nicknamen. Diese Adresse wird angezeigt, wenn jemand 
 	Informationen über deinen Nicknamen mit dem INFO 
 	Befehl anfordert.
-	
-NICK_HELP_SET_ICQ
-	Syntax: SET ICQ Nummer
-	
-	Verbindet die angegebene ICQ Nummer mit deinem Nicknamen.
-	Diese Nummer wird angezeigt, wenn jemand Informationen
-	über deinen Nicknamen mit dem INFO Befehl anfordert.
 	
 NICK_HELP_SET_GREET
 	Syntax: SET GREET Nachricht
@@ -3807,12 +3762,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Setzt einen Nicknamen als Ursprung der Nickgruppe
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Setzt das Passwort eines Nicknamens
-NICK_HELP_CMD_SASET_URL
-	    URL        Fügt eine URL dem Nicknamen hinzu
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Fügt eine Emailadresse dem Nicknamen hinzu
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Fügt eine ICQ Nummer dem Nicknamen hinzu
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Fügt eine Begrüssungsnachricht dem Nicknamen hinzu
 NICK_HELP_CMD_SASET_KILL
@@ -3858,25 +3809,11 @@ NICK_HELP_SASET_PASSWORD
 	Ändert das Passwort um sich als Besitzer eines Nicknamens
 	zu identifizieren.
 	
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Verknüpft eine URL mit dem Nicknamen. Diese URL wird
-	angezeigt wenn jemand mit dem INFO Befehl nähere 
-	Informationen zu dem Nicknamen abruft.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Verknüpft die angegeben Emailadresse mit dem
 	Nicknamen.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Verknüpft die angegebene ICQ Nummer mit dem Nicknamen.
-	Diese ICQ Nummer wird angezeigt wenn jemand mit dem 
-	INFO Befehl nähere Informationen zu dem Nicknamen abruft.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4439,11 +4376,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Stellt den Vertreter des Founders ein
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Ändert die Channel-Beschreibung
-CHAN_HELP_CMD_SET_URL
-	    URL           Verbindet eine URL mit dem Channel
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Verbindet eine eMail-Adresse mit dem
-	                  Channel
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Stellt eine Begrüssungsmeldung des
 	                  Channels ein
@@ -4507,24 +4439,6 @@ CHAN_HELP_SET_DESC
 	
 	Ändert die Beschreibung für einen Channel, die bei
 	dem LIST und INFO Befehl angezeigt wird.
-
-CHAN_HELP_SET_URL
-	Syntax: %s Channel URL [Url]
-	
-	Verbindet die angegebene URL mit dem Channel. Diese
-	URL wird angezeigt, wenn jemand Informationen
-	über den Channel mit dem INFO Befehl abfragt.
-	Wird kein Parameter angegeben, wird die aktuelle
-	URL gelöscht.
-
-CHAN_HELP_SET_EMAIL
-	Syntax: %s Channel EMAIL [eMail-Adresse]
-	
-	Verbindet die angegebene eMail-Adresse mit dem
-	Channel. Diese eMail-Adresse wird angezeigt,
-	wenn jemand Informationen über den Channel mit
-	dem INFO Befehl abfragt.Wird kein Parameter 
-	angegeben, wird die aktuelle eMail-Adresse gelöscht.
 
 CHAN_HELP_SET_ENTRYMSG
 	Syntax: %s Channel ENTRYMSG [Nachricht]

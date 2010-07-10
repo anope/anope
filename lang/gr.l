@@ -457,12 +457,6 @@ NICK_SET_LANGUAGE_UNKNOWN
 NICK_SET_LANGUAGE_CHANGED
 	Η γλώσσα άλλαξε σε Ελληνικά.
 
-# SET URL responses
-NICK_SET_URL_CHANGED
-	URL άλλαξε σε %s.
-NICK_SET_URL_UNSET
-	URL δεν υπάρχει.
-
 # SET EMAIL responses
 NICK_SET_EMAIL_CHANGED
 	Η διεύθυνση του e-mail άλλαξε σε %s.
@@ -470,14 +464,6 @@ NICK_SET_EMAIL_UNSET
 	Η διεύθυνση του e-mail απενεργοποιήθηκε.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
 	Δεν μπορείς να απενεργοποιήσεις την διεύθυνση του e-mail σε αυτό το δίκτυο.
-	
-# SET ICQ responses
-NICK_SET_ICQ_CHANGED
-	Το νούμερο του ICQ άλλαξε σε %s.
-NICK_SET_ICQ_UNSET
-	Το νούμερο του ICQ απενεργοποιήθηκε.
-NICK_SET_ICQ_INVALID
-	%s δεν είναι σωστός αριθμός.
 	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
@@ -581,12 +567,6 @@ NICK_SASET_PASSWORD_CHANGED
 NICK_SASET_PASSWORD_CHANGED_TO
 	Password for %s changed to %s.
 
-# SASET LANGUAGE responses
-NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
-NICK_SASET_URL_UNSET
-	URL %s unset.
-
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
 	E-mail address for %s changed to %s.
@@ -594,14 +574,6 @@ NICK_SASET_EMAIL_UNSET
 	E-mail address for %s unset.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
 	You cannot unset the e-mail on this network.
-	
-# SASET ICQ responses
-NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
-NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
-NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
@@ -747,8 +719,6 @@ NICK_INFO_VHOST
 	            vhost: %s
 NICK_INFO_VHOST2
 	            vhost: %s@%s
-NICK_INFO_ICQ
-	            ICQ #: %d
 NICK_INFO_GREET
 	    Μήνυμα χαιρετισμού: %s
 NICK_INFO_OPTIONS
@@ -1132,6 +1102,10 @@ CHAN_SET_DISABLED
 	Συγνώμη, οι επιλογές για την ρύθμιση των καναλιών είναι απενεργοποιημένες.
 CHAN_SET_UNKNOWN_OPTION
 	’γνωστη SET επιλογή %s.
+CHAN_SETTING_CHANGED
+	%s for %s set to %s.
+CHAN_SETTING_UNSET
+	%s for %s unset.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1150,12 +1124,6 @@ CHAN_SUCCESSOR_IS_FOUNDER
 # SET DESC responses
 CHAN_DESC_CHANGED
 	Περιγραφή του %s άλλαξε σε %s.
-
-# SET URL responses
-CHAN_URL_CHANGED
-	URL του %s άλλαξε σε %s.
-CHAN_URL_UNSET
-	URL του %s δεν έχει οριστεί.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
@@ -3655,12 +3623,8 @@ NICK_HELP_CMD_SET_PASSWORD
 NICK_HELP_CMD_SET_LANGUAGE
 	    LANGUAGE   Αλλάζει τη γλώσσα που χρησιμοποιούν οι
 	                   υπηρεσίες όταν τις χρησιμοποιείτε
-NICK_HELP_CMD_SET_URL
-	    URL        Συσχετίζει ένα URL με το ψευδώνυμό σας
 NICK_HELP_CMD_SET_EMAIL
 	    EMAIL      Συσχετίζει μία διεύθυνση e-mail με το ψευδώνυμό σας
-NICK_HELP_CMD_SET_ICQ
-	    ICQ        Συσχετίζει ένα νούμερο ICQ με το ψευδώνυμό σας
 NICK_HELP_CMD_SET_GREET
 	    GREET      Συσχετίζει ένα μήνυμα χαιρετισμού με το ψευδώνυμό σας
 NICK_HELP_CMD_SET_KILL
@@ -3706,26 +3670,12 @@ NICK_HELP_SET_LANGUAGE
 	υποστηριζόμενων γλωσσών:
 	
 
-NICK_HELP_SET_URL
-	Σύνταξη: SET URL url
-	
-	Προσθέτει στις πληροφορίες του ψευδώνυμού σου το URL που του δίνεις.  Αυτό
-	το URL θα εμφανίζεται κάθε φορά που κάποιος θα θέλει να δει κάποιεσ πληροφορίες
-	για το ψευδώνυμο σου χρησιμοποιώντας την εντολή INFO.
-
 NICK_HELP_SET_EMAIL
 	Σύνταξη: SET EMAIL διεύθυνση
 	
 	Δείχνει την δεύθυνση E-mail που του έχεις δώσει για το ψευδώνυμο σου.
 	Αυτή η διεύθυνση θα εμφανίζεται κάθε φορά που κάποιος θα κοιτάζει πληροφορίες
 	στο κανάλι με την εντολή INFO.
-	
-NICK_HELP_SET_ICQ
-	Σύνταξη: SET ICQ number
-	
-	Προσθέτει στις πληροφορίες του ψευδώνυμού σου το νούμερο του ICQ.  Αυτό 
-	το νούμερο θα εμφανίζεται κάθε φορά που κάποιος θα θέλει να δει κάποιεσ πληροφορίες 
-	για το ψευδώνυμο σου χρησιμοποιώντας την εντολή INFO.
 	
 NICK_HELP_SET_GREET
 	Σύνταξη: SET GREET message
@@ -3809,12 +3759,8 @@ NICK_HELP_CMD_SASET_DISPLAY
 	    DISPLAY    Set the display of the group in Services
 NICK_HELP_CMD_SASET_PASSWORD
 	    PASSWORD   Set the nickname password
-NICK_HELP_CMD_SASET_URL
-	    URL        Associate a URL with the nickname
 NICK_HELP_CMD_SASET_EMAIL
 	    EMAIL      Associate an E-mail address with the nickname
-NICK_HELP_CMD_SASET_ICQ
-	    ICQ        Associate an ICQ number with the nickname
 NICK_HELP_CMD_SASET_GREET
 	    GREET      Associate a greet message with the nickname
 NICK_HELP_CMD_SASET_KILL
@@ -3850,24 +3796,10 @@ NICK_HELP_SASET_PASSWORD
 	
 	Changes the password used to identify as the nick's	owner.
 
-NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
-	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
-	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -4391,10 +4323,6 @@ CHAN_HELP_CMD_SET_SUCCESSOR
 	    SUCCESSOR     Αλλάζει τον successor του καναλιού
 CHAN_HELP_CMD_SET_DESC
 	    DESC          Αλλάζει την περιγραφή του καναλιού
-CHAN_HELP_CMD_SET_URL
-	    URL           Συσχετίζει ένα URL με το κανάλι
-CHAN_HELP_CMD_SET_EMAIL
-	    EMAIL         Συσχετίζει ένα E-mail με το κανάλι
 CHAN_HELP_CMD_SET_ENTRYMSG
 	    ENTRYMSG      Αλλάζει το μήνυμα εισαγωγής που στέλνετε σε όλους τους
 	                     χρήστες που μπένουν στο κανάλι
@@ -4455,23 +4383,6 @@ CHAN_HELP_SET_DESC
 	
 	Αλλάζετε την περιγραφή του καναλιού, η οποία φένεται με την εντολή
 	LIST και INFO.
-
-CHAN_HELP_SET_URL
-	Σύνταξη: %s κανάλι URL [url]
-	
-	Συσχετίζει ένα URL με το κανάλι.  Αυτό το URL θα
-	εμφανίζεται όταν κάποιος θα κοιτάζεις τις πληροφορίες του καναλιού
-	με την εντολή INFO.  Αν δεν δωθεί καμία παράμετρος,
-	θα σβηστεί οποιοδήποτε URL είχε δωθεί παλαιότερα στο κανάλι.
-
-CHAN_HELP_SET_EMAIL
-	Σύνταξη: %s κανάλι EMAIL [διεύθυνση]
-	
-	Συσχετίζει μια διεύθυνση E-mail με το κανάλι.
-	Αυτή η διεύθυνση εμφανίζεται όταν κάποιος θέλει να δει
-	διάφορες πληροφορίες σχετικά με το κανάλι, με την εντολή INFO.
-	Αν δεν δωθεί καμία παράμετρος, διαγράφει οποιαδήποτε διεύθυνση E-mail
-	είχε δωθεί στο κανάλι.
 
 CHAN_HELP_SET_ENTRYMSG
 	Σύνταξη: %s κανάλι ENTRYMSG [μήνυμα]

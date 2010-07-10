@@ -186,9 +186,6 @@ class CommandNSUngroup : public Command
 				na->nc->email = sstrdup(oldcore->email);
 			if (oldcore->greet)
 				na->nc->greet = sstrdup(oldcore->greet);
-			na->nc->icq = oldcore->icq;
-			if (oldcore->url)
-				na->nc->url = sstrdup(oldcore->url);
 			na->nc->language = oldcore->language;
 
 			notice_lang(Config.s_NickServ, u, NICK_UNGROUP_SUCCESSFUL, na->nick, oldcore->display);

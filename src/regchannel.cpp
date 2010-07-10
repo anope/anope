@@ -22,7 +22,7 @@ ChannelInfo::ChannelInfo(const std::string &chname)
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
 	founder = successor = NULL;
-	desc = url = email = last_topic = forbidby = forbidreason = NULL;
+	desc = last_topic = forbidby = forbidreason = NULL;
 	last_topic_time = 0;
 	levels = NULL;
 	entry_message = NULL;
@@ -83,10 +83,6 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->desc)
 		delete [] this->desc;
-	if (this->url)
-		delete [] this->url;
-	if (this->email)
-		delete [] this->email;
 	if (this->entry_message)
 		delete [] this->entry_message;
 

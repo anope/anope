@@ -318,6 +318,9 @@ int init_primary(int ac, char **av)
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init())
 		return -1;
+	
+	/* Create me */
+	Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, (Config.Numeric ? Config.Numeric : ""));
 
 	/* First thing, add our core bots internally. Before modules are loaded and before the database is read
 	 * This is used for modules adding commands and for the BotInfo* poiners in the command classes.

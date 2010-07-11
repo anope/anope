@@ -189,7 +189,6 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendConnect()
 	{
-		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, TS6SID);
 		ratbox_cmd_pass(uplink_server->password);
 		ratbox_cmd_capab();
 		/* Make myself known to myself in the serverlist */

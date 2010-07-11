@@ -276,7 +276,6 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, (Config.Numeric ? Config.Numeric : ""));
 		unreal_cmd_capab();
 		unreal_cmd_pass(uplink_server->password);
 		SendServer(Me);

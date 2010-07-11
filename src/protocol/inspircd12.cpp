@@ -240,7 +240,6 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, TS6SID);
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd(TS6SID, "BURST");

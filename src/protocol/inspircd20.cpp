@@ -241,7 +241,6 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(NULL, "CAPAB START 1202");
 		send_cmd(NULL, "CAPAB CAPABILITIES :PROTOCOL=1202");
 		send_cmd(NULL, "CAPAB END");
-		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, TS6SID);
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd(TS6SID, "BURST");

@@ -239,7 +239,6 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, "");
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd(NULL, "BURST");

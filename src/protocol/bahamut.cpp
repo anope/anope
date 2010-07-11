@@ -279,7 +279,6 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, "");
 		bahamut_cmd_pass(uplink_server->password);
 		bahamut_cmd_capab();
 		SendServer(Me);

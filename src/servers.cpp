@@ -66,16 +66,19 @@ Server::Server(Server *uplink, const std::string &name, unsigned int hops, const
 
 	/* Add this server to our uplinks leaf list */
 	if (UplinkServer)
+	{
 		UplinkServer->AddLink(this);
 
-	if (Me && UplinkServer && Me == UplinkServer)
-	{
-		/* Bring in our pseudo-clients */
-		introduce_user("");
+		/* Check to be sure the uplink server only has one uplink, otherwise we introduce our clients if we jupe servers */
+		if (Me == UplinkServer && UplinkServer->GetLinks()->size() == 1)
+		{
+			/* Bring in our pseudo-clients */
+			introduce_user("");
 
-		/* And some IRCds needs Global joined in the logchan */
-		if (LogChan && ircd->join2msg)
-			Global->Join(Config.LogChannel);
+			/* And some IRCds needs Global joined in the logchan */
+			if (LogChan && ircd->join2msg)
+				Global->Join(Config.LogChannel);
+		}
 	}
 }
 
@@ -199,15 +202,13 @@ void Server::AddLink(Server *s)
 	/* This is only used for Me, initially we start services with an uplink of NULL, then
 	 * connect to the server which introduces itself and has us as the uplink, which calls this
 	 */
-	if (!UplinkServer)
+	if (this == Me && !UplinkServer)
 		UplinkServer = s;
-	else
-	{
-		if (!Links)
-			Links = new std::list<Server *>();
+	
+	if (!Links)
+		Links = new std::list<Server *>();
 
-		Links->push_back(s);
-	}
+	Links->push_back(s);
 
 	Alog() << "Server " << s->GetName() << " introduced from " << GetName();
 }
@@ -298,8 +299,10 @@ bool Server::IsULined() const
  */
 Server *Server::Find(const std::string &name, Server *s)
 {
+	Alog(LOG_DEBUG) << "Server::Find called for " << name;
+
 	if (!s)
-		s = Me->GetUplink();
+		s = Me;
 	if (s->GetName() == name || s->GetSID() == name)
 		return s;
 
@@ -311,6 +314,7 @@ Server *Server::Find(const std::string &name, Server *s)
 
 			if (serv->GetName() == name || serv->GetSID() == name)
 				return serv;
+			Alog(LOG_DEBUG) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
 			Server *server = Server::Find(name, serv);
 			if (server)
 				return server;

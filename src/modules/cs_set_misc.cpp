@@ -1,4 +1,4 @@
-/* ChanServ core functions
+/*
  *
  * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
@@ -123,7 +123,7 @@ class CSSetMisc : public Module
 
 		Command *set = FindCommand(ChanServ, "SET");
 		Command *saset = FindCommand(ChanServ, "SASET");
-		if (!set && saset)
+		if (!set && !saset)
 			return;
 
 		ConfigReader config;
@@ -174,7 +174,7 @@ class CSSetMisc : public Module
 
 			if (ci->GetExtRegular("chanserv:" + it->first, value))
 			{
-				WriteMetadata(it->first, value.c_str());
+				WriteMetadata(it->first, ":" + std::string(value.c_str()));
 			}
 		}
 	}

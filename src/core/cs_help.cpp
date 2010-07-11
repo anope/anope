@@ -50,7 +50,8 @@ class CommandCSHelp : public Command
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP);
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
-			it->second->OnServHelp(u);
+			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+				it->second->OnServHelp(u);
 		if (Config.CSExpire >= 86400)
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_EXPIRES, Config.CSExpire / 86400);
 		if (u->Account() && u->Account()->IsServicesOper())

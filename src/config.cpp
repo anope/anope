@@ -664,6 +664,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "botmodes", "", new ValueContainerCIString(&Config.BotModes), DT_CISTRING, NoValidation},
 		{"options", "maxretries", "10", new ValueContainerUInt(&Config.MaxRetries), DT_UINTEGER, NoValidation},
 		{"options", "retrywait", "60", new ValueContainerInt(&Config.RetryWait), DT_INTEGER, ValidateNotZero},
+		{"options", "hideprivilegedcommands", "no", new ValueContainerBool(&Config.HidePrivilegedCommands), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&Config.s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&Config.desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&Config.NSEmailReg), DT_BOOLEAN, NoValidation},

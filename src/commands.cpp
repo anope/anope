@@ -167,7 +167,7 @@ void mod_help_cmd(BotInfo *bi, User *u, const ci::string &cmd)
 
 	ci::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining().c_str();
 
-	if (!c || !c->OnHelp(u, subcommand))
+	if (!c || (Config.HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(u, subcommand))
 		notice_lang(bi->nick, u, NO_HELP_AVAILABLE, cmd.c_str());
 	else
 	{

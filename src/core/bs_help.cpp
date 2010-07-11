@@ -33,7 +33,8 @@ class CommandBSHelp : public Command
 		// Abuse syntax error to display general list help.
 		notice_help(Config.s_BotServ, u, BOT_HELP);
 		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
-			it->second->OnServHelp(u);
+			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+				it->second->OnServHelp(u);
 		notice_help(Config.s_BotServ, u, BOT_HELP_FOOTER, Config.BSMinUsers);
 	}
 };

@@ -42,7 +42,8 @@ class CommandNSHelp : public Command
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP);
 		for (CommandMap::const_iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; ++it)
-			it->second->OnServHelp(u);
+			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+				it->second->OnServHelp(u);
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP);
 		if (Config.NSExpire >= 86400)

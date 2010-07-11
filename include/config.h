@@ -555,6 +555,8 @@ class ServerConfig
 	unsigned MaxRetries;
 	/* How long to wait between connection attempts */
 	int RetryWait;
+	/* If services should hide unprivileged commands */
+	bool HidePrivilegedCommands;
 
 	/* Services can use email */
 	bool UseMail;

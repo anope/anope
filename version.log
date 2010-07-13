@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3013"
+VERSION_BUILD="3014"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3014 - Increased command buffer size. Insp 2.0 has a bigger appetite it seems..
 #Revision 3012 - Removed enc_encrypt_in_place, it is unnecessary and it can easially be used improperly
 #Revision 3010 - Encrypt very long passwords properly on /ns and /cs register
 #Revision 3009 - Fixed charybdis and ratbox protocol modules not (properly) translating TS6 UIDs into nicks on kills.

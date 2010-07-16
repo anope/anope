@@ -12,7 +12,6 @@
 #define SMTP_H
 
 #include "sysconf.h"
-#define CoreExport
 #include "hashcomp.h"
 
 /*************************************************************************/

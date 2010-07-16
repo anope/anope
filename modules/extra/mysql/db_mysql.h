@@ -181,7 +181,6 @@ class DBMySQL : public Module
 		me = this;
 
 		this->SetAuthor("Anope");
-		this->SetVersion(VERSION_STRING);
 		this->SetType(DATABASE);
 
 		if (!LoadConfig())

@@ -1,7 +1,5 @@
-# Find all the *.c and *.cpp files within the current source directory, and sort the list
-file(GLOB TOOLS_SRCS_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
-file(GLOB TOOLS_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
-set(TOOLS_SRCS ${TOOLS_SRCS_C} ${TOOLS_SRCS_CPP})
+# Find all the *.cpp files within the current source directory, and sort the list
+file(GLOB TOOLS_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 sort_list(TOOLS_SRCS)
 
 # Set all the files to use C++ as well as set their compile flags
@@ -10,25 +8,30 @@ set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS 
 # Iterate through all the source files
 foreach(SRC ${TOOLS_SRCS})
   # Convert the source file extension to have no extension
-  string(REGEX REPLACE "\\.(c|cpp)$" "" EXE ${SRC})
+  string(REGEX REPLACE "\\.cpp$" "" EXE ${SRC})
+  # Create skip variable
+  set(SKIP)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC})
-  # For anoptsmtp, we also want hashcomp.cpp included, so we force it into the sources
-  if(SRC STREQUAL anopesmtp.cpp)
-    set(SRC ${SRC} ${Anope_SOURCE_DIR}/src/hashcomp.cpp)
-  endif(SRC STREQUAL anopesmtp.cpp)
-  # Generate the executable and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
-  add_executable(${EXE} ${SRC})
-  set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
-  add_dependencies(${EXE} ${PROGRAM_NAME})
-  # Set the executable to be installed to the bin directory under the main directory
-  install(TARGETS ${EXE}
-    DESTINATION bin
-  )
-  # Add the executable to the list of files for CPack to ignore
-  get_target_property(EXE_BINARY ${EXE} LOCATION)
-  get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
-  add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
+  calculate_depends(${SRC} SKIP)
+  # Only continue if this file isn't skipped
+  if(NOT SKIP)
+    # For anoptsmtp, we also want hashcomp.cpp included, so we force it into the sources
+    if(SRC STREQUAL anopesmtp.cpp)
+      set(SRC ${SRC} ${Anope_SOURCE_DIR}/src/hashcomp.cpp)
+    endif(SRC STREQUAL anopesmtp.cpp)
+    # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
+    add_executable(${EXE} ${SRC})
+    set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
+    add_dependencies(${EXE} ${PROGRAM_NAME})
+    # Set the executable to be installed to the bin directory under the main directory
+    install(TARGETS ${EXE}
+      DESTINATION bin
+    )
+    # Add the executable to the list of files for CPack to ignore
+    get_target_property(EXE_BINARY ${EXE} LOCATION)
+    get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
+    add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
+  endif(NOT SKIP)
 endforeach(SRC)
 
 # Only for Windows, set anopesmtp to require the wsock32 library

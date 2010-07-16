@@ -75,7 +75,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-ICON_APP                ICON                    "@Anope_SOURCE_DIR@/src/anope-icon.ico"
+ICON_APP                ICON                    "@Anope_SOURCE_DIR@/src/win32/anope-icon.ico"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

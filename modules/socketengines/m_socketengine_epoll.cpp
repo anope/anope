@@ -1,3 +1,5 @@
+/* RequiredFunctions: epoll_wait */
+
 #include "module.h"
 #include <sys/epoll.h>
 #include <ulimit.h>

@@ -68,7 +68,7 @@ else(MINOR_VERSION GREATER 5)
 endif(MINOR_VERSION GREATER 5)
 
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
-set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
 
 include(Anope)
 
@@ -411,7 +411,7 @@ set(VERSION_FULL_NOBUILD "${VERSION_DOTTED_NOBUILD}${VERSION_EXTRA}")
 # Only do the following for Windows
 if(WIN32)
   # Generate the win32.rc file using the above variables
-  configure_file(${Anope_SOURCE_DIR}/src/win32.rc.cmake ${Anope_BINARY_DIR}/src/win32.rc)
+  configure_file(${Anope_SOURCE_DIR}/src/win32/win32.rc.cmake ${Anope_BINARY_DIR}/src/win32/win32.rc)
 endif(WIN32)
 
 # Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
@@ -435,6 +435,7 @@ add_subdirectory(data)
 add_subdirectory(docs)
 add_subdirectory(lang)
 add_subdirectory(src)
+add_subdirectory(modules)
 add_subdirectory(include)
 
 # Get the filename of the Anope binary, to use later
@@ -454,7 +455,7 @@ if(NOT WIN32 AND RUNGROUP)
 endif(NOT WIN32 AND RUNGROUP)
 # On Windows platforms, install extra files
 if(WIN32)
-  install(FILES ${Anope_SOURCE_DIR}/anope.bat
+  install(FILES ${Anope_SOURCE_DIR}/src/win32/anope.bat
     DESTINATION bin
   )
   install(FILES ${Anope_SOURCE_DIR}/docs/Changes ${Anope_SOURCE_DIR}/docs/Changes.conf ${Anope_SOURCE_DIR}/docs/Changes.lang
@@ -490,8 +491,8 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     )
     # The following doesn't work, but a bug report has been filed about it
     #set(CPACK_CREATE_DESKTOP_LINK_${SERVICES_BINARY} TRUE)
-    set(CPACK_NSIS_MUI_ICON "${Anope_SOURCE_DIR}/src\\\\anope-icon.ico")
-    set(CPACK_NSIS_MUI_UNIICON "${Anope_SOURCE_DIR}/src\\\\anope-icon.ico")
+    set(CPACK_NSIS_MUI_ICON "${Anope_SOURCE_DIR}/src\\\\win32\\\\anope-icon.ico")
+    set(CPACK_NSIS_MUI_UNIICON "${Anope_SOURCE_DIR}/src\\\\win32\\\\anope-icon.ico")
     set(CPACK_NSIS_INSTALLED_ICON_NAME "${SERVICES_BINARY}")
     set(CPACK_NSIS_URL_INFO_ABOUT "http://www.anope.org/")
     set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")

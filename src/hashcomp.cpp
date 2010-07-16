@@ -8,7 +8,6 @@
  * for use in Anope.
  */
 
-#include "services.h"
 #include "hashcomp.h"
 
 /******************************************************

@@ -2,22 +2,20 @@
 file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
 
-# Don't include win32_memory.cpp, it's only required by Visual Studio to override it's override of the new/delete operators
-remove_item_from_list(SRC_SRCS win32_memory.cpp)
-
-# If not using Windows, don't include windows.cpp, as it's Windows-specific
-if(NOT WIN32)
-  remove_item_from_list(SRC_SRCS windows.cpp)
-endif(NOT WIN32)
-sort_list(SRC_SRCS)
-
-# If using Windows, remove the pthread threading engine from the list
+# If using Windows, include windows.cpp, as it's Windows-specific
 if(WIN32)
-  remove_item_from_list(SRC_SRCS threadengine_pthread.cpp)
-# If not using Windows, remove the Windows threading engine from the list
-else(WIN32)
-  remove_item_from_list(SRC_SRCS threadengine_win32.cpp)
+  append_to_list(SRC_SRCS win32/windows.cpp)
 endif(WIN32)
+
+# If using Windows, add the win32 threading engine to the list
+if(WIN32)
+  append_to_list(SRC_SRCS threadengines/threadengine_win32.cpp)
+# If not using Windows, add the pthread threading engine to the list
+else(WIN32)
+  append_to_list(SRC_SRCS threadengines/threadengine_pthread.cpp)
+endif(WIN32)
+
+sort_list(SRC_SRCS)
 
 # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
 set_source_files_properties(${SRC_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
@@ -28,8 +26,10 @@ set(EXTRA_INCLUDES)
 foreach(SRC ${SRC_SRCS})
   # Temporary variable for the current source's include directories
   set(TEMP_INCLUDES)
+  # Create unused skip variable
+  set(SKIP)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC} TEMP_INCLUDES)
+  calculate_depends(${SRC} SKIP TEMP_INCLUDES)
   # If there were some extra include directories, add them to the list
   if(TEMP_INCLUDES)
     append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
@@ -44,9 +44,9 @@ endif(EXTRA_INCLUDES)
 # Under Windows, we also include a resource file to the build
 if(WIN32)
   # Make sure that the resource file is seen as an RC file to be compiled with a resource compiler, not a C++ compiler
-  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc LANGUAGE RC)
+  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc LANGUAGE RC)
   # Add the resource file to the list of sources
-  append_to_list(SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32.rc)
+  append_to_list(SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc)
   # For MinGW, we have to change the compile flags
   if(MINGW)
     set(RC_CFLAGS "-DMINGW -Ocoff -I${Anope_SOURCE_DIR}/include")
@@ -54,17 +54,17 @@ if(WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
       set(RC_CFLAGS "${RC_CFLAGS} -D_DEBUG")
     endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "${RC_CFLAGS}")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "${RC_CFLAGS}")
   # For anything else, assumingly Visual Studio at this point, use a different set of compile flags
   else(MINGW)
-    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
   endif(MINGW)
 endif(WIN32)
 
-# If compiling with Visual Studio, create a static library out of win32_memory.cpp to be included with everything else, needed to override it's override of new/delete operators
+# If compiling with Visual Studio, create a static library out of win32/win32_memory.cpp to be included with everything else, needed to override its override of new/delete operators
 if(MSVC)
-  set_source_files_properties(win32_memory.cpp PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
-  add_library(win32_memory STATIC win32_memory.cpp)
+  set_source_files_properties(win32/win32_memory.cpp PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+  add_library(win32_memory STATIC win32/win32_memory.cpp)
   set(WIN32_MEMORY win32_memory)
 else(MSVC)
   set(WIN32_MEMORY)
@@ -93,9 +93,6 @@ configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/i
 
 # Go into the following directories and run their CMakeLists.txt as well
 add_subdirectory(bin)
-add_subdirectory(core)
-add_subdirectory(modules)
-add_subdirectory(protocol)
 add_subdirectory(tools)
 
 # Set Anope to be installed to the bin directory

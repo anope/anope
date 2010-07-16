@@ -359,12 +359,12 @@ macro(find_includes SRC INCLUDES)
 endmacro(find_includes)
 
 ###############################################################################
-# calculate_depends(<source filename> [<optional output variable for includes>])
+# calculate_depends(<source filename> <output variable set to TRUE on fail> [<optional output variable for includes>])
 #
 # This macro is used in most of the src (sub)directories to calculate the
 #   header file dependencies for the given source file.
 ###############################################################################
-macro(calculate_depends SRC)
+macro(calculate_depends SRC SKIP)
   # Temporarily set that we didn't get a 2nd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
   # Check for a second argument
@@ -375,6 +375,8 @@ macro(calculate_depends SRC)
   find_includes(${SRC} INCLUDES)
   # Reset the list of headers to empty
   set(HEADERS)
+  # Reset skip
+  set(${SKIP} FALSE)
   # Iterate through the strings containing #include (if any)
   foreach(INCLUDE ${INCLUDES})
     # Extract the filename from the #include line
@@ -398,7 +400,8 @@ macro(calculate_depends SRC)
             endif(FOUND_IN_INCLUDES EQUAL -1)
           endif(FOUND_IN_DEFAULTS EQUAL -1)
         else(FOUND_${FILENAME}_INCLUDE)
-          message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+          set(${SKIP} TRUE)
+          message("${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
         endif(FOUND_${FILENAME}_INCLUDE)
       endif(CHECK_ANGLE_INCLUDES)
     endif(QUOTE_TYPE STREQUAL "angle brackets")
@@ -406,12 +409,12 @@ macro(calculate_depends SRC)
 endmacro(calculate_depends)
 
 ###############################################################################
-# calculate_libraries(<source filename> <output variable for linker flags> <output variable for extra depends>)
+# calculate_libraries(<source filename> <output variable set to TRUE on fail> <output variable for linker flags> <output variable for extra depends>)
 #
-# This macro is used in most of the src (sub)directories to calculate the
+# This macro is used in most of the module (sub)directories to calculate the
 #   library dependencies for the given source file.
 ###############################################################################
-macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
+macro(calculate_libraries SRC SKIP SRC_LDFLAGS EXTRA_DEPENDS)
   # Set up a temporary LDFLAGS for this file
   set(THIS_LDFLAGS "${LDFLAGS}")
   # Reset extra dependencies
@@ -420,6 +423,8 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   set(LIBRARY_PATHS)
   # Reset libraries
   set(LIBRARIES)
+  # Default to not skipping this file
+  set(${SKIP} FALSE)
   # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
   read_from_file(${SRC} "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/" REQUIRED_LIBRARIES)
   # Iterate through those lines
@@ -449,33 +454,67 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
           append_to_list(LIBRARIES "${LIBRARY}")
         endif(MSVC)
       else(FOUND_${LIBRARY}_LIBRARY)
+        # Skip this file
+        set(${SKIP} TRUE)
         # In the case of the library not being found, we fatally error so CMake stops trying to generate
-        message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
+        message("${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
       endif(FOUND_${LIBRARY}_LIBRARY)
     endforeach(LIBRARY)
   endforeach(REQUIRED_LIBRARY)
-  # Remove duplicates from the library paths
-  if(LIBRARY_PATHS)
-    remove_list_duplicates(LIBRARY_PATHS)
-  endif(LIBRARY_PATHS)
-  # Remove diplicates from the libraries
-  if(LIBRARIES)
-    remove_list_duplicates(LIBRARIES)
-  endif(LIBRARIES)
-  # Iterate through library paths and add them to the linker flags
-  foreach(LIBRARY_PATH ${LIBRARY_PATHS})
-    find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
-    if(FOUND_IN_DEFAULTS EQUAL -1)
-      set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
-    endif(FOUND_IN_DEFAULTS EQUAL -1)
-  endforeach(LIBRARY_PATH)
-  # Iterate through libraries and add them to the linker flags
-  foreach(LIBRARY ${LIBRARIES})
-    set(THIS_LDFLAGS "${THIS_LDFLAGS} -l${LIBRARY}")
-  endforeach(LIBRARY)
-  set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
-  set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")
+  if(NOT ${SKIP})
+    # Remove duplicates from the library paths
+    if(LIBRARY_PATHS)
+      remove_list_duplicates(LIBRARY_PATHS)
+    endif(LIBRARY_PATHS)
+    # Remove diplicates from the libraries
+    if(LIBRARIES)
+      remove_list_duplicates(LIBRARIES)
+    endif(LIBRARIES)
+    # Iterate through library paths and add them to the linker flags
+    foreach(LIBRARY_PATH ${LIBRARY_PATHS})
+      find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
+      if(FOUND_IN_DEFAULTS EQUAL -1)
+        set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
+      endif(FOUND_IN_DEFAULTS EQUAL -1)
+    endforeach(LIBRARY_PATH)
+    # Iterate through libraries and add them to the linker flags
+    foreach(LIBRARY ${LIBRARIES})
+      set(THIS_LDFLAGS "${THIS_LDFLAGS} -l${LIBRARY}")
+    endforeach(LIBRARY)
+    set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
+    set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")
+  endif(NOT ${SKIP})
 endmacro(calculate_libraries)
+
+###############################################################################
+# check_functions(<source filename> <output variable set to TRUE on success>)
+#
+# This macro is used in most of the module (sub)directories to calculate the
+#   fcuntion dependencies for the given source file.
+###############################################################################
+macro(check_functions SRC SUCCESS)
+  # Default to true
+  set(${SUCCESS} TRUE)
+  # Check to see if there are any lines matching: /* RequiredFunctions: [something] */
+  read_from_file(${SRC} "/\\\\*[ \t]*RequiredFunctions:[ \t]*.*[ \t]*\\\\*/" REQUIRED_FUNCTIONS)
+  # Iterate through those lines
+  foreach(REQUIRED_FUNCTION ${REQUIRED_FUNCTIONS})
+    # Strip off the /* RequiredFunctions: and */ from the line
+    string(REGEX REPLACE "/\\*[ \t]*RequiredFunctions:[ \t]*([^ \t]*)[ \t]*\\*/" "\\1" REQUIRED_FUNCTION ${REQUIRED_FUNCTION})
+    # Replace all commas with semicolons
+    string(REGEX REPLACE "," ";" REQUIRED_FUNCTION ${REQUIRED_FUNCTION})
+    # Iterate through the functions given
+    foreach(FUNCTION ${REQUIRED_FUNCTION})
+      # Check if the function exists
+      check_function_exists(${REQUIRED_FUNCTION} HAVE_${REQUIRED_FUNCTION})
+      # If we don't have the function warn the user and set SUCCESS to FALSE
+      if(NOT HAVE_${REQUIRED_FUNCTION})
+        message("${SRC} needs function ${REQUIRED_FUNCTION} but we were unable to locate that function!")
+        set(${SUCCESS} FALSE)
+      endif(NOT HAVE_${REQUIRED_FUNCTION})
+    endforeach(FUNCTION)
+  endforeach(REQUIRED_FUNCTION)
+endmacro(check_functions)
 
 ###############################################################################
 # add_to_cpack_ignored_files(<item> [TRUE])

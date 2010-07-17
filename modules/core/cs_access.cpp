@@ -397,14 +397,15 @@ class CommandCSAccess : public Command
 		ChannelInfo *ci = cs_findchan(chan);
 
 		bool is_list = cmd == "LIST" || cmd == "VIEW";
+		bool is_clear = cmd == "CLEAR";
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
-		if (is_list || cmd == "CLEAR" ? 0 : (cmd == "DEL" ? (!nick || s) : !s))
+		if (is_list || is_clear ? 0 : (cmd == "DEL" ? (!nick || s) : !s))
 			this->OnSyntaxError(u, cmd);
-		/* We still allow LIST in xOP mode, but not others */
-		else if ((ci->HasFlag(CI_XOP)) && !is_list)
+		/* We still allow LIST and CLEAR in xOP mode, but not others */
+		else if ((ci->HasFlag(CI_XOP)) && !is_list && !is_clear)
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 				notice_lang(Config.s_ChanServ, u, CHAN_ACCESS_XOP_HOP, Config.s_ChanServ);

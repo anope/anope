@@ -154,21 +154,22 @@ int do_access(User * u)
 
     int i;
     int level = 0, ulev;
+    int is_clear = (cmd && stricmp(cmd, "CLEAR") == 0);
     int is_list = (cmd && stricmp(cmd, "LIST") == 0);
     int is_servadmin = is_services_admin(u);
 
     /* If LIST, we don't *require* any parameters, but we can take any.
      * If DEL, we require a nick and no level.
      * Else (ADD), we require a level (which implies a nick). */
-    if (!cmd || ((is_list || !stricmp(cmd, "CLEAR")) ? 0 :
+    if (!cmd || ((is_list || is_clear) ? 0 :
                  (stricmp(cmd, "DEL") == 0) ? (!nick || s) : !s)) {
         syntax_error(s_ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
     } else if (!(ci = cs_findchan(chan))) {
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
     } else if (ci->flags & CI_VERBOTEN) {
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-        /* We still allow LIST in xOP mode, but not others */
-    } else if ((ci->flags & CI_XOP) && !is_list) {
+        /* We still allow LIST and CLEAR in xOP mode, but not others */
+    } else if ((ci->flags & CI_XOP) && !is_list && !is_clear) {
 		if (ircd->halfop)
 	        notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
 		else

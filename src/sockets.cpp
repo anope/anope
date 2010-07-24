@@ -202,6 +202,11 @@ bool Socket::ProcessRead()
 	sbuffer.append(buffer);
 	extrabuf.clear();
 	size_t lastnewline = sbuffer.find_last_of('\n');
+	if (lastnewline == std::string::npos)
+	{
+		extrabuf = sbuffer;
+		return true;
+	}
 	if (lastnewline < sbuffer.size() - 1)
 	{
 		extrabuf = sbuffer.substr(lastnewline);

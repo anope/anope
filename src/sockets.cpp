@@ -65,6 +65,34 @@ int Socket::GetSock() const
 	return sock;
 }
 
+/** Mark a socket as blockig
+ * @return true if the socket is now blocking
+ */
+bool Socket::SetBlocking()
+{
+#ifdef _WIN32
+	unsigned long opt = 0;
+	return !ioctlsocket(this->GetSock(), FIONBIO, &opt);
+#else
+	int flags = fcntl(this->GetSock(), F_GETFL, 0);
+	return !fcntl(this->GetSock(), F_SETFL, flags & ~O_NONBLOCK);
+#endif
+}
+
+/** Mark a socket as non-blocking
+ * @return true if the socket is now non-blocking
+ */
+bool Socket::SetNonBlocking()
+{
+#ifdef _WIN32
+	unsigned long opt = 0;
+	return !ioctlsocket(this->GetSock(), FIONBIO, &opt);
+#else
+	int flags = fcntl(this->GetSock(), F_GETFL, 0);
+	return !fcntl(this->GetSock(), F_SETFL, flags | O_NONBLOCK);
+#endif
+}
+
 /** Check if this socket is IPv6
  * @return true or false
  */
@@ -305,6 +333,8 @@ ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std:
 			throw SocketException("Error connecting to server: " + std::string(strerror(errno)));
 		}
 	}
+
+	this->SetNonBlocking();
 }
 
 /** Default destructor
@@ -375,6 +405,8 @@ ListenSocket::ListenSocket(const std::string &bindip, int port) : Socket(0, (bin
 	{
 		throw SocketException("Unable to listen: " + std::string(strerror(errno)));
 	}
+
+	this->SetNonBlocking();
 }
 
 /** Destructor

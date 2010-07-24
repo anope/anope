@@ -92,6 +92,16 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 */
 	int GetSock() const;
 
+	/** Mark a socket as blockig
+	 * @return true if the socket is now blocking
+	 */
+	bool SetBlocking();
+
+	/** Mark a socket as non-blocking
+	 * @return true if the socket is now non-blocking
+	 */
+	bool SetNonBlocking();
+
 	/** Check if this socket is IPv6
 	 * @return true or false
 	 */

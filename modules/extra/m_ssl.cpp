@@ -31,6 +31,8 @@ class SSLSocket : public ClientSocket
  public:
 	SSLSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
 	{
+		this->SetBlocking();
+
 		sslsock = SSL_new(ctx);
 
 		if (!sslsock)
@@ -41,6 +43,8 @@ class SSLSocket : public ClientSocket
 		SSL_connect(sslsock);
 
 		UplinkSock = this;
+
+		this->SetNonBlocking();
 	}
 
 	~SSLSocket()

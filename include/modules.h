@@ -559,11 +559,11 @@ class CoreExport Module
 	* Note: Code that is in seperate expiry routines should just be done
 	* when we save the DB, theres no need to have both
 	*/
-	virtual void OnPreDatabaseExpire() MARK_DEPRECATED { }
+	virtual void OnPreDatabaseExpire() { }
 
 	/** Called when the database expire routines are called
 	 */
-	virtual void OnDatabaseExpire() MARK_DEPRECATED { }
+	virtual void OnDatabaseExpire() { }
 
 	/** Called when the flatfile dbs are being written
 	 * @param Write A callback to the function used to insert a line into the database

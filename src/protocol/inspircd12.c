@@ -733,7 +733,7 @@ int anope_event_opertype(char *source, int ac, char **av)
 
 int anope_event_fmode(char *source, int ac, char **av)
 {
-    char *newav[25];
+    char *newav[128];
     int n, o;
     Channel *c;
 

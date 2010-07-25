@@ -1201,7 +1201,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				sep.GetToken(modebuf);
 				for (size_t t = 0; t < modebuf.size(); ++t)
 				{
-					if (ModeManager::FindChannelModeByChar(modebuf[t]));
+					if (ModeManager::FindChannelModeByChar(modebuf[t]))
 						continue;
 					ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
 				}
@@ -1219,6 +1219,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				{
 					for (size_t t = 0; t < modebuf.size(); ++t)
 					{
+						if (ModeManager::FindUserModeByChar(modebuf[t]))
+							continue;
 						ModeManager::AddUserMode(new UserModeParam(UMODE_END, modebuf[t]));
 					}
 				}
@@ -1227,6 +1229,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				{
 					for (size_t t = 0; t < modebuf.size(); ++t)
 					{
+						if (ModeManager::FindUserModeByChar(modebuf[t]))
+							continue;
 						ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
 					}
 				}

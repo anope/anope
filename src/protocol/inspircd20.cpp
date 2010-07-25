@@ -1010,8 +1010,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				cm = new ChannelModeStatus(CMODE_OWNER, modechar[1], modechar[0]);
 			else if (modename == "halfop")
 				cm = new ChannelModeStatus(CMODE_HALFOP, modechar[1], modechar[0]);
-			else if (modename == "halfvoice")
-				continue; // XXX - halfvoice? wtf
 			else if (modename == "history")
 				continue; // XXX
 			else if (modename == "invex")
@@ -1044,14 +1042,10 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				cm = new ChannelMode(CMODE_NONICK, modechar[0]);
 			else if (modename == "nonotice")
 				cm = new ChannelMode(CMODE_NONOTICE, modechar[0]);
-			else if (modename == "official-join")
-				continue; // XXX
 			else if (modename == "op")
 				cm = new ChannelModeStatus(CMODE_OP, modechar[1], modechar[0]);
 			else if (modename == "operonly")
 				cm = new ChannelModeOper(modechar[0]);
-			else if (modename == "operprefix")
-				continue; // XXX
 			else if (modename == "permanent")
 				cm = new ChannelMode(CMODE_PERM, modechar[0]);
 			else if (modename == "private")
@@ -1072,6 +1066,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				cm = new ChannelMode(CMODE_TOPIC, modechar[0]);
 			else if (modename == "voice")
 				cm = new ChannelModeStatus(CMODE_VOICE, modechar[1], modechar[0]);
+			/* Unknown status mode, (customprefix) - add it */
+			else if (modechar.length() == 2)
+				cm = new ChannelModeStatus(CMODE_END, modechar[1], modechar[0]);
 			
 			if (cm)
 				ModeManager::AddChannelMode(cm);

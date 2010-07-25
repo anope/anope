@@ -76,14 +76,9 @@ IRCDVar myIrcd[] = {
 };
 
 static int has_servicesmod = 0;
-static int has_globopsmod = 0;
 static int has_svsholdmod = 0;
 static int has_chghostmod = 0;
 static int has_chgidentmod = 0;
-static int has_messagefloodmod = 0;
-static int has_banexceptionmod = 0;
-static int has_inviteexceptionmod = 0;
-static int has_hidechansmod = 0;
 
 /* Previously introduced user during burst */
 static User *prev_u_intro = NULL;
@@ -251,6 +246,9 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
+		send_cmd(NULL, "CAPAB START 1202");
+		send_cmd(NULL, "CAPAB CAPABILITIES :PROTOCOL=1202");
+		send_cmd(NULL, "CAPAB END");
 		inspircd_cmd_pass(uplink_server->password);
 		me_server = new_server(NULL, Config.ServerName, Config.ServerDesc, SERVER_ISME, TS6SID);
 		SendServer(me_server);
@@ -332,10 +330,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendGlobopsInternal(BotInfo *source, const char *buf)
 	{
-		if (has_globopsmod)
-			send_cmd(source ? source->uid : TS6SID, "SNONOTICE g :%s", buf);
-		else
-			send_cmd(source ? source->uid : TS6SID, "SNONOTICE A :%s", buf);
+		send_cmd(source ? source->uid : TS6SID, "SNONOTICE g :%s", buf);
 	}
 
 	void SendAccountLogin(User *u, NickCore *account)
@@ -781,16 +776,15 @@ int anope_event_setident(const char *source, int ac, const char **av)
 
 int anope_event_chgident(const char *source, int ac, const char **av)
 {
-	User *u;
+	User *u = finduser(source);
 
-	u = finduser(av[0]);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
+		Alog(LOG_DEBUG) << "FIDENT for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
-	u->SetIdent(av[1]);
+	u->SetIdent(av[0]);
 	return MOD_CONT;
 }
 
@@ -955,50 +949,220 @@ int anope_event_metadata(const char *source, int ac, const char **av)
 
 int anope_event_capab(const char *source, int ac, const char **av)
 {
-	if (strcasecmp(av[0], "START") == 0) {
+	if (strcasecmp(av[0], "START") == 0)
+	{
+		if (ac < 2 || atoi(av[1]) < 1202)
+		{
+			send_cmd(NULL, "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START");
+			quitmsg = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
+			quitting = 1;
+			return MOD_STOP;
+		}
+
 		/* reset CAPAB */
 		has_servicesmod = 0;
-		has_globopsmod = 0;
 		has_svsholdmod = 0;
 		has_chghostmod = 0;
 		has_chgidentmod = 0;
-		has_messagefloodmod = 0;
-		has_banexceptionmod = 0;
-		has_inviteexceptionmod = 0;
-		has_hidechansmod = 0;
+	}
+	else if (strcasecmp(av[0], "CHANMODES") == 0)
+	{
+		spacesepstream ssep(av[1]);
+		std::string capab;
 
-	} else if (strcasecmp(av[0], "MODULES") == 0) {
-		if (strstr(av[1], "m_globops.so")) {
-			has_globopsmod = 1;
+		while (ssep.GetToken(capab))
+		{
+			std::string modename = capab.substr(0, capab.find('='));
+			std::string modechar = capab.substr(capab.find('=') + 1);
+			ChannelMode *cm = NULL;
+
+			if (modename == "admin")
+				cm = new ChannelModeStatus(CMODE_PROTECT, modechar[1], modechar[0]);
+			else if (modename == "allowinvite")
+				cm = new ChannelMode(CMODE_ALLINVITE, modechar[0]);
+			else if (modename == "auditorium")
+				cm = new ChannelMode(CMODE_AUDITORIUM, modechar[0]);
+			else if (modename == "autoop")
+				continue; // XXX Not currently tracked
+			else if (modename == "ban")
+				cm = new ChannelModeBan(modechar[0]);
+			else if (modename == "banexception")
+				cm = new ChannelModeExcept(modechar[0]);
+			else if (modename == "blockcaps")
+				cm = new ChannelMode(CMODE_BLOCKCAPS, modechar[0]);
+			else if (modename == "blockcolor")
+				cm = new ChannelMode(CMODE_BLOCKCOLOR, modechar[0]);
+			else if (modename == "c_registered")
+				cm = new ChannelModeRegistered(modechar[0]);
+			else if (modename == "censor")
+				cm = new ChannelMode(CMODE_FILTER, modechar[0]);
+			else if (modename == "delayjoin")
+				cm = new ChannelMode(CMODE_DELAYEDJOIN, modechar[0]);
+			else if (modename == "delaymsg")
+				continue;
+			else if (modename == "exemptchanops")
+				continue; // XXX
+			else if (modename == "filter")
+				continue; // XXX
+			else if (modename == "flood")
+				cm = new ChannelModeFlood(modechar[0], true);
+			else if (modename == "founder")
+				cm = new ChannelModeStatus(CMODE_OWNER, modechar[1], modechar[0]);
+			else if (modename == "halfop")
+				cm = new ChannelModeStatus(CMODE_HALFOP, modechar[1], modechar[0]);
+			else if (modename == "halfvoice")
+				continue; // XXX - halfvoice? wtf
+			else if (modename == "history")
+				continue; // XXX
+			else if (modename == "invex")
+				cm = new ChannelModeInvex(modechar[0]);
+			else if (modename == "inviteonly")
+				cm = new ChannelMode(CMODE_INVITE, modechar[0]);
+			else if (modename == "joinflood")
+				cm = new ChannelModeParam(CMODE_JOINFLOOD, modechar[0], true);
+			else if (modename == "key")
+				cm = new ChannelModeKey(modechar[0]);
+			else if (modename == "kicknorejoin")
+				cm = new ChannelModeParam(CMODE_NOREJOIN, modechar[0], true);
+			else if (modename == "limit")
+				cm = new ChannelModeParam(CMODE_LIMIT, modechar[0], true);
+			else if (modename == "moderated")
+				cm = new ChannelMode(CMODE_MODERATED, modechar[0]);
+			else if (modename == "namebase")
+				continue; // XXX
+			else if (modename == "nickflood")
+				cm = new ChannelModeParam(CMODE_NICKFLOOD, modechar[0], true);
+			else if (modename == "noctcp")
+				cm = new ChannelMode(CMODE_NOCTCP, modechar[0]);
+			else if (modename == "noextmsg")
+				cm = new ChannelMode(CMODE_NOEXTERNAL, modechar[0]);
+			else if (modename == "nokick")
+				cm = new ChannelMode(CMODE_NOKICK, modechar[0]);
+			else if (modename == "noknock")
+				cm = new ChannelMode(CMODE_NOKNOCK, modechar[0]);
+			else if (modename == "nonick")
+				cm = new ChannelMode(CMODE_NONICK, modechar[0]);
+			else if (modename == "nonotice")
+				cm = new ChannelMode(CMODE_NONOTICE, modechar[0]);
+			else if (modename == "official-join")
+				continue; // XXX
+			else if (modename == "op")
+				cm = new ChannelModeStatus(CMODE_OP, modechar[1], modechar[0]);
+			else if (modename == "operonly")
+				cm = new ChannelModeOper(modechar[0]);
+			else if (modename == "operprefix")
+				continue; // XXX
+			else if (modename == "permanent")
+				cm = new ChannelMode(CMODE_PERM, modechar[0]);
+			else if (modename == "private")
+				cm = new ChannelMode(CMODE_PRIVATE, modechar[0]);
+			else if (modename == "redirect")
+				cm = new ChannelModeParam(CMODE_REDIRECT, modechar[0], true);
+			else if (modename == "reginvite")
+				cm = new ChannelMode(CMODE_REGISTEREDONLY, modechar[0]);
+			else if (modename == "regmoderated")
+				cm = new ChannelMode(CMODE_REGMODERATED, modechar[0]);
+			else if (modename == "secret")
+				cm = new ChannelMode(CMODE_SECRET, modechar[0]);
+			else if (modename == "sslonly")
+				cm = new ChannelMode(CMODE_SSL, modechar[0]);
+			else if (modename == "stripcolor")
+				cm = new ChannelMode(CMODE_STRIPCOLOR, modechar[0]);
+			else if (modename == "topiclock")
+				cm = new ChannelMode(CMODE_TOPIC, modechar[0]);
+			else if (modename == "voice")
+				cm = new ChannelModeStatus(CMODE_VOICE, modechar[1], modechar[0]);
+			
+			if (cm)
+				ModeManager::AddChannelMode(cm);
+			else
+				Alog() << "Unrecognized mode string in CAPAB CHANMODES: " << capab;
 		}
-		if (strstr(av[1], "m_services_account.so")) {
-			has_servicesmod = 1;
+	}
+	else if (strcasecmp(av[0], "USERMODES") == 0)
+	{
+		spacesepstream ssep(av[1]);
+		std::string capab;
+
+		while (ssep.GetToken(capab))
+		{
+			std::string modename = capab.substr(0, capab.find('='));
+			std::string modechar = capab.substr(capab.find('=') + 1);
+			UserMode *um = NULL;
+
+			if (modename == "bot")
+				um = new UserMode(UMODE_BOT, modechar[0]);
+			else if (modename == "callerid")
+				um = new UserMode(UMODE_CALLERID, modechar[0]);
+			else if (modename == "cloak")
+				um = new UserMode(UMODE_CLOAK, modechar[0]);
+			else if (modename == "deaf")
+				um = new UserMode(UMODE_DEAF, modechar[0]);
+			else if (modename == "deaf_commonchan")
+				um = new UserMode(UMODE_COMMONCHANS, modechar[0]);
+			else if (modename == "helpop")
+				um = new UserMode(UMODE_HELPOP, modechar[0]);
+			else if (modename == "hidechans")
+				um = new UserMode(UMODE_PRIV, modechar[0]);
+			else if (modename == "hideoper")
+				um = new UserMode(UMODE_HIDEOPER, modechar[0]);
+			else if (modename == "invisible")
+				um = new UserMode(UMODE_INVIS, modechar[0]);
+			else if (modename == "oper")
+				um = new UserMode(UMODE_OPER, modechar[0]);
+			else if (modename == "regdeaf")
+				um = new UserMode(UMODE_REGPRIV, modechar[0]);
+			else if (modename == "servprotect")
+				um = new UserMode(UMODE_PROTECTED, modechar[0]);
+			else if (modename == "showwhois")
+				um = new UserMode(UMODE_WHOIS, modechar[0]);
+			else if (modename == "snomask")
+				continue; // XXX
+			else if (modename == "u_censor")
+				um = new UserMode(UMODE_FILTER, modechar[0]);
+			else if (modename == "u_registered")
+				um = new UserMode(UMODE_REGISTERED, modechar[0]);
+			else if (modename == "u_stripcolor")
+				um = new UserMode(UMODE_STRIPCOLOR, modechar[0]);
+			else if (modename == "wallops")
+				um = new UserMode(UMODE_WALLOPS, modechar[0]);
+
+			if (um)
+				ModeManager::AddUserMode(um);
+			else
+				Alog() << "Unrecognized mode string in CAPAB USERMODES: " << capab;
 		}
-		if (strstr(av[1], "m_svshold.so")) {
-			has_svsholdmod = 1;
+	}
+	else if (strcasecmp(av[0], "MODULES") == 0)
+	{
+		spacesepstream ssep(av[1]);
+		std::string module;
+
+		while (ssep.GetToken(module))
+		{
+			if (module == "m_svshold.so")
+				has_svsholdmod = 1;
 		}
-		if (strstr(av[1], "m_chghost.so")) {
-			has_chghostmod = 1;
+	}
+	else if (strcasecmp(av[0], "MODSUPPORT") == 0)
+	{
+		spacesepstream ssep(av[1]);
+		std::string module;
+
+		while (ssep.GetToken(module))
+		{
+			if (module == "m_services_account.so")
+				has_servicesmod = 1;
+			else if (module == "m_chghost.so")
+				has_chghostmod = 1;
+			else if (module == "m_chgident.so")
+				has_chgidentmod = 1;
+			else if (module == "m_servprotect.so")
+				ircd->pseudoclient_mode = "+Ik";
 		}
-		if (strstr(av[1], "m_chgident.so")) {
-			has_chgidentmod = 1;
-		}
-		if (strstr(av[1], "m_messageflood.so")) {
-			has_messagefloodmod = 1;
-		}
-		if (strstr(av[1], "m_banexception.so")) {
-			has_banexceptionmod = 1;
-		}
-		if (strstr(av[1], "m_inviteexception.so")) {
-			has_inviteexceptionmod = 1;
-		}
-		if (strstr(av[1], "m_hidechans.so")) {
-			has_hidechansmod = 1;
-		}
-		if (strstr(av[1], "m_servprotect.so")) {
-			ircd->pseudoclient_mode = "+Ik";
-		}
-	} else if (strcasecmp(av[0], "CAPABILITIES") == 0) {
+	}
+	else if (strcasecmp(av[0], "CAPABILITIES") == 0)
+	{
 		spacesepstream ssep(av[1]);
 		std::string capab;
 		while (ssep.GetToken(capab))
@@ -1012,151 +1176,34 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				sep.GetToken(modebuf);
 				for (size_t t = 0; t < modebuf.size(); ++t)
 				{
-					switch (modebuf[t])
-					{
-						case 'b':
-							ModeManager::AddChannelMode(new ChannelModeBan('b'));
-							continue;
-						case 'e':
-							ModeManager::AddChannelMode(new ChannelModeExcept('e'));
-							continue;
-						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
-							continue;
-						/* InspIRCd sends q and a here if they have no prefixes */
-						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '@'));
-							continue;
-						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT	, 'a', '@'));
-							continue;
-						// XXX list modes needs a bit of a rewrite, we need to be able to support +g here
-						default:
-							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
-					}
+					if (ModeManager::FindChannelModeByChar(modebuf[t]))
+						continue;
+					// XXX list modes needs a bit of a rewrite
+					ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
 				}
 
 				sep.GetToken(modebuf);
 				for (size_t t = 0; t < modebuf.size(); ++t)
 				{
-					switch (modebuf[t])
-					{
-						case 'k':
-							ModeManager::AddChannelMode(new ChannelModeKey('k'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
-					}
+					if (ModeManager::FindChannelModeByChar(modebuf[t]))
+						continue;
+					ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
 				}
 
 				sep.GetToken(modebuf);
 				for (size_t t = 0; t < modebuf.size(); ++t)
 				{
-					switch (modebuf[t])
-					{
-						case 'F':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NICKFLOOD, 'F', true));
-							continue;
-						case 'J':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_NOREJOIN, 'J', true));
-							continue;
-						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L', true));
-							continue;
-						case 'f':
-							ModeManager::AddChannelMode(new ChannelModeFlood('f', true));
-							continue;
-						case 'j':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, 'j', true));
-							continue;
-						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
-					}
+					if (ModeManager::FindChannelModeByChar(modebuf[t]))
+						continue;
+					ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
 				}
 
 				sep.GetToken(modebuf);
 				for (size_t t = 0; t < modebuf.size(); ++t)
 				{
-					switch (modebuf[t])
-					{
-						case 'A':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, 'A'));
-							continue;
-						case 'B':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCAPS, 'B'));
-							continue;
-						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
-							continue;
-						case 'D':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_DELAYEDJOIN, 'D'));
-							continue;
-						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
-							continue;
-						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, 'K'));
-							continue;
-						case 'M':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
-							continue;
-						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, 'N'));
-							continue;
-						case 'O':
-							ModeManager::AddChannelMode(new ChannelModeOper('O'));
-							continue;
-						case 'P':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, 'P'));
-							continue;
-						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, 'Q'));
-							continue;
-						case 'R':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
-							continue;
-						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, 'S'));
-							continue;
-						case 'T':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'T'));
-							continue;
-						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
-							continue;
-						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
-							continue;
-						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
-							continue;
-						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
-							continue;
-						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
-							continue;
-						case 'r':
-							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
-							continue;
-						case 's':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
-							continue;
-						case 't':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
-							continue;
-						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, 'u'));
-							continue;
-						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
-					}
+					if (ModeManager::FindChannelModeByChar(modebuf[t]));
+						continue;
+					ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
 				}
 			}
 			else if (capab.find("USERMODES") != std::string::npos)
@@ -1165,99 +1212,22 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				commasepstream sep(modes);
 				std::string modebuf;
 
-				while (sep.GetToken(modebuf))
+				sep.GetToken(modebuf);
+				sep.GetToken(modebuf);
+				
+				if (sep.GetToken(modebuf))
 				{
 					for (size_t t = 0; t < modebuf.size(); ++t)
 					{
-						switch (modebuf[t])
-						{
-							case 'h':
-								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
-								continue;
-							case 's':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
-								continue;
-							case 'B':
-								ModeManager::AddUserMode(new UserMode(UMODE_BOT, 'B'));
-								continue;
-							case 'G':
-								ModeManager::AddUserMode(new UserMode(UMODE_FILTER, 'G'));
-								continue;
-							case 'H':
-								ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, 'H'));
-								continue;
-							case 'I':
-								ModeManager::AddUserMode(new UserMode(UMODE_PRIV, 'I'));
-								continue;
-							case 'Q':
-								ModeManager::AddUserMode(new UserMode(UMODE_HIDDEN, 'Q'));
-								continue;
-							case 'R':
-								ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
-								continue;
-							case 'S':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
-								continue;
-							case 'W':
-								ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, 'W'));
-								continue;
-							case 'c':
-								ModeManager::AddUserMode(new UserMode(UMODE_COMMONCHANS, 'c'));
-								continue;
-							case 'g':
-								ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
-								continue;
-							case 'i':
-								ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
-								continue;
-							case 'k':
-								ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'k'));
-								continue;
-							case 'o':
-								ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
-								continue;
-							case 'r':
-								ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
-								continue;
-							case 'w':
-								ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
-								continue;
-							case 'x':
-								ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
-								continue;
-							case 'd':
-								ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
-								continue;
-							default:
-								ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
-						}
+						ModeManager::AddUserMode(new UserModeParam(UMODE_END, modebuf[t]));
 					}
 				}
-			}
-			else if (capab.find("PREFIX=(") != std::string::npos)
-			{
-				std::string modes(capab.begin() + 8, capab.begin() + capab.find(")"));
-				std::string chars(capab.begin() + capab.find(")") + 1, capab.end());
-				
-				for (size_t t = 0; t < modes.size(); ++t)
+
+				if (sep.GetToken(modebuf))
 				{
-					switch (modes[t])
+					for (size_t t = 0; t < modebuf.size(); ++t)
 					{
-						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', chars[t]));
-							continue;
-						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', chars[t]));
-							continue;
-						case 'o':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', chars[t]));
-							continue;
-						case 'h':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', chars[t]));
-							continue;
-						case 'v':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', chars[t]));
-							continue;
+						ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
 					}
 				}
 			}
@@ -1267,20 +1237,18 @@ int anope_event_capab(const char *source, int ac, const char **av)
 				ircd->maxmodes = atoi(maxmodes.c_str());
 			}
 		}
-	} else if (strcasecmp(av[0], "END") == 0) {
-		if (!has_globopsmod) {
-			send_cmd(NULL, "ERROR :m_globops is not loaded. This is required by Anope");
-			quitmsg = "Remote server does not have the m_globops module loaded, and this is required.";
-			quitting = 1;
-			return MOD_STOP;
-		}
-		if (!has_servicesmod) {
+	}
+	else if (strcasecmp(av[0], "END") == 0)
+	{
+		if (!has_servicesmod)
+		{
 			send_cmd(NULL, "ERROR :m_services_account.so is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}
-		if (!has_hidechansmod) {
+		if (!ModeManager::FindUserModeByName(UMODE_PRIV))
+		{
 			send_cmd(NULL, "ERROR :m_hidechans.so is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
 			quitting = 1;
@@ -1356,7 +1324,7 @@ void moduleAddIRCDMsgs() {
 	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
 	m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
 	m = createMessage("FHOST",	 anope_event_chghost); addCoreMessage(IRCD,m);
-	m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
+	m = createMessage("FIDENT",      anope_event_chgident); addCoreMessage(IRCD,m);
 	m = createMessage("FNAME",	 anope_event_chgname); addCoreMessage(IRCD,m);
 	m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
 	m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);

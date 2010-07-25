@@ -920,7 +920,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode(new ChannelModeExcept('e'));
 							continue;
 						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
+							ModeManager::AddChannelMode(new ChannelModeInvex('I'));
 							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));

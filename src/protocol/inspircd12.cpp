@@ -1022,7 +1022,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 							ModeManager::AddChannelMode(new ChannelModeExcept('e'));
 							continue;
 						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeInvite('I'));
+							ModeManager::AddChannelMode(new ChannelModeInvex('I'));
 							continue;
 						/* InspIRCd sends q and a here if they have no prefixes */
 						case 'q':
@@ -1174,9 +1174,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
 						{
 							case 'h':
 								ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
-								continue;
-							case 's':
-								ModeManager::AddUserMode(new UserMode(UMODE_STRIPCOLOR, 'S'));
 								continue;
 							case 'B':
 								ModeManager::AddUserMode(new UserMode(UMODE_BOT, 'B'));

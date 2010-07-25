@@ -854,7 +854,7 @@ void moduleAddModes()
 	/* b/e/I */
 	ModeManager::AddChannelMode(new ChannelModeBan('b'));
 	ModeManager::AddChannelMode(new ChannelModeExcept('e'));
-	ModeManager::AddChannelMode(new ChannelModeInvite('I'));
+	ModeManager::AddChannelMode(new ChannelModeInvex('I'));
 
 	/* v/h/o/a/q */
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));

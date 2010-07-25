@@ -284,14 +284,13 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 void process(const std::string &buffer)
 {
 	int retVal = 0;
-	Message *current = NULL;
-	char source[64];
-	char cmd[64];
-	char buf[512];			  /* Longest legal IRC command line */
+	char source[64] = "";
+	char cmd[64] = "";
+	char buf[1024] = ""; // XXX InspIRCd 2.0 can send messages longer than 512 characters to servers... how disappointing.
 	char *s;
 	int ac;					 /* Parameters for the command */
 	const char **av;
-	Message *m;
+	Message *m, *current = NULL;
 
 	/* zero out the buffers before we do much else */
 	*buf = '\0';

@@ -105,7 +105,7 @@ class CommandCSRegister : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}

@@ -204,7 +204,7 @@ class OSDEFCON : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommandRun(User *u, BotInfo *bi, const Anope::string &command, const ci::string &message, Command *c)
+	EventReturn OnPreCommandRun(User *u, BotInfo *bi, const Anope::string &command, const Anope::string &message, Command *c)
 	{
 		if (!c)
 		{

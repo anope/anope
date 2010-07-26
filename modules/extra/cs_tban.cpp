@@ -183,7 +183,7 @@ class TempBan : public CallBack
 	}
 };
 
-void addBan(Channel *c, time_t timeout, Anope::string &banmask)
+void addBan(Channel *c, time_t timeout, const Anope::string &banmask)
 {
 	c->SetMode(NULL, CMODE_BAN, banmask);
 

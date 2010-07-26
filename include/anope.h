@@ -265,36 +265,36 @@ namespace Anope
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 
-	extern string Version();
+	extern CoreExport string Version();
 
-	extern string Build();
+	extern CoreExport string Build();
 
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)
 	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
-	extern bool Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive = false);
+	extern CoreExport bool Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive = false);
 
 	/** Add a message to Anope
 	 * @param name The message name as sent by the IRCd
 	 * @param func A callback function that will be called when this message is received
 	 * @return The new message object
 	 */
-	extern Message *AddMessage(const string &name, int (*func)(const string &source, int ac, const char **av));
+	extern CoreExport Message *AddMessage(const string &name, int (*func)(const string &source, int ac, const char **av));
 
 	/** Deletes a message from Anope
 	 * XXX Im not sure what will happen if this function is called indirectly from message function pointed to by this message.. must check
 	 * @param m The message
 	 * @return true if the message was found and deleted, else false
 	 */
-	extern bool DelMessage(Message *m);
+	extern CoreExport bool DelMessage(Message *m);
 
 	/** Returns a list of pointers to message handlers
 	 * @param The message name as sent by the IRCd
 	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)
 	 */
-	extern std::vector<Message *> FindMessage(const string &name);
+	extern CoreExport std::vector<Message *> FindMessage(const string &name);
 }
 
 /** sepstream allows for splitting token seperated lists.

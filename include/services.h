@@ -143,7 +143,7 @@ extern "C" void __pfnBkCheck() {}
  */
 #ifdef _WIN32
 # define MODULE_INIT(x) \
-	extern "C" DllExport Module *AnopeInit(const std::string &, const std::string &); \
+	extern "C" DllExport Module *AnopeInit(const Anope::string &, const Anope::string &); \
 	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
 		return new x(modname, creator); \

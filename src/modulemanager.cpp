@@ -13,18 +13,6 @@
 
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
-void ModuleManager::LoadModuleList(std::list<std::string> &ModuleList)
-{
-	for (std::list<std::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
-		ModuleManager::LoadModule(*it, NULL);
-}
-
-void ModuleManager::LoadModuleList(std::list<ci::string> &ModuleList)
-{
-	for (std::list<ci::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
-		ModuleManager::LoadModule(*it, NULL);
-}
-
 void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
 {
 	for (std::list<Anope::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)

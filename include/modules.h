@@ -1126,16 +1126,6 @@ class CoreExport ModuleManager
 	/** Load up a list of modules.
 	 * @param module_list The list of modules to load
 	 **/
-	static void LoadModuleList(std::list<std::string> &ModList);
-
-	/** Load up a list of modules.
-	 * @param module_list The list of modules to load
-	 **/
-	static void LoadModuleList(std::list<ci::string> &ModList);
-
-	/** Load up a list of modules.
-	 * @param module_list The list of modules to load
-	 **/
 	static void LoadModuleList(std::list<Anope::string> &ModList);
 
 	/** Loads a given module.
